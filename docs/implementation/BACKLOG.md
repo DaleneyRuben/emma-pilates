@@ -474,7 +474,7 @@ wait for Google, Apple, and testers.
 | BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | ready |
 | BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | ready |
 | PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | ready |
-| PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | in progress (built: `cd03688c` storage and mark, `fcc8fabd` API, `bad49a81` Staff app, `6fc42238` Client app, `73534ba8` AW28, `caf26876` design 145–147; verified in Chromium at 1440 and 420 px and by Playwright; NOT yet on the iPhone 16 Pro, iPad, or Android emulator: the shared simulator lock stayed with BKM-011 for over 90 min. Decisions: the prefill takes the latest sale that carried Invoice Data; the mark applies to confirmed sales only and «Sin factura emitida» lists confirmed sales with data and no mark; AW28 now lists cash sales; the CSV pages through the same list; closing an Account erases the NIT or CI and name and keeps the mark. Open questions: erasing data of a sale not yet invoiced on closure; a date range for the accountant CSV; front-desk QR receipts of PAY-006 need the same card) |
+| PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | done (cd03688c storage and mark, fcc8fabd API, bad49a81 Staff app, 6fc42238 Client app, 73534ba8 AW28, caf26876 design 145–147; evidence below) |
 | BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | ready |
 | NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
@@ -638,6 +638,21 @@ income report and stays visible with its reason.
 
 Acceptance criteria: the mark can be set and undone only by the Administrator,
 both actions audited. The filter and the CSV match.
+
+Done on 2026-10-23. The card was walked without submitting, so no Payment was
+recorded. The Client app shows «Datos para la factura» on «Pago por
+transferencia» with «Con factura» and «Sin factura» («Tu compra se registra
+sin datos de factura.») for Sofía, on the iPhone 16 Pro, the iPad Pro 11-inch
+(M4), and the Android emulator. The Staff app shows the same card on
+«Confirmar pago en efectivo», reached from Sofía's overview, on the same three
+devices («La venta se registra sin datos de factura.»). Chromium at 1440 and
+420 px and the Playwright journey covered AW28 earlier. Decisions: the prefill
+takes the latest sale that carried Invoice Data; the mark applies to confirmed
+sales only and «Sin factura emitida» lists confirmed sales with data and no
+mark; AW28 lists cash sales; the CSV pages through the same list; closing an
+Account erases the NIT or CI and name and keeps the mark. Open questions:
+erasing data of a sale not yet invoiced on closure; a date range for the
+accountant CSV; front-desk QR receipts of PAY-006 need the same card.
 
 #### BKO-003 · Daily cash close
 

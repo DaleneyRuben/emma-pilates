@@ -1703,7 +1703,10 @@ it to the Purchase Intent; the thumbnail appears as **Comprobante adjunto** and
 **Enviar comprobante** becomes available.
 
 Under the receipt, **Datos para la factura** (PAY-007, follow-up 145) offers
-**Con factura** and **Sin factura**. Sofía has never given invoice data, so
+**Con factura** and **Sin factura**. Walked on 2026-10-23 on the iPhone 16 Pro,
+the iPad Pro 11-inch (M4), and the Android emulator: the card renders with both
+choices and the walk stopped before **Enviar comprobante**, so no Payment was
+recorded. Sofía has never given invoice data, so
 **Sin factura** is chosen with "Tu compra se registra sin datos de factura."
 Tap **Con factura**: **NIT o CI** and **Nombre o razón social** appear and
 **Enviar comprobante** waits until both are filled (a NIT or CI takes digits,
@@ -1875,7 +1878,9 @@ crossed out). Tap one: **Confirmar pago en efectivo** breaks down **Precio del
 plan**, **Crédito aplicado**, and **Monto a cobrar en efectivo**; when you are
 assigned to several Branches a chip row asks where you received the cash.
 Between the breakdown and the note, **Datos para la factura** (PAY-007,
-follow-up 146) works as in the Client app: **Sin factura** ("La venta se
+follow-up 146) works as in the Client app. Walked on 2026-10-23 on the iPhone
+16 Pro, the iPad Pro 11-inch (M4), and the Android emulator, reached from
+Sofía's overview, and stopped before **Confirmar pago recibido**. **Sin factura** ("La venta se
 registra sin datos de factura.") for a Client without earlier invoice data,
 **Con factura** with her last NIT or CI and name ("Datos de su última compra.
 Confírmalos con la clienta.") otherwise, and **Confirmar pago recibido** waits
