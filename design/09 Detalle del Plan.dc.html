@@ -33,7 +33,7 @@
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:13px;font-weight:500;">Con crédito aplicado</div>
+          <div style="font-size:13px;font-weight:500;">Con crédito aplicado · plan con tope semanal</div>
           <div style="font-size:12px;color:#766D69;">Desglose de tres líneas</div>
         </div>
       </sc-if>
@@ -43,16 +43,16 @@
             <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
             </button>
-            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Paquete de 8 clases</span>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Bimestral 16 clases</span>
           </div>
 
           <div style="padding:26px 20px 28px;display:flex;flex-direction:column;gap:26px;">
 
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Paquete de 8 clases</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Bimestral 16 clases</div>
               <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(216,189,184,0.28);color:#8A5D59;font-size:12px;font-weight:500;">8 clases</span>
-                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(216,201,187,0.3);color:#6E6663;font-size:12px;font-weight:500;">Válido por 1 mes</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(216,189,184,0.28);color:#8A5D59;font-size:12px;font-weight:500;">16 clases</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(216,201,187,0.3);color:#6E6663;font-size:12px;font-weight:500;">Válido por 60 días</span>
               </div>
             </div>
 
@@ -61,11 +61,15 @@
               <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.55;color:#6E6663;">
                 <span style="display:flex;align-items:flex-start;gap:10px;">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;"><polyline points="4.5,12.5 9.5,17.5 19.5,7"></polyline></svg>
-                  8 clases en cualquier sucursal del estudio.
+                  16 clases en cualquier sucursal del estudio.
                 </span>
                 <span style="display:flex;align-items:flex-start;gap:10px;">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;"><polyline points="4.5,12.5 9.5,17.5 19.5,7"></polyline></svg>
-                  Un mes de vigencia desde que se confirma tu pago.
+                  60 días de vigencia desde que se confirma tu pago.
+                </span>
+                <span style="display:flex;align-items:flex-start;gap:10px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;"><polyline points="4.5,12.5 9.5,17.5 19.5,7"></polyline></svg>
+                  Hasta 3 clases por semana.
                 </span>
                 <span style="display:flex;align-items:flex-start;gap:10px;">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;"><polyline points="4.5,12.5 9.5,17.5 19.5,7"></polyline></svg>
@@ -77,7 +81,7 @@
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:15px;">
                 <span style="color:#6E6663;">Precio del plan</span>
-                <span style="font-variant-numeric:tabular-nums;">Bs 560</span>
+                <span style="font-variant-numeric:tabular-nums;">Bs 1.120</span>
               </div>
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:15px;color:#5F7457;">
                 <span>Crédito aplicado</span>
@@ -133,16 +137,16 @@
             <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
             </button>
-            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Paquete de 8 clases</span>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">8 clases</span>
           </div>
 
           <div style="padding:26px 20px 28px;display:flex;flex-direction:column;gap:26px;">
 
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Paquete de 8 clases</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">8 clases</div>
               <div style="display:flex;flex-wrap:wrap;gap:8px;">
                 <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(216,189,184,0.28);color:#8A5D59;font-size:12px;font-weight:500;">8 clases</span>
-                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(216,201,187,0.3);color:#6E6663;font-size:12px;font-weight:500;">Válido por 1 mes</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(216,201,187,0.3);color:#6E6663;font-size:12px;font-weight:500;">Válido por 30 días</span>
               </div>
             </div>
 
@@ -155,7 +159,7 @@
                 </span>
                 <span style="display:flex;align-items:flex-start;gap:10px;">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;"><polyline points="4.5,12.5 9.5,17.5 19.5,7"></polyline></svg>
-                  Un mes de vigencia desde que se confirma tu pago.
+                  30 días de vigencia desde que se confirma tu pago.
                 </span>
                 <span style="display:flex;align-items:flex-start;gap:10px;">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;"><polyline points="4.5,12.5 9.5,17.5 19.5,7"></polyline></svg>
@@ -167,12 +171,12 @@
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:15px;">
                 <span style="color:#6E6663;">Precio del plan</span>
-                <span style="font-variant-numeric:tabular-nums;">Bs 560</span>
+                <span style="font-variant-numeric:tabular-nums;">Bs 590</span>
               </div>
               <div style="height:1px;background:#D8C9BB;"></div>
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
                 <span style="font-size:15px;font-weight:500;">Total a pagar</span>
-                <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 560</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 590</span>
               </div>
             </div>
 
@@ -230,7 +234,7 @@ class Component extends DCLogic {
     return {
       showCaptions: this.props.showCaptions ?? true,
       credit,
-      total: Math.max(0, 560 - credit)
+      total: Math.max(0, 1120 - credit).toLocaleString("es-BO")
     };
   }
 }
