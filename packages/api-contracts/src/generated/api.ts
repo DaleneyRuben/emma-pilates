@@ -105,6 +105,7 @@ import type {
   ExpenseInputDto,
   ExpenseReportDto,
   FinalizedUploadDto,
+  FounderMembershipPageDto,
   GetAdminPromotionImageParams,
   GetCurrentClientPhotoParams,
   GetExpenseReportParams,
@@ -12666,6 +12667,190 @@ export function useListAdminCredits<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getListAdminCreditsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listFounderMembershipsResponse200 = {
+  data: FounderMembershipPageDto;
+  status: 200;
+};
+
+export type listFounderMembershipsResponseSuccess =
+  listFounderMembershipsResponse200 & {
+    headers: Headers;
+  };
+export type listFounderMembershipsResponse =
+  listFounderMembershipsResponseSuccess;
+
+export const getListFounderMembershipsUrl = () => {
+  return `/api/v1/administrator/founder-memberships`;
+};
+
+export const listFounderMemberships = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listFounderMembershipsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListFounderMembershipsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listFounderMembershipsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listFounderMembershipsResponse;
+};
+
+export const getListFounderMembershipsQueryKey = () => {
+  return [`/api/v1/administrator/founder-memberships`] as const;
+};
+
+export const getListFounderMembershipsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listFounderMemberships>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listFounderMemberships>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListFounderMembershipsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listFounderMemberships>>
+  > = ({ signal }) =>
+    listFounderMemberships({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listFounderMemberships>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListFounderMembershipsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listFounderMemberships>>
+>;
+export type ListFounderMembershipsQueryError = unknown;
+
+export function useListFounderMemberships<
+  TData = Awaited<ReturnType<typeof listFounderMemberships>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listFounderMemberships>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listFounderMemberships>>,
+          TError,
+          Awaited<ReturnType<typeof listFounderMemberships>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListFounderMemberships<
+  TData = Awaited<ReturnType<typeof listFounderMemberships>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listFounderMemberships>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listFounderMemberships>>,
+          TError,
+          Awaited<ReturnType<typeof listFounderMemberships>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListFounderMemberships<
+  TData = Awaited<ReturnType<typeof listFounderMemberships>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listFounderMemberships>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListFounderMemberships<
+  TData = Awaited<ReturnType<typeof listFounderMemberships>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listFounderMemberships>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListFounderMembershipsQueryOptions(options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

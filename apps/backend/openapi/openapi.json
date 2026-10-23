@@ -3343,6 +3343,33 @@
         ]
       }
     },
+    "/api/v1/administrator/founder-memberships": {
+      "get": {
+        "operationId": "listFounderMemberships",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FounderMembershipPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorOversight"
+        ]
+      }
+    },
     "/api/v1/administrator/reports/income": {
       "get": {
         "operationId": "getIncomeReport",
@@ -8082,6 +8109,11 @@
                 "$ref": "#/components/schemas/ClientSubscriptionSummaryDto"
               }
             ]
+          },
+          "founderRenewalDeadline": {
+            "type": "object",
+            "format": "date",
+            "description": "A founder renews before this date. Absent when she is not a founder or has no current Subscription."
           }
         },
         "required": [
@@ -8133,6 +8165,11 @@
             "type": "number",
             "minimum": 0,
             "description": "Money Amount in BOB centavos"
+          },
+          "listPriceCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it."
           }
         },
         "required": [
@@ -9404,6 +9441,63 @@
           "outstandingCentavos"
         ]
       },
+      "FounderMembershipDto": {
+        "type": "object",
+        "properties": {
+          "membershipId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 40
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "since": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "lost"
+            ]
+          }
+        },
+        "required": [
+          "membershipId",
+          "number",
+          "clientName",
+          "since",
+          "status"
+        ]
+      },
+      "FounderMembershipPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FounderMembershipDto"
+            }
+          },
+          "granted": {
+            "type": "number"
+          },
+          "places": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "granted",
+          "places"
+        ]
+      },
       "IncomeByMethodDto": {
         "type": "object",
         "properties": {
@@ -9440,6 +9534,38 @@
           "totalCentavos"
         ]
       },
+      "IncomeSaleDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "planPriceCentavos": {
+            "type": "number",
+            "description": "List price, BOB centavos"
+          },
+          "discountCentavos": {
+            "type": "number",
+            "description": "Discount stored on the Payment, BOB centavos"
+          },
+          "discountReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "description": "Amount paid, BOB centavos"
+          }
+        },
+        "required": [
+          "paymentId",
+          "planPriceCentavos",
+          "discountCentavos",
+          "discountReason",
+          "amountDueCentavos"
+        ]
+      },
       "IncomeReportDto": {
         "type": "object",
         "properties": {
@@ -9460,6 +9586,14 @@
             "type": "number",
             "description": "Confirmed Payments, BOB centavos"
           },
+          "listPriceCentavos": {
+            "type": "number",
+            "description": "List price of the confirmed sales, BOB centavos"
+          },
+          "discountCentavos": {
+            "type": "number",
+            "description": "Discounts on the confirmed sales, BOB centavos"
+          },
           "byMethod": {
             "$ref": "#/components/schemas/IncomeByMethodDto"
           },
@@ -9467,6 +9601,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/IncomeMonthDto"
+            }
+          },
+          "sales": {
+            "description": "Sales that carry a discount, with list price and amount paid",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IncomeSaleDto"
             }
           },
           "generatedAt": {
@@ -9479,8 +9620,11 @@
           "until",
           "branchId",
           "totalCentavos",
+          "listPriceCentavos",
+          "discountCentavos",
           "byMethod",
           "months",
+          "sales",
           "generatedAt"
         ]
       },
@@ -10388,6 +10532,11 @@
             "type": "number",
             "minimum": 0,
             "description": "Money Amount in BOB centavos"
+          },
+          "listPriceCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it."
           },
           "creditAppliedCentavos": {
             "type": "number",
