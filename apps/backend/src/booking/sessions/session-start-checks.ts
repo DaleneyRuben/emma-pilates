@@ -72,3 +72,33 @@ export const waitlistSessionCancelledNotice = (facts: {
   destination: { type: 'session', id: facts.sessionId },
   occurredAt: facts.occurredAt,
 });
+
+type Alternative = { classTypeName: string; startsAt: Date };
+
+const notImplemented = (...input: unknown[]): never => {
+  throw new Error(`not implemented (${input.length})`);
+};
+
+export const isMinimumBookingsCheckDue = (
+  session: { startsAt: Date },
+  now: Date,
+  leadMinutes: number,
+): boolean => notImplemented(session, now, leadMinutes);
+
+export const minimumNotMetTrainerNotice = (facts: {
+  accountId: string;
+  sessionId: string;
+  classTypeName: string;
+  startsAt: Date;
+  minimumBookings: number;
+  occurredAt: Date;
+}): NewNotification => notImplemented(facts);
+
+export const minimumNotMetClientNotice = (facts: {
+  accountId: string;
+  sessionId: string;
+  classTypeName: string;
+  startsAt: Date;
+  occurredAt: Date;
+  alternatives: Alternative[];
+}): NewNotification => notImplemented(facts);

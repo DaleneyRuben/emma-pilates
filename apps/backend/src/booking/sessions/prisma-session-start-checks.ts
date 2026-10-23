@@ -177,5 +177,18 @@ export const createPrismaSessionStartChecks = (
     return { closed: count };
   };
 
-  return { checkEmptySessions, closeStartedWaitlists };
+  const checkMinimumBookings = (): Promise<{
+    checked: number;
+    cancelled: number;
+  }> => Promise.reject(new Error('not implemented'));
+
+  const recordWindowCloseBookings = (): Promise<{ recorded: number }> =>
+    Promise.reject(new Error('not implemented'));
+
+  return {
+    checkEmptySessions,
+    checkMinimumBookings,
+    recordWindowCloseBookings,
+    closeStartedWaitlists,
+  };
 };

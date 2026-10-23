@@ -172,11 +172,14 @@ describe('Prisma schedule administration', () => {
     expect(ended).toMatchObject({ cancelledSessions: 1, keptSessions: 0 });
   });
 
-  it('edits one Session as an exception: moves it, clears the minimum check, swaps the Trainer, and notifies', async () => {
+  it('edits one Session as an exception: moves it, clears the minimum check and the window snapshot, swaps the Trainer, and notifies', async () => {
     const [, , , booked] = await sessionsOf(firstScheduleId);
     await world.prisma.session.update({
       where: { id: booked.id },
-      data: { minimumBookingsCheckCompletedAt: fixtureNow },
+      data: {
+        minimumBookingsCheckCompletedAt: fixtureNow,
+        bookingsAtWindowClose: 1,
+      },
     });
 
     const moved = await schedules().updateSession(
@@ -198,6 +201,7 @@ describe('Prisma schedule administration', () => {
       where: { id: booked.id },
     });
     expect(stored.minimumBookingsCheckCompletedAt).toBeNull();
+    expect(stored.bookingsAtWindowClose).toBeNull();
     expect(stored.occurrenceStartsAt).toEqual(bolivia('2026-10-14', '12:00'));
     const notices = await world.prisma.notification.findMany({
       where: { businessEventKey: { contains: booked.id } },

@@ -89,8 +89,11 @@ type WorkerDependencies = {
   evaluationReminders: {
     execute(): Promise<{ sent: number }>;
   };
-  emptySessionChecks: {
+  minimumBookingsChecks: {
     execute(): Promise<{ checked: number; cancelled: number }>;
+  };
+  windowCloseSnapshots: {
+    execute(): Promise<{ recorded: number }>;
   };
   startedSessionWaitlists: {
     execute(): Promise<{ closed: number }>;
@@ -214,8 +217,8 @@ export const startWorker = async (
         intervalMs: sessionStartCheckIntervalMs,
         steps: [
           {
-            job: 'empty_session_check',
-            execute: () => dependencies.emptySessionChecks.execute(),
+            job: 'minimum_bookings_check',
+            execute: () => dependencies.minimumBookingsChecks.execute(),
           },
           {
             job: 'started_waitlist_closure',
