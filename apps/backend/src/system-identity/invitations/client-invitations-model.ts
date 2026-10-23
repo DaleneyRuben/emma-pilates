@@ -1,4 +1,7 @@
-import type { DeclaredAcquisitionChannel } from '../../booking/acquisition/acquisition';
+import type {
+  AcquisitionChannel,
+  DeclaredAcquisitionChannel,
+} from '../../booking/acquisition/acquisition';
 import type { AuthenticationEmailJob } from '../../jobs/authentication-email/authentication-email-job';
 import type { EncryptedAuthenticationLink } from '../security/authentication-link-cipher';
 import type { IssuedAuthenticationToken } from '../security/authentication-token-service';
@@ -112,6 +115,9 @@ export interface ClientInvitationTransaction {
     email: string;
     phone: string | null;
     referralCode: string;
+    /** BKM-011: how she found the studio, and the code that brought her. */
+    acquisitionChannel: AcquisitionChannel;
+    referredByCode: string | null;
     pendingExpiresAt: Date;
     activationToken: StoredAuthenticationToken;
   }) => Promise<void>;

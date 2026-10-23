@@ -158,12 +158,20 @@ describe('Client acquisition at self-registration (PostgreSQL)', () => {
     const trainer = await prisma.staffMember.create({
       data: { name: 'Rosa Entrenadora', role: 'TRAINER', referralCode: code },
     });
+    const desk = await prisma.staffMember.create({
+      data: {
+        name: 'Recepción',
+        role: 'ASSISTANT',
+        account: { create: { email: email(), activatedAt: new Date() } },
+      },
+      select: { id: true, account: { select: { id: true } } },
+    });
     const assistant: AuthenticatedPrincipal = {
-      accountId: randomUUID(),
+      accountId: desk.account!.id,
       authenticationSessionId: 'session',
       identity: {
         kind: 'staff',
-        staffMemberId: randomUUID(),
+        staffMemberId: desk.id,
         role: 'assistant',
         branchIds: [],
       },
