@@ -42,7 +42,6 @@ describe("admin shell", () => {
         "Reporte",
         "Promociones",
         "Referidos",
-        "Créditos",
       ]);
       expect(within(sidebar).getByText("Catálogo")).toBeInTheDocument();
       expect(within(sidebar).getByText("Back Office")).toBeInTheDocument();
