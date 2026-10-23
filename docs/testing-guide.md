@@ -7,8 +7,8 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
-| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment with the invoice data, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
@@ -981,7 +981,8 @@ same key again returns the same result instead of a duplicate.
 | 3    | `GET /api/v1/purchase-intents/current`                | The same open Intent; `404 purchase_intent_not_found` once it is submitted or expired    |
 | 4    | `POST /api/v1/uploads` + `PUT …/object` + `…/finalize`| A `TRANSFER_RECEIPT` image asset that the worker leaves `READY` (Test 32 has the upload steps) |
 | 5    | `POST /api/v1/purchase-intents/{id}/receipt`          | `receiptAttached: true`; another asset replaces the first one                            |
-| 6    | `POST /api/v1/purchase-intents/{id}/submit`           | `201` pending transfer Payment; the Administrator inbox gets "Comprobante por revisar"  |
+| 6    | `POST /api/v1/purchase-intents/{id}/submit` `{ "invoiceData": { "taxId", "name" } }` | `201` pending transfer Payment; the Administrator inbox gets "Comprobante por revisar". The body is optional: none, `{}`, or `"invoiceData": null` is «Sin factura» (PAY-007); half the data or a NIT/CI with symbols is `400 invalid_request` |
+| 6b   | `GET /api/v1/clients/current/invoice-data`            | `{ "invoiceData": … }`: the NIT or CI and name of your latest sale that had any, or `null` |
 | 7    | `GET /api/v1/payments/current`                        | Your latest Payment with `state`, amounts, and `rejectionReason` once decided            |
 | 8    | `GET /api/v1/clients/current/credit`                  | `availableCentavos`, `reservedCentavos` (held while a transfer is under review), activity |
 | 9    | `GET /api/v1/clients/current/referrals`               | Your referral code and referred Clients as "Nombre A."                                  |
@@ -1007,6 +1008,9 @@ authorize that credential:
 | `POST …/payments/{paymentId}/confirm`                 | `state: confirmed`, a new Subscription starting today, the Client notified             |
 | `POST …/payments/{paymentId}/reject` `{ "reason" }`   | `state: rejected` with the trimmed reason; the Client's Credit is released             |
 | `POST /api/v1/administrator/sessions/{id}/cancel`     | `{ affectedBookings }`: every Booking refunded, waitlist closed, Clients + Trainer told |
+| `POST …/payments/{paymentId}/invoice-issued`           | PAY-007: «Factura emitida» with `issuedAt` and `issuedByName`; a repeat changes nothing; a pending or rejected Payment answers `409 payment_not_confirmed`, an Assistant `403 administration_access_denied` |
+| `DELETE …/payments/{paymentId}/invoice-issued`         | The mark undone (`invoiceIssued: null`); both write an audit record (`payment.invoice_issued_marked` / `…_unmarked`) |
+| `GET /api/v1/administrator/payments?invoice=unissued`  | Only confirmed sales with Invoice Data not marked yet; every row now carries `method`, `invoiceData`, and `invoiceIssued` |
 
 Repeating the same decision returns the same result; the opposite decision
 answers `409 payment_confirmation_conflict`. A Session without Bookings answers
@@ -1026,7 +1030,8 @@ endpoints; Trainers and Clients get `403`.
 | `GET …/clients/{clientId}/bookings`                        | Upcoming Bookings and Waitlist Entries with `branchId` and `actionable` (true only at your Branches)     |
 | `GET …/clients/{clientId}/class-history`                   | Attended classes, newest first                                                                           |
 | `GET …/clients/{clientId}/plan-quotes`                     | Every Plan with `creditAppliedCentavos` and the cash `amountDueCentavos` for this Client                 |
-| `POST …/clients/{clientId}/cash-payments` `{ planId, branchId }` | `201` with the confirmed cash Payment and the new Subscription; needs an `idempotency-key` UUID     |
+| `POST …/clients/{clientId}/cash-payments` `{ planId, branchId, invoiceData? }` | `201` with the confirmed cash Payment and the new Subscription; needs an `idempotency-key` UUID; `invoiceData` (`{ taxId, name }` or `null` for «Sin factura») is PAY-007 |
+| `GET …/clients/{clientId}/invoice-data` | PAY-007: `{ invoiceData }`, the NIT or CI and name of her latest sale that had any, or `null`; Trainers and Clients get `403` |
 | `POST /api/v1/assistant/client-invitations` `{ name, email, phone? }` | `201 invited` with the new `clientId`; the worker queues the 7-day activation email           |
 | `GET /api/v1/assistant/client-invitations/{clientId}`      | The pending invitation with `pendingExpiresAt` (30 days), `activationExpiresAt`, and `cancellable`; a Client who registered herself answers `404 client_verification_pending` |
 | `POST …/client-invitations/{clientId}/email-corrections` `{ email }` | New email, old links invalidated, fresh link sent                                              |
@@ -1695,7 +1700,18 @@ either platform (MOB-065; the Simulator ships with sample photos). Picking one r
 a JPEG of at most 2048 px on its longest side (UPL-003, Test 53), uploads it
 through `/api/v1/uploads` (hash, PUT, finalize, wait until `READY`) and attaches
 it to the Purchase Intent; the thumbnail appears as **Comprobante adjunto** and
-**Enviar comprobante** becomes available. Tap it.
+**Enviar comprobante** becomes available.
+
+Under the receipt, **Datos para la factura** (PAY-007, follow-up 145) offers
+**Con factura** and **Sin factura**. Sofía has never given invoice data, so
+**Sin factura** is chosen with "Tu compra se registra sin datos de factura."
+Tap **Con factura**: **NIT o CI** and **Nombre o razón social** appear and
+**Enviar comprobante** waits until both are filled (a NIT or CI takes digits,
+letters, and hyphens; "45/67" shows "Usa solo números, letras y guiones.").
+Type `4567891` and `Sofía Guzmán` and tap **Enviar comprobante**. Her next
+purchase opens on **Con factura** with those values and "Usamos los datos de
+tu última compra. Puedes cambiarlos." (Test 27 shows them to the
+Administrator).
 
 **Estado del pago** reads "Tu pago está en revisión" with "Un administrador va
 a confirmar tu comprobante pronto. Te avisaremos apenas esté listo." and a
@@ -1858,6 +1874,12 @@ and the four Plans with the cash amount after Credit (the original price
 crossed out). Tap one: **Confirmar pago en efectivo** breaks down **Precio del
 plan**, **Crédito aplicado**, and **Monto a cobrar en efectivo**; when you are
 assigned to several Branches a chip row asks where you received the cash.
+Between the breakdown and the note, **Datos para la factura** (PAY-007,
+follow-up 146) works as in the Client app: **Sin factura** ("La venta se
+registra sin datos de factura.") for a Client without earlier invoice data,
+**Con factura** with her last NIT or CI and name ("Datos de su última compra.
+Confírmalos con la clienta.") otherwise, and **Confirmar pago recibido** waits
+for both fields once **Con factura** is chosen.
 **Confirmar pago recibido** activates the Plan at once and shows
 "¡Pago registrado!" with the Plan, its classes, and "Válido hasta el …";
 **Volver al cliente** returns to the overview, now **Activa**, and **Volver**
@@ -2823,7 +2845,8 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
 
 1. **The badge.** The sidebar shows the number of transfers waiting next to
    **Pagos** on every page; with nothing waiting it shows no number.
-2. **Pagos.** Back Office → **Pagos** lists the studio's transfer Payments,
+2. **Pagos.** Back Office → **Pagos** lists the studio's transfers and, since
+   PAY-007, its cash sales,
    not only one Branch's (the Branch selector says this page is not filtered
    by Branch). There is no **+ Nuevo** button: Clients raise Payments from the
    app. The subtitle reads "Todo el estudio · 1 transferencia esperando
@@ -2836,9 +2859,9 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    transferred as `Bs 560,00` on the right (with "con Bs 60,00 de crédito"
    under it when Credit paid part), the date and time sent in Bolivia time
    (`23/09/2026 · 22:51`), and **Pendiente**, **Confirmado**, or **Rechazado**.
-   Cash and Credit-only Payments never appear: they are confirmed when they are
-   recorded. **Buscar por cliente** finds a name without accents or capitals
-   ("mariana").
+   A **Método** column says **Transferencia** or **Efectivo**; Credit-only
+   Payments never appear. **Buscar por cliente** finds a name without accents
+   or capitals ("mariana").
 3. **Only pending rows open.** A **Confirmado** or **Rechazado** row does
    nothing; the row is the whole record.
 4. **Revisar pago.** Click a pending Client: the side panel (the whole screen
@@ -2862,9 +2885,24 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    panel says "Otra persona ya decidió este pago." with the new state (and the
    reason of a rejection) and offers no buttons.
 
+8. **Factura** (PAY-007, follow-up 147). Choose **Estado: Todos**. The
+   **Factura** column shows the NIT or CI with the name under it, or "Sin
+   factura" (Valeria's fixture cash sale). On a **Confirmado** row,
+   **Marcar emitida** turns into the **Emitida** pill with "por Paola Mendoza ·
+   dd/mm/aaaa" and **Deshacer**, which brings the button back; pending and
+   rejected rows show only the data. The **Factura** filter's **Sin factura
+   emitida** (`?invoice=unissued`) lists only the confirmed sales with invoice
+   data not marked yet, or "No hay facturas pendientes." when there are none.
+9. **Exportar CSV** downloads `pagos-aaaa-mm-dd.csv` with every row the
+   filters match, every page, not only the one on screen: «Fecha», «Cliente»,
+   «Plan», «Método», «Monto (Bs)», «Estado», «NIT o CI», «Nombre o razón
+   social», «Factura emitida», «Emitida por», «Emitida el». Open it in a
+   spreadsheet and compare it with the filtered table.
+
 Payments, their Subscriptions, and the Credit ledger are append-only money
 history, so the Payments you make here stay in `pilates_dev_sim`; the fixtures
-command does not remove them.
+command does not remove them. Closing a Client's Account (Test 35) erases the
+NIT or CI and name from her sales and keeps the **Emitida** mark.
 
 ## Test 28: run the Back Office in the admin web
 
@@ -3335,6 +3373,9 @@ The following are not ready for manual product testing:
 - iOS store builds and TestFlight (gate 9), and the Play closed test and
   production release (REL-003 to REL-007);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
+- an invoice itself: the studio issues invoices outside the system (no SIAT,
+  booking ADR-0012), so the apps only keep the NIT or CI, the name, and the
+  «Factura emitida» mark (PAY-007);
 - the admin web's «No tienes permiso…» refusal copies, an email change for
   an Account that is not active (`account_not_active`), and a registration
   that refers to itself (`referral_self_reference`): each needs a state the
