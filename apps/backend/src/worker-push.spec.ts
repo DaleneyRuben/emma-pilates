@@ -47,6 +47,7 @@ const startWithPush = async () => {
     startedSessionWaitlists: idle({ closed: 0 }),
     pushDispatch: { dispatch },
     pushReceipts,
+    studioFacts: idle({ sessions: 0, clientMonths: 0 }),
     retentionSweeps: idle({
       idempotencyRecords: 0,
       authenticationSessions: 0,

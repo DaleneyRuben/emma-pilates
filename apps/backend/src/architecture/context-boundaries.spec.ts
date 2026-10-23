@@ -9,6 +9,7 @@ const contexts = [
   'back-office',
   'booking',
   'notifications',
+  'studio',
   'system-identity',
   'uploads',
 ];
@@ -16,6 +17,9 @@ const allowedContextEdges: Record<string, string[]> = {
   // Back Office reads Branches and Staff Members through its own read-only
   // queries (ADR-0011) and imports no other context.
   'back-office': [],
+  // Studio Management reads Booking through its own queries and imports no
+  // other context (ADR-0011).
+  studio: [],
   // Booking records notifications and streams receipt objects through the
   // uploads storage port.
   booking: ['notifications', 'uploads'],

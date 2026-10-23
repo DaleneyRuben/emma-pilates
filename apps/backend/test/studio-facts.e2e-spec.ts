@@ -5,6 +5,7 @@ import { jest } from '@jest/globals';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { configureApplication } from '../src/http/configure-application';
+import { requireStudioAdministrator } from '../src/studio/studio-errors';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
@@ -58,7 +59,18 @@ describe('studio facts endpoint (e2e)', () => {
       controllers: studioControllers,
       providers: [
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
-        { provide: studioOperations, useValue: { recompute } },
+        {
+          provide: studioOperations,
+          useValue: {
+            recompute: (
+              input: { month: string },
+              actor: AuthenticatedPrincipal,
+            ) => {
+              requireStudioAdministrator(actor);
+              return recompute(input, actor);
+            },
+          },
+        },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
@@ -69,6 +81,7 @@ describe('studio facts endpoint (e2e)', () => {
 
   afterEach(async () => {
     await app.close();
+    jest.clearAllMocks();
   });
 
   it('lets an Administrator recompute a month', async () => {
