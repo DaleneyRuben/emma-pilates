@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-nati
 import { clearMobileQueryCache, createMemoryPushPlatform } from "@pilates/mobile-core";
 
 import App from "../../App";
-import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
+import { createClientRuntime, jsonResponse, routeFetcher, studioRules } from "../test-support";
 import { boliviaCivilDate, civilDateRange } from "@pilates/mobile-core";
 
 jest.setTimeout(20_000);
@@ -144,6 +144,26 @@ describe("Client Session detail", () => {
     });
     expect(booked).toHaveBeenCalledWith(expect.stringMatching(/^[0-9a-f-]{36}$/));
     expect(screen.getByText("Te quedan 4 clases en tu plan")).toBeOnTheScreen();
+  });
+
+  // MOB-070: joining inside the Cancellation Window is refused, so the
+  // detail must not offer it. The window length comes from the studio rules.
+  it("does not offer the Waitlist inside the Cancellation Window", async () => {
+    const { screen } = await openDetail(
+      {
+        "/api/v1/studio-rules": () =>
+          jsonResponse({ ...studioRules, cancellationWindowMinutes: 90 }),
+      },
+      5,
+      0,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Unirme a la lista de espera" }),
+    ).not.toBeOnTheScreen();
+    expect(
+      screen.getByText("Falta poco para la clase, así que la lista de espera ya cerró."),
+    ).toBeOnTheScreen();
   });
 
   it("offers the Waitlist when the Session is full", async () => {
