@@ -18,7 +18,9 @@ import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { StatusPill } from "../../components/ui/status-pill";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
+import { useState } from "react";
 import { CloseClientAccountAction } from "./close-client-account-action";
+import { CourtesyAccessAction } from "./courtesy-access-action";
 
 const clientDetailQueryOptions = (clientId: string) =>
   queryOptions({
@@ -138,6 +140,8 @@ export function ClientDetailPanel({
   onClosed: (notice: string) => void;
 }) {
   const query = useQuery(clientDetailQueryOptions(clientId));
+  const [granted, setGranted] = useState<string | null>(null);
+  const client = query.data;
 
   return (
     <>
@@ -161,10 +165,20 @@ export function ClientDetailPanel({
         )}
       </SidePanelBody>
       {/* AW22: a deactivated account has nothing left to close. */}
-      {query.data === undefined ||
-      query.data.accountStatus === "disabled" ? null : (
+      {client === undefined || client.accountStatus === "disabled" ? null : (
         <SidePanelFooter>
-          <CloseClientAccountAction client={query.data} onClosed={onClosed} />
+          {granted === null ? null : (
+            <p role="status" className="text-nota text-exito-texto">
+              {granted}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-2">
+            {/* REL-011: only while she has no active Plan (follow-up 160). */}
+            {client.subscription.status === "active" ? null : (
+              <CourtesyAccessAction client={client} onGranted={setGranted} />
+            )}
+            <CloseClientAccountAction client={client} onClosed={onClosed} />
+          </div>
         </SidePanelFooter>
       )}
     </>

@@ -217,6 +217,6 @@ describe("AW22 Acceso de prueba (REL-011)", () => {
       "No pudimos dar el acceso. Inténtalo de nuevo.",
     );
     expect(grants).toHaveLength(2);
-    expect(grants[1].key).toBe(grants[0].key);
+    expect(grants[1]?.key).toBe(grants[0]?.key);
   });
 });
