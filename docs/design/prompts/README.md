@@ -229,6 +229,9 @@ Each of these was sent as the next message in the existing design session for th
 | [177](./followups/177-plan-end-reads-vence-el.md) | `02`'s plan card and `12`'s dates block name the end «Vence el …» instead of «Pagado hasta» (BKM-005, booking ADR-0005) | ✅ applied (Claude Design canvas, 2026-10-23, `20a8da54`; the canvas could not be deleted from the agent session, see BKM-005 notes; the apps are built in BKM-005) |
 | [178](./followups/178-plans-by-days-assistant.md) | `S09`'s cards in days with the cap, `S10`'s plan card terms in days and its success line «Vence el …» (BKM-005) | ✅ applied (Claude Design canvas, 2026-10-23, `20a8da54`; the canvas could not be deleted from the agent session, see BKM-005 notes; the apps are built in BKM-005) |
 | [179](./followups/179-plans-by-days-corrections.md) | Record of how 175 and 178 were applied: `AW05` draws «Vigencia» and «Tope semanal» as segmented buttons (the admin web keeps selects), `S09` draws four of the eight Plans (BKM-005) | ✅ applied (same canvas and commit `20a8da54`) |
+| [193](./followups/193-mi-plan-extra-classes.md) | `12` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008, booking ADR-0006) | 🕓 pending (190–192 reserved by BKM-006) |
+| [194](./followups/194-client-summary-extra-classes.md) | `S06` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008) | 🕓 pending (190–192 reserved by BKM-006) |
+| [195](./followups/195-admin-client-detail-extra-classes.md) | `AW22` shows «Clases extra: 1 · Regalo de bienvenida» under «Clases disponibles» when the API returns the line; no courtesy form (BKM-008, PAY-006) | 🕓 pending (190–192 reserved by BKM-006) |
 
 ## Status
 
