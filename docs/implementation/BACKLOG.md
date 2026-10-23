@@ -860,9 +860,12 @@ the push catalog; integration `class-reminders` (restart inside the day
 window sends one, the hour reminder once, a cancelled Booking none, a late
 Booking no day reminder) and `notifications` (Valeria once, Isabel the day
 after her exact date, second run 0) on disposable `pilates_test_not003_*`
-databases. One end-to-end run of the job against `pilates_not003_dev` is
-recorded below once it has been read back. **Not verified:** a device walk
-and a real push (not required; the existing dispatch transport is unchanged).
+databases. End to end on `pilates_not003_dev` (dropped afterwards): booked
+Lucía into a Session starting in 2 hours through the API on port 3134, ran
+the job, and `GET /api/v1/notifications` returned one unread
+`class_reminder_hour` («Tu clase de Reformer Pilates empieza en 2 horas.»);
+a second run sent 0. **Not verified:** a device walk and a real push (not
+required; the existing dispatch transport is unchanged).
 **Open for owner approval:** the Spanish texts above, and that no migration
 was added. No design follow-up.
 
