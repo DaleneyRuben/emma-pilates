@@ -21724,6 +21724,115 @@ export const useBookEvaluation = <TError = unknown, TContext = unknown>(
   return useMutation(getBookEvaluationMutationOptions(options), queryClient);
 };
 
+export type bookPaidEvaluationResponse201 = {
+  data: ClientEvaluationDto;
+  status: 201;
+};
+
+export type bookPaidEvaluationResponseSuccess =
+  bookPaidEvaluationResponse201 & {
+    headers: Headers;
+  };
+export type bookPaidEvaluationResponse = bookPaidEvaluationResponseSuccess;
+
+export const getBookPaidEvaluationUrl = (slotId: string) => {
+  return `/api/v1/evaluation-slots/${slotId}/evaluation-payments`;
+};
+
+export const bookPaidEvaluation = async (
+  slotId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<bookPaidEvaluationResponse> => {
+  const res = await (fetchFn ?? fetch)(getBookPaidEvaluationUrl(slotId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: bookPaidEvaluationResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as bookPaidEvaluationResponse;
+};
+
+export const getBookPaidEvaluationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof bookPaidEvaluation>>,
+    TError,
+    BookPaidEvaluationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof bookPaidEvaluation>>,
+  TError,
+  BookPaidEvaluationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["bookPaidEvaluation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof bookPaidEvaluation>>,
+    BookPaidEvaluationMutationVariables
+  > = (props) => {
+    const { slotId } = props ?? {};
+
+    return bookPaidEvaluation(slotId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type BookPaidEvaluationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof bookPaidEvaluation>>
+>;
+
+export type BookPaidEvaluationMutationError = unknown;
+export type BookPaidEvaluationMutationVariables = { slotId: string };
+
+export const useBookPaidEvaluation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof bookPaidEvaluation>>,
+      TError,
+      BookPaidEvaluationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof bookPaidEvaluation>>,
+  TError,
+  BookPaidEvaluationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getBookPaidEvaluationMutationOptions(options),
+    queryClient,
+  );
+};
+
 export type listEvaluationsResponse200 = {
   data: ClientEvaluationPageDto;
   status: 200;
@@ -22356,6 +22465,121 @@ export const useCancelNutritionistEvaluation = <
 > => {
   return useMutation(
     getCancelNutritionistEvaluationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type recordEvaluationNoShowResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type recordEvaluationNoShowResponseSuccess =
+  recordEvaluationNoShowResponse204 & {
+    headers: Headers;
+  };
+export type recordEvaluationNoShowResponse =
+  recordEvaluationNoShowResponseSuccess;
+
+export const getRecordEvaluationNoShowUrl = (evaluationId: string) => {
+  return `/api/v1/nutritionist/evaluations/${evaluationId}/no-show`;
+};
+
+export const recordEvaluationNoShow = async (
+  evaluationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recordEvaluationNoShowResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getRecordEvaluationNoShowUrl(evaluationId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recordEvaluationNoShowResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recordEvaluationNoShowResponse;
+};
+
+export const getRecordEvaluationNoShowMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recordEvaluationNoShow>>,
+    TError,
+    RecordEvaluationNoShowMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recordEvaluationNoShow>>,
+  TError,
+  RecordEvaluationNoShowMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recordEvaluationNoShow"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recordEvaluationNoShow>>,
+    RecordEvaluationNoShowMutationVariables
+  > = (props) => {
+    const { evaluationId } = props ?? {};
+
+    return recordEvaluationNoShow(evaluationId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecordEvaluationNoShowMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recordEvaluationNoShow>>
+>;
+
+export type RecordEvaluationNoShowMutationError = unknown;
+export type RecordEvaluationNoShowMutationVariables = { evaluationId: string };
+
+export const useRecordEvaluationNoShow = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recordEvaluationNoShow>>,
+      TError,
+      RecordEvaluationNoShowMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recordEvaluationNoShow>>,
+  TError,
+  RecordEvaluationNoShowMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRecordEvaluationNoShowMutationOptions(options),
     queryClient,
   );
 };

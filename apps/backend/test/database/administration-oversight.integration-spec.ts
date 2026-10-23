@@ -145,6 +145,9 @@ describe('Prisma administration oversight reads', () => {
         everywhere.byMethod.transfer +
         everywhere.byMethod.credit_only,
     );
+    expect(everywhere.byKind.plan + everywhere.byKind.evaluation).toBe(
+      everywhere.totalCentavos,
+    );
     expect(centro.byMethod).toEqual({
       cash: everywhere.byMethod.cash,
       transfer: 0,

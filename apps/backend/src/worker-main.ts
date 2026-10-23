@@ -112,7 +112,10 @@ async function bootstrap(): Promise<void> {
     },
     evaluationSlots: { execute: () => evaluations.materializeAvailability() },
     evaluationReminders: {
-      execute: () => evaluations.sendDueEvaluationReminders(),
+      execute: async () => {
+        await evaluations.releaseExpiredEvaluationHolds();
+        return evaluations.sendDueEvaluationReminders();
+      },
     },
     emptySessionChecks: {
       execute: () => sessionStartChecks.checkEmptySessions(),

@@ -28,9 +28,11 @@ INSERT INTO system.accounts (id, email, staff_member_id, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000d04', 'paola@example.com', '00000000-0000-0000-0000-000000000a02', now());
 INSERT INTO booking.plans (id, name, duration_days, class_allowance, price_centavos, display_order, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 30000, 0, now());
-INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at) VALUES
-  ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000c01', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 8, '2026-09-01', '2026-10-31', now(), now()),
-  ('00000000-0000-0000-0000-000000000f02', '00000000-0000-0000-0000-000000000c02', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 8, '2026-09-01', '2026-10-31', now(), now());
+INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, state, expired_at, updated_at) VALUES
+  ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000c01', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 8, '2026-09-01', '2026-10-31', now(), 'active', NULL, now()),
+  ('00000000-0000-0000-0000-000000000f02', '00000000-0000-0000-0000-000000000c02', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 8, '2026-09-01', '2026-10-31', now(), 'active', NULL, now()),
+  ('00000000-0000-0000-0000-000000000f03', '00000000-0000-0000-0000-000000000c01', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 8, '2026-11-01', '2026-11-30', now(), 'expired', now(), now()),
+  ('00000000-0000-0000-0000-000000000f04', '00000000-0000-0000-0000-000000000c01', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 8, '2026-12-01', '2026-12-30', now(), 'expired', now(), now());
 
 -- Carla publishes Mondays 09:00-13:00 at Centro and 13:00-14:00 next to it.
 INSERT INTO booking.availability_blocks (id, nutritionist_staff_member_id, branch_id, weekday, starts_at_local, ends_at_local, effective_from, created_by_account_id, updated_at) VALUES
@@ -145,7 +147,7 @@ SELECT pg_temp.expect_failure(
   '23503'
 );
 SELECT pg_temp.expect_failure(
-  'INSERT INTO booking.evaluations (id, client_id, evaluation_slot_id, eligibility_month, subscription_id, created_by_account_id, updated_at) VALUES (gen_random_uuid(), ''00000000-0000-0000-0000-000000000c02'', ''20000000-0000-0000-0000-000000000002'', ''2026-09-01'', ''00000000-0000-0000-0000-000000000f01'', ''00000000-0000-0000-0000-000000000d02'', now())',
+  'INSERT INTO booking.evaluations (id, client_id, evaluation_slot_id, eligibility_month, subscription_id, created_by_account_id, updated_at) VALUES (gen_random_uuid(), ''00000000-0000-0000-0000-000000000c02'', ''20000000-0000-0000-0000-000000000002'', ''2026-09-01'', ''00000000-0000-0000-0000-000000000f04'', ''00000000-0000-0000-0000-000000000d02'', now())',
   '23503'
 );
 SELECT pg_temp.expect_failure(
@@ -156,7 +158,8 @@ SELECT pg_temp.expect_failure(
   'INSERT INTO booking.evaluations (id, client_id, evaluation_slot_id, eligibility_month, subscription_id, state, created_by_account_id, cancelled_at, cancelled_by_account_id, updated_at) VALUES (gen_random_uuid(), ''00000000-0000-0000-0000-000000000c02'', ''20000000-0000-0000-0000-000000000002'', ''2026-09-01'', ''00000000-0000-0000-0000-000000000f02'', ''cancelled'', ''00000000-0000-0000-0000-000000000d02'', now(), ''00000000-0000-0000-0000-000000000d02'', now())',
   '23514'
 );
--- One booked Evaluation per slot and one per Client per Bolivia month.
+-- One live Evaluation per slot, and one included Evaluation per Subscription
+-- (NUT-003). A second included Evaluation in another month is the same Plan.
 SELECT pg_temp.expect_failure(
   'INSERT INTO booking.evaluations (id, client_id, evaluation_slot_id, eligibility_month, subscription_id, created_by_account_id, updated_at) VALUES (gen_random_uuid(), ''00000000-0000-0000-0000-000000000c02'', ''20000000-0000-0000-0000-000000000001'', ''2026-09-01'', ''00000000-0000-0000-0000-000000000f02'', ''00000000-0000-0000-0000-000000000d02'', now())',
   '23505'
@@ -195,7 +198,7 @@ SELECT pg_temp.expect_failure(
 );
 INSERT INTO booking.evaluations (id, client_id, evaluation_slot_id, eligibility_month, subscription_id, created_by_account_id, updated_at) VALUES
   ('30000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000c02', '20000000-0000-0000-0000-000000000001', '2026-09-01', '00000000-0000-0000-0000-000000000f02', '00000000-0000-0000-0000-000000000d02', now()),
-  ('30000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000c01', '20000000-0000-0000-0000-000000000002', '2026-09-01', '00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000d01', now());
+  ('30000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000c01', '20000000-0000-0000-0000-000000000002', '2026-09-01', '00000000-0000-0000-0000-000000000f03', '00000000-0000-0000-0000-000000000d01', now());
 SELECT pg_temp.expect_failure(
   'DELETE FROM booking.evaluations WHERE id = ''30000000-0000-0000-0000-000000000001''',
   '55000'

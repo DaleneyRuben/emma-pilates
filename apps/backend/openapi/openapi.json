@@ -5571,6 +5571,52 @@
         ]
       }
     },
+    "/api/v1/evaluation-slots/{slotId}/evaluation-payments": {
+      "post": {
+        "operationId": "bookPaidEvaluation",
+        "parameters": [
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientEvaluationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "EvaluationSlots"
+        ]
+      }
+    },
     "/api/v1/evaluations": {
       "get": {
         "operationId": "listEvaluations",
@@ -5708,6 +5754,36 @@
     "/api/v1/nutritionist/evaluations/{evaluationId}": {
       "delete": {
         "operationId": "cancelNutritionistEvaluation",
+        "parameters": [
+          {
+            "name": "evaluationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NutritionistEvaluations"
+        ]
+      }
+    },
+    "/api/v1/nutritionist/evaluations/{evaluationId}/no-show": {
+      "post": {
+        "operationId": "recordEvaluationNoShow",
         "parameters": [
           {
             "name": "evaluationId",
@@ -9579,6 +9655,23 @@
           "credit_only"
         ]
       },
+      "IncomeByKindDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "number",
+            "description": "Plan Payments, BOB centavos"
+          },
+          "evaluation": {
+            "type": "number",
+            "description": "Evaluation Payments, BOB centavos"
+          }
+        },
+        "required": [
+          "plan",
+          "evaluation"
+        ]
+      },
       "IncomeMonthDto": {
         "type": "object",
         "properties": {
@@ -9651,6 +9744,9 @@
           "byMethod": {
             "$ref": "#/components/schemas/IncomeByMethodDto"
           },
+          "byKind": {
+            "$ref": "#/components/schemas/IncomeByKindDto"
+          },
           "months": {
             "type": "array",
             "items": {
@@ -9675,6 +9771,7 @@
           "branchId",
           "totalCentavos",
           "byMethod",
+          "byKind",
           "months",
           "generatedAt",
           "voided"
@@ -11708,7 +11805,15 @@
           },
           "bookable": {
             "type": "boolean",
-            "description": "Published, unbooked, more than 3 hours away, and in a month the Client has not used"
+            "description": "Published, unbooked, more than 3 hours away, and covered by an active Subscription"
+          },
+          "included": {
+            "type": "boolean",
+            "description": "True when the covering Plan of 90 days or longer still includes its Evaluation"
+          },
+          "priceCentavos": {
+            "type": "number",
+            "description": "Settings price in centavos; 0 when the Evaluation is included"
           }
         },
         "required": [
@@ -11719,7 +11824,9 @@
           "branchId",
           "branchName",
           "nutritionistName",
-          "bookable"
+          "bookable",
+          "included",
+          "priceCentavos"
         ]
       },
       "EvaluationDayDto": {
@@ -11822,11 +11929,24 @@
             "type": "string",
             "format": "uuid"
           },
+          "included": {
+            "type": "boolean"
+          },
+          "priceCentavos": {
+            "type": "number",
+            "description": "Charged centavos; 0 when included or unpaid"
+          },
+          "paymentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
           "state": {
             "type": "string",
             "enum": [
               "booked",
-              "cancelled"
+              "cancelled",
+              "no_show"
             ]
           },
           "startsAt": {
@@ -11863,6 +11983,9 @@
         "required": [
           "id",
           "slotId",
+          "included",
+          "priceCentavos",
+          "paymentId",
           "state",
           "startsAt",
           "endsAt",

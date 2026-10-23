@@ -273,7 +273,12 @@ export const createPrismaOversight = (
           decidedAt: { gte: query.from, lt: query.until },
           ...branch,
         },
-        select: { method: true, amountDueCentavos: true, decidedAt: true },
+        select: {
+          method: true,
+          kind: true,
+          amountDueCentavos: true,
+          decidedAt: true,
+        },
       }),
       // A voided sale leaves the totals and stays visible with its reason.
       prisma.payment.findMany({
@@ -293,11 +298,14 @@ export const createPrismaOversight = (
       }),
     ]);
     const byMethod = { cash: 0, transfer: 0, credit_only: 0 };
+    const byKind = { plan: 0, evaluation: 0 };
     const months = new Map<string, number>();
     for (const payment of payments) {
       // A courtesy grant is Bs 0 and never income, so it stays out of both.
       if (payment.method === PaymentMethod.COURTESY) continue;
       byMethod[incomeMethodNames[payment.method]] += payment.amountDueCentavos;
+      byKind[payment.kind === 'EVALUATION' ? 'evaluation' : 'plan'] +=
+        payment.amountDueCentavos;
       const month = `${boliviaDate(payment.decidedAt!).toISOString().slice(0, 7)}-01`;
       months.set(month, (months.get(month) ?? 0) + payment.amountDueCentavos);
     }
@@ -307,6 +315,7 @@ export const createPrismaOversight = (
       branchId: query.branchId ?? null,
       totalCentavos: byMethod.cash + byMethod.transfer + byMethod.credit_only,
       byMethod,
+      byKind,
       months: [...months.entries()]
         .sort(([left], [right]) => left.localeCompare(right))
         .map(([month, totalCentavos]) => ({ month, totalCentavos })),
