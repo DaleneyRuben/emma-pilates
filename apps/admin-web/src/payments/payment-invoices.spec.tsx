@@ -17,7 +17,7 @@ import {
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 
-const ana = { taxId: "4567891", name: "Ana Pérez" };
+const ana = { taxId: "4567891", name: "Ana María Pérez" };
 const unbilledCash = paymentRow("21", "Ana Pérez", {
   method: "cash",
   state: "confirmed",
