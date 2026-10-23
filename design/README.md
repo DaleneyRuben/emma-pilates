@@ -176,6 +176,7 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - The pill on a Session row or detail says how many places remain or that none does; the number or word carries the state, so it takes no dot.
 - Seats remain («N cupos», «Con cupos»): Palo de rosa tinte `#EFE0DC` behind Palo de rosa oscuro `#7A4F4B`, the badge pair of the palette table. Full («Lleno», «Completa», «Llena»): `rgba(216,201,187,0.34)` behind Texto secundario `#6E6663`, never Error red and never Éxito green. 12px, weight 500, fully rounded.
 - `S08`'s capacity summary («N de M cupos disponibles» beside the pill) is a flat Blanco card: 1px `#D8C9BB`, radius 16, padding 16px 18px, no shadow. The pill alone carries the state, so the box takes no Éxito or Error tint.
+- `S07` marks the Session the Client already holds a Booking in with «Ya reservada» on the full-class tones (`rgba(216,201,187,0.34)` / `#6E6663`), and `S08` then draws the note «La clienta ya tiene esta clase reservada.» instead of «Reservar»; a Waitlist entry keeps the count (UX-003).
 - `04`'s capacity block («**N** de M cupos disponibles» with the number in Lora 18 weight 500, then «N reservados» in 12px `#7A716D` or the «Lleno» pill on the right, and the 7px bar under the row) draws no card. The bar's track is Palo de rosa tinte `#EFE0DC` under a Palo de rosa `#B78380` fill sized to the booked share; when full the fill is Icono tenue `#C4BAB6`, the count reads «0 de M», and the pill alone names the state.
 
 ### Search result rows (`S04`)
@@ -279,9 +280,9 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `S03` | Lista de asistentes | Trainer — attendance marking |
 | `S04` | Buscar cliente | Front desk |
 | `S05` | Nuevo cliente | Front desk — email + optional phone, activation-link invitation; «Crear cuenta» opens `S06`; the self-registered state's «Ver cliente» opens her `S06` |
-| `S06` | Resumen del cliente | Front desk — also manages a pending invitation, or offers a new verification link to a pending Client who registered herself |
-| `S07` | Reservar una clase | Front desk (on behalf of a client) |
-| `S08` | Detalle de sesión | Front desk |
+| `S06` | Resumen del cliente | Front desk — also manages a pending invitation, or offers a new verification link to a pending Client who registered herself; while her Plan is active «Registrar pago en efectivo» is disabled with «Podrá comprar otro plan cuando este termine.» (UX-003) |
+| `S07` | Reservar una clase | Front desk (on behalf of a client); the Session she already holds a Booking in carries the neutral «Ya reservada» pill instead of the seat count (UX-003) |
+| `S08` | Detalle de sesión | Front desk; a Session she already booked shows «La clienta ya tiene esta clase reservada.» in place of «Reservar» (UX-003) |
 | `S09` | Elegir plan | Front desk |
 | `S10` | Confirmar pago en efectivo | Front desk |
 | `S11` | Pagos pendientes | Administration |

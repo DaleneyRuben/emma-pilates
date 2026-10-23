@@ -116,6 +116,12 @@ export function ClientOverviewScreen({
     (data.subscription.subscription?.remainingClassAllowance ?? 0) > 0;
   const hasActiveSubscription =
     data.subscription.status === "active" || data.subscription.status === "expiring_soon";
+  // The API's subscription_not_expired rule: a Plan paid through today blocks
+  // a new one while it still holds classes or a future Booking (UX-003).
+  const planStillEffective =
+    hasActiveSubscription &&
+    ((data.subscription.subscription?.remainingClassAllowance ?? 0) > 0 ||
+      (data.nextBooking ?? null) !== null);
 
   return (
     <Screen style={styles.screen}>
@@ -152,10 +158,14 @@ export function ClientOverviewScreen({
             testID="client-overview-book"
           />
           <OutlinedButton
+            disabled={planStillEffective}
             label="Registrar pago en efectivo"
             onPress={() => navigation.navigate("SelectPlan", context)}
             testID="client-overview-cash-payment"
           />
+          {planStillEffective ? (
+            <BodyText style={styles.note}>Podrá comprar otro plan cuando este termine.</BodyText>
+          ) : null}
           {hasActiveSubscription ? (
             <TextButton
               label="Ver reservas"
@@ -218,5 +228,6 @@ const styles = StyleSheet.create({
   historyTitle: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
   label: { color: colors.textMuted, fontSize: typography.label, textTransform: "uppercase" },
   muted: { color: colors.textMuted, fontSize: typography.note },
+  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   screen: { gap: spacing.md },
 });

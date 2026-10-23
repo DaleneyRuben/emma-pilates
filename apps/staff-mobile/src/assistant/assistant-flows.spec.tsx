@@ -3,6 +3,7 @@ import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilate
 
 import { jsonResponse } from "../test-support";
 import {
+  expiredOverview,
   minute,
   soonBooking,
   session,
@@ -195,6 +196,7 @@ describe("Assistant Client flows", () => {
     const paid = jest.fn();
     const screen = await openLucia({
       ...assistantRoutes(),
+      "/api/v1/assistant/clients/client-lucia": () => jsonResponse(expiredOverview),
       "POST /api/v1/assistant/clients/client-lucia/cash-payments": (init) => {
         paid({
           body: JSON.parse(String(init?.body)),
