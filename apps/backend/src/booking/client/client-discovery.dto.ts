@@ -96,6 +96,15 @@ export class ClientSubscriptionSummaryDto {
       '«Clases extra: 1 · Regalo de bienvenida» when extra classes remain',
   })
   extraClassesLine?: string | null;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 0,
+    nullable: true,
+    description:
+      'Classes left this week from the base allowance. Absent without a cap.',
+  })
+  classesLeftThisWeek?: number | null;
 }
 
 export class ClientSubscriptionDto {
@@ -206,4 +215,13 @@ export class SessionDetailDto {
 
   @ApiProperty({ minimum: 0 })
   waitlistCount!: number;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 0,
+    nullable: true,
+    description:
+      'Classes left this week from the base allowance. Absent without a cap.',
+  })
+  classesLeftThisWeek?: number | null;
 }

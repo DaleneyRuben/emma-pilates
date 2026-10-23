@@ -10,8 +10,8 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 |---|---|---|---|
 | 01 | Iniciar sesión / Registrarse | `01` | ✅ |
 | 02 | Inicio | `02` | ✅ |
-| 03 | Reservar | `03` | ✅ |
-| 04 | Detalle de sesión | `04` | ✅ |
+| 03 | Reservar | `03` | ✅ (follow-up 196 pending: «Te quedan N clases esta semana») |
+| 04 | Detalle de sesión | `04` | ✅ (follow-up 196 pending: «Te quedan N clases esta semana») |
 | 05 | Mis reservas | `05` | ✅ |
 | 06 | Reprogramar | `06` | ✅ |
 | 07 | Historial de clases | `07` | ✅ |
@@ -254,6 +254,7 @@ Each of these was sent as the next message in the existing design session for th
 | [193](./followups/193-mi-plan-extra-classes.md) | `12` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008, booking ADR-0006) | 🕓 pending (190–192 reserved by BKM-006) |
 | [194](./followups/194-client-summary-extra-classes.md) | `S06` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008) | 🕓 pending (190–192 reserved by BKM-006) |
 | [195](./followups/195-admin-client-detail-extra-classes.md) | `AW22` shows «Clases extra: 1 · Regalo de bienvenida» under «Clases disponibles» when the API returns the line; no courtesy form (BKM-008, PAY-006) | 🕓 pending (190–192 reserved by BKM-006) |
+| [196](./followups/196-weekly-cap-classes-left.md) | `03` and `04` show «Te quedan N clases esta semana» from `classesLeftThisWeek`; absent without a cap; zero stays honest when an extra class remains (BKM-007) | 🕓 pending |
 
 ## Status
 

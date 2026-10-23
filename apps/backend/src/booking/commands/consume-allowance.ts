@@ -27,19 +27,22 @@ export const consumeOneClass = async (
     clientId: string;
     authorAccountId: string;
     now: Date;
+    // BKM-007 passes zero once the weekly cap blocks the base allowance.
+    baseAllowance?: number;
   },
-): Promise<boolean> => {
+): Promise<'base' | 'extra' | null> => {
   const subscription = await transaction.subscription.findFirst({
     where: { id: input.subscriptionId, clientId: input.clientId },
     select: { remainingClassAllowance: true },
   });
-  if (subscription === null) return false;
+  if (subscription === null) return null;
 
   const source = chooseAllowanceSource({
-    remainingClassAllowance: subscription.remainingClassAllowance,
+    remainingClassAllowance:
+      input.baseAllowance ?? subscription.remainingClassAllowance,
     extraClasses: await readExtraClasses(transaction, input.subscriptionId),
   });
-  if (source === null) return false;
+  if (source === null) return null;
 
   if (source === 'base') {
     const consumed = await transaction.subscription.updateMany({
@@ -50,7 +53,7 @@ export const consumeOneClass = async (
       },
       data: { remainingClassAllowance: { decrement: 1 } },
     });
-    return consumed.count === 1;
+    return consumed.count === 1 ? 'base' : null;
   }
 
   // class_return is an Administrator's grant (PAY-006). Spending an extra
@@ -63,7 +66,7 @@ export const consumeOneClass = async (
     },
     _sum: { classes: true },
   });
-  if ((granted._sum.classes ?? 0) <= 0) return false;
+  if ((granted._sum.classes ?? 0) <= 0) return null;
   await transaction.allowanceAdjustment.create({
     data: {
       subscriptionId: input.subscriptionId,
@@ -74,5 +77,21 @@ export const consumeOneClass = async (
       createdAt: input.now,
     },
   });
-  return true;
+  return 'extra';
 };
+
+// The consumption row is written before the Booking exists. The cap count
+// needs the Booking id, so the caller links it once the Booking is created.
+export const linkConsumptionToBooking = (
+  transaction: Transaction,
+  input: { subscriptionId: string; bookingId: string },
+): Promise<unknown> =>
+  transaction.allowanceAdjustment.updateMany({
+    where: {
+      subscriptionId: input.subscriptionId,
+      reason: AllowanceAdjustmentReason.CONSUMPTION,
+      bookingId: null,
+      deletedAt: null,
+    },
+    data: { bookingId: input.bookingId },
+  });

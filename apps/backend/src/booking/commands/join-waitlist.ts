@@ -2,7 +2,11 @@ import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
 import { bookingBeforeStartMessage } from './booking-before-start';
-import { BookingAccessDeniedError } from './create-booking';
+import {
+  BookingAccessDeniedError,
+  type WeeklyCapSubscription,
+} from './create-booking';
+import { assertWeeklyCapAllows } from './weekly-cap-decision';
 
 type SessionForWaitlist = {
   id: string;
@@ -19,7 +23,7 @@ type JoinWaitlistDependencies = {
   findEligibleSubscription(input: {
     clientId: string;
     onDate: Date;
-  }): Promise<{ id: string } | null>;
+  }): Promise<WeeklyCapSubscription | null>;
   findNotYetStartedSubscription?(input: {
     clientId: string;
     onDate: Date;
@@ -113,6 +117,8 @@ export const joinWaitlist = async (
     }
     throw new Error('No eligible Subscription');
   }
+
+  assertWeeklyCapAllows(subscription);
 
   if (await dependencies.hasLiveBooking({ sessionId: session.id, clientId })) {
     throw new Error('Client already has a Booking');

@@ -22,6 +22,7 @@ import {
   TextButton,
   typography,
   usePushNotifications,
+  weeklyClassesLeftLine,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -58,6 +59,7 @@ const bookingProblems: Record<string, string> = {
   active_waitlist_entry_exists: "Ya estás en la lista de espera.",
   no_eligible_subscription: "No te quedan clases en tu plan.",
   session_has_capacity: "La clase tiene cupos: puedes reservar directamente.",
+  weekly_cap_reached: "Ya usaste tus clases de esta semana.",
 };
 
 function problemMessage(body: unknown): string | null {
@@ -121,6 +123,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
     (view.status === "active" || view.status === "expiring_soon") &&
     (view.subscription?.remainingClassAllowance ?? 0) > 0;
   const full = forcedFull || detail.availableSeats === 0;
+  const classesLeftLine = weeklyClassesLeftLine(detail.classesLeftThisWeek);
 
   const book = async () => {
     setSubmitting(true);
@@ -245,6 +248,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           capacity={detail.capacity}
           full={full}
         />
+        {classesLeftLine === null ? null : <BodyText>{classesLeftLine}</BodyText>}
         <View style={styles.about}>
           <Text style={styles.sectionTitle}>Sobre la clase</Text>
           <BodyText>{detail.classType.description}</BodyText>

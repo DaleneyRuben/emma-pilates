@@ -36,7 +36,8 @@ import {
   findCoveringSubscription,
   findNotYetStartedSubscription,
 } from './eligible-subscription';
-import { consumeOneClass } from './consume-allowance';
+import { fundBooking } from './weekly-cap-funding';
+import { readWeeklyCapPosition } from './weekly-cap-count';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -571,6 +572,15 @@ export class PrismaBookingCommands {
               transaction.booking.count({
                 where: { sessionId, state: BookingState.BOOKED },
               }),
+            weeklyCapBlocksDestination: async (input) => {
+              const position = await readWeeklyCapPosition(transaction, input);
+              return (
+                position.weeklyClassCap !== null &&
+                position.baseFundedBookingsThisWeek >=
+                  position.weeklyClassCap &&
+                position.extraClasses <= 0
+              );
+            },
             hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
               transaction.booking
                 .findFirst({
@@ -757,7 +767,7 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        findCoveringSubscription(transaction, {
+        this.findSubscriptionForBooking(transaction, {
           clientId,
           onDate,
           needsAllowance: false,
@@ -802,7 +812,7 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        findCoveringSubscription(transaction, {
+        this.findSubscriptionForBooking(transaction, {
           clientId,
           onDate,
           needsAllowance: true,
@@ -824,24 +834,39 @@ export class PrismaBookingCommands {
           })
           .then((booking) => booking !== null),
       create: async (input) => {
-        const consumed = await consumeOneClass(transaction, {
+        const session = await transaction.session.findUniqueOrThrow({
+          where: { id: input.sessionId },
+          select: { startsAt: true },
+        });
+        const booking = await fundBooking(transaction, {
           subscriptionId: input.subscriptionId,
           clientId: input.clientId,
           authorAccountId: input.createdByAccountId,
+          startsAt: session.startsAt,
           now: this.now(),
+          createBooking: () =>
+            transaction.booking.create({ data: input, select: { id: true } }),
         });
-
-        if (!consumed) {
-          throw new Error('No eligible Subscription');
-        }
-
-        return transaction.booking.create({
-          data: input,
-          select: { id: true },
-        });
+        if (booking === null) throw new Error('No eligible Subscription');
+        return booking;
       },
       now: this.now,
     });
+  }
+
+  private async findSubscriptionForBooking(
+    transaction: Prisma.TransactionClient,
+    input: { clientId: string; onDate: Date; needsAllowance: boolean },
+  ) {
+    const subscription = await findCoveringSubscription(transaction, input);
+    if (subscription === null) return null;
+    return {
+      id: subscription.id,
+      ...(await readWeeklyCapPosition(transaction, {
+        subscriptionId: subscription.id,
+        startsAt: input.onDate,
+      })),
+    };
   }
 
   private loadSession(

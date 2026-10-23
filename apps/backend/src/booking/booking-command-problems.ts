@@ -18,7 +18,10 @@ export const commandProblem = (error: Error): HttpException | null => {
       'no_eligible_subscription',
       'No eligible Subscription',
     ],
-
+    'Weekly cap reached': [
+      'weekly_cap_reached',
+      'Ya usaste tus clases de esta semana.',
+    ],
     'Client already has an overlapping Booking': [
       'booking_overlap',
       'Client already has an overlapping Booking',

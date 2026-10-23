@@ -16,6 +16,7 @@ import {
 } from './booking.controller';
 import {
   classHistory,
+  classesLeftThisWeekQuery,
   sessionAvailability,
   trainerSchedule,
   trainerSessionRoster,
@@ -26,6 +27,7 @@ import {
   TrainerSessionRosterController,
 } from './trainer.controller';
 import { boliviaDate } from '../time/bolivia-time';
+import { classesLeftThisWeek } from './commands/weekly-cap-remaining';
 import { createCatalogRepository } from './catalog/prisma-catalog-repository';
 import {
   BranchCatalogController,
@@ -328,6 +330,12 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
       useFactory: (prisma: PrismaClient) => listSessionAvailability(prisma),
     },
     {
+      provide: classesLeftThisWeekQuery,
+      inject: [PRISMA_CLIENT],
+      useFactory: (prisma: PrismaClient) => (clientId: string, at: Date) =>
+        classesLeftThisWeek(prisma, clientId, at),
+    },
+    {
       provide: clientProfile,
       inject: [PRISMA_CLIENT],
       useFactory:
@@ -449,7 +457,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
           principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
         ) => {
           const repository = createCatalogRepository(prisma);
-          const toSummary = (
+          const toSummary = async (
             subscription: NonNullable<
               Awaited<ReturnType<typeof repository.findLatestSubscription>>
             >,
@@ -461,6 +469,14 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
             startsOn: subscription.startsOn,
             endsOn: subscription.endsOn,
             extraClassesLine: subscription.extraClassesLine,
+            classesLeftThisWeek:
+              principal.identity.kind === 'client'
+                ? await classesLeftThisWeek(
+                    prisma,
+                    principal.identity.clientId,
+                    new Date(),
+                  )
+                : null,
           });
 
           return loadClientSubscription({

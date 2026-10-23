@@ -3399,10 +3399,6 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 The following are not ready for manual product testing:
 
-- the Weekly Cap at booking: BKM-005 stores and shows it («hasta 3 por
-  semana»), but a fourth Booking in the same week still goes through until
-  BKM-007;
-
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
   Swagger (Test 34). On Android the link opens the app with a development
@@ -5585,6 +5581,7 @@ command.
 | Cancel the same Booking twice, or a Booking of a cancelled Session | `409 booking_not_cancellable` |
 | Leave a Waitlist Entry that was already closed (promoted, left, or its Session started) | `409 waitlist_entry_not_active` |
 | Book as `mariana@example.com` (no Plan) or `sofia@example.com` (expired) | `409 no_eligible_subscription` |
+| Book a fourth class in the same Monday–Sunday week on a cap-3 Plan, or join that week's Waitlist, with no extra class left (Test 78) | `409 weekly_cap_reached` |
 | Reschedule outside the window, to another day, or a cancelled Booking | `409 reschedule_outside_window`, `reschedule_target_ineligible`, `booking_not_reschedulable` (Test 61) |
 
 **Payments** (`mariana@example.com`; Test 7, «Buying a Plan through
@@ -6064,8 +6061,8 @@ E. **The end date.** As Camila register cash for a Client on the 60-day Plan
    **Inicio** and **Vence el** dates; the Assistant's overview (S06) reads
    «Vence el …» too.
 
-The cap is only stored and shown here: booking more than the cap in one week
-still works until BKM-007.
+Booking more than the cap in one week is refused once BKM-007 is on the API
+(Test 78).
 
 ## Test 77: equipment, its faults, and the capacity flags (BKO-004)
 
@@ -6373,5 +6370,40 @@ C. **The gift.** The first approved Payment in a Client's life adds one
    adds the form).
 
 Spending an extra class waits for the base allowance to run out, and for the
-Weekly Cap (BKM-007). Cancelling a Booking funded by an extra class restores
+Weekly Cap (Test 78). Cancelling a Booking funded by an extra class restores
 the class to the base pool.
+
+## Test 78: the weekly cap (BKM-007)
+
+A capped Plan limits the classes a Client books from her base allowance in
+one Monday–Sunday week in America/La_Paz
+([booking ADR-0006](../booking/docs/adr/0006-weekly-cap-and-extra-classes.md)).
+Bimestral 16 and Trimestral 24 cap at 3; Bimestral 24 and Trimestral 36 cap
+at 4. A 30-day Plan has no cap. The count uses the cap snapshotted on the
+Subscription, and it leaves out a Booking an extra class paid for. Run the
+API and the fixtures as in Tests 2 and 5. The mobile surfaces of this test
+were not walked on a device in the BKM-007 session (another item owned the
+simulators); the API journey below was.
+
+A. **Three, then a refusal.** As a Client on a cap-3 Plan, book three
+   Sessions in the same week. `GET /api/v1/sessions` for that week returns
+   `classesLeftThisWeek` counting down (3, then 2, then 1, then 0). The
+   fourth `POST /api/v1/sessions/{sessionId}/bookings` answers
+   `409 weekly_cap_reached` with «Ya usaste tus clases de esta semana.»
+   Joining that week's Waitlist answers the same code.
+B. **An extra class.** As Paola, grant one courtesy class (Test 77). The
+   fourth Booking now answers `201`, and a fifth in the same week is refused
+   again. The extra-funded Booking does not itself use a place in the cap.
+C. **No cap.** A Client on a 30-day Plan books a fourth class in the same
+   week and it answers `201`. Her Session list omits `classesLeftThisWeek`.
+D. **The week boundary.** A Booking at Sunday 23:00 La Paz and one at Monday
+   00:30 La Paz fall in different weeks. A same-week Reschedule at the cap
+   answers `200`. A Reschedule into another week is still
+   `409 reschedule_target_ineligible` (the destination must stay in the same
+   Bolivia week).
+E. **The screens.** Reservar (03) and the Session detail (04) show «Te quedan
+   N clases esta semana» from the field, «Te queda 1 clase esta semana» for
+   one, and nothing when the field is absent. At zero the line stays «Te
+   quedan 0 clases esta semana»; the extra-class line is the one on Mi plan.
+   Follow-up 196 draws that line and is still pending. The Assistant's
+   refusal uses the same problem code.
