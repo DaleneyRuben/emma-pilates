@@ -21,7 +21,7 @@ describe('Prisma administration Referral list for AW26', () => {
     await world?.stop();
   });
 
-  it("counts the studio's awarded and pending Referrals and each referrer's total", async () => {
+  it("counts the studio's Referrals, none awarded since PAY-005, and each referrer's total", async () => {
     const all = await oversight().listReferrals(
       { page: 1, pageSize: 20 },
       await administrator(),
@@ -29,8 +29,8 @@ describe('Prisma administration Referral list for AW26', () => {
 
     expect(all).toMatchObject({
       totalItems: 2,
-      awardedCount: 1,
-      pendingCount: 1,
+      awardedCount: 0,
+      pendingCount: 2,
     });
     expect(all.items.map((item) => item.referrerReferralCount)).toEqual([2, 2]);
   });
@@ -49,8 +49,8 @@ describe('Prisma administration Referral list for AW26', () => {
 
     expect(narrowed).toMatchObject({
       totalItems: 1,
-      awardedCount: 1,
-      pendingCount: 1,
+      awardedCount: 0,
+      pendingCount: 2,
       items: [
         expect.objectContaining({
           referredName: first.referredName,
