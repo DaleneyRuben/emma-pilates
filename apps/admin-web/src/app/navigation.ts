@@ -9,6 +9,7 @@ export type AdminPath =
   | "/catalogo/planes"
   | "/catalogo/sucursales"
   | "/back-office/clientes"
+  | "/back-office/fundadoras"
   | "/back-office/pagos"
   | "/back-office/insumos"
   | "/back-office/evaluaciones-nutricionales"
@@ -93,6 +94,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         screen: "AW21",
         list: true,
         studioWide: "los clientes son del estudio, no de una sede.",
+      },
+      {
+        label: "Fundadoras",
+        to: "/back-office/fundadoras",
+        screen: "AW37",
+        list: true,
+        studioWide: "las fundadoras son del estudio, no de una sede.",
       },
       {
         label: "Pagos",

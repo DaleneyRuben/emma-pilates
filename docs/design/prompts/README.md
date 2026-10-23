@@ -103,6 +103,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW34](./admin-web/34-branch-selector.md) | Selector de sucursal | `AW34` | ✅ |
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
 | [AW36](./admin-web/36-reglas-del-estudio.md) | Reglas del estudio | `AW36` | ✅ (Claude Design canvas, 2026-10-23, `55bbe4cc`; the admin web is built in BKM-004) |
+| [AW37](./admin-web/37-fundadoras.md) | Fundadoras | `AW37` | not yet generated (BKM-010; the admin web is built from the prompt) |
 
 ## Follow-ups (`followups/`)
 
@@ -231,6 +232,8 @@ Each of these was sent as the next message in the existing design session for th
 | [179](./followups/179-plans-by-days-corrections.md) | Record of how 175 and 178 were applied: `AW05` draws «Vigencia» and «Tope semanal» as segmented buttons (the admin web keeps selects), `S09` draws four of the eight Plans (BKM-005) | ✅ applied (same canvas and commit `20a8da54`) |
 | [190](./followups/190-start-date-chooser.md) | Start Date chip row on `09` and `S10`: «Fecha de inicio», «Hoy», weekday chips, «Día de apertura» (BKM-006) | 🕓 pending |
 | [191](./followups/191-next-plan-and-renewal.md) | «Siguiente plan desde …» on `12`, renewal reminder on `19`, cash stays enabled on `S06` (BKM-006) | 🕓 pending |
+| [192](./followups/192-founder-prices.md) | Discounted price and struck list price on `08`, `09`, and `S09` for a founder; the single class stays at list price (BKM-010) | 🕓 pending |
+| [193](./followups/193-founder-renewal-banner.md) | «Renueva antes del …» on `12` while a founder holds a current Subscription (BKM-010) | 🕓 pending |
 
 ## Status
 

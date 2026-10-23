@@ -95,6 +95,9 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
                 <BodyText>{describePlanTerms(plan)}</BodyText>
               </View>
               <View style={styles.prices}>
+                {plan.listPriceCentavos === undefined ? null : (
+                  <Text style={styles.originalPrice}>{formatBolivianos(plan.listPriceCentavos)}</Text>
+                )}
                 {plan.creditAppliedCentavos > 0 ? (
                   <Text style={styles.originalPrice}>{formatBolivianos(plan.priceCentavos)}</Text>
                 ) : null}

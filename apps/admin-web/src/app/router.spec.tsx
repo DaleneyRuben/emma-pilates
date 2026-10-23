@@ -23,6 +23,7 @@ describe("admin navigation", () => {
         label: "Back Office",
         items: [
           "Clientes",
+          "Fundadoras",
           "Pagos",
           "Insumos",
           "Evaluaciones nutricionales",
@@ -49,6 +50,7 @@ describe("admin navigation", () => {
       "AW04",
       "AW19",
       "AW21",
+      "AW37",
       "AW28",
       "AW08",
       "AW25",
@@ -71,6 +73,7 @@ describe("admin navigation", () => {
         .map((item) => item.label),
     ).toEqual([
       "Clientes",
+      "Fundadoras",
       "Pagos",
       "Nómina",
       "Categorías de gasto",
@@ -109,7 +112,7 @@ describe("admin routes", () => {
     const listPaths = navigationItems
       .filter((item) => item.list)
       .map((item) => item.to);
-    expect(listPaths).toHaveLength(13);
+    expect(listPaths).toHaveLength(14);
     expect(listPaths).not.toContain("/");
     expect(listPaths).not.toContain("/reporte");
     // AW17 is the carousel: unpaged cards, not a table (WEB-006).
