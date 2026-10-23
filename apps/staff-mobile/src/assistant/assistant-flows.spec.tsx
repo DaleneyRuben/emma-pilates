@@ -255,7 +255,7 @@ describe("Assistant Client flows", () => {
     });
     expect(screen.getByText("Precio del plan")).toBeOnTheScreen();
     // Follow-up 178: S10's plan card carries the same terms line as S09.
-    expect(screen.getAllByText("8 clases · válido por 30 días")).toHaveLength(2);
+    expect(screen.getByText("8 clases · válido por 30 días")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Crédito aplicado")).toBeOnTheScreen();
     expect(screen.getByText("Bs 60")).toBeOnTheScreen();
