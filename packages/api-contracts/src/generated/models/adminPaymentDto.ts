@@ -4,7 +4,10 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { AdminPaymentDtoMethod } from "./adminPaymentDtoMethod";
 import type { AdminPaymentDtoState } from "./adminPaymentDtoState";
+import type { InvoiceDataDto } from "./invoiceDataDto";
+import type { InvoiceIssuedMarkDto } from "./invoiceIssuedMarkDto";
 
 export interface AdminPaymentDto {
   id: string;
@@ -22,7 +25,7 @@ export interface AdminPaymentDto {
    */
   creditAppliedCentavos: number;
   /**
-   * The Plan price less the Credit applied: what was transferred
+   * The Plan price less the Credit applied: what was paid
    * @minimum 1
    */
   amountDueCentavos: number;
@@ -32,4 +35,15 @@ export interface AdminPaymentDto {
   decidedAt: string | null;
   /** Whether the receipt image is still retained */
   receiptAvailable: boolean;
+  method: AdminPaymentDtoMethod;
+  /**
+   * NIT or CI and name for the invoice; null is «Sin factura»
+   * @nullable
+   */
+  invoiceData: InvoiceDataDto | null;
+  /**
+   * The «Factura emitida» mark: who and when
+   * @nullable
+   */
+  invoiceIssued: InvoiceIssuedMarkDto | null;
 }

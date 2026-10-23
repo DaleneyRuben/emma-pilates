@@ -113,6 +113,8 @@ import type {
   ImpersonationDto,
   IncomeReportDto,
   InviteClientDto,
+  InvoiceIssuedDto,
+  LastInvoiceDataDto,
   ListAdminBranchesParams,
   ListAdminClassTypesParams,
   ListAdminClientsParams,
@@ -186,6 +188,7 @@ import type {
   StaffProfileDto,
   StartClientRegistrationDto,
   StartImpersonationDto,
+  SubmitTransferDto,
   SupplyChangeDto,
   SupplyInputDto,
   SupplyMovementDto,
@@ -13342,14 +13345,28 @@ export const getSubmitPurchaseIntentTransferUrl = (
 
 export const submitPurchaseIntentTransfer = async (
   purchaseIntentId: string,
+  submitTransferDto?: SubmitTransferDto,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<submitPurchaseIntentTransferResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await (fetchFn ?? fetch)(
     getSubmitPurchaseIntentTransferUrl(purchaseIntentId),
     {
       ...options,
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(submitTransferDto),
     },
   );
 
@@ -13400,10 +13417,11 @@ export const getSubmitPurchaseIntentTransferMutationOptions = <
     Awaited<ReturnType<typeof submitPurchaseIntentTransfer>>,
     SubmitPurchaseIntentTransferMutationVariables
   > = (props) => {
-    const { purchaseIntentId } = props ?? {};
+    const { purchaseIntentId, data } = props ?? {};
 
     return submitPurchaseIntentTransfer(
       purchaseIntentId,
+      data,
       fetchOptions,
       fetcherFn,
     );
@@ -13415,10 +13433,12 @@ export const getSubmitPurchaseIntentTransferMutationOptions = <
 export type SubmitPurchaseIntentTransferMutationResult = NonNullable<
   Awaited<ReturnType<typeof submitPurchaseIntentTransfer>>
 >;
-
+export type SubmitPurchaseIntentTransferMutationBody =
+  SubmitTransferDto | undefined;
 export type SubmitPurchaseIntentTransferMutationError = unknown;
 export type SubmitPurchaseIntentTransferMutationVariables = {
   purchaseIntentId: string;
+  data?: SubmitTransferDto;
 };
 
 export const useSubmitPurchaseIntentTransfer = <
@@ -20220,6 +20240,634 @@ export function useGetCurrentClientPhoto<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type getCurrentClientInvoiceDataResponse200 = {
+  data: LastInvoiceDataDto;
+  status: 200;
+};
+
+export type getCurrentClientInvoiceDataResponseSuccess =
+  getCurrentClientInvoiceDataResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentClientInvoiceDataResponse =
+  getCurrentClientInvoiceDataResponseSuccess;
+
+export const getGetCurrentClientInvoiceDataUrl = () => {
+  return `/api/v1/clients/current/invoice-data`;
+};
+
+export const getCurrentClientInvoiceData = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentClientInvoiceDataResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentClientInvoiceDataUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentClientInvoiceDataResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentClientInvoiceDataResponse;
+};
+
+export const getGetCurrentClientInvoiceDataQueryKey = () => {
+  return [`/api/v1/clients/current/invoice-data`] as const;
+};
+
+export const getGetCurrentClientInvoiceDataQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentClientInvoiceDataQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentClientInvoiceData>>
+  > = ({ signal }) =>
+    getCurrentClientInvoiceData({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentClientInvoiceDataQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentClientInvoiceData>>
+>;
+export type GetCurrentClientInvoiceDataQueryError = unknown;
+
+export function useGetCurrentClientInvoiceData<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientInvoiceData>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientInvoiceData<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientInvoiceData>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientInvoiceData<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentClientInvoiceData<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoiceData>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentClientInvoiceDataQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getAssistantClientInvoiceDataResponse200 = {
+  data: LastInvoiceDataDto;
+  status: 200;
+};
+
+export type getAssistantClientInvoiceDataResponseSuccess =
+  getAssistantClientInvoiceDataResponse200 & {
+    headers: Headers;
+  };
+export type getAssistantClientInvoiceDataResponse =
+  getAssistantClientInvoiceDataResponseSuccess;
+
+export const getGetAssistantClientInvoiceDataUrl = (clientId: string) => {
+  return `/api/v1/assistant/clients/${clientId}/invoice-data`;
+};
+
+export const getAssistantClientInvoiceData = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAssistantClientInvoiceDataResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetAssistantClientInvoiceDataUrl(clientId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAssistantClientInvoiceDataResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getAssistantClientInvoiceDataResponse;
+};
+
+export const getGetAssistantClientInvoiceDataQueryKey = (clientId: string) => {
+  return [`/api/v1/assistant/clients/${clientId}/invoice-data`] as const;
+};
+
+export const getGetAssistantClientInvoiceDataQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetAssistantClientInvoiceDataQueryKey(clientId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getAssistantClientInvoiceData>>
+  > = ({ signal }) =>
+    getAssistantClientInvoiceData(
+      clientId,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: clientId !== null && clientId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAssistantClientInvoiceDataQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAssistantClientInvoiceData>>
+>;
+export type GetAssistantClientInvoiceDataQueryError = unknown;
+
+export function useGetAssistantClientInvoiceData<
+  TData = Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+          TError,
+          Awaited<ReturnType<typeof getAssistantClientInvoiceData>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAssistantClientInvoiceData<
+  TData = Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+          TError,
+          Awaited<ReturnType<typeof getAssistantClientInvoiceData>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAssistantClientInvoiceData<
+  TData = Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetAssistantClientInvoiceData<
+  TData = Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAssistantClientInvoiceData>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetAssistantClientInvoiceDataQueryOptions(
+    clientId,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type markPaymentInvoiceIssuedResponse200 = {
+  data: InvoiceIssuedDto;
+  status: 200;
+};
+
+export type markPaymentInvoiceIssuedResponseSuccess =
+  markPaymentInvoiceIssuedResponse200 & {
+    headers: Headers;
+  };
+export type markPaymentInvoiceIssuedResponse =
+  markPaymentInvoiceIssuedResponseSuccess;
+
+export const getMarkPaymentInvoiceIssuedUrl = (paymentId: string) => {
+  return `/api/v1/administrator/payments/${paymentId}/invoice-issued`;
+};
+
+export const markPaymentInvoiceIssued = async (
+  paymentId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<markPaymentInvoiceIssuedResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getMarkPaymentInvoiceIssuedUrl(paymentId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: markPaymentInvoiceIssuedResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as markPaymentInvoiceIssuedResponse;
+};
+
+export const getMarkPaymentInvoiceIssuedMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
+    TError,
+    MarkPaymentInvoiceIssuedMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
+  TError,
+  MarkPaymentInvoiceIssuedMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["markPaymentInvoiceIssued"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
+    MarkPaymentInvoiceIssuedMutationVariables
+  > = (props) => {
+    const { paymentId } = props ?? {};
+
+    return markPaymentInvoiceIssued(paymentId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type MarkPaymentInvoiceIssuedMutationResult = NonNullable<
+  Awaited<ReturnType<typeof markPaymentInvoiceIssued>>
+>;
+
+export type MarkPaymentInvoiceIssuedMutationError = unknown;
+export type MarkPaymentInvoiceIssuedMutationVariables = { paymentId: string };
+
+export const useMarkPaymentInvoiceIssued = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
+      TError,
+      MarkPaymentInvoiceIssuedMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
+  TError,
+  MarkPaymentInvoiceIssuedMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getMarkPaymentInvoiceIssuedMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type unmarkPaymentInvoiceIssuedResponse200 = {
+  data: InvoiceIssuedDto;
+  status: 200;
+};
+
+export type unmarkPaymentInvoiceIssuedResponseSuccess =
+  unmarkPaymentInvoiceIssuedResponse200 & {
+    headers: Headers;
+  };
+export type unmarkPaymentInvoiceIssuedResponse =
+  unmarkPaymentInvoiceIssuedResponseSuccess;
+
+export const getUnmarkPaymentInvoiceIssuedUrl = (paymentId: string) => {
+  return `/api/v1/administrator/payments/${paymentId}/invoice-issued`;
+};
+
+export const unmarkPaymentInvoiceIssued = async (
+  paymentId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<unmarkPaymentInvoiceIssuedResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getUnmarkPaymentInvoiceIssuedUrl(paymentId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: unmarkPaymentInvoiceIssuedResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as unmarkPaymentInvoiceIssuedResponse;
+};
+
+export const getUnmarkPaymentInvoiceIssuedMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
+    TError,
+    UnmarkPaymentInvoiceIssuedMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
+  TError,
+  UnmarkPaymentInvoiceIssuedMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["unmarkPaymentInvoiceIssued"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
+    UnmarkPaymentInvoiceIssuedMutationVariables
+  > = (props) => {
+    const { paymentId } = props ?? {};
+
+    return unmarkPaymentInvoiceIssued(paymentId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UnmarkPaymentInvoiceIssuedMutationResult = NonNullable<
+  Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>
+>;
+
+export type UnmarkPaymentInvoiceIssuedMutationError = unknown;
+export type UnmarkPaymentInvoiceIssuedMutationVariables = { paymentId: string };
+
+export const useUnmarkPaymentInvoiceIssued = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
+      TError,
+      UnmarkPaymentInvoiceIssuedMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
+  TError,
+  UnmarkPaymentInvoiceIssuedMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getUnmarkPaymentInvoiceIssuedMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type listEvaluationSlotsResponse200 = {
   data: EvaluationAvailabilityDto;
