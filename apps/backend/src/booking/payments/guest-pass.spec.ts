@@ -38,7 +38,7 @@ describe('decideInvitation', () => {
     expect(
       decideInvitation({
         now: october,
-        invitationsThisMonth: 1,
+        earlierInvitations: [new Date('2026-10-01T04:00:00.000Z')],
         invitesPerMonth: 1,
       }),
     ).toEqual({
@@ -51,10 +51,23 @@ describe('decideInvitation', () => {
     expect(
       decideInvitation({
         now: new Date('2026-11-01T04:30:00.000Z'),
-        invitationsThisMonth: 0,
+        earlierInvitations: [october],
         invitesPerMonth: 1,
       }),
     ).toBeNull();
+  });
+
+  it('counts an invitation at 20:30 La Paz on the last day as this month', () => {
+    expect(
+      decideInvitation({
+        now: new Date('2026-11-01T00:30:00.000Z'),
+        earlierInvitations: [new Date('2026-10-01T04:30:00.000Z')],
+        invitesPerMonth: 1,
+      }),
+    ).toEqual({
+      code: 'guest_pass_monthly_limit',
+      detail: 'A host invites one friend a month',
+    });
   });
 });
 

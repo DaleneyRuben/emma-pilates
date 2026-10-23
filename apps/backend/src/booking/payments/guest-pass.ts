@@ -1,3 +1,5 @@
+import { boliviaMonth } from '../../time/bolivia-time';
+
 export type GuestPassBookingDecision = {
   code: 'guest_pass_already_used' | 'guest_pass_last_place';
   detail: string;
@@ -31,10 +33,19 @@ export type InvitationDecision = {
 
 export const decideInvitation = (input: {
   now: Date;
-  invitationsThisMonth: number;
+  earlierInvitations: readonly Date[];
   invitesPerMonth: number;
 }): InvitationDecision | null => {
-  void input;
+  const month = boliviaMonth(input.now).toISOString();
+  const invitationsThisMonth = input.earlierInvitations.filter(
+    (invitedAt) => boliviaMonth(invitedAt).toISOString() === month,
+  ).length;
+  if (invitationsThisMonth >= input.invitesPerMonth) {
+    return {
+      code: 'guest_pass_monthly_limit',
+      detail: 'A host invites one friend a month',
+    };
+  }
   return null;
 };
 
@@ -47,6 +58,9 @@ export const decideInviteReward = (input: {
   alreadyRewarded: boolean;
   currentSubscriptionId: string | null;
 }): InviteRewardDecision | null => {
-  void input;
-  return null;
+  if (input.alreadyRewarded) return null;
+  return {
+    subscriptionId: input.currentSubscriptionId,
+    owed: input.currentSubscriptionId === null,
+  };
 };
