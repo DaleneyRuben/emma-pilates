@@ -27,6 +27,7 @@ you are starting with no project knowledge.
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
+| Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 75) | One close a day per Branch and never undone, so use a copy of the fixtures; voiding a sale (PAY-006) is not built yet |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
@@ -3328,6 +3329,9 @@ The following are not ready for manual product testing:
 - «El registro venció» on a device, which needs seven days to pass after the
   registration (the automated tests show it);
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
+- a sale voided after the cash close showing as a negative «Ajuste» on AW151:
+  voiding arrives with PAY-006 (the integration spec simulates it; a late
+  cash sale already shows as a positive adjustment, Test 75);
 - real push delivery on iOS, which needs the APNs key (gate 9): the
   Simulators show pushes only through `xcrun simctl push`, while Android
   receives real pushes on the development, staging, and Play builds
@@ -5834,3 +5838,52 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 75: the daily cash close (BKO-003)
+
+At the end of the day the Assistant (or the Administrator) counts the drawer
+and closes the Branch's cash once (S25); the Administrator reviews the closes
+on AW151. The expected cash is the day's confirmed cash Payments at that
+Branch, up to the moment of the close.
+
+1. Use a copy of the fixtures database, because a close can never be undone:
+   `createdb pilates_test_cash`, then `db:migrate:deploy` and `db:fixtures` on
+   it, and run the API, the admin web, and the Staff app against it (Tests 19
+   and 23).
+2. Log in to the Staff app as `camila.rojas@example.com` and sell a Plan in
+   cash at Centro to a Client without one (Mariana or Sofía, Test 19).
+3. Press «Cerrar caja» beside the avatar on Buscar cliente. Expected: today
+   and «Centro» under the title, «EFECTIVO ESPERADO» with the sale's amount
+   and «1 venta en efectivo hoy en Centro», and «Cerrar caja» disabled until a
+   count is typed.
+4. Type the expected amount, then less, then more. Expected: «Diferencia · Bs
+   0 · Cuadra» on green, «−Bs … · Falta efectivo» on red, «+Bs … · Sobra
+   efectivo» on amber; «12,345» is not read and keeps the button off.
+5. Add a note and press «Cerrar caja». Expected: «Caja cerrada» with the
+   expected, counted, and difference lines, the note, and «Cerrada por Camila
+   Rojas a las hh:mm.», and in `psql` one `back_office.cash_closes` row plus a
+   `cash_close.recorded` audit record (actor role `ASSISTANT`, the Branch,
+   `businessDate`, the amounts).
+6. Open «Cerrar caja» again. Expected: the same closed state, no form. A second
+   `POST /api/v1/cash-closes` for that Branch today with another
+   Idempotency-Key answers `409` `cash_close_already_recorded`; the same key
+   replays the first answer. `GET /api/v1/cash-closes/today?branchId=<Urubó>`
+   as Camila answers `403` `branch_not_assigned`; as a Trainer, `403`
+   `back_office_access_denied`.
+7. Log in as `paola.mendoza@example.com`: «Cerrar caja» sits beside the avatar
+   on Pagos pendientes and offers every Branch as chips. Close another Branch.
+8. On the admin web, open Back Office › «Caja» (after Pagos). Expected: AW151
+   «Cierres de caja» for the selected Branch and the current month, one row
+   per day with cash sales or a close, newest first: «Cerrada», «Sin cierre»
+   (a past day with cash sales and no close, also counted in the amber notice
+   above the table), or «Abierta» (today, not closed yet). A short count reads
+   «−Bs …» in red on a tinted row, a surplus «+Bs …» in amber. Make a past
+   unclosed day by recording a cash sale with the API's clock in the past (or
+   wait a day) to see the notice.
+9. The «Ajuste» column shows how a closed day's cash sales moved after the
+   close: a cash sale recorded later the same day raises it; a sale voided
+   after the close (PAY-006, not built yet) will lower it. The close itself is
+   never edited.
+10. Check AW151 at 1440 px and 420 px (the rows become cards that keep the
+    tint), and `GET /api/v1/administrator/cash-closes?branchId=…&month=…` as
+    the Assistant answers `403`. Then `dropdb pilates_test_cash`.
