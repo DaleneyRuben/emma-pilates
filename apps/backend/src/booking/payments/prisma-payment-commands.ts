@@ -30,6 +30,30 @@ import { BookingAccessDeniedError } from '../commands/create-booking';
 import { summarizeCredit, type CreditSummary } from './credit-summary';
 import { PaymentRuleError } from './payment-errors';
 import {
+  intentSelect,
+  paymentMethods,
+  paymentSelect,
+  toIntentView,
+  toPaymentView,
+  type CreditActivityEntry,
+  type IntentRow,
+  type PaymentReview,
+  type PaymentRow,
+  type PaymentView,
+  type PendingPaymentSummary,
+  type PurchaseIntentView,
+  type ReferralsView,
+} from './payment-views';
+
+export type {
+  CreditActivityEntry,
+  PaymentReview,
+  PaymentView,
+  PendingPaymentSummary,
+  PurchaseIntentView,
+  ReferralsView,
+} from './payment-views';
+import {
   scheduleReceiptDeletion,
   settleReservation,
 } from './purchase-intent-settlement';
@@ -42,76 +66,7 @@ import {
 
 type Transaction = Prisma.TransactionClient;
 
-export type PurchaseIntentView = {
-  id: string;
-  planId: string;
-  planName: string;
-  durationMonths: number;
-  classAllowance: number;
-  planPriceCentavos: number;
-  creditReservedCentavos: number;
-  amountDueCentavos: number;
-  state: 'open' | 'submitted' | 'expired';
-  receiptAttached: boolean;
-  createdAt: Date;
-  expiresAt: Date;
-};
-
-export type PaymentView = {
-  id: string;
-  method: 'transfer' | 'cash' | 'credit_only';
-  state: 'pending' | 'confirmed' | 'rejected';
-  planId: string;
-  planName: string;
-  durationMonths: number;
-  classAllowance: number;
-  planPriceCentavos: number;
-  creditAppliedCentavos: number;
-  amountDueCentavos: number;
-  submittedAt: Date;
-  decidedAt: Date | null;
-  rejectionReason: string | null;
-  subscriptionId: string | null;
-};
-
-export type CreditActivityEntry = {
-  id: string;
-  kind:
-    | 'referral_award'
-    | 'payment_reservation'
-    | 'payment_spend'
-    | 'payment_release';
-  amountCentavos: number;
-  occurredAt: Date;
-};
-
-export type ReferralsView = {
-  referralCode: string;
-  referrals: {
-    referredClientId: string;
-    referredName: string;
-    state: 'pending' | 'awarded';
-    createdAt: Date;
-    awardedAt: Date | null;
-    awardCentavos: number | null;
-  }[];
-};
-
 const creditActivityLimit = 20;
-
-export type PendingPaymentSummary = {
-  id: string;
-  clientName: string;
-  planName: string;
-  amountDueCentavos: number;
-  submittedAt: Date;
-  receiptAvailable: boolean;
-};
-
-export type PaymentReview = PaymentView & {
-  clientName: string;
-  receipt: { imageAssetId: string; mediaType: string } | null;
-};
 
 const mediaTypes: Record<ImageMediaType, string> = {
   [ImageMediaType.JPEG]: 'image/jpeg',
@@ -136,94 +91,6 @@ const purchaseIntentLifetimeMilliseconds = 24 * hourMilliseconds;
 // Retained at least 48 hours after the Intent's 24-hour lifetime ends.
 const idempotencyRetentionMilliseconds = 72 * hourMilliseconds;
 const rejectionReasonMaxLength = 300;
-
-const intentStates: Record<PurchaseIntentState, PurchaseIntentView['state']> = {
-  [PurchaseIntentState.OPEN]: 'open',
-  [PurchaseIntentState.SUBMITTED]: 'submitted',
-  [PurchaseIntentState.EXPIRED]: 'expired',
-};
-const paymentMethods: Record<PaymentMethod, PaymentView['method']> = {
-  [PaymentMethod.TRANSFER]: 'transfer',
-  [PaymentMethod.CASH]: 'cash',
-  [PaymentMethod.CREDIT_ONLY]: 'credit_only',
-};
-const paymentStates: Record<PaymentState, PaymentView['state']> = {
-  [PaymentState.PENDING]: 'pending',
-  [PaymentState.CONFIRMED]: 'confirmed',
-  [PaymentState.REJECTED]: 'rejected',
-};
-
-const intentSelect = {
-  id: true,
-  clientId: true,
-  planId: true,
-  planNameSnapshot: true,
-  durationMonthsSnapshot: true,
-  classAllowanceSnapshot: true,
-  planPriceCentavos: true,
-  creditReservedCentavos: true,
-  amountDueCentavos: true,
-  receiptImageAssetId: true,
-  state: true,
-  createdAt: true,
-  expiresAt: true,
-} as const;
-
-const paymentSelect = {
-  id: true,
-  clientId: true,
-  planId: true,
-  purchaseIntentId: true,
-  planNameSnapshot: true,
-  durationMonthsSnapshot: true,
-  classAllowanceSnapshot: true,
-  planPriceCentavos: true,
-  creditAppliedCentavos: true,
-  amountDueCentavos: true,
-  method: true,
-  state: true,
-  submittedAt: true,
-  decidedAt: true,
-  rejectionReason: true,
-  subscription: { select: { id: true } },
-} as const;
-
-type IntentRow = Prisma.PurchaseIntentGetPayload<{
-  select: typeof intentSelect;
-}>;
-type PaymentRow = Prisma.PaymentGetPayload<{ select: typeof paymentSelect }>;
-
-const toIntentView = (row: IntentRow): PurchaseIntentView => ({
-  id: row.id,
-  planId: row.planId,
-  planName: row.planNameSnapshot,
-  durationMonths: row.durationMonthsSnapshot,
-  classAllowance: row.classAllowanceSnapshot,
-  planPriceCentavos: row.planPriceCentavos,
-  creditReservedCentavos: row.creditReservedCentavos,
-  amountDueCentavos: row.amountDueCentavos,
-  state: intentStates[row.state],
-  receiptAttached: row.receiptImageAssetId !== null,
-  createdAt: row.createdAt,
-  expiresAt: row.expiresAt,
-});
-
-const toPaymentView = (row: PaymentRow): PaymentView => ({
-  id: row.id,
-  method: paymentMethods[row.method],
-  state: paymentStates[row.state],
-  planId: row.planId,
-  planName: row.planNameSnapshot,
-  durationMonths: row.durationMonthsSnapshot,
-  classAllowance: row.classAllowanceSnapshot,
-  planPriceCentavos: row.planPriceCentavos,
-  creditAppliedCentavos: row.creditAppliedCentavos,
-  amountDueCentavos: row.amountDueCentavos,
-  submittedAt: row.submittedAt,
-  decidedAt: row.decidedAt,
-  rejectionReason: row.rejectionReason,
-  subscriptionId: row.subscription?.id ?? null,
-});
 
 const requireClient = (principal: AuthenticatedPrincipal): string => {
   if (principal.identity.kind !== 'client') {
