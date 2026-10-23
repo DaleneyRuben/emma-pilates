@@ -207,6 +207,9 @@ model Account {
   recordedSupplyRestocks    SupplyRestock[]         @relation("SupplyRestockRecordedBy")
   recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
+  createdEquipment          Equipment[]             @relation("EquipmentCreatedBy")
+  reportedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueReportedBy")
+  resolvedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueResolvedBy")
 
   @@map("accounts")
   @@schema("system")
