@@ -3,6 +3,7 @@ import {
   BodyText,
   Chevron,
   colors,
+  ConfirmationSheet,
   EmptyState,
   initials,
   LoadingState,
@@ -16,7 +17,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createImpersonationApi } from "./impersonation-api";
@@ -39,6 +40,8 @@ export function ViewAsScreen() {
   const { refreshSession } = useImpersonation();
   const api = useMemo(() => createImpersonationApi(fetcher), [fetcher]);
   const [failure, setFailure] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<StaffMemberDto | null>(null);
+  const [busy, setBusy] = useState(false);
   const members = useListStaffMembers(
     { status: "active", pageSize: 100 },
     { fetcher, query: { refetchOnMount: "always" } },
@@ -75,27 +78,20 @@ export function ViewAsScreen() {
   }
 
   const people = members.data.data.items.filter(isImpersonable);
-  const confirm = (member: StaffMemberDto) => {
-    const firstName = member.name.split(" ")[0] ?? member.name;
-    Alert.alert(
-      `¿Ver la app como ${member.name}?`,
-      "Durante 30 minutos verás sus clases y sus sucursales y podrás actuar como ella. Todo lo que hagas quedará registrado a tu nombre.",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: `Ver como ${firstName}`,
-          onPress: async () => {
-            setFailure(null);
-            try {
-              await api.start(member.id);
-              await refreshSession();
-            } catch {
-              setFailure("No pudimos empezar a ver la app como esa persona. Inténtalo de nuevo.");
-            }
-          },
-        },
-      ],
-    );
+  const firstName = confirming === null ? "" : (confirming.name.split(" ")[0] ?? confirming.name);
+  const start = async () => {
+    if (confirming === null) return;
+    setBusy(true);
+    setFailure(null);
+    try {
+      await api.start(confirming.id);
+      await refreshSession();
+    } catch {
+      setFailure("No pudimos empezar a ver la app como esa persona. Inténtalo de nuevo.");
+    } finally {
+      setBusy(false);
+      setConfirming(null);
+    }
   };
 
   return (
@@ -130,7 +126,7 @@ export function ViewAsScreen() {
                     accessibilityLabel={member.name}
                     accessibilityRole="button"
                     key={member.id}
-                    onPress={() => confirm(member)}
+                    onPress={() => setConfirming(member)}
                     style={[styles.row, index < rows.length - 1 && styles.rowRule]}
                     testID={`view-as-${member.id}`}
                   >
@@ -154,6 +150,20 @@ export function ViewAsScreen() {
           );
         })}
       </ScrollView>
+      {/* S24's sheet (UX-002): the solid action, since starting is not destructive. */}
+      <ConfirmationSheet
+        busy={busy}
+        confirmLabel={`Ver como ${firstName}`}
+        confirmTestID="view-as-confirm"
+        dismissLabel="Cancelar"
+        note="Durante 30 minutos verás sus clases y sus sucursales y podrás actuar como ella. Todo lo que hagas quedará registrado a tu nombre."
+        onConfirm={() => void start()}
+        onDismiss={() => setConfirming(null)}
+        testID="view-as-sheet"
+        title={`¿Ver la app como ${confirming?.name ?? ""}?`}
+        tone="primary"
+        visible={confirming !== null}
+      />
     </Screen>
   );
 }

@@ -8,6 +8,7 @@ import {
   formatTimeRange,
   Heading,
   LoadingState,
+  OutlinedButton,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -22,7 +23,6 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { useInClientPanel } from "./assistant-workspace";
-import { OutlinedButton } from "./outlined-button";
 import { PendingInvitationCard } from "./pending-invitation-card";
 import { formatCivilDate } from "./assistant-format";
 

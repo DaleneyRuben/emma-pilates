@@ -1582,8 +1582,14 @@ test password.
 
 ### D. Log out with confirmation
 
-Tap **Cerrar sesión**. The app asks "¿Cerrar sesión?" first; **Cancelar** keeps
-you signed in and **Cerrar sesión** returns to Login.
+Tap **Cerrar sesión**. A bottom sheet slides up over the dimmed screen (the
+design's confirmation sheet, not the system dialog, UX-002): «¿Cerrar sesión?»
+in Lora, the note "Vuelves al inicio de sesión y tendrás que entrar de nuevo
+con tu correo y contraseña.", an outlined Error **Cerrar sesión** and a quiet
+**Cancelar** link. **Cancelar** (or the Android back button) closes the sheet
+and keeps you signed in; **Cerrar sesión** spins in Error while the session is
+revoked and returns to Login. The sheet is the same in the Staff app (E) and
+on Android, where the old native dialog drew Material teal buttons.
 
 ### E. Staff Perfil
 
@@ -5284,9 +5290,10 @@ Start the API and the Staff app as Test 1 and Test 2 describe and log in as
    aquí.»; with the API down it shows «No pudimos cargar al personal.» with
    **Reintentar** (Test 71), and a start the API refuses reads «No pudimos
    empezar a ver la app como esa persona. Inténtalo de nuevo.».
-3. Tap Emma Vargas. The confirmation names her («¿Ver la app como Emma
-   Vargas?») and states the 30 minutes and that everything is recorded in
-   your name; «Cancelar» leaves everything as it is, «Ver como Emma» starts.
+3. Tap Emma Vargas. A bottom sheet (S24's, UX-002) names her («¿Ver la app
+   como Emma Vargas?» in Lora) and states the 30 minutes and that everything
+   is recorded in your name; the quiet «Cancelar» link leaves everything as
+   it is, the solid Palo de rosa «Ver como Emma» spins while the start runs.
 4. The app re-draws as Emma: her «Mi agenda» root under a fixed Palo de rosa
    profundo strip reading «Viendo como Emma Vargas» over «Entrenadora ·
    Quedan 29 min», with «Salir» at its right. The strip stays over every
