@@ -121,7 +121,8 @@ describe('the Coordinator acting for a Client (ADR-0102)', () => {
         countLiveBookings: jest.fn().mockResolvedValue(0),
         hasOverlappingBooking: jest.fn().mockResolvedValue(false),
         reschedule,
-        now,
+        // Rescheduling happens inside the Cancellation Window, on the same day.
+        now: () => new Date('2026-09-11T14:30:00Z'),
       },
     );
     expect(reschedule).toHaveBeenCalledWith(

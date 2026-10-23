@@ -1,3 +1,4 @@
+import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from './create-booking';
 
@@ -37,12 +38,7 @@ const assertAccess = (
     throw new BookingAccessDeniedError();
   }
 
-  if (
-    principal.identity.role === 'assistant' &&
-    principal.identity.branchIds.includes(booking.session.branchId)
-  ) {
-    return;
-  }
+  if (actsForClientsAt(principal, booking.session.branchId)) return;
 
   throw new BookingAccessDeniedError();
 };

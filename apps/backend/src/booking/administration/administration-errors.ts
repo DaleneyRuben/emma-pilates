@@ -9,6 +9,7 @@ export type AdministrationErrorCode =
   | 'session_not_found'
   | 'evaluation_not_found'
   | 'client_not_found'
+  | 'client_name_required'
   | 'promotion_contact_not_found'
   | 'branch_in_use'
   | 'class_type_in_use'
@@ -31,6 +32,7 @@ const statuses: Record<AdministrationErrorCode, number> = {
   session_not_found: 404,
   evaluation_not_found: 404,
   client_not_found: 404,
+  client_name_required: 400,
   promotion_contact_not_found: 404,
   branch_in_use: 409,
   class_type_in_use: 409,
@@ -72,6 +74,29 @@ export const requireAdministrator = (
   return {
     accountId: principal.accountId,
     staffMemberId: principal.identity.staffMemberId,
+  };
+};
+
+export type OperationsActor = AdministratorActor & {
+  role: 'administrator' | 'coordinator';
+};
+
+// ADR-0102: the studio's operation without money, for the Administrator and
+// the Coordinator. Every money decision keeps requireAdministrator.
+export const requireOperations = (
+  principal: AuthenticatedPrincipal,
+): OperationsActor => {
+  if (
+    principal.identity.kind !== 'staff' ||
+    (principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
+  ) {
+    throw new AdministrationError('administration_access_denied');
+  }
+  return {
+    accountId: principal.accountId,
+    staffMemberId: principal.identity.staffMemberId,
+    role: principal.identity.role,
   };
 };
 
