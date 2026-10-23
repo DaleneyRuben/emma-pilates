@@ -43,6 +43,7 @@ const startWithPush = async () => {
     sessionSchedules: idle({ schedules: 0, created: 0, skipped: 0 }),
     evaluationSlots: idle({ blocks: 0, created: 0, skipped: 0 }),
     evaluationReminders: idle({ sent: 0 }),
+    classReminders: idle({ sent: 0 }),
     emptySessionChecks: idle({ checked: 0, cancelled: 0 }),
     startedSessionWaitlists: idle({ closed: 0 }),
     pushDispatch: { dispatch },

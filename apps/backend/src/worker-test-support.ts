@@ -17,6 +17,9 @@ export const occurrenceJobs = () => ({
   evaluationReminders: {
     execute: jest.fn().mockResolvedValue({ sent: 0 }),
   },
+  classReminders: {
+    execute: jest.fn().mockResolvedValue({ sent: 0 }),
+  },
   emptySessionChecks: {
     execute: jest.fn().mockResolvedValue({ checked: 0, cancelled: 0 }),
   },

@@ -6,8 +6,8 @@ import {
 const today = new Date('2026-09-21T00:00:00.000Z');
 
 describe('remindExpiringSubscriptions', () => {
-  it('records one reminder per Subscription ending in three days', async () => {
-    const findSubscriptionsEndingOn = jest.fn().mockResolvedValue([
+  it('records one reminder per Subscription ending within three days and not yet reminded', async () => {
+    const findSubscriptionsEndingWithin = jest.fn().mockResolvedValue([
       { id: 'subscription-1', accountId: 'account-1' },
       { id: 'subscription-2', accountId: 'account-2' },
     ]);
@@ -16,14 +16,12 @@ describe('remindExpiringSubscriptions', () => {
     await expect(
       remindExpiringSubscriptions({
         today,
-        findSubscriptionsEndingOn,
+        findSubscriptionsEndingWithin,
         record,
       }),
     ).resolves.toEqual({ reminded: 2 });
 
-    expect(findSubscriptionsEndingOn).toHaveBeenCalledWith(
-      new Date('2026-09-24T00:00:00.000Z'),
-    );
+    expect(findSubscriptionsEndingWithin).toHaveBeenCalledWith(today);
     expect(record).toHaveBeenCalledWith({
       accountId: 'account-1',
       category: 'reminder',
@@ -64,7 +62,7 @@ describe('remindExpiringSubscriptions', () => {
     await expect(
       remindExpiringSubscriptions({
         today,
-        findSubscriptionsEndingOn: jest.fn().mockResolvedValue([]),
+        findSubscriptionsEndingWithin: jest.fn().mockResolvedValue([]),
         record,
       }),
     ).resolves.toEqual({ reminded: 0 });

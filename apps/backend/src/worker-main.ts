@@ -15,6 +15,7 @@ import { createPrismaRetentionSweeps } from './system-identity/retention/prisma-
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
 import { createNotificationRecorder } from './notifications/prisma-notification-store';
 import { createPushDeliveryRuntime } from './notifications/push/push-delivery-runtime';
+import { createClassReminderJob } from './notifications/class-reminder-job';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
 import { PrismaClientRegistrationUnitOfWork } from './system-identity/registration/prisma-client-registration-unit-of-work';
@@ -114,6 +115,7 @@ async function bootstrap(): Promise<void> {
     evaluationReminders: {
       execute: () => evaluations.sendDueEvaluationReminders(),
     },
+    classReminders: createClassReminderJob(prisma, now, recordNotification),
     emptySessionChecks: {
       execute: () => sessionStartChecks.checkEmptySessions(),
     },

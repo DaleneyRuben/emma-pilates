@@ -15,8 +15,8 @@ export const subscriptionEndsWithinReminderWindow = (
 
 type RemindExpiringSubscriptionsDependencies = {
   today: Date;
-  findSubscriptionsEndingOn(
-    endsOn: Date,
+  findSubscriptionsEndingWithin(
+    today: Date,
   ): Promise<{ id: string; accountId: string }[]>;
   record(notification: NewNotification): Promise<void>;
 };
@@ -24,10 +24,9 @@ type RemindExpiringSubscriptionsDependencies = {
 export const remindExpiringSubscriptions = async (
   dependencies: RemindExpiringSubscriptionsDependencies,
 ): Promise<{ reminded: number }> => {
-  const endsOn = new Date(
-    dependencies.today.getTime() + reminderLeadDays * dayMilliseconds,
+  const subscriptions = await dependencies.findSubscriptionsEndingWithin(
+    dependencies.today,
   );
-  const subscriptions = await dependencies.findSubscriptionsEndingOn(endsOn);
 
   for (const subscription of subscriptions) {
     await dependencies.record({
