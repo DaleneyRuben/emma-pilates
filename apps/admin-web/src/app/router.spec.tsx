@@ -34,6 +34,7 @@ describe("admin navigation", () => {
       },
       { label: null, items: ["Reporte"] },
       { label: "Promociones", items: ["Promociones", "Referidos", "Créditos"] },
+      { label: null, items: ["Comentarios"] },
     ]);
     expect(navigationItems.map((item) => item.label)).not.toContain(
       "Descuentos",
@@ -60,6 +61,7 @@ describe("admin navigation", () => {
       "AW17",
       "AW26",
       "AW27",
+      "AW38",
     ]);
   });
 
@@ -75,6 +77,7 @@ describe("admin navigation", () => {
       "Categorías de gasto",
       "Referidos",
       "Créditos",
+      "Comentarios",
     ]);
   });
 });
