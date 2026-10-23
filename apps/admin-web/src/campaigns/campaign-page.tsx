@@ -70,10 +70,9 @@ export function CampaignPage() {
     defaultValues: { name: "", classes: "1" },
   });
 
-  const submit = form.handleSubmit((values) => {
+  const submit = form.handleSubmit(() => {
     setFailure(null);
     setConfirming(true);
-    form.reset(values, { keepValues: true });
   });
 
   const confirm = async () => {
