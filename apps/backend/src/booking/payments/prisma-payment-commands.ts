@@ -4,8 +4,6 @@ import {
   AuditActorKind,
   AuditOutcome,
   CreditLedgerActorKind,
-  CreditLedgerEntryKind,
-  CreditReservationState,
   ImageAssetPurpose,
   ImageAssetState,
   ImageMediaType,
@@ -27,7 +25,7 @@ import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
-import { summarizeCredit, type CreditSummary } from './credit-summary';
+import type { CreditSummary } from './credit-summary';
 import { PaymentRuleError } from './payment-errors';
 import {
   scheduleReceiptDeletion,
@@ -96,8 +94,6 @@ export type ReferralsView = {
   }[];
 };
 
-const creditActivityLimit = 20;
-
 export type PendingPaymentSummary = {
   id: string;
   clientName: string;
@@ -126,7 +122,6 @@ const abbreviateName = (name: string): string => {
 
 export type PaymentCommandsDependencies = {
   now: () => Date;
-  referralRewardCentavos: number;
   recordNotification?: NotificationRecorder;
 };
 
@@ -282,22 +277,6 @@ export function createPrismaPaymentCommands(
     for (const clientId of [...new Set(clientIds)].sort()) {
       await transaction.$queryRaw`SELECT "id" FROM "booking"."clients" WHERE "id" = ${clientId}::uuid FOR UPDATE`;
     }
-  };
-
-  const readLedgerSummary = async (
-    transaction: Transaction,
-    clientId: string,
-  ): Promise<CreditSummary> => {
-    const entries = await transaction.creditLedgerEntry.findMany({
-      where: { clientId },
-      select: { kind: true, amountCentavos: true },
-    });
-    return summarizeCredit(
-      entries.map((entry) => ({
-        kind: entry.kind.toLowerCase() as Lowercase<CreditLedgerEntryKind>,
-        amountCentavos: entry.amountCentavos,
-      })),
-    );
   };
 
   const withIdempotency = async <Result extends Prisma.InputJsonValue>(
@@ -518,12 +497,12 @@ export function createPrismaPaymentCommands(
     });
   };
 
-  // A confirmed Payment activates exactly one Subscription and qualifies the
-  // Client's pending Referral, awarding the referrer once.
+  // A confirmed Payment activates exactly one Subscription. It awards no
+  // Credit: the Bs 60 Referral reward is retired (booking ADR-0009), so a
+  // pending Referral stays pending.
   const activateSubscription = async (
     transaction: Transaction,
     payment: PaymentRow,
-    principal: AuthenticatedPrincipal,
     now: Date,
   ): Promise<string> => {
     const term = computeSubscriptionTerm(
@@ -546,38 +525,6 @@ export function createPrismaPaymentCommands(
       },
       select: { id: true },
     });
-
-    const referral = await transaction.referral.findFirst({
-      where: {
-        referredClientId: payment.clientId,
-        state: ReferralState.PENDING,
-      },
-      select: { id: true, referrerClientId: true },
-    });
-    if (referral !== null) {
-      await transaction.referral.update({
-        where: { id: referral.id },
-        data: {
-          state: ReferralState.AWARDED,
-          qualifiedPaymentId: payment.id,
-          qualifiedAt: now,
-          awardCentavos: dependencies.referralRewardCentavos,
-          awardedAt: now,
-        },
-      });
-      await transaction.creditLedgerEntry.create({
-        data: {
-          clientId: referral.referrerClientId,
-          kind: CreditLedgerEntryKind.REFERRAL_AWARD,
-          amountCentavos: dependencies.referralRewardCentavos,
-          occurredAt: now,
-          referralId: referral.id,
-          actorKind: CreditLedgerActorKind.ACCOUNT,
-          actorAccountId: principal.accountId,
-          correlationId: payment.id,
-        },
-      });
-    }
 
     return subscription.id;
   };
@@ -630,43 +577,23 @@ export function createPrismaPaymentCommands(
     }
   };
 
-  // Cash and Credit-only Payments are created confirmed by their submitter:
-  // Credit is reserved and spent in the same transaction, the Subscription
-  // activates, and any pending Referral is awarded.
-  const settleImmediatePayment = async (
+  // A cash Payment is created confirmed by its collector for the full Plan
+  // price, and the Subscription activates at once.
+  const settleCashPayment = async (
     transaction: Transaction,
     input: {
       clientId: string;
       planId: string;
       principal: AuthenticatedPrincipal;
-      branchId: string | null;
-      requireFullCredit: boolean;
+      branchId: string;
     },
   ): Promise<{ id: string }> => {
     const now = dependencies.now();
-    const referral = await transaction.referral.findFirst({
-      where: { referredClientId: input.clientId, state: ReferralState.PENDING },
-      select: { referrerClientId: true },
-    });
-    await lockClients(transaction, [
-      input.clientId,
-      ...(referral ? [referral.referrerClientId] : []),
-    ]);
+    await lockClients(transaction, [input.clientId]);
     const plan = await assertEligible(transaction, {
       clientId: input.clientId,
       planId: input.planId,
     });
-    const credit = await readLedgerSummary(transaction, input.clientId);
-    if (
-      input.requireFullCredit &&
-      credit.availableCentavos < plan.priceCentavos
-    ) {
-      throw rule('credit_insufficient', 'Credit does not cover the Plan price');
-    }
-    const applied = Math.min(credit.availableCentavos, plan.priceCentavos);
-    const amountDue = plan.priceCentavos - applied;
-    const method =
-      amountDue === 0 ? PaymentMethod.CREDIT_ONLY : PaymentMethod.CASH;
 
     const payment = await transaction.payment.create({
       data: {
@@ -676,12 +603,11 @@ export function createPrismaPaymentCommands(
         durationMonthsSnapshot: plan.durationMonths,
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: plan.priceCentavos,
-        creditAppliedCentavos: applied,
-        amountDueCentavos: amountDue,
-        method,
+        creditAppliedCentavos: 0,
+        amountDueCentavos: plan.priceCentavos,
+        method: PaymentMethod.CASH,
         state: PaymentState.CONFIRMED,
-        collectedAtBranchId:
-          method === PaymentMethod.CASH ? input.branchId : null,
+        collectedAtBranchId: input.branchId,
         submittedByAccountId: input.principal.accountId,
         submittedAt: now,
         decidedByAccountId: input.principal.accountId,
@@ -691,53 +617,18 @@ export function createPrismaPaymentCommands(
       select: paymentSelect,
     });
 
-    if (applied > 0) {
-      const reservation = await transaction.creditReservation.create({
-        data: {
-          clientId: input.clientId,
-          amountCentavos: applied,
-          paymentId: payment.id,
-          state: CreditReservationState.SPENT,
-          reservedAt: now,
-          settledAt: now,
-        },
-        select: { id: true },
-      });
-      for (const kind of [
-        CreditLedgerEntryKind.PAYMENT_RESERVATION,
-        CreditLedgerEntryKind.PAYMENT_SPEND,
-      ]) {
-        await transaction.creditLedgerEntry.create({
-          data: {
-            clientId: input.clientId,
-            kind,
-            amountCentavos: applied,
-            occurredAt: now,
-            reservationId: reservation.id,
-            actorKind: CreditLedgerActorKind.ACCOUNT,
-            actorAccountId: input.principal.accountId,
-            correlationId: payment.id,
-          },
-        });
-      }
-    }
-
     const subscriptionId = await activateSubscription(
       transaction,
       payment,
-      input.principal,
       now,
     );
     await recordPaymentAudit(transaction, {
-      actionCode:
-        method === PaymentMethod.CASH
-          ? 'payment.cash_confirmed'
-          : 'payment.credit_only_confirmed',
+      actionCode: 'payment.cash_confirmed',
       principal: input.principal,
       payment,
       priorState: null,
       newState: 'confirmed',
-      branchId: method === PaymentMethod.CASH ? input.branchId : null,
+      branchId: input.branchId,
       now,
     });
     await notifyPaymentConfirmed(transaction, {
@@ -767,12 +658,11 @@ export function createPrismaPaymentCommands(
           request: command,
         },
         () =>
-          settleImmediatePayment(transaction, {
+          settleCashPayment(transaction, {
             clientId: command.clientId,
             planId: command.planId,
             principal,
             branchId: command.branchId,
-            requireFullCredit: false,
           }),
       ),
     );
@@ -780,34 +670,15 @@ export function createPrismaPaymentCommands(
     return readPaymentView(stored.id);
   };
 
-  const completeCreditPurchase = async (
-    command: { planId: string },
+  // Deprecated with Credit (PAY-005): a store build from before it calls this
+  // only when Credit covers the price, which it no longer ever does.
+  const completeCreditPurchase = (
     principal: AuthenticatedPrincipal,
-    idempotencyKey: string,
   ): Promise<PaymentView> => {
-    const clientId = requireClient(principal);
-
-    const stored = await serializable((transaction) =>
-      withIdempotency(
-        transaction,
-        {
-          accountId: principal.accountId,
-          command: 'complete_credit_purchase',
-          idempotencyKey,
-          request: command,
-        },
-        () =>
-          settleImmediatePayment(transaction, {
-            clientId,
-            planId: command.planId,
-            principal,
-            branchId: null,
-            requireFullCredit: true,
-          }),
-      ),
+    requireClient(principal);
+    return Promise.reject(
+      rule('credit_insufficient', 'Credit was retired and covers no Plan'),
     );
-
-    return readPaymentView(stored.id);
   };
 
   const readPaymentView = async (paymentId: string): Promise<PaymentView> =>
@@ -852,11 +723,6 @@ export function createPrismaPaymentCommands(
               planId: command.planId,
             });
             const now = dependencies.now();
-            const credit = await readLedgerSummary(transaction, clientId);
-            const reserved = Math.min(
-              credit.availableCentavos,
-              plan.priceCentavos,
-            );
 
             const intent = await transaction.purchaseIntent.create({
               data: {
@@ -866,8 +732,8 @@ export function createPrismaPaymentCommands(
                 durationMonthsSnapshot: plan.durationMonths,
                 classAllowanceSnapshot: plan.classAllowance,
                 planPriceCentavos: plan.priceCentavos,
-                creditReservedCentavos: reserved,
-                amountDueCentavos: plan.priceCentavos - reserved,
+                creditReservedCentavos: 0,
+                amountDueCentavos: plan.priceCentavos,
                 createdByAccountId: principal.accountId,
                 createdAt: now,
                 expiresAt: new Date(
@@ -876,30 +742,6 @@ export function createPrismaPaymentCommands(
               },
               select: { id: true },
             });
-
-            if (reserved > 0) {
-              const reservation = await transaction.creditReservation.create({
-                data: {
-                  clientId,
-                  amountCentavos: reserved,
-                  purchaseIntentId: intent.id,
-                  reservedAt: now,
-                },
-                select: { id: true },
-              });
-              await transaction.creditLedgerEntry.create({
-                data: {
-                  clientId,
-                  kind: CreditLedgerEntryKind.PAYMENT_RESERVATION,
-                  amountCentavos: reserved,
-                  occurredAt: now,
-                  reservationId: reservation.id,
-                  actorKind: CreditLedgerActorKind.ACCOUNT,
-                  actorAccountId: principal.accountId,
-                  correlationId: intent.id,
-                },
-              });
-            }
 
             return { id: intent.id };
           },
@@ -1169,17 +1011,7 @@ export function createPrismaPaymentCommands(
       }
 
       const now = dependencies.now();
-      const referral = await transaction.referral.findFirst({
-        where: {
-          referredClientId: payment.clientId,
-          state: ReferralState.PENDING,
-        },
-        select: { referrerClientId: true },
-      });
-      await lockClients(transaction, [
-        payment.clientId,
-        ...(referral ? [referral.referrerClientId] : []),
-      ]);
+      await lockClients(transaction, [payment.clientId]);
 
       const active = await loadActiveSubscription(
         transaction,
@@ -1236,7 +1068,6 @@ export function createPrismaPaymentCommands(
       const subscriptionId = await activateSubscription(
         transaction,
         payment,
-        principal,
         now,
       );
       await recordPaymentAudit(transaction, {
@@ -1383,26 +1214,20 @@ export function createPrismaPaymentCommands(
     return payment === null ? null : toPaymentView(payment);
   };
 
+  // Credit is retired (booking ADR-0009): store builds from before PAY-005
+  // still read it, so it reads as zero with no activity; old ledger rows stay.
   const readCreditSummary = (
     principal: AuthenticatedPrincipal,
-  ): Promise<CreditSummary> =>
-    readLedgerSummary(prisma, requireClient(principal));
+  ): Promise<CreditSummary> => {
+    requireClient(principal);
+    return Promise.resolve({ availableCentavos: 0, reservedCentavos: 0 });
+  };
 
-  const readCreditActivity = async (
+  const readCreditActivity = (
     principal: AuthenticatedPrincipal,
   ): Promise<CreditActivityEntry[]> => {
-    const entries = await prisma.creditLedgerEntry.findMany({
-      where: { clientId: requireClient(principal) },
-      orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
-      take: creditActivityLimit,
-      select: { id: true, kind: true, amountCentavos: true, occurredAt: true },
-    });
-    return entries.map((entry) => ({
-      id: entry.id,
-      kind: entry.kind.toLowerCase() as CreditActivityEntry['kind'],
-      amountCentavos: entry.amountCentavos,
-      occurredAt: entry.occurredAt,
-    }));
+    requireClient(principal);
+    return Promise.resolve([]);
   };
 
   // Referred Clients appear as first name plus surname initial only.

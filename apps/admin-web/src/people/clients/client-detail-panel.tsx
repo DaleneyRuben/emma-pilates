@@ -20,7 +20,6 @@ import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
 import { PageNotice } from "../../components/page/page-notice";
 import { formatCivilDate } from "../../lib/bolivia-time";
-import { formatBolivianos } from "../../lib/money";
 import { useAdminRole } from "../../session/admin-role";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
@@ -32,7 +31,7 @@ const clientDetailQueryOptions = (clientId: string) =>
       (await getAdminClient(clientId, { signal }, adminFetch))
         .data as AdminClientDetailDto,
     // The summary decides a closure (follow-up 66), so every opening reads
-    // the current Bookings, Plan, and Credit instead of a cached copy.
+    // the current Bookings and Plan instead of a cached copy.
     staleTime: 0,
   });
 
@@ -109,14 +108,6 @@ function ClientSummary({
       ) : null}
       {contact}
       <PlanBlock view={client.subscription} />
-      {/* ADR-0102: the Coordinator's detail carries no amount. */}
-      {client.creditAvailableCentavos === undefined ? null : (
-        <SummaryBlock title="Crédito">
-          <SummaryRow label="Saldo disponible" figure>
-            {formatBolivianos(client.creditAvailableCentavos)}
-          </SummaryRow>
-        </SummaryBlock>
-      )}
       <SummaryBlock title="Referidos">
         <SummaryRow label="Clientas referidas" figure>
           {client.referredClientCount === 0

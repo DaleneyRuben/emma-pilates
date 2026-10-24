@@ -107,9 +107,7 @@ describe("AW22 Editar perfil", () => {
   });
 
   it("shows the Coordinator no amount and no «Cerrar cuenta»", async () => {
-    const withoutCredit = { ...luciaDetail };
-    delete withoutCredit.creditAvailableCentavos;
-    server.use(...coordinatorHandlers(), ...handlers(withoutCredit));
+    server.use(...coordinatorHandlers(), ...handlers(luciaDetail));
     const { panel } = await openLucia();
 
     expect(

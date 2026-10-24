@@ -28,6 +28,7 @@ import { ClientHistoryScreen } from "./assistant/client-history-screen";
 import { ClientOverviewScreen } from "./assistant/client-overview-screen";
 import { ClientSearchScreen } from "./assistant/client-search-screen";
 import { ConfirmCashPaymentScreen } from "./assistant/confirm-cash-payment-screen";
+import { CashCloseScreen } from "./cash-close/cash-close-screen";
 import { NewClientScreen } from "./assistant/new-client-screen";
 import { SelectPlanScreen } from "./assistant/select-plan-screen";
 import {
@@ -82,6 +83,7 @@ const AssistantStack = createNativeStackNavigator({
     ClientBookings: ClientBookingsScreen,
     Reschedule: AssistantRescheduleScreen,
     ClientHistory: ClientHistoryScreen,
+    CashClose: CashCloseScreen,
     ...accountScreens,
   },
 });
@@ -94,6 +96,7 @@ const AdministratorStack = createNativeStackNavigator({
     CancelClass: CancelClassScreen,
     CancelSession: CancelSessionScreen,
     ViewAs: ViewAsScreen,
+    CashClose: CashCloseScreen,
     ...accountScreens,
   },
 });

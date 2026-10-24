@@ -151,6 +151,7 @@ import { receiptReadProvider } from './payments/prisma-receipt-read';
 import { promotionContactsWiring } from './promotion-contacts/promotion-contacts-wiring';
 import { promotionsConsentWiring } from './promotions-consent/promotions-consent-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
+import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
 
 @Module({
@@ -188,6 +189,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionsWiring.controllers,
     ...promotionContactsWiring.controllers,
     ...promotionsConsentWiring.controllers,
+    ...studioSettingsWiring.controllers,
     ...clientPhotoWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
@@ -497,15 +499,13 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     },
     {
       provide: paymentCommands,
-      inject: [PRISMA_CLIENT, ConfigService, NOTIFICATION_RECORDER],
+      inject: [PRISMA_CLIENT, NOTIFICATION_RECORDER],
       useFactory: (
         prisma: PrismaClient,
-        config: ConfigService<Environment, true>,
         recordNotification: NotificationRecorder,
       ) =>
         createPrismaPaymentCommands(prisma, {
           now: () => new Date(),
-          referralRewardCentavos: config.getOrThrow('REFERRAL_REWARD_CENTAVOS'),
           recordNotification,
         }),
     },
@@ -582,6 +582,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionsWiring.providers(PRISMA_CLIENT),
     ...promotionContactsWiring.providers(PRISMA_CLIENT),
     ...promotionsConsentWiring.providers(PRISMA_CLIENT),
+    ...studioSettingsWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
   ],
 })

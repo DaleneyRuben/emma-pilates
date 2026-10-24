@@ -60,7 +60,7 @@ const directory = (
 });
 
 describe('the Coordinator in the Client directory (ADR-0102)', () => {
-  it('pages the directory and reads the detail without the Credit amount', async () => {
+  it('pages the directory and reads the detail with Credit retired', async () => {
     const clients = directory();
     const coordinator = staff('coordinator');
 
@@ -76,8 +76,11 @@ describe('the Coordinator in the Client directory (ADR-0102)', () => {
       coordinator,
       { directory: clients, now: () => now },
     );
-    expect(detail).toMatchObject({ id: 'client-id', closure: outlook });
-    expect(detail).not.toHaveProperty('creditAvailableCentavos');
+    expect(detail).toMatchObject({
+      id: 'client-id',
+      closure: outlook,
+      creditAvailableCentavos: 0,
+    });
     expect(clients.readAvailableCredit).not.toHaveBeenCalled();
   });
 });

@@ -6,7 +6,6 @@ const always = [
 ];
 
 const nothing = {
-  availableCreditCentavos: 0,
   bookings: [],
   evaluations: [],
   latestPayment: null,
@@ -24,7 +23,6 @@ describe("describeAccountClosure", () => {
   it("names every consequence with its numbers", () => {
     expect(
       describeAccountClosure({
-        availableCreditCentavos: 12_000,
         bookings: [{ kind: "booking" }, { kind: "booking" }, { kind: "waitlist" }],
         evaluations: [{ state: "booked" }],
         latestPayment: { method: "transfer", state: "confirmed" },
@@ -37,7 +35,6 @@ describe("describeAccountClosure", () => {
       "Cancelamos tus 2 reservas futuras y tu evaluación nutricional pendiente. No se descuenta nada.",
       "Sales de 1 lista de espera.",
       "Tu plan Mensual 16 clases termina hoy. No se devuelve dinero y pierdes las 11 clases que te quedan.",
-      "Pierdes tu crédito de Bs 120.",
       ...always,
     ]);
   });

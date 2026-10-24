@@ -11,12 +11,20 @@ import {
 } from "./session-format";
 
 describe("Session formatting", () => {
-  it("treats the last 2 h 30 before a Session as the Cancellation Window", () => {
+  it("treats the configured minutes before a Session as the Cancellation Window", () => {
     const now = new Date("2026-09-21T12:00:00.000Z");
 
-    expect(isInsideCancellationWindow("2026-09-21T14:30:00.000Z", now)).toBe(true);
-    expect(isInsideCancellationWindow("2026-09-21T14:30:00.001Z", now)).toBe(false);
-    expect(isInsideCancellationWindow("2026-09-21T11:00:00.000Z", now)).toBe(true);
+    expect(isInsideCancellationWindow("2026-09-21T14:30:00.000Z", now, 150)).toBe(true);
+    expect(isInsideCancellationWindow("2026-09-21T14:30:00.001Z", now, 150)).toBe(false);
+    expect(isInsideCancellationWindow("2026-09-21T11:00:00.000Z", now, 150)).toBe(true);
+  });
+
+  // BKM-004: the window is a Studio Setting, so changing it moves the edge.
+  it("follows a changed Cancellation Window", () => {
+    const now = new Date("2026-09-21T12:00:00.000Z");
+
+    expect(isInsideCancellationWindow("2026-09-21T15:00:00.000Z", now, 150)).toBe(false);
+    expect(isInsideCancellationWindow("2026-09-21T15:00:00.000Z", now, 240)).toBe(true);
   });
 
   // MOB-044: a Session that has started can no longer be booked or cancelled.

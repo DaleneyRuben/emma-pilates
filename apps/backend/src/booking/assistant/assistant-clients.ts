@@ -135,33 +135,26 @@ export const readClientOverview = async (
       from: Date;
     }): Promise<UpcomingClientBooking[]>;
     findAttendedBookings(clientId: string): Promise<ClassHistoryEntry[]>;
-    readAvailableCredit(clientId: string): Promise<number>;
   },
 ): Promise<ClientOverview> => {
-  const identity = requireAssistant(dependencies.principal);
+  requireAssistant(dependencies.principal);
   const client = await requireClient(command.clientId, dependencies);
-  // ADR-0016 keeps the field for installed builds; the Coordinator gets 0.
-  const readCredit = (clientId: string) =>
-    identity.role === 'coordinator'
-      ? Promise.resolve(0)
-      : dependencies.readAvailableCredit(clientId);
-  const [subscription, upcoming, history, creditAvailableCentavos] =
-    await Promise.all([
-      describeSubscription(client.id, dependencies),
-      dependencies.findUpcoming({
-        clientId: client.id,
-        from: dependencies.now(),
-      }),
-      dependencies.findAttendedBookings(client.id),
-      readCredit(client.id),
-    ]);
+  const [subscription, upcoming, history] = await Promise.all([
+    describeSubscription(client.id, dependencies),
+    dependencies.findUpcoming({
+      clientId: client.id,
+      from: dependencies.now(),
+    }),
+    dependencies.findAttendedBookings(client.id),
+  ]);
 
   return {
     client,
     subscription,
     nextBooking: upcoming[0] ?? null,
     recentHistory: history.slice(0, recentHistoryLength),
-    creditAvailableCentavos,
+    // Credit is retired (booking ADR-0009); store builds still read it.
+    creditAvailableCentavos: 0,
   };
 };
 
@@ -206,35 +199,26 @@ export const quotePlansForClient = async (
   dependencies: ClientLookup & {
     principal: AuthenticatedPrincipal;
     listVisiblePlans(): Promise<PlanSummary[]>;
-    readAvailableCredit(clientId: string): Promise<number>;
   },
 ): Promise<PlanQuotes> => {
   requireSeller(dependencies.principal);
-  const client = await requireClient(command.clientId, dependencies);
-  const [plans, creditAvailableCentavos] = await Promise.all([
-    dependencies.listVisiblePlans(),
-    dependencies.readAvailableCredit(client.id),
-  ]);
+  await requireClient(command.clientId, dependencies);
+  const plans = await dependencies.listVisiblePlans();
 
+  // Credit is retired (booking ADR-0009): every Plan costs its full price.
   return {
-    creditAvailableCentavos,
+    creditAvailableCentavos: 0,
     plans: [...plans]
       .sort(
         (left, right) =>
           left.displayOrder - right.displayOrder ||
           left.id.localeCompare(right.id),
       )
-      .map((plan) => {
-        const creditAppliedCentavos = Math.min(
-          creditAvailableCentavos,
-          plan.priceCentavos,
-        );
-        return {
-          ...plan,
-          creditAppliedCentavos,
-          amountDueCentavos: plan.priceCentavos - creditAppliedCentavos,
-        };
-      }),
+      .map((plan) => ({
+        ...plan,
+        creditAppliedCentavos: 0,
+        amountDueCentavos: plan.priceCentavos,
+      })),
   };
 };
 

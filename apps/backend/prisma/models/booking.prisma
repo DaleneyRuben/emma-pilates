@@ -74,6 +74,7 @@ model Branch {
   evaluationSlots  EvaluationSlot[]
   supplies         Supply[]
   expenses         Expense[]
+  cashCloses       CashClose[]
 
   @@map("branches")
   @@schema("booking")

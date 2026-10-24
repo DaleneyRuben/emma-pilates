@@ -80,7 +80,6 @@ describe('administration endpoints (e2e)', () => {
   const oversight = {
     listEvaluations: operation(),
     listReferrals: operation(),
-    listCredits: operation(),
     incomeReport: operation(),
   };
   const cancelEvaluation = operation();

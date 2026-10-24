@@ -111,12 +111,12 @@ export class AdminClientDetailDto {
   @ApiProperty({ type: ClientSubscriptionDto })
   subscription!: ClientSubscriptionDto;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     minimum: 0,
-    description:
-      'Available Credit in BOB centavos; absent for the Coordinator, who sees no amount (ADR-0102)',
+    deprecated: true,
+    description: 'Deprecated (PAY-005): Credit was retired; always 0',
   })
-  creditAvailableCentavos?: number;
+  creditAvailableCentavos!: number;
 
   @ApiProperty()
   referralCode!: string;

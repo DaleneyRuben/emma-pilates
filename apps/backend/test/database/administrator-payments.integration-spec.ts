@@ -27,7 +27,6 @@ describe('Administrator Payment list (PostgreSQL)', () => {
   const commands = (clock: Date) =>
     createPrismaPaymentCommands(prisma, {
       now: () => clock,
-      referralRewardCentavos: 6000,
     });
   const paymentIds: Record<string, string> = {};
 
@@ -169,8 +168,8 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       clientName: expect.stringMatching(/^Sofía/) as string,
       planName: 'Paquete de 8 clases',
       planPriceCentavos: plan.priceCentavos,
-      creditAppliedCentavos: 6000,
-      amountDueCentavos: plan.priceCentavos - 6000,
+      creditAppliedCentavos: 0,
+      amountDueCentavos: plan.priceCentavos,
       state: 'pending',
       submittedAt: at('14:00'),
       decidedAt: null,

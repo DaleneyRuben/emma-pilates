@@ -94,11 +94,6 @@ export type DevelopmentFixtures = {
     id: string;
     referrerClientId: string;
     referredClientId: string;
-    state: 'pending' | 'awarded';
-    qualifiedPaymentId: string | null;
-    qualifiedAt: Date | null;
-    awardCentavos: number | null;
-    awardedAt: Date | null;
     createdAt: Date;
   }[];
   availabilityBlocks: {
@@ -111,20 +106,7 @@ export type DevelopmentFixtures = {
     effectiveFrom: Date;
     createdByAccountId: string;
   }[];
-  creditLedgerEntries: {
-    id: string;
-    clientId: string;
-    kind: 'referral_award';
-    amountCentavos: number;
-    occurredAt: Date;
-    referralId: string;
-    actorKind: 'account';
-    actorAccountId: string;
-    correlationId: string;
-  }[];
 };
-
-const referralRewardCentavos = 6_000;
 
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
 const boliviaOffsetHours = 4;
@@ -434,8 +416,7 @@ type CashPaymentDefinition = {
   collectedBy: (typeof staffDefinitions)[number]['key'];
 };
 
-// Valeria paid her current Plan in cash at the front desk, which is what
-// qualifies Sofía's referral below.
+// Valeria paid her current Plan in cash at the front desk.
 const cashPaymentDefinitions: readonly CashPaymentDefinition[] = [
   {
     client: 'valeria',
@@ -636,63 +617,21 @@ export const buildDevelopmentFixtures = (input: {
     },
   );
 
+  // Referrals stay pending: the Bs 60 award is retired (booking ADR-0009).
   const referrals: DevelopmentFixtures['referrals'] = referralDefinitions.map(
-    (definition) => {
-      const referredClientId = clientId(definition.referred);
-      const qualifyingPayment = payments.find(
-        (payment) => payment.clientId === referredClientId,
-      );
-      const createdAt = boliviaInstant(
+    (definition) => ({
+      id: deterministicId(
+        `referral:${definition.referrer}:${definition.referred}`,
+      ),
+      referrerClientId: clientId(definition.referrer),
+      referredClientId: clientId(definition.referred),
+      createdAt: boliviaInstant(
         addDays(input.today, -definition.registeredDaysAgo),
         10,
         0,
-      );
-      const awarded =
-        qualifyingPayment !== undefined &&
-        qualifyingPayment.decidedAt.getTime() > createdAt.getTime();
-
-      return {
-        id: deterministicId(
-          `referral:${definition.referrer}:${definition.referred}`,
-        ),
-        referrerClientId: clientId(definition.referrer),
-        referredClientId,
-        state: awarded ? 'awarded' : 'pending',
-        qualifiedPaymentId: awarded ? qualifyingPayment.id : null,
-        qualifiedAt: awarded ? qualifyingPayment.decidedAt : null,
-        awardCentavos: awarded ? referralRewardCentavos : null,
-        awardedAt: awarded ? qualifyingPayment.decidedAt : null,
-        createdAt,
-      };
-    },
+      ),
+    }),
   );
-
-  const creditLedgerEntries: DevelopmentFixtures['creditLedgerEntries'] =
-    referrals.flatMap((referral) => {
-      if (referral.state !== 'awarded' || referral.awardedAt === null) {
-        return [];
-      }
-      const payment = payments.find(
-        (candidate) => candidate.id === referral.qualifiedPaymentId,
-      );
-      if (!payment) throw new Error(`Referral ${referral.id} lost its payment`);
-
-      return [
-        {
-          id: deterministicId(`credit-ledger:referral-award:${referral.id}`),
-          clientId: referral.referrerClientId,
-          kind: 'referral_award' as const,
-          amountCentavos: referralRewardCentavos,
-          occurredAt: referral.awardedAt,
-          referralId: referral.id,
-          actorKind: 'account' as const,
-          actorAccountId: payment.decidedByAccountId,
-          correlationId: deterministicId(
-            `correlation:referral-award:${referral.id}`,
-          ),
-        },
-      ];
-    });
 
   return {
     branches: branchDefinitions.map(({ key, name, address }) => ({
@@ -724,7 +663,6 @@ export const buildDevelopmentFixtures = (input: {
     subscriptions,
     payments,
     referrals,
-    creditLedgerEntries,
     availabilityBlocks: availabilityBlockDefinitions.map((definition) => {
       const nutritionist = staffDefinitions.find(
         (member) => member.key === definition.nutritionist,

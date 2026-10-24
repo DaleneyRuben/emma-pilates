@@ -63,12 +63,20 @@ export class ClientOverviewDto {
   @ApiProperty({ type: ClassHistoryEntryDto, isArray: true })
   recentHistory!: ClassHistoryEntryDto[];
 
-  @ApiProperty({ minimum: 0, description: 'Available Credit in BOB centavos' })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description: 'Deprecated (PAY-005): Credit was retired; always 0',
+  })
   creditAvailableCentavos!: number;
 }
 
 export class PlanQuoteDto extends PlanDto {
-  @ApiProperty({ minimum: 0, description: 'Credit this purchase would spend' })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description: 'Deprecated (PAY-005): Credit was retired; always 0',
+  })
   creditAppliedCentavos!: number;
 
   @ApiProperty({ minimum: 0, description: 'Cash to collect in BOB centavos' })
@@ -76,7 +84,11 @@ export class PlanQuoteDto extends PlanDto {
 }
 
 export class PlanQuotesDto {
-  @ApiProperty({ minimum: 0 })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description: 'Deprecated (PAY-005): Credit was retired; always 0',
+  })
   creditAvailableCentavos!: number;
 
   @ApiProperty({ type: PlanQuoteDto, isArray: true })

@@ -257,49 +257,29 @@ describe('development fixtures', () => {
     ).toHaveLength(1);
   });
 
-  it('gives Sofía an awarded and a pending referral worth Bs 60 of credit', () => {
+  it('gives Sofía two pending referrals and seeds no Credit (PAY-005)', () => {
     const sofia = clientByEmail(fixtures, 'sofia@example.com');
     const valeria = clientByEmail(fixtures, 'valeria@example.com');
     const mariana = clientByEmail(fixtures, 'mariana@example.com');
-    const referrals = fixtures.referrals.filter(
-      (referral) => referral.referrerClientId === sofia.id,
-    );
 
-    expect(referrals).toMatchObject([
-      { referredClientId: valeria.id, state: 'awarded', awardCentavos: 6_000 },
+    expect(fixtures.referrals).toEqual([
       {
+        id: expect.any(String) as string,
+        referrerClientId: sofia.id,
+        referredClientId: valeria.id,
+        createdAt: expect.any(Date) as Date,
+      },
+      {
+        id: expect.any(String) as string,
+        referrerClientId: sofia.id,
         referredClientId: mariana.id,
-        state: 'pending',
-        qualifiedPaymentId: null,
-        qualifiedAt: null,
-        awardCentavos: null,
-        awardedAt: null,
+        createdAt: expect.any(Date) as Date,
       },
     ]);
-    expect(fixtures.referrals).toHaveLength(2);
-
-    const [awarded, pending] = referrals;
-    const payment = fixtures.payments.find(
-      (candidate) => candidate.id === awarded.qualifiedPaymentId,
+    expect(fixtures.referrals[1].createdAt.getTime()).toBeLessThan(
+      today.getTime(),
     );
-    expect(payment?.clientId).toBe(valeria.id);
-    expect(awarded.qualifiedAt).toEqual(payment?.decidedAt);
-    expect(awarded.awardedAt).toEqual(payment?.decidedAt);
-    expect(awarded.createdAt.getTime()).toBeLessThan(
-      awarded.qualifiedAt?.getTime() ?? 0,
-    );
-    expect(pending.createdAt.getTime()).toBeLessThan(today.getTime());
-
-    expect(fixtures.creditLedgerEntries).toEqual([
-      expect.objectContaining({
-        clientId: sofia.id,
-        kind: 'referral_award',
-        amountCentavos: 6_000,
-        referralId: awarded.id,
-        occurredAt: awarded.awardedAt,
-        actorAccountId: payment?.decidedByAccountId,
-      }),
-    ]);
+    expect(fixtures).not.toHaveProperty('creditLedgerEntries');
   });
 
   it('uses unique emails and referral codes', () => {
