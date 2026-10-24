@@ -906,7 +906,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | done |
 | STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | ready |
 | STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | ready |
-| STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | ready |
+| STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | done |
 | STU-007 | P3 | Backend/admin web | AI: a narrated monthly report and natural-language questions over the aggregates | STU-006 | 4–6 d | ready |
 | MOB-071 | P3 | Client app | Inicio offline: persist the profile so Inicio renders from cache | — | 0.5 d | ready |
 | UX-005 to UX-014 | P2–P3 | All surfaces | *Existing rows.* The rest of the UX polish queue | UX-001 | 6–9 d | ready |
@@ -1022,6 +1022,57 @@ active clients. The Coordinator role is IDN-009's; this path accepts a
 cast `coordinator` and a real login waits for that role. Design follow-up
 204 and prompt AW39 stay pending; the export was not run.
 [Pull request #199](https://github.com/DaleneyRuben/emma-pilates/pull/199).
+
+#### STU-006 · Evidence
+
+Done 2026-10-23. Recomendaciones, after Indicadores, reads
+`GET /api/v1/administrator/recommendations?month=YYYY-MM`. v1 ships two
+rules the facts can support. A weak schedule is one trainer and one weekday
+with at least 3 held sessions whose average `bookingsAtWindowClose` is below
+3. Session facts have a date and no hour, so the subject is the trainer id
+and the ISO weekday, and the sentence is «Revisa el horario del {día}:
+promedia {n} alumnas.» An inactive client is a current-month fact with
+`planDays > 0`, `classesAttended = 0`, and `classesBooked = 0`. The sentence
+is «Contacta a la clienta: tiene un plan vigente y no reservó este mes.» The
+subject is the client id; the page shows the sentence, not a name. A
+Coordinator sees both, because neither is money. An Assistant gets
+`403 studio_access_denied`. Recompute and dismiss are Administrator only. A
+second recompute does not duplicate, and a dismissed finding stays dismissed.
+
+Commits: in progress `6365cdcb`, red rules `553f3dc7`, green rules
+`ba618068`, red persistence `4ec78013`, green persistence `357f09c0`, red
+endpoint `ab5e461c`, green endpoint `bb48d019`, contract `2d61d66f`, red
+page `c4f125a8`, page `87792908`.
+
+Verified: unit 6/6 (`recommend-from-facts.spec.ts`), integration 2/2
+(`recommendations.integration-spec.ts`) plus foundation schema and
+soft-delete schema on `pilates_test_stu006`, e2e 5/5
+(`recommendations.e2e-spec.ts`) including Coordinator list and Assistant
+403, admin jest 5/5 including a read-only render with no «Descartar».
+Playwright walk of the Vite server at `http://localhost:5209` against the
+API on 3143, at 1440 and 420: signed in with Correo electrónico and
+Contraseña, opened Recomendaciones (at 420 behind «Abrir menú»), saw the
+inactive-client sentence, «Nueva», «Descartada», and «Descartar». Curl of
+the same API: Administrator recompute `written` 4 then 4, list of 4, dismiss
+stays dismissed, invalid month `400 invalid_request`, Assistant
+`403 studio_access_denied`. An Assistant cannot sign in to the admin web
+(`401 authentication_failed`). Databases `pilates_stu006_dev` and
+`pilates_test_stu006` on port 5433 were dropped.
+
+Migration `20261023250000_recommendations` needs owner approval before it is
+applied anywhere but a disposable database. Applied only to those two
+databases. Open questions: client no-shows are not on `client_month_facts`,
+so the repeated no-show rule is not implemented. A renewal gap needs an
+expiry the fact cannot show, so it is skipped. The 7-day inactive window
+waits for a booking query this item does not add. Saturated schedule,
+break-even distance, activation risk, expiry reminders, unused classes,
+guest passes, cash close, budget overrun, founder discount cost, reduced
+capacity, and trainer statements wait for tables this branch does not have
+(BKO-004 and the rest). The nightly pass waits; the existing studio worker
+recomputes facts only, and the recompute endpoint is the trigger. The
+Coordinator role is IDN-009's; this path accepts a cast `coordinator`, and a
+real login waits. Design follow-up 205 and prompt AW40 stay pending; the
+export was not run.
 
 ### Summary (2026-10-23)
 

@@ -26,6 +26,9 @@ type KpiOperation = (
 const createStudioOperations = createStudioOperationsUntyped as (deps: {
   readKpis: typeof readMonthKpis;
   readRevenue: typeof readRevenueMonth;
+  readRecommendations: () => Promise<never[]>;
+  recomputeRecommendations: () => Promise<{ written: number }>;
+  dismissRecommendation: () => Promise<null>;
 }) => { kpis: KpiOperation };
 
 const bearer = `Bearer ${'a'.repeat(43)}`;
@@ -88,6 +91,9 @@ describe('month kpi endpoint (e2e)', () => {
             const operations = createStudioOperations({
               readKpis: kpis,
               readRevenue: revenue,
+              readRecommendations: () => Promise.resolve([]),
+              recomputeRecommendations: () => Promise.resolve({ written: 0 }),
+              dismissRecommendation: () => Promise.resolve(null),
             });
             return {
               recompute: () => Promise.reject(new Error('unused')),

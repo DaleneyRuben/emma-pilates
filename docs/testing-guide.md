@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 76); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 76); read the month's indicators (Test 77) and its recommendations (Test 78); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
@@ -3350,7 +3350,12 @@ The following are not ready for manual product testing:
   keys. Store-review rows are not excluded until REL-016 marks them. Extra
   classes (BKM-008) are not counted in «Clases pendientes de dar». The
   renewal percent uses active clients as the denominator, not plans that
-  expired this month: the fact table cannot see those.
+  expired this month: the fact table cannot see those;
+- a real Coordinator discarding a recommendation (IDN-009): Test 78 hides
+  «Descartar» by rendering the page read-only. Client no-shows, a renewal
+  gap, and the other twelve diagnosis rules are not findings yet: the fact
+  tables cannot support them, or the tables they need are not on this
+  branch. The nightly recommendation pass is not a worker job.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -5931,3 +5936,44 @@ and never an amount. Use a disposable database.
    denominator is an open question; do not treat 50 % as the coordinator's
    bonus base.
    [Pull request #199](https://github.com/DaleneyRuben/emma-pilates/pull/199).
+
+## Test 78: read the month's recommendations
+
+Recomendaciones sits in the sidebar after Indicadores. It lists the month's
+findings from the studio facts. v1 has two rules, both counts: a weak
+schedule and an inactive client. Neither names a Client. The page shows the
+Spanish sentence and the state. Use a disposable database.
+
+1. **The list.** Log in as `paola.mendoza@example.com` (Test 3) and open
+   Recomendaciones. The month stepper starts on the current Bolivia month.
+   A finding reads its sentence («Revisa el horario del martes: promedia
+   1,7 alumnas.» or «Contacta a la clienta: tiene un plan vigente y no
+   reservó este mes.») and its state («Nueva», «Vista», «Descartada»,
+   «Resuelta»). «Descartar» sets the state to discarded. A month with no
+   findings says «Nada que revisar este mes.» A failed read says «No
+   pudimos cargar las recomendaciones.» with «Reintentar». While it loads,
+   the page says «Cargando las recomendaciones…».
+2. **How a finding is born.**
+   `POST /api/v1/administrator/recommendations/recompute` with
+   `{"month":"2026-10"}` reads the facts and upserts. A second run does not
+   add a row. A weak schedule is one Trainer and one weekday with at least
+   three held sessions whose average bookings at window close is below 3.
+   The fact has no start hour, so the weekday is the whole subject. An
+   inactive client is a current-month fact with plan days and no booking
+   and no attendance. The 7-day window is not this rule.
+3. **Who may read it.**
+   `GET /api/v1/administrator/recommendations?month=YYYY-MM` returns the
+   findings for the Administrator and for a Coordinator. v1 has no money
+   rule, so her response omits no amount field because none exists. An
+   Assistant gets `403 studio_access_denied`. Recompute and dismiss are
+   Administrator only. A month that is not `YYYY-MM` gets
+   `400 invalid_request`. The Coordinator role is not on this branch
+   (IDN-009), so her list is the e2e suite's cast, and the page hides
+   «Descartar» when rendered read-only.
+4. **What is not a rule yet.** Client no-shows are not on
+   `client_month_facts`. A renewal gap needs an expiry the fact cannot
+   show, so an unrenewed plan is not a finding. Saturated schedules, the
+   distance to break-even, activation risk, classes lost at expiry, guest
+   passes, cash close, budget overruns, founder discount cost, reduced
+   capacity, and trainer statements wait for tables this branch does not
+   have. The nightly pass waits; the recompute endpoint is the trigger.

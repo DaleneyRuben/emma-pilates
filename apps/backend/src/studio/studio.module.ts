@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NotFoundException } from '@nestjs/common';
 import { PRISMA_CLIENT } from '../database/database.module';
 import { PrismaClient } from '../generated/prisma/client';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
@@ -8,6 +8,11 @@ import {
   currentStudioMonth,
 } from './prisma-studio-facts';
 import { readMonthKpis } from './prisma-month-kpis';
+import {
+  dismissRecommendation,
+  readRecommendations,
+  recomputeRecommendations,
+} from './prisma-recommendations';
 import { readRevenueMonth } from './prisma-revenue-report';
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
 import {
@@ -24,6 +29,9 @@ const monthDate = (month: string) => {
 export const createStudioOperations = (deps: {
   readKpis: typeof readMonthKpis;
   readRevenue: typeof readRevenueMonth;
+  readRecommendations: typeof readRecommendations;
+  recomputeRecommendations: typeof recomputeRecommendations;
+  dismissRecommendation: typeof dismissRecommendation;
 }) => ({
   kpis: async (
     input: { month: string },
@@ -43,6 +51,44 @@ export const createStudioOperations = (deps: {
     });
     return { month: input.month, ...counts, ...amounts };
   },
+  list: async (
+    input: { month: string },
+    principal: AuthenticatedPrincipal,
+    prisma: PrismaClient,
+  ) => {
+    studioKpiRole(principal);
+    const recommendations = await deps.readRecommendations(prisma, {
+      month: monthDate(input.month),
+    });
+    return { month: input.month, recommendations };
+  },
+  recomputeRecommendations: async (
+    input: { month: string },
+    principal: AuthenticatedPrincipal,
+    prisma: PrismaClient,
+  ) => {
+    requireStudioAdministrator(principal);
+    const result = await deps.recomputeRecommendations(prisma, {
+      month: monthDate(input.month),
+      today: new Date(),
+    });
+    return { month: input.month, ...result };
+  },
+  dismiss: async (
+    input: { id: string },
+    principal: AuthenticatedPrincipal,
+    prisma: PrismaClient,
+  ) => {
+    requireStudioAdministrator(principal);
+    const dismissed = await deps.dismissRecommendation(prisma, input);
+    if (dismissed === null) {
+      throw new NotFoundException({
+        code: 'resource_not_found',
+        detail: 'Recommendation not found',
+      });
+    }
+    return dismissed;
+  },
 });
 
 @Module({
@@ -52,29 +98,40 @@ export const createStudioOperations = (deps: {
     {
       provide: studioOperations,
       inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient): StudioOperations => ({
-        recompute: async (input, principal) => {
-          requireStudioAdministrator(principal);
-          const result = await recomputeStudioFacts(prisma, {
-            month: monthDate(input.month),
-            now: () => new Date(),
-          });
-          return { month: input.month, ...result };
-        },
-        revenue: async (input, principal) => {
-          requireStudioAdministrator(principal);
-          const result = await readRevenueMonth(prisma, {
-            month: monthDate(input.month),
-            today: new Date(),
-          });
-          return { month: input.month, ...result };
-        },
-        kpis: (input, principal) =>
-          createStudioOperations({
-            readKpis: readMonthKpis,
-            readRevenue: readRevenueMonth,
-          }).kpis(input, principal, prisma),
-      }),
+      useFactory: (prisma: PrismaClient): StudioOperations => {
+        const operations = createStudioOperations({
+          readKpis: readMonthKpis,
+          readRevenue: readRevenueMonth,
+          readRecommendations,
+          recomputeRecommendations,
+          dismissRecommendation,
+        });
+        return {
+          recompute: async (input, principal) => {
+            requireStudioAdministrator(principal);
+            const result = await recomputeStudioFacts(prisma, {
+              month: monthDate(input.month),
+              now: () => new Date(),
+            });
+            return { month: input.month, ...result };
+          },
+          revenue: async (input, principal) => {
+            requireStudioAdministrator(principal);
+            const result = await readRevenueMonth(prisma, {
+              month: monthDate(input.month),
+              today: new Date(),
+            });
+            return { month: input.month, ...result };
+          },
+          kpis: (input, principal) => operations.kpis(input, principal, prisma),
+          recommendations: (input, principal) =>
+            operations.list(input, principal, prisma),
+          recomputeRecommendations: (input, principal) =>
+            operations.recomputeRecommendations(input, principal, prisma),
+          dismissRecommendation: (input, principal) =>
+            operations.dismiss(input, principal, prisma),
+        };
+      },
     },
   ],
 })

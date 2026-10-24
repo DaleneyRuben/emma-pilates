@@ -56,6 +56,7 @@ describe('foundation migration', () => {
       'booking.subscriptions',
       'booking.waitlist_entries',
       'studio.client_month_facts',
+      'studio.recommendations',
       'studio.session_facts',
       'system.account_devices',
       'system.account_email_changes',

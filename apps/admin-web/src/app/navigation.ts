@@ -18,6 +18,7 @@ export type AdminPath =
   | "/back-office/categorias-de-gasto"
   | "/reporte"
   | "/reporte/indicadores"
+  | "/recomendaciones"
   | "/promociones"
   | "/promociones/referidos"
   | "/promociones/creditos";
@@ -157,6 +158,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/reporte/indicadores",
         screen: "AW39",
         studioWide: "los indicadores del mes son del estudio, no de una sede.",
+      },
+      {
+        label: "Recomendaciones",
+        to: "/recomendaciones",
+        screen: "AW40",
+        studioWide:
+          "las recomendaciones del mes son del estudio, no de una sede.",
       },
     ],
   },
