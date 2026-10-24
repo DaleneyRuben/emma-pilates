@@ -25,13 +25,17 @@ export const freezeAuthorizationRows = (): Record<string, MatrixRow> => ({
       reason: 'Viaje',
     },
   },
-  'GET /api/v1/administrator/freezes': administratorOnly(),
-  'GET /api/v1/administrator/freezes/{freezeId}': administratorOnly(),
+  // These handlers read the bearer credential, not the admin-web cookie.
+  'GET /api/v1/administrator/freezes': administratorOnly({ bearer: true }),
+  'GET /api/v1/administrator/freezes/{freezeId}': administratorOnly({
+    bearer: true,
+  }),
   // A missing Freeze is denied before the Role is read, so both Roles
   // answer 403 on a freeze id that does not exist.
   'POST /api/v1/administrator/freezes/{freezeId}/decision': {
     administrator: 'deny',
     coordinator: 'deny',
+    bearer: true,
     body: { decision: 'refused' },
   },
 });
