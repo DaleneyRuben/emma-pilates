@@ -83,7 +83,9 @@ describe("AW39 Indicadores", () => {
         "Bs 270,00",
       ),
     ).toBeVisible();
-    expect(screen.getByRole("img", { name: "Clases dictadas" })).toBeVisible();
+    expect(
+      screen.getByRole("figure", { name: "Clases dictadas" }),
+    ).toBeVisible();
   });
 
   it("hides every money figure when the payload has no centavo keys", async () => {
@@ -113,7 +115,9 @@ describe("AW39 Indicadores", () => {
     expect(
       await screen.findByText("Sin clases dictadas en este mes."),
     ).toBeVisible();
-    expect(screen.queryByRole("img", { name: "Clases dictadas" })).toBeNull();
+    expect(
+      screen.queryByRole("figure", { name: "Clases dictadas" }),
+    ).toBeNull();
   });
 
   it("shows the error state and retries", async () => {
