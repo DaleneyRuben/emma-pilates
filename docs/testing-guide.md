@@ -32,6 +32,7 @@ you are starting with no project knowledge.
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
+| Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
@@ -56,6 +57,7 @@ can be found by its design name.
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
+| 25 Enviar comentarios | 19, 80 |
 
 | Staff app | Tests |
 | --- | --- |
@@ -69,6 +71,7 @@ can be found by its design name.
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
+| S27 Enviar comentarios | 19, 80 |
 
 | Admin web | Tests |
 | --- | --- |
@@ -85,6 +88,7 @@ can be found by its design name.
 | AW23–AW24 Personal | 26, 31, 72, 79 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
+| AW38 Comentarios | 80 |
 
 ## Before you begin
 
@@ -5871,186 +5875,6 @@ touching production.
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
 
-## Test 79: how a Client found the studio, and referral codes (BKM-011)
-
-«¿Cómo nos conociste?» is asked at registration (Client app `01`) and by the
-Assistant (`S05`), with eight answers: Instagram, TikTok, Facebook, Google,
-Recomendación de una amiga, Una instructora, Pasé por el estudio, Otro. An
-optional Referral Code, a Client's (`REF-…`) or a Trainer's personal code,
-wins over the answer: a Client's code makes her `friend`, a Trainer's
-`trainer`, and the Trainer is the one BKO-006 pays for. The Administrator sets
-a Trainer's code on `AW24` and corrects a Client's attribution on `AW22`
-(the Coordinator joins once IDN-009 adds that Role). Use the fixtures
-(Test 5 A) and the admin web (Test 23).
-
-### A. Give a Trainer her code (AW24)
-
-1. In the admin web open **Personal** and click **Emma Vargas** (a Trainer).
-   Under the Branches the panel shows **Código personal** with its own
-   **Guardar código**.
-2. Type `emma` and click **Guardar código** (or press Enter): the field reads
-   `EMMA` and «Código guardado: EMMA.» appears. The panel's **Guardar** still
-   saves only Role and Branches.
-3. Open **Andrea Suárez** (another Trainer), type `EMMA`, and save: «Ese
-   código ya lo tiene otra clienta o instructora.». Type `REF-ANDREA`: «Usa
-   de 3 a 20 letras, números o guiones, sin empezar con REF-.».
-4. Open **Camila Rojas** (Assistant): no **Código personal**.
-
-The API is `GET`/`PUT /api/v1/administrator/staff-members/{id}/referral-code`
-(`{"referralCode": "EMMA"}`, `null` removes it); each change writes the audit
-record `staff_member.referral_code_changed`.
-
-### B. Register with the question and a code (Client app `01`)
-
-1. In the Client app tap **Regístrate**. Under **Confirmar contraseña** the
-   form asks **¿Cómo nos conociste?** with the eight chips; one can be
-   chosen at a time.
-2. Fill the form and tap **Crear cuenta** without choosing: «Elige cómo nos
-   conociste.» and nothing is sent.
-3. Choose **Instagram**, open **¿Tienes un código de referido?** (the field
-   says «De una amiga o de tu instructora.»), type `emma`, and create the
-   account. «Revisa tu correo» follows.
-4. A code nobody holds answers «Revisa el código de referido.» under the
-   field and creates nothing.
-
-Through Swagger, `POST /api/v1/client-registrations` with
-`"acquisitionChannel": "instagram", "referralCode": "emma"` does the same; the
-same request without `acquisitionChannel` (an older store build) still answers
-`202` and records `unknown`; an unknown code answers `400`
-`referral_code_invalid`.
-
-### C. The Assistant's new Client (`S05`)
-
-Log in to the Staff app as `camila.rojas@example.com`, tap **+ Nuevo
-cliente**, fill the name and email, and tap **Crear cuenta** without an
-answer: «Elige cómo nos conociste.». Choose **Pasé por el estudio**, type
-`EMMA` in **Código de referido (opcional)**, and create: her overview opens as
-before. A code nobody holds answers «No encontramos ese código. Revísalo o
-déjalo vacío.» under the code and creates nothing.
-
-### D. Read and correct it on the Client detail (`AW22`)
-
-1. In **Clientes** open the Client from B or C. The block **¿Cómo nos
-   conociste?** reads **Canal** «Una instructora» with «Ella respondió:
-   Instagram» (or «Pasé por el estudio») under it, **Código** `EMMA`, and
-   **La trajo la instructora** «Emma Vargas». A Client from before the
-   question reads «Sin dato».
-2. Click **Corregir**, choose **TikTok**, empty **Código (opcional)**, and
-   click **Guardar**: the block reads «TikTok» alone. An unknown code keeps
-   the form open with «No encontramos ese código. Revísalo o déjalo vacío.»;
-   no answer chosen says «Elige cómo nos conoció.».
-
-The API is `GET`/`PUT /api/v1/administrator/clients/{id}/acquisition`
-(`{"channel": "tiktok", "referralCode": null}`), Administrator only for now;
-each correction writes `client_acquisition.corrected` with the previous and
-new channel and code. Check the rows with
-`select declared_channel, channel, referral_code, referrer_client_id,
-referrer_staff_member_id from booking.client_acquisitions;` on your database:
-Clients that existed before the migration got `unknown`, or `friend` with the
-referrer when a Referral named one.
-=======
-## Test 78: tester access (Courtesy Access, REL-011)
-
-The closed-test testers and the stores' review Accounts book without paying
-through «Acceso de prueba»: a hidden Bs 0 Plan of 16 classes that only the
-Administrator grants (booking ADR-0012). Run it against `pilates_dev_sim` (or
-a copy) with the API and the admin web, at 1440 px and 420 px.
-
-1. **Grant.** Sign in to the admin web as `paola.mendoza@example.com`, open
-   **Clientes**, and open a Client with no active Plan (Valeria Quiroga or
-   Sofía Guzmán in the fixtures). The panel footer shows **Acceso de prueba**
-   left of **Cerrar cuenta**; a Client with an active Plan (Lucía) shows only
-   **Cerrar cuenta**. Click it: the dialog «¿Dar acceso de prueba a …?»
-   explains the grant and proposes «Válido hasta» 30 days from today (the
-   field accepts today up to one year ahead; an empty date greys out **Dar
-   acceso**). Confirm: the dialog closes, the Plan block reads «Acceso de
-   prueba · Activo», «Vigencia» from today to that date, «Clases
-   disponibles 16 de 16», and the footer says «Acceso de prueba activo hasta
-   el dd/mm/aaaa.» without the button. In the database the Payment has
-   method `courtesy`, Bs 0, `confirmed`; the audit log holds
-   `payment.courtesy_granted`; the Client's inbox (and phone, with push) has
-   «Pago confirmado».
-2. **Refusals.** Grant again through Swagger
-   (`POST /api/v1/administrator/clients/{clientId}/courtesy-access` with an
-   `Idempotency-Key` UUID and `{"endsOn":"YYYY-MM-DD"}`): `409
-   subscription_not_expired`. A past date or one more than a year ahead
-   answers `400 courtesy_end_date_invalid`; a Client with a transfer in
-   review answers `409 payment_pending_exists` and the dialog points to
-   **Pagos**. As `camila.rojas@example.com` (Assistant) or a Client the
-   endpoint answers `403 administration_access_denied`.
-3. **Hidden everywhere else.** The Plan appears in **Planes** only under
-   the hidden filter, with Bs 0; **Mostrar** on it is refused. It never
-   appears in the Client app's Planes, in the Staff app's cash sale, or in
-   `GET /api/v1/plans`, and buying it by id answers `409
-   plan_not_purchasable`. The income report (Test 30) does not change.
-4. **Booking with it.** Log in to the Client app as the granted Client and
-   book a Session, cancel it (the class returns), book one starting within
-   2 h 30 and reschedule it the same day, and join a full Session's
-   waitlist: Mi plan counts down from 16. The test schedule is ordinary
-   Sessions built in **Horario**; production is reset after Google's
-   approval (ADR-0104), so nothing marks them.
-
-## Test 77: work as the Coordinator (IDN-009)
-
-The Coordinator runs the studio's operation without seeing money
-([ADR-0102](./adr/0102-coordinator-role-without-money.md)). The fixtures
-(Test 5 A) include her: `carolina.rivas@example.com`, with the fixture
-password, holding every Branch.
-
-### A. The admin web
-
-1. Start the API and the admin web (Test 24) and sign in as
-   `carolina.rivas@example.com`. The sidebar shows only **Horario**,
-   **Clientes**, and **Personal**; the account menu names her Role
-   «Coordinación».
-2. In **Horario**, create a one-off Session, move one to another Trainer,
-   and cancel one that has Bookings (Test 25): everything works as for the
-   Administrator, at every Branch.
-3. Type `/back-office/pagos` (or `/reporte`, `/back-office/nomina`,
-   `/promociones`) in the address bar: you land on Horario with «Esa
-   sección es solo para administración.».
-4. In **Clientes**, open a Client: no «Crédito» row, no «Cerrar cuenta»,
-   and no «Bs» anywhere. Press **Editar perfil**, change the phone, and
-   **Guardar cambios**: «Guardamos los cambios del perfil.» and the new
-   phone. Empty the name to see «Escribe el nombre de la clienta.». The
-   email stays read-only («La clienta cambia su correo desde su app.»).
-5. In **Personal**, there is no «Nuevo miembro»; opening a member shows
-   her details read-only with «Solo administración invita y cambia roles.».
-6. Sign in as `paola.mendoza@example.com`: **Editar perfil** works the same
-   for the Administrator, and **Personal → Nuevo miembro** offers the Role
-   **Coordinador**, which replaces the Branch chips with «Todas las
-   sucursales (implícito por el rol)».
-
-### B. The Staff app
-
-1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. She
-   lands on **Buscar cliente** without «+ Nuevo cliente» and with
-   **Cancelar una clase**, which opens the Administrator's cancellation
-   screens (Test 10 D).
-2. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
-   for the Assistant (Test 11 B and C) at any Branch, but there is no
-   «Registrar pago en efectivo». A Client without a Plan reads «La clienta
-   necesita un plan activo para reservar.».
-3. Perfil reads «Coordinación» and «Todas las sucursales».
-4. As the Administrator, Perfil → «Ver la app como…» lists her under
-   «Coordinación»; seeing the app as her shows the same stack under the
-   banner (Test 67).
-
-### C. The API
-
-Every endpoint has an explicit decision for the Administrator and the
-Coordinator in `apps/backend/test/database/authorization-matrix.ts`; the
-integration spec `authorization-matrix.integration-spec.ts` boots the API on
-a disposable database and checks each one (Test 8, integration tests). By
-hand, with her bearer token from Swagger (Test 3): `GET
-/api/v1/administrator/payments`, `GET /api/v1/administrator/reports/income`,
-and `GET /api/v1/assistant/clients/{id}/plan-quotes` answer `403`;
-`PATCH /api/v1/administrator/clients/{id}` with `{"name": "…", "phone":
-null}` answers the refreshed detail with `creditAvailableCentavos` at 0
-(Credit is retired, PAY-005), and `system.audit_records` gains
-`client.profile_corrected` with `actor_role = coordinator` and only the
-changed field names.
-
 ## Test 75: the studio rules (BKM-004)
 
 The rules the apps and the API follow live in one versioned Studio Settings
@@ -6187,4 +6011,243 @@ Branch, up to the moment of the close.
     tint), and `GET /api/v1/administrator/cash-closes?branchId=…&month=…` as
     the Assistant answers `403`. Then `dropdb pilates_test_cash`.
 
->>>>>>> theirs
+## Test 77: work as the Coordinator (IDN-009)
+
+The Coordinator runs the studio's operation without seeing money
+([ADR-0102](./adr/0102-coordinator-role-without-money.md)). The fixtures
+(Test 5 A) include her: `carolina.rivas@example.com`, with the fixture
+password, holding every Branch.
+
+### A. The admin web
+
+1. Start the API and the admin web (Test 24) and sign in as
+   `carolina.rivas@example.com`. The sidebar shows only **Horario**,
+   **Clientes**, and **Personal**; the account menu names her Role
+   «Coordinación».
+2. In **Horario**, create a one-off Session, move one to another Trainer,
+   and cancel one that has Bookings (Test 25): everything works as for the
+   Administrator, at every Branch.
+3. Type `/back-office/pagos` (or `/reporte`, `/back-office/nomina`,
+   `/promociones`) in the address bar: you land on Horario with «Esa
+   sección es solo para administración.».
+4. In **Clientes**, open a Client: no «Crédito» row, no «Cerrar cuenta»,
+   and no «Bs» anywhere. Press **Editar perfil**, change the phone, and
+   **Guardar cambios**: «Guardamos los cambios del perfil.» and the new
+   phone. Empty the name to see «Escribe el nombre de la clienta.». The
+   email stays read-only («La clienta cambia su correo desde su app.»).
+5. In **Personal**, there is no «Nuevo miembro»; opening a member shows
+   her details read-only with «Solo administración invita y cambia roles.».
+6. Sign in as `paola.mendoza@example.com`: **Editar perfil** works the same
+   for the Administrator, and **Personal → Nuevo miembro** offers the Role
+   **Coordinador**, which replaces the Branch chips with «Todas las
+   sucursales (implícito por el rol)».
+
+### B. The Staff app
+
+1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. She
+   lands on **Buscar cliente** without «+ Nuevo cliente» and with
+   **Cancelar una clase**, which opens the Administrator's cancellation
+   screens (Test 10 D).
+2. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
+   for the Assistant (Test 11 B and C) at any Branch, but there is no
+   «Registrar pago en efectivo». A Client without a Plan reads «La clienta
+   necesita un plan activo para reservar.».
+3. Perfil reads «Coordinación» and «Todas las sucursales».
+4. As the Administrator, Perfil → «Ver la app como…» lists her under
+   «Coordinación»; seeing the app as her shows the same stack under the
+   banner (Test 67).
+
+### C. The API
+
+Every endpoint has an explicit decision for the Administrator and the
+Coordinator in `apps/backend/test/database/authorization-matrix.ts`; the
+integration spec `authorization-matrix.integration-spec.ts` boots the API on
+a disposable database and checks each one (Test 8, integration tests). By
+hand, with her bearer token from Swagger (Test 3): `GET
+/api/v1/administrator/payments`, `GET /api/v1/administrator/reports/income`,
+and `GET /api/v1/assistant/clients/{id}/plan-quotes` answer `403`;
+`PATCH /api/v1/administrator/clients/{id}` with `{"name": "…", "phone":
+null}` answers the refreshed detail with `creditAvailableCentavos` at 0
+(Credit is retired, PAY-005), and `system.audit_records` gains
+`client.profile_corrected` with `actor_role = coordinator` and only the
+changed field names.
+
+## Test 78: tester access (Courtesy Access, REL-011)
+
+The closed-test testers and the stores' review Accounts book without paying
+through «Acceso de prueba»: a hidden Bs 0 Plan of 16 classes that only the
+Administrator grants (booking ADR-0012). Run it against `pilates_dev_sim` (or
+a copy) with the API and the admin web, at 1440 px and 420 px.
+
+1. **Grant.** Sign in to the admin web as `paola.mendoza@example.com`, open
+   **Clientes**, and open a Client with no active Plan (Valeria Quiroga or
+   Sofía Guzmán in the fixtures). The panel footer shows **Acceso de prueba**
+   left of **Cerrar cuenta**; a Client with an active Plan (Lucía) shows only
+   **Cerrar cuenta**. Click it: the dialog «¿Dar acceso de prueba a …?»
+   explains the grant and proposes «Válido hasta» 30 days from today (the
+   field accepts today up to one year ahead; an empty date greys out **Dar
+   acceso**). Confirm: the dialog closes, the Plan block reads «Acceso de
+   prueba · Activo», «Vigencia» from today to that date, «Clases
+   disponibles 16 de 16», and the footer says «Acceso de prueba activo hasta
+   el dd/mm/aaaa.» without the button. In the database the Payment has
+   method `courtesy`, Bs 0, `confirmed`; the audit log holds
+   `payment.courtesy_granted`; the Client's inbox (and phone, with push) has
+   «Pago confirmado».
+2. **Refusals.** Grant again through Swagger
+   (`POST /api/v1/administrator/clients/{clientId}/courtesy-access` with an
+   `Idempotency-Key` UUID and `{"endsOn":"YYYY-MM-DD"}`): `409
+   subscription_not_expired`. A past date or one more than a year ahead
+   answers `400 courtesy_end_date_invalid`; a Client with a transfer in
+   review answers `409 payment_pending_exists` and the dialog points to
+   **Pagos**. As `camila.rojas@example.com` (Assistant) or a Client the
+   endpoint answers `403 administration_access_denied`.
+3. **Hidden everywhere else.** The Plan appears in **Planes** only under
+   the hidden filter, with Bs 0; **Mostrar** on it is refused. It never
+   appears in the Client app's Planes, in the Staff app's cash sale, or in
+   `GET /api/v1/plans`, and buying it by id answers `409
+   plan_not_purchasable`. The income report (Test 30) does not change.
+4. **Booking with it.** Log in to the Client app as the granted Client and
+   book a Session, cancel it (the class returns), book one starting within
+   2 h 30 and reschedule it the same day, and join a full Session's
+   waitlist: Mi plan counts down from 16. The test schedule is ordinary
+   Sessions built in **Horario**; production is reset after Google's
+   approval (ADR-0104), so nothing marks them.
+
+## Test 79: how a Client found the studio, and referral codes (BKM-011)
+
+«¿Cómo nos conociste?» is asked at registration (Client app `01`) and by the
+Assistant (`S05`), with eight answers: Instagram, TikTok, Facebook, Google,
+Recomendación de una amiga, Una instructora, Pasé por el estudio, Otro. An
+optional Referral Code, a Client's (`REF-…`) or a Trainer's personal code,
+wins over the answer: a Client's code makes her `friend`, a Trainer's
+`trainer`, and the Trainer is the one BKO-006 pays for. The Administrator sets
+a Trainer's code on `AW24` and corrects a Client's attribution on `AW22`
+(the Coordinator joins once IDN-009 adds that Role). Use the fixtures
+(Test 5 A) and the admin web (Test 23).
+
+### A. Give a Trainer her code (AW24)
+
+1. In the admin web open **Personal** and click **Emma Vargas** (a Trainer).
+   Under the Branches the panel shows **Código personal** with its own
+   **Guardar código**.
+2. Type `emma` and click **Guardar código** (or press Enter): the field reads
+   `EMMA` and «Código guardado: EMMA.» appears. The panel's **Guardar** still
+   saves only Role and Branches.
+3. Open **Andrea Suárez** (another Trainer), type `EMMA`, and save: «Ese
+   código ya lo tiene otra clienta o instructora.». Type `REF-ANDREA`: «Usa
+   de 3 a 20 letras, números o guiones, sin empezar con REF-.».
+4. Open **Camila Rojas** (Assistant): no **Código personal**.
+
+The API is `GET`/`PUT /api/v1/administrator/staff-members/{id}/referral-code`
+(`{"referralCode": "EMMA"}`, `null` removes it); each change writes the audit
+record `staff_member.referral_code_changed`.
+
+### B. Register with the question and a code (Client app `01`)
+
+1. In the Client app tap **Regístrate**. Under **Confirmar contraseña** the
+   form asks **¿Cómo nos conociste?** with the eight chips; one can be
+   chosen at a time.
+2. Fill the form and tap **Crear cuenta** without choosing: «Elige cómo nos
+   conociste.» and nothing is sent.
+3. Choose **Instagram**, open **¿Tienes un código de referido?** (the field
+   says «De una amiga o de tu instructora.»), type `emma`, and create the
+   account. «Revisa tu correo» follows.
+4. A code nobody holds answers «Revisa el código de referido.» under the
+   field and creates nothing.
+
+Through Swagger, `POST /api/v1/client-registrations` with
+`"acquisitionChannel": "instagram", "referralCode": "emma"` does the same; the
+same request without `acquisitionChannel` (an older store build) still answers
+`202` and records `unknown`; an unknown code answers `400`
+`referral_code_invalid`.
+
+### C. The Assistant's new Client (`S05`)
+
+Log in to the Staff app as `camila.rojas@example.com`, tap **+ Nuevo
+cliente**, fill the name and email, and tap **Crear cuenta** without an
+answer: «Elige cómo nos conociste.». Choose **Pasé por el estudio**, type
+`EMMA` in **Código de referido (opcional)**, and create: her overview opens as
+before. A code nobody holds answers «No encontramos ese código. Revísalo o
+déjalo vacío.» under the code and creates nothing.
+
+### D. Read and correct it on the Client detail (`AW22`)
+
+1. In **Clientes** open the Client from B or C. The block **¿Cómo nos
+   conociste?** reads **Canal** «Una instructora» with «Ella respondió:
+   Instagram» (or «Pasé por el estudio») under it, **Código** `EMMA`, and
+   **La trajo la instructora** «Emma Vargas». A Client from before the
+   question reads «Sin dato».
+2. Click **Corregir**, choose **TikTok**, empty **Código (opcional)**, and
+   click **Guardar**: the block reads «TikTok» alone. An unknown code keeps
+   the form open with «No encontramos ese código. Revísalo o déjalo vacío.»;
+   no answer chosen says «Elige cómo nos conoció.».
+
+The API is `GET`/`PUT /api/v1/administrator/clients/{id}/acquisition`
+(`{"channel": "tiktok", "referralCode": null}`), Administrator only for now;
+each correction writes `client_acquisition.corrected` with the previous and
+new channel and code. Check the rows with
+`select declared_channel, channel, referral_code, referrer_client_id,
+referrer_staff_member_id from booking.client_acquisitions;` on your database:
+Clients that existed before the migration got `unknown`, or `friend` with the
+referrer when a Referral named one.
+## Test 80: send feedback from the apps and triage it on the admin web (REL-012)
+
+«Enviar comentarios» is the last row of Perfil in the Client app (Prompt 25,
+follow-up 165) and a row after «Cambiar contraseña» on the Staff app's Perfil
+for every Role (`S27`). The admin web lists what arrives under
+**Comentarios** (`AW38`), the last entry of the sidebar.
+
+### A. Send one from each app
+
+1. With the backend, the worker, and Metro running (Test 2), log in to the
+   Client app as `isabel@example.com` on the iPhone, the iPad, or the Android
+   emulator and open **Perfil → Enviar comentarios**.
+2. The button «Enviar comentario» stays disabled until you pick a type
+   (Problema, Sugerencia, Otro) and write at least 10 characters; the counter
+   reads «n / 2000» and the field stops at 2,000. The card under the field
+   names what travels with the text: «la versión de la app (1.0.1,
+   compilación 3), el sistema (Android 14) y tu rol. No enviamos capturas de
+   pantalla.» (Expo Go reports its own version and build; a store or
+   development build reports the app's.)
+3. Send it: «¡Gracias por tu comentario!» replaces the form, and «Volver al
+   perfil» returns to Perfil.
+4. In the Staff app, log in as `emma.vargas@example.com` (or any Staff
+   fixture), open the account avatar → **Enviar comentarios**, and send one.
+   While an Administrator sees the app as someone (Test 67) the send answers
+   «Mientras ves la app como otra persona no puedes enviar comentarios.»
+5. Each Administrator except the sender gets the inbox entry «Comentario
+   nuevo» («Llegó un problema desde la app de clientas. Revísalo en la web de
+   administración.») and, on a development build, its push.
+
+The Maestro journeys `send-feedback.yaml` in both apps' `.maestro` run steps
+1–4 (Test 19).
+
+### B. Triage it on the admin web
+
+1. Log in to the admin web as `paola.mendoza@example.com` and open
+   **Comentarios**. The subtitle counts the «Nuevo» ones; the table shows
+   Fecha, Tipo, Comentario, App, Versión («1.0.1 (3) · Android 14»), and the
+   Estado pill. Filter by Estado (Todos, Nuevo, Revisado, Resuelto) and App
+   (Las dos, App de clientas, App del personal); the filters live in the
+   address.
+2. Open a row: the panel shows the whole text, Fecha, App, Rol, Correo,
+   Versión, and Sistema. Choose **Resuelto**, write «Qué cambiamos», and
+   **Guardar**: «Guardamos el comentario.» and the pill turns Resuelto.
+3. **Exportar CSV** downloads `comentarios-aaaa-mm-dd.csv` with every comment:
+   Fecha, App, Tipo, Comentario, Versión, Estado, Qué cambiamos (what Google's
+   production questionnaire asks for). The export and every triage write an
+   audit record (`feedback.exported`, `feedback.triaged`).
+
+### C. Through the API
+
+- `POST /api/v1/feedback` with a Bearer credential, an `Idempotency-Key`
+  UUID, and `{type, text, appVersion, appBuild, platform, osVersion}` answers
+  `201 {id, createdAt}`; the same key replays the answer, another body with it
+  answers `409 idempotency_key_reused`, a text under 10 or over 2,000
+  characters or an unknown field (such as `role`) answers `400`. The eleventh
+  in 24 hours from one Account answers `429 feedback_limit_reached`.
+- `GET /api/v1/administrator/feedback?status=&app=&page=&pageSize=`,
+  `GET /api/v1/administrator/feedback/export`, and
+  `POST /api/v1/administrator/feedback/{id}/triage` with
+  `{status, changeNote}` are the Administrator's; any other Role answers
+  `403 feedback_access_denied`.

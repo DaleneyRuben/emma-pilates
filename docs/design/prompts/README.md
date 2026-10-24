@@ -32,6 +32,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [22](./client/22-edit-profile.md) | Editar perfil | `22` | ✅ |
 | [23](./client/23-change-password-signed-in.md) | Cambiar contraseña (sesión iniciada) | `23` | ✅ |
 | [24](./client/24-close-account.md) | Cerrar mi cuenta | `24` | ✅ |
+| [25](./client/25-send-feedback.md) | Enviar comentarios | `25` | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 
 ## Staff app (`staff/`)
 
@@ -62,6 +63,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S23](./staff/23-staff-profile.md) | Perfil (todos los roles) | `S23` | ✅ |
 | [S24](./staff/24-administrator-view-as.md) | Ver la app como… (Administración) | `S24` | ✅ (Claude Design canvas, 2026-10-22, `e81417e9`; the app side is stage 3 of FUT-001) |
 | [S25](./staff/25-cash-close.md) | Cerrar caja (Asistente y Administración) | `S25` | ✅ (Claude Design canvas, 2026-10-23, `1e4dee1e`; BKO-003) |
+| [S27](./staff/27-send-feedback.md) | Enviar comentarios (todos los roles) | `S27` | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 
 ## Admin web (`admin-web/`)
 
@@ -104,6 +106,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW34](./admin-web/34-branch-selector.md) | Selector de sucursal | `AW34` | ✅ |
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
 | [AW36](./admin-web/36-reglas-del-estudio.md) | Reglas del estudio | `AW36` | ✅ (Claude Design canvas, 2026-10-23, `55bbe4cc`; the admin web is built in BKM-004) |
+| [AW38](./admin-web/38-comentarios.md) | Comentarios | `AW38` | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 | [AW151](./admin-web/151-cierres-de-caja.md) | Cierres de caja | `AW151` | ✅ (Claude Design canvas, 2026-10-23, `1e4dee1e`; BKO-003, numbered from its assigned block 150–154) |
 
 ## Follow-ups (`followups/`)
@@ -244,6 +247,8 @@ Each of these was sent as the next message in the existing design session for th
 | [157](./followups/157-staff-coordinator-role.md) | The «Coordinador» Role in `AW23`/`AW24` (IDN-009): the filter option and tag, five Role options with every Branch implicit for her, and the Coordinator's read-only Personal | ✅ applied (Claude Design canvas, 2026-10-23, `e8137c42`; canvas deleted) |
 | [158](./followups/158-staff-app-coordinator-stack.md) | The Coordinator's Staff app stack (IDN-009): `S04` without «Nuevo cliente» and with «Cancelar una clase», `S06` without the cash sale and the Crédito line, `S13` back to Clientes, «Coordinación» on `S23`, and her row in `S24` | ✅ applied (Claude Design canvas, 2026-10-23, `e8137c42`; canvas deleted) |
 | [160](./followups/160-aw22-tester-access.md) | `AW22` gains «Acceso de prueba» (REL-011, booking ADR-0012): a compact neutral outline footer button left of «Cerrar cuenta» while the Client has no active Plan, a primary-tone dialog with «Válido hasta» (today + 30 days, up to a year), the granted Plan block «Acceso de prueba · Activo · 16 de 16» with an Éxito line, and the refused and failed notices | ✅ applied (Claude Design canvas, 2026-10-23, `cd62e0e6`; the admin web is built in REL-011; the canvas could not be deleted from the agent session and awaits the user's delete) |
+| [165](./followups/165-perfil-feedback-row.md) | The «Enviar comentarios» row: last in `18`'s menu card with a speech-bubble line icon (opens the new `25`), and after «Cambiar contraseña» in every `S23` frame (opens the new `S27`); README inventory rows (REL-012) | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
+| [166](./followups/166-admin-comentarios-entry.md) | «Comentarios» alone in a last sidebar group after Promociones (opens the new `AW38`), in the design system's sidebar card and the README's order (REL-012) | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 
 ## Status
 

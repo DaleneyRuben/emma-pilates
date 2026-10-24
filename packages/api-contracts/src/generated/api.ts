@@ -33,6 +33,9 @@ import type {
   AdminExpenseCategoryDto,
   AdminExpenseDto,
   AdminExpensePageDto,
+  AdminFeedbackDto,
+  AdminFeedbackExportDto,
+  AdminFeedbackPageDto,
   AdminPaymentPageDto,
   AdminPlanDto,
   AdminPlanPageDto,
@@ -109,6 +112,7 @@ import type {
   ExpenseChangeDto,
   ExpenseInputDto,
   ExpenseReportDto,
+  FeedbackReceiptDto,
   FinalizedUploadDto,
   GetAdminPromotionImageParams,
   GetCurrentClientPhotoParams,
@@ -128,6 +132,7 @@ import type {
   ListAdminClientsParams,
   ListAdminEvaluationsParams,
   ListAdminExpensesParams,
+  ListAdminFeedbackParams,
   ListAdminPaymentsParams,
   ListAdminPlansParams,
   ListAdminPromotionContactsParams,
@@ -176,6 +181,7 @@ import type {
   RequestPasswordRecoveryDto,
   SalaryPaymentInputDto,
   SearchAssistantClientsParams,
+  SendFeedbackDto,
   SessionAvailabilityDto,
   SessionCancellationDto,
   SessionChangeDto,
@@ -207,6 +213,7 @@ import type {
   TrainerScheduleSessionDto,
   TrainerSessionRosterDto,
   TransferInstructionsDto,
+  TriageFeedbackDto,
   UnreadNotificationCountDto,
   UpcomingBookingDto,
   UpdateAdminClientProfileDto,
@@ -28298,3 +28305,645 @@ export function useGetUploadStatus<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type sendFeedbackResponse201 = {
+  data: FeedbackReceiptDto;
+  status: 201;
+};
+
+export type sendFeedbackResponseSuccess = sendFeedbackResponse201 & {
+  headers: Headers;
+};
+export type sendFeedbackResponse = sendFeedbackResponseSuccess;
+
+export const getSendFeedbackUrl = () => {
+  return `/api/v1/feedback`;
+};
+
+/**
+ * The app and Role come from the Account; at most 10 in 24 hours (429 feedback_limit_reached)
+ */
+export const sendFeedback = async (
+  sendFeedbackDto: SendFeedbackDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<sendFeedbackResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getSendFeedbackUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(sendFeedbackDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: sendFeedbackResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as sendFeedbackResponse;
+};
+
+export const getSendFeedbackMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendFeedback>>,
+    TError,
+    SendFeedbackMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof sendFeedback>>,
+  TError,
+  SendFeedbackMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["sendFeedback"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof sendFeedback>>,
+    SendFeedbackMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return sendFeedback(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SendFeedbackMutationResult = NonNullable<
+  Awaited<ReturnType<typeof sendFeedback>>
+>;
+export type SendFeedbackMutationBody = SendFeedbackDto;
+export type SendFeedbackMutationError = unknown;
+export type SendFeedbackMutationVariables = { data: SendFeedbackDto };
+
+export const useSendFeedback = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof sendFeedback>>,
+      TError,
+      SendFeedbackMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof sendFeedback>>,
+  TError,
+  SendFeedbackMutationVariables,
+  TContext
+> => {
+  return useMutation(getSendFeedbackMutationOptions(options), queryClient);
+};
+
+export type listAdminFeedbackResponse200 = {
+  data: AdminFeedbackPageDto;
+  status: 200;
+};
+
+export type listAdminFeedbackResponseSuccess = listAdminFeedbackResponse200 & {
+  headers: Headers;
+};
+export type listAdminFeedbackResponse = listAdminFeedbackResponseSuccess;
+
+export const getListAdminFeedbackUrl = (params?: ListAdminFeedbackParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/feedback?${stringifiedParams}`
+    : `/api/v1/administrator/feedback`;
+};
+
+export const listAdminFeedback = async (
+  params?: ListAdminFeedbackParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminFeedbackResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminFeedbackUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminFeedbackResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminFeedbackResponse;
+};
+
+export const getListAdminFeedbackQueryKey = (
+  params?: ListAdminFeedbackParams,
+) => {
+  return [
+    `/api/v1/administrator/feedback`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminFeedbackQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminFeedback>>,
+  TError = unknown,
+>(
+  params?: ListAdminFeedbackParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminFeedbackQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminFeedback>>
+  > = ({ signal }) =>
+    listAdminFeedback(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminFeedback>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminFeedbackQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminFeedback>>
+>;
+export type ListAdminFeedbackQueryError = unknown;
+
+export function useListAdminFeedback<
+  TData = Awaited<ReturnType<typeof listAdminFeedback>>,
+  TError = unknown,
+>(
+  params: undefined | ListAdminFeedbackParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminFeedback>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminFeedback>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminFeedback<
+  TData = Awaited<ReturnType<typeof listAdminFeedback>>,
+  TError = unknown,
+>(
+  params?: ListAdminFeedbackParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminFeedback>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminFeedback>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminFeedback<
+  TData = Awaited<ReturnType<typeof listAdminFeedback>>,
+  TError = unknown,
+>(
+  params?: ListAdminFeedbackParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminFeedback<
+  TData = Awaited<ReturnType<typeof listAdminFeedback>>,
+  TError = unknown,
+>(
+  params?: ListAdminFeedbackParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminFeedbackQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type exportAdminFeedbackResponse200 = {
+  data: AdminFeedbackExportDto;
+  status: 200;
+};
+
+export type exportAdminFeedbackResponseSuccess =
+  exportAdminFeedbackResponse200 & {
+    headers: Headers;
+  };
+export type exportAdminFeedbackResponse = exportAdminFeedbackResponseSuccess;
+
+export const getExportAdminFeedbackUrl = () => {
+  return `/api/v1/administrator/feedback/export`;
+};
+
+/**
+ * Every Feedback, newest first; audited
+ */
+export const exportAdminFeedback = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<exportAdminFeedbackResponse> => {
+  const res = await (fetchFn ?? fetch)(getExportAdminFeedbackUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: exportAdminFeedbackResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as exportAdminFeedbackResponse;
+};
+
+export const getExportAdminFeedbackQueryKey = () => {
+  return [`/api/v1/administrator/feedback/export`] as const;
+};
+
+export const getExportAdminFeedbackQueryOptions = <
+  TData = Awaited<ReturnType<typeof exportAdminFeedback>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof exportAdminFeedback>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getExportAdminFeedbackQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof exportAdminFeedback>>
+  > = ({ signal }) =>
+    exportAdminFeedback({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof exportAdminFeedback>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ExportAdminFeedbackQueryResult = NonNullable<
+  Awaited<ReturnType<typeof exportAdminFeedback>>
+>;
+export type ExportAdminFeedbackQueryError = unknown;
+
+export function useExportAdminFeedback<
+  TData = Awaited<ReturnType<typeof exportAdminFeedback>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminFeedback>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdminFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdminFeedback>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useExportAdminFeedback<
+  TData = Awaited<ReturnType<typeof exportAdminFeedback>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminFeedback>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdminFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdminFeedback>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useExportAdminFeedback<
+  TData = Awaited<ReturnType<typeof exportAdminFeedback>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useExportAdminFeedback<
+  TData = Awaited<ReturnType<typeof exportAdminFeedback>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getExportAdminFeedbackQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type triageAdminFeedbackResponse200 = {
+  data: AdminFeedbackDto;
+  status: 200;
+};
+
+export type triageAdminFeedbackResponseSuccess =
+  triageAdminFeedbackResponse200 & {
+    headers: Headers;
+  };
+export type triageAdminFeedbackResponse = triageAdminFeedbackResponseSuccess;
+
+export const getTriageAdminFeedbackUrl = (feedbackId: string) => {
+  return `/api/v1/administrator/feedback/${feedbackId}/triage`;
+};
+
+/**
+ * Sets the status and «Qué cambiamos»; audited
+ */
+export const triageAdminFeedback = async (
+  feedbackId: string,
+  triageFeedbackDto: TriageFeedbackDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<triageAdminFeedbackResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getTriageAdminFeedbackUrl(feedbackId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(triageFeedbackDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: triageAdminFeedbackResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as triageAdminFeedbackResponse;
+};
+
+export const getTriageAdminFeedbackMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof triageAdminFeedback>>,
+    TError,
+    TriageAdminFeedbackMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof triageAdminFeedback>>,
+  TError,
+  TriageAdminFeedbackMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["triageAdminFeedback"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof triageAdminFeedback>>,
+    TriageAdminFeedbackMutationVariables
+  > = (props) => {
+    const { feedbackId, data } = props ?? {};
+
+    return triageAdminFeedback(feedbackId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type TriageAdminFeedbackMutationResult = NonNullable<
+  Awaited<ReturnType<typeof triageAdminFeedback>>
+>;
+export type TriageAdminFeedbackMutationBody = TriageFeedbackDto;
+export type TriageAdminFeedbackMutationError = unknown;
+export type TriageAdminFeedbackMutationVariables = {
+  feedbackId: string;
+  data: TriageFeedbackDto;
+};
+
+export const useTriageAdminFeedback = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof triageAdminFeedback>>,
+      TError,
+      TriageAdminFeedbackMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof triageAdminFeedback>>,
+  TError,
+  TriageAdminFeedbackMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getTriageAdminFeedbackMutationOptions(options),
+    queryClient,
+  );
+};

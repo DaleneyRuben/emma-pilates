@@ -22,6 +22,7 @@ export type AdminPath =
   | "/reporte"
   | "/promociones"
   | "/promociones/referidos"
+  | "/comentarios"
   | "/reglas-del-estudio";
 
 export type NavigationItem = {
@@ -182,6 +183,18 @@ export const navigationGroups: readonly NavigationGroup[] = [
         screen: "AW26",
         list: true,
         studioWide: "los referidos son del estudio, no de una sede.",
+      },
+    ],
+  },
+  // AW38 (REL-012): «Enviar comentarios» from both apps.
+  {
+    items: [
+      {
+        label: "Comentarios",
+        to: "/comentarios",
+        screen: "AW38",
+        list: true,
+        studioWide: "los comentarios llegan de las apps, no de una sede.",
       },
     ],
   },

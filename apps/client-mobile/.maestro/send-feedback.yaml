@@ -1,0 +1,36 @@
+# Critical journey: a Client sends «Enviar comentarios» from Perfil
+# (REL-012, Prompt 25). Each run stores one Feedback; the API takes ten per
+# Account in 24 hours.
+appId: ${APP_ID}
+env:
+  EMAIL: isabel@example.com
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    id: "tab-profile"
+- extendedWaitUntil:
+    visible: "Cambiar contraseña"
+    timeout: 15000
+- scrollUntilVisible:
+    element: "Enviar comentarios"
+    direction: DOWN
+- tapOn: "Enviar comentarios"
+- extendedWaitUntil:
+    visible: "Cuéntanos qué falló o qué mejorarías.*"
+    timeout: 15000
+- tapOn: "Problema"
+- tapOn:
+    id: "feedback-text"
+- waitForAnimationToEnd
+- inputText: "No puedo ver mis reservas de mañana en la lista."
+- hideKeyboard
+- takeScreenshot: client-feedback-1-listo
+- tapOn: "Enviar comentario"
+- extendedWaitUntil:
+    visible: "¡Gracias por tu comentario!"
+    timeout: 15000
+- takeScreenshot: client-feedback-2-enviado
+- tapOn: "Volver al perfil"
+- extendedWaitUntil:
+    visible: "Cambiar contraseña"
+    timeout: 15000

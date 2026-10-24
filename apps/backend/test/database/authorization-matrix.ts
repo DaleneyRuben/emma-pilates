@@ -120,6 +120,24 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/uploads/{id}/finalize': both('allow', { ownerScoped: true }),
   'GET /api/v1/uploads/{id}': both('allow', { ownerScoped: true }),
 
+  // REL-012: any signed-in Account may send feedback; triage is money-free
+  // operations the Administrator alone runs (ADR-0102).
+  'POST /api/v1/feedback': both('allow', {
+    body: {
+      type: 'suggestion',
+      text: 'Un comentario de al menos diez.',
+      appVersion: '1.0.1',
+      appBuild: '3',
+      platform: 'ios',
+      osVersion: '18.2',
+    },
+  }),
+  'GET /api/v1/administrator/feedback': administratorOnly(),
+  'GET /api/v1/administrator/feedback/export': administratorOnly(),
+  'POST /api/v1/administrator/feedback/{feedbackId}/triage': administratorOnly({
+    body: { status: 'reviewed', changeNote: null },
+  }),
+
   // Impersonation (ADR-0100): only an Administrator starts one; the
   // Coordinator may be seen as, never see as. Ending one ends the session's
   // own, so a session without one answers 404 whatever its Role.

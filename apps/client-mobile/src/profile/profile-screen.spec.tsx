@@ -136,6 +136,7 @@ describe("Client Profile", () => {
       "referrals",
       "notifications",
       "password",
+      "feedback",
     ]) {
       expect(
         screen.getByTestId(`profile-row-icon-${row}`, { includeHiddenElements: true }),
@@ -153,7 +154,7 @@ describe("Client Profile", () => {
     const chevrons = screen
       .getAllByTestId("chevron", { includeHiddenElements: true })
       .filter((chevron) => chevron.props.stroke === "#C4BAB6");
-    expect(chevrons).toHaveLength(6);
+    expect(chevrons).toHaveLength(7);
     for (const chevron of chevrons) {
       expect(chevron).toHaveProp("width", 19);
     }
@@ -232,6 +233,17 @@ describe("Client Profile", () => {
       expect(screen.getByLabelText("Contraseña actual")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Guardar contraseña" })).toBeOnTheScreen();
+  });
+
+  it("opens «Enviar comentarios» from Perfil (REL-012)", async () => {
+    const screen = await openProfile();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar comentarios" }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Comentario")).toBeOnTheScreen();
+    });
+    expect(screen.getByRole("button", { name: "Enviar comentario" })).toBeDisabled();
   });
 
   it("edits the name and phone and saves them through the API", async () => {

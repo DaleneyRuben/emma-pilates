@@ -19,6 +19,7 @@ executionOrder:
     - coordinator-client-search
     - nutritionist-availability
     - trainer-agenda-and-inbox
+    - send-feedback
     - administrator-review-payments
     - administrator-cancel-session
     - assistant-create-client

@@ -11,8 +11,11 @@ const cell = (value: string): string => {
 };
 
 /**
- * The admin web's CSV exports (AW35, AW28): CRLF rows and a byte-order mark
- * so a spreadsheet reads the accents as UTF-8.
+ * The admin web's CSV exports (AW35, AW28, REL-012): CRLF rows, quoted cells,
+ * and a byte-order mark so a spreadsheet reads the accents as UTF-8.
  */
 export const csvDocument = (rows: readonly (readonly string[])[]): string =>
   `\uFEFF${rows.map((row) => `${row.map(cell).join(",")}\r\n`).join("")}`;
+
+/** @deprecated Prefer csvDocument; kept for feedback and contacts call sites. */
+export const toCsv = csvDocument;

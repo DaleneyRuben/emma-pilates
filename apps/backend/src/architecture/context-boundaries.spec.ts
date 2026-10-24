@@ -20,7 +20,9 @@ const allowedContextEdges: Record<string, string[]> = {
   // uploads storage port.
   booking: ['notifications', 'uploads'],
   notifications: [],
-  'system-identity': [],
+  // Feedback notifies the Administrators through the notification recorder
+  // (REL-012).
+  'system-identity': ['notifications'],
   uploads: [],
 };
 // Every context may authenticate callers through the shared authentication

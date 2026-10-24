@@ -7388,6 +7388,199 @@
           "Uploads"
         ]
       }
+    },
+    "/api/v1/feedback": {
+      "post": {
+        "description": "The app and Role come from the Account; at most 10 in 24 hours (429 feedback_limit_reached)",
+        "operationId": "sendFeedback",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendFeedbackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackReceiptDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Feedback"
+        ]
+      }
+    },
+    "/api/v1/administrator/feedback": {
+      "get": {
+        "operationId": "listAdminFeedback",
+        "parameters": [
+          {
+            "name": "app",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "client",
+                "staff"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "new",
+                "reviewed",
+                "resolved"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFeedbackPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFeedback"
+        ]
+      }
+    },
+    "/api/v1/administrator/feedback/export": {
+      "get": {
+        "description": "Every Feedback, newest first; audited",
+        "operationId": "exportAdminFeedback",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFeedbackExportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFeedback"
+        ]
+      }
+    },
+    "/api/v1/administrator/feedback/{feedbackId}/triage": {
+      "post": {
+        "description": "Sets the status and «Qué cambiamos»; audited",
+        "operationId": "triageAdminFeedback",
+        "parameters": [
+          {
+            "name": "feedbackId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriageFeedbackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFeedbackDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFeedback"
+        ]
+      }
     }
   },
   "info": {
@@ -13477,6 +13670,245 @@
         "required": [
           "id",
           "state"
+        ]
+      },
+      "SendFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "problem",
+              "suggestion",
+              "other"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 2000,
+            "description": "Counted after trimming"
+          },
+          "appVersion": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "1.0.1"
+          },
+          "appBuild": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "3"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "android",
+              "ios"
+            ]
+          },
+          "osVersion": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "14"
+          }
+        },
+        "required": [
+          "type",
+          "text",
+          "appVersion",
+          "appBuild",
+          "platform",
+          "osVersion"
+        ]
+      },
+      "FeedbackReceiptDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "createdAt"
+        ]
+      },
+      "AdminFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "app": {
+            "type": "string",
+            "enum": [
+              "client",
+              "staff"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "client",
+              "trainer",
+              "assistant",
+              "nutritionist",
+              "administrator",
+              "coordinator"
+            ],
+            "description": "The sender’s Role when it was sent"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "problem",
+              "suggestion",
+              "other"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "appVersion": {
+            "type": "string"
+          },
+          "appBuild": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "android",
+              "ios"
+            ]
+          },
+          "osVersion": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "reviewed",
+              "resolved"
+            ]
+          },
+          "changeNote": {
+            "type": "string",
+            "nullable": true,
+            "description": "«Qué cambiamos», the Administrators’ internal note"
+          },
+          "senderEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "The sender’s login email"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "triagedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "app",
+          "role",
+          "type",
+          "text",
+          "appVersion",
+          "appBuild",
+          "platform",
+          "osVersion",
+          "status",
+          "changeNote",
+          "senderEmail",
+          "createdAt",
+          "triagedAt"
+        ]
+      },
+      "AdminFeedbackPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFeedbackDto"
+            }
+          },
+          "page": {
+            "type": "number",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalItems": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Feedback matching the filters"
+          },
+          "newCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Every Feedback still «Nuevo»"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "newCount"
+        ]
+      },
+      "AdminFeedbackExportDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "Every Feedback, newest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFeedbackDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "TriageFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "reviewed",
+              "resolved"
+            ]
+          },
+          "changeNote": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000,
+            "description": "«Qué cambiamos»; blank clears it"
+          }
+        },
+        "required": [
+          "status",
+          "changeNote"
         ]
       }
     }
