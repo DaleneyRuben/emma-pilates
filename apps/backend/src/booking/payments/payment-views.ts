@@ -143,6 +143,7 @@ export const paymentSelect = {
   startsOn: true,
   method: true,
   state: true,
+  kind: true,
   submittedAt: true,
   decidedAt: true,
   rejectionReason: true,

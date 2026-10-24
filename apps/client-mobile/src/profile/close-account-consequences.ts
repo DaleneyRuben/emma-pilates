@@ -1,6 +1,6 @@
 export type ClosureInputs = {
   bookings: { kind: "booking" | "waitlist" }[];
-  evaluations: { state: "booked" | "cancelled" }[];
+  evaluations: { state: "booked" | "cancelled" | "no_show" }[];
   latestPayment: { method: string; state: string } | null;
   subscription: {
     status: "active" | "expiring_soon" | "expired" | "none";

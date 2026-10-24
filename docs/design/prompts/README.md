@@ -280,6 +280,8 @@ Each of these was sent as the next message in the existing design session for th
 | [203](./followups/196-weekly-cap-classes-left.md) | `03` and `04` show «Te quedan N clases esta semana» from `classesLeftThisWeek`; absent without a cap; zero stays honest when an extra class remains (BKM-007) | 🕓 pending |
 | [204](./followups/204-freeze-request.md) | Freeze request and status on `12`; booking refusal on `04` (BKM-012) | 🕓 pending |
 | [205](./followups/205-freeze-review.md) | Congelamientos list on the admin web (`AW41`) and the Administrator's Staff review (BKM-012) | 🕓 pending |
+| [206](./followups/199-evaluation-price-and-history.md) | `13` and `14` name an included Evaluation or the settings price; `15` stops saying every past Evaluation is «Realizada» (NUT-003) | 🕓 pending |
+| [207](./followups/200-evaluation-income-apart.md) | `AW16` splits Plan income and Evaluation income under the method line (NUT-003) | 🕓 pending |
 
 ## Status
 

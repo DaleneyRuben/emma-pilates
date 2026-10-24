@@ -1,4 +1,5 @@
 import { campaignAuthorizationRows } from './campaign-authorization';
+import { evaluationAuthorizationRows } from './evaluation-authorization';
 
 // IDN-009 / ADR-0102: every endpoint the API serves, with an explicit
 // decision for the Administrator and the Coordinator. «allow» means the Role
@@ -174,25 +175,15 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'PUT /api/v1/clients/current/photo': both('deny'),
   'DELETE /api/v1/clients/current/photo': both('deny'),
   'GET /api/v1/clients/current/photo': both('deny'),
-  'GET /api/v1/evaluation-slots': both('deny'),
-  'GET /api/v1/evaluation-slots/{slotId}': both('deny'),
-  'POST /api/v1/evaluation-slots/{slotId}/evaluations': both('deny'),
-  'GET /api/v1/evaluations': both('deny'),
-  'DELETE /api/v1/evaluations/{evaluationId}': both('deny'),
+  ...evaluationAuthorizationRows(),
 
-  // The Trainer's and the Nutritionist's own work.
+  // The Trainer's own work. The Nutritionist's rows live with the Evaluation
+  // ones, because this file is already at the size limit.
   'POST /api/v1/sessions/{sessionId}/attendance': both('deny', {
     body: { outcomes: [{ bookingId: uuid, outcome: 'attended' }] },
   }),
   'GET /api/v1/trainer/sessions': both('deny'),
   'GET /api/v1/trainer/sessions/{sessionId}/roster': both('deny'),
-  'GET /api/v1/nutritionist/evaluations': both('deny'),
-  'DELETE /api/v1/nutritionist/evaluations/{evaluationId}': administratorOnly(),
-  'GET /api/v1/nutritionist/availability-blocks': both('deny'),
-  'POST /api/v1/nutritionist/availability-blocks': both('deny'),
-  'POST /api/v1/nutritionist/availability-blocks/{blockId}/replacement':
-    both('deny'),
-  'POST /api/v1/nutritionist/availability-blocks/{blockId}/end': both('deny'),
 
   // Bookings on a Client's behalf: the Coordinator like the Assistant, at
   // every Branch; the Administrator never books for a Client.

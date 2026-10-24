@@ -55,7 +55,7 @@ can be found by its design name.
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81, 87, 88, 89 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
-| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
+| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
@@ -71,7 +71,7 @@ can be found by its design name.
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
-| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
+| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93 |
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
@@ -87,14 +87,14 @@ can be found by its design name.
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW37 Equipos | 82 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
-| AW16 Reporte de ingresos y gastos | 30, 31 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 93 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras | 88 |
 | AW41 Congelamientos | 92 |
 | AW23–AW24 Personal | 26, 31, 72, 79 |
-| AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72 |
+| AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72, 93 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89 |
 | AW38 Comentarios | 80 |
 | AW151 Caja | 76 |
@@ -6666,6 +6666,38 @@ D. **Courtesy.** On the Client detail (AW22), with an active Plan,
 The migrations `20261023190000_void_payment_values` and
 `20261023190100_void_payment` need owner approval before they run on a
 shared database.
+
+## Test 93: nutritionist rules (NUT-003)
+
+A Plan of 90 days or longer includes one Evaluation, used inside its
+dates. Every other active Plan pays the Studio Settings price, Bs 70 in
+the fixtures. A Client with no active Plan cannot book. A paid Evaluation
+is its own Payment, with no Subscription
+([decisions §6](./decisiones-emma-pilates.md),
+[booking ADR-0011](../booking/docs/adr/0011-paid-evaluations.md)).
+Paola is the Administrator, Gabriela the Nutritionist, Lucía holds
+Paquete de 8 clases.
+
+A. **Included once.** Give a Client a 90-day Plan and book an Evaluation.
+   The confirmation says it is free and it does not consume a class. A
+   second Evaluation in the same Plan is offered at Bs 70. An early
+   cancellation frees the included one. A cancellation inside 3 hours, or
+   a no-show recorded by Gabriela or Paola after the start, counts it as
+   used and refunds nothing.
+B. **QR.** As Lucía, the slot shows Bs 70 and confirming starts a
+   transfer. The slot stays held for 24 hours. Paola approves it on the
+   existing payment review; the Evaluation is then held and no Subscription
+   is created. If the transfer is still pending after 24 hours, the worker
+   releases the slot and rejects the Payment. Cash at the front desk is
+   not on this branch.
+C. **Cost and income.** Three held Evaluations in a month record Bs 150
+   owed to the Nutritionist. On **Reporte** (AW16), under the method line,
+   Plan income and Evaluation income are separate. Mis evaluaciones labels
+   a past row «Incluida», «Pagada», «No asistió», or «Cancelada».
+
+The migrations `20261023210000_evaluation_payments` and
+`20261023210100_evaluation_payment_constraints` need owner approval before
+they run on a shared database. Follow-ups 206 and 207 stay pending.
 
 ## Test 86: invite a friend (BKM-014)
 

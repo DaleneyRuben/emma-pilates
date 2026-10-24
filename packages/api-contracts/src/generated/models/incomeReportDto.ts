@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { IncomeByKindDto } from "./incomeByKindDto";
 import type { IncomeByMethodDto } from "./incomeByMethodDto";
 import type { IncomeMonthDto } from "./incomeMonthDto";
 import type { IncomeSaleDto } from "./incomeSaleDto";
@@ -21,6 +22,7 @@ export interface IncomeReportDto {
   /** Discounts on the confirmed sales, BOB centavos */
   discountCentavos: number;
   byMethod: IncomeByMethodDto;
+  byKind: IncomeByKindDto;
   months: IncomeMonthDto[];
   /** Sales that carry a discount, with list price and amount paid */
   sales: IncomeSaleDto[];

@@ -68,7 +68,9 @@ export const startClosureWorld = async (): Promise<ClosureWorld> => {
             : {
                 planId: plan.id,
                 planNameSnapshot: plan.name,
-                durationDaysSnapshot: plan.durationDays,
+                // NUT-003 includes the Evaluation only on a Plan of 90 days
+                // or longer. The first catalog Plan is 30 days.
+                durationDaysSnapshot: 90,
                 originalClassAllowance: 8,
                 remainingClassAllowance: 8,
                 startsOn: new Date('2026-09-01T00:00:00.000Z'),

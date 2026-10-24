@@ -235,6 +235,7 @@ export const createPrismaOversight = (
         select: {
           id: true,
           method: true,
+          kind: true,
           planPriceCentavos: true,
           discountCentavos: true,
           discountReason: true,
@@ -260,6 +261,7 @@ export const createPrismaOversight = (
       }),
     ]);
     const byMethod = { cash: 0, transfer: 0, credit_only: 0 };
+    const byKind = { plan: 0, evaluation: 0 };
     const months = new Map<string, number>();
     let listPriceCentavos = 0;
     let discountCentavos = 0;
@@ -273,6 +275,8 @@ export const createPrismaOversight = (
     for (const payment of payments) {
       if (payment.method === PaymentMethod.COURTESY) continue;
       byMethod[methodNames[payment.method]] += payment.amountDueCentavos;
+      byKind[payment.kind === 'EVALUATION' ? 'evaluation' : 'plan'] +=
+        payment.amountDueCentavos;
       listPriceCentavos += payment.planPriceCentavos;
       discountCentavos += payment.discountCentavos;
       const month = `${boliviaDate(payment.decidedAt!).toISOString().slice(0, 7)}-01`;
@@ -295,6 +299,7 @@ export const createPrismaOversight = (
       listPriceCentavos,
       discountCentavos,
       byMethod,
+      byKind,
       months: [...months.entries()]
         .sort(([left], [right]) => left.localeCompare(right))
         .map(([month, totalCentavos]) => ({ month, totalCentavos })),
