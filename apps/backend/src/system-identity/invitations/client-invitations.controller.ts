@@ -25,6 +25,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { z } from 'zod';
+import { acquisitionProblem } from '../../booking/acquisition/acquisition-errors';
 import { authenticatedPrincipalResolver } from '../authentication/authentication.controller';
 import {
   authenticateBearer,
@@ -39,6 +40,7 @@ import {
   InvitationEmailThrottledError,
   InvitationHasActivityError,
   type ClientInvitationView,
+  type InviteClientCommand,
   type InviteClientResult,
 } from './client-invitations';
 import { StaffEmailBudget } from '../staff-email-budget/staff-email-budget.guard';
@@ -56,7 +58,7 @@ export const clientInvitationOperations = Symbol('clientInvitationOperations');
 
 export type ClientInvitationOperations = {
   invite: (
-    command: { name: string; email: string; phone: string | null },
+    command: InviteClientCommand,
     principal: AuthenticatedPrincipal,
   ) => Promise<InviteClientResult>;
   read: (
@@ -124,6 +126,13 @@ const run = async <Result>(
   } catch (error) {
     if (error instanceof InvitationEmailThrottledError) {
       response?.setHeader('Retry-After', String(error.retryAfterSeconds));
+    }
+    const acquisition = acquisitionProblem(error);
+    if (acquisition !== null) {
+      throw new HttpException(
+        { code: acquisition.code, detail: acquisition.detail },
+        acquisition.status,
+      );
     }
     const match = problems.find(([type]) => error instanceof type);
     if (match !== undefined && error instanceof Error) {

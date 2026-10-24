@@ -21,6 +21,7 @@ import { StatusPill } from "../../components/ui/status-pill";
 import { PageNotice } from "../../components/page/page-notice";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { useAdminRole } from "../../session/admin-role";
+import { ClientAcquisitionBlock } from "./client-acquisition-block";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
 import { CourtesyAccessAction } from "./courtesy-access-action";
@@ -121,6 +122,7 @@ function ClientSummary({
           </span>
         </SummaryRow>
       </SummaryBlock>
+      <ClientAcquisitionBlock clientId={client.id} />
     </>
   );
 }

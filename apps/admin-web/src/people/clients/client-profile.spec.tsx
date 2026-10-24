@@ -9,6 +9,7 @@ import {
   useMockServer,
 } from "../../test/msw";
 import {
+  acquisitionHandler,
   clientPage,
   clientsPath,
   lucia,
@@ -27,6 +28,7 @@ const saved: unknown[] = [];
 const handlers = (detail: AdminClientDetailDto) => [
   http.get(apiUrl(clientsPath), () => jsonResponse(clientPage([lucia]))),
   http.get(apiUrl(`${clientsPath}/:clientId`), () => jsonResponse(detail)),
+  acquisitionHandler(),
   http.patch(apiUrl(`${clientsPath}/:clientId`), async ({ request }) => {
     const body = (await request.json()) as { name: string; phone: string };
     saved.push(body);

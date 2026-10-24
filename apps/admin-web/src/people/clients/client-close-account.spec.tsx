@@ -9,6 +9,7 @@ import {
   useMockServer,
 } from "../../test/msw";
 import {
+  acquisitionHandler,
   clientPage,
   clientsPath,
   lucia,
@@ -35,6 +36,7 @@ const handlers = (
     return jsonResponse(clientPage([lucia]));
   }),
   http.get(apiUrl(`${clientsPath}/:clientId`), () => jsonResponse(detail)),
+  acquisitionHandler(),
   http.post(apiUrl(`${clientsPath}/:clientId/closure`), ({ params }) => {
     closures.push(String(params.clientId));
     return close();
@@ -63,7 +65,7 @@ describe("AW22 Cerrar cuenta", () => {
   beforeEach(() => {
     listReads = 0;
     closures.length = 0;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), acquisitionHandler());
   });
 
   it("lists what closing does for this Client before asking to confirm", async () => {
@@ -198,6 +200,7 @@ describe("AW22 Cerrar cuenta", () => {
           closure: { ...luciaDetail.closure, futureBookingCount: bookings },
         }),
       ),
+      acquisitionHandler(),
     );
     const { dialog, user } = await openDialog();
     expect(

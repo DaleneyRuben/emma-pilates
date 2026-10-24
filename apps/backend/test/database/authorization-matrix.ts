@@ -231,11 +231,25 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     administratorOnly({
       body: { endsOn: '2026-11-23' },
     }),
+  // BKM-011: how she found the studio. A body is required before the Role
+  // is checked; the use case decides who may correct it.
+  'GET /api/v1/administrator/clients/{clientId}/acquisition':
+    administratorOnly(),
+  'PUT /api/v1/administrator/clients/{clientId}/acquisition': administratorOnly(
+    {
+      body: { channel: 'instagram', referralCode: null },
+    },
+  ),
 
   // Staff: details for the schedule; access decisions stay with the
   // Administrator.
   'GET /api/v1/administrator/staff-members': both('allow'),
   'GET /api/v1/administrator/staff-members/{staffMemberId}': both('allow'),
+  // BKM-011: a Trainer's personal code is the Administrator's.
+  'GET /api/v1/administrator/staff-members/{staffMemberId}/referral-code':
+    administratorOnly(),
+  'PUT /api/v1/administrator/staff-members/{staffMemberId}/referral-code':
+    administratorOnly({ body: { referralCode: null } }),
   'POST /api/v1/administrator/staff-members': administratorOnly(),
   'POST /api/v1/administrator/staff-members/{staffMemberId}/activation-link':
     administratorOnly(),

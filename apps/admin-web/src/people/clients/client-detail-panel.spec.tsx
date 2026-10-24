@@ -9,6 +9,7 @@ import {
   useMockServer,
 } from "../../test/msw";
 import {
+  acquisitionHandler,
   clientPage,
   clientsPath,
   lucia,
@@ -47,7 +48,7 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     detailReads.length = 0;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), acquisitionHandler());
   });
 
   it("summarizes contact, the current Plan, and referrals read-only, without Credit (PAY-005)", async () => {
@@ -201,7 +202,7 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
 describe("AW22 Detalle de cliente on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() => server.use(...signedInHandlers(), acquisitionHandler()));
 
   it("fills the screen with the same summary", async () => {
     server.use(...handlers(() => jsonResponse(luciaDetail)));

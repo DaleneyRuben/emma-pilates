@@ -1,4 +1,5 @@
 import type { PgBoss } from 'pg-boss';
+import { recordClientAcquisition } from '../../booking/acquisition/record-client-acquisition';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
   AuditActorKind,
@@ -171,6 +172,12 @@ const createInvitationTransaction = (
           },
         },
       },
+    });
+    // BKM-011: no Referral here; the Guest Pass flow (BKM-014) adds its own.
+    await recordClientAcquisition(transaction, {
+      clientId: invitation.clientId,
+      declaredChannel: invitation.acquisitionChannel,
+      referralCode: invitation.referredByCode,
     });
   },
   replaceStaffInvitationActivation: (input) =>
