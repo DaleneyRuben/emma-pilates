@@ -225,6 +225,7 @@ Each of these was sent as the next message in the existing design session for th
 | [115](./followups/115-lists-refresh-on-focus-and-pull.md) | Every list refreshes when it regains focus and on pull (UX-004, UX-001 finding C1): one bullet in the README's «Loading state (Client and Staff)» naming the background refetch and the native pull-to-refresh control in Palo de rosa; no numbered screen changes (109–114 are reserved by UX-003, UX-005, UX-006, UX-009, UX-010 and UX-012) | ✅ applied (Claude Design canvas, 2026-10-22, `7b761df1`; the apps are built in UX-004) |
 | [204](./followups/204-sidebar-indicadores.md) | The sidebar gains **Indicadores** after **Reporte** (STU-003, AW39): every admin screen that draws the sidebar, and the design-system sample, lists the entry; it is active only on `AW39`. 110–114 and 190–203 are reserved by sibling branches | 🕓 pending |
 | [205](./followups/205-sidebar-recomendaciones.md) | The sidebar gains **Recomendaciones** after **Indicadores** (STU-006, AW40): every admin screen that draws the sidebar, and the design-system sample, lists the entry; it is active only on `AW40` | 🕓 pending |
+| [206](./followups/206-indicadores-informe.md) | `AW39` gains «Informe del mes» under the chart (STU-007): two paragraphs, one cited action, and «Pregunta sobre el mes». The Coordinator frame does not gain it | 🕓 pending |
 
 ## Status
 

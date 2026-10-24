@@ -56,6 +56,26 @@ export class RecommendationRecomputeDto {
   @ApiProperty() written!: number;
 }
 
+export class NarrativeActionDto {
+  @ApiProperty() text!: string;
+  @ApiProperty() because!: string;
+}
+
+export class NarrativeReportDto {
+  @ApiProperty({ type: [String] }) paragraphs!: string[];
+  @ApiProperty({ type: [NarrativeActionDto] }) actions!: NarrativeActionDto[];
+}
+
+export class NarrativeQuestionInputDto {
+  @ApiProperty({ example: '2026-10' }) month!: string;
+  @ApiProperty({ maxLength: 200 }) question!: string;
+}
+
+export class NarrativeQuestionDto {
+  @ApiProperty() answer!: string;
+  @ApiProperty() refused!: boolean;
+}
+
 export class RevenueReportDto {
   @ApiProperty({ example: '2026-10' }) month!: string;
   @ApiProperty({ description: 'Cash collected in the month, BOB centavos' })

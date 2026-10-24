@@ -15,11 +15,9 @@ import {
 } from './prisma-recommendations';
 import { readRevenueMonth } from './prisma-revenue-report';
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
-import {
-  studioControllers,
-  studioOperations,
-  type StudioOperations,
-} from './studio.controller';
+import { narrativeFromReads, questionFromCounts } from './narrate-month';
+import { studioOperations, type StudioOperations } from './studio-operations';
+import { studioControllers } from './studio.controller';
 
 const monthDate = (month: string) => {
   const [year, monthNumber] = month.split('-').map(Number);
@@ -89,6 +87,35 @@ export const createStudioOperations = (deps: {
     }
     return dismissed;
   },
+  narrative: async (
+    input: { month: string },
+    principal: AuthenticatedPrincipal,
+    prisma: PrismaClient,
+  ) => {
+    requireStudioAdministrator(principal);
+    const counts = await deps.readKpis(prisma, {
+      month: monthDate(input.month),
+    });
+    const listed = await deps.readRecommendations(prisma, {
+      month: monthDate(input.month),
+    });
+    return narrativeFromReads({
+      month: input.month,
+      kpis: counts,
+      recommendations: listed,
+    });
+  },
+  question: async (
+    input: { month: string; question: string },
+    principal: AuthenticatedPrincipal,
+    prisma: PrismaClient,
+  ) => {
+    requireStudioAdministrator(principal);
+    const counts = await deps.readKpis(prisma, {
+      month: monthDate(input.month),
+    });
+    return questionFromCounts(input.question, counts);
+  },
 });
 
 @Module({
@@ -130,6 +157,10 @@ export const createStudioOperations = (deps: {
             operations.recomputeRecommendations(input, principal, prisma),
           dismissRecommendation: (input, principal) =>
             operations.dismiss(input, principal, prisma),
+          narrative: (input, principal) =>
+            operations.narrative(input, principal, prisma),
+          question: (input, principal) =>
+            operations.question(input, principal, prisma),
         };
       },
     },

@@ -11,6 +11,8 @@ import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 
 const kpisPath = "/api/v1/administrator/reports/kpis";
+const narrativePath = "/api/v1/administrator/reports/narrative";
+const questionsPath = "/api/v1/administrator/reports/narrative/questions";
 
 const counts = {
   sessionsHeld: 2,
@@ -32,12 +34,33 @@ const amounts = {
 };
 
 const months = (body: Record<string, unknown>) =>
-  http.get(apiUrl(kpisPath), () => jsonResponse(body));
+  http.get(apiUrl(kpisPath), ({ request }) => {
+    const month = new URL(request.url).searchParams.get("month");
+    return jsonResponse({ ...body, month });
+  });
+
+const narrative = {
+  paragraphs: [
+    "En octubre de 2026 se dictaron 20 clases, con una ocupación del 59 %. Había 8 clientas activas.",
+    "La renovación del mes fue del 50 %.",
+  ],
+  actions: [
+    {
+      text: "Contacta a la clienta: tiene un plan vigente y no reservó este mes.",
+      because:
+        "Contacta a la clienta: tiene un plan vigente y no reservó este mes.",
+    },
+  ],
+};
+
+const narrativeHandlers = () => [
+  http.get(apiUrl(narrativePath), () => jsonResponse(narrative)),
+];
 
 describe("AW39 Indicadores", () => {
   useMockServer();
   beforeEach(() => {
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), ...narrativeHandlers());
   });
 
   it("shows the count tiles, the money figures, and a three-month chart for an Administrator", async () => {
@@ -86,6 +109,104 @@ describe("AW39 Indicadores", () => {
     expect(
       screen.getByRole("figure", { name: "Clases dictadas" }),
     ).toBeVisible();
+  });
+
+  it("shows the month's report and answers a question for an Administrator", async () => {
+    server.use(
+      months({ month: "2026-10", ...counts, ...amounts }),
+      ...narrativeHandlers(),
+    );
+    const { user } = renderAdmin("/reporte/indicadores");
+
+    expect(
+      await screen.findByRole("region", { name: "Informe del mes" }),
+    ).toBeVisible();
+    expect(
+      screen.getByText(/se dictaron 20 clases, con una ocupación del 59 %/),
+    ).toBeVisible();
+    expect(
+      within(screen.getByRole("list", { name: "Acciones" })).getByText(
+        "Contacta a la clienta: tiene un plan vigente y no reservó este mes.",
+      ),
+    ).toBeVisible();
+
+    const asked: string[] = [];
+    server.use(
+      http.post(apiUrl(questionsPath), async ({ request }) => {
+        asked.push(await request.text());
+        return jsonResponse({
+          refused: false,
+          answer: "La ocupación del mes fue del 59 %.",
+        });
+      }),
+    );
+    await user.click(screen.getByRole("button", { name: "Preguntar" }));
+    expect(asked).toEqual([]);
+
+    await user.type(
+      screen.getByLabelText("Pregunta sobre el mes"),
+      "ocupación",
+    );
+    await user.click(screen.getByRole("button", { name: "Preguntar" }));
+    expect(
+      await screen.findByText("La ocupación del mes fue del 59 %."),
+    ).toBeVisible();
+    expect(asked).toHaveLength(1);
+  });
+
+  it("hides the report when the narrative answers 403 and keeps the count tiles", async () => {
+    server.use(
+      months({ month: "2026-10", ...counts }),
+      http.get(apiUrl(narrativePath), () =>
+        problemResponse(403, "studio_access_denied"),
+      ),
+    );
+    renderAdmin("/reporte/indicadores");
+
+    expect(
+      await screen.findByRole("region", { name: "Ocupación" }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole("region", { name: "Informe del mes" }),
+    ).toBeNull();
+    expect(screen.queryByLabelText("Pregunta sobre el mes")).toBeNull();
+  });
+
+  it("shows the no-classes paragraph when the month held none", async () => {
+    server.use(
+      months({
+        month: "2026-10",
+        ...counts,
+        ...amounts,
+        sessionsHeld: 0,
+        occupancyPercent: 0,
+      }),
+      http.get(apiUrl(narrativePath), () =>
+        jsonResponse({
+          paragraphs: ["En octubre de 2026 no se dictaron clases."],
+          actions: [],
+        }),
+      ),
+    );
+    renderAdmin("/reporte/indicadores");
+
+    expect(
+      await screen.findByText("En octubre de 2026 no se dictaron clases."),
+    ).toBeVisible();
+    expect(screen.queryByRole("list", { name: "Acciones" })).toBeNull();
+  });
+
+  it("shows the loading notice while the report is pending", async () => {
+    server.resetHandlers();
+    server.use(
+      ...signedInHandlers(),
+      months({ month: "2026-10", ...counts, ...amounts }),
+      http.get(apiUrl(narrativePath), () => new Promise(() => undefined)),
+    );
+    renderAdmin("/reporte/indicadores");
+
+    expect(await screen.findByText("Cargando el informe…")).toBeVisible();
+    expect(screen.getByRole("region", { name: "Ocupación" })).toBeVisible();
   });
 
   it("hides every money figure when the payload has no centavo keys", async () => {

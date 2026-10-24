@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 76); read the month's indicators (Test 77) and its recommendations (Test 78); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 76); read the month's indicators (Test 77), its narrated report (Test 79), and its recommendations (Test 78); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
@@ -3355,7 +3355,11 @@ The following are not ready for manual product testing:
   «Descartar» by rendering the page read-only. Client no-shows, a renewal
   gap, and the other twelve diagnosis rules are not findings yet: the fact
   tables cannot support them, or the tables they need are not on this
-  branch. The nightly recommendation pass is not a worker job.
+  branch. The nightly recommendation pass is not a worker job;
+- a Coordinator reading the narrated report (IDN-009): Test 79 refuses her
+  with `403 studio_access_denied`, and the Indicadores section hides itself
+  on that response. No model is called and no key is configured; the report
+  is the pure function over the month's counts.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -5977,3 +5981,39 @@ Spanish sentence and the state. Use a disposable database.
    passes, cash close, budget overruns, founder discount cost, reduced
    capacity, and trainer statements wait for tables this branch does not
    have. The nightly pass waits; the recompute endpoint is the trigger.
+
+## Test 79: read the month's narrated report
+
+Indicadores, below the chart, shows «Informe del mes» for the Administrator.
+The text comes from the month's counts and the recommendation sentences. It
+names no Client. A question is matched to those counts, not answered by a
+model. Use a disposable database.
+
+1. **The report.** Log in as `paola.mendoza@example.com` (Test 3) and open
+   Indicadores. Below «Clases dictadas» the card «Informe del mes» states
+   the classes held, the occupancy, the active clients, and the renewal
+   percent, using the same digits as the tiles. Each recommendation of the
+   month is an action whose «Porque:» line is that recommendation's
+   sentence. A month with no held classes says «En {mes} de {año} no se
+   dictaron clases.» and lists no action. While it loads, the card says
+   «Cargando el informe…». A failed read says «No pudimos cargar el
+   informe.» with «Reintentar».
+2. **A question.** The field is «Pregunta sobre el mes» and the button is
+   «Preguntar». An empty field does not ask. «ocupación» answers with the
+   occupancy percent. «clientas activas» answers with the active-client
+   count. Anything else, including a person's name, answers «Solo puedo
+   responder sobre los indicadores del mes. Pregunta por la ocupación o por
+   las clientas activas.» A question longer than 200 characters, or a month
+   that is not `YYYY-MM`, gets `400 invalid_request`.
+3. **Who may read it.**
+   `GET /api/v1/administrator/reports/narrative?month=YYYY-MM` and
+   `POST /api/v1/administrator/reports/narrative/questions` are
+   Administrator only. A Coordinator and an Assistant get
+   `403 studio_access_denied`. The Coordinator role is not on this branch
+   (IDN-009), so her refusal is the e2e suite's cast, and the section hides
+   itself when the response is 403. The count tiles stay.
+4. **No model.** Nothing in this test calls an external model, and no API
+   key is configured. The sentences are the pure function over the
+   aggregates. A provider can replace that function later. The report is
+   not stored.
+   [Pull request #204](https://github.com/DaleneyRuben/emma-pilates/pull/204).

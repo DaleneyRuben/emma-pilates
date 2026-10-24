@@ -27,8 +27,9 @@ import {
   authenticateBearer,
   type PrincipalResolver,
 } from '../system-identity/authentication/bearer-principal';
-import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
+import { NarrativeReportController } from './narrative.controller';
 import { StudioError } from './studio-errors';
+import { studioOperations, type StudioOperations } from './studio-operations';
 import {
   MonthKpisDto,
   parseStudioRecompute,
@@ -40,68 +41,13 @@ import {
   StudioRecomputeInputDto,
 } from './studio.dto';
 
-export const studioOperations = Symbol('studioOperations');
-
-export type RevenueReport = {
-  month: string;
-  cashCentavos: number;
-  accruedCentavos: number;
-  deferredCentavos: number;
-  classesStillOwed: number;
-};
-
-export type MonthKpiReport = {
-  month: string;
-  sessionsHeld: number;
-  occupancyPercent: number;
-  averageStudentsTimes10: number;
-  averageAttendanceTimes10: number;
-  noShowPercent: number;
-  activeClients: number;
-  newClients: number;
-  renewedClients: number;
-  renewalPercent: number;
-  cashCentavos?: number;
-  accruedCentavos?: number;
-  deferredCentavos?: number;
-  classesStillOwed?: number;
-};
-
-export type RecommendationView = {
-  id: string;
-  rule: string;
-  subject: string;
-  period: string;
-  detail: string;
-  state: string;
-};
-
-export type StudioOperations = {
-  recompute(
-    input: { month: string },
-    principal: AuthenticatedPrincipal,
-  ): Promise<{ month: string; sessions: number; clientMonths: number }>;
-  revenue(
-    input: { month: string },
-    principal: AuthenticatedPrincipal,
-  ): Promise<RevenueReport>;
-  kpis(
-    input: { month: string },
-    principal: AuthenticatedPrincipal,
-  ): Promise<MonthKpiReport>;
-  recommendations(
-    input: { month: string },
-    principal: AuthenticatedPrincipal,
-  ): Promise<{ month: string; recommendations: RecommendationView[] }>;
-  recomputeRecommendations(
-    input: { month: string },
-    principal: AuthenticatedPrincipal,
-  ): Promise<{ month: string; written: number }>;
-  dismissRecommendation(
-    input: { id: string },
-    principal: AuthenticatedPrincipal,
-  ): Promise<RecommendationView>;
-};
+export { studioOperations } from './studio-operations';
+export type {
+  MonthKpiReport,
+  RecommendationView,
+  RevenueReport,
+  StudioOperations,
+} from './studio-operations';
 
 @Controller({ path: 'administrator/studio-facts', version: '1' })
 @ApiBearerAuth()
@@ -325,4 +271,5 @@ export const studioControllers = [
   StudioFactsController,
   RevenueReportController,
   RecommendationsController,
+  NarrativeReportController,
 ];
