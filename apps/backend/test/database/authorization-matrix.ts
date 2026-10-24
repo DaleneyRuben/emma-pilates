@@ -438,7 +438,8 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/administrator/equipment-issues': both('allow', {
     query: `?branchId=${uuid}`,
   }),
-  'POST /api/v1/administrator/equipment-issues/{issueId}/resolve': both('allow'),
+  'POST /api/v1/administrator/equipment-issues/{issueId}/resolve':
+    both('allow'),
   'GET /api/v1/administrator/equipment-flags': both('allow', {
     query: `?branchId=${uuid}&from=2030-01-07T15:00:00.000Z&until=2030-01-14T15:00:00.000Z`,
   }),
