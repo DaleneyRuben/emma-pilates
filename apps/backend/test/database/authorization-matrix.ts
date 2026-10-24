@@ -257,6 +257,21 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/class-types/{classTypeId}/archive':
     administratorOnly(),
   'GET /api/v1/administrator/plans': administratorOnly(),
+  // BKM-004: the Administrator edits the studio rules. The public rules
+  // need no credential.
+  'GET /api/v1/administrator/studio-settings': administratorOnly(),
+  'PUT /api/v1/administrator/studio-settings': administratorOnly({
+    body: {
+      expectedVersion: 1,
+      minimumBookings: 2,
+      taxRatePercent: 16,
+      renewalTargetMonths1To6Percent: 40,
+      renewalTargetMonths7To12Percent: 55,
+      renewalTargetFromMonth13Percent: 70,
+      openingDate: null,
+    },
+  }),
+  'GET /api/v1/studio-rules': publicRoute,
   'POST /api/v1/administrator/plans': administratorOnly(),
   'PUT /api/v1/administrator/plans/{planId}': administratorOnly(),
   'PUT /api/v1/administrator/plans/{planId}/visibility': administratorOnly(),
@@ -294,6 +309,19 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/administrator/promotion-contacts/export': administratorOnly(),
   'POST /api/v1/administrator/promotion-contacts/{contactId}/withdrawal':
     administratorOnly(),
+
+  // BKO-003: closing the drawer is the Assistant's and the Administrator's.
+  // The Coordinator sees no amount (ADR-0102), so every cash-close route
+  // refuses her. The history is the Administrator's alone.
+  'GET /api/v1/cash-closes/today': administratorOnly({
+    query: `?branchId=${uuid}`,
+  }),
+  'POST /api/v1/cash-closes': administratorOnly({
+    body: { branchId: uuid, countedCentavos: 0, note: null },
+  }),
+  'GET /api/v1/administrator/cash-closes': administratorOnly({
+    query: `?branchId=${uuid}&month=2026-10`,
+  }),
 
   // Back Office: supplies, payroll, expenses.
   'GET /api/v1/administrator/supplies': administratorOnly(),
