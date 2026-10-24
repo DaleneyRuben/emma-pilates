@@ -3,7 +3,6 @@ import {
   getGetIncomeReportQueryKey,
   getGetPaymentReviewQueryKey,
   getListAdminClientsQueryKey,
-  getListAdminCreditsQueryKey,
   getListAdminEvaluationsQueryKey,
   getListAdminPaymentsQueryKey,
   getListAdminReferralsQueryKey,
@@ -40,7 +39,6 @@ const keys = {
     pageSize: 20,
     query: "sofia",
   }),
-  credits: getListAdminCreditsQueryKey({ page: 1, pageSize: 20 }),
   studioIncome: getGetIncomeReportQueryKey({
     from: "2026-08-01T04:00:00.000Z",
     until: "2026-10-01T04:00:00.000Z",
@@ -80,21 +78,17 @@ describe("the cache after a Payment decision", () => {
       clientId,
     });
 
-    // The Plan starts (the directory and her detail show it), a first
-    // Payment can award Credit to whoever referred her (Referidos, Créditos),
-    // her reserved Credit is spent, and a transfer counts as income only in
-    // the all-Branches report (CONTEXT-MAP).
+    // The Plan starts (the directory and her detail show it) and a transfer
+    // counts as income only in the all-Branches report (CONTEXT-MAP). No
+    // Credit is awarded or spent any more (PAY-005), so the Referral list
+    // and the referrer's detail stay as they are.
     expect(invalidated(queryClient)).toEqual(
       [
         "badge",
         "client",
         "clientTable",
-        "credits",
         "pendingTable",
-        "referrals",
-        "referrer",
         "review",
-        "searchedReferrals",
         "studioIncome",
       ].sort(),
     );
@@ -109,10 +103,10 @@ describe("the cache after a Payment decision", () => {
       clientId,
     });
 
-    // Her reserved Credit comes back (Créditos); nothing else about any
-    // Client changes and no Referral is awarded.
+    // Her detail no longer shows a transfer awaiting review; nothing else
+    // about any Client changes.
     expect(invalidated(queryClient)).toEqual(
-      ["badge", "client", "credits", "pendingTable", "review"].sort(),
+      ["badge", "client", "pendingTable", "review"].sort(),
     );
   });
 
@@ -130,12 +124,8 @@ describe("the cache after a Payment decision", () => {
         "badge",
         "client",
         "clientTable",
-        "credits",
         "pendingTable",
-        "referrals",
-        "referrer",
         "review",
-        "searchedReferrals",
         "studioIncome",
       ].sort(),
     );

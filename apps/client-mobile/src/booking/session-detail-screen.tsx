@@ -24,6 +24,7 @@ import {
   usePushNotifications,
   useStudioRules,
   isInsideCancellationWindow,
+  weeklyClassesLeftLine,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -32,6 +33,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { formatCivilDate } from "../home/home-format";
 import { CapacityBlock } from "./capacity-block";
 import { formatSessionDate, formatSessionMinutes, formatTimeRange } from "@pilates/mobile-core";
 
@@ -59,11 +61,21 @@ const bookingProblems: Record<string, string> = {
   active_waitlist_entry_exists: "Ya estás en la lista de espera.",
   no_eligible_subscription: "No te quedan clases en tu plan.",
   session_has_capacity: "La clase tiene cupos: puedes reservar directamente.",
+  weekly_cap_reached: "Ya usaste tus clases de esta semana.",
 };
 
 function problemMessage(body: unknown): string | null {
   if (typeof body !== "object" || body === null) return null;
   const code = (body as { code?: unknown }).code;
+  const detail = (body as { detail?: unknown }).detail;
+  if (code === "booking_during_freeze" && typeof detail === "string") {
+    const date = /until (\d{4}-\d{2}-\d{2})$/.exec(detail)?.[1];
+    if (date !== undefined) return `Tu plan está congelado hasta el ${formatCivilDate(date)}.`;
+  }
+  if (code === "booking_before_start_date" && typeof detail === "string") {
+    const date = /: (\d{4}-\d{2}-\d{2})$/.exec(detail)?.[1];
+    if (date !== undefined) return `Podrás reservar a partir del ${formatCivilDate(date)}.`;
+  }
   return typeof code === "string" ? (bookingProblems[code] ?? null) : null;
 }
 
@@ -123,6 +135,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   const waitlistOpen =
     studioRules !== undefined &&
     !isInsideCancellationWindow(detail.startsAt, new Date(), studioRules.cancellationWindowMinutes);
+  const classesLeftLine = weeklyClassesLeftLine(detail.classesLeftThisWeek);
 
   const book = async () => {
     setSubmitting(true);
@@ -247,6 +260,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           capacity={detail.capacity}
           full={full}
         />
+        {classesLeftLine === null ? null : <BodyText>{classesLeftLine}</BodyText>}
         <View style={styles.about}>
           <Text style={styles.sectionTitle}>Sobre la clase</Text>
           <BodyText>{detail.classType.description}</BodyText>

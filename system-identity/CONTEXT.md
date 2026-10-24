@@ -33,7 +33,7 @@ A single-use email link through which an Account holder replaces a forgotten pas
 _Avoid_: Reset code, magic link
 
 **Impersonation**:
-An Administrator's time-boxed (30 minutes) view of the Staff app as one active Trainer, Assistant, or Nutritionist, tied to the Administrator's own mobile Authentication Session and ended by «Salir», by expiry, or by logout ([ADR-0100](../docs/adr/0100-impersonate-a-staff-member-from-the-staff-app.md)). While it lasts, requests resolve to the Staff Member's Account, Role, and Branches, the Administrator's own rights do not apply, account-level self-service is refused, and every audit record names the Administrator as actor and references the Impersonation. Never another Administrator, never a Client.
+An Administrator's time-boxed (30 minutes) view of the Staff app as one active Trainer, Assistant, Nutritionist, or the Coordinator ([ADR-0102](../docs/adr/0102-coordinator-role-without-money.md)), tied to the Administrator's own mobile Authentication Session and ended by «Salir», by expiry, or by logout ([ADR-0100](../docs/adr/0100-impersonate-a-staff-member-from-the-staff-app.md)). While it lasts, requests resolve to the Staff Member's Account, Role, and Branches, the Administrator's own rights do not apply, account-level self-service is refused, and every audit record names the Administrator as actor and references the Impersonation. Never another Administrator, never a Client.
 _Avoid_: Login as, switch user, sudo, view-as session (without the Impersonation qualifier)
 
 **Feedback**:

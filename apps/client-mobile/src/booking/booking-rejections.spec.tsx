@@ -78,9 +78,9 @@ describe("Client booking rejection messages", () => {
       "booking_cancellation_window",
       "Ya no se puede cancelar: falta menos que la ventana de cancelación.",
     ],
-    ["weekly_class_cap_reached", "Ya alcanzaste el máximo de clases de esta semana."],
+    ["weekly_cap_reached", "Ya usaste tus clases de esta semana."],
     [
-      "subscription_not_started",
+      "booking_before_start_date",
       "Tu plan todavía no empieza: podrás reservar desde su fecha de inicio.",
     ],
   ])("names a refused cancellation by %s", async (code, message) => {
@@ -109,9 +109,9 @@ describe("Client booking rejection messages", () => {
     ["reschedule_outside_window", "Solo puedes reprogramar dentro de la ventana de cancelación."],
     ["reschedule_target_ineligible", "Esa clase no está disponible para reprogramar."],
     ["session_full", "La clase ya no tiene cupos."],
-    ["weekly_class_cap_reached", "Ya alcanzaste el máximo de clases de esta semana."],
+    ["weekly_cap_reached", "Ya usaste tus clases de esta semana."],
     [
-      "subscription_not_started",
+      "booking_before_start_date",
       "Tu plan todavía no empieza: podrás reservar desde su fecha de inicio.",
     ],
   ])("names a refused reschedule by %s", async (code, message) => {

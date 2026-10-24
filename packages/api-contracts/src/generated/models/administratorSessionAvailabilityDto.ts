@@ -23,6 +23,12 @@ export interface AdministratorSessionAvailabilityDto {
   availableSeats: number;
   /** @minimum 0 */
   waitlistCount: number;
+  /**
+   * Classes left this week from the base allowance. Absent when the Plan has no cap or the caller is not a Client.
+   * @minimum 0
+   * @nullable
+   */
+  classesLeftThisWeek?: number | null;
   /** @nullable */
   sessionScheduleId: string | null;
   isException: boolean;

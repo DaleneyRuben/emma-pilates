@@ -50,6 +50,7 @@ import {
 } from './admin-web-cookies';
 import { requestNetworkAddress } from '../security/request-source';
 import { AdminWebPasswordRecoveryResultDto } from './admin-web-session.dto';
+import { opensAdminWebSessions } from '../authentication/staff-role';
 
 export const adminWebLogin = Symbol('adminWebLogin');
 export const adminWebPasswordRecoveryCompletion = Symbol(
@@ -141,10 +142,11 @@ export class AdminWebSessionController {
     );
 
     // A browser session outlives no demotion: once the Staff Member is no
-    // longer an Administrator the admin web treats it as signed out.
+    // longer an Administrator or the Coordinator (ADR-0102) the admin web
+    // treats it as signed out.
     if (
       principal.identity.kind !== 'staff' ||
-      principal.identity.role !== 'administrator'
+      !opensAdminWebSessions(principal.identity.role)
     ) {
       throw new UnauthorizedException('Authentication is required');
     }

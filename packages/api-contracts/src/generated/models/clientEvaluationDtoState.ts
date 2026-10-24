@@ -11,4 +11,5 @@ export type ClientEvaluationDtoState =
 export const ClientEvaluationDtoState = {
   booked: "booked",
   cancelled: "cancelled",
+  no_show: "no_show",
 } as const;

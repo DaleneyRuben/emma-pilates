@@ -22,6 +22,7 @@ import {
   emptyIncome,
   expenseReportPath,
   incomeReportPath,
+  revenueReportPath,
   studioExpenses,
   studioIncome,
   urubo,
@@ -48,6 +49,15 @@ const reports = (
     expenseReads.push(params);
     return expenses(params);
   }),
+  http.get(apiUrl(revenueReportPath), () =>
+    jsonResponse({
+      month: "2026-10",
+      cashCentavos: 30_000,
+      accruedCentavos: 12_000,
+      deferredCentavos: 18_000,
+      classesStillOwed: 5,
+    }),
+  ),
   // The report's own selector also offers archived Branches (their history).
   http.get(apiUrl(branchesPath), ({ request }) =>
     new URL(request.url).searchParams.get("status") === "all"
@@ -91,6 +101,11 @@ describe("AW16 Reporte on a desktop browser", () => {
         "Efectivo Bs 780,00 · Transferencias Bs 1.500,00",
       ),
     ).toBeVisible();
+    expect(
+      within(tile("Ingresos")).getByText(
+        "Planes Bs 2.210,00 · Evaluaciones Bs 70,00",
+      ),
+    ).toBeVisible();
     expect(within(tile("Gastos")).getByText("Bs 4.380,50")).toBeVisible();
     expect(
       within(tile("Gastos")).getByText(
@@ -98,6 +113,19 @@ describe("AW16 Reporte on a desktop browser", () => {
       ),
     ).toBeVisible();
     expect(within(tile("Neto")).getByText("−Bs 2.100,50")).toBeVisible();
+    const accrued = screen.getByRole("region", { name: "Ingreso devengado" });
+    expect(
+      within(accrued).getByRole("region", { name: "Caja" }),
+    ).toHaveTextContent("Bs 300,00");
+    expect(
+      within(accrued).getByRole("region", { name: "Devengado" }),
+    ).toHaveTextContent("Bs 120,00");
+    expect(
+      within(accrued).getByRole("region", { name: "Diferido" }),
+    ).toHaveTextContent("Bs 180,00");
+    expect(
+      within(accrued).getByText("Clases pendientes de dar hoy: 5"),
+    ).toBeVisible();
     expect(
       screen.getByText("01/08/2026 – 30/09/2026 · Todas las sucursales"),
     ).toBeVisible();
@@ -187,6 +215,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       branch: centro.id,
       from: "2026-08-01",
       to: "2026-09-30",
+      vista: "reporte",
     });
     expect(
       screen.getByText("01/08/2026 – 30/09/2026 · Sucursal Centro"),

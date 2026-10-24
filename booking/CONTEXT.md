@@ -41,7 +41,7 @@ A discount of 15 % on every Plan except the single class, held by one of the fir
 _Avoid_: VIP, loyalty discount
 
 **Freeze**:
-A pause of a Subscription on a Plan of 90 days or more: once per Subscription, up to 15 days, never starting in the past. The client asks with dates and a reason; an Administrator approves or refuses it. During it the client cannot book and Bookings inside it are cancelled with their class returned; the end date moves by exactly the frozen days ([ADR-0010](./docs/adr/0010-freeze-quarterly-subscriptions.md)).
+A pause of a Subscription on a Plan of 90 days or more: once per Subscription, up to 15 days, never starting in the past. The client asks with dates and a reason; an Administrator approves or refuses it. During it the client cannot book and Bookings inside it are cancelled with their class returned the same way a cancellation returns it; the end date moves by exactly the frozen days ([ADR-0010](./docs/adr/0010-freeze-quarterly-subscriptions.md)).
 _Avoid_: Pause, hold, suspension
 
 **Courtesy Access**:
@@ -49,7 +49,7 @@ A hidden Plan an Administrator grants through a Bs 0 courtesy Payment, so a pers
 _Avoid_: Free plan, trial
 
 **Class Type**:
-The catalog definition of a kind of class — e.g. "Reformer Pilates", "Mat Pilates" — with a short client-facing description, a default capacity, and equipment needs. A Class Type has no duration: how long a class lasts belongs to each Session and Session Schedule ([ADR-0004](./docs/adr/0004-session-owns-its-duration.md)).
+The catalog definition of a kind of class — e.g. "Reformer Pilates", "Mat Pilates" — with a short client-facing description, a default capacity, and equipment needs. A Class Type has no duration: how long a class lasts belongs to each Session and Session Schedule ([ADR-0004](./docs/adr/0004-session-owns-its-duration.md)). Its name also tells which Equipment its Sessions use (Back Office, «Equipment Kind of a Class Type»).
 _Avoid_: Class (when referring to the catalog entry)
 
 **Session**:
@@ -133,7 +133,7 @@ A record of how a sale is settled — a Plan or a Paid Evaluation — with a met
 _Avoid_: Charge, transaction, completado (UI label for confirmed). The pending state reads «Pendiente» in the admin web, as follow-up 59 §2 settled.
 
 **Invoice Data**:
-The tax identity a client wants on her invoice for a sale — NIT or CI, and a name or business name — prefilled from her last sale and optional («Sin factura»). Invoices are issued outside the system; an Administrator marks a sale «Factura emitida», which records who and when.
+The tax identity a client wants on her invoice for a sale — NIT or CI, and a name or business name — prefilled from her last sale and optional («Sin factura»). Invoices are issued outside the system; an Administrator marks a sale «Factura emitida», which records who and when, and can undo the mark, both audited. Closing her Account erases it from her sales, which keep the mark ([ADR-0097](../docs/adr/0097-erase-personal-data-when-a-client-account-closes.md)).
 _Avoid_: Factura (the system issues none), receipt
 
 **Promotion**:

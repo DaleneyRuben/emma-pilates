@@ -105,7 +105,7 @@ function SubscriptionCard({
           subscription.originalClassAllowance,
         )}
       </BodyText>
-      <BodyText>{`Pagado hasta el ${formatCivilDate(subscription.endsOn)}`}</BodyText>
+      <BodyText>{`Vence el ${formatCivilDate(subscription.endsOn)}`}</BodyText>
       <Pressable
         accessibilityLabel="Ver detalle"
         accessibilityRole="button"
@@ -248,7 +248,7 @@ export function HomeScreen() {
             />
             <ShortcutTile
               icon="person"
-              label="Mis referidos"
+              label="Invita a una amiga"
               onPress={() => navigation.navigate("Referrals")}
               summary={referralShortcut(referralCount)}
             />
