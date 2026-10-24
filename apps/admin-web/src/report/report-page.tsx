@@ -21,6 +21,7 @@ import {
 } from "./report-search";
 import { CategoryTable, MonthTable } from "./report-tables";
 import { ReportTiles } from "./report-tiles";
+import { RevenueSection } from "./revenue-section";
 
 function DateField({
   label,
@@ -160,6 +161,7 @@ export function ReportPage({
           sucursales».
         </p>
       )}
+      <RevenueSection />
       {failed !== null ? (
         <QueryFailure
           error={failed.error}

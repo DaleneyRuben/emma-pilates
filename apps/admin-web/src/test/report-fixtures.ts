@@ -7,6 +7,7 @@ import { centro } from "./booking-handlers";
 
 export const incomeReportPath = "/api/v1/administrator/reports/income";
 export const expenseReportPath = "/api/v1/administrator/reports/expenses";
+export const revenueReportPath = "/api/v1/administrator/reports/revenue";
 
 // August–September 2026: Bs 780 cash at Centro in August and a Bs 1.500
 // transfer in September; a Bs 400 cleaning at Equipetrol in August, a
