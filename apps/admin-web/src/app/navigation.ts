@@ -27,6 +27,7 @@ export type AdminPath =
   | "/back-office/gastos"
   | "/back-office/categorias-de-gasto"
   | "/reporte"
+  | "/reporte/indicadores"
   | "/simulador"
   | "/promociones"
   | "/promociones/referidos"
@@ -212,6 +213,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/reporte",
         screen: "AW16",
         ownBranchFilter: true,
+      },
+      {
+        label: "Indicadores",
+        to: "/reporte/indicadores",
+        screen: "AW43",
+        coordinator: true,
+        studioWide: "los indicadores del mes son del estudio, no de una sede.",
       },
       {
         label: "Simulador",

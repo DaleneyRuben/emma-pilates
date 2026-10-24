@@ -3436,11 +3436,10 @@ The following are not ready for manual product testing:
   sends one until a new type ships;
 - real push delivery on iOS devices and the `InvalidCredentials` receipt
   Expo answers for them until the APNs key is uploaded (gate 9, Test 46);
-- the studio facts panel and its charts (STU-003): Test 98 recomputes the
-  rows, and nothing displays them yet. Test 99 shows cash, accrued, and
-  deferred revenue, not the charts. Store-review rows are not excluded
-  until REL-016 marks them. Extra classes (BKM-008) are not counted in
-  «Clases pendientes de dar».
+- store-review rows, which stay in the facts and in Test 99 until REL-016
+  marks them. Extra classes (BKM-008) are not counted in «Clases pendientes
+  de dar». The renewal percent uses active clients as the denominator, not
+  plans that expired this month: the fact table cannot see those.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -5992,6 +5991,41 @@ remainder, so the two months sum to Bs 300. Use a disposable database.
 The migration `20261023240000_studio_facts` needs owner approval before it
 runs on a shared database. Pull request:
 https://github.com/DaleneyRuben/emma-pilates/pull/187.
+
+## Test 100: read the month's indicators
+
+Indicadores sits in the sidebar after Reporte. It shows the month's
+occupancy, students per class, active clients, and renewal, plus a bar of
+classes held for that month and the two before it. The Administrator also
+sees the three money figures from Test 76. The Coordinator sees the counts
+and never an amount. Use a disposable database.
+
+1. **The counts.** Log in as `paola.mendoza@example.com` (Test 3) and open
+   Indicadores. The month stepper starts on the current Bolivia month. The
+   four tiles are Ocupación, Alumnas por clase, Clientas activas, and
+   Renovación. The chart is «Clases dictadas». A month with no held classes
+   says «Sin clases dictadas en este mes.» and draws no chart. A failed
+   read says «No pudimos cargar los indicadores.» with «Reintentar».
+2. **The worked example.** Two held sessions, capacities 12 and 10,
+   bookings at window close 8 and 5, attended 7 and 4, no-shows 1 and 1.
+   Ocupación is 59 %. Alumnas por clase is 6,5. The no-show percent, which
+   the page does not tile, is 15. Two client-month rows with plan days, one
+   of them renewed, give Clientas activas 2 and Renovación 50 %. A client
+   is new only when no earlier month had plan days.
+3. **Who may read it.**
+   `GET /api/v1/administrator/reports/kpis?month=YYYY-MM` returns the counts
+   and `cashCentavos`, `accruedCentavos`, `deferredCentavos`, and
+   `classesStillOwed` for the Administrator. A Coordinator gets the counts
+   only: the JSON has no `*Centavos` key. An Assistant and a Trainer get
+   `403 studio_access_denied`. A month that is not `YYYY-MM` gets
+   `400 invalid_request`. Sign in as `carolina.rivas@example.com`: the
+   sidebar lists Indicadores and hides Reporte and Simulador. The page
+   shows the four count tiles and never «Bs».
+4. **Renewal.** The diagnosis divides by plans that expired this month. The
+   fact table cannot see that, so v1 divides by active clients. That
+   denominator is an open question; do not treat 50 % as the coordinator's
+   bonus base.
+   [Pull request #199](https://github.com/DaleneyRuben/emma-pilates/pull/199).
 
 ## Test 83: raise a Session's capacity and correct an Attendance (BE-027)
 

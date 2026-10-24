@@ -1277,7 +1277,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | --- | --- | --- | --- | --- | --- | --- |
 | STU-001 | P2 | Backend | Studio Management context: `studio` schema, `session_facts`, `client_month_facts`, nightly and on-demand recompute | DOC-008, REL-016 | 3–4 d | done |
 | STU-002 | P2 | Backend/admin web | Accrued versus cash revenue by validity days, deferred revenue, classes still owed | STU-001, BKO-005 | 2–3 d | done |
-| STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | ready |
+| STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | done |
 | STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | done |
 | STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | ready |
 | STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | ready |
@@ -1376,6 +1376,46 @@ Decisions (blanket approval, 2026-10-23):
 Open question: the diagnosis's section 3.4 also asks for the break-even in students per class, occupancy, and clients. This page shows it in bolivianos. STU-005 owns the projections that need the other expressions.
 
 Evidence: commits `4435f40a` (the package), `d651f879` (the page), `c97a3009` (the prompt and follow-up 202, renumbered 210 because 202 is trainer pay). AW37 is Equipos, so the page is AW42 and the walk is Test 97. The package's check is 3,626,786 centavos, derivation `(21175 + 9290) / 0.84 = 36267.86`, and a higher tax rate moves the break-even up. The page's opening month derives `(21175 + 9295) / 0.84 = 36273.81`. Verified: studio-economics 2 passed; admin simulator, router, and shell specs 27 passed; admin-web typecheck passed. Playwright Chromium at 1440 and 420, admin web on 5206, API on 3140, `pilates_stu004_dev`: Paola signs in, opens Simulador, sees Resultado Bs 761,20, Punto de equilibrio Bs 36.273,81, and the derivation; raising the tax to 20 moves the break-even to Bs 38.087,50 and the derivation to `(21175 + 9295) / 0.8 = 38087.50`. The only write was the login. At 420 the fields and figures stack and the sidebar opens from «Abrir menú». The database was dropped. Follow-ups 202 and AW37 stay pending: the design session was not run. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/192.
+
+#### STU-003 · Evidence
+
+Done 2026-10-23. Indicadores, after Reporte, reads
+`GET /api/v1/administrator/reports/kpis?month=YYYY-MM`. Counts come from
+`studio.session_facts` and `studio.client_month_facts` only. Amounts reuse
+the STU-002 revenue report and are omitted for a Coordinator, not zeroed.
+A worked example of two sessions (capacities 12 and 10, bookings 8 and 5,
+attended 7 and 4, no-shows 1 and 1) is occupancy 59, students 6.5
+(`averageStudentsTimes10` 65), attendance 5.5, no-show 15. A client is new
+when no earlier client-month fact has plan days. Renewal divides renewed
+active clients by active clients.
+
+Commits: in progress `f9cacd32`, red formula `a6448cad`, green formula
+`1db69b9c`, red reader `7ffcea50`, green reader `66885565`, red endpoint
+`874b3577`, green endpoint `579943a0`, contract `1a8b5934` and models
+`3e496a99`, red page `b4794a17`, recharts `9e7093a7`, page `a8858710`.
+
+Verified: unit 3/3 (`month-kpis.spec.ts`), integration 1/1
+(`month-kpis.integration-spec.ts`) on `pilates_test_stu003`, e2e 5/5
+including Coordinator counts-only (no `*Centavos` key, revenue not called)
+and Assistant and Trainer `403 studio_access_denied`. Admin jest 4/4: an
+Administrator sees «Bs»; a counts-only payload does not. Playwright walk
+of the Vite server at `http://localhost:5207` against the API on 3141, at
+1440 and 420: signed in with Correo and Contraseña, opened Indicadores
+(at 420 behind «Abrir menú»), saw the four count tiles, Cobrado
+Bs 0,00, Devengado Bs 650,00, Diferido Bs 650,00, and a three-month bar
+with October at 20. Curl of the same API: Administrator `200` with counts
+and amounts, invalid month `400 invalid_request`. An Assistant cannot sign
+in to the admin web (`401 authentication_failed`), so the 403 is the e2e
+suite. Databases `pilates_stu003_dev` and `pilates_test_stu003` on port
+5433 were dropped.
+
+No migration. Open question: the diagnosis's renewal denominator is plans
+that expired this month, which this fact table cannot see, so v1 uses
+active clients. The Coordinator signs in on this branch and opens
+Indicadores; the payload omits every centavo key, and Reporte and
+Simulador stay closed. Design follow-up
+204 and prompt AW39 stay pending; the export was not run.
+[Pull request #199](https://github.com/DaleneyRuben/emma-pilates/pull/199).
 
 ### Summary (2026-10-23)
 

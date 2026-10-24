@@ -67,6 +67,7 @@ describe('accrued revenue endpoint (e2e)', () => {
           provide: studioOperations,
           useValue: {
             recompute: () => Promise.reject(new Error('unused')),
+            kpis: () => Promise.reject(new Error('unused')),
             revenue: (
               input: { month: string },
               actor: AuthenticatedPrincipal,

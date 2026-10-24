@@ -17,4 +17,12 @@ export const studioFactsAuthorizationRows = (): Record<string, MatrixRow> => ({
     query: '?month=2026-10',
     bearer: true,
   },
+  // STU-003: both roles read the counts. The month has to parse, or the Role
+  // check never runs. Amounts stay off the Coordinator payload.
+  'GET /api/v1/administrator/reports/kpis': {
+    administrator: 'allow',
+    coordinator: 'allow',
+    query: '?month=2026-10',
+    bearer: true,
+  },
 });

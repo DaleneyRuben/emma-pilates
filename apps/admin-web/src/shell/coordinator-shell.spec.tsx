@@ -6,7 +6,8 @@ import { renderAdmin } from "../test/render-admin";
 import { coordinatorHandlers } from "../test/session-handlers";
 
 // IDN-009 / ADR-0102 (follow-up 155): the Coordinator's admin web is the
-// schedule, Clientes, and Personal; money pages are neither shown nor opened.
+// schedule, Clientes, Personal, and the counts-only Indicadores page.
+// Money pages are neither shown nor opened.
 describe("the admin web for the Coordinator", () => {
   useMockServer();
   beforeEach(() => server.use(...coordinatorHandlers()));
@@ -23,7 +24,13 @@ describe("the admin web for the Coordinator", () => {
       within(sidebar)
         .getAllByRole("link")
         .map((link) => link.textContent),
-    ).toEqual(["Horario", "Clientes", "Para contactar", "Personal"]);
+    ).toEqual([
+      "Horario",
+      "Clientes",
+      "Para contactar",
+      "Personal",
+      "Indicadores",
+    ]);
     expect(within(sidebar).queryByText("Catálogo")).not.toBeInTheDocument();
     expect(within(sidebar).queryByText("Promociones")).not.toBeInTheDocument();
   });
@@ -34,6 +41,7 @@ describe("the admin web for the Coordinator", () => {
     "/back-office/nomina",
     "/catalogo/planes",
     "/promociones",
+    "/simulador",
     "/back-office/pago-coordinadora",
     "/back-office/clientes/campana",
   ])("returns %s to Horario with the notice", async (path) => {
@@ -44,6 +52,34 @@ describe("the admin web for the Coordinator", () => {
       await screen.findByText("Esa sección es solo para administración."),
     ).toBeInTheDocument();
     await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+  });
+
+  it("opens Indicadores with counts and no amount", async () => {
+    server.use(
+      http.get(apiUrl("/api/v1/administrator/reports/kpis"), () =>
+        jsonResponse({
+          month: "2026-10",
+          sessionsHeld: 2,
+          occupancyPercent: 59,
+          averageStudentsTimes10: 65,
+          averageAttendanceTimes10: 55,
+          noShowPercent: 15,
+          activeClients: 2,
+          newClients: 1,
+          renewedClients: 1,
+          renewalPercent: 50,
+        }),
+      ),
+    );
+    renderAdmin("/reporte/indicadores");
+
+    await heading("Indicadores");
+    expect(
+      await screen.findByRole("region", { name: "Ocupación" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Bs/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Simulador" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Reporte" })).toBeNull();
   });
 
   it("opens Clientes", async () => {

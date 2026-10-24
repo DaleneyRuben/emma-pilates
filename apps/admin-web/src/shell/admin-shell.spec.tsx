@@ -47,6 +47,7 @@ describe("admin shell", () => {
         "Gastos",
         "Categorías de gasto",
         "Reporte",
+        "Indicadores",
         "Simulador",
         "Promociones",
         "Referidos",

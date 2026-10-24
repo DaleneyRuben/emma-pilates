@@ -158,7 +158,13 @@ describe("AW39 Para contactar", () => {
       within(sidebar)
         .getAllByRole("link")
         .map((link) => link.textContent),
-    ).toEqual(["Horario", "Clientes", "Para contactar", "Personal"]);
+    ).toEqual([
+      "Horario",
+      "Clientes",
+      "Para contactar",
+      "Personal",
+      "Indicadores",
+    ]);
   });
 });
 

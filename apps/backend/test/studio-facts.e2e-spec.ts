@@ -70,6 +70,7 @@ describe('studio facts endpoint (e2e)', () => {
               return recompute(input, actor);
             },
             revenue: () => Promise.reject(new Error('unused')),
+            kpis: () => Promise.reject(new Error('unused')),
           },
         },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
