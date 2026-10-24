@@ -32,9 +32,10 @@ test("serves the security headers and stays within its policy", async ({
   // on screen, and its stylesheet and image pass the policy.
   await expect(page.locator("#arranque")).toHaveCount(0);
   for (const section of ["Clientes", "Pagos", "Reporte", "Promociones"]) {
-    // «Pagos a instructoras» also contains the word Pagos.
+    // Anchored: «Pagos a instructoras» also contains the word, and a badge
+    // appends «, 1 por revisar» to the accessible name.
     await sidebar(page)
-      .getByRole("link", { name: section, exact: true })
+      .getByRole("link", { name: new RegExp(`^${section}(,|$)`) })
       .click();
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   }
@@ -46,7 +47,9 @@ test("serves the security headers and stays within its policy", async ({
   // WEB-037: the overlays lock the page behind them without the <style>
   // element Radix would inject, and the lock holds while one sits over
   // another, until the last one closes.
-  await sidebar(page).getByRole("link", { name: "Pagos", exact: true }).click();
+  await sidebar(page)
+    .getByRole("link", { name: /^Pagos(,|$)/ })
+    .click();
   await page.getByRole("button", { name: "Isabel Arce" }).click();
   const panel = page.getByRole("dialog", { name: "Revisar pago" });
   await expect(panel.getByText("Monto a verificar")).toBeVisible();
