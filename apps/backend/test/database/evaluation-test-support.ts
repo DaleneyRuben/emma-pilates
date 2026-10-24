@@ -102,23 +102,14 @@ export const startEvaluationTestWorld =
               {
                 planId: plan.id,
                 planNameSnapshot: plan.name,
-                durationDaysSnapshot: 30,
+                // One 90-day Plan includes one Evaluation (NUT-003). September
+                // and October both fall inside it, so the second booking is paid.
+                durationDaysSnapshot: 90,
                 originalClassAllowance: plan.classAllowance,
                 remainingClassAllowance: plan.classAllowance,
                 startsOn: new Date('2026-09-01T00:00:00.000Z'),
-                endsOn: new Date('2026-09-30T00:00:00.000Z'),
+                endsOn: new Date('2026-11-30T00:00:00.000Z'),
                 activatedAt: new Date('2026-09-01T12:00:00.000Z'),
-              },
-              // The later included Evaluation needs its own Subscription.
-              {
-                planId: plan.id,
-                planNameSnapshot: plan.name,
-                durationDaysSnapshot: 30,
-                originalClassAllowance: plan.classAllowance,
-                remainingClassAllowance: plan.classAllowance,
-                startsOn: new Date('2026-10-01T00:00:00.000Z'),
-                endsOn: new Date('2026-10-30T00:00:00.000Z'),
-                activatedAt: new Date('2026-10-01T12:00:00.000Z'),
               },
             ],
           },

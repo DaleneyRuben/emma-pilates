@@ -1,3 +1,4 @@
+import type { ContactAlertItemDto } from "@pilates/api-contracts";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { Linking } from "react-native";
@@ -19,7 +20,7 @@ const carolina = {
   branches: [],
 };
 
-const valeria = {
+const valeria: ContactAlertItemDto = {
   clientId: "client-valeria",
   name: "Valeria Quiroga",
   phone: "+591 70011005",
@@ -27,7 +28,7 @@ const valeria = {
   reasons: ["no_booking_7_days"],
 };
 
-const daniela = {
+const daniela: ContactAlertItemDto = {
   clientId: "client-daniela",
   name: "Daniela Rojas",
   phone: null,
@@ -35,7 +36,7 @@ const daniela = {
   reasons: ["fewer_than_2_classes_by_day_15", "no_booking_7_days"],
 };
 
-const list = (items: (typeof valeria)[]) => jsonResponse({ items, totalItems: items.length });
+const list = (items: ContactAlertItemDto[]) => jsonResponse({ items, totalItems: items.length });
 
 const coordinatorRoutes = (extra: Parameters<typeof routeFetcher>[0] = {}) => ({
   ...assistantRoutes(),

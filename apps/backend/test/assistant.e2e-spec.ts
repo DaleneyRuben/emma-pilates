@@ -189,6 +189,7 @@ describe('assistant clients (e2e)', () => {
           subscription: {
             status: 'active',
             founderRenewalDeadline: null,
+            nextSubscription: null,
             subscription: {
               ...subscription,
               startsOn: '2026-09-10',

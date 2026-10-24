@@ -205,13 +205,15 @@ export class AssistantClientsController {
     const overview = await run(() =>
       this.operations.overview({ clientId: id }, principal),
     );
+    const subscription = overview.subscription;
     return {
       ...overview,
       subscription: {
-        status: overview.subscription.status,
-        subscription: toSubscriptionDto(overview.subscription.subscription),
+        status: subscription?.status ?? 'none',
+        founderRenewalDeadline: subscription?.founderRenewalDeadline ?? null,
+        subscription: toSubscriptionDto(subscription?.subscription ?? null),
         nextSubscription: toSubscriptionDto(
-          overview.subscription.nextSubscription,
+          subscription?.nextSubscription ?? null,
         ),
       },
     };

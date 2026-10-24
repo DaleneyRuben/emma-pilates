@@ -8,6 +8,7 @@ import { createClassReminderJob } from '../../src/notifications/class-reminder-j
 import { recordNotification } from '../../src/notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../src/time/bolivia-time';
+import { classReminderNotice } from '../../src/notifications/class-reminders';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -104,7 +105,15 @@ describe('class reminder worker', () => {
         type: 'class_reminder_day',
         businessEventKey: `class-reminder-day:${booking.id}`,
         title: 'Recordatorio',
-        message: `Mañana tienes ${classType.name} a las 02:00.`,
+        message: classReminderNotice({
+          bookingId: booking.id,
+          accountId: lucia.accountId,
+          classTypeName: classType.name,
+          startsAt,
+          createdAt: new Date(0),
+          kind: 'day',
+          occurredAt: clock,
+        }).message,
         destinationType: 'booking',
         destinationId: booking.id,
       }),

@@ -41,7 +41,6 @@ import { describeClasses, formatCivilDate } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
 import { FrontDeskReceiptCard, type FrontDeskReceipt } from "./front-desk-receipt-card";
-import { InvoiceDataCard, invoiceChoiceFrom, type InvoiceChoice } from "./invoice-data-card";
 
 type ConfirmNavigation = {
   goBack: () => void;

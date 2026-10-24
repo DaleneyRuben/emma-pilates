@@ -28,8 +28,7 @@ const acquisitionQueryOptions = (clientId: string) =>
   queryOptions({
     queryKey: getGetClientAcquisitionQueryKey(clientId),
     queryFn: async ({ signal }) =>
-      (await getClientAcquisition(clientId, { signal }, adminFetch))
-        .data as ClientAcquisitionDto,
+      (await getClientAcquisition(clientId, { signal }, adminFetch)).data,
   });
 
 const failureMessage = (error: unknown): string =>
@@ -69,7 +68,7 @@ function AcquisitionForm({
           undefined,
           adminFetch,
         )
-      ).data as ClientAcquisitionDto,
+      ).data,
     onSuccess: (saved) => {
       queryClient.setQueryData(
         getGetClientAcquisitionQueryKey(acquisition.clientId),

@@ -43,12 +43,12 @@ describe("AW22 «¿Cómo nos conociste?»", () => {
   beforeEach(() => {
     corrections.length = 0;
     server.use(
+      acquisitionHandler(),
       ...signedInHandlers(),
       http.get(apiUrl(clientsPath), () => jsonResponse(clientPage([lucia]))),
       http.get(apiUrl(`${clientsPath}/:clientId`), () =>
         jsonResponse(luciaDetail),
       ),
-      acquisitionHandler(),
     );
   });
 

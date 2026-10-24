@@ -50,6 +50,7 @@ describe('Prisma evaluation availability commands', () => {
   beforeAll(async () => {
     world = await startEvaluationTestWorld();
     await grantQuarterlySubscription(world.prisma, 'lucia@example.com');
+    await grantQuarterlySubscription(world.prisma, 'ana@example.com');
   });
 
   afterAll(async () => {

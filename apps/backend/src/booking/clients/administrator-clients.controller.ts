@@ -69,6 +69,7 @@ const toDetailDto = (
     clientSince: civil(client.clientSince),
     subscription: {
       status: client.subscription.status,
+      founderRenewalDeadline: client.subscription.founderRenewalDeadline,
       subscription:
         current === null
           ? null
