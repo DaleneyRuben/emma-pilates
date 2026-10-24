@@ -5912,7 +5912,6 @@ touching production.
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
 
-<<<<<<< HEAD
 ## Test 83: raise a Session's capacity and correct an Attendance (BE-027)
 
 Both checks are the API only, with curl against a disposable database. No
