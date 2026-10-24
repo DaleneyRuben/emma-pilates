@@ -71,6 +71,7 @@ describe('the Coordinator acting for a Client (ADR-0102)', () => {
       { sessionId: session.id, clientId: 'client-id' },
       {
         principal: coordinator,
+        cancellationWindowMinutes: () => Promise.resolve(150),
         loadSession: jest.fn().mockResolvedValue(session),
         countLiveBookings: jest.fn().mockResolvedValue(session.capacity),
         findEligibleSubscription: jest
@@ -79,7 +80,6 @@ describe('the Coordinator acting for a Client (ADR-0102)', () => {
         hasLiveBooking: jest.fn().mockResolvedValue(false),
         hasActiveEntry: jest.fn().mockResolvedValue(false),
         create,
-        cancellationWindowMinutes: () => Promise.resolve(150),
         now,
       },
     );
@@ -95,9 +95,9 @@ describe('the Coordinator acting for a Client (ADR-0102)', () => {
       { bookingId: booking.id },
       {
         principal: coordinator,
+        cancellationWindowMinutes: () => Promise.resolve(150),
         loadBooking: jest.fn().mockResolvedValue(booking),
         cancel,
-        cancellationWindowMinutes: () => Promise.resolve(150),
         now,
       },
     );
@@ -112,6 +112,7 @@ describe('the Coordinator acting for a Client (ADR-0102)', () => {
       { bookingId: booking.id, targetSessionId: 'target-session-id' },
       {
         principal: coordinator,
+        cancellationWindowMinutes: () => Promise.resolve(150),
         loadBooking: jest.fn().mockResolvedValue(booking),
         loadSession: jest.fn().mockResolvedValue({
           ...session,
@@ -123,7 +124,6 @@ describe('the Coordinator acting for a Client (ADR-0102)', () => {
         countLiveBookings: jest.fn().mockResolvedValue(0),
         hasOverlappingBooking: jest.fn().mockResolvedValue(false),
         reschedule,
-        cancellationWindowMinutes: () => Promise.resolve(150),
         // Rescheduling happens inside the Cancellation Window, on the same day.
         now: () => new Date('2026-09-11T14:30:00Z'),
       },

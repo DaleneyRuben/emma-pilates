@@ -23,4 +23,7 @@ export const payStatementAuthorizationRows = (): Record<string, MatrixRow> => ({
   'POST /api/v1/administrator/pay-statements/{statementId}/approve':
     administratorOnly(),
   'GET /api/v1/trainer/pay-statements': bothDenied(),
+  // BKO-007: the Coordinator never reads her own statement. The route exists
+  // so the denial is a 403 rather than a missing path.
+  'GET /api/v1/coordinator/pay-statements': bothDenied(),
 });

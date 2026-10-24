@@ -1,8 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PayStatementLineDto {
-  @ApiProperty({ enum: ['class', 'minimum_not_met', 'commission'] })
-  kind!: 'class' | 'minimum_not_met' | 'commission';
+  @ApiProperty({
+    enum: [
+      'class',
+      'minimum_not_met',
+      'commission',
+      'base',
+      'new_client',
+      'bonus',
+    ],
+  })
+  kind!:
+    | 'class'
+    | 'minimum_not_met'
+    | 'commission'
+    | 'base'
+    | 'new_client'
+    | 'bonus';
   @ApiProperty() detail!: string;
   @ApiProperty({ description: 'BOB centavos' }) amountCentavos!: number;
 }

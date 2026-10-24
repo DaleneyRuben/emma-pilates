@@ -266,8 +266,8 @@ export const startWorker = async (
           },
         ],
       },
-      // Trainer statements for the previous month and the current one
-      // (BKO-006). Hourly is enough: approval is what pays.
+      // Trainer and Coordinator statements for the previous month and the
+      // current one (BKO-006, BKO-007). Hourly is enough: approval pays.
       {
         intervalMs: trainerPayDraftIntervalMs,
         steps: [

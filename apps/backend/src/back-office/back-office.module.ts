@@ -13,6 +13,7 @@ import { createPrismaSessionEquipment } from './equipment/prisma-session-equipme
 import { createPrismaExpenses } from './expenses/prisma-expenses';
 import { createPrismaFinance } from './finance/prisma-finance';
 import { monthFacts } from './finance/month-facts';
+import { coordinatorMonthFacts } from './payroll/coordinator-pay-facts';
 import { createPrismaPayStatements } from './payroll/prisma-pay-statements';
 import { createPrismaSalaryPayments } from './payroll/prisma-salary-payments';
 import { trainerMonthFacts } from './payroll/trainer-pay-facts';
@@ -37,6 +38,8 @@ import { createPrismaSupplies } from './supplies/prisma-supplies';
             now,
             factsOfMonth: (from, until) =>
               trainerMonthFacts(prisma, from, until),
+            coordinatorFactsOfMonth: (from, until) =>
+              coordinatorMonthFacts(prisma, from, until),
           }),
           expenses: createPrismaExpenses(prisma, { now }),
           report: createPrismaExpenseReport(prisma, { now }),

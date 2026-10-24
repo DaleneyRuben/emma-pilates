@@ -31425,6 +31425,190 @@ export const useApprovePayStatement = <TError = unknown, TContext = unknown>(
   );
 };
 
+export type listCoordinatorPayStatementsResponse200 = {
+  data: PayStatementDto[];
+  status: 200;
+};
+
+export type listCoordinatorPayStatementsResponseSuccess =
+  listCoordinatorPayStatementsResponse200 & {
+    headers: Headers;
+  };
+export type listCoordinatorPayStatementsResponse =
+  listCoordinatorPayStatementsResponseSuccess;
+
+export const getListCoordinatorPayStatementsUrl = () => {
+  return `/api/v1/coordinator/pay-statements`;
+};
+
+export const listCoordinatorPayStatements = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listCoordinatorPayStatementsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListCoordinatorPayStatementsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCoordinatorPayStatementsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listCoordinatorPayStatementsResponse;
+};
+
+export const getListCoordinatorPayStatementsQueryKey = () => {
+  return [`/api/v1/coordinator/pay-statements`] as const;
+};
+
+export const getListCoordinatorPayStatementsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListCoordinatorPayStatementsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listCoordinatorPayStatements>>
+  > = ({ signal }) =>
+    listCoordinatorPayStatements({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListCoordinatorPayStatementsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listCoordinatorPayStatements>>
+>;
+export type ListCoordinatorPayStatementsQueryError = unknown;
+
+export function useListCoordinatorPayStatements<
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+          TError,
+          Awaited<ReturnType<typeof listCoordinatorPayStatements>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCoordinatorPayStatements<
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+          TError,
+          Awaited<ReturnType<typeof listCoordinatorPayStatements>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCoordinatorPayStatements<
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListCoordinatorPayStatements<
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListCoordinatorPayStatementsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type listOwnPayStatementsResponse200 = {
   data: PayStatementDto[];
   status: 200;

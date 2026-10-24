@@ -41,6 +41,22 @@ export type MatrixRow = {
   /** Sends image bytes instead of JSON. */
   rawBody?: true;
   /**
+   * The handler reads the row before the Role, so a missing identifier is
+   * 404 for both. That 404 is the denial this probe can reach.
+   */
+  missingResource?: true;
+  /**
+   * The Staff app calls this with a bearer credential. The probe otherwise
+   * sends the admin cookie on `/administrator/` paths only, and a cookie on
+   * an assistant path never becomes a session.
+   */
+  bearer?: true;
+  /**
+   * A 403 with this problem code is a data rule after the Role passed
+   * (a receipt the caller does not own), so the probe counts it as allow.
+   */
+  passedCode?: string;
+  /**
    * Needs no credential: any answer but 403 passes, a refused Login (401)
    * included.
    */

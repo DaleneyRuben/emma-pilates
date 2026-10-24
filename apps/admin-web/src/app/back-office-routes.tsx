@@ -114,6 +114,18 @@ const withdrawalsRoute = createRoute({
   ),
 });
 
+const coordinatorPayRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/pago-coordinadora",
+  validateSearch: (search: Record<string, unknown>) => ({
+    month: typeof search.month === "string" ? search.month : boliviaMonth(),
+  }),
+  component: lazyRouteComponent(
+    () => import("../back-office/payroll/coordinator-pay-route"),
+    "CoordinatorPayRoute",
+  ),
+});
+
 const payStatementsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/pagos-instructoras",
@@ -181,6 +193,7 @@ export const backOfficeRoutes = [
   staffRoute,
   payrollRoute,
   payStatementsRoute,
+  coordinatorPayRoute,
   expensesRoute,
   expenseCategoriesRoute,
 ];

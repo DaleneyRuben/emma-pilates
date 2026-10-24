@@ -34,6 +34,7 @@ describe("the admin web for the Coordinator", () => {
     "/back-office/nomina",
     "/catalogo/planes",
     "/promociones",
+    "/back-office/pago-coordinadora",
     "/back-office/clientes/campana",
   ])("returns %s to Horario with the notice", async (path) => {
     const { router } = renderAdmin(path);

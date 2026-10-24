@@ -25,6 +25,7 @@ import { cleanupAbandonedUploads } from './uploads/cleanup-abandoned-uploads';
 import { createObjectStorage } from './uploads/create-object-storage';
 import { createUploadCleanupGateway } from './uploads/prisma-upload-cleanup-gateway';
 import { createFinalizeUploadJobCommands } from './uploads/prisma-upload-commands';
+import { coordinatorMonthFacts } from './back-office/payroll/coordinator-pay-facts';
 import { createPrismaPayStatements } from './back-office/payroll/prisma-pay-statements';
 import { trainerMonthFacts } from './back-office/payroll/trainer-pay-facts';
 import { boliviaDate } from './time/bolivia-time';
@@ -147,6 +148,8 @@ async function bootstrap(): Promise<void> {
         const statements = createPrismaPayStatements(prisma, {
           now,
           factsOfMonth: (from, until) => trainerMonthFacts(prisma, from, until),
+          coordinatorFactsOfMonth: (from, until) =>
+            coordinatorMonthFacts(prisma, from, until),
         });
         const current = boliviaDate(now());
         const previous = new Date(

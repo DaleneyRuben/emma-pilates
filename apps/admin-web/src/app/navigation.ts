@@ -23,6 +23,7 @@ export type AdminPath =
   | "/back-office/personal"
   | "/back-office/nomina"
   | "/back-office/pagos-instructoras"
+  | "/back-office/pago-coordinadora"
   | "/back-office/gastos"
   | "/back-office/categorias-de-gasto"
   | "/reporte"
@@ -169,6 +170,12 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/pagos-instructoras",
         screen: "AW11",
         studioWide: "los pagos a instructoras son del estudio, no de una sede.",
+      },
+      {
+        label: "Pago a la coordinadora",
+        to: "/back-office/pago-coordinadora",
+        screen: "AW11",
+        studioWide: "el pago a la coordinadora es del estudio, no de una sede.",
       },
       {
         label: "Nómina",
