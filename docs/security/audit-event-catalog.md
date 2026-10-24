@@ -31,12 +31,13 @@ beyond what the table below names.
 | `client_invitation.email_corrected` | System Identity | The pending invitation's email is corrected | Staff Account and Role | `account` | — | `previousEmail` |
 | `client_invitation.cancelled` | System Identity | A pending invitation without activity is removed | Staff Account and Role | `account` | — | `email` (the removed Account no longer exists) |
 | `client_invitation.verification_sent` | System Identity | An Assistant or Administrator sends a self-registered pending Client a new Verification Link from S05 «Enviar enlace de verificación» (MOB-021); older verification links stop working and the 7-day pending window restarts | Staff Account and Role | `account` | — | — |
-| `impersonation.started` | System Identity | An Administrator starts seeing the Staff app as a Trainer, Assistant, or Nutritionist from `S24` (FUT-001, ADR-0100) | Administrator | `account` (the Staff Member's) | — | `staffMemberId`, `role`, `expiresAt` |
+| `impersonation.started` | System Identity | An Administrator starts seeing the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator from `S24` (FUT-001, ADR-0100, ADR-0102) | Administrator | `account` (the Staff Member's) | — | `staffMemberId`, `role`, `expiresAt` |
 | `impersonation.ended` | System Identity | The Impersonation ends: «Salir» (`exited`), the 30 minutes pass (`expired`), the Administrator logs out (`logged_out`), or the Staff Member is deactivated or the session revoked (`revoked`) | Administrator for `exited` and `logged_out`; `system` for `expired` and `revoked` | `account` (the Staff Member's) | — | `reason`, `durationSeconds` |
 | `administrator_bootstrap.created` | System Identity | The bootstrap command creates the first, pending Administrator | `bootstrap` | `account` | — | — |
 | `administrator_bootstrap.activation_resent` | System Identity | The bootstrap command reissues the pending Administrator's link | `bootstrap` | `account` | — | — |
 | `client.photo_changed` | Booking & Membership | A Client attaches or replaces their own profile photo (Client 22); a replaced photo's variants are released at once (ADR-0076) | Client Account | `client` | — | `replaced` |
 | `client.photo_removed` | Booking & Membership | A Client removes their own profile photo; its variants are released at once (ADR-0076) | Client Account | `client` | — | — |
+| `client.profile_corrected` | Booking & Membership | An Administrator or the Coordinator corrects a Client's name or phone from AW22 «Editar perfil» (IDN-009, ADR-0102); the login email stays the Client's own | Administrator or Coordinator | `client` | — | `changedFields` (`name` / `phone`, never their values) |
 | `account.closed` | Booking & Membership | A Client closes their own Account (password re-entered), or an Administrator closes a Client's Account (BE-007 G2–G6): future Bookings and Evaluations are cancelled as `account_closed`, the Subscription ends, the Credit is forfeited, every session, link, and device is revoked, and the name, email, phone, password, and photo are erased (ADR-0097) | Client Account, or Administrator | `account` | — | `initiatedBy` (`client` / `administrator`), `closedWaitlistEntries`, `cancelledBookings`, `cancelledEvaluations`, `forfeitedClasses`, `forfeitedCreditCentavos`, `keptPromotionContact` (the Client ticked the promotions box, ADR-0097), `endedPromotionsConsent` (an open Promotions Consent was ended, ADR-0098) |
 | `staff_member.created` | Booking & Membership | An Administrator creates a Staff Member with a pending Account | Administrator | `account` | — | `role`, `branchIds` |
 | `staff_member.activation_resent` | Booking & Membership | An Administrator reissues a pending Staff Member's Activation Link | Administrator | `account` | — | — |
@@ -59,7 +60,6 @@ beyond what the table below names.
 | `payment.transfer_rejected` | Booking & Membership | An Administrator rejects a transfer Payment | Administrator | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `payment.cash_confirmed` | Booking & Membership | An Assistant or Administrator records a cash Payment | Staff Account and Role | `payment` | Collection Branch | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `payment.courtesy_granted` | Booking & Membership | An Administrator grants Courtesy Access: a confirmed Bs 0 courtesy Payment for the hidden «Acceso de prueba» Plan (REL-011) | Administrator | `payment` | — | `method`, `clientId`, `planId`, `classAllowance`, `startsOn`, `endsOn` |
-| `payment.credit_only_confirmed` | Booking & Membership | A Client completes a purchase entirely with Credit | Client Account | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `session.cancelled` | Booking & Membership | An Administrator cancels a Session with Bookings (last resort) | Administrator | `session` | Session Branch | `cause`, `cancelledBookings`, `closedWaitlistEntries` |
 | `session.created` | Booking & Membership | An Administrator creates a one-off Session («Una sola vez», follow-up 39 §1) outside any Session Schedule | Administrator | `session` | Session Branch | `classTypeId`, `trainerStaffMemberId`, `startsAt`, `durationMinutes`, `capacity` |
 | `session.updated` | Booking & Membership | An Administrator edits one Session (Trainer swap, new start, or capacity) | Administrator | `session` | Session Branch | previous and new `trainerStaffMemberId`, `startsAt`, `capacity` (only those changed) |
@@ -72,10 +72,12 @@ beyond what the table below names.
 | `promotion_contact.exported` | Booking & Membership | An Administrator exports the Promotion Contacts (BE-022, ADR-0097), handing their names, emails, and phones out of the system | Administrator | `promotion_contact` | — | `contactCount` |
 | `promotion_contact.withdrawn` | Booking & Membership | An Administrator records a former Client's «stop» request: the contact's name, email, and phone are erased and `withdrawn_at` is set (BE-022) | Administrator | `promotion_contact` | — | — |
 | `promotions_consent.withdrawn` | Booking & Membership | An Administrator records a live Client's «stop» request on AW35: their open Promotions Consent gets `withdrawn_at`, and the Account stays as it is (BE-023, ADR-0098). The Client's own switch in Perfil is not audited; the consent rows are its record | Administrator | `client_promotions_consent` | — | `clientId` |
+| `studio_settings.updated` | Booking & Membership | An Administrator changes the configurable Studio Settings on «Reglas del estudio» (BKM-004, ADR-0101); the change is a new version row | Administrator | `studio_settings` | — | `version`, previous and new `minimumBookings`, `taxRatePercent`, `renewalTargetMonths1To6Percent`, `renewalTargetMonths7To12Percent`, `renewalTargetFromMonth13Percent`, `openingDate` (only those changed) |
 | `salary_payment.recorded` | Back Office | An Administrator records a Salary Payment | Administrator | `salary_payment` | — | `amountCentavos`, `paidOn` |
 | `salary_payment.updated` | Back Office | An Administrator corrects a Salary Payment | Administrator | `salary_payment` | — | previous and new `staffMemberId`, `amountCentavos`, `paidOn` (only those changed) |
 | `expense.recorded` | Back Office | An Administrator records a Branch Expense | Administrator | `expense` | Expense Branch | `amountCentavos`, `incurredOn`, `expenseCategoryId` |
 | `expense.updated` | Back Office | An Administrator corrects an Expense (the Branch never changes) | Administrator | `expense` | Expense Branch | previous and new `expenseCategoryId`, `amountCentavos`, `incurredOn` (only those changed) |
+| `cash_close.recorded` | Back Office | An Assistant (at her Branch) or an Administrator makes the day's Cash Close; it is never edited afterwards (BKO-003) | Staff Account and Role (the Administrator, with the Impersonation, while she sees the app as an Assistant) | `cash_close` | Cash Close Branch | `businessDate`, `expectedCentavos`, `countedCentavos`, `differenceCentavos` |
 
 Back Office money records follow BKO-001 D17: Salary Payments and Expenses are audited; Supplies, Withdrawals, Restocks, and Expense Categories are not (below).
 
@@ -87,6 +89,10 @@ names the acted-as Staff Member. Rows that are not audited (a Booking's
 keep the Staff Member's Account, as the screen showed it, and are attributed
 to the Administrator through the Impersonation's `started_at`–`ended_at`
 window.
+
+## Retired codes
+
+- `payment.credit_only_confirmed` was written when a Client paid a whole Plan with Credit. PAY-005 retired Credit (booking ADR-0009), so nothing writes it any more; the records written before stay.
 
 ## Considered and not audited
 

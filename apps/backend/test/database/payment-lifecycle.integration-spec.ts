@@ -165,7 +165,7 @@ describe('Prisma payment lifecycle', () => {
     });
   });
 
-  it('confirms a transfer: activates the Subscription, spends Credit, awards the Referral, audits, and notifies', async () => {
+  it('confirms a transfer: activates the Subscription, awards no Credit, leaves the Referral pending, audits, and notifies', async () => {
     const buyer = await newClient('Confirmada');
     const referrer = await newClient('Referente');
     await seedAward(buyer.clientId);
@@ -185,8 +185,8 @@ describe('Prisma payment lifecycle', () => {
       randomUUID(),
     );
     expect(intent).toMatchObject({
-      creditReservedCentavos: 6000,
-      amountDueCentavos: 50_000,
+      creditReservedCentavos: 0,
+      amountDueCentavos: 56_000,
     });
     const receipt = await readyReceipt(buyer.accountId);
     await commands().attachReceipt(
@@ -199,6 +199,10 @@ describe('Prisma payment lifecycle', () => {
       buyer,
       randomUUID(),
     );
+    expect(pending).toMatchObject({
+      creditAppliedCentavos: 0,
+      amountDueCentavos: 56_000,
+    });
 
     await expect(
       codeOf(commands().confirmTransfer({ paymentId: pending.id }, buyer)),
@@ -233,28 +237,23 @@ describe('Prisma payment lifecycle', () => {
       endsOn: new Date('2026-10-21T00:00:00.000Z'),
       state: 'ACTIVE',
     });
-    await expect(commands().readCreditSummary(buyer)).resolves.toEqual({
-      availableCentavos: 0,
-      reservedCentavos: 0,
-    });
     await expect(
-      prisma.creditReservation.findUniqueOrThrow({
-        where: { purchaseIntentId: intent.id },
-      }),
-    ).resolves.toMatchObject({ state: 'SPENT', settledAt: decidedAt });
+      prisma.creditReservation.count({ where: { clientId: buyer.clientId } }),
+    ).resolves.toBe(0);
     await expect(
       prisma.referral.findUniqueOrThrow({
         where: { referredClientId: buyer.clientId },
       }),
     ).resolves.toMatchObject({
-      state: 'AWARDED',
-      qualifiedPaymentId: pending.id,
-      awardCentavos: 6000,
+      state: 'PENDING',
+      qualifiedPaymentId: null,
+      awardCentavos: null,
     });
-    await expect(commands().readCreditSummary(referrer)).resolves.toEqual({
-      availableCentavos: 6000,
-      reservedCentavos: 0,
-    });
+    await expect(
+      prisma.creditLedgerEntry.count({
+        where: { clientId: referrer.clientId },
+      }),
+    ).resolves.toBe(0);
     await expect(
       prisma.auditRecord.findFirst({
         where: {
@@ -297,7 +296,7 @@ describe('Prisma payment lifecycle', () => {
     });
   });
 
-  it('rejects a transfer with a trimmed reason, releases Credit, and lets the Client start again', async () => {
+  it('rejects a transfer with a trimmed reason and lets the Client start again without Credit', async () => {
     const buyer = await newClient('Rechazada');
     await seedAward(buyer.clientId);
     const admin = await staffPrincipal('paola.mendoza@example.com');
@@ -331,15 +330,9 @@ describe('Prisma payment lifecycle', () => {
       rejectionReason: 'El monto no coincide con el plan.',
       subscriptionId: null,
     });
-    await expect(commands().readCreditSummary(buyer)).resolves.toEqual({
-      availableCentavos: 6000,
-      reservedCentavos: 0,
-    });
     await expect(
-      prisma.creditReservation.findUniqueOrThrow({
-        where: { purchaseIntentId: intent.id },
-      }),
-    ).resolves.toMatchObject({ state: 'RELEASED' });
+      prisma.creditLedgerEntry.count({ where: { clientId: buyer.clientId } }),
+    ).resolves.toBe(1);
     await expect(
       prisma.auditRecord.findFirst({
         where: {
@@ -375,6 +368,10 @@ describe('Prisma payment lifecycle', () => {
     ).resolves.toBe('payment_confirmation_conflict');
     await expect(
       commands().createPurchaseIntent({ planId: plan.id }, buyer, randomUUID()),
-    ).resolves.toMatchObject({ state: 'open', creditReservedCentavos: 6000 });
+    ).resolves.toMatchObject({
+      state: 'open',
+      creditReservedCentavos: 0,
+      amountDueCentavos: 56_000,
+    });
   });
 });

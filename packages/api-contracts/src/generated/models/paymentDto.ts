@@ -20,7 +20,11 @@ export interface PaymentDto {
   classAllowance: number;
   /** @minimum 1 */
   planPriceCentavos: number;
-  /** @minimum 0 */
+  /**
+   * Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds
+   * @deprecated
+   * @minimum 0
+   */
   creditAppliedCentavos: number;
   /** @minimum 0 */
   amountDueCentavos: number;

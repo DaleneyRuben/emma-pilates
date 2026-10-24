@@ -17,12 +17,13 @@ export interface AdminPaymentDto {
    */
   planPriceCentavos: number;
   /**
-   * Credit taken off the Plan price
+   * Deprecated (PAY-005): Credit was retired; 0 on every Payment made since
+   * @deprecated
    * @minimum 0
    */
   creditAppliedCentavos: number;
   /**
-   * The Plan price less the Credit applied: what was transferred
+   * What was transferred: the Plan price
    * @minimum 1
    */
   amountDueCentavos: number;

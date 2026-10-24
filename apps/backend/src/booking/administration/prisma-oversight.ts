@@ -27,17 +27,6 @@ const methodNames: Record<
   [PaymentMethod.CREDIT_ONLY]: 'credit_only',
 };
 
-// AW27's "Última actividad": what the last ledger entry did to the balance.
-const creditMovements: Record<
-  string,
-  'earned' | 'reserved' | 'spent' | 'returned'
-> = {
-  referral_award: 'earned',
-  payment_reservation: 'reserved',
-  payment_spend: 'spent',
-  payment_release: 'returned',
-};
-
 // ADM-001 slices D and E: read-only oversight for AW25–AW27 and the income
 // half of AW16 (expenses join from Back Office in BKO-002).
 export const createPrismaOversight = (
@@ -180,77 +169,6 @@ export const createPrismaOversight = (
       totalItems,
       awardedCount: countOf(ReferralState.AWARDED),
       pendingCount: countOf(ReferralState.PENDING),
-    };
-  },
-
-  // Available Credit = awards + releases − reservations (PAY-001 ledger).
-  listCredits: async (
-    query: Paging & { query?: string },
-    principal: AuthenticatedPrincipal,
-  ) => {
-    requireAdministrator(principal);
-    const pattern =
-      query.query === undefined || query.query.trim() === ''
-        ? null
-        : containsPattern(query.query);
-    const balances = await prisma.$queryRaw<
-      {
-        client_id: string;
-        name: string;
-        available: bigint;
-        last_movement_at: Date;
-        last_movement_kind: string;
-      }[]
-    >`
-      SELECT c.id AS client_id, c.name,
-             (SELECT last.kind::text
-              FROM booking.credit_ledger_entries last
-              WHERE last.client_id = c.id
-              ORDER BY last.occurred_at DESC, last.id DESC
-              LIMIT 1) AS last_movement_kind,
-             sum(CASE e.kind
-                   WHEN 'referral_award' THEN e.amount_centavos
-                   WHEN 'payment_release' THEN e.amount_centavos
-                   WHEN 'payment_reservation' THEN -e.amount_centavos
-                   ELSE 0 END) AS available,
-             max(e.occurred_at) AS last_movement_at
-      FROM booking.credit_ledger_entries e
-      JOIN booking.clients c ON c.id = e.client_id
-      GROUP BY c.id, c.name
-      HAVING sum(CASE e.kind
-                   WHEN 'referral_award' THEN e.amount_centavos
-                   WHEN 'payment_release' THEN e.amount_centavos
-                   WHEN 'payment_reservation' THEN -e.amount_centavos
-                   ELSE 0 END) > 0
-      ORDER BY c.name, c.id`;
-    const outstandingCentavos = balances.reduce(
-      (sum, row) => sum + Number(row.available),
-      0,
-    );
-    const matching = await (pattern === null
-      ? Promise.resolve(balances)
-      : prisma.$queryRaw<{ id: string }[]>`
-            SELECT id FROM booking.clients
-            WHERE booking.search_text(name) LIKE booking.search_text(${pattern})`.then(
-          (rows) => {
-            const ids = new Set(rows.map(({ id }) => id));
-            return balances.filter((row) => ids.has(row.client_id));
-          },
-        ));
-    return {
-      items: matching
-        .slice(offset(query), offset(query) + query.pageSize)
-        .map((row) => ({
-          clientId: row.client_id,
-          clientName: row.name,
-          availableCentavos: Number(row.available),
-          lastMovementAt: row.last_movement_at,
-          lastMovementKind: creditMovements[row.last_movement_kind] ?? 'earned',
-        })),
-      page: query.page,
-      pageSize: query.pageSize,
-      totalItems: matching.length,
-      outstandingCentavos,
     };
   },
 

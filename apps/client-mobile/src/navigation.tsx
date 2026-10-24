@@ -26,7 +26,6 @@ import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availabil
 import { MyEvaluationsScreen } from "./evaluations/my-evaluations-screen";
 import { HomeScreen } from "./home/home-screen";
 import { ClientPushNotifications } from "./notifications/client-push-notifications";
-import { CreditScreen } from "./payments/credit-screen";
 import { PaymentScreen } from "./payments/payment-screen";
 import { ReferralsScreen } from "./payments/referrals-screen";
 import { PaymentStatusScreen } from "./payments/payment-status-screen";
@@ -59,7 +58,6 @@ const shortcutScreens = {
   BookEvaluation: BookEvaluationScreen,
   MyEvaluations: MyEvaluationsScreen,
   Referrals: ReferralsScreen,
-  Credit: CreditScreen,
 };
 
 const HomeStack = createNativeStackNavigator({

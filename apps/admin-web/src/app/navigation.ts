@@ -1,3 +1,5 @@
+import type { AdminRole } from "../session/admin-role";
+
 /**
  * The admin sidebar as design follow-up 30 (§5) and the design system fix
  * it: Horario, Catálogo, Back Office, Reporte, Promociones, in this order,
@@ -10,6 +12,7 @@ export type AdminPath =
   | "/catalogo/sucursales"
   | "/back-office/clientes"
   | "/back-office/pagos"
+  | "/back-office/caja"
   | "/back-office/insumos"
   | "/back-office/evaluaciones-nutricionales"
   | "/back-office/personal"
@@ -19,7 +22,7 @@ export type AdminPath =
   | "/reporte"
   | "/promociones"
   | "/promociones/referidos"
-  | "/promociones/creditos";
+  | "/reglas-del-estudio";
 
 export type NavigationItem = {
   label: string;
@@ -43,7 +46,7 @@ export type NavigationItem = {
   /**
    * Its sub-pages keep it marked: every page under it (AW31 is a view of
    * Insumos), or only the listed ones where siblings share its prefix
-   * (AW35 under Promociones, beside Referidos and Créditos).
+   * (AW35 under Promociones, beside Referidos).
    */
   subPages?: true | readonly string[];
   /**
@@ -51,6 +54,8 @@ export type NavigationItem = {
    * (AW16), so the top bar shows a note instead of the shell's.
    */
   ownBranchFilter?: true;
+  /** Open to the Coordinator too (ADR-0102): operations, never money. */
+  coordinator?: true;
 };
 
 export type NavigationGroup = {
@@ -59,7 +64,7 @@ export type NavigationGroup = {
 };
 
 export const navigationGroups: readonly NavigationGroup[] = [
-  { items: [{ label: "Horario", to: "/", screen: "AW02" }] },
+  { items: [{ label: "Horario", to: "/", screen: "AW02", coordinator: true }] },
   {
     label: "Catálogo",
     items: [
@@ -91,6 +96,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/clientes",
         screen: "AW21",
         list: true,
+        coordinator: true,
         studioWide: "los clientes son del estudio, no de una sede.",
       },
       {
@@ -100,6 +106,11 @@ export const navigationGroups: readonly NavigationGroup[] = [
         list: true,
         badge: "pendingPayments",
         studioWide: "los pagos son del estudio, no de una sede.",
+      },
+      {
+        label: "Caja",
+        to: "/back-office/caja",
+        screen: "AW151",
       },
       {
         label: "Insumos",
@@ -120,6 +131,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/personal",
         screen: "AW23",
         list: true,
+        coordinator: true,
       },
       {
         label: "Nómina",
@@ -171,19 +183,27 @@ export const navigationGroups: readonly NavigationGroup[] = [
         list: true,
         studioWide: "los referidos son del estudio, no de una sede.",
       },
-      {
-        label: "Créditos",
-        to: "/promociones/creditos",
-        screen: "AW27",
-        list: true,
-        studioWide: "los créditos son del estudio, no de una sede.",
-      },
     ],
   },
 ];
 
-export const navigationItems: readonly NavigationItem[] =
-  navigationGroups.flatMap((group) => group.items);
+/**
+ * Pages the account menu (AW33) opens rather than the sidebar; they still
+ * name the browser tab and the Branch selector's studio-wide note.
+ */
+export const accountMenuItems: readonly NavigationItem[] = [
+  {
+    label: "Reglas del estudio",
+    to: "/reglas-del-estudio",
+    screen: "AW36",
+    studioWide: "las reglas son del estudio, no de una sede.",
+  },
+];
+
+export const navigationItems: readonly NavigationItem[] = [
+  ...navigationGroups.flatMap((group) => group.items),
+  ...accountMenuItems,
+];
 
 export const findNavigationItem = (
   pathname: string,
@@ -200,3 +220,20 @@ export const navigationItemOf = (
       ? pathname.startsWith(`${item.to}/`)
       : (item.subPages?.includes(pathname) ?? false),
   );
+
+/** The sidebar a Role sees: the Coordinator's holds no money (follow-up 155). */
+export const navigationGroupsFor = (
+  role: AdminRole,
+): readonly NavigationGroup[] =>
+  role === "administrator"
+    ? navigationGroups
+    : navigationGroups
+        .map((group) => ({
+          ...group,
+          items: group.items.filter((item) => item.coordinator === true),
+        }))
+        .filter((group) => group.items.length > 0);
+
+/** Whether the Coordinator may open a page; the API refuses the rest. */
+export const coordinatorMayOpen = (pathname: string): boolean =>
+  navigationItemOf(pathname)?.coordinator === true;

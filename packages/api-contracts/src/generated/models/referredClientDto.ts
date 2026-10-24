@@ -10,10 +10,20 @@ export interface ReferredClientDto {
   referredClientId: string;
   /** First name and surname initial */
   referredName: string;
+  /**
+   * Deprecated (PAY-005): Credit was retired; a Referral made since stays pending
+   * @deprecated
+   */
   state: ReferredClientDtoState;
   createdAt: string;
-  /** @nullable */
+  /**
+   * @deprecated
+   * @nullable
+   */
   awardedAt?: string | null;
-  /** @nullable */
+  /**
+   * @deprecated
+   * @nullable
+   */
   awardCentavos?: number | null;
 }

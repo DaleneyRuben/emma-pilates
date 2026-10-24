@@ -32,6 +32,7 @@ import {
 } from './waitlist-promotion';
 import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendance } from './record-attendance';
+import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -505,6 +506,8 @@ export class PrismaBookingCommands {
               );
             },
             now: this.now,
+            cancellationWindowMinutes: () =>
+              readCancellationWindowMinutes(transaction),
           });
         },
         { isolationLevel: 'Serializable' },
@@ -606,6 +609,8 @@ export class PrismaBookingCommands {
               return replacement;
             },
             now: this.now,
+            cancellationWindowMinutes: () =>
+              readCancellationWindowMinutes(transaction),
           });
         },
         { isolationLevel: 'Serializable' },
@@ -777,6 +782,8 @@ export class PrismaBookingCommands {
           select: { id: true },
         }),
       now: this.now,
+      cancellationWindowMinutes: () =>
+        readCancellationWindowMinutes(transaction),
     });
   }
 

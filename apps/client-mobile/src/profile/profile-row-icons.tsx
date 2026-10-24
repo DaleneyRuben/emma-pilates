@@ -7,7 +7,6 @@ const glyphs = {
   evaluation: "leaf",
   evaluations: "trend",
   referrals: "person",
-  credit: "credit",
   notifications: "bell",
   password: "password",
 } as const satisfies Record<string, GlyphName>;

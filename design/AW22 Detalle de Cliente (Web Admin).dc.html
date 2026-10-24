@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW22</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Detalle de cliente</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Panel lateral sobre la tabla de AW21, pensado para resolver una consulta de soporte de un vistazo: contacto, plan vigente, crédito y referidos. Todo es resumen de solo lectura sobre filas #FAF7F2, así que el panel no tiene "Guardar" ni campos editables. Sus acciones son «Acceso de prueba» (solo sin plan activo) y «Cerrar cuenta», discretas en el pie, que abre una confirmación con las consecuencias.</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Panel lateral sobre la tabla de AW21, pensado para resolver una consulta de soporte de un vistazo: contacto, plan vigente y referidos. Todo es resumen de solo lectura sobre filas #FAF7F2. «Editar perfil» corrige el nombre y el teléfono. Sus otras acciones son «Acceso de prueba» (solo la administración, y solo sin plan activo) y «Cerrar cuenta», discretas en el pie.</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
@@ -92,7 +92,6 @@
           <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
         </nav>
 
         <main style="flex:1;min-width:0;background:#FAF7F2;position:relative;">
@@ -166,14 +165,6 @@
               </div>
 
               <div style="display:flex;flex-direction:column;gap:9px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
-                  <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
-                  <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 120,00</span>
-                </div>
-              </div>
-
-              <div style="display:flex;flex-direction:column;gap:9px;">
                 <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
                 <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
@@ -189,7 +180,8 @@
 
             </div>
             <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;">
-              <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
+              <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
+            <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
             </div>
           </aside>
         </main>
@@ -243,13 +235,6 @@
               <span style="font-size:11.5px;color:#7A716D;">Último plan vencido el 30/06/2026.</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:9px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
-                <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
-                <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 0,00</span>
-              </div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:9px;">
               <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
               <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
@@ -264,6 +249,7 @@
             </div>
           </div>
           <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;gap:10px;flex-wrap:wrap;">
+            <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
             <button style="height:34px;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;" style-hover="border-color:#B78380;">Acceso de prueba</button>
             <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
           </div>
@@ -312,13 +298,6 @@
               <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;"><span style="font-size:14.5px;font-weight:500;color:#4A4A4A;">Paquete de 8 clases</span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11px;font-weight:500;white-space:nowrap;">Activo</span></div><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;"><span style="font-size:12.5px;color:#766D69;">Vigencia</span><span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">10/08/2026 – 09/09/2026</span></div><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;"><span style="font-size:12.5px;color:#766D69;">Clases disponibles</span><span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">5 de 8</span></div></div>
             </div>
             <div style="display:flex;flex-direction:column;gap:9px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
-                <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
-                <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 0,00</span>
-              </div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:9px;">
               <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
               <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
@@ -333,6 +312,7 @@
             </div>
           </div>
           <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;">
+            <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
             <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
           </div>
         </div>
@@ -380,6 +360,78 @@
               <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;"><span style="font-size:14.5px;font-weight:500;color:#4A4A4A;">Paquete de 12 clases</span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11px;font-weight:500;white-space:nowrap;">Expirado</span></div><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;"><span style="font-size:12.5px;color:#766D69;">Vigencia</span><span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">12/07/2026 – 11/08/2026</span></div><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;"><span style="font-size:12.5px;color:#766D69;">Clases disponibles</span><span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">0 de 12</span></div></div>
             </div>
             <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Clientas referidas</span>
+                  <span style="font-size:13.5px;color:#7A716D;">Ninguna todavía</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Código</span>
+                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">ROCIO25</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Panel · Editando perfil</div>
+          <div style="font-size:12px;color:#766D69;">Editar perfil abre el nombre y el teléfono en el lugar; el correo queda de solo lectura (IDN-009)</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:720px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">LM</div>
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Lucía Mendoza</h3>
+                <span style="font-size:11.5px;color:#766D69;">Cliente desde 03/07/2025</span>
+              </div>
+            </div>
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:22px;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
+                <input value="Lucía Mendoza" style="height:40px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:14px;color:#4A4A4A;" />
+
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
+                <input value="+591 691 44 307" style="height:40px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:14px;color:#4A4A4A;" />
+                <span style="font-size:11.5px;color:#7A716D;">Opcional</span>
+              </label>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Correo</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;">lucia.mendoza@gmail.com</span>
+                </div>
+                <span style="font-size:11.5px;color:#7A716D;">La clienta cambia su correo desde su app.</span>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;">Cancelar</button>
+                <button style="height:34px;padding:0 14px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13px;font-weight:500;">Guardar cambios</button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Plan</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:13.5px;color:#7A716D;">Sin plan activo</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11px;font-weight:500;white-space:nowrap;">Expirado</span>
+              </div>
+              <span style="font-size:11.5px;color:#7A716D;">Último plan vencido el 30/06/2026.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
               <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
                 <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
@@ -395,10 +447,232 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
                   <span style="font-size:12.5px;color:#766D69;">Código</span>
-                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">ROCIO25</span>
+                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">LUCIA25</span>
                 </div>
               </div>
             </div>
+          </div>
+          <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;gap:8px;">
+            <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Panel · Nombre vacío</div>
+          <div style="font-size:12px;color:#766D69;">El nombre es obligatorio; un error al guardar mantiene el formulario</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:720px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">LM</div>
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Lucía Mendoza</h3>
+                <span style="font-size:11.5px;color:#766D69;">Cliente desde 03/07/2025</span>
+              </div>
+            </div>
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:22px;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
+                <input value="" style="height:40px;padding:0 12px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;font-size:14px;color:#4A4A4A;" />
+                <span style="font-size:11.5px;color:#94493A;">Escribe el nombre de la clienta.</span>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
+                <input value="+591 691 44 307" style="height:40px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:14px;color:#4A4A4A;" />
+                <span style="font-size:11.5px;color:#7A716D;">Opcional</span>
+              </label>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Correo</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;">lucia.mendoza@gmail.com</span>
+                </div>
+                <span style="font-size:11.5px;color:#7A716D;">La clienta cambia su correo desde su app.</span>
+              </div>
+              <span role="alert" style="font-size:12.5px;color:#94493A;">No pudimos guardar los cambios. Inténtalo de nuevo.</span><div style="display:flex;gap:8px;">
+                <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;">Cancelar</button>
+                <button style="height:34px;padding:0 14px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13px;font-weight:500;">Guardar cambios</button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Plan</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:13.5px;color:#7A716D;">Sin plan activo</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11px;font-weight:500;white-space:nowrap;">Expirado</span>
+              </div>
+              <span style="font-size:11.5px;color:#7A716D;">Último plan vencido el 30/06/2026.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
+                <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 0,00</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Clientas referidas</span>
+                  <span style="font-size:13.5px;color:#7A716D;">Ninguna todavía</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Código</span>
+                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">LUCIA25</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;gap:8px;">
+            <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Panel · Perfil guardado</div>
+          <div style="font-size:12px;color:#766D69;">De vuelta a solo lectura con el nombre corregido</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:720px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">LM</div>
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Lucía Mendoza Paz</h3>
+                <span style="font-size:11.5px;color:#766D69;">Cliente desde 03/07/2025</span>
+              </div>
+            </div>
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:22px;overflow:hidden;">
+            <div style="padding:10px 12px;border:1px solid rgba(124,148,115,0.40);border-radius:8px;background:rgba(124,148,115,0.10);font-size:12.5px;color:#5F7457;">Guardamos los cambios del perfil.</div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contacto</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Correo</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;">lucia.mendoza@gmail.com</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Teléfono</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">+591 691 44 307</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Plan</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:13.5px;color:#7A716D;">Sin plan activo</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11px;font-weight:500;white-space:nowrap;">Expirado</span>
+              </div>
+              <span style="font-size:11.5px;color:#7A716D;">Último plan vencido el 30/06/2026.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
+                <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 0,00</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Clientas referidas</span>
+                  <span style="font-size:13.5px;color:#7A716D;">Ninguna todavía</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Código</span>
+                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">LUCIA25</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;gap:8px;">
+            <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
+            <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Panel · Coordinadora</div>
+          <div style="font-size:12px;color:#766D69;">Sin ningún monto ni «Cerrar cuenta»: la coordinadora solo corrige el perfil (ADR-0102)</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:720px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">LM</div>
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Lucía Mendoza</h3>
+                <span style="font-size:11.5px;color:#766D69;">Cliente desde 03/07/2025</span>
+              </div>
+            </div>
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:22px;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contacto</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Correo</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;">lucia.mendoza@gmail.com</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Teléfono</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">+591 691 44 307</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Plan</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:13.5px;color:#7A716D;">Sin plan activo</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11px;font-weight:500;white-space:nowrap;">Expirado</span>
+              </div>
+              <span style="font-size:11.5px;color:#7A716D;">Último plan vencido el 30/06/2026.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Clientas referidas</span>
+                  <span style="font-size:13.5px;color:#7A716D;">Ninguna todavía</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Código</span>
+                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">LUCIA25</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;gap:8px;">
+            <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
           </div>
         </div>
       </div>
@@ -462,10 +736,6 @@
             </div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
-            <span style="font-size:12.5px;color:#766D69;">Crédito disponible</span>
-            <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 120,00</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
             <span style="font-size:12.5px;color:#766D69;">3 referidas</span>
             <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">ANDREA24</span>
           </div>
@@ -481,7 +751,7 @@
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:13px;font-weight:500;">Confirmación · con plan, reservas y crédito</div>
+          <div style="font-size:13px;font-weight:500;">Confirmación · con plan y reservas</div>
           <div style="font-size:12px;color:#766D69;">Abre «Cerrar cuenta» · una línea por consecuencia que aplica</div>
         </div>
       </sc-if>
@@ -492,7 +762,6 @@
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Se cancelan sus 3 reservas futuras y su evaluación nutricional, sin descontar nada.</span></li>
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Sale de 1 lista de espera.</span></li>
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Su plan Mensual 16 clases termina hoy, sin reembolso; pierde las 11 clases que le quedan.</span></li>
-            <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Pierde su crédito de Bs 120,00.</span></li>
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Se cierra su sesión en todos sus dispositivos y su correo queda libre.</span></li>
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Se borran su nombre, correo, teléfono y foto. Sus pagos y clases se conservan sin sus datos, para la contabilidad del estudio.</span></li>
           </ul>
@@ -542,7 +811,6 @@
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Se cancelan sus 3 reservas futuras y su evaluación nutricional, sin descontar nada.</span></li>
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Sale de 1 lista de espera.</span></li>
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Su plan Mensual 16 clases termina hoy, sin reembolso; pierde las 11 clases que le quedan.</span></li>
-            <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Pierde su crédito de Bs 120,00.</span></li>
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Se cierra su sesión en todos sus dispositivos y su correo queda libre.</span></li>
             <li style="display:flex;gap:9px;font-size:13.5px;line-height:1.5;color:#4A4A4A;"><span style="width:5px;height:5px;margin-top:8px;flex:none;border-radius:999px;background:#C4B8B2;"></span><span>Se borran su nombre, correo, teléfono y foto. Sus pagos y clases se conservan sin sus datos, para la contabilidad del estudio.</span></li>
           </ul>
@@ -646,9 +914,9 @@
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Filas #FAF7F2</span>El fondo tenue marca todo el panel como lectura, sin candados por campo.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cuenta pendiente</span>Una cuenta creada en recepción puede tener plan y reservas antes de activarse: bajo «Cliente desde» va el recuadro Advertencia «Pendiente de activación». No hay acción aquí; la invitación se maneja desde la app del personal (S05/S06).</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cuenta desactivada</span>Una cuenta desactivada lleva la píldora neutra «Cuenta desactivada» bajo «Cliente desde», sin recuadro; todo lo demás queda de solo lectura y el pie no ofrece «Cerrar cuenta».</div>
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Bloques por tema</span>Contacto, plan, crédito y referidos: el orden en que se atiende una consulta de soporte.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Bloques por tema</span>Contacto, plan y referidos: el orden en que se atiende una consulta de soporte.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cerrar cuenta</span>La confirmación enumera solo lo que le pasa a esta clienta y termina en «Esta acción no se puede deshacer.». Si tiene una transferencia en revisión, el cierre se rechaza y el diálogo remite a Pagos. Tras cerrar, AW21 se recarga sin ella y con el aviso de éxito.</div>
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cifras alineadas</span>Crédito y referidos van a la derecha en cifras tabulares para leerse de un vistazo.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cifras alineadas</span>Los referidos van a la derecha en cifras tabulares para leerse de un vistazo.</div>
     </div>
   </div>
 

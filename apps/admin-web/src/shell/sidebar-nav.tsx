@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  navigationGroups,
+  navigationGroupsFor,
   navigationItemOf,
   type NavigationItem,
 } from "../app/navigation";
@@ -9,23 +9,24 @@ import { branchSuppliesQueryOptions } from "../back-office/supplies/supply-queri
 import { countFormat } from "../components/table/pagination";
 import { cn } from "../lib/cn";
 import { pendingPaymentCountQueryOptions } from "../payments/payment-queries";
+import { useAdminRole } from "../session/admin-role";
 import { useBranchSelection } from "./branch/use-branch-selection";
 
 // AW28: the transfers waiting for review, beside Pagos; nothing when none
 // wait or the count cannot be read.
-function usePendingPaymentCount(): number {
-  const { data } = useQuery(pendingPaymentCountQueryOptions());
+function usePendingPaymentCount(enabled: boolean): number {
+  const { data } = useQuery({ ...pendingPaymentCountQueryOptions(), enabled });
   return data ?? 0;
 }
 
 // AW08: the selected Branch's Supplies at or below their threshold, beside
 // Insumos; another Branch's stock never shows here.
-function useLowStockCount(): number {
+function useLowStockCount(enabled: boolean): number {
   const { selectedBranch } = useBranchSelection();
   const { data } = useQuery({
     ...branchSuppliesQueryOptions(selectedBranch?.id ?? ""),
     select: (page) => page.lowStockCount,
-    enabled: selectedBranch !== undefined,
+    enabled: enabled && selectedBranch !== undefined,
   });
   return data ?? 0;
 }
@@ -42,14 +43,17 @@ const badges = {
 } as const;
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+  // ADR-0102: the Coordinator's sidebar has no money, so no count is read.
+  const role = useAdminRole();
+  const administrator = role === "administrator";
   const counts = {
-    pendingPayments: usePendingPaymentCount(),
-    lowStock: useLowStockCount(),
+    pendingPayments: usePendingPaymentCount(administrator),
+    lowStock: useLowStockCount(administrator),
   };
 
   return (
     <nav aria-label="Secciones" className="flex flex-col gap-5 px-3 py-4">
-      {navigationGroups.map((group, index) => (
+      {navigationGroupsFor(role).map((group, index) => (
         <div
           key={group.label ?? `group-${index}`}
           className="flex flex-col gap-0.5"

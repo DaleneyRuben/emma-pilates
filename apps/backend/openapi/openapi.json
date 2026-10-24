@@ -1853,7 +1853,8 @@
                 "trainer",
                 "nutritionist",
                 "assistant",
-                "administrator"
+                "administrator",
+                "coordinator"
               ],
               "type": "string"
             }
@@ -3293,56 +3294,6 @@
         ]
       }
     },
-    "/api/v1/administrator/credits": {
-      "get": {
-        "operationId": "listAdminCredits",
-        "parameters": [
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "query",
-            "required": false,
-            "in": "query",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminCreditPageDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": [
-          "AdministratorOversight"
-        ]
-      }
-    },
     "/api/v1/administrator/reports/income": {
       "get": {
         "operationId": "getIncomeReport",
@@ -3573,6 +3524,8 @@
     },
     "/api/v1/credit-purchases": {
       "post": {
+        "deprecated": true,
+        "description": "Credit was retired (PAY-005): always refused with credit_insufficient",
         "operationId": "completeCreditPurchase",
         "parameters": [
           {
@@ -3647,6 +3600,8 @@
     },
     "/api/v1/clients/current/credit": {
       "get": {
+        "deprecated": true,
+        "description": "Credit was retired (PAY-005): reads zero with no activity",
         "operationId": "getCurrentClientCredit",
         "parameters": [],
         "responses": {
@@ -4317,6 +4272,51 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminClientDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClients"
+        ]
+      },
+      "patch": {
+        "operationId": "updateAdminClientProfile",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminClientProfileDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -5104,6 +5104,90 @@
         "summary": "",
         "tags": [
           "PromotionsConsent"
+        ]
+      }
+    },
+    "/api/v1/administrator/studio-settings": {
+      "get": {
+        "operationId": "getStudioSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorStudioSettings"
+        ]
+      },
+      "put": {
+        "operationId": "updateStudioSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStudioSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorStudioSettings"
+        ]
+      }
+    },
+    "/api/v1/studio-rules": {
+      "get": {
+        "operationId": "getStudioRules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioRulesDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "StudioRules"
         ]
       }
     },
@@ -6705,6 +6789,133 @@
         ]
       }
     },
+    "/api/v1/cash-closes/today": {
+      "get": {
+        "operationId": "getTodayCashClose",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashTodayDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CashCloses"
+        ]
+      }
+    },
+    "/api/v1/cash-closes": {
+      "post": {
+        "operationId": "recordCashClose",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashCloseInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashCloseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CashCloses"
+        ]
+      }
+    },
+    "/api/v1/administrator/cash-closes": {
+      "get": {
+        "operationId": "listAdminCashCloses",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashCloseHistoryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorCashCloses"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -7106,7 +7317,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -7161,7 +7373,8 @@
             "enum": [
               "trainer",
               "assistant",
-              "nutritionist"
+              "nutritionist",
+              "coordinator"
             ]
           },
           "expiresAt": {
@@ -8227,7 +8440,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branches": {
@@ -8273,7 +8487,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -8367,7 +8582,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -8406,7 +8622,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -9138,14 +9355,18 @@
           "awardedAt": {
             "type": "string",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): no Referral is awarded any more"
           },
           "state": {
             "type": "string",
             "enum": [
               "pending",
               "awarded"
-            ]
+            ],
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): no Referral is awarded any more"
           }
         },
         "required": [
@@ -9178,7 +9399,8 @@
           },
           "awardedCount": {
             "type": "number",
-            "description": "The studio's awarded Referrals, whatever the search"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): the studio's Referrals awarded before Credit was retired"
           },
           "pendingCount": {
             "type": "number",
@@ -9194,74 +9416,6 @@
           "pendingCount"
         ]
       },
-      "AdminCreditBalanceDto": {
-        "type": "object",
-        "properties": {
-          "clientId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "clientName": {
-            "type": "string"
-          },
-          "availableCentavos": {
-            "type": "number",
-            "description": "BOB centavos"
-          },
-          "lastMovementAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "lastMovementKind": {
-            "type": "string",
-            "enum": [
-              "earned",
-              "reserved",
-              "spent",
-              "returned"
-            ],
-            "description": "The last ledger entry: a Referral award, a reservation for an open purchase, its spend at confirmation, or its release"
-          }
-        },
-        "required": [
-          "clientId",
-          "clientName",
-          "availableCentavos",
-          "lastMovementAt",
-          "lastMovementKind"
-        ]
-      },
-      "AdminCreditPageDto": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AdminCreditBalanceDto"
-            }
-          },
-          "page": {
-            "type": "number"
-          },
-          "pageSize": {
-            "type": "number"
-          },
-          "totalItems": {
-            "type": "number"
-          },
-          "outstandingCentavos": {
-            "type": "number",
-            "description": "Studio-wide available Credit, BOB centavos"
-          }
-        },
-        "required": [
-          "items",
-          "page",
-          "pageSize",
-          "totalItems",
-          "outstandingCentavos"
-        ]
-      },
       "IncomeByMethodDto": {
         "type": "object",
         "properties": {
@@ -9272,7 +9426,9 @@
             "type": "number"
           },
           "credit_only": {
-            "type": "number"
+            "type": "number",
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit-only Payments carry no money"
           }
         },
         "required": [
@@ -9467,7 +9623,8 @@
           "creditReservedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit held for this purchase"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0, kept for store builds"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -9572,7 +9729,9 @@
           },
           "creditAppliedCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -9648,14 +9807,19 @@
         "properties": {
           "availableCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Always 0"
           },
           "reservedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit held for a Payment under review"
+            "deprecated": true,
+            "description": "Always 0"
           },
           "activity": {
+            "deprecated": true,
+            "description": "Always empty",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreditActivityDto"
@@ -9684,7 +9848,9 @@
             "enum": [
               "pending",
               "awarded"
-            ]
+            ],
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; a Referral made since stays pending"
           },
           "createdAt": {
             "format": "date-time",
@@ -9693,11 +9859,13 @@
           "awardedAt": {
             "type": "string",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           },
           "awardCentavos": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           }
         },
         "required": [
@@ -9861,7 +10029,9 @@
           },
           "creditAppliedCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -10083,7 +10253,8 @@
           "creditAvailableCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Available Credit in BOB centavos"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           }
         },
         "required": [
@@ -10184,7 +10355,8 @@
           "creditAppliedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit this purchase would spend"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -10207,7 +10379,9 @@
         "properties": {
           "creditAvailableCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           },
           "plans": {
             "type": "array",
@@ -10421,7 +10595,8 @@
           "creditAvailableCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Available Credit in BOB centavos"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           },
           "referralCode": {
             "type": "string"
@@ -10446,6 +10621,25 @@
           "referralCode",
           "referredClientCount",
           "closure"
+        ]
+      },
+      "UpdateAdminClientProfileDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 30
+          }
+        },
+        "required": [
+          "name",
+          "phone"
         ]
       },
       "AdminPaymentDto": {
@@ -10473,12 +10667,13 @@
           "creditAppliedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit taken off the Plan price"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; 0 on every Payment made since"
           },
           "amountDueCentavos": {
             "type": "number",
             "minimum": 1,
-            "description": "The Plan price less the Credit applied: what was transferred"
+            "description": "What was transferred: the Plan price"
           },
           "state": {
             "type": "string",
@@ -10608,7 +10803,8 @@
           "forfeitedCreditCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit forfeited through the account_closure ledger entry"
+            "description": "Deprecated (PAY-005): always 0 since Credit was retired; kept for store builds",
+            "deprecated": true
           }
         },
         "required": [
@@ -10936,6 +11132,195 @@
         },
         "required": [
           "consented"
+        ]
+      },
+      "StudioSettingsDto": {
+        "type": "object",
+        "properties": {
+          "minimumBookings": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "taxRatePercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetMonths1To6Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetMonths7To12Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetFromMonth13Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "openingDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The studio Opening Date (La Paz), or null while unknown"
+          },
+          "version": {
+            "type": "number"
+          },
+          "cancellationWindowMinutes": {
+            "type": "number"
+          },
+          "minimumBookingsCheckLeadMinutes": {
+            "type": "number"
+          },
+          "startDateLimitDays": {
+            "type": "number"
+          },
+          "founderPlaces": {
+            "type": "number"
+          },
+          "founderDiscountPercent": {
+            "type": "number"
+          },
+          "founderGapDays": {
+            "type": "number"
+          },
+          "guestPassesPerClient": {
+            "type": "number"
+          },
+          "invitesPerHostPerMonth": {
+            "type": "number"
+          },
+          "inviteRewardClasses": {
+            "type": "number"
+          },
+          "evaluationPriceCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "nutritionistFeeCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedByName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Who saved this version, or null for the seeded one"
+          }
+        },
+        "required": [
+          "minimumBookings",
+          "taxRatePercent",
+          "renewalTargetMonths1To6Percent",
+          "renewalTargetMonths7To12Percent",
+          "renewalTargetFromMonth13Percent",
+          "openingDate",
+          "version",
+          "cancellationWindowMinutes",
+          "minimumBookingsCheckLeadMinutes",
+          "startDateLimitDays",
+          "founderPlaces",
+          "founderDiscountPercent",
+          "founderGapDays",
+          "guestPassesPerClient",
+          "invitesPerHostPerMonth",
+          "inviteRewardClasses",
+          "evaluationPriceCentavos",
+          "nutritionistFeeCentavos",
+          "updatedAt",
+          "updatedByName"
+        ]
+      },
+      "UpdateStudioSettingsDto": {
+        "type": "object",
+        "properties": {
+          "minimumBookings": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "taxRatePercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetMonths1To6Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetMonths7To12Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetFromMonth13Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "openingDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The studio Opening Date (La Paz), or null while unknown"
+          },
+          "expectedVersion": {
+            "type": "number",
+            "description": "The version the form was read from"
+          }
+        },
+        "required": [
+          "minimumBookings",
+          "taxRatePercent",
+          "renewalTargetMonths1To6Percent",
+          "renewalTargetMonths7To12Percent",
+          "renewalTargetFromMonth13Percent",
+          "openingDate",
+          "expectedVersion"
+        ]
+      },
+      "StudioRulesDto": {
+        "type": "object",
+        "properties": {
+          "cancellationWindowMinutes": {
+            "type": "number",
+            "description": "Minutes before a Session start inside which a Booking is not cancellable"
+          },
+          "evaluationPriceCentavos": {
+            "type": "number",
+            "description": "Paid Evaluation price in BOB centavos"
+          },
+          "plansFromPriceCentavos": {
+            "type": "number",
+            "nullable": true,
+            "description": "The lowest price among the visible Plans, or null when none"
+          },
+          "startDateLimitDays": {
+            "type": "number",
+            "description": "Days after the purchase a Start Date may be chosen"
+          },
+          "openingDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The studio Opening Date (La Paz), or null while unknown"
+          }
+        },
+        "required": [
+          "cancellationWindowMinutes",
+          "evaluationPriceCentavos",
+          "plansFromPriceCentavos",
+          "startDateLimitDays",
+          "openingDate"
         ]
       },
       "SetClientPhotoDto": {
@@ -12104,6 +12489,253 @@
           "byCategory",
           "months",
           "generatedAt"
+        ]
+      },
+      "CashCloseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil day closed"
+          },
+          "expectedCentavos": {
+            "type": "number",
+            "description": "Confirmed cash Payments at the Branch that day, at the close"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "countedCentavos": {
+            "type": "number"
+          },
+          "differenceCentavos": {
+            "type": "number",
+            "description": "Counted minus expected"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "closedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closedByName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "businessDate",
+          "expectedCentavos",
+          "cashPaymentCount",
+          "countedCentavos",
+          "differenceCentavos",
+          "note",
+          "closedAt",
+          "closedByName"
+        ]
+      },
+      "CashTodayDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Today in Bolivia"
+          },
+          "expectedCentavos": {
+            "type": "number",
+            "description": "Confirmed cash Payments at the Branch today, so far"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "close": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CashCloseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "branchId",
+          "businessDate",
+          "expectedCentavos",
+          "cashPaymentCount",
+          "close"
+        ]
+      },
+      "CashCloseInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "countedCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Cash counted in the drawer"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "branchId",
+          "countedCentavos"
+        ]
+      },
+      "CashCloseHistoryEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil day closed"
+          },
+          "expectedCentavos": {
+            "type": "number",
+            "description": "Confirmed cash Payments at the Branch that day, at the close"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "countedCentavos": {
+            "type": "number"
+          },
+          "differenceCentavos": {
+            "type": "number",
+            "description": "Counted minus expected"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "closedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closedByName": {
+            "type": "string"
+          },
+          "adjustmentCentavos": {
+            "type": "number",
+            "description": "How the day’s cash sales moved after the close: a sale voided later (−) or recorded later (+)"
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "businessDate",
+          "expectedCentavos",
+          "cashPaymentCount",
+          "countedCentavos",
+          "differenceCentavos",
+          "note",
+          "closedAt",
+          "closedByName",
+          "adjustmentCentavos"
+        ]
+      },
+      "CashDayDto": {
+        "type": "object",
+        "properties": {
+          "businessDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "closed",
+              "missing",
+              "open"
+            ],
+            "description": "missing: a past day with cash sales and no close"
+          },
+          "cashSalesCentavos": {
+            "type": "number",
+            "description": "The day’s confirmed cash Payments now"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "close": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CashCloseHistoryEntryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "businessDate",
+          "status",
+          "cashSalesCentavos",
+          "cashPaymentCount",
+          "close"
+        ]
+      },
+      "CashCloseHistoryDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "month": {
+            "type": "string",
+            "example": "2026-10",
+            "description": "Bolivia month"
+          },
+          "missingDays": {
+            "type": "number",
+            "description": "Past days with cash sales and no close"
+          },
+          "days": {
+            "description": "Days with cash sales or a close, newest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CashDayDto"
+            }
+          }
+        },
+        "required": [
+          "branchId",
+          "month",
+          "missingDays",
+          "days"
         ]
       },
       "CreatePendingUploadDto": {

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button, select { font: inherit; }
+  input::placeholder { color: #7A716D; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:2200px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW36</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Reglas del estudio</h1>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Las reglas del estudio en un solo lugar (ADR-0101). La administradora cambia las que las decisiones llaman configurables (mínimo de reservas, impuestos, metas de renovación de la coordinadora y fecha de apertura) y ve las que solo cambian con una actualización del sistema. Se llega desde el menú de usuario (AW33).</p>
+  </header>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
+        <div style="font-size:12px;color:#766D69;">Lo que puedes cambiar y las reglas fijas · valores de hoy</div>
+      </div>
+    </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/reglas-del-estudio
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Equipetrol
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:760px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
+        </nav>
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Reglas del estudio</h2>
+            <div style="font-size:12.5px;color:#766D69;">Las reglas que siguen las apps y el sistema. Un cambio llega a las apps en un minuto, sin actualizarlas.</div>
+          </div>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Puedes cambiar</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Versión 3 · guardada el 23/10/2026 por María Fernanda Loza</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Mínimo de reservas por clase</span>
+                <input type="text" inputmode="numeric" value="2" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Una clase con menos reservas se cancela sola 3 h antes de empezar.</span>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Impuestos sobre las ventas (%)</span>
+                <input type="text" inputmode="numeric" value="16" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">La parte de cada venta que se separa para impuestos.</span>
+              </label>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:14px;font-weight:500;color:#4A4A4A;">Meta de renovación de la coordinadora</span>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 1 a 6 (%)</span>
+                  <input type="text" inputmode="numeric" value="80" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 7 a 12 (%)</span>
+                  <input type="text" inputmode="numeric" value="85" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Desde el mes 13 (%)</span>
+                  <input type="text" inputmode="numeric" value="90" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+              </div>
+              <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Los meses se cuentan desde la fecha de apertura.</span>
+            </div>
+            <div style="max-width:calc(50% - 8px);display:flex;flex-direction:column;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Fecha de apertura</span>
+                <div style="position:relative;"><input type="text" value="" placeholder="dd/mm/aaaa" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" /><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7" style="position:absolute;right:14px;top:14px;"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg></div>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Déjala vacía hasta conocerla. Antes de esa fecha, las clientas pueden comprar con inicio el día de la apertura.</span>
+              </label>
+            </div>
+            <div><button style="height:46px;padding:0 22px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar cambios</button></div>
+          </section>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Reglas fijas</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Solo cambian con una actualización del sistema.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;">
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;"><span style="font-size:13px;color:#6E6663;">Ventana de cancelación</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">2 h 30 antes de cada clase</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Revisión del mínimo de reservas</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">3 h antes de cada clase</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Fecha de inicio de un plan</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">Hasta 14 días después de la compra</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Membresía fundadora</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">40 lugares · 15 % de descuento · se pierde con más de 7 días sin plan</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Invita a una amiga</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">1 clase de invitada por persona · 1 invitación al mes · +1 clase cuando la amiga compra</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Evaluación nutricional pagada</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">Bs 70,00 · Bs 50,00 para la nutricionista</span></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Escritorio · Guardado</div>
+        <div style="font-size:12px;color:#766D69;">Después de «Guardar cambios»: el aviso de éxito, los valores nuevos y la versión siguiente</div>
+      </div>
+    </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/reglas-del-estudio
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Equipetrol
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:760px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
+        </nav>
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Reglas del estudio</h2>
+            <div style="font-size:12.5px;color:#766D69;">Las reglas que siguen las apps y el sistema. Un cambio llega a las apps en un minuto, sin actualizarlas.</div>
+          </div>
+          <div role="status" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;background:rgba(124,148,115,0.14);border:1px solid rgba(124,148,115,0.30);font-size:13px;color:#4C5F46;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5F7457" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="9"></circle><polyline points="8,12.5 11,15.5 16.5,9.5"></polyline></svg>
+            Guardamos las reglas del estudio.
+          </div>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Puedes cambiar</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Versión 4 · guardada el 23/10/2026 por María Fernanda Loza</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Mínimo de reservas por clase</span>
+                <input type="text" inputmode="numeric" value="3" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Una clase con menos reservas se cancela sola 3 h antes de empezar.</span>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Impuestos sobre las ventas (%)</span>
+                <input type="text" inputmode="numeric" value="16" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">La parte de cada venta que se separa para impuestos.</span>
+              </label>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:14px;font-weight:500;color:#4A4A4A;">Meta de renovación de la coordinadora</span>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 1 a 6 (%)</span>
+                  <input type="text" inputmode="numeric" value="80" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 7 a 12 (%)</span>
+                  <input type="text" inputmode="numeric" value="85" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Desde el mes 13 (%)</span>
+                  <input type="text" inputmode="numeric" value="90" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+              </div>
+              <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Los meses se cuentan desde la fecha de apertura.</span>
+            </div>
+            <div style="max-width:calc(50% - 8px);display:flex;flex-direction:column;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Fecha de apertura</span>
+                <div style="position:relative;"><input type="text" value="01/12/2026" placeholder="dd/mm/aaaa" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" /><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7" style="position:absolute;right:14px;top:14px;"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg></div>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Déjala vacía hasta conocerla. Antes de esa fecha, las clientas pueden comprar con inicio el día de la apertura.</span>
+              </label>
+            </div>
+            <div><button style="height:46px;padding:0 22px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar cambios</button></div>
+          </section>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Reglas fijas</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Solo cambian con una actualización del sistema.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;">
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;"><span style="font-size:13px;color:#6E6663;">Ventana de cancelación</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">2 h 30 antes de cada clase</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Revisión del mínimo de reservas</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">3 h antes de cada clase</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Fecha de inicio de un plan</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">Hasta 14 días después de la compra</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Membresía fundadora</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">40 lugares · 15 % de descuento · se pierde con más de 7 días sin plan</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Invita a una amiga</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">1 clase de invitada por persona · 1 invitación al mes · +1 clase cuando la amiga compra</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Evaluación nutricional pagada</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">Bs 70,00 · Bs 50,00 para la nutricionista</span></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Escritorio · Valores fuera de rango</div>
+        <div style="font-size:12px;color:#766D69;">Cada campo marca su error; no se envía nada</div>
+      </div>
+    </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/reglas-del-estudio
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Equipetrol
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:760px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
+        </nav>
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Reglas del estudio</h2>
+            <div style="font-size:12.5px;color:#766D69;">Las reglas que siguen las apps y el sistema. Un cambio llega a las apps en un minuto, sin actualizarlas.</div>
+          </div>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Puedes cambiar</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Versión 3 · guardada el 23/10/2026 por María Fernanda Loza</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Mínimo de reservas por clase</span>
+                <input type="text" inputmode="numeric" value="0" aria-invalid="true" style="height:44px;width:100%;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;box-shadow:0 0 0 3px rgba(178,93,75,0.12);" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Una clase con menos reservas se cancela sola 3 h antes de empezar.</span>
+                <span style="font-size:11.5px;line-height:1.5;color:#94493A;">Entre 1 y 20 reservas.</span>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Impuestos sobre las ventas (%)</span>
+                <input type="text" inputmode="numeric" value="120" aria-invalid="true" style="height:44px;width:100%;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;box-shadow:0 0 0 3px rgba(178,93,75,0.12);" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">La parte de cada venta que se separa para impuestos.</span>
+                <span style="font-size:11.5px;line-height:1.5;color:#94493A;">Un porcentaje entre 0 y 100.</span>
+              </label>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:14px;font-weight:500;color:#4A4A4A;">Meta de renovación de la coordinadora</span>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 1 a 6 (%)</span>
+                  <input type="text" inputmode="numeric" value="80" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 7 a 12 (%)</span>
+                  <input type="text" inputmode="numeric" value="85" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Desde el mes 13 (%)</span>
+                  <input type="text" inputmode="numeric" value="90" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+              </div>
+              <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Los meses se cuentan desde la fecha de apertura.</span>
+            </div>
+            <div style="max-width:calc(50% - 8px);display:flex;flex-direction:column;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Fecha de apertura</span>
+                <div style="position:relative;"><input type="text" value="" placeholder="dd/mm/aaaa" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" /><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7" style="position:absolute;right:14px;top:14px;"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg></div>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Déjala vacía hasta conocerla. Antes de esa fecha, las clientas pueden comprar con inicio el día de la apertura.</span>
+              </label>
+            </div>
+            <div><button style="height:46px;padding:0 22px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar cambios</button></div>
+          </section>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Reglas fijas</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Solo cambian con una actualización del sistema.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;">
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;"><span style="font-size:13px;color:#6E6663;">Ventana de cancelación</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">2 h 30 antes de cada clase</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Revisión del mínimo de reservas</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">3 h antes de cada clase</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Fecha de inicio de un plan</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">Hasta 14 días después de la compra</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Membresía fundadora</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">40 lugares · 15 % de descuento · se pierde con más de 7 días sin plan</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Invita a una amiga</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">1 clase de invitada por persona · 1 invitación al mes · +1 clase cuando la amiga compra</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Evaluación nutricional pagada</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">Bs 70,00 · Bs 50,00 para la nutricionista</span></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Escritorio · Otra persona guardó antes</div>
+        <div style="font-size:12px;color:#766D69;">Se guardó una versión más nueva mientras editabas: el formulario muestra la actual</div>
+      </div>
+    </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/reglas-del-estudio
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Equipetrol
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:760px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
+        </nav>
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Reglas del estudio</h2>
+            <div style="font-size:12.5px;color:#766D69;">Las reglas que siguen las apps y el sistema. Un cambio llega a las apps en un minuto, sin actualizarlas.</div>
+          </div>
+          <div role="alert" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;background:rgba(201,154,78,0.14);border:1px solid rgba(201,154,78,0.34);font-size:13px;color:#7A5A26;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9A7434" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg>
+            Alguien guardó otras reglas mientras editabas. Te mostramos las actuales: revisa y vuelve a guardar.
+          </div>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Puedes cambiar</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Versión 5 · guardada el 23/10/2026 por María Fernanda Loza</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Mínimo de reservas por clase</span>
+                <input type="text" inputmode="numeric" value="2" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Una clase con menos reservas se cancela sola 3 h antes de empezar.</span>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Impuestos sobre las ventas (%)</span>
+                <input type="text" inputmode="numeric" value="13" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">La parte de cada venta que se separa para impuestos.</span>
+              </label>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:14px;font-weight:500;color:#4A4A4A;">Meta de renovación de la coordinadora</span>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 1 a 6 (%)</span>
+                  <input type="text" inputmode="numeric" value="80" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 7 a 12 (%)</span>
+                  <input type="text" inputmode="numeric" value="85" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Desde el mes 13 (%)</span>
+                  <input type="text" inputmode="numeric" value="90" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+              </div>
+              <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Los meses se cuentan desde la fecha de apertura.</span>
+            </div>
+            <div style="max-width:calc(50% - 8px);display:flex;flex-direction:column;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Fecha de apertura</span>
+                <div style="position:relative;"><input type="text" value="" placeholder="dd/mm/aaaa" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" /><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7" style="position:absolute;right:14px;top:14px;"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg></div>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Déjala vacía hasta conocerla. Antes de esa fecha, las clientas pueden comprar con inicio el día de la apertura.</span>
+              </label>
+            </div>
+            <div><button style="height:46px;padding:0 22px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar cambios</button></div>
+          </section>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Reglas fijas</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Solo cambian con una actualización del sistema.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;">
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;"><span style="font-size:13px;color:#6E6663;">Ventana de cancelación</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">2 h 30 antes de cada clase</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Revisión del mínimo de reservas</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">3 h antes de cada clase</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Fecha de inicio de un plan</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">Hasta 14 días después de la compra</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Membresía fundadora</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">40 lugares · 15 % de descuento · se pierde con más de 7 días sin plan</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Invita a una amiga</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">1 clase de invitada por persona · 1 invitación al mes · +1 clase cuando la amiga compra</span></div>
+              <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Evaluación nutricional pagada</span><span style="font-size:13px;color:#4A4A4A;text-align:right;">Bs 70,00 · Bs 50,00 para la nutricionista</span></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
+          <div style="font-size:12px;color:#766D69;">Un campo por fila, las metas apiladas, «Guardar cambios» a todo el ancho; cada regla fija apila su valor bajo su nombre</div>
+        </div>
+      </sc-if>
+      <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+        <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            admin.emmapilates.bo/reglas-del-estudio
+          </div>
+        </div>
+        <div style="height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:20px;line-height:1;">Emma</span>
+          </div>
+          <div style="width:28px;height:28px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+        </div>
+        <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.15;">Reglas del estudio</h2>
+            <span style="font-size:12px;color:#766D69;">Las reglas que siguen las apps y el sistema. Un cambio llega a las apps en un minuto, sin actualizarlas.</span>
+          </div>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Puedes cambiar</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Versión 3 · guardada el 23/10/2026 por María Fernanda Loza</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Mínimo de reservas por clase</span>
+                <input type="text" inputmode="numeric" value="2" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Una clase con menos reservas se cancela sola 3 h antes de empezar.</span>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Impuestos sobre las ventas (%)</span>
+                <input type="text" inputmode="numeric" value="16" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">La parte de cada venta que se separa para impuestos.</span>
+              </label>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:14px;font-weight:500;color:#4A4A4A;">Meta de renovación de la coordinadora</span>
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 1 a 6 (%)</span>
+                  <input type="text" inputmode="numeric" value="80" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Meses 7 a 12 (%)</span>
+                  <input type="text" inputmode="numeric" value="85" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+                <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Desde el mes 13 (%)</span>
+                  <input type="text" inputmode="numeric" value="90" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" />
+                </label>
+              </div>
+              <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Los meses se cuentan desde la fecha de apertura.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;">
+              <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Fecha de apertura</span>
+                <div style="position:relative;"><input type="text" value="" placeholder="dd/mm/aaaa" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" /><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7" style="position:absolute;right:14px;top:14px;"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg></div>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Déjala vacía hasta conocerla. Antes de esa fecha, las clientas pueden comprar con inicio el día de la apertura.</span>
+              </label>
+            </div>
+            <div><button style="height:46px;padding:0 22px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar cambios</button></div>
+          </section>
+          <section style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.2;">Reglas fijas</h3>
+              <span style="font-size:11.5px;color:#7A716D;">Solo cambian con una actualización del sistema.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;">
+              <div style="display:flex;flex-direction:column;gap:2px;padding:10px 0;"><span style="font-size:13px;color:#6E6663;">Ventana de cancelación</span><span style="font-size:13px;color:#4A4A4A;">2 h 30 antes de cada clase</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Revisión del mínimo de reservas</span><span style="font-size:13px;color:#4A4A4A;">3 h antes de cada clase</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Fecha de inicio de un plan</span><span style="font-size:13px;color:#4A4A4A;">Hasta 14 días después de la compra</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Membresía fundadora</span><span style="font-size:13px;color:#4A4A4A;">40 lugares · 15 % de descuento · se pierde con más de 7 días sin plan</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Invita a una amiga</span><span style="font-size:13px;color:#4A4A4A;">1 clase de invitada por persona · 1 invitación al mes · +1 clase cuando la amiga compra</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid #EFE6DC;"><span style="font-size:13px;color:#6E6663;">Evaluación nutricional pagada</span><span style="font-size:13px;color:#4A4A4A;">Bs 70,00 · Bs 50,00 para la nutricionista</span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:13px;line-height:1.6;color:#766D69;">
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">De dónde sale</span>Una sola configuración versionada del estudio (ADR-0101). Se abre desde el menú de usuario (AW33), sin entrada propia en el menú lateral, y solo la ve la administradora.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Guardar cambios</span>Envía el formulario con la versión que leyó. Cada cambio es una versión nueva y queda en la auditoría con el valor anterior y el nuevo; guardar sin cambios no crea versión.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Otra persona guardó antes</span>Si alguien guardó una versión más nueva mientras editabas, no se guarda nada: la página muestra los valores actuales y el aviso en tono de advertencia.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">En las apps</span>La ventana de cancelación y el precio de «Paquetes desde» (el plan visible más barato) llegan a las apps desde la API en un minuto, sin una actualización de la app.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showCaptions: this.props.showCaptions ?? true };
+  }
+}
+</script>
+</body>
+</html>

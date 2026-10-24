@@ -4,6 +4,8 @@ packages:
 
 overrides:
   zod: 4.6.7
+  multer: 2.5.0
+  body-parser: 2.4.0
 
 allowBuilds:
   "@nestjs/core": true

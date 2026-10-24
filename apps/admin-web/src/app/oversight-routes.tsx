@@ -48,20 +48,9 @@ const referralsRoute = createRoute({
   ),
 });
 
-const creditsRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/promociones/creditos",
-  validateSearch: optionalSearch(nameSearchSchema),
-  component: lazyRouteComponent(
-    () => import("../oversight/credits/credits-route"),
-    "CreditsRoute",
-  ),
-});
-
 export const oversightRoutes = [
   evaluationsRoute,
   promotionsRoute,
   promotionContactsRoute,
   referralsRoute,
-  creditsRoute,
 ];
