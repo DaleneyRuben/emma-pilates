@@ -37,16 +37,26 @@ describe("Pagos a instructoras", () => {
     let approved = 0;
     server.use(
       http.get(apiUrl(statementsPath), () =>
-        jsonResponse(approved === 0 ? [statement] : [{ ...statement, state: "approved" }]),
+        jsonResponse(
+          approved === 0 ? [statement] : [{ ...statement, state: "approved" }],
+        ),
       ),
       http.post(apiUrl(`${statementsPath}/statement-1/approve`), () => {
         approved += 1;
-        return jsonResponse({ ...statement, state: "approved", salaryPaymentId: "pay-1" });
+        return jsonResponse({
+          ...statement,
+          state: "approved",
+          salaryPaymentId: "pay-1",
+        });
       }),
     );
-    const { user } = renderAdmin("/back-office/pagos-instructoras?month=2026-09");
+    const { user } = renderAdmin(
+      "/back-office/pagos-instructoras?month=2026-09",
+    );
 
-    expect(await screen.findByRole("heading", { name: "Emma Vargas" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Emma Vargas" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Bs 322,00")).toBeInTheDocument();
     expect(screen.getByText("3 alumnas")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Aprobar" }));

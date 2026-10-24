@@ -1,7 +1,10 @@
 import type { PayStatementDto } from "@pilates/api-contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MonthStepper } from "../../components/table/month-stepper";
-import { LoadingNotice, QueryFailure } from "../../components/page/query-failure";
+import {
+  LoadingNotice,
+  QueryFailure,
+} from "../../components/page/query-failure";
 import { PageHeader } from "../../components/page/page-header";
 import { Button } from "../../components/ui/button";
 import {
@@ -78,10 +81,7 @@ function StatementCard({
         </TableBody>
       </Table>
       {statement.state === "draft" ? (
-        <Button
-          busy={approve.isPending}
-          onClick={() => approve.mutate()}
-        >
+        <Button busy={approve.isPending} onClick={() => approve.mutate()}>
           Aprobar
         </Button>
       ) : null}

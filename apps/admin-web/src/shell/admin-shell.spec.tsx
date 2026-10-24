@@ -41,6 +41,7 @@ describe("admin shell", () => {
         "Equipos",
         "Evaluaciones nutricionales",
         "Personal",
+        "Pagos a instructoras",
         "Nómina",
         "Gastos",
         "Categorías de gasto",
@@ -319,7 +320,7 @@ describe("admin shell", () => {
         { timeout: 5_000 },
       );
       expect(
-        within(sidebar).getByRole("link", { name: "Pagos" }),
+        within(sidebar).getByRole("link", { name: "Pagos", exact: true }),
       ).toHaveTextContent(/^Pagos$/);
       expect(
         within(sidebar).getByRole("link", { name: "Insumos" }),
