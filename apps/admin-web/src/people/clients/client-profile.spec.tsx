@@ -120,7 +120,9 @@ describe("AW22 Editar perfil", () => {
       within(panel).queryByRole("button", { name: "Cerrar cuenta" }),
     ).not.toBeInTheDocument();
     expect(
-      within(panel).queryByRole("button", { name: "Agregar clase de cortesía" }),
+      within(panel).queryByRole("button", {
+        name: "Agregar clase de cortesía",
+      }),
     ).not.toBeInTheDocument();
     expect(
       within(panel).queryByRole("button", { name: "Devolver una clase" }),

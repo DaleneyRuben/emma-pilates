@@ -134,11 +134,7 @@ function ClientSummary({
         <StatusPill tone="neutral">Cuenta desactivada</StatusPill>
       ) : null}
       {contact}
-      <PlanBlock
-        clientId={client.id}
-        view={client.subscription}
-        role={role}
-      />
+      <PlanBlock clientId={client.id} view={client.subscription} role={role} />
       <SummaryBlock title="Referidos">
         <SummaryRow label="Clientas referidas" figure>
           {client.referredClientCount === 0
