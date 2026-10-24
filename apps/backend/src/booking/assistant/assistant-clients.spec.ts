@@ -11,7 +11,7 @@ import {
 } from './assistant-clients';
 
 const staff = (
-  role: 'assistant' | 'administrator' | 'trainer',
+  role: 'assistant' | 'administrator' | 'trainer' | 'coordinator',
   branchIds: string[],
 ): AuthenticatedPrincipal => ({
   accountId: 'staff-account',
@@ -133,18 +133,22 @@ describe('Assistant Client overview', () => {
     findFutureSubscription: jest.fn().mockResolvedValue(null),
     findUpcoming: jest.fn().mockResolvedValue(upcoming),
     findAttendedBookings: jest.fn().mockResolvedValue(history),
-    readAvailableCredit: jest.fn().mockResolvedValue(6_000),
   };
 
-  it('composes the Client, Subscription state, next Booking, last two attended classes, and Credit', async () => {
+  it('composes the Client, Subscription state, next Booking, last two attended classes, and no Credit (PAY-005)', async () => {
     await expect(
       readClientOverview({ clientId: 'client-id' }, dependencies),
     ).resolves.toEqual({
       client: clientRecord,
-      subscription: { status: 'active', subscription, nextSubscription: null },
+      subscription: {
+        status: 'active',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+      },
       nextBooking: upcoming[0],
       recentHistory: history.slice(0, 2),
-      creditAvailableCentavos: 6_000,
+      creditAvailableCentavos: 0,
     });
     expect(dependencies.findActiveSubscription).toHaveBeenCalledWith(
       'client-id',
@@ -153,6 +157,29 @@ describe('Assistant Client overview', () => {
     expect(dependencies.findUpcoming).toHaveBeenCalledWith({
       clientId: 'client-id',
       from: now,
+    });
+  });
+
+  it('shows the Coordinator the same overview with Credit retired (ADR-0102)', async () => {
+    await expect(
+      readClientOverview(
+        { clientId: 'client-id' },
+        {
+          ...dependencies,
+          principal: staff('coordinator', []),
+        },
+      ),
+    ).resolves.toEqual({
+      client: clientRecord,
+      subscription: {
+        status: 'active',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+      },
+      nextBooking: upcoming[0],
+      recentHistory: history.slice(0, 2),
+      creditAvailableCentavos: 0,
     });
   });
 
@@ -207,6 +234,37 @@ describe('Assistant Client Bookings and history', () => {
     ).resolves.toEqual(upcoming.map((item) => ({ ...item, actionable: true })));
   });
 
+  it('lets the Coordinator search Clients and act on their Bookings at every Branch (ADR-0102)', async () => {
+    const coordinator = staff('coordinator', []);
+    await expect(
+      searchClients(
+        { query: 'Luc' },
+        { principal: coordinator, search: jest.fn().mockResolvedValue([]) },
+      ),
+    ).resolves.toEqual([]);
+    await expect(
+      listAssistantClientBookings(
+        { clientId: 'client-id' },
+        {
+          principal: coordinator,
+          now: () => now,
+          findClient: jest.fn().mockResolvedValue(clientRecord),
+          findUpcoming: jest.fn().mockResolvedValue(upcoming),
+        },
+      ),
+    ).resolves.toEqual(upcoming.map((item) => ({ ...item, actionable: true })));
+    await expect(
+      listAssistantClientHistory(
+        { clientId: 'client-id' },
+        {
+          principal: coordinator,
+          findClient: jest.fn().mockResolvedValue(clientRecord),
+          findAttendedBookings: jest.fn().mockResolvedValue(history),
+        },
+      ),
+    ).resolves.toEqual(history);
+  });
+
   it('lists the attended classes of the Client', async () => {
     const findAttendedBookings = jest.fn().mockResolvedValue(history);
     await expect(
@@ -237,7 +295,7 @@ describe('Assistant Client Bookings and history', () => {
 });
 
 describe('Assistant Plan quotes and cash Payment', () => {
-  it('applies the available Credit to every visible Plan in display order', async () => {
+  it('quotes every visible Plan at its full price in display order, since Credit is retired (PAY-005)', async () => {
     await expect(
       quotePlansForClient(
         { clientId: 'client-id' },
@@ -245,24 +303,36 @@ describe('Assistant Plan quotes and cash Payment', () => {
           principal: assistant,
           findClient: jest.fn().mockResolvedValue(clientRecord),
           listVisiblePlans: jest.fn().mockResolvedValue(plans),
-          readAvailableCredit: jest.fn().mockResolvedValue(6_000),
         },
       ),
     ).resolves.toEqual({
-      creditAvailableCentavos: 6_000,
+      creditAvailableCentavos: 0,
       plans: [
         {
           ...plans[1],
-          creditAppliedCentavos: 5_000,
-          amountDueCentavos: 0,
+          creditAppliedCentavos: 0,
+          amountDueCentavos: plans[1].priceCentavos,
         },
         {
           ...plans[0],
-          creditAppliedCentavos: 6_000,
-          amountDueCentavos: 50_000,
+          creditAppliedCentavos: 0,
+          amountDueCentavos: plans[0].priceCentavos,
         },
       ],
     });
+  });
+
+  it('never quotes prices to the Coordinator, who does not sell (ADR-0102)', async () => {
+    await expect(
+      quotePlansForClient(
+        { clientId: 'client-id' },
+        {
+          principal: staff('coordinator', []),
+          findClient: jest.fn().mockResolvedValue(clientRecord),
+          listVisiblePlans: jest.fn().mockResolvedValue(plans),
+        },
+      ),
+    ).rejects.toBeInstanceOf(BookingAccessDeniedError);
   });
 
   it('records the cash Payment and returns the activated Subscription', async () => {
@@ -293,6 +363,7 @@ describe('Assistant Plan quotes and cash Payment', () => {
           planId: 'plan-8',
           branchId: 'branch-centro',
           idempotencyKey: 'idempotency-key',
+          invoiceData: { taxId: '4567891', name: 'Ana Pérez' },
         },
         {
           principal: assistant,
@@ -302,7 +373,12 @@ describe('Assistant Plan quotes and cash Payment', () => {
       ),
     ).resolves.toEqual({ payment, subscription: activated });
     expect(recordCashPayment).toHaveBeenCalledWith(
-      { clientId: 'client-id', planId: 'plan-8', branchId: 'branch-centro' },
+      {
+        clientId: 'client-id',
+        planId: 'plan-8',
+        branchId: 'branch-centro',
+        invoiceData: { taxId: '4567891', name: 'Ana Pérez' },
+      },
       assistant,
       'idempotency-key',
     );

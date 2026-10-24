@@ -4,7 +4,8 @@ Answers for Play Console → each app → Policy and programs → App content �
 Data safety. They come from an audit of the code on 2026-10-19 (both apps and
 `packages/mobile-core`), not from the proposals, and they match the privacy
 policy (`apps/public-site/privacidad/index.html`) and ADR-0081's telemetry
-rules. Re-check them whenever an app starts sending a new kind of data.
+rules. Re-check them whenever an app starts sending a new kind of data; PAY-007
+(2026-10-23) added Invoice Data, see [Deletion and retention](#deletion-and-retention).
 
 Play counts data as **collected** when the app sends it off the device. Data
 the app only downloads and shows (a Staff Member viewing a receipt) is not
@@ -35,11 +36,13 @@ ephemerally: no**.
 | Personal info → Email address | Login, verification, recovery; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
 | Personal info → User IDs | Referral code entered at registration | Optional | App functionality |
 | Personal info → Phone number | Profile; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Optional | App functionality, Account management, Advertising or marketing |
+| Personal info → Other info | Invoice Data on a purchase (PAY-007): the NIT or CI and the name or business name for the studio's invoice, prefilled from her last purchase; «Sin factura» sends none | Optional | App functionality |
 | Financial info → Purchase history | Plans bought, Payment amount, method and state | Required | App functionality |
 | Photos and videos → Photos | Profile photo and transfer receipt, picked from the gallery | Optional (a receipt only to pay by transfer) | App functionality |
 | App activity → Other actions | Bookings, Waitlist entries, Evaluation appointments | Required | App functionality |
+| App activity → Other user-generated content | The text of «Enviar comentarios» (REL-012), with its type (Problema, Sugerencia, Otro); no screenshots | Optional | App functionality (fixing and improving the apps) |
 | App info and performance → Crash logs | Sanitized exception type and stack (Better Stack) | Required | App functionality (diagnosing errors) |
-| App info and performance → Diagnostics | App release and build number on crash reports | Required | App functionality |
+| App info and performance → Diagnostics | App release and build number on crash reports; the app version, build, platform, and OS version sent with «Enviar comentarios» | Required | App functionality |
 | Device or other IDs → Device or other IDs | Random installation ID and Expo push token | Required | App functionality (push notifications), Fraud prevention, security, and compliance (sign-in throttling) |
 
 ## Data types: Staff app
@@ -52,13 +55,23 @@ Members send:
 | Personal info → Name | A Client's name when the Assistant creates the Account | Required for that feature | App functionality, Account management |
 | Personal info → Email address | Login; a Client's email when the Assistant invites them | Required | App functionality, Account management |
 | Personal info → Phone number | A Client's phone, entered by the Assistant | Optional | App functionality, Account management |
+| Personal info → Other info | A Client's Invoice Data (NIT or CI and name or business name) the Assistant types with a cash sale (PAY-007) | Optional | App functionality |
 | Financial info → Purchase history | Cash Payments recorded by the Assistant, transfer approvals and rejection reasons by the Administrator | Required for those Roles | App functionality |
 | App activity → Other actions | Attendance, Bookings made for Clients, the Nutritionist's availability | Required | App functionality |
+| App activity → Other user-generated content | as in the Client app («Enviar comentarios») | Optional | App functionality |
 | App info and performance → Crash logs | as in the Client app | Required | App functionality |
 | App info and performance → Diagnostics | as in the Client app | Required | App functionality |
 | Device or other IDs → Device or other IDs | Installation ID and push token | Required | App functionality, Fraud prevention, security, and compliance |
 
 The Staff app uploads no photos.
+
+«Enviar comentarios» (REL-012) adds the **Other user-generated content**
+rows and widens **Diagnostics**: the OS version travels with a comment, never
+with a crash report. The Role is attached by the server from the Account and
+is not a new data type. A comment stays after a Client closes her Account,
+under the anonymised Account (its email becomes the `cerrada-…` placeholder),
+as the record of what testers asked for; it is never shown to other users.
+Update the Play form for both apps with REL-004 before the next store build.
 
 ## Not collected (both apps)
 
@@ -78,7 +91,7 @@ stay (accounting, security, legal obligations) may remain, disclosed in the
 privacy policy. Closing a Client Account (Perfil → «Cerrar mi cuenta», or an
 Administrator from the admin web after an email request) now erases the name,
 email, phone, password, and profile photo in the closure transaction. The
-Payments, Bookings, Credit, and attendance stay, soft-deleted (ADR-0086),
+Payments, Bookings, and attendance stay, soft-deleted (ADR-0086),
 under «Cliente eliminado» for the studio's accounting, which the privacy and
 deletion pages disclose.
 
@@ -105,7 +118,45 @@ phone number is already declared collected for «Advertising or marketing», so
 the answers stay **not shared**. Re-check them if the studio ever sends from
 the app or the API through the WhatsApp Business Platform.
 
+**Invoice Data (PAY-007, 2026-10-23, booking ADR-0012).** Every sale may
+carry the NIT or CI and the name or business name the Client wants on the
+studio's invoice, which is issued outside the system. Play has no tax-ID type,
+so it is declared as **Personal info → Other info** in both apps (and the name
+it carries is the Client's or her business's), **optional**, for **App
+functionality** only: it is never used for promotions. The Administrator sees
+it on the admin web and exports it to a CSV for the studio's accountant, a
+service provider acting for the studio, so it stays **not shared**. Closing the
+Account erases it from every sale in the closure transaction, like the name
+and phone; the privacy and deletion pages say so (updated 2026-10-23).
+
 The form's «delete» answers are **Yes** with the deletion URL above.
+
+## Added since the 2026-10-19 draft
+
+Paste these when the forms are filled. None of them changes a declaration
+already made; each adds a data type the closed-test build collects.
+
+**Feedback text (REL-012, «Enviar comentarios»).** Both apps. Data type
+**Other user-generated content**, collected, not shared. Purposes: App
+functionality (the studio reads it to fix the app) and Account management
+(the Administrator triages it). Optional: a person can use the app without
+sending any. The text, the app version, and the device kind are kept while
+the Account is open and erased with it on closure. It is not used for
+advertising.
+
+**NIT or CI and business name (PAY-007, invoice data).** Client app, and the
+Staff app when the Assistant records a sale. Data type **Other financial
+info**, collected, not shared. Purpose: Account management and Fraud
+prevention, security, and compliance (the studio issues the invoice outside
+the app). Optional: «Sin factura» records the sale with none. Closing the
+Account erases the NIT or CI and the name and keeps the mark that an invoice
+was issued, which the accounting record needs.
+
+**How she found the studio (BKM-011).** Client app, at registration. Data
+type **Other info**, collected, not shared. Purpose: App functionality and
+Analytics (the studio counts where new Clients come from; no third party
+receives it). Required on new registrations. It stays with the accounting
+record after closure, like the Payments.
 
 ## Related gaps found by the audit
 

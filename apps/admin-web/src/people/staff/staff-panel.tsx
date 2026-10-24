@@ -21,6 +21,8 @@ import { Input } from "../../components/ui/input";
 import { WaitNotice } from "../../auth/request-limit-notice";
 import { useCountdown } from "../../auth/use-countdown";
 import { currentSessionQueryOptions } from "../../session/session-queries";
+import { holdsEveryBranch } from "../people-search";
+import { adminRoleOf } from "../../session/admin-role";
 import { StaffEditForm } from "./staff-edit-form";
 import {
   emptyStaffForm,
@@ -67,7 +69,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
         kind: "create",
         input: {
           ...values,
-          branchIds: values.role === "administrator" ? [] : values.branchIds,
+          branchIds: holdsEveryBranch(values.role) ? [] : values.branchIds,
         },
       });
       onDone(
@@ -152,6 +154,16 @@ export function StaffPanelForm({
       ? principal.identity.staffMemberId
       : undefined;
 
+  // ADR-0102: the Coordinator reads Staff details; access stays with the
+  // Administrator.
+  if (principal !== undefined && adminRoleOf(principal) === "coordinator") {
+    return member === undefined ? null : (
+      <StaffReadOnly
+        member={member}
+        note="Solo administración invita y cambia roles."
+      />
+    );
+  }
   if (member === undefined) return <StaffCreateForm onDone={onDone} />;
   if (member.id === ownStaffMemberId) {
     return (

@@ -6,6 +6,7 @@
  */
 import type { IncomeByMethodDto } from "./incomeByMethodDto";
 import type { IncomeMonthDto } from "./incomeMonthDto";
+import type { IncomeSaleDto } from "./incomeSaleDto";
 import type { VoidedIncomeDto } from "./voidedIncomeDto";
 
 export interface IncomeReportDto {
@@ -15,8 +16,14 @@ export interface IncomeReportDto {
   branchId: string | null;
   /** Confirmed Payments, BOB centavos */
   totalCentavos: number;
+  /** List price of the confirmed sales, BOB centavos */
+  listPriceCentavos: number;
+  /** Discounts on the confirmed sales, BOB centavos */
+  discountCentavos: number;
   byMethod: IncomeByMethodDto;
   months: IncomeMonthDto[];
+  /** Sales that carry a discount, with list price and amount paid */
+  sales: IncomeSaleDto[];
   generatedAt: string;
   /** Voided sales in the window. Visible with their reason, never in the totals. */
   voided: VoidedIncomeDto[];

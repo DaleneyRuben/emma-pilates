@@ -4,8 +4,6 @@ import {
   AuditActorKind,
   AuditOutcome,
   CreditLedgerActorKind,
-  CreditLedgerEntryKind,
-  CreditReservationState,
   ImageAssetPurpose,
   ImageAssetState,
   ImageMediaType,
@@ -26,17 +24,6 @@ import {
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
-import { summarizeCredit, type CreditSummary } from './credit-summary';
-import { PaymentRuleError } from './payment-errors';
-import {
-  scheduleReceiptDeletion,
-  settleReservation,
-} from './purchase-intent-settlement';
-import {
-  evaluatePurchaseEligibility,
-  isSubscriptionEffective,
-} from './purchase-eligibility';
-import { deprecatedDurationMonths } from '../catalog/plan-validity';
 import {
   allocateStartDate,
   endSubscriptionEarly,
@@ -46,87 +33,63 @@ import {
   subscriptionTermFor,
   todayOf,
 } from './prisma-start-date-allocation';
-import { loadActiveSubscription as sharedLoadActiveSubscription } from './subscription-allocation';
+import type { CreditSummary } from './credit-summary';
+import { PaymentRuleError } from './payment-errors';
+import {
+  intentSelect,
+  paymentMethods,
+  paymentSelect,
+  toIntentView,
+  toPaymentView,
+  type CreditActivityEntry,
+  type IntentRow,
+  type PaymentReview,
+  type PaymentRow,
+  type PaymentView,
+  type PendingPaymentSummary,
+  type InvitationStatus,
+  type PurchaseIntentView,
+  type ReferralsView,
+} from './payment-views';
+
+export type {
+  CreditActivityEntry,
+  InvitationStatus,
+  PaymentReview,
+  PaymentView,
+  PendingPaymentSummary,
+  PurchaseIntentView,
+  ReferralsView,
+} from './payment-views';
+import {
+  scheduleReceiptDeletion,
+  settleReservation,
+} from './purchase-intent-settlement';
+import { invoiceColumns, type InvoiceData } from './invoice-data/invoice-data';
+import {
+  evaluatePurchaseEligibility,
+  isSubscriptionEffective,
+} from './purchase-eligibility';
+import {
+  expireSubscription,
+  loadActiveSubscription,
+  notifyPaymentConfirmed,
+} from './subscription-allocation';
+
 import { grantGiftClass } from './allowance-adjustments';
 import { createFrontDeskTransfer } from './front-desk-transfer';
+import {
+  grantFounderPlace,
+  priceFounderSale,
+  readIsFounder,
+} from './prisma-founder-membership';
+import {
+  collectOwedInviteReward,
+  grantInviteReward,
+} from './grant-invite-reward';
 import { hasEarlierRealPayment } from './gift-class-history';
 
 type Transaction = Prisma.TransactionClient;
-
-export type PurchaseIntentView = {
-  id: string;
-  planId: string;
-  planName: string;
-  durationDays: number;
-  durationMonths: number;
-  classAllowance: number;
-  planPriceCentavos: number;
-  creditReservedCentavos: number;
-  amountDueCentavos: number;
-  state: 'open' | 'submitted' | 'expired';
-  receiptAttached: boolean;
-  createdAt: Date;
-  expiresAt: Date;
-  startsOn: string;
-};
-
-export type PaymentView = {
-  id: string;
-  method: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
-  state: 'pending' | 'confirmed' | 'rejected' | 'voided';
-  planId: string;
-  planName: string;
-  durationDays: number;
-  durationMonths: number;
-  classAllowance: number;
-  planPriceCentavos: number;
-  creditAppliedCentavos: number;
-  amountDueCentavos: number;
-  startsOn: string;
-  submittedAt: Date;
-  decidedAt: Date | null;
-  rejectionReason: string | null;
-  subscriptionId: string | null;
-};
-
-export type CreditActivityEntry = {
-  id: string;
-  kind:
-    | 'referral_award'
-    | 'payment_reservation'
-    | 'payment_spend'
-    | 'payment_release';
-  amountCentavos: number;
-  occurredAt: Date;
-};
-
-export type ReferralsView = {
-  referralCode: string;
-  referrals: {
-    referredClientId: string;
-    referredName: string;
-    state: 'pending' | 'awarded';
-    createdAt: Date;
-    awardedAt: Date | null;
-    awardCentavos: number | null;
-  }[];
-};
-
-const creditActivityLimit = 20;
-
-export type PendingPaymentSummary = {
-  id: string;
-  clientName: string;
-  planName: string;
-  amountDueCentavos: number;
-  submittedAt: Date;
-  receiptAvailable: boolean;
-};
-
-export type PaymentReview = PaymentView & {
-  clientName: string;
-  receipt: { imageAssetId: string; mediaType: string } | null;
-};
 
 const mediaTypes: Record<ImageMediaType, string> = {
   [ImageMediaType.JPEG]: 'image/jpeg',
@@ -142,7 +105,6 @@ const abbreviateName = (name: string): string => {
 
 export type PaymentCommandsDependencies = {
   now: () => Date;
-  referralRewardCentavos: number;
   recordNotification?: NotificationRecorder;
 };
 
@@ -151,105 +113,6 @@ const purchaseIntentLifetimeMilliseconds = 24 * hourMilliseconds;
 // Retained at least 48 hours after the Intent's 24-hour lifetime ends.
 const idempotencyRetentionMilliseconds = 72 * hourMilliseconds;
 const rejectionReasonMaxLength = 300;
-
-const intentStates: Record<PurchaseIntentState, PurchaseIntentView['state']> = {
-  [PurchaseIntentState.OPEN]: 'open',
-  [PurchaseIntentState.SUBMITTED]: 'submitted',
-  [PurchaseIntentState.EXPIRED]: 'expired',
-};
-const paymentMethods: Record<PaymentMethod, PaymentView['method']> = {
-  [PaymentMethod.TRANSFER]: 'transfer',
-  [PaymentMethod.CASH]: 'cash',
-  [PaymentMethod.CREDIT_ONLY]: 'credit_only',
-  [PaymentMethod.COURTESY]: 'courtesy',
-};
-const paymentStates: Record<PaymentState, PaymentView['state']> = {
-  [PaymentState.PENDING]: 'pending',
-  [PaymentState.CONFIRMED]: 'confirmed',
-  [PaymentState.REJECTED]: 'rejected',
-  [PaymentState.VOIDED]: 'voided',
-};
-
-const intentSelect = {
-  id: true,
-  clientId: true,
-  planId: true,
-  planNameSnapshot: true,
-  durationDaysSnapshot: true,
-  weeklyClassCapSnapshot: true,
-  classAllowanceSnapshot: true,
-  planPriceCentavos: true,
-  creditReservedCentavos: true,
-  amountDueCentavos: true,
-  startsOn: true,
-  receiptImageAssetId: true,
-  state: true,
-  createdAt: true,
-  expiresAt: true,
-} as const;
-
-const paymentSelect = {
-  id: true,
-  clientId: true,
-  planId: true,
-  purchaseIntentId: true,
-  planNameSnapshot: true,
-  durationDaysSnapshot: true,
-  weeklyClassCapSnapshot: true,
-  classAllowanceSnapshot: true,
-  planPriceCentavos: true,
-  creditAppliedCentavos: true,
-  amountDueCentavos: true,
-  startsOn: true,
-  method: true,
-  state: true,
-  submittedAt: true,
-  decidedAt: true,
-  rejectionReason: true,
-  subscription: { select: { id: true } },
-  plan: { select: { hiddenAt: true } },
-} as const;
-
-type IntentRow = Prisma.PurchaseIntentGetPayload<{
-  select: typeof intentSelect;
-}>;
-type PaymentRow = Prisma.PaymentGetPayload<{ select: typeof paymentSelect }>;
-
-const toIntentView = (row: IntentRow): PurchaseIntentView => ({
-  id: row.id,
-  planId: row.planId,
-  planName: row.planNameSnapshot,
-  durationDays: row.durationDaysSnapshot,
-  durationMonths: deprecatedDurationMonths(row.durationDaysSnapshot),
-  classAllowance: row.classAllowanceSnapshot,
-  planPriceCentavos: row.planPriceCentavos,
-  creditReservedCentavos: row.creditReservedCentavos,
-  amountDueCentavos: row.amountDueCentavos,
-  state: intentStates[row.state],
-  receiptAttached: row.receiptImageAssetId !== null,
-  createdAt: row.createdAt,
-  expiresAt: row.expiresAt,
-  startsOn: row.startsOn.toISOString().slice(0, 10),
-});
-
-const toPaymentView = (row: PaymentRow): PaymentView => ({
-  id: row.id,
-  method: paymentMethods[row.method],
-  state: paymentStates[row.state],
-  planId: row.planId,
-  planName: row.planNameSnapshot,
-  durationDays: row.durationDaysSnapshot,
-  durationMonths: deprecatedDurationMonths(row.durationDaysSnapshot),
-  classAllowance: row.classAllowanceSnapshot,
-  planPriceCentavos: row.planPriceCentavos,
-  creditAppliedCentavos: row.creditAppliedCentavos,
-  amountDueCentavos: row.amountDueCentavos,
-  startsOn: row.startsOn.toISOString().slice(0, 10),
-  submittedAt: row.submittedAt,
-  decidedAt: row.decidedAt,
-  rejectionReason: row.rejectionReason,
-  subscriptionId: row.subscription?.id ?? null,
-});
 
 const requireClient = (principal: AuthenticatedPrincipal): string => {
   if (principal.identity.kind !== 'client') {
@@ -272,35 +135,6 @@ const isUniqueViolation = (error: unknown): boolean =>
   error !== null &&
   'code' in error &&
   error.code === 'P2002';
-
-const uniqueDetail = (error: unknown): string => {
-  if (!isUniqueViolation(error)) return '';
-  const known = error as {
-    message?: string;
-    meta?: { target?: unknown; driverAdapterError?: { message?: string } };
-  };
-  const target = Array.isArray(known.meta?.target)
-    ? known.meta.target.join(',')
-    : '';
-  return `${target} ${known.message ?? ''} ${known.meta?.driverAdapterError?.message ?? ''}`;
-};
-
-const raiseUniqueSaleConflict = (error: unknown): never => {
-  const detail = uniqueDetail(error);
-  if (
-    detail.includes('subscriptions_one_future') ||
-    detail.includes('a future subscription already exists')
-  ) {
-    throw rule(
-      'future_subscription_exists',
-      'A future Subscription already exists',
-    );
-  }
-  throw rule(
-    'purchase_intent_open_exists',
-    'An open Purchase Intent already exists',
-  );
-};
 
 const hashRequest = (request: unknown): Uint8Array<ArrayBuffer> =>
   toPrismaBytes(createHash('sha256').update(JSON.stringify(request)).digest());
@@ -338,22 +172,6 @@ export function createPrismaPaymentCommands(
     for (const clientId of [...new Set(clientIds)].sort()) {
       await transaction.$queryRaw`SELECT "id" FROM "booking"."clients" WHERE "id" = ${clientId}::uuid FOR UPDATE`;
     }
-  };
-
-  const readLedgerSummary = async (
-    transaction: Transaction,
-    clientId: string,
-  ): Promise<CreditSummary> => {
-    const entries = await transaction.creditLedgerEntry.findMany({
-      where: { clientId },
-      select: { kind: true, amountCentavos: true },
-    });
-    return summarizeCredit(
-      entries.map((entry) => ({
-        kind: entry.kind.toLowerCase() as Lowercase<CreditLedgerEntryKind>,
-        amountCentavos: entry.amountCentavos,
-      })),
-    );
   };
 
   const withIdempotency = async <Result extends Prisma.InputJsonValue>(
@@ -405,22 +223,6 @@ export function createPrismaPaymentCommands(
     });
     return result;
   };
-
-  const loadActiveSubscription = (
-    transaction: Transaction,
-    clientId: string,
-    now: Date,
-  ) => sharedLoadActiveSubscription(transaction, clientId, now);
-
-  const expireSubscription = (
-    transaction: Transaction,
-    subscriptionId: string,
-    now: Date,
-  ) =>
-    transaction.subscription.update({
-      where: { id: subscriptionId },
-      data: { state: SubscriptionState.EXPIRED, expiredAt: now },
-    });
 
   // Eligibility reloads the effective Subscription, open Intent, pending
   // Payment, and Plan inside the locked transaction; a Subscription that no
@@ -578,8 +380,9 @@ export function createPrismaPaymentCommands(
     });
   };
 
-  // A confirmed Payment activates exactly one Subscription and qualifies the
-  // Client's pending Referral, awarding the referrer once.
+  // A confirmed Payment activates exactly one Subscription. It awards no
+  // Credit: the Bs 60 Referral reward is retired (booking ADR-0009), so a
+  // pending Referral stays pending.
   const activateSubscription = async (
     transaction: Transaction,
     payment: PaymentRow,
@@ -608,37 +411,26 @@ export function createPrismaPaymentCommands(
       select: { id: true },
     });
 
-    const referral = await transaction.referral.findFirst({
-      where: {
-        referredClientId: payment.clientId,
-        state: ReferralState.PENDING,
-      },
-      select: { id: true, referrerClientId: true },
+    // A pending Referral stays pending. Awarding it requires a Credit ledger
+    // entry (booking.referrals_state_fields_check), and Credit is retired
+    // (PAY-005). The host's reward is the guest-pass class below.
+    const author = {
+      accountId: principal.accountId,
+      role: auditActorOf(principal).role,
+    };
+    await collectOwedInviteReward(transaction, {
+      hostClientId: payment.clientId,
+      subscriptionId: subscription.id,
+      author,
+      now,
+      correlationId: payment.id,
     });
-    if (referral !== null) {
-      await transaction.referral.update({
-        where: { id: referral.id },
-        data: {
-          state: ReferralState.AWARDED,
-          qualifiedPaymentId: payment.id,
-          qualifiedAt: now,
-          awardCentavos: dependencies.referralRewardCentavos,
-          awardedAt: now,
-        },
-      });
-      await transaction.creditLedgerEntry.create({
-        data: {
-          clientId: referral.referrerClientId,
-          kind: CreditLedgerEntryKind.REFERRAL_AWARD,
-          amountCentavos: dependencies.referralRewardCentavos,
-          occurredAt: now,
-          referralId: referral.id,
-          actorKind: CreditLedgerActorKind.ACCOUNT,
-          actorAccountId: principal.accountId,
-          correlationId: payment.id,
-        },
-      });
-    }
+    await grantInviteReward(transaction, {
+      friendClientId: payment.clientId,
+      author,
+      now,
+      correlationId: payment.id,
+    });
 
     await grantGiftClass(transaction, {
       clientId: payment.clientId,
@@ -647,8 +439,7 @@ export function createPrismaPaymentCommands(
       method: paymentMethods[payment.method],
       hidden: payment.plan.hiddenAt !== null,
       priceCentavos: payment.planPriceCentavos,
-      // BKM-010 makes the Founder Membership real; until then nobody is one.
-      founder: false,
+      founder: await readIsFounder(transaction, payment.clientId),
       earlierRealPayment: await hasEarlierRealPayment(transaction, {
         clientId: payment.clientId,
         paymentId: payment.id,
@@ -659,32 +450,6 @@ export function createPrismaPaymentCommands(
     });
 
     return subscription.id;
-  };
-
-  const notifyPaymentConfirmed = async (
-    transaction: Transaction,
-    input: {
-      clientId: string;
-      paymentId: string;
-      subscriptionId: string;
-      now: Date;
-    },
-  ): Promise<void> => {
-    const client = await transaction.client.findUniqueOrThrow({
-      where: { id: input.clientId },
-      select: { account: { select: { id: true } } },
-    });
-    if (client.account === null) return;
-    await recordNotification(transaction, {
-      accountId: client.account.id,
-      category: 'subscription_payment',
-      type: 'payment_confirmed',
-      businessEventKey: `payment-confirmed:${input.paymentId}`,
-      title: 'Pago confirmado',
-      message: 'Tu pago fue confirmado. ¡Ya puedes reservar clases!',
-      destination: { type: 'subscription', id: input.subscriptionId },
-      occurredAt: input.now,
-    });
   };
 
   const requireCashCollector = (
@@ -709,51 +474,38 @@ export function createPrismaPaymentCommands(
     }
   };
 
-  // Cash and Credit-only Payments are created confirmed by their submitter:
-  // Credit is reserved and spent in the same transaction, the Subscription
-  // activates, and any pending Referral is awarded.
-  const settleImmediatePayment = async (
+  // A cash Payment is created confirmed by its collector for the full Plan
+  // price, and the Subscription activates at once.
+  const settleCashPayment = async (
     transaction: Transaction,
     input: {
       clientId: string;
       planId: string;
       startsOn?: string;
       principal: AuthenticatedPrincipal;
-      branchId: string | null;
-      requireFullCredit: boolean;
+      branchId: string;
+      invoiceData?: InvoiceData | null;
     },
   ): Promise<{ id: string }> => {
     const now = dependencies.now();
-    const referral = await transaction.referral.findFirst({
-      where: { referredClientId: input.clientId, state: ReferralState.PENDING },
-      select: { referrerClientId: true },
-    });
-    await lockClients(transaction, [
-      input.clientId,
-      ...(referral ? [referral.referrerClientId] : []),
-    ]);
+    await lockClients(transaction, [input.clientId]);
     const eligible = await assertEligible(transaction, {
       clientId: input.clientId,
       planId: input.planId,
     });
-    const plan = eligible.plan;
+    const { plan } = eligible;
     const allocated = await committedStartDate(transaction, {
       clientId: input.clientId,
       requested: parseRequestedStartDate(input.startsOn),
       today: eligible.today,
       active: eligible.active,
     });
-    const credit = await readLedgerSummary(transaction, input.clientId);
-    if (
-      input.requireFullCredit &&
-      credit.availableCentavos < plan.priceCentavos
-    ) {
-      throw rule('credit_insufficient', 'Credit does not cover the Plan price');
-    }
-    const applied = Math.min(credit.availableCentavos, plan.priceCentavos);
-    const amountDue = plan.priceCentavos - applied;
-    const method =
-      amountDue === 0 ? PaymentMethod.CREDIT_ONLY : PaymentMethod.CASH;
+    const priced = await priceFounderSale(transaction, {
+      clientId: input.clientId,
+      classAllowance: plan.classAllowance,
+      priceCentavos: plan.priceCentavos,
+      creditAppliedCentavos: 0,
+    });
 
     const payment = await transaction.payment.create({
       data: {
@@ -764,52 +516,23 @@ export function createPrismaPaymentCommands(
         weeklyClassCapSnapshot: plan.weeklyClassCap,
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: plan.priceCentavos,
-        creditAppliedCentavos: applied,
-        amountDueCentavos: amountDue,
+        creditAppliedCentavos: 0,
+        discountCentavos: priced.discountCentavos,
+        discountReason: priced.discountReason,
+        amountDueCentavos: priced.amountDueCentavos,
         startsOn: allocated.startsOn,
-        method,
+        method: PaymentMethod.CASH,
         state: PaymentState.CONFIRMED,
-        collectedAtBranchId:
-          method === PaymentMethod.CASH ? input.branchId : null,
+        collectedAtBranchId: input.branchId,
         submittedByAccountId: input.principal.accountId,
         submittedAt: now,
         decidedByAccountId: input.principal.accountId,
         decidedAt: now,
         createdAt: now,
+        ...invoiceColumns(input.invoiceData),
       },
       select: paymentSelect,
     });
-
-    if (applied > 0) {
-      const reservation = await transaction.creditReservation.create({
-        data: {
-          clientId: input.clientId,
-          amountCentavos: applied,
-          paymentId: payment.id,
-          state: CreditReservationState.SPENT,
-          reservedAt: now,
-          settledAt: now,
-        },
-        select: { id: true },
-      });
-      for (const kind of [
-        CreditLedgerEntryKind.PAYMENT_RESERVATION,
-        CreditLedgerEntryKind.PAYMENT_SPEND,
-      ]) {
-        await transaction.creditLedgerEntry.create({
-          data: {
-            clientId: input.clientId,
-            kind,
-            amountCentavos: applied,
-            occurredAt: now,
-            reservationId: reservation.id,
-            actorKind: CreditLedgerActorKind.ACCOUNT,
-            actorAccountId: input.principal.accountId,
-            correlationId: payment.id,
-          },
-        });
-      }
-    }
 
     if (
       allocated.subscriptionIdToEndEarly !== null &&
@@ -830,19 +553,22 @@ export function createPrismaPaymentCommands(
       input.principal,
       now,
     );
+    await grantFounderPlace(transaction, {
+      clientId: input.clientId,
+      paymentId: payment.id,
+      now,
+      courtesy: false,
+    });
     await recordPaymentAudit(transaction, {
-      actionCode:
-        method === PaymentMethod.CASH
-          ? 'payment.cash_confirmed'
-          : 'payment.credit_only_confirmed',
+      actionCode: 'payment.cash_confirmed',
       principal: input.principal,
       payment,
       priorState: null,
       newState: 'confirmed',
-      branchId: method === PaymentMethod.CASH ? input.branchId : null,
+      branchId: input.branchId,
       now,
     });
-    await notifyPaymentConfirmed(transaction, {
+    await notifyPaymentConfirmed(recordNotification, transaction, {
       clientId: input.clientId,
       paymentId: payment.id,
       subscriptionId,
@@ -858,75 +584,46 @@ export function createPrismaPaymentCommands(
       planId: string;
       branchId: string;
       startsOn?: string;
+      invoiceData?: InvoiceData | null;
     },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ): Promise<PaymentView> => {
     requireCashCollector(principal, command.branchId);
 
-    try {
-      const stored = await serializable((transaction) =>
-        withIdempotency(
-          transaction,
-          {
-            accountId: principal.accountId,
-            command: 'record_cash_payment',
-            idempotencyKey,
-            request: command,
-          },
-          () =>
-            settleImmediatePayment(transaction, {
-              clientId: command.clientId,
-              planId: command.planId,
-              startsOn: command.startsOn,
-              principal,
-              branchId: command.branchId,
-              requireFullCredit: false,
-            }),
-        ),
-      );
+    const stored = await serializable((transaction) =>
+      withIdempotency(
+        transaction,
+        {
+          accountId: principal.accountId,
+          command: 'record_cash_payment',
+          idempotencyKey,
+          request: command,
+        },
+        () =>
+          settleCashPayment(transaction, {
+            clientId: command.clientId,
+            planId: command.planId,
+            startsOn: command.startsOn,
+            principal,
+            branchId: command.branchId,
+            invoiceData: command.invoiceData,
+          }),
+      ),
+    );
 
-      return readPaymentView(stored.id);
-    } catch (error) {
-      if (isUniqueViolation(error)) raiseUniqueSaleConflict(error);
-      throw error;
-    }
+    return readPaymentView(stored.id);
   };
 
-  const completeCreditPurchase = async (
-    command: { planId: string; startsOn?: string },
+  // Deprecated with Credit (PAY-005): a store build from before it calls this
+  // only when Credit covers the price, which it no longer ever does.
+  const completeCreditPurchase = (
     principal: AuthenticatedPrincipal,
-    idempotencyKey: string,
   ): Promise<PaymentView> => {
-    const clientId = requireClient(principal);
-
-    try {
-      const stored = await serializable((transaction) =>
-        withIdempotency(
-          transaction,
-          {
-            accountId: principal.accountId,
-            command: 'complete_credit_purchase',
-            idempotencyKey,
-            request: command,
-          },
-          () =>
-            settleImmediatePayment(transaction, {
-              clientId,
-              planId: command.planId,
-              startsOn: command.startsOn,
-              principal,
-              branchId: null,
-              requireFullCredit: true,
-            }),
-        ),
-      );
-
-      return readPaymentView(stored.id);
-    } catch (error) {
-      if (isUniqueViolation(error)) raiseUniqueSaleConflict(error);
-      throw error;
-    }
+    requireClient(principal);
+    return Promise.reject(
+      rule('credit_insufficient', 'Credit was retired and covers no Plan'),
+    );
   };
 
   const readPaymentView = async (paymentId: string): Promise<PaymentView> =>
@@ -970,7 +667,7 @@ export function createPrismaPaymentCommands(
               clientId,
               planId: command.planId,
             });
-            const plan = eligible.plan;
+            const { plan } = eligible;
             const allocated = await committedStartDate(transaction, {
               clientId,
               requested: parseRequestedStartDate(command.startsOn),
@@ -978,11 +675,12 @@ export function createPrismaPaymentCommands(
               active: eligible.active,
             });
             const now = dependencies.now();
-            const credit = await readLedgerSummary(transaction, clientId);
-            const reserved = Math.min(
-              credit.availableCentavos,
-              plan.priceCentavos,
-            );
+            const priced = await priceFounderSale(transaction, {
+              clientId,
+              classAllowance: plan.classAllowance,
+              priceCentavos: plan.priceCentavos,
+              creditAppliedCentavos: 0,
+            });
 
             const intent = await transaction.purchaseIntent.create({
               data: {
@@ -993,8 +691,10 @@ export function createPrismaPaymentCommands(
                 weeklyClassCapSnapshot: plan.weeklyClassCap,
                 classAllowanceSnapshot: plan.classAllowance,
                 planPriceCentavos: plan.priceCentavos,
-                creditReservedCentavos: reserved,
-                amountDueCentavos: plan.priceCentavos - reserved,
+                creditReservedCentavos: 0,
+                discountCentavos: priced.discountCentavos,
+                discountReason: priced.discountReason,
+                amountDueCentavos: priced.amountDueCentavos,
                 startsOn: allocated.startsOn,
                 createdByAccountId: principal.accountId,
                 createdAt: now,
@@ -1005,30 +705,6 @@ export function createPrismaPaymentCommands(
               select: { id: true },
             });
 
-            if (reserved > 0) {
-              const reservation = await transaction.creditReservation.create({
-                data: {
-                  clientId,
-                  amountCentavos: reserved,
-                  purchaseIntentId: intent.id,
-                  reservedAt: now,
-                },
-                select: { id: true },
-              });
-              await transaction.creditLedgerEntry.create({
-                data: {
-                  clientId,
-                  kind: CreditLedgerEntryKind.PAYMENT_RESERVATION,
-                  amountCentavos: reserved,
-                  occurredAt: now,
-                  reservationId: reservation.id,
-                  actorKind: CreditLedgerActorKind.ACCOUNT,
-                  actorAccountId: principal.accountId,
-                  correlationId: intent.id,
-                },
-              });
-            }
-
             return { id: intent.id };
           },
         ),
@@ -1036,7 +712,12 @@ export function createPrismaPaymentCommands(
 
       return readIntentView(stored.id);
     } catch (error) {
-      if (isUniqueViolation(error)) raiseUniqueSaleConflict(error);
+      if (isUniqueViolation(error)) {
+        throw rule(
+          'purchase_intent_open_exists',
+          'An open Purchase Intent already exists',
+        );
+      }
       throw error;
     }
   };
@@ -1150,7 +831,7 @@ export function createPrismaPaymentCommands(
   };
 
   const submitTransfer = async (
-    command: { purchaseIntentId: string },
+    command: { purchaseIntentId: string; invoiceData?: InvoiceData | null },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ): Promise<PaymentView> => {
@@ -1193,6 +874,8 @@ export function createPrismaPaymentCommands(
               classAllowanceSnapshot: intent.classAllowanceSnapshot,
               planPriceCentavos: intent.planPriceCentavos,
               creditAppliedCentavos: intent.creditReservedCentavos,
+              discountCentavos: intent.discountCentavos,
+              discountReason: intent.discountReason,
               amountDueCentavos: intent.amountDueCentavos,
               startsOn: intent.startsOn,
               method: PaymentMethod.TRANSFER,
@@ -1200,6 +883,7 @@ export function createPrismaPaymentCommands(
               submittedByAccountId: principal.accountId,
               submittedAt: now,
               createdAt: now,
+              ...invoiceColumns(command.invoiceData),
             },
             select: { id: true },
           });
@@ -1294,17 +978,7 @@ export function createPrismaPaymentCommands(
       }
 
       const now = dependencies.now();
-      const referral = await transaction.referral.findFirst({
-        where: {
-          referredClientId: payment.clientId,
-          state: ReferralState.PENDING,
-        },
-        select: { referrerClientId: true },
-      });
-      await lockClients(transaction, [
-        payment.clientId,
-        ...(referral ? [referral.referrerClientId] : []),
-      ]);
+      await lockClients(transaction, [payment.clientId]);
 
       const active = await loadActiveSubscription(
         transaction,
@@ -1384,6 +1058,12 @@ export function createPrismaPaymentCommands(
         principal,
         now,
       );
+      await grantFounderPlace(transaction, {
+        clientId: payment.clientId,
+        paymentId: payment.id,
+        now,
+        courtesy: false,
+      });
       await recordPaymentAudit(transaction, {
         actionCode: 'payment.transfer_confirmed',
         principal,
@@ -1402,7 +1082,7 @@ export function createPrismaPaymentCommands(
         now,
         true,
       );
-      await notifyPaymentConfirmed(transaction, {
+      await notifyPaymentConfirmed(recordNotification, transaction, {
         clientId: payment.clientId,
         paymentId: payment.id,
         subscriptionId,
@@ -1528,26 +1208,20 @@ export function createPrismaPaymentCommands(
     return payment === null ? null : toPaymentView(payment);
   };
 
+  // Credit is retired (booking ADR-0009): store builds from before PAY-005
+  // still read it, so it reads as zero with no activity; old ledger rows stay.
   const readCreditSummary = (
     principal: AuthenticatedPrincipal,
-  ): Promise<CreditSummary> =>
-    readLedgerSummary(prisma, requireClient(principal));
+  ): Promise<CreditSummary> => {
+    requireClient(principal);
+    return Promise.resolve({ availableCentavos: 0, reservedCentavos: 0 });
+  };
 
-  const readCreditActivity = async (
+  const readCreditActivity = (
     principal: AuthenticatedPrincipal,
   ): Promise<CreditActivityEntry[]> => {
-    const entries = await prisma.creditLedgerEntry.findMany({
-      where: { clientId: requireClient(principal) },
-      orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
-      take: creditActivityLimit,
-      select: { id: true, kind: true, amountCentavos: true, occurredAt: true },
-    });
-    return entries.map((entry) => ({
-      id: entry.id,
-      kind: entry.kind.toLowerCase() as CreditActivityEntry['kind'],
-      amountCentavos: entry.amountCentavos,
-      occurredAt: entry.occurredAt,
-    }));
+    requireClient(principal);
+    return Promise.resolve([]);
   };
 
   // Referred Clients appear as first name plus surname initial only.
@@ -1568,21 +1242,42 @@ export function createPrismaPaymentCommands(
           createdAt: true,
           awardedAt: true,
           awardCentavos: true,
-          referred: { select: { id: true, name: true } },
+          referred: {
+            select: {
+              id: true,
+              name: true,
+              guestPassesReceived: {
+                where: { deletedAt: null },
+                select: { bookingId: true, rewardedAt: true, rewardOwed: true },
+                take: 1,
+              },
+            },
+          },
         },
       }),
     ]);
 
     return {
       referralCode: client.referralCode,
-      referrals: referrals.map((referral) => ({
-        referredClientId: referral.referred.id,
-        referredName: abbreviateName(referral.referred.name),
-        state: referral.state === ReferralState.AWARDED ? 'awarded' : 'pending',
-        createdAt: referral.createdAt,
-        awardedAt: referral.awardedAt,
-        awardCentavos: referral.awardCentavos,
-      })),
+      referrals: referrals.map((referral) => {
+        const pass = referral.referred.guestPassesReceived[0] ?? null;
+        const invitationStatus: InvitationStatus = (() => {
+          if (pass === null) return 'registered';
+          if (pass.rewardedAt !== null || pass.rewardOwed) return 'bought';
+          if (pass.bookingId !== null) return 'class_booked';
+          return 'registered';
+        })();
+        return {
+          referredClientId: referral.referred.id,
+          referredName: abbreviateName(referral.referred.name),
+          state:
+            referral.state === ReferralState.AWARDED ? 'awarded' : 'pending',
+          invitationStatus,
+          createdAt: referral.createdAt,
+          awardedAt: referral.awardedAt,
+          awardCentavos: referral.awardCentavos,
+        };
+      }),
     };
   };
 

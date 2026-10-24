@@ -66,7 +66,6 @@ describe('voided sale on the Administrator payment list (PostgreSQL)', () => {
     });
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => today,
-      referralRewardCentavos: 0,
     });
     const sale = await commands.recordCashPayment(
       { clientId: client.id, planId: plan.id, branchId: branch.id },

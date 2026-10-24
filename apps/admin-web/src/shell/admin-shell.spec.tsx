@@ -32,8 +32,12 @@ describe("admin shell", () => {
         "Planes",
         "Sucursales",
         "Clientes",
+        "Para contactar",
+        "Fundadoras",
         "Pagos",
+        "Caja",
         "Insumos",
+        "Equipos",
         "Evaluaciones nutricionales",
         "Personal",
         "Nómina",
@@ -42,7 +46,7 @@ describe("admin shell", () => {
         "Reporte",
         "Promociones",
         "Referidos",
-        "Créditos",
+        "Comentarios",
       ]);
       expect(within(sidebar).getByText("Catálogo")).toBeInTheDocument();
       expect(within(sidebar).getByText("Back Office")).toBeInTheDocument();

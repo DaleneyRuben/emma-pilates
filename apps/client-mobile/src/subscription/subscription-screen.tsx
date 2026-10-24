@@ -82,7 +82,7 @@ export function SubscriptionScreen() {
     );
   }
 
-  const { status, subscription, nextSubscription } = view.data.data;
+  const { status, subscription, nextSubscription, founderRenewalDeadline } = view.data.data;
 
   if (status === "none" || subscription === null || subscription === undefined) {
     return (
@@ -104,6 +104,13 @@ export function SubscriptionScreen() {
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
+        {founderRenewalDeadline == null ? null : (
+          <View style={styles.founderBanner}>
+            <Text style={styles.founderBannerText}>
+              {`Renueva antes del ${formatCivilDateWithYear(founderRenewalDeadline)}.`}
+            </Text>
+          </View>
+        )}
         {status === "expiring_soon" ? (
           <View style={styles.warning}>
             <Text style={styles.warningText}>
@@ -213,6 +220,12 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     textAlign: "right",
   },
+  founderBanner: {
+    backgroundColor: "rgba(124,148,115,0.14)",
+    borderRadius: radii.inset,
+    padding: spacing.md,
+  },
+  founderBannerText: { color: colors.successText, fontSize: typography.note, fontWeight: "600" },
   expiredDate: { color: colors.errorText },
   note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   purchase: { gap: spacing.sm },

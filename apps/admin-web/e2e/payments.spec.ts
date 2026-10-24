@@ -46,9 +46,9 @@ test("confirms one transfer and rejects another with a reason", async ({
     ),
   ).toBeVisible();
   await expect(panel).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Mariana Peña" })).toHaveCount(
-    0,
-  );
+  await expect(
+    page.getByRole("button", { name: "Mariana Peña", exact: true }),
+  ).toHaveCount(0);
   await expect(
     page.getByText("Todo el estudio · 1 transferencia esperando revisión"),
   ).toBeVisible();
@@ -75,7 +75,7 @@ test("confirms one transfer and rejects another with a reason", async ({
   await expect(mariana.getByText("Confirmado")).toBeVisible();
   const sofia = page.getByRole("row", { name: /Sofía Guzmán/ });
   await expect(sofia.getByText("Rechazado")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Mariana Peña" })).toHaveCount(
-    0,
-  );
+  await expect(
+    page.getByRole("button", { name: "Mariana Peña", exact: true }),
+  ).toHaveCount(0);
 });

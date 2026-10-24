@@ -192,6 +192,23 @@ describe('changeStaffBranches', () => {
     expect(transaction.replaceBranches).not.toHaveBeenCalled();
   });
 
+  it('refuses Branch changes for a Coordinator, who holds every Branch', async () => {
+    const transaction = createTransaction({
+      findStaffMember: jest
+        .fn()
+        .mockResolvedValue(record({ role: 'coordinator', branchIds: [] })),
+    });
+
+    await rejectsWith(
+      changeStaffBranches(
+        { staffMemberId: 'staff-1', branchIds: ['centro'] },
+        administrator,
+        dependencies(transaction),
+      ),
+      'invalid_branch_assignment',
+    );
+  });
+
   it('refuses Branch changes for an Administrator', async () => {
     const transaction = createTransaction({
       findStaffMember: jest

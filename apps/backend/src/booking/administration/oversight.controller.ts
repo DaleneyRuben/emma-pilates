@@ -30,9 +30,9 @@ import {
   type AdministrationOperations,
 } from './administration-http';
 import {
-  AdminCreditPageDto,
   AdminEvaluationPageDto,
   AdminReferralPageDto,
+  FounderMembershipPageDto,
   IncomeReportDto,
   parseEvaluationListQuery,
   parseIncomeQuery,
@@ -120,20 +120,15 @@ export class AdministratorOversightController extends AdministrationController {
     return run(() => this.operations.oversight.listReferrals(input, principal));
   }
 
-  @Get('credits')
-  @ApiOperation({ operationId: 'listAdminCredits' })
-  @ApiQuery({ name: 'query', required: false })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number })
-  @ApiOkResponse({ type: AdminCreditPageDto })
+  @Get('founder-memberships')
+  @ApiOperation({ operationId: 'listFounderMemberships' })
+  @ApiOkResponse({ type: FounderMembershipPageDto })
   @Header('Cache-Control', 'no-store')
-  async credits(
+  async founders(
     @Headers('authorization') authorization: string | undefined,
-    @Query() query: unknown,
-  ): Promise<AdminCreditPageDto> {
-    const input = parsed(parseSearchListQuery(query), 'Invalid Credit filters');
+  ): Promise<FounderMembershipPageDto> {
     const principal = await this.authenticate(authorization);
-    return run(() => this.operations.oversight.listCredits(input, principal));
+    return run(() => this.operations.oversight.listFounders(principal));
   }
 
   @Get('reports/income')

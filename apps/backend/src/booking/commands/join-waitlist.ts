@@ -1,3 +1,4 @@
+import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
 import { bookingBeforeStartMessage } from './booking-before-start';
@@ -62,9 +63,8 @@ const resolveClientId = (
   }
 
   if (
-    principal.identity.role !== 'assistant' ||
     command.clientId === undefined ||
-    !principal.identity.branchIds.includes(session.branchId)
+    !actsForClientsAt(principal, session.branchId)
   ) {
     throw new BookingAccessDeniedError();
   }

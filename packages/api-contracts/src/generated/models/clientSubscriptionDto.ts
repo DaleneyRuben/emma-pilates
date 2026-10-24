@@ -16,4 +16,9 @@ export interface ClientSubscriptionDto {
    * @nullable
    */
   nextSubscription?: ClientSubscriptionSummaryDto | null;
+  /**
+   * A founder renews before this date. Absent when she is not a founder or has no current Subscription.
+   * @nullable
+   */
+  founderRenewalDeadline?: string | null;
 }

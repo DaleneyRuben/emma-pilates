@@ -1,5 +1,6 @@
 import {
   EvaluationState,
+  FounderMembershipStatus,
   PaymentMethod,
   PaymentState,
   ReferralState,
@@ -16,24 +17,15 @@ type Paging = { page: number; pageSize: number };
 
 const offset = ({ page, pageSize }: Paging) => (page - 1) * pageSize;
 
-const incomeMethodNames: Record<
-  Exclude<PaymentMethod, 'COURTESY'>,
+// Courtesy Access never counts as income (booking ADR-0012), so the income
+// report leaves courtesy Payments out.
+const methodNames: Record<
+  Exclude<PaymentMethod, typeof PaymentMethod.COURTESY>,
   'cash' | 'transfer' | 'credit_only'
 > = {
   [PaymentMethod.CASH]: 'cash',
   [PaymentMethod.TRANSFER]: 'transfer',
   [PaymentMethod.CREDIT_ONLY]: 'credit_only',
-};
-
-// AW27's "Última actividad": what the last ledger entry did to the balance.
-const creditMovements: Record<
-  string,
-  'earned' | 'reserved' | 'spent' | 'returned'
-> = {
-  referral_award: 'earned',
-  payment_reservation: 'reserved',
-  payment_spend: 'spent',
-  payment_release: 'returned',
 };
 
 // ADM-001 slices D and E: read-only oversight for AW25–AW27 and the income
@@ -181,74 +173,41 @@ export const createPrismaOversight = (
     };
   },
 
-  // Available Credit = awards + releases − reservations (PAY-001 ledger).
-  listCredits: async (
-    query: Paging & { query?: string },
-    principal: AuthenticatedPrincipal,
-  ) => {
+  // The 40 places, numbered in confirmation order. Administrator only
+  // (ADR-0102): the Coordinator never sees money.
+  listFounders: async (principal: AuthenticatedPrincipal) => {
     requireAdministrator(principal);
-    const pattern =
-      query.query === undefined || query.query.trim() === ''
-        ? null
-        : containsPattern(query.query);
-    const balances = await prisma.$queryRaw<
-      {
-        client_id: string;
-        name: string;
-        available: bigint;
-        last_movement_at: Date;
-        last_movement_kind: string;
-      }[]
-    >`
-      SELECT c.id AS client_id, c.name,
-             (SELECT last.kind::text
-              FROM booking.credit_ledger_entries last
-              WHERE last.client_id = c.id
-              ORDER BY last.occurred_at DESC, last.id DESC
-              LIMIT 1) AS last_movement_kind,
-             sum(CASE e.kind
-                   WHEN 'referral_award' THEN e.amount_centavos
-                   WHEN 'payment_release' THEN e.amount_centavos
-                   WHEN 'payment_reservation' THEN -e.amount_centavos
-                   ELSE 0 END) AS available,
-             max(e.occurred_at) AS last_movement_at
-      FROM booking.credit_ledger_entries e
-      JOIN booking.clients c ON c.id = e.client_id
-      GROUP BY c.id, c.name
-      HAVING sum(CASE e.kind
-                   WHEN 'referral_award' THEN e.amount_centavos
-                   WHEN 'payment_release' THEN e.amount_centavos
-                   WHEN 'payment_reservation' THEN -e.amount_centavos
-                   ELSE 0 END) > 0
-      ORDER BY c.name, c.id`;
-    const outstandingCentavos = balances.reduce(
-      (sum, row) => sum + Number(row.available),
-      0,
-    );
-    const matching = await (pattern === null
-      ? Promise.resolve(balances)
-      : prisma.$queryRaw<{ id: string }[]>`
-            SELECT id FROM booking.clients
-            WHERE booking.search_text(name) LIKE booking.search_text(${pattern})`.then(
-          (rows) => {
-            const ids = new Set(rows.map(({ id }) => id));
-            return balances.filter((row) => ids.has(row.client_id));
-          },
-        ));
+    const [rows, granted, settings] = await Promise.all([
+      prisma.founderMembership.findMany({
+        where: { deletedAt: null },
+        orderBy: { number: 'asc' },
+        select: {
+          id: true,
+          number: true,
+          since: true,
+          status: true,
+          client: { select: { name: true } },
+        },
+      }),
+      prisma.founderMembership.count({ where: { deletedAt: null } }),
+      prisma.studioSettingsVersion.findFirst({
+        orderBy: { version: 'desc' },
+        select: { founderPlaces: true },
+      }),
+    ]);
     return {
-      items: matching
-        .slice(offset(query), offset(query) + query.pageSize)
-        .map((row) => ({
-          clientId: row.client_id,
-          clientName: row.name,
-          availableCentavos: Number(row.available),
-          lastMovementAt: row.last_movement_at,
-          lastMovementKind: creditMovements[row.last_movement_kind] ?? 'earned',
-        })),
-      page: query.page,
-      pageSize: query.pageSize,
-      totalItems: matching.length,
-      outstandingCentavos,
+      items: rows.map((row) => ({
+        membershipId: row.id,
+        number: row.number,
+        clientName: row.client.name,
+        since: row.since,
+        status:
+          row.status === FounderMembershipStatus.ACTIVE
+            ? ('active' as const)
+            : ('lost' as const),
+      })),
+      granted,
+      places: settings?.founderPlaces ?? 40,
     };
   },
 
@@ -273,7 +232,15 @@ export const createPrismaOversight = (
           decidedAt: { gte: query.from, lt: query.until },
           ...branch,
         },
-        select: { method: true, amountDueCentavos: true, decidedAt: true },
+        select: {
+          id: true,
+          method: true,
+          planPriceCentavos: true,
+          discountCentavos: true,
+          discountReason: true,
+          amountDueCentavos: true,
+          decidedAt: true,
+        },
       }),
       // A voided sale leaves the totals and stays visible with its reason.
       prisma.payment.findMany({
@@ -294,22 +261,44 @@ export const createPrismaOversight = (
     ]);
     const byMethod = { cash: 0, transfer: 0, credit_only: 0 };
     const months = new Map<string, number>();
+    let listPriceCentavos = 0;
+    let discountCentavos = 0;
+    const sales: {
+      paymentId: string;
+      planPriceCentavos: number;
+      discountCentavos: number;
+      discountReason: string | null;
+      amountDueCentavos: number;
+    }[] = [];
     for (const payment of payments) {
-      // A courtesy grant is Bs 0 and never income, so it stays out of both.
       if (payment.method === PaymentMethod.COURTESY) continue;
-      byMethod[incomeMethodNames[payment.method]] += payment.amountDueCentavos;
+      byMethod[methodNames[payment.method]] += payment.amountDueCentavos;
+      listPriceCentavos += payment.planPriceCentavos;
+      discountCentavos += payment.discountCentavos;
       const month = `${boliviaDate(payment.decidedAt!).toISOString().slice(0, 7)}-01`;
       months.set(month, (months.get(month) ?? 0) + payment.amountDueCentavos);
+      if (payment.discountCentavos > 0) {
+        sales.push({
+          paymentId: payment.id,
+          planPriceCentavos: payment.planPriceCentavos,
+          discountCentavos: payment.discountCentavos,
+          discountReason: payment.discountReason,
+          amountDueCentavos: payment.amountDueCentavos,
+        });
+      }
     }
     return {
       from: query.from,
       until: query.until,
       branchId: query.branchId ?? null,
       totalCentavos: byMethod.cash + byMethod.transfer + byMethod.credit_only,
+      listPriceCentavos,
+      discountCentavos,
       byMethod,
       months: [...months.entries()]
         .sort(([left], [right]) => left.localeCompare(right))
         .map(([month, totalCentavos]) => ({ month, totalCentavos })),
+      sales,
       generatedAt: dependencies.now(),
       voided: voided.map((payment) => ({
         paymentId: payment.id,

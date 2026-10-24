@@ -1,4 +1,5 @@
 import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
+import { cashCloseSearchSchema } from "../back-office/cash-close/cash-close-search";
 import { expenseSearchSchema } from "../back-office/expenses/expense-search";
 import { payrollSearchSchema } from "../back-office/payroll/payroll-search";
 import { withdrawalSearchSchema } from "../back-office/supplies/supply-search";
@@ -22,6 +23,24 @@ const clientsRoute = createRoute({
   ),
 });
 
+const contactAlertsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/para-contactar",
+  component: lazyRouteComponent(
+    () => import("../people/contact-alerts/contact-alerts-route"),
+    "ContactAlertsRoute",
+  ),
+});
+
+const foundersRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/fundadoras",
+  component: lazyRouteComponent(
+    () => import("../oversight/founders/founders-route"),
+    "FoundersRoute",
+  ),
+});
+
 const staffRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/personal",
@@ -39,6 +58,17 @@ const paymentsRoute = createRoute({
   component: lazyRouteComponent(
     () => import("../payments/payments-route"),
     "PaymentsRoute",
+  ),
+});
+
+// AW151: the selected Branch's Cash Closes, one Bolivia month at a time.
+const cashClosesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/caja",
+  validateSearch: optionalSearch(cashCloseSearchSchema),
+  component: lazyRouteComponent(
+    () => import("../back-office/cash-close/cash-closes-route"),
+    "CashClosesRoute",
   ),
 });
 
@@ -60,6 +90,16 @@ const withdrawalsRoute = createRoute({
   component: lazyRouteComponent(
     () => import("../back-office/supplies/withdrawals-route"),
     "WithdrawalsRoute",
+  ),
+});
+
+// AW37 (BKO-004): one Branch's Equipment on one page, so no list search.
+const equipmentRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/equipos",
+  component: lazyRouteComponent(
+    () => import("../back-office/equipment/equipment-page"),
+    "EquipmentPage",
   ),
 });
 
@@ -96,9 +136,13 @@ const expenseCategoriesRoute = createRoute({
 
 export const backOfficeRoutes = [
   clientsRoute,
+  contactAlertsRoute,
+  foundersRoute,
   paymentsRoute,
+  cashClosesRoute,
   suppliesRoute,
   withdrawalsRoute,
+  equipmentRoute,
   staffRoute,
   payrollRoute,
   expensesRoute,
