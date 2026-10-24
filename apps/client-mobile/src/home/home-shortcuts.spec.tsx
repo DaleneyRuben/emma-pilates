@@ -89,7 +89,7 @@ describe("Client Home shortcut tiles", () => {
       fontFamily: "Lora_500Medium",
       fontSize: 16,
     });
-    expect(screen.getByText("Mis referidos")).toHaveStyle({
+    expect(screen.getByText("Invita a una amiga")).toHaveStyle({
       fontFamily: "Lora_500Medium",
       fontSize: 16,
     });
@@ -100,7 +100,7 @@ describe("Client Home shortcut tiles", () => {
     expect(screen.getByTestId("glyph-trend", hidden)).toHaveProp("width", 22);
     expect(screen.getByTestId("glyph-person", hidden)).toHaveProp("width", 22);
     expect(screen.getByTestId("shortcut-tiles")).toHaveStyle({ flexDirection: "row", gap: 12 });
-    expect(screen.getByRole("button", { name: /^Mis referidos/ })).toHaveStyle({
+    expect(screen.getByRole("button", { name: /^Invita a una amiga/ })).toHaveStyle({
       flex: 1,
       gap: 10,
       padding: 18,

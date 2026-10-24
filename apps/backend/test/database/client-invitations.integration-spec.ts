@@ -282,7 +282,7 @@ describe('Client invitation unit of work', () => {
         clientId: result.clientId,
         planId: plan.id,
         planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
+        durationDaysSnapshot: plan.durationDays,
         originalClassAllowance: plan.classAllowance,
         remainingClassAllowance: plan.classAllowance,
         startsOn: today,

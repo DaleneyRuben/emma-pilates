@@ -35,7 +35,8 @@ export const remindExpiringSubscriptions = async (
       type: 'subscription_expiring',
       businessEventKey: `subscription-expiring:${subscription.id}`,
       title: 'Plan por vencer',
-      message: `Tu plan vence en ${reminderLeadDays} días.`,
+      message:
+        'Tu plan vence en 3 días. Renueva cuando quieras y elige tu fecha de inicio.',
       destination: { type: 'subscription', id: subscription.id },
       occurredAt: dependencies.today,
     });

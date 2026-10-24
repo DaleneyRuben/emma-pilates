@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { listSearchSchema } from "../components/table/pagination";
 
-// AW26 and AW27: a Client's name is the lists' only filter (Referrals and
-// Credit belong to the studio, not a Branch). The backend calls it `query`,
+// AW26: a Client's name is the list's only filter (Referrals belong to the
+// studio, not a Branch). The backend calls it `query`,
 // ignores accents and case (STAFF-004), and caps it at 80 characters.
 export const nameSearchSchema = listSearchSchema.extend({
   q: z.string().trim().min(1).max(80).optional().catch(undefined),

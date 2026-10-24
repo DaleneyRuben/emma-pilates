@@ -27,6 +27,9 @@ const row = {
   submittedAt: new Date('2026-09-21T18:05:00.000Z'),
   decidedAt: null,
   receiptAvailable: true,
+  method: 'transfer',
+  invoiceData: { taxId: '4567891', name: 'Sofía Guzmán' },
+  invoiceIssued: null,
 };
 const paymentPage = {
   items: [row],
@@ -96,18 +99,24 @@ describe('administrator Payment list endpoint (e2e)', () => {
         }),
       );
     expect(operations.list).toHaveBeenCalledWith(
-      { page: 1, pageSize: 20, status: 'all' },
+      { page: 1, pageSize: 20, status: 'all', invoice: 'all' },
       expect.objectContaining({ accountId: 'admin-account' }),
     );
 
     await request(app.getHttpServer())
       .get(
-        '/api/v1/administrator/payments?status=pending&q=sofía&page=2&pageSize=5',
+        '/api/v1/administrator/payments?status=pending&invoice=unissued&q=sofía&page=2&pageSize=5',
       )
       .set('authorization', bearer)
       .expect(200);
     expect(operations.list).toHaveBeenLastCalledWith(
-      { page: 2, pageSize: 5, status: 'pending', query: 'sofía' },
+      {
+        page: 2,
+        pageSize: 5,
+        status: 'pending',
+        invoice: 'unissued',
+        query: 'sofía',
+      },
       expect.anything(),
     );
   });
@@ -115,6 +124,7 @@ describe('administrator Payment list endpoint (e2e)', () => {
   it.each([
     ['an unknown filter', '?branchId=11111111-1111-4111-8111-111111111111'],
     ['a state outside the allowlist', '?status=completed'],
+    ['an invoice filter outside the allowlist', '?invoice=issued'],
     ['a page size above 100', '?pageSize=101'],
     ['a search longer than 100 characters', `?q=${'a'.repeat(101)}`],
   ])('refuses %s as invalid_request', async (_case, search) => {

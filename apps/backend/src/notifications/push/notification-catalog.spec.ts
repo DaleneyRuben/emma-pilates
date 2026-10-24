@@ -12,6 +12,9 @@ const audible = [
   'evaluation_cancelled_by_studio',
   'payment_submitted',
   'payment_rejected',
+  'freeze_requested',
+  'freeze_approved',
+  'freeze_refused',
 ];
 const silent = [
   'evaluation_booked',
@@ -30,6 +33,7 @@ const privateTypes = [
   'evaluation_booked',
   'evaluation_cancelled',
   'payment_rejected',
+  'freeze_refused',
 ];
 
 describe('notification catalog (ADR-0070)', () => {
