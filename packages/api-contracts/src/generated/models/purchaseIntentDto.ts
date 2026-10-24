@@ -20,7 +20,8 @@ export interface PurchaseIntentDto {
    */
   planPriceCentavos: number;
   /**
-   * Credit held for this purchase
+   * Deprecated (PAY-005): Credit was retired; always 0, kept for store builds
+   * @deprecated
    * @minimum 0
    */
   creditReservedCentavos: number;

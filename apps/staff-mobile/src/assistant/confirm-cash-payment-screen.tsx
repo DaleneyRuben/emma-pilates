@@ -156,17 +156,12 @@ export function ConfirmCashPaymentScreen({
           <View style={styles.card}>
             <Text style={styles.cardTitle}>{quote.name}</Text>
             <Line label="Precio del plan" value={formatBolivianos(quote.priceCentavos)} />
-            {quote.creditAppliedCentavos > 0 ? (
-              <Line
-                label="Crédito aplicado"
-                value={formatBolivianos(quote.creditAppliedCentavos)}
-              />
-            ) : null}
             <View style={styles.divider} />
+            {/* Credit is retired (PAY-005): the cash collected is the full price. */}
             <Line
               label="Monto a cobrar en efectivo"
               strong
-              value={formatBolivianos(quote.amountDueCentavos)}
+              value={formatBolivianos(quote.priceCentavos)}
             />
           </View>
           <BranchChips

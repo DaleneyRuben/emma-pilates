@@ -34,7 +34,7 @@ describe("admin navigation", () => {
         ],
       },
       { label: null, items: ["Reporte"] },
-      { label: "Promociones", items: ["Promociones", "Referidos", "Créditos"] },
+      { label: "Promociones", items: ["Promociones", "Referidos"] },
     ]);
     expect(navigationItems.map((item) => item.label)).not.toContain(
       "Descuentos",
@@ -61,7 +61,6 @@ describe("admin navigation", () => {
       "AW16",
       "AW17",
       "AW26",
-      "AW27",
     ]);
   });
 
@@ -76,8 +75,11 @@ describe("admin navigation", () => {
       "Nómina",
       "Categorías de gasto",
       "Referidos",
-      "Créditos",
     ]);
+  });
+
+  it("no longer lists the retired Créditos page (PAY-005)", () => {
+    expect(navigationItems.map((item) => item.label)).not.toContain("Créditos");
   });
 });
 
@@ -109,7 +111,7 @@ describe("admin routes", () => {
     const listPaths = navigationItems
       .filter((item) => item.list)
       .map((item) => item.to);
-    expect(listPaths).toHaveLength(13);
+    expect(listPaths).toHaveLength(12);
     expect(listPaths).not.toContain("/");
     expect(listPaths).not.toContain("/reporte");
     // AW17 is the carousel: unpaged cards, not a table (WEB-006).

@@ -37,7 +37,7 @@ describe("AW26 Referidos on a desktop browser", () => {
     server.use(...signedInHandlers());
   });
 
-  it("lists every Referral of the studio read-only with its state and the studio counts", async () => {
+  it("lists every Referral of the studio read-only with the studio count and no Credit state (PAY-005)", async () => {
     server.use(
       referralTable(() =>
         jsonResponse(
@@ -61,13 +61,14 @@ describe("AW26 Referidos on a desktop browser", () => {
     expect(
       within(pending).getByRole("cell", { name: "11/08/2026" }),
     ).toHaveAttribute("data-label", "Fecha de registro");
-    expect(within(pending).getByText("Pendiente")).toBeInTheDocument();
+    expect(within(pending).queryByText("Pendiente")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", { name: "Estado" }),
+    ).not.toBeInTheDocument();
     const awarded = screen.getByRole("cell", { name: /Camila Vargas Ortiz/ })
       .parentElement as HTMLElement;
-    expect(within(awarded).getByText("Crédito otorgado")).toBeInTheDocument();
-    expect(
-      screen.getByText("34 referidos · 27 con crédito otorgado, 7 pendientes"),
-    ).toBeVisible();
+    expect(screen.queryByText(/crédito/i)).not.toBeInTheDocument();
+    expect(screen.getByText("34 referidos")).toBeVisible();
     expect(screen.getByText("Mostrando 1–20 de 34 referidos")).toBeVisible();
     expect(screen.queryByRole("button", { name: /Nuevo/ })).toBeNull();
 
@@ -96,9 +97,7 @@ describe("AW26 Referidos on a desktop browser", () => {
     renderAdmin(path);
 
     expect(await screen.findByText("1 referida en total")).toBeVisible();
-    expect(
-      screen.getByText("1 referido · 1 con crédito otorgado, 0 pendientes"),
-    ).toBeVisible();
+    expect(screen.getByText("1 referido")).toBeVisible();
   });
 
   it("searches either Client by name and keeps the search in the address", async () => {
@@ -132,9 +131,7 @@ describe("AW26 Referidos on a desktop browser", () => {
       q: "valeria",
     });
     // The studio counts do not follow the search.
-    expect(
-      screen.getByText("34 referidos · 27 con crédito otorgado, 7 pendientes"),
-    ).toBeVisible();
+    expect(screen.getByText("34 referidos")).toBeVisible();
   });
 
   it("says a search found nothing without offering to create a Referral", async () => {
@@ -156,7 +153,7 @@ describe("AW26 Referidos on a desktop browser", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      within(table).getByRole("columnheader", { name: "Estado" }),
+      within(table).getByRole("columnheader", { name: "Fecha de registro" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Sin resultados")).toBeVisible();
     expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();

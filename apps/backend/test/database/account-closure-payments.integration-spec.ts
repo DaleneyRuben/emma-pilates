@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import { createPrismaAccountClosure } from '../../src/booking/account-closure/prisma-account-closure';
-import { summarizeCredit } from '../../src/booking/payments/credit-summary';
 import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
 import { toPrismaBytes } from '../../src/database/prisma-bytes';
 import {
@@ -20,7 +19,6 @@ describe('closing a Client Account with Payments and Credit (PostgreSQL)', () =>
   const payments = () =>
     createPrismaPaymentCommands(world.prisma, {
       now: () => closureNow,
-      referralRewardCentavos: 6000,
     });
 
   beforeAll(async () => {
@@ -174,7 +172,7 @@ describe('closing a Client Account with Payments and Credit (PostgreSQL)', () =>
     ).resolves.toBe(0);
   });
 
-  it('forfeits the available Credit through one account_closure entry', async () => {
+  it('forfeits nothing and writes no ledger entry even when an old Credit balance remains (PAY-005)', async () => {
     const ana = await world.newClient('Ana Justiniano');
     await awardCredit(ana);
 
@@ -183,33 +181,15 @@ describe('closing a Client Account with Payments and Credit (PostgreSQL)', () =>
       ana.principal,
     );
 
-    expect(summary.forfeitedCreditCentavos).toBe(6000);
+    expect(summary.forfeitedCreditCentavos).toBe(0);
     const ledger = await ledgerOf(ana);
-    expect(ledger.map(({ kind }) => kind)).toEqual([
-      'REFERRAL_AWARD',
-      'ACCOUNT_CLOSURE',
-    ]);
-    expect(ledger[1]).toEqual({
-      kind: 'ACCOUNT_CLOSURE',
-      amountCentavos: 6000,
-      actorKind: 'ACCOUNT',
-      actorAccountId: ana.accountId,
-    });
-    expect(
-      summarizeCredit(
-        ledger.map((entry) => ({
-          kind: entry.kind.toLowerCase() as 'referral_award',
-          amountCentavos: entry.amountCentavos,
-        })),
-      ),
-    ).toEqual({ availableCentavos: 0, reservedCentavos: 0 });
+    expect(ledger.map(({ kind }) => kind)).toEqual(['REFERRAL_AWARD']);
   });
 
-  it('releases the Credit an open Purchase Intent holds before forfeiting it', async () => {
+  it('expires an open Purchase Intent without any Credit movement', async () => {
     const ana = await world.newClient('Ana Justiniano', {
       subscription: false,
     });
-    await awardCredit(ana);
     const chosen = await plan();
     const intent = await payments().createPurchaseIntent(
       { planId: chosen.id },
@@ -222,21 +202,14 @@ describe('closing a Client Account with Payments and Credit (PostgreSQL)', () =>
       ana.principal,
     );
 
-    expect(summary.forfeitedCreditCentavos).toBe(6000);
+    expect(summary.forfeitedCreditCentavos).toBe(0);
     await expect(
       world.prisma.purchaseIntent.findUniqueOrThrow({
         where: { id: intent.id },
         select: { state: true, expiredAt: true },
       }),
     ).resolves.toEqual({ state: 'EXPIRED', expiredAt: closureNow });
-    // The commands stamp the reservation with the real clock, so compare
-    // the entries as a set.
-    expect((await ledgerOf(ana)).map(({ kind }) => kind).sort()).toEqual([
-      'ACCOUNT_CLOSURE',
-      'PAYMENT_RELEASE',
-      'PAYMENT_RESERVATION',
-      'REFERRAL_AWARD',
-    ]);
+    await expect(ledgerOf(ana)).resolves.toEqual([]);
   });
 
   it('writes no ledger entry when there is no Credit to forfeit', async () => {

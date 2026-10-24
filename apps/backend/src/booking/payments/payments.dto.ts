@@ -44,7 +44,12 @@ export class PurchaseIntentDto {
   @ApiProperty({ minimum: 1, description: 'Money Amount in BOB centavos' })
   planPriceCentavos!: number;
 
-  @ApiProperty({ minimum: 0, description: 'Credit held for this purchase' })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description:
+      'Deprecated (PAY-005): Credit was retired; always 0, kept for store builds',
+  })
   creditReservedCentavos!: number;
 
   @ApiProperty({
@@ -91,7 +96,12 @@ export class PaymentDto {
   @ApiProperty({ minimum: 1 })
   planPriceCentavos!: number;
 
-  @ApiProperty({ minimum: 0 })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description:
+      'Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds',
+  })
   creditAppliedCentavos!: number;
 
   @ApiProperty({ minimum: 0 })
@@ -135,17 +145,20 @@ export class CreditActivityDto {
   occurredAt!: Date;
 }
 
+// Deprecated with its endpoint (PAY-005): every value reads as zero or empty.
 export class CreditDto {
-  @ApiProperty({ minimum: 0 })
+  @ApiProperty({ minimum: 0, deprecated: true, description: 'Always 0' })
   availableCentavos!: number;
 
-  @ApiProperty({
-    minimum: 0,
-    description: 'Credit held for a Payment under review',
-  })
+  @ApiProperty({ minimum: 0, deprecated: true, description: 'Always 0' })
   reservedCentavos!: number;
 
-  @ApiProperty({ type: CreditActivityDto, isArray: true })
+  @ApiProperty({
+    type: CreditActivityDto,
+    isArray: true,
+    deprecated: true,
+    description: 'Always empty',
+  })
   activity!: CreditActivityDto[];
 }
 
@@ -156,16 +169,25 @@ export class ReferredClientDto {
   @ApiProperty({ description: 'First name and surname initial' })
   referredName!: string;
 
-  @ApiProperty({ enum: ['pending', 'awarded'] })
+  @ApiProperty({
+    enum: ['pending', 'awarded'],
+    deprecated: true,
+    description: `${'Deprecated (PAY-005): Credit was retired'}; a Referral made since stays pending`,
+  })
   state!: 'pending' | 'awarded';
 
   @ApiProperty({ format: 'date-time' })
   createdAt!: Date;
 
-  @ApiPropertyOptional({ type: String, format: 'date-time', nullable: true })
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    deprecated: true,
+  })
   awardedAt!: Date | null;
 
-  @ApiPropertyOptional({ type: Number, nullable: true })
+  @ApiPropertyOptional({ type: Number, nullable: true, deprecated: true })
   awardCentavos!: number | null;
 }
 

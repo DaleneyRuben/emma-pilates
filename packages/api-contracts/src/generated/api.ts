@@ -29,7 +29,6 @@ import type {
   AdminClassTypePageDto,
   AdminClientDetailDto,
   AdminClientPageDto,
-  AdminCreditPageDto,
   AdminEvaluationPageDto,
   AdminExpenseCategoryDto,
   AdminExpenseDto,
@@ -122,7 +121,6 @@ import type {
   ListAdminCashClosesParams,
   ListAdminClassTypesParams,
   ListAdminClientsParams,
-  ListAdminCreditsParams,
   ListAdminEvaluationsParams,
   ListAdminExpensesParams,
   ListAdminPaymentsParams,
@@ -12472,211 +12470,6 @@ export function useListAdminReferrals<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-export type listAdminCreditsResponse200 = {
-  data: AdminCreditPageDto;
-  status: 200;
-};
-
-export type listAdminCreditsResponseSuccess = listAdminCreditsResponse200 & {
-  headers: Headers;
-};
-export type listAdminCreditsResponse = listAdminCreditsResponseSuccess;
-
-export const getListAdminCreditsUrl = (params?: ListAdminCreditsParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `/api/v1/administrator/credits?${stringifiedParams}`
-    : `/api/v1/administrator/credits`;
-};
-
-export const listAdminCredits = async (
-  params?: ListAdminCreditsParams,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<listAdminCreditsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListAdminCreditsUrl(params), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: listAdminCreditsResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as listAdminCreditsResponse;
-};
-
-export const getListAdminCreditsQueryKey = (
-  params?: ListAdminCreditsParams,
-) => {
-  return [
-    `/api/v1/administrator/credits`,
-    ...(params ? [params] : []),
-  ] as const;
-};
-
-export const getListAdminCreditsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listAdminCredits>>,
-  TError = unknown,
->(
-  params?: ListAdminCreditsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdminCredits>>,
-        TError,
-        TData
-      >
-    >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-) => {
-  const {
-    query: queryOptions,
-    fetch: fetchOptions,
-    fetcher: fetcherFn,
-  } = options ?? {};
-
-  const queryKey =
-    queryOptions?.queryKey ?? getListAdminCreditsQueryKey(params);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listAdminCredits>>
-  > = ({ signal }) =>
-    listAdminCredits(params, { signal, ...fetchOptions }, fetcherFn);
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof listAdminCredits>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ListAdminCreditsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listAdminCredits>>
->;
-export type ListAdminCreditsQueryError = unknown;
-
-export function useListAdminCredits<
-  TData = Awaited<ReturnType<typeof listAdminCredits>>,
-  TError = unknown,
->(
-  params: undefined | ListAdminCreditsParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdminCredits>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listAdminCredits>>,
-          TError,
-          Awaited<ReturnType<typeof listAdminCredits>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListAdminCredits<
-  TData = Awaited<ReturnType<typeof listAdminCredits>>,
-  TError = unknown,
->(
-  params?: ListAdminCreditsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdminCredits>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listAdminCredits>>,
-          TError,
-          Awaited<ReturnType<typeof listAdminCredits>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListAdminCredits<
-  TData = Awaited<ReturnType<typeof listAdminCredits>>,
-  TError = unknown,
->(
-  params?: ListAdminCreditsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdminCredits>>,
-        TError,
-        TData
-      >
-    >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-
-export function useListAdminCredits<
-  TData = Awaited<ReturnType<typeof listAdminCredits>>,
-  TError = unknown,
->(
-  params?: ListAdminCreditsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdminCredits>>,
-        TError,
-        TData
-      >
-    >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getListAdminCreditsQueryOptions(params, options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
 export type getIncomeReportResponse200 = {
   data: IncomeReportDto;
   status: 200;
@@ -13470,6 +13263,10 @@ export const getCompleteCreditPurchaseUrl = () => {
   return `/api/v1/credit-purchases`;
 };
 
+/**
+ * Credit was retired (PAY-005): always refused with credit_insufficient
+ * @deprecated
+ */
 export const completeCreditPurchase = async (
   createPurchaseIntentDto: CreatePurchaseIntentDto,
   options?: RequestInit,
@@ -13557,6 +13354,9 @@ export type CompleteCreditPurchaseMutationVariables = {
   data: CreatePurchaseIntentDto;
 };
 
+/**
+ * @deprecated
+ */
 export const useCompleteCreditPurchase = <TError = unknown, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
@@ -13775,6 +13575,10 @@ export const getGetCurrentClientCreditUrl = () => {
   return `/api/v1/clients/current/credit`;
 };
 
+/**
+ * Credit was retired (PAY-005): reads zero with no activity
+ * @deprecated
+ */
 export const getCurrentClientCredit = async (
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -13913,6 +13717,9 @@ export function useGetCurrentClientCredit<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
+/**
+ * @deprecated
+ */
 
 export function useGetCurrentClientCredit<
   TData = Awaited<ReturnType<typeof getCurrentClientCredit>>,

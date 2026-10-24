@@ -7,7 +7,7 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, the referral code, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
 | Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 75) | One close a day per Branch and never undone, so use a copy of the fixtures; voiding a sale (PAY-006) is not built yet |
@@ -51,7 +51,7 @@ can be found by its design name.
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70 |
 | 12 Mi plan | 5, 18, 71 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
-| 16 Mis referidos, 17 Mi crédito | 10, 18 |
+| 16 Mis referidos (17 Mi crédito retired by PAY-005) | 10, 18 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
@@ -81,7 +81,7 @@ can be found by its design name.
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
 | AW23–AW24 Personal | 26, 31, 72 |
-| AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
+| AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
 
 ## Before you begin
@@ -162,7 +162,7 @@ with the sage check, and a dead or unusable link with a Palo de rosa circle
 (a clock for an expired, used, or removed link, an envelope while 22
 confirms, a struck circle for an invalid email-change link, an at sign for an
 address already in use). These navigation checks do not need the backend.
-Once signed in, every screen opened from a tab or a list (Mi plan, Mi crédito,
+Once signed in, every screen opened from a tab or a list (Mi plan, Mis referidos,
 Notificaciones, Editar perfil, Cambiar contraseña, a Plan, and the rest) opens
 under the same top bar, the chevron (read as "Volver") and the screen's title
 over a thin rule. A Plan's bar shows the Plan's name, a class opened from
@@ -541,7 +541,7 @@ Evaluation slots, and these active Accounts. Every fixture Account uses the pass
 | `lucia@example.com`          | Client        | Active Plan with 5 of 8 classes left          |
 | `valeria@example.com`        | Client        | Active Plan expiring in 3 days, 2 classes left; paid in cash; referred by Sofía |
 | `isabel@example.com`         | Client        | Active Plan with no classes left              |
-| `sofia@example.com`          | Client        | Expired Plan; Bs 60 of referral Credit; referred Valeria (awarded) and Mariana (pending) |
+| `sofia@example.com`          | Client        | Expired Plan; referred Valeria and Mariana (both pending: PAY-005 retired the Bs 60 Credit; a database loaded before it keeps an old award row that nothing shows) |
 | `mariana@example.com`        | Client        | Never purchased a Plan; referred by Sofía     |
 | `emma.vargas@example.com`    | Trainer       | Leads Sessions in all three Branches          |
 | `daniela.ortiz@example.com`  | Trainer       | Leads Sessions in Centro and Urubó            |
@@ -647,7 +647,7 @@ existing cards still in place (before UX-004 it stayed hidden until the app
 restarted). Returning from a screen a list opened (Detalle de sesión,
 Reprogramar, Historial) refreshes it the same way. Pull any list down
 (**Reservar**, **Mis reservas**, **Historial de clases**, **Mi plan**, **Mis
-evaluaciones**, **Notificaciones**, **Mis referidos**, **Mi crédito**, and
+evaluaciones**, **Notificaciones**, **Mis referidos**, and
 **Inicio** as before): the platform's spinner in Palo de rosa turns while the
 list refetches and the list stays under it.
 
@@ -984,16 +984,17 @@ same key again returns the same result instead of a duplicate.
 | 5    | `POST /api/v1/purchase-intents/{id}/receipt`          | `receiptAttached: true`; another asset replaces the first one                            |
 | 6    | `POST /api/v1/purchase-intents/{id}/submit`           | `201` pending transfer Payment; the Administrator inbox gets "Comprobante por revisar"  |
 | 7    | `GET /api/v1/payments/current`                        | Your latest Payment with `state`, amounts, and `rejectionReason` once decided            |
-| 8    | `GET /api/v1/clients/current/credit`                  | `availableCentavos`, `reservedCentavos` (held while a transfer is under review), activity |
+| 8    | `GET /api/v1/clients/current/credit`                  | Deprecated since PAY-005: always `0`, `0`, and an empty `activity`, for store builds that still read it |
 | 9    | `GET /api/v1/clients/current/referrals`               | Your referral code and referred Clients as "Nombre A."                                  |
 
 Rules you can check: a second open Intent returns `409 purchase_intent_open_exists`;
-`lucia@example.com` (active Plan) gets `409 subscription_not_expired`; a Client
-whose Credit covers the price can call `POST /api/v1/credit-purchases` and is
-activated immediately without a QR. Registration accepts an optional
-`referralCode` (another Client's code); an unknown code fails the whole
-registration with `400 referral_code_invalid`. Open Intents expire 24 h later
-through the worker, releasing their Credit.
+`lucia@example.com` (active Plan) gets `409 subscription_not_expired`. Since
+PAY-005 there is no Credit: every Intent has `creditReservedCentavos: 0` and
+`amountDueCentavos` equal to the Plan price, and the deprecated
+`POST /api/v1/credit-purchases` always answers `409 credit_insufficient`.
+Registration accepts an optional `referralCode` (another Client's code); an
+unknown code fails the whole registration with `400 referral_code_invalid`.
+Open Intents expire 24 h later through the worker.
 
 ### Reviewing transfers as the Administrator (STAFF-001)
 
@@ -1006,7 +1007,7 @@ authorize that credential:
 | `GET /api/v1/administrator/payments/{paymentId}`      | The review projection plus `receiptUrl`                                                |
 | `GET …/payments/{paymentId}/receipt`                  | The rebuilt `readable` JPEG (`?variant=thumbnail` for the small one), `no-store`; Trainers and Clients get `403` |
 | `POST …/payments/{paymentId}/confirm`                 | `state: confirmed`, a new Subscription starting today, the Client notified             |
-| `POST …/payments/{paymentId}/reject` `{ "reason" }`   | `state: rejected` with the trimmed reason; the Client's Credit is released             |
+| `POST …/payments/{paymentId}/reject` `{ "reason" }`   | `state: rejected` with the trimmed reason; the Client can start a new purchase         |
 | `POST /api/v1/administrator/sessions/{id}/cancel`     | `{ affectedBookings }`: every Booking refunded, waitlist closed, Clients + Trainer told |
 
 Repeating the same decision returns the same result; the opposite decision
@@ -1023,10 +1024,10 @@ endpoints; Trainers and Clients get `403`.
 | Endpoint                                                   | What you should see                                                                                      |
 | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | `GET /api/v1/assistant/clients?query=luc`                  | Up to 20 Clients whose name, email, or phone contains the text (2+ characters), with `accountStatus`     |
-| `GET /api/v1/assistant/clients/{clientId}`                 | Name and contact, Subscription status with `YYYY-MM-DD` dates, next Booking, last two classes, Credit   |
+| `GET /api/v1/assistant/clients/{clientId}`                 | Name and contact, Subscription status with `YYYY-MM-DD` dates, next Booking, last two classes (`creditAvailableCentavos` is a deprecated `0`) |
 | `GET …/clients/{clientId}/bookings`                        | Upcoming Bookings and Waitlist Entries with `branchId` and `actionable` (true only at your Branches)     |
 | `GET …/clients/{clientId}/class-history`                   | Attended classes, newest first                                                                           |
-| `GET …/clients/{clientId}/plan-quotes`                     | Every Plan with `creditAppliedCentavos` and the cash `amountDueCentavos` for this Client                 |
+| `GET …/clients/{clientId}/plan-quotes`                     | Every Plan with the cash `amountDueCentavos`, its full price (`creditAppliedCentavos` is a deprecated `0`) |
 | `POST …/clients/{clientId}/cash-payments` `{ planId, branchId }` | `201` with the confirmed cash Payment and the new Subscription; needs an `idempotency-key` UUID     |
 | `POST /api/v1/assistant/client-invitations` `{ name, email, phone? }` | `201 invited` with the new `clientId`; the worker queues the 7-day activation email           |
 | `GET /api/v1/assistant/client-invitations/{clientId}`      | The pending invitation with `pendingExpiresAt` (30 days), `activationExpiresAt`, and `cancellable`; a Client who registered herself answers `404 client_verification_pending` |
@@ -1529,7 +1530,7 @@ Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
 
 Log in as `sofia@example.com` and open the **Perfil** tab. Below the summary
 card you should see the rows **Mi plan**, **Evaluación nutricional**, **Mis
-evaluaciones**, **Mis referidos**, **Mi crédito**, **Notificaciones**, and
+evaluaciones**, **Mis referidos**, **Notificaciones**, and
 **Cambiar contraseña**, each with its line icon in Palo de rosa and a quiet
 19 pt chevron (Icono tenue, MOB-041) at its right end, an outlined
 **Cerrar sesión** button, and the footer "Emma Pilates Studio · versión 1.0".
@@ -1640,37 +1641,25 @@ The backend pins every Prisma connection to UTC. If a timestamp you inserted
 with `psql` shows up four hours off in the app, the API you are running is
 older than this guide: rebuild it with `pnpm --filter @pilates/backend build`.
 
-## Test 10: buy a Plan and check referrals and Credit in the Client app
+## Test 10: buy a Plan and check the referral code in the Client app
 
 Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
-The fixtures give Sofía an expired Plan, two referred friends, and Bs 60 of
-referral Credit; Mariana has no Plan, no Credit, and no referrals.
+The fixtures give Sofía an expired Plan and two referred friends; Mariana has
+no Plan and no referrals. Since PAY-005 nobody earns, holds, or spends Credit
+(booking ADR-0009): no screen and no email mentions it.
 
-### A. Referrals and Credit from Perfil
+### A. The referral code from Perfil
 
-Log in as `sofia@example.com` and open **Perfil**. The menu now reads **Mi
-plan**, **Mis referidos**, **Mi crédito** (with the value `Bs 60` on the
-right), **Notificaciones**, and **Cambiar contraseña**.
+Log in as `sofia@example.com` and open **Perfil**. The menu reads **Mi
+plan**, **Evaluación nutricional**, **Mis evaluaciones**, **Mis referidos**,
+**Notificaciones**, and **Cambiar contraseña**; there is no **Mi crédito**.
 
 Tap **Mis referidos**. The card shows the code `REF-SOFIA` with a
 **Compartir** button that opens the system share sheet with a message that
-contains the code. Below it: "Comparte tu código. Cuando un amigo se registre y
-haga su primer pago, ganas crédito.", a **Tu crédito** row with `Bs 60`, and
-**Tus invitaciones** with one row per referred Client: initials, "Nombre A.",
-either "Primer pago el 26 de agosto" with the green **Crédito ganado** badge
-(Valeria Q.) or "Se registró el 17 de septiembre" with the amber **Esperando su
-primer pago** badge (Mariana P.). Dates follow the fixture clock.
-
-Tap **Tu crédito**. **Mi crédito** shows **Saldo a favor**, the amount `Bs 60`
-in the largest type of the app, "disponibles", the line "Este crédito se aplica
-automáticamente al monto que pagues por tu próximo plan.", a **De dónde viene**
-list ("Valeria Q. · 26 de agosto" and `+Bs 60`), and the text link **Ver mis
-referidos**.
-
-Log in as `mariana@example.com` to see the empty states: **Mi crédito** reads
-`Bs 0`, "Aún no tienes crédito. Invita a tus amigos para ganar." and a solid
-**Ver mi código** button; **Mis referidos** shows `REF-MARIANA`, `Tu crédito
-Bs 0`, and "Aún no has invitado a nadie. ¡Comparte tu código!".
+contains the code. Below it, one line: "Pronto podrás invitar a una amiga a una
+clase gratis." Nothing else: no Credit row, no list of invited friends, no
+amount (follow-up 136; «Invita a una amiga» arrives with BKM-014). Mariana
+sees the same screen with `REF-MARIANA`.
 
 ### B. Buy a Plan with a bank transfer
 
@@ -1682,9 +1671,8 @@ pnpm --filter @pilates/backend start:worker
 ```
 
 As Sofía, tap **Comprar un plan** on Home (her Plan is expired), pick
-**Paquete de 8 clases**, and check **Detalle del plan**: price `Bs 560`, a
-**Crédito aplicado** line with `−Bs 60`, and **Total a pagar** `Bs 500`. Tap
-**Continuar al pago**.
+**Paquete de 8 clases**, and check **Detalle del plan**: price `Bs 560` and
+**Total a pagar** `Bs 560`, with no Credit line. Tap **Continuar al pago**.
 
 **Pago por transferencia** shows the amount, then a card with the studio QR
 (locally the placeholder image from `apps/backend/.data/transfer-qr.png`) and
@@ -1700,17 +1688,15 @@ it to the Purchase Intent; the thumbnail appears as **Comprobante adjunto** and
 
 **Estado del pago** reads "Tu pago está en revisión" with "Un administrador va
 a confirmar tu comprobante pronto. Te avisaremos apenas esté listo." and a
-**Volver al inicio** button. While the transfer is under review, **Mi crédito**
-shows `Bs 0` disponibles and "Bs 60 están reservados para un pago en
-revisión.", and **Comprar un plan** answers with the pending Payment instead
-of a new Intent. Coming back to **Continuar al pago** with an open Intent
+**Volver al inicio** button. While the transfer is under review, **Comprar
+un plan** answers with the pending Payment instead of a new Intent. Coming back to **Continuar al pago** with an open Intent
 reopens the same Intent (the API answers `409 purchase_intent_open_exists`).
 
 ### C. Review the transfer in the Staff app
 
 Start the Staff app (Test 9E) and log in as `paola.mendoza@example.com`. The
 Administrator root is **Pagos pendientes**: a **Por confirmar** line with the
-count and "Bs 500 en total", then one card per transfer, oldest first: the
+count and "Bs 560 en total", then one card per transfer, oldest first: the
 Client's first letter in a tinted circle, her name in Lora over the Plan, a
 Palo de rosa chevron on the right, and under a thin rule the amount in Lora
 and an amber clock with how long ago it was sent ("Hace 3 minutos", "Ayer,
@@ -1719,7 +1705,7 @@ pagos pendientes." and "Todo al día. Te avisaremos cuando llegue una
 transferencia nueva.".
 
 Tap Sofía's card. **Revisar pago** shows name and Plan, **Monto a verificar**
-with `Bs 500`, the **Pendiente** badge, "Transferencia · enviado el 22 de
+with `Bs 560`, the **Pendiente** badge, "Transferencia · enviado el 22 de
 septiembre, 14:05", and the **Comprobante** image loaded through the
 authenticated API. **Ampliar** (or tapping the image) opens it full screen
 with pinch zoom; close it with the ✕ in the top-right corner, below the status
@@ -1735,8 +1721,7 @@ Back in the Client app, after a confirmation Sofía's Home shows the new Plan
 and the inbox row "Tu pago fue confirmado…" opens **Estado del pago** with
 "¡Pago confirmado!" and **Ir al inicio**. After a rejection the same screen
 reads "Tu comprobante fue rechazado", shows the reason, explains "Sube un
-nuevo comprobante para activar tu plan. Tu crédito volvió a estar disponible.",
-and **Subir un nuevo comprobante** opens a fresh **Pago por transferencia**
+nuevo comprobante para activar tu plan.", and **Subir un nuevo comprobante** opens a fresh **Pago por transferencia**
 for the same Plan.
 
 ### D. Cancel a Session as the Administrator
@@ -1767,14 +1752,13 @@ The fixtures ship no Bookings, so book a class from the Client app first
 `409 session_has_no_bookings` and the screen shows "No pudimos cancelar la
 sesión. Inténtalo de nuevo.".
 
-### E. Paying fully with Credit
+### E. No Credit for a referral
 
-When the available Credit covers the whole price, **Continuar al pago**
-activates the Plan immediately (`POST /api/v1/credit-purchases`) and lands on
-"¡Pago confirmado!" without a QR. The fixtures cannot reach this (Bs 60 is
-below the cheapest Plan), so the automated purchase-flow spec covers it; to
-see it by hand, create a Plan priced under Bs 60 in Planes and buy it as
-Sofía (Test 70, «Payments»).
+Confirm Sofía's transfer as above, then confirm one for Mariana (whom Sofía
+referred). Sofía gets nothing: in `psql`, `booking.credit_ledger_entries` has
+no new row and Mariana's Referral stays `pending`. A store build from before
+PAY-005 still works against this API: it reads `GET
+/api/v1/clients/current/credit` as `Bs 0` and never offers to pay with Credit.
 
 ## Test 11: act for a Client as the Assistant in the Staff app
 
@@ -1853,11 +1837,10 @@ way.
 ### D. Take a cash Payment
 
 Open `mariana@example.com` (no Plan) and tap **Registrar pago en efectivo**.
-**Elige un plan** shows "Registrando pago para: Mariana Peña", the Credit line
-when the Client has any ("Este cliente tiene Bs 60 de crédito disponible."),
-and the four Plans with the cash amount after Credit (the original price
-crossed out). Tap one: **Confirmar pago en efectivo** breaks down **Precio del
-plan**, **Crédito aplicado**, and **Monto a cobrar en efectivo**; when you are
+**Elige un plan** shows "Registrando pago para: Mariana Peña" and the four
+Plans at their full price, with no Credit notice (PAY-005). Tap one:
+**Confirmar pago en efectivo** shows **Precio del plan** and **Monto a cobrar
+en efectivo**, both the full price; when you are
 assigned to several Branches a chip row asks where you received the cash.
 **Confirmar pago recibido** activates the Plan at once and shows
 "¡Pago registrado!" with the Plan, its classes, and "Válido hasta el …";
@@ -2156,7 +2139,7 @@ In the Client app as `lucia@example.com`:
    **Evaluación nutricional** (a trend icon; "Próxima: …" when one is booked,
    otherwise "Agenda tu cita del mes"; it opens Mis evaluaciones or the
    availability) and **Mis referidos** (a person icon; "N amigas invitadas" or
-   "Invita amigas y gana crédito").
+   "Comparte tu código").
 2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with dates such as
    "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
    termine."; while expiring, an amber banner; once expired, "Último plan",
@@ -2403,9 +2386,8 @@ shows how to log in and authorize). Other Roles get
    Evaluations of one Branch, each with `kind` `first` or `follow_up`),
    `DELETE evaluations/{id}` (cancels it for the Client), `GET
    referrals?query=sofia` (with the studio's `awardedCount` and
-   `pendingCount` and each referrer's `referrerReferralCount`), `GET credits`
-   (Clients with available Credit, the studio total, and each one's
-   `lastMovementKind`), and
+   `pendingCount` and each referrer's `referrerReferralCount`; since PAY-005
+   no Referral is awarded and `GET credits` answers `404`), and
    `GET reports/income?from=…&until=…&branchId=…` (income by month and method;
    with a Branch only its cash counts).
 
@@ -2498,7 +2480,8 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
    (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
    Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
-   Referidos, Créditos). There is no "Descuentos". Every entry is a real page
+   Referidos). There is no "Descuentos" and, since PAY-005, no "Créditos"
+   (`/promociones/creditos` shows «Página no encontrada»). Every entry is a real page
    (Tests 25 to 30 and 33); the entry you choose is highlighted in the
    sidebar and the address changes (`/promociones`, for example).
 2. **Branch selector.** The top bar shows **Sucursal Centro**. Click it: a
@@ -2513,8 +2496,7 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    sidebar navigation focus lands on the new page's content.
    On **Reporte** the cell is replaced by "El reporte usa su propio filtro de
    sucursal" (the report has its own selector, Test 30). On **Pagos**,
-   **Clientes**, **Nómina**, **Categorías de gasto**, **Referidos**, or
-   **Créditos** the
+   **Clientes**, **Nómina**, **Categorías de gasto**, or **Referidos** the
    popover first says "Esta página no se filtra por sucursal — …" and still
    lets you switch for the next page. The Branches are the active ones the
    API returns (Test 25); archived Branches never appear here.
@@ -2747,8 +2729,8 @@ the admin web, exactly as Test 24 describes, and log in as
    disabled.
 3. **Detalle de cliente.** Click a Client: the side panel (the whole screen on
    a phone) shows "Cliente desde dd/mm/aaaa", the contact, the Plan with its
-   dates and remaining classes ("5 de 8"), the Credit as `Bs 0,00`, how many
-   Clients she referred, and her referral code. Without an active Plan the
+   dates and remaining classes ("5 de 8"), how many Clients she referred, and
+   her referral code; there is no Crédito block (PAY-005). Without an active Plan the
    block reads "Sin plan activo", plus "Último plan vencido el dd/mm/aaaa." if
    she had one. A Client invited from the Staff app who has not created her
    password yet shows **Pendiente de activación**. Nothing here is editable;
@@ -2834,17 +2816,16 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    `GET /api/v1/administrator/payments?status=…&q=…&page=…&pageSize=…`,
    while the Staff app's list is `…/payments/pending`, Test 7). Each row
    shows the Client, the Plan, the amount she
-   transferred as `Bs 560,00` on the right (with "con Bs 60,00 de crédito"
-   under it when Credit paid part), the date and time sent in Bolivia time
+   transferred as `Bs 560,00` on the right (never a Credit line, even on a
+   Payment from before PAY-005), the date and time sent in Bolivia time
    (`23/09/2026 · 22:51`), and **Pendiente**, **Confirmado**, or **Rechazado**.
-   Cash and Credit-only Payments never appear: they are confirmed when they are
-   recorded. **Buscar por cliente** finds a name without accents or capitals
+   Cash Payments never appear: they are confirmed when they are recorded. **Buscar por cliente** finds a name without accents or capitals
    ("mariana").
 3. **Only pending rows open.** A **Confirmado** or **Rechazado** row does
    nothing; the row is the whole record.
 4. **Revisar pago.** Click a pending Client: the side panel (the whole screen
-   on a phone) shows the Client and Plan, **Monto a verificar**, the Plan price
-   and **Crédito aplicado** when Credit was used, the date, **Transferencia**,
+   on a phone) shows the Client and Plan, **Monto a verificar**, the date,
+   **Transferencia**,
    and the receipt image read straight from the API (never cached). **Ver en
    grande** (or a click on the image) opens it above everything; Esc, the ✕,
    or a click outside returns to the panel as it was.
@@ -2944,15 +2925,15 @@ deleted (Withdrawals and Restocks cannot even be edited), so what you create
 here stays in `pilates_dev_sim`; only an unused category can be deleted. Date
 pickers follow the browser's language, as Test 25 notes.
 
-## Test 29: read the Evaluation, Referral, and Credit lists in the admin web
+## Test 29: read the Evaluation and Referral lists in the admin web
 
 Start the backend on `pilates_dev_sim` after loading the fixtures and start
 the admin web, exactly as Test 24 describes, and log in as
 `paola.mendoza@example.com` / `emma-local-2026`. The fixtures hold no
 Evaluations: book a few first as Clients (Test 15, or Test 7's API calls as
 `lucia@example.com` and `valeria@example.com`, whose Plans cover this
-month). The fixtures' Referrals and Credit belong to Sofía (an earlier walk
-or Test 10 may have added more). All three pages are read-only: there is no
+month). The fixtures' Referrals belong to Sofía (an earlier walk or Test 10
+may have added more). Both pages are read-only: there is no
 **Nuevo** button, and clicking a row opens nothing.
 
 1. **Evaluaciones nutricionales.** Back Office → **Evaluaciones
@@ -2972,28 +2953,19 @@ or Test 10 may have added more). All three pages are read-only: there is no
    publish a block there as Gabriela (Test 15), and book it as a Client.
 3. **Referidos.** Promociones → **Referidos** lists every Referral with
    **Cliente que refiere** (and "N referidas en total" under her name),
-   **Cliente referido**, **Fecha de registro**, and a green **Crédito
-   otorgado** or amber **Pendiente** pill. The subtitle counts the whole
-   studio ("2 referidos · 2 con crédito otorgado, 0 pendientes") and stays
-   put while you search; **Buscar por nombre de cliente** finds either
-   Client, ignoring accents ("mariana pena"). A search that finds nothing
-   keeps the table's header and says "No se encontró ningún referido.".
-4. **Créditos.** Promociones → **Créditos** lists the Clients whose
-   available Credit is above zero, the amount right-aligned ("Bs 60,00"),
-   and the last movement's date with what it did: "Crédito ganado",
-   "Reservado para un pago", "Usado en un pago", or "Devuelto al saldo". The
-   subtitle reads "Bs 60,00 en saldo activo · 1 clienta con crédito", and
-   **Total en saldo activo** closes the table while nothing is searched.
-5. **Studio-wide pages.** On Referidos and Créditos the Branch selector says
-   "Esta página no se filtra por sucursal — …" and switching Branch changes
-   nothing on the page.
-6. **After a Payment decision.** Confirm a transfer in **Pagos** (Test 27)
-   whose Client was referred, then open Referidos and Créditos: the Referral
-   turns **Crédito otorgado** and the referrer's Credit appears or grows
-   without reloading the browser.
-7. **Narrow browser.** At a phone width each row becomes a labelled card,
-   the week stepper and the search stay above the cards, and the Créditos
-   total stays under them.
+   **Cliente referido**, and **Fecha de registro**; since PAY-005 there is no
+   Estado column and no Credit. The subtitle counts the whole studio
+   ("2 referidos") and stays put while you search; **Buscar por nombre de
+   cliente** finds either Client, ignoring accents ("mariana pena"). A search
+   that finds nothing keeps the table's header and says "No se encontró
+   ningún referido.".
+4. **Créditos is gone.** The sidebar has no **Créditos**, and
+   `/promociones/creditos` shows «Página no encontrada» (PAY-005).
+5. **Studio-wide pages.** On Referidos the Branch selector says "Esta página
+   no se filtra por sucursal — …" and switching Branch changes nothing on
+   the page.
+6. **Narrow browser.** At a phone width each row becomes a labelled card and
+   the week stepper and the search stay above the cards.
 
 ## Test 30: read the income and expense report in the admin web
 
@@ -3461,13 +3433,13 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
 ```
 
 1. Log in as `sofia@example.com` (Test 3 shows how) and read
-   `GET /api/v1/clients/current/credit`: Bs 60 available.
+   `GET /api/v1/clients/current/credit`: `0` (deprecated since PAY-005).
 2. `POST /api/v1/accounts/current/closure` with `{"password": "wrong"}` returns
    `400` `current_password_incorrect`; with `{}` it returns `400`
    `invalid_request`.
 3. Repeat with the fixture password and `"keepPromotions": true`. It returns
-   `200` with the counts: `forfeitedCreditCentavos: 6000` and the classes left
-   on the ended Plan. A `keepPromotions` that is not a boolean returns `400`;
+   `200` with the counts: the classes left on the ended Plan and
+   `forfeitedCreditCentavos: 0` (deprecated since PAY-005). A `keepPromotions` that is not a boolean returns `400`;
    leaving it out means `false`.
 4. The old credential now returns `401`, and logging in again with the same
    email and password returns `401`.
@@ -3477,8 +3449,8 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
    second call returns `404` `client_not_found`, and Lucía no longer appears in
    the Clientes list.
 6. In `psql`, see the two `account.closed` audit records (actor role empty for
-   Sofía's own closure, `administrator` for Lucía's) and Sofía's
-   `account_closure` ledger entry of 6000. Both closures erased the personal
+   Sofía's own closure, `administrator` for Lucía's); since PAY-005 no
+   `account_closure` ledger entry is written. Both closures erased the personal
    data (BE-021, ADR-0097): `booking.clients` shows «Cliente eliminado» with no
    phone and no `profile_image_asset_id`, and `system.accounts` shows
    `cerrada-<account id>@cuentas-cerradas.invalid` with no `password_hash`.
@@ -3493,7 +3465,7 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
 In the Client app (API on the copy, `EXPO_PUBLIC_API_URL=http://127.0.0.1:3100/api/v1`),
 log in as `sofia@example.com`, open Perfil, scroll to the Error-tone
 «Cerrar mi cuenta» link under «Cerrar sesión», read the consequences (her
-plan ends and her Bs 60 of Credit is forfeited) and the note that her name,
+plan ends; nothing about Credit) and the note that her name,
 email, phone, and photo are erased, see the «Quiero seguir recibiendo
 promociones de Emma Pilates» box unticked, tick it (the whole row toggles it),
 type the password, and confirm: the app returns to Iniciar sesión with «Cerramos tu cuenta. Gracias
@@ -4796,7 +4768,7 @@ throwaway proxy (never committed) in front of it: a Node `http` server on
 3101 that waits 6 s and forwards each request to 3100, and start each Metro
 with `EXPO_PUBLIC_API_URL=http://127.0.0.1:3101/api/v1` (on Android also
 `adb reverse tcp:3101 tcp:3101`). A screen whose data an earlier screen
-already fetched (Perfil and Mi crédito after Inicio) shows its content at once.
+already fetched (Perfil and Mis referidos after Inicio) shows its content at once.
 
 1. Client, as Lucía: Perfil → Notificaciones. Expected: the logo centred
    under «Notificaciones» with the tab bar below, its opacity changing
@@ -5423,9 +5395,8 @@ removes it, and a pg-boss runtime error, which the worker only logs as
    1–3; attach no receipt), then
    `update booking.purchase_intents set expires_at = now() - interval '1 minute' where state = 'open'`.
    Within five minutes `GET /api/v1/purchase-intents/current` answers
-   `404 purchase_intent_not_found`, the row reads `state = 'expired'`,
-   `GET /api/v1/clients/current/credit` shows any reserved Credit back in
-   `availableCentavos`, and `POST …/{id}/submit` answers
+   `404 purchase_intent_not_found`, the row reads `state = 'expired'`, and
+   `POST …/{id}/submit` answers
    `409 purchase_intent_not_open` (before the sweep passes, the same call
    on the back-dated row answers `409 purchase_intent_expired`). A new
    Intent can be opened at once.
@@ -5511,7 +5482,7 @@ Swagger», names the endpoints):
 | Attach or submit after the Intent was submitted | `409 purchase_intent_not_open` |
 | Attach or submit after the Intent expired (Test 68, step 3) | `409 purchase_intent_expired` |
 | Open an Intent while a transfer is under review | `409 payment_pending_exists` |
-| `POST /api/v1/credit-purchases` as `sofia@example.com` (Bs 60 of Credit) for a Plan that costs more | `409 credit_insufficient`; create a Plan priced under Bs 60 in Planes (Test 25, step 5) and the same call activates it at once, with `payment_confirmed` in her inbox and no QR (Test 10 E) |
+| `POST /api/v1/credit-purchases` as any Client, for any Plan (deprecated since PAY-005) | `409 credit_insufficient`, always; nothing is created |
 | As Paola, confirm or reject a cash Payment's id, or a decided one again with the opposite decision | `409 payment_not_pending`, `409 payment_confirmation_conflict` (Test 7) |
 
 **Uploads** (any Account; Test 32 A names the three calls; limits are 10 MB
@@ -5582,8 +5553,8 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
 1. **A load failure.** Sign in as `lucia@example.com`, then stop the API
    (Ctrl+C in its Terminal) and open a screen you have not visited: Perfil
    → **Notificaciones** reads «No pudimos cargar tus notificaciones.»,
-   **Mis evaluaciones** «No pudimos cargar tus evaluaciones.», **Mi
-   crédito** «No pudimos cargar tu crédito.», the **Reservar** tab «No
+   **Mis evaluaciones** «No pudimos cargar tus evaluaciones.», **Mis
+   referidos** «No pudimos cargar tu código.», the **Reservar** tab «No
    pudimos cargar las clases.», a Plan «No pudimos cargar el plan.». A tab you
    had already opened shows the same line once its refresh fails. Start the
    API again and tap
@@ -5625,7 +5596,7 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    plan (Test 5 B and Test 18), the Client's history and inbox (Tests 5 B
    and 9 B), the Assistant's reservations and history and «Sin plan
    activo» (Test 11 B), Pagos pendientes (Test 10 C), the roster (Test 12),
-   Mis evaluaciones (Test 15), referrals and Credit (Test 10 A), and «Ver
+   Mis evaluaciones (Test 15), the referral code (Test 10 A), and «Ver
    la app como…» (Test 67 A).
 
 ## Test 72: the admin web's empty, failed, refused, and lost states

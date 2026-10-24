@@ -19,8 +19,7 @@ export type AdminPath =
   | "/back-office/categorias-de-gasto"
   | "/reporte"
   | "/promociones"
-  | "/promociones/referidos"
-  | "/promociones/creditos";
+  | "/promociones/referidos";
 
 export type NavigationItem = {
   label: string;
@@ -44,7 +43,7 @@ export type NavigationItem = {
   /**
    * Its sub-pages keep it marked: every page under it (AW31 is a view of
    * Insumos), or only the listed ones where siblings share its prefix
-   * (AW35 under Promociones, beside Referidos and Créditos).
+   * (AW35 under Promociones, beside Referidos).
    */
   subPages?: true | readonly string[];
   /**
@@ -176,13 +175,6 @@ export const navigationGroups: readonly NavigationGroup[] = [
         screen: "AW26",
         list: true,
         studioWide: "los referidos son del estudio, no de una sede.",
-      },
-      {
-        label: "Créditos",
-        to: "/promociones/creditos",
-        screen: "AW27",
-        list: true,
-        studioWide: "los créditos son del estudio, no de una sede.",
       },
     ],
   },
