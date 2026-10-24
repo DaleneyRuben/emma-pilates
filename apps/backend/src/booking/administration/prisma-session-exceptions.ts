@@ -16,7 +16,8 @@ import { formatEvaluationMoment } from '../evaluations/evaluation-notifications'
 import { recordAdministratorAudit } from './administration-audit';
 import {
   AdministrationError,
-  requireAdministrator,
+  auditRoleOf,
+  requireOperations,
 } from './administration-errors';
 import {
   isSessionLength,
@@ -61,7 +62,7 @@ export const createPrismaSessionExceptions = (
       },
       principal: AuthenticatedPrincipal,
     ) => {
-      const actor = requireAdministrator(principal);
+      const actor = requireOperations(principal);
       const now = dependencies.now();
       if (input.startsAt <= now) {
         throw new AdministrationError('effective_date_invalid');
@@ -123,7 +124,7 @@ export const createPrismaSessionExceptions = (
       },
       principal: AuthenticatedPrincipal,
     ) => {
-      const actor = requireAdministrator(principal);
+      const actor = requireOperations(principal);
       const now = dependencies.now();
       return transact(async (transaction) => {
         const session = await transaction.session.findUnique({
@@ -188,7 +189,13 @@ export const createPrismaSessionExceptions = (
             startsAt,
             endsAt: new Date(startsAt.getTime() + durationMinutes * minuteMs),
             isException: true,
-            ...(startChanged ? { emptyBookingCheckCompletedAt: null } : {}),
+            // A moved Session is checked and snapshotted again at its new time.
+            ...(startChanged
+              ? {
+                  minimumBookingsCheckCompletedAt: null,
+                  bookingsAtWindowClose: null,
+                }
+              : {}),
           },
           select: sessionSelect,
         });
@@ -235,7 +242,7 @@ export const createPrismaSessionExceptions = (
             outcome: AuditOutcome.SUCCEEDED,
             actorKind: AuditActorKind.ACCOUNT,
             actorAccountId: actor.accountId,
-            actorRole: StaffRole.ADMINISTRATOR,
+            actorRole: StaffRole[auditRoleOf(actor)],
             targetType: 'session',
             targetId: session.id,
             branchId: session.branchId,

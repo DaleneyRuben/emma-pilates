@@ -9,6 +9,7 @@ enum SessionCancellationCause {
   ZERO_BOOKINGS         @map("zero_bookings")
   NO_SUBSTITUTE_TRAINER @map("no_substitute_trainer")
   SCHEDULE_CHANGED      @map("schedule_changed")
+  MINIMUM_NOT_MET       @map("minimum_not_met")
 
   @@schema("booking")
 }
@@ -23,7 +24,11 @@ enum SubscriptionState {
 model Plan {
   id             String         @id @default(uuid()) @db.Uuid
   name           String
-  durationMonths Int            @map("duration_months") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it; the contract derives
+  // durationMonths from durationDays for old builds.
+  durationMonths Int?           @map("duration_months") @db.SmallInt
+  durationDays   Int            @map("duration_days") @db.SmallInt
+  weeklyClassCap Int?           @map("weekly_class_cap") @db.SmallInt
   classAllowance Int            @map("class_allowance")
   priceCentavos  Int            @map("price_centavos")
   displayOrder   Int            @map("display_order")
@@ -99,7 +104,11 @@ model Session {
   cancelledAt                  DateTime?                 @map("cancelled_at") @db.Timestamptz(3)
   cancelledByAccountId         String?                   @map("cancelled_by_account_id") @db.Uuid
   cancellationNote             String?                   @map("cancellation_note")
-  emptyBookingCheckCompletedAt DateTime?                 @map("empty_booking_check_completed_at") @db.Timestamptz(3)
+  // The one-time Minimum Bookings check (ADR-0007, BKM-009); the column kept
+  // BOOK-004's name when the zero-booking check became this check.
+  minimumBookingsCheckCompletedAt DateTime?              @map("empty_booking_check_completed_at") @db.Timestamptz(3)
+  // Live Bookings when the Cancellation Window closed; Trainer pay counts them.
+  bookingsAtWindowClose        Int?                      @map("bookings_at_window_close") @db.SmallInt
   createdAt                    DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt                    DateTime                  @updatedAt @map("updated_at") @db.Timestamptz(3)
   sessionSchedule              SessionSchedule?          @relation(fields: [sessionScheduleId], references: [id], onDelete: Restrict)
@@ -124,7 +133,10 @@ model Subscription {
   clientId                String            @map("client_id") @db.Uuid
   planId                  String            @map("plan_id") @db.Uuid
   planNameSnapshot        String            @map("plan_name_snapshot")
-  durationMonthsSnapshot  Int               @map("duration_months_snapshot") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it.
+  durationMonthsSnapshot  Int?              @map("duration_months_snapshot") @db.SmallInt
+  durationDaysSnapshot    Int               @map("duration_days_snapshot") @db.SmallInt
+  weeklyClassCapSnapshot  Int?              @map("weekly_class_cap_snapshot") @db.SmallInt
   originalClassAllowance  Int               @map("original_class_allowance")
   remainingClassAllowance Int               @map("remaining_class_allowance")
   startsOn                DateTime          @map("starts_on") @db.Date

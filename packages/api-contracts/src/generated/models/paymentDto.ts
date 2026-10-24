@@ -4,22 +4,33 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { PaymentDtoDurationDays } from "./paymentDtoDurationDays";
 import type { PaymentDtoDurationMonths } from "./paymentDtoDurationMonths";
 import type { PaymentDtoMethod } from "./paymentDtoMethod";
 import type { PaymentDtoState } from "./paymentDtoState";
 
 export interface PaymentDto {
   id: string;
+  /** `courtesy` is a Bs 0 Courtesy Access grant (REL-011). */
   method: PaymentDtoMethod;
   state: PaymentDtoState;
   planId: string;
   planName: string;
+  durationDays: PaymentDtoDurationDays;
+  /**
+   * durationDays / 30, for builds that still read months
+   * @deprecated
+   */
   durationMonths: PaymentDtoDurationMonths;
   /** @minimum 1 */
   classAllowance: number;
   /** @minimum 1 */
   planPriceCentavos: number;
-  /** @minimum 0 */
+  /**
+   * Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds
+   * @deprecated
+   * @minimum 0
+   */
   creditAppliedCentavos: number;
   /** @minimum 0 */
   amountDueCentavos: number;

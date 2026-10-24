@@ -133,7 +133,7 @@ A record of how a sale is settled — a Plan or a Paid Evaluation — with a met
 _Avoid_: Charge, transaction, completado (UI label for confirmed). The pending state reads «Pendiente» in the admin web, as follow-up 59 §2 settled.
 
 **Invoice Data**:
-The tax identity a client wants on her invoice for a sale — NIT or CI, and a name or business name — prefilled from her last sale and optional («Sin factura»). Invoices are issued outside the system; an Administrator marks a sale «Factura emitida», which records who and when.
+The tax identity a client wants on her invoice for a sale — NIT or CI, and a name or business name — prefilled from her last sale and optional («Sin factura»). Invoices are issued outside the system; an Administrator marks a sale «Factura emitida», which records who and when, and can undo the mark, both audited. Closing her Account erases it from her sales, which keep the mark ([ADR-0097](../docs/adr/0097-erase-personal-data-when-a-client-account-closes.md)).
 _Avoid_: Factura (the system issues none), receipt
 
 **Promotion**:

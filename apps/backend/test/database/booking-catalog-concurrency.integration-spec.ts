@@ -42,7 +42,7 @@ describe('booking catalog concurrent writes', () => {
       data: {
         id: planId,
         name: planId,
-        durationMonths: 1,
+        durationDays: 30,
         classAllowance: 8,
         priceCentavos: 30000,
         displayOrder: 0,
@@ -111,9 +111,9 @@ describe('booking catalog concurrent writes', () => {
 
   it('allows only one active Subscription to commit for a Client', async () => {
     const insert = `INSERT INTO booking.subscriptions
-      (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot,
+      (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot,
        original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at)
-      VALUES ($1, $2, $3, 'Test', 1, 8, 8, '2026-09-01', '2026-10-01', now(), now())`;
+      VALUES ($1, $2, $3, 'Test', 30, 8, 8, '2026-09-01', '2026-10-01', now(), now())`;
     await expectBlockedConflict(
       context,
       insert,

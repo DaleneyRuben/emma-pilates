@@ -2,10 +2,11 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { BackOfficeError, type BackOfficeActor } from '../back-office-errors';
 
 // The authorization seam for managing Equipment and resolving its faults
-// (BKO-004). ADR-0106 names the Administrator and the Coordinator; the
-// Coordinator Role arrives with IDN-009, which adds it to this list and
-// nowhere else.
-const equipmentManagerRoles: readonly string[] = ['administrator'];
+// (BKO-004, ADR-0106). The Coordinator is operational, not money (IDN-009).
+const equipmentManagerRoles: readonly string[] = [
+  'administrator',
+  'coordinator',
+];
 
 export const requireEquipmentManager = (
   principal: AuthenticatedPrincipal,

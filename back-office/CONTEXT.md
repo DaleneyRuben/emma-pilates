@@ -33,7 +33,7 @@ The share of Clients whose Subscription ended in a month who bought another Plan
 _Avoid_: Retention (retention is measured at 90 days)
 
 **Cash Close**:
-The end-of-day count of a Branch's cash: the expected cash (the day's cash Payments there), the cash counted, the difference, and a note. One a day, made by an Assistant or an Administrator; a sale voided after the close shows as an adjustment. Only an Administrator sees the history.
+The end-of-day count of a Branch's cash: the expected cash (the day's confirmed cash Payments there, up to the close), the cash counted, the difference, and a note. One a day per Branch, made by an Assistant at her Branch or an Administrator, and never edited; a sale voided after the close, or a cash sale recorded after it the same day, shows as an adjustment. A past day with cash sales and no close is flagged. Only an Administrator sees the history.
 _Avoid_: Arqueo (in code), shift close
 
 **Equipment**:

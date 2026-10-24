@@ -1,4 +1,5 @@
 import type { PgBoss } from 'pg-boss';
+import { recordClientAcquisition } from '../../booking/acquisition/record-client-acquisition';
 import { attributeReferral } from '../../booking/payments/referral-attribution';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
@@ -151,7 +152,14 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
       },
     });
 
-    if (registration.referredByCode !== null) {
+    // BKM-011: the code decides the attribution, whoever holds it; only a
+    // Client's code also starts the Referral (PAY-001).
+    const holder = await recordClientAcquisition(this.transaction, {
+      clientId: registration.clientId,
+      declaredChannel: registration.acquisitionChannel,
+      referralCode: registration.referredByCode,
+    });
+    if (registration.referredByCode !== null && holder?.kind === 'client') {
       await attributeReferral(this.transaction, {
         referredClientId: registration.clientId,
         referralCode: registration.referredByCode,

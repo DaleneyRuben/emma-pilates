@@ -4,12 +4,18 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
-import type { PlanInputDtoDurationMonths } from "./planInputDtoDurationMonths";
+import type { PlanInputDtoDurationDays } from "./planInputDtoDurationDays";
+import type { PlanInputDtoWeeklyClassCap } from "./planInputDtoWeeklyClassCap";
 
 export interface PlanInputDto {
   /** @maxLength 80 */
   name: string;
-  durationMonths: PlanInputDtoDurationMonths;
+  durationDays: PlanInputDtoDurationDays;
+  /**
+   * Only on 60- and 90-day Plans
+   * @nullable
+   */
+  weeklyClassCap: PlanInputDtoWeeklyClassCap;
   /** @minimum 1 */
   classAllowance: number;
   /**

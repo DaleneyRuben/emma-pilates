@@ -1,4 +1,5 @@
 import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
+import { cashCloseSearchSchema } from "../back-office/cash-close/cash-close-search";
 import { expenseSearchSchema } from "../back-office/expenses/expense-search";
 import { payrollSearchSchema } from "../back-office/payroll/payroll-search";
 import { withdrawalSearchSchema } from "../back-office/supplies/supply-search";
@@ -39,6 +40,17 @@ const paymentsRoute = createRoute({
   component: lazyRouteComponent(
     () => import("../payments/payments-route"),
     "PaymentsRoute",
+  ),
+});
+
+// AW151: the selected Branch's Cash Closes, one Bolivia month at a time.
+const cashClosesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/caja",
+  validateSearch: optionalSearch(cashCloseSearchSchema),
+  component: lazyRouteComponent(
+    () => import("../back-office/cash-close/cash-closes-route"),
+    "CashClosesRoute",
   ),
 });
 
@@ -107,6 +119,7 @@ const expenseCategoriesRoute = createRoute({
 export const backOfficeRoutes = [
   clientsRoute,
   paymentsRoute,
+  cashClosesRoute,
   suppliesRoute,
   withdrawalsRoute,
   equipmentRoute,

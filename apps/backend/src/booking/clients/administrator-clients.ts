@@ -2,7 +2,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { boliviaDate } from '../../time/bolivia-time';
 import {
   AdministrationError,
-  requireAdministrator,
+  requireOperations,
 } from '../administration/administration-errors';
 import type { ClientAccountStatus } from '../assistant/assistant-clients';
 import {
@@ -59,6 +59,7 @@ export type ClientClosureOutlook = {
 
 export type AdministratorClientDetail = AdministratorClientRecord & {
   subscription: ClientSubscriptionView;
+  /** Credit is retired (PAY-005); the field stays as a zero. */
   creditAvailableCentavos: number;
   closure: ClientClosureOutlook;
 };
@@ -78,26 +79,39 @@ export interface AdministratorClientDirectory {
   findLatestSubscription: (
     clientId: string,
   ) => Promise<ClientSubscriptionSummary | null>;
-  readAvailableCredit: (clientId: string) => Promise<number>;
   readClosureOutlook: (
     clientId: string,
     now: Date,
   ) => Promise<ClientClosureOutlook>;
+  saveProfile: (
+    input: ClientProfileCorrection,
+  ) => Promise<AdministratorClientRecord>;
 }
+
+export type ClientProfileCorrection = {
+  clientId: string;
+  name: string;
+  phone: string | null;
+  actorAccountId: string;
+  actorRole: 'administrator' | 'coordinator';
+  occurredAt: Date;
+  previous: { name: string; phone: string | null };
+};
 
 type Dependencies = {
   directory: AdministratorClientDirectory;
   now: () => Date;
 };
 
-// Client personal data is for Administrators only (ADR-0054); Assistants
-// keep their own bounded search for acting on a Client's behalf.
+// Client personal data is for the Administrator and the Coordinator
+// (ADR-0054, ADR-0102); Assistants keep their own bounded search for acting on
+// a Client's behalf.
 export const listAdministratorClients = async (
   command: { page: number; pageSize: number; query?: string },
   principal: AuthenticatedPrincipal,
   { directory, now }: Dependencies,
 ): Promise<AdministratorClientPage> => {
-  requireAdministrator(principal);
+  requireOperations(principal);
   const query = command.query?.trim() ?? '';
   return directory.list({
     page: command.page,
@@ -112,11 +126,11 @@ export const readAdministratorClient = async (
   principal: AuthenticatedPrincipal,
   { directory, now }: Dependencies,
 ): Promise<AdministratorClientDetail> => {
-  requireAdministrator(principal);
+  requireOperations(principal);
   const client = await directory.read(command.clientId);
   if (client === null) throw new AdministrationError('client_not_found');
   const instant = now();
-  const [subscription, creditAvailableCentavos, closure] = await Promise.all([
+  const [subscription, closure] = await Promise.all([
     describeSubscription(client.id, {
       today: boliviaDate(instant),
       findActiveSubscription: (clientId, onDate) =>
@@ -124,8 +138,36 @@ export const readAdministratorClient = async (
       findLatestSubscription: (clientId) =>
         directory.findLatestSubscription(clientId),
     }),
-    directory.readAvailableCredit(client.id),
     directory.readClosureOutlook(client.id, instant),
   ]);
-  return { ...client, subscription, creditAvailableCentavos, closure };
+  // Credit is retired (booking ADR-0009); the field stays as a zero.
+  return { ...client, subscription, creditAvailableCentavos: 0, closure };
+};
+
+const normalizePhone = (phone: string | null): string | null => {
+  const trimmed = phone?.trim() ?? '';
+  return trimmed === '' ? null : trimmed;
+};
+
+// IDN-009: correcting a Client's name and phone (AW22 «Editar perfil»). The
+// login email stays the Client's own, through IDN-008's verified change.
+export const updateAdministratorClientProfile = async (
+  command: { clientId: string; name: string; phone: string | null },
+  principal: AuthenticatedPrincipal,
+  { directory, now }: Dependencies,
+): Promise<AdministratorClientRecord> => {
+  const actor = requireOperations(principal);
+  const name = command.name.trim();
+  if (name === '') throw new AdministrationError('client_name_required');
+  const client = await directory.read(command.clientId);
+  if (client === null) throw new AdministrationError('client_not_found');
+  return directory.saveProfile({
+    clientId: client.id,
+    name,
+    phone: normalizePhone(command.phone),
+    actorAccountId: actor.accountId,
+    actorRole: actor.role,
+    occurredAt: now(),
+    previous: { name: client.name, phone: client.phone },
+  });
 };

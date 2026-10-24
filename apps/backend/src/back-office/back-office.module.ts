@@ -7,6 +7,7 @@ import {
   backOfficeOperations,
   type BackOfficeOperations,
 } from './back-office.controller';
+import { createPrismaCashCloses } from './cash-close/prisma-cash-closes';
 import { createPrismaEquipment } from './equipment/prisma-equipment';
 import { createPrismaSessionEquipment } from './equipment/prisma-session-equipment';
 import { createPrismaExpenses } from './expenses/prisma-expenses';
@@ -14,8 +15,8 @@ import { createPrismaSalaryPayments } from './payroll/prisma-salary-payments';
 import { createPrismaExpenseReport } from './reports/prisma-expense-report';
 import { createPrismaSupplies } from './supplies/prisma-supplies';
 
-// Inventory, payroll, expenses, and equipment (Back Office context, BKO-002,
-// BKO-004).
+// Inventory, payroll, expenses (BKO-002), equipment (BKO-004), and the daily
+// Cash Close (BKO-003).
 @Module({
   imports: [SystemIdentityModule],
   controllers: backOfficeControllers,
@@ -32,6 +33,7 @@ import { createPrismaSupplies } from './supplies/prisma-supplies';
           report: createPrismaExpenseReport(prisma, { now }),
           equipment: createPrismaEquipment(prisma, { now }),
           sessionEquipment: createPrismaSessionEquipment(prisma, { now }),
+          cashCloses: createPrismaCashCloses(prisma, { now }),
         };
       },
     },
