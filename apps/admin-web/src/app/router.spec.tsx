@@ -23,6 +23,7 @@ describe("admin navigation", () => {
         label: "Back Office",
         items: [
           "Clientes",
+          "Para contactar",
           "Pagos",
           "Caja",
           "Insumos",
@@ -52,6 +53,7 @@ describe("admin navigation", () => {
       "AW04",
       "AW19",
       "AW21",
+      "AW39",
       "AW28",
       "AW151",
       "AW08",
@@ -76,6 +78,7 @@ describe("admin navigation", () => {
         .map((item) => item.label),
     ).toEqual([
       "Clientes",
+      "Para contactar",
       "Pagos",
       "Nómina",
       "Categorías de gasto",

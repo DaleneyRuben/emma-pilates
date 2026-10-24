@@ -6457,3 +6457,35 @@ a capacity.
     rows stacked, the day list's cards with «Faltan equipos»), and S26 on the
     iPhone, the iPad, and the Android emulator.
 
+
+## Test 84: the first 90 days (BKM-013)
+
+A new Client gets a message on day 2, at the end of week 1, on day 30, and
+on day 90, and she appears on **Para contactar** when she stops booking.
+
+### A. The admin web
+
+1. Sign in as `paola.mendoza@example.com` (Test 24). The sidebar shows
+   **Para contactar** after **Clientes**, with a count.
+2. Open it. Each row names the Client, her phone, the reason («7 días sin
+   reservar», «Menos de 2 clases a los 15 días», «Menos de 4 clases en su
+   primer mes»), and the day she started. **Abrir WhatsApp** opens
+   `wa.me` with her number, and **Contactada** removes her with «Marcaste a
+   {nombre} como contactada.».
+3. At 420 px the same rows become cards behind **Abrir menú**.
+4. Sign in as `carolina.rivas@example.com`: she sees the same page and no
+   «Bs» anywhere. A Trainer does not see the entry.
+
+### B. The Staff app
+
+Log in as `carolina.rivas@example.com` (Test 9 E). **Buscar cliente** shows
+**Para contactar** under **Cancelar una clase**. It opens the same list:
+the Client, her phone, the reason, **Abrir WhatsApp**, and **Contactada**.
+With nobody to write to it reads «Nadie para contactar por ahora.».
+
+### C. The Client app
+
+The messages arrive in **Notificaciones** (Perfil). The four titles are
+«Tu segunda clase», «Tu primera semana», «Tu primer mes», and «Tres meses
+con nosotras». The inbox card draws the message body and not the title
+(noted on the BKM-013 row; the title is what the push shows).

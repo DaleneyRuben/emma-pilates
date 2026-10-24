@@ -44,6 +44,9 @@ export const signedInHandlers = () => [
   ),
   pendingBadgeHandler(),
   branchSuppliesHandler(),
+  http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
+    jsonResponse({ items: [], totalItems: 0 }),
+  ),
   studioRulesHandler(),
 ];
 
@@ -73,6 +76,9 @@ export const coordinatorHandlers = () => [
   http.get(apiUrl(staffProfilePath), () => jsonResponse(carolinaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
+    jsonResponse({ items: [], totalItems: 0 }),
+  ),
   http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
     jsonResponse([]),
   ),

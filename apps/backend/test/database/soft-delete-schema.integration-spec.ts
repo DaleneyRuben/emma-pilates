@@ -32,6 +32,8 @@ describe('soft delete schema', () => {
       'booking.client_acquisitions',
       'booking.client_promotions_consents',
       'booking.clients',
+      'booking.contact_alerts',
+      'booking.lifecycle_messages',
       'booking.promotion_contacts',
       'booking.staff_branch_assignments',
       'booking.staff_members',

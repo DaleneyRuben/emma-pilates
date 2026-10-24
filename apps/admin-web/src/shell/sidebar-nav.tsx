@@ -8,6 +8,7 @@ import {
 import { branchSuppliesQueryOptions } from "../back-office/supplies/supply-queries";
 import { countFormat } from "../components/table/pagination";
 import { cn } from "../lib/cn";
+import { contactAlertCountQueryOptions } from "../people/contact-alerts/contact-alert-queries";
 import { pendingPaymentCountQueryOptions } from "../payments/payment-queries";
 import { useAdminRole } from "../session/admin-role";
 import { useBranchSelection } from "./branch/use-branch-selection";
@@ -16,6 +17,13 @@ import { useBranchSelection } from "./branch/use-branch-selection";
 // wait or the count cannot be read.
 function usePendingPaymentCount(enabled: boolean): number {
   const { data } = useQuery({ ...pendingPaymentCountQueryOptions(), enabled });
+  return data ?? 0;
+}
+
+// AW39: people waiting on «Para contactar»; the Coordinator sees it too
+// because the count is people, never money (ADR-0102).
+function useContactAlertCount(): number {
+  const { data } = useQuery(contactAlertCountQueryOptions());
   return data ?? 0;
 }
 
@@ -40,6 +48,10 @@ const badges = {
     tone: "bg-advertencia/15 text-advertencia-texto",
     label: "con stock bajo",
   },
+  contactAlerts: {
+    tone: "bg-primario-tinte text-primario-profundo",
+    label: "para contactar",
+  },
 } as const;
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
@@ -49,6 +61,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const counts = {
     pendingPayments: usePendingPaymentCount(administrator),
     lowStock: useLowStockCount(administrator),
+    contactAlerts: useContactAlertCount(),
   };
 
   return (

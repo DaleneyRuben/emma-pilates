@@ -23,6 +23,15 @@ const clientsRoute = createRoute({
   ),
 });
 
+const contactAlertsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/para-contactar",
+  component: lazyRouteComponent(
+    () => import("../people/contact-alerts/contact-alerts-route"),
+    "ContactAlertsRoute",
+  ),
+});
+
 const staffRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/personal",
@@ -118,6 +127,7 @@ const expenseCategoriesRoute = createRoute({
 
 export const backOfficeRoutes = [
   clientsRoute,
+  contactAlertsRoute,
   paymentsRoute,
   cashClosesRoute,
   suppliesRoute,

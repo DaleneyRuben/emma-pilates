@@ -154,6 +154,7 @@ import { acquisitionWiring } from './acquisition/acquisition-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
 import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
+import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
 import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
 
 @Module({
@@ -194,6 +195,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...acquisitionWiring.controllers,
     ...studioSettingsWiring.controllers,
     ...clientPhotoWiring.controllers,
+    ...first90DaysWiring.controllers,
     ...invoiceDataWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
@@ -589,6 +591,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...acquisitionWiring.providers(PRISMA_CLIENT),
     ...studioSettingsWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
+    ...first90DaysWiring.providers(PRISMA_CLIENT),
     ...invoiceDataWiring.providers(PRISMA_CLIENT),
   ],
 })

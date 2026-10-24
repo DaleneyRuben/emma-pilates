@@ -89,6 +89,7 @@ import type {
   CompleteAccountActivationDto,
   CompleteEmailChangeDto,
   CompletePasswordRecoveryDto,
+  ContactAlertListDto,
   CorrectClientAcquisitionDto,
   CorrectInvitationEmailDto,
   CorrectPendingClientEmailDto,
@@ -21489,6 +21490,295 @@ export function useGetCurrentClientPhoto<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type listContactAlertsResponse200 = {
+  data: ContactAlertListDto;
+  status: 200;
+};
+
+export type listContactAlertsResponseSuccess = listContactAlertsResponse200 & {
+  headers: Headers;
+};
+export type listContactAlertsResponse = listContactAlertsResponseSuccess;
+
+export const getListContactAlertsUrl = () => {
+  return `/api/v1/administrator/contact-alerts`;
+};
+
+export const listContactAlerts = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listContactAlertsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListContactAlertsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listContactAlertsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listContactAlertsResponse;
+};
+
+export const getListContactAlertsQueryKey = () => {
+  return [`/api/v1/administrator/contact-alerts`] as const;
+};
+
+export const getListContactAlertsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listContactAlerts>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listContactAlerts>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListContactAlertsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listContactAlerts>>
+  > = ({ signal }) => listContactAlerts({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listContactAlerts>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListContactAlertsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listContactAlerts>>
+>;
+export type ListContactAlertsQueryError = unknown;
+
+export function useListContactAlerts<
+  TData = Awaited<ReturnType<typeof listContactAlerts>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listContactAlerts>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listContactAlerts>>,
+          TError,
+          Awaited<ReturnType<typeof listContactAlerts>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListContactAlerts<
+  TData = Awaited<ReturnType<typeof listContactAlerts>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listContactAlerts>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listContactAlerts>>,
+          TError,
+          Awaited<ReturnType<typeof listContactAlerts>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListContactAlerts<
+  TData = Awaited<ReturnType<typeof listContactAlerts>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listContactAlerts>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListContactAlerts<
+  TData = Awaited<ReturnType<typeof listContactAlerts>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listContactAlerts>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListContactAlertsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type markClientContactedResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type markClientContactedResponseSuccess =
+  markClientContactedResponse204 & {
+    headers: Headers;
+  };
+export type markClientContactedResponse = markClientContactedResponseSuccess;
+
+export const getMarkClientContactedUrl = (clientId: string) => {
+  return `/api/v1/administrator/contact-alerts/${clientId}/contacted`;
+};
+
+export const markClientContacted = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<markClientContactedResponse> => {
+  const res = await (fetchFn ?? fetch)(getMarkClientContactedUrl(clientId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: markClientContactedResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as markClientContactedResponse;
+};
+
+export const getMarkClientContactedMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof markClientContacted>>,
+    TError,
+    MarkClientContactedMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof markClientContacted>>,
+  TError,
+  MarkClientContactedMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["markClientContacted"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof markClientContacted>>,
+    MarkClientContactedMutationVariables
+  > = (props) => {
+    const { clientId } = props ?? {};
+
+    return markClientContacted(clientId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type MarkClientContactedMutationResult = NonNullable<
+  Awaited<ReturnType<typeof markClientContacted>>
+>;
+
+export type MarkClientContactedMutationError = unknown;
+export type MarkClientContactedMutationVariables = { clientId: string };
+
+export const useMarkClientContacted = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof markClientContacted>>,
+      TError,
+      MarkClientContactedMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof markClientContacted>>,
+  TError,
+  MarkClientContactedMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getMarkClientContactedMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type getCurrentClientInvoiceDataResponse200 = {
   data: LastInvoiceDataDto;
