@@ -1,7 +1,10 @@
 import type { PayStatementDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { MonthStepper } from "../../components/table/month-stepper";
-import { LoadingNotice, QueryFailure } from "../../components/page/query-failure";
+import {
+  LoadingNotice,
+  QueryFailure,
+} from "../../components/page/query-failure";
 import { PageHeader } from "../../components/page/page-header";
 import { boliviaMonth } from "../../lib/bolivia-time";
 import { payStatementsQueryOptions } from "./pay-statement-queries";

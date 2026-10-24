@@ -23,6 +23,7 @@ export type AdminPath =
   | "/back-office/personal"
   | "/back-office/nomina"
   | "/back-office/pagos-instructoras"
+  | "/back-office/pago-coordinadora"
   | "/back-office/gastos"
   | "/back-office/categorias-de-gasto"
   | "/reporte"
