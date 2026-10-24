@@ -75,6 +75,18 @@ describe("AW02 Horario on a desktop browser", () => {
     expect(
       screen.getAllByRole("columnheader").map((header) => header.textContent),
     ).toHaveLength(7);
+    // UX-011: the Class Type and the time are two lines, so a 1024 px week
+    // can show «Reformer Pilates» instead of «Refo…».
+    const block = screen.getByRole("button", {
+      name: "Reformer Pilates, 07:00, Valeria Peña, 4 de 10 lugares",
+    });
+    const type = within(block).getByText("Reformer Pilates");
+    const time = within(block).getByText(/07:00 –/);
+    expect(
+      type.compareDocumentPosition(time) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(type.parentElement).not.toBe(time.parentElement);
+    expect(type).not.toHaveClass("truncate");
 
     const read = reads.find((params) => params.get("branchId") === centro.id);
     expect(read?.get("from")).toBe(boliviaInstant(nextMonday, "00:00"));
