@@ -1,17 +1,33 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import type { InvoiceData } from './invoice-data/invoice-data';
+import {
+  InvoiceDataDto,
+  invoiceDataField,
+} from './invoice-data/invoice-data.dto';
 
 const uuid = z.uuid();
+
+const civilDate = z.iso.date();
 
 export class CreatePurchaseIntentDto {
   @ApiProperty({ format: 'uuid' })
   planId!: string;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
+  })
+  startsOn?: string;
 }
 
 export const parseCreatePurchaseIntent = (
   value: unknown,
 ): CreatePurchaseIntentDto | null => {
-  const result = z.strictObject({ planId: uuid }).safeParse(value);
+  const result = z
+    .strictObject({ planId: uuid, startsOn: civilDate.optional() })
+    .safeParse(value);
   return result.success ? result.data : null;
 };
 
@@ -25,6 +41,26 @@ export const parseAttachReceipt = (value: unknown): AttachReceiptDto | null => {
   return result.success ? result.data : null;
 };
 
+export class SubmitTransferDto {
+  @ApiPropertyOptional({
+    type: InvoiceDataDto,
+    nullable: true,
+    description:
+      'PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»',
+  })
+  invoiceData?: InvoiceDataDto | null;
+}
+
+// Releases before PAY-007 send no body at all.
+export const parseSubmitTransfer = (
+  value: unknown,
+): { invoiceData: InvoiceData | null } | null => {
+  const result = z
+    .strictObject({ invoiceData: invoiceDataField })
+    .safeParse(value ?? {});
+  return result.success ? result.data : null;
+};
+
 export class PurchaseIntentDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -35,7 +71,14 @@ export class PurchaseIntentDto {
   @ApiProperty()
   planName!: string;
 
-  @ApiProperty({ enum: [1, 3, 6, 12] })
+  @ApiProperty({ enum: [30, 60, 90] })
+  durationDays!: number;
+
+  @ApiProperty({
+    enum: [1, 2, 3],
+    deprecated: true,
+    description: 'durationDays / 30, for builds that still read months',
+  })
   durationMonths!: number;
 
   @ApiProperty({ minimum: 1 })
@@ -64,17 +107,23 @@ export class PurchaseIntentDto {
 
   @ApiProperty({ format: 'date-time' })
   expiresAt!: Date;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description: 'Chosen Start Date. Absent on responses older builds ignore.',
+  })
+  startsOn?: string;
 }
 
 export class PaymentDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
 
-  @ApiProperty({ enum: ['transfer', 'cash', 'credit_only'] })
-  method!: 'transfer' | 'cash' | 'credit_only';
+  @ApiProperty({ enum: ['transfer', 'cash', 'credit_only', 'courtesy'] })
+  method!: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
 
-  @ApiProperty({ enum: ['pending', 'confirmed', 'rejected'] })
-  state!: 'pending' | 'confirmed' | 'rejected';
+  @ApiProperty({ enum: ['pending', 'confirmed', 'rejected', 'voided'] })
+  state!: 'pending' | 'confirmed' | 'rejected' | 'voided';
 
   @ApiProperty({ format: 'uuid' })
   planId!: string;
@@ -82,7 +131,14 @@ export class PaymentDto {
   @ApiProperty()
   planName!: string;
 
-  @ApiProperty({ enum: [1, 3, 6, 12] })
+  @ApiProperty({ enum: [30, 60, 90] })
+  durationDays!: number;
+
+  @ApiProperty({
+    enum: [1, 2, 3],
+    deprecated: true,
+    description: 'durationDays / 30, for builds that still read months',
+  })
   durationMonths!: number;
 
   @ApiProperty({ minimum: 1 })
@@ -96,6 +152,12 @@ export class PaymentDto {
 
   @ApiProperty({ minimum: 0 })
   amountDueCentavos!: number;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description: 'Chosen Start Date. Absent on responses older builds ignore.',
+  })
+  startsOn?: string;
 
   @ApiProperty({ format: 'date-time' })
   submittedAt!: Date;
@@ -158,6 +220,13 @@ export class ReferredClientDto {
 
   @ApiProperty({ enum: ['pending', 'awarded'] })
   state!: 'pending' | 'awarded';
+
+  @ApiProperty({
+    enum: ['registered', 'class_booked', 'bought'],
+    description:
+      "BKM-014: the invitation's status. Older releases ignore it and read state.",
+  })
+  invitationStatus!: 'registered' | 'class_booked' | 'bought';
 
   @ApiProperty({ format: 'date-time' })
   createdAt!: Date;

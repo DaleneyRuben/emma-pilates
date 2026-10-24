@@ -12,4 +12,5 @@ export const PaymentDtoMethod = {
   transfer: "transfer",
   cash: "cash",
   credit_only: "credit_only",
+  courtesy: "courtesy",
 } as const;

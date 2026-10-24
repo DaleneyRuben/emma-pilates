@@ -70,6 +70,7 @@ const directory = (
   findLatestSubscription: jest.fn().mockResolvedValue(subscription),
   readAvailableCredit: jest.fn().mockResolvedValue(105_000),
   readClosureOutlook: jest.fn().mockResolvedValue(outlook),
+  saveProfile: jest.fn(),
   ...overrides,
 });
 
@@ -143,7 +144,14 @@ describe('Administrator Client detail', () => {
       }),
     ).resolves.toEqual({
       ...lucia,
-      subscription: { status: 'active', subscription },
+      subscription: {
+        status: 'active',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
+      },
       creditAvailableCentavos: 105_000,
       closure: outlook,
     });
@@ -172,7 +180,14 @@ describe('Administrator Client detail', () => {
         now: () => now,
       }),
     ).resolves.toMatchObject({
-      subscription: { status: 'expired', subscription: expired },
+      subscription: {
+        status: 'expired',
+        subscription: expired,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
+      },
       creditAvailableCentavos: 0,
     });
   });

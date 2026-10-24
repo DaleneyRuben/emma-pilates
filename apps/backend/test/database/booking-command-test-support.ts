@@ -49,7 +49,7 @@ export const createFixture = async (
   const plan = await prisma.plan.create({
     data: {
       name: randomUUID(),
-      durationMonths: 1,
+      durationDays: 30,
       classAllowance: 2,
       priceCentavos: 10000,
       displayOrder: 0,
@@ -60,7 +60,7 @@ export const createFixture = async (
       clientId: client.id,
       planId: plan.id,
       planNameSnapshot: plan.name,
-      durationMonthsSnapshot: 1,
+      durationDaysSnapshot: 30,
       originalClassAllowance: 2,
       remainingClassAllowance: 2,
       startsOn: new Date('2026-09-01'),
@@ -90,7 +90,7 @@ export const createClientWithSubscription = async (prisma: PrismaClient) => {
   const plan = await prisma.plan.create({
     data: {
       name: randomUUID(),
-      durationMonths: 1,
+      durationDays: 30,
       classAllowance: 2,
       priceCentavos: 10000,
       displayOrder: 0,
@@ -101,7 +101,7 @@ export const createClientWithSubscription = async (prisma: PrismaClient) => {
       clientId: client.id,
       planId: plan.id,
       planNameSnapshot: plan.name,
-      durationMonthsSnapshot: 1,
+      durationDaysSnapshot: 30,
       originalClassAllowance: 2,
       remainingClassAllowance: 2,
       startsOn: new Date('2026-09-01'),

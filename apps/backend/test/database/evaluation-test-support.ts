@@ -98,16 +98,20 @@ export const startEvaluationTestWorld =
             },
           },
           subscriptions: {
-            create: {
-              planId: plan.id,
-              planNameSnapshot: plan.name,
-              durationMonthsSnapshot: plan.durationMonths,
-              originalClassAllowance: plan.classAllowance,
-              remainingClassAllowance: plan.classAllowance,
-              startsOn: new Date('2026-09-01T00:00:00.000Z'),
-              endsOn: new Date('2026-11-30T00:00:00.000Z'),
-              activatedAt: new Date('2026-09-01T12:00:00.000Z'),
-            },
+            create: [
+              {
+                planId: plan.id,
+                planNameSnapshot: plan.name,
+                // One 90-day Plan includes one Evaluation (NUT-003). September
+                // and October both fall inside it, so the second booking is paid.
+                durationDaysSnapshot: 90,
+                originalClassAllowance: plan.classAllowance,
+                remainingClassAllowance: plan.classAllowance,
+                startsOn: new Date('2026-09-01T00:00:00.000Z'),
+                endsOn: new Date('2026-11-30T00:00:00.000Z'),
+                activatedAt: new Date('2026-09-01T12:00:00.000Z'),
+              },
+            ],
           },
         },
       });

@@ -27,7 +27,7 @@ describe('Prisma administration Evaluation list for AW25', () => {
       where: { id: deterministicId(`test-client:${clientKey}`) },
       select: {
         id: true,
-        subscriptions: { select: { id: true } },
+        subscriptions: { select: { id: true }, orderBy: { startsOn: 'asc' } },
         account: { select: { id: true } },
       },
     });
@@ -42,12 +42,40 @@ describe('Prisma administration Evaluation list for AW25', () => {
       },
       orderBy: { startsAt: 'asc' },
     });
+    // September takes the one included Evaluation. October is paid, so the
+    // unique index still holds and the kind is derived from the earlier one.
+    const paymentId =
+      month === '10'
+        ? (
+            await world.prisma.payment.create({
+              data: {
+                clientId: client.id,
+                planId: (await world.prisma.plan.findFirstOrThrow()).id,
+                planNameSnapshot: 'Evaluación',
+                durationDaysSnapshot: 0,
+                classAllowanceSnapshot: 0,
+                planPriceCentavos: 7_000,
+                creditAppliedCentavos: 0,
+                amountDueCentavos: 7_000,
+                startsOn: new Date(`2026-${month}-01T00:00:00.000Z`),
+                method: 'CASH',
+                kind: 'EVALUATION',
+                state: 'CONFIRMED',
+                submittedByAccountId: client.account!.id,
+                submittedAt: fixtureNow,
+                decidedByAccountId: client.account!.id,
+                decidedAt: fixtureNow,
+              },
+            })
+          ).id
+        : null;
     await world.prisma.evaluation.create({
       data: {
         clientId: client.id,
         evaluationSlotId: slot.id,
         eligibilityMonth: new Date(`2026-${month}-01T00:00:00.000Z`),
-        subscriptionId: client.subscriptions[0].id,
+        subscriptionId: month === '09' ? client.subscriptions[0].id : null,
+        paymentId,
         createdByAccountId: client.account!.id,
       },
     });

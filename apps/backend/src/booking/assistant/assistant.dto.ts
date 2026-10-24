@@ -7,6 +7,11 @@ import {
   ClientSubscriptionSummaryDto,
   PlanDto,
 } from '../client/client-discovery.dto';
+import type { InvoiceData } from '../payments/invoice-data/invoice-data';
+import {
+  InvoiceDataDto,
+  invoiceDataField,
+} from '../payments/invoice-data/invoice-data.dto';
 import { PaymentDto } from '../payments/payments.dto';
 import type { ClientAccountStatus } from './assistant-clients';
 
@@ -92,13 +97,73 @@ export class RecordCashPaymentDto {
     description: 'Branch where the cash was collected',
   })
   branchId!: string;
+
+  @ApiPropertyOptional({
+    type: InvoiceDataDto,
+    nullable: true,
+    description:
+      'PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»',
+  })
+  invoiceData?: InvoiceDataDto | null;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
+  })
+  startsOn?: string;
 }
 
 export const parseRecordCashPayment = (
   value: unknown,
-): RecordCashPaymentDto | null => {
+): {
+  planId: string;
+  branchId: string;
+  invoiceData: InvoiceData | null;
+  startsOn?: string;
+} | null => {
   const result = z
-    .strictObject({ planId: uuid, branchId: uuid })
+    .strictObject({
+      planId: uuid,
+      branchId: uuid,
+      invoiceData: invoiceDataField,
+      startsOn: z.iso.date().optional(),
+    })
+    .safeParse(value);
+  return result.success ? result.data : null;
+};
+
+export class RecordFrontDeskTransferDto {
+  @ApiProperty({ format: 'uuid' })
+  planId!: string;
+
+  @ApiProperty({ format: 'uuid', description: 'Branch of the front desk' })
+  branchId!: string;
+
+  @ApiProperty({
+    format: 'uuid',
+    description: 'The photographed transfer receipt, already READY',
+  })
+  imageAssetId!: string;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
+  })
+  startsOn?: string;
+}
+
+export const parseRecordFrontDeskTransfer = (
+  value: unknown,
+): RecordFrontDeskTransferDto | null => {
+  const result = z
+    .strictObject({
+      planId: uuid,
+      branchId: uuid,
+      imageAssetId: uuid,
+      startsOn: z.iso.date().optional(),
+    })
     .safeParse(value);
   return result.success ? result.data : null;
 };

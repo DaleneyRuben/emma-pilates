@@ -31,6 +31,14 @@ const sharedContextSlices = [
   // Registration attributes the referrer inside its own transaction through
   // this Booking-owned slice (PAY-001 decision d).
   'booking/payments/referral-attribution',
+  // Registration and the Assistant's invitation record how the new Client
+  // found the studio in the same transaction (BKM-011).
+  'booking/acquisition/acquisition',
+  'booking/acquisition/acquisition-errors',
+  'booking/acquisition/record-client-acquisition',
+  // Registration opens the friend's Guest Pass in the same transaction
+  // (BKM-014).
+  'booking/payments/open-guest-pass',
   // Staff management creates, reissues, and disables the Staff Member's
   // Account inside its own transaction through this System Identity slice
   // (IDN-007).

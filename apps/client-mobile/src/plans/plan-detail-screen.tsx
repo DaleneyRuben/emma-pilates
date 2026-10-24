@@ -12,14 +12,20 @@ import {
 import {
   BodyText,
   colors,
+  describeValidity,
+  describeWeeklyCap,
+  formatCancellationWindow,
   LoadingState,
+  boliviaCivilDate,
   PrimaryButton,
   QueryFailure,
   Screen,
   ScreenTopBar,
   spacing,
+  StartDateChooser,
   surfaces,
   typography,
+  useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,7 +34,7 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { describeValidity, formatBolivianos } from "./plan-format";
+import { formatBolivianos } from "./plan-format";
 
 type PlanDetailNavigation = {
   goBack: () => void;
@@ -38,6 +44,8 @@ type PlanDetailNavigation = {
 const purchaseErrorCopy: Record<string, string> = {
   subscription_not_expired: "Tu plan actual sigue activo. Podrás comprar uno nuevo cuando venza.",
   plan_not_purchasable: "Este plan no está disponible para compra.",
+  start_date_out_of_window: "Esa fecha de inicio no está disponible.",
+  future_subscription_exists: "Ya tienes un plan siguiente.",
 };
 
 const problemCode = (data: unknown): string | null =>
@@ -45,15 +53,16 @@ const problemCode = (data: unknown): string | null =>
     ? String((data as { code: unknown }).code)
     : null;
 
-const validityCopy = (durationMonths: number): string =>
-  durationMonths === 1
-    ? "Un mes de vigencia desde que se confirma tu pago."
-    : `${durationMonths} meses de vigencia desde que se confirma tu pago.`;
+// Follow-up 176: validity in days (booking ADR-0005); BKM-006 replaces the
+// confirmation day with the chosen Start Date.
+const validityCopy = (durationDays: number): string =>
+  `${durationDays} días de vigencia desde la fecha de inicio.`;
 
 export function PlanDetailScreen({ route }: { route: { params: { planId: string } } }) {
   const navigation = useNavigation<PlanDetailNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
+  const studioRules = useStudioRules(fetcher);
   const plan = useGetPlan(route.params.planId, {
     fetcher,
     query: { refetchOnMount: "always" },
@@ -64,6 +73,8 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
   });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const today = boliviaCivilDate(new Date());
+  const [startsOn, setStartsOn] = useState(today);
 
   if (plan.isPending) {
     return (
@@ -97,7 +108,11 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     const headers = { "idempotency-key": randomUUID() };
     try {
       if (total === 0) {
-        const purchase = await completeCreditPurchase({ planId: detail.id }, { headers }, fetcher);
+        const purchase = await completeCreditPurchase(
+          { planId: detail.id, startsOn },
+          { headers },
+          fetcher,
+        );
         if (purchase.status !== 201) {
           setError(
             purchaseErrorCopy[problemCode(purchase.data) ?? ""] ??
@@ -116,7 +131,11 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
         return;
       }
 
-      const created = await createPurchaseIntent({ planId: detail.id }, { headers }, fetcher);
+      const created = await createPurchaseIntent(
+        { planId: detail.id, startsOn },
+        { headers },
+        fetcher,
+      );
       if (created.status === 201) {
         await queryClient.invalidateQueries({ queryKey: getGetCurrentPurchaseIntentQueryKey() });
         navigation.navigate("Payment", { purchaseIntentId: created.data.id });
@@ -148,14 +167,35 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
           <Text style={styles.planName}>{detail.name}</Text>
-          <BodyText>{describeValidity(detail.durationMonths)}</BodyText>
-          <Text style={styles.price}>{price}</Text>
+          <BodyText>{describeValidity(detail.durationDays)}</BodyText>
+          <View style={styles.priceRow}>
+            {detail.listPriceCentavos === undefined ? null : (
+              <Text style={styles.listPrice}>{formatBolivianos(detail.listPriceCentavos)}</Text>
+            )}
+            <Text style={styles.price}>{price}</Text>
+          </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Qué incluye</Text>
           <BodyText>{`${detail.classAllowance} clases en cualquier sucursal del estudio.`}</BodyText>
-          <BodyText>Cancelación sin costo hasta 2 h 30 antes de cada clase.</BodyText>
-          <BodyText>{validityCopy(detail.durationMonths)}</BodyText>
+          {studioRules === undefined ? null : (
+            <BodyText>
+              {`Cancelación sin costo hasta ${formatCancellationWindow(studioRules.cancellationWindowMinutes)} antes de cada clase.`}
+            </BodyText>
+          )}
+          <BodyText>{validityCopy(detail.durationDays)}</BodyText>
+          {studioRules === undefined ? null : (
+            <StartDateChooser
+              openingDate={studioRules.openingDate}
+              selected={startsOn}
+              startDateLimitDays={studioRules.startDateLimitDays}
+              today={today}
+              onSelect={setStartsOn}
+            />
+          )}
+          {detail.weeklyClassCap === null ? null : (
+            <BodyText>{`${describeWeeklyCap(detail.weeklyClassCap)}.`}</BodyText>
+          )}
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Desglose</Text>
@@ -212,12 +252,18 @@ const styles = StyleSheet.create({
     fontSize: typography.titleSecondary,
     fontWeight: "500",
   },
+  listPrice: {
+    color: colors.textSubtle,
+    fontSize: typography.note,
+    textDecorationLine: "line-through",
+  },
   price: {
     color: colors.text,
     fontFamily: "Lora_500Medium",
     fontSize: typography.price,
     marginTop: spacing.sm,
   },
+  priceRow: { alignItems: "flex-end", gap: spacing.xs },
   row: { flexDirection: "row", justifyContent: "space-between" },
   screen: { gap: spacing.lg },
   section: { gap: spacing.sm },

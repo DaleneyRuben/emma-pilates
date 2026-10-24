@@ -50,7 +50,7 @@ describe("Client purchase flow", () => {
     });
     expect(created).toHaveBeenCalledWith(
       expect.objectContaining({ "idempotency-key": expect.any(String) }),
-      { planId: "plan-8" },
+      { planId: "plan-8", startsOn: "2026-10-08" },
     );
     expect(screen.getAllByText("Bs 500").length).toBeGreaterThan(0);
     expect(
@@ -203,7 +203,10 @@ describe("Client purchase flow", () => {
     await waitFor(() => {
       expect(screen.getByText("¡Pago confirmado!")).toBeOnTheScreen();
     });
-    expect(purchased).toHaveBeenCalledWith({ planId: "plan-8" });
+    expect(purchased).toHaveBeenCalledWith({
+      planId: "plan-8",
+      startsOn: "2026-10-08",
+    });
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Ir al inicio" })).toBeOnTheScreen();
   });

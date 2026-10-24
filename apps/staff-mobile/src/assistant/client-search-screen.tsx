@@ -1,5 +1,6 @@
 import {
   getSearchAssistantClientsQueryKey,
+  useListContactAlerts,
   useSearchAssistantClients,
 } from "@pilates/api-contracts";
 import {
@@ -13,7 +14,9 @@ import {
   Screen,
   spacing,
   surfaces,
+  TextButton,
   typography,
+  UnreadCountPill,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
@@ -22,6 +25,7 @@ import { useEffect, useState } from "react";
 import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { useStaffRole } from "../staff-role";
 import { RootHeader } from "../ui/root-header";
 import { describeContact } from "./assistant-format";
 import { useAssistantWorkspace } from "./assistant-workspace";
@@ -29,7 +33,7 @@ import { ClientDetailPanel } from "./client-panel";
 
 export type ClientSearchNavigation = {
   navigate: {
-    (screen: "NewClient"): void;
+    (screen: "NewClient" | "CancelClass" | "ContactList"): void;
     (screen: "ClientOverview", params: { clientId: string }): void;
   };
 };
@@ -55,8 +59,16 @@ function NewClientButton({ onPress }: { onPress: () => void }) {
 export function ClientSearchScreen() {
   const navigation = useNavigation<ClientSearchNavigation>();
   const fetcher = useStaffFetcher();
+  // ADR-0102: only the Assistant registers new Clients; the Coordinator
+  // cancels a class from here instead (follow-up 158).
+  const coordinator = useStaffRole() === "coordinator";
   const [text, setText] = useState("");
   const [query, setQuery] = useState("");
+  const alerts = useListContactAlerts({
+    fetcher,
+    query: { enabled: coordinator },
+  });
+  const contactCount = alerts.data?.status === 200 ? alerts.data.data.totalItems : 0;
 
   useEffect(() => {
     const timer = setTimeout(() => setQuery(text.trim()), debounceMilliseconds);
@@ -99,7 +111,27 @@ export function ClientSearchScreen() {
         testID="client-search-input"
         value={text}
       />
-      <NewClientButton onPress={() => navigation.navigate("NewClient")} />
+      {coordinator ? (
+        <>
+          <TextButton
+            label="Cancelar una clase"
+            onPress={() => navigation.navigate("CancelClass")}
+            testID="client-search-cancel-class"
+          />
+          <Pressable
+            accessibilityLabel="Para contactar"
+            accessibilityRole="button"
+            onPress={() => navigation.navigate("ContactList")}
+            style={styles.contactListButton}
+            testID="client-search-contact-list"
+          >
+            <Text style={styles.contactListLabel}>Para contactar</Text>
+            <UnreadCountPill count={contactCount} testID="contact-list-count" />
+          </Pressable>
+        </>
+      ) : (
+        <NewClientButton onPress={() => navigation.navigate("NewClient")} />
+      )}
       {!searching ? (
         <BodyText style={styles.hint}>Escribe al menos dos letras o números para buscar.</BodyText>
       ) : results.isPending ? (
@@ -161,6 +193,18 @@ export function ClientSearchScreen() {
 }
 
 const styles = StyleSheet.create({
+  contactListButton: {
+    alignItems: "center",
+    borderColor: colors.primary,
+    borderRadius: radii.control,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: spacing.sm,
+    justifyContent: "center",
+    minHeight: 48,
+    paddingHorizontal: spacing.lg,
+  },
+  contactListLabel: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "500" },
   contact: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   empty: { alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xl },
   emptyTitle: {

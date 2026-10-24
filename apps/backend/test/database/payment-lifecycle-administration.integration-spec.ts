@@ -281,6 +281,13 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
         key,
       ),
     ).resolves.toMatchObject({ id: payment.id });
+    const renewal = await commands().recordCashPayment(
+      { clientId: buyer.clientId, planId: plan.id, branchId: centro.id },
+      assistant,
+      randomUUID(),
+    );
+    expect(renewal.id).not.toBe(payment.id);
+    expect(renewal.startsOn).toBe('2026-10-21');
     await expect(
       codeOf(
         commands().recordCashPayment(
@@ -289,7 +296,7 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
           randomUUID(),
         ),
       ),
-    ).resolves.toBe('subscription_not_expired');
+    ).resolves.toBe('future_subscription_exists');
   });
 
   it('refuses cash while the Client has an open Purchase Intent', async () => {

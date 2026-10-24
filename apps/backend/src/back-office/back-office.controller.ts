@@ -1,3 +1,4 @@
+import { equipmentControllers } from './equipment/equipment.controller';
 import {
   Body,
   Controller,
@@ -379,6 +380,7 @@ export class AdministratorExpenseReportController extends BackOfficeController {
 }
 
 export const backOfficeControllers = [
+  ...equipmentControllers,
   AdministratorSuppliesController,
   AdministratorWithdrawalsController,
   AdministratorSalaryPaymentsController,

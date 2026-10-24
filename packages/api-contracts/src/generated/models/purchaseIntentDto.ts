@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { PurchaseIntentDtoDurationDays } from "./purchaseIntentDtoDurationDays";
 import type { PurchaseIntentDtoDurationMonths } from "./purchaseIntentDtoDurationMonths";
 import type { PurchaseIntentDtoState } from "./purchaseIntentDtoState";
 
@@ -11,6 +12,11 @@ export interface PurchaseIntentDto {
   id: string;
   planId: string;
   planName: string;
+  durationDays: PurchaseIntentDtoDurationDays;
+  /**
+   * durationDays / 30, for builds that still read months
+   * @deprecated
+   */
   durationMonths: PurchaseIntentDtoDurationMonths;
   /** @minimum 1 */
   classAllowance: number;
@@ -33,4 +39,6 @@ export interface PurchaseIntentDto {
   receiptAttached: boolean;
   createdAt: string;
   expiresAt: string;
+  /** Chosen Start Date. Absent on responses older builds ignore. */
+  startsOn?: string;
 }

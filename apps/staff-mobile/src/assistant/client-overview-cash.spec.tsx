@@ -12,11 +12,9 @@ import {
 
 jest.setTimeout(20_000);
 
-// UX-003: no second Plan while the current one is effective (the API's
-// subscription_not_expired: paid through today and still holding classes or
-// a future Booking), so S06 says so before the picker instead of S10
-// refusing at the last tap (UX-001 finding S3).
-const note = "Podrá comprar otro plan cuando este termine.";
+// UX-003: an effective Plan blocks cash. A future Plan does too, with its own note.
+const activeNote = "Podrá comprar otro plan cuando este termine.";
+const futureNote = "Ya tiene un plan siguiente.";
 
 describe("Client overview cash action", () => {
   afterEach(async () => {
@@ -24,14 +22,14 @@ describe("Client overview cash action", () => {
     clearMobileQueryCache();
   });
 
-  it("disables «Registrar pago en efectivo» with the note while the Plan is active", async () => {
+  it("disables «Registrar pago en efectivo» while the Plan is active", async () => {
     const screen = await openLucia(assistantRoutes());
 
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeDisabled();
-    expect(screen.getByText(note)).toBeOnTheScreen();
+    expect(screen.getByText(activeNote)).toBeOnTheScreen();
   });
 
-  it("disables it while the Plan is about to expire", async () => {
+  it("keeps it enabled while the Plan is about to expire", async () => {
     const screen = await openLucia({
       ...assistantRoutes(),
       "/api/v1/assistant/clients/client-lucia": () =>
@@ -39,7 +37,7 @@ describe("Client overview cash action", () => {
     });
 
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeDisabled();
-    expect(screen.getByText(note)).toBeOnTheScreen();
+    expect(screen.getByText(activeNote)).toBeOnTheScreen();
   });
 
   it("keeps it enabled while an active Plan has no classes left and no upcoming Booking", async () => {
@@ -60,10 +58,10 @@ describe("Client overview cash action", () => {
       expect(screen.getByText("0 clases restantes")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
-    expect(screen.queryByText(note)).toBeNull();
+    expect(screen.queryByText(activeNote)).toBeNull();
   });
 
-  it("disables it while an active Plan with no classes left still has an upcoming Booking", async () => {
+  it("keeps it disabled while an active Plan with no classes left still has an upcoming Booking", async () => {
     const screen = await openLucia({
       ...assistantRoutes(),
       "/api/v1/assistant/clients/client-lucia": () =>
@@ -81,7 +79,25 @@ describe("Client overview cash action", () => {
       expect(screen.getByText("0 clases restantes")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeDisabled();
-    expect(screen.getByText(note)).toBeOnTheScreen();
+    expect(screen.getByText(activeNote)).toBeOnTheScreen();
+  });
+
+  it("disables it when a future Plan is already queued", async () => {
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      "/api/v1/assistant/clients/client-lucia": () =>
+        jsonResponse({
+          ...overview,
+          subscription: {
+            status: "active",
+            subscription,
+            nextSubscription: { ...subscription, id: "next", startsOn: "2026-10-13" },
+          },
+        }),
+    });
+
+    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeDisabled();
+    expect(screen.getByText(futureNote)).toBeOnTheScreen();
   });
 
   it("keeps it enabled without the note once the Plan has expired", async () => {
@@ -101,6 +117,7 @@ describe("Client overview cash action", () => {
       expect(screen.getByText("Vencida")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
-    expect(screen.queryByText(note)).toBeNull();
+    expect(screen.queryByText(activeNote)).toBeNull();
+    expect(screen.queryByText(futureNote)).toBeNull();
   });
 });

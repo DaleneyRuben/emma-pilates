@@ -26,15 +26,31 @@ env:
     id: "new-client-name"
 - waitForAnimationToEnd
 - inputText: "Paula Maestro"
-- tapOn:
-    id: "new-client-email"
-- waitForAnimationToEnd
-- inputText: ${output.email}
+# The phone pad has no return key: type the phone first and close the
+# email keyboard with its return key, so it never covers «Crear cuenta».
 - tapOn:
     id: "new-client-phone"
 - waitForAnimationToEnd
 - inputText: "70012345"
+- tapOn:
+    id: "new-client-email"
+- waitForAnimationToEnd
+- inputText: ${output.email}
+- pressKey: Enter
+# BKM-011: «¿Cómo nos conociste?» is required (follow-up 141).
+- scrollUntilVisible:
+    element:
+      id: "acquisition-channel-walk_in"
+    direction: DOWN
+# A tap while the scroll still moves is lost.
+- waitForAnimationToEnd
+- tapOn:
+    id: "acquisition-channel-walk_in"
 - takeScreenshot: staff-new-client-1-form
+- scrollUntilVisible:
+    element:
+      id: "new-client-submit"
+    direction: DOWN
 - tapOn:
     id: "new-client-submit"
 - extendedWaitUntil:

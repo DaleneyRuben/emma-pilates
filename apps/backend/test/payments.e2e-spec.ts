@@ -31,11 +31,13 @@ const intent = {
   id: intentId,
   planId,
   planName: 'Paquete de 8 clases',
+  durationDays: 30,
   durationMonths: 1,
   classAllowance: 8,
   planPriceCentavos: 56_000,
   creditReservedCentavos: 6000,
   amountDueCentavos: 50_000,
+  startsOn: '2026-09-21',
   state: 'open',
   receiptAttached: false,
   createdAt: new Date('2026-09-21T15:00:00.000Z'),
@@ -47,11 +49,13 @@ const payment = {
   state: 'pending',
   planId,
   planName: 'Paquete de 8 clases',
+  durationDays: 30,
   durationMonths: 1,
   classAllowance: 8,
   planPriceCentavos: 56_000,
   creditAppliedCentavos: 6000,
   amountDueCentavos: 50_000,
+  startsOn: '2026-09-21',
   submittedAt: new Date('2026-09-21T16:00:00.000Z'),
   decidedAt: null,
   rejectionReason: null,
@@ -215,6 +219,46 @@ describe('client payments (e2e)', () => {
       .expect(({ body }) => {
         expect(body).toMatchObject({ method: 'transfer', state: 'pending' });
       });
+    // A release before PAY-007 sends no body: the sale is «Sin factura».
+    expect(commands.submitTransfer).toHaveBeenLastCalledWith(
+      { purchaseIntentId: intentId, invoiceData: null },
+      expect.objectContaining({ accountId: 'account-id' }),
+      key,
+    );
+  });
+
+  it('submits the transfer with the Invoice Data the Client typed, tidied', async () => {
+    await request(app.getHttpServer())
+      .post(`/api/v1/purchase-intents/${intentId}/submit`)
+      .set('authorization', bearer)
+      .set('idempotency-key', key)
+      .send({ invoiceData: { taxId: ' 4567891-1a ', name: ' Ana  Pérez ' } })
+      .expect(201);
+    expect(commands.submitTransfer).toHaveBeenLastCalledWith(
+      {
+        purchaseIntentId: intentId,
+        invoiceData: { taxId: '4567891-1A', name: 'Ana Pérez' },
+      },
+      expect.anything(),
+      key,
+    );
+
+    for (const body of [
+      { invoiceData: { taxId: '4567891' } },
+      { invoiceData: { taxId: 'sin numero', name: 'Ana' } },
+      { invoiceData: null, extra: true },
+    ]) {
+      await request(app.getHttpServer())
+        .post(`/api/v1/purchase-intents/${intentId}/submit`)
+        .set('authorization', bearer)
+        .set('idempotency-key', key)
+        .send(body)
+        .expect(400)
+        .expect(({ body: problem }: { body: { code: string } }) =>
+          expect(problem.code).toBe('invalid_request'),
+        );
+    }
+    expect(commands.submitTransfer).toHaveBeenCalledTimes(1);
   });
 
   it('serves the current Purchase Intent, Payment, Credit, and referrals', async () => {

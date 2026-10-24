@@ -8,6 +8,7 @@ const idle = (result: unknown) => ({
 const startWithJobs = async ({
   rows = [] as unknown[],
   evaluationReminders = idle({ sent: 0 }),
+  classReminders = idle({ sent: 0 }),
   emailEnabled = false,
 } = {}) => {
   const executeSql = jest.fn().mockResolvedValue({ rows });
@@ -38,11 +39,15 @@ const startWithJobs = async ({
     pendingAccountCleanup: idle({ cleaned: 0 }),
     imageUploadCleanup: idle({ cleaned: 0 }),
     subscriptionReminders: idle({ reminded: 0 }),
+    first90Days: idle({ messages: 0, alerts: 0 }),
+    founderMemberships: idle({ ended: 0 }),
     purchaseIntentExpiry: idle({ expired: 0 }),
     sessionSchedules: idle({ schedules: 0, created: 0, skipped: 0 }),
     evaluationSlots: idle({ blocks: 0, created: 0, skipped: 0 }),
     evaluationReminders,
-    emptySessionChecks: idle({ checked: 0, cancelled: 0 }),
+    classReminders,
+    minimumBookingsChecks: idle({ checked: 0, cancelled: 0 }),
+    windowCloseSnapshots: idle({ recorded: 0 }),
     startedSessionWaitlists: idle({ closed: 0 }),
     pushDispatch: { dispatch: jest.fn() },
     pushReceipts: idle({ discarded: 0, checked: 0, delivered: 0, failed: 0 }),

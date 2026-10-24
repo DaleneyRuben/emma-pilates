@@ -9,6 +9,7 @@ enum SessionCancellationCause {
   ZERO_BOOKINGS         @map("zero_bookings")
   NO_SUBSTITUTE_TRAINER @map("no_substitute_trainer")
   SCHEDULE_CHANGED      @map("schedule_changed")
+  MINIMUM_NOT_MET       @map("minimum_not_met")
 
   @@schema("booking")
 }
@@ -20,10 +21,25 @@ enum SubscriptionState {
   @@schema("booking")
 }
 
+enum AllowanceAdjustmentReason {
+  GIFT_NEW_CLIENT  @map("gift_new_client")
+  INVITE_CONVERTED @map("invite_converted")
+  CAMPAIGN         @map("campaign")
+  COURTESY         @map("courtesy")
+  CLASS_RETURN     @map("class_return")
+  CONSUMPTION      @map("consumption")
+
+  @@schema("booking")
+}
+
 model Plan {
   id             String         @id @default(uuid()) @db.Uuid
   name           String
-  durationMonths Int            @map("duration_months") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it; the contract derives
+  // durationMonths from durationDays for old builds.
+  durationMonths Int?           @map("duration_months") @db.SmallInt
+  durationDays   Int            @map("duration_days") @db.SmallInt
+  weeklyClassCap Int?           @map("weekly_class_cap") @db.SmallInt
   classAllowance Int            @map("class_allowance")
   priceCentavos  Int            @map("price_centavos")
   displayOrder   Int            @map("display_order")
@@ -99,7 +115,11 @@ model Session {
   cancelledAt                  DateTime?                 @map("cancelled_at") @db.Timestamptz(3)
   cancelledByAccountId         String?                   @map("cancelled_by_account_id") @db.Uuid
   cancellationNote             String?                   @map("cancellation_note")
-  emptyBookingCheckCompletedAt DateTime?                 @map("empty_booking_check_completed_at") @db.Timestamptz(3)
+  // The one-time Minimum Bookings check (ADR-0007, BKM-009); the column kept
+  // BOOK-004's name when the zero-booking check became this check.
+  minimumBookingsCheckCompletedAt DateTime?              @map("empty_booking_check_completed_at") @db.Timestamptz(3)
+  // Live Bookings when the Cancellation Window closed; Trainer pay counts them.
+  bookingsAtWindowClose        Int?                      @map("bookings_at_window_close") @db.SmallInt
   createdAt                    DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt                    DateTime                  @updatedAt @map("updated_at") @db.Timestamptz(3)
   sessionSchedule              SessionSchedule?          @relation(fields: [sessionScheduleId], references: [id], onDelete: Restrict)
@@ -124,11 +144,16 @@ model Subscription {
   clientId                String            @map("client_id") @db.Uuid
   planId                  String            @map("plan_id") @db.Uuid
   planNameSnapshot        String            @map("plan_name_snapshot")
-  durationMonthsSnapshot  Int               @map("duration_months_snapshot") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it.
+  durationMonthsSnapshot  Int?              @map("duration_months_snapshot") @db.SmallInt
+  durationDaysSnapshot    Int               @map("duration_days_snapshot") @db.SmallInt
+  weeklyClassCapSnapshot  Int?              @map("weekly_class_cap_snapshot") @db.SmallInt
   originalClassAllowance  Int               @map("original_class_allowance")
   remainingClassAllowance Int               @map("remaining_class_allowance")
   startsOn                DateTime          @map("starts_on") @db.Date
   endsOn                  DateTime          @map("ends_on") @db.Date
+  // A void may end the Subscription the day before it started (ADR-0012).
+  endedByVoid             Boolean           @default(false) @map("ended_by_void")
   state                   SubscriptionState @default(ACTIVE)
   activatedAt             DateTime          @map("activated_at") @db.Timestamptz(3)
   expiredAt               DateTime?         @map("expired_at") @db.Timestamptz(3)
@@ -140,12 +165,45 @@ model Subscription {
   payment                 Payment?          @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   bookings                Booking[]
   evaluations             Evaluation[]
+  allowanceAdjustments    AllowanceAdjustment[]
+  freezes                 Freeze[]
+  guestPasses             GuestPass[]
+  guestPassRewards        GuestPass[]           @relation("GuestPassReward")
 
   @@unique([id, clientId])
   @@index([clientId, startsOn])
   @@index([planId])
   @@index([state, endsOn])
   @@map("subscriptions")
+  @@schema("booking")
+}
+
+// BKM-008, booking ADR-0006: extra classes live here, never on the Payment
+// or the Plan's allowance, so a report can tell bought classes from given
+// ones. A removal is deleted_at (ADR-0086). One live gift per Client is a
+// partial unique index in the migration.
+model AllowanceAdjustment {
+  id                String                    @id @default(uuid()) @db.Uuid
+  subscriptionId    String                    @map("subscription_id") @db.Uuid
+  // Denormalized so one live gift per Client is a partial unique index.
+  // PostgreSQL cannot index a subquery over the Subscription.
+  clientId          String                    @map("client_id") @db.Uuid
+  classes           Int                       @db.SmallInt
+  reason            AllowanceAdjustmentReason
+  authorAccountId   String                    @map("author_account_id") @db.Uuid
+  // Set only when an extra class funds a Booking, so the weekly cap can
+  // tell that Booking from one funded by the base allowance (BKM-007).
+  bookingId         String?                   @unique @map("booking_id") @db.Uuid
+  createdAt         DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt         DateTime?                 @map("deleted_at") @db.Timestamptz(3)
+  subscription      Subscription              @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  client            Client                    @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  authorAccount     Account                   @relation("AllowanceAdjustmentAuthor", fields: [authorAccountId], references: [id], onDelete: Restrict)
+  booking           Booking?                  @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@index([subscriptionId, createdAt])
+  @@index([authorAccountId])
+  @@map("allowance_adjustments")
   @@schema("booking")
 }
 

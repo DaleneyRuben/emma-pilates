@@ -50,41 +50,44 @@ describe('admin-web Authentication Session persistence', () => {
     });
   });
 
-  it('opens the replacement browser session when an Administrator recovers the password', async () => {
-    const accountId = await createAccount(prisma, 'ADMINISTRATOR');
-    const tokenDigest = await createRecoveryToken(prisma, accountId);
-    const oldSessionId = await createMobileSession(prisma, accountId);
-    const replacement = newAuthenticationSession(
-      {
-        id: randomUUID(),
-        accountId,
-        surface: 'admin_web',
-        credentialDigest: Buffer.from(randomUUID()),
-      },
-      now,
-    );
+  it.each(['ADMINISTRATOR', 'COORDINATOR'] as const)(
+    'opens the replacement browser session when a %s recovers the password',
+    async (role) => {
+      const accountId = await createAccount(prisma, role);
+      const tokenDigest = await createRecoveryToken(prisma, accountId);
+      const oldSessionId = await createMobileSession(prisma, accountId);
+      const replacement = newAuthenticationSession(
+        {
+          id: randomUUID(),
+          accountId,
+          surface: 'admin_web',
+          credentialDigest: Buffer.from(randomUUID()),
+        },
+        now,
+      );
 
-    await expect(
-      new PrismaAccountSecurityGateway(prisma).completeRecovery({
-        tokenDigest,
-        passwordHash: 'recovered-password-hash',
-        completedAt: now,
-        authenticationSession: replacement,
-        sessionEligibility: 'administrator',
-        auditRecordId: randomUUID(),
-      }),
-    ).resolves.toEqual({ sessionOpened: true });
-    await expect(
-      prisma.authenticationSession.findUniqueOrThrow({
-        where: { id: replacement.id },
-      }),
-    ).resolves.toMatchObject({ surface: 'ADMIN_WEB', revokedAt: null });
-    await expect(
-      prisma.authenticationSession.findUniqueOrThrow({
-        where: { id: oldSessionId },
-      }),
-    ).resolves.toMatchObject({ revocationReason: 'PASSWORD_RECOVERED' });
-  });
+      await expect(
+        new PrismaAccountSecurityGateway(prisma).completeRecovery({
+          tokenDigest,
+          passwordHash: 'recovered-password-hash',
+          completedAt: now,
+          authenticationSession: replacement,
+          sessionEligibility: 'admin_web',
+          auditRecordId: randomUUID(),
+        }),
+      ).resolves.toEqual({ sessionOpened: true });
+      await expect(
+        prisma.authenticationSession.findUniqueOrThrow({
+          where: { id: replacement.id },
+        }),
+      ).resolves.toMatchObject({ surface: 'ADMIN_WEB', revokedAt: null });
+      await expect(
+        prisma.authenticationSession.findUniqueOrThrow({
+          where: { id: oldSessionId },
+        }),
+      ).resolves.toMatchObject({ revocationReason: 'PASSWORD_RECOVERED' });
+    },
+  );
 
   it('replaces the password and revokes every session but opens no browser session for a Client', async () => {
     const accountId = await createAccount(prisma, null);
@@ -106,7 +109,7 @@ describe('admin-web Authentication Session persistence', () => {
         passwordHash: 'recovered-password-hash',
         completedAt: now,
         authenticationSession: replacement,
-        sessionEligibility: 'administrator',
+        sessionEligibility: 'admin_web',
         auditRecordId: randomUUID(),
       }),
     ).resolves.toEqual({ sessionOpened: false });
@@ -128,7 +131,7 @@ describe('admin-web Authentication Session persistence', () => {
 
 const createAccount = async (
   prisma: PrismaClient,
-  staffRole: 'ADMINISTRATOR' | null,
+  staffRole: 'ADMINISTRATOR' | 'COORDINATOR' | null,
 ): Promise<string> => {
   const accountId = randomUUID();
   const activatedAt = new Date('2026-08-30T18:00:00.000Z');

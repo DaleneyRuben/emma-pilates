@@ -68,7 +68,9 @@ export const startClosureWorld = async (): Promise<ClosureWorld> => {
             : {
                 planId: plan.id,
                 planNameSnapshot: plan.name,
-                durationMonthsSnapshot: plan.durationMonths,
+                // Account closure cancels a future Evaluation; booking it
+                // needs the included Evaluation of a 90-day Plan (NUT-003).
+                durationDaysSnapshot: 90,
                 originalClassAllowance: 8,
                 remainingClassAllowance: 8,
                 startsOn: new Date('2026-09-01T00:00:00.000Z'),

@@ -3,6 +3,7 @@ import {
   BackLink,
   BodyText,
   colors,
+  describePlanTerms,
   formatBolivianos,
   Heading,
   LoadingState,
@@ -18,7 +19,6 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { TabletGrid } from "./assistant-layout";
-import { describeClasses } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
 
@@ -26,11 +26,6 @@ type SelectPlanNavigation = {
   goBack: () => void;
   navigate: (screen: "ConfirmCashPayment", params: ClientContext & { quote: PlanQuoteDto }) => void;
 };
-
-function planTerms(plan: PlanQuoteDto): string {
-  const months = plan.durationMonths === 1 ? "1 mes" : `${plan.durationMonths} meses`;
-  return `${describeClasses(plan.classAllowance)} · válido por ${months}`;
-}
 
 export function SelectPlanScreen({ route }: { route: { params: ClientContext } }) {
   const { clientId, clientName } = route.params;
@@ -97,9 +92,14 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
             >
               <View style={styles.cardBody}>
                 <Text style={styles.planName}>{plan.name}</Text>
-                <BodyText>{planTerms(plan)}</BodyText>
+                <BodyText>{describePlanTerms(plan)}</BodyText>
               </View>
               <View style={styles.prices}>
+                {plan.listPriceCentavos === undefined ? null : (
+                  <Text style={styles.originalPrice}>
+                    {formatBolivianos(plan.listPriceCentavos)}
+                  </Text>
+                )}
                 {plan.creditAppliedCentavos > 0 ? (
                   <Text style={styles.originalPrice}>{formatBolivianos(plan.priceCentavos)}</Text>
                 ) : null}

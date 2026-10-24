@@ -22,6 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { useStaffRole } from "../staff-role";
 import { useInClientPanel } from "./assistant-workspace";
 import { PendingInvitationCard } from "./pending-invitation-card";
 import { formatCivilDate } from "./assistant-format";
@@ -39,13 +40,23 @@ type OverviewNavigation = {
   };
 };
 
-function SubscriptionCard({ view }: { view: ClientOverviewDto["subscription"] }) {
+function SubscriptionCard({
+  view,
+  sells,
+}: {
+  view: ClientOverviewDto["subscription"];
+  sells: boolean;
+}) {
   const subscription = view.subscription;
   if (subscription === null || subscription === undefined) {
     return (
       <EmptyState
         icon="card"
-        message="Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar."
+        message={
+          sells
+            ? "Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar."
+            : "La clienta necesita un plan activo para reservar."
+        }
         title="Sin plan activo"
       />
     );
@@ -64,6 +75,7 @@ function SubscriptionCard({ view }: { view: ClientOverviewDto["subscription"] })
         </View>
       </View>
       <BodyText>{`${subscription.remainingClassAllowance} clases restantes`}</BodyText>
+      {subscription.extraClassesLine ? <BodyText>{subscription.extraClassesLine}</BodyText> : null}
       <BodyText style={styles.muted}>
         {`${active ? "Vence el" : "Venció el"} ${formatCivilDate(subscription.endsOn)}`}
       </BodyText>
@@ -79,6 +91,8 @@ export function ClientOverviewScreen({
   const { clientId, reopened = false } = route.params;
   const navigation = useNavigation<OverviewNavigation>();
   const fetcher = useStaffFetcher();
+  // ADR-0102: the Coordinator books but never sells or manages invitations.
+  const sells = useStaffRole() !== "coordinator";
   const overview = useGetAssistantClientOverview(clientId, {
     fetcher,
     query: { refetchOnMount: "always" },
@@ -122,6 +136,7 @@ export function ClientOverviewScreen({
     hasActiveSubscription &&
     ((data.subscription.subscription?.remainingClassAllowance ?? 0) > 0 ||
       (data.nextBooking ?? null) !== null);
+  const futurePlan = data.subscription.nextSubscription ?? null;
 
   return (
     <Screen style={styles.screen}>
@@ -131,7 +146,7 @@ export function ClientOverviewScreen({
         <BodyText style={styles.muted}>
           {client.phone ? `${client.phone} · ${client.email}` : client.email}
         </BodyText>
-        {client.accountStatus === "pending" ? (
+        {client.accountStatus === "pending" && sells ? (
           <PendingInvitationCard
             clientEmail={client.email}
             clientId={client.id}
@@ -140,7 +155,7 @@ export function ClientOverviewScreen({
             reopened={reopened}
           />
         ) : null}
-        <SubscriptionCard view={data.subscription} />
+        <SubscriptionCard sells={sells} view={data.subscription} />
         {data.nextBooking ? (
           <View style={styles.card}>
             <BodyText style={styles.label}>Próxima reserva</BodyText>
@@ -157,14 +172,19 @@ export function ClientOverviewScreen({
             onPress={() => navigation.navigate("BrowseSessions", context)}
             testID="client-overview-book"
           />
-          <OutlinedButton
-            disabled={planStillEffective}
-            label="Registrar pago en efectivo"
-            onPress={() => navigation.navigate("SelectPlan", context)}
-            testID="client-overview-cash-payment"
-          />
-          {planStillEffective ? (
+          {sells ? (
+            <OutlinedButton
+              disabled={planStillEffective || futurePlan !== null}
+              label="Registrar pago en efectivo"
+              onPress={() => navigation.navigate("SelectPlan", context)}
+              testID="client-overview-cash-payment"
+            />
+          ) : null}
+          {sells && planStillEffective ? (
             <BodyText style={styles.note}>Podrá comprar otro plan cuando este termine.</BodyText>
+          ) : null}
+          {sells && futurePlan !== null ? (
+            <BodyText style={styles.note}>Ya tiene un plan siguiente.</BodyText>
           ) : null}
           {hasActiveSubscription ? (
             <TextButton

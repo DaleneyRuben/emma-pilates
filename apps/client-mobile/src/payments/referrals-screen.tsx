@@ -1,13 +1,10 @@
 import {
-  getGetCurrentClientCreditQueryKey,
   getGetCurrentClientReferralsQueryKey,
   type ReferredClientDto,
-  useGetCurrentClientCredit,
   useGetCurrentClientReferrals,
 } from "@pilates/api-contracts";
 import {
   BodyText,
-  Chevron,
   colors,
   initials,
   LoadingState,
@@ -23,10 +20,9 @@ import {
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Share, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { formatBolivianos } from "../plans/plan-format";
 import { formatReferralDate } from "./referral-format";
 
 type ReferralsNavigation = {
@@ -41,10 +37,16 @@ const warningTint = "rgba(201, 154, 78, 0.16)";
 const shareMessage = (code: string): string =>
   `Únete a Emma Pilates Studio con mi código ${code}: regístrate en la app y úsalo al crear tu cuenta.`;
 
+const invitationBadge = {
+  registered: "Registrada",
+  class_booked: "Clase reservada",
+  bought: "Compró su plan",
+} as const;
+
 function ReferredRow({ entry }: { entry: ReferredClientDto }) {
-  const awarded = entry.state === "awarded";
+  const bought = entry.invitationStatus === "bought";
   const detail =
-    awarded && entry.awardedAt
+    bought && entry.awardedAt
       ? `Primer pago el ${formatReferralDate(entry.awardedAt)}`
       : `Se registró el ${formatReferralDate(entry.createdAt)}`;
 
@@ -57,9 +59,9 @@ function ReferredRow({ entry }: { entry: ReferredClientDto }) {
         <Text style={styles.name}>{entry.referredName}</Text>
         <BodyText style={styles.detail}>{detail}</BodyText>
       </View>
-      <View style={[styles.badge, awarded ? styles.awarded : styles.pending]}>
-        <Text style={[styles.badgeText, awarded ? styles.awardedText : styles.pendingText]}>
-          {awarded ? "Crédito ganado" : "Esperando su primer pago"}
+      <View style={[styles.badge, bought ? styles.awarded : styles.pending]}>
+        <Text style={[styles.badgeText, bought ? styles.awardedText : styles.pendingText]}>
+          {invitationBadge[entry.invitationStatus]}
         </Text>
       </View>
     </View>
@@ -71,14 +73,13 @@ export function ReferralsScreen() {
   const fetcher = useClientFetcher();
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const referrals = useGetCurrentClientReferrals(queryOptions);
-  const credit = useGetCurrentClientCredit(queryOptions);
-  const queryKeys = [getGetCurrentClientReferralsQueryKey(), getGetCurrentClientCreditQueryKey()];
+  const queryKeys = [getGetCurrentClientReferralsQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
 
   const header = (
     <>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mis referidos" />
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Invita a una amiga" />
     </>
   );
 
@@ -86,7 +87,7 @@ export function ReferralsScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <LoadingState label="Cargando referidos" />
+        <LoadingState label="Cargando invitaciones" />
       </Screen>
     );
   }
@@ -95,7 +96,7 @@ export function ReferralsScreen() {
       <Screen style={styles.screen}>
         {header}
         <QueryFailure
-          label="No pudimos cargar tus referidos."
+          label="No pudimos cargar tus invitaciones."
           onRetry={() => void referrals.refetch()}
         />
       </Screen>
@@ -103,8 +104,6 @@ export function ReferralsScreen() {
   }
 
   const { referralCode, referrals: referred } = referrals.data.data;
-  const available = credit.data?.status === 200 ? credit.data.data.availableCentavos : 0;
-  const creditValue = formatBolivianos(available);
 
   return (
     <Screen style={styles.screen}>
@@ -119,20 +118,9 @@ export function ReferralsScreen() {
           />
         </View>
         <BodyText style={styles.explanation}>
-          Comparte tu código. Cuando un amigo se registre y haga su primer pago, ganas crédito.
+          Comparte tu código. Tu amiga recibe una clase gratis, una sola vez. Cuando compre su
+          primer plan, tú ganas una clase.
         </BodyText>
-        <Pressable
-          accessibilityLabel={`Tu crédito: ${creditValue}`}
-          accessibilityRole="button"
-          onPress={() => navigation.navigate("Credit")}
-          style={styles.creditRow}
-        >
-          <Text style={styles.creditLabel}>Tu crédito</Text>
-          <View style={styles.creditTrailing}>
-            <Text style={styles.creditValue}>{creditValue}</Text>
-            <Chevron />
-          </View>
-        </Pressable>
         {referred.length === 0 ? (
           <View style={styles.emptyState}>
             <BodyText style={styles.empty}>

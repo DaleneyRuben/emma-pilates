@@ -4,11 +4,23 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { PlanQuoteDtoDurationDays } from "./planQuoteDtoDurationDays";
 import type { PlanQuoteDtoDurationMonths } from "./planQuoteDtoDurationMonths";
+import type { PlanQuoteDtoWeeklyClassCap } from "./planQuoteDtoWeeklyClassCap";
 
 export interface PlanQuoteDto {
   id: string;
   name: string;
+  durationDays: PlanQuoteDtoDurationDays;
+  /**
+   * Most Bookings a week from the base allowance
+   * @nullable
+   */
+  weeklyClassCap: PlanQuoteDtoWeeklyClassCap;
+  /**
+   * durationDays / 30, for builds that still read months
+   * @deprecated
+   */
   durationMonths: PlanQuoteDtoDurationMonths;
   /** @minimum 1 */
   classAllowance: number;
@@ -17,6 +29,11 @@ export interface PlanQuoteDto {
    * @minimum 0
    */
   priceCentavos: number;
+  /**
+   * List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it.
+   * @minimum 0
+   */
+  listPriceCentavos?: number;
   /**
    * Credit this purchase would spend
    * @minimum 0

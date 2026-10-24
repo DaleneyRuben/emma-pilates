@@ -1,3 +1,4 @@
+import { worksAtBranch } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import type { PlanSummary } from '../catalog/catalog-repository';
 import type { ClassHistoryEntry } from '../class-history';
@@ -8,6 +9,7 @@ import {
   type ClientSubscriptionView,
 } from '../client/client-subscription';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import type { InvoiceData } from '../payments/invoice-data/invoice-data';
 import type { PaymentView } from '../payments/prisma-payment-commands';
 
 export class ClientNotFoundError extends Error {
@@ -64,20 +66,27 @@ type StaffIdentity = Extract<
   { kind: 'staff' }
 >;
 
-// Assistants act for any Client; Administrators cover every Branch.
+// Assistants act for any Client; Administrators and the Coordinator cover
+// every Branch (ADR-0102).
 const requireAssistant = (principal: AuthenticatedPrincipal): StaffIdentity => {
   if (
     principal.identity.kind !== 'staff' ||
     (principal.identity.role !== 'assistant' &&
-      principal.identity.role !== 'administrator')
+      principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
   ) {
     throw new BookingAccessDeniedError();
   }
   return principal.identity;
 };
 
-const actsAtBranch = (identity: StaffIdentity, branchId: string): boolean =>
-  identity.role === 'administrator' || identity.branchIds.includes(branchId);
+// Selling stays with the front desk and the Administrator: the Coordinator
+// never sees a price or a Credit amount (ADR-0102).
+const requireSeller = (principal: AuthenticatedPrincipal): StaffIdentity => {
+  const identity = requireAssistant(principal);
+  if (identity.role === 'coordinator') throw new BookingAccessDeniedError();
+  return identity;
+};
 
 type ClientLookup = {
   findClient(clientId: string): Promise<AssistantClientSummary | null>;
@@ -122,6 +131,10 @@ export const readClientOverview = async (
     findLatestSubscription(
       clientId: string,
     ): Promise<ClientSubscriptionSummary | null>;
+    findFutureSubscription(
+      clientId: string,
+      after: Date,
+    ): Promise<ClientSubscriptionSummary | null>;
     findUpcoming(input: {
       clientId: string;
       from: Date;
@@ -130,8 +143,13 @@ export const readClientOverview = async (
     readAvailableCredit(clientId: string): Promise<number>;
   },
 ): Promise<ClientOverview> => {
-  requireAssistant(dependencies.principal);
+  const identity = requireAssistant(dependencies.principal);
   const client = await requireClient(command.clientId, dependencies);
+  // ADR-0016 keeps the field for installed builds; the Coordinator gets 0.
+  const readCredit = (clientId: string) =>
+    identity.role === 'coordinator'
+      ? Promise.resolve(0)
+      : dependencies.readAvailableCredit(clientId);
   const [subscription, upcoming, history, creditAvailableCentavos] =
     await Promise.all([
       describeSubscription(client.id, dependencies),
@@ -140,7 +158,7 @@ export const readClientOverview = async (
         from: dependencies.now(),
       }),
       dependencies.findAttendedBookings(client.id),
-      dependencies.readAvailableCredit(client.id),
+      readCredit(client.id),
     ]);
 
   return {
@@ -172,7 +190,7 @@ export const listAssistantClientBookings = async (
 
   return upcoming.map((item) => ({
     ...item,
-    actionable: actsAtBranch(identity, item.branchId),
+    actionable: worksAtBranch(identity, item.branchId),
   }));
 };
 
@@ -192,14 +210,14 @@ export const quotePlansForClient = async (
   command: { clientId: string },
   dependencies: ClientLookup & {
     principal: AuthenticatedPrincipal;
-    listVisiblePlans(): Promise<PlanSummary[]>;
+    listVisiblePlans(clientId: string): Promise<PlanSummary[]>;
     readAvailableCredit(clientId: string): Promise<number>;
   },
 ): Promise<PlanQuotes> => {
-  requireAssistant(dependencies.principal);
+  requireSeller(dependencies.principal);
   const client = await requireClient(command.clientId, dependencies);
   const [plans, creditAvailableCentavos] = await Promise.all([
-    dependencies.listVisiblePlans(),
+    dependencies.listVisiblePlans(client.id),
     dependencies.readAvailableCredit(client.id),
   ]);
 
@@ -230,12 +248,20 @@ export const recordAssistantCashPayment = async (
     clientId: string;
     planId: string;
     branchId: string;
+    startsOn?: string;
     idempotencyKey: string;
+    invoiceData?: InvoiceData | null;
   },
   dependencies: {
     principal: AuthenticatedPrincipal;
     recordCashPayment(
-      command: { clientId: string; planId: string; branchId: string },
+      command: {
+        clientId: string;
+        planId: string;
+        branchId: string;
+        startsOn?: string;
+        invoiceData: InvoiceData | null;
+      },
       principal: AuthenticatedPrincipal,
       idempotencyKey: string,
     ): Promise<PaymentView>;
@@ -249,6 +275,8 @@ export const recordAssistantCashPayment = async (
       clientId: command.clientId,
       planId: command.planId,
       branchId: command.branchId,
+      invoiceData: command.invoiceData ?? null,
+      ...(command.startsOn === undefined ? {} : { startsOn: command.startsOn }),
     },
     dependencies.principal,
     command.idempotencyKey,

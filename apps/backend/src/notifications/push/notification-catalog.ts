@@ -26,6 +26,20 @@ const catalog: Record<string, PushPresentation> = {
       body: 'Tienes una cita próxima. Abre la app para ver el detalle.',
     },
   },
+  class_reminder_day: {
+    sound: true,
+    lockScreen: {
+      title: 'Recordatorio',
+      body: 'Tienes una clase próxima. Abre la app para ver el detalle.',
+    },
+  },
+  class_reminder_hour: {
+    sound: true,
+    lockScreen: {
+      title: 'Recordatorio',
+      body: 'Tienes una clase próxima. Abre la app para ver el detalle.',
+    },
+  },
   evaluation_cancelled_by_studio: {
     sound: true,
     lockScreen: {
@@ -34,6 +48,15 @@ const catalog: Record<string, PushPresentation> = {
     },
   },
   payment_submitted: { sound: true, lockScreen: 'entry' },
+  freeze_requested: { sound: true, lockScreen: 'entry' },
+  freeze_approved: { sound: true, lockScreen: 'entry' },
+  freeze_refused: {
+    sound: true,
+    lockScreen: {
+      title: 'Congelamiento',
+      body: 'Revisa tu plan en la app.',
+    },
+  },
   payment_rejected: {
     sound: true,
     lockScreen: {

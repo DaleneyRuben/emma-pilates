@@ -22,6 +22,44 @@ const clientsRoute = createRoute({
   ),
 });
 
+const contactAlertsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/para-contactar",
+  component: lazyRouteComponent(
+    () => import("../people/contact-alerts/contact-alerts-route"),
+    "ContactAlertsRoute",
+  ),
+});
+
+// AW21 (BKM-015): the campaign grant, opened from Clientes, not its own
+// sidebar entry.
+const campaignRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/clientes/campana",
+  component: lazyRouteComponent(
+    () => import("../campaigns/campaign-route"),
+    "CampaignRoute",
+  ),
+});
+
+const freezesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/congelamientos",
+  component: lazyRouteComponent(
+    () => import("../oversight/freezes/freezes-route"),
+    "FreezesRoute",
+  ),
+});
+
+const foundersRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/fundadoras",
+  component: lazyRouteComponent(
+    () => import("../oversight/founders/founders-route"),
+    "FoundersRoute",
+  ),
+});
+
 const staffRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/personal",
@@ -63,6 +101,16 @@ const withdrawalsRoute = createRoute({
   ),
 });
 
+// AW37 (BKO-004): one Branch's Equipment on one page, so no list search.
+const equipmentRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/equipos",
+  component: lazyRouteComponent(
+    () => import("../back-office/equipment/equipment-page"),
+    "EquipmentPage",
+  ),
+});
+
 const payrollRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/nomina",
@@ -96,9 +144,14 @@ const expenseCategoriesRoute = createRoute({
 
 export const backOfficeRoutes = [
   clientsRoute,
+  contactAlertsRoute,
+  campaignRoute,
+  foundersRoute,
+  freezesRoute,
   paymentsRoute,
   suppliesRoute,
   withdrawalsRoute,
+  equipmentRoute,
   staffRoute,
   payrollRoute,
   expensesRoute,

@@ -21,6 +21,7 @@ const staffRoles: Record<FixtureStaffRole, StaffRole> = {
   assistant: StaffRole.ASSISTANT,
   administrator: StaffRole.ADMINISTRATOR,
   nutritionist: StaffRole.NUTRITIONIST,
+  coordinator: StaffRole.COORDINATOR,
 };
 
 const subscriptionStates = {
@@ -113,12 +114,14 @@ export const applyDevelopmentFixtures = async (
         });
       }
 
+      // The fixtures are the visible catalog, so a Plan hidden since (the
+      // monthly Plans BKM-005 hid, say) shows again.
       for (const plan of fixtures.plans) {
         const { id, ...data } = plan;
         await transaction.plan.upsert({
           where: { id },
           create: plan,
-          update: data,
+          update: { ...data, hiddenAt: null },
         });
       }
 

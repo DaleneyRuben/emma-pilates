@@ -30,9 +30,16 @@ describe('development fixtures', () => {
   it('offers the designed Plan catalog with exact centavo prices', () => {
     expect(
       fixtures.plans.map(
-        ({ name, durationMonths, classAllowance, priceCentavos }) => ({
+        ({
           name,
-          durationMonths,
+          durationDays,
+          weeklyClassCap,
+          classAllowance,
+          priceCentavos,
+        }) => ({
+          name,
+          durationDays,
+          weeklyClassCap,
           classAllowance,
           priceCentavos,
         }),
@@ -40,25 +47,29 @@ describe('development fixtures', () => {
     ).toEqual([
       {
         name: 'Paquete de 8 clases',
-        durationMonths: 1,
+        durationDays: 30,
+        weeklyClassCap: null,
         classAllowance: 8,
         priceCentavos: 56_000,
       },
       {
         name: 'Paquete de 12 clases',
-        durationMonths: 1,
+        durationDays: 30,
+        weeklyClassCap: null,
         classAllowance: 12,
         priceCentavos: 78_000,
       },
       {
         name: 'Mensual 16 clases',
-        durationMonths: 1,
+        durationDays: 30,
+        weeklyClassCap: null,
         classAllowance: 16,
         priceCentavos: 105_000,
       },
       {
         name: 'Trimestral 36 clases',
-        durationMonths: 3,
+        durationDays: 90,
+        weeklyClassCap: 4,
         classAllowance: 36,
         priceCentavos: 210_000,
       },
@@ -177,6 +188,14 @@ describe('development fixtures', () => {
     expect(roles).toContain('assistant');
     expect(roles).toContain('administrator');
     expect(roles).toContain('nutritionist');
+    // IDN-009: Carolina Rivas, the Coordinator, holds every Branch implicitly.
+    expect(
+      fixtures.staffMembers.find((member) => member.role === 'coordinator'),
+    ).toMatchObject({
+      name: 'Carolina Rivas',
+      email: 'carolina.rivas@example.com',
+      branchIds: [],
+    });
 
     for (const schedule of fixtures.sessionSchedules) {
       expect(

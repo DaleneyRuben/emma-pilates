@@ -18,6 +18,7 @@ import {
   SessionDetailController,
   sessionDetail,
 } from '../src/booking/client/client-discovery.controller';
+import { classesLeftThisWeekQuery } from '../src/booking/booking-controller-support';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
@@ -86,6 +87,7 @@ describe('client discovery (e2e)', () => {
           useValue: () =>
             Promise.resolve({
               status: 'active',
+              founderRenewalDeadline: null,
               subscription: {
                 id: 'subscription-id',
                 planName: 'Paquete de 8 clases',
@@ -103,14 +105,15 @@ describe('client discovery (e2e)', () => {
               Promise.resolve([
                 {
                   id: planId,
-                  name: 'Paquete de 8 clases',
-                  durationMonths: 1,
-                  classAllowance: 8,
+                  name: 'Bimestral 16 clases',
+                  durationDays: 60,
+                  weeklyClassCap: 3,
+                  classAllowance: 16,
                   priceCentavos: 56_000,
                   displayOrder: 0,
                 },
               ]),
-            find: findPlan,
+            find: (planId: string) => findPlan(planId),
           },
         },
         {
@@ -134,6 +137,10 @@ describe('client discovery (e2e)', () => {
             ]),
         },
         { provide: sessionDetail, useValue: findSessionDetail },
+        {
+          provide: classesLeftThisWeekQuery,
+          useValue: () => Promise.resolve(null),
+        },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
@@ -194,6 +201,10 @@ describe('client discovery (e2e)', () => {
       .expect(200)
       .expect({
         status: 'active',
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
         subscription: {
           id: 'subscription-id',
           planName: 'Paquete de 8 clases',
@@ -213,9 +224,12 @@ describe('client discovery (e2e)', () => {
       .expect([
         {
           id: planId,
-          name: 'Paquete de 8 clases',
-          durationMonths: 1,
-          classAllowance: 8,
+          name: 'Bimestral 16 clases',
+          durationDays: 60,
+          weeklyClassCap: 3,
+          // Deprecated (ADR-0016): derived for store builds that read months.
+          durationMonths: 2,
+          classAllowance: 16,
           priceCentavos: 56_000,
         },
       ]);
