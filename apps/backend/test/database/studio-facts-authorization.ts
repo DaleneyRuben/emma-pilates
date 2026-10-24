@@ -46,4 +46,18 @@ export const studioFactsAuthorizationRows = (): Record<string, MatrixRow> => ({
     coordinator: 'deny',
     bearer: true,
   },
+  // STU-007: the narrated report sits with the financial layer. The month
+  // and the question have to parse, or the Role check never runs.
+  'GET /api/v1/administrator/reports/narrative': {
+    administrator: 'allow',
+    coordinator: 'deny',
+    query: '?month=2026-10',
+    bearer: true,
+  },
+  'POST /api/v1/administrator/reports/narrative/questions': {
+    administrator: 'allow',
+    coordinator: 'deny',
+    body: { month: '2026-10', question: 'ocupación' },
+    bearer: true,
+  },
 });

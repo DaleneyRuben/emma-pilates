@@ -137,6 +137,7 @@ import type {
   GetIncomeReportParams,
   GetMonthKpisParams,
   GetMonthResultParams,
+  GetNarrativeReportParams,
   GetPaymentReceiptParams,
   GetRevenueReportParams,
   GetTodayCashCloseParams,
@@ -179,6 +180,9 @@ import type {
   MarkedNotificationsDto,
   MonthKpisDto,
   MonthResultDto,
+  NarrativeQuestionDto,
+  NarrativeQuestionInputDto,
+  NarrativeReportDto,
   NotificationPageDto,
   NutritionistAgendaPageDto,
   OpeningBudgetSeedDto,
@@ -33291,6 +33295,338 @@ export const useDismissRecommendation = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(
     getDismissRecommendationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getNarrativeReportResponse200 = {
+  data: NarrativeReportDto;
+  status: 200;
+};
+
+export type getNarrativeReportResponseSuccess =
+  getNarrativeReportResponse200 & {
+    headers: Headers;
+  };
+export type getNarrativeReportResponse = getNarrativeReportResponseSuccess;
+
+export const getGetNarrativeReportUrl = (params: GetNarrativeReportParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/reports/narrative?${stringifiedParams}`
+    : `/api/v1/administrator/reports/narrative`;
+};
+
+export const getNarrativeReport = async (
+  params: GetNarrativeReportParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getNarrativeReportResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetNarrativeReportUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getNarrativeReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getNarrativeReportResponse;
+};
+
+export const getGetNarrativeReportQueryKey = (
+  params?: GetNarrativeReportParams,
+) => {
+  return [
+    `/api/v1/administrator/reports/narrative`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetNarrativeReportQueryOptions = <
+  TData = Awaited<ReturnType<typeof getNarrativeReport>>,
+  TError = unknown,
+>(
+  params: GetNarrativeReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getNarrativeReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetNarrativeReportQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getNarrativeReport>>
+  > = ({ signal }) =>
+    getNarrativeReport(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getNarrativeReport>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetNarrativeReportQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getNarrativeReport>>
+>;
+export type GetNarrativeReportQueryError = unknown;
+
+export function useGetNarrativeReport<
+  TData = Awaited<ReturnType<typeof getNarrativeReport>>,
+  TError = unknown,
+>(
+  params: GetNarrativeReportParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getNarrativeReport>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getNarrativeReport>>,
+          TError,
+          Awaited<ReturnType<typeof getNarrativeReport>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetNarrativeReport<
+  TData = Awaited<ReturnType<typeof getNarrativeReport>>,
+  TError = unknown,
+>(
+  params: GetNarrativeReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getNarrativeReport>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getNarrativeReport>>,
+          TError,
+          Awaited<ReturnType<typeof getNarrativeReport>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetNarrativeReport<
+  TData = Awaited<ReturnType<typeof getNarrativeReport>>,
+  TError = unknown,
+>(
+  params: GetNarrativeReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getNarrativeReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetNarrativeReport<
+  TData = Awaited<ReturnType<typeof getNarrativeReport>>,
+  TError = unknown,
+>(
+  params: GetNarrativeReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getNarrativeReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetNarrativeReportQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type askNarrativeQuestionResponse200 = {
+  data: NarrativeQuestionDto;
+  status: 200;
+};
+
+export type askNarrativeQuestionResponseSuccess =
+  askNarrativeQuestionResponse200 & {
+    headers: Headers;
+  };
+export type askNarrativeQuestionResponse = askNarrativeQuestionResponseSuccess;
+
+export const getAskNarrativeQuestionUrl = () => {
+  return `/api/v1/administrator/reports/narrative/questions`;
+};
+
+export const askNarrativeQuestion = async (
+  narrativeQuestionInputDto: NarrativeQuestionInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<askNarrativeQuestionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getAskNarrativeQuestionUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(narrativeQuestionInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: askNarrativeQuestionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as askNarrativeQuestionResponse;
+};
+
+export const getAskNarrativeQuestionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof askNarrativeQuestion>>,
+    TError,
+    AskNarrativeQuestionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof askNarrativeQuestion>>,
+  TError,
+  AskNarrativeQuestionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["askNarrativeQuestion"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof askNarrativeQuestion>>,
+    AskNarrativeQuestionMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return askNarrativeQuestion(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AskNarrativeQuestionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof askNarrativeQuestion>>
+>;
+export type AskNarrativeQuestionMutationBody = NarrativeQuestionInputDto;
+export type AskNarrativeQuestionMutationError = unknown;
+export type AskNarrativeQuestionMutationVariables = {
+  data: NarrativeQuestionInputDto;
+};
+
+export const useAskNarrativeQuestion = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof askNarrativeQuestion>>,
+      TError,
+      AskNarrativeQuestionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof askNarrativeQuestion>>,
+  TError,
+  AskNarrativeQuestionMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAskNarrativeQuestionMutationOptions(options),
     queryClient,
   );
 };

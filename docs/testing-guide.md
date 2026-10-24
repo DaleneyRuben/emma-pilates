@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100) and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
@@ -3443,7 +3443,9 @@ The following are not ready for manual product testing:
 - client no-shows, a renewal gap, and the other twelve diagnosis rules are
   not findings yet (Test 102): the fact tables cannot support them, or the
   tables they need are not on this branch. The nightly recommendation pass
-  is not a worker job.
+  is not a worker job;
+- a model-written report (Test 103): no model is called and no key is
+  configured. The sentences are the pure function over the month's counts.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -6072,6 +6074,41 @@ Spanish sentence and the state. Use a disposable database.
    capacity, and trainer statements wait for tables this branch does not
    have. The nightly pass waits; the recompute endpoint is the trigger.
 
+## Test 103: read the month's narrated report
+
+Indicadores, below the chart, shows «Informe del mes» for the Administrator.
+The text comes from the month's counts and the recommendation sentences. It
+names no Client. A question is matched to those counts, not answered by a
+model. Use a disposable database.
+
+1. **The report.** Log in as `paola.mendoza@example.com` (Test 3) and open
+   Indicadores. Below «Clases dictadas» the card «Informe del mes» states
+   the classes held, the occupancy, the active clients, and the renewal
+   percent, using the same digits as the tiles. Each recommendation of the
+   month is an action whose «Porque:» line is that recommendation's
+   sentence. A month with no held classes says «En {mes} de {año} no se
+   dictaron clases.» and lists no action. While it loads, the card says
+   «Cargando el informe…». A failed read says «No pudimos cargar el
+   informe.» with «Reintentar».
+2. **A question.** The field is «Pregunta sobre el mes» and the button is
+   «Preguntar». An empty field does not ask. «ocupación» answers with the
+   occupancy percent. «clientas activas» answers with the active-client
+   count. Anything else, including a person's name, answers «Solo puedo
+   responder sobre los indicadores del mes. Pregunta por la ocupación o por
+   las clientas activas.» A question longer than 200 characters, or a month
+   that is not `YYYY-MM`, gets `400 invalid_request`.
+3. **Who may read it.**
+   `GET /api/v1/administrator/reports/narrative?month=YYYY-MM` and
+   `POST /api/v1/administrator/reports/narrative/questions` are
+   Administrator only. A Coordinator and an Assistant get
+   `403 studio_access_denied`. Sign in as `carolina.rivas@example.com`:
+   Indicadores shows the count tiles and never «Informe del mes».
+4. **No model.** Nothing in this test calls an external model, and no API
+   key is configured. The sentences are the pure function over the
+   aggregates. A provider can replace that function later. The report is
+   not stored.
+   [Pull request #204](https://github.com/DaleneyRuben/emma-pilates/pull/204).
+
 ## Test 83: raise a Session's capacity and correct an Attendance (BE-027)
 
 Both checks are the API only, with curl against a disposable database. No
@@ -7125,3 +7162,4 @@ E. **The screens.** Reservar (03) and the Session detail (04) show «Te quedan
    quedan 0 clases esta semana»; the extra-class line is the one on Mi plan.
    Follow-up 203 draws that line and is still pending. The Assistant's
    refusal uses the same problem code.
+>>>>>>> origin/feature/launch-rollout

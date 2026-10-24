@@ -1,6 +1,12 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
+import {
+  apiUrl,
+  jsonResponse,
+  problemResponse,
+  server,
+  useMockServer,
+} from "../test/msw";
 import { clientPage } from "../test/people-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { coordinatorHandlers } from "../test/session-handlers";
@@ -72,6 +78,9 @@ describe("the admin web for the Coordinator", () => {
           renewalPercent: 50,
         }),
       ),
+      http.get(apiUrl("/api/v1/administrator/reports/narrative"), () =>
+        problemResponse(403, "studio_access_denied"),
+      ),
     );
     renderAdmin("/reporte/indicadores");
 
@@ -83,6 +92,14 @@ describe("the admin web for the Coordinator", () => {
     expect(screen.queryByRole("link", { name: "Simulador" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Reporte" })).toBeNull();
     expect(screen.getByRole("link", { name: "Recomendaciones" })).toBeVisible();
+    await waitFor(() =>
+      expect(
+        screen.queryByText("Cargando el informe…"),
+      ).not.toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByRole("region", { name: "Informe del mes" }),
+    ).toBeNull();
   });
 
   it("opens Recomendaciones without Descartar", async () => {

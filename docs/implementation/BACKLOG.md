@@ -1281,7 +1281,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | done |
 | STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | done |
 | STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | done |
-| STU-007 | P3 | Backend/admin web | AI: a narrated monthly report and natural-language questions over the aggregates | STU-006 | 4–6 d | ready |
+| STU-007 | P3 | Backend/admin web | AI: a narrated monthly report and natural-language questions over the aggregates | STU-006 | 4–6 d | done |
 | MOB-071 | P3 | Client app | Inicio offline: persist the profile so Inicio renders from cache | — | 0.5 d | ready |
 | UX-005 to UX-014 | P2–P3 | All surfaces | *Existing rows.* The rest of the UX polish queue | UX-001 | 6–9 d | ready |
 | REL-008 | P3 | Delivery | *Existing row.* Release workflows in GitHub Actions | — | 2–3 d | later |
@@ -1501,6 +1501,60 @@ Decisions (blanket approval, 2026-10-23):
 - The break-even in students per class, occupancy, and clients stays unbuilt. The diagnosis asks for it; this item does not draw it.
 
 Evidence: commits `41156c36` (in progress), `59a85e70` (red package), `eabd2f99` (green package), `b3653e61` (red page), `30e46ae4` (green page), `012cd19c` (Playwright), `ea30c049` (follow-up 205 and Test 83). The opening 1-month base is the page's Resultado, Bs 761,20 (revenue 3,718,000 centavos, 143 classes). The 3-month base result is three times that, Bs 2.283,60. Low revenue is below base and high is above it. Tax 20 lowers the 12-month base result. Verified: studio-economics 5 passed; admin simulator, router, and shell specs 27 passed. Admin-web typecheck fails in `indicators-page.spec.tsx` line 126, a STU-003 file this item does not touch. Playwright Chromium at 1440 and 420, admin web on 5208, API on 3142, `pilates_stu005_dev`: Paola signs in with Correo and Contraseña, opens Simulador, and sees the nine rows. At 1440, 3 Base is Bs 111.540,00 and 12 Alto is Bs 102.828,00. At 420 the rows are labelled cards and the sidebar opens from «Abrir menú», which lists Simulador. The only write was the login. Databases `pilates_stu005_dev` and `pilates_test_stu005` on port 5433 were dropped. No migration. Follow-up 205 and AW37 stay pending: the design session was not run. The page still multiplies a week by its own 4.33; the package holds the same constant. Open question: the break-even in students per class, occupancy, and clients is still not drawn. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/202.
+
+#### STU-007 · Evidence
+
+Done 2026-10-23. Stacked on STU-006. Indicadores, below the chart, shows
+«Informe del mes» for the Administrator.
+`GET /api/v1/administrator/reports/narrative?month=YYYY-MM` builds the
+paragraphs from that month's KPI counts and recommendation sentences by
+calling the existing reads. It does not recompute them and it does not
+store the text. A question is
+`POST /api/v1/administrator/reports/narrative/questions` with `{ month,
+question }`. «ocupación» answers with `occupancyPercent`. «clientas
+activas» answers with `activeClients`. Anything else, including a person's
+name, is refused with «Solo puedo responder sobre los indicadores del
+mes. Pregunta por la ocupación o por las clientas activas.» An empty or
+oversized question (over 200 characters) and a month that is not `YYYY-MM`
+get `400 invalid_request`.
+
+No model is called and no key was added. The seam is the pure function
+`narrateMonth` and `answerQuestion`. A provider can replace it later. The
+function never interpolates a client id, a name, or an email: a subject
+passed beside the aggregates is ignored, and a test asserts a client id in
+that subject is absent from the output.
+
+A Coordinator gets `403 studio_access_denied` on both endpoints. The
+narration cites counts she may see, but the backlog puts the narrated
+report with the financial layer, and decisions section 13 keeps results
+and financial recommendations from her. v1 recommendations are operational,
+and she already reads those on Recomendaciones. The counts-only KPI page
+remains hers. The section hides itself when the response is 403, so her
+frame (when IDN-009 lands) does not show a broken panel. An Assistant gets
+the same 403.
+
+Commits: in progress and red narration `21a3716f`, green narration
+`bcefbdb6`, red endpoint `cb7976a3`, green endpoint `7911e0e9`, red page
+`534ade45`, page and contract `264de28e`, screen and test 79 `0ce90fe1`.
+
+Verified: unit 7/7 (`narrate-month.spec.ts`), e2e 5/5
+(`narrative-report.e2e-spec.ts`) including Coordinator and Assistant 403,
+admin jest 8/8 including a 403 that leaves the section absent and the count
+tiles present. Playwright walk of the Vite server at `http://localhost:5210`
+against the API on 3144, at 1440 and 420: signed in with Correo electrónico
+and Contraseña, opened Indicadores (at 420 behind «Abrir menú»), saw
+«Informe del mes», asked «ocupación», and a name was refused. Curl of the
+same API after recompute: Administrator narrative `200` («20 clases»,
+ocupación 0 %, 4 clientas activas, 3 actions), question `200`, a name
+refused, empty question and month `2026-13` `400 invalid_request`,
+Assistant `403 studio_access_denied`. Databases `pilates_stu007_dev` and
+`pilates_test_stu007` on port 5433 were dropped.
+
+No migration. Open questions: the Coordinator role is IDN-009's; this path
+accepts a cast `coordinator`, and a real login waits. The fixed questions
+are occupancy and active clients only. Design follow-up 206 stays pending;
+the export was not run.
+[Pull request #204](https://github.com/DaleneyRuben/emma-pilates/pull/204).
 
 ### Summary (2026-10-23)
 

@@ -88,6 +88,8 @@ describe('month kpi endpoint (e2e)', () => {
               recomputeRecommendations: () =>
                 Promise.reject(new Error('unused')),
               dismissRecommendation: () => Promise.reject(new Error('unused')),
+              narrative: () => Promise.reject(new Error('unused')),
+              question: () => Promise.reject(new Error('unused')),
             };
           },
         },

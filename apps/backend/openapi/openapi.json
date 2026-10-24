@@ -8629,6 +8629,80 @@
         ]
       }
     },
+    "/api/v1/administrator/reports/narrative": {
+      "get": {
+        "operationId": "getNarrativeReport",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NarrativeReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NarrativeReport"
+        ]
+      }
+    },
+    "/api/v1/administrator/reports/narrative/questions": {
+      "post": {
+        "operationId": "askNarrativeQuestion",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NarrativeQuestionInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NarrativeQuestionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NarrativeReport"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -16433,6 +16507,74 @@
         "required": [
           "month",
           "written"
+        ]
+      },
+      "NarrativeActionDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "because": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "because"
+        ]
+      },
+      "NarrativeReportDto": {
+        "type": "object",
+        "properties": {
+          "paragraphs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NarrativeActionDto"
+            }
+          }
+        },
+        "required": [
+          "paragraphs",
+          "actions"
+        ]
+      },
+      "NarrativeQuestionInputDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-10"
+          },
+          "question": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "month",
+          "question"
+        ]
+      },
+      "NarrativeQuestionDto": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string"
+          },
+          "refused": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "answer",
+          "refused"
         ]
       },
       "CreatePendingUploadDto": {
