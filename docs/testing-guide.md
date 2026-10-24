@@ -5894,3 +5894,4 @@ remainder, so the two months sum to Bs 300. Use a disposable database.
    `GET /api/v1/administrator/reports/revenue?month=YYYY-MM`. A month that
    is not `YYYY-MM` gets `400 invalid_request`. The Coordinator role is not
    on this branch (IDN-009), so the refusal is the e2e suite's.
+   [Pull request #195](https://github.com/DaleneyRuben/emma-pilates/pull/195).

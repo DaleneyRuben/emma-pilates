@@ -982,7 +982,7 @@ No migration. Open questions: store-review exclusion waits for REL-016's
 flag, so nothing is excluded; extra classes (BKM-008) are not on this
 branch, so classes still owed count the base remaining allowance only.
 The Coordinator role is IDN-009's, so the 403 is proven by casting the
-role in the e2e suite. Pull request URL recorded in the follow-up commit.
+role in the e2e suite. [Pull request #195](https://github.com/DaleneyRuben/emma-pilates/pull/195).
 
 ### Summary (2026-10-23)
 
