@@ -123,7 +123,7 @@ describe("AW39 Indicadores", () => {
   it("shows the error state and retries", async () => {
     server.use(
       http.get(apiUrl(kpisPath), () =>
-        problemResponse(500, "no_se_pudo", "No se pudo"),
+        problemResponse(500, "no_se_pudo", { detail: "No se pudo" }),
       ),
     );
     renderAdmin("/reporte/indicadores");
