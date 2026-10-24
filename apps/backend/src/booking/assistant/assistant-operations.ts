@@ -28,6 +28,10 @@ export const createAssistantClientOperations = (input: {
       catalog
         .findActiveSubscription(clientId, onDate)
         .then(toSubscriptionSummary),
+    findFutureSubscription: (clientId: string, after: Date) =>
+      catalog
+        .findFutureSubscription(clientId, after)
+        .then(toSubscriptionSummary),
     findLatestSubscription: (clientId: string) =>
       catalog.findLatestSubscription(clientId).then(toSubscriptionSummary),
   };
@@ -48,8 +52,6 @@ export const createAssistantClientOperations = (input: {
         findUpcoming: (range) => catalog.findUpcomingClientBookings(range),
         findAttendedBookings: (clientId) =>
           catalog.findAttendedBookings(clientId),
-        readAvailableCredit: (clientId) =>
-          clients.readAvailableCredit(clientId),
       }),
     bookings: (command, principal) =>
       listAssistantClientBookings(command, {
@@ -70,8 +72,6 @@ export const createAssistantClientOperations = (input: {
         principal,
         findClient: (clientId) => clients.findClient(clientId),
         listVisiblePlans: () => catalog.listVisiblePlans(),
-        readAvailableCredit: (clientId) =>
-          clients.readAvailableCredit(clientId),
       }),
     recordCashPayment: (command, principal, idempotencyKey) =>
       recordAssistantCashPayment(

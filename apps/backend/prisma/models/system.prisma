@@ -197,6 +197,7 @@ model Account {
   createdPurchaseIntents    PurchaseIntent[]        @relation("PurchaseIntentCreatedBy")
   submittedPayments         Payment[]               @relation("PaymentSubmittedBy")
   decidedPayments           Payment[]               @relation("PaymentDecidedBy")
+  invoiceIssuedPayments     Payment[]               @relation("PaymentInvoiceIssuedBy")
   creditLedgerEntries       CreditLedgerEntry[]     @relation("CreditLedgerActor")
   createdAvailabilityBlocks AvailabilityBlock[]     @relation("AvailabilityBlockCreatedBy")
   endedAvailabilityBlocks   AvailabilityBlock[]     @relation("AvailabilityBlockEndedBy")
@@ -209,6 +210,12 @@ model Account {
   recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
   allowanceAdjustments      AllowanceAdjustment[]   @relation("AllowanceAdjustmentAuthor")
+  contactedAlerts           ContactAlert[]          @relation("ContactAlertContactedBy")
+  createdEquipment          Equipment[]             @relation("EquipmentCreatedBy")
+  reportedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueReportedBy")
+  resolvedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueResolvedBy")
+  feedback                  Feedback[]
+  closedCashCloses          CashClose[]             @relation("CashCloseClosedBy")
 
   @@map("accounts")
   @@schema("system")
@@ -512,5 +519,62 @@ model ImageVariant {
   @@unique([imageAssetId, kind, visibility, deliveryVersion])
   @@index([imageAssetId, visibility, deleteRequestedAt])
   @@map("image_variants")
+  @@schema("system")
+}
+
+// REL-012: «Enviar comentarios» from either app (system-identity CONTEXT,
+// Feedback).
+enum FeedbackType {
+  PROBLEM    @map("problem")
+  SUGGESTION @map("suggestion")
+  OTHER      @map("other")
+
+  @@schema("system")
+}
+
+enum FeedbackStatus {
+  NEW      @map("new")
+  REVIEWED @map("reviewed")
+  RESOLVED @map("resolved")
+
+  @@schema("system")
+}
+
+enum FeedbackApp {
+  CLIENT @map("client")
+  STAFF  @map("staff")
+
+  @@schema("system")
+}
+
+enum FeedbackPlatform {
+  ANDROID @map("android")
+  IOS     @map("ios")
+
+  @@schema("system")
+}
+
+model Feedback {
+  id          String           @id @db.Uuid
+  accountId   String           @map("account_id") @db.Uuid
+  app         FeedbackApp
+  // The sender's Role when it was sent (`client` or a StaffRole value).
+  senderRole  String           @map("sender_role")
+  type        FeedbackType
+  text        String
+  appVersion  String           @map("app_version")
+  appBuild    String           @map("app_build")
+  platform    FeedbackPlatform
+  osVersion   String           @map("os_version")
+  status      FeedbackStatus   @default(NEW)
+  changeNote  String?          @map("change_note")
+  triagedAt   DateTime?        @map("triaged_at") @db.Timestamptz(3)
+  createdAt   DateTime         @map("created_at") @db.Timestamptz(3)
+  deletedAt   DateTime?        @map("deleted_at") @db.Timestamptz(3)
+  account     Account          @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([accountId, createdAt])
+  @@index([createdAt])
+  @@map("feedback")
   @@schema("system")
 }

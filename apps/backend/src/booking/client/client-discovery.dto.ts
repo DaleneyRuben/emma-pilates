@@ -104,6 +104,14 @@ export class ClientSubscriptionDto {
 
   @ApiPropertyOptional({ type: ClientSubscriptionSummaryDto, nullable: true })
   subscription!: ClientSubscriptionSummaryDto | null;
+
+  @ApiPropertyOptional({
+    type: ClientSubscriptionSummaryDto,
+    nullable: true,
+    description:
+      'The one future Subscription from an Early Renewal. Absent when there is none.',
+  })
+  nextSubscription?: ClientSubscriptionSummaryDto | null;
 }
 
 export class PlanDto {

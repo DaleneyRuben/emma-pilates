@@ -12,6 +12,7 @@ const sweeps = () => ({
   pendingAccountCleanup: idle({ cleaned: 0 }),
   imageUploadCleanup: idle({ cleaned: 0 }),
   subscriptionReminders: idle({ reminded: 0 }),
+  first90Days: idle({ messages: 0, alerts: 0 }),
   purchaseIntentExpiry: idle({ expired: 0 }),
 });
 
@@ -24,6 +25,7 @@ describe('worker startup sweeps (EXT-002)', () => {
     ['pendingAccountCleanup', 'pending_account_cleanup_failed'],
     ['imageUploadCleanup', 'image_upload_cleanup_failed'],
     ['subscriptionReminders', 'subscription_reminders_failed'],
+    ['first90Days', 'first_90_days_failed'],
     ['purchaseIntentExpiry', 'purchase_intent_expiry_failed'],
   ] as const)(
     'keeps the worker running when the first %s pass fails',
@@ -51,7 +53,8 @@ describe('worker startup sweeps (EXT-002)', () => {
         sessionSchedules: idle({ schedules: 0, created: 0, skipped: 0 }),
         evaluationSlots: idle({ blocks: 0, created: 0, skipped: 0 }),
         evaluationReminders: idle({ sent: 0 }),
-        emptySessionChecks: idle({ checked: 0, cancelled: 0 }),
+        minimumBookingsChecks: idle({ checked: 0, cancelled: 0 }),
+        windowCloseSnapshots: idle({ recorded: 0 }),
         startedSessionWaitlists: idle({ closed: 0 }),
         pushDispatch: { dispatch: jest.fn() },
         pushReceipts: idle({

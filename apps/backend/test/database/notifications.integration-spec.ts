@@ -173,7 +173,8 @@ describe('Notification store', () => {
     expect(reminders).toHaveLength(1);
     expect(reminders[0]).toMatchObject({
       category: 'REMINDER',
-      message: 'Tu plan vence en 3 días.',
+      message:
+        'Tu plan vence en 3 días. Renueva cuando quieras y elige tu fecha de inicio.',
       destinationType: 'subscription',
     });
   });

@@ -1,10 +1,15 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import {
+  AcquisitionChannelField,
+  acquisitionChannelRequired,
+  type AcquisitionChannelChoice,
+} from "../acquisition/acquisition-channel-field";
 import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
-import { colors, spacing } from "../ui/tokens";
+import { colors, spacing, typography } from "../ui/tokens";
 import { AuthenticationScreen } from "./auth-layout";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
@@ -34,6 +39,7 @@ export function RegistrationScreen({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
+  const [channel, setChannel] = useState<AcquisitionChannelChoice | null>(null);
   const [referralOpen, setReferralOpen] = useState(false);
   const [referralCode, setReferralCode] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -51,6 +57,7 @@ export function RegistrationScreen({
     submitted && passwordError === undefined && password !== confirmation
       ? "Las contraseñas no coinciden."
       : undefined;
+  const channelError = submitted && channel === null ? acquisitionChannelRequired : undefined;
 
   async function submit() {
     setSubmitted(true);
@@ -61,7 +68,8 @@ export function RegistrationScreen({
       name.trim() === "" ||
       !email.includes("@") ||
       password.length < minimumPasswordLength ||
-      password !== confirmation
+      password !== confirmation ||
+      channel === null
     ) {
       return;
     }
@@ -71,6 +79,7 @@ export function RegistrationScreen({
 
     try {
       const result = await api.register({
+        acquisitionChannel: channel,
         email: email.trim(),
         name: name.trim(),
         password,
@@ -143,16 +152,20 @@ export function RegistrationScreen({
         secureTextEntry
         value={confirmation}
       />
+      <AcquisitionChannelField error={channelError} onChange={setChannel} value={channel} />
       {referralOpen ? (
-        <FormField
-          autoCapitalize="characters"
-          autoCorrect={false}
-          error={referralError ? "Revisa el código de referido." : undefined}
-          label="Código de referido"
-          onChangeText={setReferralCode}
-          placeholder="Ej. EMMA-2026"
-          value={referralCode}
-        />
+        <View style={styles.referral}>
+          <FormField
+            autoCapitalize="characters"
+            autoCorrect={false}
+            error={referralError ? "Revisa el código de referido." : undefined}
+            label="Código de referido"
+            onChangeText={setReferralCode}
+            placeholder="Ej. EMMA-2026"
+            value={referralCode}
+          />
+          <Text style={styles.referralHelp}>De una amiga o de tu instructora.</Text>
+        </View>
       ) : (
         <Pressable
           accessibilityLabel="¿Tienes un código de referido?"
@@ -175,6 +188,12 @@ export function RegistrationScreen({
 }
 
 const styles = StyleSheet.create({
+  referral: { gap: spacing.xs },
+  referralHelp: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+  },
   referralLabel: {
     color: colors.primaryDeep,
     fontFamily: fontFamilies.body,

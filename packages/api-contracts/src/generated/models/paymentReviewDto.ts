@@ -12,6 +12,7 @@ import type { PaymentReviewDtoState } from "./paymentReviewDtoState";
 
 export interface PaymentReviewDto {
   id: string;
+  /** `courtesy` is a Bs 0 Courtesy Access grant (REL-011). */
   method: PaymentReviewDtoMethod;
   state: PaymentReviewDtoState;
   planId: string;
@@ -26,10 +27,16 @@ export interface PaymentReviewDto {
   classAllowance: number;
   /** @minimum 1 */
   planPriceCentavos: number;
-  /** @minimum 0 */
+  /**
+   * Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds
+   * @deprecated
+   * @minimum 0
+   */
   creditAppliedCentavos: number;
   /** @minimum 0 */
   amountDueCentavos: number;
+  /** Chosen Start Date. Absent on responses older builds ignore. */
+  startsOn?: string;
   submittedAt: string;
   /** @nullable */
   decidedAt?: string | null;

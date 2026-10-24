@@ -7,7 +7,12 @@ export class StartImpersonationDto {
   staffMemberId!: string;
 }
 
-const impersonableRoles = ['trainer', 'assistant', 'nutritionist'] as const;
+const impersonableRoles = [
+  'trainer',
+  'assistant',
+  'nutritionist',
+  'coordinator',
+] as const;
 
 export class ImpersonationDto {
   @ApiProperty({ format: 'uuid' })

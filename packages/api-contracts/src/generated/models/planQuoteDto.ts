@@ -30,7 +30,8 @@ export interface PlanQuoteDto {
    */
   priceCentavos: number;
   /**
-   * Credit this purchase would spend
+   * Deprecated (PAY-005): Credit was retired; always 0
+   * @deprecated
    * @minimum 0
    */
   creditAppliedCentavos: number;

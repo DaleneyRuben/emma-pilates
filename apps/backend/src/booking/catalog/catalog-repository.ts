@@ -114,6 +114,10 @@ export type CatalogRepository = {
     onDate: Date,
   ): Promise<SubscriptionSummary | null>;
   findLatestSubscription(clientId: string): Promise<SubscriptionSummary | null>;
+  findFutureSubscription(
+    clientId: string,
+    after: Date,
+  ): Promise<SubscriptionSummary | null>;
   listPublishedPromotions(onDate: Date): Promise<PromotionSummary[]>;
   findVisiblePlan(id: string): Promise<PlanSummary | null>;
   listBranches(): Promise<BranchSummary[]>;

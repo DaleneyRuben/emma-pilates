@@ -73,9 +73,7 @@ describe("Client Plans", () => {
     await waitFor(() => {
       expect(screen.getByText("Válido por 90 días")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByText("90 días de vigencia desde que se confirma tu pago."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("90 días de vigencia desde la fecha de inicio.")).toBeOnTheScreen();
     expect(screen.getByText("Hasta 4 clases por semana.")).toBeOnTheScreen();
     expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
     // 09's bar names the Plan once it loads (MOB-034).

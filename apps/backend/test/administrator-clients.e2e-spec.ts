@@ -159,6 +159,7 @@ describe('administrator Client endpoints (e2e)', () => {
           clientSince: '2025-07-02',
           subscription: {
             status: 'active',
+            nextSubscription: null,
             subscription: {
               ...detail.subscription.subscription,
               startsOn: '2026-09-01',

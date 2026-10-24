@@ -7,6 +7,7 @@ const baseline = {
   today,
   endsOn: new Date(today.getTime() + 29 * day),
   activeSubscription: null,
+  futureSubscriptionId: null,
   openPurchaseIntentId: null,
   pendingPaymentId: null,
 };
@@ -64,20 +65,28 @@ describe('evaluateCourtesyGrant', () => {
     ).toBe('courtesy_end_date_invalid');
   });
 
-  it('refuses while a Plan is still effective, a payment pending, or an intent open', () => {
+  it('refuses a grant while a Plan is still effective, and a second future one, a pending payment, or an open intent', () => {
+    const current = {
+      id: 'current',
+      startsOn: today,
+      endsOn: new Date(today.getTime() + 5 * day),
+      remainingClassAllowance: 3,
+      futureBookedCount: 0,
+    };
+    expect(
+      codeOf(() =>
+        evaluateCourtesyGrant({ ...baseline, activeSubscription: current }),
+      ),
+    ).toBe('subscription_not_expired');
     expect(
       codeOf(() =>
         evaluateCourtesyGrant({
           ...baseline,
-          activeSubscription: {
-            id: 'current',
-            endsOn: new Date(today.getTime() + 5 * day),
-            remainingClassAllowance: 3,
-            futureBookedCount: 0,
-          },
+          activeSubscription: current,
+          futureSubscriptionId: 'queued',
         }),
       ),
-    ).toBe('subscription_not_expired');
+    ).toBe('future_subscription_exists');
     expect(
       codeOf(() =>
         evaluateCourtesyGrant({ ...baseline, pendingPaymentId: 'pending' }),
@@ -96,11 +105,12 @@ describe('evaluateCourtesyGrant', () => {
         ...baseline,
         activeSubscription: {
           id: 'spent',
+          startsOn: today,
           endsOn: new Date(today.getTime() + 5 * day),
           remainingClassAllowance: 0,
           futureBookedCount: 0,
         },
       }),
-    ).toEqual({ subscriptionIdToExpire: 'spent' });
+    ).toEqual({ subscriptionIdToExpire: null });
   });
 });
