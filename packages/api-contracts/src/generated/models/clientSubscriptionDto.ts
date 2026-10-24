@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ClientFreezeDto } from "./clientFreezeDto";
 import type { ClientSubscriptionDtoStatus } from "./clientSubscriptionDtoStatus";
 import type { ClientSubscriptionSummaryDto } from "./clientSubscriptionSummaryDto";
 
@@ -21,4 +22,11 @@ export interface ClientSubscriptionDto {
    * @nullable
    */
   founderRenewalDeadline?: string | null;
+  /**
+   * The one Freeze of the current Subscription. Absent when there is none.
+   * @nullable
+   */
+  freeze?: ClientFreezeDto | null;
+  /** True when the current Plan lasts 90 days or more and has no Freeze yet. */
+  canRequestFreeze?: boolean;
 }

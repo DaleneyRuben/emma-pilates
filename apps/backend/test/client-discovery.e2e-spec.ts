@@ -88,6 +88,8 @@ describe('client discovery (e2e)', () => {
             Promise.resolve({
               status: 'active',
               founderRenewalDeadline: null,
+              freeze: null,
+              canRequestFreeze: false,
               subscription: {
                 id: 'subscription-id',
                 planName: 'Paquete de 8 clases',
@@ -203,6 +205,8 @@ describe('client discovery (e2e)', () => {
         status: 'active',
         nextSubscription: null,
         founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
         subscription: {
           id: 'subscription-id',
           planName: 'Paquete de 8 clases',

@@ -34,6 +34,7 @@ describe("admin shell", () => {
         "Clientes",
         "Para contactar",
         "Fundadoras",
+        "Congelamientos",
         "Pagos",
         "Caja",
         "Insumos",

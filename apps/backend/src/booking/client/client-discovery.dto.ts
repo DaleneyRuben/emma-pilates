@@ -130,6 +130,34 @@ export class ClientSubscriptionDto {
       'A founder renews before this date. Absent when she is not a founder or has no current Subscription.',
   })
   founderRenewalDeadline?: string | null;
+
+  @ApiPropertyOptional({
+    type: () => ClientFreezeDto,
+    nullable: true,
+    description:
+      'The one Freeze of the current Subscription. Absent when there is none.',
+  })
+  freeze?: ClientFreezeDto | null;
+
+  @ApiPropertyOptional({
+    description:
+      'True when the current Plan lasts 90 days or more and has no Freeze yet.',
+  })
+  canRequestFreeze?: boolean;
+}
+
+export class ClientFreezeDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ enum: ['requested', 'approved', 'refused'] })
+  state!: 'requested' | 'approved' | 'refused';
+
+  @ApiProperty({ format: 'date' })
+  startsOn!: string;
+
+  @ApiProperty({ format: 'date' })
+  endsOn!: string;
 }
 
 export class PlanDto {

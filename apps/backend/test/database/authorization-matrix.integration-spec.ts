@@ -5,6 +5,7 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { configureApplication } from '../../src/http/configure-application';
 import { authenticationTokens } from '../../src/system-identity/security/authentication-token-service';
+import { freezeAuthorizationRows } from './freeze-authorization';
 import {
   authorizationMatrix,
   concretePath,
@@ -27,6 +28,11 @@ type Role = keyof typeof roles;
 const methods = ['get', 'post', 'put', 'patch', 'delete'] as const;
 type OpenApiDocument = Parameters<typeof sampleRequest>[0];
 type Method = (typeof methods)[number];
+
+const matrix = {
+  ...authorizationMatrix,
+  ...freezeAuthorizationRows(),
+};
 
 // IDN-009 / ADR-0102: the authorization matrix over the whole API, booted on
 // PostgreSQL with the development fixtures. Each request gets a fresh
@@ -69,7 +75,7 @@ describe('authorization matrix: Administrator and Coordinator', () => {
     method: Method,
     path: string,
   ): Promise<number> => {
-    const row = authorizationMatrix[`${method.toUpperCase()} ${path}`];
+    const row = matrix[`${method.toUpperCase()} ${path}`];
     const sample = sampleRequest(document, method, path);
     const address = `${concretePath(
       path,
@@ -146,7 +152,7 @@ describe('authorization matrix: Administrator and Coordinator', () => {
     const served = routes
       .map(({ method, path }) => `${method.toUpperCase()} ${path}`)
       .sort();
-    expect(Object.keys(authorizationMatrix).sort()).toEqual(served);
+    expect(Object.keys(matrix).sort()).toEqual(served);
   });
 
   const answers = new Map<string, number>();
@@ -157,10 +163,10 @@ describe('authorization matrix: Administrator and Coordinator', () => {
       const mismatches: string[] = [];
       for (const { method, path } of routes) {
         const key = `${method.toUpperCase()} ${path}`;
-        const expected = authorizationMatrix[key]?.[role];
+        const expected = matrix[key]?.[role];
         const status = await call(role, method, path);
         answers.set(`${role} ${key}`, status);
-        const row = authorizationMatrix[key];
+        const row = matrix[key];
         if (row?.ownerScoped) {
           if (outcome(status).startsWith('unexpected')) {
             mismatches.push(`${key}: answered ${status}`);
@@ -177,7 +183,7 @@ describe('authorization matrix: Administrator and Coordinator', () => {
   // Uploads are authorized by ownership, never by Role: both Roles get the
   // same answer for an upload that is not theirs.
   it('answers owner-scoped endpoints alike for both Roles', () => {
-    const differing = Object.entries(authorizationMatrix)
+    const differing = Object.entries(matrix)
       .filter(([, row]) => row.ownerScoped)
       .filter(
         ([key]) =>

@@ -33,11 +33,20 @@ export const toSubscriptionSummary = (
 export type ClientSubscriptionStatus =
   'active' | 'expiring_soon' | 'expired' | 'none';
 
+export type ClientFreezeSummary = {
+  id: string;
+  state: 'requested' | 'approved' | 'refused';
+  startsOn: string;
+  endsOn: string;
+};
+
 export type ClientSubscriptionView = {
   status: ClientSubscriptionStatus;
   subscription: ClientSubscriptionSummary | null;
   nextSubscription: ClientSubscriptionSummary | null;
   founderRenewalDeadline: string | null;
+  freeze: ClientFreezeSummary | null;
+  canRequestFreeze: boolean;
 };
 
 type LoadClientSubscriptionDependencies = {
@@ -55,6 +64,8 @@ type LoadClientSubscriptionDependencies = {
     after: Date,
   ): Promise<ClientSubscriptionSummary | null>;
   readFounderRenewal?(clientId: string): Promise<{ gapDays: number } | null>;
+  readFreeze?(subscriptionId: string): Promise<ClientFreezeSummary | null>;
+  readPlanDurationDays?(subscriptionId: string): Promise<number | null>;
 };
 
 // The renewal reminder is sent 3 days before the paid-through date.
@@ -75,6 +86,8 @@ type SubscriptionLookup = {
     after: Date,
   ): Promise<ClientSubscriptionSummary | null>;
   readFounderRenewal?(clientId: string): Promise<{ gapDays: number } | null>;
+  readFreeze?(subscriptionId: string): Promise<ClientFreezeSummary | null>;
+  readPlanDurationDays?(subscriptionId: string): Promise<number | null>;
 };
 
 const renewalDeadline = async (
@@ -107,6 +120,9 @@ export const describeSubscription = async (
       clientId,
       dependencies.today,
     );
+    const freeze = (await dependencies.readFreeze?.(active.id)) ?? null;
+    const durationDays =
+      (await dependencies.readPlanDurationDays?.(active.id)) ?? 0;
     return {
       status: daysLeft <= renewalReminderDays ? 'expiring_soon' : 'active',
       subscription: active,
@@ -116,6 +132,8 @@ export const describeSubscription = async (
         active.endsOn,
         dependencies,
       ),
+      freeze,
+      canRequestFreeze: durationDays >= 90 && freeze === null,
     };
   }
 
@@ -127,12 +145,16 @@ export const describeSubscription = async (
         subscription: null,
         nextSubscription: null,
         founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
       }
     : {
         status: 'expired',
         subscription: latest,
         nextSubscription: null,
         founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
       };
 };
 

@@ -165,6 +165,7 @@ model Subscription {
   payment                 Payment?          @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   bookings                Booking[]
   evaluations             Evaluation[]
+  freezes                 Freeze[]
   allowanceAdjustments    AllowanceAdjustment[]
   guestPasses             GuestPass[]
   guestPassRewards        GuestPass[]           @relation("GuestPassReward")

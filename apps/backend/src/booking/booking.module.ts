@@ -68,6 +68,10 @@ import {
   receiptObjectStorage,
 } from './payments/administrator.controller';
 import {
+  AdministratorFreezesController,
+  ClientFreezesController,
+} from './payments/freeze.controller';
+import {
   ClientCreditController,
   ClientPaymentsController,
   ClientReferralsController,
@@ -191,6 +195,8 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ClientReferralsController,
     TransferInstructionsController,
     AdministratorPaymentsController,
+    AdministratorFreezesController,
+    ClientFreezesController,
     AdministratorSessionsController,
     AssistantClientsController,
     ...adminWebReads.controllers,
@@ -500,6 +506,35 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
                 .then((found) => (found === null ? null : toSummary(found))),
             readFounderRenewal: (clientId) =>
               readFounderRenewal(prisma, clientId),
+            readFreeze: (subscriptionId) =>
+              prisma.freeze
+                .findFirst({
+                  where: { subscriptionId, deletedAt: null },
+                  select: {
+                    id: true,
+                    state: true,
+                    startsOn: true,
+                    endsOn: true,
+                  },
+                })
+                .then((row) =>
+                  row === null
+                    ? null
+                    : {
+                        id: row.id,
+                        state: row.state.toLowerCase() as
+                          'requested' | 'approved' | 'refused',
+                        startsOn: row.startsOn.toISOString().slice(0, 10),
+                        endsOn: row.endsOn.toISOString().slice(0, 10),
+                      },
+                ),
+            readPlanDurationDays: (subscriptionId) =>
+              prisma.subscription
+                .findUnique({
+                  where: { id: subscriptionId },
+                  select: { durationDaysSnapshot: true },
+                })
+                .then((row) => row?.durationDaysSnapshot ?? null),
           });
         },
     },

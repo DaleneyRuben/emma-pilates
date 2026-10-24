@@ -112,6 +112,8 @@ describe('assistant clients (e2e)', () => {
         subscription,
         nextSubscription: null,
         founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
       },
       nextBooking: booking,
       recentHistory: [historyEntry],
@@ -191,6 +193,8 @@ describe('assistant clients (e2e)', () => {
             status: 'active',
             nextSubscription: null,
             founderRenewalDeadline: null,
+            freeze: null,
+            canRequestFreeze: false,
             subscription: {
               ...subscription,
               startsOn: '2026-09-10',

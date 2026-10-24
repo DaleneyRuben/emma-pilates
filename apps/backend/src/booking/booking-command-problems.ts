@@ -72,6 +72,19 @@ export const commandProblem = (error: Error): HttpException | null => {
       'Attendance roster is incomplete',
     ],
   };
+  const duringFreeze =
+    /^Booking is during a Freeze until (\d{4}-\d{2}-\d{2})$/.exec(
+      error.message,
+    );
+  if (duringFreeze !== null) {
+    return new HttpException(
+      {
+        code: 'booking_during_freeze',
+        detail: `Booking is during a Freeze until ${duringFreeze[1]}`,
+      },
+      HttpStatus.CONFLICT,
+    );
+  }
   const beforeStart =
     /^Booking is before the Start Date: (\d{4}-\d{2}-\d{2})$/.exec(
       error.message,

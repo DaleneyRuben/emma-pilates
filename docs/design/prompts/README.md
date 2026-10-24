@@ -112,6 +112,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW38](./admin-web/38-comentarios.md) | Comentarios | `AW38` | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 | [AW39](./admin-web/39-para-contactar.md) | Para contactar | `AW39` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
 | [AW40](./admin-web/40-fundadoras.md) | Fundadoras | `AW40` | not yet generated (BKM-010; the admin web is built from the prompt; AW37 is Equipos) |
+| [AW41](./admin-web/41-congelamientos.md) | Congelamientos | `AW41` | not yet generated (BKM-012; the admin web is built from the prompt; AW38 is Comentarios) |
 | [AW151](./admin-web/151-cierres-de-caja.md) | Cierres de caja | `AW151` | ✅ (Claude Design canvas, 2026-10-23, `1e4dee1e`; BKO-003, numbered from its assigned block 150–154) |
 
 ## Follow-ups (`followups/`)
@@ -277,6 +278,8 @@ Each of these was sent as the next message in the existing design session for th
 | [201](./followups/198-courtesy-form-on-client-detail.md) | `AW22` gains courtesy and class-return buttons; amends 195, which said not to add the form (PAY-006) | 🕓 pending |
 | [202](./followups/196-admin-campaign-grant.md) | `AW21` gains «Dar clases de campaña», opening the campaign grant on the same screen's address; no new screen and no sidebar entry (BKM-015, decisions §5.4) | 🕓 pending |
 | [203](./followups/196-weekly-cap-classes-left.md) | `03` and `04` show «Te quedan N clases esta semana» from `classesLeftThisWeek`; absent without a cap; zero stays honest when an extra class remains (BKM-007) | 🕓 pending |
+| [204](./followups/204-freeze-request.md) | Freeze request and status on `12`; booking refusal on `04` (BKM-012) | 🕓 pending |
+| [205](./followups/205-freeze-review.md) | Congelamientos list on the admin web (`AW41`) and the Administrator's Staff review (BKM-012) | 🕓 pending |
 
 ## Status
 
