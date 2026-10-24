@@ -36,6 +36,7 @@ const handlers = (
     return jsonResponse(clientPage([lucia]));
   }),
   http.get(apiUrl(`${clientsPath}/:clientId`), () => jsonResponse(detail)),
+  acquisitionHandler(),
   http.post(apiUrl(`${clientsPath}/:clientId/closure`), ({ params }) => {
     closures.push(String(params.clientId));
     return close();
@@ -199,6 +200,7 @@ describe("AW22 Cerrar cuenta", () => {
           closure: { ...luciaDetail.closure, futureBookingCount: bookings },
         }),
       ),
+      acquisitionHandler(),
     );
     const { dialog, user } = await openDialog();
     expect(

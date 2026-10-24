@@ -10,6 +10,7 @@ import {
   useMockServer,
 } from "../../test/msw";
 import {
+  acquisitionHandler,
   clientPage,
   clientsPath,
   lucia,
@@ -30,6 +31,7 @@ let detail: AdminClientDetailDto = withoutPlan;
 const handlers = (answer: (endsOn: string) => Response) => [
   http.get(apiUrl(clientsPath), () => jsonResponse(clientPage([lucia]))),
   http.get(apiUrl(`${clientsPath}/:clientId`), () => jsonResponse(detail)),
+  acquisitionHandler(),
   http.post(
     apiUrl(`${clientsPath}/:clientId/courtesy-access`),
     async ({ request }) => {
