@@ -71,6 +71,8 @@ const toDetailDto = (
       status: client.subscription.status,
       nextSubscription: null,
       founderRenewalDeadline: client.subscription.founderRenewalDeadline,
+      freeze: client.subscription.freeze ?? null,
+      canRequestFreeze: client.subscription.canRequestFreeze ?? false,
       subscription:
         current === null
           ? null

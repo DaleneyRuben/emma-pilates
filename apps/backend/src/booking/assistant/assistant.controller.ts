@@ -215,6 +215,8 @@ export class AssistantClientsController {
         ),
         founderRenewalDeadline:
           overview.subscription.founderRenewalDeadline ?? null,
+        freeze: overview.subscription.freeze ?? null,
+        canRequestFreeze: overview.subscription.canRequestFreeze ?? false,
       },
     };
   }
