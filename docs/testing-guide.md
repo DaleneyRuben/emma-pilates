@@ -6113,8 +6113,11 @@ password, holding every Branch.
 3. Type `/back-office/pagos` (or `/reporte`, `/back-office/nomina`,
    `/promociones`) in the address bar: you land on Horario with «Esa
    sección es solo para administración.».
-4. In **Clientes**, open a Client: no «Crédito» row, no «Cerrar cuenta»,
-   and no «Bs» anywhere. Press **Editar perfil**, change the phone, and
+4. In **Clientes**, there is no **Dar clases de campaña**. Open a Client:
+   no «Crédito» row, no «Cerrar cuenta», no **Agregar clase de cortesía**,
+   no **Devolver una clase**, no **¿Cómo nos conociste?**, and no «Bs»
+   anywhere. Typing `/back-office/clientes/campana` lands on Horario with
+   the same notice as step 3. Press **Editar perfil**, change the phone, and
    **Guardar cambios**: «Guardamos los cambios del perfil.» and the new
    phone. Empty the name to see «Escribe el nombre de la clienta.». The
    email stays read-only («La clienta cambia su correo desde su app.»).

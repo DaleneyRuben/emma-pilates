@@ -34,6 +34,7 @@ describe("the admin web for the Coordinator", () => {
     "/back-office/nomina",
     "/catalogo/planes",
     "/promociones",
+    "/back-office/clientes/campana",
   ])("returns %s to Horario with the notice", async (path) => {
     const { router } = renderAdmin(path);
 
@@ -53,6 +54,9 @@ describe("the admin web for the Coordinator", () => {
     renderAdmin("/back-office/clientes");
 
     await heading("Clientes");
+    expect(
+      screen.queryByRole("link", { name: "Dar clases de campaña" }),
+    ).not.toBeInTheDocument();
   });
 
   it("names her Role in the account menu", async () => {

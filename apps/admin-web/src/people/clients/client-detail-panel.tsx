@@ -20,7 +20,7 @@ import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
 import { PageNotice } from "../../components/page/page-notice";
 import { formatCivilDate } from "../../lib/bolivia-time";
-import { useAdminRole } from "../../session/admin-role";
+import { useAdminRole, type AdminRole } from "../../session/admin-role";
 import { AllowanceAdjustmentAction } from "./allowance-adjustment-action";
 import { ClientAcquisitionBlock } from "./client-acquisition-block";
 import { ClientProfileForm } from "./client-profile-form";
@@ -41,9 +41,11 @@ const clientDetailQueryOptions = (clientId: string) =>
 function PlanBlock({
   clientId,
   view,
+  role,
 }: {
   clientId: string;
   view: AdminClientDetailDto["subscription"];
+  role: AdminRole;
 }) {
   const current = view.subscription;
   if (current === null || current === undefined || view.status === "none") {
@@ -93,7 +95,7 @@ function PlanBlock({
           {current.extraClassesLine}
         </p>
       ) : null}
-      {view.status === "active" ? (
+      {view.status === "active" && role === "administrator" ? (
         <div className="flex flex-wrap gap-2 px-3 py-2">
           <AllowanceAdjustmentAction clientId={clientId} reason="courtesy" />
           <AllowanceAdjustmentAction
@@ -109,9 +111,11 @@ function PlanBlock({
 function ClientSummary({
   client,
   contact,
+  role,
 }: {
   client: AdminClientDetailDto;
   contact: ReactNode;
+  role: AdminRole;
 }) {
   return (
     <>
@@ -130,7 +134,7 @@ function ClientSummary({
         <StatusPill tone="neutral">Cuenta desactivada</StatusPill>
       ) : null}
       {contact}
-      <PlanBlock clientId={client.id} view={client.subscription} />
+      <PlanBlock clientId={client.id} view={client.subscription} role={role} />
       <SummaryBlock title="Referidos">
         <SummaryRow label="Clientas referidas" figure>
           {client.referredClientCount === 0
@@ -143,7 +147,9 @@ function ClientSummary({
           </span>
         </SummaryRow>
       </SummaryBlock>
-      <ClientAcquisitionBlock clientId={client.id} />
+      {role === "administrator" ? (
+        <ClientAcquisitionBlock clientId={client.id} />
+      ) : null}
     </>
   );
 }
@@ -203,6 +209,7 @@ export function ClientDetailPanel({
             ) : null}
             <ClientSummary
               client={query.data}
+              role={role}
               contact={
                 editing ? (
                   <ClientProfileForm

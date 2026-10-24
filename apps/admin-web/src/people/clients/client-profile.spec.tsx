@@ -119,6 +119,14 @@ describe("AW22 Editar perfil", () => {
     expect(
       within(panel).queryByRole("button", { name: "Cerrar cuenta" }),
     ).not.toBeInTheDocument();
+    expect(
+      within(panel).queryByRole("button", {
+        name: "Agregar clase de cortesía",
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(panel).queryByRole("button", { name: "Devolver una clase" }),
+    ).not.toBeInTheDocument();
     expect(document.body.textContent).not.toContain("Bs");
   });
 });
