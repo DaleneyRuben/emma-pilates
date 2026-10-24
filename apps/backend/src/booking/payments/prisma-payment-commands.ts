@@ -359,7 +359,13 @@ export function createPrismaPaymentCommands(
       pendingPaymentId: pendingPayment?.id ?? null,
     });
 
-    if (eligibility.subscriptionIdToExpire !== null) {
+    // A spent Subscription that still covers today is shortened by the
+    // renewal, not expired here. Expiring it first would hide it from the
+    // Start Date allocation and leave the early end unrecorded.
+    if (
+      eligibility.subscriptionIdToExpire !== null &&
+      (active === null || active.endsOn.getTime() < today.getTime())
+    ) {
       await expireSubscription(
         transaction,
         eligibility.subscriptionIdToExpire,
