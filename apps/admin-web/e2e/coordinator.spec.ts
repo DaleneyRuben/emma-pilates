@@ -15,6 +15,7 @@ test.describe("the Coordinator's admin web", () => {
 
     // Lucía, Valeria, and Isabel start a paid Plan inside the first 90 days
     // with no Booking, so the worker's first pass badges those three.
+    // Renata has no Plan, so she is not one of them.
     await expect(
       sidebar(page).getByRole("link", {
         name: "Para contactar, 3 para contactar",

@@ -18,8 +18,7 @@ const disposablePrefix = "pilates_test_";
 const databaseName = (url: string) => new URL(url).pathname.slice(1);
 
 // Every fixture Client already holds a Plan or a transfer in review. The
-// cash-sale journey needs one who holds neither, so she is seeded beside
-// the fixtures with the same password hash.
+// cash-sale journey needs one who holds neither.
 const seedClientWithoutPlan = `
   WITH hashed AS (
     SELECT password_hash FROM system.accounts
