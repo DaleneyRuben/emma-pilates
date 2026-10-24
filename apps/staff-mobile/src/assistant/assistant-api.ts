@@ -14,6 +14,7 @@ import {
   type ClientInvitationDto,
   type ClientInvitationResultDto,
   type InviteClientDto,
+  type InvoiceDataDto,
 } from "@pilates/api-contracts";
 import { randomUUID } from "expo-crypto";
 
@@ -40,6 +41,7 @@ export type AssistantApi = {
     clientId: string,
     planId: string,
     branchId: string,
+    invoiceData: InvoiceDataDto | null,
   ) => Promise<AssistantCashPaymentDto>;
   rescheduleBooking: (bookingId: string, targetSessionId: string) => Promise<{ id: string }>;
   resendInvitation: (clientId: string) => Promise<ClientInvitationDto>;
@@ -106,10 +108,10 @@ export function createAssistantApi(fetcher: typeof globalThis.fetch): AssistantA
     async leaveWaitlist(waitlistEntryId) {
       requireSuccess(await leaveWaitlist(waitlistEntryId, undefined, fetcher));
     },
-    async recordCashPayment(clientId, planId, branchId) {
+    async recordCashPayment(clientId, planId, branchId, invoiceData) {
       const response = await recordAssistantCashPayment(
         clientId,
-        { planId, branchId },
+        { planId, branchId, invoiceData },
         { headers: idempotent() },
         fetcher,
       );

@@ -1,12 +1,7 @@
 import {
-  completeCreditPurchase,
   createPurchaseIntent,
   getCurrentPurchaseIntent,
-  getGetCurrentClientCreditQueryKey,
-  getGetCurrentClientSubscriptionQueryKey,
-  getGetCurrentPaymentQueryKey,
   getGetCurrentPurchaseIntentQueryKey,
-  useGetCurrentClientCredit,
   useGetPlan,
 } from "@pilates/api-contracts";
 import {
@@ -63,10 +58,6 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  const credit = useGetCurrentClientCredit({
-    fetcher,
-    query: { refetchOnMount: "always" },
-  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -90,37 +81,14 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
 
   const detail = plan.data.data;
   const price = formatBolivianos(detail.priceCentavos);
-  const available = credit.data?.status === 200 ? credit.data.data.availableCentavos : 0;
-  const applied = Math.min(available, detail.priceCentavos);
-  const total = detail.priceCentavos - applied;
 
-  // Credit that covers the whole price activates the Plan at once; otherwise
-  // a Purchase Intent freezes the amount to transfer.
+  // A Purchase Intent freezes the amount to transfer: the Plan's full price,
+  // since Credit is retired (PAY-005).
   const continueToPayment = async () => {
     setError(null);
     setBusy(true);
     const headers = { "idempotency-key": randomUUID() };
     try {
-      if (total === 0) {
-        const purchase = await completeCreditPurchase({ planId: detail.id }, { headers }, fetcher);
-        if (purchase.status !== 201) {
-          setError(
-            purchaseErrorCopy[problemCode(purchase.data) ?? ""] ??
-              "No pudimos completar la compra. Inténtalo de nuevo.",
-          );
-          return;
-        }
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: getGetCurrentPaymentQueryKey() }),
-          queryClient.invalidateQueries({ queryKey: getGetCurrentClientCreditQueryKey() }),
-          queryClient.invalidateQueries({
-            queryKey: getGetCurrentClientSubscriptionQueryKey(),
-          }),
-        ]);
-        navigation.navigate("PaymentStatus");
-        return;
-      }
-
       const created = await createPurchaseIntent({ planId: detail.id }, { headers }, fetcher);
       if (created.status === 201) {
         await queryClient.invalidateQueries({ queryKey: getGetCurrentPurchaseIntentQueryKey() });
@@ -175,23 +143,16 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
             <BodyText>Precio del plan</BodyText>
             <BodyText>{price}</BodyText>
           </View>
-          {applied > 0 ? (
-            <View style={styles.row}>
-              <BodyText>Crédito aplicado</BodyText>
-              <BodyText style={styles.creditValue}>{`−${formatBolivianos(applied)}`}</BodyText>
-            </View>
-          ) : null}
           <View style={[styles.row, styles.totalRow]}>
             <Text style={styles.totalLabel}>Total a pagar</Text>
-            <Text style={styles.total}>{formatBolivianos(total)}</Text>
+            <Text style={styles.total}>{price}</Text>
           </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Siguiente paso</Text>
           <BodyText>
-            {total === 0
-              ? "Tu crédito cubre todo el plan: se activa al instante, sin transferencia."
-              : "Pagas por transferencia con el QR del estudio y subes tu comprobante. El plan se activa cuando el estudio confirma tu pago."}
+            Pagas por transferencia con el QR del estudio y subes tu comprobante. El plan se activa
+            cuando el estudio confirma tu pago.
           </BodyText>
         </View>
         {error === null ? null : (
@@ -217,7 +178,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  creditValue: { color: colors.successText },
   error: { color: colors.errorText },
   planName: {
     color: colors.text,

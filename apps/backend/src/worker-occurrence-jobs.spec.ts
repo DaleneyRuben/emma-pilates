@@ -143,7 +143,7 @@ describe('worker entrypoint occurrence jobs', () => {
     expect(retentionSweeps.execute).toHaveBeenCalledTimes(2);
   });
 
-  it('checks empty Sessions and closes started Waitlists at start and every minute with sanitized failure signals', async () => {
+  it('checks the Minimum Bookings, records window-close Bookings, and closes started Waitlists at start and every minute with sanitized failure signals', async () => {
     jest.useFakeTimers();
     const boss: WorkerBoss = {
       isInstalled: jest.fn().mockResolvedValue(true),
@@ -155,15 +155,25 @@ describe('worker entrypoint occurrence jobs', () => {
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const order: string[] = [];
-    const emptySessionChecks = {
+    const minimumBookingsChecks = {
       execute: jest
         .fn()
         .mockImplementationOnce(() => {
-          order.push('empty-check');
+          order.push('minimum-check');
           return Promise.resolve({ checked: 1, cancelled: 1 });
         })
-        .mockRejectedValueOnce(new Error('sensitive empty check failure'))
+        .mockRejectedValueOnce(new Error('sensitive minimum check failure'))
         .mockResolvedValue({ checked: 0, cancelled: 0 }),
+    };
+    const windowCloseSnapshots = {
+      execute: jest
+        .fn()
+        .mockImplementationOnce(() => {
+          order.push('window-snapshot');
+          return Promise.resolve({ recorded: 3 });
+        })
+        .mockRejectedValueOnce(new Error('sensitive snapshot failure'))
+        .mockResolvedValue({ recorded: 0 }),
     };
     const startedSessionWaitlists = {
       execute: jest
@@ -200,25 +210,36 @@ describe('worker entrypoint occurrence jobs', () => {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
       ...occurrenceJobs(),
-      emptySessionChecks,
+      minimumBookingsChecks,
+      windowCloseSnapshots,
       startedSessionWaitlists,
       serviceVersion: '1.2.3',
       emit,
     });
 
-    // A check missed while the worker was down runs before the Waitlist of a
-    // Session that has since started is closed.
-    expect(order).toEqual(['empty-check', 'waitlist-closure']);
+    // A check missed while the worker was down runs before the window-close
+    // snapshot, so a cancelled Session gets none, and both run before the
+    // Waitlist of a Session that has since started is closed.
+    expect(order).toEqual([
+      'minimum-check',
+      'window-snapshot',
+      'waitlist-closure',
+    ]);
 
     await jest.advanceTimersByTimeAsync(59 * 1_000);
-    expect(emptySessionChecks.execute).toHaveBeenCalledTimes(1);
+    expect(minimumBookingsChecks.execute).toHaveBeenCalledTimes(1);
     expect(startedSessionWaitlists.execute).toHaveBeenCalledTimes(1);
 
     await jest.advanceTimersByTimeAsync(1_000);
-    expect(emptySessionChecks.execute).toHaveBeenCalledTimes(2);
+    expect(minimumBookingsChecks.execute).toHaveBeenCalledTimes(2);
     expect(startedSessionWaitlists.execute).toHaveBeenCalledTimes(2);
     expect(emit).toHaveBeenCalledWith({
-      event: 'empty_session_check_failed',
+      event: 'minimum_bookings_check_failed',
+      serviceVersion: '1.2.3',
+    });
+    expect(windowCloseSnapshots.execute).toHaveBeenCalledTimes(2);
+    expect(emit).toHaveBeenCalledWith({
+      event: 'window_close_snapshot_failed',
       serviceVersion: '1.2.3',
     });
     expect(emit).toHaveBeenCalledWith({
@@ -228,12 +249,12 @@ describe('worker entrypoint occurrence jobs', () => {
     expect(JSON.stringify(emit.mock.calls)).not.toContain('sensitive');
 
     await jest.advanceTimersByTimeAsync(60 * 1_000);
-    expect(emptySessionChecks.execute).toHaveBeenCalledTimes(3);
+    expect(minimumBookingsChecks.execute).toHaveBeenCalledTimes(3);
     expect(startedSessionWaitlists.execute).toHaveBeenCalledTimes(3);
 
     await stopWorker();
     await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
-    expect(emptySessionChecks.execute).toHaveBeenCalledTimes(3);
+    expect(minimumBookingsChecks.execute).toHaveBeenCalledTimes(3);
     expect(startedSessionWaitlists.execute).toHaveBeenCalledTimes(3);
   });
 

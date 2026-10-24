@@ -25,11 +25,6 @@ import { ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import { formatReferralDate } from "./referral-format";
 
-type ReferralsNavigation = {
-  goBack: () => void;
-  navigate: (screen: "Credit") => void;
-};
-
 // The design system defines tints as the semantic color at low alpha.
 const successTint = "rgba(124, 148, 115, 0.16)";
 const warningTint = "rgba(201, 154, 78, 0.16)";
@@ -69,7 +64,7 @@ function ReferredRow({ entry }: { entry: ReferredClientDto }) {
 }
 
 export function ReferralsScreen() {
-  const navigation = useNavigation<ReferralsNavigation>();
+  const navigation = useNavigation<{ goBack: () => void }>();
   const fetcher = useClientFetcher();
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const referrals = useGetCurrentClientReferrals(queryOptions);

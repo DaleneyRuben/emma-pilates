@@ -11,12 +11,22 @@ export interface ReferredClientDto {
   referredClientId: string;
   /** First name and surname initial */
   referredName: string;
+  /**
+   * Deprecated (PAY-005): Credit was retired; a Referral made since stays pending
+   * @deprecated
+   */
   state: ReferredClientDtoState;
   /** BKM-014: the invitation's status. Older releases ignore it and read state. */
   invitationStatus: ReferredClientDtoInvitationStatus;
   createdAt: string;
-  /** @nullable */
+  /**
+   * @deprecated
+   * @nullable
+   */
   awardedAt?: string | null;
-  /** @nullable */
+  /**
+   * @deprecated
+   * @nullable
+   */
   awardCentavos?: number | null;
 }

@@ -45,7 +45,6 @@ export const startPaymentWorld = async () => {
   const commands = (at: Date = now) =>
     createPrismaPaymentCommands(prisma, {
       now: () => at,
-      referralRewardCentavos: 6000,
     });
 
   const staffPrincipal = async (

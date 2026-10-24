@@ -62,7 +62,6 @@ describe('Prisma payment commands', () => {
   const commands = () =>
     createPrismaPaymentCommands(prisma, {
       now: () => now,
-      referralRewardCentavos: 6000,
     });
 
   it('creates one open Purchase Intent with frozen Plan snapshots and replays it by idempotency key', async () => {
@@ -122,12 +121,12 @@ describe('Prisma payment commands', () => {
       commands().createPurchaseIntent({ planId: plan.id }, sofia, randomUUID()),
     ).resolves.toMatchObject({
       state: 'open',
-      creditReservedCentavos: 6000,
-      amountDueCentavos: 50_000,
+      creditReservedCentavos: 0,
+      amountDueCentavos: 56_000,
     });
   });
 
-  it('reserves available Credit against the Plan price and records the reservation in the ledger', async () => {
+  it('reserves no Credit even when an old ledger balance remains, and reads the retired Credit as zero (PAY-005)', async () => {
     const sofia = await principalOf('sofia@example.com');
     const isabel = await principalOf('isabel@example.com');
     const isabelId =
@@ -202,9 +201,10 @@ describe('Prisma payment commands', () => {
       });
     });
 
-    // Isabel now holds Bs 60 of Credit and has no Subscription.
+    // Isabel keeps a Bs 60 ledger row from before PAY-005 and has no
+    // Subscription; the retired Credit is neither shown nor spent.
     await expect(commands().readCreditSummary(isabel)).resolves.toEqual({
-      availableCentavos: 6000,
+      availableCentavos: 0,
       reservedCentavos: 0,
     });
 
@@ -215,39 +215,26 @@ describe('Prisma payment commands', () => {
     );
 
     expect(intent).toMatchObject({
-      creditReservedCentavos: 6000,
-      amountDueCentavos: 50_000,
+      creditReservedCentavos: 0,
+      amountDueCentavos: 56_000,
     });
-    await expect(commands().readCreditSummary(isabel)).resolves.toEqual({
-      availableCentavos: 0,
-      reservedCentavos: 6000,
-    });
-    const reservation = await prisma.creditReservation.findUniqueOrThrow({
-      where: { purchaseIntentId: intent.id },
-      include: { ledgerEntries: true },
-    });
-    expect(reservation).toMatchObject({
-      state: 'RESERVED',
-      amountCentavos: 6000,
-    });
-    expect(reservation.ledgerEntries).toHaveLength(1);
+    await expect(
+      prisma.creditReservation.findUnique({
+        where: { purchaseIntentId: intent.id },
+      }),
+    ).resolves.toBeNull();
+    await expect(
+      prisma.creditLedgerEntry.count({ where: { clientId: isabelId } }),
+    ).resolves.toBe(1);
   });
 
-  it('lists recent Credit activity newest first and the Client referral code with referred Clients', async () => {
+  it('lists no Credit activity and still gives the Client her referral code with referred Clients', async () => {
     const isabel = await principalOf('isabel@example.com');
     const sofia = await principalOf('sofia@example.com');
     const sofiaId =
       sofia.identity.kind === 'client' ? sofia.identity.clientId : '';
 
-    const activity = await commands().readCreditActivity(isabel);
-    expect(activity.map((entry) => entry.kind)).toEqual([
-      'payment_reservation',
-      'referral_award',
-    ]);
-    expect(activity[0]).toMatchObject({
-      amountCentavos: 6000,
-      occurredAt: expect.any(Date) as Date,
-    });
+    await expect(commands().readCreditActivity(isabel)).resolves.toEqual([]);
 
     const referrals = await commands().readReferrals(isabel);
     expect(referrals.referralCode).toEqual(expect.any(String));
@@ -317,7 +304,6 @@ describe('Prisma payment commands', () => {
 
     await createPrismaPaymentCommands(prisma, {
       now: () => pastNow,
-      referralRewardCentavos: 6000,
     }).createPurchaseIntent({ planId: plan.id }, principal, key);
 
     await expect(
