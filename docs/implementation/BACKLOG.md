@@ -475,7 +475,7 @@ wait for Google, Apple, and testers.
 | BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | ready |
 | PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | ready |
 | PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | ready |
-| BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
+| BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | done (c39d73a3 backend, 3ae735e5 Staff app S25, 4510368c admin web AW151, 1e4dee1e design export; iPhone 16 Pro, iPad Pro 11 (M4), Android emulator, browser at 1440/420 px) |
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | ready |
 | NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
 | BKM-012 | P0 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | ready |
@@ -648,6 +648,30 @@ both actions audited. The filter and the CSV match.
 Acceptance criteria: the expected amount equals the sum of the cash Payments in
 the window, including a sale voided after the close (shown as an adjustment).
 Integration tests prove a second close of the same day is refused.
+
+Notes (BKO-003, 2026-10-23):
+
+- Decisions taken under the blanket approval: the close is always for today's
+  Bolivia day; the expected cash is the confirmed cash Payments collected at
+  the Branch from midnight up to the close, stored on the close; the history
+  recomputes the day's sales and shows the change as «Ajuste» (a sale voided
+  later lowers it, a cash sale recorded after the close raises it), so the
+  close is never edited (a trigger refuses updates and deletes). The note is
+  optional (500 characters); the count is whole centavos up to Bs 1,000,000.
+  One close per Branch and day is a unique index (`409`
+  `cash_close_already_recorded`); an Assistant closes only her Branches
+  (`403` `branch_not_assigned`); every other Role is denied by default, the
+  Coordinator included. The voided-sale seam is the «confirmed» filter: the
+  integration spec moves a confirmed cash Payment out of it on a disposable
+  database, as PAY-006's «voided» will.
+- AW151 takes its number from the block 150–154 given to this item so the
+  parallel items never collide; follow-up 150 is partly applied (the
+  design-system sidebar card, the other admin screens' sidebars, and the
+  generated `design/README.md` rows take «Caja» at their next regeneration).
+- Open question: may an Administrator close a past day that nobody closed?
+  Today it is only flagged on AW151.
+- For IDN-009: add `/cash-closes` and `/administrator/cash-closes` to the
+  authorization matrix as Coordinator ✗, and hide «Caja» from her sidebar.
 
 #### IDN-009 · Coordinator Role
 

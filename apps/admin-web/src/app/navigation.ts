@@ -10,6 +10,7 @@ export type AdminPath =
   | "/catalogo/sucursales"
   | "/back-office/clientes"
   | "/back-office/pagos"
+  | "/back-office/caja"
   | "/back-office/insumos"
   | "/back-office/evaluaciones-nutricionales"
   | "/back-office/personal"
@@ -99,6 +100,11 @@ export const navigationGroups: readonly NavigationGroup[] = [
         list: true,
         badge: "pendingPayments",
         studioWide: "los pagos son del estudio, no de una sede.",
+      },
+      {
+        label: "Caja",
+        to: "/back-office/caja",
+        screen: "AW151",
       },
       {
         label: "Insumos",

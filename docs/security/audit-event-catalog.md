@@ -74,6 +74,7 @@ beyond what the table below names.
 | `salary_payment.updated` | Back Office | An Administrator corrects a Salary Payment | Administrator | `salary_payment` | — | previous and new `staffMemberId`, `amountCentavos`, `paidOn` (only those changed) |
 | `expense.recorded` | Back Office | An Administrator records a Branch Expense | Administrator | `expense` | Expense Branch | `amountCentavos`, `incurredOn`, `expenseCategoryId` |
 | `expense.updated` | Back Office | An Administrator corrects an Expense (the Branch never changes) | Administrator | `expense` | Expense Branch | previous and new `expenseCategoryId`, `amountCentavos`, `incurredOn` (only those changed) |
+| `cash_close.recorded` | Back Office | An Assistant (at her Branch) or an Administrator makes the day's Cash Close; it is never edited afterwards (BKO-003) | Staff Account and Role (the Administrator, with the Impersonation, while she sees the app as an Assistant) | `cash_close` | Cash Close Branch | `businessDate`, `expectedCentavos`, `countedCentavos`, `differenceCentavos` |
 
 Back Office money records follow BKO-001 D17: Salary Payments and Expenses are audited; Supplies, Withdrawals, Restocks, and Expense Categories are not (below).
 
