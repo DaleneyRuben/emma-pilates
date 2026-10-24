@@ -72,7 +72,17 @@ const review = (payment: typeof carla, state = "pending") => ({
   receiptUrl: `/api/v1/administrator/payments/${payment.id}/receipt`,
 });
 
-const pngBytes = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+// A PNG signature followed by an IHDR chunk, so the thumbnail can read its own ratio.
+function pngHeader(width: number, height: number): Uint8Array {
+  const bytes = new Uint8Array(33);
+  bytes.set([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82]);
+  const view = new DataView(bytes.buffer);
+  view.setUint32(16, width);
+  view.setUint32(20, height);
+  return bytes;
+}
+
+const pngBytes = pngHeader(420, 600);
 const receiptResponse = () =>
   new Response(pngBytes, { headers: { "Content-Type": "image/png" }, status: 200 });
 
@@ -176,6 +186,11 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Comprobante de transferencia")).toBeOnTheScreen();
     });
+    // UX-012 / S9: a portrait receipt keeps its own ratio instead of a fixed square.
+    expect(screen.getByLabelText("Comprobante de transferencia")).toHaveStyle({
+      aspectRatio: 420 / 600,
+      width: "100%",
+    });
 
     await fireEvent.press(screen.getByRole("button", { name: "Ampliar" }));
     await waitFor(() => {
@@ -278,7 +293,8 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.getByLabelText("Cancelar una clase")).toBeOnTheScreen();
     });
     await waitFor(() => {
-      expect(screen.getByText("Centro")).toBeOnTheScreen();
+      // The picker pill and the Session row both name the Branch.
+      expect(screen.getAllByText("Centro").length).toBeGreaterThan(0);
     });
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();

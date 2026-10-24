@@ -270,8 +270,8 @@ export function BookingsScreen({
               </BodyText>
             ) : null}
             <BodyText>
-              La clase vuelve al saldo de tu plan y el cupo se libera; volver a reservar depende de
-              que siga habiendo lugar.
+              La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para
+              volver a reservarlo tendrá que seguir habiendo cupo.
             </BodyText>
             <OutlinedAction
               label="Sí, cancelar reserva"

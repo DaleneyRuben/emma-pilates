@@ -38,6 +38,7 @@ import {
   subscriptionBadge,
 } from "./home-format";
 import { ShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
+import { promotionCardMaxWidth } from "./promotion-image";
 import { PromotionsCarousel } from "./promotions-carousel";
 
 type HomeNavigation = {
@@ -118,7 +119,7 @@ function SubscriptionCard({
 
 function PurchaseCard({ onPurchase }: { onPurchase: () => void }) {
   return (
-    <View style={[styles.card, styles.purchaseCard]}>
+    <View style={[styles.card, styles.purchaseCard]} testID="home-purchase-card">
       <Text style={styles.purchaseTitle}>Elige tu plan y vuelve al mat</Text>
       <BodyText style={styles.purchaseBody}>
         Paquetes desde Bs 560. Puedes pagar en el estudio o desde la app.
@@ -283,7 +284,14 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   purchaseBody: { color: colors.white },
-  purchaseCard: { backgroundColor: colors.primary, borderColor: colors.primary },
+  // UX-012: the tablet carousel stops at 720 px; the no-plan card takes the same cap.
+  purchaseCard: {
+    alignSelf: "center",
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    maxWidth: promotionCardMaxWidth,
+    width: "100%",
+  },
   purchaseTitle: {
     color: colors.white,
     fontSize: typography.titleSecondary,

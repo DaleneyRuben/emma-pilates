@@ -132,7 +132,12 @@ describe("Administrator rows", () => {
     });
     expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#4A4A4A", fontSize: 14 });
     expect(card.getByTestId("glyph-person", hidden)).toHaveProp("width", 16);
-    expect(card.getByText("Sucursal Centro")).toHaveStyle({ color: "#766D69", fontSize: 13 });
+    // UX-012 / S7: the pill already says «Sucursal: Centro», so the row is the bare name.
+    expect(card.getByText("Centro", { exact: true })).toHaveStyle({
+      color: "#766D69",
+      fontSize: 13,
+    });
+    expect(card.queryByText(/^Sucursal /)).toBeNull();
     expect(card.getByTestId("glyph-pin", hidden)).toHaveProp("width", 15);
     expect(card.getByTestId("card-footer")).toHaveStyle({ paddingTop: 13 });
     expect(card.getByText("6 reservas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
