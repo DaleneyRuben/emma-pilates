@@ -22,6 +22,7 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
     "Asistente",
     "Administración",
     "Nutricionista",
+    "Coordinador",
   ]);
   await expect(
     page.getByRole("row", { name: /Emma Vargas/ }).getByText("Entrenadora"),
