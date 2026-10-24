@@ -57,6 +57,7 @@ model Booking {
   attendanceRecord       AttendanceRecord?
   guestPasses            GuestPass[]
   promotedWaitlistEntry  WaitlistEntry?            @relation("WaitlistPromotion")
+  allowanceAdjustment    AllowanceAdjustment?
 
   @@unique([id, sessionId, clientId])
   @@unique([id, clientId, subscriptionId])

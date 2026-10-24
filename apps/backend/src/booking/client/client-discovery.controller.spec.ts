@@ -232,10 +232,16 @@ describe('catalog list controllers', () => {
 describe('SessionDetailController', () => {
   const resolvePrincipal = jest.fn().mockResolvedValue(principal);
   const findSessionDetail = jest.fn();
+  const classesLeft = jest.fn().mockResolvedValue(null);
   const controller = new SessionDetailController(
     findSessionDetail,
+    classesLeft,
     resolvePrincipal,
   );
+
+  beforeEach(() => {
+    resolvePrincipal.mockResolvedValue(principal);
+  });
 
   it('returns the Session detail', async () => {
     const detail = {
@@ -257,8 +263,13 @@ describe('SessionDetailController', () => {
     };
     findSessionDetail.mockResolvedValue(detail);
 
-    await expect(controller.get(sessionId, bearer)).resolves.toEqual(detail);
+    classesLeft.mockResolvedValue(1);
+    await expect(controller.get(sessionId, bearer)).resolves.toEqual({
+      ...detail,
+      classesLeftThisWeek: 1,
+    });
     expect(findSessionDetail).toHaveBeenCalledWith(sessionId);
+    expect(classesLeft).toHaveBeenCalledWith('client-id', detail.startsAt);
   });
 
   it('returns a stable not-found problem for cancelled or unknown Sessions', async () => {

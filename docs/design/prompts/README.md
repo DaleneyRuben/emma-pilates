@@ -10,8 +10,8 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 |---|---|---|---|
 | 01 | Iniciar sesión / Registrarse | `01` | ✅ |
 | 02 | Inicio | `02` | ✅ |
-| 03 | Reservar | `03` | ✅ |
-| 04 | Detalle de sesión | `04` | ✅ |
+| 03 | Reservar | `03` | ✅ (follow-up 196 pending: «Te quedan N clases esta semana») |
+| 04 | Detalle de sesión | `04` | ✅ (follow-up 196 pending: «Te quedan N clases esta semana») |
 | 05 | Mis reservas | `05` | ✅ |
 | 06 | Reprogramar | `06` | ✅ |
 | 07 | Historial de clases | `07` | ✅ |
@@ -276,6 +276,7 @@ Each of these was sent as the next message in the existing design session for th
 | [200](./followups/197-void-sale-on-payments.md) | `AW28` gains «Anular venta» with a required reason and an «Anulado» filter (PAY-006, decisions §4.3) | 🕓 pending |
 | [201](./followups/198-courtesy-form-on-client-detail.md) | `AW22` gains courtesy and class-return buttons; amends 195, which said not to add the form (PAY-006) | 🕓 pending |
 | [202](./followups/196-admin-campaign-grant.md) | `AW21` gains «Dar clases de campaña», opening the campaign grant on the same screen's address; no new screen and no sidebar entry (BKM-015, decisions §5.4) | 🕓 pending |
+| [203](./followups/196-weekly-cap-classes-left.md) | `03` and `04` show «Te quedan N clases esta semana» from `classesLeftThisWeek`; absent without a cap; zero stays honest when an extra class remains (BKM-007) | 🕓 pending |
 
 ## Status
 

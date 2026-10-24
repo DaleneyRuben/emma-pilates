@@ -33,11 +33,12 @@ import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendanceCorrections } from './attendance-audit';
 import { recordAttendance } from './record-attendance';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
+import { fundBooking } from './weekly-cap-funding';
+import { readWeeklyCapPosition } from './weekly-cap-count';
 import {
   findCoveringSubscription,
   findNotYetStartedSubscription,
 } from './eligible-subscription';
-import { consumeOneClass } from './consume-allowance';
 import { decideGuestPassBooking } from '../payments/guest-pass';
 import { retrySerializable } from '../../database/retry-serializable';
 
@@ -573,6 +574,15 @@ export class PrismaBookingCommands {
               transaction.booking.count({
                 where: { sessionId, state: BookingState.BOOKED },
               }),
+            weeklyCapBlocksDestination: async (input) => {
+              const position = await readWeeklyCapPosition(transaction, input);
+              return (
+                position.weeklyClassCap !== null &&
+                position.baseFundedBookingsThisWeek >=
+                  position.weeklyClassCap &&
+                position.extraClasses <= 0
+              );
+            },
             hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
               transaction.booking
                 .findFirst({
@@ -772,7 +782,7 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        findCoveringSubscription(transaction, {
+        this.findSubscriptionForBooking(transaction, {
           clientId,
           onDate,
           needsAllowance: false,
@@ -817,7 +827,7 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        findCoveringSubscription(transaction, {
+        this.findSubscriptionForBooking(transaction, {
           clientId,
           onDate,
           needsAllowance: true,
@@ -847,16 +857,16 @@ export class PrismaBookingCommands {
           },
           select: { id: true, courtesySubscriptionId: true },
         });
+        const session = await transaction.session.findUniqueOrThrow({
+          where: { id: input.sessionId },
+          select: { startsAt: true, capacity: true },
+        });
         if (
           pass !== null &&
           pass.courtesySubscriptionId === input.subscriptionId
         ) {
           const taken = await transaction.booking.count({
             where: { sessionId: input.sessionId, state: 'BOOKED' },
-          });
-          const session = await transaction.session.findUniqueOrThrow({
-            where: { id: input.sessionId },
-            select: { capacity: true },
           });
           const decision = decideGuestPassBooking({
             placesLeft: session.capacity - taken,
@@ -865,14 +875,16 @@ export class PrismaBookingCommands {
           if (decision !== null) throw new Error(decision.code);
         }
 
-        const consumed = await consumeOneClass(transaction, {
+        const booking = await fundBooking(transaction, {
           subscriptionId: input.subscriptionId,
           clientId: input.clientId,
           authorAccountId: input.createdByAccountId,
+          startsAt: session.startsAt,
           now: this.now(),
+          createBooking: () =>
+            transaction.booking.create({ data: input, select: { id: true } }),
         });
-
-        if (!consumed) {
+        if (booking === null) {
           const spent = await transaction.guestPass.findFirst({
             where: {
               friendClientId: input.clientId,
@@ -887,11 +899,6 @@ export class PrismaBookingCommands {
               : 'guest_pass_already_used',
           );
         }
-
-        const booking = await transaction.booking.create({
-          data: input,
-          select: { id: true },
-        });
         if (pass !== null) {
           await transaction.guestPass.update({
             where: { id: pass.id },
@@ -902,6 +909,21 @@ export class PrismaBookingCommands {
       },
       now: this.now,
     });
+  }
+
+  private async findSubscriptionForBooking(
+    transaction: Prisma.TransactionClient,
+    input: { clientId: string; onDate: Date; needsAllowance: boolean },
+  ) {
+    const subscription = await findCoveringSubscription(transaction, input);
+    if (subscription === null) return null;
+    return {
+      id: subscription.id,
+      ...(await readWeeklyCapPosition(transaction, {
+        subscriptionId: subscription.id,
+        startsAt: input.onDate,
+      })),
+    };
   }
 
   private loadSession(

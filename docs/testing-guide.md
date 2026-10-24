@@ -38,6 +38,7 @@ you are starting with no project knowledge.
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
+| Weekly cap                   | Book up to the cap snapshotted on a Plan, see `classesLeftThisWeek` count down, and get `409 weekly_cap_reached` on the next Booking or Waitlist join unless an extra class remains (Test 91) | The «Te quedan N clases esta semana» line on Reservar is follow-up 203 and is still pending; the mobile screens were not walked on a device |
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 83) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
@@ -50,8 +51,8 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
-| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91 |
+| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81, 87, 88, 89 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
@@ -3385,9 +3386,6 @@ The following are not ready for manual product testing:
 - the mobile apps were not walked for BKM-014: the invitation screen was
   verified by Jest and the registration rules by curl, not on a device
   (Test 86);
-- the Weekly Cap at booking: BKM-005 stores and shows it («hasta 3 por
-  semana»), but a fourth Booking in the same week still goes through until
-  BKM-007;
 - the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
   the Role arrives with IDN-009, so today only the Administrator can (Test 79);
 - opening an emailed link on iOS: Universal Links need the Apple Developer
@@ -5575,6 +5573,7 @@ command.
 | Cancel the same Booking twice, or a Booking of a cancelled Session | `409 booking_not_cancellable` |
 | Leave a Waitlist Entry that was already closed (promoted, left, or its Session started) | `409 waitlist_entry_not_active` |
 | Book as `mariana@example.com` (no Plan) or `sofia@example.com` (expired) | `409 no_eligible_subscription` |
+| Book a fourth class in the same Monday–Sunday week on a cap-3 Plan, or join that week's Waitlist, with no extra class left (Test 91) | `409 weekly_cap_reached` |
 | Reschedule outside the window, to another day, or a cancelled Booking | `409 reschedule_outside_window`, `reschedule_target_ineligible`, `booking_not_reschedulable` (Test 61) |
 
 **Payments** (`mariana@example.com`; Test 7, «Buying a Plan through
@@ -6385,8 +6384,7 @@ E. **The end date.** As Camila register cash for a Client on the 60-day Plan
    **Inicio** and **Vence el** dates; the Assistant's overview (S06) reads
    «Vence el …» too.
 
-The cap is only stored and shown here: booking more than the cap in one week
-still works until BKM-007.
+Booking more than the cap in one week is refused (Test 91).
 
 ## Test 87: the Start Date and early renewal (BKM-006)
 
@@ -6596,7 +6594,7 @@ C. **The gift.** The first approved Payment in a Client's life adds one
    adds the form).
 
 Spending an extra class waits for the base allowance to run out, and for the
-Weekly Cap (BKM-007). Cancelling a Booking funded by an extra class restores
+Weekly Cap (Test 91). Cancelling a Booking funded by an extra class restores
 the class to the base pool.
 
 ## Test 89: payment controls (PAY-006)
@@ -6696,3 +6694,38 @@ A. **The page (AW21).** Log in as `paola.mendoza@example.com` /
 B. **The denial.** The same `POST /api/v1/administrator/campaigns` as Camila
    answers `403` and writes nothing. The header `Idempotency-Key` is a UUID;
    sending the same call again grants nothing more.
+
+## Test 91: the weekly cap (BKM-007)
+
+A capped Plan limits the classes a Client books from her base allowance in
+one Monday–Sunday week in America/La_Paz
+([booking ADR-0006](../booking/docs/adr/0006-weekly-cap-and-extra-classes.md)).
+Bimestral 16 and Trimestral 24 cap at 3; Bimestral 24 and Trimestral 36 cap
+at 4. A 30-day Plan has no cap. The count uses the cap snapshotted on the
+Subscription, and it leaves out a Booking an extra class paid for. Run the
+API and the fixtures as in Tests 2 and 5. The mobile surfaces of this test
+were not walked on a device in the BKM-007 session (another item owned the
+simulators); the API journey below was.
+
+A. **Three, then a refusal.** As a Client on a cap-3 Plan, book three
+   Sessions in the same week. `GET /api/v1/sessions` for that week returns
+   `classesLeftThisWeek` counting down (3, then 2, then 1, then 0). The
+   fourth `POST /api/v1/sessions/{sessionId}/bookings` answers
+   `409 weekly_cap_reached` with «Ya usaste tus clases de esta semana.»
+   Joining that week's Waitlist answers the same code.
+B. **An extra class.** As Paola, grant one courtesy class (Test 89). The
+   fourth Booking now answers `201`, and a fifth in the same week is refused
+   again. The extra-funded Booking does not itself use a place in the cap.
+C. **No cap.** A Client on a 30-day Plan books a fourth class in the same
+   week and it answers `201`. Her Session list omits `classesLeftThisWeek`.
+D. **The week boundary.** A Booking at Sunday 23:00 La Paz and one at Monday
+   00:30 La Paz fall in different weeks. A same-week Reschedule at the cap
+   answers `200`. A Reschedule into another week is still
+   `409 reschedule_target_ineligible` (the destination must stay in the same
+   Bolivia week).
+E. **The screens.** Reservar (03) and the Session detail (04) show «Te quedan
+   N clases esta semana» from the field, «Te queda 1 clase esta semana» for
+   one, and nothing when the field is absent. At zero the line stays «Te
+   quedan 0 clases esta semana»; the extra-class line is the one on Mi plan.
+   Follow-up 203 draws that line and is still pending. The Assistant's
+   refusal uses the same problem code.
