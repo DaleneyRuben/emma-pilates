@@ -10,7 +10,7 @@ export const createPlan = (
   prisma.plan.create({
     data: {
       name: randomUUID(),
-      durationMonths: 1,
+      durationDays: 30,
       classAllowance: 8,
       priceCentavos: extra.priceCentavos ?? 56_000,
       displayOrder: 0,
@@ -47,7 +47,7 @@ export const createClientWithPlan = async (
       clientId: client.id,
       planId: plan.id,
       planNameSnapshot: plan.name,
-      durationMonthsSnapshot: 1,
+      durationDaysSnapshot: 30,
       originalClassAllowance: 8,
       remainingClassAllowance: 8,
       startsOn: input.startsOn,
