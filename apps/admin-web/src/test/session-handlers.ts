@@ -48,6 +48,17 @@ export const signedInHandlers = () => [
   http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
     jsonResponse({ items: [], totalItems: 0 }),
   ),
+  // AW22 reads how the Client found the studio as soon as the panel opens.
+  // Defined here, not in people-fixtures, because that module imports this one.
+  http.get(apiUrl("/api/v1/administrator/clients/:clientId/acquisition"), () =>
+    jsonResponse({
+      clientId: "c1000000-0000-5000-8000-000000000015",
+      channel: "unknown",
+      declaredChannel: "unknown",
+      referralCode: null,
+      referrer: null,
+    }),
+  ),
 ];
 
 // IDN-009: Carolina Rivas, the Coordinator (ADR-0102). Her shell reads no
@@ -76,8 +87,24 @@ export const coordinatorHandlers = () => [
   http.get(apiUrl(staffProfilePath), () => jsonResponse(carolinaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  // Horario reads equipment flags for the selected week. The Coordinator sees
+  // the schedule, so this empty read is not a money endpoint.
+  http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
+    jsonResponse([]),
+  ),
   http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
     jsonResponse({ items: [], totalItems: 0 }),
+  ),
+  // AW22 reads how the Client found the studio as soon as the panel opens.
+  // Defined here, not in people-fixtures, because that module imports this one.
+  http.get(apiUrl("/api/v1/administrator/clients/:clientId/acquisition"), () =>
+    jsonResponse({
+      clientId: "c1000000-0000-5000-8000-000000000015",
+      channel: "unknown",
+      declaredChannel: "unknown",
+      referralCode: null,
+      referrer: null,
+    }),
   ),
 ];
 
