@@ -1411,8 +1411,9 @@ suite. Databases `pilates_stu003_dev` and `pilates_test_stu003` on port
 
 No migration. Open question: the diagnosis's renewal denominator is plans
 that expired this month, which this fact table cannot see, so v1 uses
-active clients. The Coordinator role is IDN-009's; this path accepts a
-cast `coordinator` and a real login waits for that role. Design follow-up
+active clients. The Coordinator signs in on this branch and opens
+Indicadores; the payload omits every centavo key, and Reporte and
+Simulador stay closed. Design follow-up
 204 and prompt AW39 stay pending; the export was not run.
 [Pull request #199](https://github.com/DaleneyRuben/emma-pilates/pull/199).
 

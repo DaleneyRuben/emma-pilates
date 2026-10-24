@@ -218,6 +218,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         label: "Indicadores",
         to: "/reporte/indicadores",
         screen: "AW43",
+        coordinator: true,
         studioWide: "los indicadores del mes son del estudio, no de una sede.",
       },
       {

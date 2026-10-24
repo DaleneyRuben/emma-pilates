@@ -6018,9 +6018,9 @@ and never an amount. Use a disposable database.
    `classesStillOwed` for the Administrator. A Coordinator gets the counts
    only: the JSON has no `*Centavos` key. An Assistant and a Trainer get
    `403 studio_access_denied`. A month that is not `YYYY-MM` gets
-   `400 invalid_request`. The Coordinator role is not on this branch
-   (IDN-009), so the counts-only response is the e2e suite's cast, and the
-   page hides «Bs» when the payload has no centavo keys.
+   `400 invalid_request`. Sign in as `carolina.rivas@example.com`: the
+   sidebar lists Indicadores and hides Reporte and Simulador. The page
+   shows the four count tiles and never «Bs».
 4. **Renewal.** The diagnosis divides by plans that expired this month. The
    fact table cannot see that, so v1 divides by active clients. That
    denominator is an open question; do not treat 50 % as the coordinator's
