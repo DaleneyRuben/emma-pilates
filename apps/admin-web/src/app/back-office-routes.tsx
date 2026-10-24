@@ -2,6 +2,7 @@ import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 import { cashCloseSearchSchema } from "../back-office/cash-close/cash-close-search";
 import { expenseSearchSchema } from "../back-office/expenses/expense-search";
 import { payrollSearchSchema } from "../back-office/payroll/payroll-search";
+import { boliviaMonth } from "../lib/bolivia-time";
 import { withdrawalSearchSchema } from "../back-office/supplies/supply-search";
 import {
   listSearchSchema,
@@ -113,6 +114,18 @@ const withdrawalsRoute = createRoute({
   ),
 });
 
+const payStatementsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/pagos-instructoras",
+  validateSearch: (search: Record<string, unknown>) => ({
+    month: typeof search.month === "string" ? search.month : boliviaMonth(),
+  }),
+  component: lazyRouteComponent(
+    () => import("../back-office/payroll/pay-statements-route"),
+    "PayStatementsRoute",
+  ),
+});
+
 // AW37 (BKO-004): one Branch's Equipment on one page, so no list search.
 const equipmentRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
@@ -167,6 +180,7 @@ export const backOfficeRoutes = [
   equipmentRoute,
   staffRoute,
   payrollRoute,
+  payStatementsRoute,
   expensesRoute,
   expenseCategoriesRoute,
 ];

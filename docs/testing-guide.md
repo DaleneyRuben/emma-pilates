@@ -72,7 +72,7 @@ can be found by its design name.
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93 |
-| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
+| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 95 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
 | S27 Enviar comentarios | 19, 80 |
@@ -86,7 +86,7 @@ can be found by its design name.
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW37 Equipos | 82 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90 |
@@ -3391,6 +3391,8 @@ The following are not ready for manual product testing:
   the Role arrives with IDN-009, so today only the Administrator can (Test 79);
 - accrued revenue by validity days: decisions §11 asks for it beside the
   cash view, and Test 94 shows only cash. STU-002 owns the accrued view;
+- «Mis pagos» in the Staff app: the API answers a Trainer (Test 95), but
+  the screen waits on follow-up 209, which stays pending;
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
   Swagger (Test 34). On Android the link opens the app with a development
@@ -6279,6 +6281,7 @@ new channel and code. Check the rows with
 referrer_staff_member_id from booking.client_acquisitions;` on your database:
 Clients that existed before the migration got `unknown`, or `friend` with the
 referrer when a Referral named one.
+
 ## Test 80: send feedback from the apps and triage it on the admin web (REL-012)
 
 «Enviar comentarios» is the last row of Perfil in the Client app (Prompt 25,
@@ -6742,6 +6745,40 @@ describes.
 The migration `20261023230000_cost_budget_lines` needs owner approval before
 it runs on a shared database. The accrued-revenue view (decisions §11) is
 not on this page. Follow-up 208 stays pending.
+
+## Test 95: trainer pay and «Mis pagos» (BKO-006)
+
+A Trainer is paid from the rates in force: Bs 65 per class with up to 4
+students, plus Bs 8 from the fifth, counted on the Bookings the Session held
+when the cancellation window closed (a no-show counts), Bs 25 when a Session
+was cancelled because the minimum was not met, and 10 % of what a Client she
+brought actually paid for her first Plan, in the month that Payment was
+approved. Paola is the Administrator. Camila, the Assistant, cannot approve
+and cannot list the statements. Log in as Test 24 describes.
+
+1. **Calculate the month.** In the admin web open **Pagos a instructoras**
+   (above Nómina). The month stepper cannot go past the current month. Press
+   **Calcular mes**. Each Trainer with a line appears as a card: her name,
+   «Borrador», the total (`Bs 322,00`, never centavos), and a table of
+   Concepto, Detalle, and Monto.
+2. **Approve once.** Press **Aprobar** on one card. It reads «Aprobado» and
+   Nómina gains one Salary Payment for that total. Pressing again, or
+   calculating the month again, does not add a second payment.
+3. **The figures.** A class of 3 students is Bs 65,00. A class of 6 is
+   Bs 81,00. A no-show counts in the snapshot. A Session cancelled for the
+   minimum is Bs 25,00. A first Plan of Bs 780,00 pays Bs 78,00, once, even
+   if she buys again.
+4. **Narrow browser.** At 420 px the cards stack and the line table becomes
+   labelled cards. The sidebar opens from **Abrir menú**.
+5. **Her own only.** `GET /api/v1/trainer/pay-statements` as Emma returns
+   only Emma's statements. As Daniela it does not include Emma's. As Camila
+   it answers `403` `back_office_access_denied`, and so does approval.
+
+The Staff app's «Mis pagos» row is not built: follow-up 209 stays pending.
+The Coordinator sees no money (ADR-0102), so she cannot list or approve a
+statement. The migration `20261023230100_trainer_pay_statements` needs owner
+approval before it runs on a shared database. Pull request:
+https://github.com/DaleneyRuben/emma-pilates/pull/186.
 
 ## Test 86: invite a friend (BKM-014)
 

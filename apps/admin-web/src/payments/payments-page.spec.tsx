@@ -263,7 +263,7 @@ describe("AW28 Pagos without pending transfers in the sidebar", () => {
     renderAdmin("/back-office/pagos");
     await heading();
 
-    expect(screen.getByRole("link", { name: "Pagos" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /^Pagos$/ })).toBeInTheDocument();
   });
 });
 

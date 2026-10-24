@@ -57,6 +57,7 @@ describe('worker startup sweeps (EXT-002)', () => {
         minimumBookingsChecks: idle({ checked: 0, cancelled: 0 }),
         windowCloseSnapshots: idle({ recorded: 0 }),
         startedSessionWaitlists: idle({ closed: 0 }),
+        trainerPayDrafts: idle({ drafted: 0 }),
         pushDispatch: { dispatch: jest.fn() },
         pushReceipts: idle({
           discarded: 0,

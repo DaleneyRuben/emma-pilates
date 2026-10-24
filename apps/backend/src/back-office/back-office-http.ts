@@ -9,6 +9,7 @@ import { parseUuidValue } from './back-office.dto';
 import type { EquipmentOperations } from './equipment/prisma-equipment';
 import type { SessionEquipment } from './equipment/prisma-session-equipment';
 import type { Expenses } from './expenses/prisma-expenses';
+import type { PayStatements } from './payroll/prisma-pay-statements';
 import type { SalaryPayments } from './payroll/prisma-salary-payments';
 import type { ExpenseReport } from './reports/prisma-expense-report';
 import type { Finance } from './finance/prisma-finance';
@@ -21,6 +22,7 @@ export const backOfficeOperations = Symbol('backOfficeOperations');
 export type BackOfficeOperations = {
   supplies: Supplies;
   salaryPayments: SalaryPayments;
+  payStatements: PayStatements;
   expenses: Expenses;
   report: ExpenseReport;
   finance: Finance;
