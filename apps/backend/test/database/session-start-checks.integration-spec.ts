@@ -1,389 +1,386 @@
-import { randomUUID } from 'node:crypto';
-import { PrismaClient } from '../../src/generated/prisma/client';
-import { PrismaBookingCommands } from '../../src/booking/commands/prisma-booking-commands';
-import { createPrismaSessionStartChecks } from '../../src/booking/sessions/prisma-session-start-checks';
-import { createPrismaAdapter } from '../../src/database/prisma-adapter';
-import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
-import { buildDevelopmentFixtures } from '../../src/development-fixtures/development-fixtures';
-import {
-  recordNotification,
-  type NotificationRecorder,
-} from '../../src/notifications/prisma-notification-store';
-import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
+import { recordNotification } from '../../src/notifications/prisma-notification-store';
 import { boliviaDate } from '../../src/time/bolivia-time';
 import {
-  DatabaseTestContext,
-  startDatabaseTestContext,
-} from './database-test-context';
+  hour,
+  minute,
+  slotStart,
+  startSessionStartChecksWorld,
+  type SessionStartChecksWorld,
+} from './session-start-checks-test-support';
 
-const hour = 60 * 60 * 1_000;
-const minute = 60 * 1_000;
-// Bookings and Waitlist Entries take the database clock, so every Session
-// starts a few hours after the real clock and each test gets its own 4-hour
-// slot: one slot's check window never reaches another slot's Session.
-const base = new Date(Math.ceil(Date.now() / hour) * hour + 3 * hour);
-const slotStart = (slot: number) => new Date(base.getTime() + slot * 4 * hour);
+const lead = 3 * hour;
 
-describe('Prisma Session start checks', () => {
-  let context: DatabaseTestContext;
-  let prisma: PrismaClient;
-  let bookings: PrismaBookingCommands;
-  let clock: Date;
-  const fixtures = buildDevelopmentFixtures({ today: boliviaDate(new Date()) });
-  const trainer = fixtures.staffMembers.find(
-    (member) => member.email === 'emma.vargas@example.com',
-  )!;
-  const classType = fixtures.classTypes[0];
-
-  const checks = (recorder?: NotificationRecorder) =>
-    createPrismaSessionStartChecks(prisma, {
-      now: () => clock,
-      recordNotification: recorder,
-    });
-
-  const principalOf = async (
-    email: string,
-  ): Promise<AuthenticatedPrincipal & { clientId: string }> => {
-    const account = await prisma.account.findFirstOrThrow({
-      where: { email, deletedAt: null },
-      select: { id: true, clientId: true },
-    });
-    return {
-      accountId: account.id,
-      authenticationSessionId: randomUUID(),
-      identity: { kind: 'client', clientId: account.clientId! },
-      clientId: account.clientId!,
-    };
-  };
-
-  const accountIdOf = async (email: string) =>
-    (
-      await prisma.account.findFirstOrThrow({
-        where: { email, deletedAt: null },
-      })
-    ).id;
-
-  const createSession = (slot: number, capacity = 10) => {
-    const startsAt = slotStart(slot);
-    return prisma.session.create({
-      data: {
-        branchId: trainer.branchIds[0],
-        classTypeId: classType.id,
-        trainerStaffMemberId: trainer.id,
-        startsAt,
-        endsAt: new Date(startsAt.getTime() + 50 * minute),
-        capacity,
-      },
-    });
-  };
-
-  const joinWaitlist = (
-    sessionId: string,
-    client: { clientId: string; accountId: string },
-  ) =>
-    prisma.waitlistEntry.create({
-      data: {
-        sessionId,
-        clientId: client.clientId,
-        joinedByAccountId: client.accountId,
-      },
-    });
-
-  const trainerNotices = async () =>
-    prisma.notification.findMany({
-      where: {
-        accountId: await accountIdOf(trainer.email),
-        type: 'session_cancelled',
-      },
-    });
+describe('Prisma Session start checks: Minimum Bookings', () => {
+  let world: SessionStartChecksWorld;
 
   beforeAll(async () => {
-    context = await startDatabaseTestContext();
-    prisma = new PrismaClient({
-      adapter: createPrismaAdapter(context.databaseUrl),
-    });
-    await applyDevelopmentFixtures(prisma, {
-      fixtures,
-      passwordHash: 'not-a-real-hash',
-    });
-    // The sweeps scan every Session, so keep only the ones each test creates.
-    await prisma.session.deleteMany();
-    bookings = new PrismaBookingCommands(prisma, () => new Date());
+    world = await startSessionStartChecksWorld();
   });
 
   afterAll(async () => {
-    await prisma?.$disconnect();
-    await context?.stop();
+    await world?.stop();
   });
 
-  it('cancels a zero-Booking Session once at the check, closes its Waitlist, and notifies the Trainer and waitlisted Client', async () => {
-    const session = await createSession(0);
-    const valeria = await principalOf('valeria@example.com');
-    const entry = await joinWaitlist(session.id, valeria);
-    const due = new Date(session.startsAt.getTime() - 2 * hour);
+  const sessionRow = (id: string) =>
+    world.prisma.session.findUniqueOrThrow({ where: { id } });
 
-    clock = new Date(due.getTime() - 1);
-    await expect(checks().checkEmptySessions()).resolves.toEqual({
+  it('cancels a Session with 1 Booking at the 3-hour check, returns the class, closes the Waitlist, and notifies everyone once', async () => {
+    const startsAt = slotStart(0);
+    const session = await world.createSession(startsAt);
+    const later = await world.createSession(
+      new Date(startsAt.getTime() + hour),
+    );
+    const full = await world.createSession(
+      new Date(startsAt.getTime() + 2 * hour),
+      1,
+    );
+    const lucia = await world.principalOf('lucia@example.com');
+    const valeria = await world.principalOf('valeria@example.com');
+    const isabel = await world.principalOf('isabel@example.com');
+    const [booking] = await world.book(session.id, lucia);
+    await world.book(full.id, valeria);
+    const entry = await world.joinWaitlist(session.id, isabel);
+    const allowanceAfterBooking = await world.remainingAllowance(lucia);
+    const due = new Date(startsAt.getTime() - lead);
+
+    world.setClock(new Date(due.getTime() - 1));
+    await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
       checked: 0,
       cancelled: 0,
     });
-    await expect(
-      prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
-    ).resolves.toMatchObject({
-      state: 'SCHEDULED',
-      emptyBookingCheckCompletedAt: null,
-    });
 
-    clock = due;
-    await expect(checks().checkEmptySessions()).resolves.toEqual({
+    world.setClock(due);
+    await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
       checked: 1,
       cancelled: 1,
     });
-    await expect(
-      prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
-    ).resolves.toMatchObject({
+    await expect(sessionRow(session.id)).resolves.toMatchObject({
       state: 'CANCELLED',
-      cancellationCause: 'ZERO_BOOKINGS',
+      cancellationCause: 'MINIMUM_NOT_MET',
       cancelledAt: due,
       cancelledByAccountId: null,
-      emptyBookingCheckCompletedAt: due,
+      minimumBookingsCheckCompletedAt: due,
     });
     await expect(
-      prisma.waitlistEntry.findUniqueOrThrow({ where: { id: entry.id } }),
+      world.prisma.booking.findUniqueOrThrow({ where: { id: booking.id } }),
+    ).resolves.toMatchObject({
+      state: 'CANCELLED',
+      cancellationCause: 'SESSION_CANCELLED',
+      cancelledAt: due,
+      cancelledByAccountId: null,
+    });
+    await expect(world.remainingAllowance(lucia)).resolves.toBe(
+      allowanceAfterBooking + 1,
+    );
+    await expect(
+      world.prisma.waitlistEntry.findUniqueOrThrow({ where: { id: entry.id } }),
     ).resolves.toMatchObject({
       closedAt: due,
       closureReason: 'SESSION_CANCELLED',
-      closedByAccountId: null,
     });
-    const [trainerNotice, ...otherTrainerNotices] = await trainerNotices();
-    expect(otherTrainerNotices).toEqual([]);
-    expect(trainerNotice).toMatchObject({
+
+    const [clientNotice, ...otherClientNotices] =
+      await world.sessionCancelledNotices('lucia@example.com');
+    expect(otherClientNotices).toEqual([]);
+    expect(clientNotice).toMatchObject({
       category: 'BOOKING_SCHEDULE',
       title: 'Clase cancelada',
+      destinationType: 'session',
+      destinationId: session.id,
+    });
+    expect(clientNotice.message).toMatch(
+      new RegExp(
+        `^Tu clase de ${world.classType.name} .+ se canceló porque no llegó al mínimo de reservas\\. Te devolvimos la clase a tu plan\\. `,
+      ),
+    );
+    // The later Session has places; the full one does not.
+    const laterTime = new Intl.DateTimeFormat('es-BO', {
+      timeZone: 'America/La_Paz',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).format(later.startsAt);
+    if (
+      boliviaDate(later.startsAt).getTime() === boliviaDate(startsAt).getTime()
+    ) {
+      expect(clientNotice.message).toMatch(
+        new RegExp(`hay lugar en ${world.classType.name} ${laterTime}\\.$`),
+      );
+    } else {
+      expect(clientNotice.message).toMatch(
+        /ya no quedan otras clases con lugar\.$/,
+      );
+    }
+
+    const [trainerNotice, ...otherTrainerNotices] =
+      await world.sessionCancelledNotices(world.trainer.email);
+    expect(otherTrainerNotices).toEqual([]);
+    expect(trainerNotice).toMatchObject({
       destinationType: 'trainer_schedule',
       destinationId: null,
     });
     expect(trainerNotice.message).toMatch(
-      new RegExp(
-        `^Tu clase de ${classType.name} .+ se canceló: no tuvo reservas\\.$`,
-      ),
+      /se canceló: no llegó al mínimo de 2 reservas\.$/,
     );
     await expect(
-      prisma.notification.findMany({
-        where: { accountId: valeria.accountId, type: 'session_cancelled' },
-      }),
+      world.sessionCancelledNotices('isabel@example.com'),
     ).resolves.toEqual([
       expect.objectContaining({
-        message: `La clase de ${classType.name} a la que estabas en lista de espera fue cancelada.`,
-        destinationType: 'session',
-        destinationId: session.id,
+        message: `La clase de ${world.classType.name} a la que estabas en lista de espera fue cancelada.`,
       }),
     ]);
 
-    clock = new Date(due.getTime() + minute);
-    await expect(checks().checkEmptySessions()).resolves.toEqual({
+    world.setClock(new Date(due.getTime() + minute));
+    await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
       checked: 0,
       cancelled: 0,
     });
-    await expect(trainerNotices()).resolves.toHaveLength(1);
+    await expect(world.remainingAllowance(lucia)).resolves.toBe(
+      allowanceAfterBooking + 1,
+    );
+    await expect(
+      world.sessionCancelledNotices(world.trainer.email),
+    ).resolves.toHaveLength(1);
+    // Keep the other two Sessions out of the later slots' checks.
+    await world.prisma.session.updateMany({
+      where: { id: { in: [later.id, full.id] } },
+      data: { minimumBookingsCheckCompletedAt: due },
+    });
   });
 
-  it('leaves a booked Session scheduled and never re-checks it after its Bookings drop to zero', async () => {
-    const session = await createSession(1);
-    const lucia = await principalOf('lucia@example.com');
-    const booking = await bookings.create({ sessionId: session.id }, lucia);
-    const due = new Date(session.startsAt.getTime() - 2 * hour);
-    const noticesBefore = (await trainerNotices()).length;
+  it('teaches a Session with 2 Bookings and never re-checks it after they drop', async () => {
+    const startsAt = slotStart(1);
+    const session = await world.createSession(startsAt);
+    const lucia = await world.principalOf('lucia@example.com');
+    const valeria = await world.principalOf('valeria@example.com');
+    const [first] = await world.book(session.id, lucia, valeria);
+    const due = new Date(startsAt.getTime() - lead);
+    const noticesBefore = (
+      await world.sessionCancelledNotices(world.trainer.email)
+    ).length;
 
-    clock = due;
-    await expect(checks().checkEmptySessions()).resolves.toEqual({
+    world.setClock(due);
+    await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
       checked: 1,
       cancelled: 0,
     });
-    await expect(
-      prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
-    ).resolves.toMatchObject({
+    await expect(sessionRow(session.id)).resolves.toMatchObject({
       state: 'SCHEDULED',
-      emptyBookingCheckCompletedAt: due,
+      cancellationCause: null,
+      minimumBookingsCheckCompletedAt: due,
     });
 
-    await bookings.cancel({ bookingId: booking.id }, lucia);
-    clock = new Date(due.getTime() + 30 * minute);
-    await expect(checks().checkEmptySessions()).resolves.toEqual({
+    await world.bookings.cancel({ bookingId: first.id }, lucia);
+    world.setClock(new Date(due.getTime() + 10 * minute));
+    await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
       checked: 0,
       cancelled: 0,
     });
-    await expect(
-      prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
-    ).resolves.toMatchObject({
+    await expect(sessionRow(session.id)).resolves.toMatchObject({
       state: 'SCHEDULED',
-      emptyBookingCheckCompletedAt: due,
     });
-    await expect(trainerNotices()).resolves.toHaveLength(noticesBefore);
+    await expect(
+      world.sessionCancelledNotices(world.trainer.email),
+    ).resolves.toHaveLength(noticesBefore);
   });
 
-  it('keeps a Session that drops to zero before the check bookable until the check runs', async () => {
-    const session = await createSession(2);
-    const lucia = await principalOf('lucia@example.com');
-    const valeria = await principalOf('valeria@example.com');
-    const due = new Date(session.startsAt.getTime() - 2 * hour);
+  it('finishes the remaining Sessions after a restart in the middle of a check, without repeating the settled one', async () => {
+    const firstStart = slotStart(2);
+    const first = await world.createSession(firstStart);
+    const second = await world.createSession(
+      new Date(firstStart.getTime() + hour),
+    );
+    const lucia = await world.principalOf('lucia@example.com');
+    const valeria = await world.principalOf('valeria@example.com');
+    await world.book(first.id, lucia);
+    await world.book(second.id, valeria);
+    const luciaAllowance = await world.remainingAllowance(lucia);
+    const valeriaAllowance = await world.remainingAllowance(valeria);
+    const luciaNoticesBefore = (
+      await world.sessionCancelledNotices('lucia@example.com')
+    ).length;
+    // The worker dies while settling the second Session: its transaction
+    // rolls back, the first one stays committed.
+    let crashed = false;
+    const crashOnSecond = async (
+      ...[transaction, notice]: Parameters<typeof recordNotification>
+    ) => {
+      if (!crashed && notice.businessEventKey.endsWith(second.id)) {
+        crashed = true;
+        throw new Error('worker stopped');
+      }
+      await recordNotification(transaction, notice);
+    };
 
-    const first = await bookings.create({ sessionId: session.id }, lucia);
-    await bookings.cancel({ bookingId: first.id }, lucia);
-    clock = new Date(due.getTime() - minute);
-    await expect(checks().checkEmptySessions()).resolves.toEqual({
-      checked: 0,
-      cancelled: 0,
+    world.setClock(new Date(second.startsAt.getTime() - lead));
+    await expect(
+      world.checks(crashOnSecond).checkMinimumBookings(),
+    ).rejects.toThrow('worker stopped');
+    await expect(sessionRow(first.id)).resolves.toMatchObject({
+      state: 'CANCELLED',
+    });
+    await expect(sessionRow(second.id)).resolves.toMatchObject({
+      state: 'SCHEDULED',
+      minimumBookingsCheckCompletedAt: null,
     });
 
-    const second = await bookings.create({ sessionId: session.id }, valeria);
-    await expect(
-      prisma.booking.findUniqueOrThrow({ where: { id: second.id } }),
-    ).resolves.toMatchObject({ state: 'BOOKED' });
-    await bookings.cancel({ bookingId: second.id }, valeria);
-
-    clock = due;
-    await expect(checks().checkEmptySessions()).resolves.toEqual({
+    await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
       checked: 1,
       cancelled: 1,
     });
-    await expect(
-      prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
-    ).resolves.toMatchObject({
+    await expect(sessionRow(second.id)).resolves.toMatchObject({
       state: 'CANCELLED',
-      cancellationCause: 'ZERO_BOOKINGS',
+      cancellationCause: 'MINIMUM_NOT_MET',
     });
+    await expect(world.remainingAllowance(lucia)).resolves.toBe(
+      luciaAllowance + 1,
+    );
+    await expect(world.remainingAllowance(valeria)).resolves.toBe(
+      valeriaAllowance + 1,
+    );
+    await expect(
+      world.sessionCancelledNotices('lucia@example.com'),
+    ).resolves.toHaveLength(luciaNoticesBefore + 1);
   });
 
   it('ignores a Session an Administrator already cancelled', async () => {
-    const session = await createSession(3);
-    const administratorAccountId = await accountIdOf(
-      'paola.mendoza@example.com',
-    );
-    const cancelledAt = new Date();
-    await prisma.session.update({
+    const session = await world.createSession(slotStart(3));
+    await world.prisma.session.update({
       where: { id: session.id },
       data: {
         state: 'CANCELLED',
         cancellationCause: 'NO_SUBSTITUTE_TRAINER',
-        cancelledAt,
-        cancelledByAccountId: administratorAccountId,
+        cancelledAt: new Date(),
+        cancelledByAccountId: await world.accountIdOf(
+          'paola.mendoza@example.com',
+        ),
       },
     });
-    const noticesBefore = (await trainerNotices()).length;
 
-    clock = new Date(session.startsAt.getTime() - 2 * hour);
-    await expect(checks().checkEmptySessions()).resolves.toEqual({
+    world.setClock(new Date(session.startsAt.getTime() - lead));
+    await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
       checked: 0,
       cancelled: 0,
     });
-    await expect(
-      prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
-    ).resolves.toMatchObject({
-      state: 'CANCELLED',
+    await expect(sessionRow(session.id)).resolves.toMatchObject({
       cancellationCause: 'NO_SUBSTITUTE_TRAINER',
-      cancelledAt,
-      cancelledByAccountId: administratorAccountId,
-      emptyBookingCheckCompletedAt: null,
-    });
-    await expect(trainerNotices()).resolves.toHaveLength(noticesBefore);
-  });
-
-  it('closes open Waitlist Entries as session_started once the Session starts, without a notice, exactly once', async () => {
-    const session = await createSession(4, 1);
-    const lucia = await principalOf('lucia@example.com');
-    const valeria = await principalOf('valeria@example.com');
-    await bookings.create({ sessionId: session.id }, lucia);
-    const entry = await joinWaitlist(session.id, valeria);
-    const valeriaNotices = () =>
-      prisma.notification.count({ where: { accountId: valeria.accountId } });
-    const noticesBefore = await valeriaNotices();
-
-    clock = new Date(session.startsAt.getTime() - 1);
-    await expect(checks().closeStartedWaitlists()).resolves.toEqual({
-      closed: 0,
-    });
-    await expect(
-      prisma.waitlistEntry.findUniqueOrThrow({ where: { id: entry.id } }),
-    ).resolves.toMatchObject({ closedAt: null });
-
-    clock = session.startsAt;
-    await expect(checks().closeStartedWaitlists()).resolves.toEqual({
-      closed: 1,
-    });
-    await expect(
-      prisma.waitlistEntry.findUniqueOrThrow({ where: { id: entry.id } }),
-    ).resolves.toMatchObject({
-      closedAt: session.startsAt,
-      closureReason: 'SESSION_STARTED',
-      closedByAccountId: null,
-      promotedBookingId: null,
-    });
-    await expect(valeriaNotices()).resolves.toBe(noticesBefore);
-
-    clock = new Date(session.startsAt.getTime() + minute);
-    await expect(checks().closeStartedWaitlists()).resolves.toEqual({
-      closed: 0,
+      minimumBookingsCheckCompletedAt: null,
     });
   });
 
   it('never cancels a Session under a Booking that lands during the check', async () => {
-    const session = await createSession(5);
-    const lucia = await principalOf('lucia@example.com');
+    const session = await world.createSession(slotStart(4));
+    const lucia = await world.principalOf('lucia@example.com');
+    const valeria = await world.principalOf('valeria@example.com');
+    await world.book(session.id, lucia);
     let landed: PromiseSettledResult<{ id: string }> | undefined;
     // The Booking commits while the check holds the Session row and has
     // already decided to cancel. Booking's foreign key check must not wait on
     // that lock, or this would deadlock instead of retrying.
-    const bookDuringCheck: NotificationRecorder = async (
-      transaction,
-      notice,
+    const bookDuringCheck = async (
+      ...[transaction, notice]: Parameters<typeof recordNotification>
     ) => {
       if (landed === undefined) {
         [landed] = await Promise.allSettled([
-          bookings.create({ sessionId: session.id }, lucia),
+          world.bookings.create({ sessionId: session.id }, valeria),
         ]);
       }
       await recordNotification(transaction, notice);
     };
 
-    clock = new Date(session.startsAt.getTime() - 2 * hour);
-    await checks(bookDuringCheck).checkEmptySessions();
+    world.setClock(new Date(session.startsAt.getTime() - lead));
+    await world.checks(bookDuringCheck).checkMinimumBookings();
 
-    const after = await prisma.session.findUniqueOrThrow({
+    const after = await world.prisma.session.findUniqueOrThrow({
       where: { id: session.id },
       include: { bookings: { where: { state: 'BOOKED' } } },
     });
     expect(landed).toBeDefined();
-    expect(after.emptyBookingCheckCompletedAt).toEqual(clock);
     if (landed!.status === 'fulfilled') {
-      expect(after).toMatchObject({
-        state: 'SCHEDULED',
-        cancellationCause: null,
-      });
-      expect(after.bookings.map(({ id }) => id)).toEqual([landed!.value.id]);
+      expect(after).toMatchObject({ state: 'SCHEDULED' });
+      expect(after.bookings).toHaveLength(2);
     } else {
-      expect(after).toMatchObject({
-        state: 'CANCELLED',
-        cancellationCause: 'ZERO_BOOKINGS',
-      });
+      expect(after).toMatchObject({ cancellationCause: 'MINIMUM_NOT_MET' });
       expect(after.bookings).toEqual([]);
     }
   });
 
   it('cancels and notifies once when two workers check the same Session concurrently', async () => {
-    const session = await createSession(6);
-    const noticesBefore = (await trainerNotices()).length;
+    const session = await world.createSession(slotStart(5));
+    const noticesBefore = (
+      await world.sessionCancelledNotices(world.trainer.email)
+    ).length;
 
-    clock = new Date(session.startsAt.getTime() - 2 * hour);
+    world.setClock(new Date(session.startsAt.getTime() - lead));
     const results = await Promise.all([
-      checks().checkEmptySessions(),
-      checks().checkEmptySessions(),
+      world.checks().checkMinimumBookings(),
+      world.checks().checkMinimumBookings(),
     ]);
 
     expect(results.reduce((sum, result) => sum + result.cancelled, 0)).toBe(1);
     await expect(
-      prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
-    ).resolves.toMatchObject({ state: 'CANCELLED' });
-    await expect(trainerNotices()).resolves.toHaveLength(noticesBefore + 1);
+      world.sessionCancelledNotices(world.trainer.email),
+    ).resolves.toHaveLength(noticesBefore + 1);
+  });
+
+  it('applies a minimum changed in Studio Settings at the next check', async () => {
+    const session = await world.createSession(slotStart(6));
+    const lucia = await world.principalOf('lucia@example.com');
+    const valeria = await world.principalOf('valeria@example.com');
+    await world.book(session.id, lucia, valeria);
+    await world.setStudioSettings({ minimumBookings: 3 });
+
+    try {
+      world.setClock(new Date(session.startsAt.getTime() - lead));
+      await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
+        checked: 1,
+        cancelled: 1,
+      });
+      await expect(sessionRow(session.id)).resolves.toMatchObject({
+        cancellationCause: 'MINIMUM_NOT_MET',
+      });
+      const notices = await world.sessionCancelledNotices(world.trainer.email);
+      expect(notices.at(-1)!.message).toMatch(
+        /no llegó al mínimo de 3 reservas\.$/,
+      );
+    } finally {
+      await world.setStudioSettings({ minimumBookings: 2 });
+    }
+  });
+
+  it('closes open Waitlist Entries as session_started once the Session starts, without a notice, exactly once', async () => {
+    const session = await world.createSession(slotStart(7), 1);
+    const lucia = await world.principalOf('lucia@example.com');
+    const valeria = await world.principalOf('valeria@example.com');
+    await world.book(session.id, lucia);
+    const entry = await world.joinWaitlist(session.id, valeria);
+    const valeriaNotices = () =>
+      world.prisma.notification.count({
+        where: { accountId: valeria.accountId },
+      });
+    const noticesBefore = await valeriaNotices();
+
+    world.setClock(new Date(session.startsAt.getTime() - 1));
+    await expect(world.checks().closeStartedWaitlists()).resolves.toEqual({
+      closed: 0,
+    });
+
+    world.setClock(session.startsAt);
+    await expect(world.checks().closeStartedWaitlists()).resolves.toEqual({
+      closed: 1,
+    });
+    await expect(
+      world.prisma.waitlistEntry.findUniqueOrThrow({ where: { id: entry.id } }),
+    ).resolves.toMatchObject({
+      closedAt: session.startsAt,
+      closureReason: 'SESSION_STARTED',
+      promotedBookingId: null,
+    });
+    await expect(valeriaNotices()).resolves.toBe(noticesBefore);
+
+    world.setClock(new Date(session.startsAt.getTime() + minute));
+    await expect(world.checks().closeStartedWaitlists()).resolves.toEqual({
+      closed: 0,
+    });
   });
 });
