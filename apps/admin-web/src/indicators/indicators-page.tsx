@@ -7,6 +7,7 @@ import { addMonths, boliviaMonth } from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
 import { IndicatorChart } from "./indicator-chart";
 import { hasAmounts, monthKpisQueryOptions } from "./indicator-queries";
+import { MonthNarrative } from "./month-narrative";
 
 const tenths = new Intl.NumberFormat("es-BO", {
   minimumFractionDigits: 1,
@@ -106,6 +107,7 @@ export function IndicatorsPage() {
               }))}
             />
           )}
+          <MonthNarrative month={month} />
         </>
       )}
     </article>

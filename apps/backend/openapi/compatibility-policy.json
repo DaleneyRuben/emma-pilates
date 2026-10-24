@@ -67,6 +67,12 @@
     "deletePromotion",
     "getAdminPromotionImage",
     "recomputeStudioFacts",
-    "getRevenueReport"
+    "getRevenueReport",
+    "getMonthKpis",
+    "listRecommendations",
+    "recomputeRecommendations",
+    "dismissRecommendation",
+    "getNarrativeReport",
+    "askNarrativeQuestion"
   ]
 }

@@ -1,6 +1,4 @@
 import type { MonthKpiCounts } from './month-kpis';
-import type { RecommendationFinding } from './recommend-from-facts';
-
 // STU-007 narrates aggregates only. A later provider can replace these two
 // functions. They never receive a name, and a subject passed beside the
 // aggregates is ignored so a client id cannot leak into the text.
@@ -44,7 +42,7 @@ const refusal =
 export const narrateMonth = (input: {
   month: string;
   kpis: MonthKpiCounts;
-  recommendations: readonly Pick<RecommendationFinding, 'rule' | 'detail'>[];
+  recommendations: readonly { rule: string; detail: string }[];
   subject?: string;
 }): MonthNarrative => {
   const label = monthLabel(input.month);

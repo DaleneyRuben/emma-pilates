@@ -40,6 +40,17 @@ const questionBody = z.object({
   question: z.string().trim().min(1).max(200),
 });
 
+const readQuestion = (body: unknown): { month: string; question: string } => {
+  const parsed = questionBody.safeParse(body);
+  if (!parsed.success) {
+    throw new BadRequestException({
+      code: 'invalid_request',
+      detail: 'Invalid narrative question',
+    });
+  }
+  return parsed.data;
+};
+
 const refuse = (error: unknown): never => {
   if (error instanceof StudioError) {
     throw new HttpException(
@@ -94,14 +105,13 @@ export class NarrativeReportController {
     @Headers('authorization') authorization: string | undefined,
     @Body() body: unknown,
   ): Promise<NarrativeQuestionDto> {
-    const parsed = questionBody.safeParse(body);
-    if (!parsed.success) invalid('Invalid narrative question');
+    const asked = readQuestion(body);
     const principal = await authenticateBearer(
       this.principalResolver,
       authorization,
     );
     try {
-      return await this.operations.question(parsed.data, principal);
+      return await this.operations.question(asked, principal);
     } catch (error) {
       return refuse(error);
     }

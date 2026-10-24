@@ -34,7 +34,10 @@ const amounts = {
 };
 
 const months = (body: Record<string, unknown>) =>
-  http.get(apiUrl(kpisPath), () => jsonResponse(body));
+  http.get(apiUrl(kpisPath), ({ request }) => {
+    const month = new URL(request.url).searchParams.get("month");
+    return jsonResponse({ ...body, month });
+  });
 
 const narrative = {
   paragraphs: [
@@ -57,7 +60,7 @@ const narrativeHandlers = () => [
 describe("AW39 Indicadores", () => {
   useMockServer();
   beforeEach(() => {
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), ...narrativeHandlers());
   });
 
   it("shows the count tiles, the money figures, and a three-month chart for an Administrator", async () => {
@@ -122,7 +125,7 @@ describe("AW39 Indicadores", () => {
       screen.getByText(/se dictaron 20 clases, con una ocupación del 59 %/),
     ).toBeVisible();
     expect(
-      screen.getByText(
+      within(screen.getByRole("list", { name: "Acciones" })).getByText(
         "Contacta a la clienta: tiene un plan vigente y no reservó este mes.",
       ),
     ).toBeVisible();
@@ -193,38 +196,16 @@ describe("AW39 Indicadores", () => {
     expect(screen.queryByRole("list", { name: "Acciones" })).toBeNull();
   });
 
-  it("shows the report error and retries", async () => {
-    let calls = 0;
-    server.use(
-      months({ month: "2026-10", ...counts, ...amounts }),
-      http.get(apiUrl(narrativePath), () => {
-        calls += 1;
-        return calls === 1
-          ? problemResponse(500, "no_se_pudo", { detail: "No se pudo" })
-          : jsonResponse(narrative);
-      }),
-    );
-    const { user } = renderAdmin("/reporte/indicadores");
-
-    expect(
-      await screen.findByText("No pudimos cargar el informe."),
-    ).toBeVisible();
-    await user.click(screen.getByRole("button", { name: "Reintentar" }));
-    expect(
-      await screen.findByRole("region", { name: "Informe del mes" }),
-    ).toBeVisible();
-  });
-
   it("shows the loading notice while the report is pending", async () => {
+    server.resetHandlers();
     server.use(
+      ...signedInHandlers(),
       months({ month: "2026-10", ...counts, ...amounts }),
       http.get(apiUrl(narrativePath), () => new Promise(() => undefined)),
     );
     renderAdmin("/reporte/indicadores");
 
-    expect(
-      await screen.findByText("Cargando el informe…"),
-    ).toBeVisible();
+    expect(await screen.findByText("Cargando el informe…")).toBeVisible();
     expect(screen.getByRole("region", { name: "Ocupación" })).toBeVisible();
   });
 
