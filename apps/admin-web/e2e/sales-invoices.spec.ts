@@ -9,13 +9,15 @@ import { signIn } from "./support/session";
 test("exports the unbilled sales and marks a cash sale's invoice issued", async ({
   page,
 }) => {
-  await sellForCash("sofia@example.com", {
+  // Renata holds no Plan and no transfer. A pending Payment or a Plan
+  // still in use blocks a cash sale, and every fixture Client has one.
+  await sellForCash("renata@example.com", {
     taxId: "4567891",
-    name: "Sofía Guzmán",
+    name: "Renata Soliz",
   });
   await signIn(page, "/back-office/pagos?status=all&invoice=unissued");
 
-  const row = page.getByRole("row", { name: /Sofía Guzmán/ });
+  const row = page.getByRole("row", { name: /Renata Soliz/ });
   await expect(row.getByText("Efectivo")).toBeVisible();
   await expect(row.getByText("4567891")).toBeVisible();
 
@@ -27,17 +29,17 @@ test("exports the unbilled sales and marks a cash sale's invoice issued", async 
     .split("\r\n")
     .filter((line) => line !== "");
   expect(lines).toHaveLength(2);
-  expect(lines[1]).toContain("Sofía Guzmán,Paquete de 8 clases,Efectivo,");
-  expect(lines[1]).toMatch(/,Confirmado,4567891,Sofía Guzmán,No,,$/);
+  expect(lines[1]).toContain("Renata Soliz,Paquete de 8 clases,Efectivo,");
+  expect(lines[1]).toMatch(/,Confirmado,4567891,Renata Soliz,No,,$/);
 
   await row
-    .getByRole("button", { name: "Marcar emitida: Sofía Guzmán" })
+    .getByRole("button", { name: "Marcar emitida: Renata Soliz" })
     .click();
   await expect(page.getByText("No hay facturas pendientes.")).toBeVisible();
 
   await page.goto("/back-office/pagos?status=all");
   const issued = page
-    .getByRole("row", { name: /Sofía Guzmán/ })
+    .getByRole("row", { name: /Renata Soliz/ })
     .filter({ hasText: "Efectivo" });
   await expect(issued.getByText("Emitida", { exact: true })).toBeVisible();
   await expect(issued.getByText(/^por Paola Mendoza · /)).toBeVisible();

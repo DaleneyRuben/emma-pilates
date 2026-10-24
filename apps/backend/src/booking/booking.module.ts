@@ -460,6 +460,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
             remainingClassAllowance: subscription.remainingClassAllowance,
             startsOn: subscription.startsOn,
             endsOn: subscription.endsOn,
+            extraClassesLine: subscription.extraClassesLine,
           });
 
           return loadClientSubscription({

@@ -3,6 +3,8 @@ import { administratorClientProvider } from './clients/administrator-client-oper
 import { AdministratorClientsController } from './clients/administrator-clients.controller';
 import { AdministratorPaymentListController } from './payments/administrator-payment-list.controller';
 import { administratorPaymentProvider } from './payments/administrator-payment-operations';
+import { allowanceAdjustmentProvider } from './payments/allowance-adjustment-provider';
+import { AllowanceAdjustmentController } from './payments/allowance-adjustment.controller';
 import { CourtesyAccessController } from './payments/courtesy-access.controller';
 import { courtesyAccessProvider } from './payments/courtesy-access-provider';
 
@@ -14,10 +16,12 @@ export const adminWebReads = {
     AdministratorClientsController,
     AdministratorPaymentListController,
     CourtesyAccessController,
+    AllowanceAdjustmentController,
   ],
   providers: (prismaToken: symbol): Provider[] => [
     administratorClientProvider(prismaToken),
     administratorPaymentProvider(prismaToken),
     courtesyAccessProvider(prismaToken),
+    allowanceAdjustmentProvider(prismaToken),
   ],
 };

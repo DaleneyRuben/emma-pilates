@@ -29,10 +29,12 @@ describe('soft delete schema', () => {
 
     expect(result.rows.map(({ table_name: name }) => name)).toEqual([
       'back_office.expense_categories',
+      'booking.allowance_adjustments',
       'booking.client_acquisitions',
       'booking.client_promotions_consents',
       'booking.clients',
       'booking.contact_alerts',
+      'booking.guest_passes',
       'booking.lifecycle_messages',
       'booking.promotion_contacts',
       'booking.staff_branch_assignments',

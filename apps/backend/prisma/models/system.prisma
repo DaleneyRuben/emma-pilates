@@ -209,6 +209,7 @@ model Account {
   studioSettingsVersions    StudioSettingsVersion[] @relation("StudioSettingsVersionCreatedBy")
   recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
+  allowanceAdjustments      AllowanceAdjustment[]   @relation("AllowanceAdjustmentAuthor")
   contactedAlerts           ContactAlert[]          @relation("ContactAlertContactedBy")
   createdEquipment          Equipment[]             @relation("EquipmentCreatedBy")
   reportedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueReportedBy")

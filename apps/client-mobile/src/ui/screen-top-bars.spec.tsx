@@ -67,7 +67,7 @@ const screens: [string, ComponentType<never>, object, string, ("title" | "contex
   ["13", EvaluationAvailabilityScreen as ComponentType<never>, {}, "Evaluación nutricional"],
   ["14", BookEvaluationScreen as ComponentType<never>, { slot }, "Confirmar evaluación"],
   ["15", MyEvaluationsScreen as ComponentType<never>, {}, "Mis evaluaciones"],
-  ["16", ReferralsScreen as ComponentType<never>, {}, "Mis referidos"],
+  ["16", ReferralsScreen as ComponentType<never>, {}, "Invita a una amiga"],
   ["22", EditProfileScreen as ComponentType<never>, {}, "Editar perfil"],
   ["24", CloseAccountScreen as ComponentType<never>, {}, "Cerrar mi cuenta"],
 ];

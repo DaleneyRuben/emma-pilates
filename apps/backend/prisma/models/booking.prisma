@@ -19,6 +19,7 @@ model Client {
   deletedAt           DateTime?       @map("deleted_at") @db.Timestamptz(3)
   account             Account?
   subscriptions       Subscription[]
+  allowanceAdjustments AllowanceAdjustment[]
   bookings            Booking[]
   waitlistEntries     WaitlistEntry[]
   profileImageAsset   ImageAsset?     @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
@@ -28,6 +29,8 @@ model Client {
   creditLedgerEntries CreditLedgerEntry[]
   referralsMade       Referral[]      @relation("ReferralReferrer")
   referralReceived    Referral?       @relation("ReferralReferred")
+  guestPassesHosted   GuestPass[]     @relation("GuestPassHost")
+  guestPassesReceived GuestPass[]     @relation("GuestPassFriend")
   evaluations         Evaluation[]
   promotionsConsents  ClientPromotionsConsent[]
   lifecycleMessages   LifecycleMessage[]

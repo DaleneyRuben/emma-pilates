@@ -1,13 +1,16 @@
 import {
   getGetCurrentClientReferralsQueryKey,
+  type ReferredClientDto,
   useGetCurrentClientReferrals,
 } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
+  initials,
   LoadingState,
   PrimaryButton,
   QueryFailure,
+  radii,
   Screen,
   ScreenTopBar,
   spacing,
@@ -20,32 +23,66 @@ import { useNavigation } from "@react-navigation/native";
 import { ScrollView, Share, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { formatReferralDate } from "./referral-format";
+
+// The design system defines tints as the semantic color at low alpha.
+const successTint = "rgba(124, 148, 115, 0.16)";
+const warningTint = "rgba(201, 154, 78, 0.16)";
 
 const shareMessage = (code: string): string =>
   `Únete a Emma Pilates Studio con mi código ${code}: regístrate en la app y úsalo al crear tu cuenta.`;
 
-// 16 after PAY-005 (follow-up 136): the Client's referral code and a promise.
-// Credit is retired; «Invita a una amiga» (BKM-014) brings the guest pass.
+const invitationBadge = {
+  registered: "Registrada",
+  class_booked: "Clase reservada",
+  bought: "Compró su plan",
+} as const;
+
+function ReferredRow({ entry }: { entry: ReferredClientDto }) {
+  const bought = entry.invitationStatus === "bought";
+  const detail =
+    bought && entry.awardedAt
+      ? `Primer pago el ${formatReferralDate(entry.awardedAt)}`
+      : `Se registró el ${formatReferralDate(entry.createdAt)}`;
+
+  return (
+    <View style={styles.row}>
+      <View style={styles.avatar}>
+        <Text style={styles.avatarText}>{initials(entry.referredName)}</Text>
+      </View>
+      <View style={styles.rowBody}>
+        <Text style={styles.name}>{entry.referredName}</Text>
+        <BodyText style={styles.detail}>{detail}</BodyText>
+      </View>
+      <View style={[styles.badge, bought ? styles.awarded : styles.pending]}>
+        <Text style={[styles.badgeText, bought ? styles.awardedText : styles.pendingText]}>
+          {invitationBadge[entry.invitationStatus]}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
 export function ReferralsScreen() {
   const navigation = useNavigation<{ goBack: () => void }>();
   const fetcher = useClientFetcher();
-  const referrals = useGetCurrentClientReferrals({
-    fetcher,
-    query: { refetchOnMount: "always" },
-  });
+  const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
+  const referrals = useGetCurrentClientReferrals(queryOptions);
   const queryKeys = [getGetCurrentClientReferralsQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
 
   const header = (
-    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mis referidos" />
+    <>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Invita a una amiga" />
+    </>
   );
 
   if (referrals.isPending) {
     return (
       <Screen style={styles.screen}>
         {header}
-        <LoadingState label="Cargando referidos" />
+        <LoadingState label="Cargando invitaciones" />
       </Screen>
     );
   }
@@ -54,14 +91,14 @@ export function ReferralsScreen() {
       <Screen style={styles.screen}>
         {header}
         <QueryFailure
-          label="No pudimos cargar tu código."
+          label="No pudimos cargar tus invitaciones."
           onRetry={() => void referrals.refetch()}
         />
       </Screen>
     );
   }
 
-  const { referralCode } = referrals.data.data;
+  const { referralCode, referrals: referred } = referrals.data.data;
 
   return (
     <Screen style={styles.screen}>
@@ -76,14 +113,50 @@ export function ReferralsScreen() {
           />
         </View>
         <BodyText style={styles.explanation}>
-          Pronto podrás invitar a una amiga a una clase gratis.
+          Comparte tu código. Tu amiga recibe una clase gratis, una sola vez. Cuando compre su
+          primer plan, tú ganas una clase.
         </BodyText>
+        {referred.length === 0 ? (
+          <View style={styles.emptyState}>
+            <BodyText style={styles.empty}>
+              Aún no has invitado a nadie. ¡Comparte tu código!
+            </BodyText>
+          </View>
+        ) : (
+          <View style={styles.list}>
+            <Text style={styles.sectionTitle}>Tus invitaciones</Text>
+            {referred.map((entry) => (
+              <ReferredRow entry={entry} key={entry.referredClientId} />
+            ))}
+          </View>
+        )}
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  avatar: {
+    alignItems: "center",
+    backgroundColor: colors.primaryTint,
+    borderRadius: radii.pill,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
+  },
+  avatarText: {
+    color: colors.primaryOnTint,
+    fontSize: typography.note,
+    fontWeight: "600",
+  },
+  awarded: { backgroundColor: successTint },
+  awardedText: { color: colors.successText },
+  badge: {
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.smd,
+    paddingVertical: spacing.xxs,
+  },
+  badgeText: { fontSize: typography.label, fontWeight: "500" },
   code: {
     color: colors.text,
     fontFamily: "Lora_500Medium",
@@ -103,6 +176,43 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  explanation: { color: colors.textMuted, textAlign: "center" },
+  creditLabel: { color: colors.text, fontSize: typography.body },
+  creditRow: {
+    ...surfaces.flatCard,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    minHeight: 56,
+    paddingHorizontal: spacing.lg,
+  },
+  creditTrailing: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
+  creditValue: {
+    color: colors.primaryDeep,
+    fontFamily: "Lora_500Medium",
+    fontSize: typography.bodyLarge,
+  },
+  detail: { color: colors.textMuted, fontSize: typography.note },
+  empty: { color: colors.textMuted, textAlign: "center" },
+  emptyState: { gap: spacing.xxs, paddingVertical: spacing.lg },
+  explanation: { textAlign: "center" },
+  list: { gap: spacing.sm },
+  name: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
+  pending: { backgroundColor: warningTint },
+  pendingText: { color: colors.warningText },
+  row: {
+    ...surfaces.flatCard,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    minHeight: 64,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  rowBody: { flex: 1, gap: spacing.xxs },
   screen: { gap: spacing.lg },
+  sectionTitle: {
+    color: colors.text,
+    fontSize: typography.bodyLarge,
+    fontWeight: "500",
+  },
 });

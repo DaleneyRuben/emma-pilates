@@ -39,12 +39,14 @@ import {
   type PaymentRow,
   type PaymentView,
   type PendingPaymentSummary,
+  type InvitationStatus,
   type PurchaseIntentView,
   type ReferralsView,
 } from './payment-views';
 
 export type {
   CreditActivityEntry,
+  InvitationStatus,
   PaymentReview,
   PaymentView,
   PendingPaymentSummary,
@@ -63,6 +65,12 @@ import {
   notifyPaymentConfirmed,
 } from './subscription-allocation';
 import { computeSubscriptionTerm } from './subscription-term';
+import { grantGiftClass } from './allowance-adjustments';
+import {
+  collectOwedInviteReward,
+  grantInviteReward,
+} from './grant-invite-reward';
+import { hasEarlierRealPayment } from './gift-class-history';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -333,6 +341,7 @@ export function createPrismaPaymentCommands(
   const activateSubscription = async (
     transaction: Transaction,
     payment: PaymentRow,
+    principal: AuthenticatedPrincipal,
     now: Date,
   ): Promise<string> => {
     const term = computeSubscriptionTerm(
@@ -355,6 +364,45 @@ export function createPrismaPaymentCommands(
         activatedAt: now,
       },
       select: { id: true },
+    });
+
+    // A pending Referral stays pending. Awarding it requires a Credit ledger
+    // entry (booking.referrals_state_fields_check), and Credit is retired
+    // (PAY-005). The host's reward is the guest-pass class below.
+    const author = {
+      accountId: principal.accountId,
+      role: auditActorOf(principal).role,
+    };
+    await collectOwedInviteReward(transaction, {
+      hostClientId: payment.clientId,
+      subscriptionId: subscription.id,
+      author,
+      now,
+      correlationId: payment.id,
+    });
+    await grantInviteReward(transaction, {
+      friendClientId: payment.clientId,
+      author,
+      now,
+      correlationId: payment.id,
+    });
+
+    await grantGiftClass(transaction, {
+      clientId: payment.clientId,
+      subscriptionId: subscription.id,
+      paymentId: payment.id,
+      method: paymentMethods[payment.method],
+      hidden: payment.plan.hiddenAt !== null,
+      priceCentavos: payment.planPriceCentavos,
+      // BKM-010 makes the Founder Membership real; until then nobody is one.
+      founder: false,
+      earlierRealPayment: await hasEarlierRealPayment(transaction, {
+        clientId: payment.clientId,
+        paymentId: payment.id,
+      }),
+      authorAccountId: principal.accountId,
+      authorRole: auditActorOf(principal).role,
+      now,
     });
 
     return subscription.id;
@@ -428,6 +476,7 @@ export function createPrismaPaymentCommands(
     const subscriptionId = await activateSubscription(
       transaction,
       payment,
+      input.principal,
       now,
     );
     await recordPaymentAudit(transaction, {
@@ -885,6 +934,7 @@ export function createPrismaPaymentCommands(
       const subscriptionId = await activateSubscription(
         transaction,
         payment,
+        principal,
         now,
       );
       await recordPaymentAudit(transaction, {
@@ -1065,21 +1115,42 @@ export function createPrismaPaymentCommands(
           createdAt: true,
           awardedAt: true,
           awardCentavos: true,
-          referred: { select: { id: true, name: true } },
+          referred: {
+            select: {
+              id: true,
+              name: true,
+              guestPassesReceived: {
+                where: { deletedAt: null },
+                select: { bookingId: true, rewardedAt: true, rewardOwed: true },
+                take: 1,
+              },
+            },
+          },
         },
       }),
     ]);
 
     return {
       referralCode: client.referralCode,
-      referrals: referrals.map((referral) => ({
-        referredClientId: referral.referred.id,
-        referredName: abbreviateName(referral.referred.name),
-        state: referral.state === ReferralState.AWARDED ? 'awarded' : 'pending',
-        createdAt: referral.createdAt,
-        awardedAt: referral.awardedAt,
-        awardCentavos: referral.awardCentavos,
-      })),
+      referrals: referrals.map((referral) => {
+        const pass = referral.referred.guestPassesReceived[0] ?? null;
+        const invitationStatus: InvitationStatus = (() => {
+          if (pass === null) return 'registered';
+          if (pass.rewardedAt !== null || pass.rewardOwed) return 'bought';
+          if (pass.bookingId !== null) return 'class_booked';
+          return 'registered';
+        })();
+        return {
+          referredClientId: referral.referred.id,
+          referredName: abbreviateName(referral.referred.name),
+          state:
+            referral.state === ReferralState.AWARDED ? 'awarded' : 'pending',
+          invitationStatus,
+          createdAt: referral.createdAt,
+          awardedAt: referral.awardedAt,
+          awardCentavos: referral.awardCentavos,
+        };
+      }),
     };
   };
 

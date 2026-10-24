@@ -44,9 +44,9 @@ export function evaluationShortcut(nextStartsAt: string | undefined): string {
     : `Próxima: ${dayMonthFormatter.format(new Date(nextStartsAt))}`;
 }
 
-// Credit is retired (PAY-005): the shortcut invites sharing the code.
+// BKM-014: the reward is one class, not credit. The count still names the tile.
 export function referralShortcut(count: number | undefined): string {
-  if (count === undefined || count === 0) return "Comparte tu código";
+  if (count === undefined || count === 0) return "Invita a una amiga a una clase gratis";
   return count === 1 ? "1 amiga invitada" : `${count} amigas invitadas`;
 }
 

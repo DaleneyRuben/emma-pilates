@@ -12,7 +12,11 @@ const profile = {
   referralCode: "REF-VALERIA",
 };
 
-const subscription = (status: string, remaining: number) => ({
+const subscription = (
+  status: string,
+  remaining: number,
+  extraClassesLine: string | null = null,
+) => ({
   status,
   subscription: {
     id: "subscription-1",
@@ -21,6 +25,7 @@ const subscription = (status: string, remaining: number) => ({
     remainingClassAllowance: remaining,
     startsOn: "2026-08-25",
     endsOn: "2026-09-24",
+    extraClassesLine,
   },
 });
 
@@ -59,8 +64,17 @@ describe("Client Subscription detail", () => {
     expect(screen.getByText("24 de septiembre de 2026")).toBeOnTheScreen();
     // Follow-up 177: the end is an expiry, «Vence el», not «Pagado hasta».
     expect(screen.getByText("Vence el")).toBeOnTheScreen();
+    expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
     expect(screen.queryByText("Pagado hasta")).toBeNull();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).not.toBeOnTheScreen();
+  });
+
+  it("shows the gift class with its origin", async () => {
+    const screen = await openSubscription(
+      subscription("active", 5, "Clases extra: 1 · Regalo de bienvenida"),
+    );
+
+    expect(screen.getByText("Clases extra: 1 · Regalo de bienvenida")).toBeOnTheScreen();
   });
 
   it("warns about the paid-through date when expiring soon", async () => {

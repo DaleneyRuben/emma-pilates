@@ -1,4 +1,5 @@
 import type { Prisma } from '../../generated/prisma/client';
+import { extraClassesLine } from '../payments/allowance-adjustment-copy';
 import type { StaffProfile } from '../staff/staff-profile';
 import type { CatalogRepository } from './catalog-repository';
 
@@ -29,6 +30,11 @@ const subscriptionSelect = {
   remainingClassAllowance: true,
   startsOn: true,
   endsOn: true,
+  allowanceAdjustments: {
+    where: { deletedAt: null },
+    orderBy: { createdAt: 'asc' as const },
+    select: { classes: true, reason: true },
+  },
 } as const;
 
 const clientProfileSelect = {
@@ -39,6 +45,37 @@ const clientProfileSelect = {
   profileImageAssetId: true,
   account: { select: { email: true } },
 } as const;
+
+const reasonLabels = {
+  GIFT_NEW_CLIENT: 'gift_new_client',
+  INVITE_CONVERTED: 'invite_converted',
+  CAMPAIGN: 'campaign',
+  COURTESY: 'courtesy',
+  CLASS_RETURN: 'class_return',
+  CONSUMPTION: 'consumption',
+} as const;
+
+const toSubscription = <
+  Row extends {
+    allowanceAdjustments: {
+      classes: number;
+      reason: keyof typeof reasonLabels;
+    }[];
+  },
+>(
+  row: Row | null,
+) =>
+  row === null
+    ? null
+    : {
+        ...row,
+        extraClassesLine: extraClassesLine(
+          row.allowanceAdjustments.map((adjustment) => ({
+            classes: adjustment.classes,
+            reason: reasonLabels[adjustment.reason],
+          })),
+        ),
+      };
 
 const toClientProfile = (
   client: {
@@ -316,21 +353,25 @@ export function createCatalogRepository(
         },
       }),
     findActiveSubscription: (clientId, onDate) =>
-      prisma.subscription.findFirst({
-        where: {
-          clientId,
-          state: 'ACTIVE',
-          startsOn: { lte: onDate },
-          endsOn: { gte: onDate },
-        },
-        select: subscriptionSelect,
-      }),
+      prisma.subscription
+        .findFirst({
+          where: {
+            clientId,
+            state: 'ACTIVE',
+            startsOn: { lte: onDate },
+            endsOn: { gte: onDate },
+          },
+          select: subscriptionSelect,
+        })
+        .then(toSubscription),
     findLatestSubscription: (clientId) =>
-      prisma.subscription.findFirst({
-        where: { clientId },
-        orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
-        select: subscriptionSelect,
-      }),
+      prisma.subscription
+        .findFirst({
+          where: { clientId },
+          orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
+          select: subscriptionSelect,
+        })
+        .then(toSubscription),
     listPublishedPromotions: (onDate) =>
       prisma.promotion.findMany({
         where: {

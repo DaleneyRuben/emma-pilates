@@ -52,9 +52,9 @@ can be found by its design name.
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81 |
-| 12 Mi plan | 5, 18, 71, 81 |
+| 12 Mi plan | 5, 18, 71, 81, 85 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
-| 16 Mis referidos (17 Mi crédito retired by PAY-005) | 10, 18 |
+| 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
@@ -65,7 +65,7 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82 |
 | S26 Reportar una falla (Entrenadora) | 82 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
@@ -87,7 +87,7 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 79 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 79, 85 |
 | AW23–AW24 Personal | 26, 31, 72, 79 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
@@ -3378,6 +3378,9 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 The following are not ready for manual product testing:
 
+- the mobile apps were not walked for BKM-014: the invitation screen was
+  verified by Jest and the registration rules by curl, not on a device
+  (Test 86);
 - the Weekly Cap at booking: BKM-005 stores and shows it («hasta 3 por
   semana»), but a fourth Booking in the same week still goes through until
   BKM-007; the Start Date chosen at purchase and early renewal arrive with
@@ -6489,3 +6492,75 @@ The messages arrive in **Notificaciones** (Perfil). The four titles are
 «Tu segunda clase», «Tu primera semana», «Tu primer mes», and «Tres meses
 con nosotras». The inbox card draws the message body and not the title
 (noted on the BKM-013 row; the title is what the push shows).
+
+## Test 85: extra classes (BKM-008)
+
+An extra class is an `AllowanceAdjustment` on the Subscription: a signed
+number of classes, a reason, an author, and a time
+([booking ADR-0006](../booking/docs/adr/0006-weekly-cap-and-extra-classes.md)).
+The line a person sees names the first grant: «Clases extra: 1 · Cortesía»,
+«Clases extra: 1 · Regalo de bienvenida», «Clases extra: 1 · Invitación»,
+«Clases extra: 1 · Campaña», or «Clases extra: 1 · Clase devuelta». Run the
+API and the fixtures as in Tests 2 and 5.
+
+A. **The Administrator records one.** As Paola,
+   `POST /api/v1/administrator/clients/{clientId}/allowance-adjustments`
+   with `{ "classes": 1, "reason": "courtesy" }` answers `201`. The same call
+   as Camila answers `403`. `class_return` is the other reason the endpoint
+   accepts; any other reason answers `400`.
+B. **The three surfaces.** Open that Client's **Mi plan** (12), her summary
+   as Camila (S06), and her detail in the admin web (AW22, at 1440 px and at
+   420 px). Each reads «Clases extra: 1 · Cortesía». A Client with no extra
+   class shows no line.
+C. **The gift.** The first approved Payment in a Client's life adds one
+   class with reason `gift_new_client`, and the line then reads «Clases extra:
+   1 · Regalo de bienvenida». A founder and a courtesy Plan do not get it,
+   and a second Payment does not add it again. The automated suites cover
+   that grant; no screen records the first cash Payment's gift yet (PAY-006
+   adds the form).
+
+Spending an extra class waits for the base allowance to run out, and for the
+Weekly Cap (BKM-007). Cancelling a Booking funded by an extra class restores
+the class to the base pool.
+
+## Test 86: invite a friend (BKM-014)
+
+A friend who registers with a Client's code gets one free class in her life,
+in a Session that has a free place that is not the last one. The host invites
+one friend a calendar month, in America/La_Paz. When the friend buys her
+first real Plan, the host gets one extra class («Clases extra: 1 ·
+Invitación») on her current Subscription, or on her next one if she has none.
+Credit is retired (PAY-005); this screen never shows it. Use the fixtures (Test 5 A) and the API (Test 2).
+
+### A. The screen (Client app `16`)
+
+1. Log in as `lucia@example.com` and open **Invita a una amiga** from Home
+   or from Perfil. The top bar reads «Invita a una amiga», the card shows
+   her code `REF-LUCIA` with **Compartir**, and the note reads «Comparte tu
+   código. Tu amiga recibe una clase gratis, una sola vez. Cuando compre su
+   primer plan, tú ganas una clase.». There is no **Tu crédito** row.
+2. The list names each friend with her status: «Registrada», «Clase
+   reservada», or «Compró su plan». With nobody invited it reads «Aún no
+   has invitado a nadie. ¡Comparte tu código!».
+
+`GET /api/v1/clients/current/referrals` returns the code and each friend's
+`invitationStatus` (`registered`, `class_booked`, `bought`). The credit fields stay as deprecated zeros; screen `17` is retired.
+
+### B. The rules, through the API
+
+Register a friend with the host's code (Test 79 B, or the Assistant's S05).
+The answer is `202`, and `booking.guest_passes` gains one row. A second
+friend of the same host in the same calendar month answers `409`
+`guest_pass_monthly_limit`; the same invitation in the next month answers
+`202`. A second registration of the same friend is already refused by the
+one-Referral rule.
+
+The friend books a Session with exactly one place left: `409`
+`guest_pass_last_place`. A Client with a Plan takes that place as usual.
+Her second booking answers `409` `guest_pass_already_used`.
+
+When her first real Payment is approved, the host's current Subscription
+gains one `invite_converted` adjustment, and a second approval adds nothing.
+A host with no current Subscription gets it on the next one she buys. The
+friend's own first real Payment still gets the gift class: the free class
+never counted as a first Plan.

@@ -4484,6 +4484,53 @@
         ]
       }
     },
+    "/api/v1/administrator/clients/{clientId}/allowance-adjustments": {
+      "post": {
+        "operationId": "recordAllowanceAdjustment",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordAllowanceAdjustmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllowanceAdjustmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AllowanceAdjustment"
+        ]
+      }
+    },
     "/api/v1/accounts/current/closure": {
       "post": {
         "operationId": "closeCurrentClientAccount",
@@ -9171,6 +9218,11 @@
           "endsOn": {
             "type": "string",
             "format": "date"
+          },
+          "extraClassesLine": {
+            "type": "string",
+            "nullable": true,
+            "description": "«Clases extra: 1 · Regalo de bienvenida» when extra classes remain"
           }
         },
         "required": [
@@ -10957,6 +11009,15 @@
             "deprecated": true,
             "description": "Deprecated (PAY-005): Credit was retired; a Referral made since stays pending"
           },
+          "invitationStatus": {
+            "type": "string",
+            "enum": [
+              "registered",
+              "class_booked",
+              "bought"
+            ],
+            "description": "BKM-014: the invitation's status. Older releases ignore it and read state."
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -10977,6 +11038,7 @@
           "referredClientId",
           "referredName",
           "state",
+          "invitationStatus",
           "createdAt"
         ]
       },
@@ -11951,6 +12013,50 @@
         },
         "required": [
           "endsOn"
+        ]
+      },
+      "RecordAllowanceAdjustmentDto": {
+        "type": "object",
+        "properties": {
+          "classes": {
+            "type": "number",
+            "description": "A signed number of classes, never zero"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "courtesy",
+              "class_return"
+            ]
+          }
+        },
+        "required": [
+          "classes",
+          "reason"
+        ]
+      },
+      "AllowanceAdjustmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classes": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "courtesy",
+              "class_return"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "classes",
+          "reason"
         ]
       },
       "CloseAccountRequestDto": {
