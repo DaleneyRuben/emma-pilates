@@ -66,7 +66,7 @@ describe("Trainer agenda header", () => {
     expect(screen.queryByLabelText("2026-10-21")).toBeNull();
 
     await fireEvent.press(screen.getByLabelText("Sáb 24"));
-    expect(screen.getByLabelText("Sáb 24")).toHaveAccessibilityState({ selected: true });
+    expect(screen.getByLabelText("Sáb 24")).toHaveProp("accessibilityState", { selected: true });
     expect(screen.queryByLabelText("2026-10-24")).toBeNull();
     expect(screen.queryByLabelText("2026-10-25")).toBeNull();
   });
