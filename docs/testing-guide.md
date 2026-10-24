@@ -34,6 +34,7 @@ you are starting with no project knowledge.
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
+| Money format                 | Whole bolivianos in both apps («Bs 560») and centavos on the admin web («Bs 560,00») (Test 75) | A leftover fraction of a boliviano is not in the fixtures; the unit tests cover the rounding |
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
 
 ## Where each designed screen is tested
@@ -47,10 +48,10 @@ can be found by its design name.
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75 |
 | 12 Mi plan | 5, 18, 71 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
-| 16 Mis referidos, 17 Mi crédito | 10, 18 |
+| 16 Mis referidos, 17 Mi crédito | 10, 18, 75 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
@@ -60,8 +61,8 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19 |
-| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 75 |
+| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 75 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
@@ -73,15 +74,15 @@ can be found by its design name.
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
-| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72 |
+| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 75 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
-| AW16 Reporte de ingresos y gastos | 30, 31 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 75 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 75 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 75 |
 | AW23–AW24 Personal | 26, 31, 72 |
-| AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
-| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
+| AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72, 75 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 75 |
 
 ## Before you begin
 
@@ -5834,3 +5835,30 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 75: one money format per surface (UX-010)
+
+Money is stored as centavos everywhere (ADR-0082). What a person reads
+depends on the surface, and only on the surface.
+
+1. **Client app.** As Sofía, open **Elige tu plan**: the four prices read
+   `Bs 560`, `Bs 780`, `Bs 1.050`, and `Bs 2.100`, with a dot for thousands
+   and no decimals. **Detalle del plan** for Paquete de 8 clases reads
+   `Bs 560`, **Crédito aplicado** `−Bs 60`, and **Total a pagar** `Bs 500`.
+   **Mi crédito** reads `Bs 60` (Mariana's empty state reads `Bs 0`), and
+   Perfil's **Mi crédito** row uses the same figure. Inicio's note still
+   says «Paquetes desde Bs 560».
+2. **Staff app.** As Paola, **Pagos pendientes** reads `Bs 560` on a row
+   and `Bs 560 en total` (or the fixture total) with no decimals. As the
+   Assistant, **Elegir plan** and **Confirmar pago en efectivo** use the
+   same figures (`Bs 560`, `Bs 60`, `Bs 500`).
+3. **Admin web.** Planes shows `Bs 1.050,00` (Test 25). Pagos shows
+   `Bs 560,00` and, when Credit paid part, «con Bs 60,00 de crédito»
+   (Test 27). The report's tiles, tables, and chart axis use the same
+   centavos form (`Bs 0,00`, `Bs 1.200,00`), including a negative net
+   written `−Bs 1.200,00` (Test 30).
+
+A leftover fraction (an amount not divisible by 100) is not in the fixtures.
+The apps round it half up to a whole boliviano and never print the
+centavos; the admin web keeps them. The unit tests lock that case. Nothing
+about how money is stored or sent changes.
