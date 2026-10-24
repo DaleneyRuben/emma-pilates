@@ -27,6 +27,7 @@ import {
 } from "./report-search";
 import { CategoryTable, MonthTable } from "./report-tables";
 import { ReportTiles } from "./report-tiles";
+import { RevenueSection } from "./revenue-section";
 import { VoidedSales } from "./voided-sales";
 
 function DateField({
@@ -229,6 +230,7 @@ export function ReportPage({
           sucursales».
         </p>
       )}
+      <RevenueSection active={search.vista !== undefined && !finance} />
       {finance ? null : failed !== null ? (
         <QueryFailure
           error={failed.error}

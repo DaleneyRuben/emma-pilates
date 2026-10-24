@@ -9,4 +9,12 @@ export const studioFactsAuthorizationRows = (): Record<string, MatrixRow> => ({
     body: { month: '2026-10' },
     bearer: true,
   },
+  // STU-002: accrued revenue is money. The month has to parse, or the Role
+  // check never runs. The report takes a bearer credential.
+  'GET /api/v1/administrator/reports/revenue': {
+    administrator: 'allow',
+    coordinator: 'deny',
+    query: '?month=2026-10',
+    bearer: true,
+  },
 });

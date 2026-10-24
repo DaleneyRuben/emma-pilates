@@ -137,6 +137,7 @@ import type {
   GetIncomeReportParams,
   GetMonthResultParams,
   GetPaymentReceiptParams,
+  GetRevenueReportParams,
   GetTodayCashCloseParams,
   GrantCampaignDto,
   GrantCourtesyAccessDto,
@@ -209,6 +210,7 @@ import type {
   RequestEmailChangeDto,
   RequestFreezeDto,
   RequestPasswordRecoveryDto,
+  RevenueReportDto,
   SalaryPaymentInputDto,
   SearchAssistantClientsParams,
   SendFeedbackDto,
@@ -32448,6 +32450,211 @@ export const useRecomputeStudioFacts = <TError = unknown, TContext = unknown>(
     queryClient,
   );
 };
+
+export type getRevenueReportResponse200 = {
+  data: RevenueReportDto;
+  status: 200;
+};
+
+export type getRevenueReportResponseSuccess = getRevenueReportResponse200 & {
+  headers: Headers;
+};
+export type getRevenueReportResponse = getRevenueReportResponseSuccess;
+
+export const getGetRevenueReportUrl = (params: GetRevenueReportParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/reports/revenue?${stringifiedParams}`
+    : `/api/v1/administrator/reports/revenue`;
+};
+
+export const getRevenueReport = async (
+  params: GetRevenueReportParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getRevenueReportResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetRevenueReportUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getRevenueReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getRevenueReportResponse;
+};
+
+export const getGetRevenueReportQueryKey = (
+  params?: GetRevenueReportParams,
+) => {
+  return [
+    `/api/v1/administrator/reports/revenue`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetRevenueReportQueryOptions = <
+  TData = Awaited<ReturnType<typeof getRevenueReport>>,
+  TError = unknown,
+>(
+  params: GetRevenueReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRevenueReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetRevenueReportQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getRevenueReport>>
+  > = ({ signal }) =>
+    getRevenueReport(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getRevenueReport>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetRevenueReportQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getRevenueReport>>
+>;
+export type GetRevenueReportQueryError = unknown;
+
+export function useGetRevenueReport<
+  TData = Awaited<ReturnType<typeof getRevenueReport>>,
+  TError = unknown,
+>(
+  params: GetRevenueReportParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRevenueReport>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRevenueReport>>,
+          TError,
+          Awaited<ReturnType<typeof getRevenueReport>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetRevenueReport<
+  TData = Awaited<ReturnType<typeof getRevenueReport>>,
+  TError = unknown,
+>(
+  params: GetRevenueReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRevenueReport>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRevenueReport>>,
+          TError,
+          Awaited<ReturnType<typeof getRevenueReport>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetRevenueReport<
+  TData = Awaited<ReturnType<typeof getRevenueReport>>,
+  TError = unknown,
+>(
+  params: GetRevenueReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRevenueReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetRevenueReport<
+  TData = Awaited<ReturnType<typeof getRevenueReport>>,
+  TError = unknown,
+>(
+  params: GetRevenueReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRevenueReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetRevenueReportQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
 
 export type createPendingUploadResponse201 = {
   data: PendingUploadDto;

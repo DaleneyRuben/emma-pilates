@@ -1276,7 +1276,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | ID | Priority | Surface | Work item | Depends on | Effort | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | STU-001 | P2 | Backend | Studio Management context: `studio` schema, `session_facts`, `client_month_facts`, nightly and on-demand recompute | DOC-008, REL-016 | 3–4 d | done |
-| STU-002 | P2 | Backend/admin web | Accrued versus cash revenue by validity days, deferred revenue, classes still owed | STU-001, BKO-005 | 2–3 d | ready |
+| STU-002 | P2 | Backend/admin web | Accrued versus cash revenue by validity days, deferred revenue, classes still owed | STU-001, BKO-005 | 2–3 d | done |
 | STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | ready |
 | STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | done |
 | STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | ready |
@@ -1339,6 +1339,25 @@ month), Assistant `403 studio_access_denied`. No browser and no Simulator: this
 item has no screen. The nightly pass was not run as a worker process; the
 worker unit test covers the 24-hour schedule. Open question: store-review
 exclusion waits for REL-016's flag.
+
+#### STU-002 · Evidence
+
+Done 2026-10-23. Studio Management reads confirmed Payments and the
+Subscriptions they activated through its own query (no Booking import) and
+accrues each Payment by validity days. `GET /api/v1/administrator/reports/revenue?month=YYYY-MM`
+returns cash, accrued, and deferred for the month, plus classes still owed
+today. Administrator only: an Assistant and a cast Coordinator get
+`403 studio_access_denied`. Reporte shows the three figures under «Ingreso
+devengado». A Payment of Bs 300 from 2026-10-20 to 2026-11-19 accrues
+Bs 120 in October and Bs 180 in November, and the months sum to Bs 300.
+The last month absorbs the remainder. A month after the Subscription ended
+stays at zero when half-up rounding already used the whole amount.
+
+No migration. Open questions: store-review exclusion waits for REL-016's
+flag, so nothing is excluded; extra classes (BKM-008) are not counted in
+classes still owed. The Coordinator role is on the rollout (IDN-009):
+Carolina gets `403 studio_access_denied` and her sidebar has no money.
+[Pull request #195](https://github.com/DaleneyRuben/emma-pilates/pull/195).
 
 #### STU-004 · The studio economics package and the simulator
 

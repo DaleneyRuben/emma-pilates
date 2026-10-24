@@ -69,6 +69,7 @@ describe('studio facts endpoint (e2e)', () => {
               requireStudioAdministrator(actor);
               return recompute(input, actor);
             },
+            revenue: () => Promise.reject(new Error('unused')),
           },
         },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },

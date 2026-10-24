@@ -8,6 +8,15 @@ import { centro } from "./booking-handlers";
 
 export const incomeReportPath = "/api/v1/administrator/reports/income";
 export const expenseReportPath = "/api/v1/administrator/reports/expenses";
+export const revenueReportPath = "/api/v1/administrator/reports/revenue";
+
+export const emptyRevenueReport = {
+  month: "2026-10",
+  cashCentavos: 0,
+  accruedCentavos: 0,
+  deferredCentavos: 0,
+  classesStillOwed: 0,
+};
 export const monthResultPath = "/api/v1/administrator/reports/finance";
 export const openingBudgetPath =
   "/api/v1/administrator/reports/finance/opening-budget";
