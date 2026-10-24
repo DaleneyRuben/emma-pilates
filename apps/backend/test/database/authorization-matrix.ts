@@ -134,6 +134,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   }),
   'GET /api/v1/administrator/feedback': administratorOnly(),
   'GET /api/v1/administrator/feedback/export': administratorOnly(),
+  'GET /api/v1/administrator/founder-memberships': administratorOnly(),
   'POST /api/v1/administrator/feedback/{feedbackId}/triage': administratorOnly({
     body: { status: 'reviewed', changeNote: null },
   }),
