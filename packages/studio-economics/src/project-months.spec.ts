@@ -24,7 +24,7 @@ const horizon = (
 describe('studio projections', () => {
   it('repeats the opening month, and three months are three times one', () => {
     expect(weeksInAMonth).toBe(4.33);
-    const result = projectMonths(owner);
+    const result = projectMonths(owner, { includeMonth: true });
     const one = horizon(result, 1, 'base');
     const three = horizon(result, 3, 'base');
     const classes = Math.round(33 * 4.33);
