@@ -3,12 +3,14 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   navigationGroups,
   navigationItemOf,
+  type NavigationGroup,
   type NavigationItem,
 } from "../app/navigation";
 import { branchSuppliesQueryOptions } from "../back-office/supplies/supply-queries";
 import { countFormat } from "../components/table/pagination";
 import { cn } from "../lib/cn";
 import { pendingPaymentCountQueryOptions } from "../payments/payment-queries";
+import { staffProfileQueryOptions } from "../session/staff-profile-query";
 import { useBranchSelection } from "./branch/use-branch-selection";
 
 // AW28: the transfers waiting for review, beside Pagos; nothing when none
@@ -41,15 +43,34 @@ const badges = {
   },
 } as const;
 
+// The Coordinator Role is not wired on this branch (IDN-009). These three
+// are every other Role the profile can carry today, so an amount stays
+// hidden from them and visible until the profile answers.
+const rolesWithoutAmounts = ["assistant", "trainer", "nutritionist"];
+
+const visibleGroups = (role: string | undefined): readonly NavigationGroup[] =>
+  navigationGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter(
+        (item) =>
+          item.administratorOnly !== true ||
+          !rolesWithoutAmounts.includes(role ?? ""),
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
+
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const counts = {
     pendingPayments: usePendingPaymentCount(),
     lowStock: useLowStockCount(),
   };
+  const { data: profile } = useQuery(staffProfileQueryOptions());
+  const groups = visibleGroups(profile?.role);
 
   return (
     <nav aria-label="Secciones" className="flex flex-col gap-5 px-3 py-4">
-      {navigationGroups.map((group, index) => (
+      {groups.map((group, index) => (
         <div
           key={group.label ?? `group-${index}`}
           className="flex flex-col gap-0.5"

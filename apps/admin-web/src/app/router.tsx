@@ -63,6 +63,15 @@ const plansRoute = createRoute({
 });
 
 // AW36 (BKM-004): opened from the account menu, not the sidebar.
+const simulatorRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/simulador",
+  component: lazyRouteComponent(
+    () => import("../simulator/simulator-route"),
+    "SimulatorRoute",
+  ),
+});
+
 const studioRulesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/reglas-del-estudio",
@@ -77,6 +86,7 @@ const pageRoutes = [
   branchesRoute,
   classTypesRoute,
   plansRoute,
+  simulatorRoute,
   studioRulesRoute,
   ...backOfficeRoutes,
   ...oversightRoutes,

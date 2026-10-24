@@ -78,6 +78,7 @@ can be found by its design name.
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 80, 81 |
+| AW37 Simulador | 82 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 78, 79 |
 | AW23–AW24 Personal | 26, 31, 72 |
@@ -3327,6 +3328,11 @@ The following are not ready for manual product testing:
   BKM-007;
 - accrued revenue by validity days: decisions §11 asks for it beside the
   cash view, and Test 81 shows only cash. STU-002 owns the accrued view;
+- the break-even in students per class, occupancy, and clients: Test 82
+  shows it in bolivianos. The diagnosis's section 3.4 asks for the other
+  expressions, and STU-005 owns the projections that need them;
+- the Coordinator's view of the simulator: the role is not wired (IDN-009),
+  so Test 82 only hides the page from the roles that exist today;
 
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
@@ -6156,3 +6162,34 @@ describes.
 The migration `20261023230000_cost_budget_lines` needs owner approval before
 it runs on a shared database. The accrued-revenue view (decisions §11) is
 not on this page.
+
+## Test 82: simulate a month (STU-004)
+
+**Simulador** (AW37) is a calculator. It sits in the sidebar after
+**Reporte**, and only the Administrator sees it. Nothing is saved: changing
+a number recalculates in the browser, and leaving the page forgets the
+change. Paola is the Administrator. Log in as Test 24 describes. The
+Coordinator role is not wired yet (IDN-009), so this test does not sign in
+as one.
+
+1. **The opening month.** The five fields read 33, 4, 65, 21175, and 16.
+   **Resultado** reads Bs 761,20, with the line "143 clases · ingreso
+   Bs 37.180,00". **Punto de equilibrio** reads Bs 36.273,81. Under the
+   figures the derivation reads `(21175 + 9295) / 0.84 = 36273.81`. Open the
+   Branch selector: it says "Esta página no se filtra por sucursal — el
+   simulador no lee una sede."
+2. **A change.** Set **Impuestos (%)** to 20. **Punto de equilibrio** rises
+   to Bs 38.087,50 and the derivation becomes
+   `(21175 + 9295) / 0.8 = 38087.50`. **Resultado** becomes a loss,
+   −Bs 726,00. Set **Clases por semana** to 20 and both figures move again.
+   Reload the page: the five fields are back to the opening values.
+3. **Nothing is saved.** The browser's network panel shows no request while
+   you edit. There is no save button.
+4. **Narrow browser.** At 420 px the fields and the two figures stack. The
+   sidebar opens from **Abrir menú** and lists **Simulador**.
+
+The package's own check uses variable costs of Bs 9.290 and derives
+`(21175 + 9290) / 0.84 = 36267.86`. The page's 143 classes at Bs 65 come to
+Bs 9.295, so its derivation differs by those Bs 5. The break-even in
+students per class, occupancy, and clients is not on this page. Pull
+request: https://github.com/DaleneyRuben/emma-pilates/pull/192.
