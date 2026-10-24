@@ -1,6 +1,6 @@
 # Take payments by QR with manual confirmation in v1
 
-Status: accepted
+Status: accepted; Credit is retired by [ADR-0009](./0009-invite-a-friend-replaces-referral-credit.md), and a Payment may be raised before expiry since [ADR-0005](./0005-validity-in-days-with-a-chosen-start-date.md)
 
 v1 has no payment processor. The studio displays a single fixed QR code in the app with the amount to pay printed beside it, the client transfers that amount from their own bank app and attaches a screenshot as proof, and an Administrator — alerted by a push notification — checks the money against the bank and confirms the Payment. We chose this over integrating a processor because the studio already collects money this way today and a processor is weeks of work plus per-transaction fees for a business taking a handful of payments a day.
 
