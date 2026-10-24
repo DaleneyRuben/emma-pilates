@@ -33,7 +33,8 @@ export function FreezeRequest({
     try {
       const response = await requestFreeze(
         { subscriptionId, startsOn, endsOn, reason },
-        { fetcher },
+        undefined,
+        fetcher,
       );
       if (response.status === 201) {
         onRequested();

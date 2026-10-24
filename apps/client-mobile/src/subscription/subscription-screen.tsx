@@ -112,13 +112,13 @@ export function SubscriptionScreen() {
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-        {founderRenewalDeadline == null ? null : (
+        {typeof founderRenewalDeadline === "string" ? (
           <View style={styles.founderBanner}>
             <Text style={styles.founderBannerText}>
               {`Renueva antes del ${formatCivilDateWithYear(founderRenewalDeadline)}.`}
             </Text>
           </View>
-        )}
+        ) : null}
         {status === "expiring_soon" ? (
           <View style={styles.warning}>
             <Text style={styles.warningText}>
