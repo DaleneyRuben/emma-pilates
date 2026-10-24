@@ -1,0 +1,39 @@
+# Critical journey (IDN-009, ADR-0102): the Coordinator finds a Client, sees
+# her overview with booking but no sale, and opens «Cancelar una clase».
+appId: ${APP_ID}
+env:
+  EMAIL: carolina.rivas@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible: "Tu cuenta.*"
+    timeout: 30000
+- runFlow: subflows/park-dev-gear.yaml
+- assertNotVisible: "+ Nuevo cliente"
+- assertVisible: "Cancelar una clase"
+- takeScreenshot: staff-coordinator-search
+- tapOn: "Cancelar una clase"
+- extendedWaitUntil:
+    visible: "Sucursal:.*"
+    timeout: 15000
+- takeScreenshot: staff-coordinator-cancel-class
+- tapOn: "Volver"
+- extendedWaitUntil:
+    visible: "Buscar por nombre, teléfono o correo"
+    timeout: 15000
+- tapOn: "Buscar por nombre, teléfono o correo"
+- inputText: "Lucía"
+- extendedWaitUntil:
+    visible:
+      text: ".*Lucía Fernández.*"
+    timeout: 15000
+- tapOn:
+    text: ".*Lucía Fernández.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      text: "Historial.*|Reservas.*"
+    timeout: 15000
+- assertVisible: "Reservar clase"
+- assertNotVisible: "Registrar pago en efectivo"
+- takeScreenshot: staff-coordinator-overview

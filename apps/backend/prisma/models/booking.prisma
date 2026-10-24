@@ -3,6 +3,7 @@ enum StaffRole {
   NUTRITIONIST  @map("nutritionist")
   ASSISTANT     @map("assistant")
   ADMINISTRATOR @map("administrator")
+  COORDINATOR   @map("coordinator")
 
   @@schema("booking")
 }
@@ -79,6 +80,7 @@ model Branch {
   evaluationSlots  EvaluationSlot[]
   supplies         Supply[]
   expenses         Expense[]
+  cashCloses       CashClose[]
 
   @@map("branches")
   @@schema("booking")

@@ -101,3 +101,25 @@ model Expense {
   @@map("expenses")
   @@schema("back_office")
 }
+
+// BKO-003: one Cash Close a day per Branch, immutable once made.
+model CashClose {
+  id                String   @id @default(uuid()) @db.Uuid
+  branchId          String   @map("branch_id") @db.Uuid
+  businessDate      DateTime @map("business_date") @db.Date
+  expectedCentavos  Int      @map("expected_centavos")
+  cashPaymentCount  Int      @map("cash_payment_count")
+  countedCentavos   Int      @map("counted_centavos")
+  note              String?
+  closedByAccountId String   @map("closed_by_account_id") @db.Uuid
+  closedAt          DateTime @map("closed_at") @db.Timestamptz(3)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  branch            Branch   @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  closedByAccount   Account  @relation("CashCloseClosedBy", fields: [closedByAccountId], references: [id], onDelete: Restrict)
+
+  @@unique([branchId, businessDate])
+  @@index([businessDate])
+  @@index([closedByAccountId])
+  @@map("cash_closes")
+  @@schema("back_office")
+}

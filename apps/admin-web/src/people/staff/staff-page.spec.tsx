@@ -105,6 +105,7 @@ describe("AW23 Personal on a desktop browser", () => {
       "Asistente",
       "Administrador",
       "Nutricionista",
+      "Coordinador",
     ]);
 
     await user.selectOptions(filter, "assistant");

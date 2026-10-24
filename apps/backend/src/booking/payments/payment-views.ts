@@ -1,0 +1,168 @@
+import {
+  PaymentMethod,
+  PaymentState,
+  PurchaseIntentState,
+  type Prisma,
+} from '../../generated/prisma/client';
+
+// The read models the payment commands return, and the selects and
+// mappers that build them from Payment and Purchase Intent rows.
+export type PurchaseIntentView = {
+  id: string;
+  planId: string;
+  planName: string;
+  durationMonths: number;
+  classAllowance: number;
+  planPriceCentavos: number;
+  creditReservedCentavos: number;
+  amountDueCentavos: number;
+  state: 'open' | 'submitted' | 'expired';
+  receiptAttached: boolean;
+  createdAt: Date;
+  expiresAt: Date;
+};
+
+export type PaymentView = {
+  id: string;
+  method: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
+  state: 'pending' | 'confirmed' | 'rejected';
+  planId: string;
+  planName: string;
+  durationMonths: number;
+  classAllowance: number;
+  planPriceCentavos: number;
+  creditAppliedCentavos: number;
+  amountDueCentavos: number;
+  submittedAt: Date;
+  decidedAt: Date | null;
+  rejectionReason: string | null;
+  subscriptionId: string | null;
+};
+
+export type CreditActivityEntry = {
+  id: string;
+  kind:
+    | 'referral_award'
+    | 'payment_reservation'
+    | 'payment_spend'
+    | 'payment_release';
+  amountCentavos: number;
+  occurredAt: Date;
+};
+
+export type ReferralsView = {
+  referralCode: string;
+  referrals: {
+    referredClientId: string;
+    referredName: string;
+    state: 'pending' | 'awarded';
+    createdAt: Date;
+    awardedAt: Date | null;
+    awardCentavos: number | null;
+  }[];
+};
+
+export type PendingPaymentSummary = {
+  id: string;
+  clientName: string;
+  planName: string;
+  amountDueCentavos: number;
+  submittedAt: Date;
+  receiptAvailable: boolean;
+};
+
+export type PaymentReview = PaymentView & {
+  clientName: string;
+  receipt: { imageAssetId: string; mediaType: string } | null;
+};
+
+const intentStates: Record<PurchaseIntentState, PurchaseIntentView['state']> = {
+  [PurchaseIntentState.OPEN]: 'open',
+  [PurchaseIntentState.SUBMITTED]: 'submitted',
+  [PurchaseIntentState.EXPIRED]: 'expired',
+};
+export const paymentMethods: Record<PaymentMethod, PaymentView['method']> = {
+  [PaymentMethod.TRANSFER]: 'transfer',
+  [PaymentMethod.CASH]: 'cash',
+  [PaymentMethod.CREDIT_ONLY]: 'credit_only',
+  [PaymentMethod.COURTESY]: 'courtesy',
+};
+const paymentStates: Record<PaymentState, PaymentView['state']> = {
+  [PaymentState.PENDING]: 'pending',
+  [PaymentState.CONFIRMED]: 'confirmed',
+  [PaymentState.REJECTED]: 'rejected',
+};
+
+export const intentSelect = {
+  id: true,
+  clientId: true,
+  planId: true,
+  planNameSnapshot: true,
+  durationMonthsSnapshot: true,
+  classAllowanceSnapshot: true,
+  planPriceCentavos: true,
+  creditReservedCentavos: true,
+  amountDueCentavos: true,
+  receiptImageAssetId: true,
+  state: true,
+  createdAt: true,
+  expiresAt: true,
+} as const;
+
+export const paymentSelect = {
+  id: true,
+  clientId: true,
+  planId: true,
+  purchaseIntentId: true,
+  planNameSnapshot: true,
+  durationMonthsSnapshot: true,
+  classAllowanceSnapshot: true,
+  planPriceCentavos: true,
+  creditAppliedCentavos: true,
+  amountDueCentavos: true,
+  method: true,
+  state: true,
+  submittedAt: true,
+  decidedAt: true,
+  rejectionReason: true,
+  subscription: { select: { id: true } },
+} as const;
+
+export type IntentRow = Prisma.PurchaseIntentGetPayload<{
+  select: typeof intentSelect;
+}>;
+export type PaymentRow = Prisma.PaymentGetPayload<{
+  select: typeof paymentSelect;
+}>;
+
+export const toIntentView = (row: IntentRow): PurchaseIntentView => ({
+  id: row.id,
+  planId: row.planId,
+  planName: row.planNameSnapshot,
+  durationMonths: row.durationMonthsSnapshot,
+  classAllowance: row.classAllowanceSnapshot,
+  planPriceCentavos: row.planPriceCentavos,
+  creditReservedCentavos: row.creditReservedCentavos,
+  amountDueCentavos: row.amountDueCentavos,
+  state: intentStates[row.state],
+  receiptAttached: row.receiptImageAssetId !== null,
+  createdAt: row.createdAt,
+  expiresAt: row.expiresAt,
+});
+
+export const toPaymentView = (row: PaymentRow): PaymentView => ({
+  id: row.id,
+  method: paymentMethods[row.method],
+  state: paymentStates[row.state],
+  planId: row.planId,
+  planName: row.planNameSnapshot,
+  durationMonths: row.durationMonthsSnapshot,
+  classAllowance: row.classAllowanceSnapshot,
+  planPriceCentavos: row.planPriceCentavos,
+  creditAppliedCentavos: row.creditAppliedCentavos,
+  amountDueCentavos: row.amountDueCentavos,
+  submittedAt: row.submittedAt,
+  decidedAt: row.decidedAt,
+  rejectionReason: row.rejectionReason,
+  subscriptionId: row.subscription?.id ?? null,
+});

@@ -1,6 +1,5 @@
 import {
   closeCurrentClientAccount,
-  useGetCurrentClientCredit,
   useGetCurrentClientSubscription,
   useGetCurrentPayment,
   useListEvaluations,
@@ -81,7 +80,6 @@ export function CloseAccountScreen() {
   const bookings = useListUpcomingBookings(queryOptions);
   const evaluations = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const subscription = useGetCurrentClientSubscription(queryOptions);
-  const credit = useGetCurrentClientCredit(queryOptions);
   const payment = useGetCurrentPayment(queryOptions);
   const [password, setPassword] = useState("");
   const [keepPromotions, setKeepPromotions] = useState(false);
@@ -95,7 +93,7 @@ export function CloseAccountScreen() {
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Cerrar mi cuenta" />
     </>
   );
-  const queries = [bookings, evaluations, subscription, credit, payment];
+  const queries = [bookings, evaluations, subscription, payment];
 
   if (queries.some((query) => query.isPending)) {
     return (
@@ -107,7 +105,7 @@ export function CloseAccountScreen() {
   }
 
   if (
-    [bookings, evaluations, subscription, credit].some(
+    [bookings, evaluations, subscription].some(
       (query) => query.isError || query.data?.status !== 200,
     ) ||
     payment.isError
@@ -124,7 +122,6 @@ export function CloseAccountScreen() {
   }
 
   const closure = describeAccountClosure({
-    availableCreditCentavos: credit.data?.status === 200 ? credit.data.data.availableCentavos : 0,
     bookings: bookings.data?.status === 200 ? bookings.data.data : [],
     evaluations: evaluations.data?.status === 200 ? evaluations.data.data.items : [],
     // No Payment yet answers 404, which is "nothing pending".

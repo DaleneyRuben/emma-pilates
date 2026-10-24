@@ -152,7 +152,9 @@ import { promotionContactsWiring } from './promotion-contacts/promotion-contacts
 import { promotionsConsentWiring } from './promotions-consent/promotions-consent-wiring';
 import { acquisitionWiring } from './acquisition/acquisition-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
+import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
+import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
 
 @Module({
   imports: [SystemIdentityModule, NotificationsModule],
@@ -190,7 +192,9 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionContactsWiring.controllers,
     ...promotionsConsentWiring.controllers,
     ...acquisitionWiring.controllers,
+    ...studioSettingsWiring.controllers,
     ...clientPhotoWiring.controllers,
+    ...invoiceDataWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
     NutritionistEvaluationsController,
@@ -499,15 +503,13 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     },
     {
       provide: paymentCommands,
-      inject: [PRISMA_CLIENT, ConfigService, NOTIFICATION_RECORDER],
+      inject: [PRISMA_CLIENT, NOTIFICATION_RECORDER],
       useFactory: (
         prisma: PrismaClient,
-        config: ConfigService<Environment, true>,
         recordNotification: NotificationRecorder,
       ) =>
         createPrismaPaymentCommands(prisma, {
           now: () => new Date(),
-          referralRewardCentavos: config.getOrThrow('REFERRAL_REWARD_CENTAVOS'),
           recordNotification,
         }),
     },
@@ -585,7 +587,9 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionContactsWiring.providers(PRISMA_CLIENT),
     ...promotionsConsentWiring.providers(PRISMA_CLIENT),
     ...acquisitionWiring.providers(PRISMA_CLIENT),
+    ...studioSettingsWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
+    ...invoiceDataWiring.providers(PRISMA_CLIENT),
   ],
 })
 export class BookingModule {}

@@ -36,7 +36,7 @@ env:
 - tapOn:
     text: "Mis referidos: .*"
 - extendedWaitUntil:
-    visible: "Tus invitaciones|Mis referidos"
+    visible: "Pronto podrás invitar a una amiga a una clase gratis."
     timeout: 15000
 - takeScreenshot: client-home-2-referidos
 - tapOn: "Volver"

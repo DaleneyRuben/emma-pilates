@@ -61,6 +61,18 @@ describe('admin-web Login', () => {
     });
   });
 
+  it('opens a browser session for the Coordinator too (ADR-0102)', async () => {
+    const dependencies = createDependencies({
+      ...administrator,
+      staffRole: 'COORDINATOR',
+    });
+
+    await expect(login(command, dependencies)).resolves.toEqual({
+      credential: 'opaque-session-credential',
+    });
+    expect(dependencies.completeLogin).toHaveBeenCalledTimes(1);
+  });
+
   it.each([
     ['a Client', null],
     ['an Assistant', 'ASSISTANT'],

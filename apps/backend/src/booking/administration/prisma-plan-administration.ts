@@ -122,6 +122,10 @@ export const createPrismaPlanAdministration = (
         });
         if (previous === null) throw new AdministrationError('plan_not_found');
         if ((previous.hiddenAt === null) === input.visible) return previous;
+        // Only a hidden Plan may cost Bs 0 (Courtesy Access, REL-011).
+        if (input.visible && previous.priceCentavos === 0) {
+          throw new AdministrationError('invalid_catalog_value');
+        }
         const plan = await transaction.plan.update({
           where: { id: input.planId },
           data: { hiddenAt: input.visible ? null : dependencies.now() },
