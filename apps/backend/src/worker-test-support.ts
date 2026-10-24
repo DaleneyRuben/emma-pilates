@@ -29,6 +29,9 @@ export const occurrenceJobs = () => ({
   startedSessionWaitlists: {
     execute: jest.fn().mockResolvedValue({ closed: 0 }),
   },
+  trainerPayDrafts: {
+    execute: jest.fn().mockResolvedValue({ drafted: 0 }),
+  },
   retentionSweeps: {
     execute: jest.fn().mockResolvedValue({
       idempotencyRecords: 0,

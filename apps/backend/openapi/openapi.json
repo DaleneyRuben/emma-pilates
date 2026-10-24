@@ -5533,6 +5533,90 @@
         ]
       }
     },
+    "/api/v1/administrator/studio-settings": {
+      "get": {
+        "operationId": "getStudioSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorStudioSettings"
+        ]
+      },
+      "put": {
+        "operationId": "updateStudioSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStudioSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorStudioSettings"
+        ]
+      }
+    },
+    "/api/v1/studio-rules": {
+      "get": {
+        "operationId": "getStudioRules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioRulesDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "StudioRules"
+        ]
+      }
+    },
     "/api/v1/administrator/clients/{clientId}/acquisition": {
       "get": {
         "operationId": "getClientAcquisition",
@@ -5694,90 +5778,6 @@
         "summary": "",
         "tags": [
           "AdministratorTrainerReferralCode"
-        ]
-      }
-    },
-    "/api/v1/administrator/studio-settings": {
-      "get": {
-        "operationId": "getStudioSettings",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StudioSettingsDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": [
-          "AdministratorStudioSettings"
-        ]
-      },
-      "put": {
-        "operationId": "updateStudioSettings",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateStudioSettingsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StudioSettingsDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": [
-          "AdministratorStudioSettings"
-        ]
-      }
-    },
-    "/api/v1/studio-rules": {
-      "get": {
-        "operationId": "getStudioRules",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StudioRulesDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "",
-        "tags": [
-          "StudioRules"
         ]
       }
     },
@@ -8104,6 +8104,150 @@
         "summary": "",
         "tags": [
           "AdministratorFinance"
+        ]
+      }
+    },
+    "/api/v1/administrator/pay-statements": {
+      "get": {
+        "operationId": "listPayStatements",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-09",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayStatementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayStatements"
+        ]
+      }
+    },
+    "/api/v1/administrator/pay-statements/draft": {
+      "post": {
+        "operationId": "draftPayStatements",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-09",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayStatementDraftDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayStatements"
+        ]
+      }
+    },
+    "/api/v1/administrator/pay-statements/{statementId}/approve": {
+      "post": {
+        "operationId": "approvePayStatement",
+        "parameters": [
+          {
+            "name": "statementId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayStatementDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayStatements"
+        ]
+      }
+    },
+    "/api/v1/trainer/pay-statements": {
+      "get": {
+        "operationId": "listOwnPayStatements",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayStatementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerPayStatements"
         ]
       }
     },
@@ -13500,148 +13644,6 @@
           "consented"
         ]
       },
-      "AcquisitionReferrerDto": {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "type": "string",
-            "enum": [
-              "client",
-              "trainer"
-            ]
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "kind",
-          "id",
-          "name"
-        ]
-      },
-      "ClientAcquisitionDto": {
-        "type": "object",
-        "properties": {
-          "clientId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "channel": {
-            "type": "string",
-            "enum": [
-              "instagram",
-              "tiktok",
-              "facebook",
-              "google",
-              "friend",
-              "trainer",
-              "walk_in",
-              "other",
-              "unknown"
-            ],
-            "description": "The attribution: a Referral Code makes it `friend` (a Client’s) or `trainer` (a Trainer’s); `unknown` before the question existed"
-          },
-          "declaredChannel": {
-            "type": "string",
-            "enum": [
-              "instagram",
-              "tiktok",
-              "facebook",
-              "google",
-              "friend",
-              "trainer",
-              "walk_in",
-              "other",
-              "unknown"
-            ],
-            "description": "What she answered to «¿Cómo nos conociste?»"
-          },
-          "referralCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "referrer": {
-            "nullable": true,
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AcquisitionReferrerDto"
-              }
-            ]
-          }
-        },
-        "required": [
-          "clientId",
-          "channel",
-          "declaredChannel",
-          "referralCode",
-          "referrer"
-        ]
-      },
-      "CorrectClientAcquisitionDto": {
-        "type": "object",
-        "properties": {
-          "channel": {
-            "type": "string",
-            "enum": [
-              "instagram",
-              "tiktok",
-              "facebook",
-              "google",
-              "friend",
-              "trainer",
-              "walk_in",
-              "other"
-            ]
-          },
-          "referralCode": {
-            "type": "string",
-            "nullable": true,
-            "description": "A Client’s or Trainer’s Referral Code; it wins over the channel"
-          }
-        },
-        "required": [
-          "channel",
-          "referralCode"
-        ]
-      },
-      "TrainerReferralCodeDto": {
-        "type": "object",
-        "properties": {
-          "staffMemberId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "referralCode": {
-            "type": "string",
-            "nullable": true,
-            "example": "CARLA"
-          }
-        },
-        "required": [
-          "staffMemberId",
-          "referralCode"
-        ]
-      },
-      "SetTrainerReferralCodeDto": {
-        "type": "object",
-        "properties": {
-          "referralCode": {
-            "type": "string",
-            "nullable": true,
-            "example": "CARLA",
-            "description": "3 to 20 letters, digits, or hyphens, not starting with REF-; null removes the code"
-          }
-        },
-        "required": [
-          "referralCode"
-        ]
-      },
       "StudioSettingsDto": {
         "type": "object",
         "properties": {
@@ -13829,6 +13831,148 @@
           "plansFromPriceCentavos",
           "startDateLimitDays",
           "openingDate"
+        ]
+      },
+      "AcquisitionReferrerDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "client",
+              "trainer"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "name"
+        ]
+      },
+      "ClientAcquisitionDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other",
+              "unknown"
+            ],
+            "description": "The attribution: a Referral Code makes it `friend` (a Client’s) or `trainer` (a Trainer’s); `unknown` before the question existed"
+          },
+          "declaredChannel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other",
+              "unknown"
+            ],
+            "description": "What she answered to «¿Cómo nos conociste?»"
+          },
+          "referralCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "referrer": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AcquisitionReferrerDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "clientId",
+          "channel",
+          "declaredChannel",
+          "referralCode",
+          "referrer"
+        ]
+      },
+      "CorrectClientAcquisitionDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other"
+            ]
+          },
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "A Client’s or Trainer’s Referral Code; it wins over the channel"
+          }
+        },
+        "required": [
+          "channel",
+          "referralCode"
+        ]
+      },
+      "TrainerReferralCodeDto": {
+        "type": "object",
+        "properties": {
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "CARLA"
+          }
+        },
+        "required": [
+          "staffMemberId",
+          "referralCode"
+        ]
+      },
+      "SetTrainerReferralCodeDto": {
+        "type": "object",
+        "properties": {
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "CARLA",
+            "description": "3 to 20 letters, digits, or hyphens, not starting with REF-; null removes the code"
+          }
+        },
+        "required": [
+          "referralCode"
         ]
       },
       "SetClientPhotoDto": {
@@ -15497,6 +15641,94 @@
         },
         "required": [
           "seeded"
+        ]
+      },
+      "PayStatementLineDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "class",
+              "minimum_not_met",
+              "commission"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          }
+        },
+        "required": [
+          "kind",
+          "detail",
+          "amountCentavos"
+        ]
+      },
+      "PayStatementDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffMemberName": {
+            "type": "string"
+          },
+          "month": {
+            "type": "string",
+            "format": "date"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "approved"
+            ]
+          },
+          "totalCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "salaryPaymentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PayStatementLineDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "staffMemberId",
+          "staffMemberName",
+          "month",
+          "state",
+          "totalCentavos",
+          "salaryPaymentId",
+          "lines"
+        ]
+      },
+      "PayStatementDraftDto": {
+        "type": "object",
+        "properties": {
+          "drafted": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "drafted"
         ]
       },
       "CashCloseDto": {

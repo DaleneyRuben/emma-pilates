@@ -48,6 +48,7 @@ const startWithPush = async () => {
     minimumBookingsChecks: idle({ checked: 0, cancelled: 0 }),
     windowCloseSnapshots: idle({ recorded: 0 }),
     startedSessionWaitlists: idle({ closed: 0 }),
+    trainerPayDrafts: idle({ drafted: 0 }),
     pushDispatch: { dispatch },
     pushReceipts,
     retentionSweeps: idle({

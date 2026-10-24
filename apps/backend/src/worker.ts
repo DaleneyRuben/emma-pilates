@@ -42,6 +42,7 @@ const evaluationSlotIntervalMs = 60 * 60 * 1_000;
 const evaluationReminderIntervalMs = 60 * 1_000;
 const sessionStartCheckIntervalMs = 60 * 1_000;
 const retentionSweepIntervalMs = 60 * 60 * 1_000;
+const trainerPayDraftIntervalMs = 60 * 60 * 1_000;
 const pushReceiptIntervalMs = 5 * 60 * 1_000;
 
 type QueueStatsSnapshot = {
@@ -107,6 +108,9 @@ type WorkerDependencies = {
   pushDispatch: Pick<PushDispatchWorkerDependencies, 'dispatch'>;
   pushReceipts: {
     execute(): Promise<CheckPushReceiptsResult>;
+  };
+  trainerPayDrafts: {
+    execute(): Promise<{ drafted: number }>;
   };
   retentionSweeps: {
     execute(): Promise<{
@@ -259,6 +263,17 @@ export const startWorker = async (
           {
             job: 'push_receipts',
             execute: () => dependencies.pushReceipts.execute(),
+          },
+        ],
+      },
+      // Trainer statements for the previous month and the current one
+      // (BKO-006). Hourly is enough: approval is what pays.
+      {
+        intervalMs: trainerPayDraftIntervalMs,
+        steps: [
+          {
+            job: 'trainer_pay_draft',
+            execute: () => dependencies.trainerPayDrafts.execute(),
           },
         ],
       },

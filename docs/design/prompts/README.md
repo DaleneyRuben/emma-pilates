@@ -283,6 +283,7 @@ Each of these was sent as the next message in the existing design session for th
 | [206](./followups/199-evaluation-price-and-history.md) | `13` and `14` name an included Evaluation or the settings price; `15` stops saying every past Evaluation is «Realizada» (NUT-003) | 🕓 pending |
 | [207](./followups/200-evaluation-income-apart.md) | `AW16` splits Plan income and Evaluation income under the method line (NUT-003) | 🕓 pending |
 | [208](./followups/201-aw16-finanzas-tab.md) | `AW16` gains Reporte and Finanzas tabs; Finanzas shows the month's cash income, tax, budget against actual, Nutritionist cost, result, and break-even (BKO-005) | 🕓 pending |
+| [209](./followups/202-trainer-pay-statements.md) | A new «Pagos a instructoras» page beside `AW11`, and «Mis pagos» on the Trainer frame of `S23` (BKO-006) | 🕓 pending |
 
 ## Status
 
