@@ -13,7 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
+import { cn } from "../../lib/cn";
 import type { PageWindow } from "./pagination";
 import { TablePagination, type RangeLabel } from "./table-pagination";
 
@@ -35,7 +36,10 @@ type DataTableProps<Row> = {
   onRowClick?: (row: Row) => void;
   /** Rows the click opens; the others stay plain (every row by default). */
   canClickRow?: (row: Row) => boolean;
-  pagination: PageWindow & {
+  /** Extra attributes for a row, such as AW151's tint for a difference. */
+  rowProps?: (row: Row) => ComponentProps<"tr">;
+  /** A month view (AW151) shows every row and its own summary instead. */
+  pagination?: PageWindow & {
     onPageChange: (page: number) => void;
     rangeLabel?: RangeLabel;
   };
@@ -54,6 +58,7 @@ export function DataTable<Row>({
   emptyMessage = "No hay registros.",
   onRowClick,
   canClickRow = () => true,
+  rowProps,
   pagination,
 }: DataTableProps<Row>) {
   // TanStack Table hands back functions the React Compiler cannot memoize;
@@ -65,7 +70,7 @@ export function DataTable<Row>({
     getRowId: rowId,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    rowCount: pagination.totalItems,
+    rowCount: pagination?.totalItems ?? rows.length,
   });
 
   const headerLabel = (columnId: string): string => {
@@ -115,13 +120,18 @@ export function DataTable<Row>({
             table.getRowModel().rows.map((row) => {
               const clickable =
                 onRowClick !== undefined && canClickRow(row.original);
+              const extra = rowProps?.(row.original) ?? {};
               return (
                 <TableRow
                   key={row.id}
+                  {...extra}
                   onClick={
                     clickable ? () => onRowClick(row.original) : undefined
                   }
-                  className={clickable ? "cursor-pointer" : undefined}
+                  className={cn(
+                    clickable ? "cursor-pointer" : undefined,
+                    extra.className,
+                  )}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
@@ -145,7 +155,9 @@ export function DataTable<Row>({
           )}
         </TableBody>
       </Table>
-      <TablePagination {...pagination} shown={rows.length} />
+      {pagination === undefined ? null : (
+        <TablePagination {...pagination} shown={rows.length} />
+      )}
     </div>
   );
 }

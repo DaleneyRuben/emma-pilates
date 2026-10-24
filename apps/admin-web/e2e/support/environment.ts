@@ -22,5 +22,9 @@ export const fixtures = {
     name: "Paola Mendoza",
   },
   assistant: { email: "camila.rojas@example.com" },
+  coordinator: {
+    email: "carolina.rivas@example.com",
+    name: "Carolina Rivas",
+  },
   password: "emma-local-2026",
 } as const;

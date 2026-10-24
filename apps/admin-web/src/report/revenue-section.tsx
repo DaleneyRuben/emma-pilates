@@ -26,10 +26,17 @@ function Figure({ name, figure }: { name: string; figure: string }) {
 
 // STU-002: cash, accrued by validity days, and deferred, beside the cash
 // report. Classes still owed are today's remaining allowance, not a month.
-export function RevenueSection() {
+export function RevenueSection({ active = true }: { active?: boolean }) {
   const latest = boliviaMonth();
   const [month, setMonth] = useState(latest);
-  const revenue = useQuery(revenueReportQueryOptions(month));
+  const revenue = useQuery({
+    ...revenueReportQueryOptions(month),
+    enabled: active,
+  });
+
+  if (!active) {
+    return null;
+  }
 
   return (
     <section aria-label="Ingreso devengado" className="flex flex-col gap-3">

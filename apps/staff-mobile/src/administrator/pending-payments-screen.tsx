@@ -26,12 +26,16 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { useStaffFetcher } from "../staff-fetcher";
+import { HeaderAction } from "../ui/header-action";
 import { RootHeader } from "../ui/root-header";
 
 export type PaymentsNotice = "Pago confirmado" | "Pago rechazado";
 
 type PendingPaymentsNavigation = {
-  navigate: (screen: "ReviewPayment" | "CancelClass", params?: { paymentId: string }) => void;
+  navigate: (
+    screen: "ReviewPayment" | "CancelClass" | "CashClose",
+    params?: { paymentId: string },
+  ) => void;
   setParams: (params: { notice?: PaymentsNotice }) => void;
 };
 
@@ -67,7 +71,17 @@ export function PendingPaymentsScreen({
 
   const header = (
     <>
-      <RootHeader label="Pagos pendientes" title="Pagos pendientes" />
+      <RootHeader
+        action={
+          <HeaderAction
+            label="Cerrar caja"
+            onPress={() => navigation.navigate("CashClose")}
+            testID="cash-close-entry"
+          />
+        }
+        label="Pagos pendientes"
+        title="Pagos pendientes"
+      />
       {notice === null ? null : (
         <View accessibilityRole="alert" style={styles.notice}>
           <Text style={styles.noticeText}>{notice}</Text>

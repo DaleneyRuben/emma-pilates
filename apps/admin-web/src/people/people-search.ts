@@ -13,7 +13,12 @@ export const staffRoles = [
   "assistant",
   "administrator",
   "nutritionist",
+  "coordinator",
 ] as const;
+
+/** Administrators and the Coordinator hold every Branch implicitly. */
+export const holdsEveryBranch = (role: unknown): boolean =>
+  role === "administrator" || role === "coordinator";
 export type StaffRole = (typeof staffRoles)[number];
 
 // AW23: one Role at a time, "Todos" by default (ADR-0062 allowlist).

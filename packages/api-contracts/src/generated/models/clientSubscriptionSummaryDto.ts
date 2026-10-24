@@ -14,4 +14,15 @@ export interface ClientSubscriptionSummaryDto {
   remainingClassAllowance: number;
   startsOn: string;
   endsOn: string;
+  /**
+   * «Clases extra: 1 · Regalo de bienvenida» when extra classes remain
+   * @nullable
+   */
+  extraClassesLine?: string | null;
+  /**
+   * Classes left this week from the base allowance. Absent without a cap.
+   * @minimum 0
+   * @nullable
+   */
+  classesLeftThisWeek?: number | null;
 }
