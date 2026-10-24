@@ -101,7 +101,8 @@ export const startEvaluationTestWorld =
             create: {
               planId: plan.id,
               planNameSnapshot: plan.name,
-              durationMonthsSnapshot: plan.durationMonths,
+              durationDaysSnapshot:
+                key === 'ana' || key === 'bea' ? 90 : plan.durationDays,
               originalClassAllowance: plan.classAllowance,
               remainingClassAllowance: plan.classAllowance,
               startsOn: new Date('2026-09-01T00:00:00.000Z'),

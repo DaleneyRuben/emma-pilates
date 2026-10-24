@@ -7,9 +7,14 @@ const audible = [
   'session_assigned',
   'evaluation_reminder_day',
   'evaluation_reminder_hour',
+  'class_reminder_day',
+  'class_reminder_hour',
   'evaluation_cancelled_by_studio',
   'payment_submitted',
   'payment_rejected',
+  'freeze_requested',
+  'freeze_approved',
+  'freeze_refused',
 ];
 const silent = [
   'evaluation_booked',
@@ -22,10 +27,13 @@ const silent = [
 const privateTypes = [
   'evaluation_reminder_day',
   'evaluation_reminder_hour',
+  'class_reminder_day',
+  'class_reminder_hour',
   'evaluation_cancelled_by_studio',
   'evaluation_booked',
   'evaluation_cancelled',
   'payment_rejected',
+  'freeze_refused',
 ];
 
 describe('notification catalog (ADR-0070)', () => {

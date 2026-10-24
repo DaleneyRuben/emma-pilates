@@ -7,6 +7,7 @@ import {
   BackLink,
   BodyText,
   colors,
+  fontFamilies,
   formatTimeRange,
   Heading,
   LoadingState,
@@ -27,7 +28,10 @@ import { createTrainerApi } from "../trainer-api";
 import { requireOk } from "./require-ok";
 
 type AttendanceOutcome = "attended" | "no_show";
-type TrainerRosterNavigation = { goBack: () => void };
+type TrainerRosterNavigation = {
+  goBack: () => void;
+  navigate: (screen: "ReportFault", params: { sessionId: string }) => void;
+};
 
 function savedOutcomes(bookings: TrainerRosterBookingDto[]): Record<string, AttendanceOutcome> {
   return Object.fromEntries(
@@ -39,6 +43,7 @@ function savedOutcomes(bookings: TrainerRosterBookingDto[]): Record<string, Atte
   );
 }
 
+// S03: the attendance list of a Session the Trainer leads.
 export function TrainerRosterScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<TrainerRosterNavigation>();
   const fetcher = useStaffFetcher();
@@ -100,6 +105,16 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
       <BackLink onPress={() => navigation.goBack()} />
       <Heading accessibilityLabel={session.classTypeName}>{session.classTypeName}</Heading>
       <BodyText>{`${session.branchName} · ${formatTimeRange(session.startsAt, session.endsAt)}`}</BodyText>
+      {/* Follow-up 171: a fault can be found at any time, before or after the class. */}
+      <Pressable
+        accessibilityLabel="Reportar una falla"
+        accessibilityRole="button"
+        onPress={() => navigation.navigate("ReportFault", { sessionId: session.sessionId })}
+        style={styles.reportFault}
+        testID="roster-report-fault"
+      >
+        <Text style={styles.reportFaultText}>Reportar una falla</Text>
+      </Pressable>
       <ScrollView contentContainerStyle={styles.list}>
         {session.bookings.length === 0 ? (
           <BodyText>No hay reservas para esta sesión.</BodyText>
@@ -158,6 +173,13 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
 }
 
 const styles = StyleSheet.create({
+  reportFault: { alignSelf: "flex-start", justifyContent: "center", minHeight: 44 },
+  reportFaultText: {
+    color: colors.primary,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.body,
+    fontWeight: "500",
+  },
   centered: {
     alignItems: "center",
     flex: 1,

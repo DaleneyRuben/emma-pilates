@@ -16,9 +16,12 @@ import {
 
 import { CancelClassScreen } from "./administrator/cancel-class-screen";
 import { CancelSessionScreen } from "./administrator/cancel-session-screen";
+import { FreezesScreen } from "./administrator/freezes-screen";
 import { PendingPaymentsScreen } from "./administrator/pending-payments-screen";
+import { ReviewFreezeScreen } from "./administrator/review-freeze-screen";
 import { ReviewPaymentScreen } from "./administrator/review-payment-screen";
 import { AssistantWorkspaceProvider } from "./assistant/assistant-workspace";
+import { createCoordinatorStack } from "./coordinator/coordinator-stack";
 import { AssistantRescheduleScreen } from "./assistant/assistant-reschedule-screen";
 import { AssistantSessionDetailScreen } from "./assistant/assistant-session-detail-screen";
 import { BrowseSessionsScreen } from "./assistant/browse-sessions-screen";
@@ -27,6 +30,7 @@ import { ClientHistoryScreen } from "./assistant/client-history-screen";
 import { ClientOverviewScreen } from "./assistant/client-overview-screen";
 import { ClientSearchScreen } from "./assistant/client-search-screen";
 import { ConfirmCashPaymentScreen } from "./assistant/confirm-cash-payment-screen";
+import { CashCloseScreen } from "./cash-close/cash-close-screen";
 import { NewClientScreen } from "./assistant/new-client-screen";
 import { SelectPlanScreen } from "./assistant/select-plan-screen";
 import {
@@ -45,9 +49,12 @@ import type { StaffRole } from "./notifications/notification-destinations";
 import { StaffPushNotifications } from "./notifications/staff-push-notifications";
 import { NutritionistAgendaScreen } from "./nutritionist/nutritionist-agenda-screen";
 import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
+import { StaffFeedbackScreen } from "./profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { StaffFetcherContext, unavailableFetcher } from "./staff-fetcher";
+import { StaffRoleContext } from "./staff-role";
+import { ReportFaultScreen } from "./trainer/report-fault-screen";
 import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
 import { TrainerRosterScreen } from "./trainer/trainer-roster-screen";
 
@@ -55,6 +62,7 @@ const accountScreens = {
   Profile: StaffProfileScreen,
   Notifications: StaffNotificationsScreen,
   ChangePassword: StaffChangePasswordScreen,
+  Feedback: StaffFeedbackScreen,
 };
 
 const TrainerStack = createNativeStackNavigator({
@@ -63,6 +71,7 @@ const TrainerStack = createNativeStackNavigator({
   screens: {
     Agenda: TrainerAgendaScreen,
     Roster: TrainerRosterScreen,
+    ReportFault: ReportFaultScreen,
     ...accountScreens,
   },
 });
@@ -80,6 +89,7 @@ const AssistantStack = createNativeStackNavigator({
     ClientBookings: ClientBookingsScreen,
     Reschedule: AssistantRescheduleScreen,
     ClientHistory: ClientHistoryScreen,
+    CashClose: CashCloseScreen,
     ...accountScreens,
   },
 });
@@ -89,9 +99,12 @@ const AdministratorStack = createNativeStackNavigator({
   screens: {
     Payments: PendingPaymentsScreen,
     ReviewPayment: ReviewPaymentScreen,
+    Freezes: FreezesScreen,
+    ReviewFreeze: ReviewFreezeScreen,
     CancelClass: CancelClassScreen,
     CancelSession: CancelSessionScreen,
     ViewAs: ViewAsScreen,
+    CashClose: CashCloseScreen,
     ...accountScreens,
   },
 });
@@ -108,6 +121,7 @@ const NutritionistStack = createNativeStackNavigator({
 const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNavigation>> = {
   administrator: createStaticNavigation(AdministratorStack),
   assistant: createStaticNavigation(AssistantStack),
+  coordinator: createStaticNavigation(createCoordinatorStack(accountScreens)),
   nutritionist: createStaticNavigation(NutritionistStack),
   trainer: createStaticNavigation(TrainerStack),
 };
@@ -188,20 +202,22 @@ export function StaffNavigation({
       <MobileQueryProvider accountId={accountId}>
         <StaffFetcherContext.Provider value={fetcher}>
           <AssistantWorkspaceProvider>
-            <ImpersonationContext.Provider value={impersonationState}>
-              {impersonation === undefined ? (
-                navigator
-              ) : (
-                <SafeAreaProvider initialMetrics={windowMetrics} style={styles.underBanner}>
-                  <UnderBanner>{navigator}</UnderBanner>
-                  <ImpersonationBanner
-                    impersonation={impersonation}
-                    onExit={onExit}
-                    onExpire={onExpire}
-                  />
-                </SafeAreaProvider>
-              )}
-            </ImpersonationContext.Provider>
+            <StaffRoleContext.Provider value={role}>
+              <ImpersonationContext.Provider value={impersonationState}>
+                {impersonation === undefined ? (
+                  navigator
+                ) : (
+                  <SafeAreaProvider initialMetrics={windowMetrics} style={styles.underBanner}>
+                    <UnderBanner>{navigator}</UnderBanner>
+                    <ImpersonationBanner
+                      impersonation={impersonation}
+                      onExit={onExit}
+                      onExpire={onExpire}
+                    />
+                  </SafeAreaProvider>
+                )}
+              </ImpersonationContext.Provider>
+            </StaffRoleContext.Provider>
           </AssistantWorkspaceProvider>
         </StaffFetcherContext.Provider>
       </MobileQueryProvider>
@@ -218,7 +234,6 @@ export function StaffNavigation({
     />
   );
 }
-
 const styles = StyleSheet.create({
   pushedDown: { flex: 1 },
   underBanner: { flex: 1 },

@@ -6,7 +6,9 @@ export type StaffNotificationRoute =
   | readonly ["Agenda"]
   | readonly ["ClientOverview", { clientId: string }]
   | readonly ["Payments"]
-  | readonly ["ReviewPayment", { paymentId: string }];
+  | readonly ["ReviewPayment", { paymentId: string }]
+  | readonly ["Freezes"]
+  | readonly ["ReviewFreeze", { freezeId: string }];
 
 // The one map from a notification's destination to a Staff screen, shared by
 // the inbox and push taps (NOT-002). Mi agenda is the root of the Trainer and
@@ -28,6 +30,9 @@ export function staffNotificationDestination(
   }
   if (role === "assistant" && destinationType === "client" && destinationId !== null) {
     return ["ClientOverview", { clientId: destinationId }];
+  }
+  if (role === "administrator" && destinationType === "freeze") {
+    return destinationId === null ? ["Freezes"] : ["ReviewFreeze", { freezeId: destinationId }];
   }
   return null;
 }

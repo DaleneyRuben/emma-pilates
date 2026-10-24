@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button, select { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:2200px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW151</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Cierres de caja</h1>
+    <p style="margin:0;max-width:880px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">El historial de cierres de caja de la sucursal elegida, un mes a la vez (BKO-003). Solo lectura: los cierres se hacen en la app de staff (S25) y nunca se editan. Solo la administradora lo ve.</p>
+  </header>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
+          <div style="font-size:12px;color:#766D69;">Aviso de días sin cierre · diferencias resaltadas · ajuste posterior</div>
+        </div>
+      </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/back-office/caja
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #B78380;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Centro
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:860px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Caja</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
+        </nav>
+
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Cierres de caja</h2>
+              <div style="font-size:12.5px;color:#766D69;">Sucursal Centro</div>
+            </div>
+            <div style="height:34px;width:fit-content;display:flex;align-items:center;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;overflow:hidden;">
+              <button aria-label="Mes anterior" style="width:32px;height:100%;border:none;border-right:1px solid #F2EBE2;background:transparent;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg></button>
+              <div style="padding:0 14px;font-size:12.5px;font-weight:500;">octubre de 2026</div>
+              <button disabled="" aria-label="Mes siguiente" style="width:32px;height:100%;border:none;border-left:1px solid #F2EBE2;background:#F7F1EA;opacity:0.6;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"></path></svg></button>
+            </div>
+            <div role="status" style="display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid rgba(201,154,78,0.4);border-radius:12px;background:rgba(201,154,78,0.10);">
+              <span style="font-size:14px;font-weight:500;color:#9A7434;">2 días con ventas en efectivo sin cierre</span>
+              <span style="font-size:13px;color:#6E6663;">Revisa con recepción qué pasó esos días.</span>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+              <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.7fr);gap:14px;padding:11px 20px;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;"><div style="">Fecha</div><div style="">Estado</div><div style="text-align:right;">Esperado</div><div style="text-align:right;">Contado</div><div style="text-align:right;">Diferencia</div><div style="text-align:right;">Ajuste</div><div style="">Cerró</div><div style="">Nota</div></div>
+              <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.7fr);align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;background:rgba(178,93,75,0.06);">
+                <div style="font-weight:500;">vie 23/10</div>
+                <div><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(124,148,115,0.15);color:#5F7457;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#7C9473;"></span>Cerrada</span></div>
+                <div style="text-align:right;color:#4A4A4A;">Bs 520,00</div>
+                <div style="text-align:right;">Bs 510,00</div>
+                <div style="text-align:right;"><span style="color:#94493A;font-weight:500;">−Bs 10,00</span></div>
+                <div style="text-align:right;"></div>
+                <div style="font-size:12.5px;color:#6E6663;">Camila Rojas · 19:05</div>
+                <div style="font-size:12.5px;color:#6E6663;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="Faltó cambio para un billete de 200">Faltó cambio para un billete de 200</div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.7fr);align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;">
+                <div style="font-weight:500;">jue 22/10</div>
+                <div><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(201,154,78,0.15);color:#9A7434;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#C99A4E;"></span>Sin cierre</span></div>
+                <div style="text-align:right;color:#7A716D;">Bs 300,00</div>
+                <div style="text-align:right;"><span style="color:#7A716D;">—</span></div>
+                <div style="text-align:right;"><span style="color:#7A716D;">—</span></div>
+                <div style="text-align:right;"></div>
+                <div style="font-size:12.5px;color:#6E6663;"><span style="color:#7A716D;">—</span></div>
+                <div style="font-size:12.5px;color:#6E6663;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title=""></div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.7fr);align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;">
+                <div style="font-weight:500;">mié 21/10</div>
+                <div><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(124,148,115,0.15);color:#5F7457;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#7C9473;"></span>Cerrada</span></div>
+                <div style="text-align:right;color:#4A4A4A;">Bs 760,00</div>
+                <div style="text-align:right;">Bs 760,00</div>
+                <div style="text-align:right;"><span style="color:#6E6663;">Bs 0,00</span></div>
+                <div style="text-align:right;"><span title="Una venta anulada o registrada después del cierre cambió las ventas del día." style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:#6E6663;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>−Bs 250,00</span></div>
+                <div style="font-size:12.5px;color:#6E6663;">Camila Rojas · 19:12</div>
+                <div style="font-size:12.5px;color:#6E6663;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title=""></div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.7fr);align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;background:rgba(201,154,78,0.08);">
+                <div style="font-weight:500;">mar 20/10</div>
+                <div><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(124,148,115,0.15);color:#5F7457;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#7C9473;"></span>Cerrada</span></div>
+                <div style="text-align:right;color:#4A4A4A;">Bs 250,00</div>
+                <div style="text-align:right;">Bs 255,00</div>
+                <div style="text-align:right;"><span style="color:#9A7434;font-weight:500;">+Bs 5,00</span></div>
+                <div style="text-align:right;"></div>
+                <div style="font-size:12.5px;color:#6E6663;">Camila Rojas · 19:01</div>
+                <div style="font-size:12.5px;color:#6E6663;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="Sobró una moneda de 5">Sobró una moneda de 5</div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.7fr);align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;">
+                <div style="font-weight:500;">lun 19/10</div>
+                <div><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(124,148,115,0.15);color:#5F7457;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#7C9473;"></span>Cerrada</span></div>
+                <div style="text-align:right;color:#4A4A4A;">Bs 980,00</div>
+                <div style="text-align:right;">Bs 980,00</div>
+                <div style="text-align:right;"><span style="color:#6E6663;">Bs 0,00</span></div>
+                <div style="text-align:right;"></div>
+                <div style="font-size:12.5px;color:#6E6663;">Paola Mendoza · 20:15</div>
+                <div style="font-size:12.5px;color:#6E6663;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title=""></div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.7fr);align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;">
+                <div style="font-weight:500;">sáb 18/10</div>
+                <div><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(201,154,78,0.15);color:#9A7434;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#C99A4E;"></span>Sin cierre</span></div>
+                <div style="text-align:right;color:#7A716D;">Bs 480,00</div>
+                <div style="text-align:right;"><span style="color:#7A716D;">—</span></div>
+                <div style="text-align:right;"><span style="color:#7A716D;">—</span></div>
+                <div style="text-align:right;"></div>
+                <div style="font-size:12.5px;color:#6E6663;"><span style="color:#7A716D;">—</span></div>
+                <div style="font-size:12.5px;color:#6E6663;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title=""></div>
+              </div>
+            </div>
+            <div style="font-size:12.5px;color:#6E6663;">6 días con ventas en efectivo · 4 cerrados · 2 sin cierre</div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Todo cerrado</div>
+          <div style="font-size:12px;color:#766D69;">Sin aviso ni filas teñidas</div>
+        </div>
+      </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/back-office/caja
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #B78380;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Centro
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:860px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Caja</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
+        </nav>
+
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Cierres de caja</h2>
+              <div style="font-size:12.5px;color:#766D69;">Sucursal Centro</div>
+            </div>
+            <div style="height:34px;width:fit-content;display:flex;align-items:center;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;overflow:hidden;">
+              <button aria-label="Mes anterior" style="width:32px;height:100%;border:none;border-right:1px solid #F2EBE2;background:transparent;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg></button>
+              <div style="padding:0 14px;font-size:12.5px;font-weight:500;">octubre de 2026</div>
+              <button disabled="" aria-label="Mes siguiente" style="width:32px;height:100%;border:none;border-left:1px solid #F2EBE2;background:#F7F1EA;opacity:0.6;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"></path></svg></button>
+            </div>
+            
+            <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+              <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.7fr);gap:14px;padding:11px 20px;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;"><div style="">Fecha</div><div style="">Estado</div><div style="text-align:right;">Esperado</div><div style="text-align:right;">Contado</div><div style="text-align:right;">Diferencia</div><div style="text-align:right;">Ajuste</div><div style="">Cerró</div><div style="">Nota</div></div>
+              <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,1.7fr);align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;">
+                <div style="font-weight:500;">lun 19/10</div>
+                <div><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(124,148,115,0.15);color:#5F7457;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#7C9473;"></span>Cerrada</span></div>
+                <div style="text-align:right;color:#4A4A4A;">Bs 980,00</div>
+                <div style="text-align:right;">Bs 980,00</div>
+                <div style="text-align:right;"><span style="color:#6E6663;">Bs 0,00</span></div>
+                <div style="text-align:right;"></div>
+                <div style="font-size:12.5px;color:#6E6663;">Paola Mendoza · 20:15</div>
+                <div style="font-size:12.5px;color:#6E6663;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title=""></div>
+              </div>
+            </div>
+            <div style="font-size:12.5px;color:#6E6663;">1 día con ventas en efectivo · 1 cerrado · 0 sin cierre</div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Sin movimientos</div>
+          <div style="font-size:12px;color:#766D69;">Mes sin ventas en efectivo ni cierres</div>
+        </div>
+      </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/back-office/caja
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #B78380;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Centro
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:860px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Caja</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
+        </nav>
+
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Cierres de caja</h2>
+              <div style="font-size:12.5px;color:#766D69;">Sucursal Centro</div>
+            </div>
+            <div style="height:34px;width:fit-content;display:flex;align-items:center;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;overflow:hidden;">
+              <button aria-label="Mes anterior" style="width:32px;height:100%;border:none;border-right:1px solid #F2EBE2;background:transparent;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg></button>
+              <div style="padding:0 14px;font-size:12.5px;font-weight:500;">octubre de 2026</div>
+              <button disabled="" aria-label="Mes siguiente" style="width:32px;height:100%;border:none;border-left:1px solid #F2EBE2;background:#F7F1EA;opacity:0.6;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"></path></svg></button>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:64px 32px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+              <div style="width:52px;height:52px;border-radius:50%;background:#F7F1EA;display:flex;align-items:center;justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C3B6AC" stroke-width="1.5"><rect x="3" y="6" width="18" height="13" rx="2"></rect><circle cx="12" cy="12.5" r="2.5"></circle></svg></div>
+              <div style="font-family:Lora,Georgia,serif;font-size:20px;">No hubo ventas en efectivo ni cierres en este mes.</div>
+              <p style="margin:0;font-size:13.5px;color:#766D69;">Prueba con otro mes o con otra sucursal.</p>
+            </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
+          <div style="font-size:12px;color:#766D69;">Tarjetas apiladas; el tinte de la diferencia se mantiene</div>
+        </div>
+      </sc-if>
+      <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+        <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            admin.emmapilates.bo/back-office/caja
+          </div>
+        </div>
+        <div style="height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:20px;line-height:1;">Emma</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button style="height:28px;display:flex;align-items:center;gap:5px;padding:0 9px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:11.5px;color:#4A4A4A;cursor:pointer;">Equipetrol<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
+            <div style="width:28px;height:28px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+          </div>
+        </div>
+        <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
+          <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:23px;">Cierres de caja</h2>
+          <div style="font-size:12.5px;color:#766D69;margin-top:-8px;">Sucursal Centro</div>
+          <div style="height:34px;width:fit-content;display:flex;align-items:center;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;overflow:hidden;">
+              <button aria-label="Mes anterior" style="width:32px;height:100%;border:none;border-right:1px solid #F2EBE2;background:transparent;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg></button>
+              <div style="padding:0 14px;font-size:12.5px;font-weight:500;">octubre de 2026</div>
+              <button disabled="" aria-label="Mes siguiente" style="width:32px;height:100%;border:none;border-left:1px solid #F2EBE2;background:#F7F1EA;opacity:0.6;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"></path></svg></button>
+            </div>
+          <div role="status" style="display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid rgba(201,154,78,0.4);border-radius:12px;background:rgba(201,154,78,0.10);">
+              <span style="font-size:14px;font-weight:500;color:#9A7434;">2 días con ventas en efectivo sin cierre</span>
+              <span style="font-size:13px;color:#6E6663;">Revisa con recepción qué pasó esos días.</span>
+            </div>
+          <div style="display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid #E4D8CC;border-radius:12px;background:rgba(178,93,75,0.06);">
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-weight:500;font-size:14px;">vie 23/10</span><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(124,148,115,0.15);color:#5F7457;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#7C9473;"></span>Cerrada</span></div>
+              <div style="display:flex;justify-content:flex-end;gap:18px;"><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Esperado</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 520,00</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Contado</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 510,00</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Diferencia</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;"><span style="color:#94493A;">−Bs 10,00</span></span></div></div>
+              <span style="font-size:12px;color:#6E6663;">Cerró Camila Rojas · 19:05</span><span style="font-size:12px;color:#6E6663;">Faltó cambio para un billete de 200</span>
+            </div>
+<div style="display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid #E4D8CC;border-radius:12px;background:#FFFFFF;">
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-weight:500;font-size:14px;">jue 22/10</span><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(201,154,78,0.15);color:#9A7434;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#C99A4E;"></span>Sin cierre</span></div>
+              <div style="display:flex;justify-content:flex-end;gap:18px;"><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Esperado</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 300,00</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Contado</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;"><span style="color:#7A716D;">—</span></span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Diferencia</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;"><span style="color:#7A716D;">—</span></span></div></div>
+              
+            </div>
+<div style="display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid #E4D8CC;border-radius:12px;background:#FFFFFF;">
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-weight:500;font-size:14px;">mié 21/10</span><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(124,148,115,0.15);color:#5F7457;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#7C9473;"></span>Cerrada</span></div>
+              <div style="display:flex;justify-content:flex-end;gap:18px;"><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Esperado</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 760,00</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Contado</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 760,00</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Diferencia</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;"><span style="color:#6E6663;">Bs 0,00</span></span></div></div>
+              <span style="font-size:12px;color:#6E6663;">Ajuste −Bs 250,00</span><span style="font-size:12px;color:#6E6663;">Cerró Camila Rojas · 19:12</span>
+            </div>
+<div style="display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid #E4D8CC;border-radius:12px;background:rgba(201,154,78,0.08);">
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-weight:500;font-size:14px;">mar 20/10</span><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:rgba(124,148,115,0.15);color:#5F7457;font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#7C9473;"></span>Cerrada</span></div>
+              <div style="display:flex;justify-content:flex-end;gap:18px;"><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Esperado</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 250,00</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Contado</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 255,00</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A716D;">Diferencia</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;"><span style="color:#9A7434;">+Bs 5,00</span></span></div></div>
+              <span style="font-size:12px;color:#6E6663;">Cerró Camila Rojas · 19:01</span><span style="font-size:12px;color:#6E6663;">Sobró una moneda de 5</span>
+            </div>
+        </div>
+      </div>
+  </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin cierre</span>Un día pasado con ventas en efectivo y sin cierre se marca y se cuenta en el aviso.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Diferencia</span>Faltante en Error y sobrante en Advertencia, con la fila teñida.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Ajuste</span>Una venta anulada (PAY-006) o registrada después del cierre cambia las ventas del día; el cierre no se edita.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Barra lateral</span>«Caja» va en Back Office después de «Pagos» (seguimiento 150).</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showCaptions: this.props.showCaptions ?? true };
+  }
+}
+</script>
+</body>
+</html>

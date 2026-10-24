@@ -29,7 +29,7 @@ import { branchesLabel, roleLabel } from "./staff-labels";
 
 type ProfileNavigation = {
   goBack: () => void;
-  navigate: (screen: "Notifications" | "ChangePassword" | "ViewAs") => void;
+  navigate: (screen: "Notifications" | "ChangePassword" | "Feedback" | "ViewAs") => void;
 };
 
 function ValueRow({ label, value }: { label: string; value: string }) {
@@ -133,6 +133,7 @@ export function StaffProfileScreen() {
             label="Cambiar contraseña"
             onPress={() => navigation.navigate("ChangePassword")}
           />
+          <MenuRow label="Enviar comentarios" onPress={() => navigation.navigate("Feedback")} />
           {identity.session?.role === "administrator" ? (
             <MenuRow label="Ver la app como…" onPress={() => navigation.navigate("ViewAs")} />
           ) : null}

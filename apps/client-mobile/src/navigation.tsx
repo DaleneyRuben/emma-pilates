@@ -26,13 +26,13 @@ import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availabil
 import { MyEvaluationsScreen } from "./evaluations/my-evaluations-screen";
 import { HomeScreen } from "./home/home-screen";
 import { ClientPushNotifications } from "./notifications/client-push-notifications";
-import { CreditScreen } from "./payments/credit-screen";
 import { PaymentScreen } from "./payments/payment-screen";
 import { ReferralsScreen } from "./payments/referrals-screen";
 import { PaymentStatusScreen } from "./payments/payment-status-screen";
 import { PlanDetailScreen } from "./plans/plan-detail-screen";
 import { PlansScreen } from "./plans/plans-screen";
 import { ClientChangePasswordScreen } from "./profile/change-password-screen";
+import { ClientFeedbackScreen } from "./profile/feedback-screen";
 import { CloseAccountScreen } from "./profile/close-account-screen";
 import { EditProfileScreen } from "./profile/edit-profile-screen";
 import { ClientNotificationsScreen } from "./profile/notifications-screen";
@@ -59,7 +59,6 @@ const shortcutScreens = {
   BookEvaluation: BookEvaluationScreen,
   MyEvaluations: MyEvaluationsScreen,
   Referrals: ReferralsScreen,
-  Credit: CreditScreen,
 };
 
 const HomeStack = createNativeStackNavigator({
@@ -96,6 +95,7 @@ const ProfileStack = createNativeStackNavigator({
     EditProfile: EditProfileScreen,
     Notifications: ClientNotificationsScreen,
     ChangePassword: ClientChangePasswordScreen,
+    Feedback: ClientFeedbackScreen,
     CloseAccount: CloseAccountScreen,
     ...shortcutScreens,
     ...planScreens,

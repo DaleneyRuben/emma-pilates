@@ -14,7 +14,7 @@ export const recordBackOfficeAudit = (
   actor: BackOfficeActor,
   record: {
     actionCode: string;
-    targetType: 'salary_payment' | 'expense';
+    targetType: 'salary_payment' | 'expense' | 'pay_statement';
     targetId: string;
     branchId: string | null;
     metadata: Prisma.InputJsonObject;
