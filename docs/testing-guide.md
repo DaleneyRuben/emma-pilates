@@ -5741,6 +5741,26 @@ a week per ecosystem for **security** updates only (version updates stay
 off); it shows up as a pull request by `dependabot[bot]` that CI checks
 like any other, and the user merges it.
 
+## Test 75: the mobile release workflows refuse to publish without the owner secret
+
+REL-008. Dispatch each workflow from the Actions tab and confirm it stops
+before Expo:
+
+1. **Publish OTA** on a branch other than `main` fails with "OTA publishes
+   only from main". On `main`, without `EXPO_TOKEN`, it fails with
+   "EXPO_TOKEN is not set" and no update is published. A production channel
+   dispatch of a commit with no `preview-ota:<app>:<sha>` git note fails
+   before `eas update`.
+2. **Create native release** with a version that is not `x.y.z` fails before
+   it opens a branch.
+3. **Store deploy** from a branch that does not start with `release/` fails.
+   Dispatching it with platform `ios` fails with the gate 9 refusal and
+   starts no build.
+
+No workflow runs on push or on pull request. Creating the Expo robot user
+and storing `EXPO_TOKEN` is an owner action; until then every dispatch that
+reaches the token check is inert.
+
 ## Test 74: the operations runbooks, the monthly reminder, and the monitors
 
 The runbooks under [`docs/runbooks/`](./runbooks/) are the procedures a
