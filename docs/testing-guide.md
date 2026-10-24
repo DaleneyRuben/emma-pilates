@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 76); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
@@ -76,7 +76,7 @@ can be found by its design name.
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
-| AW16 Reporte de ingresos y gastos | 30, 31 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 76 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
 | AW23–AW24 Personal | 26, 31, 72 |
@@ -3346,8 +3346,10 @@ The following are not ready for manual product testing:
 - real push delivery on iOS devices and the `InvalidCredentials` receipt
   Expo answers for them until the APNs key is uploaded (gate 9, Test 46);
 - the studio facts panel and its charts (STU-003): Test 75 recomputes the
-  rows, and nothing displays them yet. Store-review rows are not excluded
-  until REL-016 marks them.
+  rows, and nothing displays them yet. Test 76 shows cash, accrued, and
+  deferred revenue, not the charts. Store-review rows are not excluded
+  until REL-016 marks them. Extra classes (BKM-008) are not counted in
+  «Clases pendientes de dar».
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -5865,3 +5867,31 @@ the current month every night. Use a disposable database, never
    overlapping that month, classes booked, classes attended, and whether
    she renewed. Cancelled Bookings are not counted. Store-review rows are
    not marked yet (REL-016), so this pass excludes nothing.
+
+## Test 76: read accrued revenue beside cash
+
+Reporte shows the month's cash, the revenue accrued by validity days, and
+the cash not yet accrued, plus the classes still owed today. A Payment of
+Bs 300 valid from 20 October 2026 to 19 November 2026 accrues Bs 120 in
+October (12 of 30 days) and Bs 180 in November; the last month absorbs the
+remainder, so the two months sum to Bs 300. Use a disposable database.
+
+1. **The figures.** Log in as `paola.mendoza@example.com` (Test 3) and open
+   Reporte. Under «Ingreso devengado» the month stepper starts on the
+   current Bolivia month. The three figures are Caja (confirmed Payments
+   decided in the month), Devengado (the part of each confirmed Payment
+   that falls in the month), and Diferido (cash not yet accrued through
+   today, the same number whichever month is selected). «Clases pendientes
+   de dar hoy» is the remaining class allowance of Subscriptions covering
+   today. Extra classes are not counted (BKM-008).
+2. **The worked example.** Confirm a Payment of Bs 300 whose Subscription
+   runs from 2026-10-20 to 2026-11-19. October shows Caja Bs 300,00 and
+   Devengado Bs 120,00. November shows Caja Bs 0,00 and Devengado
+   Bs 180,00. On 23 October, Diferido is Bs 270,00: today is exclusive, so
+   3 of 30 days have accrued.
+3. **Who may read it.** An Assistant (`camila.rojas@example.com`) and a
+   Coordinator get `403 studio_access_denied` from
+   `GET /api/v1/administrator/reports/revenue?month=YYYY-MM`. A month that
+   is not `YYYY-MM` gets `400 invalid_request`. The Coordinator role is not
+   on this branch (IDN-009), so the refusal is the e2e suite's.
+   [Pull request #195](https://github.com/DaleneyRuben/emma-pilates/pull/195).

@@ -6686,6 +6686,43 @@
         ]
       }
     },
+    "/api/v1/administrator/reports/revenue": {
+      "get": {
+        "operationId": "getRevenueReport",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevenueReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "RevenueReport"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -12100,6 +12137,38 @@
           "month",
           "sessions",
           "clientMonths"
+        ]
+      },
+      "RevenueReportDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-10"
+          },
+          "cashCentavos": {
+            "type": "number",
+            "description": "Cash collected in the month, BOB centavos"
+          },
+          "accruedCentavos": {
+            "type": "number",
+            "description": "Revenue accrued by validity days, BOB centavos"
+          },
+          "deferredCentavos": {
+            "type": "number",
+            "description": "Cash not yet accrued through today, BOB centavos"
+          },
+          "classesStillOwed": {
+            "type": "number",
+            "description": "Remaining class allowance of Subscriptions covering today"
+          }
+        },
+        "required": [
+          "month",
+          "cashCentavos",
+          "accruedCentavos",
+          "deferredCentavos",
+          "classesStillOwed"
         ]
       },
       "CreatePendingUploadDto": {

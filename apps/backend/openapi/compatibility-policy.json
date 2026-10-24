@@ -66,6 +66,7 @@
     "unpublishPromotion",
     "deletePromotion",
     "getAdminPromotionImage",
-    "recomputeStudioFacts"
+    "recomputeStudioFacts",
+    "getRevenueReport"
   ]
 }
