@@ -91,6 +91,11 @@ describe("AW16 Reporte on a desktop browser", () => {
         "Efectivo Bs 780,00 · Transferencias Bs 1.500,00",
       ),
     ).toBeVisible();
+    expect(
+      within(tile("Ingresos")).getByText(
+        "Planes Bs 2.210,00 · Evaluaciones Bs 70,00",
+      ),
+    ).toBeVisible();
     expect(within(tile("Gastos")).getByText("Bs 4.380,50")).toBeVisible();
     expect(
       within(tile("Gastos")).getByText(
@@ -187,6 +192,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       branch: centro.id,
       from: "2026-08-01",
       to: "2026-09-30",
+      vista: "reporte",
     });
     expect(
       screen.getByText("01/08/2026 – 30/09/2026 · Sucursal Centro"),

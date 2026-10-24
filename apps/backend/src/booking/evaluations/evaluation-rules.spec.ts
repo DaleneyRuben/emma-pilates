@@ -3,6 +3,7 @@ import {
   assertBlockValues,
   cancellableUntil,
   dueReminders,
+  evaluationHoldExpiresAt,
   isEvaluationBookable,
   plannedSlots,
   resolveBlockChangeDate,
@@ -176,6 +177,12 @@ describe('booking and cancellation windows', () => {
       false,
     );
     expect(cancellableUntil(startsAt)).toEqual(at('2026-09-28T10:00:00.000Z'));
+  });
+
+  it('holds a pending transfer for 24 hours and no longer', () => {
+    expect(evaluationHoldExpiresAt(at('2026-09-21T15:00:00.000Z'))).toEqual(
+      at('2026-09-22T15:00:00.000Z'),
+    );
   });
 });
 

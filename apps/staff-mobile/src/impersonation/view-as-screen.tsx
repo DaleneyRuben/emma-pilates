@@ -23,11 +23,12 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { createImpersonationApi } from "./impersonation-api";
 import { useImpersonation } from "./impersonation-context";
 
-type ImpersonableRole = "trainer" | "assistant" | "nutritionist";
+type ImpersonableRole = "trainer" | "assistant" | "nutritionist" | "coordinator";
 const groups: { role: ImpersonableRole; label: string }[] = [
   { role: "trainer", label: "Entrenadoras" },
   { role: "assistant", label: "Asistentes" },
   { role: "nutritionist", label: "Nutricionistas" },
+  { role: "coordinator", label: "Coordinación" },
 ];
 const isImpersonable = (
   member: StaffMemberDto,
@@ -136,10 +137,12 @@ export function ViewAsScreen() {
                     <View style={styles.rowBody}>
                       <Text style={styles.name}>{member.name}</Text>
                       <Text numberOfLines={1} style={styles.branches}>
-                        {member.branchIds
-                          .map((id) => branchNames.get(id) ?? "")
-                          .filter(Boolean)
-                          .join(", ")}
+                        {member.branchIds.length === 0
+                          ? "Todas las sucursales"
+                          : member.branchIds
+                              .map((id) => branchNames.get(id) ?? "")
+                              .filter(Boolean)
+                              .join(", ")}
                       </Text>
                     </View>
                     <Chevron />

@@ -1,9 +1,12 @@
 export type PlanSummary = {
   id: string;
   name: string;
-  durationMonths: number;
+  durationDays: number;
+  weeklyClassCap: number | null;
   classAllowance: number;
   priceCentavos: number;
+  // Present only for a founder, and only when the Plan is discounted.
+  listPriceCentavos?: number;
   displayOrder: number;
 };
 
@@ -42,11 +45,12 @@ export type SubscriptionSummary = {
   id: string;
   planId: string;
   planNameSnapshot: string;
-  durationMonthsSnapshot: number;
+  durationDaysSnapshot: number;
   originalClassAllowance: number;
   remainingClassAllowance: number;
   startsOn: Date;
   endsOn: Date;
+  extraClassesLine: string | null;
 };
 
 export type PromotionSummary = {
@@ -112,6 +116,10 @@ export type CatalogRepository = {
     onDate: Date,
   ): Promise<SubscriptionSummary | null>;
   findLatestSubscription(clientId: string): Promise<SubscriptionSummary | null>;
+  findFutureSubscription(
+    clientId: string,
+    after: Date,
+  ): Promise<SubscriptionSummary | null>;
   listPublishedPromotions(onDate: Date): Promise<PromotionSummary[]>;
   findVisiblePlan(id: string): Promise<PlanSummary | null>;
   listBranches(): Promise<BranchSummary[]>;

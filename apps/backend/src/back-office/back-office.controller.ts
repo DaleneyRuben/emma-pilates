@@ -1,3 +1,4 @@
+import { equipmentControllers } from './equipment/equipment.controller';
 import {
   Body,
   Controller,
@@ -57,6 +58,13 @@ import {
   SalaryPaymentInputDto,
   WithdrawalPageDto,
 } from './back-office.dto';
+import { cashCloseControllers } from './cash-close/cash-close.controller';
+import { AdministratorFinanceController } from './finance/finance.controller';
+import {
+  AdministratorPayStatementsController,
+  CoordinatorPayStatementsController,
+  TrainerPayStatementsController,
+} from './payroll/pay-statements.controller';
 import { AdministratorSuppliesController } from './supplies/supplies.controller';
 
 export {
@@ -379,10 +387,16 @@ export class AdministratorExpenseReportController extends BackOfficeController {
 }
 
 export const backOfficeControllers = [
+  ...equipmentControllers,
   AdministratorSuppliesController,
   AdministratorWithdrawalsController,
   AdministratorSalaryPaymentsController,
   AdministratorExpenseCategoriesController,
   AdministratorExpensesController,
   AdministratorExpenseReportController,
+  AdministratorFinanceController,
+  AdministratorPayStatementsController,
+  CoordinatorPayStatementsController,
+  TrainerPayStatementsController,
+  ...cashCloseControllers,
 ];

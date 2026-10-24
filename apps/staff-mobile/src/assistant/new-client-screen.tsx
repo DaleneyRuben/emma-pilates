@@ -1,4 +1,7 @@
 import {
+  AcquisitionChannelField,
+  acquisitionChannelRequired,
+  type AcquisitionChannelChoice,
   BackLink,
   BodyText,
   colors,
@@ -46,6 +49,9 @@ export function NewClientScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [channel, setChannel] = useState<AcquisitionChannelChoice | null>(null);
+  const [referralCode, setReferralCode] = useState("");
+  const [codeUnknown, setCodeUnknown] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
@@ -64,6 +70,8 @@ export function NewClientScreen() {
       ? "Escribe un correo válido."
       : undefined;
 
+  const channelError = submitted && channel === null ? acquisitionChannelRequired : undefined;
+
   const workspace = useAssistantWorkspace();
   const openClient = (clientId: string, reopened = false) => {
     if (workspace.split) {
@@ -79,13 +87,17 @@ export function NewClientScreen() {
     setFailure(null);
     setEmailInUse(false);
     setAccountLimited(false);
-    if (name.trim().length === 0 || !emailPattern.test(email.trim())) return;
+    setCodeUnknown(false);
+    if (name.trim().length === 0 || !emailPattern.test(email.trim()) || channel === null) return;
     setSubmitting(true);
+    const code = referralCode.trim();
     try {
       const result = await api.inviteClient({
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim().length === 0 ? null : phone.trim(),
+        acquisitionChannel: channel,
+        ...(code === "" ? {} : { referralCode: code }),
       });
       if (result.status === "verification_pending") {
         setSelfRegistered({ clientId: result.clientId, email: result.email });
@@ -94,7 +106,9 @@ export function NewClientScreen() {
       openClient(result.clientId, result.status === "invitation_resent");
     } catch (error) {
       const problem = problemOf(error);
-      if (problem?.code === "email_in_use") {
+      if (problem?.code === "referral_code_invalid") {
+        setCodeUnknown(true);
+      } else if (problem?.code === "email_in_use") {
         setEmailInUse(true);
       } else if (problem?.code === accountEmailLimitCode) {
         startWait(problem.retryAfterSeconds);
@@ -161,6 +175,22 @@ export function NewClientScreen() {
                 placeholder="+591 700 00000"
                 testID="new-client-phone"
                 value={phone}
+              />
+              <AcquisitionChannelField error={channelError} onChange={setChannel} value={channel} />
+              <FormField
+                autoCapitalize="characters"
+                autoCorrect={false}
+                error={
+                  codeUnknown ? "No encontramos ese código. Revísalo o déjalo vacío." : undefined
+                }
+                label="Código de referido (opcional)"
+                onChangeText={(value) => {
+                  setReferralCode(value);
+                  setCodeUnknown(false);
+                }}
+                placeholder="De una clienta o de una instructora"
+                testID="new-client-referral-code"
+                value={referralCode}
               />
               <BodyText style={styles.note}>
                 Enviaremos un enlace de activación al correo. Vence en 7 días.

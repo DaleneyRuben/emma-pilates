@@ -17,7 +17,6 @@ import {
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
 import {
@@ -31,7 +30,17 @@ import {
   promoteWaitlistInTransaction,
 } from './waitlist-promotion';
 import { rescheduleBooking } from './reschedule-booking';
+import { recordAttendanceCorrections } from './attendance-audit';
 import { recordAttendance } from './record-attendance';
+import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
+import { boliviaDate } from '../../time/bolivia-time';
+import { fundBooking } from './weekly-cap-funding';
+import { readWeeklyCapPosition } from './weekly-cap-count';
+import {
+  findCoveringSubscription,
+  findNotYetStartedSubscription,
+} from './eligible-subscription';
+import { decideGuestPassBooking } from '../payments/guest-pass';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -505,6 +514,8 @@ export class PrismaBookingCommands {
               );
             },
             now: this.now,
+            cancellationWindowMinutes: () =>
+              readCancellationWindowMinutes(transaction),
           });
         },
         { isolationLevel: 'Serializable' },
@@ -564,6 +575,15 @@ export class PrismaBookingCommands {
               transaction.booking.count({
                 where: { sessionId, state: BookingState.BOOKED },
               }),
+            weeklyCapBlocksDestination: async (input) => {
+              const position = await readWeeklyCapPosition(transaction, input);
+              return (
+                position.weeklyClassCap !== null &&
+                position.baseFundedBookingsThisWeek >=
+                  position.weeklyClassCap &&
+                position.extraClasses <= 0
+              );
+            },
             hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
               transaction.booking
                 .findFirst({
@@ -606,6 +626,8 @@ export class PrismaBookingCommands {
               return replacement;
             },
             now: this.now,
+            cancellationWindowMinutes: () =>
+              readCancellationWindowMinutes(transaction),
           });
         },
         { isolationLevel: 'Serializable' },
@@ -628,6 +650,7 @@ export class PrismaBookingCommands {
             where: { id: sessionId },
             select: {
               id: true,
+              branchId: true,
               trainerStaffMemberId: true,
               endsAt: true,
               state: true,
@@ -647,7 +670,19 @@ export class PrismaBookingCommands {
               select: { id: true },
             })
           ).map(({ id }) => id),
-        save: async ({ outcomes, recordedByAccountId }) => {
+        save: async ({
+          sessionId,
+          branchId,
+          outcomes,
+          recordedByAccountId,
+        }) => {
+          await recordAttendanceCorrections(transaction, {
+            sessionId,
+            branchId,
+            outcomes,
+            principal,
+            occurredAt: this.now(),
+          });
           await Promise.all(
             outcomes.map(({ bookingId, outcome }) =>
               transaction.attendanceRecord.upsert({
@@ -748,15 +783,13 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        transaction.subscription.findFirst({
-          where: {
-            clientId,
-            state: 'ACTIVE',
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-          },
-          select: { id: true },
+        this.findSubscriptionForBooking(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: false,
         }),
+      findNotYetStartedSubscription: ({ clientId, onDate }) =>
+        findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasLiveBooking: ({ sessionId, clientId }) =>
         transaction.booking
           .findFirst({
@@ -777,6 +810,8 @@ export class PrismaBookingCommands {
           select: { id: true },
         }),
       now: this.now,
+      cancellationWindowMinutes: () =>
+        readCancellationWindowMinutes(transaction),
     });
   }
 
@@ -793,16 +828,24 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        transaction.subscription.findFirst({
+        this.findSubscriptionForBooking(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: true,
+        }),
+      findApprovedFreeze: ({ clientId, onDate }) =>
+        transaction.freeze.findFirst({
           where: {
             clientId,
-            state: 'ACTIVE',
+            state: 'APPROVED',
+            deletedAt: null,
             startsOn: { lte: boliviaDate(onDate) },
             endsOn: { gte: boliviaDate(onDate) },
-            remainingClassAllowance: { gt: 0 },
           },
-          select: { id: true },
+          select: { endsOn: true },
         }),
+      findNotYetStartedSubscription: ({ clientId, onDate }) =>
+        findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
         transaction.booking
           .findFirst({
@@ -818,26 +861,81 @@ export class PrismaBookingCommands {
           })
           .then((booking) => booking !== null),
       create: async (input) => {
-        const consumed = await transaction.subscription.updateMany({
+        const pass = await transaction.guestPass.findFirst({
           where: {
-            id: input.subscriptionId,
-            clientId: input.clientId,
-            remainingClassAllowance: { gt: 0 },
+            friendClientId: input.clientId,
+            bookingId: null,
+            deletedAt: null,
           },
-          data: { remainingClassAllowance: { decrement: 1 } },
+          select: { id: true, courtesySubscriptionId: true },
         });
-
-        if (consumed.count !== 1) {
-          throw new Error('No eligible Subscription');
+        const session = await transaction.session.findUniqueOrThrow({
+          where: { id: input.sessionId },
+          select: { startsAt: true, capacity: true },
+        });
+        if (
+          pass !== null &&
+          pass.courtesySubscriptionId === input.subscriptionId
+        ) {
+          const taken = await transaction.booking.count({
+            where: { sessionId: input.sessionId, state: 'BOOKED' },
+          });
+          const decision = decideGuestPassBooking({
+            placesLeft: session.capacity - taken,
+            guestPassesAlreadyUsed: 0,
+          });
+          if (decision !== null) throw new Error(decision.code);
         }
 
-        return transaction.booking.create({
-          data: input,
-          select: { id: true },
+        const booking = await fundBooking(transaction, {
+          subscriptionId: input.subscriptionId,
+          clientId: input.clientId,
+          authorAccountId: input.createdByAccountId,
+          startsAt: session.startsAt,
+          now: this.now(),
+          createBooking: () =>
+            transaction.booking.create({ data: input, select: { id: true } }),
         });
+        if (booking === null) {
+          const spent = await transaction.guestPass.findFirst({
+            where: {
+              friendClientId: input.clientId,
+              bookingId: { not: null },
+              deletedAt: null,
+            },
+            select: { id: true },
+          });
+          throw new Error(
+            spent === null
+              ? 'No eligible Subscription'
+              : 'guest_pass_already_used',
+          );
+        }
+        if (pass !== null) {
+          await transaction.guestPass.update({
+            where: { id: pass.id },
+            data: { bookingId: booking.id },
+          });
+        }
+        return booking;
       },
       now: this.now,
     });
+  }
+
+  private async findSubscriptionForBooking(
+    transaction: Prisma.TransactionClient,
+    input: { clientId: string; onDate: Date; needsAllowance: boolean },
+  ) {
+    const subscription = await findCoveringSubscription(transaction, input);
+    if (subscription === null) return null;
+    return {
+      id: subscription.id,
+      ...(await readWeeklyCapPosition(transaction, {
+        subscriptionId: subscription.id,
+        startsAt: input.onDate,
+      })),
+    };
   }
 
   private loadSession(

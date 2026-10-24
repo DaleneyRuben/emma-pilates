@@ -38,6 +38,7 @@ const stateLabels = {
   pending: "Pendiente",
   confirmed: "Confirmado",
   rejected: "Rechazado",
+  voided: "Anulado",
 } as const;
 
 export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: string } } }) {
