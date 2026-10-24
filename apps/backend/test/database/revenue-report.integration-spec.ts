@@ -100,7 +100,9 @@ describe('accrued revenue report', () => {
     expect(october.accruedCentavos + november.accruedCentavos).toBe(30_000);
     expect(october.cashCentavos).toBe(30_000);
     expect(november.cashCentavos).toBe(0);
-    expect(october.deferredCentavos).toBe(26_000);
+    // Today is exclusive, like endsOn: 3 of 30 days have accrued, so Bs 270
+    // of the Payment is still deferred.
+    expect(october.deferredCentavos).toBe(27_000);
     expect(october.classesStillOwed).toBe(5);
     expect(november.classesStillOwed).toBe(5);
   });
