@@ -9,11 +9,25 @@ export function jsonResponse(body: unknown, status = 200): Response {
 
 type Route = (init?: RequestInit) => Response;
 
+// The Studio Settings in force today (BKM-004), answered unless a spec routes
+// `/api/v1/studio-rules` itself.
+export const studioRules = {
+  cancellationWindowMinutes: 150,
+  evaluationPriceCentavos: 7_000,
+  plansFromPriceCentavos: 56_000,
+  startDateLimitDays: 14,
+  openingDate: null,
+};
+
+const defaultRoutes: Record<string, Route> = {
+  "/api/v1/studio-rules": () => jsonResponse(studioRules),
+};
+
 export function routeFetcher(routes: Record<string, Route>): typeof globalThis.fetch {
   return jest.fn((input: RequestInfo | URL, init?: RequestInit) => {
     const path = typeof input === "string" ? input : input.toString();
     const method = init?.method?.toUpperCase() ?? "GET";
-    const route = routes[`${method} ${path}`] ?? routes[path];
+    const route = routes[`${method} ${path}`] ?? routes[path] ?? defaultRoutes[path];
     return Promise.resolve(
       route === undefined ? jsonResponse({ code: "not_found", status: 404 }, 404) : route(init),
     );

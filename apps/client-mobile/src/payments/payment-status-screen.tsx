@@ -123,7 +123,7 @@ export function PaymentStatusScreen() {
             <Text style={styles.reason}>{current.rejectionReason}</Text>
           </View>
           <BodyText style={styles.centered}>
-            Sube un nuevo comprobante para activar tu plan. Tu crédito volvió a estar disponible.
+            Sube un nuevo comprobante para activar tu plan.
           </BodyText>
           {error === null ? null : (
             <BodyText accessibilityRole="alert" style={styles.error}>

@@ -13,8 +13,9 @@ const dayMilliseconds = 24 * 60 * 60 * 1_000;
 const receiptRetentionAfterFinalizationMilliseconds = 45 * dayMilliseconds;
 const receiptRetentionAfterDecisionMilliseconds = 7 * dayMilliseconds;
 
-// Settles the Credit a Purchase Intent reserved: spent when the purchase is
-// decided, released when the Intent expires.
+// Settles the Credit a Purchase Intent reserved before PAY-005 retired Credit:
+// spent when the purchase is decided, released when the Intent expires. No
+// Intent reserves Credit any more, so for every new one this does nothing.
 export const settleReservation = async (
   transaction: Transaction,
   input: {

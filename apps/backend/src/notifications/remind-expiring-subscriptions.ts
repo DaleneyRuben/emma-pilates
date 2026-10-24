@@ -1,13 +1,22 @@
 import type { NewNotification } from './prisma-notification-store';
 
-// The renewal reminder goes out 3 days before the paid-through date.
+// The renewal reminder goes out once while 3 days or fewer remain.
 const reminderLeadDays = 3;
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
 
+export const subscriptionEndsWithinReminderWindow = (
+  endsOn: Date,
+  today: Date,
+): boolean => {
+  const latest = new Date(today.getTime() + reminderLeadDays * dayMilliseconds);
+
+  return endsOn >= today && endsOn <= latest;
+};
+
 type RemindExpiringSubscriptionsDependencies = {
   today: Date;
-  findSubscriptionsEndingOn(
-    endsOn: Date,
+  findSubscriptionsEndingWithin(
+    today: Date,
   ): Promise<{ id: string; accountId: string }[]>;
   record(notification: NewNotification): Promise<void>;
 };
@@ -15,10 +24,9 @@ type RemindExpiringSubscriptionsDependencies = {
 export const remindExpiringSubscriptions = async (
   dependencies: RemindExpiringSubscriptionsDependencies,
 ): Promise<{ reminded: number }> => {
-  const endsOn = new Date(
-    dependencies.today.getTime() + reminderLeadDays * dayMilliseconds,
+  const subscriptions = await dependencies.findSubscriptionsEndingWithin(
+    dependencies.today,
   );
-  const subscriptions = await dependencies.findSubscriptionsEndingOn(endsOn);
 
   for (const subscription of subscriptions) {
     await dependencies.record({
@@ -27,7 +35,8 @@ export const remindExpiringSubscriptions = async (
       type: 'subscription_expiring',
       businessEventKey: `subscription-expiring:${subscription.id}`,
       title: 'Plan por vencer',
-      message: `Tu plan vence en ${reminderLeadDays} días.`,
+      message:
+        'Tu plan vence en 3 días. Renueva cuando quieras y elige tu fecha de inicio.',
       destination: { type: 'subscription', id: subscription.id },
       occurredAt: dependencies.today,
     });

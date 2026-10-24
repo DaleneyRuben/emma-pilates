@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { staffRoles, type StaffRole } from "../people-search";
+import { holdsEveryBranch, staffRoles, type StaffRole } from "../people-search";
 
 const needsBranches = (role: unknown): boolean =>
-  staffRoles.includes(role as StaffRole) && role !== "administrator";
+  staffRoles.includes(role as StaffRole) && !holdsEveryBranch(role);
 
 // AW24 with follow-ups 33 and 35: a required email (the login), an optional
 // contact phone, exactly one Role, and Branches unless the Role is
-// Administrator, who holds every Branch implicitly.
+// Administrator or Coordinator, who hold every Branch implicitly.
 export const staffFormSchema = z
   .object({
     name: z.string().trim().min(1, "Escribe el nombre.").max(120),

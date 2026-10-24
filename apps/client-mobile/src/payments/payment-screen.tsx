@@ -2,11 +2,17 @@ import {
   getGetCurrentPaymentQueryKey,
   getGetCurrentPurchaseIntentQueryKey,
   submitPurchaseIntentTransfer,
+  useGetCurrentClientInvoiceData,
   useGetCurrentPurchaseIntent,
 } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
+  FormScrollView,
+  InvoiceDataCard,
+  invoiceChoiceFrom,
+  invoiceDataPayload,
+  type InvoiceChoice,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -21,7 +27,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatBolivianos } from "../plans/plan-format";
@@ -46,6 +52,15 @@ export function PaymentScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  // PAY-007: prefilled from her last sale; a failed read leaves «Sin factura».
+  const lastInvoice = useGetCurrentClientInvoiceData({ fetcher });
+  const [invoiceEdit, setInvoiceEdit] = useState<InvoiceChoice | null>(null);
+  const invoice =
+    invoiceEdit ??
+    invoiceChoiceFrom(
+      lastInvoice.data?.status === 200 ? (lastInvoice.data.data.invoiceData ?? null) : null,
+    );
+  const invoiceData = invoiceDataPayload(invoice);
   const [receipt, setReceipt] = useState<AttachedReceipt | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -96,11 +111,13 @@ export function PaymentScreen() {
   };
 
   const submit = async () => {
+    if (invoiceData === "incomplete") return;
     setError(null);
     setSubmitting(true);
     try {
       const response = await submitPurchaseIntentTransfer(
         current.id,
+        { invoiceData },
         { headers: { "idempotency-key": randomUUID() } },
         fetcher,
       );
@@ -120,15 +137,10 @@ export function PaymentScreen() {
   return (
     <Screen style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={styles.content}>
+      <FormScrollView contentContainerStyle={styles.content}>
         <View style={styles.amountCard}>
           <BodyText>Monto exacto a transferir</BodyText>
           <Text style={styles.amount}>{formatBolivianos(current.amountDueCentavos)}</Text>
-          {current.creditReservedCentavos > 0 ? (
-            <BodyText style={styles.credit}>
-              {`Ya aplicamos ${formatBolivianos(current.creditReservedCentavos)} de tu crédito.`}
-            </BodyText>
-          ) : null}
         </View>
         <TransferQrCard fetcher={fetcher} />
         <Pressable
@@ -162,6 +174,12 @@ export function PaymentScreen() {
             </>
           )}
         </Pressable>
+        <InvoiceDataCard
+          noInvoiceNote="Tu compra se registra sin datos de factura."
+          onChange={setInvoiceEdit}
+          prefilledNote="Usamos los datos de tu última compra. Puedes cambiarlos."
+          value={invoice}
+        />
         {error === null ? null : (
           <BodyText accessibilityRole="alert" style={styles.error}>
             {error}
@@ -169,12 +187,12 @@ export function PaymentScreen() {
         )}
         <PrimaryButton
           busy={submitting}
-          disabled={receipt === null || uploading}
+          disabled={receipt === null || uploading || invoiceData === "incomplete"}
           label="Enviar comprobante"
           onPress={() => void submit()}
           testID="payment-submit"
         />
-      </ScrollView>
+      </FormScrollView>
     </Screen>
   );
 }
@@ -192,7 +210,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  credit: { color: colors.successText },
   error: { color: colors.errorText },
   screen: { gap: spacing.lg },
   thumbnail: { borderRadius: radii.control, height: 120, width: 90 },

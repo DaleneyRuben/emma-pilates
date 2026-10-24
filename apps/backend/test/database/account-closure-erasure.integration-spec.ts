@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { createPrismaAccountClosure } from '../../src/booking/account-closure/prisma-account-closure';
+import { createPrismaInvoiceData } from '../../src/booking/payments/invoice-data/prisma-invoice-data';
+import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
 import {
   closureNow,
   closurePassword,
@@ -125,6 +127,57 @@ describe('erasing a closed Client Account (PostgreSQL)', () => {
     ).resolves.toEqual([
       { newEmail: `cerrada-${ana.accountId}@cuentas-cerradas.invalid` },
     ]);
+  });
+
+  it('erases the Invoice Data on her sales and keeps the sales and the «Factura emitida» mark (PAY-007)', async () => {
+    const ana = await world.newClient('Ana Justiniano', {
+      subscription: false,
+    });
+    const plan = await world.prisma.plan.findFirstOrThrow({
+      where: { hiddenAt: null },
+      orderBy: { displayOrder: 'asc' },
+    });
+    const branch = await world.prisma.branch.findFirstOrThrow();
+    const sale = await createPrismaPaymentCommands(world.prisma, {
+      now: () => anHourBefore,
+    }).recordCashPayment(
+      {
+        clientId: ana.clientId,
+        planId: plan.id,
+        branchId: branch.id,
+        invoiceData: { taxId: '4567891', name: 'Ana Justiniano' },
+      },
+      world.administrator,
+      randomUUID(),
+    );
+    await createPrismaInvoiceData(world.prisma).setIssued({
+      paymentId: sale.id,
+      issued: true,
+      principal: world.administrator,
+      now: anHourBefore,
+    });
+
+    await closure().close(
+      { clientId: ana.clientId, password: closurePassword },
+      ana.principal,
+    );
+
+    await expect(
+      world.prisma.payment.findUniqueOrThrow({
+        where: { id: sale.id },
+        select: {
+          state: true,
+          invoiceTaxId: true,
+          invoiceName: true,
+          invoiceIssuedAt: true,
+        },
+      }),
+    ).resolves.toEqual({
+      state: 'CONFIRMED',
+      invoiceTaxId: null,
+      invoiceName: null,
+      invoiceIssuedAt: anHourBefore,
+    });
   });
 
   it('erases the Client an Administrator closes too', async () => {

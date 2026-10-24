@@ -1,5 +1,8 @@
 // Occurrence job doubles shared by the worker entrypoint specs.
 export const occurrenceJobs = () => ({
+  first90Days: {
+    execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
+  },
   pushDispatch: { dispatch: jest.fn() },
   pushReceipts: {
     execute: jest
@@ -17,11 +20,23 @@ export const occurrenceJobs = () => ({
   evaluationReminders: {
     execute: jest.fn().mockResolvedValue({ sent: 0 }),
   },
-  emptySessionChecks: {
+  classReminders: {
+    execute: jest.fn().mockResolvedValue({ sent: 0 }),
+  },
+  minimumBookingsChecks: {
     execute: jest.fn().mockResolvedValue({ checked: 0, cancelled: 0 }),
+  },
+  windowCloseSnapshots: {
+    execute: jest.fn().mockResolvedValue({ recorded: 0 }),
   },
   startedSessionWaitlists: {
     execute: jest.fn().mockResolvedValue({ closed: 0 }),
+  },
+  studioFacts: {
+    execute: jest.fn().mockResolvedValue({ sessions: 0, clientMonths: 0 }),
+  },
+  trainerPayDrafts: {
+    execute: jest.fn().mockResolvedValue({ drafted: 0 }),
   },
   retentionSweeps: {
     execute: jest.fn().mockResolvedValue({
