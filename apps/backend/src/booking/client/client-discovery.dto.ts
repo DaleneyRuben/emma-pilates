@@ -114,7 +114,9 @@ export class ClientSubscriptionDto {
   nextSubscription?: ClientSubscriptionSummaryDto | null;
 
   @ApiPropertyOptional({
+    type: String,
     format: 'date',
+    nullable: true,
     description:
       'A founder renews before this date. Absent when she is not a founder or has no current Subscription.',
   })

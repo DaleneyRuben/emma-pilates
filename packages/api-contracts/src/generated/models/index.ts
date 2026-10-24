@@ -115,7 +115,6 @@ export * from "./clientOverviewDto";
 export * from "./clientPhotoDto";
 export * from "./clientProfileDto";
 export * from "./clientSubscriptionDto";
-export * from "./clientSubscriptionDtoFounderRenewalDeadline";
 export * from "./clientSubscriptionDtoStatus";
 export * from "./clientSubscriptionSummaryDto";
 export * from "./clientVerificationEmailDto";
