@@ -213,6 +213,12 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/administrator/clients/{clientId}': both('allow'),
   'PATCH /api/v1/administrator/clients/{clientId}': both('allow'),
   'POST /api/v1/administrator/clients/{clientId}/closure': administratorOnly(),
+  // REL-011: tester access is the Administrator's. The date only has to
+  // parse; the use case refuses a Client who already has a Plan.
+  'POST /api/v1/administrator/clients/{clientId}/courtesy-access':
+    administratorOnly({
+      body: { endsOn: '2026-11-23' },
+    }),
 
   // Staff: details for the schedule; access decisions stay with the
   // Administrator.

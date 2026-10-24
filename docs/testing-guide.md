@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; voiding a sale (PAY-006) is not built yet |
@@ -81,7 +81,7 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 75 |
 | AW23–AW24 Personal | 26, 31, 72 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
@@ -5816,6 +5816,47 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 78: tester access (Courtesy Access, REL-011)
+
+The closed-test testers and the stores' review Accounts book without paying
+through «Acceso de prueba»: a hidden Bs 0 Plan of 16 classes that only the
+Administrator grants (booking ADR-0012). Run it against `pilates_dev_sim` (or
+a copy) with the API and the admin web, at 1440 px and 420 px.
+
+1. **Grant.** Sign in to the admin web as `paola.mendoza@example.com`, open
+   **Clientes**, and open a Client with no active Plan (Valeria Quiroga or
+   Sofía Guzmán in the fixtures). The panel footer shows **Acceso de prueba**
+   left of **Cerrar cuenta**; a Client with an active Plan (Lucía) shows only
+   **Cerrar cuenta**. Click it: the dialog «¿Dar acceso de prueba a …?»
+   explains the grant and proposes «Válido hasta» 30 days from today (the
+   field accepts today up to one year ahead; an empty date greys out **Dar
+   acceso**). Confirm: the dialog closes, the Plan block reads «Acceso de
+   prueba · Activo», «Vigencia» from today to that date, «Clases
+   disponibles 16 de 16», and the footer says «Acceso de prueba activo hasta
+   el dd/mm/aaaa.» without the button. In the database the Payment has
+   method `courtesy`, Bs 0, `confirmed`; the audit log holds
+   `payment.courtesy_granted`; the Client's inbox (and phone, with push) has
+   «Pago confirmado».
+2. **Refusals.** Grant again through Swagger
+   (`POST /api/v1/administrator/clients/{clientId}/courtesy-access` with an
+   `Idempotency-Key` UUID and `{"endsOn":"YYYY-MM-DD"}`): `409
+   subscription_not_expired`. A past date or one more than a year ahead
+   answers `400 courtesy_end_date_invalid`; a Client with a transfer in
+   review answers `409 payment_pending_exists` and the dialog points to
+   **Pagos**. As `camila.rojas@example.com` (Assistant) or a Client the
+   endpoint answers `403 administration_access_denied`.
+3. **Hidden everywhere else.** The Plan appears in **Planes** only under
+   the hidden filter, with Bs 0; **Mostrar** on it is refused. It never
+   appears in the Client app's Planes, in the Staff app's cash sale, or in
+   `GET /api/v1/plans`, and buying it by id answers `409
+   plan_not_purchasable`. The income report (Test 30) does not change.
+4. **Booking with it.** Log in to the Client app as the granted Client and
+   book a Session, cancel it (the class returns), book one starting within
+   2 h 30 and reschedule it the same day, and join a full Session's
+   waitlist: Mi plan counts down from 16. The test schedule is ordinary
+   Sessions built in **Horario**; production is reset after Google's
+   approval (ADR-0104), so nothing marks them.
 
 ## Test 77: work as the Coordinator (IDN-009)
 

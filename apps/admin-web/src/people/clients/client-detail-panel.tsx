@@ -23,6 +23,7 @@ import { formatCivilDate } from "../../lib/bolivia-time";
 import { useAdminRole } from "../../session/admin-role";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
+import { CourtesyAccessAction } from "./courtesy-access-action";
 
 const clientDetailQueryOptions = (clientId: string) =>
   queryOptions({
@@ -150,6 +151,7 @@ export function ClientDetailPanel({
   onClosed: (notice: string) => void;
 }) {
   const query = useQuery(clientDetailQueryOptions(clientId));
+  const [granted, setGranted] = useState<string | null>(null);
   const role = useAdminRole();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -200,6 +202,11 @@ export function ClientDetailPanel({
       {query.data === undefined ||
       query.data.accountStatus === "disabled" ? null : (
         <SidePanelFooter>
+          {granted === null ? null : (
+            <p role="status" className="text-nota text-exito-texto">
+              {granted}
+            </p>
+          )}
           {editing ? null : (
             <Button
               variant="neutral"
@@ -213,9 +220,22 @@ export function ClientDetailPanel({
               Editar perfil
             </Button>
           )}
-          {role === "administrator" ? (
-            <CloseClientAccountAction client={query.data} onClosed={onClosed} />
-          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {/* REL-011: only the Administrator, and only without an active Plan. */}
+            {role === "administrator" &&
+            query.data.subscription.status !== "active" ? (
+              <CourtesyAccessAction
+                client={query.data}
+                onGranted={setGranted}
+              />
+            ) : null}
+            {role === "administrator" ? (
+              <CloseClientAccountAction
+                client={query.data}
+                onClosed={onClosed}
+              />
+            ) : null}
+          </div>
         </SidePanelFooter>
       )}
     </>

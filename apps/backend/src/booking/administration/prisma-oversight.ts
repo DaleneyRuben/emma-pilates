@@ -16,12 +16,16 @@ type Paging = { page: number; pageSize: number };
 
 const offset = ({ page, pageSize }: Paging) => (page - 1) * pageSize;
 
-const methodNames: Record<PaymentMethod, 'cash' | 'transfer' | 'credit_only'> =
-  {
-    [PaymentMethod.CASH]: 'cash',
-    [PaymentMethod.TRANSFER]: 'transfer',
-    [PaymentMethod.CREDIT_ONLY]: 'credit_only',
-  };
+// Courtesy Access never counts as income (booking ADR-0012), so the income
+// report leaves courtesy Payments out.
+const methodNames: Record<
+  Exclude<PaymentMethod, typeof PaymentMethod.COURTESY>,
+  'cash' | 'transfer' | 'credit_only'
+> = {
+  [PaymentMethod.CASH]: 'cash',
+  [PaymentMethod.TRANSFER]: 'transfer',
+  [PaymentMethod.CREDIT_ONLY]: 'credit_only',
+};
 
 // ADM-001 slices D and E: read-only oversight for AW25–AW27 and the income
 // half of AW16 (expenses join from Back Office in BKO-002).
@@ -191,6 +195,7 @@ export const createPrismaOversight = (
     const byMethod = { cash: 0, transfer: 0, credit_only: 0 };
     const months = new Map<string, number>();
     for (const payment of payments) {
+      if (payment.method === PaymentMethod.COURTESY) continue;
       byMethod[methodNames[payment.method]] += payment.amountDueCentavos;
       const month = `${boliviaDate(payment.decidedAt!).toISOString().slice(0, 7)}-01`;
       months.set(month, (months.get(month) ?? 0) + payment.amountDueCentavos);

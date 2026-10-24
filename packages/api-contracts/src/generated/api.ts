@@ -114,6 +114,7 @@ import type {
   GetIncomeReportParams,
   GetPaymentReceiptParams,
   GetTodayCashCloseParams,
+  GrantCourtesyAccessDto,
   ImpersonationDto,
   IncomeReportDto,
   InviteClientDto,
@@ -17138,6 +17139,134 @@ export function useListAdminPayments<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type grantCourtesyAccessResponse201 = {
+  data: PaymentDto;
+  status: 201;
+};
+
+export type grantCourtesyAccessResponseSuccess =
+  grantCourtesyAccessResponse201 & {
+    headers: Headers;
+  };
+export type grantCourtesyAccessResponse = grantCourtesyAccessResponseSuccess;
+
+export const getGrantCourtesyAccessUrl = (clientId: string) => {
+  return `/api/v1/administrator/clients/${clientId}/courtesy-access`;
+};
+
+export const grantCourtesyAccess = async (
+  clientId: string,
+  grantCourtesyAccessDto: GrantCourtesyAccessDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<grantCourtesyAccessResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getGrantCourtesyAccessUrl(clientId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(grantCourtesyAccessDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: grantCourtesyAccessResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as grantCourtesyAccessResponse;
+};
+
+export const getGrantCourtesyAccessMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof grantCourtesyAccess>>,
+    TError,
+    GrantCourtesyAccessMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof grantCourtesyAccess>>,
+  TError,
+  GrantCourtesyAccessMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["grantCourtesyAccess"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof grantCourtesyAccess>>,
+    GrantCourtesyAccessMutationVariables
+  > = (props) => {
+    const { clientId, data } = props ?? {};
+
+    return grantCourtesyAccess(clientId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GrantCourtesyAccessMutationResult = NonNullable<
+  Awaited<ReturnType<typeof grantCourtesyAccess>>
+>;
+export type GrantCourtesyAccessMutationBody = GrantCourtesyAccessDto;
+export type GrantCourtesyAccessMutationError = unknown;
+export type GrantCourtesyAccessMutationVariables = {
+  clientId: string;
+  data: GrantCourtesyAccessDto;
+};
+
+export const useGrantCourtesyAccess = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof grantCourtesyAccess>>,
+      TError,
+      GrantCourtesyAccessMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof grantCourtesyAccess>>,
+  TError,
+  GrantCourtesyAccessMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getGrantCourtesyAccessMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type closeCurrentClientAccountResponse200 = {
   data: AccountClosureSummaryDto;

@@ -492,7 +492,7 @@ wait for Google, Apple, and testers.
 
 | ID | Priority | Surface | Work item | Depends on | Effort | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| REL-011 | P0 | All surfaces | Tester access on production: a hidden Bs 0 Plan of 16 classes that only the Administrator can grant, on a fictitious schedule | — | 1.5–2 d | ready |
+| REL-011 | P0 | All surfaces | Tester access on production: a hidden Bs 0 Plan of 16 classes that only the Administrator can grant, on a fictitious schedule | — | 1.5–2 d | done (16c6a823 grant, acc7b4fb endpoint, 37a08c98 admin web, cd62e0e6 follow-up 160 export; see the REL-011 notes) |
 | REL-012 | P0 | All surfaces | «Enviar comentarios»: in-app feedback from both apps, with a list on the admin web for triage and for Google's production questionnaire | — | 2–2.5 d | ready |
 | REL-003 | P0 | Mobile release | *Existing row.* Store listings: finish the feature graphic and screenshots, and drop every mention of the Bs 60 credit from the descriptions | REL-002, WEB-021 | 1 d | ready |
 | REL-004 | P0 | Mobile release | *Existing row.* Data safety: add the feedback text (REL-012). The NIT/CI of PAY-007 is added to the form when it ships | REL-012 | 0.5 d | ready |
@@ -791,6 +791,13 @@ Acceptance criteria:
 - An Assistant and a Client never see or buy the tester Plan, through the API or the apps. The API returns 403 or 404 to anyone but the Administrator.
 - A tester books, cancels, reschedules, and joins the waitlist with her 16 classes.
 - Integration tests cover the grant and the visibility rule. The testing guide has the steps.
+
+Notes (done 2026-10-23):
+
+- **Built.** `PaymentMethod.COURTESY` (two migrations: the enum value alone, then `plans_free_only_hidden_check` and the courtesy branches of `payments_amounts_check` / `payments_method_fields_check`); `POST /api/v1/administrator/clients/{clientId}/courtesy-access` (`Idempotency-Key`, `{endsOn}`, 201 `PaymentDto` with `method: courtesy`); audit code `payment.courtesy_granted`; the usual «Pago confirmado» push; «Acceso de prueba» on AW22 (follow-up 160, exported).
+- **Decisions taken.** The hidden «Acceso de prueba» Plan (16 classes, Bs 0, catalog duration 1 month) is created on the first grant and reused, not seeded, so it survives the ADR-0104 reset with no step. The Subscription runs from today to the chosen date, which must lie between today and one year ahead. A grant is refused like a sale while the Client has a Plan in use, a pending Payment, or an open Intent (409); the button only shows without an active Plan. Showing a Bs 0 Plan in Planes is refused (`invalid_catalog_value`). A courtesy grant never qualifies a pending Referral and the income report skips courtesy Payments. Anyone but an Administrator gets 403 `administration_access_denied`; the Plan never reaches the Client or Assistant catalogs or purchases (`plan_not_purchasable`). Shared reads moved out of `prisma-payment-commands.ts` into `subscription-allocation.ts`.
+- **Verified.** Backend unit 963, e2e 272, integration 366 (92 suites) green on PostgreSQL 18; admin web Jest 527 (two load flakes in an untouched schedule spec pass alone), Playwright 17 journeys (the payments journey flaked once under load, passes alone); `pnpm check:api` clean. Browser at 1440 and 420 px on the admin web against `pilates_rel011_dev`: granted Valeria Quiroga access until 22/11/2026, saw the Plan block «Acceso de prueba · Activo · 16 de 16» and the Éxito line, and the database held the courtesy Payment, the audit record, and the notification. No mobile code changed, so no Simulator or emulator run; the tester's booking, cancel, reschedule, and waitlist are covered by `courtesy-access-bookings.integration-spec.ts`.
+- **Open.** BKM-005 (Plans by days) must give the tester Plan a validity in days instead of `durationMonths: 1` when it lands. The Claude Design canvas of follow-up 160 (`https://claude.ai/artifact/7bvLoYc2iHhP5PUTfHaAHj`) could not be deleted from the agent session: the user deletes it.
 
 #### REL-012 · «Enviar comentarios»
 

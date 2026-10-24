@@ -33,6 +33,11 @@ import {
 } from './purchase-intent-settlement';
 import { evaluatePurchaseEligibility } from './purchase-eligibility';
 import {
+  expireSubscription,
+  loadActiveSubscription,
+  notifyPaymentConfirmed,
+} from './subscription-allocation';
+import {
   computeSubscriptionTerm,
   type SubscriptionDurationMonths,
 } from './subscription-term';
@@ -56,7 +61,7 @@ export type PurchaseIntentView = {
 
 export type PaymentView = {
   id: string;
-  method: 'transfer' | 'cash' | 'credit_only';
+  method: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
   state: 'pending' | 'confirmed' | 'rejected';
   planId: string;
   planName: string;
@@ -140,6 +145,7 @@ const paymentMethods: Record<PaymentMethod, PaymentView['method']> = {
   [PaymentMethod.TRANSFER]: 'transfer',
   [PaymentMethod.CASH]: 'cash',
   [PaymentMethod.CREDIT_ONLY]: 'credit_only',
+  [PaymentMethod.COURTESY]: 'courtesy',
 };
 const paymentStates: Record<PaymentState, PaymentView['state']> = {
   [PaymentState.PENDING]: 'pending',
@@ -329,47 +335,6 @@ export function createPrismaPaymentCommands(
     return result;
   };
 
-  const loadActiveSubscription = async (
-    transaction: Transaction,
-    clientId: string,
-    now: Date,
-  ) => {
-    const active = await transaction.subscription.findFirst({
-      where: { clientId, state: SubscriptionState.ACTIVE },
-      orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
-      select: {
-        id: true,
-        endsOn: true,
-        remainingClassAllowance: true,
-        _count: {
-          select: {
-            bookings: {
-              where: { state: 'BOOKED', session: { startsAt: { gt: now } } },
-            },
-          },
-        },
-      },
-    });
-    return active === null
-      ? null
-      : {
-          id: active.id,
-          endsOn: active.endsOn,
-          remainingClassAllowance: active.remainingClassAllowance,
-          futureBookedCount: active._count.bookings,
-        };
-  };
-
-  const expireSubscription = (
-    transaction: Transaction,
-    subscriptionId: string,
-    now: Date,
-  ) =>
-    transaction.subscription.update({
-      where: { id: subscriptionId },
-      data: { state: SubscriptionState.EXPIRED, expiredAt: now },
-    });
-
   // Eligibility reloads the effective Subscription, open Intent, pending
   // Payment, and Plan inside the locked transaction; a Subscription that no
   // longer holds is expired here before the new allocation record is created.
@@ -529,32 +494,6 @@ export function createPrismaPaymentCommands(
     return subscription.id;
   };
 
-  const notifyPaymentConfirmed = async (
-    transaction: Transaction,
-    input: {
-      clientId: string;
-      paymentId: string;
-      subscriptionId: string;
-      now: Date;
-    },
-  ): Promise<void> => {
-    const client = await transaction.client.findUniqueOrThrow({
-      where: { id: input.clientId },
-      select: { account: { select: { id: true } } },
-    });
-    if (client.account === null) return;
-    await recordNotification(transaction, {
-      accountId: client.account.id,
-      category: 'subscription_payment',
-      type: 'payment_confirmed',
-      businessEventKey: `payment-confirmed:${input.paymentId}`,
-      title: 'Pago confirmado',
-      message: 'Tu pago fue confirmado. ¡Ya puedes reservar clases!',
-      destination: { type: 'subscription', id: input.subscriptionId },
-      occurredAt: input.now,
-    });
-  };
-
   const requireCashCollector = (
     principal: AuthenticatedPrincipal,
     branchId: string,
@@ -631,7 +570,7 @@ export function createPrismaPaymentCommands(
       branchId: input.branchId,
       now,
     });
-    await notifyPaymentConfirmed(transaction, {
+    await notifyPaymentConfirmed(recordNotification, transaction, {
       clientId: input.clientId,
       paymentId: payment.id,
       subscriptionId,
@@ -1088,7 +1027,7 @@ export function createPrismaPaymentCommands(
         now,
         true,
       );
-      await notifyPaymentConfirmed(transaction, {
+      await notifyPaymentConfirmed(recordNotification, transaction, {
         clientId: payment.clientId,
         paymentId: payment.id,
         subscriptionId,
