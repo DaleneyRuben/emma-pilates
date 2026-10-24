@@ -7,6 +7,7 @@ import {
 import {
   BodyText,
   colors,
+  formatCancellationWindow,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -15,6 +16,7 @@ import {
   spacing,
   surfaces,
   typography,
+  useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -49,6 +51,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
   const navigation = useNavigation<PlanDetailNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
+  const studioRules = useStudioRules(fetcher);
   const plan = useGetPlan(route.params.planId, {
     fetcher,
     query: { refetchOnMount: "always" },
@@ -122,7 +125,11 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Qué incluye</Text>
           <BodyText>{`${detail.classAllowance} clases en cualquier sucursal del estudio.`}</BodyText>
-          <BodyText>Cancelación sin costo hasta 2 h 30 antes de cada clase.</BodyText>
+          {studioRules === undefined ? null : (
+            <BodyText>
+              {`Cancelación sin costo hasta ${formatCancellationWindow(studioRules.cancellationWindowMinutes)} antes de cada clase.`}
+            </BodyText>
+          )}
           <BodyText>{validityCopy(detail.durationMonths)}</BodyText>
         </View>
         <View style={styles.section}>

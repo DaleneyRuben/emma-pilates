@@ -54,6 +54,7 @@ describe('foundation migration', () => {
       'booking.sessions',
       'booking.staff_branch_assignments',
       'booking.staff_members',
+      'booking.studio_settings_versions',
       'booking.subscriptions',
       'booking.waitlist_entries',
       'system.account_devices',

@@ -61,6 +61,7 @@ describe("admin navigation", () => {
       "AW16",
       "AW17",
       "AW26",
+      "AW36",
     ]);
   });
 
@@ -75,6 +76,7 @@ describe("admin navigation", () => {
       "Nómina",
       "Categorías de gasto",
       "Referidos",
+      "Reglas del estudio",
     ]);
   });
 

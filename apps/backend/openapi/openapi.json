@@ -5005,6 +5005,90 @@
         ]
       }
     },
+    "/api/v1/administrator/studio-settings": {
+      "get": {
+        "operationId": "getStudioSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorStudioSettings"
+        ]
+      },
+      "put": {
+        "operationId": "updateStudioSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStudioSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioSettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorStudioSettings"
+        ]
+      }
+    },
+    "/api/v1/studio-rules": {
+      "get": {
+        "operationId": "getStudioRules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioRulesDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "StudioRules"
+        ]
+      }
+    },
     "/api/v1/clients/current/photo": {
       "put": {
         "operationId": "setCurrentClientPhoto",
@@ -10904,6 +10988,195 @@
         },
         "required": [
           "consented"
+        ]
+      },
+      "StudioSettingsDto": {
+        "type": "object",
+        "properties": {
+          "minimumBookings": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "taxRatePercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetMonths1To6Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetMonths7To12Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetFromMonth13Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "openingDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The studio Opening Date (La Paz), or null while unknown"
+          },
+          "version": {
+            "type": "number"
+          },
+          "cancellationWindowMinutes": {
+            "type": "number"
+          },
+          "minimumBookingsCheckLeadMinutes": {
+            "type": "number"
+          },
+          "startDateLimitDays": {
+            "type": "number"
+          },
+          "founderPlaces": {
+            "type": "number"
+          },
+          "founderDiscountPercent": {
+            "type": "number"
+          },
+          "founderGapDays": {
+            "type": "number"
+          },
+          "guestPassesPerClient": {
+            "type": "number"
+          },
+          "invitesPerHostPerMonth": {
+            "type": "number"
+          },
+          "inviteRewardClasses": {
+            "type": "number"
+          },
+          "evaluationPriceCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "nutritionistFeeCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedByName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Who saved this version, or null for the seeded one"
+          }
+        },
+        "required": [
+          "minimumBookings",
+          "taxRatePercent",
+          "renewalTargetMonths1To6Percent",
+          "renewalTargetMonths7To12Percent",
+          "renewalTargetFromMonth13Percent",
+          "openingDate",
+          "version",
+          "cancellationWindowMinutes",
+          "minimumBookingsCheckLeadMinutes",
+          "startDateLimitDays",
+          "founderPlaces",
+          "founderDiscountPercent",
+          "founderGapDays",
+          "guestPassesPerClient",
+          "invitesPerHostPerMonth",
+          "inviteRewardClasses",
+          "evaluationPriceCentavos",
+          "nutritionistFeeCentavos",
+          "updatedAt",
+          "updatedByName"
+        ]
+      },
+      "UpdateStudioSettingsDto": {
+        "type": "object",
+        "properties": {
+          "minimumBookings": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "taxRatePercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetMonths1To6Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetMonths7To12Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "renewalTargetFromMonth13Percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "openingDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The studio Opening Date (La Paz), or null while unknown"
+          },
+          "expectedVersion": {
+            "type": "number",
+            "description": "The version the form was read from"
+          }
+        },
+        "required": [
+          "minimumBookings",
+          "taxRatePercent",
+          "renewalTargetMonths1To6Percent",
+          "renewalTargetMonths7To12Percent",
+          "renewalTargetFromMonth13Percent",
+          "openingDate",
+          "expectedVersion"
+        ]
+      },
+      "StudioRulesDto": {
+        "type": "object",
+        "properties": {
+          "cancellationWindowMinutes": {
+            "type": "number",
+            "description": "Minutes before a Session start inside which a Booking is not cancellable"
+          },
+          "evaluationPriceCentavos": {
+            "type": "number",
+            "description": "Paid Evaluation price in BOB centavos"
+          },
+          "plansFromPriceCentavos": {
+            "type": "number",
+            "nullable": true,
+            "description": "The lowest price among the visible Plans, or null when none"
+          },
+          "startDateLimitDays": {
+            "type": "number",
+            "description": "Days after the purchase a Start Date may be chosen"
+          },
+          "openingDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The studio Opening Date (La Paz), or null while unknown"
+          }
+        },
+        "required": [
+          "cancellationWindowMinutes",
+          "evaluationPriceCentavos",
+          "plansFromPriceCentavos",
+          "startDateLimitDays",
+          "openingDate"
         ]
       },
       "SetClientPhotoDto": {

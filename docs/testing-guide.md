@@ -27,7 +27,7 @@ you are starting with no project knowledge.
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
-| Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 75) | One close a day per Branch and never undone, so use a copy of the fixtures; voiding a sale (PAY-006) is not built yet |
+| Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; voiding a sale (PAY-006) is not built yet |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
@@ -46,9 +46,9 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75 |
 | 12 Mi plan | 5, 18, 71 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Mis referidos (17 Mi crédito retired by PAY-005) | 10, 18 |
@@ -72,6 +72,7 @@ can be found by its design name.
 | Admin web | Tests |
 | --- | --- |
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
+| AW36 Reglas del estudio (from AW33) | 75 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72 |
@@ -3303,7 +3304,7 @@ The following are not ready for manual product testing:
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - a sale voided after the cash close showing as a negative «Ajuste» on AW151:
   voiding arrives with PAY-006 (the integration spec simulates it; a late
-  cash sale already shows as a positive adjustment, Test 75);
+  cash sale already shows as a positive adjustment, Test 76);
 - real push delivery on iOS, which needs the APNs key (gate 9): the
   Simulators show pushes only through `xcrun simctl push`, while Android
   receives real pushes on the development, staging, and Play builds
@@ -5810,7 +5811,94 @@ touching production.
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
 
-## Test 75: the daily cash close (BKO-003)
+## Test 75: the studio rules (BKM-004)
+
+The rules the apps and the API follow live in one versioned Studio Settings
+record ([ADR-0101](./adr/0101-keep-studio-rules-in-studio-settings.md)).
+Migration `20261023104000_studio_settings` seeds version 1 with today's
+values: a 2 h 30 Cancellation Window, 2 Minimum Bookings checked 3 h before,
+Start Dates up to 14 days ahead, 40 Founder places at 15 % lost after 7 days
+without a Plan, one Guest Pass per person, one invite a month, +1 class when
+a guest buys, 16 % tax, Bs 70 per Paid Evaluation, Bs 50 to the
+Nutritionist, renewal targets 80/85/90 %, and no Opening Date. Run the API
+and the admin web as in Tests 2 and 24.
+
+A. **The public rules.** `curl -i http://127.0.0.1:3100/api/v1/studio-rules`
+   answers without a credential, with `Cache-Control: public, max-age=60` and
+   an `ETag`:
+   `{"cancellationWindowMinutes":150,"evaluationPriceCentavos":7000,"plansFromPriceCentavos":56000,"startDateLimitDays":14,"openingDate":null}`.
+   `plansFromPriceCentavos` is the cheapest visible Plan (hidden Plans do not
+   count; `null` when none is visible). Sending the `ETag` back as
+   `If-None-Match` answers `304`.
+B. **Reglas del estudio (AW36).** Log in as `paola.mendoza@example.com`, open
+   the account menu (your name, top right) and choose **Reglas del
+   estudio**. «Puedes cambiar» shows Mínimo de reservas por clase 2,
+   Impuestos sobre las ventas (%) 16, the three renewal targets 80/85/90,
+   an empty Fecha de apertura, and «Versión 1 · valores iniciales».
+   «Reglas fijas» lists «2 h 30 antes de cada clase», «3 h antes de cada
+   clase», «Hasta 14 días después de la compra», «40 lugares · 15 % de
+   descuento · se pierde con más de 7 días sin plan», «1 clase de invitada
+   por persona · 1 invitación al mes · +1 clase cuando la amiga compra», and
+   «Bs 70,00 · Bs 50,00 para la nutricionista».
+   - Type 0 in the minimum and 120 in the tax and press **Guardar
+     cambios**: «Entre 1 y 20 reservas.» and «Un porcentaje entre 0 y
+     100.», and nothing is saved.
+   - Type 3 and pick 01/12/2026 as the opening date, then save: «Guardamos
+     las reglas del estudio.», «Versión 2 · guardada el … por Paola
+     Mendoza», and `GET /api/v1/studio-rules` now shows
+     `"openingDate":"2026-12-01"`. The audit table has a
+     `studio_settings.updated` row whose metadata holds the old and new
+     values (`previousMinimumBookings: 2`, `minimumBookings: 3`, …), and
+     `booking.studio_settings_versions` has a second row; neither row can be
+     updated or deleted (the trigger answers «append-only»).
+   - Open the page in two tabs, save a change in one, then save in the
+     other: «Alguien guardó otras reglas mientras editabas…» and the second
+     tab shows the newer values.
+   - At 420 px every field takes the full width and each fixed rule stacks
+     its value under its label; the account menu is a bottom sheet whose
+     first row is **Reglas del estudio**.
+   - Without a session `GET /api/v1/administrator/studio-settings` answers
+     `401`; as Camila (Assistant) it answers `403
+     administration_access_denied`.
+C. **The apps follow the settings without a build.** The Cancellation
+   Window is not editable on the web (it changes with a release), so append
+   a version by hand on a development database to see the apps follow it:
+
+   ```sql
+   insert into booking.studio_settings_versions
+     select gen_random_uuid(), version + 1, 360, minimum_bookings,
+       minimum_bookings_check_lead_minutes, start_date_limit_days,
+       founder_places, founder_discount_percent, founder_gap_days,
+       guest_passes_per_client, invites_per_host_per_month,
+       invite_reward_classes, tax_rate_percent, evaluation_price_centavos,
+       nutritionist_fee_centavos, renewal_target_months_1_to_6_percent,
+       renewal_target_months_7_to_12_percent,
+       renewal_target_from_month_13_percent, opening_date,
+       (select id from system.accounts where email = 'paola.mendoza@example.com'),
+       now()
+     from booking.studio_settings_versions order by version desc limit 1;
+   ```
+
+   Within a minute (pull to refresh), a booking 5 hours away shows **No
+   cancelable** and **Reprogramar** in Mis reservas (05) and in the
+   Assistant's «Reservas de la clienta» (S21); 09 Detalle del plan reads
+   «Cancelación sin costo hasta 6 h antes de cada clase.»; AW03's «Cancelar
+   sesión» confirmation says «aunque falten menos de 6 h»; and
+   `DELETE /api/v1/bookings/{id}` for that booking answers `409
+   booking_cancellation_window`. Append another version with `150` to go
+   back. 02 Inicio's buy card reads «Paquetes desde Bs 560. Puedes pagar en
+   el estudio o desde la app.» on the fixtures (the cheapest visible Plan);
+   hide that Plan on AW04 and the price follows.
+D. **When the rules cannot be read** (stop the API while an app is open on
+   a screen that has not loaded them yet), 02 says only «Puedes pagar en el
+   estudio o desde la app.», 09 leaves the cancellation line out, and 05 and
+   S21 show no **Cancelar** or **Reprogramar** until the rules load.
+
+Only these values are stored and shown by BKM-004; the rules that use the
+others (the 2-booking check, Start Dates, founders, invites, tax, the paid
+Evaluation, the renewal bonus) arrive with their own backlog items.
+
+## Test 76: the daily cash close (BKO-003)
 
 At the end of the day the Assistant (or the Administrator) counts the drawer
 and closes the Branch's cash once (S25); the Administrator reviews the closes
@@ -5858,3 +5946,4 @@ Branch, up to the moment of the close.
 10. Check AW151 at 1440 px and 420 px (the rows become cards that keep the
     tint), and `GET /api/v1/administrator/cash-closes?branchId=…&month=…` as
     the Assistant answers `403`. Then `dropdb pilates_test_cash`.
+

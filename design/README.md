@@ -193,6 +193,12 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 
 ---
 
+### Studio rules in copy
+
+- «2 h 30» wherever the Cancellation Window is named (`05`'s «No cancelable» edge, `09`'s «Cancelación sin costo hasta 2 h 30 antes de cada clase.», `S21`'s card actions, `AW03`'s «aunque falten menos de 2 h 30») is the Studio Settings' Cancellation Window written as «2 h 30», «3 h», or «45 min». While the apps cannot read it, `09` leaves that line out, `05` and `S21` offer neither «Cancelar» nor «Reprogramar» on a booking, and `AW03` drops the «aunque falten menos de …» clause.
+- `02`'s «Paquetes desde Bs 560.» is the lowest price among the Plans the Client app shows (hidden Plans excluded), written as `formatBolivianos` does («Bs 80», «Bs 1.050»). While it is unknown the card says only «Puedes pagar en el estudio o desde la app.»
+- The values change on `AW36` or with a release, and reach the apps within a minute without a store update.
+
 ## Admin web — shell (shared by AW02–AW29, AW31, AW33)
 
 Reference width **1440px**; a 420px narrow-browser variant is drawn for every screen.
@@ -336,9 +342,10 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW30` | Recuperar contraseña | Request a reset link + neutral "link sent" and temporary-limit states |
 | `AW31` | Retiros e insumos consumidos | Withdrawal history behind `AW08`; «Volver a Insumos», month arrows (forward disabled on the current month), archived Supplies in the filter, «Consumo del mes» |
 | `AW32` | Crear contraseña | Page opened by an emailed link: Desde una invitación or Restablecer contraseña, plus expired and removed-invitation states |
-| `AW33` | Menú de usuario y cambiar contraseña | Top-bar user menu overlay, change-password side panel, log-out confirm |
+| `AW33` | Menú de usuario y cambiar contraseña | Top-bar user menu overlay, change-password side panel, log-out confirm; a «Reglas del estudio» row opens `AW36` |
 | `AW34` | Selector de sucursal | Not a page: the open states of the top-bar branch control (branches come from `AW19`); picking one closes the popover and reloads the current page in that scope |
 | `AW35` | Contactos para promociones | List of the live Clients who agreed to promotions in Perfil (ADR-0098) and the Promotion Contacts kept for former Clients who asked to keep receiving them (ADR-0097), newest consent first, search only, a «Tipo» column with «Activa» and «Cuenta cerrada» pills; «Exportar CSV» downloads every contact (audited); a per-row «Dejar de enviar» confirmation closes a live Client's consent (her Account stays) or erases a former Client's contact; reached from `AW17`, no sidebar item; empty, no-results, and after-erasing frames |
+| `AW36` | Reglas del estudio | The Studio Settings (ADR-0101): «Puedes cambiar» with Mínimo de reservas, Impuestos, the three renewal targets, and Fecha de apertura, saved as a new audited version with «Guardar cambios» (a save over a newer version is refused and the page reloads the current values); «Reglas fijas» with the Cancellation Window, the minimum check, the Start Date limit, the Founder membership, Invita a una amiga, and the paid Evaluation; reached from `AW33`, no sidebar item |
 
 ---
 
@@ -350,6 +357,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `AW01→AW30` via "¿Olvidaste tu contraseña?". The emailed links open `AW32`: an activation from `AW24` returns to `AW01` with «Tu cuenta está activa. Inicia sesión con tu nueva contraseña.» and no session; a password reset revokes older sessions and lands on `AW02` with a new one. A throttled `AW01` shows «Demasiados intentos. Intenta de nuevo en un momento.» with the server-provided wait and never says the account is locked.
 - `AW08→AW31` via "Ver historial de retiros"; the back link returns to `AW08`.
 - The top-bar user cell opens the `AW33` menu overlay (change-password side panel, log-out confirm) from any shell page.
+- `AW33` → «Reglas del estudio» opens `AW36` and closes the menu.
 - `AW22` → «Cerrar cuenta» opens a confirmation that lists what the closure does to that client; **Volver** / **Cerrar cuenta** (Error outline). A pending transfer keeps the dialog open with a refusal and a link to `AW28`; a completed closure returns to `AW21` with an Éxito line.
 - `AW17` → «Contactos para promociones» opens `AW35`; `AW35` → «← Promociones» returns to `AW17`. «Dejar de enviar» opens a confirmation (**Volver** / **Borrar contacto**, Error outline); a completed erasure stays on `AW35` with an Éxito line.
 - Read-only pages with no primary action: `AW21`, `AW22`, `AW25`, `AW26`, `AW27`, `AW28`, `AW31`, plus `AW16`.
