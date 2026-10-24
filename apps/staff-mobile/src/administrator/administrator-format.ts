@@ -32,8 +32,8 @@ export function describeSessionCancellation({
 
   const bookings =
     bookedCount === 1
-      ? "Se cancelará la única reserva de esta clase, se reembolsará la clase al cliente afectado — incluso si ya no podía cancelar por su cuenta — y se le notificará."
-      : `Se cancelarán las ${bookedCount} reservas de esta clase, se reembolsará una clase a cada cliente afectado — incluso si ya no podían cancelar por su cuenta — y se les notificará.`;
+      ? "Se cancelará la única reserva de esta clase, se reembolsará la clase al cliente afectado, incluso si ya no podía cancelar por su cuenta, y se le notificará."
+      : `Se cancelarán las ${bookedCount} reservas de esta clase, se reembolsará una clase a cada cliente afectado, incluso si ya no podían cancelar por su cuenta, y se les notificará.`;
   if (waitlistCount === 0) return bookings;
 
   const waitlist =

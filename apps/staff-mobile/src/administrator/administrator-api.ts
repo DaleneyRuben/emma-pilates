@@ -5,12 +5,12 @@ import {
   type PaymentReviewDto,
   type SessionCancellationDto,
 } from "@pilates/api-contracts";
-import { loadPrivateImage } from "@pilates/mobile-core";
+import { loadPrivateImageWithRatio } from "@pilates/mobile-core";
 
 export type AdministratorApi = {
   cancelSession: (sessionId: string) => Promise<SessionCancellationDto>;
   confirmPayment: (paymentId: string) => Promise<PaymentReviewDto>;
-  loadReceipt: (receiptUrl: string) => Promise<string | null>;
+  loadReceipt: (receiptUrl: string) => Promise<{ aspectRatio: number; uri: string } | null>;
   rejectPayment: (paymentId: string, reason: string) => Promise<PaymentReviewDto>;
 };
 
@@ -33,7 +33,7 @@ export function createAdministratorApi(fetcher: typeof globalThis.fetch): Admini
       return response.data as PaymentReviewDto;
     },
     // The receipt is a private, authenticated image (mobile-core loader).
-    loadReceipt: (receiptUrl) => loadPrivateImage(fetcher, receiptUrl),
+    loadReceipt: (receiptUrl) => loadPrivateImageWithRatio(fetcher, receiptUrl),
     async rejectPayment(paymentId, reason) {
       const response = await rejectPayment(paymentId, { reason }, undefined, fetcher);
       requireSuccessfulResponse(response);

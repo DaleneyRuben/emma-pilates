@@ -76,7 +76,7 @@ describe("AW21 Clientes on a desktop browser", () => {
     expect(within(expired).getByText("Expirado")).toBeInTheDocument();
     const never = screen.getByRole("cell", { name: /Ana Quiroga/ })
       .parentElement as HTMLElement;
-    expect(within(never).getByText("Sin plan")).toBeInTheDocument();
+    expect(within(never).getAllByText("Sin plan")).toHaveLength(2);
     expect(within(never).queryByText("Expirado")).not.toBeInTheDocument();
   });
 

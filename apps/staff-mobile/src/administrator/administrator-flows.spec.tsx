@@ -293,7 +293,8 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.getByLabelText("Cancelar una clase")).toBeOnTheScreen();
     });
     await waitFor(() => {
-      expect(screen.getByText("Centro")).toBeOnTheScreen();
+      // The picker pill and the Session row both name the Branch.
+      expect(screen.getAllByText("Centro").length).toBeGreaterThan(0);
     });
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
