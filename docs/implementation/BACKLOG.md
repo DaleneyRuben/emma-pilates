@@ -903,7 +903,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | --- | --- | --- | --- | --- | --- | --- |
 | STU-001 | P2 | Backend | Studio Management context: `studio` schema, `session_facts`, `client_month_facts`, nightly and on-demand recompute | DOC-008, REL-016 | 3–4 d | done |
 | STU-002 | P2 | Backend/admin web | Accrued versus cash revenue by validity days, deferred revenue, classes still owed | STU-001, BKO-005 | 2–3 d | done |
-| STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | in progress |
+| STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | done |
 | STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | ready |
 | STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | ready |
 | STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | ready |
@@ -983,6 +983,44 @@ flag, so nothing is excluded; extra classes (BKM-008) are not on this
 branch, so classes still owed count the base remaining allowance only.
 The Coordinator role is IDN-009's, so the 403 is proven by casting the
 role in the e2e suite. [Pull request #195](https://github.com/DaleneyRuben/emma-pilates/pull/195).
+
+#### STU-003 · Evidence
+
+Done 2026-10-23. Indicadores, after Reporte, reads
+`GET /api/v1/administrator/reports/kpis?month=YYYY-MM`. Counts come from
+`studio.session_facts` and `studio.client_month_facts` only. Amounts reuse
+the STU-002 revenue report and are omitted for a Coordinator, not zeroed.
+A worked example of two sessions (capacities 12 and 10, bookings 8 and 5,
+attended 7 and 4, no-shows 1 and 1) is occupancy 59, students 6.5
+(`averageStudentsTimes10` 65), attendance 5.5, no-show 15. A client is new
+when no earlier client-month fact has plan days. Renewal divides renewed
+active clients by active clients.
+
+Commits: in progress `f9cacd32`, red formula `a6448cad`, green formula
+`1db69b9c`, red reader `7ffcea50`, green reader `66885565`, red endpoint
+`874b3577`, green endpoint `579943a0`, contract `1a8b5934` and models
+`3e496a99`, red page `b4794a17`, recharts `9e7093a7`, page `a8858710`.
+
+Verified: unit 3/3 (`month-kpis.spec.ts`), integration 1/1
+(`month-kpis.integration-spec.ts`) on `pilates_test_stu003`, e2e 5/5
+including Coordinator counts-only (no `*Centavos` key, revenue not called)
+and Assistant and Trainer `403 studio_access_denied`. Admin jest 4/4: an
+Administrator sees «Bs»; a counts-only payload does not. Playwright walk
+of the Vite server at `http://localhost:5207` against the API on 3141, at
+1440 and 420: signed in with Correo and Contraseña, opened Indicadores
+(at 420 behind «Abrir menú»), saw the four count tiles, Cobrado
+Bs 0,00, Devengado Bs 650,00, Diferido Bs 650,00, and a three-month bar
+with October at 20. Curl of the same API: Administrator `200` with counts
+and amounts, invalid month `400 invalid_request`. An Assistant cannot sign
+in to the admin web (`401 authentication_failed`), so the 403 is the e2e
+suite. Databases `pilates_stu003_dev` and `pilates_test_stu003` on port
+5433 were dropped.
+
+No migration. Open question: the diagnosis's renewal denominator is plans
+that expired this month, which this fact table cannot see, so v1 uses
+active clients. The Coordinator role is IDN-009's; this path accepts a
+cast `coordinator` and a real login waits for that role. Design follow-up
+204 and prompt AW39 stay pending; the export was not run.
 
 ### Summary (2026-10-23)
 
