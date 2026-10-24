@@ -29,4 +29,9 @@ export interface PlanDto {
    * @minimum 0
    */
   priceCentavos: number;
+  /**
+   * List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it.
+   * @minimum 0
+   */
+  listPriceCentavos?: number;
 }

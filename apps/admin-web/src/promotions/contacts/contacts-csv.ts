@@ -4,6 +4,7 @@ import {
   boliviaToday,
   formatCivilDate,
 } from "../../lib/bolivia-time";
+import { csvDocument } from "../../lib/csv";
 
 /** AW35's «Tipo»: a live Client, or a former Client (follow-up 104). */
 export const kindLabel = (contact: AdminPromotionContactDto): string =>
@@ -13,26 +14,11 @@ export const kindLabel = (contact: AdminPromotionContactDto): string =>
 export const consentDate = (contact: AdminPromotionContactDto): string =>
   formatCivilDate(boliviaParts(contact.consentedAt).date);
 
-// A spreadsheet runs a cell that starts with = + - @ as a formula; a phone
-// number such as «+591 70011005» stays as typed.
-const neutralised = (value: string): string =>
-  /^[=@\t\r]/.test(value) || /^[+-](?![\d\s]+$)/.test(value)
-    ? `'${value}`
-    : value;
-
-const cell = (value: string): string => {
-  const safe = neutralised(value);
-  return /[",\r\n]/.test(safe) ? `"${safe.replaceAll('"', '""')}"` : safe;
-};
-
-/**
- * AW35's «Exportar CSV»: the table's columns, CRLF rows, and a byte-order
- * mark so a spreadsheet reads the accents as UTF-8.
- */
+/** AW35's «Exportar CSV»: the table's columns. */
 export const promotionContactsCsv = (
   contacts: readonly AdminPromotionContactDto[],
 ): string =>
-  `\uFEFF${[
+  csvDocument([
     ["Nombre", "Tipo", "Correo", "Teléfono", "Aceptó el"],
     ...contacts.map((contact) => [
       contact.name,
@@ -41,9 +27,7 @@ export const promotionContactsCsv = (
       contact.phone ?? "",
       consentDate(contact),
     ]),
-  ]
-    .map((row) => `${row.map(cell).join(",")}\r\n`)
-    .join("")}`;
+  ]);
 
 export const contactsCsvName = (now: Date): string =>
   `contactos-promociones-${boliviaToday(now)}.csv`;

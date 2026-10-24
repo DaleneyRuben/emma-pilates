@@ -16,6 +16,8 @@ import {
   emptyMonthResult,
   expenseReportPath,
   incomeReportPath,
+  revenueReportPath,
+  emptyRevenueReport,
   monthResultPath,
   openingBudgetPath,
   seededMonthResult,
@@ -28,6 +30,7 @@ const finance = (
   result: (month: string) => Response = (month) =>
     jsonResponse(seededMonthResult(month)),
 ) => [
+  http.get(apiUrl(revenueReportPath), () => jsonResponse(emptyRevenueReport)),
   http.get(apiUrl(incomeReportPath), () => jsonResponse(emptyIncome(null))),
   http.get(apiUrl(expenseReportPath), () => jsonResponse(emptyExpenses(null))),
   http.get(apiUrl(branchesPath), () =>

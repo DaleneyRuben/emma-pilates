@@ -8,7 +8,6 @@ import {
   Heading,
   LoadingState,
   QueryFailure,
-  radii,
   Screen,
   spacing,
   surfaces,
@@ -61,18 +60,12 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
     );
   }
 
-  const { creditAvailableCentavos, plans } = quotes.data.data;
+  // Credit is retired (PAY-005): every Plan is collected at its full price.
+  const { plans } = quotes.data.data;
 
   return (
     <Screen style={styles.screen}>
       {header}
-      {creditAvailableCentavos > 0 ? (
-        <View style={styles.credit}>
-          <Text style={styles.creditText}>
-            {`Este cliente tiene ${formatBolivianos(creditAvailableCentavos)} de crédito disponible.`}
-          </Text>
-        </View>
-      ) : null}
       <ScrollView contentContainerStyle={styles.list}>
         <TabletGrid testID="assistant-plan-grid">
           {plans.map((plan) => (
@@ -95,10 +88,12 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
                 <BodyText>{describePlanTerms(plan)}</BodyText>
               </View>
               <View style={styles.prices}>
-                {plan.creditAppliedCentavos > 0 ? (
-                  <Text style={styles.originalPrice}>{formatBolivianos(plan.priceCentavos)}</Text>
-                ) : null}
-                <Text style={styles.price}>{formatBolivianos(plan.amountDueCentavos)}</Text>
+                {plan.listPriceCentavos === undefined ? null : (
+                  <Text style={styles.originalPrice}>
+                    {formatBolivianos(plan.listPriceCentavos)}
+                  </Text>
+                )}
+                <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
               </View>
             </Pressable>
           ))}
@@ -117,19 +112,13 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   cardBody: { flex: 1, gap: spacing.xs },
-  credit: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    padding: spacing.md,
-  },
-  creditText: { color: colors.successText, fontSize: typography.note, fontWeight: "600" },
   list: { paddingBottom: spacing.xxl },
+  planName: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   originalPrice: {
     color: colors.textSubtle,
     fontSize: typography.note,
     textDecorationLine: "line-through",
   },
-  planName: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   price: { color: colors.text, fontFamily: "Lora_500Medium", fontSize: typography.titleSecondary },
   prices: { alignItems: "flex-end" },
   screen: { gap: spacing.lg },

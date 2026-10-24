@@ -6,8 +6,9 @@ import { Separator } from "../../components/ui/separator";
 import { cn } from "../../lib/cn";
 import { useLogout } from "./use-logout";
 
-// Same label the Staff app's Perfil uses (S23): a role, not a status pill.
-const roleLabel = "Administración";
+// Same labels the Staff app's Perfil uses (S23): a role, not a status pill.
+const roleLabelOf = (profile: StaffProfileDto | undefined): string =>
+  profile?.role === "coordinator" ? "Coordinación" : "Administración";
 
 const rowClass =
   "flex h-9 w-full items-center px-4 text-left text-fila-menu hover:bg-hover-fila focus-visible:bg-hover-fila focus-visible:shadow-none";
@@ -82,7 +83,9 @@ export function AccountMenu({
         <span className="text-ayuda text-texto-muy-tenue">
           {profile?.email ?? ""}
         </span>
-        <span className="pt-1 text-ayuda text-texto-tenue">{roleLabel}</span>
+        <span className="pt-1 text-ayuda text-texto-tenue">
+          {roleLabelOf(profile)}
+        </span>
       </div>
       <Separator />
       <div className="flex flex-col pt-2">

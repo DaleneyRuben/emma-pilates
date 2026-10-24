@@ -39,6 +39,7 @@ export const accrueRevenue = (
     if (payment.state !== 'confirmed' || payment.excludedFromAnalytics)
       continue;
     const span = dayCount(payment.startsOn, payment.endsOn);
+    const daysBefore = dayCount(payment.startsOn, monthStart);
     const daysThroughMonthEnd = dayCount(
       payment.startsOn,
       monthEnd(monthStart) < payment.endsOn
@@ -48,14 +49,18 @@ export const accrueRevenue = (
     const accruedThroughMonthEnd = Math.round(
       (payment.amountCentavos * Math.max(daysThroughMonthEnd, 0)) / span,
     );
-    const daysBefore = dayCount(payment.startsOn, monthStart);
     const accruedBefore = Math.round(
       (payment.amountCentavos * Math.max(daysBefore, 0)) / span,
     );
     const isLastMonth = monthEnd(monthStart) >= payment.endsOn;
-    accruedCentavos += isLastMonth
-      ? payment.amountCentavos - accruedBefore
-      : accruedThroughMonthEnd - accruedBefore;
+    // A month after the Subscription ended has no days left. Rounding the
+    // earlier months half up can already equal the amount, so absorbing a
+    // remainder here would make the month negative.
+    if (daysBefore < span) {
+      accruedCentavos += isLastMonth
+        ? payment.amountCentavos - accruedBefore
+        : accruedThroughMonthEnd - accruedBefore;
+    }
     if (
       payment.decidedOn >= monthStart &&
       payment.decidedOn <= monthEnd(monthStart)

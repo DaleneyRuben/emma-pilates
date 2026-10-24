@@ -230,7 +230,7 @@ export function ReportPage({
           sucursales».
         </p>
       )}
-      <RevenueSection />
+      <RevenueSection active={search.vista !== undefined && !finance} />
       {finance ? null : failed !== null ? (
         <QueryFailure
           error={failed.error}

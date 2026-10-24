@@ -9,7 +9,8 @@ export type GiftClassDecision = {
   reason: 'gift_new_client';
 };
 
-// A real Payment is one a Client paid for a Plan the catalog shows. Courtesy
+// A real Payment is one a Client paid for a Plan the catalog shows.
+// Courtesy
 // Access (method courtesy, Bs 0) and any hidden Plan — a tester grant, a
 // store review, a guest pass — are never a first Plan, so they neither
 // receive nor consume the gift.

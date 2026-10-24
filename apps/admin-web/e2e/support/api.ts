@@ -144,6 +144,39 @@ export async function sendTransfer(email: string): Promise<void> {
   });
 }
 
+/**
+ * The Assistant sells «Paquete de 8 clases» for cash at her Branch with the
+ * Invoice Data the Client gives (S10, PAY-007).
+ */
+export async function sellForCash(
+  clientEmail: string,
+  invoiceData: { taxId: string; name: string } | null,
+): Promise<void> {
+  const token = await loginClient(fixtures.assistant.email);
+  const [client] = (await call(
+    "GET",
+    `/assistant/clients?query=${encodeURIComponent(clientEmail)}`,
+    { token },
+  )) as { id: string }[];
+  if (client === undefined) throw new Error(`No Client ${clientEmail}`);
+  const profile = (await call("GET", "/staff-members/current", {
+    token,
+  })) as { branches: { id: string }[] };
+  const plans = (await call("GET", "/plans", { token })) as {
+    id: string;
+    name: string;
+  }[];
+  const plan = plans.find(
+    (candidate) => candidate.name === "Paquete de 8 clases",
+  );
+  if (plan === undefined) throw new Error("The fixtures lost the 8-class Plan");
+  await call("POST", `/assistant/clients/${client.id}/cash-payments`, {
+    token,
+    body: { planId: plan.id, branchId: profile.branches[0]?.id, invoiceData },
+    headers: idempotent(),
+  });
+}
+
 /** The Client closes her own Account from Perfil (screen 24, ADR-0097). */
 export async function closeOwnAccount(
   email: string,

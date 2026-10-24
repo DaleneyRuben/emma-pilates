@@ -12,11 +12,19 @@ export type BackOfficeErrorCode =
   | 'date_in_future'
   | 'staff_member_not_found'
   | 'salary_payment_not_found'
+  | 'pay_statement_not_found'
   | 'expense_not_found'
   | 'expense_category_not_found'
   | 'expense_category_name_taken'
   | 'expense_category_in_use'
-  | 'idempotency_key_reused';
+  | 'branch_not_assigned'
+  | 'cash_close_already_recorded'
+  | 'idempotency_key_reused'
+  | 'equipment_not_found'
+  | 'equipment_number_taken'
+  | 'equipment_archived'
+  | 'equipment_issue_not_found'
+  | 'equipment_issue_resolved';
 
 const statuses: Record<BackOfficeErrorCode, number> = {
   back_office_access_denied: 403,
@@ -30,11 +38,19 @@ const statuses: Record<BackOfficeErrorCode, number> = {
   date_in_future: 400,
   staff_member_not_found: 404,
   salary_payment_not_found: 404,
+  pay_statement_not_found: 404,
   expense_not_found: 404,
   expense_category_not_found: 404,
   expense_category_name_taken: 409,
   expense_category_in_use: 409,
+  branch_not_assigned: 403,
+  cash_close_already_recorded: 409,
   idempotency_key_reused: 409,
+  equipment_not_found: 404,
+  equipment_number_taken: 409,
+  equipment_archived: 409,
+  equipment_issue_not_found: 404,
+  equipment_issue_resolved: 409,
 };
 
 export class BackOfficeError extends Error {
