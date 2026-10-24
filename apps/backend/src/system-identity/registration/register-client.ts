@@ -1,3 +1,7 @@
+import type {
+  AcquisitionChannel,
+  DeclaredAcquisitionChannel,
+} from '../../booking/acquisition/acquisition';
 import type { AuthenticationEmailJob } from '../../jobs/authentication-email/authentication-email-job';
 import type { EncryptedAuthenticationLink } from '../security/authentication-link-cipher';
 import type { IssuedAuthenticationToken } from '../security/authentication-token-service';
@@ -21,6 +25,7 @@ type NewSelfRegistration = {
   passwordHash: string;
   referralCode: string;
   referredByCode: string | null;
+  acquisitionChannel: AcquisitionChannel;
   pendingExpiresAt: Date;
   verificationToken: StoredAuthenticationToken;
   continuationToken: StoredAuthenticationToken;
@@ -81,6 +86,8 @@ export type RegisterClientCommand = {
   email: string;
   password: string;
   referralCode?: string;
+  /** BKM-011: absent from store builds older than the question. */
+  acquisitionChannel?: DeclaredAcquisitionChannel;
 };
 
 export type RegisterClientResult = {
@@ -218,6 +225,7 @@ export class RegisterClient {
           passwordHash,
           referralCode: this.dependencies.newReferralCode(),
           referredByCode: command.referralCode?.trim().toUpperCase() || null,
+          acquisitionChannel: command.acquisitionChannel ?? 'unknown',
           pendingExpiresAt,
           verificationToken: {
             id: verificationTokenId,

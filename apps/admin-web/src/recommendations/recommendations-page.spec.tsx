@@ -28,8 +28,7 @@ const inactive = {
   rule: "inactive_client",
   subject: "client-luz",
   period: "2026-10-01",
-  detail:
-    "Contacta a la clienta: tiene un plan vigente y no reservó este mes.",
+  detail: "Contacta a la clienta: tiene un plan vigente y no reservó este mes.",
   state: "new",
 };
 
@@ -38,7 +37,7 @@ const list = (recommendations: unknown[]) =>
     jsonResponse({ month: "2026-10", recommendations }),
   );
 
-describe("AW40 Recomendaciones", () => {
+describe("AW44 Recomendaciones", () => {
   useMockServer();
   beforeEach(() => {
     server.use(...signedInHandlers());
@@ -65,7 +64,9 @@ describe("AW40 Recomendaciones", () => {
       ),
       list([{ ...finding, state: "dismissed" }, inactive]),
     );
-    await user.click(within(row as HTMLElement).getByRole("button", { name: "Descartar" }));
+    await user.click(
+      within(row as HTMLElement).getByRole("button", { name: "Descartar" }),
+    );
 
     expect(await screen.findByText("Descartada")).toBeVisible();
   });
@@ -89,15 +90,13 @@ describe("AW40 Recomendaciones", () => {
     server.use(list([]));
     renderAdmin("/recomendaciones");
 
-    expect(
-      await screen.findByText("Nada que revisar este mes."),
-    ).toBeVisible();
+    expect(await screen.findByText("Nada que revisar este mes.")).toBeVisible();
   });
 
   it("shows the error state", async () => {
     server.use(
       http.get(apiUrl(listPath), () =>
-        problemResponse(500, "no_se_pudo", "No se pudo"),
+        problemResponse(500, "no_se_pudo", { detail: "No se pudo" }),
       ),
     );
     renderAdmin("/recomendaciones");

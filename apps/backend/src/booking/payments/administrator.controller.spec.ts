@@ -25,6 +25,7 @@ const review = {
   state: 'pending' as const,
   planId: '22222222-2222-4222-8222-222222222222',
   planName: 'Paquete de 8 clases',
+  durationDays: 30,
   durationMonths: 1,
   classAllowance: 8,
   planPriceCentavos: 56_000,

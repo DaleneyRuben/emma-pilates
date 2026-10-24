@@ -21,6 +21,13 @@ describe("staffNotificationDestination", () => {
     expect(staffNotificationDestination("administrator", "payment", null)).toEqual(["Payments"]);
   });
 
+  it("opens the Freeze review for the Administrator", () => {
+    expect(staffNotificationDestination("administrator", "freeze", paymentId)).toEqual([
+      "ReviewFreeze",
+      { freezeId: paymentId },
+    ]);
+  });
+
   it.each([
     ["assistant", "payment"],
     ["trainer", "nutritionist_agenda"],

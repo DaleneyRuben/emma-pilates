@@ -22,6 +22,7 @@ import {
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
+  useStudioRules,
   useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -81,18 +82,25 @@ function OutlinedAction({
 }
 
 function BookingCard({
+  cancellationWindowMinutes,
   item,
   onCancel,
   onLeave,
   onReschedule,
 }: {
+  cancellationWindowMinutes: number | undefined;
   item: UpcomingBookingDto;
   onCancel: () => void;
   onLeave: () => void;
   onReschedule: () => void;
 }) {
+  // The window is a Studio Setting (BKM-004): until it is known, a booking
+  // offers neither Cancelar nor Reprogramar rather than guess.
+  const windowKnown = cancellationWindowMinutes !== undefined;
   const insideWindow =
-    item.kind === "booking" && isInsideCancellationWindow(item.startsAt, new Date());
+    item.kind === "booking" &&
+    windowKnown &&
+    isInsideCancellationWindow(item.startsAt, new Date(), cancellationWindowMinutes);
 
   return (
     <View style={styles.card}>
@@ -114,7 +122,7 @@ function BookingCard({
           onPress={onLeave}
           testID={`booking-leave-waitlist-${item.waitlistEntryId}`}
         />
-      ) : insideWindow ? (
+      ) : !windowKnown ? null : insideWindow ? (
         <OutlinedAction
           label="Reprogramar"
           onPress={onReschedule}
@@ -152,6 +160,7 @@ export function BookingsScreen({
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const studioRules = useStudioRules(fetcher);
   const queryKeys = [getListUpcomingBookingsQueryKey(), getGetCurrentClientSubscriptionQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
@@ -246,6 +255,7 @@ export function BookingsScreen({
         >
           {items.map((item) => (
             <BookingCard
+              cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
               item={item}
               key={item.bookingId ?? item.waitlistEntryId}
               onCancel={() => setCancelling(item)}

@@ -32,4 +32,39 @@ describe('accrue revenue', () => {
     expect(november.accruedCentavos).toBe(18_000);
     expect(october.accruedCentavos + november.accruedCentavos).toBe(30_000);
   });
+
+  it('keeps every month non-negative when half-up rounding would overshoot the amount', () => {
+    const crossing = payment({
+      amountCentavos: 78_000,
+      decidedOn: new Date('2026-09-27T00:00:00.000Z'),
+      startsOn: new Date('2026-09-27T00:00:00.000Z'),
+      endsOn: new Date('2026-10-27T00:00:00.000Z'),
+    });
+    const september = accrueRevenue(
+      [crossing],
+      month('2026-09'),
+      month('2026-10'),
+    );
+    const october = accrueRevenue(
+      [crossing],
+      month('2026-10'),
+      month('2026-10'),
+    );
+    const november = accrueRevenue(
+      [crossing],
+      month('2026-11'),
+      month('2026-10'),
+    );
+
+    // 4 of 30 days fall in September: 780 * 4 / 30 rounds to 104. October,
+    // the last month, absorbs the remainder. November has no days left.
+    expect(september.accruedCentavos).toBe(10_400);
+    expect(october.accruedCentavos).toBe(67_600);
+    expect(november.accruedCentavos).toBe(0);
+    expect(
+      september.accruedCentavos +
+        october.accruedCentavos +
+        november.accruedCentavos,
+    ).toBe(78_000);
+  });
 });

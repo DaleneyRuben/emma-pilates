@@ -111,6 +111,26 @@ export class NutritionistEvaluationsController {
       this.commands.cancelEvaluationAsStaff(id, principal),
     );
   }
+
+  @Post(':evaluationId/no-show')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ operationId: 'recordEvaluationNoShow' })
+  @ApiParam({ name: 'evaluationId', format: 'uuid' })
+  @ApiNoContentResponse()
+  @Header('Cache-Control', 'no-store')
+  async noShow(
+    @Param('evaluationId') evaluationId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<void> {
+    const id = requireId(evaluationId, 'Invalid Evaluation identifier');
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    await runEvaluationCommand(() =>
+      this.commands.recordEvaluationNoShow(id, principal),
+    );
+  }
 }
 
 @Controller({ path: 'nutritionist/availability-blocks', version: '1' })
