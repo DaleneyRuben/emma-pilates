@@ -177,7 +177,14 @@ describe('Assistant Client overview', () => {
       ),
     ).resolves.toEqual({
       client: clientRecord,
-      subscription: { status: 'active', subscription },
+      subscription: {
+        status: 'active',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
+      },
       nextBooking: upcoming[0],
       recentHistory: history.slice(0, 2),
       creditAvailableCentavos: 0,
