@@ -4,6 +4,7 @@ packages:
 
 overrides:
   zod: 4.6.7
+  multer: 2.5.0
 
 allowBuilds:
   "@nestjs/core": true
