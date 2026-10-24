@@ -32,6 +32,7 @@ import {
 import {
   AdminEvaluationPageDto,
   AdminReferralPageDto,
+  FounderMembershipPageDto,
   IncomeReportDto,
   parseEvaluationListQuery,
   parseIncomeQuery,
@@ -117,6 +118,17 @@ export class AdministratorOversightController extends AdministrationController {
     );
     const principal = await this.authenticate(authorization);
     return run(() => this.operations.oversight.listReferrals(input, principal));
+  }
+
+  @Get('founder-memberships')
+  @ApiOperation({ operationId: 'listFounderMemberships' })
+  @ApiOkResponse({ type: FounderMembershipPageDto })
+  @Header('Cache-Control', 'no-store')
+  async founders(
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<FounderMembershipPageDto> {
+    const principal = await this.authenticate(authorization);
+    return run(() => this.operations.oversight.listFounders(principal));
   }
 
   @Get('reports/income')

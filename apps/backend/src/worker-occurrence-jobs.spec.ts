@@ -42,6 +42,9 @@ describe('worker entrypoint occurrence jobs', () => {
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
+      founderMemberships: {
+        execute: jest.fn().mockResolvedValue({ ended: 0 }),
+      },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
@@ -116,6 +119,9 @@ describe('worker entrypoint occurrence jobs', () => {
       },
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      founderMemberships: {
+        execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
@@ -202,6 +208,9 @@ describe('worker entrypoint occurrence jobs', () => {
       },
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      founderMemberships: {
+        execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
@@ -300,6 +309,9 @@ describe('worker entrypoint occurrence jobs', () => {
       },
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      founderMemberships: {
+        execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),

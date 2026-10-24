@@ -30,6 +30,11 @@ export interface PlanQuoteDto {
    */
   priceCentavos: number;
   /**
+   * List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it.
+   * @minimum 0
+   */
+  listPriceCentavos?: number;
+  /**
    * Deprecated (PAY-005): Credit was retired; always 0
    * @deprecated
    * @minimum 0

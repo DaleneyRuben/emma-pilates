@@ -3,6 +3,7 @@ import { boliviaDate } from '../../time/bolivia-time';
 import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { toSubscriptionSummary } from '../client/client-subscription';
 import type { PaymentCommands } from '../payments/prisma-payment-commands';
+import { priceFounderPlanList } from '../payments/prisma-founder-membership';
 import {
   listAssistantClientBookings,
   listAssistantClientHistory,
@@ -71,7 +72,12 @@ export const createAssistantClientOperations = (input: {
       quotePlansForClient(command, {
         principal,
         findClient: (clientId) => clients.findClient(clientId),
-        listVisiblePlans: () => catalog.listVisiblePlans(),
+        listVisiblePlans: async (clientId) =>
+          priceFounderPlanList(
+            input.prisma,
+            clientId,
+            await catalog.listVisiblePlans(),
+          ),
       }),
     recordCashPayment: (command, principal, idempotencyKey) =>
       recordAssistantCashPayment(

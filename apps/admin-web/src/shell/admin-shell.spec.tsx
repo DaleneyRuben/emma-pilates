@@ -33,6 +33,7 @@ describe("admin shell", () => {
         "Sucursales",
         "Clientes",
         "Para contactar",
+        "Fundadoras",
         "Pagos",
         "Caja",
         "Insumos",

@@ -140,7 +140,12 @@ describe('Assistant Client overview', () => {
       readClientOverview({ clientId: 'client-id' }, dependencies),
     ).resolves.toEqual({
       client: clientRecord,
-      subscription: { status: 'active', subscription, nextSubscription: null },
+      subscription: {
+        status: 'active',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+      },
       nextBooking: upcoming[0],
       recentHistory: history.slice(0, 2),
       creditAvailableCentavos: 0,
@@ -166,7 +171,12 @@ describe('Assistant Client overview', () => {
       ),
     ).resolves.toEqual({
       client: clientRecord,
-      subscription: { status: 'active', subscription, nextSubscription: null },
+      subscription: {
+        status: 'active',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+      },
       nextBooking: upcoming[0],
       recentHistory: history.slice(0, 2),
       creditAvailableCentavos: 0,

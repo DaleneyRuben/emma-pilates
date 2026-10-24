@@ -28,6 +28,7 @@ you are starting with no project knowledge.
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; voiding a sale (PAY-006) is not built yet |
+| Founder membership           | The first 40 Clients whose first real Payment is confirmed get 15 % off later Plans except the single class, a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; the first Payment itself is at list price |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
@@ -51,8 +52,8 @@ can be found by its design name.
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79 |
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81, 87 |
-| 12 Mi plan | 5, 18, 71, 81, 85, 87 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81, 87, 88 |
+| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
@@ -66,7 +67,7 @@ can be found by its design name.
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82 |
 | S26 Reportar una falla (Entrenadora) | 82 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
@@ -88,6 +89,7 @@ can be found by its design name.
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 79, 85 |
+| AW40 Fundadoras | 88 |
 | AW23–AW24 Personal | 26, 31, 72, 79 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
@@ -6039,7 +6041,8 @@ D. **When the rules cannot be read** (stop the API while an app is open on
 The Minimum Bookings and its lead time drive the worker's check since BKM-009
 (Test 13): raise the minimum here and the next check uses it. The rules that
 use the other values (Start Dates, founders, invites, tax, the paid
-Evaluation, the renewal bonus) arrive with their own backlog items.
+Evaluation, the renewal bonus) arrive with their own backlog items. Founders
+are Test 88.
 
 ## Test 76: the daily cash close (BKO-003)
 
@@ -6415,6 +6418,45 @@ D. **A booking before the Start Date (04).** End the current Subscription
 The reminder that names the renewal arrives with the worker's Plan reminder
 (Test 7). An Evaluation booked before the Start Date still answers the
 existing ineligible-subscription refusal.
+
+## Test 88: founder membership (BKM-010)
+
+The first 40 Clients whose first real Payment is confirmed hold a Founder
+Membership: 15 % off every Plan except the single class, lost for good after
+a gap of more than 7 days
+([booking ADR-0008](../booking/docs/adr/0008-founder-membership.md)).
+Run the API and the fixtures as in Tests 2 and 5. The Client app and the
+Staff app were not walked on a device for this item; the prices and the
+banner are covered by their unit tests. The admin list is the browser check.
+
+A. **The place.** Confirm a real Payment (cash or an approved transfer) for
+   a Client who has never paid. She receives the next number, from 1 to 40.
+   The 41st distinct Client receives none. A Courtesy Access (Bs 0) takes
+   no place. A second real Payment for a founder does not take a second
+   number.
+B. **The price (08, 09, S09).** As a founder, **Elige tu plan** shows the
+   discounted price, with the list price struck through under it. The
+   single class (1 class, Bs 80) shows only its list price. A Client who is
+   not a founder sees only the list price. The Assistant's quote shows the
+   same pair, and the cash to collect is the discounted price minus any
+   credit. The first real Payment itself is at list price; the discount
+   starts on the next purchase.
+C. **The banner (12).** As a founder with a current Subscription, **Mi
+   plan** shows «Renueva antes del {fecha}.» The date is the current
+   Subscription's real end plus 7 days. No banner when she has no current
+   Subscription, or when the membership is lost.
+D. **The gap.** A nightly job ends a membership when more than 7 days pass
+   after the stored end with no next Start Date. A gap of 7 days keeps it.
+   A lost membership does not return on a later Payment. Running the job
+   twice ends nothing the second time. The Client receives a push and an
+   inbox notification titled «Membresía fundadora».
+E. **The income report.** A founder's later sale shows the list price, the
+   discount (`discountReason` `founder`), and the amount paid.
+F. **Fundadoras (AW40).** As Paola, open **Back Office → Fundadoras**. The
+   subtitle reads «n de 40 lugares». Each row shows the number, the name,
+   the day (`dd/mm/aaaa`), and **Activa** or **Perdida**. There is no
+   create action. At 420 px each membership is a card. An empty studio
+   reads «Todavía no hay fundadoras.»
 
 ## Test 82: equipment, its faults, and the capacity flags (BKO-004)
 

@@ -78,6 +78,11 @@ import {
 
 import { grantGiftClass } from './allowance-adjustments';
 import {
+  grantFounderPlace,
+  priceFounderSale,
+  readIsFounder,
+} from './prisma-founder-membership';
+import {
   collectOwedInviteReward,
   grantInviteReward,
 } from './grant-invite-reward';
@@ -433,8 +438,7 @@ export function createPrismaPaymentCommands(
       method: paymentMethods[payment.method],
       hidden: payment.plan.hiddenAt !== null,
       priceCentavos: payment.planPriceCentavos,
-      // BKM-010 makes the Founder Membership real; until then nobody is one.
-      founder: false,
+      founder: await readIsFounder(transaction, payment.clientId),
       earlierRealPayment: await hasEarlierRealPayment(transaction, {
         clientId: payment.clientId,
         paymentId: payment.id,
@@ -495,6 +499,12 @@ export function createPrismaPaymentCommands(
       today: eligible.today,
       active: eligible.active,
     });
+    const priced = await priceFounderSale(transaction, {
+      clientId: input.clientId,
+      classAllowance: plan.classAllowance,
+      priceCentavos: plan.priceCentavos,
+      creditAppliedCentavos: 0,
+    });
 
     const payment = await transaction.payment.create({
       data: {
@@ -506,7 +516,9 @@ export function createPrismaPaymentCommands(
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: plan.priceCentavos,
         creditAppliedCentavos: 0,
-        amountDueCentavos: plan.priceCentavos,
+        discountCentavos: priced.discountCentavos,
+        discountReason: priced.discountReason,
+        amountDueCentavos: priced.amountDueCentavos,
         startsOn: allocated.startsOn,
         method: PaymentMethod.CASH,
         state: PaymentState.CONFIRMED,
@@ -540,6 +552,12 @@ export function createPrismaPaymentCommands(
       input.principal,
       now,
     );
+    await grantFounderPlace(transaction, {
+      clientId: input.clientId,
+      paymentId: payment.id,
+      now,
+      courtesy: false,
+    });
     await recordPaymentAudit(transaction, {
       actionCode: 'payment.cash_confirmed',
       principal: input.principal,
@@ -656,6 +674,12 @@ export function createPrismaPaymentCommands(
               active: eligible.active,
             });
             const now = dependencies.now();
+            const priced = await priceFounderSale(transaction, {
+              clientId,
+              classAllowance: plan.classAllowance,
+              priceCentavos: plan.priceCentavos,
+              creditAppliedCentavos: 0,
+            });
 
             const intent = await transaction.purchaseIntent.create({
               data: {
@@ -667,7 +691,9 @@ export function createPrismaPaymentCommands(
                 classAllowanceSnapshot: plan.classAllowance,
                 planPriceCentavos: plan.priceCentavos,
                 creditReservedCentavos: 0,
-                amountDueCentavos: plan.priceCentavos,
+                discountCentavos: priced.discountCentavos,
+                discountReason: priced.discountReason,
+                amountDueCentavos: priced.amountDueCentavos,
                 startsOn: allocated.startsOn,
                 createdByAccountId: principal.accountId,
                 createdAt: now,
@@ -847,6 +873,8 @@ export function createPrismaPaymentCommands(
               classAllowanceSnapshot: intent.classAllowanceSnapshot,
               planPriceCentavos: intent.planPriceCentavos,
               creditAppliedCentavos: intent.creditReservedCentavos,
+              discountCentavos: intent.discountCentavos,
+              discountReason: intent.discountReason,
               amountDueCentavos: intent.amountDueCentavos,
               startsOn: intent.startsOn,
               method: PaymentMethod.TRANSFER,
@@ -1029,6 +1057,12 @@ export function createPrismaPaymentCommands(
         principal,
         now,
       );
+      await grantFounderPlace(transaction, {
+        clientId: payment.clientId,
+        paymentId: payment.id,
+        now,
+        courtesy: false,
+      });
       await recordPaymentAudit(transaction, {
         actionCode: 'payment.transfer_confirmed',
         principal,

@@ -1,3 +1,10 @@
+enum FounderMembershipStatus {
+  ACTIVE @map("active")
+  LOST   @map("lost")
+
+  @@schema("booking")
+}
+
 enum StaffRole {
   TRAINER       @map("trainer")
   NUTRITIONIST  @map("nutritionist")
@@ -33,12 +40,33 @@ model Client {
   guestPassesReceived GuestPass[]     @relation("GuestPassFriend")
   evaluations         Evaluation[]
   promotionsConsents  ClientPromotionsConsent[]
+  founderMembership   FounderMembership?
   lifecycleMessages   LifecycleMessage[]
   contactAlerts       ContactAlert[]
   acquisitions        ClientAcquisition[] @relation("AcquiredClient")
   acquisitionsReferred ClientAcquisition[] @relation("AcquisitionReferrerClient")
 
   @@map("clients")
+  @@schema("booking")
+}
+
+// BKM-010 / booking ADR-0008: one membership per Client, numbered 1–40 in
+// confirmation order. A lost membership stays; the number is never reused.
+model FounderMembership {
+  id         String                  @id @default(uuid()) @db.Uuid
+  clientId   String                  @unique @map("client_id") @db.Uuid
+  number     Int                     @unique @db.SmallInt
+  since      DateTime                @db.Timestamptz(3)
+  status     FounderMembershipStatus @default(ACTIVE)
+  reason     String?
+  lostAt     DateTime?               @map("lost_at") @db.Timestamptz(3)
+  createdAt  DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt  DateTime?               @map("deleted_at") @db.Timestamptz(3)
+  client     Client                  @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  @@index([status, number])
+  @@map("founder_memberships")
   @@schema("booking")
 }
 

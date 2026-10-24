@@ -135,6 +135,32 @@ export class IncomeMonthDto {
   @ApiProperty() totalCentavos!: number;
 }
 
+export class FounderMembershipDto {
+  @ApiProperty({ format: 'uuid' }) membershipId!: string;
+  @ApiProperty({ minimum: 1, maximum: 40 }) number!: number;
+  @ApiProperty() clientName!: string;
+  @ApiProperty({ format: 'date-time' }) since!: Date;
+  @ApiProperty({ enum: ['active', 'lost'] }) status!: 'active' | 'lost';
+}
+
+export class FounderMembershipPageDto {
+  @ApiProperty({ type: FounderMembershipDto, isArray: true })
+  items!: FounderMembershipDto[];
+  @ApiProperty() granted!: number;
+  @ApiProperty() places!: number;
+}
+
+export class IncomeSaleDto {
+  @ApiProperty({ format: 'uuid' }) paymentId!: string;
+  @ApiProperty({ description: 'List price, BOB centavos' })
+  planPriceCentavos!: number;
+  @ApiProperty({ description: 'Discount stored on the Payment, BOB centavos' })
+  discountCentavos!: number;
+  @ApiProperty({ type: String, nullable: true }) discountReason!: string | null;
+  @ApiProperty({ description: 'Amount paid, BOB centavos' })
+  amountDueCentavos!: number;
+}
+
 export class IncomeReportDto {
   @ApiProperty({ format: 'date-time' }) from!: Date;
   @ApiProperty({ format: 'date-time' }) until!: Date;
@@ -142,8 +168,22 @@ export class IncomeReportDto {
     string | null;
   @ApiProperty({ description: 'Confirmed Payments, BOB centavos' })
   totalCentavos!: number;
+  @ApiProperty({
+    description: 'List price of the confirmed sales, BOB centavos',
+  })
+  listPriceCentavos!: number;
+  @ApiProperty({
+    description: 'Discounts on the confirmed sales, BOB centavos',
+  })
+  discountCentavos!: number;
   @ApiProperty({ type: IncomeByMethodDto }) byMethod!: IncomeByMethodDto;
   @ApiProperty({ type: IncomeMonthDto, isArray: true })
   months!: IncomeMonthDto[];
+  @ApiProperty({
+    type: IncomeSaleDto,
+    isArray: true,
+    description: 'Sales that carry a discount, with list price and amount paid',
+  })
+  sales!: IncomeSaleDto[];
   @ApiProperty({ format: 'date-time' }) generatedAt!: Date;
 }

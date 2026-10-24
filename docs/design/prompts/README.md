@@ -111,6 +111,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW37](./admin-web/37-equipos.md) | Equipos | `AW37` | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
 | [AW38](./admin-web/38-comentarios.md) | Comentarios | `AW38` | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 | [AW39](./admin-web/39-para-contactar.md) | Para contactar | `AW39` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
+| [AW40](./admin-web/40-fundadoras.md) | Fundadoras | `AW40` | not yet generated (BKM-010; the admin web is built from the prompt; AW37 is Equipos) |
 | [AW151](./admin-web/151-cierres-de-caja.md) | Cierres de caja | `AW151` | ✅ (Claude Design canvas, 2026-10-23, `1e4dee1e`; BKO-003, numbered from its assigned block 150–154) |
 
 ## Follow-ups (`followups/`)
@@ -269,6 +270,8 @@ Each of these was sent as the next message in the existing design session for th
 | [194](./followups/194-client-summary-extra-classes.md) | `S06` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008) | 🕓 pending (190–192 reserved by BKM-006) |
 | [195](./followups/195-admin-client-detail-extra-classes.md) | `AW22` shows «Clases extra: 1 · Regalo de bienvenida» under «Clases disponibles» when the API returns the line; no courtesy form (BKM-008, PAY-006) | 🕓 pending (190–192 reserved by BKM-006) |
 | [196](./followups/196-invita-a-una-amiga.md) | `16` becomes «Invita a una amiga»: the code, the free-class explanation, and each invitation's status (Registrada, Clase reservada, Compró su plan); the credit row goes (BKM-014, booking ADR-0009) | 🕓 pending |
+| [197](./followups/197-founder-prices.md) | Discounted price and struck list price on `08`, `09`, and `S09` for a founder; the single class stays at list price (BKM-010) | 🕓 pending |
+| [198](./followups/198-founder-renewal-banner.md) | «Renueva antes del …» on `12` while a founder holds a current Subscription (BKM-010) | 🕓 pending |
 
 ## Status
 

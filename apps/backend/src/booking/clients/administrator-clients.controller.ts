@@ -70,6 +70,7 @@ const toDetailDto = (
     subscription: {
       status: client.subscription.status,
       nextSubscription: null,
+      founderRenewalDeadline: client.subscription.founderRenewalDeadline,
       subscription:
         current === null
           ? null

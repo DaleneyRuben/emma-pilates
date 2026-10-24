@@ -107,7 +107,12 @@ describe('assistant clients (e2e)', () => {
     operations.search.mockResolvedValue([client]);
     operations.overview.mockResolvedValue({
       client,
-      subscription: { status: 'active', subscription, nextSubscription: null },
+      subscription: {
+        status: 'active',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+      },
       nextBooking: booking,
       recentHistory: [historyEntry],
       creditAvailableCentavos: 6_000,
@@ -185,6 +190,7 @@ describe('assistant clients (e2e)', () => {
           subscription: {
             status: 'active',
             nextSubscription: null,
+            founderRenewalDeadline: null,
             subscription: {
               ...subscription,
               startsOn: '2026-09-10',

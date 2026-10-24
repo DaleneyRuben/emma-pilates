@@ -203,12 +203,12 @@ export const quotePlansForClient = async (
   command: { clientId: string },
   dependencies: ClientLookup & {
     principal: AuthenticatedPrincipal;
-    listVisiblePlans(): Promise<PlanSummary[]>;
+    listVisiblePlans(clientId: string): Promise<PlanSummary[]>;
   },
 ): Promise<PlanQuotes> => {
   requireSeller(dependencies.principal);
-  await requireClient(command.clientId, dependencies);
-  const plans = await dependencies.listVisiblePlans();
+  const client = await requireClient(command.clientId, dependencies);
+  const plans = await dependencies.listVisiblePlans(client.id);
 
   // Credit is retired (booking ADR-0009): every Plan costs its full price.
   return {

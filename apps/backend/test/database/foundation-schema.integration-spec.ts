@@ -49,6 +49,7 @@ describe('foundation migration', () => {
       'booking.credit_reservations',
       'booking.evaluation_slots',
       'booking.evaluations',
+      'booking.founder_memberships',
       'booking.guest_passes',
       'booking.lifecycle_messages',
       'booking.payments',

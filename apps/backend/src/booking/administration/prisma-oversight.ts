@@ -1,5 +1,6 @@
 import {
   EvaluationState,
+  FounderMembershipStatus,
   PaymentMethod,
   PaymentState,
   ReferralState,
@@ -172,6 +173,44 @@ export const createPrismaOversight = (
     };
   },
 
+  // The 40 places, numbered in confirmation order. Administrator only
+  // (ADR-0102): the Coordinator never sees money.
+  listFounders: async (principal: AuthenticatedPrincipal) => {
+    requireAdministrator(principal);
+    const [rows, granted, settings] = await Promise.all([
+      prisma.founderMembership.findMany({
+        where: { deletedAt: null },
+        orderBy: { number: 'asc' },
+        select: {
+          id: true,
+          number: true,
+          since: true,
+          status: true,
+          client: { select: { name: true } },
+        },
+      }),
+      prisma.founderMembership.count({ where: { deletedAt: null } }),
+      prisma.studioSettingsVersion.findFirst({
+        orderBy: { version: 'desc' },
+        select: { founderPlaces: true },
+      }),
+    ]);
+    return {
+      items: rows.map((row) => ({
+        membershipId: row.id,
+        number: row.number,
+        clientName: row.client.name,
+        since: row.since,
+        status:
+          row.status === FounderMembershipStatus.ACTIVE
+            ? ('active' as const)
+            : ('lost' as const),
+      })),
+      granted,
+      places: settings?.founderPlaces ?? 40,
+    };
+  },
+
   // CONTEXT-MAP: cash income belongs to its collection Branch; transfer and
   // Credit-only Payments appear only in the all-Branches result.
   incomeReport: async (
@@ -190,25 +229,56 @@ export const createPrismaOversight = (
               collectedAtBranchId: query.branchId,
             }),
       },
-      select: { method: true, amountDueCentavos: true, decidedAt: true },
+      select: {
+        id: true,
+        method: true,
+        planPriceCentavos: true,
+        discountCentavos: true,
+        discountReason: true,
+        amountDueCentavos: true,
+        decidedAt: true,
+      },
     });
     const byMethod = { cash: 0, transfer: 0, credit_only: 0 };
     const months = new Map<string, number>();
+    let listPriceCentavos = 0;
+    let discountCentavos = 0;
+    const sales: {
+      paymentId: string;
+      planPriceCentavos: number;
+      discountCentavos: number;
+      discountReason: string | null;
+      amountDueCentavos: number;
+    }[] = [];
     for (const payment of payments) {
       if (payment.method === PaymentMethod.COURTESY) continue;
       byMethod[methodNames[payment.method]] += payment.amountDueCentavos;
+      listPriceCentavos += payment.planPriceCentavos;
+      discountCentavos += payment.discountCentavos;
       const month = `${boliviaDate(payment.decidedAt!).toISOString().slice(0, 7)}-01`;
       months.set(month, (months.get(month) ?? 0) + payment.amountDueCentavos);
+      if (payment.discountCentavos > 0) {
+        sales.push({
+          paymentId: payment.id,
+          planPriceCentavos: payment.planPriceCentavos,
+          discountCentavos: payment.discountCentavos,
+          discountReason: payment.discountReason,
+          amountDueCentavos: payment.amountDueCentavos,
+        });
+      }
     }
     return {
       from: query.from,
       until: query.until,
       branchId: query.branchId ?? null,
       totalCentavos: byMethod.cash + byMethod.transfer + byMethod.credit_only,
+      listPriceCentavos,
+      discountCentavos,
       byMethod,
       months: [...months.entries()]
         .sort(([left], [right]) => left.localeCompare(right))
         .map(([month, totalCentavos]) => ({ month, totalCentavos })),
+      sales,
       generatedAt: dependencies.now(),
     };
   },

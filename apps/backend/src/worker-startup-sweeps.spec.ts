@@ -12,6 +12,7 @@ const sweeps = () => ({
   pendingAccountCleanup: idle({ cleaned: 0 }),
   imageUploadCleanup: idle({ cleaned: 0 }),
   subscriptionReminders: idle({ reminded: 0 }),
+  founderMemberships: idle({ ended: 0 }),
   first90Days: idle({ messages: 0, alerts: 0 }),
   purchaseIntentExpiry: idle({ expired: 0 }),
 });
