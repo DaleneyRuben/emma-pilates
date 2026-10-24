@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
 import { clientAccountStatuses } from '../assistant/assistant.dto';
 import type { ClientAccountStatus } from '../assistant/assistant-clients';

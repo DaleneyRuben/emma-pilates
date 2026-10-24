@@ -59,8 +59,8 @@ export type ClientClosureOutlook = {
 
 export type AdministratorClientDetail = AdministratorClientRecord & {
   subscription: ClientSubscriptionView;
-  /** Never sent to the Coordinator, who sees no amount (ADR-0102). */
-  creditAvailableCentavos?: number;
+  /** Credit is retired (PAY-005); the field stays as a zero. */
+  creditAvailableCentavos: number;
   closure: ClientClosureOutlook;
 };
 
@@ -126,7 +126,7 @@ export const readAdministratorClient = async (
   principal: AuthenticatedPrincipal,
   { directory, now }: Dependencies,
 ): Promise<AdministratorClientDetail> => {
-  const actor = requireOperations(principal);
+  requireOperations(principal);
   const client = await directory.read(command.clientId);
   if (client === null) throw new AdministrationError('client_not_found');
   const instant = now();
