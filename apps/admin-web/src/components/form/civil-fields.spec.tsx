@@ -4,7 +4,9 @@ import userEvent from "@testing-library/user-event";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
+import { civilDateValue } from "./civil-date";
 import { CivilDateInput } from "./civil-date-input";
+import { civilTimeValue } from "./civil-time";
 import { CivilTimeInput } from "./civil-time-input";
 import {
   Form,
@@ -16,8 +18,8 @@ import {
 } from "./form";
 
 const sessionSchema = z.object({
-  date: z.string(),
-  time: z.string(),
+  date: civilDateValue,
+  time: civilTimeValue,
 });
 
 type SessionValues = z.infer<typeof sessionSchema>;
@@ -101,6 +103,39 @@ describe("civil date and time fields", () => {
     expect(date).toHaveValue("32/13/2026");
     expect(date).toHaveAccessibleDescription("Elige una fecha válida.");
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("accepts a filled yyyy-mm-dd and shows it as dd/mm/aaaa", async () => {
+    const onSubmit = jest.fn();
+    const user = userEvent.setup();
+    render(<SessionFields onSubmit={onSubmit} />);
+
+    const date = screen.getByRole("textbox", { name: "Fecha" });
+    await user.type(date, "2026-10-21");
+
+    expect(date).toHaveValue("21/10/2026");
+    await user.click(screen.getByRole("button", { name: "Guardar" }));
+    expect(onSubmit).toHaveBeenCalledWith(
+      { date: "2026-10-21", time: "" },
+      expect.anything(),
+    );
+  });
+
+  it("shows a filled yyyy-mm-dd as dd/mm/aaaa and submits it", async () => {
+    const onSubmit = jest.fn();
+    const user = userEvent.setup();
+    render(<SessionFields onSubmit={onSubmit} />);
+
+    const date = screen.getByRole("textbox", { name: "Fecha" });
+    await user.click(date);
+    await user.paste("2026-10-21");
+
+    expect(date).toHaveValue("21/10/2026");
+    await user.click(screen.getByRole("button", { name: "Guardar" }));
+    expect(onSubmit).toHaveBeenCalledWith(
+      { date: "2026-10-21", time: "" },
+      expect.anything(),
+    );
   });
 
   it("leaves an empty date empty and shows a stored date as dd/mm/aaaa", () => {
