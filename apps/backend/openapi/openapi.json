@@ -6649,6 +6649,133 @@
         ]
       }
     },
+    "/api/v1/cash-closes/today": {
+      "get": {
+        "operationId": "getTodayCashClose",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashTodayDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CashCloses"
+        ]
+      }
+    },
+    "/api/v1/cash-closes": {
+      "post": {
+        "operationId": "recordCashClose",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashCloseInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashCloseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CashCloses"
+        ]
+      }
+    },
+    "/api/v1/administrator/cash-closes": {
+      "get": {
+        "operationId": "listAdminCashCloses",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashCloseHistoryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorCashCloses"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -12031,6 +12158,253 @@
           "byCategory",
           "months",
           "generatedAt"
+        ]
+      },
+      "CashCloseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil day closed"
+          },
+          "expectedCentavos": {
+            "type": "number",
+            "description": "Confirmed cash Payments at the Branch that day, at the close"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "countedCentavos": {
+            "type": "number"
+          },
+          "differenceCentavos": {
+            "type": "number",
+            "description": "Counted minus expected"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "closedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closedByName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "businessDate",
+          "expectedCentavos",
+          "cashPaymentCount",
+          "countedCentavos",
+          "differenceCentavos",
+          "note",
+          "closedAt",
+          "closedByName"
+        ]
+      },
+      "CashTodayDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Today in Bolivia"
+          },
+          "expectedCentavos": {
+            "type": "number",
+            "description": "Confirmed cash Payments at the Branch today, so far"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "close": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CashCloseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "branchId",
+          "businessDate",
+          "expectedCentavos",
+          "cashPaymentCount",
+          "close"
+        ]
+      },
+      "CashCloseInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "countedCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Cash counted in the drawer"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "branchId",
+          "countedCentavos"
+        ]
+      },
+      "CashCloseHistoryEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil day closed"
+          },
+          "expectedCentavos": {
+            "type": "number",
+            "description": "Confirmed cash Payments at the Branch that day, at the close"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "countedCentavos": {
+            "type": "number"
+          },
+          "differenceCentavos": {
+            "type": "number",
+            "description": "Counted minus expected"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "closedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closedByName": {
+            "type": "string"
+          },
+          "adjustmentCentavos": {
+            "type": "number",
+            "description": "How the day’s cash sales moved after the close: a sale voided later (−) or recorded later (+)"
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "businessDate",
+          "expectedCentavos",
+          "cashPaymentCount",
+          "countedCentavos",
+          "differenceCentavos",
+          "note",
+          "closedAt",
+          "closedByName",
+          "adjustmentCentavos"
+        ]
+      },
+      "CashDayDto": {
+        "type": "object",
+        "properties": {
+          "businessDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "closed",
+              "missing",
+              "open"
+            ],
+            "description": "missing: a past day with cash sales and no close"
+          },
+          "cashSalesCentavos": {
+            "type": "number",
+            "description": "The day’s confirmed cash Payments now"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "close": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CashCloseHistoryEntryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "businessDate",
+          "status",
+          "cashSalesCentavos",
+          "cashPaymentCount",
+          "close"
+        ]
+      },
+      "CashCloseHistoryDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "month": {
+            "type": "string",
+            "example": "2026-10",
+            "description": "Bolivia month"
+          },
+          "missingDays": {
+            "type": "number",
+            "description": "Past days with cash sales and no close"
+          },
+          "days": {
+            "description": "Days with cash sales or a close, newest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CashDayDto"
+            }
+          }
+        },
+        "required": [
+          "branchId",
+          "month",
+          "missingDays",
+          "days"
         ]
       },
       "CreatePendingUploadDto": {

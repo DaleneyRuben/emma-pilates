@@ -1,7 +1,5 @@
 import {
   getGetAssistantClientOverviewQueryKey,
-  useGetCurrentStaffMemberProfile,
-  useListBranches,
   type AssistantCashPaymentDto,
   type PlanQuoteDto,
 } from "@pilates/api-contracts";
@@ -21,9 +19,10 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { BranchChips, useCashBranches } from "../ui/branch-chips";
 import { CenteredCard } from "./assistant-layout";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
@@ -76,17 +75,8 @@ export function ConfirmCashPaymentScreen({
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
-  const profile = useGetCurrentStaffMemberProfile({ fetcher });
-  const assigned = profile.data?.status === 200 ? profile.data.data.branches : [];
-  // Administrators have no assignments and choose among every Branch.
-  const branches = useListBranches({
-    fetcher,
-    query: { enabled: profile.data?.status === 200 && assigned.length === 0 },
-  });
-  const options =
-    assigned.length > 0 ? assigned : branches.data?.status === 200 ? branches.data.data : [];
-  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
-  const branchId = selectedBranchId ?? options[0]?.id ?? null;
+  const branches = useCashBranches();
+  const branchId = branches.branch?.id ?? null;
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [result, setResult] = useState<AssistantCashPaymentDto | null>(null);
@@ -179,31 +169,13 @@ export function ConfirmCashPaymentScreen({
               value={formatBolivianos(quote.amountDueCentavos)}
             />
           </View>
-          {options.length > 1 ? (
-            <View style={styles.branches}>
-              <BodyText style={styles.muted}>Sucursal donde recibes el efectivo</BodyText>
-              <View style={styles.chips}>
-                {options.map((branch) => {
-                  const selected = branch.id === branchId;
-                  return (
-                    <Pressable
-                      accessibilityLabel={branch.name}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected }}
-                      key={branch.id}
-                      onPress={() => setSelectedBranchId(branch.id)}
-                      style={[styles.chip, selected && styles.chipSelected]}
-                      testID={`cash-branch-${branch.id}`}
-                    >
-                      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
-                        {branch.name}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
-          ) : null}
+          <BranchChips
+            label="Sucursal donde recibes el efectivo"
+            onSelect={branches.select}
+            options={branches.options}
+            selectedId={branchId}
+            testIDPrefix="cash-branch"
+          />
           <BodyText style={styles.muted}>
             Confirma solo cuando tengas el efectivo en mano. El plan se activa al instante.
           </BodyText>
@@ -226,7 +198,6 @@ export function ConfirmCashPaymentScreen({
 }
 
 const styles = StyleSheet.create({
-  branches: { gap: spacing.sm },
   card: {
     ...surfaces.card,
     gap: spacing.sm,
@@ -234,17 +205,6 @@ const styles = StyleSheet.create({
   },
   cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   centered: { textAlign: "center" },
-  chip: {
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  chipLabel: { color: colors.textSecondary, fontSize: typography.note },
-  chipLabelSelected: { color: colors.white },
-  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   divider: { backgroundColor: colors.border, height: 1 },
   failure: { color: colors.errorText },

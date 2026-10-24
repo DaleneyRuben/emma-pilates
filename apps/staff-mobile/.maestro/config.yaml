@@ -22,4 +22,5 @@ executionOrder:
     - administrator-cancel-session
     - assistant-create-client
     - assistant-cash-payment-and-booking
+    - assistant-cash-close
     - trainer-attendance
