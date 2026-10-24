@@ -20,6 +20,7 @@ executionOrder:
     - home-plan-and-notifications
     - profile-photo
     - promotions-consent
+    - send-feedback
     - purchase-plan-transfer
     - waitlist-join-and-leave
     - reschedule-booking

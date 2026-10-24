@@ -21,6 +21,7 @@ import {
   surfaces,
   TextButton,
   typography,
+  useStudioRules,
   useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -83,18 +84,25 @@ function OutlinedAction({
 }
 
 function BookingCard({
+  cancellationWindowMinutes,
   item,
   onCancel,
   onLeave,
   onReschedule,
 }: {
+  cancellationWindowMinutes: number | undefined;
   item: AssistantClientBookingDto;
   onCancel: () => void;
   onLeave: () => void;
   onReschedule: () => void;
 }) {
+  // The window is a Studio Setting (BKM-004): until it is known, a Booking
+  // offers neither Cancelar nor Reprogramar rather than guess.
+  const windowKnown = cancellationWindowMinutes !== undefined;
   const insideWindow =
-    item.kind === "booking" && isInsideCancellationWindow(item.startsAt, new Date());
+    item.kind === "booking" &&
+    windowKnown &&
+    isInsideCancellationWindow(item.startsAt, new Date(), cancellationWindowMinutes);
   const locked = !item.actionable;
 
   return (
@@ -113,7 +121,7 @@ function BookingCard({
       </BodyText>
       {item.kind === "waitlist" ? (
         <OutlinedAction disabled={locked} label="Salir de la lista de espera" onPress={onLeave} />
-      ) : insideWindow ? (
+      ) : !windowKnown ? null : insideWindow ? (
         <OutlinedAction disabled={locked} label="Reprogramar" onPress={onReschedule} />
       ) : (
         <OutlinedAction disabled={locked} label="Cancelar" onPress={onCancel} />
@@ -133,6 +141,7 @@ export function ClientBookingsScreen({
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
+  const studioRules = useStudioRules(fetcher);
   const notice = useTransientNotice(route.params.confirmed, noticeVisibleMs, () =>
     navigation.setParams({ confirmed: undefined }),
   );
@@ -222,6 +231,7 @@ export function ClientBookingsScreen({
         <ScrollView contentContainerStyle={styles.list}>
           {items.map((item) => (
             <BookingCard
+              cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
               item={item}
               key={item.bookingId ?? item.waitlistEntryId}
               onCancel={() => setCancelling(item)}

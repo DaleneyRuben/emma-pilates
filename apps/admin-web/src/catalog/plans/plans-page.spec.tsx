@@ -14,21 +14,26 @@ import { useNarrowViewport } from "../../test/viewport";
 
 const plansPath = "/api/v1/administrator/plans";
 
+// BKM-005: Plans last 30, 60, or 90 days; the long ones may cap the week.
 const mensual = {
   id: "7a1b2c3d-0000-5000-8000-000000000003",
-  name: "Mensual 16 clases",
-  durationMonths: 1,
+  name: "Bimestral 16 clases",
+  durationDays: 60,
+  weeklyClassCap: 3,
+  durationMonths: 2,
   classAllowance: 16,
-  priceCentavos: 105_000,
+  priceCentavos: 112_000,
   displayOrder: 3,
   hiddenAt: null,
 };
 const anual = {
   id: "7a1b2c3d-0000-5000-8000-000000000006",
-  name: "Anual 180 clases",
-  durationMonths: 12,
-  classAllowance: 180,
-  priceCentavos: 960_000,
+  name: "Paquete de 12 clases",
+  durationDays: 30,
+  weeklyClassCap: null,
+  durationMonths: 1,
+  classAllowance: 12,
+  priceCentavos: 78_000,
   displayOrder: 6,
   hiddenAt: "2026-09-20T12:00:00.000Z",
 };
@@ -42,7 +47,7 @@ const planTable = (respond: (params: URLSearchParams) => Response) =>
   });
 
 const openNewPlan = async (user: ReturnType<typeof renderAdmin>["user"]) => {
-  await screen.findByRole("cell", { name: /Mensual 16 clases/ });
+  await screen.findByRole("cell", { name: /Bimestral 16 clases/ });
   await user.click(screen.getByRole("button", { name: "Nuevo plan" }));
   return screen.findByRole("dialog", { name: "Nuevo plan" });
 };
@@ -54,28 +59,37 @@ describe("AW04 Planes on a desktop browser", () => {
     server.use(...signedInHandlers());
   });
 
-  it("lists Plans with a fixed class count, their duration, and the price in BOB", async () => {
+  it("lists Plans with a fixed class count, their validity in days, the Weekly Cap, and the price in BOB", async () => {
     server.use(planTable(() => jsonResponse(page([mensual, anual]))));
     renderAdmin("/catalogo/planes");
 
     expect(await screen.findByText("Cargando planes…")).toBeInTheDocument();
-    const row = (await screen.findByRole("cell", { name: /Anual 180 clases/ }))
-      .parentElement as HTMLElement;
-    expect(within(row).getByRole("cell", { name: "12 meses" })).toHaveAttribute(
+    const row = (
+      await screen.findByRole("cell", { name: /Paquete de 12 clases/ })
+    ).parentElement as HTMLElement;
+    expect(within(row).getByRole("cell", { name: "30 días" })).toHaveAttribute(
       "data-label",
-      "Duración",
+      "Vigencia",
+    );
+    expect(within(row).getByRole("cell", { name: "Sin tope" })).toHaveAttribute(
+      "data-label",
+      "Tope semanal",
     );
     expect(
-      within(row).getByRole("cell", { name: "180 clases" }),
+      within(row).getByRole("cell", { name: "12 clases" }),
     ).toBeInTheDocument();
     expect(
-      within(row).getByRole("cell", { name: "Bs 9.600,00" }),
+      within(row).getByRole("cell", { name: "Bs 780,00" }),
     ).toBeInTheDocument();
     expect(within(row).getByText("Oculto")).toBeInTheDocument();
-    const monthly = screen.getByRole("cell", { name: /Mensual 16 clases/ })
+    const capped = screen.getByRole("cell", { name: /Bimestral 16 clases/ })
       .parentElement as HTMLElement;
-    expect(within(monthly).getByRole("cell", { name: "1 mes" })).toBeVisible();
-    expect(within(monthly).getByText("Visible")).toBeInTheDocument();
+    expect(within(capped).getByRole("cell", { name: "60 días" })).toBeVisible();
+    expect(
+      within(capped).getByRole("cell", { name: "3 por semana" }),
+    ).toBeVisible();
+    expect(within(capped).getByText("Visible")).toBeInTheDocument();
+    expect(screen.queryByText(/\bmes(es)?\b/)).not.toBeInTheDocument();
     expect(reads[0]?.get("visibility")).toBe("all");
   });
 
@@ -88,7 +102,7 @@ describe("AW04 Planes on a desktop browser", () => {
       ),
     );
     const { router, user } = renderAdmin("/catalogo/planes");
-    await screen.findByRole("cell", { name: /Mensual 16 clases/ });
+    await screen.findByRole("cell", { name: /Bimestral 16 clases/ });
 
     await user.selectOptions(screen.getByLabelText("Visibilidad"), "hidden");
 
@@ -124,7 +138,7 @@ describe("AW04 Planes on a desktop browser", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("creates a Plan with a 1, 3, 6, or 12 month duration and the price in centavos", async () => {
+  it("creates a Plan of 30, 60, or 90 days with an optional Weekly Cap and the price in centavos", async () => {
     let body: unknown;
     server.use(
       planTable(() => jsonResponse(page([mensual]))),
@@ -137,15 +151,24 @@ describe("AW04 Planes on a desktop browser", () => {
     const panel = await openNewPlan(user);
 
     expect(
-      within(within(panel).getByLabelText("Duración"))
+      within(within(panel).getByLabelText("Vigencia"))
         .getAllByRole("option")
         .map((option) => option.textContent),
-    ).toEqual(["1 mes", "3 meses", "6 meses", "12 meses"]);
+    ).toEqual(["30 días", "60 días", "90 días"]);
+    expect(
+      within(within(panel).getByLabelText("Tope semanal"))
+        .getAllByRole("option")
+        .map((option) => option.textContent),
+    ).toEqual(["Sin tope", "3 clases por semana", "4 clases por semana"]);
+    // 30-day Plans have no cap (booking ADR-0006).
+    expect(within(panel).getByLabelText("Tope semanal")).toBeDisabled();
     await user.type(
       within(panel).getByLabelText("Nombre"),
       "Trimestral 36 clases",
     );
-    await user.selectOptions(within(panel).getByLabelText("Duración"), "3");
+    await user.selectOptions(within(panel).getByLabelText("Vigencia"), "90");
+    expect(within(panel).getByLabelText("Tope semanal")).toBeEnabled();
+    await user.selectOptions(within(panel).getByLabelText("Tope semanal"), "4");
     await user.type(within(panel).getByLabelText("Clases incluidas"), "36");
     await user.type(within(panel).getByLabelText("Precio"), "dos mil");
     await user.type(within(panel).getByLabelText("Orden en la app"), "4");
@@ -162,7 +185,8 @@ describe("AW04 Planes on a desktop browser", () => {
     await waitFor(() =>
       expect(body).toEqual({
         name: "Trimestral 36 clases",
-        durationMonths: 3,
+        durationDays: 90,
+        weeklyClassCap: 4,
         classAllowance: 36,
         priceCentavos: 210_000,
         displayOrder: 4,
@@ -181,11 +205,13 @@ describe("AW04 Planes on a desktop browser", () => {
     );
     const { user } = renderAdmin("/catalogo/planes");
     await user.click(
-      await screen.findByRole("button", { name: "Mensual 16 clases" }),
+      await screen.findByRole("button", { name: "Bimestral 16 clases" }),
     );
     const panel = await screen.findByRole("dialog", { name: "Editar plan" });
 
-    expect(within(panel).getByLabelText("Precio")).toHaveValue("1.050,00");
+    expect(within(panel).getByLabelText("Precio")).toHaveValue("1.120,00");
+    expect(within(panel).getByLabelText("Vigencia")).toHaveValue("60");
+    expect(within(panel).getByLabelText("Tope semanal")).toHaveValue("3");
     expect(
       within(panel).getByText(
         "Las suscripciones vigentes y las compras ya iniciadas conservan su precio.",
@@ -194,12 +220,16 @@ describe("AW04 Planes on a desktop browser", () => {
 
     await user.clear(within(panel).getByLabelText("Precio"));
     await user.type(within(panel).getByLabelText("Precio"), "1100");
+    // Back to 30 days drops the cap, which only 60- and 90-day Plans carry.
+    await user.selectOptions(within(panel).getByLabelText("Vigencia"), "30");
+    expect(within(panel).getByLabelText("Tope semanal")).toHaveValue("");
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     await waitFor(() =>
       expect(body).toEqual({
-        name: "Mensual 16 clases",
-        durationMonths: 1,
+        name: "Bimestral 16 clases",
+        durationDays: 30,
+        weeklyClassCap: null,
         classAllowance: 16,
         priceCentavos: 110_000,
         displayOrder: 3,
@@ -222,7 +252,7 @@ describe("AW04 Planes on a desktop browser", () => {
     const { user } = renderAdmin("/catalogo/planes");
 
     await user.click(
-      await screen.findByRole("button", { name: "Mensual 16 clases" }),
+      await screen.findByRole("button", { name: "Bimestral 16 clases" }),
     );
     let panel = await screen.findByRole("dialog", { name: "Editar plan" });
     await user.click(
@@ -231,7 +261,7 @@ describe("AW04 Planes on a desktop browser", () => {
     await waitFor(() => expect(bodies).toEqual([{ visible: false }]));
 
     await user.click(
-      await screen.findByRole("button", { name: "Anual 180 clases" }),
+      await screen.findByRole("button", { name: "Paquete de 12 clases" }),
     );
     panel = await screen.findByRole("dialog", { name: "Editar plan" });
     await user.click(

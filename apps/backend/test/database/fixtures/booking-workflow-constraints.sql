@@ -23,16 +23,16 @@ INSERT INTO system.accounts (id, email, client_id, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000002', 'lucia@example.com', '00000000-0000-0000-0000-000000000002', now());
 INSERT INTO system.accounts (id, email, staff_member_id, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000003', 'trainer@example.com', '00000000-0000-0000-0000-000000000001', now());
-INSERT INTO booking.plans (id, name, duration_months, class_allowance, price_centavos, display_order, updated_at) VALUES
-  ('00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 1, 8, 30000, 0, now());
+INSERT INTO booking.plans (id, name, duration_days, class_allowance, price_centavos, display_order, updated_at) VALUES
+  ('00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 30, 8, 30000, 0, now());
 INSERT INTO booking.class_types (id, name, description, duration_minutes, default_capacity, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000001', 'Reformer Pilates', 'Pilates con Reformer', 60, 8, now());
 INSERT INTO booking.sessions (id, branch_id, class_type_id, trainer_staff_member_id, starts_at, ends_at, capacity, is_exception, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '2026-09-14 09:00-04', '2026-09-14 10:00-04', 8, true, now()),
   ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '2026-09-14 10:00-04', '2026-09-14 11:00-04', 8, true, now());
-INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at) VALUES
-  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 1, 8, 8, '2026-09-01', '2026-09-30', now(), now()),
-  ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 1, 8, 8, '2026-09-01', '2026-09-30', now(), now());
+INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at) VALUES
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 30, 8, 8, '2026-09-01', '2026-09-30', now(), now()),
+  ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 30, 8, 8, '2026-09-01', '2026-09-30', now(), now());
 
 INSERT INTO booking.bookings (id, session_id, client_id, subscription_id, created_by_account_id, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', now());
@@ -49,6 +49,12 @@ SELECT pg_temp.expect_failure(
   'UPDATE booking.bookings SET state = ''cancelled'' WHERE id = ''00000000-0000-0000-0000-000000000001''',
   '23514'
 );
+-- Only a Booking cancelled with its Session may name no Account (BKM-009).
+SELECT pg_temp.expect_failure(
+  'UPDATE booking.bookings SET state = ''cancelled'', cancelled_at = now(), cancellation_cause = ''client_request'' WHERE id = ''00000000-0000-0000-0000-000000000001''',
+  '23514'
+);
+UPDATE booking.bookings SET state = 'cancelled', cancelled_at = now(), cancellation_cause = 'session_cancelled' WHERE id = '00000000-0000-0000-0000-000000000001';
 
 INSERT INTO booking.bookings (id, session_id, client_id, subscription_id, created_by_account_id, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', now()),

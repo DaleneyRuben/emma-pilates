@@ -5,7 +5,8 @@ import type { CatalogRepository } from './catalog-repository';
 const planSelect = {
   id: true,
   name: true,
-  durationMonths: true,
+  durationDays: true,
+  weeklyClassCap: true,
   classAllowance: true,
   priceCentavos: true,
   displayOrder: true,
@@ -23,7 +24,7 @@ const subscriptionSelect = {
   id: true,
   planId: true,
   planNameSnapshot: true,
-  durationMonthsSnapshot: true,
+  durationDaysSnapshot: true,
   originalClassAllowance: true,
   remainingClassAllowance: true,
   startsOn: true,

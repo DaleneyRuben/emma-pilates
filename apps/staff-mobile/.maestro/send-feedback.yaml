@@ -1,0 +1,37 @@
+# Critical journey: a Trainer sends «Enviar comentarios» from Perfil
+# (REL-012, Prompt S27). Each run stores one Feedback; the API takes ten per
+# Account in 24 hours.
+appId: ${APP_ID}
+env:
+  EMAIL: emma.vargas@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible: "Tu cuenta.*"
+    timeout: 30000
+- runFlow: subflows/park-dev-gear.yaml
+- tapOn:
+    id: "account-avatar"
+- extendedWaitUntil:
+    visible: "Enviar comentarios"
+    timeout: 15000
+- tapOn: "Enviar comentarios"
+- extendedWaitUntil:
+    visible: "Cuéntanos qué falló o qué mejorarías.*"
+    timeout: 15000
+- tapOn: "Sugerencia"
+- tapOn:
+    id: "feedback-text"
+- waitForAnimationToEnd
+- inputText: "Sería útil ver la lista de la clase siguiente."
+- hideKeyboard
+- takeScreenshot: staff-feedback-1-listo
+- tapOn: "Enviar comentario"
+- extendedWaitUntil:
+    visible: "¡Gracias por tu comentario!"
+    timeout: 15000
+- takeScreenshot: staff-feedback-2-enviado
+- tapOn: "Volver al perfil"
+- extendedWaitUntil:
+    visible: "Enviar comentarios"
+    timeout: 15000

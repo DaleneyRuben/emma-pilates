@@ -5,7 +5,7 @@ import { signIn } from "./support/session";
 // address (ADR-0042, ADR-0062) and survives a reload.
 test("Personal keeps its Role filter in the address", async ({ page }) => {
   await signIn(page, "/back-office/personal");
-  await expect(page.getByText("Mostrando 1–6 de 6 miembros")).toBeVisible();
+  await expect(page.getByText("Mostrando 1–7 de 7 miembros")).toBeVisible();
 
   await page.getByLabel("Rol").selectOption("trainer");
 

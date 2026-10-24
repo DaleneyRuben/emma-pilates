@@ -19,6 +19,7 @@ import {
   type PrincipalResolver,
 } from '../../system-identity/authentication/bearer-principal';
 import { parsed, run } from './administration.controller';
+import { toAdminPlanDto } from './administration.dto';
 import {
   AdminBranchPageDto,
   AdminClassTypePageDto,
@@ -125,7 +126,11 @@ export class AdministratorPlanListController extends CatalogListController {
   ): Promise<AdminPlanPageDto> {
     const input = parsed(parsePlanListQuery(query), 'Invalid filters');
     const principal = await this.authenticate(authorization);
-    return run(() => this.lists.listPlans(input, principal));
+    return run(() =>
+      this.lists
+        .listPlans(input, principal)
+        .then((page) => ({ ...page, items: page.items.map(toAdminPlanDto) })),
+    );
   }
 }
 
