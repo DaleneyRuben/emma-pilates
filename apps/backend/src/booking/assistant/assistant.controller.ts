@@ -196,7 +196,7 @@ export class AssistantClientsController {
         status: overview.subscription.status,
         subscription: toSubscriptionDto(overview.subscription.subscription),
         nextSubscription: toSubscriptionDto(
-          overview.subscription.nextSubscription,
+          overview.subscription.nextSubscription ?? null,
         ),
       },
     };

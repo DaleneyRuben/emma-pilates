@@ -107,7 +107,7 @@ describe('assistant clients (e2e)', () => {
     operations.search.mockResolvedValue([client]);
     operations.overview.mockResolvedValue({
       client,
-      subscription: { status: 'active', subscription },
+      subscription: { status: 'active', subscription, nextSubscription: null },
       nextBooking: booking,
       recentHistory: [historyEntry],
       creditAvailableCentavos: 6_000,
