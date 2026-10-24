@@ -8,4 +8,6 @@
 export interface GrantCourtesyAccessDto {
   /** Bolivia civil date of the last day of access: today up to one year ahead. */
   endsOn: string;
+  /** Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it. */
+  startsOn?: string;
 }

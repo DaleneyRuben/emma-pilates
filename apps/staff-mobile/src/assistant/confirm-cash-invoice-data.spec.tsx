@@ -78,6 +78,7 @@ describe("Cash payment invoice data", () => {
     expect(paid).toHaveBeenCalledWith({
       planId: "plan-8",
       branchId: "branch-centro",
+      startsOn: "2026-10-08",
       invoiceData: company,
     });
   });
@@ -94,6 +95,7 @@ describe("Cash payment invoice data", () => {
       expect(paid).toHaveBeenCalledWith({
         planId: "plan-8",
         branchId: "branch-centro",
+        startsOn: "2026-10-08",
         invoiceData: null,
       });
     });

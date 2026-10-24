@@ -40,4 +40,6 @@ export interface PurchaseIntentDto {
   receiptAttached: boolean;
   createdAt: string;
   expiresAt: string;
+  /** Chosen Start Date. Absent on responses older builds ignore. */
+  startsOn?: string;
 }

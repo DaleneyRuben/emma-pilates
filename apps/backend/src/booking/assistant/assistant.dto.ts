@@ -111,6 +111,13 @@ export class RecordCashPaymentDto {
   branchId!: string;
 
   @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
+  })
+  startsOn?: string;
+
+  @ApiPropertyOptional({
     type: InvoiceDataDto,
     nullable: true,
     description:
@@ -124,12 +131,14 @@ export const parseRecordCashPayment = (
 ): {
   planId: string;
   branchId: string;
+  startsOn?: string;
   invoiceData: InvoiceData | null;
 } | null => {
   const result = z
     .strictObject({
       planId: uuid,
       branchId: uuid,
+      startsOn: z.iso.date().optional(),
       invoiceData: invoiceDataField,
     })
     .safeParse(value);

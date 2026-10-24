@@ -22,6 +22,7 @@ export type PurchaseIntentView = {
   receiptAttached: boolean;
   createdAt: Date;
   expiresAt: Date;
+  startsOn: string;
 };
 
 export type PaymentView = {
@@ -36,6 +37,7 @@ export type PaymentView = {
   planPriceCentavos: number;
   creditAppliedCentavos: number;
   amountDueCentavos: number;
+  startsOn: string;
   submittedAt: Date;
   decidedAt: Date | null;
   rejectionReason: string | null;
@@ -111,6 +113,7 @@ export const intentSelect = {
   creditReservedCentavos: true,
   amountDueCentavos: true,
   receiptImageAssetId: true,
+  startsOn: true,
   state: true,
   createdAt: true,
   expiresAt: true,
@@ -128,6 +131,7 @@ export const paymentSelect = {
   planPriceCentavos: true,
   creditAppliedCentavos: true,
   amountDueCentavos: true,
+  startsOn: true,
   method: true,
   state: true,
   submittedAt: true,
@@ -158,6 +162,7 @@ export const toIntentView = (row: IntentRow): PurchaseIntentView => ({
   receiptAttached: row.receiptImageAssetId !== null,
   createdAt: row.createdAt,
   expiresAt: row.expiresAt,
+  startsOn: row.startsOn.toISOString().slice(0, 10),
 });
 
 export const toPaymentView = (row: PaymentRow): PaymentView => ({
@@ -172,6 +177,7 @@ export const toPaymentView = (row: PaymentRow): PaymentView => ({
   planPriceCentavos: row.planPriceCentavos,
   creditAppliedCentavos: row.creditAppliedCentavos,
   amountDueCentavos: row.amountDueCentavos,
+  startsOn: row.startsOn.toISOString().slice(0, 10),
   submittedAt: row.submittedAt,
   decidedAt: row.decidedAt,
   rejectionReason: row.rejectionReason,

@@ -9254,6 +9254,16 @@
                 "$ref": "#/components/schemas/ClientSubscriptionSummaryDto"
               }
             ]
+          },
+          "nextSubscription": {
+            "nullable": true,
+            "description": "The one future Subscription from an Early Renewal. Absent when there is none.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSubscriptionSummaryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -10683,6 +10693,11 @@
           "planId": {
             "type": "string",
             "format": "uuid"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
           }
         },
         "required": [
@@ -10759,6 +10774,11 @@
           "expiresAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date. Absent on responses older builds ignore."
           }
         },
         "required": [
@@ -10892,6 +10912,11 @@
           "amountDueCentavos": {
             "type": "number",
             "minimum": 0
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date. Absent on responses older builds ignore."
           },
           "submittedAt": {
             "format": "date-time",
@@ -11212,6 +11237,11 @@
           "amountDueCentavos": {
             "type": "number",
             "minimum": 0
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date. Absent on responses older builds ignore."
           },
           "submittedAt": {
             "format": "date-time",
@@ -11603,6 +11633,11 @@
             "type": "string",
             "format": "uuid",
             "description": "Branch where the cash was collected"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
           },
           "invoiceData": {
             "nullable": true,
@@ -12009,6 +12044,11 @@
             "type": "string",
             "format": "date",
             "description": "Bolivia civil date of the last day of access: today up to one year ahead."
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
           }
         },
         "required": [

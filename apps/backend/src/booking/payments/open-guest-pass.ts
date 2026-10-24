@@ -110,6 +110,7 @@ export const openGuestPass = async (
       planPriceCentavos: 0,
       creditAppliedCentavos: 0,
       amountDueCentavos: 0,
+      startsOn: today,
       method: PaymentMethod.COURTESY,
       state: PaymentState.CONFIRMED,
       submittedByAccountId: input.authorAccountId,

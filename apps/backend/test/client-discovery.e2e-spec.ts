@@ -195,6 +195,7 @@ describe('client discovery (e2e)', () => {
       .expect(200)
       .expect({
         status: 'active',
+        nextSubscription: null,
         subscription: {
           id: 'subscription-id',
           planName: 'Paquete de 8 clases',

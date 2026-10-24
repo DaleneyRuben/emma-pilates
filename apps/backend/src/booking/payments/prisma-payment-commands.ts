@@ -23,8 +23,16 @@ import {
 } from '../../notifications/prisma-notification-store';
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import {
+  allocateStartDate,
+  endSubscriptionEarly,
+  loadFutureSubscriptionId,
+  parseRequestedStartDate,
+  readStartDateRules,
+  subscriptionTermFor,
+  todayOf,
+} from './prisma-start-date-allocation';
 import type { CreditSummary } from './credit-summary';
 import { PaymentRuleError } from './payment-errors';
 import {
@@ -58,13 +66,16 @@ import {
   settleReservation,
 } from './purchase-intent-settlement';
 import { invoiceColumns, type InvoiceData } from './invoice-data/invoice-data';
-import { evaluatePurchaseEligibility } from './purchase-eligibility';
+import {
+  evaluatePurchaseEligibility,
+  isSubscriptionEffective,
+} from './purchase-eligibility';
 import {
   expireSubscription,
   loadActiveSubscription,
   notifyPaymentConfirmed,
 } from './subscription-allocation';
-import { computeSubscriptionTerm } from './subscription-term';
+
 import { grantGiftClass } from './allowance-adjustments';
 import {
   collectOwedInviteReward,
@@ -257,10 +268,17 @@ export function createPrismaPaymentCommands(
       }),
     ]);
 
+    const today = todayOf(now);
+    const futureSubscriptionId = await loadFutureSubscriptionId(
+      transaction,
+      input.clientId,
+      today,
+    );
     const eligibility = evaluatePurchaseEligibility({
-      today: boliviaDate(now),
+      today,
       plan,
       activeSubscription: active,
+      futureSubscriptionId,
       openPurchaseIntentId: openIntent?.id ?? null,
       pendingPaymentId: pendingPayment?.id ?? null,
     });
@@ -274,8 +292,29 @@ export function createPrismaPaymentCommands(
     }
 
     // evaluatePurchaseEligibility has thrown when the Plan is not purchasable.
-    return plan!;
+    return { plan: plan!, active, today };
   };
+
+  const committedStartDate = async (
+    transaction: Transaction,
+    input: {
+      clientId: string;
+      requested: Date | null;
+      today: Date;
+      active: Awaited<ReturnType<typeof loadActiveSubscription>>;
+    },
+  ) =>
+    allocateStartDate({
+      today: input.today,
+      requested: input.requested,
+      rules: await readStartDateRules(transaction),
+      active: input.active,
+      futureSubscriptionId: await loadFutureSubscriptionId(
+        transaction,
+        input.clientId,
+        input.today,
+      ),
+    });
 
   const loadOwnedIntent = async (
     transaction: Transaction,
@@ -344,8 +383,8 @@ export function createPrismaPaymentCommands(
     principal: AuthenticatedPrincipal,
     now: Date,
   ): Promise<string> => {
-    const term = computeSubscriptionTerm(
-      boliviaDate(now),
+    const term = subscriptionTermFor(
+      payment.startsOn,
       payment.durationDaysSnapshot,
     );
     const subscription = await transaction.subscription.create({
@@ -437,6 +476,7 @@ export function createPrismaPaymentCommands(
     input: {
       clientId: string;
       planId: string;
+      startsOn?: string;
       principal: AuthenticatedPrincipal;
       branchId: string;
       invoiceData?: InvoiceData | null;
@@ -444,9 +484,16 @@ export function createPrismaPaymentCommands(
   ): Promise<{ id: string }> => {
     const now = dependencies.now();
     await lockClients(transaction, [input.clientId]);
-    const plan = await assertEligible(transaction, {
+    const eligible = await assertEligible(transaction, {
       clientId: input.clientId,
       planId: input.planId,
+    });
+    const { plan } = eligible;
+    const allocated = await committedStartDate(transaction, {
+      clientId: input.clientId,
+      requested: parseRequestedStartDate(input.startsOn),
+      today: eligible.today,
+      active: eligible.active,
     });
 
     const payment = await transaction.payment.create({
@@ -460,6 +507,7 @@ export function createPrismaPaymentCommands(
         planPriceCentavos: plan.priceCentavos,
         creditAppliedCentavos: 0,
         amountDueCentavos: plan.priceCentavos,
+        startsOn: allocated.startsOn,
         method: PaymentMethod.CASH,
         state: PaymentState.CONFIRMED,
         collectedAtBranchId: input.branchId,
@@ -473,6 +521,19 @@ export function createPrismaPaymentCommands(
       select: paymentSelect,
     });
 
+    if (
+      allocated.subscriptionIdToEndEarly !== null &&
+      allocated.endsOn !== undefined
+    ) {
+      await endSubscriptionEarly(transaction, {
+        subscriptionId: allocated.subscriptionIdToEndEarly,
+        endsOn: allocated.endsOn,
+        startsOn: allocated.startsOn,
+        principal: input.principal,
+        now,
+        paymentId: payment.id,
+      });
+    }
     const subscriptionId = await activateSubscription(
       transaction,
       payment,
@@ -503,6 +564,7 @@ export function createPrismaPaymentCommands(
       clientId: string;
       planId: string;
       branchId: string;
+      startsOn?: string;
       invoiceData?: InvoiceData | null;
     },
     principal: AuthenticatedPrincipal,
@@ -523,6 +585,7 @@ export function createPrismaPaymentCommands(
           settleCashPayment(transaction, {
             clientId: command.clientId,
             planId: command.planId,
+            startsOn: command.startsOn,
             principal,
             branchId: command.branchId,
             invoiceData: command.invoiceData,
@@ -563,7 +626,7 @@ export function createPrismaPaymentCommands(
     );
 
   const createPurchaseIntent = async (
-    command: { planId: string },
+    command: { planId: string; startsOn?: string },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ): Promise<PurchaseIntentView> => {
@@ -577,13 +640,20 @@ export function createPrismaPaymentCommands(
             accountId: principal.accountId,
             command: 'create_purchase_intent',
             idempotencyKey,
-            request: { planId: command.planId },
+            request: { planId: command.planId, startsOn: command.startsOn },
           },
           async () => {
             await lockClients(transaction, [clientId]);
-            const plan = await assertEligible(transaction, {
+            const eligible = await assertEligible(transaction, {
               clientId,
               planId: command.planId,
+            });
+            const { plan } = eligible;
+            const allocated = await committedStartDate(transaction, {
+              clientId,
+              requested: parseRequestedStartDate(command.startsOn),
+              today: eligible.today,
+              active: eligible.active,
             });
             const now = dependencies.now();
 
@@ -598,6 +668,7 @@ export function createPrismaPaymentCommands(
                 planPriceCentavos: plan.priceCentavos,
                 creditReservedCentavos: 0,
                 amountDueCentavos: plan.priceCentavos,
+                startsOn: allocated.startsOn,
                 createdByAccountId: principal.accountId,
                 createdAt: now,
                 expiresAt: new Date(
@@ -777,6 +848,7 @@ export function createPrismaPaymentCommands(
               planPriceCentavos: intent.planPriceCentavos,
               creditAppliedCentavos: intent.creditReservedCentavos,
               amountDueCentavos: intent.amountDueCentavos,
+              startsOn: intent.startsOn,
               method: PaymentMethod.TRANSFER,
               state: PaymentState.PENDING,
               submittedByAccountId: principal.accountId,
@@ -884,33 +956,53 @@ export function createPrismaPaymentCommands(
         payment.clientId,
         now,
       );
-      if (active !== null) {
-        const eligibility = (() => {
-          try {
-            return evaluatePurchaseEligibility({
-              today: boliviaDate(now),
-              plan: {
-                hiddenAt: null,
-                priceCentavos: payment.planPriceCentavos,
-              },
-              activeSubscription: active,
-              openPurchaseIntentId: null,
-              pendingPaymentId: null,
-            });
-          } catch {
+      const today = todayOf(now);
+      const allocated = await (async () => {
+        try {
+          return await committedStartDate(transaction, {
+            clientId: payment.clientId,
+            requested: payment.startsOn,
+            today,
+            active,
+          });
+        } catch (error) {
+          if (
+            error instanceof PaymentRuleError &&
+            error.code === 'future_subscription_exists'
+          ) {
             throw rule(
               'payment_confirmation_conflict',
-              'The Client already has an active Subscription',
+              'The Client already has a future Subscription',
             );
           }
-        })();
-        if (eligibility.subscriptionIdToExpire !== null) {
-          await expireSubscription(
-            transaction,
-            eligibility.subscriptionIdToExpire,
-            now,
-          );
+          throw error;
         }
+      })();
+      if (allocated.startsOn.getTime() !== payment.startsOn.getTime()) {
+        throw rule(
+          'payment_confirmation_conflict',
+          'The committed Start Date no longer matches the renewal',
+        );
+      }
+      if (
+        active !== null &&
+        active.endsOn.getTime() < today.getTime() &&
+        !isSubscriptionEffective(active, today)
+      ) {
+        await expireSubscription(transaction, active.id, now);
+      }
+      if (
+        allocated.subscriptionIdToEndEarly !== null &&
+        allocated.endsOn !== undefined
+      ) {
+        await endSubscriptionEarly(transaction, {
+          subscriptionId: allocated.subscriptionIdToEndEarly,
+          endsOn: allocated.endsOn,
+          startsOn: allocated.startsOn,
+          principal,
+          now,
+          paymentId: payment.id,
+        });
       }
 
       await transaction.payment.update({

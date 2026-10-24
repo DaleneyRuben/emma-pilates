@@ -130,6 +130,7 @@ describe('Assistant Client overview', () => {
     findClient: jest.fn().mockResolvedValue(clientRecord),
     findActiveSubscription: jest.fn().mockResolvedValue(subscription),
     findLatestSubscription: jest.fn().mockResolvedValue(null),
+    findFutureSubscription: jest.fn().mockResolvedValue(null),
     findUpcoming: jest.fn().mockResolvedValue(upcoming),
     findAttendedBookings: jest.fn().mockResolvedValue(history),
   };
@@ -139,7 +140,7 @@ describe('Assistant Client overview', () => {
       readClientOverview({ clientId: 'client-id' }, dependencies),
     ).resolves.toEqual({
       client: clientRecord,
-      subscription: { status: 'active', subscription },
+      subscription: { status: 'active', subscription, nextSubscription: null },
       nextBooking: upcoming[0],
       recentHistory: history.slice(0, 2),
       creditAvailableCentavos: 0,
@@ -165,7 +166,7 @@ describe('Assistant Client overview', () => {
       ),
     ).resolves.toEqual({
       client: clientRecord,
-      subscription: { status: 'active', subscription },
+      subscription: { status: 'active', subscription, nextSubscription: null },
       nextBooking: upcoming[0],
       recentHistory: history.slice(0, 2),
       creditAvailableCentavos: 0,

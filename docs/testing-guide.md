@@ -51,8 +51,8 @@ can be found by its design name.
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79 |
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81 |
-| 12 Mi plan | 5, 18, 71, 81, 85 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81, 87 |
+| 12 Mi plan | 5, 18, 71, 81, 85, 87 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
@@ -65,8 +65,8 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82 |
 | S26 Reportar una falla (Entrenadora) | 82 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
@@ -3383,9 +3383,7 @@ The following are not ready for manual product testing:
   (Test 86);
 - the Weekly Cap at booking: BKM-005 stores and shows it («hasta 3 por
   semana»), but a fourth Booking in the same week still goes through until
-  BKM-007; the Start Date chosen at purchase and early renewal arrive with
-  BKM-006 (until then a Subscription starts the day its Payment is
-  confirmed);
+  BKM-007;
 - the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
   the Role arrives with IDN-009, so today only the Administrator can (Test 79);
 - opening an emailed link on iOS: Universal Links need the Apple Developer
@@ -6384,6 +6382,40 @@ E. **The end date.** As Camila register cash for a Client on the 60-day Plan
 
 The cap is only stored and shown here: booking more than the cap in one week
 still works until BKM-007.
+
+## Test 87: the Start Date and early renewal (BKM-006)
+
+A Plan starts on the date chosen at purchase, from today up to 14 days later,
+and a Client with a Plan in force can buy the next one
+([booking ADR-0005](../booking/docs/adr/0005-validity-in-days-with-a-chosen-start-date.md)).
+Run the API and the fixtures as in Tests 2 and 5, and the apps as in Tests 9
+and 11.
+
+A. **The chip row (09 and S10).** As Lucía, open **Mi plan** (12) and tap
+   **Renovar plan**. **Elige tu plan** (08) still reads «válido por 30 días».
+   Open **Paquete de 8 clases**: under **Qué incluye** a row labelled
+   **Fecha de inicio** offers chips from **Hoy** through 14 days, and **Hoy**
+   starts selected. The row scrolls sideways. As Camila, search Sofía, tap
+   **Registrar pago en efectivo**, and open the same Plan: **Confirmar pago
+   en efectivo** (S10) shows the same row above **Confirmar pago recibido**.
+B. **The chosen date.** As Sofía, `POST /api/v1/purchase-intents` with the
+   Plan id and `startsOn` inside the window answers `201` and echoes
+   `startsOn`. A date past today + 14 answers `409`.
+C. **The next Plan (12).** Give a Client a second active Subscription that
+   starts after the current one ends (a disposable database only). **Mi
+   plan** adds a line **Siguiente plan** whose value reads «Siguiente plan
+   desde {fecha}», and the date wraps inside the card on a phone. The
+   **Renovar plan** button stays.
+D. **A booking before the Start Date (04).** End the current Subscription
+   before the next one starts, then open a Session dated in the gap and tap
+   **Reservar**. The screen answers «Podrás reservar a partir del {fecha}.»
+   and the API answers `409` `booking_before_start_date`. A Session the
+   current Plan still covers books as before.
+
+The reminder that names the renewal arrives with the worker's Plan reminder
+(Test 7). An Evaluation booked before the Start Date still answers the
+existing ineligible-subscription refusal.
+
 ## Test 82: equipment, its faults, and the capacity flags (BKO-004)
 
 The studio registers each reformer, cadillac, and mat per Branch; a Trainer

@@ -162,7 +162,16 @@ export class PurchaseIntentsController extends AuthenticatedPaymentController {
     const principal = await this.authenticate(authorization);
 
     return runPaymentCommand(() =>
-      this.commands.createPurchaseIntent(parsed, principal, key),
+      this.commands.createPurchaseIntent(
+        {
+          planId: parsed.planId,
+          ...(parsed.startsOn === undefined
+            ? {}
+            : { startsOn: parsed.startsOn }),
+        },
+        principal,
+        key,
+      ),
     );
   }
 

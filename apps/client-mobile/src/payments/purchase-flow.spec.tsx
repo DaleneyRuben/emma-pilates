@@ -51,7 +51,7 @@ describe("Client purchase flow", () => {
     });
     expect(created).toHaveBeenCalledWith(
       expect.objectContaining({ "idempotency-key": expect.any(String) }),
-      { planId: "plan-8" },
+      { planId: "plan-8", startsOn: "2026-10-08" },
     );
     expect(screen.getAllByText("Bs 560").length).toBeGreaterThan(0);
     expect(screen.queryByText(/crédito/)).toBeNull();

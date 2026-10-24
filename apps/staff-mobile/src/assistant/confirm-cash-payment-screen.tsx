@@ -9,6 +9,7 @@ import {
   BodyText,
   colors,
   describePlanTerms,
+  boliviaCivilDate,
   formatBolivianos,
   FormScrollView,
   Heading,
@@ -20,8 +21,10 @@ import {
   radii,
   Screen,
   spacing,
+  StartDateChooser,
   surfaces,
   typography,
+  useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -52,6 +55,8 @@ const paymentProblems: Record<string, string> = {
   payment_pending_exists: "El cliente tiene un pago en revisión.",
   branch_not_assigned: "Solo puedes registrar pagos en tus sucursales.",
   plan_not_purchasable: "Este plan ya no está disponible.",
+  start_date_out_of_window: "Esa fecha de inicio no está disponible.",
+  future_subscription_exists: "El cliente ya tiene un plan siguiente.",
 };
 
 function Line({
@@ -87,6 +92,9 @@ export function ConfirmCashPaymentScreen({
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [result, setResult] = useState<AssistantCashPaymentDto | null>(null);
+  const studioRules = useStudioRules(fetcher);
+  const today = boliviaCivilDate(new Date());
+  const [startsOn, setStartsOn] = useState(today);
   // PAY-007: prefilled from the Client's last sale; a failed read leaves «Sin factura».
   const lastInvoice = useGetAssistantClientInvoiceData(clientId, { fetcher });
   const [invoiceEdit, setInvoiceEdit] = useState<InvoiceChoice | null>(null);
@@ -102,7 +110,13 @@ export function ConfirmCashPaymentScreen({
     setSubmitting(true);
     setFailure(null);
     try {
-      const recorded = await api.recordCashPayment(clientId, quote.id, branchId, invoiceData);
+      const recorded = await api.recordCashPayment(
+        clientId,
+        quote.id,
+        branchId,
+        startsOn,
+        invoiceData,
+      );
       await queryClient.invalidateQueries({
         queryKey: getGetAssistantClientOverviewQueryKey(clientId),
       });
@@ -181,6 +195,15 @@ export function ConfirmCashPaymentScreen({
               value={formatBolivianos(quote.priceCentavos)}
             />
           </View>
+          {studioRules === undefined ? null : (
+            <StartDateChooser
+              openingDate={studioRules.openingDate}
+              selected={startsOn}
+              startDateLimitDays={studioRules.startDateLimitDays}
+              today={today}
+              onSelect={setStartsOn}
+            />
+          )}
           <BranchChips
             label="Sucursal donde recibes el efectivo"
             onSelect={branches.select}

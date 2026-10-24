@@ -25,6 +25,12 @@ import { PaymentRuleError } from './payment-errors';
 import type { PaymentView } from './prisma-payment-commands';
 import { grantGiftClass } from './allowance-adjustments';
 import {
+  allocateStartDate,
+  endSubscriptionEarly,
+  loadFutureSubscriptionId,
+  readStartDateRules,
+} from './prisma-start-date-allocation';
+import {
   expireSubscription,
   loadActiveSubscription,
   notifyPaymentConfirmed,
@@ -82,7 +88,7 @@ export const createPrismaCourtesyAccess = (
 
   const grantInTransaction = async (
     transaction: Transaction,
-    command: { clientId: string; endsOn: Date },
+    command: { clientId: string; startsOn?: Date; endsOn: Date },
     principal: AuthenticatedPrincipal,
   ): Promise<{ paymentId: string }> => {
     const now = dependencies.now();
@@ -115,12 +121,25 @@ export const createPrismaCourtesyAccess = (
       }),
     ]);
     const today = boliviaDate(now);
+    const futureSubscriptionId = await loadFutureSubscriptionId(
+      transaction,
+      command.clientId,
+      today,
+    );
     const eligibility = evaluateCourtesyGrant({
       today,
       endsOn: command.endsOn,
       activeSubscription: active,
+      futureSubscriptionId,
       openPurchaseIntentId: openIntent?.id ?? null,
       pendingPaymentId: pendingPayment?.id ?? null,
+    });
+    const allocated = allocateStartDate({
+      today,
+      requested: command.startsOn ?? today,
+      rules: await readStartDateRules(transaction),
+      active,
+      futureSubscriptionId,
     });
     if (eligibility.subscriptionIdToExpire !== null) {
       await expireSubscription(
@@ -142,6 +161,7 @@ export const createPrismaCourtesyAccess = (
         planPriceCentavos: 0,
         creditAppliedCentavos: 0,
         amountDueCentavos: 0,
+        startsOn: allocated.startsOn,
         method: PaymentMethod.COURTESY,
         state: PaymentState.CONFIRMED,
         submittedByAccountId: principal.accountId,
@@ -162,7 +182,7 @@ export const createPrismaCourtesyAccess = (
         weeklyClassCapSnapshot: null,
         originalClassAllowance: plan.classAllowance,
         remainingClassAllowance: plan.classAllowance,
-        startsOn: today,
+        startsOn: allocated.startsOn,
         endsOn: command.endsOn,
         state: SubscriptionState.ACTIVE,
         activatedAt: now,
@@ -203,11 +223,24 @@ export const createPrismaCourtesyAccess = (
           planId: plan.id,
           classAllowance: plan.classAllowance,
           durationDays: plan.durationDays,
-          startsOn: civil(today),
+          startsOn: civil(allocated.startsOn),
           endsOn: civil(command.endsOn),
         },
       },
     });
+    if (
+      allocated.subscriptionIdToEndEarly !== null &&
+      allocated.endsOn !== undefined
+    ) {
+      await endSubscriptionEarly(transaction, {
+        subscriptionId: allocated.subscriptionIdToEndEarly,
+        endsOn: allocated.endsOn,
+        startsOn: allocated.startsOn,
+        principal,
+        now,
+        paymentId: payment.id,
+      });
+    }
     await notifyPaymentConfirmed(recordNotification, transaction, {
       clientId: command.clientId,
       paymentId: payment.id,
@@ -229,6 +262,7 @@ export const createPrismaCourtesyAccess = (
         planPriceCentavos: true,
         creditAppliedCentavos: true,
         amountDueCentavos: true,
+        startsOn: true,
         submittedAt: true,
         decidedAt: true,
         subscription: { select: { id: true } },
@@ -246,6 +280,7 @@ export const createPrismaCourtesyAccess = (
       planPriceCentavos: row.planPriceCentavos,
       creditAppliedCentavos: row.creditAppliedCentavos,
       amountDueCentavos: row.amountDueCentavos,
+      startsOn: row.startsOn.toISOString().slice(0, 10),
       submittedAt: row.submittedAt,
       decidedAt: row.decidedAt,
       rejectionReason: null,
@@ -255,7 +290,7 @@ export const createPrismaCourtesyAccess = (
 
   return {
     grant: async (
-      command: { clientId: string; endsOn: Date },
+      command: { clientId: string; startsOn?: Date; endsOn: Date },
       principal: AuthenticatedPrincipal,
       idempotencyKey: string,
     ): Promise<PaymentView> => {

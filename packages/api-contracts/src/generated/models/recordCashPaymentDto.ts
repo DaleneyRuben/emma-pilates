@@ -10,6 +10,8 @@ export interface RecordCashPaymentDto {
   planId: string;
   /** Branch where the cash was collected */
   branchId: string;
+  /** Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it. */
+  startsOn?: string;
   /**
    * PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»
    * @nullable
