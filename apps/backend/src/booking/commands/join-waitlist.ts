@@ -1,5 +1,12 @@
+import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { BookingAccessDeniedError } from './create-booking';
+import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
+import { bookingBeforeStartMessage } from './booking-before-start';
+import {
+  BookingAccessDeniedError,
+  type WeeklyCapSubscription,
+} from './create-booking';
+import { assertWeeklyCapAllows } from './weekly-cap-decision';
 
 type SessionForWaitlist = {
   id: string;
@@ -16,7 +23,11 @@ type JoinWaitlistDependencies = {
   findEligibleSubscription(input: {
     clientId: string;
     onDate: Date;
-  }): Promise<{ id: string } | null>;
+  }): Promise<WeeklyCapSubscription | null>;
+  findNotYetStartedSubscription?(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ startsOn: Date } | null>;
   hasLiveBooking(input: {
     sessionId: string;
     clientId: string;
@@ -30,6 +41,7 @@ type JoinWaitlistDependencies = {
     clientId: string;
     joinedByAccountId: string;
   }): Promise<{ id: string }>;
+  cancellationWindowMinutes(): Promise<number>;
   now(): Date;
 };
 
@@ -37,8 +49,6 @@ type JoinWaitlistCommand = {
   sessionId: string;
   clientId?: string;
 };
-
-const cancellationWindowMilliseconds = 2.5 * 60 * 60 * 1_000;
 
 const resolveClientId = (
   command: JoinWaitlistCommand,
@@ -57,9 +67,8 @@ const resolveClientId = (
   }
 
   if (
-    principal.identity.role !== 'assistant' ||
     command.clientId === undefined ||
-    !principal.identity.branchIds.includes(session.branchId)
+    !actsForClientsAt(principal, session.branchId)
   ) {
     throw new BookingAccessDeniedError();
   }
@@ -76,8 +85,11 @@ export const joinWaitlist = async (
   if (
     session === null ||
     session.state !== 'scheduled' ||
-    session.startsAt.getTime() - dependencies.now().getTime() <=
-      cancellationWindowMilliseconds
+    isInsideCancellationWindow(
+      session.startsAt,
+      dependencies.now(),
+      await dependencies.cancellationWindowMinutes(),
+    )
   ) {
     throw new BookingAccessDeniedError();
   }
@@ -94,8 +106,19 @@ export const joinWaitlist = async (
   });
 
   if (subscription === null) {
+    const pending = dependencies.findNotYetStartedSubscription
+      ? await dependencies.findNotYetStartedSubscription({
+          clientId,
+          onDate: session.startsAt,
+        })
+      : null;
+    if (pending !== null) {
+      throw new Error(bookingBeforeStartMessage(pending.startsOn));
+    }
     throw new Error('No eligible Subscription');
   }
+
+  assertWeeklyCapAllows(subscription);
 
   if (await dependencies.hasLiveBooking({ sessionId: session.id, clientId })) {
     throw new Error('Client already has a Booking');

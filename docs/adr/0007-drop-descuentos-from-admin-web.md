@@ -1,6 +1,6 @@
 # Drop Descuentos from the admin web sidebar
 
-Status: accepted
+Status: accepted; the rule-based Founder discount of booking [ADR-0008](../../booking/docs/adr/0008-founder-membership.md) is the one exception
 
 The admin web design carried a "Descuentos" link in the Promociones sidebar group from the earliest schedule-shell screens (`AW02`) onward, with no screen, no prompt, and no backing domain concept behind it. `booking/CONTEXT.md` lists Discount explicitly as a term to avoid for [Credit](../../booking/CONTEXT.md), and states that [Promotion](../../booking/CONTEXT.md) carries no automatic pricing or discount effect. There is nothing in the domain a "Descuentos" screen would manage — the studio's only two client-facing money mechanisms are Credit (earned via Referral, spent automatically at Payment time) and Plan pricing itself (managed on `AW05`).
 

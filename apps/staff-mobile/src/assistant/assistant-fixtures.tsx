@@ -32,6 +32,7 @@ export const subscription = {
   remainingClassAllowance: 5,
   startsOn: "2026-09-12",
   endsOn: "2026-10-12",
+  extraClassesLine: null,
 };
 
 export const facts = (
@@ -91,6 +92,17 @@ export const overview = {
   creditAvailableCentavos: 6_000,
 };
 
+export const giftedOverview = {
+  ...overview,
+  subscription: {
+    status: "active" as const,
+    subscription: {
+      ...subscription,
+      extraClassesLine: "Clases extra: 1 · Regalo de bienvenida",
+    },
+  },
+};
+
 // Her last Plan has ended, so the Assistant may take cash for a new one (UX-003).
 export const expiredOverview = {
   ...overview,
@@ -107,6 +119,8 @@ export const planQuotes = {
     {
       id: "plan-8",
       name: "Paquete de 8 clases",
+      durationDays: 30,
+      weeklyClassCap: null,
       durationMonths: 1,
       classAllowance: 8,
       priceCentavos: 56_000,
@@ -116,6 +130,8 @@ export const planQuotes = {
     {
       id: "plan-12",
       name: "Paquete de 12 clases",
+      durationDays: 30,
+      weeklyClassCap: null,
       durationMonths: 1,
       classAllowance: 12,
       priceCentavos: 78_000,

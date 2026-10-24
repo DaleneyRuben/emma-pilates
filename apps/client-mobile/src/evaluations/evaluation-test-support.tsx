@@ -56,6 +56,8 @@ export const slot = (
     branchName: "Centro",
     nutritionistName: "Gabriela Rojas",
     bookable: true,
+    included: true,
+    priceCentavos: 0,
     ...overrides,
   };
 };
@@ -87,6 +89,9 @@ export const upcomingEvaluation = (
   id,
   slotId: `slot-of-${id}`,
   state: "booked",
+  included: true,
+  priceCentavos: 0,
+  paymentId: null,
   startsAt: startsAt.toISOString(),
   endsAt: new Date(startsAt.getTime() + 45 * minute).toISOString(),
   durationMinutes: 45,

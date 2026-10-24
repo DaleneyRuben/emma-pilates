@@ -20,7 +20,8 @@ export class ImpersonationError extends Error {
   }
 }
 
-export type ImpersonableRole = 'trainer' | 'assistant' | 'nutritionist';
+export type ImpersonableRole =
+  'trainer' | 'assistant' | 'nutritionist' | 'coordinator';
 
 export type ImpersonationStaffMember = {
   id: string;

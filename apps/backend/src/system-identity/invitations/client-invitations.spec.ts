@@ -49,6 +49,8 @@ describe('inviteClient', () => {
       email: 'ana@example.com',
       phone: '+591 70000000',
       referralCode: 'REF-NEW',
+      acquisitionChannel: 'unknown',
+      referredByCode: null,
       pendingExpiresAt: new Date(now.getTime() + 30 * day),
       activationToken: {
         id: 'id-3',

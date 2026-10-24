@@ -46,9 +46,6 @@ export type ClosureTransaction = {
   endSubscription: (
     input: Actor & { clientId: string },
   ) => Promise<{ forfeitedClasses: number } | null>;
-  forfeitCredit: (
-    input: Actor & { clientId: string; correlationId: string },
-  ) => Promise<number>;
   promoteWaitlists: (sessionIds: string[], now: Date) => Promise<void>;
   // Ends the Client's open Promotions Consent and answers when it was given.
   endPromotionsConsent: (input: {
@@ -160,13 +157,8 @@ export const closeClientAccount = async (
     const bookings = await transaction.cancelFutureBookings(step);
     const cancelledEvaluations =
       await transaction.cancelFutureEvaluations(step);
-    // An open Purchase Intent holds Credit; release it before the forfeiture.
     await transaction.releaseOpenPurchaseIntent(step);
     const subscription = await transaction.endSubscription(step);
-    const forfeitedCreditCentavos = await transaction.forfeitCredit({
-      ...step,
-      correlationId,
-    });
     // The Client's own Bookings are gone, so freed seats reach the Waitlist.
     await transaction.promoteWaitlists(bookings.sessionIds, now);
     const liveConsentAt = await transaction.endPromotionsConsent({
@@ -199,7 +191,8 @@ export const closeClientAccount = async (
       cancelledBookings: bookings.count,
       cancelledEvaluations,
       forfeitedClasses: subscription?.forfeitedClasses ?? 0,
-      forfeitedCreditCentavos,
+      // Credit is retired (booking ADR-0009): nothing is left to forfeit.
+      forfeitedCreditCentavos: 0,
     };
     await transaction.recordAudit({
       actorAccountId: principal.accountId,

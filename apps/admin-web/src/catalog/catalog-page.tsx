@@ -43,6 +43,8 @@ type CatalogPageProps<Row extends { id: string }> = {
   panelActions?: readonly PanelAction[];
   /** Quiet text links after the actions (AW08's withdrawal history). */
   links?: ReactNode;
+  /** A header action that is not a panel (AW21's campaign grant). */
+  actions?: ReactNode;
   /** A summary under a loaded table (AW27's studio total). */
   footer?: ReactNode;
 };
@@ -84,6 +86,7 @@ export function CatalogPage<Row extends { id: string }>({
   renderForm,
   panelActions = [],
   links,
+  actions,
   footer,
 }: CatalogPageProps<Row>) {
   const [panel, setPanel] = useState<PanelState<Row>>({ kind: "closed" });
@@ -109,8 +112,10 @@ export function CatalogPage<Row extends { id: string }>({
           forbidden ||
           (createLabel === undefined &&
             panelActions.length === 0 &&
-            links === undefined) ? undefined : (
+            links === undefined &&
+            actions === undefined) ? undefined : (
             <>
+              {actions}
               {createLabel === undefined ? null : (
                 <Button onClick={() => open()}>
                   <Plus size={16} strokeWidth={1.8} aria-hidden="true" />

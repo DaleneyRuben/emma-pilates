@@ -34,6 +34,7 @@ import {
   clockTime,
   evaluationBadge,
   evaluationDate,
+  evaluationHistoryLabel,
   followingMonth,
   monthName,
   monthPhrase,
@@ -226,7 +227,7 @@ export function MyEvaluationsScreen({
                 <BodyText style={styles.pastText}>
                   {`${clockTime(evaluation.startsAt)} · ${evaluation.nutritionistName}`}
                 </BodyText>
-                <BodyText style={styles.muted}>Realizada</BodyText>
+                <BodyText style={styles.muted}>{evaluationHistoryLabel(evaluation)}</BodyText>
               </View>
             ))}
           </>
