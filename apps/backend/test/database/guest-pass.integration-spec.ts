@@ -59,9 +59,6 @@ describe('guest pass reward', () => {
     });
     return createPrismaPaymentCommands(prisma, {
       now: () => now,
-      // PAY-005 removes the Bs 60 award. Until #157 merges the confirmation
-      // still writes it, and the check requires it to be positive.
-      referralRewardCentavos: 6000,
     }).recordCashPayment(
       { clientId, planId: plan.id, branchId: staff.branchId },
       {
