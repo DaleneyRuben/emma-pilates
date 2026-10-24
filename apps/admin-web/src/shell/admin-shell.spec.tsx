@@ -42,6 +42,7 @@ describe("admin shell", () => {
         "Evaluaciones nutricionales",
         "Personal",
         "Pagos a instructoras",
+        "Pago a la coordinadora",
         "Nómina",
         "Gastos",
         "Categorías de gasto",
