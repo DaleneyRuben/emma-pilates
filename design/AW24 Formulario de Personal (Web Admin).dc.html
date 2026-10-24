@@ -93,7 +93,6 @@
           <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
         </nav>
 
         <main style="flex:1;min-width:0;background:#FAF7F2;position:relative;">
@@ -272,7 +271,7 @@
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
-        <div style="width:408px;height:656px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+        <div style="width:408px;height:760px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar miembro</h3>
@@ -306,6 +305,7 @@
               </div>
               <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Si sacas una sucursal, sus sesiones ya asignadas no se reasignan solas. Cámbialas de entrenadora en Horario antes de guardar.</span>
             </div>
+            <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Código personal</span><div style="display:flex;gap:8px;"><input type="text" placeholder="Ej. CARLA" value="CARLA" style="flex:1;min-width:0;height:44px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:14px;letter-spacing:0.06em;" /><button style="height:44px;padding:0 14px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Guardar código</button></div><span style="font-size:12px;line-height:1.5;color:#766D69;">Las clientas que se registran con este código quedan como traídas por ella.</span></div>
           </div>
           <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:12px;">
             <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
@@ -358,6 +358,55 @@
               <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Si sacas una sucursal, sus sesiones ya asignadas no se reasignan solas. Cámbialas de entrenadora en Horario antes de guardar.</span>
             </div>
             <div role="alert" style="padding:10px 12px;border-radius:8px;background:rgba(178,93,75,0.08);border:1px solid rgba(178,93,75,0.35);font-size:12.5px;line-height:1.5;color:#94493A;">Todavía tiene sesiones próximas o un horario semanal en esas sucursales. Cámbiale la entrenadora desde Horario y vuelve a intentarlo.</div>
+          </div>
+          <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:12px;">
+            <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
+            <a href="#" style="align-self:center;font-size:13.5px;color:#B25D4B;padding:4px 8px;" style-hover="color:#94493A;">Desactivar cuenta</a>
+          </div>
+        </div>
+      </div>
+    </div><div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Código personal · en uso</div>
+          <div style="font-size:12px;color:#766D69;">«Guardar código» con un código que ya tiene otra clienta o instructora · nada cambia</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:760px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar miembro</h3>
+              <span style="font-size:11.5px;color:#766D69;">14 sesiones asignadas esta semana</span>
+            </div>
+            <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:18px;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;border:1px solid #F2EBE2;border-radius:8px;background:#FAF7F2;"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:9px 12px;"><span style="flex:none;font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span><span style="min-width:0;text-align:right;font-size:13px;color:#4A4A4A;word-break:break-word;">Paola Arteaga</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:9px 12px;border-top:1px solid #F2EBE2;"><span style="flex:none;font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo</span><span style="min-width:0;text-align:right;font-size:13px;color:#4A4A4A;word-break:break-word;">paola.arteaga@emmapilates.bo</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:9px 12px;border-top:1px solid #F2EBE2;"><span style="flex:none;font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span><span style="min-width:0;text-align:right;font-size:13px;color:#4A4A4A;word-break:break-word;">+591 707 31988</span></div></div>
+
+
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Rol</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <button style="height:40px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;cursor:pointer;">Entrenador</button>
+                <button style="height:40px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13px;cursor:pointer;" style-hover="border-color:#B78380;color:#B78380;">Asistente</button>
+                <button style="height:40px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13px;cursor:pointer;" style-hover="border-color:#B78380;color:#B78380;">Administrador</button>
+                <button style="height:40px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13px;cursor:pointer;" style-hover="border-color:#B78380;color:#B78380;">Nutricionista</button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Sucursales asignadas</span>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <button style="height:36px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;font-size:13px;color:#8A5D59;font-weight:500;cursor:pointer;"><span style="width:15px;height:15px;border-radius:4px;background:#B78380;display:flex;align-items:center;justify-content:center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>Equipetrol</button>
+                <button style="height:36px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;font-size:13px;color:#8A5D59;font-weight:500;cursor:pointer;"><span style="width:15px;height:15px;border-radius:4px;background:#B78380;display:flex;align-items:center;justify-content:center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>Urubó</button>
+                <button style="height:36px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:13px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;color:#B78380;"><span style="width:15px;height:15px;border:1px solid #D8C9BB;border-radius:4px;background:#FAF7F2;"></span>Norte</button>
+                <button style="height:36px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:13px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;color:#B78380;"><span style="width:15px;height:15px;border:1px solid #D8C9BB;border-radius:4px;background:#FAF7F2;"></span>Las Palmas</button>
+              </div>
+              <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Si sacas una sucursal, sus sesiones ya asignadas no se reasignan solas. Cámbialas de entrenadora en Horario antes de guardar.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Código personal</span><div style="display:flex;gap:8px;"><input type="text" placeholder="Ej. CARLA" value="LUZ" style="flex:1;min-width:0;height:44px;padding:0 12px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:14px;letter-spacing:0.06em;" /><button style="height:44px;padding:0 14px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Guardar código</button></div><span style="font-size:12px;line-height:1.5;color:#94493A;">Ese código ya lo tiene otra clienta o instructora.</span></div>
           </div>
           <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:12px;">
             <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
@@ -558,7 +607,8 @@
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Correo repetido</span>El mismo correo en la misma alta abre la invitación pendiente con un enlace nuevo, sin tocar rol ni sucursales. Si el correo es de una clienta, se avisa y no cambia nada.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Límite de envío</span>Un reenvío limitado muestra la espera que indica el servidor y conserva el enlace vigente. Sin excepción manual ni forma de copiar el enlace.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Al editar</span>Nombre, correo y teléfono se muestran en filas de solo lectura: se cambian el rol y las sucursales. Sin «Restablecer contraseña»: cada cuenta recupera la suya por correo (AW30/S18). «Desactivar cuenta» pide confirmar; tu propia cuenta y una desactivada se abren en solo lectura.</div>
-    </div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Código personal</span>Solo para entrenadoras, con su propio «Guardar código»: el «Guardar» del panel sigue guardando rol y sucursales. Guardado: "Código guardado: CARLA." en verde; vacío: "Quitamos el código."; mal escrito: "Usa de 3 a 20 letras, números o guiones, sin empezar con REF-." (BKM-011).</div>
+  </div>
   </div>
 
 </div>

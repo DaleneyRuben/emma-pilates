@@ -1,4 +1,5 @@
 import type { StaffProfileDto } from "@pilates/api-contracts";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Separator } from "../../components/ui/separator";
@@ -48,14 +49,16 @@ function LogoutConfirmation({ onCancel }: { onCancel: () => void }) {
   );
 }
 
-// AW33: header with the Administrator, then two rows; "Cerrar sesión" only
+// AW33: header with the Administrator, then its rows; "Cerrar sesión" only
 // carries the Error tone on its text and asks before logging out.
 export function AccountMenu({
   profile,
   onChangePassword,
+  onNavigate,
 }: {
   profile: StaffProfileDto | undefined;
   onChangePassword: () => void;
+  onNavigate: () => void;
 }) {
   const [confirming, setConfirming] = useState(false);
   const [cancelled, setCancelled] = useState(false);
@@ -86,6 +89,15 @@ export function AccountMenu({
       </div>
       <Separator />
       <div className="flex flex-col pt-2">
+        {/* AW36 (BKM-004): the studio's rules live with the account, not
+            in the sidebar every page draws (follow-up 130). */}
+        <Link
+          to="/reglas-del-estudio"
+          className={cn(rowClass, "text-texto")}
+          onClick={onNavigate}
+        >
+          Reglas del estudio
+        </Link>
         <button
           type="button"
           className={cn(rowClass, "text-texto")}

@@ -1,10 +1,7 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
 import {
-  CreditLedgerActorKind,
-  CreditLedgerEntryKind,
   PaymentMethod,
   PaymentState,
-  ReferralState,
   StaffRole,
   SubscriptionState,
 } from '../generated/prisma/enums';
@@ -114,12 +111,14 @@ export const applyDevelopmentFixtures = async (
         });
       }
 
+      // The fixtures are the visible catalog, so a Plan hidden since (the
+      // monthly Plans BKM-005 hid, say) shows again.
       for (const plan of fixtures.plans) {
         const { id, ...data } = plan;
         await transaction.plan.upsert({
           where: { id },
           create: plan,
-          update: data,
+          update: { ...data, hiddenAt: null },
         });
       }
 
@@ -202,7 +201,7 @@ export const applyDevelopmentFixtures = async (
         });
       }
 
-      // Payments, referrals, and ledger entries are immutable once written,
+      // Payments and referrals are immutable once written,
       // so they are only created when missing instead of upserted.
       for (const payment of fixtures.payments) {
         const existing = await transaction.payment.findUnique({
@@ -235,30 +234,7 @@ export const applyDevelopmentFixtures = async (
           select: { id: true },
         });
         if (existing) continue;
-        await transaction.referral.create({
-          data: {
-            ...referral,
-            state:
-              referral.state === 'awarded'
-                ? ReferralState.AWARDED
-                : ReferralState.PENDING,
-          },
-        });
-      }
-
-      for (const entry of fixtures.creditLedgerEntries) {
-        const existing = await transaction.creditLedgerEntry.findUnique({
-          where: { id: entry.id },
-          select: { id: true },
-        });
-        if (existing) continue;
-        await transaction.creditLedgerEntry.create({
-          data: {
-            ...entry,
-            kind: CreditLedgerEntryKind.REFERRAL_AWARD,
-            actorKind: CreditLedgerActorKind.ACCOUNT,
-          },
-        });
+        await transaction.referral.create({ data: referral });
       }
 
       // Blocks are immutable once published, so a re-application keeps the

@@ -26,6 +26,7 @@ import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } fr
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
+import { HeaderAction } from "../ui/header-action";
 import { RootHeader } from "../ui/root-header";
 import { describeContact } from "./assistant-format";
 import { useAssistantWorkspace } from "./assistant-workspace";
@@ -33,7 +34,7 @@ import { ClientDetailPanel } from "./client-panel";
 
 export type ClientSearchNavigation = {
   navigate: {
-    (screen: "NewClient" | "CancelClass" | "ContactList"): void;
+    (screen: "NewClient" | "CancelClass" | "ContactList" | "CashClose"): void;
     (screen: "ClientOverview", params: { clientId: string }): void;
   };
 };
@@ -99,7 +100,17 @@ export function ClientSearchScreen() {
 
   const search = (
     <>
-      <RootHeader label="Buscar cliente" title="Buscar cliente" />
+      <RootHeader
+        action={
+          <HeaderAction
+            label="Cerrar caja"
+            onPress={() => navigation.navigate("CashClose")}
+            testID="cash-close-entry"
+          />
+        }
+        label="Buscar cliente"
+        title="Buscar cliente"
+      />
       <TextInput
         accessibilityLabel={placeholder}
         autoCapitalize="none"

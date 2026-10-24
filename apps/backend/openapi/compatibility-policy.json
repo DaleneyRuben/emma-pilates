@@ -40,7 +40,6 @@
     "listAdminEvaluations",
     "cancelAdminEvaluation",
     "listAdminReferrals",
-    "listAdminCredits",
     "getIncomeReport",
     "listAdminSupplies",
     "createSupply",

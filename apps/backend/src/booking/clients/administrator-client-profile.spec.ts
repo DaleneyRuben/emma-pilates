@@ -49,7 +49,6 @@ const directory = (
   read: jest.fn().mockResolvedValue(lucia),
   findActiveSubscription: jest.fn().mockResolvedValue(null),
   findLatestSubscription: jest.fn().mockResolvedValue(null),
-  readAvailableCredit: jest.fn().mockResolvedValue(105_000),
   readClosureOutlook: jest.fn().mockResolvedValue(outlook),
   saveProfile: jest
     .fn()
@@ -60,7 +59,7 @@ const directory = (
 });
 
 describe('the Coordinator in the Client directory (ADR-0102)', () => {
-  it('pages the directory and reads the detail without the Credit amount', async () => {
+  it('pages the directory and reads the detail with Credit retired', async () => {
     const clients = directory();
     const coordinator = staff('coordinator');
 
@@ -76,9 +75,11 @@ describe('the Coordinator in the Client directory (ADR-0102)', () => {
       coordinator,
       { directory: clients, now: () => now },
     );
-    expect(detail).toMatchObject({ id: 'client-id', closure: outlook });
-    expect(detail).not.toHaveProperty('creditAvailableCentavos');
-    expect(clients.readAvailableCredit).not.toHaveBeenCalled();
+    expect(detail).toMatchObject({
+      id: 'client-id',
+      closure: outlook,
+      creditAvailableCentavos: 0,
+    });
   });
 });
 

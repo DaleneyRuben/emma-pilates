@@ -9,6 +9,7 @@ import {
   type ClientSubscriptionView,
 } from '../client/client-subscription';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import type { InvoiceData } from '../payments/invoice-data/invoice-data';
 import type { PaymentView } from '../payments/prisma-payment-commands';
 
 export class ClientNotFoundError extends Error {
@@ -135,33 +136,26 @@ export const readClientOverview = async (
       from: Date;
     }): Promise<UpcomingClientBooking[]>;
     findAttendedBookings(clientId: string): Promise<ClassHistoryEntry[]>;
-    readAvailableCredit(clientId: string): Promise<number>;
   },
 ): Promise<ClientOverview> => {
-  const identity = requireAssistant(dependencies.principal);
+  requireAssistant(dependencies.principal);
   const client = await requireClient(command.clientId, dependencies);
-  // ADR-0016 keeps the field for installed builds; the Coordinator gets 0.
-  const readCredit = (clientId: string) =>
-    identity.role === 'coordinator'
-      ? Promise.resolve(0)
-      : dependencies.readAvailableCredit(clientId);
-  const [subscription, upcoming, history, creditAvailableCentavos] =
-    await Promise.all([
-      describeSubscription(client.id, dependencies),
-      dependencies.findUpcoming({
-        clientId: client.id,
-        from: dependencies.now(),
-      }),
-      dependencies.findAttendedBookings(client.id),
-      readCredit(client.id),
-    ]);
+  const [subscription, upcoming, history] = await Promise.all([
+    describeSubscription(client.id, dependencies),
+    dependencies.findUpcoming({
+      clientId: client.id,
+      from: dependencies.now(),
+    }),
+    dependencies.findAttendedBookings(client.id),
+  ]);
 
   return {
     client,
     subscription,
     nextBooking: upcoming[0] ?? null,
     recentHistory: history.slice(0, recentHistoryLength),
-    creditAvailableCentavos,
+    // Credit is retired (booking ADR-0009); store builds still read it.
+    creditAvailableCentavos: 0,
   };
 };
 
@@ -206,35 +200,26 @@ export const quotePlansForClient = async (
   dependencies: ClientLookup & {
     principal: AuthenticatedPrincipal;
     listVisiblePlans(): Promise<PlanSummary[]>;
-    readAvailableCredit(clientId: string): Promise<number>;
   },
 ): Promise<PlanQuotes> => {
   requireSeller(dependencies.principal);
-  const client = await requireClient(command.clientId, dependencies);
-  const [plans, creditAvailableCentavos] = await Promise.all([
-    dependencies.listVisiblePlans(),
-    dependencies.readAvailableCredit(client.id),
-  ]);
+  await requireClient(command.clientId, dependencies);
+  const plans = await dependencies.listVisiblePlans();
 
+  // Credit is retired (booking ADR-0009): every Plan costs its full price.
   return {
-    creditAvailableCentavos,
+    creditAvailableCentavos: 0,
     plans: [...plans]
       .sort(
         (left, right) =>
           left.displayOrder - right.displayOrder ||
           left.id.localeCompare(right.id),
       )
-      .map((plan) => {
-        const creditAppliedCentavos = Math.min(
-          creditAvailableCentavos,
-          plan.priceCentavos,
-        );
-        return {
-          ...plan,
-          creditAppliedCentavos,
-          amountDueCentavos: plan.priceCentavos - creditAppliedCentavos,
-        };
-      }),
+      .map((plan) => ({
+        ...plan,
+        creditAppliedCentavos: 0,
+        amountDueCentavos: plan.priceCentavos,
+      })),
   };
 };
 
@@ -244,11 +229,17 @@ export const recordAssistantCashPayment = async (
     planId: string;
     branchId: string;
     idempotencyKey: string;
+    invoiceData?: InvoiceData | null;
   },
   dependencies: {
     principal: AuthenticatedPrincipal;
     recordCashPayment(
-      command: { clientId: string; planId: string; branchId: string },
+      command: {
+        clientId: string;
+        planId: string;
+        branchId: string;
+        invoiceData: InvoiceData | null;
+      },
       principal: AuthenticatedPrincipal,
       idempotencyKey: string,
     ): Promise<PaymentView>;
@@ -262,6 +253,7 @@ export const recordAssistantCashPayment = async (
       clientId: command.clientId,
       planId: command.planId,
       branchId: command.branchId,
+      invoiceData: command.invoiceData ?? null,
     },
     dependencies.principal,
     command.idempotencyKey,

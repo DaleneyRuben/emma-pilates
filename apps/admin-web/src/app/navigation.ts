@@ -13,7 +13,9 @@ export type AdminPath =
   | "/back-office/clientes"
   | "/back-office/para-contactar"
   | "/back-office/pagos"
+  | "/back-office/caja"
   | "/back-office/insumos"
+  | "/back-office/equipos"
   | "/back-office/evaluaciones-nutricionales"
   | "/back-office/personal"
   | "/back-office/nomina"
@@ -22,7 +24,8 @@ export type AdminPath =
   | "/reporte"
   | "/promociones"
   | "/promociones/referidos"
-  | "/promociones/creditos";
+  | "/comentarios"
+  | "/reglas-del-estudio";
 
 export type NavigationItem = {
   label: string;
@@ -46,7 +49,7 @@ export type NavigationItem = {
   /**
    * Its sub-pages keep it marked: every page under it (AW31 is a view of
    * Insumos), or only the listed ones where siblings share its prefix
-   * (AW35 under Promociones, beside Referidos and Créditos).
+   * (AW35 under Promociones, beside Referidos).
    */
   subPages?: true | readonly string[];
   /**
@@ -116,6 +119,11 @@ export const navigationGroups: readonly NavigationGroup[] = [
         studioWide: "los pagos son del estudio, no de una sede.",
       },
       {
+        label: "Caja",
+        to: "/back-office/caja",
+        screen: "AW151",
+      },
+      {
         label: "Insumos",
         to: "/back-office/insumos",
         screen: "AW08",
@@ -123,6 +131,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         badge: "lowStock",
         subPages: true,
       },
+      { label: "Equipos", to: "/back-office/equipos", screen: "AW37" },
       {
         label: "Evaluaciones nutricionales",
         to: "/back-office/evaluaciones-nutricionales",
@@ -186,19 +195,39 @@ export const navigationGroups: readonly NavigationGroup[] = [
         list: true,
         studioWide: "los referidos son del estudio, no de una sede.",
       },
+    ],
+  },
+  // AW38 (REL-012): «Enviar comentarios» from both apps.
+  {
+    items: [
       {
-        label: "Créditos",
-        to: "/promociones/creditos",
-        screen: "AW27",
+        label: "Comentarios",
+        to: "/comentarios",
+        screen: "AW38",
         list: true,
-        studioWide: "los créditos son del estudio, no de una sede.",
+        studioWide: "los comentarios llegan de las apps, no de una sede.",
       },
     ],
   },
 ];
 
-export const navigationItems: readonly NavigationItem[] =
-  navigationGroups.flatMap((group) => group.items);
+/**
+ * Pages the account menu (AW33) opens rather than the sidebar; they still
+ * name the browser tab and the Branch selector's studio-wide note.
+ */
+export const accountMenuItems: readonly NavigationItem[] = [
+  {
+    label: "Reglas del estudio",
+    to: "/reglas-del-estudio",
+    screen: "AW36",
+    studioWide: "las reglas son del estudio, no de una sede.",
+  },
+];
+
+export const navigationItems: readonly NavigationItem[] = [
+  ...navigationGroups.flatMap((group) => group.items),
+  ...accountMenuItems,
+];
 
 export const findNavigationItem = (
   pathname: string,

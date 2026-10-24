@@ -1,5 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
+import {
+  deprecatedDurationMonths,
+  isValidPlanValidity,
+} from '../catalog/plan-validity';
 
 const uuid = z.uuid();
 const civilDate = z.iso.date();
@@ -41,7 +45,15 @@ export class ClassTypeInputDto {
 export class AdminPlanDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() name!: string;
-  @ApiProperty({ enum: [1, 3, 6, 12] }) durationMonths!: number;
+  @ApiProperty({ enum: [30, 60, 90] }) durationDays!: number;
+  @ApiProperty({ type: Number, enum: [3, 4], nullable: true })
+  weeklyClassCap!: number | null;
+  @ApiProperty({
+    enum: [1, 2, 3],
+    deprecated: true,
+    description: 'durationDays / 30, for builds that still read months',
+  })
+  durationMonths!: number;
   @ApiProperty() classAllowance!: number;
   @ApiProperty({ description: 'BOB centavos' }) priceCentavos!: number;
   @ApiProperty() displayOrder!: number;
@@ -51,12 +63,26 @@ export class AdminPlanDto {
 
 export class PlanInputDto {
   @ApiProperty({ maxLength: 80 }) name!: string;
-  @ApiProperty({ enum: [1, 3, 6, 12] }) durationMonths!: number;
+  @ApiProperty({ enum: [30, 60, 90] }) durationDays!: number;
+  @ApiProperty({
+    type: Number,
+    enum: [3, 4],
+    nullable: true,
+    description: 'Only on 60- and 90-day Plans',
+  })
+  weeklyClassCap!: number | null;
   @ApiProperty({ minimum: 1 }) classAllowance!: number;
   @ApiProperty({ minimum: 1, description: 'BOB centavos' })
   priceCentavos!: number;
   @ApiProperty({ minimum: 0 }) displayOrder!: number;
 }
+
+export const toAdminPlanDto = <Plan extends { durationDays: number }>(
+  plan: Plan,
+): Plan & { durationMonths: number } => ({
+  ...plan,
+  durationMonths: deprecatedDurationMonths(plan.durationDays),
+});
 
 export class PlanVisibilityDto {
   @ApiProperty() visible!: boolean;
@@ -83,16 +109,13 @@ export const parsePlanInput = (value: unknown) =>
   z
     .strictObject({
       name: text(80),
-      durationMonths: z.union([
-        z.literal(1),
-        z.literal(3),
-        z.literal(6),
-        z.literal(12),
-      ]),
+      durationDays: z.union([z.literal(30), z.literal(60), z.literal(90)]),
+      weeklyClassCap: z.union([z.literal(3), z.literal(4)]).nullable(),
       classAllowance: z.int().min(1).max(1000),
       priceCentavos: z.int().min(1),
       displayOrder: z.int().min(0),
     })
+    .refine(isValidPlanValidity, { path: ['weeklyClassCap'] })
     .safeParse(value);
 
 export const parsePlanVisibility = (value: unknown) =>

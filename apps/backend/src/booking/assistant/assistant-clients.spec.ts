@@ -75,7 +75,8 @@ const plans = [
   {
     id: 'plan-8',
     name: 'Paquete de 8 clases',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 8,
     priceCentavos: 56_000,
     displayOrder: 1,
@@ -83,7 +84,8 @@ const plans = [
   {
     id: 'plan-1',
     name: 'Clase suelta',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 1,
     priceCentavos: 5_000,
     displayOrder: 0,
@@ -130,10 +132,9 @@ describe('Assistant Client overview', () => {
     findLatestSubscription: jest.fn().mockResolvedValue(null),
     findUpcoming: jest.fn().mockResolvedValue(upcoming),
     findAttendedBookings: jest.fn().mockResolvedValue(history),
-    readAvailableCredit: jest.fn().mockResolvedValue(6_000),
   };
 
-  it('composes the Client, Subscription state, next Booking, last two attended classes, and Credit', async () => {
+  it('composes the Client, Subscription state, next Booking, last two attended classes, and no Credit (PAY-005)', async () => {
     await expect(
       readClientOverview({ clientId: 'client-id' }, dependencies),
     ).resolves.toEqual({
@@ -141,7 +142,7 @@ describe('Assistant Client overview', () => {
       subscription: { status: 'active', subscription },
       nextBooking: upcoming[0],
       recentHistory: history.slice(0, 2),
-      creditAvailableCentavos: 6_000,
+      creditAvailableCentavos: 0,
     });
     expect(dependencies.findActiveSubscription).toHaveBeenCalledWith(
       'client-id',
@@ -153,16 +154,13 @@ describe('Assistant Client overview', () => {
     });
   });
 
-  it('shows the Coordinator the same overview without the Credit amount (ADR-0102)', async () => {
-    const readAvailableCredit = jest.fn().mockResolvedValue(6_000);
-
+  it('shows the Coordinator the same overview with Credit retired (ADR-0102)', async () => {
     await expect(
       readClientOverview(
         { clientId: 'client-id' },
         {
           ...dependencies,
           principal: staff('coordinator', []),
-          readAvailableCredit,
         },
       ),
     ).resolves.toEqual({
@@ -172,7 +170,6 @@ describe('Assistant Client overview', () => {
       recentHistory: history.slice(0, 2),
       creditAvailableCentavos: 0,
     });
-    expect(readAvailableCredit).not.toHaveBeenCalled();
   });
 
   it('reports a missing Client', async () => {
@@ -287,7 +284,7 @@ describe('Assistant Client Bookings and history', () => {
 });
 
 describe('Assistant Plan quotes and cash Payment', () => {
-  it('applies the available Credit to every visible Plan in display order', async () => {
+  it('quotes every visible Plan at its full price in display order, since Credit is retired (PAY-005)', async () => {
     await expect(
       quotePlansForClient(
         { clientId: 'client-id' },
@@ -295,21 +292,20 @@ describe('Assistant Plan quotes and cash Payment', () => {
           principal: assistant,
           findClient: jest.fn().mockResolvedValue(clientRecord),
           listVisiblePlans: jest.fn().mockResolvedValue(plans),
-          readAvailableCredit: jest.fn().mockResolvedValue(6_000),
         },
       ),
     ).resolves.toEqual({
-      creditAvailableCentavos: 6_000,
+      creditAvailableCentavos: 0,
       plans: [
         {
           ...plans[1],
-          creditAppliedCentavos: 5_000,
-          amountDueCentavos: 0,
+          creditAppliedCentavos: 0,
+          amountDueCentavos: plans[1].priceCentavos,
         },
         {
           ...plans[0],
-          creditAppliedCentavos: 6_000,
-          amountDueCentavos: 50_000,
+          creditAppliedCentavos: 0,
+          amountDueCentavos: plans[0].priceCentavos,
         },
       ],
     });
@@ -323,7 +319,6 @@ describe('Assistant Plan quotes and cash Payment', () => {
           principal: staff('coordinator', []),
           findClient: jest.fn().mockResolvedValue(clientRecord),
           listVisiblePlans: jest.fn().mockResolvedValue(plans),
-          readAvailableCredit: jest.fn().mockResolvedValue(6_000),
         },
       ),
     ).rejects.toBeInstanceOf(BookingAccessDeniedError);
@@ -336,6 +331,7 @@ describe('Assistant Plan quotes and cash Payment', () => {
       state: 'confirmed' as const,
       planId: 'plan-8',
       planName: 'Paquete de 8 clases',
+      durationDays: 30,
       durationMonths: 1,
       classAllowance: 8,
       planPriceCentavos: 56_000,
@@ -356,6 +352,7 @@ describe('Assistant Plan quotes and cash Payment', () => {
           planId: 'plan-8',
           branchId: 'branch-centro',
           idempotencyKey: 'idempotency-key',
+          invoiceData: { taxId: '4567891', name: 'Ana Pérez' },
         },
         {
           principal: assistant,
@@ -365,7 +362,12 @@ describe('Assistant Plan quotes and cash Payment', () => {
       ),
     ).resolves.toEqual({ payment, subscription: activated });
     expect(recordCashPayment).toHaveBeenCalledWith(
-      { clientId: 'client-id', planId: 'plan-8', branchId: 'branch-centro' },
+      {
+        clientId: 'client-id',
+        planId: 'plan-8',
+        branchId: 'branch-centro',
+        invoiceData: { taxId: '4567891', name: 'Ana Pérez' },
+      },
       assistant,
       'idempotency-key',
     );

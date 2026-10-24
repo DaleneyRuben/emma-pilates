@@ -150,9 +150,12 @@ import { adminWebReads } from './admin-web-reads';
 import { receiptReadProvider } from './payments/prisma-receipt-read';
 import { promotionContactsWiring } from './promotion-contacts/promotion-contacts-wiring';
 import { promotionsConsentWiring } from './promotions-consent/promotions-consent-wiring';
+import { acquisitionWiring } from './acquisition/acquisition-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
+import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
 import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
+import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
 
 @Module({
   imports: [SystemIdentityModule, NotificationsModule],
@@ -189,8 +192,11 @@ import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
     ...promotionsWiring.controllers,
     ...promotionContactsWiring.controllers,
     ...promotionsConsentWiring.controllers,
+    ...acquisitionWiring.controllers,
+    ...studioSettingsWiring.controllers,
     ...clientPhotoWiring.controllers,
     ...first90DaysWiring.controllers,
+    ...invoiceDataWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
     NutritionistEvaluationsController,
@@ -499,15 +505,13 @@ import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
     },
     {
       provide: paymentCommands,
-      inject: [PRISMA_CLIENT, ConfigService, NOTIFICATION_RECORDER],
+      inject: [PRISMA_CLIENT, NOTIFICATION_RECORDER],
       useFactory: (
         prisma: PrismaClient,
-        config: ConfigService<Environment, true>,
         recordNotification: NotificationRecorder,
       ) =>
         createPrismaPaymentCommands(prisma, {
           now: () => new Date(),
-          referralRewardCentavos: config.getOrThrow('REFERRAL_REWARD_CENTAVOS'),
           recordNotification,
         }),
     },
@@ -584,8 +588,11 @@ import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
     ...promotionsWiring.providers(PRISMA_CLIENT),
     ...promotionContactsWiring.providers(PRISMA_CLIENT),
     ...promotionsConsentWiring.providers(PRISMA_CLIENT),
+    ...acquisitionWiring.providers(PRISMA_CLIENT),
+    ...studioSettingsWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
     ...first90DaysWiring.providers(PRISMA_CLIENT),
+    ...invoiceDataWiring.providers(PRISMA_CLIENT),
   ],
 })
 export class BookingModule {}

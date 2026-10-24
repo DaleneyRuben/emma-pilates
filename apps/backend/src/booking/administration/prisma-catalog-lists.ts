@@ -86,7 +86,8 @@ export const createPrismaCatalogLists = (prisma: PrismaClient) => ({
         select: {
           id: true,
           name: true,
-          durationMonths: true,
+          durationDays: true,
+          weeklyClassCap: true,
           classAllowance: true,
           priceCentavos: true,
           displayOrder: true,

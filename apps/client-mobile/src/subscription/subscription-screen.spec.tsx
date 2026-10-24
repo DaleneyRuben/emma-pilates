@@ -57,6 +57,9 @@ describe("Client Subscription detail", () => {
     expect(screen.getByText("Te quedan 5 clases por usar")).toBeOnTheScreen();
     expect(screen.getByText("25 de agosto de 2026")).toBeOnTheScreen();
     expect(screen.getByText("24 de septiembre de 2026")).toBeOnTheScreen();
+    // Follow-up 177: the end is an expiry, «Vence el», not «Pagado hasta».
+    expect(screen.getByText("Vence el")).toBeOnTheScreen();
+    expect(screen.queryByText("Pagado hasta")).toBeNull();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).not.toBeOnTheScreen();
   });
 

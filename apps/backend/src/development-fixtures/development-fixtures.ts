@@ -17,7 +17,8 @@ export type DevelopmentFixtures = {
   plans: {
     id: string;
     name: string;
-    durationMonths: number;
+    durationDays: number;
+    weeklyClassCap: number | null;
     classAllowance: number;
     priceCentavos: number;
     displayOrder: number;
@@ -62,7 +63,8 @@ export type DevelopmentFixtures = {
     clientId: string;
     planId: string;
     planNameSnapshot: string;
-    durationMonthsSnapshot: number;
+    durationDaysSnapshot: number;
+    weeklyClassCapSnapshot: number | null;
     originalClassAllowance: number;
     remainingClassAllowance: number;
     startsOn: Date;
@@ -77,7 +79,8 @@ export type DevelopmentFixtures = {
     clientId: string;
     planId: string;
     planNameSnapshot: string;
-    durationMonthsSnapshot: number;
+    durationDaysSnapshot: number;
+    weeklyClassCapSnapshot: number | null;
     classAllowanceSnapshot: number;
     planPriceCentavos: number;
     creditAppliedCentavos: number;
@@ -94,11 +97,6 @@ export type DevelopmentFixtures = {
     id: string;
     referrerClientId: string;
     referredClientId: string;
-    state: 'pending' | 'awarded';
-    qualifiedPaymentId: string | null;
-    qualifiedAt: Date | null;
-    awardCentavos: number | null;
-    awardedAt: Date | null;
     createdAt: Date;
   }[];
   availabilityBlocks: {
@@ -111,20 +109,7 @@ export type DevelopmentFixtures = {
     effectiveFrom: Date;
     createdByAccountId: string;
   }[];
-  creditLedgerEntries: {
-    id: string;
-    clientId: string;
-    kind: 'referral_award';
-    amountCentavos: number;
-    occurredAt: Date;
-    referralId: string;
-    actorKind: 'account';
-    actorAccountId: string;
-    correlationId: string;
-  }[];
 };
-
-const referralRewardCentavos = 6_000;
 
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
 const boliviaOffsetHours = 4;
@@ -187,28 +172,32 @@ const planDefinitions = [
   {
     key: 'paquete-8',
     name: 'Paquete de 8 clases',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 8,
     priceCentavos: 56_000,
   },
   {
     key: 'paquete-12',
     name: 'Paquete de 12 clases',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 12,
     priceCentavos: 78_000,
   },
   {
     key: 'mensual-16',
     name: 'Mensual 16 clases',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 16,
     priceCentavos: 105_000,
   },
   {
     key: 'trimestral-36',
     name: 'Trimestral 36 clases',
-    durationMonths: 3,
+    durationDays: 90,
+    weeklyClassCap: 4,
     classAllowance: 36,
     priceCentavos: 210_000,
   },
@@ -434,8 +423,7 @@ type CashPaymentDefinition = {
   collectedBy: (typeof staffDefinitions)[number]['key'];
 };
 
-// Valeria paid her current Plan in cash at the front desk, which is what
-// qualifies Sofía's referral below.
+// Valeria paid her current Plan in cash at the front desk.
 const cashPaymentDefinitions: readonly CashPaymentDefinition[] = [
   {
     client: 'valeria',
@@ -583,7 +571,8 @@ export const buildDevelopmentFixtures = (input: {
         clientId: clientId(definition.client),
         planId: planId(plan.key),
         planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
+        durationDaysSnapshot: plan.durationDays,
+        weeklyClassCapSnapshot: plan.weeklyClassCap,
         originalClassAllowance: plan.classAllowance,
         remainingClassAllowance: definition.remainingClassAllowance,
         startsOn,
@@ -620,7 +609,8 @@ export const buildDevelopmentFixtures = (input: {
         clientId: clientId(definition.client),
         planId: planId(plan.key),
         planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
+        durationDaysSnapshot: plan.durationDays,
+        weeklyClassCapSnapshot: plan.weeklyClassCap,
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: plan.priceCentavos,
         creditAppliedCentavos: 0,
@@ -636,63 +626,21 @@ export const buildDevelopmentFixtures = (input: {
     },
   );
 
+  // Referrals stay pending: the Bs 60 award is retired (booking ADR-0009).
   const referrals: DevelopmentFixtures['referrals'] = referralDefinitions.map(
-    (definition) => {
-      const referredClientId = clientId(definition.referred);
-      const qualifyingPayment = payments.find(
-        (payment) => payment.clientId === referredClientId,
-      );
-      const createdAt = boliviaInstant(
+    (definition) => ({
+      id: deterministicId(
+        `referral:${definition.referrer}:${definition.referred}`,
+      ),
+      referrerClientId: clientId(definition.referrer),
+      referredClientId: clientId(definition.referred),
+      createdAt: boliviaInstant(
         addDays(input.today, -definition.registeredDaysAgo),
         10,
         0,
-      );
-      const awarded =
-        qualifyingPayment !== undefined &&
-        qualifyingPayment.decidedAt.getTime() > createdAt.getTime();
-
-      return {
-        id: deterministicId(
-          `referral:${definition.referrer}:${definition.referred}`,
-        ),
-        referrerClientId: clientId(definition.referrer),
-        referredClientId,
-        state: awarded ? 'awarded' : 'pending',
-        qualifiedPaymentId: awarded ? qualifyingPayment.id : null,
-        qualifiedAt: awarded ? qualifyingPayment.decidedAt : null,
-        awardCentavos: awarded ? referralRewardCentavos : null,
-        awardedAt: awarded ? qualifyingPayment.decidedAt : null,
-        createdAt,
-      };
-    },
+      ),
+    }),
   );
-
-  const creditLedgerEntries: DevelopmentFixtures['creditLedgerEntries'] =
-    referrals.flatMap((referral) => {
-      if (referral.state !== 'awarded' || referral.awardedAt === null) {
-        return [];
-      }
-      const payment = payments.find(
-        (candidate) => candidate.id === referral.qualifiedPaymentId,
-      );
-      if (!payment) throw new Error(`Referral ${referral.id} lost its payment`);
-
-      return [
-        {
-          id: deterministicId(`credit-ledger:referral-award:${referral.id}`),
-          clientId: referral.referrerClientId,
-          kind: 'referral_award' as const,
-          amountCentavos: referralRewardCentavos,
-          occurredAt: referral.awardedAt,
-          referralId: referral.id,
-          actorKind: 'account' as const,
-          actorAccountId: payment.decidedByAccountId,
-          correlationId: deterministicId(
-            `correlation:referral-award:${referral.id}`,
-          ),
-        },
-      ];
-    });
 
   return {
     branches: branchDefinitions.map(({ key, name, address }) => ({
@@ -724,7 +672,6 @@ export const buildDevelopmentFixtures = (input: {
     subscriptions,
     payments,
     referrals,
-    creditLedgerEntries,
     availabilityBlocks: availabilityBlockDefinitions.map((definition) => {
       const nutritionist = staffDefinitions.find(
         (member) => member.key === definition.nutritionist,

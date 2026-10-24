@@ -30,6 +30,7 @@ describe('promoteWaitlist', () => {
           hasOverlappingBooking: jest.fn().mockResolvedValue(false),
           createBooking,
           closeAsPromoted,
+          cancellationWindowMinutes: () => Promise.resolve(150),
           now: () => new Date('2026-09-10T12:00:00Z'),
         },
       ),

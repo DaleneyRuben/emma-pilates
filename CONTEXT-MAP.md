@@ -16,6 +16,7 @@
 - **System Identity ↔ Booking & Membership**: System Identity owns `Account` and authentication state; each Account links to exactly one `Client` or `Staff Member`, which remain owned by Booking & Membership and supply the current Role and Branch scope used for authorization.
 
 - **Studio Management → Booking & Membership, Back Office**: reads Sessions, Bookings, Attendance, Subscriptions, Payments, Allowance Adjustments, Founder Memberships, Acquisition Channels, Salary Payments, Pay Statements, Expenses, Cost Budget Lines, and Cash Closes into its own facts; it writes only its own `studio` schema.
+- **Back Office → Booking & Membership**: a Cash Close sums the day's confirmed cash `Payment` Money Amounts collected at its `Branch` (read-only); it never writes a Payment, and a sale voided or recorded after the close shows as an adjustment computed from the Payments, never as an edit of the close.
 - **Back Office → Booking & Membership**: Pay Statements are calculated from Sessions (Bookings at the window close, «minimum not met» cancellations) and from the first Payments of Clients a Trainer brought; Equipment is scoped to a `Branch` and flags Sessions whose capacity exceeds the working machines.
 - **Booking & Membership → Studio Settings**: the configurable rules every context reads (Cancellation Window, Minimum Bookings, prices, tax rate, Opening Date) live in Studio Settings, owned by Booking & Membership ([ADR-0101](./docs/adr/0101-keep-studio-rules-in-studio-settings.md)).
 

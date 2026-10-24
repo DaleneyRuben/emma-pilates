@@ -13,6 +13,7 @@ import {
 } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { formatEvaluationMoment } from '../evaluations/evaluation-notifications';
+import { promoteWaitlistInTransaction } from '../commands/waitlist-promotion';
 import { recordAdministratorAudit } from './administration-audit';
 import {
   AdministrationError,
@@ -189,7 +190,13 @@ export const createPrismaSessionExceptions = (
             startsAt,
             endsAt: new Date(startsAt.getTime() + durationMinutes * minuteMs),
             isException: true,
-            ...(startChanged ? { emptyBookingCheckCompletedAt: null } : {}),
+            // A moved Session is checked and snapshotted again at its new time.
+            ...(startChanged
+              ? {
+                  minimumBookingsCheckCompletedAt: null,
+                  bookingsAtWindowClose: null,
+                }
+              : {}),
           },
           select: sessionSelect,
         });
@@ -229,6 +236,12 @@ export const createPrismaSessionExceptions = (
               occurredAt: now,
             });
           }
+        }
+        if (input.capacity !== undefined && input.capacity > session.capacity) {
+          await promoteWaitlistInTransaction(transaction, session.id, {
+            now: () => now,
+            recordNotification: record,
+          });
         }
         await transaction.auditRecord.create({
           data: {

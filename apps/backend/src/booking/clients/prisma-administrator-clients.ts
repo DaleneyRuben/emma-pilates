@@ -6,10 +6,7 @@ import {
   StaffRole,
 } from '../../generated/prisma/enums';
 import { boliviaDate } from '../../time/bolivia-time';
-import {
-  accountStatus,
-  createAssistantClientRepository,
-} from '../assistant/prisma-assistant-client-repository';
+import { accountStatus } from '../assistant/prisma-assistant-client-repository';
 import { closureScope } from '../account-closure/closure-scope';
 import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { toSubscriptionSummary } from '../client/client-subscription';
@@ -61,7 +58,6 @@ export const createPrismaAdministratorClients = (
   prisma: PrismaClient,
 ): AdministratorClientDirectory => {
   const catalog = createCatalogRepository(prisma);
-  const credit = createAssistantClientRepository(prisma);
 
   const directory: AdministratorClientDirectory = {
     list: async ({ page, pageSize, query, today }) => {
@@ -167,7 +163,6 @@ export const createPrismaAdministratorClients = (
         .then(toSubscriptionSummary),
     findLatestSubscription: (clientId) =>
       catalog.findLatestSubscription(clientId).then(toSubscriptionSummary),
-    readAvailableCredit: (clientId) => credit.readAvailableCredit(clientId),
     readClosureOutlook: async (clientId, now) => {
       const [bookings, waitlist, evaluations, pending] = await Promise.all([
         prisma.booking.count({

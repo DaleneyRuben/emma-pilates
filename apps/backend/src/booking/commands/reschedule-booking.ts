@@ -1,5 +1,6 @@
 import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
 import { BookingAccessDeniedError } from './create-booking';
 
 type BookingForReschedule = {
@@ -41,10 +42,9 @@ type RescheduleBookingDependencies = {
     subscriptionId: string;
     rescheduledByAccountId: string;
   }): Promise<{ id: string }>;
+  cancellationWindowMinutes(): Promise<number>;
   now(): Date;
 };
-
-const cancellationWindowMilliseconds = 2.5 * 60 * 60 * 1_000;
 
 const boliviaDate = (instant: Date): string =>
   new Intl.DateTimeFormat('en-CA', {
@@ -98,8 +98,14 @@ export const rescheduleBooking = async (
   assertAccess(booking, target, dependencies.principal);
 
   const now = dependencies.now();
-  const sourceOffset = booking.session.startsAt.getTime() - now.getTime();
-  if (sourceOffset <= 0 || sourceOffset > cancellationWindowMilliseconds) {
+  if (
+    booking.session.startsAt <= now ||
+    !isInsideCancellationWindow(
+      booking.session.startsAt,
+      now,
+      await dependencies.cancellationWindowMinutes(),
+    )
+  ) {
     throw new Error('Booking is outside the Cancellation Window');
   }
 

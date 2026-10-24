@@ -20,10 +20,11 @@ import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
 import { PageNotice } from "../../components/page/page-notice";
 import { formatCivilDate } from "../../lib/bolivia-time";
-import { formatBolivianos } from "../../lib/money";
 import { useAdminRole } from "../../session/admin-role";
+import { ClientAcquisitionBlock } from "./client-acquisition-block";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
+import { CourtesyAccessAction } from "./courtesy-access-action";
 
 const clientDetailQueryOptions = (clientId: string) =>
   queryOptions({
@@ -32,7 +33,7 @@ const clientDetailQueryOptions = (clientId: string) =>
       (await getAdminClient(clientId, { signal }, adminFetch))
         .data as AdminClientDetailDto,
     // The summary decides a closure (follow-up 66), so every opening reads
-    // the current Bookings, Plan, and Credit instead of a cached copy.
+    // the current Bookings and Plan instead of a cached copy.
     staleTime: 0,
   });
 
@@ -109,14 +110,6 @@ function ClientSummary({
       ) : null}
       {contact}
       <PlanBlock view={client.subscription} />
-      {/* ADR-0102: the Coordinator's detail carries no amount. */}
-      {client.creditAvailableCentavos === undefined ? null : (
-        <SummaryBlock title="Crédito">
-          <SummaryRow label="Saldo disponible" figure>
-            {formatBolivianos(client.creditAvailableCentavos)}
-          </SummaryRow>
-        </SummaryBlock>
-      )}
       <SummaryBlock title="Referidos">
         <SummaryRow label="Clientas referidas" figure>
           {client.referredClientCount === 0
@@ -129,6 +122,7 @@ function ClientSummary({
           </span>
         </SummaryRow>
       </SummaryBlock>
+      <ClientAcquisitionBlock clientId={client.id} />
     </>
   );
 }
@@ -159,6 +153,7 @@ export function ClientDetailPanel({
   onClosed: (notice: string) => void;
 }) {
   const query = useQuery(clientDetailQueryOptions(clientId));
+  const [granted, setGranted] = useState<string | null>(null);
   const role = useAdminRole();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -209,6 +204,11 @@ export function ClientDetailPanel({
       {query.data === undefined ||
       query.data.accountStatus === "disabled" ? null : (
         <SidePanelFooter>
+          {granted === null ? null : (
+            <p role="status" className="text-nota text-exito-texto">
+              {granted}
+            </p>
+          )}
           {editing ? null : (
             <Button
               variant="neutral"
@@ -222,9 +222,22 @@ export function ClientDetailPanel({
               Editar perfil
             </Button>
           )}
-          {role === "administrator" ? (
-            <CloseClientAccountAction client={query.data} onClosed={onClosed} />
-          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {/* REL-011: only the Administrator, and only without an active Plan. */}
+            {role === "administrator" &&
+            query.data.subscription.status !== "active" ? (
+              <CourtesyAccessAction
+                client={query.data}
+                onGranted={setGranted}
+              />
+            ) : null}
+            {role === "administrator" ? (
+              <CloseClientAccountAction
+                client={query.data}
+                onClosed={onClosed}
+              />
+            ) : null}
+          </div>
         </SidePanelFooter>
       )}
     </>

@@ -20,10 +20,11 @@ export interface AdminClientDetailDto {
   clientSince: string;
   subscription: ClientSubscriptionDto;
   /**
-   * Available Credit in BOB centavos; absent for the Coordinator, who sees no amount (ADR-0102)
+   * Deprecated (PAY-005): Credit was retired; always 0
+   * @deprecated
    * @minimum 0
    */
-  creditAvailableCentavos?: number;
+  creditAvailableCentavos: number;
   referralCode: string;
   /** @minimum 0 */
   referredClientCount: number;

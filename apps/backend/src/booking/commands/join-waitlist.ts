@@ -1,5 +1,6 @@
 import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
 import { BookingAccessDeniedError } from './create-booking';
 
 type SessionForWaitlist = {
@@ -31,6 +32,7 @@ type JoinWaitlistDependencies = {
     clientId: string;
     joinedByAccountId: string;
   }): Promise<{ id: string }>;
+  cancellationWindowMinutes(): Promise<number>;
   now(): Date;
 };
 
@@ -38,8 +40,6 @@ type JoinWaitlistCommand = {
   sessionId: string;
   clientId?: string;
 };
-
-const cancellationWindowMilliseconds = 2.5 * 60 * 60 * 1_000;
 
 const resolveClientId = (
   command: JoinWaitlistCommand,
@@ -76,8 +76,11 @@ export const joinWaitlist = async (
   if (
     session === null ||
     session.state !== 'scheduled' ||
-    session.startsAt.getTime() - dependencies.now().getTime() <=
-      cancellationWindowMilliseconds
+    isInsideCancellationWindow(
+      session.startsAt,
+      dependencies.now(),
+      await dependencies.cancellationWindowMinutes(),
+    )
   ) {
     throw new BookingAccessDeniedError();
   }

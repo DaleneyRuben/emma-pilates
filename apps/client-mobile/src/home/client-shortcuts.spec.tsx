@@ -152,7 +152,7 @@ describe("Client Home quick actions and notification destinations", () => {
       ).toBeOnTheScreen();
     });
     expect(
-      screen.getByRole("button", { name: "Mis referidos: Invita amigas y gana crédito" }),
+      screen.getByRole("button", { name: "Mis referidos: Comparte tu código" }),
     ).toBeOnTheScreen();
 
     await fireEvent.press(
