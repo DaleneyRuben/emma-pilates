@@ -906,7 +906,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | done |
 | STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | ready |
 | STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | ready |
-| STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | ready |
+| STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | in progress |
 | STU-007 | P3 | Backend/admin web | AI: a narrated monthly report and natural-language questions over the aggregates | STU-006 | 4–6 d | ready |
 | MOB-071 | P3 | Client app | Inicio offline: persist the profile so Inicio renders from cache | — | 0.5 d | ready |
 | UX-005 to UX-014 | P2–P3 | All surfaces | *Existing rows.* The rest of the UX polish queue | UX-001 | 6–9 d | ready |
