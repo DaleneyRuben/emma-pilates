@@ -1,8 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
+import {
+  InvoiceDataDto,
+  InvoiceIssuedMarkDto,
+} from './invoice-data/invoice-data.dto';
 import type {
   AdministratorPaymentQuery,
   AdministratorPaymentState,
+  AdministratorPaymentInvoiceFilter,
   AdministratorPaymentStatusFilter,
 } from './administrator-payments';
 
@@ -16,6 +21,11 @@ export const paymentStatusFilters = [
   'all',
   ...paymentStates,
 ] as const satisfies readonly AdministratorPaymentStatusFilter[];
+export const paymentInvoiceFilters = [
+  'all',
+  'unissued',
+] as const satisfies readonly AdministratorPaymentInvoiceFilter[];
+const paymentMethods = ['transfer', 'cash'] as const;
 
 export class AdminPaymentDto {
   @ApiProperty({ format: 'uuid' })
@@ -33,12 +43,18 @@ export class AdminPaymentDto {
   @ApiProperty({ minimum: 1, description: 'Money Amount in BOB centavos' })
   planPriceCentavos!: number;
 
-  @ApiProperty({ minimum: 0, description: 'Credit taken off the Plan price' })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description:
+      'Deprecated (PAY-005): Credit was retired; 0 on every Payment made since',
+  })
   creditAppliedCentavos!: number;
 
   @ApiProperty({
     minimum: 1,
-    description: 'The Plan price less the Credit applied: what was transferred',
+    description:
+      'What was paid: the Plan price (Credit is retired; always the full price since PAY-005)',
   })
   amountDueCentavos!: number;
 
@@ -60,6 +76,23 @@ export class AdminPaymentDto {
     description: 'Why the sale was voided; null unless the state is voided',
   })
   voidReason!: string | null;
+
+  @ApiProperty({ enum: paymentMethods })
+  method!: 'transfer' | 'cash';
+
+  @ApiProperty({
+    type: InvoiceDataDto,
+    nullable: true,
+    description: 'NIT or CI and name for the invoice; null is «Sin factura»',
+  })
+  invoiceData!: InvoiceDataDto | null;
+
+  @ApiProperty({
+    type: InvoiceIssuedMarkDto,
+    nullable: true,
+    description: 'The «Factura emitida» mark: who and when',
+  })
+  invoiceIssued!: InvoiceIssuedMarkDto | null;
 }
 
 export class AdminPaymentPageDto {
@@ -89,6 +122,7 @@ export const parseAdminPaymentQuery = (value: unknown) =>
       page: z.coerce.number().int().min(1).default(1),
       pageSize: z.coerce.number().int().min(1).max(100).default(20),
       status: z.enum(paymentStatusFilters).default('all'),
+      invoice: z.enum(paymentInvoiceFilters).default('all'),
       q: z.string().trim().max(100).optional(),
     })
     .transform(({ q, ...filters }): AdministratorPaymentQuery =>

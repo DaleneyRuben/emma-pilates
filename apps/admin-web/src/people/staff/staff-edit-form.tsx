@@ -1,3 +1,4 @@
+import { holdsEveryBranch } from "../people-search";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { StaffMemberDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
@@ -71,8 +72,7 @@ export function StaffEditForm({
       const branchIds = shown(chosen);
       const roleChanged = next !== member.role;
       const branchesChanged =
-        next !== "administrator" &&
-        !sameSet(branchIds, shown(member.branchIds));
+        !holdsEveryBranch(next) && !sameSet(branchIds, shown(member.branchIds));
       if (!roleChanged && !branchesChanged) {
         onDone();
         return;
@@ -83,10 +83,9 @@ export function StaffEditForm({
             ? {
                 kind: "role",
                 staffMemberId: member.id,
-                input:
-                  next === "administrator"
-                    ? { role: next }
-                    : { role: next, branchIds },
+                input: holdsEveryBranch(next)
+                  ? { role: next }
+                  : { role: next, branchIds },
               }
             : { kind: "branches", staffMemberId: member.id, branchIds },
         );

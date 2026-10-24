@@ -12,4 +12,5 @@ export const ImpersonationDtoRole = {
   trainer: "trainer",
   assistant: "assistant",
   nutritionist: "nutritionist",
+  coordinator: "coordinator",
 } as const;

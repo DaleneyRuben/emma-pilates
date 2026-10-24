@@ -63,6 +63,7 @@ export const startPromotionWorld = async () => {
       ASSISTANT: 'assistant',
       TRAINER: 'trainer',
       NUTRITIONIST: 'nutritionist',
+      COORDINATOR: 'coordinator',
     } as const;
     return {
       accountId: account.id,

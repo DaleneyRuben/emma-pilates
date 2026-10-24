@@ -31,9 +31,16 @@ export class StaffAuthenticationIdentityDto {
   staffMemberId!: string;
 
   @ApiProperty({
-    enum: ['trainer', 'nutritionist', 'assistant', 'administrator'],
+    enum: [
+      'trainer',
+      'nutritionist',
+      'assistant',
+      'administrator',
+      'coordinator',
+    ],
   })
-  role!: 'trainer' | 'nutritionist' | 'assistant' | 'administrator';
+  role!:
+    'trainer' | 'nutritionist' | 'assistant' | 'administrator' | 'coordinator';
 
   @ApiProperty({ type: [String], format: 'uuid' })
   branchIds!: string[];

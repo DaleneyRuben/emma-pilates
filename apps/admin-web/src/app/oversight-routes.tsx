@@ -1,4 +1,5 @@
 import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
+import { feedbackSearchSchema } from "../feedback/feedback-search";
 import { evaluationSearchSchema } from "../oversight/evaluations/evaluation-search";
 import { nameSearchSchema } from "../oversight/oversight-search";
 import { clientSearchSchema } from "../people/people-search";
@@ -48,13 +49,14 @@ const referralsRoute = createRoute({
   ),
 });
 
-const creditsRoute = createRoute({
+// AW38 (REL-012): the feedback from both apps, studio-wide.
+const feedbackRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/promociones/creditos",
-  validateSearch: optionalSearch(nameSearchSchema),
+  path: "/comentarios",
+  validateSearch: optionalSearch(feedbackSearchSchema),
   component: lazyRouteComponent(
-    () => import("../oversight/credits/credits-route"),
-    "CreditsRoute",
+    () => import("../feedback/feedback-route"),
+    "FeedbackRoute",
   ),
 });
 
@@ -63,5 +65,5 @@ export const oversightRoutes = [
   promotionsRoute,
   promotionContactsRoute,
   referralsRoute,
-  creditsRoute,
+  feedbackRoute,
 ];

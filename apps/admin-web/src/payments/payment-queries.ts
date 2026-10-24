@@ -25,6 +25,7 @@ export const paymentTableQueryOptions = (search: PaymentSearch) => {
     page: search.page,
     pageSize: search.pageSize,
     status: search.status,
+    ...(search.invoice === undefined ? {} : { invoice: search.invoice }),
     ...(search.q === undefined ? {} : { q: search.q }),
   };
   return queryOptions({

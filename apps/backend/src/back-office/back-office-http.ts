@@ -4,7 +4,10 @@ import {
   type PrincipalResolver,
 } from '../system-identity/authentication/bearer-principal';
 import { BackOfficeError } from './back-office-errors';
+import type { CashCloses } from './cash-close/prisma-cash-closes';
 import { parseUuidValue } from './back-office.dto';
+import type { EquipmentOperations } from './equipment/prisma-equipment';
+import type { SessionEquipment } from './equipment/prisma-session-equipment';
 import type { Expenses } from './expenses/prisma-expenses';
 import type { PayStatements } from './payroll/prisma-pay-statements';
 import type { SalaryPayments } from './payroll/prisma-salary-payments';
@@ -23,6 +26,9 @@ export type BackOfficeOperations = {
   expenses: Expenses;
   report: ExpenseReport;
   finance: Finance;
+  equipment: EquipmentOperations;
+  sessionEquipment: SessionEquipment;
+  cashCloses: CashCloses;
 };
 
 export const idempotencyHeader = {

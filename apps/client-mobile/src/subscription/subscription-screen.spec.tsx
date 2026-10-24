@@ -125,6 +125,15 @@ describe("Refreshed Mi plan (Client 12)", () => {
     expect(nextPlan).toHaveStyle({ flexShrink: 1 });
   });
 
+  it("names the founder renewal deadline from the current Subscription", async () => {
+    const screen = await openSubscription({
+      ...subscription("active", 5),
+      founderRenewalDeadline: "2026-10-01",
+    });
+
+    expect(screen.getByText("Renueva antes del 1 de octubre de 2026.")).toBeOnTheScreen();
+  });
+
   it("invites renewal while expiring soon", async () => {
     const screen = await openSubscription(subscription("expiring_soon", 2));
 

@@ -12,6 +12,8 @@ const sweeps = () => ({
   pendingAccountCleanup: idle({ cleaned: 0 }),
   imageUploadCleanup: idle({ cleaned: 0 }),
   subscriptionReminders: idle({ reminded: 0 }),
+  founderMemberships: idle({ ended: 0 }),
+  first90Days: idle({ messages: 0, alerts: 0 }),
   purchaseIntentExpiry: idle({ expired: 0 }),
 });
 
@@ -24,6 +26,7 @@ describe('worker startup sweeps (EXT-002)', () => {
     ['pendingAccountCleanup', 'pending_account_cleanup_failed'],
     ['imageUploadCleanup', 'image_upload_cleanup_failed'],
     ['subscriptionReminders', 'subscription_reminders_failed'],
+    ['first90Days', 'first_90_days_failed'],
     ['purchaseIntentExpiry', 'purchase_intent_expiry_failed'],
   ] as const)(
     'keeps the worker running when the first %s pass fails',

@@ -1,4 +1,6 @@
 import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
+import type { WeeklyCapSubscription } from './create-booking';
+import { weeklyCapBlocks } from './weekly-cap-decision';
 
 type WaitlistSession = {
   id: string;
@@ -21,7 +23,7 @@ type PromoteWaitlistDependencies = {
   findEligibleSubscription(input: {
     clientId: string;
     onDate: Date;
-  }): Promise<{ id: string } | null>;
+  }): Promise<WeeklyCapSubscription | null>;
   hasOverlappingBooking(input: {
     clientId: string;
     startsAt: Date;
@@ -76,7 +78,7 @@ export const promoteWaitlist = async (
       onDate: session.startsAt,
     });
 
-    if (subscription === null) {
+    if (subscription === null || weeklyCapBlocks(subscription)) {
       continue;
     }
 
