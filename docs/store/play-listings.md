@@ -53,10 +53,10 @@ Tu plan, siempre a la vista
 • Consulta tu historial de clases y de pagos.
 
 Evaluación nutricional
-• Con tu plan activo, agenda una evaluación al mes con nuestra nutricionista, sin costo adicional.
+• Agenda una evaluación con nuestra nutricionista. Una evaluación al mes está incluida con algunos planes; el estudio te dice el costo de las demás.
 
 Invita a tus amigas y amigos
-• Comparte tu código: cuando tu invitado confirme su primer pago, recibes crédito para tu próximo plan.
+• Comparte tu código de referido. Pronto podrás invitar a una amiga a una clase.
 
 Notificaciones útiles
 • El estado de tus pagos, tu lugar confirmado desde la lista de espera, cambios del estudio en tus clases, recordatorios de tu evaluación y el aviso antes de que venza tu plan.
@@ -88,6 +88,7 @@ Emma Pilates Staff es la app interna del equipo de Emma Pilates Studio. Solo pue
 Cada persona ve lo que corresponde a su rol:
 • Instructoras e instructores: su agenda de clases y la asistencia de cada clase.
 • Recepción: buscar clientes, crear sus cuentas, reservar clases por ellos y registrar pagos en efectivo.
+• Coordinación: buscar clientes, reservar por ellos y cancelar clases. No registra pagos ni ve montos.
 • Nutricionista: su disponibilidad y sus evaluaciones.
 • Administración: confirmar pagos por transferencia y cancelar clases.
 

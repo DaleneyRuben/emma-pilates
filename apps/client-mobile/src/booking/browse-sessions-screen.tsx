@@ -17,6 +17,7 @@ import {
   SeatPill,
   SessionCard,
   spacing,
+  weeklyClassesLeftLine,
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -227,22 +228,27 @@ export function BrowseSessionsScreen() {
           refreshControl={refreshControl}
           testID="browse-sessions-scroll"
         >
-          {visibleSessions.map((session) => (
-            <SessionCard
-              accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
-              key={session.id}
-              onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
-              tag={
-                <SeatPill full={session.availableSeats === 0}>
-                  {seatsTag(session.availableSeats)}
-                </SeatPill>
-              }
-              testID={`session-card-${session.id}`}
-              time={formatTimeRange(session.startsAt, session.endsAt)}
-              title={session.classTypeName}
-              trainerName={session.trainerName}
-            />
-          ))}
+          {visibleSessions.map((session) => {
+            const left = weeklyClassesLeftLine(session.classesLeftThisWeek);
+            return (
+              <View key={session.id}>
+                <SessionCard
+                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
+                  onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
+                  tag={
+                    <SeatPill full={session.availableSeats === 0}>
+                      {seatsTag(session.availableSeats)}
+                    </SeatPill>
+                  }
+                  testID={`session-card-${session.id}`}
+                  time={formatTimeRange(session.startsAt, session.endsAt)}
+                  title={session.classTypeName}
+                  trainerName={session.trainerName}
+                />
+                {left === null ? null : <BodyText>{left}</BodyText>}
+              </View>
+            );
+          })}
         </ScrollView>
       )}
     </Screen>

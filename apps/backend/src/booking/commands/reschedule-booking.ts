@@ -2,6 +2,7 @@ import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
 import { BookingAccessDeniedError } from './create-booking';
+import { boliviaWeek } from './weekly-cap';
 
 type BookingForReschedule = {
   id: string;
@@ -30,6 +31,11 @@ type RescheduleBookingDependencies = {
   loadBooking(bookingId: string): Promise<BookingForReschedule | null>;
   loadSession(sessionId: string): Promise<SessionForReschedule | null>;
   countLiveBookings(sessionId: string): Promise<number>;
+  weeklyCapBlocksDestination?(input: {
+    subscriptionId: string;
+    startsAt: Date;
+    excludeBookingId: string;
+  }): Promise<boolean>;
   hasOverlappingBooking(input: {
     clientId: string;
     startsAt: Date;
@@ -46,13 +52,9 @@ type RescheduleBookingDependencies = {
   now(): Date;
 };
 
-const boliviaDate = (instant: Date): string =>
-  new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/La_Paz',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(instant);
+const sameBoliviaWeek = (left: Date, right: Date): boolean =>
+  boliviaWeek(left).startsOn.getTime() ===
+  boliviaWeek(right).startsOn.getTime();
 
 const assertAccess = (
   booking: BookingForReschedule,
@@ -112,9 +114,26 @@ export const rescheduleBooking = async (
   if (
     target.id === booking.session.id ||
     target.startsAt <= now ||
-    boliviaDate(target.startsAt) !== boliviaDate(booking.session.startsAt)
+    !sameBoliviaWeek(target.startsAt, booking.session.startsAt)
   ) {
     throw new Error('Target Session is not eligible for Reschedule');
+  }
+
+  // A same-week move frees the source Booking and takes one place in the
+  // same week, so the cap does not change. A move into another week counts
+  // there; the current Reschedule rule stays inside one week, so that check
+  // runs once a later item allows a cross-week target.
+  const blocks =
+    dependencies.weeklyCapBlocksDestination?.bind(dependencies) ??
+    (() => Promise.resolve(false));
+  if (
+    await blocks({
+      subscriptionId: booking.subscriptionId,
+      startsAt: target.startsAt,
+      excludeBookingId: booking.id,
+    })
+  ) {
+    throw new Error('Weekly cap reached');
   }
 
   if ((await dependencies.countLiveBookings(target.id)) >= target.capacity) {

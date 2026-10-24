@@ -1,6 +1,9 @@
 import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { bookingDuringFreezeMessage } from '../payments/freeze';
+
 import { bookingBeforeStartMessage } from './booking-before-start';
+import { assertWeeklyCapAllows } from './weekly-cap-decision';
 
 export class BookingAccessDeniedError extends Error {
   constructor() {
@@ -17,6 +20,13 @@ type SessionForBooking = {
   state: 'scheduled' | 'cancelled';
 };
 
+export type WeeklyCapSubscription = {
+  id: string;
+  weeklyClassCap?: number | null;
+  baseFundedBookingsThisWeek?: number;
+  extraClasses?: number;
+};
+
 type CreateBookingDependencies = {
   principal: AuthenticatedPrincipal;
   loadSession(sessionId: string): Promise<SessionForBooking | null>;
@@ -24,7 +34,11 @@ type CreateBookingDependencies = {
   findEligibleSubscription(input: {
     clientId: string;
     onDate: Date;
-  }): Promise<{ id: string } | null>;
+  }): Promise<WeeklyCapSubscription | null>;
+  findApprovedFreeze?(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ endsOn: Date } | null>;
   findNotYetStartedSubscription?(input: {
     clientId: string;
     onDate: Date;
@@ -89,6 +103,15 @@ export const createBooking = async (
   }
 
   const clientId = resolveClientId(command, session, dependencies.principal);
+  const freeze = dependencies.findApprovedFreeze
+    ? await dependencies.findApprovedFreeze({
+        clientId,
+        onDate: session.startsAt,
+      })
+    : null;
+  if (freeze !== null) {
+    throw new Error(bookingDuringFreezeMessage(freeze.endsOn));
+  }
 
   if ((await dependencies.countLiveBookings(session.id)) >= session.capacity) {
     throw new Error('Session is full');
@@ -111,6 +134,8 @@ export const createBooking = async (
     }
     throw new Error('No eligible Subscription');
   }
+
+  assertWeeklyCapAllows(subscription);
 
   if (
     await dependencies.hasOverlappingBooking({

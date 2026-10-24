@@ -1,5 +1,4 @@
 import type { AdminClientDetailDto } from "@pilates/api-contracts";
-import { formatBolivianos } from "../../lib/money";
 
 const reservas = (count: number) =>
   count === 1 ? "su reserva futura" : `sus ${count} reservas futuras`;
@@ -48,11 +47,6 @@ export const describeClosureForAdministrator = (
                 : `; pierde las ${left} clases que le quedan`
           }.`,
         ]),
-    ...((client.creditAvailableCentavos ?? 0) > 0
-      ? [
-          `Pierde su crédito de ${formatBolivianos(client.creditAvailableCentavos ?? 0)}.`,
-        ]
-      : []),
     "Se cierra su sesión en todos sus dispositivos y su correo queda libre.",
     "Se borran su nombre, correo, teléfono y foto. Sus pagos y clases se conservan sin sus datos, para la contabilidad del estudio.",
   ];

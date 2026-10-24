@@ -43,6 +43,7 @@ import {
   UpdateClientProfileDto,
 } from './client-discovery.dto';
 import { denyNonClients } from './deny-non-clients';
+import { classesLeftThisWeekQuery } from '../booking-controller-support';
 
 export const clientProfile = Symbol('clientProfile');
 export const clientSubscription = Symbol('clientSubscription');
@@ -66,8 +67,11 @@ type ClientProfileUpdateHandler = (
   principal: AuthenticatedPrincipal,
 ) => Promise<ClientProfile>;
 export type PlanCatalogHandler = {
-  list(): Promise<PlanSummary[]>;
-  find(planId: string): Promise<PlanSummary | null>;
+  list(principal: AuthenticatedPrincipal): Promise<PlanSummary[]>;
+  find(
+    planId: string,
+    principal: AuthenticatedPrincipal,
+  ): Promise<PlanSummary | null>;
 };
 type BranchCatalogHandler = () => Promise<BranchSummary[]>;
 type ClassTypeCatalogHandler = () => Promise<ClassTypeSummary[]>;
@@ -88,6 +92,9 @@ const toPlanDto = (plan: PlanSummary): PlanDto => ({
   durationMonths: deprecatedDurationMonths(plan.durationDays),
   classAllowance: plan.classAllowance,
   priceCentavos: plan.priceCentavos,
+  ...(plan.listPriceCentavos === undefined
+    ? {}
+    : { listPriceCentavos: plan.listPriceCentavos }),
 });
 
 @Controller({ path: 'clients/current', version: '1' })
@@ -174,6 +181,9 @@ export class ClientProfileController {
               startsOn: civilDate(view.nextSubscription.startsOn),
               endsOn: civilDate(view.nextSubscription.endsOn),
             },
+      founderRenewalDeadline: view.founderRenewalDeadline ?? null,
+      freeze: view.freeze ?? null,
+      canRequestFreeze: view.canRequestFreeze ?? false,
       subscription:
         view.subscription === null
           ? null
@@ -186,6 +196,7 @@ export class ClientProfileController {
               startsOn: civilDate(view.subscription.startsOn),
               endsOn: civilDate(view.subscription.endsOn),
               extraClassesLine: view.subscription.extraClassesLine,
+              classesLeftThisWeek: view.subscription.classesLeftThisWeek,
             },
     };
   }
@@ -206,8 +217,11 @@ export class PlanCatalogController {
   async list(
     @Headers('authorization') authorization: string | undefined,
   ): Promise<PlanDto[]> {
-    await authenticateBearer(this.principalResolver, authorization);
-    return (await this.plans.list()).map(toPlanDto);
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    return (await this.plans.list(principal)).map(toPlanDto);
   }
 
   @Get(':planId')
@@ -220,8 +234,11 @@ export class PlanCatalogController {
   ): Promise<PlanDto> {
     const parsedPlanId = parseUuid(planId);
     if (parsedPlanId === null) throw invalidRequest('Invalid Plan identifier');
-    await authenticateBearer(this.principalResolver, authorization);
-    const plan = await this.plans.find(parsedPlanId);
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    const plan = await this.plans.find(parsedPlanId, principal);
 
     if (plan === null) {
       throw new NotFoundException({
@@ -286,6 +303,11 @@ export class SessionDetailController {
   constructor(
     @Inject(sessionDetail)
     private readonly findSessionDetail: SessionDetailHandler,
+    @Inject(classesLeftThisWeekQuery)
+    private readonly classesLeft: (
+      clientId: string,
+      at: Date,
+    ) => Promise<number | null>,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
   ) {}
@@ -302,7 +324,10 @@ export class SessionDetailController {
     if (parsedSessionId === null) {
       throw invalidRequest('Invalid Session identifier');
     }
-    await authenticateBearer(this.principalResolver, authorization);
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
     const detail = await this.findSessionDetail(parsedSessionId);
 
     if (detail === null) {
@@ -312,6 +337,13 @@ export class SessionDetailController {
       });
     }
 
-    return detail;
+    if (principal.identity.kind !== 'client') return detail;
+    return {
+      ...detail,
+      classesLeftThisWeek: await this.classesLeft(
+        principal.identity.clientId,
+        detail.startsAt,
+      ),
+    };
   }
 }

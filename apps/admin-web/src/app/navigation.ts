@@ -11,8 +11,14 @@ export type AdminPath =
   | "/catalogo/planes"
   | "/catalogo/sucursales"
   | "/back-office/clientes"
+  | "/back-office/clientes/campana"
+  | "/back-office/para-contactar"
+  | "/back-office/fundadoras"
+  | "/back-office/congelamientos"
   | "/back-office/pagos"
+  | "/back-office/caja"
   | "/back-office/insumos"
+  | "/back-office/equipos"
   | "/back-office/evaluaciones-nutricionales"
   | "/back-office/personal"
   | "/back-office/nomina"
@@ -22,7 +28,7 @@ export type AdminPath =
   | "/reporte"
   | "/promociones"
   | "/promociones/referidos"
-  | "/promociones/creditos"
+  | "/comentarios"
   | "/reglas-del-estudio";
 
 export type NavigationItem = {
@@ -43,11 +49,11 @@ export type NavigationItem = {
    * waiting in Pagos, or the selected Branch's low-stock Supplies in the
    * warning tint beside Insumos.
    */
-  badge?: "pendingPayments" | "lowStock";
+  badge?: "pendingPayments" | "lowStock" | "contactAlerts";
   /**
    * Its sub-pages keep it marked: every page under it (AW31 is a view of
    * Insumos), or only the listed ones where siblings share its prefix
-   * (AW35 under Promociones, beside Referidos and Créditos).
+   * (AW35 under Promociones, beside Referidos).
    */
   subPages?: true | readonly string[];
   /**
@@ -97,8 +103,31 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/clientes",
         screen: "AW21",
         list: true,
+        subPages: ["/back-office/clientes/campana"],
         coordinator: true,
         studioWide: "los clientes son del estudio, no de una sede.",
+      },
+      {
+        label: "Para contactar",
+        to: "/back-office/para-contactar",
+        screen: "AW39",
+        coordinator: true,
+        badge: "contactAlerts",
+        studioWide: "las clientas son del estudio, no de una sede.",
+      },
+      {
+        label: "Fundadoras",
+        to: "/back-office/fundadoras",
+        screen: "AW40",
+        list: true,
+        studioWide: "las fundadoras son del estudio, no de una sede.",
+      },
+      {
+        label: "Congelamientos",
+        to: "/back-office/congelamientos",
+        screen: "AW41",
+        list: true,
+        studioWide: "los congelamientos son del estudio, no de una sede.",
       },
       {
         label: "Pagos",
@@ -109,6 +138,11 @@ export const navigationGroups: readonly NavigationGroup[] = [
         studioWide: "los pagos son del estudio, no de una sede.",
       },
       {
+        label: "Caja",
+        to: "/back-office/caja",
+        screen: "AW151",
+      },
+      {
         label: "Insumos",
         to: "/back-office/insumos",
         screen: "AW08",
@@ -116,6 +150,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         badge: "lowStock",
         subPages: true,
       },
+      { label: "Equipos", to: "/back-office/equipos", screen: "AW37" },
       {
         label: "Evaluaciones nutricionales",
         to: "/back-office/evaluaciones-nutricionales",
@@ -191,12 +226,17 @@ export const navigationGroups: readonly NavigationGroup[] = [
         list: true,
         studioWide: "los referidos son del estudio, no de una sede.",
       },
+    ],
+  },
+  // AW38 (REL-012): «Enviar comentarios» from both apps.
+  {
+    items: [
       {
-        label: "Créditos",
-        to: "/promociones/creditos",
-        screen: "AW27",
+        label: "Comentarios",
+        to: "/comentarios",
+        screen: "AW38",
         list: true,
-        studioWide: "los créditos son del estudio, no de una sede.",
+        studioWide: "los comentarios llegan de las apps, no de una sede.",
       },
     ],
   },
@@ -250,5 +290,8 @@ export const navigationGroupsFor = (
         .filter((group) => group.items.length > 0);
 
 /** Whether the Coordinator may open a page; the API refuses the rest. */
+const coordinatorDeniedPaths = ["/back-office/clientes/campana"];
+
 export const coordinatorMayOpen = (pathname: string): boolean =>
-  navigationItemOf(pathname)?.coordinator === true;
+  navigationItemOf(pathname)?.coordinator === true &&
+  !coordinatorDeniedPaths.includes(pathname);

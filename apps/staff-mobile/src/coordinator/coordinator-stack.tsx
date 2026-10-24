@@ -11,12 +11,12 @@ import { ClientBookingsScreen } from "../assistant/client-bookings-screen";
 import { ClientHistoryScreen } from "../assistant/client-history-screen";
 import { ClientOverviewScreen } from "../assistant/client-overview-screen";
 import { ClientSearchScreen } from "../assistant/client-search-screen";
+import { ContactListScreen } from "./contact-list-screen";
 
 // IDN-009 / ADR-0102 (follow-up 158): the Coordinator's own stack. She finds
 // Clients and manages their Bookings like the Assistant, at every Branch,
 // with neither the sale nor the new-Client screens, and cancels a class like
-// the Administrator. Her follow-up contact list (BKM-013) joins these
-// screens when it exists.
+// the Administrator. S04 opens S28 «Para contactar» (BKM-013).
 export const coordinatorScreens = {
   ClientSearch: ClientSearchScreen,
   ClientOverview: ClientOverviewScreen,
@@ -27,6 +27,7 @@ export const coordinatorScreens = {
   ClientHistory: ClientHistoryScreen,
   CancelClass: CancelClassScreen,
   CancelSession: CancelSessionScreen,
+  ContactList: ContactListScreen,
 };
 
 export const createCoordinatorStack = (accountScreens: Record<string, ComponentType<never>>) =>

@@ -9,6 +9,7 @@ import {
   useMockServer,
 } from "../../test/msw";
 import {
+  acquisitionHandler,
   clientPage,
   clientsPath,
   lucia,
@@ -27,6 +28,7 @@ const saved: unknown[] = [];
 const handlers = (detail: AdminClientDetailDto) => [
   http.get(apiUrl(clientsPath), () => jsonResponse(clientPage([lucia]))),
   http.get(apiUrl(`${clientsPath}/:clientId`), () => jsonResponse(detail)),
+  acquisitionHandler(),
   http.patch(apiUrl(`${clientsPath}/:clientId`), async ({ request }) => {
     const body = (await request.json()) as { name: string; phone: string };
     saved.push(body);
@@ -107,9 +109,7 @@ describe("AW22 Editar perfil", () => {
   });
 
   it("shows the Coordinator no amount and no «Cerrar cuenta»", async () => {
-    const withoutCredit = { ...luciaDetail };
-    delete withoutCredit.creditAvailableCentavos;
-    server.use(...coordinatorHandlers(), ...handlers(withoutCredit));
+    server.use(...coordinatorHandlers(), ...handlers(luciaDetail));
     const { panel } = await openLucia();
 
     expect(
@@ -118,6 +118,14 @@ describe("AW22 Editar perfil", () => {
     expect(within(panel).queryByText("Crédito")).not.toBeInTheDocument();
     expect(
       within(panel).queryByRole("button", { name: "Cerrar cuenta" }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(panel).queryByRole("button", {
+        name: "Agregar clase de cortesía",
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(panel).queryByRole("button", { name: "Devolver una clase" }),
     ).not.toBeInTheDocument();
     expect(document.body.textContent).not.toContain("Bs");
   });

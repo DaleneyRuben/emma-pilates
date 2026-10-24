@@ -26,6 +26,7 @@ import type {
 import {
   AdminPaymentPageDto,
   parseAdminPaymentQuery,
+  paymentInvoiceFilters,
   paymentStatusFilters,
 } from './administrator-payments.dto';
 
@@ -40,7 +41,8 @@ export type AdministratorPaymentOperations = {
   ) => Promise<AdministratorPaymentPage>;
 };
 
-// WEB-005 (AW28): the admin web's paged transfer list. The Staff app keeps
+// WEB-005 (AW28): the admin web's paged sales list (transfers, and cash since
+// PAY-007). The Staff app keeps
 // `GET …/payments/pending` unchanged (ADR-0016). Payment data is personal,
 // so nothing is cached (ADR-0063).
 @Controller({ path: 'administrator/payments', version: '1' })
@@ -58,6 +60,13 @@ export class AdministratorPaymentListController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
   @ApiQuery({ name: 'status', required: false, enum: paymentStatusFilters })
+  @ApiQuery({
+    name: 'invoice',
+    required: false,
+    enum: paymentInvoiceFilters,
+    description:
+      '«unissued»: confirmed sales with Invoice Data not marked «Factura emitida»',
+  })
   @ApiQuery({
     name: 'q',
     required: false,

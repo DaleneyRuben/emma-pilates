@@ -21,6 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { FreezeRequest } from "./freeze-request";
 import {
   describeAllowance,
   formatCivilDate,
@@ -82,7 +83,14 @@ export function SubscriptionScreen() {
     );
   }
 
-  const { status, subscription, nextSubscription } = view.data.data;
+  const {
+    status,
+    subscription,
+    nextSubscription,
+    founderRenewalDeadline,
+    freeze,
+    canRequestFreeze,
+  } = view.data.data;
 
   if (status === "none" || subscription === null || subscription === undefined) {
     return (
@@ -104,6 +112,13 @@ export function SubscriptionScreen() {
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
+        {founderRenewalDeadline == null ? null : (
+          <View style={styles.founderBanner}>
+            <Text style={styles.founderBannerText}>
+              {`Renueva antes del ${formatCivilDateWithYear(founderRenewalDeadline)}.`}
+            </Text>
+          </View>
+        )}
         {status === "expiring_soon" ? (
           <View style={styles.warning}>
             <Text style={styles.warningText}>
@@ -171,6 +186,19 @@ export function SubscriptionScreen() {
             </View>
           ) : null}
         </View>
+        {freeze?.state === "approved" ? (
+          <View style={styles.founderBanner}>
+            <Text style={styles.founderBannerText}>
+              {`Tu plan está congelado hasta el ${formatCivilDateWithYear(freeze.endsOn)}.`}
+            </Text>
+          </View>
+        ) : null}
+        {freeze?.state === "requested" ? (
+          <BodyText>Tu solicitud de congelamiento está en revisión.</BodyText>
+        ) : null}
+        {canRequestFreeze && subscription !== undefined ? (
+          <FreezeRequest onRequested={() => void view.refetch()} subscriptionId={subscription.id} />
+        ) : null}
         {expired ? (
           <View style={styles.purchase}>
             <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
@@ -213,6 +241,12 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     textAlign: "right",
   },
+  founderBanner: {
+    backgroundColor: "rgba(124,148,115,0.14)",
+    borderRadius: radii.inset,
+    padding: spacing.md,
+  },
+  founderBannerText: { color: colors.successText, fontSize: typography.note, fontWeight: "600" },
   expiredDate: { color: colors.errorText },
   note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   purchase: { gap: spacing.sm },

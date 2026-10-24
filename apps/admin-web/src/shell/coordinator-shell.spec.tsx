@@ -23,7 +23,7 @@ describe("the admin web for the Coordinator", () => {
       within(sidebar)
         .getAllByRole("link")
         .map((link) => link.textContent),
-    ).toEqual(["Horario", "Clientes", "Personal"]);
+    ).toEqual(["Horario", "Clientes", "Para contactar", "Personal"]);
     expect(within(sidebar).queryByText("Catálogo")).not.toBeInTheDocument();
     expect(within(sidebar).queryByText("Promociones")).not.toBeInTheDocument();
   });
@@ -35,6 +35,7 @@ describe("the admin web for the Coordinator", () => {
     "/catalogo/planes",
     "/promociones",
     "/back-office/pago-coordinadora",
+    "/back-office/clientes/campana",
   ])("returns %s to Horario with the notice", async (path) => {
     const { router } = renderAdmin(path);
 
@@ -54,6 +55,9 @@ describe("the admin web for the Coordinator", () => {
     renderAdmin("/back-office/clientes");
 
     await heading("Clientes");
+    expect(
+      screen.queryByRole("link", { name: "Dar clases de campaña" }),
+    ).not.toBeInTheDocument();
   });
 
   it("names her Role in the account menu", async () => {

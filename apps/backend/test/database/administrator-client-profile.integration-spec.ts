@@ -56,6 +56,6 @@ describe('Client profile corrections on PostgreSQL', () => {
       dependencies(),
     );
     expect(detail.name).toBe('Lucía Fernández Paz');
-    expect(detail).not.toHaveProperty('creditAvailableCentavos');
+    expect(detail.creditAvailableCentavos).toBe(0);
   });
 });

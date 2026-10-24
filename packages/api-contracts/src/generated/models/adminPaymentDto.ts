@@ -4,7 +4,10 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { AdminPaymentDtoMethod } from "./adminPaymentDtoMethod";
 import type { AdminPaymentDtoState } from "./adminPaymentDtoState";
+import type { InvoiceDataDto } from "./invoiceDataDto";
+import type { InvoiceIssuedMarkDto } from "./invoiceIssuedMarkDto";
 
 export interface AdminPaymentDto {
   id: string;
@@ -17,12 +20,13 @@ export interface AdminPaymentDto {
    */
   planPriceCentavos: number;
   /**
-   * Credit taken off the Plan price
+   * Deprecated (PAY-005): Credit was retired; 0 on every Payment made since
+   * @deprecated
    * @minimum 0
    */
   creditAppliedCentavos: number;
   /**
-   * The Plan price less the Credit applied: what was transferred
+   * What was paid: the Plan price (Credit is retired; always the full price since PAY-005)
    * @minimum 1
    */
   amountDueCentavos: number;
@@ -37,4 +41,15 @@ export interface AdminPaymentDto {
    * @nullable
    */
   voidReason: string | null;
+  method: AdminPaymentDtoMethod;
+  /**
+   * NIT or CI and name for the invoice; null is «Sin factura»
+   * @nullable
+   */
+  invoiceData: InvoiceDataDto | null;
+  /**
+   * The «Factura emitida» mark: who and when
+   * @nullable
+   */
+  invoiceIssued: InvoiceIssuedMarkDto | null;
 }

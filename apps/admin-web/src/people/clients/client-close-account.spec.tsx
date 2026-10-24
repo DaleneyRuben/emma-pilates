@@ -36,6 +36,7 @@ const handlers = (
     return jsonResponse(clientPage([lucia]));
   }),
   http.get(apiUrl(`${clientsPath}/:clientId`), () => jsonResponse(detail)),
+  acquisitionHandler(),
   http.post(apiUrl(`${clientsPath}/:clientId/closure`), ({ params }) => {
     closures.push(String(params.clientId));
     return close();
@@ -75,13 +76,13 @@ describe("AW22 Cerrar cuenta", () => {
       "Se cancelan sus 3 reservas futuras y su evaluación nutricional, sin descontar nada.",
       "Sale de 1 lista de espera.",
       "Su plan Paquete de 8 clases termina hoy, sin reembolso; pierde las 5 clases que le quedan.",
-      "Pierde su crédito de Bs 1.050,00.",
       "Se cierra su sesión en todos sus dispositivos y su correo queda libre.",
       "Se borran su nombre, correo, teléfono y foto. Sus pagos y clases se conservan sin sus datos, para la contabilidad del estudio.",
       "Esta acción no se puede deshacer.",
     ]) {
       expect(within(dialog).getByText(line)).toBeInTheDocument();
     }
+    expect(within(dialog).queryByText(/crédito/)).not.toBeInTheDocument();
     expect(
       within(dialog).getByRole("button", { name: "Volver" }),
     ).toBeInTheDocument();
@@ -199,6 +200,7 @@ describe("AW22 Cerrar cuenta", () => {
           closure: { ...luciaDetail.closure, futureBookingCount: bookings },
         }),
       ),
+      acquisitionHandler(),
     );
     const { dialog, user } = await openDialog();
     expect(

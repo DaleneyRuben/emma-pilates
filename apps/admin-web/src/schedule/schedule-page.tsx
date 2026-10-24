@@ -1,7 +1,7 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { isForbidden } from "../components/page/is-forbidden";
 import { NoBranchPage } from "../components/page/no-branch-page";
 import { PageHeader } from "../components/page/page-header";
@@ -14,6 +14,11 @@ import type { Branch } from "../shell/branch/branch-context";
 import { useBranchSelection } from "../shell/branch/use-branch-selection";
 import { useIsNarrowViewport } from "../shell/use-media-query";
 import { DayList } from "./day-list";
+import {
+  EquipmentFlagsContext,
+  weekFlagsQueryOptions,
+} from "./equipment-flag-data";
+import { EquipmentFlagsNotice } from "./equipment-flags";
 import { weekSessionLimit, weekSessionsQueryOptions } from "./schedule-queries";
 import type { ScheduleSearch } from "./schedule-search";
 import { SessionPanel, type SessionPanelState } from "./session-panel";
@@ -46,6 +51,12 @@ function BranchSchedule({
   );
   const [day, setDay] = useState<string | null>(null);
   const sessions = useQuery(weekSessionsQueryOptions(branch.id, monday));
+  // BKO-004: a failed read only hides the flags; the week stays usable.
+  const flags = useQuery(weekFlagsQueryOptions(branch.id, monday));
+  const flagged = useMemo(
+    () => new Map((flags.data ?? []).map((flag) => [flag.sessionId, flag])),
+    [flags.data],
+  );
 
   const shownDay =
     day !== null && day >= monday && day < addDays(monday, 7)
@@ -84,6 +95,9 @@ function BranchSchedule({
       />
       <WeekStepper monday={monday} today={today} onChange={onWeekChange} />
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
+      {sessions.isSuccess ? (
+        <EquipmentFlagsNotice flags={flags.data ?? []} />
+      ) : null}
       {sessions.isPending ? (
         <LoadingNotice>Cargando el horario…</LoadingNotice>
       ) : sessions.isError ? (
@@ -104,27 +118,29 @@ function BranchSchedule({
               Se muestran las primeras {weekSessionLimit} sesiones de la semana.
             </p>
           ) : null}
-          {narrow ? (
-            <DayList
-              monday={monday}
-              today={today}
-              day={shownDay}
-              onDayChange={setDay}
-              sessions={sessions.data}
-              onOpen={openSession}
-            />
-          ) : (
-            <WeekGrid
-              monday={monday}
-              today={today}
-              sessions={sessions.data}
-              onOpen={openSession}
-              onCreate={(start) => {
-                setNotice(null);
-                setPanel({ mode: "create", start });
-              }}
-            />
-          )}
+          <EquipmentFlagsContext.Provider value={flagged}>
+            {narrow ? (
+              <DayList
+                monday={monday}
+                today={today}
+                day={shownDay}
+                onDayChange={setDay}
+                sessions={sessions.data}
+                onOpen={openSession}
+              />
+            ) : (
+              <WeekGrid
+                monday={monday}
+                today={today}
+                sessions={sessions.data}
+                onOpen={openSession}
+                onCreate={(start) => {
+                  setNotice(null);
+                  setPanel({ mode: "create", start });
+                }}
+              />
+            )}
+          </EquipmentFlagsContext.Provider>
         </>
       )}
       <SessionPanel

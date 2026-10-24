@@ -117,7 +117,6 @@ describe('allowance adjustments', () => {
     });
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => now,
-      referralRewardCentavos: 6000,
     });
     const pay = () =>
       commands.recordCashPayment(

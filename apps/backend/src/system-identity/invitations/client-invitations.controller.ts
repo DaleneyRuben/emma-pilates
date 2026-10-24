@@ -26,6 +26,7 @@ import {
 } from '@nestjs/swagger';
 import { z } from 'zod';
 import { acquisitionProblem } from '../../booking/acquisition/acquisition-errors';
+import { guestPassProblem } from '../../booking/payments/open-guest-pass';
 import { authenticatedPrincipalResolver } from '../authentication/authentication.controller';
 import {
   authenticateBearer,
@@ -127,7 +128,7 @@ const run = async <Result>(
     if (error instanceof InvitationEmailThrottledError) {
       response?.setHeader('Retry-After', String(error.retryAfterSeconds));
     }
-    const acquisition = acquisitionProblem(error);
+    const acquisition = acquisitionProblem(error) ?? guestPassProblem(error);
     if (acquisition !== null) {
       throw new HttpException(
         { code: acquisition.code, detail: acquisition.detail },

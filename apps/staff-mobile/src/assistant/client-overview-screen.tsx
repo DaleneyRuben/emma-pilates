@@ -168,25 +168,16 @@ export function ClientOverviewScreen({
             onPress={() => navigation.navigate("BrowseSessions", context)}
             testID="client-overview-book"
           />
-          <OutlinedButton
-            disabled={futurePlan !== null}
-            label="Registrar pago en efectivo"
-            onPress={() => navigation.navigate("SelectPlan", context)}
-            testID="client-overview-cash-payment"
-          />
-          {futurePlan !== null ? (
-            <BodyText style={styles.note}>Ya tiene un plan siguiente.</BodyText>
-{sells ? (
+          {sells ? (
             <OutlinedButton
-              disabled={planStillEffective}
+              disabled={futurePlan !== null}
               label="Registrar pago en efectivo"
               onPress={() => navigation.navigate("SelectPlan", context)}
               testID="client-overview-cash-payment"
             />
           ) : null}
-          {sells && planStillEffective ? (
-            <BodyText style={styles.note}>Podrá comprar otro plan cuando este termine.</BodyText>
-
+          {sells && futurePlan !== null ? (
+            <BodyText style={styles.note}>Ya tiene un plan siguiente.</BodyText>
           ) : null}
           {hasActiveSubscription ? (
             <TextButton

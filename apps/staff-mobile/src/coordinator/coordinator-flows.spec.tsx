@@ -33,6 +33,7 @@ const coordinatorRoutes = (extra: Parameters<typeof routeFetcher>[0] = {}) => ({
       creditAvailableCentavos: 0,
     }),
   "/api/v1/administrator/sessions": () => jsonResponse([]),
+  "/api/v1/administrator/contact-alerts": () => jsonResponse({ items: [], totalItems: 0 }),
   ...extra,
 });
 
@@ -73,6 +74,7 @@ describe("the Coordinator's Staff app", () => {
     const { screen } = await openAsCoordinator();
 
     expect(screen.queryByRole("button", { name: "+ Nuevo cliente" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Para contactar" })).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
     await waitFor(() => {
       expect(screen.getByText("Cancelar una clase")).toBeOnTheScreen();
