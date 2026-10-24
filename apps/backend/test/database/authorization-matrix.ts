@@ -229,14 +229,14 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   // only (the Coordinator does not sell).
   'GET /api/v1/assistant/clients/{clientId}/invoice-data': administratorOnly(),
   // PAY-006: a front-desk transfer receipt stays pending for review.
-  'POST /api/v1/assistant/clients/{clientId}/transfer-payments':
-    administratorOnly({
-      body: {
-        planId: uuid,
-        branchId: uuid,
-        imageAssetId: uuid,
-      },
-    }),
+  // Only an Assistant photographs it. Neither Role under test reaches it.
+  'POST /api/v1/assistant/clients/{clientId}/transfer-payments': both('deny', {
+    body: {
+      planId: uuid,
+      branchId: uuid,
+      imageAssetId: uuid,
+    },
+  }),
   'POST /api/v1/assistant/client-invitations': administratorOnly(),
   'GET /api/v1/assistant/client-invitations/{clientId}': administratorOnly(),
   'POST /api/v1/assistant/client-invitations/{clientId}/email-corrections':
