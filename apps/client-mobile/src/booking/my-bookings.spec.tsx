@@ -143,6 +143,12 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByText("¿Cancelar esta reserva?")).toBeOnTheScreen();
     });
+    // UX-012 / C6: 05's sheet releases the spot in two sentences, not a semicolon.
+    expect(
+      screen.getByText(
+        "La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para volver a reservarlo tendrá que seguir habiendo cupo.",
+      ),
+    ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar reserva" }));
 
     await waitFor(() => {

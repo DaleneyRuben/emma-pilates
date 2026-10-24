@@ -68,7 +68,11 @@ describe("AW21 Clientes on a desktop browser", () => {
 
     const expired = (await screen.findByRole("cell", { name: /Sofía Guzmán/ }))
       .parentElement as HTMLElement;
-    expect(within(expired).getByText("Sin plan activo")).toBeInTheDocument();
+    // UX-012 / A5: an expired Plan is «Vencido»; never bought stays the neutral pill.
+    expect(within(expired).getByText("Vencido")).toBeInTheDocument();
+    expect(
+      within(expired).queryByText("Sin plan activo"),
+    ).not.toBeInTheDocument();
     expect(within(expired).getByText("Expirado")).toBeInTheDocument();
     const never = screen.getByRole("cell", { name: /Ana Quiroga/ })
       .parentElement as HTMLElement;
