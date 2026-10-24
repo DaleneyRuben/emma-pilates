@@ -140,7 +140,6 @@ describe('erasing a closed Client Account (PostgreSQL)', () => {
     const branch = await world.prisma.branch.findFirstOrThrow();
     const sale = await createPrismaPaymentCommands(world.prisma, {
       now: () => anHourBefore,
-      referralRewardCentavos: 6000,
     }).recordCashPayment(
       {
         clientId: ana.clientId,
