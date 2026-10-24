@@ -29,6 +29,8 @@ const detail = {
   subscription: {
     status: 'none',
     nextSubscription: null,
+    freeze: null,
+    canRequestFreeze: false,
     subscription: null,
   },
   closure: {
