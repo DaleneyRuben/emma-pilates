@@ -31,6 +31,7 @@ import {
   promoteWaitlistInTransaction,
 } from './waitlist-promotion';
 import { rescheduleBooking } from './reschedule-booking';
+import { recordAttendanceCorrections } from './attendance-audit';
 import { recordAttendance } from './record-attendance';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
 import { retrySerializable } from '../../database/retry-serializable';
@@ -633,6 +634,7 @@ export class PrismaBookingCommands {
             where: { id: sessionId },
             select: {
               id: true,
+              branchId: true,
               trainerStaffMemberId: true,
               endsAt: true,
               state: true,
@@ -652,7 +654,19 @@ export class PrismaBookingCommands {
               select: { id: true },
             })
           ).map(({ id }) => id),
-        save: async ({ outcomes, recordedByAccountId }) => {
+        save: async ({
+          sessionId,
+          branchId,
+          outcomes,
+          recordedByAccountId,
+        }) => {
+          await recordAttendanceCorrections(transaction, {
+            sessionId,
+            branchId,
+            outcomes,
+            principal,
+            occurredAt: this.now(),
+          });
           await Promise.all(
             outcomes.map(({ bookingId, outcome }) =>
               transaction.attendanceRecord.upsert({
