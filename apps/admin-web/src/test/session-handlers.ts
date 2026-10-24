@@ -73,6 +73,9 @@ export const coordinatorHandlers = () => [
   http.get(apiUrl(staffProfilePath), () => jsonResponse(carolinaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
+    jsonResponse([]),
+  ),
 ];
 
 export const signedOutHandlers = () => [
