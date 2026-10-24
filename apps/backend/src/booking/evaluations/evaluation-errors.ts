@@ -3,6 +3,8 @@ export type EvaluationRuleCode =
   | 'evaluation_slot_unavailable'
   | 'evaluation_booking_closed'
   | 'evaluation_month_used'
+  | 'evaluation_included_used'
+  | 'evaluation_payment_required'
   | 'no_eligible_subscription'
   | 'evaluation_not_found'
   | 'evaluation_not_booked'
@@ -21,6 +23,8 @@ const statuses: Record<EvaluationRuleCode, number> = {
   evaluation_slot_unavailable: 409,
   evaluation_booking_closed: 409,
   evaluation_month_used: 409,
+  evaluation_included_used: 409,
+  evaluation_payment_required: 409,
   no_eligible_subscription: 409,
   evaluation_not_found: 404,
   evaluation_not_booked: 409,

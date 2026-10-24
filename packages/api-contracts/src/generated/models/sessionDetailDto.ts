@@ -22,4 +22,10 @@ export interface SessionDetailDto {
   availableSeats: number;
   /** @minimum 0 */
   waitlistCount: number;
+  /**
+   * Classes left this week from the base allowance. Absent without a cap.
+   * @minimum 0
+   * @nullable
+   */
+  classesLeftThisWeek?: number | null;
 }

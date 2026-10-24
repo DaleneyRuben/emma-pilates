@@ -84,8 +84,8 @@ describe('studio facts', () => {
     );
     await context.pool.query(
       `INSERT INTO booking.plans
-         (id, name, duration_months, class_allowance, price_centavos, display_order, updated_at)
-       VALUES ($1, 'Test Plan', 1, 8, 35000, 1, CURRENT_TIMESTAMP)`,
+         (id, name, duration_days, class_allowance, price_centavos, display_order, updated_at)
+       VALUES ($1, 'Test Plan', 30, 8, 35000, 1, CURRENT_TIMESTAMP)`,
       [planId],
     );
     await context.pool.query(
@@ -101,10 +101,10 @@ describe('studio facts', () => {
       );
       await context.pool.query(
         `INSERT INTO booking.subscriptions
-           (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot,
+           (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot,
             original_class_allowance, remaining_class_allowance, starts_on, ends_on,
             state, activated_at, expired_at, updated_at)
-         VALUES ($1, $2, $3, 'Test Plan', 1, 8, 6, $4, $5,
+         VALUES ($1, $2, $3, 'Test Plan', 30, 8, 6, $4, $5,
             $6::"booking"."SubscriptionState", $7, $8, CURRENT_TIMESTAMP)`,
         [
           subscriptionIds[index],
@@ -120,10 +120,10 @@ describe('studio facts', () => {
       if (index !== 2) {
         await context.pool.query(
           `INSERT INTO booking.subscriptions
-             (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot,
+             (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot,
               original_class_allowance, remaining_class_allowance, starts_on, ends_on,
               state, activated_at, expired_at, updated_at)
-           VALUES ($1, $2, $3, 'Next Plan', 1, 8, 8, '2026-11-01', '2026-11-30',
+           VALUES ($1, $2, $3, 'Next Plan', 30, 8, 8, '2026-11-01', '2026-11-30',
               'expired', $4, $4, CURRENT_TIMESTAMP)`,
           [randomUUID(), clientId, planId, '2026-11-01T04:00:00.000Z'],
         );

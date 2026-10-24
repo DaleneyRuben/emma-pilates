@@ -5,6 +5,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * `courtesy` is a Bs 0 Courtesy Access grant (REL-011).
+ */
 export type PaymentReviewDtoMethod =
   (typeof PaymentReviewDtoMethod)[keyof typeof PaymentReviewDtoMethod];
 
@@ -12,4 +15,5 @@ export const PaymentReviewDtoMethod = {
   transfer: "transfer",
   cash: "cash",
   credit_only: "credit_only",
+  courtesy: "courtesy",
 } as const;

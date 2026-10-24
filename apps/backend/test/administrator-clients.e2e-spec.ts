@@ -44,6 +44,10 @@ const detail = {
   referredClientCount: 2,
   subscription: {
     status: 'active',
+    nextSubscription: null,
+    founderRenewalDeadline: null,
+    freeze: null,
+    canRequestFreeze: false,
     subscription: {
       id: '22222222-2222-4222-8222-222222222222',
       planName: 'Paquete de 8 clases',
@@ -159,6 +163,10 @@ describe('administrator Client endpoints (e2e)', () => {
           clientSince: '2025-07-02',
           subscription: {
             status: 'active',
+            nextSubscription: null,
+            founderRenewalDeadline: null,
+            freeze: null,
+            canRequestFreeze: false,
             subscription: {
               ...detail.subscription.subscription,
               startsOn: '2026-09-01',

@@ -15,8 +15,9 @@ import {
 const today = new Date('2026-09-21T00:00:00.000Z');
 const at = (time: string) => new Date(`2026-09-21T${time}:00.000Z`);
 
-// The development fixtures record only cash Payments, so every transfer
-// below is the whole transfer list; Sofía starts with Bs 60 of Credit.
+// The development fixtures record one cash sale (Valeria's Plan), so every
+// transfer below plus that sale is the whole list; Sofía starts with Bs 60 of
+// Credit.
 describe('Administrator Payment list (PostgreSQL)', () => {
   let context: DatabaseTestContext;
   let prisma: PrismaClient;
@@ -27,9 +28,10 @@ describe('Administrator Payment list (PostgreSQL)', () => {
   const commands = (clock: Date) =>
     createPrismaPaymentCommands(prisma, {
       now: () => clock,
-      referralRewardCentavos: 6000,
     });
-  const paymentIds: Record<string, string> = {};
+  const paymentIds: Record<string, string> = {
+    fixtureCash: fixtures.payments[0].id,
+  };
 
   const principalOf = async (
     email: string,
@@ -148,13 +150,18 @@ describe('Administrator Payment list (PostgreSQL)', () => {
     await context?.stop();
   });
 
-  it('lists only transfers, pending ones oldest first and then the decided ones newest first', async () => {
-    const page = await ledger().list({ page: 1, pageSize: 20, status: 'all' });
+  it('lists transfers and cash sales, pending ones oldest first and then the decided ones newest first', async () => {
+    const page = await ledger().list({
+      page: 1,
+      pageSize: 20,
+      status: 'all',
+      invoice: 'all',
+    });
 
     expect(page).toMatchObject({
       page: 1,
       pageSize: 20,
-      totalItems: 4,
+      totalItems: 5,
       pendingCount: 2,
     });
     expect(page.items.map((item) => item.id)).toEqual([
@@ -162,6 +169,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       paymentIds.sofia,
       paymentIds.mariana,
       paymentIds.valeria,
+      paymentIds.fixtureCash,
     ]);
     expect(page.items[1]).toEqual({
       id: paymentIds.sofia,
@@ -169,12 +177,16 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       clientName: expect.stringMatching(/^Sofía/) as string,
       planName: 'Paquete de 8 clases',
       planPriceCentavos: plan.priceCentavos,
-      creditAppliedCentavos: 6000,
-      amountDueCentavos: plan.priceCentavos - 6000,
+      creditAppliedCentavos: 0,
+      amountDueCentavos: plan.priceCentavos,
       state: 'pending',
       submittedAt: at('14:00'),
       decidedAt: null,
       receiptAvailable: true,
+      voidReason: null,
+      method: 'transfer',
+      invoiceData: null,
+      invoiceIssued: null,
     });
     expect(page.items[2]).toMatchObject({
       clientName: 'Mariana Paz',
@@ -190,12 +202,17 @@ describe('Administrator Payment list (PostgreSQL)', () => {
 
   it.each([
     ['pending', ['lucia', 'sofia']],
-    ['confirmed', ['valeria']],
+    ['confirmed', ['valeria', 'fixtureCash']],
     ['rejected', ['mariana']],
   ] as const)(
     'filters by the %s state and still counts every pending transfer',
     async (status, names) => {
-      const page = await ledger().list({ page: 1, pageSize: 20, status });
+      const page = await ledger().list({
+        page: 1,
+        pageSize: 20,
+        status,
+        invoice: 'all',
+      });
 
       expect(page.items.map((item) => item.id)).toEqual(
         names.map((name) => paymentIds[name]),
@@ -210,6 +227,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       page: 1,
       pageSize: 20,
       status: 'all',
+      invoice: 'all',
       query: 'LUCIA FERNANDEZ',
     });
 
@@ -222,6 +240,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       page: 1,
       pageSize: 20,
       status: 'all',
+      invoice: 'all',
       query: '%',
     });
 
@@ -229,9 +248,14 @@ describe('Administrator Payment list (PostgreSQL)', () => {
   });
 
   it('pages after filtering and ordering', async () => {
-    const page = await ledger().list({ page: 2, pageSize: 1, status: 'all' });
+    const page = await ledger().list({
+      page: 2,
+      pageSize: 1,
+      status: 'all',
+      invoice: 'all',
+    });
 
     expect(page.items.map((item) => item.id)).toEqual([paymentIds.sofia]);
-    expect(page).toMatchObject({ page: 2, pageSize: 1, totalItems: 4 });
+    expect(page).toMatchObject({ page: 2, pageSize: 1, totalItems: 5 });
   });
 });

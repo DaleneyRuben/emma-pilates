@@ -1,6 +1,6 @@
 # Model the physical studio as Branch only — no Room, no Equipment
 
-Status: accepted
+Status: accepted; Equipment is modelled in Back Office since [ADR-0106](../../../docs/adr/0106-log-equipment-faults.md), still without a Room
 
 Each Branch has exactly one studio room, so two Sessions at the same Branch never overlap in time and a Branch's schedule is simply one class after another. We decided not to introduce a Room concept, and not to model Equipment (reformers and the like) as countable, serviceable things: a Session's capacity defaults from its Class Type and staff override it by hand on the rare day something is out of service, with the reason living in their heads rather than in the model.
 

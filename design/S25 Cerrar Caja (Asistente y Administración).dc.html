@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button, select { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S25 · Rol: asistente y administración</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Cerrar caja</h1>
+    <p style="margin:0;max-width:880px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">El cierre de caja diario (BKO-003): al final del día la recepción cuenta el efectivo y lo registra una sola vez por sucursal. El esperado son las ventas en efectivo confirmadas del día en esa sucursal.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Asistente · Formulario</div>
+          <div style="font-size:12px;color:#766D69;">Bs 510 contados: falta efectivo</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 32px;display:flex;flex-direction:column;gap:16px;">
+            <button aria-label="Volver" style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.2;">Cerrar caja</div>
+              <span style="font-size:13px;color:#766D69;">Viernes 23 de octubre · Centro</span>
+            </div>
+            
+            <div style="display:flex;flex-direction:column;gap:4px;padding:16px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <span style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo esperado</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 520</span>
+              <span style="font-size:13px;color:#766D69;">3 ventas en efectivo hoy en Centro</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo contado</span>
+              <div style="height:52px;display:flex;align-items:center;gap:8px;padding:0 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:16px;"><span style="color:#766D69;">Bs</span><span style="color:#4A4A4A;">510</span></div>
+              <span style="font-size:13px;color:#766D69;">Cuenta los billetes y monedas de la caja.</span>
+            </div>
+            <div style="padding:12px;border-radius:12px;background:rgba(178,93,75,0.08);color:#94493A;font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">Diferencia · −Bs 10 · Falta efectivo</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nota (opcional)</span>
+              <div style="min-height:88px;padding:12px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:15px;"><span style="color:#4A4A4A;">Faltó cambio para un billete de 200</span></div>
+              <span style="align-self:flex-end;font-size:12px;color:#7A716D;">35/500</span>
+            </div>
+            <span style="font-size:13px;line-height:1.5;color:#766D69;">Solo hay un cierre por día y no se puede corregir después.</span>
+            <button style="height:52px;border:none;border-radius:12px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;">Cerrar caja</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Asistente · Cuadra</div>
+          <div style="font-size:12px;color:#766D69;">El conteo coincide con lo esperado</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 32px;display:flex;flex-direction:column;gap:16px;">
+            <button aria-label="Volver" style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.2;">Cerrar caja</div>
+              <span style="font-size:13px;color:#766D69;">Viernes 23 de octubre · Centro</span>
+            </div>
+            
+            <div style="display:flex;flex-direction:column;gap:4px;padding:16px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <span style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo esperado</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 520</span>
+              <span style="font-size:13px;color:#766D69;">3 ventas en efectivo hoy en Centro</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo contado</span>
+              <div style="height:52px;display:flex;align-items:center;gap:8px;padding:0 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:16px;"><span style="color:#766D69;">Bs</span><span style="color:#4A4A4A;">520</span></div>
+              <span style="font-size:13px;color:#766D69;">Cuenta los billetes y monedas de la caja.</span>
+            </div>
+            <div style="padding:12px;border-radius:12px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">Diferencia · Bs 0 · Cuadra</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nota (opcional)</span>
+              <div style="min-height:88px;padding:12px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:15px;"><span style="color:#7A716D;">Ej.: faltó cambio para un billete de 200</span></div>
+              <span style="align-self:flex-end;font-size:12px;color:#7A716D;">0/500</span>
+            </div>
+            <span style="font-size:13px;line-height:1.5;color:#766D69;">Solo hay un cierre por día y no se puede corregir después.</span>
+            <button style="height:52px;border:none;border-radius:12px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;">Cerrar caja</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Caja cerrada</div>
+          <div style="font-size:12px;color:#766D69;">Después de cerrar, o al abrir un día ya cerrado</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 32px;display:flex;flex-direction:column;gap:16px;">
+            <button aria-label="Volver" style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.2;">Cerrar caja</div>
+              <span style="font-size:13px;color:#766D69;">Viernes 23 de octubre · Centro</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <span style="align-self:center;width:56px;height:56px;border-radius:50%;background:#7C9473;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;">✓</span>
+              <span style="text-align:center;font-family:Lora,Georgia,serif;font-size:24px;">Caja cerrada</span>
+              <div style="display:flex;flex-direction:column;gap:8px;padding:16px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;">
+                <div style="display:flex;justify-content:space-between;"><span style="color:#766D69;">Efectivo esperado</span><span style="font-variant-numeric:tabular-nums;">Bs 520</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:#766D69;">Efectivo contado</span><span style="font-variant-numeric:tabular-nums;">Bs 510</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="color:#766D69;">Diferencia</span><span style="color:#94493A;font-variant-numeric:tabular-nums;">−Bs 10</span></div>
+                <div style="height:1px;background:#E4D8CC;"></div>
+                <span style="font-size:13px;color:#766D69;">Faltó cambio para un billete de 200</span>
+              </div>
+              <span style="text-align:center;font-size:13px;color:#766D69;">Cerrada por Camila Rojas a las 19:05.</span>
+              <button style="height:52px;border:none;border-radius:12px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;">Volver</button>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Administración · Formulario</div>
+          <div style="font-size:12px;color:#766D69;">Chips de sucursal; Equipetrol sin ventas</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 32px;display:flex;flex-direction:column;gap:16px;">
+            <button aria-label="Volver" style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.2;">Cerrar caja</div>
+              <span style="font-size:13px;color:#766D69;">Viernes 23 de octubre · Equipetrol</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:13px;color:#766D69;">Sucursal</span>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="padding:8px 12px;border:1px solid;border-radius:999px;font-size:13px;background:transparent;border-color:#D8C9BB;color:#6E6663;">Centro</span><span style="padding:8px 12px;border:1px solid;border-radius:999px;font-size:13px;background:#B78380;border-color:#B78380;color:#FFFFFF;">Equipetrol</span><span style="padding:8px 12px;border:1px solid;border-radius:999px;font-size:13px;background:transparent;border-color:#D8C9BB;color:#6E6663;">Urubó</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;padding:16px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <span style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo esperado</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 0</span>
+              <span style="font-size:13px;color:#766D69;">Todavía no hay ventas en efectivo hoy.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo contado</span>
+              <div style="height:52px;display:flex;align-items:center;gap:8px;padding:0 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:16px;"><span style="color:#766D69;">Bs</span><span style="color:#7A716D;">0,00</span></div>
+              <span style="font-size:13px;color:#766D69;">Cuenta los billetes y monedas de la caja.</span>
+            </div>
+            
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nota (opcional)</span>
+              <div style="min-height:88px;padding:12px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:15px;"><span style="color:#7A716D;">Ej.: faltó cambio para un billete de 200</span></div>
+              <span style="align-self:flex-end;font-size:12px;color:#7A716D;">0/500</span>
+            </div>
+            <span style="font-size:13px;line-height:1.5;color:#766D69;">Solo hay un cierre por día y no se puede corregir después.</span>
+            <button style="height:52px;border:none;border-radius:12px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:pointer;">Cerrar caja</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Formulario</div>
+          <div style="font-size:12px;color:#766D69;">Mismo contenido, encabezado de Android</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:44px 20px 32px;display:flex;flex-direction:column;gap:16px;">
+            <button aria-label="Volver" style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.2;">Cerrar caja</div>
+              <span style="font-size:13px;color:#766D69;">Viernes 23 de octubre · Centro</span>
+            </div>
+            
+            <div style="display:flex;flex-direction:column;gap:4px;padding:16px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <span style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo esperado</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 520</span>
+              <span style="font-size:13px;color:#766D69;">3 ventas en efectivo hoy en Centro</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo contado</span>
+              <div style="height:52px;display:flex;align-items:center;gap:8px;padding:0 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:16px;"><span style="color:#766D69;">Bs</span><span style="color:#4A4A4A;">510</span></div>
+              <span style="font-size:13px;color:#766D69;">Cuenta los billetes y monedas de la caja.</span>
+            </div>
+            <div style="padding:12px;border-radius:12px;background:rgba(178,93,75,0.08);color:#94493A;font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">Diferencia · −Bs 10 · Falta efectivo</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nota (opcional)</span>
+              <div style="min-height:88px;padding:12px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:15px;"><span style="color:#4A4A4A;">Faltó cambio para un billete de 200</span></div>
+              <span style="align-self:flex-end;font-size:12px;color:#7A716D;">35/500</span>
+            </div>
+            <span style="font-size:13px;line-height:1.5;color:#766D69;">Solo hay un cierre por día y no se puede corregir después.</span>
+            <button style="height:52px;border:none;border-radius:12px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;">Cerrar caja</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Tablet · Formulario</div>
+          <div style="font-size:12px;color:#766D69;">iPad Pro 11: columna centrada de 520 px</div>
+        </div>
+      </sc-if>
+      <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
+        <div style="height:960px;border-radius:18px;overflow:hidden;background:#FAF7F2;display:flex;justify-content:center;">
+          <div style="width:520px;"><div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:36px 20px 32px;display:flex;flex-direction:column;gap:16px;">
+            <button aria-label="Volver" style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.2;">Cerrar caja</div>
+              <span style="font-size:13px;color:#766D69;">Viernes 23 de octubre · Centro</span>
+            </div>
+            
+            <div style="display:flex;flex-direction:column;gap:4px;padding:16px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <span style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo esperado</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 520</span>
+              <span style="font-size:13px;color:#766D69;">3 ventas en efectivo hoy en Centro</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Efectivo contado</span>
+              <div style="height:52px;display:flex;align-items:center;gap:8px;padding:0 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:16px;"><span style="color:#766D69;">Bs</span><span style="color:#4A4A4A;">510</span></div>
+              <span style="font-size:13px;color:#766D69;">Cuenta los billetes y monedas de la caja.</span>
+            </div>
+            <div style="padding:12px;border-radius:12px;background:rgba(178,93,75,0.08);color:#94493A;font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">Diferencia · −Bs 10 · Falta efectivo</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nota (opcional)</span>
+              <div style="min-height:88px;padding:12px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;font-size:15px;"><span style="color:#4A4A4A;">Faltó cambio para un billete de 200</span></div>
+              <span style="align-self:flex-end;font-size:12px;color:#7A716D;">35/500</span>
+            </div>
+            <span style="font-size:13px;line-height:1.5;color:#766D69;">Solo hay un cierre por día y no se puede corregir después.</span>
+            <button style="height:52px;border:none;border-radius:12px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;">Cerrar caja</button>
+          </div>
+        </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Uno por día</span>Un segundo cierre del mismo día se rechaza: «La caja de hoy ya se cerró en esta sucursal.» y la pantalla muestra el cierre.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Diferencia</span>Contado menos esperado: Éxito si cuadra, Error si falta, Advertencia si sobra.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Entrada</span>«Cerrar caja» en el encabezado de S04 (asistente) y S11 (administración), seguimiento 150.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Nunca la coordinadora</span>La coordinadora no ve montos (ADR-0102): no tiene esta pantalla.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showCaptions: this.props.showCaptions ?? true };
+  }
+}
+</script>
+</body>
+</html>

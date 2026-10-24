@@ -41,6 +41,7 @@ import {
   rescheduleBookingCommand,
   rethrowAsProblem,
   sessionAvailability,
+  classesLeftThisWeekQuery,
   type CancellationCommandHandler,
   type ClassHistoryHandler,
   type CommandHandler,
@@ -59,6 +60,11 @@ export class BookingController {
     private readonly joinWaitlistHandler: CommandHandler,
     @Inject(sessionAvailability)
     private readonly listAvailability: SessionAvailabilityHandler,
+    @Inject(classesLeftThisWeekQuery)
+    private readonly classesLeft: (
+      clientId: string,
+      at: Date,
+    ) => Promise<number | null>,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
   ) {}
@@ -74,11 +80,20 @@ export class BookingController {
     @Headers('authorization') authorization: string | undefined,
     @Query() query: unknown,
   ): Promise<SessionAvailabilityDto[]> {
-    await this.authenticate(authorization);
+    const principal = await this.authenticate(authorization);
     const parsed = parseAvailabilityQuery(query);
     if (parsed === null)
       throw invalidRequest('Invalid Session availability query');
-    return this.listAvailability(parsed);
+    const sessions = await this.listAvailability(parsed);
+    if (principal.identity.kind !== 'client') return sessions;
+    const left = await this.classesLeft(
+      principal.identity.clientId,
+      new Date(parsed.from),
+    );
+    return sessions.map((session) => ({
+      ...session,
+      classesLeftThisWeek: left,
+    }));
   }
 
   @Post(':sessionId/bookings')

@@ -10,6 +10,7 @@ enum BookingCancellationCause {
   CLIENT_REQUEST    @map("client_request")
   SESSION_CANCELLED @map("session_cancelled")
   ACCOUNT_CLOSED    @map("account_closed")
+  PAYMENT_VOIDED    @map("payment_voided")
 
   @@schema("booking")
 }
@@ -54,7 +55,9 @@ model Booking {
   rescheduledTo          Booking?                  @relation("BookingRescheduleChain", fields: [rescheduledToBookingId], references: [id], onDelete: Restrict)
   rescheduledFrom        Booking?                  @relation("BookingRescheduleChain")
   attendanceRecord       AttendanceRecord?
+  guestPasses            GuestPass[]
   promotedWaitlistEntry  WaitlistEntry?            @relation("WaitlistPromotion")
+  allowanceAdjustment    AllowanceAdjustment?
 
   @@unique([id, sessionId, clientId])
   @@unique([id, clientId, subscriptionId])

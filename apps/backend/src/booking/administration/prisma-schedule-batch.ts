@@ -3,7 +3,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { boliviaDate } from '../../time/bolivia-time';
 import {
   AdministrationError,
-  requireAdministrator,
+  requireOperations,
 } from './administration-errors';
 import { findRowClash, type ScheduleRow } from './schedule-rows';
 import {
@@ -36,7 +36,7 @@ export const createPrismaScheduleBatch = (
       input: ScheduleBatchInput,
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      requireOperations(principal);
       const now = dependencies.now();
       if (input.effectiveFrom < boliviaDate(now)) {
         throw new AdministrationError('effective_date_invalid');
