@@ -3,7 +3,7 @@ import { deterministicId } from './deterministic-id';
 export const DEVELOPMENT_FIXTURE_PASSWORD = 'emma-local-2026';
 
 export type FixtureStaffRole =
-  'trainer' | 'assistant' | 'administrator' | 'nutritionist';
+  'trainer' | 'assistant' | 'administrator' | 'nutritionist' | 'coordinator';
 
 export type DevelopmentFixtures = {
   branches: { id: string; name: string; address: string }[];
@@ -238,6 +238,13 @@ const staffDefinitions = [
     role: 'nutritionist',
     email: 'gabriela.flores@example.com',
     branches: ['centro'],
+  },
+  {
+    key: 'carolina',
+    name: 'Carolina Rivas',
+    role: 'coordinator',
+    email: 'carolina.rivas@example.com',
+    branches: [],
   },
 ] as const satisfies readonly {
   key: string;

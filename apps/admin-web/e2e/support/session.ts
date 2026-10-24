@@ -1,18 +1,21 @@
 import { expect, type Page, type Request } from "@playwright/test";
 import { fixtures } from "./environment";
 
-/** AW01: the fixture Administrator signs in and lands on Horario. */
-export async function signIn(page: Page, path = "/"): Promise<void> {
+/**
+ * AW01: a fixture Staff Member (the Administrator unless named) signs in
+ * and lands on Horario.
+ */
+export async function signIn(
+  page: Page,
+  path = "/",
+  account: { email: string; name: string } = fixtures.administrator,
+): Promise<void> {
   await page.goto(path);
-  await page
-    .getByLabel("Correo electrónico")
-    .fill(fixtures.administrator.email);
+  await page.getByLabel("Correo electrónico").fill(account.email);
   await page.getByLabel("Contraseña", { exact: true }).fill(fixtures.password);
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(
-    page.getByRole("button", {
-      name: `Tu cuenta: ${fixtures.administrator.name}`,
-    }),
+    page.getByRole("button", { name: `Tu cuenta: ${account.name}` }),
   ).toBeVisible();
 }
 

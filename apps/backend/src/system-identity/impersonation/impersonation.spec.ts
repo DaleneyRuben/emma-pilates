@@ -133,6 +133,29 @@ describe('impersonation (FUT-001, ADR-0100)', () => {
       ).rejects.toMatchObject({ code: 'staff_member_not_found' });
     });
 
+    it('may see the app as the Coordinator (ADR-0102)', async () => {
+      const coordinator = {
+        ...trainer,
+        id: 'coordinator-staff-member-id',
+        name: 'Carolina Rivas',
+        role: 'coordinator' as const,
+      };
+      const deps = gateway({
+        findStaffMember: jest.fn().mockResolvedValue(coordinator),
+      });
+
+      await expect(
+        startImpersonation(
+          { staffMemberId: coordinator.id, surface: 'mobile' },
+          administrator,
+          { gateway: deps, now: () => now, newId: () => 'impersonation-id' },
+        ),
+      ).resolves.toMatchObject({
+        staffMemberName: 'Carolina Rivas',
+        role: 'coordinator',
+      });
+    });
+
     it.each([
       ['another Administrator', { ...trainer, role: 'administrator' as const }],
       ['a pending Staff Member', { ...trainer, status: 'pending' as const }],

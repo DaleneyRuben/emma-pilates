@@ -13,6 +13,7 @@ import {
   Screen,
   spacing,
   surfaces,
+  TextButton,
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -22,6 +23,7 @@ import { useEffect, useState } from "react";
 import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { useStaffRole } from "../staff-role";
 import { HeaderAction } from "../ui/header-action";
 import { RootHeader } from "../ui/root-header";
 import { describeContact } from "./assistant-format";
@@ -30,7 +32,7 @@ import { ClientDetailPanel } from "./client-panel";
 
 export type ClientSearchNavigation = {
   navigate: {
-    (screen: "NewClient" | "CashClose"): void;
+    (screen: "NewClient" | "CancelClass" | "CashClose"): void;
     (screen: "ClientOverview", params: { clientId: string }): void;
   };
 };
@@ -56,6 +58,9 @@ function NewClientButton({ onPress }: { onPress: () => void }) {
 export function ClientSearchScreen() {
   const navigation = useNavigation<ClientSearchNavigation>();
   const fetcher = useStaffFetcher();
+  // ADR-0102: only the Assistant registers new Clients; the Coordinator
+  // cancels a class from here instead (follow-up 158).
+  const coordinator = useStaffRole() === "coordinator";
   const [text, setText] = useState("");
   const [query, setQuery] = useState("");
 
@@ -110,7 +115,15 @@ export function ClientSearchScreen() {
         testID="client-search-input"
         value={text}
       />
-      <NewClientButton onPress={() => navigation.navigate("NewClient")} />
+      {coordinator ? (
+        <TextButton
+          label="Cancelar una clase"
+          onPress={() => navigation.navigate("CancelClass")}
+          testID="client-search-cancel-class"
+        />
+      ) : (
+        <NewClientButton onPress={() => navigation.navigate("NewClient")} />
+      )}
       {!searching ? (
         <BodyText style={styles.hint}>Escribe al menos dos letras o números para buscar.</BodyText>
       ) : results.isPending ? (

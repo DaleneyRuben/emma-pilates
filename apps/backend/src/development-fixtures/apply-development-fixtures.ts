@@ -18,6 +18,7 @@ const staffRoles: Record<FixtureStaffRole, StaffRole> = {
   assistant: StaffRole.ASSISTANT,
   administrator: StaffRole.ADMINISTRATOR,
   nutritionist: StaffRole.NUTRITIONIST,
+  coordinator: StaffRole.COORDINATOR,
 };
 
 const subscriptionStates = {

@@ -180,7 +180,8 @@
 
             </div>
             <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;">
-              <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
+              <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
+            <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
             </div>
           </aside>
         </main>
@@ -248,6 +249,7 @@
             </div>
           </div>
           <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;">
+            <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
             <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
           </div>
         </div>
@@ -309,6 +311,7 @@
             </div>
           </div>
           <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;">
+            <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
             <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
           </div>
         </div>
@@ -368,6 +371,307 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Panel · Editando perfil</div>
+          <div style="font-size:12px;color:#766D69;">Editar perfil abre el nombre y el teléfono en el lugar; el correo queda de solo lectura (IDN-009)</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:720px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">LM</div>
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Lucía Mendoza</h3>
+                <span style="font-size:11.5px;color:#766D69;">Cliente desde 03/07/2025</span>
+              </div>
+            </div>
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:22px;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
+                <input value="Lucía Mendoza" style="height:40px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:14px;color:#4A4A4A;" />
+
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
+                <input value="+591 691 44 307" style="height:40px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:14px;color:#4A4A4A;" />
+                <span style="font-size:11.5px;color:#7A716D;">Opcional</span>
+              </label>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Correo</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;">lucia.mendoza@gmail.com</span>
+                </div>
+                <span style="font-size:11.5px;color:#7A716D;">La clienta cambia su correo desde su app.</span>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;">Cancelar</button>
+                <button style="height:34px;padding:0 14px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13px;font-weight:500;">Guardar cambios</button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Plan</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:13.5px;color:#7A716D;">Sin plan activo</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11px;font-weight:500;white-space:nowrap;">Expirado</span>
+              </div>
+              <span style="font-size:11.5px;color:#7A716D;">Último plan vencido el 30/06/2026.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
+                <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 0,00</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Clientas referidas</span>
+                  <span style="font-size:13.5px;color:#7A716D;">Ninguna todavía</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Código</span>
+                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">LUCIA25</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;gap:8px;">
+            <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Panel · Nombre vacío</div>
+          <div style="font-size:12px;color:#766D69;">El nombre es obligatorio; un error al guardar mantiene el formulario</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:720px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">LM</div>
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Lucía Mendoza</h3>
+                <span style="font-size:11.5px;color:#766D69;">Cliente desde 03/07/2025</span>
+              </div>
+            </div>
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:22px;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
+                <input value="" style="height:40px;padding:0 12px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;font-size:14px;color:#4A4A4A;" />
+                <span style="font-size:11.5px;color:#94493A;">Escribe el nombre de la clienta.</span>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
+                <input value="+591 691 44 307" style="height:40px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:14px;color:#4A4A4A;" />
+                <span style="font-size:11.5px;color:#7A716D;">Opcional</span>
+              </label>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Correo</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;">lucia.mendoza@gmail.com</span>
+                </div>
+                <span style="font-size:11.5px;color:#7A716D;">La clienta cambia su correo desde su app.</span>
+              </div>
+              <span role="alert" style="font-size:12.5px;color:#94493A;">No pudimos guardar los cambios. Inténtalo de nuevo.</span><div style="display:flex;gap:8px;">
+                <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;">Cancelar</button>
+                <button style="height:34px;padding:0 14px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13px;font-weight:500;">Guardar cambios</button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Plan</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:13.5px;color:#7A716D;">Sin plan activo</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11px;font-weight:500;white-space:nowrap;">Expirado</span>
+              </div>
+              <span style="font-size:11.5px;color:#7A716D;">Último plan vencido el 30/06/2026.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
+                <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 0,00</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Clientas referidas</span>
+                  <span style="font-size:13.5px;color:#7A716D;">Ninguna todavía</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Código</span>
+                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">LUCIA25</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;gap:8px;">
+            <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Panel · Perfil guardado</div>
+          <div style="font-size:12px;color:#766D69;">De vuelta a solo lectura con el nombre corregido</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:720px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">LM</div>
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Lucía Mendoza Paz</h3>
+                <span style="font-size:11.5px;color:#766D69;">Cliente desde 03/07/2025</span>
+              </div>
+            </div>
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:22px;overflow:hidden;">
+            <div style="padding:10px 12px;border:1px solid rgba(124,148,115,0.40);border-radius:8px;background:rgba(124,148,115,0.10);font-size:12.5px;color:#5F7457;">Guardamos los cambios del perfil.</div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contacto</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Correo</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;">lucia.mendoza@gmail.com</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Teléfono</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">+591 691 44 307</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Plan</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:13.5px;color:#7A716D;">Sin plan activo</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11px;font-weight:500;white-space:nowrap;">Expirado</span>
+              </div>
+              <span style="font-size:11.5px;color:#7A716D;">Último plan vencido el 30/06/2026.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
+                <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 0,00</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Clientas referidas</span>
+                  <span style="font-size:13.5px;color:#7A716D;">Ninguna todavía</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Código</span>
+                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">LUCIA25</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;gap:8px;">
+            <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
+            <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Panel · Coordinadora</div>
+          <div style="font-size:12px;color:#766D69;">Sin ningún monto ni «Cerrar cuenta»: la coordinadora solo corrige el perfil (ADR-0102)</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:720px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">LM</div>
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Lucía Mendoza</h3>
+                <span style="font-size:11.5px;color:#766D69;">Cliente desde 03/07/2025</span>
+              </div>
+            </div>
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:22px;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contacto</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Correo</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;">lucia.mendoza@gmail.com</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Teléfono</span>
+                  <span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">+591 691 44 307</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Plan</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                <span style="font-size:13.5px;color:#7A716D;">Sin plan activo</span>
+                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11px;font-weight:500;white-space:nowrap;">Expirado</span>
+              </div>
+              <span style="font-size:11.5px;color:#7A716D;">Último plan vencido el 30/06/2026.</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
+              <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                  <span style="font-size:12.5px;color:#766D69;">Clientas referidas</span>
+                  <span style="font-size:13.5px;color:#7A716D;">Ninguna todavía</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Código</span>
+                  <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">LUCIA25</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;gap:8px;">
+            <button style="height:34px;padding:0 14px;border:1px solid #CDBBAD;border-radius:8px;background:#F5EFE8;color:#4A4A4A;font-size:13px;font-weight:500;cursor:pointer;">Editar perfil</button>
           </div>
         </div>
       </div>

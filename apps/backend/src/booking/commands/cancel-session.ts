@@ -1,3 +1,4 @@
+import { runsOperations } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from './create-booking';
 
@@ -22,15 +23,13 @@ type CancelSessionDependencies = {
 };
 
 // Last-resort cancellation when no substitute Trainer is available: only an
-// Administrator, only a future scheduled Session that still has Bookings.
+// Administrator or the Coordinator (ADR-0102), only a future scheduled Session
+// that still has Bookings.
 export const cancelSession = async (
   command: { sessionId: string },
   dependencies: CancelSessionDependencies,
 ): Promise<SessionCancellationResult> => {
-  if (
-    dependencies.principal.identity.kind !== 'staff' ||
-    dependencies.principal.identity.role !== 'administrator'
-  ) {
+  if (!runsOperations(dependencies.principal)) {
     throw new BookingAccessDeniedError();
   }
 

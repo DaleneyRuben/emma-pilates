@@ -141,3 +141,21 @@ export const parseClientDirectoryQuery = (value: unknown) =>
       q === undefined || q === '' ? paging : { ...paging, query: q },
     )
     .safeParse(value);
+
+// IDN-009 (AW22 «Editar perfil»): the name and phone; the login email stays
+// the Client's own (IDN-008).
+export class UpdateAdminClientProfileDto {
+  @ApiProperty({ minLength: 1, maxLength: 100 })
+  name!: string;
+
+  @ApiProperty({ type: String, nullable: true, maxLength: 30 })
+  phone!: string | null;
+}
+
+export const parseUpdateAdminClientProfile = (value: unknown) =>
+  z
+    .strictObject({
+      name: z.string().max(100),
+      phone: z.string().max(30).nullable(),
+    })
+    .safeParse(value);

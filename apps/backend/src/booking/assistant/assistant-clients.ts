@@ -1,3 +1,4 @@
+import { worksAtBranch } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import type { PlanSummary } from '../catalog/catalog-repository';
 import type { ClassHistoryEntry } from '../class-history';
@@ -64,20 +65,27 @@ type StaffIdentity = Extract<
   { kind: 'staff' }
 >;
 
-// Assistants act for any Client; Administrators cover every Branch.
+// Assistants act for any Client; Administrators and the Coordinator cover
+// every Branch (ADR-0102).
 const requireAssistant = (principal: AuthenticatedPrincipal): StaffIdentity => {
   if (
     principal.identity.kind !== 'staff' ||
     (principal.identity.role !== 'assistant' &&
-      principal.identity.role !== 'administrator')
+      principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
   ) {
     throw new BookingAccessDeniedError();
   }
   return principal.identity;
 };
 
-const actsAtBranch = (identity: StaffIdentity, branchId: string): boolean =>
-  identity.role === 'administrator' || identity.branchIds.includes(branchId);
+// Selling stays with the front desk and the Administrator: the Coordinator
+// never sees a price or a Credit amount (ADR-0102).
+const requireSeller = (principal: AuthenticatedPrincipal): StaffIdentity => {
+  const identity = requireAssistant(principal);
+  if (identity.role === 'coordinator') throw new BookingAccessDeniedError();
+  return identity;
+};
 
 type ClientLookup = {
   findClient(clientId: string): Promise<AssistantClientSummary | null>;
@@ -170,7 +178,7 @@ export const listAssistantClientBookings = async (
 
   return upcoming.map((item) => ({
     ...item,
-    actionable: actsAtBranch(identity, item.branchId),
+    actionable: worksAtBranch(identity, item.branchId),
   }));
 };
 
@@ -193,7 +201,7 @@ export const quotePlansForClient = async (
     listVisiblePlans(): Promise<PlanSummary[]>;
   },
 ): Promise<PlanQuotes> => {
-  requireAssistant(dependencies.principal);
+  requireSeller(dependencies.principal);
   await requireClient(command.clientId, dependencies);
   const plans = await dependencies.listVisiblePlans();
 

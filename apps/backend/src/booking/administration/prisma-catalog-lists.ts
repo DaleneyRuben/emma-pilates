@@ -1,6 +1,9 @@
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { requireAdministrator } from './administration-errors';
+import {
+  requireAdministrator,
+  requireOperations,
+} from './administration-errors';
 
 export type CatalogStatus = 'active' | 'archived' | 'all';
 export type PlanVisibility = 'visible' | 'hidden' | 'all';
@@ -29,7 +32,7 @@ export const createPrismaCatalogLists = (prisma: PrismaClient) => ({
     input: Paging & { status: CatalogStatus },
     principal: AuthenticatedPrincipal,
   ) => {
-    requireAdministrator(principal);
+    requireOperations(principal);
     const where = archivedWhere(input.status) satisfies Prisma.BranchWhereInput;
     const [items, totalItems] = await prisma.$transaction([
       prisma.branch.findMany({
@@ -47,7 +50,7 @@ export const createPrismaCatalogLists = (prisma: PrismaClient) => ({
     input: Paging & { status: CatalogStatus },
     principal: AuthenticatedPrincipal,
   ) => {
-    requireAdministrator(principal);
+    requireOperations(principal);
     const where = archivedWhere(
       input.status,
     ) satisfies Prisma.ClassTypeWhereInput;

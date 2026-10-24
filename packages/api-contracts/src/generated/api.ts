@@ -201,6 +201,7 @@ import type {
   TransferInstructionsDto,
   UnreadNotificationCountDto,
   UpcomingBookingDto,
+  UpdateAdminClientProfileDto,
   UpdateClientProfileDto,
   UpdateStudioSettingsDto,
   UploadStatusDto,
@@ -16797,6 +16798,141 @@ export function useGetAdminClient<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type updateAdminClientProfileResponse200 = {
+  data: AdminClientDetailDto;
+  status: 200;
+};
+
+export type updateAdminClientProfileResponseSuccess =
+  updateAdminClientProfileResponse200 & {
+    headers: Headers;
+  };
+export type updateAdminClientProfileResponse =
+  updateAdminClientProfileResponseSuccess;
+
+export const getUpdateAdminClientProfileUrl = (clientId: string) => {
+  return `/api/v1/administrator/clients/${clientId}`;
+};
+
+export const updateAdminClientProfile = async (
+  clientId: string,
+  updateAdminClientProfileDto: UpdateAdminClientProfileDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateAdminClientProfileResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getUpdateAdminClientProfileUrl(clientId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(updateAdminClientProfileDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateAdminClientProfileResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateAdminClientProfileResponse;
+};
+
+export const getUpdateAdminClientProfileMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateAdminClientProfile>>,
+    TError,
+    UpdateAdminClientProfileMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateAdminClientProfile>>,
+  TError,
+  UpdateAdminClientProfileMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updateAdminClientProfile"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateAdminClientProfile>>,
+    UpdateAdminClientProfileMutationVariables
+  > = (props) => {
+    const { clientId, data } = props ?? {};
+
+    return updateAdminClientProfile(clientId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateAdminClientProfileMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateAdminClientProfile>>
+>;
+export type UpdateAdminClientProfileMutationBody = UpdateAdminClientProfileDto;
+export type UpdateAdminClientProfileMutationError = unknown;
+export type UpdateAdminClientProfileMutationVariables = {
+  clientId: string;
+  data: UpdateAdminClientProfileDto;
+};
+
+export const useUpdateAdminClientProfile = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateAdminClientProfile>>,
+      TError,
+      UpdateAdminClientProfileMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateAdminClientProfile>>,
+  TError,
+  UpdateAdminClientProfileMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getUpdateAdminClientProfileMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type listAdminPaymentsResponse200 = {
   data: AdminPaymentPageDto;
