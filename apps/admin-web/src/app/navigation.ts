@@ -269,5 +269,8 @@ export const navigationGroupsFor = (
         .filter((group) => group.items.length > 0);
 
 /** Whether the Coordinator may open a page; the API refuses the rest. */
+const coordinatorDeniedPaths = ["/back-office/clientes/campana"];
+
 export const coordinatorMayOpen = (pathname: string): boolean =>
-  navigationItemOf(pathname)?.coordinator === true;
+  navigationItemOf(pathname)?.coordinator === true &&
+  !coordinatorDeniedPaths.includes(pathname);

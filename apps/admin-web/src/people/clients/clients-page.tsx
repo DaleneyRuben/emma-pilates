@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
 import { CatalogPage, RowOpener } from "../../catalog/catalog-page";
+import { useAdminRole } from "../../session/admin-role";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { countFormat } from "../../components/table/pagination";
 import { SearchFilter } from "../../components/table/search-filter";
@@ -95,6 +96,7 @@ export function ClientsPage({
   onSearchChange: SearchChange<ClientSearch>;
 }) {
   const query = useQuery(clientTableQueryOptions(search));
+  const role = useAdminRole();
   const studio = query.data?.studioClientCount;
 
   return (
@@ -110,12 +112,14 @@ export function ClientsPage({
       emptyMessage={<EmptyDirectory searching={search.q !== undefined} />}
       panelTitles={{ create: "Detalle de cliente", edit: (row) => row.name }}
       actions={
-        <Link
-          to="/back-office/clientes/campana"
-          className="inline-flex h-[38px] items-center rounded-control bg-primario px-4 text-cuerpo font-medium text-blanco shadow-boton hover:bg-primario-hover"
-        >
-          Dar clases de campaña
-        </Link>
+        role === "administrator" ? (
+          <Link
+            to="/back-office/clientes/campana"
+            className="inline-flex h-[38px] items-center rounded-control bg-primario px-4 text-cuerpo font-medium text-blanco shadow-boton hover:bg-primario-hover"
+          >
+            Dar clases de campaña
+          </Link>
+        ) : null
       }
       filter={
         <SearchFilter
