@@ -49,7 +49,6 @@ const directory = (
   read: jest.fn().mockResolvedValue(lucia),
   findActiveSubscription: jest.fn().mockResolvedValue(null),
   findLatestSubscription: jest.fn().mockResolvedValue(null),
-  readAvailableCredit: jest.fn().mockResolvedValue(105_000),
   readClosureOutlook: jest.fn().mockResolvedValue(outlook),
   saveProfile: jest
     .fn()
@@ -81,7 +80,6 @@ describe('the Coordinator in the Client directory (ADR-0102)', () => {
       closure: outlook,
       creditAvailableCentavos: 0,
     });
-    expect(clients.readAvailableCredit).not.toHaveBeenCalled();
   });
 });
 

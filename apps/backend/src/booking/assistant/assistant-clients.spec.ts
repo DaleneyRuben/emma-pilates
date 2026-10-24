@@ -152,16 +152,13 @@ describe('Assistant Client overview', () => {
     });
   });
 
-  it('shows the Coordinator the same overview without the Credit amount (ADR-0102)', async () => {
-    const readAvailableCredit = jest.fn().mockResolvedValue(6_000);
-
+  it('shows the Coordinator the same overview with Credit retired (ADR-0102)', async () => {
     await expect(
       readClientOverview(
         { clientId: 'client-id' },
         {
           ...dependencies,
           principal: staff('coordinator', []),
-          readAvailableCredit,
         },
       ),
     ).resolves.toEqual({
@@ -171,7 +168,6 @@ describe('Assistant Client overview', () => {
       recentHistory: history.slice(0, 2),
       creditAvailableCentavos: 0,
     });
-    expect(readAvailableCredit).not.toHaveBeenCalled();
   });
 
   it('reports a missing Client', async () => {
@@ -321,7 +317,6 @@ describe('Assistant Plan quotes and cash Payment', () => {
           principal: staff('coordinator', []),
           findClient: jest.fn().mockResolvedValue(clientRecord),
           listVisiblePlans: jest.fn().mockResolvedValue(plans),
-          readAvailableCredit: jest.fn().mockResolvedValue(6_000),
         },
       ),
     ).rejects.toBeInstanceOf(BookingAccessDeniedError);
