@@ -1,5 +1,5 @@
 import type { StaffMemberDto } from "@pilates/api-contracts";
-import type { StaffRole } from "../people-search";
+import { holdsEveryBranch, type StaffRole } from "../people-search";
 
 // AW23's labels: a Role is a fixed category, drawn as a neutral label.
 export const roleLabels: Record<StaffRole, string> = {
@@ -7,6 +7,7 @@ export const roleLabels: Record<StaffRole, string> = {
   assistant: "Asistente",
   administrator: "Administración",
   nutritionist: "Nutricionista",
+  coordinator: "Coordinador",
 };
 
 type Status = StaffMemberDto["status"];
@@ -20,12 +21,12 @@ export const statusPills: Record<
   deactivated: { tone: "neutral", label: "Desactivado" },
 };
 
-/** "Todas" for an Administrator, who holds every Branch implicitly. */
+/** "Todas" for the Roles that hold every Branch implicitly. */
 export function branchNames(
   member: Pick<StaffMemberDto, "role" | "branchIds">,
   names: ReadonlyMap<string, string>,
 ): string {
-  if (member.role === "administrator") return "Todas";
+  if (holdsEveryBranch(member.role)) return "Todas";
   return member.branchIds
     .map((id) => names.get(id))
     .filter((name): name is string => name !== undefined)

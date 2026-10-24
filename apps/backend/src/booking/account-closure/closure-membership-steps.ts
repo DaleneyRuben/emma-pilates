@@ -1,11 +1,9 @@
 import type { Prisma } from '../../generated/prisma/client';
 import {
   CreditLedgerActorKind,
-  CreditLedgerEntryKind,
   PurchaseIntentState,
   SubscriptionState,
 } from '../../generated/prisma/client';
-import { summarizeCredit } from '../payments/credit-summary';
 import {
   scheduleReceiptDeletion,
   settleReservation,
@@ -15,13 +13,11 @@ import { closureScope } from './closure-scope';
 
 type Steps = Pick<
   ClosureTransaction,
-  | 'hasPendingTransferPayment'
-  | 'releaseOpenPurchaseIntent'
-  | 'endSubscription'
-  | 'forfeitCredit'
+  'hasPendingTransferPayment' | 'releaseOpenPurchaseIntent' | 'endSubscription'
 >;
 
-// The Payment, Subscription, and Credit steps of Account closure (G3, G5).
+// The Payment and Subscription steps of Account closure (G3, G5). Credit is
+// retired (booking ADR-0009), so closure forfeits none.
 export const createMembershipSteps = (
   transaction: Prisma.TransactionClient,
 ): Steps => ({
@@ -30,8 +26,8 @@ export const createMembershipSteps = (
       where: closureScope.pendingPayments(clientId),
     })) > 0,
 
-  // An open Intent holds Credit and possibly an uploaded receipt; both go
-  // back the way the expiry job returns them.
+  // An open Intent may hold an uploaded receipt (and, from before PAY-005,
+  // Credit); both go back the way the expiry job returns them.
   releaseOpenPurchaseIntent: async ({ clientId, accountId, occurredAt }) => {
     const intent = await transaction.purchaseIntent.findFirst({
       where: { clientId, state: PurchaseIntentState.OPEN },
@@ -71,31 +67,5 @@ export const createMembershipSteps = (
       data: { state: SubscriptionState.EXPIRED, expiredAt: occurredAt },
     });
     return { forfeitedClasses: active.remainingClassAllowance };
-  },
-
-  forfeitCredit: async ({ clientId, accountId, occurredAt, correlationId }) => {
-    const entries = await transaction.creditLedgerEntry.findMany({
-      where: { clientId },
-      select: { kind: true, amountCentavos: true },
-    });
-    const { availableCentavos } = summarizeCredit(
-      entries.map((entry) => ({
-        kind: entry.kind.toLowerCase() as Lowercase<CreditLedgerEntryKind>,
-        amountCentavos: entry.amountCentavos,
-      })),
-    );
-    if (availableCentavos <= 0) return 0;
-    await transaction.creditLedgerEntry.create({
-      data: {
-        clientId,
-        kind: CreditLedgerEntryKind.ACCOUNT_CLOSURE,
-        amountCentavos: availableCentavos,
-        occurredAt,
-        actorKind: CreditLedgerActorKind.ACCOUNT,
-        actorAccountId: accountId,
-        correlationId,
-      },
-    });
-    return availableCentavos;
   },
 });

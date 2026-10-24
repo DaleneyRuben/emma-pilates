@@ -83,7 +83,7 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   ).toBeVisible();
   await expect(pending).toHaveCount(0);
   await expect(valentina).toHaveCount(0);
-  await expect(page.getByText("Mostrando 1–6 de 6 miembros")).toBeVisible();
+  await expect(page.getByText("Mostrando 1–7 de 7 miembros")).toBeVisible();
 
   await page.getByRole("button", { name: "Camila Rojas" }).click();
   const camila = page.getByRole("dialog", { name: "Editar miembro" });

@@ -79,6 +79,24 @@ describe('back office endpoints (e2e)', () => {
     updateExpense: operation(),
   };
   const report = { expenseReport: operation() };
+  const finance = {
+    monthResult: operation(),
+    seedOpeningBudget: operation(),
+  };
+  finance.monthResult.mockResolvedValue({
+    month: new Date('2026-09-01T00:00:00.000Z'),
+    cashIncomeCentavos: 0,
+    taxRatePercent: 16,
+    taxCentavos: 0,
+    budgetSubtotalCentavos: 0,
+    contingencyCentavos: 0,
+    budgetTotalCentavos: 0,
+    lines: [],
+    nutritionistCostCentavos: 0,
+    resultCentavos: 0,
+    breakEvenCentavos: 0,
+  });
+  finance.seedOpeningBudget.mockResolvedValue({ seeded: false });
 
   beforeEach(async () => {
     resolvePrincipal.mockResolvedValue({
@@ -154,7 +172,7 @@ describe('back office endpoints (e2e)', () => {
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
         {
           provide: backOfficeOperations,
-          useValue: { supplies, salaryPayments, expenses, report },
+          useValue: { supplies, salaryPayments, expenses, report, finance },
         },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],

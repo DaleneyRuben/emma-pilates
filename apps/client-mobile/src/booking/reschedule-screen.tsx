@@ -21,10 +21,12 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { randomUUID } from "expo-crypto";
+import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
 import type { ConfirmedBooking } from "./session-detail-screen";
 import {
   boliviaCivilDate,
@@ -80,6 +82,8 @@ export function RescheduleScreen({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  // One key per confirmation screen, so a second tap replays the same move.
+  const idempotencyKey = useRef(randomUUID());
 
   const confirm = async () => {
     if (selectedId === null || booking.bookingId === undefined) return;
@@ -92,7 +96,10 @@ export function RescheduleScreen({
         booking.bookingId,
         {
           body: JSON.stringify({ targetSessionId: selectedId }),
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "idempotency-key": idempotencyKey.current,
+          },
         },
         fetcher,
       );
@@ -108,7 +115,10 @@ export function RescheduleScreen({
         });
         return;
       }
-      setFailure("No pudimos reprogramar la reserva. Inténtalo de nuevo.");
+      setFailure(
+        bookingRejectionMessage(problemCode(response.data)) ??
+          "No pudimos reprogramar la reserva. Inténtalo de nuevo.",
+      );
     } catch {
       setFailure("No pudimos reprogramar la reserva. Inténtalo de nuevo.");
     } finally {

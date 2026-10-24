@@ -33,7 +33,7 @@ test("a narrow browser gets the drawer, the bottom-sheet selector, and card rows
     .getByRole("dialog", { name: "Menú" })
     .getByRole("link", { name: "Personal" })
     .click();
-  await expect(page.getByText("Mostrando 1–6 de 6 miembros")).toBeVisible();
+  await expect(page.getByText("Mostrando 1–7 de 7 miembros")).toBeVisible();
   // The header row is hidden and each cell carries its column name.
   await expect(page.getByRole("columnheader", { name: "Rol" })).toBeHidden();
   const roleCell = page.getByRole("cell", { name: "Administración" });

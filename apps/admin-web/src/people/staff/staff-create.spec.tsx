@@ -75,7 +75,13 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       within(roles)
         .getAllByRole("radio")
         .map((radio) => radio.getAttribute("value")),
-    ).toEqual(["trainer", "assistant", "administrator", "nutritionist"]);
+    ).toEqual([
+      "trainer",
+      "assistant",
+      "administrator",
+      "nutritionist",
+      "coordinator",
+    ]);
     expect(within(roles).queryByRole("radio", { checked: true })).toBeNull();
 
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));

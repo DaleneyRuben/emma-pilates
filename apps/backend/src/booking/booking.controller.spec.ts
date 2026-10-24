@@ -23,10 +23,12 @@ describe('BookingController', () => {
   const createBooking = jest.fn();
   const joinWaitlist = jest.fn();
   const listAvailability = jest.fn();
+  const classesLeft = jest.fn().mockResolvedValue(null);
   const controller = new BookingController(
     createBooking,
     joinWaitlist,
     listAvailability,
+    classesLeft,
     resolvePrincipal,
   );
 
@@ -51,6 +53,34 @@ describe('BookingController', () => {
       { sessionId: '11111111-1111-4111-8111-111111111111' },
       principal,
       '22222222-2222-4222-8222-222222222222',
+    );
+  });
+
+  it('attaches the classes left this week for a Client', async () => {
+    classesLeft.mockResolvedValue(2);
+    listAvailability.mockResolvedValue([
+      {
+        id: 'session-id',
+        startsAt: new Date('2026-09-15T15:00:00.000Z'),
+      },
+    ]);
+
+    await expect(
+      controller.list('Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', {
+        branchId: '11111111-1111-4111-8111-111111111111',
+        from: '2026-09-15T14:00:00.000Z',
+        until: '2026-09-16T14:00:00.000Z',
+      }),
+    ).resolves.toEqual([
+      {
+        id: 'session-id',
+        startsAt: new Date('2026-09-15T15:00:00.000Z'),
+        classesLeftThisWeek: 2,
+      },
+    ]);
+    expect(classesLeft).toHaveBeenCalledWith(
+      'client-id',
+      new Date('2026-09-15T14:00:00.000Z'),
     );
   });
 

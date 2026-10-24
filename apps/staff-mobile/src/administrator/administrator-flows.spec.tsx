@@ -58,6 +58,7 @@ const review = (payment: typeof carla, state = "pending") => ({
   state,
   planId: "plan-1",
   planName: payment.planName,
+  durationDays: 30,
   durationMonths: 1,
   classAllowance: 8,
   planPriceCentavos: payment.amountDueCentavos,

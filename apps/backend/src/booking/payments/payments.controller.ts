@@ -42,8 +42,10 @@ import {
   PaymentDto,
   parseAttachReceipt,
   parseCreatePurchaseIntent,
+  parseSubmitTransfer,
   PurchaseIntentDto,
   ReferralsDto,
+  SubmitTransferDto,
   TransferInstructionsDto,
 } from './payments.dto';
 import type { PaymentCommands } from './prisma-payment-commands';
@@ -160,7 +162,16 @@ export class PurchaseIntentsController extends AuthenticatedPaymentController {
     const principal = await this.authenticate(authorization);
 
     return runPaymentCommand(() =>
-      this.commands.createPurchaseIntent(parsed, principal, key),
+      this.commands.createPurchaseIntent(
+        {
+          planId: parsed.planId,
+          ...(parsed.startsOn === undefined
+            ? {}
+            : { startsOn: parsed.startsOn }),
+        },
+        principal,
+        key,
+      ),
     );
   }
 
@@ -214,20 +225,24 @@ export class PurchaseIntentsController extends AuthenticatedPaymentController {
   @ApiOperation({ operationId: 'submitPurchaseIntentTransfer' })
   @ApiParam({ name: 'purchaseIntentId', format: 'uuid' })
   @ApiHeader(idempotencyHeader)
+  @ApiBody({ type: SubmitTransferDto, required: false })
   @ApiCreatedResponse({ type: PaymentDto })
   @Header('Cache-Control', 'no-store')
   async submit(
     @Param('purchaseIntentId') purchaseIntentId: string,
     @Headers('authorization') authorization: string | undefined,
     @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Body() body: unknown,
   ): Promise<PaymentDto> {
+    const parsed = parseSubmitTransfer(body);
+    if (parsed === null) throw invalidRequest('Invalid Invoice Data');
     const intentId = requireIntentId(purchaseIntentId);
     const key = requireIdempotencyKey(idempotencyKey);
     const principal = await this.authenticate(authorization);
 
     return runPaymentCommand(() =>
       this.commands.submitTransfer(
-        { purchaseIntentId: intentId },
+        { purchaseIntentId: intentId, invoiceData: parsed.invoiceData },
         principal,
         key,
       ),
@@ -247,7 +262,12 @@ export class CreditPurchasesController extends AuthenticatedPaymentController {
   }
 
   @Post()
-  @ApiOperation({ operationId: 'completeCreditPurchase' })
+  @ApiOperation({
+    operationId: 'completeCreditPurchase',
+    deprecated: true,
+    description:
+      'Credit was retired (PAY-005): always refused with credit_insufficient',
+  })
   @ApiHeader(idempotencyHeader)
   @ApiBody({ type: CreatePurchaseIntentDto })
   @ApiCreatedResponse({ type: PaymentDto })
@@ -260,11 +280,11 @@ export class CreditPurchasesController extends AuthenticatedPaymentController {
     const parsed = parseCreatePurchaseIntent(body);
     if (parsed === null)
       throw invalidRequest('Invalid Credit purchase request');
-    const key = requireIdempotencyKey(idempotencyKey);
+    requireIdempotencyKey(idempotencyKey);
     const principal = await this.authenticate(authorization);
 
     return runPaymentCommand(() =>
-      this.commands.completeCreditPurchase(parsed, principal, key),
+      this.commands.completeCreditPurchase(principal),
     );
   }
 }
@@ -308,7 +328,11 @@ export class ClientCreditController extends AuthenticatedPaymentController {
   }
 
   @Get()
-  @ApiOperation({ operationId: 'getCurrentClientCredit' })
+  @ApiOperation({
+    operationId: 'getCurrentClientCredit',
+    deprecated: true,
+    description: 'Credit was retired (PAY-005): reads zero with no activity',
+  })
   @ApiOkResponse({ type: CreditDto })
   @Header('Cache-Control', 'no-store')
   async read(

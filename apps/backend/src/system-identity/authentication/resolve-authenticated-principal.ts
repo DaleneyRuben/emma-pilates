@@ -2,10 +2,11 @@ import {
   authenticationSessionLifetimes,
   type AuthenticationSurface,
 } from './create-authentication-session';
+import type { StaffRoleCode } from './staff-role';
 
 export class AuthenticationRequiredError extends Error {}
 
-type StaffRole = 'TRAINER' | 'NUTRITIONIST' | 'ASSISTANT' | 'ADMINISTRATOR';
+type StaffRole = StaffRoleCode;
 
 type StaffMemberRecord = {
   id: string;

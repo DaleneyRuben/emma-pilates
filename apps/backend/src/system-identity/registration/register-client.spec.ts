@@ -74,6 +74,7 @@ describe('RegisterClient', () => {
       passwordHash: 'argon2id-password-hash',
       referralCode: 'ANA-REFERRAL',
       referredByCode: 'REF-LUCIA',
+      acquisitionChannel: 'unknown',
       pendingExpiresAt: new Date('2026-09-06T18:00:00.000Z'),
       verificationToken: {
         id: 'verification-token-id',

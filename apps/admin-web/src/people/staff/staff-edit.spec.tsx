@@ -13,6 +13,7 @@ import {
   allBranchesHandler,
   emma,
   paolaMember,
+  referralCodeHandler,
   staffMembersPath,
   staffPage,
   valentina,
@@ -36,7 +37,11 @@ describe("AW24 Editar miembro", () => {
   useMockServer();
   beforeEach(() => {
     sent.length = 0;
-    server.use(...signedInHandlers(), allBranchesHandler());
+    server.use(
+      ...signedInHandlers(),
+      allBranchesHandler(),
+      referralCodeHandler(),
+    );
   });
 
   it("shows the contact read-only and removes a Branch after warning about assigned Sessions", async () => {

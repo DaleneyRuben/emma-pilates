@@ -19,8 +19,8 @@ export function describeCount(count: number, singular: string, plural: string): 
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
-// S14: the cancellation, the refund even inside the 2 h 30 Cancellation
-// Window, and who is told, with the Session's live counts.
+// S14: the cancellation, the refund even inside the Cancellation Window, and
+// who is told, with the Session's live counts.
 export function describeSessionCancellation({
   bookedCount,
   waitlistCount,

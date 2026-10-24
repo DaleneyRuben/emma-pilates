@@ -4,7 +4,7 @@ import { detachImageAsset } from '../../uploads/image-asset-attachments';
 export const closedClientName = 'Cliente eliminado';
 
 // ADR-0097: the closed Client keeps its rows for the studio's history but
-// loses its name, phone, and profile photo; a Client who ticked the
+// loses its name, phone, profile photo, and Invoice Data; a Client who ticked the
 // promotions box is first copied into an unlinked Promotion Contact, and an
 // open Promotions Consent ends (ADR-0098).
 export const createPersonalDataSteps = (
@@ -59,6 +59,11 @@ export const createPersonalDataSteps = (
         phone: null,
         profileImageAssetId: null,
       },
+    });
+    // PAY-007: her sales stay, without the NIT or CI and name she gave.
+    await transaction.payment.updateMany({
+      where: { clientId: input.clientId, invoiceTaxId: { not: null } },
+      data: { invoiceTaxId: null, invoiceName: null },
     });
     if (profileImageAssetId !== null) {
       await detachImageAsset(transaction, {

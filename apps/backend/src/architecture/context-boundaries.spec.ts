@@ -9,6 +9,7 @@ const contexts = [
   'back-office',
   'booking',
   'notifications',
+  'studio',
   'system-identity',
   'uploads',
 ];
@@ -16,11 +17,16 @@ const allowedContextEdges: Record<string, string[]> = {
   // Back Office reads Branches and Staff Members through its own read-only
   // queries (ADR-0011) and imports no other context.
   'back-office': [],
+  // Studio Management reads Booking through its own queries and imports no
+  // other context (ADR-0011).
+  studio: [],
   // Booking records notifications and streams receipt objects through the
   // uploads storage port.
   booking: ['notifications', 'uploads'],
   notifications: [],
-  'system-identity': [],
+  // Feedback notifies the Administrators through the notification recorder
+  // (REL-012).
+  'system-identity': ['notifications'],
   uploads: [],
 };
 // Every context may authenticate callers through the shared authentication
@@ -31,6 +37,16 @@ const sharedContextSlices = [
   // Registration attributes the referrer inside its own transaction through
   // this Booking-owned slice (PAY-001 decision d).
   'booking/payments/referral-attribution',
+  // Registration and the Assistant's invitation record how the new Client
+  // found the studio in the same transaction (BKM-011).
+  'booking/acquisition/acquisition',
+  'booking/acquisition/acquisition-errors',
+  'booking/acquisition/record-client-acquisition',
+  // Registration opens the friend's Guest Pass in the same transaction
+  // (BKM-014).
+  'booking/payments/open-guest-pass',
+  // Finanzas asks Booking for the month's Nutritionist cost (ADR-0103).
+  'booking/evaluations/nutritionist-cost',
   // Staff management creates, reissues, and disables the Staff Member's
   // Account inside its own transaction through this System Identity slice
   // (IDN-007).

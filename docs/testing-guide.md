@@ -7,8 +7,8 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
-| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment with the invoice data, Mi plan, the referral code, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); report an equipment fault from a Session as a Trainer (Test 82) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
@@ -24,17 +24,23 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
+| Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
+| Founder membership           | The first 40 Clients whose first real Payment is confirmed get 15 % off later Plans except the single class, a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; the first Payment itself is at list price |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
-| Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
-| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
+| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
+| Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
+| Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
+| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation, class, and Plan reminders (Tests 7 and 105), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
-| Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
+| Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); Inicio from the last profile when the phone has no connection (Test 75); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
-| Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
+| Weekly cap                   | Book up to the cap snapshotted on a Plan, see `classesLeftThisWeek` count down, and get `409 weekly_cap_reached` on the next Booking or Waitlist join unless an extra class remains (Test 91) | The «Te quedan N clases esta semana» line on Reservar is follow-up 203 and is still pending; the mobile screens were not walked on a device |
+| Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 83) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
+| Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
 
@@ -44,44 +50,55 @@ can be found by its design name.
 
 | Client app | Tests |
 | --- | --- |
-| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71 |
-| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70 |
-| 12 Mi plan | 5, 18, 71 |
-| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
-| 16 Mis referidos, 17 Mi crédito | 10, 18 |
-| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
+| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107 |
+| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81, 87, 88, 89 |
+| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
+| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93 |
+| 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
-| 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
+| 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 104 |
+| 25 Enviar comentarios | 19, 80 |
 
 | Staff app | Tests |
 | --- | --- |
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
-| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19 |
-| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
+| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106 |
+| S26 Reportar una falla (Entrenadora) | 82 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89 |
+| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
-| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
-| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
+| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93 |
+| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 95, 106 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
+| S27 Enviar comentarios | 19, 80 |
 
 | Admin web | Tests |
 | --- | --- |
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
+| AW36 Reglas del estudio (from AW33) | 75 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
-| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
-| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72 |
+| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82 |
+| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
-| AW16 Reporte de ingresos y gastos | 30, 31 |
+| AW37 Equipos | 82 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99 |
+| AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
-| AW23–AW24 Personal | 26, 31, 72 |
-| AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
-| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90 |
+| AW39 Para contactar | 84 |
+| AW40 Fundadoras | 88 |
+| AW41 Congelamientos | 92 |
+| AW23–AW24 Personal | 26, 31, 72, 79 |
+| AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72, 93 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89 |
+| AW38 Comentarios | 80 |
+| AW151 Caja | 76 |
 
 ## Before you begin
 
@@ -161,7 +178,7 @@ with the sage check, and a dead or unusable link with a Palo de rosa circle
 (a clock for an expired, used, or removed link, an envelope while 22
 confirms, a struck circle for an invalid email-change link, an at sign for an
 address already in use). These navigation checks do not need the backend.
-Once signed in, every screen opened from a tab or a list (Mi plan, Mi crédito,
+Once signed in, every screen opened from a tab or a list (Mi plan, Mis referidos,
 Notificaciones, Editar perfil, Cambiar contraseña, a Plan, and the rest) opens
 under the same top bar, the chevron (read as "Volver") and the screen's title
 over a thin rule. A Plan's bar shows the Plan's name, a class opened from
@@ -402,11 +419,14 @@ In Swagger, open `POST /api/v1/client-registrations` and send:
 {
   "name": "Ana Clienta",
   "email": "ana+1@example.com",
-  "password": "a local test password"
+  "password": "a local test password",
+  "acquisitionChannel": "instagram"
 }
 ```
 
-Expected response code: `202`.
+Expected response code: `202`. `acquisitionChannel` is «¿Cómo nos
+conociste?» (BKM-011, Test 79); a request without it, as older store builds
+send, still registers and records `unknown`.
 
 The response looks like this:
 
@@ -530,8 +550,8 @@ resets every fixture Session to its scheduled start and end time while keeping
 cancellations, so run it again if class times ever look shifted by four hours.
 It creates three Branches (Centro, Equipetrol, Urubó), three Class Types, the
 four designed Plans (Paquete de 8 clases, Bs 560; Paquete de 12 clases,
-Bs 780; Mensual 16 clases, Bs 1 050; Trimestral 36 clases, Bs 2 100 for three
-months), weekly Session Schedules with the next 30 days of
+Bs 780; Mensual 16 clases, Bs 1 050, each valid 30 days; Trimestral 36 clases,
+Bs 2 100, valid 90 days with a Weekly Cap of 4), weekly Session Schedules with the next 30 days of
 Sessions, Gabriela's weekly Availability Blocks with their next 30 days of
 Evaluation slots, and these active Accounts. Every fixture Account uses the password `emma-local-2026`.
 
@@ -540,13 +560,14 @@ Evaluation slots, and these active Accounts. Every fixture Account uses the pass
 | `lucia@example.com`          | Client        | Active Plan with 5 of 8 classes left          |
 | `valeria@example.com`        | Client        | Active Plan expiring in 3 days, 2 classes left; paid in cash; referred by Sofía |
 | `isabel@example.com`         | Client        | Active Plan with no classes left              |
-| `sofia@example.com`          | Client        | Expired Plan; Bs 60 of referral Credit; referred Valeria (awarded) and Mariana (pending) |
+| `sofia@example.com`          | Client        | Expired Plan; referred Valeria and Mariana (both pending: PAY-005 retired the Bs 60 Credit; a database loaded before it keeps an old award row that nothing shows) |
 | `mariana@example.com`        | Client        | Never purchased a Plan; referred by Sofía     |
 | `emma.vargas@example.com`    | Trainer       | Leads Sessions in all three Branches          |
 | `daniela.ortiz@example.com`  | Trainer       | Leads Sessions in Centro and Urubó            |
 | `andrea.suarez@example.com`  | Trainer       | Leads Pilates Prenatal in Equipetrol          |
 | `camila.rojas@example.com`   | Assistant     | Assigned to Centro                            |
 | `paola.mendoza@example.com`  | Administrator | Covers every Branch                           |
+| `carolina.rivas@example.com` | Coordinator   | Every Branch; operations without money (ADR-0102) |
 | `gabriela.flores@example.com`| Nutritionist  | Assigned to Centro                            |
 
 The 30-day window starts on the day you run the command. With the worker
@@ -559,8 +580,9 @@ and ignores schedules at an archived Branch, for an archived Class Type, or
 whose Trainer is not assigned to that Branch.
 
 The running worker also cancels, once and for good, every fixture Session that
-still has no Bookings two hours before it starts, and tells its Trainer. Book
-a class first if you want to keep it for a manual test (Test 13).
+has fewer than 2 Bookings three hours before it starts, and tells its Trainer
+and its booked Clients. Book a class with two Clients first if you want to
+keep it for a manual test (Test 13).
 
 These fixtures are for your local databases only, whose data is public and
 resettable. Never load them into production.
@@ -613,7 +635,11 @@ share. A full Session keeps the count at «0 de M» beside the same grey
 **Lleno** pill as the list (never red) and greys the bar. **Reservar**
 creates a real Booking and lands on **Mis reservas** with a "Reserva
 confirmada" notice and the updated class balance. A full Session offers
-**Unirme a la lista de espera**, and a Client without remaining classes sees
+**Unirme a la lista de espera** while it is still outside the Cancellation
+Window. Inside it (a full class less than 2 h 30 away, or whatever window
+the studio rules currently hold) the button is gone and the note reads
+«Falta poco para la clase, así que la lista de espera ya cerró.» (Test 76).
+A Client without remaining classes sees
 the disabled button with a link to the Plans.
 
 **Mis reservas** lists upcoming Bookings and Waitlist entries. A Booking more
@@ -646,7 +672,7 @@ existing cards still in place (before UX-004 it stayed hidden until the app
 restarted). Returning from a screen a list opened (Detalle de sesión,
 Reprogramar, Historial) refreshes it the same way. Pull any list down
 (**Reservar**, **Mis reservas**, **Historial de clases**, **Mi plan**, **Mis
-evaluaciones**, **Notificaciones**, **Mis referidos**, **Mi crédito**, and
+evaluaciones**, **Notificaciones**, **Mis referidos**, and
 **Inicio** as before): the platform's spinner in Palo de rosa turns while the
 list refetches and the list stays under it.
 
@@ -981,18 +1007,20 @@ same key again returns the same result instead of a duplicate.
 | 3    | `GET /api/v1/purchase-intents/current`                | The same open Intent; `404 purchase_intent_not_found` once it is submitted or expired    |
 | 4    | `POST /api/v1/uploads` + `PUT …/object` + `…/finalize`| A `TRANSFER_RECEIPT` image asset that the worker leaves `READY` (Test 32 has the upload steps) |
 | 5    | `POST /api/v1/purchase-intents/{id}/receipt`          | `receiptAttached: true`; another asset replaces the first one                            |
-| 6    | `POST /api/v1/purchase-intents/{id}/submit`           | `201` pending transfer Payment; the Administrator inbox gets "Comprobante por revisar"  |
+| 6    | `POST /api/v1/purchase-intents/{id}/submit` `{ "invoiceData": { "taxId", "name" } }` | `201` pending transfer Payment; the Administrator inbox gets "Comprobante por revisar". The body is optional: none, `{}`, or `"invoiceData": null` is «Sin factura» (PAY-007); half the data or a NIT/CI with symbols is `400 invalid_request` |
+| 6b   | `GET /api/v1/clients/current/invoice-data`            | `{ "invoiceData": … }`: the NIT or CI and name of your latest sale that had any, or `null` |
 | 7    | `GET /api/v1/payments/current`                        | Your latest Payment with `state`, amounts, and `rejectionReason` once decided            |
-| 8    | `GET /api/v1/clients/current/credit`                  | `availableCentavos`, `reservedCentavos` (held while a transfer is under review), activity |
+| 8    | `GET /api/v1/clients/current/credit`                  | Deprecated since PAY-005: always `0`, `0`, and an empty `activity`, for store builds that still read it |
 | 9    | `GET /api/v1/clients/current/referrals`               | Your referral code and referred Clients as "Nombre A."                                  |
 
 Rules you can check: a second open Intent returns `409 purchase_intent_open_exists`;
-`lucia@example.com` (active Plan) gets `409 subscription_not_expired`; a Client
-whose Credit covers the price can call `POST /api/v1/credit-purchases` and is
-activated immediately without a QR. Registration accepts an optional
-`referralCode` (another Client's code); an unknown code fails the whole
-registration with `400 referral_code_invalid`. Open Intents expire 24 h later
-through the worker, releasing their Credit.
+`lucia@example.com` (active Plan) gets `409 subscription_not_expired`. Since
+PAY-005 there is no Credit: every Intent has `creditReservedCentavos: 0` and
+`amountDueCentavos` equal to the Plan price, and the deprecated
+`POST /api/v1/credit-purchases` always answers `409 credit_insufficient`.
+Registration accepts an optional `referralCode` (another Client's code); an
+unknown code fails the whole registration with `400 referral_code_invalid`.
+Open Intents expire 24 h later through the worker.
 
 ### Reviewing transfers as the Administrator (STAFF-001)
 
@@ -1005,8 +1033,11 @@ authorize that credential:
 | `GET /api/v1/administrator/payments/{paymentId}`      | The review projection plus `receiptUrl`                                                |
 | `GET …/payments/{paymentId}/receipt`                  | The rebuilt `readable` JPEG (`?variant=thumbnail` for the small one), `no-store`; Trainers and Clients get `403` |
 | `POST …/payments/{paymentId}/confirm`                 | `state: confirmed`, a new Subscription starting today, the Client notified             |
-| `POST …/payments/{paymentId}/reject` `{ "reason" }`   | `state: rejected` with the trimmed reason; the Client's Credit is released             |
+| `POST …/payments/{paymentId}/reject` `{ "reason" }`   | `state: rejected` with the trimmed reason; the Client can start a new purchase         |
 | `POST /api/v1/administrator/sessions/{id}/cancel`     | `{ affectedBookings }`: every Booking refunded, waitlist closed, Clients + Trainer told |
+| `POST …/payments/{paymentId}/invoice-issued`           | PAY-007: «Factura emitida» with `issuedAt` and `issuedByName`; a repeat changes nothing; a pending or rejected Payment answers `409 payment_not_confirmed`, an Assistant `403 administration_access_denied` |
+| `DELETE …/payments/{paymentId}/invoice-issued`         | The mark undone (`invoiceIssued: null`); both write an audit record (`payment.invoice_issued_marked` / `…_unmarked`) |
+| `GET /api/v1/administrator/payments?invoice=unissued`  | Only confirmed sales with Invoice Data not marked yet; every row now carries `method`, `invoiceData`, and `invoiceIssued` |
 
 Repeating the same decision returns the same result; the opposite decision
 answers `409 payment_confirmation_conflict`. A Session without Bookings answers
@@ -1022,11 +1053,12 @@ endpoints; Trainers and Clients get `403`.
 | Endpoint                                                   | What you should see                                                                                      |
 | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | `GET /api/v1/assistant/clients?query=luc`                  | Up to 20 Clients whose name, email, or phone contains the text (2+ characters), with `accountStatus`     |
-| `GET /api/v1/assistant/clients/{clientId}`                 | Name and contact, Subscription status with `YYYY-MM-DD` dates, next Booking, last two classes, Credit   |
+| `GET /api/v1/assistant/clients/{clientId}`                 | Name and contact, Subscription status with `YYYY-MM-DD` dates, next Booking, last two classes (`creditAvailableCentavos` is a deprecated `0`) |
 | `GET …/clients/{clientId}/bookings`                        | Upcoming Bookings and Waitlist Entries with `branchId` and `actionable` (true only at your Branches)     |
 | `GET …/clients/{clientId}/class-history`                   | Attended classes, newest first                                                                           |
-| `GET …/clients/{clientId}/plan-quotes`                     | Every Plan with `creditAppliedCentavos` and the cash `amountDueCentavos` for this Client                 |
-| `POST …/clients/{clientId}/cash-payments` `{ planId, branchId }` | `201` with the confirmed cash Payment and the new Subscription; needs an `idempotency-key` UUID     |
+| `GET …/clients/{clientId}/plan-quotes`                     | Every Plan with the cash `amountDueCentavos`, its full price (`creditAppliedCentavos` is a deprecated `0`) |
+| `POST …/clients/{clientId}/cash-payments` `{ planId, branchId, invoiceData? }` | `201` with the confirmed cash Payment and the new Subscription; needs an `idempotency-key` UUID; `invoiceData` (`{ taxId, name }` or `null` for «Sin factura») is PAY-007 |
+| `GET …/clients/{clientId}/invoice-data` | PAY-007: `{ invoiceData }`, the NIT or CI and name of her latest sale that had any, or `null`; Trainers and Clients get `403` |
 | `POST /api/v1/assistant/client-invitations` `{ name, email, phone? }` | `201 invited` with the new `clientId`; the worker queues the 7-day activation email           |
 | `GET /api/v1/assistant/client-invitations/{clientId}`      | The pending invitation with `pendingExpiresAt` (30 days), `activationExpiresAt`, and `cancellable`; a Client who registered herself answers `404 client_verification_pending` |
 | `POST …/client-invitations/{clientId}/email-corrections` `{ email }` | New email, old links invalidated, fresh link sent                                              |
@@ -1528,10 +1560,11 @@ Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
 
 Log in as `sofia@example.com` and open the **Perfil** tab. Below the summary
 card you should see the rows **Mi plan**, **Evaluación nutricional**, **Mis
-evaluaciones**, **Mis referidos**, **Mi crédito**, **Notificaciones**, and
+evaluaciones**, **Mis referidos**, **Notificaciones**, and
 **Cambiar contraseña**, each with its line icon in Palo de rosa and a quiet
 19 pt chevron (Icono tenue, MOB-041) at its right end, an outlined
-**Cerrar sesión** button, and the footer "Emma Pilates Studio · versión 1.0".
+**Cerrar sesión** button, and the footer "Emma Pilates Studio · versión 1.0.1"
+(the installed app version, Test 76).
 With unread notifications the Notificaciones row shows the count in a Palo de
 rosa profundo pill («9+» above nine), and so does the **Perfil** tab itself
 from every screen (VoiceOver reads "Perfil, 2 notificaciones sin leer").
@@ -1614,7 +1647,9 @@ notificaciones sin leer"); tap it to open
 administración.", **Rol** (`Entrenadora`), **Sucursales** (`Centro, Equipetrol,
 Urubó`), the **Notificaciones** row (with the unread count) and the
 **Cambiar contraseña** row, both ending in the quiet chevron of 18, the
-outlined **Cerrar sesión** button, and the version footer. Log in as
+outlined **Cerrar sesión** button, and the version footer «Emma Pilates
+Studio · versión 1.0.1» (the value in the Staff app's `app.json`, Test 81).
+Log in as
 `paola.mendoza@example.com` to see **Administración** with "Todas las
 sucursales". The staff inbox draws the same bare empty state as the Client's
 (quiet bell, Lora title) with the line "Te avisaremos aquí cuando haya algo
@@ -1624,14 +1659,15 @@ que necesite tu atención."
 
 The apps are online-first. When the device loses connectivity, a banner reads
 "Sin conexión. Mostrando la última información guardada." and only the class
-schedule, upcoming Bookings, and the Subscription summary stay visible from the
-Account-scoped cache; everything else needs the connection back. The banner
+schedule, upcoming Bookings, the Subscription summary, and the signed-in
+Client's own profile stay visible from the Account-scoped cache; everything
+else needs the connection back. The banner
 follows the device's connectivity (NetInfo feeds TanStack Query's
 `onlineManager`), so on the Android emulator `adb shell svc wifi disable`
 and `adb shell svc data disable` show it (and `enable` hides it); the iOS
 Simulator shares the Mac's network, so there it is easiest on a device with
 airplane mode. Test 71 walks the other states (load errors, action errors,
-link screens).
+link screens), and Test 75 walks Inicio's own offline copy.
 
 ### Time zones
 
@@ -1639,37 +1675,25 @@ The backend pins every Prisma connection to UTC. If a timestamp you inserted
 with `psql` shows up four hours off in the app, the API you are running is
 older than this guide: rebuild it with `pnpm --filter @pilates/backend build`.
 
-## Test 10: buy a Plan and check referrals and Credit in the Client app
+## Test 10: buy a Plan and check the referral code in the Client app
 
 Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
-The fixtures give Sofía an expired Plan, two referred friends, and Bs 60 of
-referral Credit; Mariana has no Plan, no Credit, and no referrals.
+The fixtures give Sofía an expired Plan and two referred friends; Mariana has
+no Plan and no referrals. Since PAY-005 nobody earns, holds, or spends Credit
+(booking ADR-0009): no screen and no email mentions it.
 
-### A. Referrals and Credit from Perfil
+### A. The referral code from Perfil
 
-Log in as `sofia@example.com` and open **Perfil**. The menu now reads **Mi
-plan**, **Mis referidos**, **Mi crédito** (with the value `Bs 60` on the
-right), **Notificaciones**, and **Cambiar contraseña**.
+Log in as `sofia@example.com` and open **Perfil**. The menu reads **Mi
+plan**, **Evaluación nutricional**, **Mis evaluaciones**, **Mis referidos**,
+**Notificaciones**, and **Cambiar contraseña**; there is no **Mi crédito**.
 
 Tap **Mis referidos**. The card shows the code `REF-SOFIA` with a
 **Compartir** button that opens the system share sheet with a message that
-contains the code. Below it: "Comparte tu código. Cuando una amiga se registre y
-haga su primer pago, ganas crédito.", a **Tu crédito** row with `Bs 60`, and
-**Tus invitaciones** with one row per referred Client: initials, "Nombre A.",
-either "Primer pago el 26 de agosto" with the green **Crédito ganado** badge
-(Valeria Q.) or "Se registró el 17 de septiembre" with the amber **Esperando su
-primer pago** badge (Mariana P.). Dates follow the fixture clock.
-
-Tap **Tu crédito**. **Mi crédito** shows **Saldo a favor**, the amount `Bs 60`
-in the largest type of the app, "disponibles", the line "Este crédito se aplica
-automáticamente al monto que pagues por tu próximo plan.", a **De dónde viene**
-list ("Valeria Q. · 26 de agosto" and `+Bs 60`), and the text link **Ver mis
-referidos**.
-
-Log in as `mariana@example.com` to see the empty states: **Mi crédito** reads
-`Bs 0`, "Aún no tienes crédito. Invita a tus amigas para ganar." and a solid
-**Ver mi código** button; **Mis referidos** shows `REF-MARIANA`, `Tu crédito
-Bs 0`, and "Aún no has invitado a nadie. ¡Comparte tu código!".
+contains the code. Below it, one line: "Comparte tu código. Tu amiga recibe una
+clase gratis, una sola vez. Cuando compre su primer plan, tú ganas una clase."
+Nothing else mentions Credit (PAY-005). Mariana sees the same screen with
+`REF-MARIANA`.
 
 ### B. Buy a Plan with a bank transfer
 
@@ -1681,9 +1705,8 @@ pnpm --filter @pilates/backend start:worker
 ```
 
 As Sofía, tap **Comprar un plan** on Home (her Plan is expired), pick
-**Paquete de 8 clases**, and check **Detalle del plan**: price `Bs 560`, a
-**Crédito aplicado** line with `−Bs 60`, and **Total a pagar** `Bs 500`. Tap
-**Continuar al pago**.
+**Paquete de 8 clases**, and check **Detalle del plan**: price `Bs 560` and
+**Total a pagar** `Bs 560`, with no Credit line. Tap **Continuar al pago**.
 
 **Pago por transferencia** shows the amount, then a card with the studio QR
 (locally the placeholder image from `apps/backend/.data/transfer-qr.png`) and
@@ -1695,21 +1718,37 @@ either platform (MOB-065; the Simulator ships with sample photos). Picking one r
 a JPEG of at most 2048 px on its longest side (UPL-003, Test 53), uploads it
 through `/api/v1/uploads` (hash, PUT, finalize, wait until `READY`) and attaches
 it to the Purchase Intent; the thumbnail appears as **Comprobante adjunto** and
-**Enviar comprobante** becomes available. Tap it.
+**Enviar comprobante** becomes available.
+
+Under the receipt, **Datos para la factura** (PAY-007, follow-up 145) offers
+**Con factura** and **Sin factura**. Walked on 2026-10-23 on the iPhone 16 Pro,
+the iPad Pro 11-inch (M4), and the Android emulator: the card renders with both
+choices and the walk stopped before **Enviar comprobante**, so no Payment was
+recorded. Sofía has never given invoice data, so
+**Sin factura** is chosen with "Tu compra se registra sin datos de factura."
+Tap **Con factura**: **NIT o CI** and **Nombre o razón social** appear and
+**Enviar comprobante** waits until both are filled (a NIT or CI takes digits,
+letters, and hyphens; "45/67" shows "Usa solo números, letras y guiones.").
+Type `4567891` and `Sofía Guzmán` and tap **Enviar comprobante**. Her next
+purchase opens on **Con factura** with those values and "Usamos los datos de
+tu última compra. Puedes cambiarlos." (Test 27 shows them to the
+Administrator).
 
 **Estado del pago** reads "Tu pago está en revisión" with "Un administrador va
 a confirmar tu comprobante pronto. Te avisaremos apenas esté listo." and a
-**Volver al inicio** button. While the transfer is under review, **Mi crédito**
-shows `Bs 0` disponibles and "Bs 60 están reservados para un pago en
-revisión.", and **Comprar un plan** answers with the pending Payment instead
-of a new Intent. Coming back to **Continuar al pago** with an open Intent
+**Volver al inicio** button. The status is a white line icon on a solid
+semantic disc — an hourglass on amber while it waits, a check on green once
+it is confirmed, a cross on red if it is rejected — never an emoji
+(UX-006). VoiceOver reads the disc as "Pago en revisión", "Pago confirmado",
+or "Comprobante rechazado". While the transfer is under review, **Comprar
+un plan** answers with the pending Payment instead of a new Intent. Coming back to **Continuar al pago** with an open Intent
 reopens the same Intent (the API answers `409 purchase_intent_open_exists`).
 
 ### C. Review the transfer in the Staff app
 
 Start the Staff app (Test 9E) and log in as `paola.mendoza@example.com`. The
 Administrator root is **Pagos pendientes**: a **Por confirmar** line with the
-count and "Bs 500 en total", then one card per transfer, oldest first: the
+count and "Bs 560 en total", then one card per transfer, oldest first: the
 Client's first letter in a tinted circle, her name in Lora over the Plan, a
 Palo de rosa chevron on the right, and under a thin rule the amount in Lora
 and an amber clock with how long ago it was sent ("Hace 3 minutos", "Ayer,
@@ -1718,9 +1757,12 @@ pagos pendientes." and "Todo al día. Te avisaremos cuando llegue una
 transferencia nueva.".
 
 Tap Sofía's card. **Revisar pago** shows name and Plan, **Monto a verificar**
-with `Bs 500`, the **Pendiente** badge, "Transferencia · enviado el 22 de
+with `Bs 560`, the **Pendiente** badge, "Transferencia · enviado el 22 de
 septiembre, 14:05", and the **Comprobante** image loaded through the
-authenticated API. **Ampliar** (or tapping the image) opens it full screen
+authenticated API. If that download fails the screen says «No pudimos
+mostrar el comprobante.» with **Reintentar**, and **Confirmar pago** stays
+disabled until the image is on screen (Test 81); **Rechazar** stays
+available. **Ampliar** (or tapping the image) opens it full screen
 with pinch zoom; close it with the ✕ in the top-right corner, below the status
 bar. Scroll down: **Confirmar pago** returns to the list with a two-second
 "Pago confirmado" notice and the card gone. **Rechazar**, under it, does not
@@ -1734,8 +1776,7 @@ Back in the Client app, after a confirmation Sofía's Home shows the new Plan
 and the inbox row "Tu pago fue confirmado…" opens **Estado del pago** with
 "¡Pago confirmado!" and **Ir al inicio**. After a rejection the same screen
 reads "Tu comprobante fue rechazado", shows the reason, explains "Sube un
-nuevo comprobante para activar tu plan. Tu crédito volvió a estar disponible.",
-and **Subir un nuevo comprobante** opens a fresh **Pago por transferencia**
+nuevo comprobante para activar tu plan.", and **Subir un nuevo comprobante** opens a fresh **Pago por transferencia**
 for the same Plan.
 
 ### D. Cancel a Session as the Administrator
@@ -1766,14 +1807,13 @@ The fixtures ship no Bookings, so book a class from the Client app first
 `409 session_has_no_bookings` and the screen shows "No pudimos cancelar la
 sesión. Inténtalo de nuevo.".
 
-### E. Paying fully with Credit
+### E. No Credit for a referral
 
-When the available Credit covers the whole price, **Continuar al pago**
-activates the Plan immediately (`POST /api/v1/credit-purchases`) and lands on
-"¡Pago confirmado!" without a QR. The fixtures cannot reach this (Bs 60 is
-below the cheapest Plan), so the automated purchase-flow spec covers it; to
-see it by hand, create a Plan priced under Bs 60 in Planes and buy it as
-Sofía (Test 70, «Payments»).
+Confirm Sofía's transfer as above, then confirm one for Mariana (whom Sofía
+referred). Sofía gets nothing: in `psql`, `booking.credit_ledger_entries` has
+no new row and Mariana's Referral stays `pending`. A store build from before
+PAY-005 still works against this API: it reads `GET
+/api/v1/clients/current/credit` as `Bs 0` and never offers to pay with Credit.
 
 ## Test 11: act for a Client as the Assistant in the Staff app
 
@@ -1855,14 +1895,21 @@ way.
 ### D. Take a cash Payment
 
 Open `mariana@example.com` (no Plan) and tap **Registrar pago en efectivo**.
-**Elige un plan** shows "Registrando pago para: Mariana Peña", the Credit line
-when the Client has any ("Esta clienta tiene Bs 60 de crédito disponible."),
-and the four Plans with the cash amount after Credit (the original price
-crossed out). Tap one: **Confirmar pago en efectivo** breaks down **Precio del
-plan**, **Crédito aplicado**, and **Monto a cobrar en efectivo**; when you are
+**Elige un plan** shows "Registrando pago para: Mariana Peña" and the four
+Plans at their full price, with no Credit notice (PAY-005). Tap one:
+**Confirmar pago en efectivo** shows **Precio del plan** and **Monto a cobrar
+en efectivo**, both the full price; when you are
 assigned to several Branches a chip row asks where you received the cash.
+Between the breakdown and the note, **Datos para la factura** (PAY-007,
+follow-up 146) works as in the Client app. Walked on 2026-10-23 on the iPhone
+16 Pro, the iPad Pro 11-inch (M4), and the Android emulator, reached from
+Sofía's overview, and stopped before **Confirmar pago recibido**. **Sin factura** ("La venta se
+registra sin datos de factura.") for a Client without earlier invoice data,
+**Con factura** with her last NIT or CI and name ("Datos de su última compra.
+Confírmalos con la clienta.") otherwise, and **Confirmar pago recibido** waits
+for both fields once **Con factura** is chosen.
 **Confirmar pago recibido** activates the Plan at once and shows
-"¡Pago registrado!" with the Plan, its classes, and "Válido hasta el …";
+"¡Pago registrado!" with the Plan, its classes, and "Vence el …";
 **Volver al cliente** returns to the overview, now **Activa**, and **Volver**
 from there goes back to **Buscar cliente**. While a Client's Plan is still
 in force (paid through today with classes left or an upcoming Booking, as
@@ -1875,7 +1922,9 @@ stays enabled. Should two Assistants race, the confirmation still answers
 ### E. Invite a new Client and manage the invitation
 
 From **Buscar cliente** tap **+ Nuevo cliente**. Fill **Nombre**, **Correo
-electrónico**, and optionally **Teléfono (opcional)**; the form explains
+electrónico**, and optionally **Teléfono (opcional)**, pick one answer under
+**¿Cómo nos conociste?**, and optionally type a **Código de referido
+(opcional)** (Test 79); the form explains
 "Enviaremos un enlace de activación al correo. Vence en 7 días." **Crear
 cuenta** creates the pending Client, queues the activation email (the worker
 delivers it to the local capture), and opens her overview with the card
@@ -1957,45 +2006,71 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    classes then appear in the Client's **Ver historial** as «Ha asistido a»
    with the month group of Test 5 B.
 4. Open the roster again: the saved outcomes are restored, and a changed
-   outcome can be saved as a correction.
+   outcome can be saved as a correction. A correction writes an audit record
+   naming both outcomes (Test 83); the first save does not.
 
 The same data is available through Swagger as `GET
 /api/v1/trainer/sessions?on=YYYY-MM-DD`, `GET
 /api/v1/trainer/sessions/{sessionId}/roster`, and `POST
-/api/v1/sessions/{sessionId}/attendance`; other Roles get `403`.
+/api/v1/sessions/{sessionId}/attendance`; other Roles get `403`. A `403`
+or `500` on Mi agenda or the roster shows «No pudimos cargar tu agenda.» or
+«No pudimos cargar la lista de asistencia.» with **Reintentar**, and a later
+success loads the screen (Test 81).
 
-## Test 13: watch the worker cancel an empty Session and close a Waitlist
+## Test 13: watch the worker apply the Minimum Bookings and close a Waitlist
 
 Load the fixtures (Test 5A), start the backend, and start the worker with
 `pnpm --filter @pilates/backend start:worker`. The worker checks every minute
 (and once when it starts) for:
 
-- **Sessions starting within two hours.** A Session with no Bookings at that
-  moment is cancelled with cause `zero_bookings` and no actor, its open
-  Waitlist Entries close as `session_cancelled`, and its Trainer receives
-  "Tu clase de Mat Pilates de hoy 07:00 se canceló: no tuvo reservas." (the
-  Class Type and time vary) in the inbox, which opens their agenda. A waitlisted
-  Client receives "La clase de … a la que estabas en lista de espera fue
-  cancelada." A Session with at least one Booking stays scheduled. Either way
-  the check is recorded in `empty_booking_check_completed_at` and never runs
-  again for that Session, even if its Bookings later drop to zero. A Session
-  that drops to zero before the check stays bookable until then.
+- **Sessions starting within three hours** (the lead time in Studio
+  Settings, BKM-009). A Session with fewer Bookings than the Minimum Bookings
+  (2, editable in the admin web's Reglas del estudio, Test 75) is
+  cancelled with cause `minimum_not_met` and no actor. Each of its Bookings is
+  cancelled as `session_cancelled` with no actor and the class goes back to the
+  Client's Plan. Each booked Client receives a push and an inbox entry
+  "Tu clase de Mat Pilates de hoy 18:00 se canceló porque no llegó al mínimo
+  de reservas. Te devolvimos la clase a tu plan. Hoy hay lugar en Reformer
+  19:00 y Mat Pilates 20:00." It names the later Sessions that day at the same
+  Branch that still have places and that she has not booked (four at most,
+  then "y N más"), or ends "Hoy ya no quedan otras clases con lugar."; tapping
+  it opens Mis Reservas. The open Waitlist Entries close as
+  `session_cancelled` and each waitlisted Client receives "La clase de … a la
+  que estabas en lista de espera fue cancelada." The Trainer receives "Tu
+  clase de Mat Pilates de hoy 18:00 se canceló: no llegó al mínimo de 2
+  reservas.", which opens their agenda. A Session that reaches the minimum
+  stays scheduled. Either way the check is recorded in
+  `empty_booking_check_completed_at` (the column kept its BOOK-004 name) and
+  never runs again for that Session, even if its Bookings later drop. A
+  Session that started before the worker could check it is left alone.
+- **Sessions whose Cancellation Window has closed** (2.5 hours before the
+  start, from Studio Settings). Each scheduled Session records its live
+  Bookings in `bookings_at_window_close` once; later cancellations,
+  Reschedules, or worker restarts never change it. Trainer pay (BKO-006)
+  counts this number. A cancelled Session gets none.
 - **Sessions that have started.** Their remaining open Waitlist Entries close
   as `session_started`, without a notification.
 
 To see it without waiting for a real class, pick today's Session that starts
-in the next two hours with no Bookings (or wait until one does), keep the
-worker running for a minute, then:
+in the next three hours with one Booking or none (or book one for
+`lucia@example.com` in a Session four hours away and wait), keep the worker
+running for a minute, then:
 
 1. Log in to the Staff app as that Session's Trainer (usually
    `emma.vargas@example.com`) and open the inbox from Perfil: the
    cancellation notice is there.
-2. In the Client app as `lucia@example.com`, the Session no longer appears in
-   the class list, and `GET /api/v1/sessions/{sessionId}` returns `404`.
+2. In the Client app as `lucia@example.com`, open the inbox from Perfil: the
+   notice names the other Sessions with places, the Session no longer appears
+   in the class list, her Plan shows the class back, and `GET
+   /api/v1/sessions/{sessionId}` returns `404`.
+3. In `psql`, `SELECT cancellation_cause FROM booking.sessions WHERE id =
+   '<sessionId>'` answers `minimum_not_met`; a scheduled Session inside its
+   window has a `bookings_at_window_close` value.
 
-Book a Session in the Client app first and it stays scheduled through the
-check. The worker logs only a sanitized `empty_session_check_failed` or
-`started_waitlist_closure_failed` event if a sweep fails.
+Book the Session with two Clients first and it stays scheduled through the
+check. The worker logs only a sanitized `minimum_bookings_check_failed`,
+`window_close_snapshot_failed`, or `started_waitlist_closure_failed` event if a
+sweep fails.
 
 ## Test 14: bootstrap the first Administrator on an empty database
 
@@ -2158,9 +2233,9 @@ In the Client app as `lucia@example.com`:
    **Evaluación nutricional** (a trend icon; "Próxima: …" when one is booked,
    otherwise "Agenda tu cita del mes"; it opens Mis evaluaciones or the
    availability) and **Mis referidos** (a person icon; "N amigas invitadas" or
-   "Invita amigas y gana crédito").
-2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with dates such as
-   "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
+   "Comparte tu código").
+2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with **Inicio** and
+   **Vence el** dates such as "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
    termine."; while expiring, an amber banner; once expired, "Último plan",
    "Venció el …", and **Comprar un plan**. As `isabel@example.com` (no
    classes left) the classes line reads "Sin clases disponibles". Mi plan
@@ -2172,7 +2247,8 @@ In the Client app as `lucia@example.com`:
    opens the payment status, and a Plan notice opens Mi plan.
 
 In the Staff app, a Trainer's "Tu clase … se canceló" notice and a
-Nutritionist's Evaluation notices open **Mi agenda**. The Staff roots (Mi
+Nutritionist's Evaluation notices open **Mi agenda**. An Assistant notice
+that names a Client opens that Client (Test 81). The Staff roots (Mi
 agenda, the results of Buscar cliente, Pagos pendientes, the Nutritionist's
 agenda, Mi disponibilidad) and both apps' Notificaciones refresh when they
 regain focus (closing the roster, a review, or a client refetches the list
@@ -2400,14 +2476,14 @@ shows how to log in and authorize). Other Roles get
 3. **Single Sessions**: `POST /api/v1/administrator/sessions` adds a one-off
    Session; `PATCH …/{id}` changes its start, Trainer, or capacity. Overlaps
    answer `409 session_overlap`, and capacity below the booked count answers
-   `409 capacity_below_bookings`.
+   `409 capacity_below_bookings`. Raising the capacity promotes the Waitlist
+   into the new seats (Test 83).
 4. **Oversight**: `GET evaluations?from=…&until=…&branchId=…` (booked
    Evaluations of one Branch, each with `kind` `first` or `follow_up`),
    `DELETE evaluations/{id}` (cancels it for the Client), `GET
    referrals?query=sofia` (with the studio's `awardedCount` and
-   `pendingCount` and each referrer's `referrerReferralCount`), `GET credits`
-   (Clients with available Credit, the studio total, and each one's
-   `lastMovementKind`), and
+   `pendingCount` and each referrer's `referrerReferralCount`; since PAY-005
+   no Referral is awarded and `GET credits` answers `404`), and
    `GET reports/income?from=…&until=…&branchId=…` (income by month and method;
    with a Branch only its cash counts).
 
@@ -2500,7 +2576,8 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
    (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
    Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
-   Referidos, Créditos). There is no "Descuentos". Every entry is a real page
+   Referidos). There is no "Descuentos" and, since PAY-005, no "Créditos"
+   (`/promociones/creditos` shows «Página no encontrada»). Every entry is a real page
    (Tests 25 to 30 and 33); the entry you choose is highlighted in the
    sidebar and the address changes (`/promociones`, for example).
 2. **Branch selector.** The top bar shows **Sucursal Centro**. Click it: a
@@ -2515,8 +2592,7 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    sidebar navigation focus lands on the new page's content.
    On **Reporte** the cell is replaced by "El reporte usa su propio filtro de
    sucursal" (the report has its own selector, Test 30). On **Pagos**,
-   **Clientes**, **Nómina**, **Categorías de gasto**, **Referidos**, or
-   **Créditos** the
+   **Clientes**, **Nómina**, **Categorías de gasto**, or **Referidos** the
    popover first says "Esta página no se filtra por sucursal — …" and still
    lets you switch for the next page. The Branches are the active ones the
    API returns (Test 25); archived Branches never appear here.
@@ -2706,8 +2782,10 @@ Bolivia time, whatever time zone your computer uses.
    depends on it, so renaming moves nothing, and its **Archivar sucursal**
    dialog says it leaves the selector, receives no new Sessions, and keeps
    its history. Plans
-   show prices as `Bs 1.050,00`, last 1, 3, 6, or 12 months, and always carry
-   a class count; **Ocultar en la app** hides one from the Client catalog.
+   show prices as `Bs 1.050,00`, last 30, 60, or 90 days (**Vigencia**), may
+   carry a **Tope semanal** of 3 or 4 only when they last 60 or 90 days, and
+   always carry a class count (Test 81); **Ocultar en la app** hides one from
+   the Client catalog.
    A Class Type needs a description, and a taken name is marked on its field.
    Tipos de clase has no Duración column and its form no Duración field: the
    length of a class is chosen in Horario. Both apps' Session detail shows
@@ -2749,8 +2827,8 @@ the admin web, exactly as Test 24 describes, and log in as
    disabled.
 3. **Detalle de cliente.** Click a Client: the side panel (the whole screen on
    a phone) shows "Cliente desde dd/mm/aaaa", the contact, the Plan with its
-   dates and remaining classes ("5 de 8"), the Credit as `Bs 0,00`, how many
-   Clients she referred, and her referral code. Without an active Plan the
+   dates and remaining classes ("5 de 8"), how many Clients she referred, and
+   her referral code; there is no Crédito block (PAY-005). Without an active Plan the
    block reads "Sin plan activo", plus "Último plan vencido el dd/mm/aaaa." if
    she had one. A Client invited from the Staff app who has not created her
    password yet shows **Pendiente de activación**. Nothing here is editable;
@@ -2827,7 +2905,8 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
 
 1. **The badge.** The sidebar shows the number of transfers waiting next to
    **Pagos** on every page; with nothing waiting it shows no number.
-2. **Pagos.** Back Office → **Pagos** lists the studio's transfer Payments,
+2. **Pagos.** Back Office → **Pagos** lists the studio's transfers and, since
+   PAY-007, its cash sales,
    not only one Branch's (the Branch selector says this page is not filtered
    by Branch). There is no **+ Nuevo** button: Clients raise Payments from the
    app. The subtitle reads "Todo el estudio · 1 transferencia esperando
@@ -2837,17 +2916,17 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    `GET /api/v1/administrator/payments?status=…&q=…&page=…&pageSize=…`,
    while the Staff app's list is `…/payments/pending`, Test 7). Each row
    shows the Client, the Plan, the amount she
-   transferred as `Bs 560,00` on the right (with "con Bs 60,00 de crédito"
-   under it when Credit paid part), the date and time sent in Bolivia time
+   transferred as `Bs 560,00` on the right (never a Credit line, even on a
+   Payment from before PAY-005), the date and time sent in Bolivia time
    (`23/09/2026 · 22:51`), and **Pendiente**, **Confirmado**, or **Rechazado**.
-   Cash and Credit-only Payments never appear: they are confirmed when they are
-   recorded. **Buscar por cliente** finds a name without accents or capitals
-   ("mariana").
+   A **Método** column says **Transferencia** or **Efectivo**; Credit-only
+   Payments never appear. **Buscar por cliente** finds a name without accents
+   or capitals ("mariana").
 3. **Only pending rows open.** A **Confirmado** or **Rechazado** row does
    nothing; the row is the whole record.
 4. **Revisar pago.** Click a pending Client: the side panel (the whole screen
-   on a phone) shows the Client and Plan, **Monto a verificar**, the Plan price
-   and **Crédito aplicado** when Credit was used, the date, **Transferencia**,
+   on a phone) shows the Client and Plan, **Monto a verificar**, the date,
+   **Transferencia**,
    and the receipt image read straight from the API (never cached). **Ver en
    grande** (or a click on the image) opens it above everything; Esc, the ✕,
    or a click outside returns to the panel as it was.
@@ -2866,9 +2945,24 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    panel says "Otra persona ya decidió este pago." with the new state (and the
    reason of a rejection) and offers no buttons.
 
+8. **Factura** (PAY-007, follow-up 147). Choose **Estado: Todos**. The
+   **Factura** column shows the NIT or CI with the name under it, or "Sin
+   factura" (Valeria's fixture cash sale). On a **Confirmado** row,
+   **Marcar emitida** turns into the **Emitida** pill with "por Paola Mendoza ·
+   dd/mm/aaaa" and **Deshacer**, which brings the button back; pending and
+   rejected rows show only the data. The **Factura** filter's **Sin factura
+   emitida** (`?invoice=unissued`) lists only the confirmed sales with invoice
+   data not marked yet, or "No hay facturas pendientes." when there are none.
+9. **Exportar CSV** downloads `pagos-aaaa-mm-dd.csv` with every row the
+   filters match, every page, not only the one on screen: «Fecha», «Cliente»,
+   «Plan», «Método», «Monto (Bs)», «Estado», «NIT o CI», «Nombre o razón
+   social», «Factura emitida», «Emitida por», «Emitida el». Open it in a
+   spreadsheet and compare it with the filtered table.
+
 Payments, their Subscriptions, and the Credit ledger are append-only money
 history, so the Payments you make here stay in `pilates_dev_sim`; the fixtures
-command does not remove them.
+command does not remove them. Closing a Client's Account (Test 35) erases the
+NIT or CI and name from her sales and keeps the **Emitida** mark.
 
 ## Test 28: run the Back Office in the admin web
 
@@ -2947,15 +3041,15 @@ deleted (Withdrawals and Restocks cannot even be edited), so what you create
 here stays in `pilates_dev_sim`; only an unused category can be deleted. Date
 pickers follow the browser's language, as Test 25 notes.
 
-## Test 29: read the Evaluation, Referral, and Credit lists in the admin web
+## Test 29: read the Evaluation and Referral lists in the admin web
 
 Start the backend on `pilates_dev_sim` after loading the fixtures and start
 the admin web, exactly as Test 24 describes, and log in as
 `paola.mendoza@example.com` / `emma-local-2026`. The fixtures hold no
 Evaluations: book a few first as Clients (Test 15, or Test 7's API calls as
 `lucia@example.com` and `valeria@example.com`, whose Plans cover this
-month). The fixtures' Referrals and Credit belong to Sofía (an earlier walk
-or Test 10 may have added more). All three pages are read-only: there is no
+month). The fixtures' Referrals belong to Sofía (an earlier walk or Test 10
+may have added more). Both pages are read-only: there is no
 **Nuevo** button, and clicking a row opens nothing.
 
 1. **Evaluaciones nutricionales.** Back Office → **Evaluaciones
@@ -2975,28 +3069,19 @@ or Test 10 may have added more). All three pages are read-only: there is no
    publish a block there as Gabriela (Test 15), and book it as a Client.
 3. **Referidos.** Promociones → **Referidos** lists every Referral with
    **Cliente que refiere** (and "N referidas en total" under her name),
-   **Cliente referido**, **Fecha de registro**, and a green **Crédito
-   otorgado** or amber **Pendiente** pill. The subtitle counts the whole
-   studio ("2 referidos · 2 con crédito otorgado, 0 pendientes") and stays
-   put while you search; **Buscar por nombre de cliente** finds either
-   Client, ignoring accents ("mariana pena"). A search that finds nothing
-   keeps the table's header and says "No se encontró ningún referido.".
-4. **Créditos.** Promociones → **Créditos** lists the Clients whose
-   available Credit is above zero, the amount right-aligned ("Bs 60,00"),
-   and the last movement's date with what it did: "Crédito ganado",
-   "Reservado para un pago", "Usado en un pago", or "Devuelto al saldo". The
-   subtitle reads "Bs 60,00 en saldo activo · 1 clienta con crédito", and
-   **Total en saldo activo** closes the table while nothing is searched.
-5. **Studio-wide pages.** On Referidos and Créditos the Branch selector says
-   "Esta página no se filtra por sucursal — …" and switching Branch changes
-   nothing on the page.
-6. **After a Payment decision.** Confirm a transfer in **Pagos** (Test 27)
-   whose Client was referred, then open Referidos and Créditos: the Referral
-   turns **Crédito otorgado** and the referrer's Credit appears or grows
-   without reloading the browser.
-7. **Narrow browser.** At a phone width each row becomes a labelled card,
-   the week stepper and the search stay above the cards, and the Créditos
-   total stays under them.
+   **Cliente referido**, and **Fecha de registro**; since PAY-005 there is no
+   Estado column and no Credit. The subtitle counts the whole studio
+   ("2 referidos") and stays put while you search; **Buscar por nombre de
+   cliente** finds either Client, ignoring accents ("mariana pena"). A search
+   that finds nothing keeps the table's header and says "No se encontró
+   ningún referido.".
+4. **Créditos is gone.** The sidebar has no **Créditos**, and
+   `/promociones/creditos` shows «Página no encontrada» (PAY-005).
+5. **Studio-wide pages.** On Referidos the Branch selector says "Esta página
+   no se filtra por sucursal — …" and switching Branch changes nothing on
+   the page.
+6. **Narrow browser.** At a phone width each row becomes a labelled card and
+   the week stepper and the search stay above the cards.
 
 ## Test 30: read the income and expense report in the admin web
 
@@ -3323,6 +3408,19 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 The following are not ready for manual product testing:
 
+- the mobile apps were not walked for BKM-014: the invitation screen was
+  verified by Jest and the registration rules by curl, not on a device
+  (Test 86);
+- the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
+  the Role arrives with IDN-009, so today only the Administrator can (Test 79);
+- accrued revenue by validity days: decisions §11 asks for it beside the
+  cash view, and Test 94 shows only cash. STU-002 owns the accrued view;
+- «Mis pagos» in the Staff app: the API answers a Trainer (Test 95), but
+  the screen waits on follow-up 209, which stays pending. The Coordinator
+  has no such screen: only the Administrator sees her statement (Test 96);
+- the break-even in students per class, occupancy, and clients: Test 97
+  shows it in bolivianos and Test 101 repeats the month. The diagnosis's
+  section 3.4 asks for the other expressions, and neither page draws them;
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
   Swagger (Test 34). On Android the link opens the app with a development
@@ -3332,6 +3430,9 @@ The following are not ready for manual product testing:
 - «El registro venció» on a device, which needs seven days to pass after the
   registration (the automated tests show it);
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
+- a sale voided after the cash close showing as a negative «Ajuste» on AW151
+  needs a closed day and then a void (Test 89; a late cash sale already shows
+  as a positive adjustment, Test 76);
 - real push delivery on iOS, which needs the APNs key (gate 9): the
   Simulators show pushes only through `xcrun simctl push`, while Android
   receives real pushes on the development, staging, and Play builds
@@ -3339,16 +3440,35 @@ The following are not ready for manual product testing:
 - iOS store builds and TestFlight (gate 9), and the Play closed test and
   production release (REL-003 to REL-007);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
+- an invoice itself: the studio issues invoices outside the system (no SIAT,
+  booking ADR-0012), so the apps only keep the NIT or CI, the name, and the
+  «Factura emitida» mark (PAY-007);
+- the Coordinator's counts-only statistics (attendance, occupancy, new
+  Clients, renewals), which STU-003 builds on Studio Management's facts
+  (ADR-0103), and her «Para contactar» list, which BKM-013 adds to the admin
+  web and to her Staff app stack;
 - the admin web's «No tienes permiso…» refusal copies, an email change for
   an Account that is not active (`account_not_active`), and a registration
   that refers to itself (`referral_self_reference`): each needs a state the
   API never lets a tester reach, so the Jest and e2e suites cover them
   (Tests 70 and 72);
+- the Coordinator resolving an equipment fault: the Role arrives with
+  IDN-009, so until then only an Administrator resolves one (Test 75);
 - the inbox's fallback for a notification type the push catalog does not
   know («Emma Pilates» / «Tienes una notificación nueva.», silent): nothing
   sends one until a new type ships;
 - real push delivery on iOS devices and the `InvalidCredentials` receipt
-  Expo answers for them until the APNs key is uploaded (gate 9, Test 46).
+  Expo answers for them until the APNs key is uploaded (gate 9, Test 46);
+- store-review rows, which stay in the facts and in Test 99 until REL-016
+  marks them. Extra classes (BKM-008) are not counted in «Clases pendientes
+  de dar». The renewal percent uses active clients as the denominator, not
+  plans that expired this month: the fact table cannot see those;
+- client no-shows, a renewal gap, and the other twelve diagnosis rules are
+  not findings yet (Test 102): the fact tables cannot support them, or the
+  tables they need are not on this branch. The nightly recommendation pass
+  is not a worker job;
+- a model-written report (Test 103): no model is called and no key is
+  configured. The sentences are the pure function over the month's counts.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -3461,13 +3581,13 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
 ```
 
 1. Log in as `sofia@example.com` (Test 3 shows how) and read
-   `GET /api/v1/clients/current/credit`: Bs 60 available.
+   `GET /api/v1/clients/current/credit`: `0` (deprecated since PAY-005).
 2. `POST /api/v1/accounts/current/closure` with `{"password": "wrong"}` returns
    `400` `current_password_incorrect`; with `{}` it returns `400`
    `invalid_request`.
 3. Repeat with the fixture password and `"keepPromotions": true`. It returns
-   `200` with the counts: `forfeitedCreditCentavos: 6000` and the classes left
-   on the ended Plan. A `keepPromotions` that is not a boolean returns `400`;
+   `200` with the counts: the classes left on the ended Plan and
+   `forfeitedCreditCentavos: 0` (deprecated since PAY-005). A `keepPromotions` that is not a boolean returns `400`;
    leaving it out means `false`.
 4. The old credential now returns `401`, and logging in again with the same
    email and password returns `401`.
@@ -3477,8 +3597,8 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
    second call returns `404` `client_not_found`, and Lucía no longer appears in
    the Clientes list.
 6. In `psql`, see the two `account.closed` audit records (actor role empty for
-   Sofía's own closure, `administrator` for Lucía's) and Sofía's
-   `account_closure` ledger entry of 6000. Both closures erased the personal
+   Sofía's own closure, `administrator` for Lucía's); since PAY-005 no
+   `account_closure` ledger entry is written. Both closures erased the personal
    data (BE-021, ADR-0097): `booking.clients` shows «Cliente eliminado» with no
    phone and no `profile_image_asset_id`, and `system.accounts` shows
    `cerrada-<account id>@cuentas-cerradas.invalid` with no `password_hash`.
@@ -3493,7 +3613,7 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
 In the Client app (API on the copy, `EXPO_PUBLIC_API_URL=http://127.0.0.1:3100/api/v1`),
 log in as `sofia@example.com`, open Perfil, scroll to the Error-tone
 «Cerrar mi cuenta» link under «Cerrar sesión», read the consequences (her
-plan ends and her Bs 60 of Credit is forfeited) and the note that her name,
+plan ends; nothing about Credit) and the note that her name,
 email, phone, and photo are erased, see the «Quiero seguir recibiendo
 promociones de Emma Pilates» box unticked, tick it (the whole row toggles it),
 type the password, and confirm: the app returns to Iniciar sesión with «Cerramos tu cuenta. Gracias
@@ -4796,7 +4916,7 @@ throwaway proxy (never committed) in front of it: a Node `http` server on
 3101 that waits 6 s and forwards each request to 3100, and start each Metro
 with `EXPO_PUBLIC_API_URL=http://127.0.0.1:3101/api/v1` (on Android also
 `adb reverse tcp:3101 tcp:3101`). A screen whose data an earlier screen
-already fetched (Perfil and Mi crédito after Inicio) shows its content at once.
+already fetched (Perfil and Mis referidos after Inicio) shows its content at once.
 
 1. Client, as Lucía: Perfil → Notificaciones. Expected: the logo centred
    under «Notificaciones» with the tab bar below, its opacity changing
@@ -5423,15 +5543,18 @@ removes it, and a pg-boss runtime error, which the worker only logs as
    1–3; attach no receipt), then
    `update booking.purchase_intents set expires_at = now() - interval '1 minute' where state = 'open'`.
    Within five minutes `GET /api/v1/purchase-intents/current` answers
-   `404 purchase_intent_not_found`, the row reads `state = 'expired'`,
-   `GET /api/v1/clients/current/credit` shows any reserved Credit back in
-   `availableCentavos`, and `POST …/{id}/submit` answers
+   `404 purchase_intent_not_found`, the row reads `state = 'expired'`, and
+   `POST …/{id}/submit` answers
    `409 purchase_intent_not_open` (before the sweep passes, the same call
    on the back-dated row answers `409 purchase_intent_expired`). A new
    Intent can be opened at once.
 4. **`subscription_reminders` (hourly)** records «Plan por vencer» / «Tu
-   plan vence en 3 días.» once per Subscription that ends in three days
-   (Valeria's fixture, Test 7); a second run adds nothing.
+   plan vence en 3 días.» once per active Subscription that ends today or
+   within three days and has not been reminded yet (Valeria's fixture ends
+   in three days, Test 7; Isabel's ends in fifteen, so moving her
+   `ends_on` to tomorrow and restarting the worker records it too). A
+   second run adds nothing. The message stays «en 3 días» even when fewer
+   days remain.
 
 Drop the copy afterwards: `dropdb pilates_test_sweeps`.
 
@@ -5461,8 +5584,8 @@ the admin web on `pilates_dev_sim` with the fixtures (Tests 5 A and 24).
    step 3; the API is `PATCH /api/v1/administrator/sessions/{id}`). Every
    booked Client receives «Tu clase cambió de horario» / «Tu clase de Mat
    Pilates cambió de horario: ahora es el sábado 26 de septiembre, 16:00.»
-   (the day and time vary), and Mis reservas shows the new time. The empty-Session check of Test 13 starts
-   over for the moved Session.
+   (the day and time vary), and Mis reservas shows the new time. The Minimum Bookings check and the
+   window-close snapshot of Test 13 start over for the moved Session.
 3. **The studio reassigns a Trainer.** In the same panel change the
    **Entrenadora** to Daniela Ortiz. Daniela's inbox (Staff app, Perfil →
    Notificaciones) reads «Nueva clase asignada» / «Se te asignó una clase:
@@ -5497,6 +5620,7 @@ command.
 | Cancel the same Booking twice, or a Booking of a cancelled Session | `409 booking_not_cancellable` |
 | Leave a Waitlist Entry that was already closed (promoted, left, or its Session started) | `409 waitlist_entry_not_active` |
 | Book as `mariana@example.com` (no Plan) or `sofia@example.com` (expired) | `409 no_eligible_subscription` |
+| Book a fourth class in the same Monday–Sunday week on a cap-3 Plan, or join that week's Waitlist, with no extra class left (Test 91) | `409 weekly_cap_reached` |
 | Reschedule outside the window, to another day, or a cancelled Booking | `409 reschedule_outside_window`, `reschedule_target_ineligible`, `booking_not_reschedulable` (Test 61) |
 
 **Payments** (`mariana@example.com`; Test 7, «Buying a Plan through
@@ -5511,7 +5635,7 @@ Swagger», names the endpoints):
 | Attach or submit after the Intent was submitted | `409 purchase_intent_not_open` |
 | Attach or submit after the Intent expired (Test 68, step 3) | `409 purchase_intent_expired` |
 | Open an Intent while a transfer is under review | `409 payment_pending_exists` |
-| `POST /api/v1/credit-purchases` as `sofia@example.com` (Bs 60 of Credit) for a Plan that costs more | `409 credit_insufficient`; create a Plan priced under Bs 60 in Planes (Test 25, step 5) and the same call activates it at once, with `payment_confirmed` in her inbox and no QR (Test 10 E) |
+| `POST /api/v1/credit-purchases` as any Client, for any Plan (deprecated since PAY-005) | `409 credit_insufficient`, always; nothing is created |
 | As Paola, confirm or reject a cash Payment's id, or a decided one again with the opposite decision | `409 payment_not_pending`, `409 payment_confirmation_conflict` (Test 7) |
 
 **Uploads** (any Account; Test 32 A names the three calls; limits are 10 MB
@@ -5582,8 +5706,8 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
 1. **A load failure.** Sign in as `lucia@example.com`, then stop the API
    (Ctrl+C in its Terminal) and open a screen you have not visited: Perfil
    → **Notificaciones** reads «No pudimos cargar tus notificaciones.»,
-   **Mis evaluaciones** «No pudimos cargar tus evaluaciones.», **Mi
-   crédito** «No pudimos cargar tu crédito.», the **Reservar** tab «No
+   **Mis evaluaciones** «No pudimos cargar tus evaluaciones.», **Mis
+   referidos** «No pudimos cargar tu código.», the **Reservar** tab «No
    pudimos cargar las clases.», a Plan «No pudimos cargar el plan.». A tab you
    had already opened shows the same line once its refresh fails. Start the
    API again and tap
@@ -5593,7 +5717,9 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    Trainer's root «No pudimos cargar tu agenda.», the roster «No pudimos
    cargar la lista de asistencia.», the Administrator's root «No pudimos
    cargar los pagos pendientes.», and the Nutritionist's **Mi
-   disponibilidad** «No pudimos cargar tus horarios.».
+   disponibilidad** «No pudimos cargar tus horarios.». A Trainer answer of
+   `403` or `500` shows the same **Reintentar** instead of «Algo salió
+   mal», and a later success loads the screen (Test 81).
 2. **An action failure.** With the API stopped, tap an action instead: a
    refused command shows its own line and keeps the form, in the pattern
    «No pudimos … Inténtalo de nuevo.» (Test 10 D's «No pudimos cancelar la
@@ -5603,7 +5729,8 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
 3. **Offline.** Cut the device's network as Test 9 F describes: the banner
    «Sin conexión. Mostrando la última información guardada.» sits above
    every screen until the network is back, and the screens of step 1 that
-   were already loaded keep their data.
+   were already loaded keep their data. Inicio is the exception of Test 75:
+   it keeps the last profile and says so in its own line.
 4. **A render error.** Test 1 describes «Algo salió mal» with
    **Reintentar**; it needs a defect to appear (a temporary `throw` in a
    screen, never committed), so it is read there, not here.
@@ -5625,7 +5752,7 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    plan (Test 5 B and Test 18), the Client's history and inbox (Tests 5 B
    and 9 B), the Assistant's reservations and history and «Sin plan
    activo» (Test 11 B), Pagos pendientes (Test 10 C), the roster (Test 12),
-   Mis evaluaciones (Test 15), referrals and Credit (Test 10 A), and «Ver
+   Mis evaluaciones (Test 15), the referral code (Test 10 A), and «Ver
    la app como…» (Test 67 A).
 
 ## Test 72: the admin web's empty, failed, refused, and lost states
@@ -5838,3 +5965,1352 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 107: Inicio without a connection
+
+Inicio needs the signed-in Client's profile, which the other screens do not.
+Load the fixtures (Test 5A), start the API and the Client app (Test 5B), and
+sign in as `lucia@example.com`. Open **Inicio** once while the API answers,
+so the phone has a profile to keep: «Hola, Lucía» and her plan card.
+
+1. **The last profile.** Cut the device's network as Test 9 F describes
+   and open **Inicio** again (leave the app and come back, or pull to
+   refresh). The greeting and the plan card stay, and a line on the screen
+   reads «Sin conexión. Mostrando tus datos de la última vez.» The banner
+   of Test 71 still sits above the screen; this line is Inicio's own.
+2. **Nothing saved.** Sign out, cut the network before the next sign-in,
+   and open **Inicio** on a phone that has never loaded it: «No pudimos
+   cargar tu inicio.» with **Reintentar**, and no «última vez» line. A
+   first launch with no connection has nothing to show.
+3. **The connection returns.** Restore the network (Test 9 F). The screen
+   refetches on its own, the «última vez» line goes away, and the greeting
+   is the profile the API answers now.
+
+## Test 106: the Staff app's diagnosis fixes
+
+The five Staff findings from the diagnosis (STAFF-005). The automated
+specs cover them; a device walk was not part of that check, so walk them
+here on the iPhone 16 Pro, the iPad Pro 11, and the Android emulator when
+a person is at the simulators. Do not take `/private/tmp/pilates-sim.lock`
+for an automated pass.
+
+1. **Trainer HTTP errors (S02, S03).** As `emma.vargas@example.com`, stop
+   the API and open Mi agenda: «No pudimos cargar tu agenda.» and
+   **Reintentar**, not «Algo salió mal». Start the API and tap
+   **Reintentar**: today's classes, or «No tienes clases este día.», load.
+   Open a roster, stop the API, and pull to refresh: «No pudimos cargar la
+   lista de asistencia.» and **Reintentar**, then the list once the API is
+   back.
+2. **A failed receipt (S12).** As `paola.mendoza@example.com`, open a
+   pending transfer and stop the API before the image arrives: «No pudimos
+   mostrar el comprobante.» and **Reintentar**. **Confirmar pago** stays
+   disabled. **Rechazar** still unfolds. Start the API, tap **Reintentar**,
+   and confirm only once **Comprobante de transferencia** is on screen.
+3. **An Assistant notice (S20).** As `camila.rojas@example.com`, open
+   **Notificaciones**. A notice that names a Client opens that Client's
+   overview (on the iPad, the right panel). A notice that names nobody
+   stays on the inbox. The backend does not send the Assistant a cash
+   confirmation today, so this step needs a row whose destination is that
+   Client; the automated spec plants one.
+4. **The version (S23).** Perfil's footer reads «Emma Pilates Studio ·
+   versión 1.0.1», the `expo.version` in `apps/staff-mobile/app.json`. The
+   Client app's own «versión 1.0» is a different item.
+
+## Test 105: the class reminders
+
+The worker's `class_reminders` sweep runs once at start and then every
+minute, beside the Evaluation reminders (`apps/backend/src/worker.ts`). A
+booked Client gets one inbox entry and one push 24 hours before her
+Session, and another 2 hours before. Restarting the worker in between
+does not send either one twice: the key is the Booking plus the kind
+(`class-reminder-day:{bookingId}`, `class-reminder-hour:{bookingId}`).
+
+Use a copy of the fixtures, never a database you keep
+(`createdb -T pilates_dev_sim pilates_test_class_reminders`), start the API
+and the worker on it, and sign in as `lucia@example.com` (Test 5). No
+device is required for the inbox; a real push still needs a development
+build (Test 46).
+
+1. **24 hours before.** Book a class that starts in about 26 hours (Test 5
+   B). In the database, move that Session to 23 hours from now:
+   `update booking.sessions set starts_at = now() + interval '23 hours', ends_at = now() + interval '23 hours 50 minutes' where id = '<session>'`.
+   Within a minute her inbox (Perfil → Notificaciones, screen 19) shows
+   «Recordatorio» / «Mañana tienes {clase} a las {hora}.», with the Bolivia
+   time. Restart the worker: the inbox still has one entry.
+2. **2 hours before.** Move the same Session to 90 minutes from now. The
+   inbox gains «Tu clase de {clase} empieza en 2 horas.» A second restart
+   adds nothing. A Booking made inside the last 24 hours gets only this
+   one, never «Mañana».
+3. **Nothing after a cancellation.** Cancel the Booking before the window
+   (Mis reservas → Cancelar). Moving the Session into either window leaves
+   her inbox without a new reminder.
+4. **The push**, when a development build is registered (Test 46), plays
+   the standard sound and shows «Recordatorio» / «Tienes una clase próxima.
+   Abre la app para ver el detalle.» The class name stays in the inbox.
+
+Drop the copy afterwards: `dropdb pilates_test_class_reminders`.
+
+## Test 98: recompute the studio facts
+
+Studio Management keeps one fact row per Session and one per Client per
+month, recomputed from what Booking already recorded. Nothing here is a
+screen: the Administrator triggers it from Swagger, and the worker repeats
+the current month every night. Use a disposable database, never
+`pilates_dev_sim`.
+
+1. **On demand.** Log in as `paola.mendoza@example.com` (Test 3) and
+   `POST /api/v1/administrator/studio-facts/recompute` with
+   `{"month":"2026-10"}`. The answer names the month and the counts of
+   session and client-month rows written. Run it again: the counts stay
+   the same, and the rows' `updated_at` does not move when nothing
+   changed. An Assistant (`camila.rojas@example.com`) gets
+   `403 studio_access_denied`. A month that is not `YYYY-MM` gets
+   `400 invalid_request`.
+2. **The nightly pass.** Start the worker against the same database
+   (`pnpm --filter @pilates/backend start:worker`). It recomputes the
+   current Bolivia month once at startup and then every 24 hours; the log
+   names a failure `studio_facts_failed` and the worker keeps running.
+3. **What a row holds.** `studio.session_facts` has the Session's date,
+   Branch, Class Type, Trainer, capacity, bookings still booked, attended,
+   and no-shows. A Session with no Bookings still has a row, with zeros.
+   `studio.client_month_facts` has the Client, the month, the plan days
+   overlapping that month, classes booked, classes attended, and whether
+   she renewed. Cancelled Bookings are not counted. Store-review rows are
+   not marked yet (REL-016), so this pass excludes nothing.
+
+## Test 99: read accrued revenue beside cash
+
+Reporte shows the month's cash, the revenue accrued by validity days, and
+the cash not yet accrued, plus the classes still owed today. A Payment of
+Bs 300 valid from 20 October 2026 to 19 November 2026 accrues Bs 120 in
+October (12 of 30 days) and Bs 180 in November; the last month absorbs the
+remainder, so the two months sum to Bs 300. Use a disposable database.
+
+1. **The figures.** Log in as `paola.mendoza@example.com` (Test 3) and open
+   Reporte. Under «Ingreso devengado» the month stepper starts on the
+   current Bolivia month. The three figures are Caja (confirmed Payments
+   decided in the month), Devengado (the part of each confirmed Payment
+   that falls in the month), and Diferido (cash not yet accrued through
+   today, the same number whichever month is selected). «Clases pendientes
+   de dar hoy» is the remaining class allowance of Subscriptions covering
+   today. Extra classes are not counted (BKM-008).
+2. **The worked example.** Confirm a Payment of Bs 300 whose Subscription
+   runs from 2026-10-20 to 2026-11-19. October shows Caja Bs 300,00 and
+   Devengado Bs 120,00. November shows Caja Bs 0,00 and Devengado
+   Bs 180,00. On 23 October, Diferido is Bs 270,00: today is exclusive, so
+   3 of 30 days have accrued. A month after the Subscription ended shows
+   Devengado Bs 0,00 even when half-up rounding already used the whole
+   amount in the earlier months.
+3. **Who may read it.** An Assistant (`camila.rojas@example.com`) and a
+   Coordinator (`carolina.rivas@example.com`) get `403 studio_access_denied`
+   from `GET /api/v1/administrator/reports/revenue?month=YYYY-MM`. A month
+   that is not `YYYY-MM` gets `400 invalid_request`. Carolina's sidebar has
+   no Reporte and no money.
+   [Pull request #195](https://github.com/DaleneyRuben/emma-pilates/pull/195).
+
+The migration `20261023240000_studio_facts` needs owner approval before it
+runs on a shared database. Pull request:
+https://github.com/DaleneyRuben/emma-pilates/pull/187.
+
+## Test 100: read the month's indicators
+
+Indicadores sits in the sidebar after Reporte. It shows the month's
+occupancy, students per class, active clients, and renewal, plus a bar of
+classes held for that month and the two before it. The Administrator also
+sees the three money figures from Test 76. The Coordinator sees the counts
+and never an amount. Use a disposable database.
+
+1. **The counts.** Log in as `paola.mendoza@example.com` (Test 3) and open
+   Indicadores. The month stepper starts on the current Bolivia month. The
+   four tiles are Ocupación, Alumnas por clase, Clientas activas, and
+   Renovación. The chart is «Clases dictadas». A month with no held classes
+   says «Sin clases dictadas en este mes.» and draws no chart. A failed
+   read says «No pudimos cargar los indicadores.» with «Reintentar».
+2. **The worked example.** Two held sessions, capacities 12 and 10,
+   bookings at window close 8 and 5, attended 7 and 4, no-shows 1 and 1.
+   Ocupación is 59 %. Alumnas por clase is 6,5. The no-show percent, which
+   the page does not tile, is 15. Two client-month rows with plan days, one
+   of them renewed, give Clientas activas 2 and Renovación 50 %. A client
+   is new only when no earlier month had plan days.
+3. **Who may read it.**
+   `GET /api/v1/administrator/reports/kpis?month=YYYY-MM` returns the counts
+   and `cashCentavos`, `accruedCentavos`, `deferredCentavos`, and
+   `classesStillOwed` for the Administrator. A Coordinator gets the counts
+   only: the JSON has no `*Centavos` key. An Assistant and a Trainer get
+   `403 studio_access_denied`. A month that is not `YYYY-MM` gets
+   `400 invalid_request`. Sign in as `carolina.rivas@example.com`: the
+   sidebar lists Indicadores and hides Reporte and Simulador. The page
+   shows the four count tiles and never «Bs».
+4. **Renewal.** The diagnosis divides by plans that expired this month. The
+   fact table cannot see that, so v1 divides by active clients. That
+   denominator is an open question; do not treat 50 % as the coordinator's
+   bonus base.
+   [Pull request #199](https://github.com/DaleneyRuben/emma-pilates/pull/199).
+
+## Test 102: read the month's recommendations
+
+Recomendaciones sits in the sidebar after Indicadores. It lists the month's
+findings from the studio facts. v1 has two rules, both counts: a weak
+schedule and an inactive client. Neither names a Client. The page shows the
+Spanish sentence and the state. Use a disposable database.
+
+1. **The list.** Log in as `paola.mendoza@example.com` (Test 3) and open
+   Recomendaciones. The month stepper starts on the current Bolivia month.
+   A finding reads its sentence («Revisa el horario del martes: promedia
+   1,7 alumnas.» or «Contacta a la clienta: tiene un plan vigente y no
+   reservó este mes.») and its state («Nueva», «Vista», «Descartada»,
+   «Resuelta»). «Descartar» sets the state to discarded. A month with no
+   findings says «Nada que revisar este mes.» A failed read says «No
+   pudimos cargar las recomendaciones.» with «Reintentar». While it loads,
+   the page says «Cargando las recomendaciones…».
+2. **How a finding is born.**
+   `POST /api/v1/administrator/recommendations/recompute` with
+   `{"month":"2026-10"}` reads the facts and upserts. A second run does not
+   add a row. A weak schedule is one Trainer and one weekday with at least
+   three held sessions whose average bookings at window close is below 3.
+   The fact has no start hour, so the weekday is the whole subject. An
+   inactive client is a current-month fact with plan days and no booking
+   and no attendance. The 7-day window is not this rule.
+3. **Who may read it.**
+   `GET /api/v1/administrator/recommendations?month=YYYY-MM` returns the
+   findings for the Administrator and for a Coordinator. v1 has no money
+   rule, so her response omits no amount field because none exists. An
+   Assistant gets `403 studio_access_denied`. Recompute and dismiss are
+   Administrator only. A month that is not `YYYY-MM` gets
+   `400 invalid_request`. Sign in as `carolina.rivas@example.com`: the
+   sidebar lists Recomendaciones after Indicadores and hides Reporte and
+   Simulador. The page shows the sentences and never «Descartar».
+4. **What is not a rule yet.** Client no-shows are not on
+   `client_month_facts`. A renewal gap needs an expiry the fact cannot
+   show, so an unrenewed plan is not a finding. Saturated schedules, the
+   distance to break-even, activation risk, classes lost at expiry, guest
+   passes, cash close, budget overruns, founder discount cost, reduced
+   capacity, and trainer statements wait for tables this branch does not
+   have. The nightly pass waits; the recompute endpoint is the trigger.
+
+## Test 103: read the month's narrated report
+
+Indicadores, below the chart, shows «Informe del mes» for the Administrator.
+The text comes from the month's counts and the recommendation sentences. It
+names no Client. A question is matched to those counts, not answered by a
+model. Use a disposable database.
+
+1. **The report.** Log in as `paola.mendoza@example.com` (Test 3) and open
+   Indicadores. Below «Clases dictadas» the card «Informe del mes» states
+   the classes held, the occupancy, the active clients, and the renewal
+   percent, using the same digits as the tiles. Each recommendation of the
+   month is an action whose «Porque:» line is that recommendation's
+   sentence. A month with no held classes says «En {mes} de {año} no se
+   dictaron clases.» and lists no action. While it loads, the card says
+   «Cargando el informe…». A failed read says «No pudimos cargar el
+   informe.» with «Reintentar».
+2. **A question.** The field is «Pregunta sobre el mes» and the button is
+   «Preguntar». An empty field does not ask. «ocupación» answers with the
+   occupancy percent. «clientas activas» answers with the active-client
+   count. Anything else, including a person's name, answers «Solo puedo
+   responder sobre los indicadores del mes. Pregunta por la ocupación o por
+   las clientas activas.» A question longer than 200 characters, or a month
+   that is not `YYYY-MM`, gets `400 invalid_request`.
+3. **Who may read it.**
+   `GET /api/v1/administrator/reports/narrative?month=YYYY-MM` and
+   `POST /api/v1/administrator/reports/narrative/questions` are
+   Administrator only. A Coordinator and an Assistant get
+   `403 studio_access_denied`. Sign in as `carolina.rivas@example.com`:
+   Indicadores shows the count tiles and never «Informe del mes».
+4. **No model.** Nothing in this test calls an external model, and no API
+   key is configured. The sentences are the pure function over the
+   aggregates. A provider can replace that function later. The report is
+   not stored.
+   [Pull request #204](https://github.com/DaleneyRuben/emma-pilates/pull/204).
+
+## Test 83: raise a Session's capacity and correct an Attendance (BE-027)
+
+Both checks are the API only, with curl against a disposable database. No
+phone or browser is involved. Use a copy of the fixtures so the rows you add
+never land on a database you keep.
+
+```sh
+createdb -T pilates_dev_sim pilates_test_be027
+```
+
+Point `apps/backend/.env`'s `DATABASE_URL` at
+`postgresql://$USER@localhost:5433/pilates_test_be027` and start the API on a
+free port (`PORT=3133 pnpm --filter @pilates/backend start`). Log in as Test 3
+describes (`POST /api/v1/authentication-sessions`, password
+`emma-local-2026`) and keep each credential.
+
+1. **A higher capacity promotes the Waitlist.** As `paola.mendoza@example.com`,
+   create a one-off Session of capacity 1 more than 2.5 hours ahead
+   (`POST /api/v1/administrator/sessions`, Test 21 step 3). Book it as
+   `valeria@example.com` (`POST /api/v1/sessions/{id}/bookings` with an
+   `idempotency-key`). Join its Waitlist as `lucia@example.com`, then as
+   `isabel@example.com` (`POST …/waitlist-entries`; Isabel has no classes left,
+   so she can wait but cannot be promoted). Raise the capacity to 2
+   (`PATCH /api/v1/administrator/sessions/{id}` `{"capacity": 2}`). Lucía's
+   Waitlist Entry closes as `promoted` and she has a Booking; Isabel's Entry
+   stays open, because one new seat promotes only the first eligible entry.
+   Lucía's inbox (`GET /api/v1/notifications`) reads «Cupo liberado». Lowering
+   the capacity back to 1 is refused (`409 capacity_below_bookings`) and
+   neither Booking changes. `dropdb pilates_test_be027` when you finish.
+2. **A correction names both outcomes.** Book a Session that has already
+   ended (back-date one with `psql` as Test 13 does, or pick one that ended
+   today) as `lucia@example.com`. As `emma.vargas@example.com`, save the roster
+   (`POST /api/v1/sessions/{id}/attendance`, `{"outcomes": [{"bookingId",
+   "outcome": "attended"}]}`). That first save writes no audit record. Save
+   it again with `"outcome": "no_show"`. In `psql`,
+   `system.audit_records` holds one `attendance.corrected` row for that
+   Booking whose `metadata` is `{"previousOutcome": "attended", "outcome":
+   "no_show"}`, with Emma's Account and role `trainer`. Saving `no_show`
+   again writes nothing new. Another Role still gets `403`.
+
+## Test 75: the studio rules (BKM-004)
+
+The rules the apps and the API follow live in one versioned Studio Settings
+record ([ADR-0101](./adr/0101-keep-studio-rules-in-studio-settings.md)).
+Migration `20261023104000_studio_settings` seeds version 1 with today's
+values: a 2 h 30 Cancellation Window, 2 Minimum Bookings checked 3 h before,
+Start Dates up to 14 days ahead, 40 Founder places at 15 % lost after 7 days
+without a Plan, one Guest Pass per person, one invite a month, +1 class when
+a guest buys, 16 % tax, Bs 70 per Paid Evaluation, Bs 50 to the
+Nutritionist, renewal targets 80/85/90 %, and no Opening Date. Run the API
+and the admin web as in Tests 2 and 24.
+
+A. **The public rules.** `curl -i http://127.0.0.1:3100/api/v1/studio-rules`
+   answers without a credential, with `Cache-Control: public, max-age=60` and
+   an `ETag`:
+   `{"cancellationWindowMinutes":150,"evaluationPriceCentavos":7000,"plansFromPriceCentavos":56000,"startDateLimitDays":14,"openingDate":null}`.
+   `plansFromPriceCentavos` is the cheapest visible Plan (hidden Plans do not
+   count; `null` when none is visible). Sending the `ETag` back as
+   `If-None-Match` answers `304`.
+B. **Reglas del estudio (AW36).** Log in as `paola.mendoza@example.com`, open
+   the account menu (your name, top right) and choose **Reglas del
+   estudio**. «Puedes cambiar» shows Mínimo de reservas por clase 2,
+   Impuestos sobre las ventas (%) 16, the three renewal targets 80/85/90,
+   an empty Fecha de apertura, and «Versión 1 · valores iniciales».
+   «Reglas fijas» lists «2 h 30 antes de cada clase», «3 h antes de cada
+   clase», «Hasta 14 días después de la compra», «40 lugares · 15 % de
+   descuento · se pierde con más de 7 días sin plan», «1 clase de invitada
+   por persona · 1 invitación al mes · +1 clase cuando la amiga compra», and
+   «Bs 70,00 · Bs 50,00 para la nutricionista».
+   - Type 0 in the minimum and 120 in the tax and press **Guardar
+     cambios**: «Entre 1 y 20 reservas.» and «Un porcentaje entre 0 y
+     100.», and nothing is saved.
+   - Type 3 and pick 01/12/2026 as the opening date, then save: «Guardamos
+     las reglas del estudio.», «Versión 2 · guardada el … por Paola
+     Mendoza», and `GET /api/v1/studio-rules` now shows
+     `"openingDate":"2026-12-01"`. The audit table has a
+     `studio_settings.updated` row whose metadata holds the old and new
+     values (`previousMinimumBookings: 2`, `minimumBookings: 3`, …), and
+     `booking.studio_settings_versions` has a second row; neither row can be
+     updated or deleted (the trigger answers «append-only»).
+   - Open the page in two tabs, save a change in one, then save in the
+     other: «Alguien guardó otras reglas mientras editabas…» and the second
+     tab shows the newer values.
+   - At 420 px every field takes the full width and each fixed rule stacks
+     its value under its label; the account menu is a bottom sheet whose
+     first row is **Reglas del estudio**.
+   - Without a session `GET /api/v1/administrator/studio-settings` answers
+     `401`; as Camila (Assistant) it answers `403
+     administration_access_denied`.
+C. **The apps follow the settings without a build.** The Cancellation
+   Window is not editable on the web (it changes with a release), so append
+   a version by hand on a development database to see the apps follow it:
+
+   ```sql
+   insert into booking.studio_settings_versions
+     select gen_random_uuid(), version + 1, 360, minimum_bookings,
+       minimum_bookings_check_lead_minutes, start_date_limit_days,
+       founder_places, founder_discount_percent, founder_gap_days,
+       guest_passes_per_client, invites_per_host_per_month,
+       invite_reward_classes, tax_rate_percent, evaluation_price_centavos,
+       nutritionist_fee_centavos, renewal_target_months_1_to_6_percent,
+       renewal_target_months_7_to_12_percent,
+       renewal_target_from_month_13_percent, opening_date,
+       (select id from system.accounts where email = 'paola.mendoza@example.com'),
+       now()
+     from booking.studio_settings_versions order by version desc limit 1;
+   ```
+
+   Within a minute (pull to refresh), a booking 5 hours away shows **No
+   cancelable** and **Reprogramar** in Mis reservas (05) and in the
+   Assistant's «Reservas de la clienta» (S21); 09 Detalle del plan reads
+   «Cancelación sin costo hasta 6 h antes de cada clase.»; AW03's «Cancelar
+   sesión» confirmation says «aunque falten menos de 6 h»; and
+   `DELETE /api/v1/bookings/{id}` for that booking answers `409
+   booking_cancellation_window`. Append another version with `150` to go
+   back. 02 Inicio's buy card reads «Paquetes desde Bs 560. Puedes pagar en
+   el estudio o desde la app.» on the fixtures (the cheapest visible Plan);
+   hide that Plan on AW04 and the price follows.
+D. **When the rules cannot be read** (stop the API while an app is open on
+   a screen that has not loaded them yet), 02 says only «Puedes pagar en el
+   estudio o desde la app.», 09 leaves the cancellation line out, and 05 and
+   S21 show no **Cancelar** or **Reprogramar** until the rules load.
+
+The Minimum Bookings and its lead time drive the worker's check since BKM-009
+(Test 13): raise the minimum here and the next check uses it. The rules that
+use the other values (Start Dates, founders, invites, tax, the paid
+Evaluation, the renewal bonus) arrive with their own backlog items. Founders
+are Test 88.
+
+## Test 76: the daily cash close (BKO-003)
+
+At the end of the day the Assistant (or the Administrator) counts the drawer
+and closes the Branch's cash once (S25); the Administrator reviews the closes
+on AW151. The expected cash is the day's confirmed cash Payments at that
+Branch, up to the moment of the close.
+
+1. Use a copy of the fixtures database, because a close can never be undone:
+   `createdb pilates_test_cash`, then `db:migrate:deploy` and `db:fixtures` on
+   it, and run the API, the admin web, and the Staff app against it (Tests 19
+   and 23).
+2. Log in to the Staff app as `camila.rojas@example.com` and sell a Plan in
+   cash at Centro to a Client without one (Mariana or Sofía, Test 19).
+3. Press «Cerrar caja» beside the avatar on Buscar cliente. Expected: today
+   and «Centro» under the title, «EFECTIVO ESPERADO» with the sale's amount
+   and «1 venta en efectivo hoy en Centro», and «Cerrar caja» disabled until a
+   count is typed.
+4. Type the expected amount, then less, then more. Expected: «Diferencia · Bs
+   0 · Cuadra» on green, «−Bs … · Falta efectivo» on red, «+Bs … · Sobra
+   efectivo» on amber; «12,345» is not read and keeps the button off.
+5. Add a note and press «Cerrar caja». Expected: «Caja cerrada» with the
+   expected, counted, and difference lines, the note, and «Cerrada por Camila
+   Rojas a las hh:mm.», and in `psql` one `back_office.cash_closes` row plus a
+   `cash_close.recorded` audit record (actor role `ASSISTANT`, the Branch,
+   `businessDate`, the amounts).
+6. Open «Cerrar caja» again. Expected: the same closed state, no form. A second
+   `POST /api/v1/cash-closes` for that Branch today with another
+   Idempotency-Key answers `409` `cash_close_already_recorded`; the same key
+   replays the first answer. `GET /api/v1/cash-closes/today?branchId=<Urubó>`
+   as Camila answers `403` `branch_not_assigned`; as a Trainer, `403`
+   `back_office_access_denied`.
+7. Log in as `paola.mendoza@example.com`: «Cerrar caja» sits beside the avatar
+   on Pagos pendientes and offers every Branch as chips. Close another Branch.
+8. On the admin web, open Back Office › «Caja» (after Pagos). Expected: AW151
+   «Cierres de caja» for the selected Branch and the current month, one row
+   per day with cash sales or a close, newest first: «Cerrada», «Sin cierre»
+   (a past day with cash sales and no close, also counted in the amber notice
+   above the table), or «Abierta» (today, not closed yet). A short count reads
+   «−Bs …» in red on a tinted row, a surplus «+Bs …» in amber. Make a past
+   unclosed day by recording a cash sale with the API's clock in the past (or
+   wait a day) to see the notice.
+9. The «Ajuste» column shows how a closed day's cash sales moved after the
+   close: a cash sale recorded later the same day raises it; a sale voided
+   after the close (Test 89) lowers it. The close itself is
+   never edited.
+10. Check AW151 at 1440 px and 420 px (the rows become cards that keep the
+    tint), and `GET /api/v1/administrator/cash-closes?branchId=…&month=…` as
+    the Assistant answers `403`. Then `dropdb pilates_test_cash`.
+
+## Test 77: work as the Coordinator (IDN-009)
+
+The Coordinator runs the studio's operation without seeing money
+([ADR-0102](./adr/0102-coordinator-role-without-money.md)). The fixtures
+(Test 5 A) include her: `carolina.rivas@example.com`, with the fixture
+password, holding every Branch.
+
+### A. The admin web
+
+1. Start the API and the admin web (Test 24) and sign in as
+   `carolina.rivas@example.com`. The sidebar shows only **Horario**,
+   **Clientes**, and **Personal**; the account menu names her Role
+   «Coordinación».
+2. In **Horario**, create a one-off Session, move one to another Trainer,
+   and cancel one that has Bookings (Test 25): everything works as for the
+   Administrator, at every Branch.
+3. Type `/back-office/pagos` (or `/reporte`, `/back-office/nomina`,
+   `/promociones`) in the address bar: you land on Horario with «Esa
+   sección es solo para administración.».
+4. In **Clientes**, there is no **Dar clases de campaña**. Open a Client:
+   no «Crédito» row, no «Cerrar cuenta», no **Agregar clase de cortesía**,
+   no **Devolver una clase**, no **¿Cómo nos conociste?**, and no «Bs»
+   anywhere. Typing `/back-office/clientes/campana` lands on Horario with
+   the same notice as step 3. Press **Editar perfil**, change the phone, and
+   **Guardar cambios**: «Guardamos los cambios del perfil.» and the new
+   phone. Empty the name to see «Escribe el nombre de la clienta.». The
+   email stays read-only («La clienta cambia su correo desde su app.»).
+5. In **Personal**, there is no «Nuevo miembro»; opening a member shows
+   her details read-only with «Solo administración invita y cambia roles.».
+6. Sign in as `paola.mendoza@example.com`: **Editar perfil** works the same
+   for the Administrator, and **Personal → Nuevo miembro** offers the Role
+   **Coordinador**, which replaces the Branch chips with «Todas las
+   sucursales (implícito por el rol)».
+
+### B. The Staff app
+
+1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. She
+   lands on **Buscar cliente** without «+ Nuevo cliente» and with
+   **Cancelar una clase**, which opens the Administrator's cancellation
+   screens (Test 10 D).
+2. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
+   for the Assistant (Test 11 B and C) at any Branch, but there is no
+   «Registrar pago en efectivo». A Client without a Plan reads «La clienta
+   necesita un plan activo para reservar.».
+3. Perfil reads «Coordinación» and «Todas las sucursales».
+4. As the Administrator, Perfil → «Ver la app como…» lists her under
+   «Coordinación»; seeing the app as her shows the same stack under the
+   banner (Test 67).
+
+### C. The API
+
+Every endpoint has an explicit decision for the Administrator and the
+Coordinator in `apps/backend/test/database/authorization-matrix.ts`; the
+integration spec `authorization-matrix.integration-spec.ts` boots the API on
+a disposable database and checks each one (Test 8, integration tests). By
+hand, with her bearer token from Swagger (Test 3): `GET
+/api/v1/administrator/payments`, `GET /api/v1/administrator/reports/income`,
+and `GET /api/v1/assistant/clients/{id}/plan-quotes` answer `403`;
+`PATCH /api/v1/administrator/clients/{id}` with `{"name": "…", "phone":
+null}` answers the refreshed detail with `creditAvailableCentavos` at 0
+(Credit is retired, PAY-005), and `system.audit_records` gains
+`client.profile_corrected` with `actor_role = coordinator` and only the
+changed field names.
+
+## Test 78: tester access (Courtesy Access, REL-011)
+
+The closed-test testers and the stores' review Accounts book without paying
+through «Acceso de prueba»: a hidden Bs 0 Plan of 16 classes that only the
+Administrator grants (booking ADR-0012). Run it against `pilates_dev_sim` (or
+a copy) with the API and the admin web, at 1440 px and 420 px.
+
+1. **Grant.** Sign in to the admin web as `paola.mendoza@example.com`, open
+   **Clientes**, and open a Client with no active Plan (Valeria Quiroga or
+   Sofía Guzmán in the fixtures). The panel footer shows **Acceso de prueba**
+   left of **Cerrar cuenta**; a Client with an active Plan (Lucía) shows only
+   **Cerrar cuenta**. Click it: the dialog «¿Dar acceso de prueba a …?»
+   explains the grant and proposes «Válido hasta» 30 days from today (the
+   field accepts today up to one year ahead; an empty date greys out **Dar
+   acceso**). Confirm: the dialog closes, the Plan block reads «Acceso de
+   prueba · Activo», «Vigencia» from today to that date, «Clases
+   disponibles 16 de 16», and the footer says «Acceso de prueba activo hasta
+   el dd/mm/aaaa.» without the button. In the database the Payment has
+   method `courtesy`, Bs 0, `confirmed`; the audit log holds
+   `payment.courtesy_granted`; the Client's inbox (and phone, with push) has
+   «Pago confirmado».
+2. **Refusals.** Grant again through Swagger
+   (`POST /api/v1/administrator/clients/{clientId}/courtesy-access` with an
+   `Idempotency-Key` UUID and `{"endsOn":"YYYY-MM-DD"}`): `409
+   subscription_not_expired`. A past date or one more than a year ahead
+   answers `400 courtesy_end_date_invalid`; a Client with a transfer in
+   review answers `409 payment_pending_exists` and the dialog points to
+   **Pagos**. As `camila.rojas@example.com` (Assistant) or a Client the
+   endpoint answers `403 administration_access_denied`.
+3. **Hidden everywhere else.** The Plan appears in **Planes** only under
+   the hidden filter, with Bs 0; **Mostrar** on it is refused. It never
+   appears in the Client app's Planes, in the Staff app's cash sale, or in
+   `GET /api/v1/plans`, and buying it by id answers `409
+   plan_not_purchasable`. The income report (Test 30) does not change.
+4. **Booking with it.** Log in to the Client app as the granted Client and
+   book a Session, cancel it (the class returns), book one starting within
+   2 h 30 and reschedule it the same day, and join a full Session's
+   waitlist: Mi plan counts down from 16. The test schedule is ordinary
+   Sessions built in **Horario**; production is reset after Google's
+   approval (ADR-0104), so nothing marks them.
+
+## Test 79: how a Client found the studio, and referral codes (BKM-011)
+
+«¿Cómo nos conociste?» is asked at registration (Client app `01`) and by the
+Assistant (`S05`), with eight answers: Instagram, TikTok, Facebook, Google,
+Recomendación de una amiga, Una instructora, Pasé por el estudio, Otro. An
+optional Referral Code, a Client's (`REF-…`) or a Trainer's personal code,
+wins over the answer: a Client's code makes her `friend`, a Trainer's
+`trainer`, and the Trainer is the one BKO-006 pays for. The Administrator sets
+a Trainer's code on `AW24` and corrects a Client's attribution on `AW22`
+(the Coordinator joins once IDN-009 adds that Role). Use the fixtures
+(Test 5 A) and the admin web (Test 23).
+
+### A. Give a Trainer her code (AW24)
+
+1. In the admin web open **Personal** and click **Emma Vargas** (a Trainer).
+   Under the Branches the panel shows **Código personal** with its own
+   **Guardar código**.
+2. Type `emma` and click **Guardar código** (or press Enter): the field reads
+   `EMMA` and «Código guardado: EMMA.» appears. The panel's **Guardar** still
+   saves only Role and Branches.
+3. Open **Andrea Suárez** (another Trainer), type `EMMA`, and save: «Ese
+   código ya lo tiene otra clienta o instructora.». Type `REF-ANDREA`: «Usa
+   de 3 a 20 letras, números o guiones, sin empezar con REF-.».
+4. Open **Camila Rojas** (Assistant): no **Código personal**.
+
+The API is `GET`/`PUT /api/v1/administrator/staff-members/{id}/referral-code`
+(`{"referralCode": "EMMA"}`, `null` removes it); each change writes the audit
+record `staff_member.referral_code_changed`.
+
+### B. Register with the question and a code (Client app `01`)
+
+1. In the Client app tap **Regístrate**. Under **Confirmar contraseña** the
+   form asks **¿Cómo nos conociste?** with the eight chips; one can be
+   chosen at a time.
+2. Fill the form and tap **Crear cuenta** without choosing: «Elige cómo nos
+   conociste.» and nothing is sent.
+3. Choose **Instagram**, open **¿Tienes un código de referido?** (the field
+   says «De una amiga o de tu instructora.»), type `emma`, and create the
+   account. «Revisa tu correo» follows.
+4. A code nobody holds answers «Revisa el código de referido.» under the
+   field and creates nothing.
+
+Through Swagger, `POST /api/v1/client-registrations` with
+`"acquisitionChannel": "instagram", "referralCode": "emma"` does the same; the
+same request without `acquisitionChannel` (an older store build) still answers
+`202` and records `unknown`; an unknown code answers `400`
+`referral_code_invalid`.
+
+### C. The Assistant's new Client (`S05`)
+
+Log in to the Staff app as `camila.rojas@example.com`, tap **+ Nuevo
+cliente**, fill the name and email, and tap **Crear cuenta** without an
+answer: «Elige cómo nos conociste.». Choose **Pasé por el estudio**, type
+`EMMA` in **Código de referido (opcional)**, and create: her overview opens as
+before. A code nobody holds answers «No encontramos ese código. Revísalo o
+déjalo vacío.» under the code and creates nothing.
+
+### D. Read and correct it on the Client detail (`AW22`)
+
+1. In **Clientes** open the Client from B or C. The block **¿Cómo nos
+   conociste?** reads **Canal** «Una instructora» with «Ella respondió:
+   Instagram» (or «Pasé por el estudio») under it, **Código** `EMMA`, and
+   **La trajo la instructora** «Emma Vargas». A Client from before the
+   question reads «Sin dato».
+2. Click **Corregir**, choose **TikTok**, empty **Código (opcional)**, and
+   click **Guardar**: the block reads «TikTok» alone. An unknown code keeps
+   the form open with «No encontramos ese código. Revísalo o déjalo vacío.»;
+   no answer chosen says «Elige cómo nos conoció.».
+
+The API is `GET`/`PUT /api/v1/administrator/clients/{id}/acquisition`
+(`{"channel": "tiktok", "referralCode": null}`), Administrator only for now;
+each correction writes `client_acquisition.corrected` with the previous and
+new channel and code. Check the rows with
+`select declared_channel, channel, referral_code, referrer_client_id,
+referrer_staff_member_id from booking.client_acquisitions;` on your database:
+Clients that existed before the migration got `unknown`, or `friend` with the
+referrer when a Referral named one.
+
+## Test 80: send feedback from the apps and triage it on the admin web (REL-012)
+
+«Enviar comentarios» is the last row of Perfil in the Client app (Prompt 25,
+follow-up 165) and a row after «Cambiar contraseña» on the Staff app's Perfil
+for every Role (`S27`). The admin web lists what arrives under
+**Comentarios** (`AW38`), the last entry of the sidebar.
+
+### A. Send one from each app
+
+1. With the backend, the worker, and Metro running (Test 2), log in to the
+   Client app as `isabel@example.com` on the iPhone, the iPad, or the Android
+   emulator and open **Perfil → Enviar comentarios**.
+2. The button «Enviar comentario» stays disabled until you pick a type
+   (Problema, Sugerencia, Otro) and write at least 10 characters; the counter
+   reads «n / 2000» and the field stops at 2,000. The card under the field
+   names what travels with the text: «la versión de la app (1.0.1,
+   compilación 3), el sistema (Android 14) y tu rol. No enviamos capturas de
+   pantalla.» (Expo Go reports its own version and build; a store or
+   development build reports the app's.)
+3. Send it: «¡Gracias por tu comentario!» replaces the form, and «Volver al
+   perfil» returns to Perfil.
+4. In the Staff app, log in as `emma.vargas@example.com` (or any Staff
+   fixture), open the account avatar → **Enviar comentarios**, and send one.
+   While an Administrator sees the app as someone (Test 67) the send answers
+   «Mientras ves la app como otra persona no puedes enviar comentarios.»
+5. Each Administrator except the sender gets the inbox entry «Comentario
+   nuevo» («Llegó un problema desde la app de clientas. Revísalo en la web de
+   administración.») and, on a development build, its push.
+
+The Maestro journeys `send-feedback.yaml` in both apps' `.maestro` run steps
+1–4 (Test 19).
+
+### B. Triage it on the admin web
+
+1. Log in to the admin web as `paola.mendoza@example.com` and open
+   **Comentarios**. The subtitle counts the «Nuevo» ones; the table shows
+   Fecha, Tipo, Comentario, App, Versión («1.0.1 (3) · Android 14»), and the
+   Estado pill. Filter by Estado (Todos, Nuevo, Revisado, Resuelto) and App
+   (Las dos, App de clientas, App del personal); the filters live in the
+   address.
+2. Open a row: the panel shows the whole text, Fecha, App, Rol, Correo,
+   Versión, and Sistema. Choose **Resuelto**, write «Qué cambiamos», and
+   **Guardar**: «Guardamos el comentario.» and the pill turns Resuelto.
+3. **Exportar CSV** downloads `comentarios-aaaa-mm-dd.csv` with every comment:
+   Fecha, App, Tipo, Comentario, Versión, Estado, Qué cambiamos (what Google's
+   production questionnaire asks for). The export and every triage write an
+   audit record (`feedback.exported`, `feedback.triaged`).
+
+### C. Through the API
+
+- `POST /api/v1/feedback` with a Bearer credential, an `Idempotency-Key`
+  UUID, and `{type, text, appVersion, appBuild, platform, osVersion}` answers
+  `201 {id, createdAt}`; the same key replays the answer, another body with it
+  answers `409 idempotency_key_reused`, a text under 10 or over 2,000
+  characters or an unknown field (such as `role`) answers `400`. The eleventh
+  in 24 hours from one Account answers `429 feedback_limit_reached`.
+- `GET /api/v1/administrator/feedback?status=&app=&page=&pageSize=`,
+  `GET /api/v1/administrator/feedback/export`, and
+  `POST /api/v1/administrator/feedback/{id}/triage` with
+  `{status, changeNote}` are the Administrator's; any other Role answers
+  `403 feedback_access_denied`.
+
+## Test 81: Plans by days and the Weekly Cap (BKM-005)
+
+A Plan now lasts **30, 60, or 90 days** and the 60- and 90-day Plans may
+carry a **Weekly Cap** of 3 or 4 classes
+([booking ADR-0005](../booking/docs/adr/0005-validity-in-days-with-a-chosen-start-date.md),
+[ADR-0006](../booking/docs/adr/0006-weekly-cap-and-extra-classes.md)). A
+Subscription ends on its start plus the days minus one. Run the API, the
+fixtures, and the admin web as in Tests 2 and 24, and the apps as in Tests 9
+and 11.
+
+A. **The migration.** On a copy of a database made before BKM-005, apply
+   `20261023120000_plans_by_days`: every Plan gets `duration_days` (1 month →
+   30, 3 months → 90, 6 and 12 months → 90) and is **hidden** (`hidden_at`
+   set, never deleted); Purchase Intents, Payments, and Subscriptions get the
+   same `duration_days_snapshot`, and Subscriptions keep their dates. Running
+   the fixtures afterwards shows the four fixture Plans again, in days.
+B. **Planes (AW04) and the Plan form (AW05).** As
+   `paola.mendoza@example.com` open **Catálogo › Planes**: the columns read
+   **Vigencia** («30 días», «90 días») and **Tope semanal** («4 por semana»
+   for Trimestral 36 clases, a grey «Sin tope» for the others). **Nuevo
+   plan**: **Vigencia** offers 30, 60, and 90 días; **Tope semanal** is
+   disabled on «Sin tope» while Vigencia is 30 días and offers «3 clases por
+   semana» and «4 clases por semana» at 60 or 90. Create «Bimestral 16
+   clases», 60 días, 3 clases por semana, 16 clases, `1.120,00`: the row
+   reads «60 días · 3 por semana». Edit it back to 30 días: the cap returns to
+   «Sin tope». At 420 px each row is a card with Vigencia and Tope semanal
+   lines and the form is a full-screen sheet. Through the API
+   `POST /api/v1/administrator/plans` with `durationDays: 30` and
+   `weeklyClassCap: 3`, or with `durationDays: 45`, answers `400`; as Camila
+   it answers `403 administration_access_denied`.
+C. **The contract.** `GET /api/v1/plans` (as any Client) returns
+   `durationDays`, `weeklyClassCap` (`null` without a cap), and the
+   deprecated `durationMonths` that store builds still read (30 → 1, 60 → 2,
+   90 → 3). The Payment, Purchase Intent, and Assistant quote responses
+   carry `durationDays` too.
+D. **Elige tu plan (08) and Detalle del plan (09).** As Sofía, **Comprar un
+   plan**: each card reads «8 clases · válido por 30 días»; a capped Plan
+   adds « · hasta 3 por semana». Its detail shows «Válido por 60 días», «60
+   días de vigencia desde que se confirma tu pago.», and «Hasta 3 clases por
+   semana.». No Plan line says «mes» or «meses».
+E. **The end date.** As Camila register cash for a Client on the 60-day Plan
+   (Test 11): **Elige un plan** (S09) and **Confirmar pago en efectivo** (S10)
+   show «16 clases · válido por 60 días · hasta 3 por semana», and «¡Pago
+   registrado!» reads «Vence el …» 59 days after today (bought on 23 October,
+   it ends on 21 December; bought on 1 December, on 29 January). That
+   Client's Home (02) reads «Vence el …» and **Mi plan** (12) shows the
+   **Inicio** and **Vence el** dates; the Assistant's overview (S06) reads
+   «Vence el …» too.
+
+Booking more than the cap in one week is refused (Test 91).
+
+## Test 87: the Start Date and early renewal (BKM-006)
+
+A Plan starts on the date chosen at purchase, from today up to 14 days later,
+and a Client with a Plan in force can buy the next one
+([booking ADR-0005](../booking/docs/adr/0005-validity-in-days-with-a-chosen-start-date.md)).
+Run the API and the fixtures as in Tests 2 and 5, and the apps as in Tests 9
+and 11.
+
+A. **The chip row (09 and S10).** As Lucía, open **Mi plan** (12) and tap
+   **Renovar plan**. **Elige tu plan** (08) still reads «válido por 30 días».
+   Open **Paquete de 8 clases**: under **Qué incluye** a row labelled
+   **Fecha de inicio** offers chips from **Hoy** through 14 days, and **Hoy**
+   starts selected. The row scrolls sideways. As Camila, search Sofía, tap
+   **Registrar pago en efectivo**, and open the same Plan: **Confirmar pago
+   en efectivo** (S10) shows the same row above **Confirmar pago recibido**.
+B. **The chosen date.** As Sofía, `POST /api/v1/purchase-intents` with the
+   Plan id and `startsOn` inside the window answers `201` and echoes
+   `startsOn`. A date past today + 14 answers `409`.
+C. **The next Plan (12).** Give a Client a second active Subscription that
+   starts after the current one ends (a disposable database only). **Mi
+   plan** adds a line **Siguiente plan** whose value reads «Siguiente plan
+   desde {fecha}», and the date wraps inside the card on a phone. The
+   **Renovar plan** button stays.
+D. **A booking before the Start Date (04).** End the current Subscription
+   before the next one starts, then open a Session dated in the gap and tap
+   **Reservar**. The screen answers «Podrás reservar a partir del {fecha}.»
+   and the API answers `409` `booking_before_start_date`. A Session the
+   current Plan still covers books as before.
+
+The reminder that names the renewal arrives with the worker's Plan reminder
+(Test 7). An Evaluation booked before the Start Date still answers the
+existing ineligible-subscription refusal.
+
+## Test 88: founder membership (BKM-010)
+
+The first 40 Clients whose first real Payment is confirmed hold a Founder
+Membership: 15 % off every Plan except the single class, lost for good after
+a gap of more than 7 days
+([booking ADR-0008](../booking/docs/adr/0008-founder-membership.md)).
+Run the API and the fixtures as in Tests 2 and 5. The Client app and the
+Staff app were not walked on a device for this item; the prices and the
+banner are covered by their unit tests. The admin list is the browser check.
+
+A. **The place.** Confirm a real Payment (cash or an approved transfer) for
+   a Client who has never paid. She receives the next number, from 1 to 40.
+   The 41st distinct Client receives none. A Courtesy Access (Bs 0) takes
+   no place. A second real Payment for a founder does not take a second
+   number.
+B. **The price (08, 09, S09).** As a founder, **Elige tu plan** shows the
+   discounted price, with the list price struck through under it. The
+   single class (1 class, Bs 80) shows only its list price. A Client who is
+   not a founder sees only the list price. The Assistant's quote shows the
+   same pair, and the cash to collect is the discounted price minus any
+   credit. The first real Payment itself is at list price; the discount
+   starts on the next purchase.
+C. **The banner (12).** As a founder with a current Subscription, **Mi
+   plan** shows «Renueva antes del {fecha}.» The date is the current
+   Subscription's real end plus 7 days. No banner when she has no current
+   Subscription, or when the membership is lost.
+D. **The gap.** A nightly job ends a membership when more than 7 days pass
+   after the stored end with no next Start Date. A gap of 7 days keeps it.
+   A lost membership does not return on a later Payment. Running the job
+   twice ends nothing the second time. The Client receives a push and an
+   inbox notification titled «Membresía fundadora».
+E. **The income report.** A founder's later sale shows the list price, the
+   discount (`discountReason` `founder`), and the amount paid.
+F. **Fundadoras (AW40).** As Paola, open **Back Office → Fundadoras**. The
+   subtitle reads «n de 40 lugares». Each row shows the number, the name,
+   the day (`dd/mm/aaaa`), and **Activa** or **Perdida**. There is no
+   create action. At 420 px each membership is a card. An empty studio
+   reads «Todavía no hay fundadoras.»
+
+## Test 92: the freeze (BKM-012)
+
+A Plan of 90 days or more may be frozen once, for up to 15 days, never
+starting in the past
+([booking ADR-0010](../booking/docs/adr/0010-freeze-quarterly-subscriptions.md)).
+The Client asks; Paola approves or refuses. Run the API and the fixtures as
+in Tests 2 and 5. The Client app and the Staff app were not walked on a
+device for this item. The admin approval is the browser check.
+
+A. **The request (12).** As a Client with **Trimestral 36 clases**, open
+   **Mi plan**. The form asks for a start, an end, and a reason. A 10-day
+   request is accepted and the screen says it is in review. A 30-day or
+   60-day Plan, a second request, more than 15 days, or a start in the past
+   answers `409` `freeze_not_allowed` and «Este plan no se puede congelar.»
+B. **The decision.** Paola opens **Back Office → Congelamientos**. The card
+   names the Client, the Plan, the dates, and the reason, with **Aprobar**
+   and **Rechazar**. Approving moves the Subscription end by exactly the
+   frozen days and cancels Bookings already inside the window; the class
+   returns the same way a cancellation does. The Payment amount does not
+   change. The Client receives a push and an inbox notification.
+C. **The booking.** A Session inside an approved Freeze answers `409`
+   `booking_during_freeze` and «Tu plan está congelado hasta el {fecha}.»
+   A Session outside it books as before.
+D. **The founder.** A founder whose Subscription was frozen is not ended by
+   the nightly job: the stored end already includes the frozen days.
+E. **Who decides.** An Assistant, a Trainer, a Nutritionist, and a Client
+   get `403` on the decision. A Coordinator principal is rejected too;
+   IDN-009 makes that role real.
+
+## Test 82: equipment, its faults, and the capacity flags (BKO-004)
+
+The studio registers each reformer, cadillac, and mat per Branch; a Trainer
+reports a fault from a Session of her agenda; an Administrator resolves it;
+and Horario flags the future Sessions with more places than working machines
+of their kind (ADR-0106, back-office glossary «Equipment», «Equipment Issue»,
+and «Equipment Kind of a Class Type»). The kind of a Session comes from its
+Class Type's name: «Reformer Pilates» uses reformers, «Mat Pilates» mats, and
+«Pilates Prenatal» nothing, so it is never flagged. The system never changes
+a capacity.
+
+1. Run the API and the admin web against a migrated copy of the fixtures
+   database (Test 23), and log in to the admin web as
+   `paola.mendoza@example.com`. Open **Back Office → Equipos** (AW37).
+   Expected: «Todavía no hay equipos en esta sucursal.» with «Nuevo equipo».
+2. Register Centro's machines with «Nuevo equipo»: Tipo Reformer, Número 1,
+   «Guardar», and so on up to Reformer 12 (the fixture Reformer Sessions hold
+   12 places), plus a few cadillacs and mats. Expected: «Agregamos
+   Reformer 1.», each kind in its own section in number order, every piece
+   «Funciona», and the subtitle «Sucursal Centro · N equipos · 0 fuera de
+   servicio». Registering Reformer 3 again shows «Ya hay un Reformer 3 en esta
+   sucursal.» under Número (`409 equipment_number_taken`). To register many at
+   once, `POST /api/v1/administrator/equipment` with
+   `{"branchId", "kind": "reformer", "number": n}` in Swagger.
+3. Open **Horario** on next week. Expected: no warning yet, because 12
+   working reformers cover 12 places.
+4. Press «Registrar falla» on Reformer 5, write what happened, tick «No se
+   puede usar», and press «Registrar». Expected: «Registramos la falla de
+   Reformer 5.», the fault in **Fallas · Abiertas** with «Reportó Paola
+   Mendoza · dd/mm/aaaa · hh:mm» and the «Fuera de servicio» pill, Reformer 5
+   «Fuera de servicio» in its section, and «1 fuera de servicio» in the
+   subtitle. A fault without the tick shows «Se puede usar» and the piece
+   «Con falla»; it changes no flag.
+5. Open **Horario** on next week again. Expected: every future Reformer
+   Pilates Session with 12 places carries the warning triangle, an amber left
+   border, and «Faltan equipos · 11 de 12», its accessible name ends «faltan
+   equipos: 11 reformers funcionando para 12 lugares», and above the week
+   «N sesiones de esta semana tienen más lugares que reformers funcionando.
+   Baja su capacidad o revisa Equipos.» links to AW37. Mat and Prenatal
+   Sessions, cancelled Sessions, and Sessions already started are never
+   flagged. Lower one Session's capacity to 11 in AW03: its flag goes away.
+   (`GET /api/v1/administrator/equipment-flags?branchId&from&until`, at most
+   92 days apart.)
+6. Staff app as `emma.vargas@example.com` (Test 12): open a Reformer Pilates
+   Session of hers at Centro from Mi agenda. Expected: «Reportar una falla»
+   under the Session line on S03, before and after the class. Press it.
+   Expected: S26 «Reportar una falla» with the Session line, «¿Qué equipo?»,
+   the Branch's pieces as chips grouped «Reformers» first (the Session's
+   kind), Reformer 5 with «· fuera de servicio», «¿Qué pasó?», «No se puede
+   usar», and «Enviar reporte» disabled until a chip is chosen and the text
+   holds something. Choose Reformer 3, write a description, tick the box,
+   and send. Expected: «Gracias por avisar» and «Administración ya puede ver
+   la falla de Reformer 3.»; «Volver a la lista» returns to S03. On AW37 the
+   fault shows «Reportó Emma Vargas». A Branch with no Equipment shows «Sin
+   equipos registrados». On the iPad the form sits in a 560 pt column.
+7. Only the Trainer who leads the Session can use it: as Daniela, `GET
+   /api/v1/trainer/sessions/{Emma's session}/equipment` answers `403
+   back_office_access_denied`, and so does every
+   `/api/v1/administrator/equipment…` path for an Assistant, a Trainer, or a
+   Nutritionist.
+8. Back on AW37, press «Marcar resuelta» on Reformer 5's fault and confirm.
+   Expected: «Marcamos resuelta la falla de Reformer 5.», the fault under
+   **Resueltas** with «Resuelta por Paola Mendoza · …», no button there,
+   Reformer 5 «Funciona» again (or «Con falla» while another open fault
+   remains), and Horario's flags gone. Resolving it again through Swagger
+   answers `409 equipment_issue_resolved`.
+9. Press «Dar de baja» on a piece and confirm. Expected: «Dimos de baja
+   Reformer 12.», the piece gone from the list and from the counts (so
+   12-place Reformer Sessions are flagged again with «11 de 12»), its faults
+   kept; the number can be registered again. In `psql` the row keeps
+   `archived_at`; nothing is ever deleted (`back_office.equipment`,
+   `back_office.equipment_issues`).
+10. Check AW37 and Horario at 1440 px and 420 px (stacked cards, the fault
+    rows stacked, the day list's cards with «Faltan equipos»), and S26 on the
+    iPhone, the iPad, and the Android emulator.
+
+
+## Test 84: the first 90 days (BKM-013)
+
+A new Client gets a message on day 2, at the end of week 1, on day 30, and
+on day 90, and she appears on **Para contactar** when she stops booking.
+
+### A. The admin web
+
+1. Sign in as `paola.mendoza@example.com` (Test 24). The sidebar shows
+   **Para contactar** after **Clientes**, with a count.
+2. Open it. Each row names the Client, her phone, the reason («7 días sin
+   reservar», «Menos de 2 clases a los 15 días», «Menos de 4 clases en su
+   primer mes»), and the day she started. **Abrir WhatsApp** opens
+   `wa.me` with her number, and **Contactada** removes her with «Marcaste a
+   {nombre} como contactada.».
+3. At 420 px the same rows become cards behind **Abrir menú**.
+4. Sign in as `carolina.rivas@example.com`: she sees the same page and no
+   «Bs» anywhere. A Trainer does not see the entry.
+
+### B. The Staff app
+
+Log in as `carolina.rivas@example.com` (Test 9 E). **Buscar cliente** shows
+**Para contactar** under **Cancelar una clase**. It opens the same list:
+the Client, her phone, the reason, **Abrir WhatsApp**, and **Contactada**.
+With nobody to write to it reads «Nadie para contactar por ahora.».
+
+### C. The Client app
+
+The messages arrive in **Notificaciones** (Perfil). The four titles are
+«Tu segunda clase», «Tu primera semana», «Tu primer mes», and «Tres meses
+con nosotras». The inbox card draws the message body and not the title
+(noted on the BKM-013 row; the title is what the push shows).
+
+## Test 85: extra classes (BKM-008)
+
+An extra class is an `AllowanceAdjustment` on the Subscription: a signed
+number of classes, a reason, an author, and a time
+([booking ADR-0006](../booking/docs/adr/0006-weekly-cap-and-extra-classes.md)).
+The line a person sees names the first grant: «Clases extra: 1 · Cortesía»,
+«Clases extra: 1 · Regalo de bienvenida», «Clases extra: 1 · Invitación»,
+«Clases extra: 1 · Campaña», or «Clases extra: 1 · Clase devuelta». Run the
+API and the fixtures as in Tests 2 and 5.
+
+A. **The Administrator records one.** As Paola,
+   `POST /api/v1/administrator/clients/{clientId}/allowance-adjustments`
+   with `{ "classes": 1, "reason": "courtesy" }` answers `201`. The same call
+   as Camila answers `403`. `class_return` is the other reason the endpoint
+   accepts; any other reason answers `400`.
+B. **The three surfaces.** Open that Client's **Mi plan** (12), her summary
+   as Camila (S06), and her detail in the admin web (AW22, at 1440 px and at
+   420 px). Each reads «Clases extra: 1 · Cortesía». A Client with no extra
+   class shows no line.
+C. **The gift.** The first approved Payment in a Client's life adds one
+   class with reason `gift_new_client`, and the line then reads «Clases extra:
+   1 · Regalo de bienvenida». A founder and a courtesy Plan do not get it,
+   and a second Payment does not add it again. The automated suites cover
+   that grant; no screen records the first cash Payment's gift yet (Test 89
+   adds the form).
+
+Spending an extra class waits for the base allowance to run out, and for the
+Weekly Cap (Test 91). Cancelling a Booking funded by an extra class restores
+the class to the base pool.
+
+## Test 89: payment controls (PAY-006)
+
+A sale stays as it was recorded. The Assistant cannot edit or delete a
+Payment. Only the Administrator voids one, and only with a reason
+([decisions §4.3](./decisiones-emma-pilates.md),
+[booking ADR-0012](../booking/docs/adr/0012-sales-controls-and-invoice-data.md)).
+A void corrects a mistake: no money is returned. Run the API and the
+fixtures as in Tests 2 and 5. Paola is the Administrator and Camila the
+Assistant.
+
+A. **Front-desk receipt.** As Camila, open a Client and **Confirmar pago en
+   efectivo** (S10). **Fotografiar comprobante** sends the receipt. The
+   Payment stays pending. As Paola, the same receipt appears on **Revisar
+   pago** (S12) and on **Pagos** (AW28). Approving it uses that existing
+   review. Cash still confirms on the spot with **Confirmar pago recibido**,
+   and an older build that omits the new fields still confirms cash.
+B. **Invoice card.** On that same S10 screen, **Datos para la factura**
+   starts on **Sin factura**. **Con factura** asks for **NIT o CI** and
+   **Nombre o razón social**. Both can stay empty. This branch does not
+   store them; PAY-007 owns the columns and the «Factura emitida» mark.
+C. **Anular venta.** As Paola, on **Pagos**, filter **Confirmado** and press
+   **Anular venta**. The button stays disabled until **Motivo** has text.
+   After the void the row is **Anulado** and shows the reason. The income
+   report drops that amount from the totals and lists the sale under
+   **Ventas anuladas** with the same reason. The Subscription no longer
+   covers today, future Bookings are cancelled, and Attendance already
+   taken stays. A second void is refused.
+D. **Courtesy.** On the Client detail (AW22), with an active Plan,
+   **Agregar clase de cortesía** and **Devolver una clase** record one
+   class. Camila, a Trainer, and a Nutritionist get `403` on that endpoint
+   and on the void. The Coordinator Role is not on this branch; the denial
+   covers a cast principal the use case rejects.
+
+The migrations `20261023190000_void_payment_values` and
+`20261023190100_void_payment` need owner approval before they run on a
+shared database.
+
+## Test 93: nutritionist rules (NUT-003)
+
+A Plan of 90 days or longer includes one Evaluation, used inside its
+dates. Every other active Plan pays the Studio Settings price, Bs 70 in
+the fixtures. A Client with no active Plan cannot book. A paid Evaluation
+is its own Payment, with no Subscription
+([decisions §6](./decisiones-emma-pilates.md),
+[booking ADR-0011](../booking/docs/adr/0011-paid-evaluations.md)).
+Paola is the Administrator, Gabriela the Nutritionist, Lucía holds
+Paquete de 8 clases.
+
+A. **Included once.** Give a Client a 90-day Plan and book an Evaluation.
+   The confirmation says it is free and it does not consume a class. A
+   second Evaluation in the same Plan is offered at Bs 70. An early
+   cancellation frees the included one. A cancellation inside 3 hours, or
+   a no-show recorded by Gabriela or Paola after the start, counts it as
+   used and refunds nothing.
+B. **QR.** As Lucía, the slot shows Bs 70 and confirming starts a
+   transfer. The slot stays held for 24 hours. Paola approves it on the
+   existing payment review; the Evaluation is then held and no Subscription
+   is created. If the transfer is still pending after 24 hours, the worker
+   releases the slot and rejects the Payment. Cash at the front desk is
+   not on this branch.
+C. **Cost and income.** Three held Evaluations in a month record Bs 150
+   owed to the Nutritionist. On **Reporte** (AW16), under the method line,
+   Plan income and Evaluation income are separate. Mis evaluaciones labels
+   a past row «Incluida», «Pagada», «No asistió», or «Cancelada».
+
+The migrations `20261023210000_evaluation_payments` and
+`20261023210100_evaluation_payment_constraints` need owner approval before
+they run on a shared database. Follow-ups 206 and 207 stay pending.
+
+## Test 94: the month result and the break-even (BKO-005)
+
+**Reporte** (AW16) now has two tabs. **Reporte** is the income and expense
+report of Test 30. **Finanzas** is one Bolivia month: cash income, the tax
+from the studio rules, the fixed-cost budget against what was spent, the
+Nutritionist's cost, the result, and the break-even
+([decisions §11](./decisiones-emma-pilates.md)). Paola is the Administrator.
+Camila, the Assistant, gets `403` on both endpoints. Log in as Test 24
+describes.
+
+1. **Tabs.** **Reporte** opens on the **Reporte** tab, with Desde, Hasta,
+   and Sucursal as before. **Finanzas** replaces those controls with a month
+   stepper that cannot go past the current month. The address keeps the tab
+   (`?vista=finanzas&month=2026-10`). The top bar still says "El reporte usa
+   su propio filtro de sucursal" on a wide window and leaves that line out
+   at a phone width.
+2. **Empty budget.** With no budget loaded, the four figures read Bs 0,00
+   and the page says "Aún no hay presupuesto." with one button, **Cargar
+   presupuesto de apertura**. Press it once. The ten opening lines appear
+   (Alquiler Bs 8.500,00 through Insumos Bs 400,00), **Imprevistos (10 %)**
+   reads Bs 1.925,00 with "—" under Gastado, and **Total** reads
+   Bs 21.175,00. Pressing it again does not add lines.
+3. **The month.** **Ingresos en caja** is the confirmed Payments of that
+   month. **Impuesto** is 16 % of them ("16 % de los ingresos en caja").
+   **Resultado** is cash income less the tax, the spent lines, and the
+   Nutritionist's cost, with a minus sign when it is a loss. **Punto de
+   equilibrio** is the cash income that covers the budget and that cost
+   after tax. With no Nutritionist cost it reads Bs 25.208,33. The line
+   under the figures names the cost ("Costo de la nutricionista Bs 0,00").
+   Money is written `Bs 1.925,00`, never in centavos.
+4. **One expense.** Record a Gasto whose category is named exactly like a
+   budget line (Alquiler) in the month on screen. Gastado on that row grows
+   by the amount, and Resultado falls by it. A category with another name
+   does not move a budget row.
+5. **Narrow browser.** At 420 px the figures stack and the budget table
+   becomes labelled cards (Línea, Presupuesto, Gastado). The sidebar opens
+   from **Abrir menú**.
+
+The migration `20261023230000_cost_budget_lines` needs owner approval before
+it runs on a shared database. The accrued-revenue view (decisions §11) is
+not on this page. Follow-up 208 stays pending.
+
+## Test 97: simulate a month (STU-004)
+
+**Simulador** (AW42; AW37 is Equipos) is a calculator. It sits in the sidebar
+after **Reporte**. The Coordinator's sidebar has no money (ADR-0102), so she
+does not see it, and typing `/simulador` returns to Horario. Nothing is
+saved: changing a number recalculates in the browser, and leaving the page
+forgets the change. Paola is the Administrator. Log in as Test 24 describes.
+
+1. **The opening month.** The five fields read 33, 4, 65, 21175, and 16.
+   **Resultado** reads Bs 761,20, with the line "143 clases · ingreso
+   Bs 37.180,00". **Punto de equilibrio** reads Bs 36.273,81. Under the
+   figures the derivation reads `(21175 + 9295) / 0.84 = 36273.81`. Open the
+   Branch selector: it says "Esta página no se filtra por sucursal — el
+   simulador no lee una sede."
+2. **A change.** Set **Impuestos (%)** to 20. **Punto de equilibrio** rises
+   to Bs 38.087,50 and the derivation becomes
+   `(21175 + 9295) / 0.8 = 38087.50`. **Resultado** becomes a loss,
+   −Bs 726,00. Set **Clases por semana** to 20 and both figures move again.
+   Reload the page: the five fields are back to the opening values.
+3. **Nothing is saved.** The browser's network panel shows no request while
+   you edit. There is no save button.
+4. **Narrow browser.** At 420 px the fields and the two figures stack. The
+   sidebar opens from **Abrir menú** and lists **Simulador**.
+
+The package's own check uses variable costs of Bs 9.290 and derives
+`(21175 + 9290) / 0.84 = 36267.86`. The page's 143 classes at Bs 65 come to
+Bs 9.295, so its derivation differs by those Bs 5. The break-even in
+students per class, occupancy, and clients is not on this page. Follow-up
+210 stays pending. Pull request:
+https://github.com/DaleneyRuben/emma-pilates/pull/192.
+
+## Test 101: project the month (STU-005)
+
+**Proyección** is a section of **Simulador** (AW42), under the derivation.
+It is the same calculator: the month on screen repeats for 3, 6, and 12
+months, in three scenarios. Nothing is saved, and editing makes no request,
+so there is no spinner and no network error of its own. An empty or invalid
+field is the alert Test 82 already shows, and the table hides with the
+figures. Paola is the Administrator. Log in as Test 24 describes.
+
+1. **The three horizons.** With the opening values, the table has nine rows.
+   **3 / Base** reads ingreso Bs 111.540,00, costos Bs 91.410,00, impuesto
+   Bs 17.846,40, resultado Bs 2.283,60, three times the month's Bs 761,20.
+   **6 / Bajo** and **12 / Alto** are on the same table. Bajo is below Base
+   and Alto is above it. The note says the month above repeats, Bajo is 80 %
+   of the students, and Alto is 120 % with a cap of 12 per class.
+2. **A higher tax.** Set **Impuestos (%)** to 20. The **3 / Base** result
+   becomes −Bs 2.178,00, lower than Bs 2.283,60. The ingreso of that row
+   does not move.
+3. **Nothing is saved.** The network panel shows no request while you edit.
+   Reload: the table is back to the opening rows.
+4. **Narrow browser.** At 420 px each row is a labelled card (Meses,
+   Escenario, Ingreso, Costos, Impuesto, Resultado). The sidebar opens from
+   **Abrir menú** and lists **Simulador**.
+
+The page still multiplies a week by its own 4.33. The package holds the same
+constant. The break-even in students per class, occupancy, and clients is
+still not on this page.
+
+## Test 95: trainer pay and «Mis pagos» (BKO-006)
+
+A Trainer is paid from the rates in force: Bs 65 per class with up to 4
+students, plus Bs 8 from the fifth, counted on the Bookings the Session held
+when the cancellation window closed (a no-show counts), Bs 25 when a Session
+was cancelled because the minimum was not met, and 10 % of what a Client she
+brought actually paid for her first Plan, in the month that Payment was
+approved. Paola is the Administrator. Camila, the Assistant, cannot approve
+and cannot list the statements. Log in as Test 24 describes.
+
+1. **Calculate the month.** In the admin web open **Pagos a instructoras**
+   (above Nómina). The month stepper cannot go past the current month. Press
+   **Calcular mes**. Each Trainer with a line appears as a card: her name,
+   «Borrador», the total (`Bs 322,00`, never centavos), and a table of
+   Concepto, Detalle, and Monto.
+2. **Approve once.** Press **Aprobar** on one card. It reads «Aprobado» and
+   Nómina gains one Salary Payment for that total. Pressing again, or
+   calculating the month again, does not add a second payment.
+3. **The figures.** A class of 3 students is Bs 65,00. A class of 6 is
+   Bs 81,00. A no-show counts in the snapshot. A Session cancelled for the
+   minimum is Bs 25,00. A first Plan of Bs 780,00 pays Bs 78,00, once, even
+   if she buys again.
+4. **Narrow browser.** At 420 px the cards stack and the line table becomes
+   labelled cards. The sidebar opens from **Abrir menú**.
+5. **Her own only.** `GET /api/v1/trainer/pay-statements` as Emma returns
+   only Emma's statements. As Daniela it does not include Emma's. As Camila
+   it answers `403` `back_office_access_denied`, and so does approval.
+
+The Staff app's «Mis pagos» row is not built: follow-up 209 stays pending.
+The Coordinator sees no money (ADR-0102), so she cannot list or approve a
+statement. The migration `20261023230100_trainer_pay_statements` needs owner
+approval before it runs on a shared database. Pull request:
+https://github.com/DaleneyRuben/emma-pilates/pull/186.
+
+## Test 96: coordinator pay (BKO-007)
+
+The Coordinator is paid a base of Bs 3.500,00, plus Bs 50,00 for each new
+Client on a 30-day Plan and Bs 80,00 on a 60- or 90-day Plan, and a bonus of
+Bs 400,00 when the month's renewal rate reaches the target in Reglas del
+estudio: 80 % in months 1 to 6 from the Opening Date, 85 % in months 7 to
+12, and 90 % from month 13. A Client renewed when she bought another Plan
+before hers ended or within 7 days after. A single class, a gift class, an
+invited friend, and a Client a Trainer brought pay nothing. Only Paola sees
+it. Carolina, the Coordinator, does not, not even her own. Log in as Test
+24 describes.
+
+1. **Open the page.** In the admin web as Paola open **Pago a la
+   coordinadora** (under Pagos a instructoras). The month stepper cannot go
+   past the current month. The card names Carolina, «Borrador» or
+   «Aprobado», the total (`Bs 4.030,00`, never centavos), and a table of
+   Concepto, Detalle, and Monto. An empty month says «Este mes no tiene un
+   pago calculado.» There is no Calcular mes: the worker drafts it.
+2. **Approve once.** Press **Aprobar**. The card reads «Aprobado» and
+   Nómina gains one Salary Payment for that total. Pressing again does not
+   add a second payment.
+3. **The figures.** A new Client on a 30-day Plan is Bs 50,00. One on a
+   60- or 90-day Plan is Bs 80,00. A single class, a gift class, and a
+   Client a Trainer brought do not appear. The bonus of Bs 400,00 appears
+   when the rate reaches the target and not one point below.
+4. **She cannot see it.** Sign in as `carolina.rivas@example.com`. The
+   sidebar has no **Pago a la coordinadora**. Typing
+   `/back-office/pago-coordinadora` returns to Horario with «Esa sección es
+   solo para administración.» `GET /api/v1/coordinator/pay-statements` and
+   `GET /api/v1/administrator/pay-statements?month=2026-12` answer `403`
+   `back_office_access_denied`, and so does approval.
+5. **Narrow browser.** At 420 px the card stacks and the line table becomes
+   labelled cards. The sidebar opens from **Abrir menú**.
+
+Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/188.
+
+Follow-up 203 stays pending. The migration
+`20261023230200_coordinator_pay_line_kinds` needs owner approval before it
+runs on a shared database.
+
+## Test 86: invite a friend (BKM-014)
+
+A friend who registers with a Client's code gets one free class in her life,
+in a Session that has a free place that is not the last one. The host invites
+one friend a calendar month, in America/La_Paz. When the friend buys her
+first real Plan, the host gets one extra class («Clases extra: 1 ·
+Invitación») on her current Subscription, or on her next one if she has none.
+Credit is retired (PAY-005); this screen never shows it. Use the fixtures (Test 5 A) and the API (Test 2).
+
+### A. The screen (Client app `16`)
+
+1. Log in as `lucia@example.com` and open **Invita a una amiga** from Home
+   or from Perfil. The top bar reads «Invita a una amiga», the card shows
+   her code `REF-LUCIA` with **Compartir**, and the note reads «Comparte tu
+   código. Tu amiga recibe una clase gratis, una sola vez. Cuando compre su
+   primer plan, tú ganas una clase.». There is no **Tu crédito** row.
+2. The list names each friend with her status: «Registrada», «Clase
+   reservada», or «Compró su plan». With nobody invited it reads «Aún no
+   has invitado a nadie. ¡Comparte tu código!».
+
+`GET /api/v1/clients/current/referrals` returns the code and each friend's
+`invitationStatus` (`registered`, `class_booked`, `bought`). The credit fields stay as deprecated zeros; screen `17` is retired.
+
+### B. The rules, through the API
+
+Register a friend with the host's code (Test 79 B, or the Assistant's S05).
+The answer is `202`, and `booking.guest_passes` gains one row. A second
+friend of the same host in the same calendar month answers `409`
+`guest_pass_monthly_limit`; the same invitation in the next month answers
+`202`. A second registration of the same friend is already refused by the
+one-Referral rule.
+
+The friend books a Session with exactly one place left: `409`
+`guest_pass_last_place`. A Client with a Plan takes that place as usual.
+Her second booking answers `409` `guest_pass_already_used`.
+
+When her first real Payment is approved, the host's current Subscription
+gains one `invite_converted` adjustment, and a second approval adds nothing.
+A host with no current Subscription gets it on the next one she buys. The
+friend's own first real Payment still gets the gift class: the free class
+never counted as a first Plan.
+
+## Test 90: campaign extra classes (BKM-015)
+
+A campaign grants extra classes with reason `campaign` to every Client whose
+live Subscription covers today in Bolivia. A Client without one is skipped
+and named. It never changes a price. It composes with the gift class
+(Test 85); it does not replace it.
+
+A. **The page (AW21).** Log in as `paola.mendoza@example.com` /
+   `emma-local-2026`. On **Clientes**, at 1440 px and at 420 px (open the
+   menu with «Abrir menú»), press **Dar clases de campaña**. The page says
+   how many clientas will receive it and names who has no live Plan. Write
+   «Inicio de año», leave **Clases extra** at 1, press **Dar las clases**,
+   then **Confirmar campaña**. The result names how many received a class
+   and who was skipped. Open one recipient's detail: «Clases extra: 1 ·
+   Campaña» when the campaign is her first grant.
+B. **The denial.** The same `POST /api/v1/administrator/campaigns` as Camila
+   answers `403` and writes nothing. The header `Idempotency-Key` is a UUID;
+   sending the same call again grants nothing more.
+
+## Test 91: the weekly cap (BKM-007)
+
+A capped Plan limits the classes a Client books from her base allowance in
+one Monday–Sunday week in America/La_Paz
+([booking ADR-0006](../booking/docs/adr/0006-weekly-cap-and-extra-classes.md)).
+Bimestral 16 and Trimestral 24 cap at 3; Bimestral 24 and Trimestral 36 cap
+at 4. A 30-day Plan has no cap. The count uses the cap snapshotted on the
+Subscription, and it leaves out a Booking an extra class paid for. Run the
+API and the fixtures as in Tests 2 and 5. The mobile surfaces of this test
+were not walked on a device in the BKM-007 session (another item owned the
+simulators); the API journey below was.
+
+A. **Three, then a refusal.** As a Client on a cap-3 Plan, book three
+   Sessions in the same week. `GET /api/v1/sessions` for that week returns
+   `classesLeftThisWeek` counting down (3, then 2, then 1, then 0). The
+   fourth `POST /api/v1/sessions/{sessionId}/bookings` answers
+   `409 weekly_cap_reached` with «Ya usaste tus clases de esta semana.»
+   Joining that week's Waitlist answers the same code.
+B. **An extra class.** As Paola, grant one courtesy class (Test 89). The
+   fourth Booking now answers `201`, and a fifth in the same week is refused
+   again. The extra-funded Booking does not itself use a place in the cap.
+C. **No cap.** A Client on a 30-day Plan books a fourth class in the same
+   week and it answers `201`. Her Session list omits `classesLeftThisWeek`.
+D. **The week boundary.** A Booking at Sunday 23:00 La Paz and one at Monday
+   00:30 La Paz fall in different weeks. A same-week Reschedule at the cap
+   answers `200`. A Reschedule into another week is still
+   `409 reschedule_target_ineligible` (the destination must stay in the same
+   Bolivia week).
+E. **The screens.** Reservar (03) and the Session detail (04) show «Te quedan
+   N clases esta semana» from the field, «Te queda 1 clase esta semana» for
+   one, and nothing when the field is absent. At zero the line stays «Te
+   quedan 0 clases esta semana»; the extra-class line is the one on Mi plan.
+   Follow-up 203 draws that line and is still pending. The Assistant's
+   refusal uses the same problem code.
+
+## Test 104: the Client app's diagnosis fixes (MOB-070)
+
+Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
+These are the Client findings of the diagnosis's section 1.8. Devices were
+not walked for this item; the automated tests cover each one.
+
+A. **Reprogramar sends one key.** As `lucia@example.com`, open a Booking
+   inside the window (**No cancelable**, **Reprogramar**) and confirm a
+   same-day class. The `POST /api/v1/bookings/{id}/reschedule` carries an
+   `Idempotency-Key` UUID, and a second tap of **Confirmar cambio** sends
+   the same key, so the API replays the first answer instead of moving the
+   Booking twice.
+B. **The Waitlist closes with the window.** Open a full Session more than
+   2 h 30 away: **Unirme a la lista de espera** is there. Open one inside
+   the window: the button is gone and the note reads «Falta poco para la
+   clase, así que la lista de espera ya cerró.» The same note appears while
+   the studio rules have not loaded yet.
+C. **A refusal names the rule.** Cancel a Booking the API refuses with
+   `409 booking_cancellation_window`: Mis reservas reads «Ya no se puede
+   cancelar: falta menos que la ventana de cancelación.», not «Inténtalo de
+   nuevo». A refused reschedule reads, by code:
+   `reschedule_outside_window` «Solo puedes reprogramar dentro de la ventana
+   de cancelación.», `reschedule_target_ineligible` «Esa clase no está
+   disponible para reprogramar.», `session_full` «La clase ya no tiene
+   cupos.», `weekly_cap_reached` «Ya usaste tus clases de esta semana.»
+   (BKM-007), and `booking_before_start_date` «Tu plan todavía no empieza:
+   podrás reservar desde su fecha de inicio.» (BKM-006). Any other failure
+   keeps «Inténtalo de nuevo».
+D. **The phone is a Bolivian mobile.** Perfil → **Editar**. Type
+   `+54 9 11 1234 5678` or `71234567` and tap **Guardar cambios**: nothing
+   is saved, and the field reads «Escribe un celular de Bolivia, por ejemplo
+   +591 71234567.» `+591 71234567` saves, and clearing the field still saves
+   a null phone.
+E. **The version and the price.** Perfil's footer reads «Emma Pilates Studio
+   · versión 1.0.1», the version in `apps/client-mobile/app.json`, not a
+   fixed «versión 1.0». Inicio's buy card still prices «Paquetes desde» from
+   the cheapest visible Plan (Test 75 C).
