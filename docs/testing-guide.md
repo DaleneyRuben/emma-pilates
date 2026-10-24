@@ -6016,3 +6016,4 @@ model. Use a disposable database.
    key is configured. The sentences are the pure function over the
    aggregates. A provider can replace that function later. The report is
    not stored.
+   [Pull request #204](https://github.com/DaleneyRuben/emma-pilates/pull/204).

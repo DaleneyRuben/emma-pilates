@@ -1126,6 +1126,7 @@ No migration. Open questions: the Coordinator role is IDN-009's; this path
 accepts a cast `coordinator`, and a real login waits. The fixed questions
 are occupancy and active clients only. Design follow-up 206 stays pending;
 the export was not run.
+[Pull request #204](https://github.com/DaleneyRuben/emma-pilates/pull/204).
 
 ### Summary (2026-10-23)
 
