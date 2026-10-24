@@ -1,0 +1,68 @@
+name: Store deploy
+
+# REL-008 (ADR-0101, amending ADR-0038). Manual only, and only from a
+# release/* branch. Android submits to Play's internal track. iOS waits for
+# the Apple Developer account (gate 9) and is refused here until that account
+# exists. Nothing here promotes a track to production.
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: Which app to build and submit
+        required: true
+        type: choice
+        options: [client, staff]
+      platform:
+        description: android now; ios stays refused until gate 9
+        required: true
+        type: choice
+        options: [android, ios]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-store-${{ inputs.app }}-${{ inputs.platform }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Refuse a branch that is not a release branch
+        if: ${{ !startsWith(github.ref, 'refs/heads/release/') }}
+        run: |
+          echo "Store deploy runs from a release/<app>-x.y.z branch (ADR-0101)."
+          exit 1
+
+      - name: Refuse iOS until the Apple Developer account exists
+        if: inputs.platform == 'ios'
+        run: |
+          echo "iOS store deploy waits for gate 9 (the Apple Developer account). Do not dispatch this until that account exists and EAS has its credentials."
+          exit 1
+
+      - name: Stop until the owner stores EXPO_TOKEN
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "EXPO_TOKEN is not set. Create an Expo robot user for emma-pilates and store its token as the EXPO_TOKEN GitHub secret. This workflow builds nothing until then."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build and submit to Play internal testing
+        working-directory: apps/${{ inputs.app }}-mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: pnpm exec eas build --profile production --platform android --auto-submit --non-interactive --no-wait
