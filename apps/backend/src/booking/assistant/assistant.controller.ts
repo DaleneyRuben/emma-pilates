@@ -34,7 +34,9 @@ import { ClassHistoryEntryDto, parseUuid } from '../booking.dto';
 import type { ClientSubscriptionSummary } from '../client/client-subscription';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import type { InvoiceData } from '../payments/invoice-data/invoice-data';
+import { PaymentDto } from '../payments/payments.dto';
 import { runPaymentCommand } from '../payments/payments.controller';
+import type { PaymentView } from '../payments/prisma-payment-commands';
 import {
   ClientNotFoundError,
   type AssistantCashPaymentResult,
@@ -49,9 +51,11 @@ import {
   AssistantClientDto,
   ClientOverviewDto,
   parseRecordCashPayment,
+  parseRecordFrontDeskTransfer,
   parseSearchQuery,
   PlanQuotesDto,
   RecordCashPaymentDto,
+  RecordFrontDeskTransferDto,
 } from './assistant.dto';
 import { deprecatedDurationMonths } from '../catalog/plan-validity';
 
@@ -89,6 +93,17 @@ export type AssistantClientOperations = {
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ) => Promise<AssistantCashPaymentResult>;
+  recordFrontDeskTransfer: (
+    command: {
+      clientId: string;
+      planId: string;
+      branchId: string;
+      imageAssetId: string;
+      startsOn?: string;
+    },
+    principal: AuthenticatedPrincipal,
+    idempotencyKey: string,
+  ) => Promise<PaymentView>;
 };
 
 const invalidRequest = (detail: string): BadRequestException =>
@@ -311,5 +326,47 @@ export class AssistantClientsController {
       payment: result.payment,
       subscription: toSubscriptionDto(result.subscription),
     };
+  }
+
+  @Post(':clientId/transfer-payments')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ operationId: 'recordAssistantFrontDeskTransfer' })
+  @ApiParam({ name: 'clientId', format: 'uuid' })
+  @ApiHeader({
+    name: 'idempotency-key',
+    required: true,
+    schema: { format: 'uuid' },
+  })
+  @ApiBody({ type: RecordFrontDeskTransferDto })
+  @ApiCreatedResponse({ type: PaymentDto })
+  @Header('Cache-Control', 'no-store')
+  async recordFrontDeskTransfer(
+    @Param('clientId') clientId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Body() body: unknown,
+  ): Promise<PaymentDto> {
+    const id = requireClientId(clientId);
+    const key = requireIdempotencyKey(idempotencyKey);
+    const parsed = parseRecordFrontDeskTransfer(body);
+    if (parsed === null) {
+      throw invalidRequest('A front-desk transfer needs a receipt');
+    }
+    const principal = await this.authenticate(authorization);
+    return run(() =>
+      this.operations.recordFrontDeskTransfer(
+        {
+          clientId: id,
+          planId: parsed.planId,
+          branchId: parsed.branchId,
+          imageAssetId: parsed.imageAssetId,
+          ...(parsed.startsOn === undefined
+            ? {}
+            : { startsOn: parsed.startsOn }),
+        },
+        principal,
+        key,
+      ),
+    );
   }
 }

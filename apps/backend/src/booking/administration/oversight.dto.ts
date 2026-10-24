@@ -161,6 +161,16 @@ export class IncomeSaleDto {
   amountDueCentavos!: number;
 }
 
+export class VoidedIncomeDto {
+  @ApiProperty({ format: 'uuid' }) paymentId!: string;
+  @ApiProperty({ format: 'uuid' }) clientId!: string;
+  @ApiProperty({ description: 'Why the Administrator voided the sale' })
+  voidReason!: string;
+  @ApiProperty({ description: 'Left out of the totals, BOB centavos' })
+  amountDueCentavos!: number;
+  @ApiProperty({ format: 'date-time' }) voidedAt!: Date;
+}
+
 export class IncomeReportDto {
   @ApiProperty({ format: 'date-time' }) from!: Date;
   @ApiProperty({ format: 'date-time' }) until!: Date;
@@ -186,4 +196,11 @@ export class IncomeReportDto {
   })
   sales!: IncomeSaleDto[];
   @ApiProperty({ format: 'date-time' }) generatedAt!: Date;
+  @ApiProperty({
+    type: VoidedIncomeDto,
+    isArray: true,
+    description:
+      'Voided sales in the window. Visible with their reason, never in the totals.',
+  })
+  voided!: VoidedIncomeDto[];
 }

@@ -21,6 +21,7 @@ import { StatusPill } from "../../components/ui/status-pill";
 import { PageNotice } from "../../components/page/page-notice";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { useAdminRole } from "../../session/admin-role";
+import { AllowanceAdjustmentAction } from "./allowance-adjustment-action";
 import { ClientAcquisitionBlock } from "./client-acquisition-block";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
@@ -37,7 +38,13 @@ const clientDetailQueryOptions = (clientId: string) =>
     staleTime: 0,
   });
 
-function PlanBlock({ view }: { view: AdminClientDetailDto["subscription"] }) {
+function PlanBlock({
+  clientId,
+  view,
+}: {
+  clientId: string;
+  view: AdminClientDetailDto["subscription"];
+}) {
   const current = view.subscription;
   if (current === null || current === undefined || view.status === "none") {
     return (
@@ -86,6 +93,15 @@ function PlanBlock({ view }: { view: AdminClientDetailDto["subscription"] }) {
           {current.extraClassesLine}
         </p>
       ) : null}
+      {view.status === "active" ? (
+        <div className="flex flex-wrap gap-2 px-3 py-2">
+          <AllowanceAdjustmentAction clientId={clientId} reason="courtesy" />
+          <AllowanceAdjustmentAction
+            clientId={clientId}
+            reason="class_return"
+          />
+        </div>
+      ) : null}
     </SummaryBlock>
   );
 }
@@ -114,7 +130,7 @@ function ClientSummary({
         <StatusPill tone="neutral">Cuenta desactivada</StatusPill>
       ) : null}
       {contact}
-      <PlanBlock view={client.subscription} />
+      <PlanBlock clientId={client.id} view={client.subscription} />
       <SummaryBlock title="Referidos">
         <SummaryRow label="Clientas referidas" figure>
           {client.referredClientCount === 0

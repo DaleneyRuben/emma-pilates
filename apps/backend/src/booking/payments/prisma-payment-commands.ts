@@ -77,6 +77,7 @@ import {
 } from './subscription-allocation';
 
 import { grantGiftClass } from './allowance-adjustments';
+import { createFrontDeskTransfer } from './front-desk-transfer';
 import {
   grantFounderPlace,
   priceFounderSale,
@@ -1373,6 +1374,23 @@ export function createPrismaPaymentCommands(
     confirmTransfer,
     rejectTransfer,
     recordCashPayment,
+    recordFrontDeskTransfer: (
+      command: {
+        clientId: string;
+        planId: string;
+        branchId: string;
+        imageAssetId: string;
+        startsOn?: string;
+      },
+      principal: AuthenticatedPrincipal,
+      idempotencyKey: string,
+    ) =>
+      createFrontDeskTransfer(prisma, {
+        now: dependencies.now,
+        recordNotification,
+      })
+        .record(command, principal, idempotencyKey)
+        .then((stored) => readPaymentView(stored.id)),
     completeCreditPurchase,
     readOpenPurchaseIntent,
     readCurrentPayment,

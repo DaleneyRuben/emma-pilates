@@ -19,7 +19,10 @@ import { createAssistantClientRepository } from './prisma-assistant-client-repos
 // payment commands; every operation receives the authenticated principal.
 export const createAssistantClientOperations = (input: {
   prisma: PrismaClient;
-  payments: Pick<PaymentCommands, 'recordCashPayment'>;
+  payments: Pick<
+    PaymentCommands,
+    'recordCashPayment' | 'recordFrontDeskTransfer'
+  >;
   now(): Date;
 }): AssistantClientOperations => {
   const catalog = createCatalogRepository(input.prisma);
@@ -88,6 +91,12 @@ export const createAssistantClientOperations = (input: {
             input.payments.recordCashPayment(cash, actor, key),
           findLatestSubscription: subscriptions.findLatestSubscription,
         },
+      ),
+    recordFrontDeskTransfer: (command, principal, idempotencyKey) =>
+      input.payments.recordFrontDeskTransfer(
+        command,
+        principal,
+        idempotencyKey,
       ),
   };
 };

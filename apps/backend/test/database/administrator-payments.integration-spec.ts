@@ -183,6 +183,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       submittedAt: at('14:00'),
       decidedAt: null,
       receiptAvailable: true,
+      voidReason: null,
       method: 'transfer',
       invoiceData: null,
       invoiceIssued: null,

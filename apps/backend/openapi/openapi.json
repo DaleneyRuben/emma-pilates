@@ -4244,6 +4244,62 @@
         ]
       }
     },
+    "/api/v1/assistant/clients/{clientId}/transfer-payments": {
+      "post": {
+        "operationId": "recordAssistantFrontDeskTransfer",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordFrontDeskTransferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClients"
+        ]
+      }
+    },
     "/api/v1/administrator/clients": {
       "get": {
         "operationId": "listAdminClients",
@@ -4410,7 +4466,8 @@
                 "all",
                 "pending",
                 "confirmed",
-                "rejected"
+                "rejected",
+                "voided"
               ],
               "type": "string"
             }
@@ -4555,6 +4612,53 @@
         "summary": "",
         "tags": [
           "AllowanceAdjustment"
+        ]
+      }
+    },
+    "/api/v1/administrator/payments/{paymentId}/void": {
+      "post": {
+        "operationId": "voidPayment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoidSaleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoidedSaleDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "VoidSale"
         ]
       }
     },
@@ -10692,6 +10796,38 @@
           "amountDueCentavos"
         ]
       },
+      "VoidedIncomeDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "voidReason": {
+            "type": "string",
+            "description": "Why the Administrator voided the sale"
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "description": "Left out of the totals, BOB centavos"
+          },
+          "voidedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "paymentId",
+          "clientId",
+          "voidReason",
+          "amountDueCentavos",
+          "voidedAt"
+        ]
+      },
       "IncomeReportDto": {
         "type": "object",
         "properties": {
@@ -10739,6 +10875,13 @@
           "generatedAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "voided": {
+            "description": "Voided sales in the window. Visible with their reason, never in the totals.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoidedIncomeDto"
+            }
           }
         },
         "required": [
@@ -10751,7 +10894,8 @@
           "byMethod",
           "months",
           "sales",
-          "generatedAt"
+          "generatedAt",
+          "voided"
         ]
       },
       "AdminBranchPageDto": {
@@ -11012,7 +11156,8 @@
             "enum": [
               "pending",
               "confirmed",
-              "rejected"
+              "rejected",
+              "voided"
             ]
           },
           "planId": {
@@ -11337,7 +11482,8 @@
             "enum": [
               "pending",
               "confirmed",
-              "rejected"
+              "rejected",
+              "voided"
             ]
           },
           "planId": {
@@ -11825,6 +11971,35 @@
           "payment"
         ]
       },
+      "RecordFrontDeskTransferDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Branch of the front desk"
+          },
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The photographed transfer receipt, already READY"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
+          }
+        },
+        "required": [
+          "planId",
+          "branchId",
+          "imageAssetId"
+        ]
+      },
       "AdminClientDto": {
         "type": "object",
         "properties": {
@@ -12089,7 +12264,8 @@
             "enum": [
               "pending",
               "confirmed",
-              "rejected"
+              "rejected",
+              "voided"
             ]
           },
           "submittedAt": {
@@ -12104,6 +12280,11 @@
           "receiptAvailable": {
             "type": "boolean",
             "description": "Whether the receipt image is still retained"
+          },
+          "voidReason": {
+            "type": "string",
+            "nullable": true,
+            "description": "Why the sale was voided; null unless the state is voided"
           },
           "method": {
             "type": "string",
@@ -12145,6 +12326,7 @@
           "submittedAt",
           "decidedAt",
           "receiptAvailable",
+          "voidReason",
           "method",
           "invoiceData",
           "invoiceIssued"
@@ -12247,6 +12429,46 @@
           "id",
           "classes",
           "reason"
+        ]
+      },
+      "VoidSaleDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Why the sale is voided. Required, at most 300 characters."
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "VoidedSaleDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "voided"
+            ]
+          },
+          "voidReason": {
+            "type": "string"
+          },
+          "cancelledBookings": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "paymentId",
+          "state",
+          "voidReason",
+          "cancelledBookings"
         ]
       },
       "CloseAccountRequestDto": {

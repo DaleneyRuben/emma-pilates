@@ -30,7 +30,7 @@ export type PurchaseIntentView = {
 export type PaymentView = {
   id: string;
   method: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
-  state: 'pending' | 'confirmed' | 'rejected';
+  state: 'pending' | 'confirmed' | 'rejected' | 'voided';
   planId: string;
   planName: string;
   durationDays: number;
@@ -103,6 +103,7 @@ const paymentStates: Record<PaymentState, PaymentView['state']> = {
   [PaymentState.PENDING]: 'pending',
   [PaymentState.CONFIRMED]: 'confirmed',
   [PaymentState.REJECTED]: 'rejected',
+  [PaymentState.VOIDED]: 'voided',
 };
 
 export const intentSelect = {

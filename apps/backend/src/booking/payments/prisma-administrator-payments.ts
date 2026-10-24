@@ -21,6 +21,7 @@ type PaymentRow = {
   submitted_at: Date;
   decided_at: Date | null;
   receipt_available: boolean;
+  void_reason: string | null;
   invoice_tax_id: string | null;
   invoice_name: string | null;
   invoice_issued_at: Date | null;
@@ -59,6 +60,7 @@ const toRow = (row: PaymentRow): AdministratorPaymentRow => ({
   submittedAt: row.submitted_at,
   decidedAt: row.decided_at,
   receiptAvailable: row.receipt_available,
+  voidReason: row.void_reason,
   invoiceData:
     row.invoice_tax_id === null || row.invoice_name === null
       ? null
@@ -81,6 +83,8 @@ export const createPrismaAdministratorPayments = (
   prisma: PrismaClient,
 ): AdministratorPaymentLedger => ({
   list: async ({ page, pageSize, status, invoice, query }) => {
+    // Transfers and cash sales are the accountant's list (PAY-007). A voided
+    // cash sale is a mistake the Administrator must still see (PAY-006).
     const where = Prisma.sql`WHERE p.method IN ('transfer', 'cash')
       ${stateCondition(status)} ${invoiceCondition(invoice)}
       ${searchCondition(query)}`;
@@ -90,7 +94,7 @@ export const createPrismaAdministratorPayments = (
           p.plan_name_snapshot AS plan_name, p.method::text AS method,
           p.plan_price_centavos, p.credit_applied_centavos,
           p.amount_due_centavos, p.state::text AS state, p.submitted_at,
-          p.decided_at,
+          p.decided_at, p.void_reason,
           (receipt.id IS NOT NULL AND receipt.deleted_at IS NULL)
             AS receipt_available,
           p.invoice_tax_id, p.invoice_name, p.invoice_issued_at,

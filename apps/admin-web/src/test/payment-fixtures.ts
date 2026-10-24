@@ -25,6 +25,7 @@ export const paymentRow = (
   submittedAt: "2026-09-21T18:05:00.000Z",
   decidedAt: null,
   receiptAvailable: true,
+  voidReason: null,
   method: "transfer",
   invoiceData: null,
   invoiceIssued: null,

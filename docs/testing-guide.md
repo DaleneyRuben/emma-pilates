@@ -24,10 +24,10 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
-| Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; voiding a sale (PAY-006) is not built yet |
+| Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
 | Founder membership           | The first 40 Clients whose first real Payment is confirmed get 15 % off later Plans except the single class, a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; the first Payment itself is at list price |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
@@ -52,8 +52,8 @@ can be found by its design name.
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79 |
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81, 87, 88 |
-| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81, 87, 88, 89 |
+| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
@@ -66,8 +66,8 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82 |
 | S26 Reportar una falla (Entrenadora) | 82 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
@@ -88,11 +88,11 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 79, 85 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 79, 85, 89 |
 | AW40 Fundadoras | 88 |
 | AW23–AW24 Personal | 26, 31, 72, 79 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72 |
-| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89 |
 | AW38 Comentarios | 80 |
 
 ## Before you begin
@@ -3397,9 +3397,9 @@ The following are not ready for manual product testing:
 - «El registro venció» on a device, which needs seven days to pass after the
   registration (the automated tests show it);
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
-- a sale voided after the cash close showing as a negative «Ajuste» on AW151:
-  voiding arrives with PAY-006 (the integration spec simulates it; a late
-  cash sale already shows as a positive adjustment, Test 76);
+- a sale voided after the cash close showing as a negative «Ajuste» on AW151
+  needs a closed day and then a void (Test 89; a late cash sale already shows
+  as a positive adjustment, Test 76);
 - real push delivery on iOS, which needs the APNs key (gate 9): the
   Simulators show pushes only through `xcrun simctl push`, while Android
   receives real pushes on the development, staging, and Play builds
@@ -6087,7 +6087,7 @@ Branch, up to the moment of the close.
    wait a day) to see the notice.
 9. The «Ajuste» column shows how a closed day's cash sales moved after the
    close: a cash sale recorded later the same day raises it; a sale voided
-   after the close (PAY-006, not built yet) will lower it. The close itself is
+   after the close (Test 89) lowers it. The close itself is
    never edited.
 10. Check AW151 at 1440 px and 420 px (the rows become cards that keep the
     tint), and `GET /api/v1/administrator/cash-closes?branchId=…&month=…` as
@@ -6590,12 +6590,49 @@ C. **The gift.** The first approved Payment in a Client's life adds one
    class with reason `gift_new_client`, and the line then reads «Clases extra:
    1 · Regalo de bienvenida». A founder and a courtesy Plan do not get it,
    and a second Payment does not add it again. The automated suites cover
-   that grant; no screen records the first cash Payment's gift yet (PAY-006
+   that grant; no screen records the first cash Payment's gift yet (Test 89
    adds the form).
 
 Spending an extra class waits for the base allowance to run out, and for the
 Weekly Cap (BKM-007). Cancelling a Booking funded by an extra class restores
 the class to the base pool.
+
+## Test 89: payment controls (PAY-006)
+
+A sale stays as it was recorded. The Assistant cannot edit or delete a
+Payment. Only the Administrator voids one, and only with a reason
+([decisions §4.3](./decisiones-emma-pilates.md),
+[booking ADR-0012](../booking/docs/adr/0012-sales-controls-and-invoice-data.md)).
+A void corrects a mistake: no money is returned. Run the API and the
+fixtures as in Tests 2 and 5. Paola is the Administrator and Camila the
+Assistant.
+
+A. **Front-desk receipt.** As Camila, open a Client and **Confirmar pago en
+   efectivo** (S10). **Fotografiar comprobante** sends the receipt. The
+   Payment stays pending. As Paola, the same receipt appears on **Revisar
+   pago** (S12) and on **Pagos** (AW28). Approving it uses that existing
+   review. Cash still confirms on the spot with **Confirmar pago recibido**,
+   and an older build that omits the new fields still confirms cash.
+B. **Invoice card.** On that same S10 screen, **Datos para la factura**
+   starts on **Sin factura**. **Con factura** asks for **NIT o CI** and
+   **Nombre o razón social**. Both can stay empty. This branch does not
+   store them; PAY-007 owns the columns and the «Factura emitida» mark.
+C. **Anular venta.** As Paola, on **Pagos**, filter **Confirmado** and press
+   **Anular venta**. The button stays disabled until **Motivo** has text.
+   After the void the row is **Anulado** and shows the reason. The income
+   report drops that amount from the totals and lists the sale under
+   **Ventas anuladas** with the same reason. The Subscription no longer
+   covers today, future Bookings are cancelled, and Attendance already
+   taken stays. A second void is refused.
+D. **Courtesy.** On the Client detail (AW22), with an active Plan,
+   **Agregar clase de cortesía** and **Devolver una clase** record one
+   class. Camila, a Trainer, and a Nutritionist get `403` on that endpoint
+   and on the void. The Coordinator Role is not on this branch; the denial
+   covers a cast principal the use case rejects.
+
+The migrations `20261023190000_void_payment_values` and
+`20261023190100_void_payment` need owner approval before they run on a
+shared database.
 
 ## Test 86: invite a friend (BKM-014)
 

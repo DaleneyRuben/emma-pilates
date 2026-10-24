@@ -228,6 +228,15 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   // PAY-007: last Invoice Data for a cash sale; Assistants and Administrators
   // only (the Coordinator does not sell).
   'GET /api/v1/assistant/clients/{clientId}/invoice-data': administratorOnly(),
+  // PAY-006: a front-desk transfer receipt stays pending for review.
+  // Only an Assistant photographs it. Neither Role under test reaches it.
+  'POST /api/v1/assistant/clients/{clientId}/transfer-payments': both('deny', {
+    body: {
+      planId: uuid,
+      branchId: uuid,
+      imageAssetId: uuid,
+    },
+  }),
   'POST /api/v1/assistant/client-invitations': administratorOnly(),
   'GET /api/v1/assistant/client-invitations/{clientId}': administratorOnly(),
   'POST /api/v1/assistant/client-invitations/{clientId}/email-corrections':
@@ -371,6 +380,10 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/payments/{paymentId}/confirm':
     administratorOnly(),
   'POST /api/v1/administrator/payments/{paymentId}/reject': administratorOnly(),
+  // PAY-006: voiding a sale is money. A reason is required before the Role check.
+  'POST /api/v1/administrator/payments/{paymentId}/void': administratorOnly({
+    body: { reason: 'Registrado por error' },
+  }),
   'GET /api/v1/administrator/payments': administratorOnly(),
   // PAY-007: «Factura emitida» is the Administrator's money work.
   'POST /api/v1/administrator/payments/{paymentId}/invoice-issued':

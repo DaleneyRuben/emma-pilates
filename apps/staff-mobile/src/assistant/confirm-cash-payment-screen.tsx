@@ -39,6 +39,7 @@ import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { describeClasses, formatCivilDate } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
+import { FrontDeskReceiptCard, type FrontDeskReceipt } from "./front-desk-receipt-card";
 
 type ConfirmNavigation = {
   goBack: () => void;
@@ -95,6 +96,8 @@ export function ConfirmCashPaymentScreen({
   const studioRules = useStudioRules(fetcher);
   const today = boliviaCivilDate(new Date());
   const [startsOn, setStartsOn] = useState(today);
+  const [receipt, setReceipt] = useState<FrontDeskReceipt | null>(null);
+  const [receiptPending, setReceiptPending] = useState(false);
   // PAY-007: prefilled from the Client's last sale; a failed read leaves «Sin factura».
   const lastInvoice = useGetAssistantClientInvoiceData(clientId, { fetcher });
   const [invoiceEdit, setInvoiceEdit] = useState<InvoiceChoice | null>(null);
@@ -104,6 +107,33 @@ export function ConfirmCashPaymentScreen({
       lastInvoice.data?.status === 200 ? (lastInvoice.data.data.invoiceData ?? null) : null,
     );
   const invoiceData = invoiceDataPayload(invoice);
+
+  const photograph = async () => {
+    if (branchId === null || receiptPending) return;
+    setReceiptPending(true);
+    setFailure(null);
+    try {
+      const photographed = await api.photographTransferReceipt();
+      if (photographed === null) return;
+      await api.recordFrontDeskTransfer(
+        clientId,
+        quote.id,
+        branchId,
+        photographed.imageAssetId,
+        startsOn,
+      );
+      setReceipt(photographed);
+      setFailure("Comprobante enviado. Queda pendiente de revisión.");
+    } catch (error) {
+      const code = error instanceof AssistantApiError ? error.code : null;
+      setFailure(
+        (code !== null ? paymentProblems[code] : undefined) ??
+          "No pudimos enviar el comprobante. Inténtalo de nuevo.",
+      );
+    } finally {
+      setReceiptPending(false);
+    }
+  };
 
   const confirm = async () => {
     if (branchId === null || invoiceData === "incomplete") return;
@@ -218,6 +248,7 @@ export function ConfirmCashPaymentScreen({
             raised
             value={invoice}
           />
+          <FrontDeskReceiptCard onPhotograph={() => void photograph()} receipt={receipt} />
           <BodyText style={styles.muted}>
             Confirma solo cuando tengas el efectivo en mano. El plan se activa al instante.
           </BodyText>
