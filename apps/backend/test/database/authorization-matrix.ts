@@ -135,7 +135,10 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/purchase-intents': both('deny'),
   'GET /api/v1/purchase-intents/current': both('deny'),
   'POST /api/v1/purchase-intents/{purchaseIntentId}/receipt': both('deny'),
-  'POST /api/v1/purchase-intents/{purchaseIntentId}/submit': both('deny'),
+  // PAY-007: a missing body is invalid before the Role is checked.
+  'POST /api/v1/purchase-intents/{purchaseIntentId}/submit': both('deny', {
+    body: { invoiceData: null },
+  }),
   'POST /api/v1/credit-purchases': both('deny'),
   'GET /api/v1/payments/current': both('deny'),
   'GET /api/v1/clients/current/invoice-data': both('deny'),
@@ -196,8 +199,13 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/assistant/clients/{clientId}/class-history': both('allow'),
   // Selling and registering new Clients stay at the front desk.
   'GET /api/v1/assistant/clients/{clientId}/plan-quotes': administratorOnly(),
-  'POST /api/v1/assistant/clients/{clientId}/cash-payments':
-    administratorOnly(),
+  'POST /api/v1/assistant/clients/{clientId}/cash-payments': administratorOnly({
+    body: {
+      planId: uuid,
+      branchId: uuid,
+      invoiceData: null,
+    },
+  }),
   // PAY-007: last Invoice Data for a cash sale; Assistants and Administrators
   // only (the Coordinator does not sell).
   'GET /api/v1/assistant/clients/{clientId}/invoice-data': administratorOnly(),
