@@ -58,7 +58,7 @@ can be found by its design name.
 | Staff app | Tests |
 | --- | --- |
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
-| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
+| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 75 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
@@ -1931,9 +1931,11 @@ Client search ignores accents and case: "lucia" finds Lucía Fernández and
 Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
 1B) and log in as `emma.vargas@example.com` with `emma-local-2026`.
 
-1. **Mi agenda** greets you by name ("Hola, Emma", MOB-043) and lists today's
-   Sessions you lead, the ones that already started included (attendance is
-   recorded after the class ends, MOB-044). Each card
+1. **Mi agenda** greets you by name ("Hola, Emma", MOB-043) under the
+   **Entrenadora** eyebrow (UX-007). The day strip names each day ("Mié 21",
+   "Sáb 24", "Dom 25") instead of a bare number, and today is the filled
+   chip. It lists today's Sessions you lead, the ones that already started
+   included (attendance is recorded after the class ends, MOB-044). Each card
    ends in a Palo de rosa chevron beside the 24-hour time ("07:00 – 07:50",
    as the Client's list writes it) and the Class Type in Lora,
    names the Branch after a small pin, and closes with "N de M reservados"
@@ -5834,3 +5836,17 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 75: the Trainer agenda eyebrow and weekday chips
+
+Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
+1B) and log in as `emma.vargas@example.com` with `emma-local-2026`.
+
+1. **Mi agenda** shows **Entrenadora** in small capitals over "Hola, Emma"
+   (UX-007). The Nutritionist root still shows its own **Nutricionista**
+   eyebrow; the other roots do not gain one.
+2. The day strip names each of the same seven days it already showed, as
+   "Mié 21": the short weekday with its accent, a capital first letter, then
+   the day number. Saturday reads **Sáb** and Sunday **Dom**, so the two are
+   not the same bare number. Today is the filled Palo de rosa chip; tapping
+   another day selects it and lists that day's classes.
