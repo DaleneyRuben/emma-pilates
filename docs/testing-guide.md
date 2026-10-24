@@ -6191,4 +6191,5 @@ as one.
 The package's own check uses variable costs of Bs 9.290 and derives
 `(21175 + 9290) / 0.84 = 36267.86`. The page's 143 classes at Bs 65 come to
 Bs 9.295, so its derivation differs by those Bs 5. The break-even in
-students per class, occupancy, and clients is not on this page.
+students per class, occupancy, and clients is not on this page. Pull
+request: https://github.com/DaleneyRuben/emma-pilates/pull/192.
