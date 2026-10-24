@@ -9,6 +9,11 @@ import type { ClientEvaluationDtoState } from "./clientEvaluationDtoState";
 export interface ClientEvaluationDto {
   id: string;
   slotId: string;
+  included: boolean;
+  /** Charged centavos; 0 when included or unpaid */
+  priceCentavos: number;
+  /** @nullable */
+  paymentId: string | null;
   state: ClientEvaluationDtoState;
   startsAt: string;
   endsAt: string;

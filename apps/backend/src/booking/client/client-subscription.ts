@@ -9,6 +9,8 @@ export type ClientSubscriptionSummary = {
   remainingClassAllowance: number;
   startsOn: Date;
   endsOn: Date;
+  /** «Clases extra: 1 · Regalo de bienvenida», or null when none remain. */
+  extraClassesLine: string | null;
 };
 
 export const toSubscriptionSummary = (
@@ -23,6 +25,7 @@ export const toSubscriptionSummary = (
         remainingClassAllowance: subscription.remainingClassAllowance,
         startsOn: subscription.startsOn,
         endsOn: subscription.endsOn,
+        extraClassesLine: subscription.extraClassesLine,
       };
 
 export type ClientSubscriptionStatus =
@@ -31,6 +34,7 @@ export type ClientSubscriptionStatus =
 export type ClientSubscriptionView = {
   status: ClientSubscriptionStatus;
   subscription: ClientSubscriptionSummary | null;
+  nextSubscription: ClientSubscriptionSummary | null;
 };
 
 type LoadClientSubscriptionDependencies = {
@@ -42,6 +46,10 @@ type LoadClientSubscriptionDependencies = {
   ): Promise<ClientSubscriptionSummary | null>;
   findLatestSubscription(
     clientId: string,
+  ): Promise<ClientSubscriptionSummary | null>;
+  findFutureSubscription(
+    clientId: string,
+    after: Date,
   ): Promise<ClientSubscriptionSummary | null>;
 };
 
@@ -57,6 +65,10 @@ type SubscriptionLookup = {
   ): Promise<ClientSubscriptionSummary | null>;
   findLatestSubscription(
     clientId: string,
+  ): Promise<ClientSubscriptionSummary | null>;
+  findFutureSubscription(
+    clientId: string,
+    after: Date,
   ): Promise<ClientSubscriptionSummary | null>;
 };
 
@@ -74,17 +86,22 @@ export const describeSubscription = async (
       (active.endsOn.getTime() - dependencies.today.getTime()) /
       dayMilliseconds;
 
+    const next = await dependencies.findFutureSubscription(
+      clientId,
+      dependencies.today,
+    );
     return {
       status: daysLeft <= renewalReminderDays ? 'expiring_soon' : 'active',
       subscription: active,
+      nextSubscription: next,
     };
   }
 
   const latest = await dependencies.findLatestSubscription(clientId);
 
   return latest === null
-    ? { status: 'none', subscription: null }
-    : { status: 'expired', subscription: latest };
+    ? { status: 'none', subscription: null, nextSubscription: null }
+    : { status: 'expired', subscription: latest, nextSubscription: null };
 };
 
 export const loadClientSubscription = async (

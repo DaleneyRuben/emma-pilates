@@ -50,6 +50,7 @@ const payment = (state: "pending" | "confirmed") => ({
   state,
   planId: "plan-1",
   planName: "Mensual 16 clases",
+  durationDays: 30,
   durationMonths: 1,
   classAllowance: 16,
   planPriceCentavos: 105_000,

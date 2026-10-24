@@ -68,7 +68,7 @@ export const startClosureWorld = async (): Promise<ClosureWorld> => {
             : {
                 planId: plan.id,
                 planNameSnapshot: plan.name,
-                durationMonthsSnapshot: plan.durationMonths,
+                durationDaysSnapshot: plan.durationDays,
                 originalClassAllowance: 8,
                 remainingClassAllowance: 8,
                 startsOn: new Date('2026-09-01T00:00:00.000Z'),

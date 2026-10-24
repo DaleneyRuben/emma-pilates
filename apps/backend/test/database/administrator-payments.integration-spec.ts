@@ -175,6 +175,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       submittedAt: at('14:00'),
       decidedAt: null,
       receiptAvailable: true,
+      voidReason: null,
     });
     expect(page.items[2]).toMatchObject({
       clientName: 'Mariana Paz',

@@ -4,8 +4,10 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { IncomeByKindDto } from "./incomeByKindDto";
 import type { IncomeByMethodDto } from "./incomeByMethodDto";
 import type { IncomeMonthDto } from "./incomeMonthDto";
+import type { VoidedIncomeDto } from "./voidedIncomeDto";
 
 export interface IncomeReportDto {
   from: string;
@@ -15,6 +17,9 @@ export interface IncomeReportDto {
   /** Confirmed Payments, BOB centavos */
   totalCentavos: number;
   byMethod: IncomeByMethodDto;
+  byKind: IncomeByKindDto;
   months: IncomeMonthDto[];
   generatedAt: string;
+  /** Voided sales in the window. Visible with their reason, never in the totals. */
+  voided: VoidedIncomeDto[];
 }

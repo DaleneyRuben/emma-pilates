@@ -27,7 +27,8 @@ describe('remindExpiringSubscriptions', () => {
       type: 'subscription_expiring',
       businessEventKey: 'subscription-expiring:subscription-1',
       title: 'Plan por vencer',
-      message: 'Tu plan vence en 3 días.',
+      message:
+        'Tu plan vence en 3 días. Renueva cuando quieras y elige tu fecha de inicio.',
       destination: { type: 'subscription', id: 'subscription-1' },
       occurredAt: today,
     });

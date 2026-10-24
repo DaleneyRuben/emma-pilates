@@ -82,7 +82,7 @@ export function SubscriptionScreen() {
     );
   }
 
-  const { status, subscription } = view.data.data;
+  const { status, subscription, nextSubscription } = view.data.data;
 
   if (status === "none" || subscription === null || subscription === undefined) {
     return (
@@ -109,7 +109,9 @@ export function SubscriptionScreen() {
             <Text style={styles.warningText}>
               {`Tu plan vence el ${formatCivilDate(subscription.endsOn)}.`}
             </Text>
-            <BodyText style={styles.warningNote}>Podrás comprar uno nuevo apenas termine.</BodyText>
+            <BodyText style={styles.warningNote}>
+              Renueva cuando quieras y elige tu fecha de inicio.
+            </BodyText>
           </View>
         ) : null}
         <View style={styles.card}>
@@ -145,6 +147,9 @@ export function SubscriptionScreen() {
             )}
           </BodyText>
           <BodyText>{allowanceMessage(subscription.remainingClassAllowance, expired)}</BodyText>
+          {subscription.extraClassesLine ? (
+            <BodyText>{subscription.extraClassesLine}</BodyText>
+          ) : null}
         </View>
         <View style={styles.dates}>
           <View style={styles.dateRow}>
@@ -152,20 +157,30 @@ export function SubscriptionScreen() {
             <Text style={styles.dateValue}>{formatCivilDateWithYear(subscription.startsOn)}</Text>
           </View>
           <View style={styles.dateRow}>
-            <BodyText style={styles.dateLabel}>{expired ? "Venció el" : "Pagado hasta"}</BodyText>
+            <BodyText style={styles.dateLabel}>{expired ? "Venció el" : "Vence el"}</BodyText>
             <Text style={[styles.dateValue, expired && styles.expiredDate]}>
               {formatCivilDateWithYear(subscription.endsOn)}
             </Text>
           </View>
+          {nextSubscription ? (
+            <View style={styles.dateRow}>
+              <BodyText style={styles.dateLabel}>Siguiente plan</BodyText>
+              <Text style={styles.dateValue}>
+                {`Siguiente plan desde ${formatCivilDateWithYear(nextSubscription.startsOn)}`}
+              </Text>
+            </View>
+          ) : null}
         </View>
         {expired ? (
           <View style={styles.purchase}>
             <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
             <BodyText style={styles.note}>Elige el paquete que mejor te acomode.</BodyText>
           </View>
-        ) : status === "active" ? (
-          <BodyText style={styles.note}>Podrás comprar un plan nuevo cuando este termine.</BodyText>
-        ) : null}
+        ) : (
+          <View style={styles.purchase}>
+            <PrimaryButton label="Renovar plan" onPress={() => navigation.navigate("Plans")} />
+          </View>
+        )}
       </ScrollView>
     </Screen>
   );
@@ -191,8 +206,13 @@ const styles = StyleSheet.create({
   cardLabel: { color: colors.textMuted, fontSize: typography.label },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   dateLabel: { color: colors.textMuted },
-  dateRow: { flexDirection: "row", justifyContent: "space-between" },
-  dateValue: { color: colors.text, fontSize: typography.body },
+  dateRow: { flexDirection: "row", gap: spacing.md, justifyContent: "space-between" },
+  dateValue: {
+    color: colors.text,
+    flexShrink: 1,
+    fontSize: typography.body,
+    textAlign: "right",
+  },
   expiredDate: { color: colors.errorText },
   note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   purchase: { gap: spacing.sm },

@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { PaymentDtoDurationDays } from "./paymentDtoDurationDays";
 import type { PaymentDtoDurationMonths } from "./paymentDtoDurationMonths";
 import type { PaymentDtoMethod } from "./paymentDtoMethod";
 import type { PaymentDtoState } from "./paymentDtoState";
@@ -14,6 +15,11 @@ export interface PaymentDto {
   state: PaymentDtoState;
   planId: string;
   planName: string;
+  durationDays: PaymentDtoDurationDays;
+  /**
+   * durationDays / 30, for builds that still read months
+   * @deprecated
+   */
   durationMonths: PaymentDtoDurationMonths;
   /** @minimum 1 */
   classAllowance: number;
@@ -23,6 +29,8 @@ export interface PaymentDto {
   creditAppliedCentavos: number;
   /** @minimum 0 */
   amountDueCentavos: number;
+  /** Chosen Start Date. Absent on responses older builds ignore. */
+  startsOn?: string;
   submittedAt: string;
   /** @nullable */
   decidedAt?: string | null;

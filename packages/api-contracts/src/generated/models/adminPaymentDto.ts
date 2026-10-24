@@ -32,4 +32,9 @@ export interface AdminPaymentDto {
   decidedAt: string | null;
   /** Whether the receipt image is still retained */
   receiptAvailable: boolean;
+  /**
+   * Why the sale was voided; null unless the state is voided
+   * @nullable
+   */
+  voidReason: string | null;
 }

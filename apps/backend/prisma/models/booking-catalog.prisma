@@ -20,10 +20,25 @@ enum SubscriptionState {
   @@schema("booking")
 }
 
+enum AllowanceAdjustmentReason {
+  GIFT_NEW_CLIENT  @map("gift_new_client")
+  INVITE_CONVERTED @map("invite_converted")
+  CAMPAIGN         @map("campaign")
+  COURTESY         @map("courtesy")
+  CLASS_RETURN     @map("class_return")
+  CONSUMPTION      @map("consumption")
+
+  @@schema("booking")
+}
+
 model Plan {
   id             String         @id @default(uuid()) @db.Uuid
   name           String
-  durationMonths Int            @map("duration_months") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it; the contract derives
+  // durationMonths from durationDays for old builds.
+  durationMonths Int?           @map("duration_months") @db.SmallInt
+  durationDays   Int            @map("duration_days") @db.SmallInt
+  weeklyClassCap Int?           @map("weekly_class_cap") @db.SmallInt
   classAllowance Int            @map("class_allowance")
   priceCentavos  Int            @map("price_centavos")
   displayOrder   Int            @map("display_order")
@@ -124,11 +139,16 @@ model Subscription {
   clientId                String            @map("client_id") @db.Uuid
   planId                  String            @map("plan_id") @db.Uuid
   planNameSnapshot        String            @map("plan_name_snapshot")
-  durationMonthsSnapshot  Int               @map("duration_months_snapshot") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it.
+  durationMonthsSnapshot  Int?              @map("duration_months_snapshot") @db.SmallInt
+  durationDaysSnapshot    Int               @map("duration_days_snapshot") @db.SmallInt
+  weeklyClassCapSnapshot  Int?              @map("weekly_class_cap_snapshot") @db.SmallInt
   originalClassAllowance  Int               @map("original_class_allowance")
   remainingClassAllowance Int               @map("remaining_class_allowance")
   startsOn                DateTime          @map("starts_on") @db.Date
   endsOn                  DateTime          @map("ends_on") @db.Date
+  // A void may end the Subscription the day before it started (ADR-0012).
+  endedByVoid             Boolean           @default(false) @map("ended_by_void")
   state                   SubscriptionState @default(ACTIVE)
   activatedAt             DateTime          @map("activated_at") @db.Timestamptz(3)
   expiredAt               DateTime?         @map("expired_at") @db.Timestamptz(3)
@@ -140,12 +160,38 @@ model Subscription {
   payment                 Payment?          @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   bookings                Booking[]
   evaluations             Evaluation[]
+  allowanceAdjustments    AllowanceAdjustment[]
 
   @@unique([id, clientId])
   @@index([clientId, startsOn])
   @@index([planId])
   @@index([state, endsOn])
   @@map("subscriptions")
+  @@schema("booking")
+}
+
+// BKM-008, booking ADR-0006: extra classes live here, never on the Payment
+// or the Plan's allowance, so a report can tell bought classes from given
+// ones. A removal is deleted_at (ADR-0086). One live gift per Client is a
+// partial unique index in the migration.
+model AllowanceAdjustment {
+  id                String                    @id @default(uuid()) @db.Uuid
+  subscriptionId    String                    @map("subscription_id") @db.Uuid
+  // Denormalized so one live gift per Client is a partial unique index.
+  // PostgreSQL cannot index a subquery over the Subscription.
+  clientId          String                    @map("client_id") @db.Uuid
+  classes           Int                       @db.SmallInt
+  reason            AllowanceAdjustmentReason
+  authorAccountId   String                    @map("author_account_id") @db.Uuid
+  createdAt         DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt         DateTime?                 @map("deleted_at") @db.Timestamptz(3)
+  subscription      Subscription              @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  client            Client                    @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  authorAccount     Account                   @relation("AllowanceAdjustmentAuthor", fields: [authorAccountId], references: [id], onDelete: Restrict)
+
+  @@index([subscriptionId, createdAt])
+  @@index([authorAccountId])
+  @@map("allowance_adjustments")
   @@schema("booking")
 }
 

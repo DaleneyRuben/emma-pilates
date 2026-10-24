@@ -88,6 +88,14 @@ export class ClientSubscriptionSummaryDto {
 
   @ApiProperty({ format: 'date' })
   endsOn!: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description:
+      '«Clases extra: 1 · Regalo de bienvenida» when extra classes remain',
+  })
+  extraClassesLine?: string | null;
 }
 
 export class ClientSubscriptionDto {
@@ -96,6 +104,14 @@ export class ClientSubscriptionDto {
 
   @ApiPropertyOptional({ type: ClientSubscriptionSummaryDto, nullable: true })
   subscription!: ClientSubscriptionSummaryDto | null;
+
+  @ApiPropertyOptional({
+    type: ClientSubscriptionSummaryDto,
+    nullable: true,
+    description:
+      'The one future Subscription from an Early Renewal. Absent when there is none.',
+  })
+  nextSubscription?: ClientSubscriptionSummaryDto | null;
 }
 
 export class PlanDto {
@@ -105,7 +121,22 @@ export class PlanDto {
   @ApiProperty()
   name!: string;
 
-  @ApiProperty({ enum: [1, 3, 6, 12] })
+  @ApiProperty({ enum: [30, 60, 90] })
+  durationDays!: number;
+
+  @ApiProperty({
+    type: Number,
+    enum: [3, 4],
+    nullable: true,
+    description: 'Most Bookings a week from the base allowance',
+  })
+  weeklyClassCap!: number | null;
+
+  @ApiProperty({
+    enum: [1, 2, 3],
+    deprecated: true,
+    description: 'durationDays / 30, for builds that still read months',
+  })
   durationMonths!: number;
 
   @ApiProperty({ minimum: 1 })

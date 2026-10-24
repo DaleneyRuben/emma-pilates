@@ -99,6 +99,12 @@ export const cancellableUntil = (startsAt: Date): Date =>
 export const isEvaluationBookable = (startsAt: Date, now: Date): boolean =>
   now < cancellableUntil(startsAt);
 
+// A transfer holds the slot for 24 hours, then the worker releases it.
+export const evaluationHoldMilliseconds = 24 * hourMilliseconds;
+
+export const evaluationHoldExpiresAt = (submittedAt: Date): Date =>
+  new Date(submittedAt.getTime() + evaluationHoldMilliseconds);
+
 // D6: a change takes effect from a date on or after today; a block that has
 // not started yet ends at its own start (an empty range).
 export const resolveBlockChangeDate = (input: {

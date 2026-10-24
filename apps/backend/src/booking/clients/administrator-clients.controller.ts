@@ -112,6 +112,7 @@ export class AdministratorClientsController {
       clientSince: civil(client.clientSince),
       subscription: {
         status: client.subscription.status,
+        nextSubscription: null,
         subscription:
           current === null
             ? null

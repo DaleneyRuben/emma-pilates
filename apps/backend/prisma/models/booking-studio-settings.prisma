@@ -1,0 +1,30 @@
+// BKM-004 / ADR-0101: the studio's configurable rules, one append-only row per
+// version; the highest version is the one in force.
+model StudioSettingsVersion {
+  id                              String    @id @default(uuid()) @db.Uuid
+  version                         Int       @unique
+  cancellationWindowMinutes       Int       @map("cancellation_window_minutes") @db.SmallInt
+  minimumBookings                 Int       @map("minimum_bookings") @db.SmallInt
+  minimumBookingsCheckLeadMinutes Int       @map("minimum_bookings_check_lead_minutes") @db.SmallInt
+  startDateLimitDays              Int       @map("start_date_limit_days") @db.SmallInt
+  founderPlaces                   Int       @map("founder_places") @db.SmallInt
+  founderDiscountPercent          Int       @map("founder_discount_percent") @db.SmallInt
+  founderGapDays                  Int       @map("founder_gap_days") @db.SmallInt
+  guestPassesPerClient            Int       @map("guest_passes_per_client") @db.SmallInt
+  invitesPerHostPerMonth          Int       @map("invites_per_host_per_month") @db.SmallInt
+  inviteRewardClasses             Int       @map("invite_reward_classes") @db.SmallInt
+  taxRatePercent                  Int       @map("tax_rate_percent") @db.SmallInt
+  evaluationPriceCentavos         Int       @map("evaluation_price_centavos")
+  nutritionistFeeCentavos         Int       @map("nutritionist_fee_centavos")
+  renewalTargetMonths1To6Percent  Int       @map("renewal_target_months_1_to_6_percent") @db.SmallInt
+  renewalTargetMonths7To12Percent Int       @map("renewal_target_months_7_to_12_percent") @db.SmallInt
+  renewalTargetFromMonth13Percent Int       @map("renewal_target_from_month_13_percent") @db.SmallInt
+  openingDate                     DateTime? @map("opening_date") @db.Date
+  createdByAccountId              String?   @map("created_by_account_id") @db.Uuid
+  createdAt                       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdByAccount                Account?  @relation("StudioSettingsVersionCreatedBy", fields: [createdByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([createdByAccountId])
+  @@map("studio_settings_versions")
+  @@schema("booking")
+}

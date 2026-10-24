@@ -62,6 +62,7 @@ describe('ClientProfileController', () => {
 
     await expect(controller.subscription(bearer)).resolves.toEqual({
       status: 'expiring_soon',
+      nextSubscription: null,
       subscription: {
         id: 'subscription-id',
         planName: 'Paquete de 8 clases',
@@ -78,6 +79,7 @@ describe('ClientProfileController', () => {
 
     await expect(controller.subscription(bearer)).resolves.toEqual({
       status: 'none',
+      nextSubscription: null,
       subscription: null,
     });
   });
@@ -144,7 +146,8 @@ describe('PlanCatalogController', () => {
   const plan = {
     id: 'plan-id',
     name: 'Paquete de 8 clases',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 8,
     priceCentavos: 56_000,
     displayOrder: 0,
@@ -157,6 +160,8 @@ describe('PlanCatalogController', () => {
       {
         id: 'plan-id',
         name: 'Paquete de 8 clases',
+        durationDays: 30,
+        weeklyClassCap: null,
         durationMonths: 1,
         classAllowance: 8,
         priceCentavos: 56_000,

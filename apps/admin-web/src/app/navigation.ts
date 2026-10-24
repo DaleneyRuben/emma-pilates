@@ -18,9 +18,11 @@ export type AdminPath =
   | "/back-office/categorias-de-gasto"
   | "/reporte"
   | "/reporte/indicadores"
+  | "/simulador"
   | "/promociones"
   | "/promociones/referidos"
-  | "/promociones/creditos";
+  | "/promociones/creditos"
+  | "/reglas-del-estudio";
 
 export type NavigationItem = {
   label: string;
@@ -52,6 +54,12 @@ export type NavigationItem = {
    * (AW16), so the top bar shows a note instead of the shell's.
    */
   ownBranchFilter?: true;
+  /**
+   * Amounts. The Coordinator sees counts only (ADR-0102, ADR-0103), so the
+   * shell hides this entry from anyone who is not an Administrator. The
+   * Coordinator Role is not wired on this branch (IDN-009).
+   */
+  administratorOnly?: true;
 };
 
 export type NavigationGroup = {
@@ -158,6 +166,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         screen: "AW39",
         studioWide: "los indicadores del mes son del estudio, no de una sede.",
       },
+      {
+        label: "Simulador",
+        to: "/simulador",
+        screen: "AW37",
+        studioWide: "el simulador no lee una sede.",
+        administratorOnly: true,
+      },
     ],
   },
   {
@@ -189,8 +204,23 @@ export const navigationGroups: readonly NavigationGroup[] = [
   },
 ];
 
-export const navigationItems: readonly NavigationItem[] =
-  navigationGroups.flatMap((group) => group.items);
+/**
+ * Pages the account menu (AW33) opens rather than the sidebar; they still
+ * name the browser tab and the Branch selector's studio-wide note.
+ */
+export const accountMenuItems: readonly NavigationItem[] = [
+  {
+    label: "Reglas del estudio",
+    to: "/reglas-del-estudio",
+    screen: "AW36",
+    studioWide: "las reglas son del estudio, no de una sede.",
+  },
+];
+
+export const navigationItems: readonly NavigationItem[] = [
+  ...navigationGroups.flatMap((group) => group.items),
+  ...accountMenuItems,
+];
 
 export const findNavigationItem = (
   pathname: string,

@@ -9,14 +9,18 @@ import {
   BackLink,
   BodyText,
   colors,
+  describePlanTerms,
+  boliviaCivilDate,
   formatBolivianos,
   Heading,
   PrimaryButton,
   radii,
   Screen,
   spacing,
+  StartDateChooser,
   surfaces,
   typography,
+  useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -30,6 +34,8 @@ import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { describeClasses, formatCivilDate } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
+import { FrontDeskReceiptCard, type FrontDeskReceipt } from "./front-desk-receipt-card";
+import { InvoiceDataCard, invoiceChoiceFrom, type InvoiceChoice } from "./invoice-data-card";
 
 type ConfirmNavigation = {
   goBack: () => void;
@@ -46,6 +52,8 @@ const paymentProblems: Record<string, string> = {
   payment_pending_exists: "El cliente tiene un pago en revisión.",
   branch_not_assigned: "Solo puedes registrar pagos en tus sucursales.",
   plan_not_purchasable: "Este plan ya no está disponible.",
+  start_date_out_of_window: "Esa fecha de inicio no está disponible.",
+  future_subscription_exists: "El cliente ya tiene un plan siguiente.",
 };
 
 function Line({
@@ -90,13 +98,40 @@ export function ConfirmCashPaymentScreen({
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [result, setResult] = useState<AssistantCashPaymentDto | null>(null);
+  const studioRules = useStudioRules(fetcher);
+  const today = boliviaCivilDate(new Date());
+  const [startsOn, setStartsOn] = useState(today);
+  const [invoice, setInvoice] = useState<InvoiceChoice>(invoiceChoiceFrom);
+  const [receipt, setReceipt] = useState<FrontDeskReceipt | null>(null);
+  const [receiptPending, setReceiptPending] = useState(false);
+
+  const photograph = async () => {
+    if (branchId === null || receiptPending) return;
+    setReceiptPending(true);
+    setFailure(null);
+    try {
+      const photographed = await api.photographTransferReceipt();
+      if (photographed === null) return;
+      await api.recordFrontDeskTransfer(clientId, quote.id, branchId, photographed.imageAssetId, startsOn);
+      setReceipt(photographed);
+      setFailure("Comprobante enviado. Queda pendiente de revisión.");
+    } catch (error) {
+      const code = error instanceof AssistantApiError ? error.code : null;
+      setFailure(
+        (code !== null ? paymentProblems[code] : undefined) ??
+          "No pudimos enviar el comprobante. Inténtalo de nuevo.",
+      );
+    } finally {
+      setReceiptPending(false);
+    }
+  };
 
   const confirm = async () => {
     if (branchId === null) return;
     setSubmitting(true);
     setFailure(null);
     try {
-      const recorded = await api.recordCashPayment(clientId, quote.id, branchId);
+      const recorded = await api.recordCashPayment(clientId, quote.id, branchId, startsOn);
       await queryClient.invalidateQueries({
         queryKey: getGetAssistantClientOverviewQueryKey(clientId),
       });
@@ -129,7 +164,7 @@ export function ConfirmCashPaymentScreen({
               <BodyText>{describeClasses(result.payment.classAllowance)}</BodyText>
               {activated ? (
                 <BodyText style={styles.muted}>
-                  {`Válido hasta el ${formatCivilDate(activated.endsOn)}`}
+                  {`Vence el ${formatCivilDate(activated.endsOn)}`}
                 </BodyText>
               ) : null}
               <BodyText style={styles.muted}>
@@ -165,6 +200,7 @@ export function ConfirmCashPaymentScreen({
         <ScrollView contentContainerStyle={styles.content}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>{quote.name}</Text>
+            <BodyText>{describePlanTerms(quote)}</BodyText>
             <Line label="Precio del plan" value={formatBolivianos(quote.priceCentavos)} />
             {quote.creditAppliedCentavos > 0 ? (
               <Line
@@ -179,6 +215,15 @@ export function ConfirmCashPaymentScreen({
               value={formatBolivianos(quote.amountDueCentavos)}
             />
           </View>
+          {studioRules === undefined ? null : (
+            <StartDateChooser
+              openingDate={studioRules.openingDate}
+              selected={startsOn}
+              startDateLimitDays={studioRules.startDateLimitDays}
+              today={today}
+              onSelect={setStartsOn}
+            />
+          )}
           {options.length > 1 ? (
             <View style={styles.branches}>
               <BodyText style={styles.muted}>Sucursal donde recibes el efectivo</BodyText>
@@ -204,6 +249,8 @@ export function ConfirmCashPaymentScreen({
               </View>
             </View>
           ) : null}
+          <InvoiceDataCard onChange={setInvoice} value={invoice} />
+          <FrontDeskReceiptCard onPhotograph={() => void photograph()} receipt={receipt} />
           <BodyText style={styles.muted}>
             Confirma solo cuando tengas el efectivo en mano. El plan se activa al instante.
           </BodyText>

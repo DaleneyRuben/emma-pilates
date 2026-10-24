@@ -64,6 +64,7 @@ export function AccountCell() {
       key={String(menuOpen)}
       profile={profile}
       onChangePassword={openPanel}
+      onNavigate={() => setMenuOpen(false)}
     />
   );
 

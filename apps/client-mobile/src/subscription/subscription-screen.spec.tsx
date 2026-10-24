@@ -12,7 +12,11 @@ const profile = {
   referralCode: "REF-VALERIA",
 };
 
-const subscription = (status: string, remaining: number) => ({
+const subscription = (
+  status: string,
+  remaining: number,
+  extraClassesLine: string | null = null,
+) => ({
   status,
   subscription: {
     id: "subscription-1",
@@ -21,6 +25,7 @@ const subscription = (status: string, remaining: number) => ({
     remainingClassAllowance: remaining,
     startsOn: "2026-08-25",
     endsOn: "2026-09-24",
+    extraClassesLine,
   },
 });
 
@@ -57,7 +62,19 @@ describe("Client Subscription detail", () => {
     expect(screen.getByText("Te quedan 5 clases por usar")).toBeOnTheScreen();
     expect(screen.getByText("25 de agosto de 2026")).toBeOnTheScreen();
     expect(screen.getByText("24 de septiembre de 2026")).toBeOnTheScreen();
+    // Follow-up 177: the end is an expiry, «Vence el», not «Pagado hasta».
+    expect(screen.getByText("Vence el")).toBeOnTheScreen();
+    expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
+    expect(screen.queryByText("Pagado hasta")).toBeNull();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).not.toBeOnTheScreen();
+  });
+
+  it("shows the gift class with its origin", async () => {
+    const screen = await openSubscription(
+      subscription("active", 5, "Clases extra: 1 · Regalo de bienvenida"),
+    );
+
+    expect(screen.getByText("Clases extra: 1 · Regalo de bienvenida")).toBeOnTheScreen();
   });
 
   it("warns about the paid-through date when expiring soon", async () => {
@@ -86,14 +103,35 @@ describe("Refreshed Mi plan (Client 12)", () => {
     expect(screen.getByText("Suscripción actual")).toBeOnTheScreen();
     expect(screen.getByText("25 de agosto de 2026")).toBeOnTheScreen();
     expect(screen.getByText("24 de septiembre de 2026")).toBeOnTheScreen();
-    expect(screen.getByText("Podrás comprar un plan nuevo cuando este termine.")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Renovar plan" })).toBeOnTheScreen();
   });
 
-  it("adds the informational renewal line while expiring soon", async () => {
+  it("names the next Plan when a future Subscription exists", async () => {
+    const screen = await openSubscription({
+      ...subscription("active", 5),
+      nextSubscription: {
+        id: "subscription-2",
+        planName: "Paquete de 8 clases",
+        originalClassAllowance: 8,
+        remainingClassAllowance: 8,
+        startsOn: "2026-09-25",
+        endsOn: "2026-10-24",
+      },
+    });
+
+    const nextPlan = screen.getByText("Siguiente plan desde 25 de septiembre de 2026");
+    expect(nextPlan).toBeOnTheScreen();
+    // A long date must shrink inside the row, or it runs into the label on a phone.
+    expect(nextPlan).toHaveStyle({ flexShrink: 1 });
+  });
+
+  it("invites renewal while expiring soon", async () => {
     const screen = await openSubscription(subscription("expiring_soon", 2));
 
-    expect(screen.getByText("Podrás comprar uno nuevo apenas termine.")).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Comprar un plan" })).not.toBeOnTheScreen();
+    expect(
+      screen.getByText("Renueva cuando quieras y elige tu fecha de inicio."),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Renovar plan" })).toBeOnTheScreen();
   });
 
   it("shows the last Plan as expired with its end date and the only purchase action", async () => {

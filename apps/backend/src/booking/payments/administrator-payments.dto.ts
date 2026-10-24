@@ -10,6 +10,7 @@ const paymentStates = [
   'pending',
   'confirmed',
   'rejected',
+  'voided',
 ] as const satisfies readonly AdministratorPaymentState[];
 export const paymentStatusFilters = [
   'all',
@@ -52,6 +53,13 @@ export class AdminPaymentDto {
 
   @ApiProperty({ description: 'Whether the receipt image is still retained' })
   receiptAvailable!: boolean;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'Why the sale was voided; null unless the state is voided',
+  })
+  voidReason!: string | null;
 }
 
 export class AdminPaymentPageDto {
