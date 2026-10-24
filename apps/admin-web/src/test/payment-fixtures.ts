@@ -74,6 +74,7 @@ export const reviewOf = (
   state: row.state,
   planId: "7b000000-0000-5000-8000-000000000001",
   planName: row.planName,
+  durationDays: 30,
   durationMonths: 1,
   classAllowance: 8,
   planPriceCentavos: row.planPriceCentavos,

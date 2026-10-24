@@ -60,7 +60,10 @@ model PurchaseIntent {
   clientId               String              @map("client_id") @db.Uuid
   planId                 String              @map("plan_id") @db.Uuid
   planNameSnapshot       String              @map("plan_name_snapshot")
-  durationMonthsSnapshot Int                 @map("duration_months_snapshot") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it.
+  durationMonthsSnapshot Int?                @map("duration_months_snapshot") @db.SmallInt
+  durationDaysSnapshot   Int                 @map("duration_days_snapshot") @db.SmallInt
+  weeklyClassCapSnapshot Int?                @map("weekly_class_cap_snapshot") @db.SmallInt
   classAllowanceSnapshot Int                 @map("class_allowance_snapshot")
   planPriceCentavos      Int                 @map("plan_price_centavos")
   creditReservedCentavos Int                 @map("credit_reserved_centavos")
@@ -95,7 +98,10 @@ model Payment {
   planId                 String             @map("plan_id") @db.Uuid
   purchaseIntentId       String?            @unique @map("purchase_intent_id") @db.Uuid
   planNameSnapshot       String             @map("plan_name_snapshot")
-  durationMonthsSnapshot Int                @map("duration_months_snapshot") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it.
+  durationMonthsSnapshot Int?               @map("duration_months_snapshot") @db.SmallInt
+  durationDaysSnapshot   Int                @map("duration_days_snapshot") @db.SmallInt
+  weeklyClassCapSnapshot Int?               @map("weekly_class_cap_snapshot") @db.SmallInt
   classAllowanceSnapshot Int                @map("class_allowance_snapshot")
   planPriceCentavos      Int                @map("plan_price_centavos")
   creditAppliedCentavos  Int                @map("credit_applied_centavos")

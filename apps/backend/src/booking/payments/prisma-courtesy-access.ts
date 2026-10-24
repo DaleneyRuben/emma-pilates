@@ -19,6 +19,7 @@ import {
   AdministrationError,
   requireAdministrator,
 } from '../administration/administration-errors';
+import { deprecatedDurationMonths } from '../catalog/plan-validity';
 import { courtesyAccessPlan, evaluateCourtesyGrant } from './courtesy-access';
 import { PaymentRuleError } from './payment-errors';
 import type { PaymentView } from './prisma-payment-commands';
@@ -39,6 +40,8 @@ const civil = (date: Date): string => date.toISOString().slice(0, 10);
 
 // The hidden «Acceso de prueba» Plan is made on the first grant rather than
 // seeded, so it survives the production reset (ADR-0104) without a step.
+// BKM-005 stores its catalog validity in days; the chosen end date still
+// decides the Subscription.
 const findOrCreateCourtesyPlan = async (
   transaction: Transaction,
   now: Date,
@@ -46,7 +49,7 @@ const findOrCreateCourtesyPlan = async (
   const select = {
     id: true,
     name: true,
-    durationMonths: true,
+    durationDays: true,
     classAllowance: true,
   } as const;
   const existing = await transaction.plan.findFirst({
@@ -132,7 +135,8 @@ export const createPrismaCourtesyAccess = (
         clientId: command.clientId,
         planId: plan.id,
         planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
+        durationDaysSnapshot: plan.durationDays,
+        weeklyClassCapSnapshot: null,
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: 0,
         creditAppliedCentavos: 0,
@@ -153,7 +157,8 @@ export const createPrismaCourtesyAccess = (
         planId: plan.id,
         paymentId: payment.id,
         planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
+        durationDaysSnapshot: plan.durationDays,
+        weeklyClassCapSnapshot: null,
         originalClassAllowance: plan.classAllowance,
         remainingClassAllowance: plan.classAllowance,
         startsOn: today,
@@ -182,6 +187,7 @@ export const createPrismaCourtesyAccess = (
           clientId: command.clientId,
           planId: plan.id,
           classAllowance: plan.classAllowance,
+          durationDays: plan.durationDays,
           startsOn: civil(today),
           endsOn: civil(command.endsOn),
         },
@@ -203,7 +209,7 @@ export const createPrismaCourtesyAccess = (
         id: true,
         planId: true,
         planNameSnapshot: true,
-        durationMonthsSnapshot: true,
+        durationDaysSnapshot: true,
         classAllowanceSnapshot: true,
         planPriceCentavos: true,
         creditAppliedCentavos: true,
@@ -219,7 +225,8 @@ export const createPrismaCourtesyAccess = (
       state: 'confirmed',
       planId: row.planId,
       planName: row.planNameSnapshot,
-      durationMonths: row.durationMonthsSnapshot,
+      durationDays: row.durationDaysSnapshot,
+      durationMonths: deprecatedDurationMonths(row.durationDaysSnapshot),
       classAllowance: row.classAllowanceSnapshot,
       planPriceCentavos: row.planPriceCentavos,
       creditAppliedCentavos: row.creditAppliedCentavos,

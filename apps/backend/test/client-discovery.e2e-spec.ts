@@ -103,9 +103,10 @@ describe('client discovery (e2e)', () => {
               Promise.resolve([
                 {
                   id: planId,
-                  name: 'Paquete de 8 clases',
-                  durationMonths: 1,
-                  classAllowance: 8,
+                  name: 'Bimestral 16 clases',
+                  durationDays: 60,
+                  weeklyClassCap: 3,
+                  classAllowance: 16,
                   priceCentavos: 56_000,
                   displayOrder: 0,
                 },
@@ -213,9 +214,12 @@ describe('client discovery (e2e)', () => {
       .expect([
         {
           id: planId,
-          name: 'Paquete de 8 clases',
-          durationMonths: 1,
-          classAllowance: 8,
+          name: 'Bimestral 16 clases',
+          durationDays: 60,
+          weeklyClassCap: 3,
+          // Deprecated (ADR-0016): derived for store builds that read months.
+          durationMonths: 2,
+          classAllowance: 16,
           priceCentavos: 56_000,
         },
       ]);

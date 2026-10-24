@@ -30,9 +30,16 @@ describe('development fixtures', () => {
   it('offers the designed Plan catalog with exact centavo prices', () => {
     expect(
       fixtures.plans.map(
-        ({ name, durationMonths, classAllowance, priceCentavos }) => ({
+        ({
           name,
-          durationMonths,
+          durationDays,
+          weeklyClassCap,
+          classAllowance,
+          priceCentavos,
+        }) => ({
+          name,
+          durationDays,
+          weeklyClassCap,
           classAllowance,
           priceCentavos,
         }),
@@ -40,25 +47,29 @@ describe('development fixtures', () => {
     ).toEqual([
       {
         name: 'Paquete de 8 clases',
-        durationMonths: 1,
+        durationDays: 30,
+        weeklyClassCap: null,
         classAllowance: 8,
         priceCentavos: 56_000,
       },
       {
         name: 'Paquete de 12 clases',
-        durationMonths: 1,
+        durationDays: 30,
+        weeklyClassCap: null,
         classAllowance: 12,
         priceCentavos: 78_000,
       },
       {
         name: 'Mensual 16 clases',
-        durationMonths: 1,
+        durationDays: 30,
+        weeklyClassCap: null,
         classAllowance: 16,
         priceCentavos: 105_000,
       },
       {
         name: 'Trimestral 36 clases',
-        durationMonths: 3,
+        durationDays: 90,
+        weeklyClassCap: 4,
         classAllowance: 36,
         priceCentavos: 210_000,
       },

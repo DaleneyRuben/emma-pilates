@@ -5,7 +5,7 @@ const today = new Date('2026-10-23T00:00:00.000Z');
 const day = 24 * 60 * 60 * 1_000;
 const baseline = {
   today,
-  endsOn: new Date(today.getTime() + 30 * day),
+  endsOn: new Date(today.getTime() + 29 * day),
   activeSubscription: null,
   openPurchaseIntentId: null,
   pendingPaymentId: null,
@@ -21,11 +21,11 @@ const codeOf = (work: () => unknown): string | null => {
 };
 
 describe('evaluateCourtesyGrant', () => {
-  it('describes the hidden Bs 0 Plan of 16 classes', () => {
+  it('describes the hidden tester Plan of 16 classes valid for 30 days', () => {
     expect(courtesyAccessPlan).toEqual({
       name: 'Acceso de prueba',
       classAllowance: 16,
-      durationMonths: 1,
+      durationDays: 30,
       priceCentavos: 0,
     });
   });

@@ -60,7 +60,8 @@ const requireUuid = (value: string | undefined, detail: string): string => {
 
 // REL-011: the Administrator gives a closed-test tester or a store reviewer
 // «Acceso de prueba» from the Client detail (AW22). Everyone else is refused
-// by the use case (403); the Plan never appears in a catalog.
+// by the use case (403); the Plan never appears in a catalog. BKM-005 stores
+// the Plan's catalog validity as 30 days.
 @Controller({ path: 'administrator/clients', version: '1' })
 @ApiBearerAuth()
 export class CourtesyAccessController {

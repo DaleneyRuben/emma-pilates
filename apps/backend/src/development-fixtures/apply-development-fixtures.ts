@@ -111,12 +111,14 @@ export const applyDevelopmentFixtures = async (
         });
       }
 
+      // The fixtures are the visible catalog, so a Plan hidden since (the
+      // monthly Plans BKM-005 hid, say) shows again.
       for (const plan of fixtures.plans) {
         const { id, ...data } = plan;
         await transaction.plan.upsert({
           where: { id },
           create: plan,
-          update: data,
+          update: { ...data, hiddenAt: null },
         });
       }
 

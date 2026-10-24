@@ -65,7 +65,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
         clientId,
         planId,
         planNameSnapshot: 'Paquete de 8 clases',
-        durationMonthsSnapshot: 1,
+        durationDaysSnapshot: 30,
         originalClassAllowance: 8,
         remainingClassAllowance: range.remaining,
         startsOn: new Date(range.startsOn),
@@ -81,7 +81,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
     const plan = await prisma.plan.create({
       data: {
         name: 'Paquete de 8 clases',
-        durationMonths: 1,
+        durationDays: 30,
         classAllowance: 8,
         priceCentavos: 56_000,
         displayOrder: 1,

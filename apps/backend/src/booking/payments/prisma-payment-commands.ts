@@ -62,10 +62,7 @@ import {
   loadActiveSubscription,
   notifyPaymentConfirmed,
 } from './subscription-allocation';
-import {
-  computeSubscriptionTerm,
-  type SubscriptionDurationMonths,
-} from './subscription-term';
+import { computeSubscriptionTerm } from './subscription-term';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -221,7 +218,8 @@ export function createPrismaPaymentCommands(
         select: {
           id: true,
           name: true,
-          durationMonths: true,
+          durationDays: true,
+          weeklyClassCap: true,
           classAllowance: true,
           priceCentavos: true,
           hiddenAt: true,
@@ -339,7 +337,7 @@ export function createPrismaPaymentCommands(
   ): Promise<string> => {
     const term = computeSubscriptionTerm(
       boliviaDate(now),
-      payment.durationMonthsSnapshot as SubscriptionDurationMonths,
+      payment.durationDaysSnapshot,
     );
     const subscription = await transaction.subscription.create({
       data: {
@@ -347,7 +345,8 @@ export function createPrismaPaymentCommands(
         planId: payment.planId,
         paymentId: payment.id,
         planNameSnapshot: payment.planNameSnapshot,
-        durationMonthsSnapshot: payment.durationMonthsSnapshot,
+        durationDaysSnapshot: payment.durationDaysSnapshot,
+        weeklyClassCapSnapshot: payment.weeklyClassCapSnapshot,
         originalClassAllowance: payment.classAllowanceSnapshot,
         remainingClassAllowance: payment.classAllowanceSnapshot,
         startsOn: term.startsOn,
@@ -407,7 +406,8 @@ export function createPrismaPaymentCommands(
         clientId: input.clientId,
         planId: plan.id,
         planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
+        durationDaysSnapshot: plan.durationDays,
+        weeklyClassCapSnapshot: plan.weeklyClassCap,
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: plan.priceCentavos,
         creditAppliedCentavos: 0,
@@ -543,7 +543,8 @@ export function createPrismaPaymentCommands(
                 clientId,
                 planId: plan.id,
                 planNameSnapshot: plan.name,
-                durationMonthsSnapshot: plan.durationMonths,
+                durationDaysSnapshot: plan.durationDays,
+                weeklyClassCapSnapshot: plan.weeklyClassCap,
                 classAllowanceSnapshot: plan.classAllowance,
                 planPriceCentavos: plan.priceCentavos,
                 creditReservedCentavos: 0,
@@ -721,7 +722,8 @@ export function createPrismaPaymentCommands(
               planId: intent.planId,
               purchaseIntentId: intent.id,
               planNameSnapshot: intent.planNameSnapshot,
-              durationMonthsSnapshot: intent.durationMonthsSnapshot,
+              durationDaysSnapshot: intent.durationDaysSnapshot,
+              weeklyClassCapSnapshot: intent.weeklyClassCapSnapshot,
               classAllowanceSnapshot: intent.classAllowanceSnapshot,
               planPriceCentavos: intent.planPriceCentavos,
               creditAppliedCentavos: intent.creditReservedCentavos,

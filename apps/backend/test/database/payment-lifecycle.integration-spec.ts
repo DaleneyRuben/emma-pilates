@@ -231,10 +231,12 @@ describe('Prisma payment lifecycle', () => {
       clientId: buyer.clientId,
       paymentId: pending.id,
       planNameSnapshot: 'Paquete de 8 clases',
+      durationDaysSnapshot: 30,
       originalClassAllowance: 8,
       remainingClassAllowance: 8,
       startsOn: today,
-      endsOn: new Date('2026-10-21T00:00:00.000Z'),
+      // booking ADR-0005: the Start Date plus 30 days minus one.
+      endsOn: new Date('2026-10-20T00:00:00.000Z'),
       state: 'ACTIVE',
     });
     await expect(

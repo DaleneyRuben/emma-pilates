@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { PaymentReceiptDto } from "./paymentReceiptDto";
+import type { PaymentReviewDtoDurationDays } from "./paymentReviewDtoDurationDays";
 import type { PaymentReviewDtoDurationMonths } from "./paymentReviewDtoDurationMonths";
 import type { PaymentReviewDtoMethod } from "./paymentReviewDtoMethod";
 import type { PaymentReviewDtoState } from "./paymentReviewDtoState";
@@ -16,6 +17,11 @@ export interface PaymentReviewDto {
   state: PaymentReviewDtoState;
   planId: string;
   planName: string;
+  durationDays: PaymentReviewDtoDurationDays;
+  /**
+   * durationDays / 30, for builds that still read months
+   * @deprecated
+   */
   durationMonths: PaymentReviewDtoDurationMonths;
   /** @minimum 1 */
   classAllowance: number;

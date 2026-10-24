@@ -4,6 +4,7 @@ import {
   PurchaseIntentState,
   type Prisma,
 } from '../../generated/prisma/client';
+import { deprecatedDurationMonths } from '../catalog/plan-validity';
 
 // The read models the payment commands return, and the selects and
 // mappers that build them from Payment and Purchase Intent rows.
@@ -11,6 +12,7 @@ export type PurchaseIntentView = {
   id: string;
   planId: string;
   planName: string;
+  durationDays: number;
   durationMonths: number;
   classAllowance: number;
   planPriceCentavos: number;
@@ -28,6 +30,7 @@ export type PaymentView = {
   state: 'pending' | 'confirmed' | 'rejected';
   planId: string;
   planName: string;
+  durationDays: number;
   durationMonths: number;
   classAllowance: number;
   planPriceCentavos: number;
@@ -98,7 +101,8 @@ export const intentSelect = {
   clientId: true,
   planId: true,
   planNameSnapshot: true,
-  durationMonthsSnapshot: true,
+  durationDaysSnapshot: true,
+  weeklyClassCapSnapshot: true,
   classAllowanceSnapshot: true,
   planPriceCentavos: true,
   creditReservedCentavos: true,
@@ -115,7 +119,8 @@ export const paymentSelect = {
   planId: true,
   purchaseIntentId: true,
   planNameSnapshot: true,
-  durationMonthsSnapshot: true,
+  durationDaysSnapshot: true,
+  weeklyClassCapSnapshot: true,
   classAllowanceSnapshot: true,
   planPriceCentavos: true,
   creditAppliedCentavos: true,
@@ -139,7 +144,8 @@ export const toIntentView = (row: IntentRow): PurchaseIntentView => ({
   id: row.id,
   planId: row.planId,
   planName: row.planNameSnapshot,
-  durationMonths: row.durationMonthsSnapshot,
+  durationDays: row.durationDaysSnapshot,
+  durationMonths: deprecatedDurationMonths(row.durationDaysSnapshot),
   classAllowance: row.classAllowanceSnapshot,
   planPriceCentavos: row.planPriceCentavos,
   creditReservedCentavos: row.creditReservedCentavos,
@@ -156,7 +162,8 @@ export const toPaymentView = (row: PaymentRow): PaymentView => ({
   state: paymentStates[row.state],
   planId: row.planId,
   planName: row.planNameSnapshot,
-  durationMonths: row.durationMonthsSnapshot,
+  durationDays: row.durationDaysSnapshot,
+  durationMonths: deprecatedDurationMonths(row.durationDaysSnapshot),
   classAllowance: row.classAllowanceSnapshot,
   planPriceCentavos: row.planPriceCentavos,
   creditAppliedCentavos: row.creditAppliedCentavos,

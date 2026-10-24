@@ -53,6 +53,7 @@ import {
   PlanQuotesDto,
   RecordCashPaymentDto,
 } from './assistant.dto';
+import { deprecatedDurationMonths } from '../catalog/plan-validity';
 
 export const assistantClientOperations = Symbol('assistantClientOperations');
 
@@ -244,7 +245,9 @@ export class AssistantClientsController {
       plans: quotes.plans.map((plan) => ({
         id: plan.id,
         name: plan.name,
-        durationMonths: plan.durationMonths,
+        durationDays: plan.durationDays,
+        weeklyClassCap: plan.weeklyClassCap,
+        durationMonths: deprecatedDurationMonths(plan.durationDays),
         classAllowance: plan.classAllowance,
         priceCentavos: plan.priceCentavos,
         creditAppliedCentavos: plan.creditAppliedCentavos,

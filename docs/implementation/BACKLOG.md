@@ -465,7 +465,7 @@ wait for Google, Apple, and testers.
 | --- | --- | --- | --- | --- | --- | --- |
 | DOC-008 | P0 | Docs | Record Emma's rules in the glossaries and ADRs before any code changes | — | 1.5–2 d | done (44b47adc; booking ADR-0005 to ADR-0012, ADR-0101 to ADR-0106, Studio Management glossary) |
 | BKM-004 | P0 | Backend/admin web/apps | `StudioSettings`: one versioned row for the configurable rules, a «Reglas del estudio» page for the Administrator, and a public rules endpoint that replaces the hard-coded copy in the apps | DOC-008 | 2.5–3.5 d | done (`37284cfa` table, `8c9e795d` window, `7744ac91` endpoints, `6e2475e7`/`fc1b481e`/`4201ebc2` apps, `6dd904ed` AW36; evidence below) |
-| BKM-005 | P0 | All surfaces | Plans by days (30/60/90) with a weekly cap field, and the eight real Plans | DOC-008, BKM-004 | 3–4 d | ready |
+| BKM-005 | P0 | All surfaces | Plans by days (30/60/90) with a weekly cap field, and the eight real Plans | DOC-008, BKM-004 | 3–4 d | done (`6541a63a` days, `0b2a0633` AW04, `14fb2000` tester Plan; evidence below) |
 | BKM-006 | P0 | All surfaces | Start date chosen at purchase (today up to +14 days) and early renewal | BKM-005 | 3.5–4.5 d | ready |
 | BKM-008 | P0 | All surfaces | Extra classes as `AllowanceAdjustment` with a reason and author, and the automatic gift class on a Client's first Plan | BKM-005 | 2.5–3.5 d | ready |
 | BKM-007 | P0 | All surfaces | Weekly cap at booking, «Te quedan N clases esta semana» | BKM-005, BKM-008 | 2.5–3 d | ready |
@@ -542,6 +542,12 @@ Acceptance criteria:
 - A 60-day Plan bought for 1 December ends on 29 January.
 - No screen says «mes» or «meses» about a Plan's validity.
 - The old monthly Plans still in production are hidden, not deleted.
+
+Evidence (BKM-005, 2026-10-23, branch `feature/bkm-005-plans-by-days`, stacked on #158):
+
+- **Backend.** Migration `20261023120000_plans_by_days`: `duration_days` and `weekly_class_cap`, snapshots, the validity checks (30/60/90, cap only above 30), and the old monthly Plans hidden, never deleted. Rules red `f54c91a8` → `6541a63a`. `durationMonths` stays in the contract, derived as days / 30. REL-011's tester Plan is ported here with a catalog validity of 30 days instead of the one-month placeholder (`14fb2000` → `ed82794a`); the Subscription still ends on the date the Administrator chooses. That grant needs `20261023130000_courtesy_payment_method` and `20261023130100_courtesy_payment_constraints`.
+- **Surfaces.** Admin web Planes at 1440 px and 420 px: columns Vigencia and Tope semanal, cards at 420, the form offering 30/60/90 días with the cap disabled at 30. Client app «Elige tu plan» and the plan detail on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator: «válido por 30 días», «Válido por 60 días», «60 días de vigencia», «hasta 3 por semana». No Plan line says «mes».
+- **Open questions and notes.** The eight real Plans are loaded by REL-018, not here. The two courtesy migrations were applied only to `pilates_bkm005_dev` and need the owner's approval before staging or production. A grant made after REL-011 merges needs its Plan row rewritten to `duration_days = 30` where it still holds the month column.
 
 #### BKM-006 · Start date and early renewal
 

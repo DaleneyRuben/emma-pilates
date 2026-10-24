@@ -23,7 +23,11 @@ enum SubscriptionState {
 model Plan {
   id             String         @id @default(uuid()) @db.Uuid
   name           String
-  durationMonths Int            @map("duration_months") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it; the contract derives
+  // durationMonths from durationDays for old builds.
+  durationMonths Int?           @map("duration_months") @db.SmallInt
+  durationDays   Int            @map("duration_days") @db.SmallInt
+  weeklyClassCap Int?           @map("weekly_class_cap") @db.SmallInt
   classAllowance Int            @map("class_allowance")
   priceCentavos  Int            @map("price_centavos")
   displayOrder   Int            @map("display_order")
@@ -124,7 +128,10 @@ model Subscription {
   clientId                String            @map("client_id") @db.Uuid
   planId                  String            @map("plan_id") @db.Uuid
   planNameSnapshot        String            @map("plan_name_snapshot")
-  durationMonthsSnapshot  Int               @map("duration_months_snapshot") @db.SmallInt
+  // Deprecated (booking ADR-0005): nothing writes it.
+  durationMonthsSnapshot  Int?              @map("duration_months_snapshot") @db.SmallInt
+  durationDaysSnapshot    Int               @map("duration_days_snapshot") @db.SmallInt
+  weeklyClassCapSnapshot  Int?              @map("weekly_class_cap_snapshot") @db.SmallInt
   originalClassAllowance  Int               @map("original_class_allowance")
   remainingClassAllowance Int               @map("remaining_class_allowance")
   startsOn                DateTime          @map("starts_on") @db.Date

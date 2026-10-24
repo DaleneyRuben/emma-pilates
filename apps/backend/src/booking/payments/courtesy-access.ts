@@ -5,14 +5,15 @@ import {
   type PurchaseEligibilityContext,
 } from './purchase-eligibility';
 
-// REL-011 (booking ADR-0012): the hidden Bs 0 Plan an Administrator grants so
-// a closed-test tester or a store reviewer can book without paying. The
-// one-month duration is only the catalog value; the Subscription ends on the
+// REL-011 (booking ADR-0012), read through BKM-005: the hidden Bs 0 Plan an
+// Administrator grants so a closed-test tester or a store reviewer can book
+// without paying. Its catalog validity is 30 days, the day count that
+// replaced the one-month placeholder; the Subscription still ends on the
 // date the Administrator chooses.
 export const courtesyAccessPlan = {
   name: 'Acceso de prueba',
   classAllowance: 16,
-  durationMonths: 1,
+  durationDays: 30,
   priceCentavos: 0,
 } as const;
 

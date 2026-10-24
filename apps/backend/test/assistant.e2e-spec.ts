@@ -62,6 +62,7 @@ const payment = {
   state: 'confirmed',
   planId,
   planName: 'Paquete de 8 clases',
+  durationDays: 30,
   durationMonths: 1,
   classAllowance: 8,
   planPriceCentavos: 56_000,
@@ -119,7 +120,8 @@ describe('assistant clients (e2e)', () => {
         {
           id: planId,
           name: 'Paquete de 8 clases',
-          durationMonths: 1,
+          durationDays: 30,
+          weeklyClassCap: null,
           classAllowance: 8,
           priceCentavos: 56_000,
           displayOrder: 1,
