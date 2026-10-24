@@ -90,6 +90,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/branches': publicRoute,
   'GET /api/v1/class-types': publicRoute,
   'GET /api/v1/promotions': publicRoute,
+  'GET /api/v1/studio-rules': publicRoute,
   'GET /api/v1/promotion-images/{imageAssetId}/{kind}/{deliveryVersion}':
     publicRoute,
 
@@ -135,11 +136,17 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/purchase-intents': both('deny'),
   'GET /api/v1/purchase-intents/current': both('deny'),
   'POST /api/v1/purchase-intents/{purchaseIntentId}/receipt': both('deny'),
-  'POST /api/v1/purchase-intents/{purchaseIntentId}/submit': both('deny'),
+  // Empty body is invalid Invoice Data, and that check runs before the Role.
+  'POST /api/v1/purchase-intents/{purchaseIntentId}/submit': both('deny', {
+    body: { invoiceData: null },
+  }),
   'POST /api/v1/credit-purchases': both('deny'),
   'GET /api/v1/payments/current': both('deny'),
   'GET /api/v1/clients/current/credit': both('deny'),
   'GET /api/v1/clients/current/referrals': both('deny'),
+  'GET /api/v1/clients/current/invoice-data': both('deny'),
+  'POST /api/v1/freezes': both('deny'),
+  'POST /api/v1/evaluation-slots/{slotId}/evaluation-payments': both('deny'),
   // The studio's bank details for a transfer: shown to anyone signed in.
   'GET /api/v1/transfer-instructions': both('allow'),
   'GET /api/v1/transfer-instructions/qr': both('allow'),
@@ -161,6 +168,13 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   }),
   'GET /api/v1/trainer/sessions': both('deny'),
   'GET /api/v1/trainer/sessions/{sessionId}/roster': both('deny'),
+  'GET /api/v1/trainer/sessions/{sessionId}/equipment': both('deny'),
+  'POST /api/v1/trainer/sessions/{sessionId}/equipment-issues': both('deny'),
+  // The Coordinator is denied. An Administrator who may record a no-show
+  // still gets 404 for an Evaluation that does not exist, which the matrix
+  // counts as allow.
+  'POST /api/v1/nutritionist/evaluations/{evaluationId}/no-show':
+    administratorOnly(),
   'GET /api/v1/nutritionist/evaluations': both('deny'),
   'DELETE /api/v1/nutritionist/evaluations/{evaluationId}': administratorOnly(),
   'GET /api/v1/nutritionist/availability-blocks': both('deny'),
@@ -195,8 +209,15 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/assistant/clients/{clientId}/class-history': both('allow'),
   // Selling and registering new Clients stay at the front desk.
   'GET /api/v1/assistant/clients/{clientId}/plan-quotes': administratorOnly(),
-  'POST /api/v1/assistant/clients/{clientId}/cash-payments':
-    administratorOnly(),
+  'POST /api/v1/assistant/clients/{clientId}/cash-payments': administratorOnly({
+    // The controller rejects a body without a Plan and a Branch before the Role.
+    body: { planId: uuid, branchId: uuid },
+  }),
+  // A missing receipt is access denied before the Role is distinguished.
+  'POST /api/v1/assistant/clients/{clientId}/transfer-payments': both('deny', {
+    body: { planId: uuid, branchId: uuid, imageAssetId: uuid },
+  }),
+  'GET /api/v1/assistant/clients/{clientId}/invoice-data': administratorOnly(),
   'POST /api/v1/assistant/client-invitations': administratorOnly(),
   'GET /api/v1/assistant/client-invitations/{clientId}': administratorOnly(),
   'POST /api/v1/assistant/client-invitations/{clientId}/email-corrections':
@@ -262,8 +283,27 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/class-types/{classTypeId}/archive':
     administratorOnly(),
   'GET /api/v1/administrator/plans': administratorOnly(),
-  'POST /api/v1/administrator/plans': administratorOnly(),
-  'PUT /api/v1/administrator/plans/{planId}': administratorOnly(),
+  'POST /api/v1/administrator/plans': administratorOnly({
+    // Invalid Plan is 400 before the Role is read.
+    body: {
+      name: 'Paquete de prueba',
+      durationDays: 30,
+      weeklyClassCap: null,
+      classAllowance: 8,
+      priceCentavos: 30000,
+      displayOrder: 0,
+    },
+  }),
+  'PUT /api/v1/administrator/plans/{planId}': administratorOnly({
+    body: {
+      name: 'Paquete de prueba',
+      durationDays: 30,
+      weeklyClassCap: null,
+      classAllowance: 8,
+      priceCentavos: 30000,
+      displayOrder: 0,
+    },
+  }),
   'PUT /api/v1/administrator/plans/{planId}/visibility': administratorOnly(),
 
   // Oversight and money: Payments, Credit, Referrals, reports, Evaluations.
@@ -322,6 +362,48 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/expenses': administratorOnly(),
   'PUT /api/v1/administrator/expenses/{expenseId}': administratorOnly(),
   'GET /api/v1/administrator/reports/expenses': administratorOnly(),
+
+  // Combined launch routes. Money, payroll, void, founder, freeze review,
+  // campaigns, and equipment stay the Administrator's (ADR-0102).
+  'GET /api/v1/administrator/founder-memberships': administratorOnly(),
+  'GET /api/v1/administrator/freezes': administratorOnly(),
+  'GET /api/v1/administrator/freezes/{freezeId}': administratorOnly(),
+  // A missing Freeze is refused as access denied for every Role, so the
+  // probe cannot tell an allowed Administrator from a denied Coordinator.
+  'POST /api/v1/administrator/freezes/{freezeId}/decision': both('deny', {
+    body: { decision: 'refused' },
+  }),
+  'POST /api/v1/administrator/clients/{clientId}/courtesy-access':
+    administratorOnly(),
+  'POST /api/v1/administrator/clients/{clientId}/allowance-adjustments':
+    administratorOnly(),
+  'GET /api/v1/administrator/campaigns/preview': administratorOnly(),
+  'POST /api/v1/administrator/campaigns': administratorOnly(),
+  'POST /api/v1/administrator/payments/{paymentId}/void': administratorOnly(),
+  'GET /api/v1/administrator/studio-settings': administratorOnly(),
+  'PUT /api/v1/administrator/studio-settings': administratorOnly(),
+  'GET /api/v1/administrator/clients/{clientId}/acquisition':
+    administratorOnly(),
+  'PUT /api/v1/administrator/clients/{clientId}/acquisition':
+    administratorOnly(),
+  'GET /api/v1/administrator/staff-members/{staffMemberId}/referral-code':
+    administratorOnly(),
+  'PUT /api/v1/administrator/staff-members/{staffMemberId}/referral-code':
+    administratorOnly(),
+  'POST /api/v1/administrator/payments/{paymentId}/invoice-issued':
+    administratorOnly(),
+  'DELETE /api/v1/administrator/payments/{paymentId}/invoice-issued':
+    administratorOnly(),
+  'GET /api/v1/administrator/equipment': administratorOnly(),
+  'POST /api/v1/administrator/equipment': administratorOnly(),
+  'POST /api/v1/administrator/equipment/{equipmentId}/archive':
+    administratorOnly(),
+  'POST /api/v1/administrator/equipment/{equipmentId}/issues':
+    administratorOnly(),
+  'GET /api/v1/administrator/equipment-issues': administratorOnly(),
+  'POST /api/v1/administrator/equipment-issues/{issueId}/resolve':
+    administratorOnly(),
+  'GET /api/v1/administrator/equipment-flags': administratorOnly(),
 };
 
 /** A concrete address for a templated path. */
