@@ -281,7 +281,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'DELETE /api/v1/administrator/evaluations/{evaluationId}':
     administratorOnly(),
   'GET /api/v1/administrator/referrals': administratorOnly(),
-  'GET /api/v1/administrator/credits': administratorOnly(),
+  // PAY-005 retired Credit, so GET /administrator/credits is gone.
   'GET /api/v1/administrator/reports/income': administratorOnly(),
   'GET /api/v1/administrator/payments/pending': administratorOnly(),
   'GET /api/v1/administrator/payments/{paymentId}': administratorOnly(),
