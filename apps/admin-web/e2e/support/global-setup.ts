@@ -17,6 +17,38 @@ const disposablePrefix = "pilates_test_";
 
 const databaseName = (url: string) => new URL(url).pathname.slice(1);
 
+// Every fixture Client already holds a Plan or a transfer in review. The
+// cash-sale journey needs one who holds neither, so she is seeded beside
+// the fixtures with the same password hash.
+const seedClientWithoutPlan = `
+  WITH hashed AS (
+    SELECT password_hash FROM system.accounts
+    WHERE email = 'lucia@example.com' AND deleted_at IS NULL
+  ),
+  client AS (
+    INSERT INTO booking.clients (id, name, referral_code, updated_at)
+    VALUES (
+      '6f0c9a10-7b14-5e2a-9c33-1d8e4a7b0c55',
+      'Renata Soliz',
+      'REF-RENATA',
+      now()
+    )
+    RETURNING id
+  )
+  INSERT INTO system.accounts (
+    id, email, password_hash, email_verified_at, activated_at, client_id, updated_at
+  )
+  SELECT
+    '7a1d0b21-8c25-5f3b-0d44-2e9f5b8c1d66',
+    'renata@example.com',
+    hashed.password_hash,
+    now(),
+    now(),
+    client.id,
+    now()
+  FROM hashed CROSS JOIN client;
+`;
+
 const runSql = (statement: string) =>
   execFileSync(
     "psql",
@@ -78,6 +110,19 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       env: environment,
       stdio: "pipe",
     });
+    // Every fixture Client already holds a Plan or a transfer in review.
+    // The cash-sale journey needs one who holds neither.
+    execFileSync(
+      "psql",
+      [
+        databaseUrl.toString(),
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-c",
+        seedClientWithoutPlan,
+      ],
+      { stdio: "pipe" },
+    );
 
     api = spawn("node", ["dist/src/main.js"], {
       cwd: backendRoot,

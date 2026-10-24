@@ -366,26 +366,9 @@ export function createPrismaPaymentCommands(
       select: { id: true },
     });
 
-    // Qualify the pending Referral without restoring Credit (PAY-005).
-    const referral = await transaction.referral.findFirst({
-      where: {
-        referredClientId: payment.clientId,
-        state: ReferralState.PENDING,
-      },
-      select: { id: true },
-    });
-    if (referral !== null) {
-      await transaction.referral.update({
-        where: { id: referral.id },
-        data: {
-          state: ReferralState.AWARDED,
-          qualifiedPaymentId: payment.id,
-          qualifiedAt: now,
-          awardedAt: now,
-        },
-      });
-    }
-
+    // A pending Referral stays pending. Awarding it requires a Credit ledger
+    // entry (booking.referrals_state_fields_check), and Credit is retired
+    // (PAY-005). The host's reward is the guest-pass class below.
     const author = {
       accountId: principal.accountId,
       role: auditActorOf(principal).role,
