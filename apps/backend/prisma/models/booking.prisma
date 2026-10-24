@@ -80,6 +80,7 @@ model Branch {
   evaluationSlots  EvaluationSlot[]
   supplies         Supply[]
   expenses         Expense[]
+  equipment        Equipment[]
   cashCloses       CashClose[]
 
   @@map("branches")

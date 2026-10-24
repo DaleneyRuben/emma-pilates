@@ -6,6 +6,8 @@ import {
 import { BackOfficeError } from './back-office-errors';
 import type { CashCloses } from './cash-close/prisma-cash-closes';
 import { parseUuidValue } from './back-office.dto';
+import type { EquipmentOperations } from './equipment/prisma-equipment';
+import type { SessionEquipment } from './equipment/prisma-session-equipment';
 import type { Expenses } from './expenses/prisma-expenses';
 import type { SalaryPayments } from './payroll/prisma-salary-payments';
 import type { ExpenseReport } from './reports/prisma-expense-report';
@@ -20,6 +22,8 @@ export type BackOfficeOperations = {
   salaryPayments: SalaryPayments;
   expenses: Expenses;
   report: ExpenseReport;
+  equipment: EquipmentOperations;
+  sessionEquipment: SessionEquipment;
   cashCloses: CashCloses;
 };
 

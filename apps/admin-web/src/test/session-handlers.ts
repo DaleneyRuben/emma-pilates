@@ -31,7 +31,7 @@ export const paolaProfile = {
 // The browser holds a valid host-only session cookie (MSW cannot see it;
 // the backend would answer these reads from it). Every shell page also
 // reads the active Branches for the selector, and Horario (the landing page)
-// reads an empty week unless a spec says otherwise; the Pagos badge reads no
+// reads an empty week (and no equipment flags) unless a spec says otherwise; the Pagos badge reads no
 // pending transfers and the Insumos badge a Branch without Supplies; the
 // public studio rules (BKM-004) are today's.
 export const signedInHandlers = () => [
@@ -39,6 +39,9 @@ export const signedInHandlers = () => [
   http.get(apiUrl(staffProfilePath), () => jsonResponse(paolaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
+    jsonResponse([]),
+  ),
   pendingBadgeHandler(),
   branchSuppliesHandler(),
   studioRulesHandler(),
@@ -70,6 +73,9 @@ export const coordinatorHandlers = () => [
   http.get(apiUrl(staffProfilePath), () => jsonResponse(carolinaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
+    jsonResponse([]),
+  ),
 ];
 
 export const signedOutHandlers = () => [

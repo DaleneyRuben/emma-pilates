@@ -420,6 +420,37 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/expenses': administratorOnly(),
   'PUT /api/v1/administrator/expenses/{expenseId}': administratorOnly(),
   'GET /api/v1/administrator/reports/expenses': administratorOnly(),
+
+  // BKO-004 / ADR-0106: Equipment is operational, not money. The Administrator
+  // and the Coordinator manage it and resolve faults; a Trainer reports a
+  // fault only from a Session she leads (trainer routes refuse both Roles
+  // here).
+  'GET /api/v1/administrator/equipment': both('allow', {
+    query: `?branchId=${uuid}`,
+  }),
+  'POST /api/v1/administrator/equipment': both('allow', {
+    body: { branchId: uuid, kind: 'reformer', number: 1 },
+  }),
+  'POST /api/v1/administrator/equipment/{equipmentId}/archive': both('allow'),
+  'POST /api/v1/administrator/equipment/{equipmentId}/issues': both('allow', {
+    body: { description: 'mmmmmmmm', outOfService: true },
+  }),
+  'GET /api/v1/administrator/equipment-issues': both('allow', {
+    query: `?branchId=${uuid}`,
+  }),
+  'POST /api/v1/administrator/equipment-issues/{issueId}/resolve':
+    both('allow'),
+  'GET /api/v1/administrator/equipment-flags': both('allow', {
+    query: `?branchId=${uuid}&from=2030-01-07T15:00:00.000Z&until=2030-01-14T15:00:00.000Z`,
+  }),
+  'GET /api/v1/trainer/sessions/{sessionId}/equipment': both('deny'),
+  'POST /api/v1/trainer/sessions/{sessionId}/equipment-issues': both('deny', {
+    body: {
+      equipmentId: uuid,
+      description: 'mmmmmmmm',
+      outOfService: true,
+    },
+  }),
 };
 
 /** A concrete address for a templated path. */

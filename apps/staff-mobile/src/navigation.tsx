@@ -50,6 +50,7 @@ import { StaffChangePasswordScreen } from "./profile/staff-change-password-scree
 import { StaffFeedbackScreen } from "./profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
+import { ReportFaultScreen } from "./trainer/report-fault-screen";
 import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
 import { TrainerRosterScreen } from "./trainer/trainer-roster-screen";
 import { StaffFetcherContext, unavailableFetcher } from "./staff-fetcher";
@@ -68,6 +69,7 @@ const TrainerStack = createNativeStackNavigator({
   screens: {
     Agenda: TrainerAgendaScreen,
     Roster: TrainerRosterScreen,
+    ReportFault: ReportFaultScreen,
     ...accountScreens,
   },
 });

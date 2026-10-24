@@ -73,6 +73,23 @@ const problems: Record<string, Omit<BackOfficeProblem, "code">> = {
   expense_category_in_use: {
     message: "No puedes eliminarla: un gasto la usa.",
   },
+  equipment_number_taken: {
+    message: "Ese número ya está en uso en esta sucursal.",
+  },
+  equipment_not_found: {
+    message:
+      "Este equipo ya no existe. Cierra el panel para ver la lista actual.",
+  },
+  equipment_archived: {
+    message:
+      "Este equipo ya se dio de baja. Cierra el panel para ver la lista actual.",
+  },
+  equipment_issue_not_found: {
+    message: "Esta falla ya no existe. Vuelve a abrir la lista.",
+  },
+  equipment_issue_resolved: {
+    message: "Esta falla ya estaba resuelta.",
+  },
 };
 
 export function backOfficeProblem(error: unknown): BackOfficeProblem {

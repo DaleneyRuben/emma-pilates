@@ -209,6 +209,9 @@ model Account {
   studioSettingsVersions    StudioSettingsVersion[] @relation("StudioSettingsVersionCreatedBy")
   recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
+  createdEquipment          Equipment[]             @relation("EquipmentCreatedBy")
+  reportedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueReportedBy")
+  resolvedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueResolvedBy")
   feedback                  Feedback[]
   closedCashCloses          CashClose[]             @relation("CashCloseClosedBy")
 
