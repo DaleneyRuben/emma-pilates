@@ -132,7 +132,7 @@ function Calculator({ draft }: { draft: Draft }) {
   );
 }
 
-// AW37 «Simulador» (STU-004, ADR-0103). The calculation lives in
+// AW42 «Simulador» (STU-004, ADR-0103). AW37 is Equipos. The calculation lives in
 // @pilates/studio-economics and nothing leaves the browser.
 export function SimulatorPage() {
   const profile = useQuery(staffProfileQueryOptions());

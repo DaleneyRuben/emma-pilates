@@ -6,7 +6,8 @@ import {
 import { AuthenticationLinkStateChangedError } from './authentication-links';
 
 /** Who may receive the replacement session a completed recovery opens. */
-export type RecoverySessionEligibility = 'any' | 'administrator';
+/** `admin_web`: only the Roles that may hold an admin-web session. */
+export type RecoverySessionEligibility = 'any' | 'admin_web';
 
 type RecoveryToken = {
   id: string;
@@ -115,7 +116,8 @@ export const completePasswordRecovery = async (
   };
 
   // ADR-0030 opens one replacement session where the reset completed; the
-  // admin web may hold one only for an Administrator (ADR-0053).
+  // admin web may hold one only for an Administrator or the Coordinator
+  // (ADR-0053, ADR-0102).
   let sessionOpened: boolean;
   try {
     ({ sessionOpened } = await dependencies.gateway.completeRecovery({
@@ -123,7 +125,7 @@ export const completePasswordRecovery = async (
       passwordHash,
       completedAt,
       authenticationSession,
-      sessionEligibility: surface === 'admin_web' ? 'administrator' : 'any',
+      sessionEligibility: surface === 'admin_web' ? 'admin_web' : 'any',
       auditRecordId: dependencies.newAuditRecordId(),
     }));
   } catch (error) {

@@ -42,6 +42,7 @@ const evaluationSlotIntervalMs = 60 * 60 * 1_000;
 const evaluationReminderIntervalMs = 60 * 1_000;
 const sessionStartCheckIntervalMs = 60 * 1_000;
 const retentionSweepIntervalMs = 60 * 60 * 1_000;
+const trainerPayDraftIntervalMs = 60 * 60 * 1_000;
 const pushReceiptIntervalMs = 5 * 60 * 1_000;
 
 type QueueStatsSnapshot = {
@@ -77,6 +78,12 @@ type WorkerDependencies = {
   subscriptionReminders: {
     execute(): Promise<{ reminded: number }>;
   };
+  founderMemberships: {
+    execute(): Promise<{ ended: number }>;
+  };
+  first90Days: {
+    execute(): Promise<{ messages: number; alerts: number }>;
+  };
   purchaseIntentExpiry: {
     execute(): Promise<{ expired: number }>;
   };
@@ -89,8 +96,11 @@ type WorkerDependencies = {
   evaluationReminders: {
     execute(): Promise<{ sent: number }>;
   };
-  emptySessionChecks: {
+  minimumBookingsChecks: {
     execute(): Promise<{ checked: number; cancelled: number }>;
+  };
+  windowCloseSnapshots: {
+    execute(): Promise<{ recorded: number }>;
   };
   startedSessionWaitlists: {
     execute(): Promise<{ closed: number }>;
@@ -98,6 +108,9 @@ type WorkerDependencies = {
   pushDispatch: Pick<PushDispatchWorkerDependencies, 'dispatch'>;
   pushReceipts: {
     execute(): Promise<CheckPushReceiptsResult>;
+  };
+  trainerPayDrafts: {
+    execute(): Promise<{ drafted: number }>;
   };
   retentionSweeps: {
     execute(): Promise<{
@@ -164,6 +177,19 @@ export const startWorker = async (
             job: 'subscription_reminders',
             execute: () => dependencies.subscriptionReminders.execute(),
           },
+          {
+            job: 'founder_memberships',
+            execute: () => dependencies.founderMemberships.execute(),
+          },
+        ],
+      },
+      {
+        intervalMs: subscriptionReminderIntervalMs,
+        steps: [
+          {
+            job: 'first_90_days',
+            execute: () => dependencies.first90Days.execute(),
+          },
         ],
       },
       {
@@ -207,15 +233,21 @@ export const startWorker = async (
           },
         ],
       },
-      // The one-time empty check and the Session-start Waitlist closure are
-      // each swept every minute (ADR-0058). The check runs first so one the
-      // worker missed settles before its Session's Waitlist closes.
+      // The one-time Minimum Bookings check, the window-close snapshot, and
+      // the Session-start Waitlist closure are each swept every minute
+      // (ADR-0058, booking ADR-0007). The check runs first so one the worker
+      // missed settles before its Session is snapshotted or its Waitlist
+      // closes, and a Session it cancels gets no snapshot.
       {
         intervalMs: sessionStartCheckIntervalMs,
         steps: [
           {
-            job: 'empty_session_check',
-            execute: () => dependencies.emptySessionChecks.execute(),
+            job: 'minimum_bookings_check',
+            execute: () => dependencies.minimumBookingsChecks.execute(),
+          },
+          {
+            job: 'window_close_snapshot',
+            execute: () => dependencies.windowCloseSnapshots.execute(),
           },
           {
             job: 'started_waitlist_closure',
@@ -231,6 +263,17 @@ export const startWorker = async (
           {
             job: 'push_receipts',
             execute: () => dependencies.pushReceipts.execute(),
+          },
+        ],
+      },
+      // Trainer and Coordinator statements for the previous month and the
+      // current one (BKO-006, BKO-007). Hourly is enough: approval pays.
+      {
+        intervalMs: trainerPayDraftIntervalMs,
+        steps: [
+          {
+            job: 'trainer_pay_draft',
+            execute: () => dependencies.trainerPayDrafts.execute(),
           },
         ],
       },

@@ -19,17 +19,16 @@ const paymentId = '44444444-4444-4444-8444-444444444444';
 const principal = (
   role:
     'assistant' | 'administrator' | 'trainer' | 'nutritionist' | 'coordinator',
-): AuthenticatedPrincipal =>
-  ({
-    accountId: `${role}-account`,
-    authenticationSessionId: 'session',
-    identity: {
-      kind: 'staff',
-      staffMemberId: `${role}-staff`,
-      role,
-      branchIds: [],
-    },
-  }) as AuthenticatedPrincipal;
+): AuthenticatedPrincipal => ({
+  accountId: `${role}-account`,
+  authenticationSessionId: 'session',
+  identity: {
+    kind: 'staff',
+    staffMemberId: `${role}-staff`,
+    role,
+    branchIds: [],
+  },
+});
 
 describe('void sale endpoint', () => {
   let app: INestApplication<App>;

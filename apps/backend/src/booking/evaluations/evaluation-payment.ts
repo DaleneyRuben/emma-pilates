@@ -160,20 +160,3 @@ export const releaseExpiredEvaluationHolds = async (
   }
   return due.length;
 };
-
-export const nutritionistCostOfMonth = async (
-  transaction: Transaction,
-  month: Date,
-): Promise<number> => {
-  const rows = await transaction.evaluation.findMany({
-    where: {
-      nutritionistCostCentavos: { not: null },
-      slot: { localMonth: month },
-    },
-    select: { nutritionistCostCentavos: true },
-  });
-  return rows.reduce(
-    (total, row) => total + (row.nutritionistCostCentavos ?? 0),
-    0,
-  );
-};

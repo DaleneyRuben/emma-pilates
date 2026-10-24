@@ -13,6 +13,7 @@ import {
 } from './monitoring/error-reporting';
 import { BookingModule } from './booking/booking.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { FeedbackModule } from './system-identity/feedback/feedback.module';
 import { SystemIdentityModule } from './system-identity/system-identity.module';
 import { ObjectStorageModule } from './uploads/object-storage.module';
 import { UploadsModule } from './uploads/uploads.module';
@@ -28,6 +29,7 @@ import { UploadsModule } from './uploads/uploads.module';
     BackOfficeModule,
     UploadsModule,
     NotificationsModule,
+    FeedbackModule,
   ],
   providers: [
     {

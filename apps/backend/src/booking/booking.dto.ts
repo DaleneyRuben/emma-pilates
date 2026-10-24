@@ -91,6 +91,15 @@ export class SessionAvailabilityDto {
 
   @ApiProperty({ minimum: 0 })
   waitlistCount!: number;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 0,
+    nullable: true,
+    description:
+      'Classes left this week from the base allowance. Absent when the Plan has no cap or the caller is not a Client.',
+  })
+  classesLeftThisWeek?: number | null;
 }
 
 // The Administrator's projection (API-002, WEB-003): the same Session plus

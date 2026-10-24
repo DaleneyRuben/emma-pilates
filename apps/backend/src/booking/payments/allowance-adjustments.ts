@@ -21,7 +21,13 @@ const reasonValues: Record<AdjustmentReason, AllowanceAdjustmentReason> = {
 export type AdjustmentAuthor = {
   accountId: string;
   /** The approving Account for a gift, the Administrator otherwise. */
-  role: 'ADMINISTRATOR' | 'ASSISTANT' | 'TRAINER' | 'NUTRITIONIST' | null;
+  role:
+    | 'ADMINISTRATOR'
+    | 'COORDINATOR'
+    | 'ASSISTANT'
+    | 'TRAINER'
+    | 'NUTRITIONIST'
+    | null;
 };
 
 export type RecordedAdjustment = {
@@ -44,6 +50,8 @@ export const recordAllowanceAdjustment = async (
     author: AdjustmentAuthor;
     now: Date;
     correlationId: string;
+    /** A campaign's name lives in the audit: the adjustments are the record. */
+    campaignName?: string;
   },
 ): Promise<RecordedAdjustment> => {
   const created = await transaction.allowanceAdjustment.create({
@@ -73,6 +81,9 @@ export const recordAllowanceAdjustment = async (
         subscriptionId: input.subscriptionId,
         classes: input.classes,
         reason: input.reason,
+        ...(input.campaignName === undefined
+          ? {}
+          : { campaignName: input.campaignName }),
       },
     },
   });

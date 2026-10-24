@@ -1,6 +1,4 @@
 import {
-  BookingState,
-  SessionCancellationCause,
   SessionState,
   WaitlistClosureReason,
   type PrismaClient,
@@ -10,13 +8,14 @@ import {
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
 import { retrySerializable } from '../../database/retry-serializable';
+import { readCurrentStudioSettings } from '../studio-settings/prisma-studio-settings';
 import {
-  isEmptySessionCheckDue,
-  waitlistSessionCancelledNotice,
-  zeroBookingsTrainerNotice,
-} from './session-start-checks';
+  cancelBelowMinimum,
+  checkedSessionSelect,
+} from './prisma-minimum-bookings-cancellation';
+import { isMinimumBookingsCheckDue } from './session-start-checks';
 
-const emptyCheckLeadMilliseconds = 2 * 60 * 60 * 1_000;
+type MinimumRule = { minimumBookings: number; leadMinutes: number };
 
 export const createPrismaSessionStartChecks = (
   prisma: PrismaClient,
@@ -28,12 +27,13 @@ export const createPrismaSessionStartChecks = (
   const recordNotification =
     dependencies.recordNotification ?? defaultNotificationRecorder;
 
-  // One-time empty check (ADR-0058, BOOK-001): each due Session is settled in
-  // its own transaction, and the completion marker makes reruns no-ops even
-  // when the Session later drops to zero Bookings.
-  const checkEmptySession = (
+  // One-time Minimum Bookings check (ADR-0007, BKM-009): each due Session is
+  // settled in its own transaction, and the completion marker makes reruns
+  // and a restart mid-sweep no-ops for the Sessions already settled.
+  const checkSession = (
     sessionId: string,
     now: Date,
+    rule: MinimumRule,
   ): Promise<'skipped' | 'checked' | 'cancelled'> =>
     retrySerializable(() =>
       prisma.$transaction(
@@ -46,102 +46,55 @@ export const createPrismaSessionStartChecks = (
             SELECT id FROM booking.sessions WHERE id = ${sessionId}::uuid FOR NO KEY UPDATE`;
           const session = await transaction.session.findUniqueOrThrow({
             where: { id: sessionId },
-            select: {
-              id: true,
-              state: true,
-              startsAt: true,
-              endsAt: true,
-              emptyBookingCheckCompletedAt: true,
-              classType: { select: { name: true } },
-              trainer: { select: { account: { select: { id: true } } } },
-              _count: {
-                select: {
-                  bookings: { where: { state: BookingState.BOOKED } },
-                },
-              },
-              waitlistEntries: {
-                where: { closedAt: null },
-                select: {
-                  client: { select: { account: { select: { id: true } } } },
-                },
-              },
-            },
+            select: checkedSessionSelect,
           });
           if (
             session.state !== SessionState.SCHEDULED ||
-            session.emptyBookingCheckCompletedAt !== null ||
-            !isEmptySessionCheckDue(session, now)
+            session.minimumBookingsCheckCompletedAt !== null ||
+            !isMinimumBookingsCheckDue(session, now, rule.leadMinutes)
           ) {
             return 'skipped';
           }
 
-          if (session._count.bookings > 0) {
+          if (session.bookings.length >= rule.minimumBookings) {
             await transaction.session.update({
               where: { id: session.id },
-              data: { emptyBookingCheckCompletedAt: now },
+              data: { minimumBookingsCheckCompletedAt: now },
             });
             return 'checked';
           }
 
-          await transaction.session.update({
-            where: { id: session.id },
-            data: {
-              state: SessionState.CANCELLED,
-              cancellationCause: SessionCancellationCause.ZERO_BOOKINGS,
-              cancelledAt: now,
-              emptyBookingCheckCompletedAt: now,
-            },
+          await cancelBelowMinimum(transaction, session, {
+            now,
+            minimumBookings: rule.minimumBookings,
+            recordNotification,
           });
-          await transaction.waitlistEntry.updateMany({
-            where: { sessionId: session.id, closedAt: null },
-            data: {
-              closedAt: now,
-              closureReason: WaitlistClosureReason.SESSION_CANCELLED,
-            },
-          });
-          if (session.trainer.account !== null) {
-            await recordNotification(
-              transaction,
-              zeroBookingsTrainerNotice({
-                accountId: session.trainer.account.id,
-                sessionId: session.id,
-                classTypeName: session.classType.name,
-                startsAt: session.startsAt,
-                occurredAt: now,
-              }),
-            );
-          }
-          for (const entry of session.waitlistEntries) {
-            if (entry.client.account === null) continue;
-            await recordNotification(
-              transaction,
-              waitlistSessionCancelledNotice({
-                accountId: entry.client.account.id,
-                sessionId: session.id,
-                classTypeName: session.classType.name,
-                occurredAt: now,
-              }),
-            );
-          }
           return 'cancelled';
         },
         { isolationLevel: 'Serializable' },
       ),
     );
 
-  const checkEmptySessions = async (): Promise<{
+  const checkMinimumBookings = async (): Promise<{
     checked: number;
     cancelled: number;
   }> => {
     const now = dependencies.now();
+    // Read once per sweep: a minimum changed in Studio Settings applies from
+    // the next sweep on.
+    const settings = await readCurrentStudioSettings(prisma);
+    const rule: MinimumRule = {
+      minimumBookings: settings.minimumBookings,
+      leadMinutes: settings.minimumBookingsCheckLeadMinutes,
+    };
     const candidates = await prisma.session.findMany({
       where: {
         state: SessionState.SCHEDULED,
-        emptyBookingCheckCompletedAt: null,
+        minimumBookingsCheckCompletedAt: null,
         startsAt: {
-          lte: new Date(now.getTime() + emptyCheckLeadMilliseconds),
+          lte: new Date(now.getTime() + rule.leadMinutes * 60_000),
+          gt: now,
         },
-        endsAt: { gt: now },
       },
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
       select: { id: true },
@@ -150,13 +103,37 @@ export const createPrismaSessionStartChecks = (
     let cancelled = 0;
 
     for (const { id } of candidates) {
-      const outcome = await checkEmptySession(id, now);
+      const outcome = await checkSession(id, now, rule);
       if (outcome === 'skipped') continue;
       checked += 1;
       if (outcome === 'cancelled') cancelled += 1;
     }
 
     return { checked, cancelled };
+  };
+
+  // ADR-0007: when its Cancellation Window closes, a scheduled Session records
+  // its live Bookings, which Trainer pay counts (BKO-006). One conditional
+  // statement records each Session once, whatever reruns or restarts follow.
+  const recordWindowCloseBookings = async (): Promise<{ recorded: number }> => {
+    const now = dependencies.now();
+    const { cancellationWindowMinutes } =
+      await readCurrentStudioSettings(prisma);
+    const closesBy = new Date(
+      now.getTime() + cancellationWindowMinutes * 60_000,
+    );
+    const recorded = await prisma.$executeRaw`
+      UPDATE booking.sessions AS session
+      SET bookings_at_window_close = (
+            SELECT count(*) FROM booking.bookings AS booking
+            WHERE booking.session_id = session.id AND booking.state = 'booked'
+          ),
+          updated_at = ${now}
+      WHERE session.state = 'scheduled'
+        AND session.bookings_at_window_close IS NULL
+        AND session.starts_at <= ${closesBy}`;
+
+    return { recorded };
   };
 
   // Entries still open when their Session starts close without a notice. One
@@ -177,5 +154,9 @@ export const createPrismaSessionStartChecks = (
     return { closed: count };
   };
 
-  return { checkEmptySessions, closeStartedWaitlists };
+  return {
+    checkMinimumBookings,
+    recordWindowCloseBookings,
+    closeStartedWaitlists,
+  };
 };

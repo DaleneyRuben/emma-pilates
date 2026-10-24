@@ -26,10 +26,9 @@ export async function photographTransferReceipt(
   fetcher: typeof globalThis.fetch,
 ): Promise<FrontDeskReceipt | null> {
   const camera = await ImagePicker.requestCameraPermissionsAsync();
-  const result =
-    camera.granted
-      ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1 })
-      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 1 });
+  const result = camera.granted
+    ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 1 })
+    : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 1 });
   const asset = result.canceled ? undefined : result.assets[0];
   if (asset === undefined) return null;
 

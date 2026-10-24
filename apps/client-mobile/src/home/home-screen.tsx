@@ -248,7 +248,7 @@ export function HomeScreen() {
             />
             <ShortcutTile
               icon="person"
-              label="Mis referidos"
+              label="Invita a una amiga"
               onPress={() => navigation.navigate("Referrals")}
               summary={referralShortcut(referralCount)}
             />

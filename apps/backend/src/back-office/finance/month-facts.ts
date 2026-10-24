@@ -1,4 +1,4 @@
-import { nutritionistCostOfMonth } from '../../booking/evaluations/evaluation-payment';
+import { nutritionistCostOfMonth } from '../../booking/evaluations/nutritionist-cost';
 import type { PrismaClient } from '../../generated/prisma/client';
 import type { MonthFacts } from './prisma-finance';
 

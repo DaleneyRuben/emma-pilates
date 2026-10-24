@@ -33,9 +33,6 @@ const trustedOriginsSchema = z
     'ADMIN_WEB_TRUSTED_ORIGINS must list exact http(s) origins separated by commas',
   );
 
-// Bs 60; any other reward needs separate product approval (PAY-001).
-const approvedReferralRewardCentavos = 6000;
-
 const objectStorageSettings = [
   'OBJECT_STORAGE_ENDPOINT',
   'OBJECT_STORAGE_BUCKET',
@@ -88,13 +85,6 @@ const environmentSchema = z
     TRUSTED_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(0),
     // Release identifier reported by readiness and logs (ADR-0080/0081).
     RELEASE_ID: z.string().min(1).default('local'),
-    REFERRAL_REWARD_CENTAVOS: z.coerce
-      .number()
-      .refine(
-        (value) => value === approvedReferralRewardCentavos,
-        `REFERRAL_REWARD_CENTAVOS must be ${approvedReferralRewardCentavos}`,
-      )
-      .default(approvedReferralRewardCentavos),
     // PAY-003: the studio's QR image is the only transfer instruction.
     TRANSFER_QR_IMAGE_PATH: z.string().min(1).default(localTransferQrImagePath),
     // ADR-0088: local disk outside production, R2's S3 API in production.

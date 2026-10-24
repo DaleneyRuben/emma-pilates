@@ -32,10 +32,17 @@ describe("admin shell", () => {
         "Planes",
         "Sucursales",
         "Clientes",
+        "Para contactar",
+        "Fundadoras",
+        "Congelamientos",
         "Pagos",
+        "Caja",
         "Insumos",
+        "Equipos",
         "Evaluaciones nutricionales",
         "Personal",
+        "Pagos a instructoras",
+        "Pago a la coordinadora",
         "Nómina",
         "Gastos",
         "Categorías de gasto",
@@ -43,7 +50,7 @@ describe("admin shell", () => {
         "Simulador",
         "Promociones",
         "Referidos",
-        "Créditos",
+        "Comentarios",
       ]);
       expect(within(sidebar).getByText("Catálogo")).toBeInTheDocument();
       expect(within(sidebar).getByText("Back Office")).toBeInTheDocument();
@@ -315,7 +322,7 @@ describe("admin shell", () => {
         { timeout: 5_000 },
       );
       expect(
-        within(sidebar).getByRole("link", { name: "Pagos" }),
+        within(sidebar).getByRole("link", { name: /^Pagos$/ }),
       ).toHaveTextContent(/^Pagos$/);
       expect(
         within(sidebar).getByRole("link", { name: "Insumos" }),

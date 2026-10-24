@@ -9,6 +9,7 @@ enum SessionCancellationCause {
   ZERO_BOOKINGS         @map("zero_bookings")
   NO_SUBSTITUTE_TRAINER @map("no_substitute_trainer")
   SCHEDULE_CHANGED      @map("schedule_changed")
+  MINIMUM_NOT_MET       @map("minimum_not_met")
 
   @@schema("booking")
 }
@@ -114,7 +115,11 @@ model Session {
   cancelledAt                  DateTime?                 @map("cancelled_at") @db.Timestamptz(3)
   cancelledByAccountId         String?                   @map("cancelled_by_account_id") @db.Uuid
   cancellationNote             String?                   @map("cancellation_note")
-  emptyBookingCheckCompletedAt DateTime?                 @map("empty_booking_check_completed_at") @db.Timestamptz(3)
+  // The one-time Minimum Bookings check (ADR-0007, BKM-009); the column kept
+  // BOOK-004's name when the zero-booking check became this check.
+  minimumBookingsCheckCompletedAt DateTime?              @map("empty_booking_check_completed_at") @db.Timestamptz(3)
+  // Live Bookings when the Cancellation Window closed; Trainer pay counts them.
+  bookingsAtWindowClose        Int?                      @map("bookings_at_window_close") @db.SmallInt
   createdAt                    DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt                    DateTime                  @updatedAt @map("updated_at") @db.Timestamptz(3)
   sessionSchedule              SessionSchedule?          @relation(fields: [sessionScheduleId], references: [id], onDelete: Restrict)
@@ -160,7 +165,10 @@ model Subscription {
   payment                 Payment?          @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   bookings                Booking[]
   evaluations             Evaluation[]
+  freezes                 Freeze[]
   allowanceAdjustments    AllowanceAdjustment[]
+  guestPasses             GuestPass[]
+  guestPassRewards        GuestPass[]           @relation("GuestPassReward")
 
   @@unique([id, clientId])
   @@index([clientId, startsOn])
@@ -183,11 +191,15 @@ model AllowanceAdjustment {
   classes           Int                       @db.SmallInt
   reason            AllowanceAdjustmentReason
   authorAccountId   String                    @map("author_account_id") @db.Uuid
+  // Set only when an extra class funds a Booking, so the weekly cap can
+  // tell that Booking from one funded by the base allowance (BKM-007).
+  bookingId         String?                   @unique @map("booking_id") @db.Uuid
   createdAt         DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
   deletedAt         DateTime?                 @map("deleted_at") @db.Timestamptz(3)
   subscription      Subscription              @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
   client            Client                    @relation(fields: [clientId], references: [id], onDelete: Restrict)
   authorAccount     Account                   @relation("AllowanceAdjustmentAuthor", fields: [authorAccountId], references: [id], onDelete: Restrict)
+  booking           Booking?                  @relation(fields: [bookingId], references: [id], onDelete: Restrict)
 
   @@index([subscriptionId, createdAt])
   @@index([authorAccountId])

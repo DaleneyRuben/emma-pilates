@@ -192,6 +192,9 @@ describe('nutritionist evaluation rules', () => {
     ).resolves.toMatchObject({ bookable: true, priceCentavos: 7_000 });
 
     const again = await later.bookPaidEvaluation(slotId, lucia, randomUUID());
+    if (again.paymentId === null) {
+      throw new Error('A paid Evaluation books with its own Payment');
+    }
     await later.confirmEvaluationTransfer(
       again.paymentId,
       await world.principalOf('paola.mendoza@example.com'),
