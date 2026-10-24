@@ -46,28 +46,27 @@ export function SessionBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border-l-[3px] px-2 py-1 text-left transition-shadow hover:shadow-tarjeta-hover focus-visible:shadow-foco",
+        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border-l-[3px] px-2 py-1 text-left transition-shadow hover:shadow-tarjeta-hover focus-visible:shadow-foco lg:px-1.5 xl:px-2",
         full
           ? "border-advertencia bg-advertencia/12"
           : "border-primario bg-primario-tinte",
         className,
       )}
     >
-      <span className="flex w-full items-baseline justify-between gap-2">
-        <span className="truncate text-[12.5px] font-medium text-texto">
-          {session.classTypeName}
-        </span>
-        <span
-          className={cn(
-            "shrink-0 text-ayuda tabular",
-            full ? "text-advertencia-texto" : "text-primario-profundo",
-          )}
-        >
-          {occupancy(session)}
-        </span>
+      <span className="w-full text-[11.5px] leading-tight font-medium whitespace-nowrap text-texto xl:text-[12.5px]">
+        {session.classTypeName}
       </span>
-      <span className="w-full truncate text-ayuda text-texto-secundario tabular">
-        {start} – {end} · {session.trainerName}
+      <span className="w-full text-[11px] leading-tight whitespace-nowrap text-texto-secundario tabular lg:text-[11.5px] xl:text-ayuda">
+        {start} – {end}
+        <span className="text-texto-tenue"> · {session.trainerName}</span>
+      </span>
+      <span
+        className={cn(
+          "text-ayuda leading-tight tabular",
+          full ? "text-advertencia-texto" : "text-primario-profundo",
+        )}
+      >
+        {occupancy(session)}
       </span>
     </button>
   );
