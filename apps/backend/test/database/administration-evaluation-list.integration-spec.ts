@@ -47,9 +47,9 @@ describe('Prisma administration Evaluation list for AW25', () => {
         clientId: client.id,
         evaluationSlotId: slot.id,
         eligibilityMonth: new Date(`2026-${month}-01T00:00:00.000Z`),
-        // One included Evaluation per Subscription. October uses the later
-        // Subscription so the kind is still derived from the earlier booking.
-        subscriptionId: client.subscriptions[month === '09' ? 0 : 1].id,
+        // The fixture holds one 90-day Subscription covering both months.
+        // October's booking still follows September's, so the kind is derived.
+        subscriptionId: client.subscriptions[0].id,
         createdByAccountId: client.account!.id,
       },
     });

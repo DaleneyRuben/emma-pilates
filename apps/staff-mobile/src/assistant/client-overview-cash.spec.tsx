@@ -12,8 +12,9 @@ import {
 
 jest.setTimeout(20_000);
 
-// BKM-006: an effective Plan no longer blocks cash. Only a future Plan does.
-const note = "Ya tiene un plan siguiente.";
+// UX-003: an effective Plan blocks cash. A future Plan does too, with its own note.
+const activeNote = "Podrá comprar otro plan cuando este termine.";
+const futureNote = "Ya tiene un plan siguiente.";
 
 describe("Client overview cash action", () => {
   afterEach(async () => {
@@ -21,11 +22,11 @@ describe("Client overview cash action", () => {
     clearMobileQueryCache();
   });
 
-  it("keeps «Registrar pago en efectivo» enabled while the Plan is active", async () => {
+  it("disables «Registrar pago en efectivo» while the Plan is active", async () => {
     const screen = await openLucia(assistantRoutes());
 
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
-    expect(screen.queryByText(note)).toBeNull();
+    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeDisabled();
+    expect(screen.getByText(activeNote)).toBeOnTheScreen();
   });
 
   it("keeps it enabled while the Plan is about to expire", async () => {
@@ -35,8 +36,8 @@ describe("Client overview cash action", () => {
         jsonResponse({ ...overview, subscription: { status: "expiring_soon", subscription } }),
     });
 
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
-    expect(screen.queryByText(note)).toBeNull();
+    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeDisabled();
+    expect(screen.getByText(activeNote)).toBeOnTheScreen();
   });
 
   it("keeps it enabled while an active Plan has no classes left and no upcoming Booking", async () => {
@@ -57,10 +58,10 @@ describe("Client overview cash action", () => {
       expect(screen.getByText("0 clases restantes")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
-    expect(screen.queryByText(note)).toBeNull();
+    expect(screen.queryByText(activeNote)).toBeNull();
   });
 
-  it("keeps it enabled while an active Plan with no classes left still has an upcoming Booking", async () => {
+  it("keeps it disabled while an active Plan with no classes left still has an upcoming Booking", async () => {
     const screen = await openLucia({
       ...assistantRoutes(),
       "/api/v1/assistant/clients/client-lucia": () =>
@@ -77,8 +78,8 @@ describe("Client overview cash action", () => {
     await waitFor(() => {
       expect(screen.getByText("0 clases restantes")).toBeOnTheScreen();
     });
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
-    expect(screen.queryByText(note)).toBeNull();
+    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeDisabled();
+    expect(screen.getByText(activeNote)).toBeOnTheScreen();
   });
 
   it("disables it when a future Plan is already queued", async () => {
@@ -96,7 +97,7 @@ describe("Client overview cash action", () => {
     });
 
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeDisabled();
-    expect(screen.getByText(note)).toBeOnTheScreen();
+    expect(screen.getByText(futureNote)).toBeOnTheScreen();
   });
 
   it("keeps it enabled without the note once the Plan has expired", async () => {
@@ -116,6 +117,7 @@ describe("Client overview cash action", () => {
       expect(screen.getByText("Vencida")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
-    expect(screen.queryByText(note)).toBeNull();
+    expect(screen.queryByText(activeNote)).toBeNull();
+    expect(screen.queryByText(futureNote)).toBeNull();
   });
 });

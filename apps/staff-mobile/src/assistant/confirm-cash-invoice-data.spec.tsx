@@ -79,6 +79,7 @@ describe("Cash payment invoice data", () => {
       planId: "plan-8",
       branchId: "branch-centro",
       invoiceData: company,
+      startsOn: "2026-10-08",
     });
   });
 
@@ -95,6 +96,7 @@ describe("Cash payment invoice data", () => {
         planId: "plan-8",
         branchId: "branch-centro",
         invoiceData: null,
+        startsOn: "2026-10-08",
       });
     });
   });

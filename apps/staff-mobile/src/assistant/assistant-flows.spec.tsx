@@ -277,7 +277,12 @@ describe("Assistant Client flows", () => {
       expect(screen.getByText("¡Pago registrado!")).toBeOnTheScreen();
     });
     expect(paid).toHaveBeenCalledWith({
-      body: { planId: "plan-8", branchId: "branch-centro", invoiceData: null },
+      body: {
+        planId: "plan-8",
+        branchId: "branch-centro",
+        invoiceData: null,
+        startsOn: "2026-10-08",
+      },
       idempotencyKey: expect.stringMatching(/^[0-9a-f-]{36}$/),
     });
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
