@@ -66,6 +66,10 @@ export const glyphShapes = {
       <Path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
     </>
   ),
+  // «Enviar comentarios» on 18 (REL-012): a speech bubble.
+  message: (
+    <Path d="M6.5 5h11a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-6l-4.5 3.5v-3.5h-.5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
+  ),
   // 18's «Cambiar contraseña» row.
   password: (
     <>

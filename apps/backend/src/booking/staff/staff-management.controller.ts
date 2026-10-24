@@ -194,7 +194,13 @@ export class AdministratorStaffMembersController {
   @ApiQuery({
     name: 'role',
     required: false,
-    enum: ['trainer', 'nutritionist', 'assistant', 'administrator'],
+    enum: [
+      'trainer',
+      'nutritionist',
+      'assistant',
+      'administrator',
+      'coordinator',
+    ],
   })
   @ApiQuery({ name: 'branchId', required: false, schema: { format: 'uuid' } })
   @ApiQuery({

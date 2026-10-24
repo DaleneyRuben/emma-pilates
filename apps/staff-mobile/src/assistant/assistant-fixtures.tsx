@@ -32,6 +32,7 @@ export const subscription = {
   remainingClassAllowance: 5,
   startsOn: "2026-09-12",
   endsOn: "2026-10-12",
+  extraClassesLine: null,
 };
 
 export const facts = (
@@ -89,6 +90,17 @@ export const overview = {
   nextBooking: farBooking,
   recentHistory: history.slice(0, 2),
   creditAvailableCentavos: 6_000,
+};
+
+export const giftedOverview = {
+  ...overview,
+  subscription: {
+    status: "active" as const,
+    subscription: {
+      ...subscription,
+      extraClassesLine: "Clases extra: 1 · Regalo de bienvenida",
+    },
+  },
 };
 
 // Her last Plan has ended, so the Assistant may take cash for a new one (UX-003).

@@ -52,8 +52,6 @@ export const createAssistantClientOperations = (input: {
         findUpcoming: (range) => catalog.findUpcomingClientBookings(range),
         findAttendedBookings: (clientId) =>
           catalog.findAttendedBookings(clientId),
-        readAvailableCredit: (clientId) =>
-          clients.readAvailableCredit(clientId),
       }),
     bookings: (command, principal) =>
       listAssistantClientBookings(command, {
@@ -74,8 +72,6 @@ export const createAssistantClientOperations = (input: {
         principal,
         findClient: (clientId) => clients.findClient(clientId),
         listVisiblePlans: () => catalog.listVisiblePlans(),
-        readAvailableCredit: (clientId) =>
-          clients.readAvailableCredit(clientId),
       }),
     recordCashPayment: (command, principal, idempotencyKey) =>
       recordAssistantCashPayment(

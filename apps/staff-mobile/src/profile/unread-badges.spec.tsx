@@ -61,9 +61,9 @@ describe("Staff unread language", () => {
       expect(screen.getByTestId("notifications-row-badge")).toBeOnTheScreen();
     });
     expect(screen.getByText("9+")).toBeOnTheScreen();
-    // MOB-041: S23's two menu rows end in the 19 pt Icono tenue chevron.
+    // MOB-041: S23's three menu rows end in the 19 pt Icono tenue chevron.
     const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
-    expect(chevrons).toHaveLength(2);
+    expect(chevrons).toHaveLength(3);
     for (const chevron of chevrons) {
       expect(chevron).toHaveProp("stroke", "#C4BAB6");
     }

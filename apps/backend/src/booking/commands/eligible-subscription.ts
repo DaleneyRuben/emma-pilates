@@ -19,7 +19,18 @@ export const findCoveringSubscription = (
     where: {
       ...covering(input.clientId, input.onDate),
       startsOn: { lte: boliviaDate(input.onDate) },
-      ...(input.needsAllowance ? { remainingClassAllowance: { gt: 0 } } : {}),
+      ...(input.needsAllowance
+        ? {
+            OR: [
+              { remainingClassAllowance: { gt: 0 } },
+              {
+                allowanceAdjustments: {
+                  some: { deletedAt: null, classes: { gt: 0 } },
+                },
+              },
+            ],
+          }
+        : {}),
     },
     select: { id: true },
   });

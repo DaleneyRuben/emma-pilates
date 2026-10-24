@@ -30,12 +30,15 @@ import {
   promoteWaitlistInTransaction,
 } from './waitlist-promotion';
 import { rescheduleBooking } from './reschedule-booking';
+import { recordAttendanceCorrections } from './attendance-audit';
 import { recordAttendance } from './record-attendance';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
 import {
   findCoveringSubscription,
   findNotYetStartedSubscription,
 } from './eligible-subscription';
+import { consumeOneClass } from './consume-allowance';
+import { decideGuestPassBooking } from '../payments/guest-pass';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -636,6 +639,7 @@ export class PrismaBookingCommands {
             where: { id: sessionId },
             select: {
               id: true,
+              branchId: true,
               trainerStaffMemberId: true,
               endsAt: true,
               state: true,
@@ -655,7 +659,19 @@ export class PrismaBookingCommands {
               select: { id: true },
             })
           ).map(({ id }) => id),
-        save: async ({ outcomes, recordedByAccountId }) => {
+        save: async ({
+          sessionId,
+          branchId,
+          outcomes,
+          recordedByAccountId,
+        }) => {
+          await recordAttendanceCorrections(transaction, {
+            sessionId,
+            branchId,
+            outcomes,
+            principal,
+            occurredAt: this.now(),
+          });
           await Promise.all(
             outcomes.map(({ bookingId, outcome }) =>
               transaction.attendanceRecord.upsert({
@@ -823,23 +839,66 @@ export class PrismaBookingCommands {
           })
           .then((booking) => booking !== null),
       create: async (input) => {
-        const consumed = await transaction.subscription.updateMany({
+        const pass = await transaction.guestPass.findFirst({
           where: {
-            id: input.subscriptionId,
-            clientId: input.clientId,
-            remainingClassAllowance: { gt: 0 },
+            friendClientId: input.clientId,
+            bookingId: null,
+            deletedAt: null,
           },
-          data: { remainingClassAllowance: { decrement: 1 } },
+          select: { id: true, courtesySubscriptionId: true },
         });
-
-        if (consumed.count !== 1) {
-          throw new Error('No eligible Subscription');
+        if (
+          pass !== null &&
+          pass.courtesySubscriptionId === input.subscriptionId
+        ) {
+          const taken = await transaction.booking.count({
+            where: { sessionId: input.sessionId, state: 'BOOKED' },
+          });
+          const session = await transaction.session.findUniqueOrThrow({
+            where: { id: input.sessionId },
+            select: { capacity: true },
+          });
+          const decision = decideGuestPassBooking({
+            placesLeft: session.capacity - taken,
+            guestPassesAlreadyUsed: 0,
+          });
+          if (decision !== null) throw new Error(decision.code);
         }
 
-        return transaction.booking.create({
+        const consumed = await consumeOneClass(transaction, {
+          subscriptionId: input.subscriptionId,
+          clientId: input.clientId,
+          authorAccountId: input.createdByAccountId,
+          now: this.now(),
+        });
+
+        if (!consumed) {
+          const spent = await transaction.guestPass.findFirst({
+            where: {
+              friendClientId: input.clientId,
+              bookingId: { not: null },
+              deletedAt: null,
+            },
+            select: { id: true },
+          });
+          throw new Error(
+            spent === null
+              ? 'No eligible Subscription'
+              : 'guest_pass_already_used',
+          );
+        }
+
+        const booking = await transaction.booking.create({
           data: input,
           select: { id: true },
         });
+        if (pass !== null) {
+          await transaction.guestPass.update({
+            where: { id: pass.id },
+            data: { bookingId: booking.id },
+          });
+        }
+        return booking;
       },
       now: this.now,
     });

@@ -6,7 +6,12 @@ const activationLifetimeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
 const pendingLifetimeMilliseconds = 30 * 24 * 60 * 60 * 1_000;
 
 export type StaffRoleName =
-  'trainer' | 'nutritionist' | 'assistant' | 'administrator';
+  'trainer' | 'nutritionist' | 'assistant' | 'administrator' | 'coordinator';
+
+// Administrators and the Coordinator hold every Branch implicitly and carry no
+// Branch rows (glossary «Staff Member», ADR-0102).
+export const holdsEveryBranch = (role: StaffRoleName): boolean =>
+  role === 'administrator' || role === 'coordinator';
 
 export type StaffStatus = 'pending' | 'active' | 'deactivated';
 
@@ -154,6 +159,18 @@ export type StaffManagementDependencies = {
 
 export type Actor = { accountId: string; staffMemberId: string };
 
+// ADR-0102: the Coordinator reads Staff details for the schedule; inviting,
+// Role, Branch, and access changes stay with the Administrator.
+export const requireStaffReader = (principal: AuthenticatedPrincipal): void => {
+  if (
+    principal.identity.kind !== 'staff' ||
+    (principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
+  ) {
+    throw new StaffManagementError('staff_access_denied');
+  }
+};
+
 export const requireAdministrator = (
   principal: AuthenticatedPrincipal,
 ): Actor => {
@@ -180,14 +197,14 @@ export const requireActivationEmailRoom = async (
 
 export const unique = (values: string[]): string[] => [...new Set(values)];
 
-// Administrators hold every Branch implicitly and carry no Branch rows; every
-// other Role needs at least one usable Branch.
+// Roles holding every Branch carry no Branch rows; every other Role needs at
+// least one usable Branch.
 export const resolveBranches = async (
   transaction: StaffManagementTransaction,
   role: StaffRoleName,
   branchIds: string[] | undefined,
 ): Promise<string[]> => {
-  if (role === 'administrator') return [];
+  if (holdsEveryBranch(role)) return [];
   const requested = unique(branchIds ?? []);
   if (requested.length === 0) {
     throw new StaffManagementError('invalid_branch_assignment');

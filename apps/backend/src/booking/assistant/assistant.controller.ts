@@ -33,6 +33,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { ClassHistoryEntryDto, parseUuid } from '../booking.dto';
 import type { ClientSubscriptionSummary } from '../client/client-subscription';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import type { InvoiceData } from '../payments/invoice-data/invoice-data';
 import { runPaymentCommand } from '../payments/payments.controller';
 import {
   ClientNotFoundError,
@@ -83,6 +84,7 @@ export type AssistantClientOperations = {
       planId: string;
       branchId: string;
       startsOn?: string;
+      invoiceData: InvoiceData | null;
     },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
@@ -280,7 +282,9 @@ export class AssistantClientsController {
     const key = requireIdempotencyKey(idempotencyKey);
     const parsed = parseRecordCashPayment(body);
     if (parsed === null) {
-      throw invalidRequest('Cash Payment needs a Plan and a Branch');
+      throw invalidRequest(
+        'Cash Payment needs a Plan, a Branch, and valid Invoice Data if any',
+      );
     }
     const principal = await this.authenticate(authorization);
     const result = await run(() =>
@@ -292,6 +296,7 @@ export class AssistantClientsController {
           ...(parsed.startsOn === undefined
             ? {}
             : { startsOn: parsed.startsOn }),
+          invoiceData: parsed.invoiceData,
         },
         principal,
         key,

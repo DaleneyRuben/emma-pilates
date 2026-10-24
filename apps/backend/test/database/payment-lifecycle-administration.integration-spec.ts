@@ -32,9 +32,8 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     await world?.stop();
   });
 
-  it('expires open Purchase Intents after 24 hours and releases their Credit once', async () => {
+  it('expires open Purchase Intents after 24 hours once', async () => {
     const buyer = await newClient('Olvidada');
-    await seedAward(buyer.clientId);
     const intent = await commands().createPurchaseIntent(
       { planId: plan.id },
       buyer,
@@ -60,10 +59,6 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     await expect(
       commands(later).readOpenPurchaseIntent(buyer),
     ).resolves.toBeNull();
-    await expect(commands(later).readCreditSummary(buyer)).resolves.toEqual({
-      availableCentavos: 6000,
-      reservedCentavos: 0,
-    });
     await expect(
       prisma.imageAsset.findUniqueOrThrow({ where: { id: receipt.id } }),
     ).resolves.toMatchObject({ deletionDueAt: later });
@@ -220,7 +215,7 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     });
   });
 
-  it('records an instant cash Payment at an assigned Branch, spending Credit and activating the Subscription', async () => {
+  it('records an instant cash Payment at an assigned Branch for the full price, ignoring an old Credit balance, and activates the Subscription', async () => {
     const buyer = await newClient('Efectivo');
     await seedAward(buyer.clientId);
     const assistant = await staffPrincipal('camila.rojas@example.com');
@@ -260,15 +255,17 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     expect(payment).toMatchObject({
       method: 'cash',
       state: 'confirmed',
-      creditAppliedCentavos: 6000,
-      amountDueCentavos: 50_000,
+      creditAppliedCentavos: 0,
+      amountDueCentavos: 56_000,
       decidedAt: now,
     });
     expect(payment.subscriptionId).toEqual(expect.any(String));
-    await expect(commands().readCreditSummary(buyer)).resolves.toEqual({
-      availableCentavos: 0,
-      reservedCentavos: 0,
-    });
+    await expect(
+      prisma.creditReservation.count({ where: { clientId: buyer.clientId } }),
+    ).resolves.toBe(0);
+    await expect(
+      prisma.creditLedgerEntry.count({ where: { clientId: buyer.clientId } }),
+    ).resolves.toBe(1);
     await expect(
       prisma.auditRecord.findFirst({
         where: { actionCode: 'payment.cash_confirmed', targetId: payment.id },
@@ -320,54 +317,15 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     ).resolves.toBe('purchase_intent_open_exists');
   });
 
-  it('completes a Credit-only purchase without any transfer when Credit covers the Plan', async () => {
-    const buyer = await newClient('Con crédito');
-    const poor = await newClient('Sin crédito');
+  it('refuses a Credit-only purchase whatever an old ledger balance says (PAY-005)', async () => {
+    const buyer = await newClient('Con crédito antiguo');
     for (let award = 0; award < 10; award += 1) await seedAward(buyer.clientId);
-    await seedAward(poor.clientId);
 
     await expect(
-      codeOf(
-        commands().completeCreditPurchase(
-          { planId: plan.id },
-          poor,
-          randomUUID(),
-        ),
-      ),
+      codeOf(commands().completeCreditPurchase(buyer)),
     ).resolves.toBe('credit_insufficient');
-
-    const payment = await commands().completeCreditPurchase(
-      { planId: plan.id },
-      buyer,
-      randomUUID(),
-    );
-
-    expect(payment).toMatchObject({
-      method: 'credit_only',
-      state: 'confirmed',
-      creditAppliedCentavos: 56_000,
-      amountDueCentavos: 0,
-    });
-    expect(payment.subscriptionId).toEqual(expect.any(String));
-    await expect(commands().readCreditSummary(buyer)).resolves.toEqual({
-      availableCentavos: 4000,
-      reservedCentavos: 0,
-    });
     await expect(
-      prisma.auditRecord.findFirst({
-        where: {
-          actionCode: 'payment.credit_only_confirmed',
-          targetId: payment.id,
-        },
-      }),
-    ).resolves.toMatchObject({
-      actorAccountId: buyer.accountId,
-      branchId: null,
-    });
-    await expect(
-      prisma.notification.findFirst({
-        where: { accountId: buyer.accountId, type: 'payment_confirmed' },
-      }),
-    ).resolves.not.toBeNull();
+      prisma.payment.count({ where: { clientId: buyer.clientId } }),
+    ).resolves.toBe(0);
   });
 });

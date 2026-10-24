@@ -160,11 +160,11 @@ describe('PurchaseIntentsController', () => {
       principal,
       key,
     );
-    await expect(controller.submit(intentId, bearer, key)).resolves.toEqual(
+    await expect(controller.submit(intentId, bearer, key, {})).resolves.toEqual(
       payment,
     );
     expect(handlers.submitTransfer).toHaveBeenCalledWith(
-      { purchaseIntentId: intentId },
+      { purchaseIntentId: intentId, invoiceData: null },
       principal,
       key,
     );
@@ -180,12 +180,10 @@ describe('client payment reads and Credit-only purchases', () => {
     resolvePrincipal.mockResolvedValue(principal);
   });
 
-  it('completes a Credit-only purchase', async () => {
-    handlers.completeCreditPurchase.mockResolvedValue({
-      ...payment,
-      method: 'credit_only',
-      state: 'confirmed',
-    });
+  it('hands a deprecated Credit-only purchase to the command, which refuses it (PAY-005)', async () => {
+    handlers.completeCreditPurchase.mockRejectedValue(
+      new PaymentRuleError('credit_insufficient', 'Credit was retired'),
+    );
     const controller = new CreditPurchasesController(
       handlers as never,
       resolvePrincipal,
@@ -193,14 +191,8 @@ describe('client payment reads and Credit-only purchases', () => {
 
     await expect(
       controller.create(bearer, key, { planId }),
-    ).resolves.toMatchObject({
-      method: 'credit_only',
-    });
-    expect(handlers.completeCreditPurchase).toHaveBeenCalledWith(
-      { planId },
-      principal,
-      key,
-    );
+    ).rejects.toMatchObject({ status: 409 });
+    expect(handlers.completeCreditPurchase).toHaveBeenCalledWith(principal);
   });
 
   it('serves the latest own Payment or 404', async () => {
@@ -258,6 +250,7 @@ describe('client payment reads and Credit-only purchases', () => {
           referredClientId: 'client-2',
           referredName: 'Sofía G.',
           state: 'awarded',
+          invitationStatus: 'bought',
           createdAt: new Date('2026-09-21T15:00:00.000Z'),
           awardedAt: new Date('2026-09-21T15:00:00.000Z'),
           awardCentavos: 6000,
