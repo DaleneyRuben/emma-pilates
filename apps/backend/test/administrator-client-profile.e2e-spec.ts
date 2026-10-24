@@ -26,7 +26,11 @@ const detail = {
   clientSince: new Date('2025-07-02T00:00:00.000Z'),
   referralCode: 'LUCIA25',
   referredClientCount: 2,
-  subscription: { status: 'none', subscription: null },
+  subscription: {
+    status: 'none',
+    nextSubscription: null,
+    subscription: null,
+  },
   closure: {
     futureBookingCount: 0,
     activeWaitlistEntryCount: 0,
