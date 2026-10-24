@@ -6,6 +6,7 @@ import { Label } from "../components/ui/label";
 import { cn } from "../lib/cn";
 import { formatBolivianos, formatSignedBolivianos } from "../lib/money";
 import { staffProfileQueryOptions } from "../session/staff-profile-query";
+import { ProjectionSection } from "./projection-section";
 import { simulateMonth } from "./simulate-month";
 
 const cardClass =
@@ -128,6 +129,15 @@ function Calculator({ draft }: { draft: Draft }) {
         />
       </div>
       <p className="text-nota text-texto-tenue tabular">{month.derivation}</p>
+      <ProjectionSection
+        input={{
+          classesPerWeek,
+          studentsPerClass,
+          pricePerClassCentavos,
+          fixedCostsCentavos,
+          taxRatePercent,
+        }}
+      />
     </>
   );
 }

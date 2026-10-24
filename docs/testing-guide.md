@@ -88,7 +88,7 @@ can be found by its design name.
 | AW37 Equipos | 82 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99 |
-| AW42 Simulador | 97 |
+| AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90 |
 | AW39 Para contactar | 84 |
@@ -3396,8 +3396,8 @@ The following are not ready for manual product testing:
   the screen waits on follow-up 209, which stays pending. The Coordinator
   has no such screen: only the Administrator sees her statement (Test 96);
 - the break-even in students per class, occupancy, and clients: Test 97
-  shows it in bolivianos. The diagnosis's section 3.4 asks for the other
-  expressions, and STU-005 owns the projections that need them;
+  shows it in bolivianos and Test 101 repeats the month. The diagnosis's
+  section 3.4 asks for the other expressions, and neither page draws them;
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
   Swagger (Test 34). On Android the link opens the app with a development
@@ -6882,6 +6882,34 @@ Bs 9.295, so its derivation differs by those Bs 5. The break-even in
 students per class, occupancy, and clients is not on this page. Follow-up
 210 stays pending. Pull request:
 https://github.com/DaleneyRuben/emma-pilates/pull/192.
+
+## Test 101: project the month (STU-005)
+
+**Proyección** is a section of **Simulador** (AW42), under the derivation.
+It is the same calculator: the month on screen repeats for 3, 6, and 12
+months, in three scenarios. Nothing is saved, and editing makes no request,
+so there is no spinner and no network error of its own. An empty or invalid
+field is the alert Test 82 already shows, and the table hides with the
+figures. Paola is the Administrator. Log in as Test 24 describes.
+
+1. **The three horizons.** With the opening values, the table has nine rows.
+   **3 / Base** reads ingreso Bs 111.540,00, costos Bs 91.410,00, impuesto
+   Bs 17.846,40, resultado Bs 2.283,60, three times the month's Bs 761,20.
+   **6 / Bajo** and **12 / Alto** are on the same table. Bajo is below Base
+   and Alto is above it. The note says the month above repeats, Bajo is 80 %
+   of the students, and Alto is 120 % with a cap of 12 per class.
+2. **A higher tax.** Set **Impuestos (%)** to 20. The **3 / Base** result
+   becomes −Bs 2.178,00, lower than Bs 2.283,60. The ingreso of that row
+   does not move.
+3. **Nothing is saved.** The network panel shows no request while you edit.
+   Reload: the table is back to the opening rows.
+4. **Narrow browser.** At 420 px each row is a labelled card (Meses,
+   Escenario, Ingreso, Costos, Impuesto, Resultado). The sidebar opens from
+   **Abrir menú** and lists **Simulador**.
+
+The page still multiplies a week by its own 4.33. The package holds the same
+constant. The break-even in students per class, occupancy, and clients is
+still not on this page.
 
 ## Test 95: trainer pay and «Mis pagos» (BKO-006)
 

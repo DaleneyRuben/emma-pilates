@@ -46,6 +46,18 @@ describe("Simulador on a desktop browser", () => {
       ).getByText("Bs 36.273,81"),
     ).toBeVisible();
     expect(screen.getByText("(21175 + 9295) / 0.84 = 36273.81")).toBeVisible();
+
+    const projection = screen.getByRole("region", { name: "Proyección" });
+    expect(within(projection).getByRole("table")).toBeVisible();
+    const base = within(projection).getByRole("row", { name: /3 meses Base/ });
+    expect(within(base).getByText("Bs 111.540,00")).toBeVisible();
+    expect(within(base).getByText("Bs 2.283,60")).toBeVisible();
+    expect(
+      within(projection).getByRole("row", { name: /12 meses Alto/ }),
+    ).toBeVisible();
+    expect(
+      within(projection).getByRole("row", { name: /6 meses Bajo/ }),
+    ).toBeVisible();
   });
 
   it("moves the break-even up when the tax rate rises", async () => {
@@ -62,6 +74,10 @@ describe("Simulador on a desktop browser", () => {
         screen.getByRole("region", { name: "Punto de equilibrio" }),
       ).getByText("Bs 38.087,50"),
     ).toBeVisible();
+    const base = within(
+      screen.getByRole("region", { name: "Proyección" }),
+    ).getByRole("row", { name: /3 meses Base/ });
+    expect(within(base).getByText("−Bs 2.178,00")).toBeVisible();
   });
 
   it("hides the page from a role that is not the Administrator", async () => {
@@ -77,6 +93,9 @@ describe("Simulador on a desktop browser", () => {
     ).toBeVisible();
     expect(
       screen.queryByRole("textbox", { name: "Clases por semana" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Proyección" }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Simulador" }),
@@ -95,6 +114,8 @@ describe("Simulador on a narrow browser", () => {
     expect(
       screen.getByRole("region", { name: "Punto de equilibrio" }),
     ).toBeVisible();
+    expect(screen.getByRole("region", { name: "Proyección" })).toBeVisible();
+    expect(screen.getByRole("row", { name: /12 meses Alto/ })).toBeVisible();
     expect(
       screen.queryByRole("navigation", { name: "Secciones" }),
     ).not.toBeInTheDocument();
