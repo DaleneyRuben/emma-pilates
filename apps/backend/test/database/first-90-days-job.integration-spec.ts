@@ -75,6 +75,7 @@ describe('first 90 days job (PostgreSQL)', () => {
       name: 'Cortesía',
       startsOn,
       priceCentavos: 0,
+      hiddenAt: startsOn,
     });
     const hidden = await createClientWithPlan(prisma, {
       name: 'Oculto',
