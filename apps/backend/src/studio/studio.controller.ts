@@ -27,6 +27,7 @@ import {
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
 import { StudioError } from './studio-errors';
 import {
+  MonthKpisDto,
   parseStudioRecompute,
   RevenueReportDto,
   StudioRecomputeDto,
@@ -43,6 +44,23 @@ export type RevenueReport = {
   classesStillOwed: number;
 };
 
+export type MonthKpiReport = {
+  month: string;
+  sessionsHeld: number;
+  occupancyPercent: number;
+  averageStudentsTimes10: number;
+  averageAttendanceTimes10: number;
+  noShowPercent: number;
+  activeClients: number;
+  newClients: number;
+  renewedClients: number;
+  renewalPercent: number;
+  cashCentavos?: number;
+  accruedCentavos?: number;
+  deferredCentavos?: number;
+  classesStillOwed?: number;
+};
+
 export type StudioOperations = {
   recompute(
     input: { month: string },
@@ -52,6 +70,10 @@ export type StudioOperations = {
     input: { month: string },
     principal: AuthenticatedPrincipal,
   ): Promise<RevenueReport>;
+  kpis(
+    input: { month: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<MonthKpiReport>;
 };
 
 @Controller({ path: 'administrator/studio-facts', version: '1' })
@@ -130,6 +152,38 @@ export class RevenueReportController {
     );
     try {
       return await this.operations.revenue({ month }, principal);
+    } catch (error) {
+      if (error instanceof StudioError) {
+        throw new HttpException(
+          { code: error.code, detail: error.message },
+          error.status,
+        );
+      }
+      throw error;
+    }
+  }
+
+  @Get('kpis')
+  @ApiOperation({ operationId: 'getMonthKpis' })
+  @ApiQuery({ name: 'month', required: true, example: '2026-10' })
+  @ApiOkResponse({ type: MonthKpisDto })
+  @Header('Cache-Control', 'no-store')
+  async kpis(
+    @Headers('authorization') authorization: string | undefined,
+    @Query('month') month: string,
+  ): Promise<MonthKpisDto> {
+    if (!monthPattern.test(month)) {
+      throw new BadRequestException({
+        code: 'invalid_request',
+        detail: 'Invalid kpi month',
+      });
+    }
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    try {
+      return await this.operations.kpis({ month }, principal);
     } catch (error) {
       if (error instanceof StudioError) {
         throw new HttpException(

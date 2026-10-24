@@ -16,6 +16,25 @@ export class StudioRecomputeDto {
   @ApiProperty() clientMonths!: number;
 }
 
+export class MonthKpisDto {
+  @ApiProperty({ example: '2026-10' }) month!: string;
+  @ApiProperty() sessionsHeld!: number;
+  @ApiProperty() occupancyPercent!: number;
+  @ApiProperty({ description: 'Average bookings at window close, in tenths' })
+  averageStudentsTimes10!: number;
+  @ApiProperty({ description: 'Average attendance, in tenths' })
+  averageAttendanceTimes10!: number;
+  @ApiProperty() noShowPercent!: number;
+  @ApiProperty() activeClients!: number;
+  @ApiProperty() newClients!: number;
+  @ApiProperty() renewedClients!: number;
+  @ApiProperty() renewalPercent!: number;
+  @ApiProperty({ required: false }) cashCentavos?: number;
+  @ApiProperty({ required: false }) accruedCentavos?: number;
+  @ApiProperty({ required: false }) deferredCentavos?: number;
+  @ApiProperty({ required: false }) classesStillOwed?: number;
+}
+
 export class RevenueReportDto {
   @ApiProperty({ example: '2026-10' }) month!: string;
   @ApiProperty({ description: 'Cash collected in the month, BOB centavos' })

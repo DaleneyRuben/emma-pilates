@@ -8,6 +8,9 @@ import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
+import type { PrismaClient } from '../src/generated/prisma/client';
+import { readMonthKpis } from '../src/studio/prisma-month-kpis';
+import { readRevenueMonth } from '../src/studio/prisma-revenue-report';
 import {
   studioControllers,
   studioOperations,
@@ -24,9 +27,6 @@ const createStudioOperations = createStudioOperationsUntyped as (deps: {
   readKpis: typeof readMonthKpis;
   readRevenue: typeof readRevenueMonth;
 }) => { kpis: KpiOperation };
-import { readMonthKpis } from '../src/studio/prisma-month-kpis';
-import { readRevenueMonth } from '../src/studio/prisma-revenue-report';
-import type { PrismaClient } from '../src/generated/prisma/client';
 
 const bearer = `Bearer ${'a'.repeat(43)}`;
 
