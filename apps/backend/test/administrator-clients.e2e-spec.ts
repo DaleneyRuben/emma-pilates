@@ -44,6 +44,7 @@ const detail = {
   referredClientCount: 2,
   subscription: {
     status: 'active',
+    nextSubscription: null,
     founderRenewalDeadline: null,
     subscription: {
       id: '22222222-2222-4222-8222-222222222222',
@@ -160,6 +161,7 @@ describe('administrator Client endpoints (e2e)', () => {
           clientSince: '2025-07-02',
           subscription: {
             status: 'active',
+            nextSubscription: null,
             founderRenewalDeadline: null,
             subscription: {
               ...detail.subscription.subscription,

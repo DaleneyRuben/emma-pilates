@@ -7,9 +7,9 @@ const glyphs = {
   evaluation: "leaf",
   evaluations: "trend",
   referrals: "person",
-  credit: "credit",
   notifications: "bell",
   password: "password",
+  feedback: "message",
 } as const satisfies Record<string, GlyphName>;
 
 export type ProfileRowIconName = keyof typeof glyphs;

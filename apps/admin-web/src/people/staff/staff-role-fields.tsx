@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "../../components/form/form";
 import { activeBranchesQueryOptions } from "../../shell/branch/branch-queries";
-import { staffRoles, type StaffRole } from "../people-search";
+import { holdsEveryBranch, staffRoles, type StaffRole } from "../people-search";
 import type { StaffFormInput, StaffFormOutput } from "./staff-form-schema";
 import { roleLabels } from "./staff-format";
 
@@ -36,8 +36,9 @@ function ReadOnlyRow({ children }: { children: string }) {
   );
 }
 
-// AW24: exactly one Role in a 2×2 choice; an Administrator's Branches are
-// every Branch, so the picker becomes a read-only row.
+// AW24: exactly one Role among five (follow-up 157); the Administrator's and
+// the Coordinator's Branches are every Branch, so the picker becomes a
+// read-only row.
 export function StaffRoleFields({
   control,
   role,
@@ -64,7 +65,7 @@ export function StaffRoleFields({
               value={field.value}
               options={roleOptions}
               onChange={field.onChange}
-              className="grid grid-cols-2"
+              className="grid grid-cols-3"
             />
             <FormDescription>
               Un solo rol por persona: define qué app abre.
@@ -73,7 +74,7 @@ export function StaffRoleFields({
           </FormItem>
         )}
       />
-      {role === "administrator" ? (
+      {holdsEveryBranch(role) ? (
         <div className="flex flex-col gap-1.5">
           <FieldTitle>Sucursales asignadas</FieldTitle>
           <ReadOnlyRow>Todas las sucursales (implícito por el rol)</ReadOnlyRow>

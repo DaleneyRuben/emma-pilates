@@ -117,6 +117,6 @@ describe('evaluatePurchaseEligibility', () => {
         ...baseline,
         activeSubscription: exhausted,
       }),
-    ).toEqual({ subscriptionIdToExpire: 'subscription-1' });
+    ).toEqual({ subscriptionIdToExpire: null });
   });
 });

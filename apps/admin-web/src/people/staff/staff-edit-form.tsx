@@ -1,3 +1,4 @@
+import { holdsEveryBranch } from "../people-search";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { StaffMemberDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
@@ -27,6 +28,7 @@ import { staffProblem } from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 import { StaffContact } from "./staff-read-only";
 import { StaffRoleFields } from "./staff-role-fields";
+import { TrainerReferralCodeField } from "./trainer-referral-code-field";
 
 const sameSet = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((id) => b.includes(id));
@@ -70,8 +72,7 @@ export function StaffEditForm({
       const branchIds = shown(chosen);
       const roleChanged = next !== member.role;
       const branchesChanged =
-        next !== "administrator" &&
-        !sameSet(branchIds, shown(member.branchIds));
+        !holdsEveryBranch(next) && !sameSet(branchIds, shown(member.branchIds));
       if (!roleChanged && !branchesChanged) {
         onDone();
         return;
@@ -82,10 +83,9 @@ export function StaffEditForm({
             ? {
                 kind: "role",
                 staffMemberId: member.id,
-                input:
-                  next === "administrator"
-                    ? { role: next }
-                    : { role: next, branchIds },
+                input: holdsEveryBranch(next)
+                  ? { role: next }
+                  : { role: next, branchIds },
               }
             : { kind: "branches", staffMemberId: member.id, branchIds },
         );
@@ -124,6 +124,9 @@ export function StaffEditForm({
                 : ""
             }`}
           />
+          {member.role === "trainer" ? (
+            <TrainerReferralCodeField staffMemberId={member.id} />
+          ) : null}
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
               {failure}

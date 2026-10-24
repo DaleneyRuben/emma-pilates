@@ -227,7 +227,6 @@ describe('Administrator Client directory (PostgreSQL)', () => {
     await expect(
       directory().findLatestSubscription(ids.sofia),
     ).resolves.toMatchObject({ endsOn: new Date('2026-06-30') });
-    await expect(directory().readAvailableCredit(ids.lucia)).resolves.toBe(0);
     await expect(directory().read(ids.noAccount)).resolves.toBeNull();
     await expect(directory().read(randomUUID())).resolves.toBeNull();
   });

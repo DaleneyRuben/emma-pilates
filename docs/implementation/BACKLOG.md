@@ -467,22 +467,22 @@ wait for Google, Apple, and testers.
 | BKM-004 | P0 | Backend/admin web/apps | `StudioSettings`: one versioned row for the configurable rules, a «Reglas del estudio» page for the Administrator, and a public rules endpoint that replaces the hard-coded copy in the apps | DOC-008 | 2.5–3.5 d | done (`37284cfa` table, `8c9e795d` window, `7744ac91` endpoints, `6e2475e7`/`fc1b481e`/`4201ebc2` apps, `6dd904ed` AW36; evidence below) |
 | BKM-005 | P0 | All surfaces | Plans by days (30/60/90) with a weekly cap field, and the eight real Plans | DOC-008, BKM-004 | 3–4 d | done (`6541a63a` days, `0b2a0633` AW04, `14fb2000` tester Plan; evidence below) |
 | BKM-006 | P0 | All surfaces | Start date chosen at purchase (today up to +14 days) and early renewal | BKM-005 | 3.5–4.5 d | done |
-| BKM-008 | P0 | All surfaces | Extra classes as `AllowanceAdjustment` with a reason and author, and the automatic gift class on a Client's first Plan | BKM-005 | 2.5–3.5 d | ready |
+| BKM-008 | P0 | All surfaces | Extra classes as `AllowanceAdjustment` with a reason and author, and the automatic gift class on a Client's first Plan | BKM-005 | 2.5–3.5 d | done |
 | BKM-007 | P0 | All surfaces | Weekly cap at booking, «Te quedan N clases esta semana» | BKM-005, BKM-008 | 2.5–3 d | ready |
-| BKM-009 | P0 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | ready |
-| PAY-005 | P0 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | ready |
+| BKM-009 | P0 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | done (919ef391, a6c21924, 938d0e56, 1db2fa8e; evidence below) |
+| PAY-005 | P0 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | done (4588fc6a purchases, 56d47a6e assistant and admin detail, 697cd121 closure, eb44650d admin endpoint, 99508a7f env var, 2ff8fa4d contract, 23a1e759 admin web, ead7ace2 client app, a8828bcb staff app; design follow-ups 135–139 exported 4657e3b7–2df9bc5a; verified on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator for both apps and in a browser at 1440 and 420 px; open: delete `REFERRAL_REWARD_CENTAVOS` from the Northflank services, now ignored) |
 | BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | done |
-| BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | ready |
+| BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | done (6f8f47df registration, de271070 Assistant flow, bc106c51 + bcee395d correction and Trainer codes, d8a6008a + 3a7f3b96 apps, cab4a4b0 admin web, 3a77ac3c design export; see the notes under «BKM-011») |
 | PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | ready |
-| PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | ready |
-| BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
-| IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | ready |
+| PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | done (cd03688c storage and mark, fcc8fabd API, bad49a81 Staff app, 6fc42238 Client app, 73534ba8 AW28, caf26876 design 145–147; evidence below) |
+| BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | done (c39d73a3 backend, 3ae735e5 Staff app S25, 4510368c admin web AW151, 1e4dee1e design export; iPhone 16 Pro, iPad Pro 11 (M4), Android emulator, browser at 1440/420 px) |
+| IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | done (22c81c81; evidence below). Schema `e8390f9d`; admin-web session red `4b83f3e7` → `91f12934`; staff red `6684d0df` → `56eebbde`; operations red `fd06a8ad` → `db534ca6`; schedule red `0534aa8c` → `05fd60c0`; profile endpoint red `7fcb5de5` → `722ad126`; authorization matrix `41f5e250`; contracts `329a9415`; admin web red `0843bbd1`/`8073598e`/`ebbb2d6a` → `30d676c0`/`0f96e7b9`/`950bbabc`; Playwright `cc200115`; Staff app red `ec115e2e` → `e1511505`; Maestro `c357c97c`; testing guide Test 75 `e8938f7a`. Verified: backend unit 975, e2e 268, integration 92 suites / 367 tests (6 skipped, pre-existing), the matrix over all 170 endpoints for both Roles; `check:api` and `check:api-compat` clean; admin-web Jest 531, Playwright 19/19 (new coordinator journey finds no «Bs»); staff-mobile Jest 155, mobile-core 116; lint, Prettier, tsc clean. Browser walk at 1440 and 420 px as Carolina (Horario edit panel, money URL notice, Clientes «Editar perfil» saved, no «Bs», Personal read-only, drawer) and as Paola (Coordinador role option with implicit Branches). API curl as Carolina: Client search 200, payments 403. Walked on 2026-10-23 as Carolina on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator: Client search, a Client's overview without cash or «Nuevo cliente», and «Cancelar clase». Decisions: counts-only statistics deferred to STU-003 (ADR-0103 rejects on-the-fly indicators); Coordinator reads Staff but never invites or changes Roles/Branches; reads Branches and Class Types, not the Plan list; Assistant overview sends her Credit 0 (ADR-0016), the admin detail omits it; Evaluations oversight stays with the Administrator until NUT-003. Open questions: should the Coordinator see AW25 Evaluations and correct pending staff emails? development-fixtures.ts (oversized) grew by one staff entry.) |
 | NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
 | BKM-012 | P0 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | ready |
-| BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | ready |
+| BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | done |
 | BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | ready |
-| BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | ready |
-| BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | ready |
+| BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | done (c0bf32ec; evidence below) |
+| BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | done (640306cc, 60f50324, 2ef9df18, d8798346, 830ece53; evidence below) |
 | BKO-005 | P0 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | ready |
 | BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | ready |
 | BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | ready |
@@ -492,13 +492,13 @@ wait for Google, Apple, and testers.
 
 | ID | Priority | Surface | Work item | Depends on | Effort | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| REL-011 | P0 | All surfaces | Tester access on production: a hidden Bs 0 Plan of 16 classes that only the Administrator can grant, on a fictitious schedule | — | 1.5–2 d | ready |
-| REL-012 | P0 | All surfaces | «Enviar comentarios»: in-app feedback from both apps, with a list on the admin web for triage and for Google's production questionnaire | — | 2–2.5 d | ready |
-| REL-003 | P0 | Mobile release | *Existing row.* Store listings: finish the feature graphic and screenshots, and drop every mention of the Bs 60 credit from the descriptions | REL-002, WEB-021 | 1 d | ready |
-| REL-004 | P0 | Mobile release | *Existing row.* Data safety: add the feedback text (REL-012). The NIT/CI of PAY-007 is added to the form when it ships | REL-012 | 0.5 d | ready |
-| REL-005 | P0 | Mobile release | *Existing row.* App content: the Client reviewer Account now gets the tester Plan through REL-011, so the reviewer can book; REL-016 replaces these Accounts after the reset | REL-011 | 0.5 d | ready |
+| REL-011 | P0 | All surfaces | Tester access on production: a hidden Bs 0 Plan of 16 classes that only the Administrator can grant, on a fictitious schedule | — | 1.5–2 d | done (16c6a823 grant, acc7b4fb endpoint, 37a08c98 admin web, cd62e0e6 follow-up 160 export; see the REL-011 notes) |
+| REL-012 | P0 | All surfaces | «Enviar comentarios»: in-app feedback from both apps, with a list on the admin web for triage and for Google's production questionnaire | — | 2–2.5 d | done (`9ca7d3ce` endpoints, `8a3d5bf5` shared screen, `f78991f2` Perfil rows, `8ff9f985` admin «Comentarios», `6125f04d` design export; `system.feedback` table (migration `20261023120000_feedback`), `POST /api/v1/feedback` idempotent and 10 per Account in a rolling 24 h (429 `feedback_limit_reached`), refused while impersonating, inbox and push «Comentario nuevo» to every other active Administrator; admin list with Estado and App filters, panel with «Qué cambiamos», audited CSV export (Fecha, App, Tipo, Comentario, Versión, Estado, Qué cambiamos). Verified: backend unit 977, e2e 281, integration 371 on PostgreSQL 18; admin Jest and Playwright 17/17; Maestro `send-feedback.yaml` in both apps on the iPhone 16 Pro and iPad Pro 11 (M4) through Expo Go and on the Android emulator through the dev builds (the dev build reported 1.0.1 build 3 from ExpoApplication); admin web in Chromium at 1440 and 420 px. Decisions: the app and Role come from the Account, not the request; the push leaves out the text; feedback stays under the anonymised Account when a Client closes it; Administrators only for triage. The Coordinator may send feedback (operations, not money) and cannot open the admin list. Open: whether a closed Client's comment text must be erased too (ADR-0097) is the owner's call; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session (`/artifacts` → d) |
+| REL-003 | P0 | Mobile release | *Existing row.* Store listings: finish the feature graphic and screenshots, and drop every mention of the Bs 60 credit from the descriptions | REL-002, WEB-021 | 1 d | in progress (texts updated in docs/store/play-listings.md: the Bs 60 credit line is gone, the evaluation line no longer promises a free monthly visit, and the Staff listing names Coordinación; the feature graphic and screenshots are still to make, and nothing was submitted) |
+| REL-004 | P0 | Mobile release | *Existing row.* Data safety: add the feedback text (REL-012). The NIT/CI of PAY-007 is added to the form when it ships | REL-012 | 0.5 d | in progress (docs/store/play-data-safety.md drafts the feedback text, the NIT or CI, and the acquisition answer, and drops the Credit line; the form itself is filled by the owner, nothing was submitted) |
+| REL-005 | P0 | Mobile release | *Existing row.* App content: the Client reviewer Account now gets the tester Plan through REL-011, so the reviewer can book; REL-016 replaces these Accounts after the reset | REL-011 | 0.5 d | in progress (docs/store/play-app-content.md now says the reviewer Client holds the hidden 16-class tester Plan and that REL-016 replaces both Accounts after the reset; the form is filled by the owner, nothing was submitted) |
 | REL-009 | P0 | Mobile release | *Existing row.* The next store builds of both apps from `main` once the business rules are in, with the final icons, the launch screen (MOB-068), the intent filters (LNK-001), and REL-012. Client goes to the closed track, Staff to Internal testing | REL-012 | 0.5–1 d | in progress |
-| REL-013 | P0 | Mobile release | Recruit and onboard the closed-test testers: 15 to 20 Android users with Google accounts (12 is the minimum), a Google Group as the tester list, an install-and-register guide, and an opt-in tracker | — | 0.5 d + the user's time | ready |
+| REL-013 | P0 | Mobile release | Recruit and onboard the closed-test testers: 15 to 20 Android users with Google accounts (12 is the minimum), a Google Group as the tester list, an install-and-register guide, and an opt-in tracker | — | 0.5 d + the user's time | in progress (docs/store/closed-test-testers.md drafts the WhatsApp message, the one-page guide, and the tracker columns; the group, the opt-in link, and the sheet are the owner's, and nothing was sent) |
 | REL-006 | P0 | Mobile release | *Existing row.* Start the closed test: the closed track «Prueba cerrada» (Bolivia), Google's review of the first closed release, then 14 days with at least 12 testers opted in, and at least one update shipped from feedback during the test | Every business-rule item above, REL-003, REL-004, REL-005, REL-009, REL-011, REL-013 | 0.5 d + 14 days | in progress |
 
 #### DOC-008 · Emma's rules in the domain docs
@@ -603,6 +603,35 @@ Acceptance criteria:
 - Every adjustment has an audit record.
 - Only the Administrator can create `courtesy` or `class_return` adjustments (PAY-006).
 
+Evidence (BKM-008, 2026-10-23, branch `feature/bkm-008-extra-classes`, stacked on BKM-005 at `6675fc38`, [PR #170](https://github.com/DaleneyRuben/emma-pilates/pull/170)).
+
+Commits: `2f640844` failing gift and consumption tests, `09ee117d` the decision and the consumption order, `ca7be1dd` the adjustment and the gift once, `c61f443b` spending base before extra, `84352736` the administrator endpoint, `9bbd7af5` the extra-class line on the three surfaces, `dd729e15` follow-ups 193–195 left pending.
+
+Decisions:
+
+- Extra classes are their own rows, not a column on the Subscription. The base pool stays `remaining_class_allowance`; the extra pool is the signed sum of the live adjustments.
+- Spending an extra class writes a negative adjustment with reason `consumption`, authored by the Account that created the Booking. `class_return` stays an Administrator's grant, so the enum has six values. The five reasons a person sees are «Regalo de bienvenida», «Invitación», «Campaña», «Cortesía», and «Clase devuelta».
+- The gift author is the Account that approved the Payment, with that Account's role. A courtesy or hidden Plan calls the same decision and is declined. `isFounder` returns the flag the caller passes; the confirmation hook passes `false` until BKM-010 makes the Founder Membership real.
+- The weekly cap is not built. `chooseAllowanceSource` is the seam BKM-007 calls, passing a base of zero once the cap blocks it.
+- The admin endpoint records `courtesy` and `class_return` only, and denies every other principal. PAY-006 adds the form. The contract adds an optional `extraClassesLine` on the shared subscription summary, and the courtesy method the courtesy grant already writes.
+- Migration `20261023150000_allowance_adjustments` was applied only to `pilates_test_bkm008` and `pilates_bkm008_dev`, both dropped when the item paused. It needs owner approval before any shared, staging, or production database.
+
+Verified (2026-10-23, API on 3125 over `pilates_bkm008_dev`, admin web on 5195, Metro 8114):
+
+- **API.** Paola's `POST /api/v1/administrator/clients/{clientId}/allowance-adjustments` with one courtesy class answered `201`. The same call as Camila answered `403`.
+- **Admin web**, Chromium at 1440 px and 420 px. Lucía's detail panel reads «Clases extra: 1 · Cortesía» under **Clases disponibles**.
+- **Client app**, iPhone 16 Pro, iPad Pro 11-inch (M4), and the Android emulator. Lucía's **Mi plan** reads «Clases extra: 1 · Cortesía» under the allowance.
+
+- **Staff app**, the same three devices. Camila's summary of Lucía (S06) reads «Clases extra: 1 · Cortesía» under «5 clases restantes». On the iPad the summary opens beside the search.
+
+Open questions:
+
+- An Assistant who records the Client's first cash Payment is the gift's author. The ADR says the gift is applied by the system. Left as the approving Account so the audit row can name a person.
+- The Coordinator Role does not exist (IDN-009). The endpoint denies every principal who is not an Administrator, and the e2e covers a coordinator only by casting a principal the use case rejects. The denial becomes a real role when IDN-009 adds it.
+- Cancelling a Booking funded by an extra class restores the class to the base pool, not the extra pool. A `consumed_from` column was not added; the mandated migration is the one file above.
+- Waitlist promotion still spends only the base allowance. A Client whose only remaining class is extra is not promoted.
+- Two Bookings in one serializable transaction cannot both spend the last base class. Two that both read a positive extra sum can each write a negative row. No check keeps the live sum at zero or above.
+
 #### BKM-007 · Weekly cap
 
 - Only on Plans with a cap. The week runs Monday to Sunday in La Paz time.
@@ -624,6 +653,8 @@ Acceptance criteria:
 
 - Worker integration tests cover 1 booking (cancelled), 2 (taught), a restart in the middle (idempotent), and a minimum changed in the settings.
 - The snapshot exists for every taught Session.
+
+Evidence: `session-start-checks.integration-spec.ts` and `window-close-snapshot.integration-spec.ts` cover one Booking (cancelled, class returned, both notices), two (stays scheduled), a restart mid-sweep, and a minimum raised in Studio Settings. On `pilates_bkm009_dev` the worker cancelled a Session moved inside the lead time with one Booking: cause `minimum_not_met`, the Booking cancelled as `session_cancelled` with no actor, and the class returned. The inbox walks of Test 13 passed on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator, in both apps: the Client's notice names the other Sessions with places and opens Mis Reservas, and the Trainer's notice opens her agenda. The two scheduled Sessions already inside the Cancellation Window held a `bookings_at_window_close` value; the cancelled one held none. Open: the inbox lists the notice under Anteriores once its push has been read, so a Client who opens the inbox after the push sees no unread dot.
 
 #### PAY-005 · No more money credit
 
@@ -691,6 +722,8 @@ Acceptance criteria:
 - A Client registered with a Trainer's code is attributed to that Trainer whatever channel she picked.
 - The channel is required on new registrations, but older store builds without the field still register (the default is `unknown`).
 
+Evidence (2026-10-23): `booking.client_acquisitions` keeps the answer (`declared_channel`), the attribution (`channel`), the code, and the referrer, one live row per Client; check constraints make a Client's code `friend` and a Trainer's `trainer`; the migration backfills existing Clients (`unknown`, or `friend` from a Referral). `staff_members.referral_code` is unique among live rows and a personal code may not start with `REF-`, so it never collides with a Client's. Registration and the Assistant's invitation take an optional `acquisitionChannel` (absent → `unknown`) and `referralCode`; a Client's code still starts the PAY-001 Referral (credit untouched for PAY-005). `GET`/`PUT /administrator/clients/{id}/acquisition` and `/administrator/staff-members/{id}/referral-code`, audited as `client_acquisition.corrected` and `staff_member.referral_code_changed`. Coordinator seam: `acquisitionEditorRoles` in `booking/acquisition/client-acquisition.ts` lists only `administrator`; IDN-009 adds `coordinator` there. Tests: backend unit 993, integration 367 passed and 6 skipped of 373 (incl. two new specs), e2e acquisition 13, admin web 527, Playwright 17, mobile-core 350, client 188, staff 155. Verified: API by curl (Trainer code wins over Instagram, no channel → `unknown`, unknown code → 400); admin web in a browser at 1440 and 420 px (Código personal set and refused in use, Corregir with TikTok, unknown code and missing channel); Client registration on the iPhone 16 Pro and iPad Pro 11-inch (M4) (chips, «Elige cómo nos conociste.», code helper); Staff «Nuevo cliente» end to end on both through the updated Maestro journey (row stored as `walk_in`). Not verified: Android (the emulator's system server kept dying under host memory pressure, Maestro could not start); the Client app on the dev build (it loaded a stale bundle, Expo Go was used). Follow-ups 140–143 exported (144 unused).
+
 #### PAY-006 · Payment controls
 
 - Front-desk QR: the Assistant photographs or uploads the receipt for a Client's purchase. The Payment is pending, and the Administrator approves it as with an in-app QR (same push, same review screen).
@@ -712,6 +745,21 @@ income report and stays visible with its reason.
 Acceptance criteria: the mark can be set and undone only by the Administrator,
 both actions audited. The filter and the CSV match.
 
+Done on 2026-10-23. The card was walked without submitting, so no Payment was
+recorded. The Client app shows «Datos para la factura» on «Pago por
+transferencia» with «Con factura» and «Sin factura» («Tu compra se registra
+sin datos de factura.») for Sofía, on the iPhone 16 Pro, the iPad Pro 11-inch
+(M4), and the Android emulator. The Staff app shows the same card on
+«Confirmar pago en efectivo», reached from Sofía's overview, on the same three
+devices («La venta se registra sin datos de factura.»). Chromium at 1440 and
+420 px and the Playwright journey covered AW28 earlier. Decisions: the prefill
+takes the latest sale that carried Invoice Data; the mark applies to confirmed
+sales only and «Sin factura emitida» lists confirmed sales with data and no
+mark; AW28 lists cash sales; the CSV pages through the same list; closing an
+Account erases the NIT or CI and name and keeps the mark. Open questions:
+erasing data of a sale not yet invoiced on closure; a date range for the
+accountant CSV; front-desk QR receipts of PAY-006 need the same card.
+
 #### BKO-003 · Daily cash close
 
 - Staff app (Assistant): «Cerrar caja». It shows the expected cash (the day's cash sales at the branch), the counted cash, the difference, and a note. One close a day, at the end of the day; the Assistant or the Administrator closes it (user, 2026-10-23).
@@ -721,6 +769,30 @@ both actions audited. The filter and the CSV match.
 Acceptance criteria: the expected amount equals the sum of the cash Payments in
 the window, including a sale voided after the close (shown as an adjustment).
 Integration tests prove a second close of the same day is refused.
+
+Notes (BKO-003, 2026-10-23):
+
+- Decisions taken under the blanket approval: the close is always for today's
+  Bolivia day; the expected cash is the confirmed cash Payments collected at
+  the Branch from midnight up to the close, stored on the close; the history
+  recomputes the day's sales and shows the change as «Ajuste» (a sale voided
+  later lowers it, a cash sale recorded after the close raises it), so the
+  close is never edited (a trigger refuses updates and deletes). The note is
+  optional (500 characters); the count is whole centavos up to Bs 1,000,000.
+  One close per Branch and day is a unique index (`409`
+  `cash_close_already_recorded`); an Assistant closes only her Branches
+  (`403` `branch_not_assigned`); every other Role is denied by default, the
+  Coordinator included. The voided-sale seam is the «confirmed» filter: the
+  integration spec moves a confirmed cash Payment out of it on a disposable
+  database, as PAY-006's «voided» will.
+- AW151 takes its number from the block 150–154 given to this item so the
+  parallel items never collide; follow-up 150 is partly applied (the
+  design-system sidebar card, the other admin screens' sidebars, and the
+  generated `design/README.md` rows take «Caja» at their next regeneration).
+- Open question: may an Administrator close a past day that nobody closed?
+  Today it is only flagged on AW151.
+- For IDN-009: add `/cash-closes` and `/administrator/cash-closes` to the
+  authorization matrix as Coordinator ✗, and hide «Caja» from her sidebar.
 
 #### IDN-009 · Coordinator Role
 
@@ -733,6 +805,28 @@ Acceptance criteria:
 - An authorization matrix test lists every endpoint and checks Administrator ✓ and Coordinator ✓/✗.
 - The admin web for a Coordinator shows no amount anywhere: the Playwright journey searches the page text for «Bs».
 - The Coordinator's pay is invisible to her.
+
+#### BKM-013 · First 90 days
+
+Done on 2026-10-23, branch `feature/bkm-013-first-90-days`, stacked on #159.
+Commits: `1c160144` date rules, `9ab7dcf2` persistence, `b3237068` worker job,
+`f565709d` list and mark, `2da80840` admin page, `c0bf32ec` Staff screen.
+Migration `20261023182540_first_90_days` (needs approval).
+
+Verified: backend unit 32 passed, integration 10 passed on
+`pilates_test_bkm013`, lint clean. AW39 in Chromium at 1440 and 420 px as
+Paola and as Carolina: the list, the count badge, «Abrir WhatsApp»
+(`wa.me/591…`), and «Contactada» removing the row with «Marcaste a Valeria
+Quiroga como contactada.». Carolina's page shows no «Bs». S28 on the iPhone
+16 Pro, the iPad Pro 11-inch (M4), and the Android emulator: Lucía with
+«Menos de 4 clases en su primer mes», «Abrir WhatsApp», and «Contactada»; the
+empty state «Nadie para contactar por ahora.» was seen on the iPhone first.
+The inbox message reached Sofía on all three devices.
+
+Open: the inbox card draws the message body and not the title («Tu primera
+semana» never appears; the push carries the title). The four titles need the
+owner's approval. A Client leaves the list as soon as she books, and a
+cancellation can put her back.
 
 #### NUT-003 · Nutritionist rules
 
@@ -768,6 +862,37 @@ Acceptance criteria: a second guest pass for the same friend is refused, and
 so is the last place. The reward is applied once, at the friend's first
 approved Payment.
 
+Evidence (BKM-014, 2026-10-23, branch `feature/bkm-014-invite-a-friend`, [PR #178](https://github.com/DaleneyRuben/emma-pilates/pull/178)). This branch merges BKM-011 (`feature/bkm-011-acquisition-channel`, PR #162) and BKM-008 (`feature/bkm-008-extra-classes`, PR #170) at `dc02ec16`, because the host's reward is an allowance adjustment and the invitation reuses the referral code. PAY-005's credit removal (PR #157) is a sibling and is not in this branch. The credit fields stay the deprecated zeros that branch established, and the credit screen disappears when #157 merges. This item's screen 16 no longer shows credit or Bs 60; screen 17 and the profile credit row stay until then.
+
+Commits after `dc02ec16`: `491b50fb` failing booking rules, `5d5eb782` failing invite and reward rules, `b04d79a3` the decision, `a9cc4dae` failing the reward on the first Payment, `b77d8010` the grant and the reward once, `b1d76ad8` follow-up 196 left pending, `5cbb4229` each invitation's status, `6efc5673` the registration slice, `4dbbf772` Test 79.
+
+Decisions:
+
+- Courtesy Access does not fit. It grants the hidden 16-class «Acceso de prueba» Plan and refuses a Client who already holds a Subscription. A Guest Pass is one courtesy class, opened by registration with a Client's code, and it must not count as a first Plan. The path is a `GuestPass` row plus a hidden one-class Plan «Pase de invitada», created on first use, with a confirmed courtesy Payment of Bs 0 and a `courtesy` adjustment. The gift decision already declines a courtesy Payment, a hidden Plan, and a price of 0, so the pass never takes a founder place and never triggers the gift class. Confirmation still passes `founder: false` until BKM-010.
+- Registration and the Assistant's invitation reuse BKM-011. There is no second registration path. A host invites one friend a calendar month in America/La_Paz (`invitesPerHostPerMonth`). A second pass for the same friend is refused by the partial unique index `guest_passes_friend_live_key`.
+- The last place is refused only when the eligible Subscription is the courtesy one, with `guest_pass_last_place`. A paying Client still takes that place. A second booking on a spent pass answers `guest_pass_already_used`.
+- The host's reward reuses `recordAllowanceAdjustment` with reason `invite_converted`, once, at the friend's first approved Payment. With no current Subscription the pass is marked `rewardOwed` and the class lands on the next one she activates. A retry finds the pass already rewarded.
+- Contracts stay additive (ADR-0016). `GET /api/v1/clients/current/referrals` adds `invitationStatus` (`registered`, `class_booked`, `bought`). Older releases ignore it and keep reading `state`.
+- Screen 16 is amended by follow-up 196, left `🕓 pending`. The app is built to that text because no export exists for this item. Home and Perfil name the row «Invita a una amiga» so the screen is reachable by that name.
+- Migration `20261023220000_guest_passes` was applied only to `pilates_bkm014_migration_review`, `pilates_test_bkm014_admin`, and `pilates_bkm014_dev`, all dropped when the item finished. It needs owner approval before any shared, staging, or production database. Soft delete only (ADR-0086).
+
+Verified (2026-10-23):
+
+- Integration `test/database/guest-pass.integration-spec.ts`: 7 passed. A second invitation in the same La Paz month is refused and the next month succeeds; the last place is refused for the pass and taken by a paying Client; a second class answers `guest_pass_already_used`; the reward lands once on Lucía's current Subscription and, for a host with none, on her next one; the pass grants no gift, and the friend's first real Payment still does.
+- Unit: guest-pass decision specs, the context-boundary suite (2 passed after the shared slice), and the Client screen specs for referrals, home shortcuts, and the top bar.
+- API on port 3132 over `pilates_bkm014_dev`. `POST /api/v1/client-registrations` with `REF-LUCIA` answered `202`, and `booking.guest_passes` gained one row: hidden Plan «Pase de invitada», confirmed courtesy Payment of Bs 0, remaining allowance 0, one `courtesy` adjustment. A second registration the same month answered `409` `guest_pass_monthly_limit`. `GET /api/v1/clients/current/referrals` as Lucía returned `invitationStatus: registered` and the credit fields stayed empty.
+
+The mobile apps were not walked on a device. This item did not take the simulator lock and did not run Maestro.
+
+Open questions:
+
+- The courtesy adjustment's author is the friend's own new Account at self-registration, or the Assistant's Account at the front desk, with role null on the registration path. The reward's author is the Account that approved the friend's Payment, matching the gift. The pass's courtesy author being the friend herself is odd; it stays because the adjustment requires an Account and registration has no staff actor.
+- A second `openGuestPass` for the same friend is refused by the unique index (Prisma P2002) and is not translated into a named `GuestPassError`. A second registration of the same friend is already refused by the one-Referral rule, so the index is a backstop. The acceptance test covers the second class, not a second registration.
+- The Coordinator Role does not exist (IDN-009).
+- A cancelled guest-pass Booking does not clear `bookingId` or restore the courtesy class. Cancelling restores the base allowance, so a cancelled pass class still counts as used.
+- Waitlist promotion does not know the last-place rule. A guest pass could be promoted into the last place.
+- The confirmation still writes the Bs 60 credit ledger entry. PAY-005 (#157) removes it. This branch does not.
+
 #### BKM-013 · First 90 days
 
 - `LifecycleMessage`: day 2, week 1, day 30, and day 90 after the first real Plan, by push and inbox. I draft the copy and the owner approves it before release.
@@ -787,6 +912,8 @@ the list empties as Clients book or are marked.
 
 Acceptance criteria: one reformer out of service flags every future reformer
 Session at capacity 8.
+
+Evidence: the integration specs cover the number uniqueness, the fault history, and the capacity flags. On `pilates_bko004_dev`, AW37 listed the equipment and its open faults, and Horario showed «1 sesión de esta semana tiene más lugares que reformers funcionando» with the flagged Session reading «Faltan equipos · 11 de 12», checked at 1440 px and 420 px. Emma reported a fault from her Centro Session on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator; each ended on «Gracias por avisar». Open: the fixture Branch already held equipment from an earlier walk, so the empty state was confirmed by the page spec, not in the browser.
 
 #### BKO-005 · Taxes, budget, and the monthly result
 
@@ -832,6 +959,13 @@ Acceptance criteria:
 - A tester books, cancels, reschedules, and joins the waitlist with her 16 classes.
 - Integration tests cover the grant and the visibility rule. The testing guide has the steps.
 
+Notes (done 2026-10-23):
+
+- **Built.** `PaymentMethod.COURTESY` (two migrations: the enum value alone, then `plans_free_only_hidden_check` and the courtesy branches of `payments_amounts_check` / `payments_method_fields_check`); `POST /api/v1/administrator/clients/{clientId}/courtesy-access` (`Idempotency-Key`, `{endsOn}`, 201 `PaymentDto` with `method: courtesy`); audit code `payment.courtesy_granted`; the usual «Pago confirmado» push; «Acceso de prueba» on AW22 (follow-up 160, exported).
+- **Decisions taken.** The hidden «Acceso de prueba» Plan (16 classes, Bs 0, catalog duration 1 month) is created on the first grant and reused, not seeded, so it survives the ADR-0104 reset with no step. The Subscription runs from today to the chosen date, which must lie between today and one year ahead. A grant is refused like a sale while the Client has a Plan in use, a pending Payment, or an open Intent (409); the button only shows without an active Plan. Showing a Bs 0 Plan in Planes is refused (`invalid_catalog_value`). A courtesy grant never qualifies a pending Referral and the income report skips courtesy Payments. Anyone but an Administrator gets 403 `administration_access_denied`; the Plan never reaches the Client or Assistant catalogs or purchases (`plan_not_purchasable`). Shared reads moved out of `prisma-payment-commands.ts` into `subscription-allocation.ts`.
+- **Verified.** Backend unit 963, e2e 272, integration 366 (92 suites) green on PostgreSQL 18; admin web Jest 527 (two load flakes in an untouched schedule spec pass alone), Playwright 17 journeys (the payments journey flaked once under load, passes alone); `pnpm check:api` clean. Browser at 1440 and 420 px on the admin web against `pilates_rel011_dev`: granted Valeria Quiroga access until 22/11/2026, saw the Plan block «Acceso de prueba · Activo · 16 de 16» and the Éxito line, and the database held the courtesy Payment, the audit record, and the notification. No mobile code changed, so no Simulator or emulator run; the tester's booking, cancel, reschedule, and waitlist are covered by `courtesy-access-bookings.integration-spec.ts`.
+- **Open.** BKM-005 (Plans by days) must give the tester Plan a validity in days instead of `durationMonths: 1` when it lands. The Claude Design canvas of follow-up 160 (`https://claude.ai/artifact/7bvLoYc2iHhP5PUTfHaAHj`) could not be deleted from the agent session: the user deletes it.
+
 #### REL-012 · «Enviar comentarios»
 
 Google asks what feedback the testers gave and what changed because of it.
@@ -858,7 +992,7 @@ Acceptance criteria: at least 12 testers opted in on the day REL-006's closed re
 
 | ID | Priority | Surface | Work item | Depends on | Effort | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| BE-027 | P1 | Backend | Diagnosis fixes: promote the waitlist when capacity rises; audit Attendance corrections | — | 1 d | ready |
+| BE-027 | P1 | Backend | Diagnosis fixes: promote the waitlist when capacity rises; audit Attendance corrections | — | 1 d | done |
 | MOB-070 | P1 | Client app | Diagnosis fixes in the Client app: Reschedule idempotency, the waitlist offered inside the window, specific rejection messages, phone validation, hard-coded copy | BKM-004 | 1.5–2 d | ready |
 | STAFF-005 | P1 | Staff app | Diagnosis fixes in the Staff app: HTTP errors on the Trainer screens, a failed receipt download, notification taps for the Assistant, the version label | — | 1.5–2 d | ready |
 | UX-003, UX-004 | P1 | Apps | *Existing rows.* Early refusals for the Assistant, refetch on focus | UX-001 | 1–2 d left | ready |
@@ -877,7 +1011,7 @@ Acceptance criteria: at least 12 testers opted in on the day REL-006's closed re
 These are the medium findings from the diagnosis's section 1.8 that still
 apply after the decisions. The credit and report findings go away with PAY-005.
 
-- **BE-027:** raising a Session's capacity promotes the waitlist, and an Attendance correction writes an audit record with the previous outcome.
+- **BE-027:** raising a Session's capacity promotes the waitlist, and an Attendance correction writes an audit record with the previous outcome. **Done.** Evidence: red `32de64da` (one integration test per finding, watched fail: the raised capacity left the oldest entry open, and a correction wrote no audit row) → green `778b8dd5` (capacity growth calls the existing `promoteWaitlistInTransaction` after the Session update, inside the same Serializable transaction; a lower or equal capacity does not) and `6566f1ca` (a changed Attendance outcome writes `attendance.corrected` with `previousOutcome` and `outcome` before the upsert; the first save and an unchanged resave write nothing). No migration. Decisions: promotion reuses `promoteWaitlistInTransaction` rather than a second implementation, so eligibility, queue order, allowance, overlap, and the «Cupo liberado» notice stay the ones cancellation already uses, including the 2.5 h window; the audit targets the Booking, carries the Session Branch, and uses `auditActorOf` so an impersonating Administrator is named as today; only a changed outcome is a correction, which is the diagnosis's finding and leaves the first roster save unaudited as the catalog already said; lowering capacity still refuses to go below the booked count and never cancels a Booking. Verified: integration `booking-command` 7/7, `booking-command-waitlist` 6/6, `schedule-administration` 6/6, plus `audit-catalog` and `record-attendance` unit; curl on port 3133 against `pilates_be027_dev` (dropped afterwards) — raising a capacity-1 Session to 2 promoted Lucía (first in queue, eligible) into a Booking and left Isabel (no classes left) waiting, and lowering it answered `409 capacity_below_bookings`; Emma's first roster save wrote no audit, the correction to `no_show` wrote one `attendance.corrected` row naming `attended` then `no_show`, a repeat wrote nothing more, and the Assistant got `403`. No device or browser walk: both findings are API-only. Open: none. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/176.
 - **MOB-070:** Reschedule sends an Idempotency-Key. The app stops offering the waitlist inside the window. Business rejections get their own messages (window, destination not eligible, full, weekly cap, before the start date). Phone numbers are validated as Bolivian mobile numbers. «Paquetes desde» comes from the catalog, and «versión» from the app config.
 - **STAFF-005:** both Trainer screens check the HTTP status and show «Reintentar». A failed receipt download shows an error, and the Administrator cannot confirm without seeing the receipt. The Assistant's notifications open the Client. «versión» comes from the app config. The attendance screen moves out of `navigation.tsx`.
 

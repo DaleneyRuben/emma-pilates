@@ -1,3 +1,4 @@
+import { normalizeReferralCode } from '../../booking/acquisition/acquisition';
 import { auditActorOf } from '../authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 import {
@@ -16,6 +17,7 @@ import {
   type ClientInvitationView,
   type EmailPurpose,
   type InvitationAudit,
+  type InviteClientCommand,
   type InviteClientResult,
   type StoredAuthenticationToken,
 } from './client-invitations-model';
@@ -171,7 +173,7 @@ const renewActivation = async (
 };
 
 export const inviteClient = async (
-  command: { name: string; email: string; phone: string | null },
+  command: InviteClientCommand,
   principal: AuthenticatedPrincipal,
   dependencies: ClientInvitationDependencies,
 ): Promise<InviteClientResult> => {
@@ -198,6 +200,8 @@ export const inviteClient = async (
         email,
         phone: command.phone,
         referralCode: dependencies.newReferralCode(),
+        acquisitionChannel: command.acquisitionChannel ?? 'unknown',
+        referredByCode: normalizeReferralCode(command.referralCode),
         pendingExpiresAt: new Date(
           now.getTime() + pendingInvitationLifetimeMilliseconds,
         ),

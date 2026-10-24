@@ -15,6 +15,7 @@ import { createPrismaRetentionSweeps } from './system-identity/retention/prisma-
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
 import { createNotificationRecorder } from './notifications/prisma-notification-store';
 import { createPushDeliveryRuntime } from './notifications/push/push-delivery-runtime';
+import { createFirst90DaysJob } from './booking/first-90-days/prisma-first-90-days';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
 import { createFounderMembershipJob } from './booking/payments/founder-membership-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
@@ -107,10 +108,10 @@ async function bootstrap(): Promise<void> {
       now,
       recordNotification,
     ),
+    first90Days: createFirst90DaysJob(prisma, now, recordNotification),
     purchaseIntentExpiry: createPurchaseIntentExpiryJob(
       prisma,
       now,
-      environment.REFERRAL_REWARD_CENTAVOS,
       recordNotification,
     ),
     sessionSchedules: {
@@ -120,8 +121,11 @@ async function bootstrap(): Promise<void> {
     evaluationReminders: {
       execute: () => evaluations.sendDueEvaluationReminders(),
     },
-    emptySessionChecks: {
-      execute: () => sessionStartChecks.checkEmptySessions(),
+    minimumBookingsChecks: {
+      execute: () => sessionStartChecks.checkMinimumBookings(),
+    },
+    windowCloseSnapshots: {
+      execute: () => sessionStartChecks.recordWindowCloseBookings(),
     },
     startedSessionWaitlists: {
       execute: () => sessionStartChecks.closeStartedWaitlists(),

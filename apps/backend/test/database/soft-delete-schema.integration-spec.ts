@@ -29,8 +29,13 @@ describe('soft delete schema', () => {
 
     expect(result.rows.map(({ table_name: name }) => name)).toEqual([
       'back_office.expense_categories',
+      'booking.allowance_adjustments',
+      'booking.client_acquisitions',
       'booking.client_promotions_consents',
       'booking.clients',
+      'booking.contact_alerts',
+      'booking.guest_passes',
+      'booking.lifecycle_messages',
       'booking.promotion_contacts',
       'booking.staff_branch_assignments',
       'booking.staff_members',
@@ -38,6 +43,7 @@ describe('soft delete schema', () => {
       'system.accounts',
       'system.authentication_sessions',
       'system.authentication_throttle_events',
+      'system.feedback',
       'system.idempotency_records',
       'system.image_assets',
       'system.image_variants',

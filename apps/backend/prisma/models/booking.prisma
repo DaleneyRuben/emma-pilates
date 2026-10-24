@@ -10,6 +10,7 @@ enum StaffRole {
   NUTRITIONIST  @map("nutritionist")
   ASSISTANT     @map("assistant")
   ADMINISTRATOR @map("administrator")
+  COORDINATOR   @map("coordinator")
 
   @@schema("booking")
 }
@@ -25,6 +26,7 @@ model Client {
   deletedAt           DateTime?       @map("deleted_at") @db.Timestamptz(3)
   account             Account?
   subscriptions       Subscription[]
+  allowanceAdjustments AllowanceAdjustment[]
   bookings            Booking[]
   waitlistEntries     WaitlistEntry[]
   profileImageAsset   ImageAsset?     @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
@@ -34,9 +36,15 @@ model Client {
   creditLedgerEntries CreditLedgerEntry[]
   referralsMade       Referral[]      @relation("ReferralReferrer")
   referralReceived    Referral?       @relation("ReferralReferred")
+  guestPassesHosted   GuestPass[]     @relation("GuestPassHost")
+  guestPassesReceived GuestPass[]     @relation("GuestPassFriend")
   evaluations         Evaluation[]
   promotionsConsents  ClientPromotionsConsent[]
   founderMembership   FounderMembership?
+  lifecycleMessages   LifecycleMessage[]
+  contactAlerts       ContactAlert[]
+  acquisitions        ClientAcquisition[] @relation("AcquiredClient")
+  acquisitionsReferred ClientAcquisition[] @relation("AcquisitionReferrerClient")
 
   @@map("clients")
   @@schema("booking")
@@ -67,6 +75,9 @@ model StaffMember {
   name                String
   phone               String?
   role                StaffRole
+  // BKM-011: a Trainer's personal Referral Code, set by the Administrator.
+  // Unique among live rows: a partial index in the BKM-011 migration.
+  referralCode        String?                 @map("referral_code")
   profileImageAssetId String?                 @unique @map("profile_image_asset_id") @db.Uuid
   createdAt           DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -80,6 +91,7 @@ model StaffMember {
   evaluationSlots     EvaluationSlot[]
   salaryPayments      SalaryPayment[]
   impersonations      ImpersonationSession[]
+  acquisitionsReferred ClientAcquisition[]
 
   @@map("staff_members")
   @@schema("booking")
@@ -101,6 +113,8 @@ model Branch {
   evaluationSlots  EvaluationSlot[]
   supplies         Supply[]
   expenses         Expense[]
+  equipment        Equipment[]
+  cashCloses       CashClose[]
 
   @@map("branches")
   @@schema("booking")
@@ -153,5 +167,99 @@ model ClientPromotionsConsent {
 
   @@index([clientId])
   @@map("client_promotions_consents")
+  @@schema("booking")
+}
+
+enum LifecycleMilestone {
+  DAY_2  @map("day_2")
+  WEEK_1 @map("week_1")
+  DAY_30 @map("day_30")
+  DAY_90 @map("day_90")
+
+  @@schema("booking")
+}
+
+enum ContactAlertReason {
+  NO_BOOKING_7_DAYS                     @map("no_booking_7_days")
+  FEWER_THAN_2_CLASSES_BY_DAY_15        @map("fewer_than_2_classes_by_day_15")
+  FEWER_THAN_4_CLASSES_IN_FIRST_30_DAYS @map("fewer_than_4_classes_in_first_30_days")
+
+  @@schema("booking")
+}
+
+// One sent first-90-days message per Client per milestone (BKM-013).
+model LifecycleMessage {
+  id        String             @id @default(uuid()) @db.Uuid
+  clientId  String             @map("client_id") @db.Uuid
+  milestone LifecycleMilestone
+  sentAt    DateTime           @map("sent_at") @db.Timestamptz(3)
+  createdAt DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt DateTime?          @map("deleted_at") @db.Timestamptz(3)
+  client    Client             @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  @@index([clientId])
+  @@map("lifecycle_messages")
+  @@schema("booking")
+}
+
+// One stretch of a Contact Alert per Client per reason (BKM-013).
+model ContactAlert {
+  id                   String             @id @default(uuid()) @db.Uuid
+  clientId             String             @map("client_id") @db.Uuid
+  reason               ContactAlertReason
+  openedAt             DateTime           @map("opened_at") @db.Timestamptz(3)
+  contactedAt          DateTime?          @map("contacted_at") @db.Timestamptz(3)
+  contactedByAccountId String?            @map("contacted_by_account_id") @db.Uuid
+  createdAt            DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt            DateTime?          @map("deleted_at") @db.Timestamptz(3)
+  client               Client             @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  contactedByAccount   Account?           @relation("ContactAlertContactedBy", fields: [contactedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([clientId])
+  @@index([contactedByAccountId])
+  @@map("contact_alerts")
+  @@schema("booking")
+}
+
+// BKM-011: how a Client found the studio («¿Cómo nos conociste?»). `unknown`
+// is for Clients registered before the question existed or by a store build
+// that does not ask it.
+enum AcquisitionChannel {
+  INSTAGRAM @map("instagram")
+  TIKTOK    @map("tiktok")
+  FACEBOOK  @map("facebook")
+  GOOGLE    @map("google")
+  FRIEND    @map("friend")
+  TRAINER   @map("trainer")
+  WALK_IN   @map("walk_in")
+  OTHER     @map("other")
+  UNKNOWN   @map("unknown")
+
+  @@schema("booking")
+}
+
+// A Client's attribution (BKM-011, Booking ADR-0009): the channel she picked,
+// the effective channel, and the Referral Code that decided it. A code wins:
+// a Client's code makes the channel `friend`, a Trainer's `trainer`. One live
+// row per Client (partial unique index) and at most one referrer, present
+// exactly when a code is (check constraints in the migration).
+model ClientAcquisition {
+  id                    String             @id @default(uuid()) @db.Uuid
+  clientId              String             @map("client_id") @db.Uuid
+  declaredChannel       AcquisitionChannel @map("declared_channel")
+  channel               AcquisitionChannel
+  referralCode          String?            @map("referral_code")
+  referrerClientId      String?            @map("referrer_client_id") @db.Uuid
+  referrerStaffMemberId String?            @map("referrer_staff_member_id") @db.Uuid
+  createdAt             DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt             DateTime?          @map("deleted_at") @db.Timestamptz(3)
+  client                Client             @relation("AcquiredClient", fields: [clientId], references: [id], onDelete: Restrict)
+  referrerClient        Client?            @relation("AcquisitionReferrerClient", fields: [referrerClientId], references: [id], onDelete: Restrict)
+  referrerStaffMember   StaffMember?       @relation(fields: [referrerStaffMemberId], references: [id], onDelete: Restrict)
+
+  @@index([referrerClientId])
+  @@index([referrerStaffMemberId])
+  @@map("client_acquisitions")
   @@schema("booking")
 }
