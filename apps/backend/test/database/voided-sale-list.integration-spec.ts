@@ -83,6 +83,7 @@ describe('voided sale on the Administrator payment list (PostgreSQL)', () => {
       page: 1,
       pageSize: 20,
       status: 'voided',
+      invoice: 'all',
     });
 
     expect(page.items).toEqual([
