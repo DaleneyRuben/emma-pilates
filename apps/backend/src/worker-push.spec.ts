@@ -51,6 +51,7 @@ const startWithPush = async () => {
     trainerPayDrafts: idle({ drafted: 0 }),
     pushDispatch: { dispatch },
     pushReceipts,
+    studioFacts: idle({ sessions: 0, clientMonths: 0 }),
     retentionSweeps: idle({
       idempotencyRecords: 0,
       authenticationSessions: 0,

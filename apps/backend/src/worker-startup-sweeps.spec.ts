@@ -65,6 +65,7 @@ describe('worker startup sweeps (EXT-002)', () => {
           delivered: 0,
           failed: 0,
         }),
+        studioFacts: idle({ sessions: 0, clientMonths: 0 }),
         retentionSweeps: idle({
           idempotencyRecords: 0,
           authenticationSessions: 0,

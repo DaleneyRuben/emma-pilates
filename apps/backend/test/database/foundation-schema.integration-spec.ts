@@ -20,7 +20,7 @@ describe('foundation migration', () => {
     const result = await context.pool.query<{ table_name: string }>(`
       SELECT table_schema || '.' || table_name AS table_name
       FROM information_schema.tables
-      WHERE table_schema IN ('back_office', 'booking', 'system')
+      WHERE table_schema IN ('back_office', 'booking', 'studio', 'system')
         AND table_type = 'BASE TABLE'
       ORDER BY table_schema, table_name
     `);
@@ -70,6 +70,8 @@ describe('foundation migration', () => {
       'booking.studio_settings_versions',
       'booking.subscriptions',
       'booking.waitlist_entries',
+      'studio.client_month_facts',
+      'studio.session_facts',
       'system.account_devices',
       'system.account_email_changes',
       'system.accounts',

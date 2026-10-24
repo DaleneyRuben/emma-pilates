@@ -42,6 +42,7 @@ const evaluationSlotIntervalMs = 60 * 60 * 1_000;
 const evaluationReminderIntervalMs = 60 * 1_000;
 const sessionStartCheckIntervalMs = 60 * 1_000;
 const retentionSweepIntervalMs = 60 * 60 * 1_000;
+const studioFactsIntervalMs = 24 * 60 * 60 * 1_000;
 const trainerPayDraftIntervalMs = 60 * 60 * 1_000;
 const pushReceiptIntervalMs = 5 * 60 * 1_000;
 
@@ -108,6 +109,9 @@ type WorkerDependencies = {
   pushDispatch: Pick<PushDispatchWorkerDependencies, 'dispatch'>;
   pushReceipts: {
     execute(): Promise<CheckPushReceiptsResult>;
+  };
+  studioFacts: {
+    execute(): Promise<{ sessions: number; clientMonths: number }>;
   };
   trainerPayDrafts: {
     execute(): Promise<{ drafted: number }>;
@@ -263,6 +267,16 @@ export const startWorker = async (
           {
             job: 'push_receipts',
             execute: () => dependencies.pushReceipts.execute(),
+          },
+        ],
+      },
+      // Studio facts recompute the current Bolivia month nightly (STU-001).
+      {
+        intervalMs: studioFactsIntervalMs,
+        steps: [
+          {
+            job: 'studio_facts',
+            execute: () => dependencies.studioFacts.execute(),
           },
         ],
       },

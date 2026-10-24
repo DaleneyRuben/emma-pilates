@@ -50,6 +50,7 @@ const startWithJobs = async ({
     trainerPayDrafts: idle({ drafted: 0 }),
     pushDispatch: { dispatch: jest.fn() },
     pushReceipts: idle({ discarded: 0, checked: 0, delivered: 0, failed: 0 }),
+    studioFacts: idle({ sessions: 0, clientMonths: 0 }),
     retentionSweeps: idle({
       idempotencyRecords: 0,
       authenticationSessions: 0,

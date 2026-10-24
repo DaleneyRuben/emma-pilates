@@ -28,6 +28,7 @@ import { createFinalizeUploadJobCommands } from './uploads/prisma-upload-command
 import { coordinatorMonthFacts } from './back-office/payroll/coordinator-pay-facts';
 import { createPrismaPayStatements } from './back-office/payroll/prisma-pay-statements';
 import { trainerMonthFacts } from './back-office/payroll/trainer-pay-facts';
+import { recomputeCurrentStudioMonth } from './studio/studio.module';
 import { boliviaDate } from './time/bolivia-time';
 import { startWorker } from './worker';
 
@@ -143,6 +144,7 @@ async function bootstrap(): Promise<void> {
       expoAccessToken: environment.EXPO_ACCESS_TOKEN,
       now,
     }),
+    studioFacts: { execute: () => recomputeCurrentStudioMonth(prisma) },
     trainerPayDrafts: {
       execute: async () => {
         const statements = createPrismaPayStatements(prisma, {

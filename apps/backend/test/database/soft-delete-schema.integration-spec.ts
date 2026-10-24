@@ -22,7 +22,7 @@ describe('soft delete schema', () => {
     const result = await context.pool.query<{ table_name: string }>(`
       SELECT table_schema || '.' || table_name AS table_name
       FROM information_schema.columns
-      WHERE table_schema IN ('back_office', 'booking', 'system')
+      WHERE table_schema IN ('back_office', 'booking', 'studio', 'system')
         AND column_name = 'deleted_at'
       ORDER BY 1
     `);
@@ -43,6 +43,8 @@ describe('soft delete schema', () => {
       'booking.promotion_contacts',
       'booking.staff_branch_assignments',
       'booking.staff_members',
+      'studio.client_month_facts',
+      'studio.session_facts',
       'system.account_email_changes',
       'system.accounts',
       'system.authentication_sessions',
@@ -61,7 +63,7 @@ describe('soft delete schema', () => {
       SELECT conrelid::regclass::text || '.' || conname AS name
       FROM pg_constraint
       WHERE contype = 'f'
-        AND connamespace::regnamespace::text IN ('back_office', 'booking', 'system')
+        AND connamespace::regnamespace::text IN ('back_office', 'booking', 'studio', 'system')
         AND confdeltype IN ('c', 'n', 'd')
       ORDER BY 1
     `);

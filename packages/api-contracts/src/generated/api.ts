@@ -234,6 +234,8 @@ import type {
   StaffProfileDto,
   StartClientRegistrationDto,
   StartImpersonationDto,
+  StudioRecomputeDto,
+  StudioRecomputeInputDto,
   StudioRulesDto,
   StudioSettingsDto,
   SubmitTransferDto,
@@ -32320,6 +32322,132 @@ export function useListAdminCashCloses<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type recomputeStudioFactsResponse200 = {
+  data: StudioRecomputeDto;
+  status: 200;
+};
+
+export type recomputeStudioFactsResponseSuccess =
+  recomputeStudioFactsResponse200 & {
+    headers: Headers;
+  };
+export type recomputeStudioFactsResponse = recomputeStudioFactsResponseSuccess;
+
+export const getRecomputeStudioFactsUrl = () => {
+  return `/api/v1/administrator/studio-facts/recompute`;
+};
+
+export const recomputeStudioFacts = async (
+  studioRecomputeInputDto: StudioRecomputeInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recomputeStudioFactsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRecomputeStudioFactsUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(studioRecomputeInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recomputeStudioFactsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recomputeStudioFactsResponse;
+};
+
+export const getRecomputeStudioFactsMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recomputeStudioFacts>>,
+    TError,
+    RecomputeStudioFactsMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recomputeStudioFacts>>,
+  TError,
+  RecomputeStudioFactsMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recomputeStudioFacts"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recomputeStudioFacts>>,
+    RecomputeStudioFactsMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return recomputeStudioFacts(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecomputeStudioFactsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recomputeStudioFacts>>
+>;
+export type RecomputeStudioFactsMutationBody = StudioRecomputeInputDto;
+export type RecomputeStudioFactsMutationError = unknown;
+export type RecomputeStudioFactsMutationVariables = {
+  data: StudioRecomputeInputDto;
+};
+
+export const useRecomputeStudioFacts = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recomputeStudioFacts>>,
+      TError,
+      RecomputeStudioFactsMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recomputeStudioFacts>>,
+  TError,
+  RecomputeStudioFactsMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRecomputeStudioFactsMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type createPendingUploadResponse201 = {
   data: PendingUploadDto;

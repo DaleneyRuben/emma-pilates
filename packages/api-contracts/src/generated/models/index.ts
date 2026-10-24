@@ -378,6 +378,8 @@ export * from "./staffProfileDtoRole";
 export * from "./startClientRegistrationDto";
 export * from "./startClientRegistrationDtoAcquisitionChannel";
 export * from "./startImpersonationDto";
+export * from "./studioRecomputeDto";
+export * from "./studioRecomputeInputDto";
 export * from "./studioRulesDto";
 export * from "./studioSettingsDto";
 export * from "./submitTransferDto";
