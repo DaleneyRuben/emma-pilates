@@ -41,6 +41,8 @@ const sharedContextSlices = [
   // Registration opens the friend's Guest Pass in the same transaction
   // (BKM-014).
   'booking/payments/open-guest-pass',
+  // Finanzas asks Booking for the month's Nutritionist cost (ADR-0103).
+  'booking/evaluations/nutritionist-cost',
   // Staff management creates, reissues, and disables the Staff Member's
   // Account inside its own transaction through this System Identity slice
   // (IDN-007).

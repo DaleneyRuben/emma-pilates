@@ -367,6 +367,13 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/administrator/referrals': administratorOnly(),
   // PAY-005 retired Credit, so GET /administrator/credits is gone.
   'GET /api/v1/administrator/reports/income': administratorOnly(),
+  // BKO-005: the month result and the opening budget are money. The month
+  // has to parse, or the Role check never runs.
+  'GET /api/v1/administrator/reports/finance': administratorOnly({
+    query: '?month=2026-10',
+  }),
+  'POST /api/v1/administrator/reports/finance/opening-budget':
+    administratorOnly(),
   'GET /api/v1/administrator/payments/pending': administratorOnly(),
   'GET /api/v1/administrator/payments/{paymentId}': administratorOnly(),
   'GET /api/v1/administrator/payments/{paymentId}/receipt': administratorOnly(),

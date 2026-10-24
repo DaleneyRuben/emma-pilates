@@ -192,6 +192,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       branch: centro.id,
       from: "2026-08-01",
       to: "2026-09-30",
+      vista: "reporte",
     });
     expect(
       screen.getByText("01/08/2026 – 30/09/2026 · Sucursal Centro"),

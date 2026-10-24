@@ -87,7 +87,7 @@ can be found by its design name.
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW37 Equipos | 82 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
-| AW16 Reporte de ingresos y gastos | 30, 31, 93 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90 |
 | AW39 Para contactar | 84 |
@@ -3389,6 +3389,8 @@ The following are not ready for manual product testing:
   (Test 86);
 - the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
   the Role arrives with IDN-009, so today only the Administrator can (Test 79);
+- accrued revenue by validity days: decisions §11 asks for it beside the
+  cash view, and Test 94 shows only cash. STU-002 owns the accrued view;
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
   Swagger (Test 34). On Android the link opens the app with a development
@@ -6698,6 +6700,48 @@ C. **Cost and income.** Three held Evaluations in a month record Bs 150
 The migrations `20261023210000_evaluation_payments` and
 `20261023210100_evaluation_payment_constraints` need owner approval before
 they run on a shared database. Follow-ups 206 and 207 stay pending.
+
+## Test 94: the month result and the break-even (BKO-005)
+
+**Reporte** (AW16) now has two tabs. **Reporte** is the income and expense
+report of Test 30. **Finanzas** is one Bolivia month: cash income, the tax
+from the studio rules, the fixed-cost budget against what was spent, the
+Nutritionist's cost, the result, and the break-even
+([decisions §11](./decisiones-emma-pilates.md)). Paola is the Administrator.
+Camila, the Assistant, gets `403` on both endpoints. Log in as Test 24
+describes.
+
+1. **Tabs.** **Reporte** opens on the **Reporte** tab, with Desde, Hasta,
+   and Sucursal as before. **Finanzas** replaces those controls with a month
+   stepper that cannot go past the current month. The address keeps the tab
+   (`?vista=finanzas&month=2026-10`). The top bar still says "El reporte usa
+   su propio filtro de sucursal" on a wide window and leaves that line out
+   at a phone width.
+2. **Empty budget.** With no budget loaded, the four figures read Bs 0,00
+   and the page says "Aún no hay presupuesto." with one button, **Cargar
+   presupuesto de apertura**. Press it once. The ten opening lines appear
+   (Alquiler Bs 8.500,00 through Insumos Bs 400,00), **Imprevistos (10 %)**
+   reads Bs 1.925,00 with "—" under Gastado, and **Total** reads
+   Bs 21.175,00. Pressing it again does not add lines.
+3. **The month.** **Ingresos en caja** is the confirmed Payments of that
+   month. **Impuesto** is 16 % of them ("16 % de los ingresos en caja").
+   **Resultado** is cash income less the tax, the spent lines, and the
+   Nutritionist's cost, with a minus sign when it is a loss. **Punto de
+   equilibrio** is the cash income that covers the budget and that cost
+   after tax. With no Nutritionist cost it reads Bs 25.208,33. The line
+   under the figures names the cost ("Costo de la nutricionista Bs 0,00").
+   Money is written `Bs 1.925,00`, never in centavos.
+4. **One expense.** Record a Gasto whose category is named exactly like a
+   budget line (Alquiler) in the month on screen. Gastado on that row grows
+   by the amount, and Resultado falls by it. A category with another name
+   does not move a budget row.
+5. **Narrow browser.** At 420 px the figures stack and the budget table
+   becomes labelled cards (Línea, Presupuesto, Gastado). The sidebar opens
+   from **Abrir menú**.
+
+The migration `20261023230000_cost_budget_lines` needs owner approval before
+it runs on a shared database. The accrued-revenue view (decisions §11) is
+not on this page. Follow-up 208 stays pending.
 
 ## Test 86: invite a friend (BKM-014)
 

@@ -134,6 +134,7 @@ import type {
   GetCurrentClientPhotoParams,
   GetExpenseReportParams,
   GetIncomeReportParams,
+  GetMonthResultParams,
   GetPaymentReceiptParams,
   GetTodayCashCloseParams,
   GrantCampaignDto,
@@ -171,8 +172,10 @@ import type {
   ListTrainerScheduleParams,
   LivenessResponseDto,
   MarkedNotificationsDto,
+  MonthResultDto,
   NotificationPageDto,
   NutritionistAgendaPageDto,
+  OpeningBudgetSeedDto,
   PasswordRecoveryRequestResultDto,
   PasswordRecoveryResultDto,
   PaymentDto,
@@ -30696,6 +30699,288 @@ export function useGetExpenseReport<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type getMonthResultResponse200 = {
+  data: MonthResultDto;
+  status: 200;
+};
+
+export type getMonthResultResponseSuccess = getMonthResultResponse200 & {
+  headers: Headers;
+};
+export type getMonthResultResponse = getMonthResultResponseSuccess;
+
+export const getGetMonthResultUrl = (params: GetMonthResultParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/reports/finance?${stringifiedParams}`
+    : `/api/v1/administrator/reports/finance`;
+};
+
+export const getMonthResult = async (
+  params: GetMonthResultParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getMonthResultResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetMonthResultUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getMonthResultResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getMonthResultResponse;
+};
+
+export const getGetMonthResultQueryKey = (params?: GetMonthResultParams) => {
+  return [
+    `/api/v1/administrator/reports/finance`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetMonthResultQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMonthResult>>,
+  TError = unknown,
+>(
+  params: GetMonthResultParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthResult>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMonthResultQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMonthResult>>> = ({
+    signal,
+  }) => getMonthResult(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMonthResult>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMonthResultQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMonthResult>>
+>;
+export type GetMonthResultQueryError = unknown;
+
+export function useGetMonthResult<
+  TData = Awaited<ReturnType<typeof getMonthResult>>,
+  TError = unknown,
+>(
+  params: GetMonthResultParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthResult>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMonthResult>>,
+          TError,
+          Awaited<ReturnType<typeof getMonthResult>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMonthResult<
+  TData = Awaited<ReturnType<typeof getMonthResult>>,
+  TError = unknown,
+>(
+  params: GetMonthResultParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthResult>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMonthResult>>,
+          TError,
+          Awaited<ReturnType<typeof getMonthResult>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMonthResult<
+  TData = Awaited<ReturnType<typeof getMonthResult>>,
+  TError = unknown,
+>(
+  params: GetMonthResultParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthResult>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetMonthResult<
+  TData = Awaited<ReturnType<typeof getMonthResult>>,
+  TError = unknown,
+>(
+  params: GetMonthResultParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthResult>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetMonthResultQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type seedOpeningBudgetResponse200 = {
+  data: OpeningBudgetSeedDto;
+  status: 200;
+};
+
+export type seedOpeningBudgetResponseSuccess = seedOpeningBudgetResponse200 & {
+  headers: Headers;
+};
+export type seedOpeningBudgetResponse = seedOpeningBudgetResponseSuccess;
+
+export const getSeedOpeningBudgetUrl = () => {
+  return `/api/v1/administrator/reports/finance/opening-budget`;
+};
+
+export const seedOpeningBudget = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<seedOpeningBudgetResponse> => {
+  const res = await (fetchFn ?? fetch)(getSeedOpeningBudgetUrl(), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: seedOpeningBudgetResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as seedOpeningBudgetResponse;
+};
+
+export const getSeedOpeningBudgetMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof seedOpeningBudget>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof seedOpeningBudget>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["seedOpeningBudget"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof seedOpeningBudget>>,
+    void
+  > = () => {
+    return seedOpeningBudget(fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SeedOpeningBudgetMutationResult = NonNullable<
+  Awaited<ReturnType<typeof seedOpeningBudget>>
+>;
+
+export type SeedOpeningBudgetMutationError = unknown;
+
+export const useSeedOpeningBudget = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof seedOpeningBudget>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof seedOpeningBudget>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getSeedOpeningBudgetMutationOptions(options), queryClient);
+};
 
 export type getTodayCashCloseResponse200 = {
   data: CashTodayDto;

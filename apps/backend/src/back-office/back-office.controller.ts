@@ -59,6 +59,7 @@ import {
   WithdrawalPageDto,
 } from './back-office.dto';
 import { cashCloseControllers } from './cash-close/cash-close.controller';
+import { AdministratorFinanceController } from './finance/finance.controller';
 import { AdministratorSuppliesController } from './supplies/supplies.controller';
 
 export {
@@ -388,5 +389,6 @@ export const backOfficeControllers = [
   AdministratorExpenseCategoriesController,
   AdministratorExpensesController,
   AdministratorExpenseReportController,
+  AdministratorFinanceController,
   ...cashCloseControllers,
 ];

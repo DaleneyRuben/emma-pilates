@@ -27,6 +27,7 @@ describe('foundation migration', () => {
 
     expect(result.rows.map(({ table_name: tableName }) => tableName)).toEqual([
       'back_office.cash_closes',
+      'back_office.cost_budget_lines',
       'back_office.equipment',
       'back_office.equipment_issues',
       'back_office.expense_categories',
