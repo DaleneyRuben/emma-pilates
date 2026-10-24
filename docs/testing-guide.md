@@ -6457,4 +6457,4 @@ a capacity.
 10. Check AW37 and Horario at 1440 px and 420 px (stacked cards, the fault
     rows stacked, the day list's cards with «Faltan equipos»), and S26 on the
     iPhone, the iPad, and the Android emulator.
->>>>>>> origin/feature/launch-rollout
+
