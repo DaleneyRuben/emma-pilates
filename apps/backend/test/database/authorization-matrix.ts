@@ -322,8 +322,28 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     },
   }),
   'GET /api/v1/studio-rules': publicRoute,
-  'POST /api/v1/administrator/plans': administratorOnly(),
-  'PUT /api/v1/administrator/plans/{planId}': administratorOnly(),
+  // BKM-005: a Plan is 30, 60, or 90 days. A body is required before the
+  // Role is checked.
+  'POST /api/v1/administrator/plans': administratorOnly({
+    body: {
+      name: 'Mensual',
+      durationDays: 30,
+      weeklyClassCap: null,
+      classAllowance: 8,
+      priceCentavos: 35000,
+      displayOrder: 1,
+    },
+  }),
+  'PUT /api/v1/administrator/plans/{planId}': administratorOnly({
+    body: {
+      name: 'Mensual',
+      durationDays: 30,
+      weeklyClassCap: null,
+      classAllowance: 8,
+      priceCentavos: 35000,
+      displayOrder: 1,
+    },
+  }),
   'PUT /api/v1/administrator/plans/{planId}/visibility': administratorOnly(),
 
   // Oversight and money: Payments, Credit, Referrals, reports, Evaluations.
