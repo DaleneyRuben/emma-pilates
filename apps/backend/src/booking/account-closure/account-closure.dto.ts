@@ -36,7 +36,9 @@ export class AccountClosureSummaryDto {
   @ApiProperty({
     type: Number,
     minimum: 0,
-    description: 'Credit forfeited through the account_closure ledger entry',
+    description:
+      'Deprecated (PAY-005): always 0 since Credit was retired; kept for store builds',
+    deprecated: true,
   })
   forfeitedCreditCentavos!: number;
 }

@@ -124,7 +124,7 @@ describe("Client Home quick actions and notification destinations", () => {
       ).toBeOnTheScreen();
     });
     expect(
-      screen.getByRole("button", { name: "Mis referidos: 2 amigas invitadas" }),
+      screen.getByRole("button", { name: "Invita a una amiga: 2 amigas invitadas" }),
     ).toBeOnTheScreen();
 
     await fireEvent.press(
@@ -152,7 +152,9 @@ describe("Client Home quick actions and notification destinations", () => {
       ).toBeOnTheScreen();
     });
     expect(
-      screen.getByRole("button", { name: "Mis referidos: Invita amigas y gana crédito" }),
+      screen.getByRole("button", {
+        name: "Invita a una amiga: Invita a una amiga a una clase gratis",
+      }),
     ).toBeOnTheScreen();
 
     await fireEvent.press(

@@ -21,6 +21,7 @@ import {
 } from "./report-search";
 import { CategoryTable, MonthTable } from "./report-tables";
 import { ReportTiles } from "./report-tiles";
+import { VoidedSales } from "./voided-sales";
 
 function DateField({
   label,
@@ -173,6 +174,7 @@ export function ReportPage({
         <LoadingNotice>Cargando el reporte…</LoadingNotice>
       ) : (
         <>
+          <VoidedSales sales={income.data.voided} />
           <ReportTiles
             income={income.data}
             expenses={expenses.data}

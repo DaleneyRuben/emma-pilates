@@ -49,6 +49,12 @@ SELECT pg_temp.expect_failure(
   'UPDATE booking.bookings SET state = ''cancelled'' WHERE id = ''00000000-0000-0000-0000-000000000001''',
   '23514'
 );
+-- Only a Booking cancelled with its Session may name no Account (BKM-009).
+SELECT pg_temp.expect_failure(
+  'UPDATE booking.bookings SET state = ''cancelled'', cancelled_at = now(), cancellation_cause = ''client_request'' WHERE id = ''00000000-0000-0000-0000-000000000001''',
+  '23514'
+);
+UPDATE booking.bookings SET state = 'cancelled', cancelled_at = now(), cancellation_cause = 'session_cancelled' WHERE id = '00000000-0000-0000-0000-000000000001';
 
 INSERT INTO booking.bookings (id, session_id, client_id, subscription_id, created_by_account_id, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', now()),

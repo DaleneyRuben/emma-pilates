@@ -13,7 +13,15 @@ export interface AdminReferralDto {
   referrerReferralCount: number;
   referredName: string;
   registeredAt: string;
-  /** @nullable */
+  /**
+   * Deprecated (PAY-005): no Referral is awarded any more
+   * @deprecated
+   * @nullable
+   */
   awardedAt: string | null;
+  /**
+   * Deprecated (PAY-005): no Referral is awarded any more
+   * @deprecated
+   */
   state: AdminReferralDtoState;
 }

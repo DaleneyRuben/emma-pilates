@@ -66,8 +66,11 @@ type ClientProfileUpdateHandler = (
   principal: AuthenticatedPrincipal,
 ) => Promise<ClientProfile>;
 export type PlanCatalogHandler = {
-  list(): Promise<PlanSummary[]>;
-  find(planId: string): Promise<PlanSummary | null>;
+  list(principal: AuthenticatedPrincipal): Promise<PlanSummary[]>;
+  find(
+    planId: string,
+    principal: AuthenticatedPrincipal,
+  ): Promise<PlanSummary | null>;
 };
 type BranchCatalogHandler = () => Promise<BranchSummary[]>;
 type ClassTypeCatalogHandler = () => Promise<ClassTypeSummary[]>;
@@ -88,6 +91,9 @@ const toPlanDto = (plan: PlanSummary): PlanDto => ({
   durationMonths: deprecatedDurationMonths(plan.durationDays),
   classAllowance: plan.classAllowance,
   priceCentavos: plan.priceCentavos,
+  ...(plan.listPriceCentavos === undefined
+    ? {}
+    : { listPriceCentavos: plan.listPriceCentavos }),
 });
 
 @Controller({ path: 'clients/current', version: '1' })
@@ -161,6 +167,20 @@ export class ClientProfileController {
 
     return {
       status: view.status,
+      nextSubscription:
+        view.nextSubscription == null
+          ? null
+          : {
+              id: view.nextSubscription.id,
+              planName: view.nextSubscription.planName,
+              originalClassAllowance:
+                view.nextSubscription.originalClassAllowance,
+              remainingClassAllowance:
+                view.nextSubscription.remainingClassAllowance,
+              startsOn: civilDate(view.nextSubscription.startsOn),
+              endsOn: civilDate(view.nextSubscription.endsOn),
+            },
+      founderRenewalDeadline: view.founderRenewalDeadline ?? null,
       subscription:
         view.subscription === null
           ? null
@@ -193,8 +213,11 @@ export class PlanCatalogController {
   async list(
     @Headers('authorization') authorization: string | undefined,
   ): Promise<PlanDto[]> {
-    await authenticateBearer(this.principalResolver, authorization);
-    return (await this.plans.list()).map(toPlanDto);
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    return (await this.plans.list(principal)).map(toPlanDto);
   }
 
   @Get(':planId')
@@ -207,8 +230,11 @@ export class PlanCatalogController {
   ): Promise<PlanDto> {
     const parsedPlanId = parseUuid(planId);
     if (parsedPlanId === null) throw invalidRequest('Invalid Plan identifier');
-    await authenticateBearer(this.principalResolver, authorization);
-    const plan = await this.plans.find(parsedPlanId);
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    const plan = await this.plans.find(parsedPlanId, principal);
 
     if (plan === null) {
       throw new NotFoundException({

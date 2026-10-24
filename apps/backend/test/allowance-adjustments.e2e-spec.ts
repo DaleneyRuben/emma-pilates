@@ -23,17 +23,16 @@ const clientId = '11111111-1111-4111-8111-111111111111';
 const principal = (
   role:
     'assistant' | 'administrator' | 'trainer' | 'nutritionist' | 'coordinator',
-): AuthenticatedPrincipal =>
-  ({
-    accountId: `${role}-account`,
-    authenticationSessionId: 'session',
-    identity: {
-      kind: 'staff',
-      staffMemberId: `${role}-staff`,
-      role,
-      branchIds: [],
-    },
-  }) as AuthenticatedPrincipal;
+): AuthenticatedPrincipal => ({
+  accountId: `${role}-account`,
+  authenticationSessionId: 'session',
+  identity: {
+    kind: 'staff',
+    staffMemberId: `${role}-staff`,
+    role,
+    branchIds: [],
+  },
+});
 
 describe('allowance adjustment endpoint', () => {
   let app: INestApplication<App>;

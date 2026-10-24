@@ -25,10 +25,15 @@ export const paymentRow = (
   submittedAt: "2026-09-21T18:05:00.000Z",
   decidedAt: null,
   receiptAvailable: true,
+  voidReason: null,
+  method: "transfer",
+  invoiceData: null,
+  invoiceIssued: null,
   ...extra,
 });
 
-// Sofía pays Bs 500 after Bs 60 of referral Credit; Lucía pays in full.
+// Sofía paid Bs 500 after Bs 60 of referral Credit before PAY-005 retired it;
+// Lucía pays in full.
 export const sofiaPayment = paymentRow("01", "Sofía Guzmán", {
   creditAppliedCentavos: 6_000,
   amountDueCentavos: 50_000,

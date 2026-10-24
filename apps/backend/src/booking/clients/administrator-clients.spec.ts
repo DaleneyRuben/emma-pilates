@@ -68,8 +68,8 @@ const directory = (
   read: jest.fn().mockResolvedValue(lucia),
   findActiveSubscription: jest.fn().mockResolvedValue(subscription),
   findLatestSubscription: jest.fn().mockResolvedValue(subscription),
-  readAvailableCredit: jest.fn().mockResolvedValue(105_000),
   readClosureOutlook: jest.fn().mockResolvedValue(outlook),
+  saveProfile: jest.fn(),
   ...overrides,
 });
 
@@ -133,7 +133,7 @@ describe('Administrator Client directory', () => {
 });
 
 describe('Administrator Client detail', () => {
-  it('summarizes contact, the current Plan, Credit, and referrals', async () => {
+  it('summarizes contact, the current Plan, and referrals, with Credit retired to zero (PAY-005)', async () => {
     const clients = directory();
 
     await expect(
@@ -143,8 +143,13 @@ describe('Administrator Client detail', () => {
       }),
     ).resolves.toEqual({
       ...lucia,
-      subscription: { status: 'active', subscription },
-      creditAvailableCentavos: 105_000,
+      subscription: {
+        status: 'active',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+      },
+      creditAvailableCentavos: 0,
       closure: outlook,
     });
     expect(clients.findActiveSubscription).toHaveBeenCalledWith(
@@ -163,7 +168,6 @@ describe('Administrator Client detail', () => {
     const clients = directory({
       findActiveSubscription: jest.fn().mockResolvedValue(null),
       findLatestSubscription: jest.fn().mockResolvedValue(expired),
-      readAvailableCredit: jest.fn().mockResolvedValue(0),
     });
 
     await expect(
@@ -172,7 +176,12 @@ describe('Administrator Client detail', () => {
         now: () => now,
       }),
     ).resolves.toMatchObject({
-      subscription: { status: 'expired', subscription: expired },
+      subscription: {
+        status: 'expired',
+        subscription: expired,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+      },
       creditAvailableCentavos: 0,
     });
   });

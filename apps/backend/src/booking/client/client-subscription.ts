@@ -34,6 +34,8 @@ export type ClientSubscriptionStatus =
 export type ClientSubscriptionView = {
   status: ClientSubscriptionStatus;
   subscription: ClientSubscriptionSummary | null;
+  nextSubscription: ClientSubscriptionSummary | null;
+  founderRenewalDeadline: string | null;
 };
 
 type LoadClientSubscriptionDependencies = {
@@ -46,6 +48,11 @@ type LoadClientSubscriptionDependencies = {
   findLatestSubscription(
     clientId: string,
   ): Promise<ClientSubscriptionSummary | null>;
+  findFutureSubscription(
+    clientId: string,
+    after: Date,
+  ): Promise<ClientSubscriptionSummary | null>;
+  readFounderRenewal?(clientId: string): Promise<{ gapDays: number } | null>;
 };
 
 // The renewal reminder is sent 3 days before the paid-through date.
@@ -61,6 +68,23 @@ type SubscriptionLookup = {
   findLatestSubscription(
     clientId: string,
   ): Promise<ClientSubscriptionSummary | null>;
+  findFutureSubscription(
+    clientId: string,
+    after: Date,
+  ): Promise<ClientSubscriptionSummary | null>;
+  readFounderRenewal?(clientId: string): Promise<{ gapDays: number } | null>;
+};
+
+const renewalDeadline = async (
+  clientId: string,
+  realEnd: Date,
+  dependencies: SubscriptionLookup,
+): Promise<string | null> => {
+  const founder = await dependencies.readFounderRenewal?.(clientId);
+  if (founder == null) return null;
+  return new Date(realEnd.getTime() + founder.gapDays * dayMilliseconds)
+    .toISOString()
+    .slice(0, 10);
 };
 
 export const describeSubscription = async (
@@ -77,17 +101,37 @@ export const describeSubscription = async (
       (active.endsOn.getTime() - dependencies.today.getTime()) /
       dayMilliseconds;
 
+    const next = await dependencies.findFutureSubscription(
+      clientId,
+      dependencies.today,
+    );
     return {
       status: daysLeft <= renewalReminderDays ? 'expiring_soon' : 'active',
       subscription: active,
+      nextSubscription: next,
+      founderRenewalDeadline: await renewalDeadline(
+        clientId,
+        active.endsOn,
+        dependencies,
+      ),
     };
   }
 
   const latest = await dependencies.findLatestSubscription(clientId);
 
   return latest === null
-    ? { status: 'none', subscription: null }
-    : { status: 'expired', subscription: latest };
+    ? {
+        status: 'none',
+        subscription: null,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+      }
+    : {
+        status: 'expired',
+        subscription: latest,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+      };
 };
 
 export const loadClientSubscription = async (
