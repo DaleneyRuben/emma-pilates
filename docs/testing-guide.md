@@ -5930,3 +5930,4 @@ and never an amount. Use a disposable database.
    fact table cannot see that, so v1 divides by active clients. That
    denominator is an open question; do not treat 50 % as the coordinator's
    bonus base.
+   [Pull request #199](https://github.com/DaleneyRuben/emma-pilates/pull/199).

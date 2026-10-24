@@ -1021,6 +1021,7 @@ that expired this month, which this fact table cannot see, so v1 uses
 active clients. The Coordinator role is IDN-009's; this path accepts a
 cast `coordinator` and a real login waits for that role. Design follow-up
 204 and prompt AW39 stay pending; the export was not run.
+[Pull request #199](https://github.com/DaleneyRuben/emma-pilates/pull/199).
 
 ### Summary (2026-10-23)
 
