@@ -1,5 +1,6 @@
 import { campaignAuthorizationRows } from './campaign-authorization';
 import { evaluationAuthorizationRows } from './evaluation-authorization';
+import { payStatementAuthorizationRows } from './pay-statement-authorization';
 
 // IDN-009 / ADR-0102: every endpoint the API serves, with an explicit
 // decision for the Administrator and the Coordinator. «allow» means the Role
@@ -433,6 +434,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/supplies/{supplyId}/restocks':
     administratorOnly(),
   'GET /api/v1/administrator/withdrawals': administratorOnly(),
+  ...payStatementAuthorizationRows(),
   'GET /api/v1/administrator/salary-payments': administratorOnly(),
   'POST /api/v1/administrator/salary-payments': administratorOnly(),
   'PUT /api/v1/administrator/salary-payments/{salaryPaymentId}':
