@@ -106,7 +106,7 @@ export function ClientOverviewScreen({
     return (
       <Screen style={styles.screen}>
         {back}
-        <LoadingState label="Cargando cliente" />
+        <LoadingState label="Cargando clienta" />
       </Screen>
     );
   }
@@ -115,7 +115,7 @@ export function ClientOverviewScreen({
       <Screen style={styles.screen}>
         {back}
         <QueryFailure
-          label="No pudimos cargar al cliente."
+          label="No pudimos cargar a la clienta."
           onRetry={() => void overview.refetch()}
         />
       </Screen>

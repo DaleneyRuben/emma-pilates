@@ -51,9 +51,9 @@ type ConfirmNavigation = {
 };
 
 const paymentProblems: Record<string, string> = {
-  subscription_not_expired: "El cliente ya tiene un plan activo.",
-  purchase_intent_open_exists: "El cliente tiene una compra en curso desde la app.",
-  payment_pending_exists: "El cliente tiene un pago en revisión.",
+  subscription_not_expired: "La clienta ya tiene un plan activo.",
+  purchase_intent_open_exists: "La clienta tiene una compra en curso desde la app.",
+  payment_pending_exists: "La clienta tiene un pago en revisión.",
   branch_not_assigned: "Solo puedes registrar pagos en tus sucursales.",
   plan_not_purchasable: "Este plan ya no está disponible.",
   start_date_out_of_window: "Esa fecha de inicio no está disponible.",

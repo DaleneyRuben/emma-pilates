@@ -51,10 +51,10 @@ type DetailNavigation = {
 };
 
 const bookingProblems: Record<string, string> = {
-  booking_overlap: "El cliente ya tiene una reserva a esa hora.",
-  active_booking_exists: "El cliente ya tiene una reserva en esta clase.",
-  active_waitlist_entry_exists: "El cliente ya está en la lista de espera.",
-  no_eligible_subscription: "El cliente no tiene clases disponibles en su plan.",
+  booking_overlap: "La clienta ya tiene una reserva a esa hora.",
+  active_booking_exists: "La clienta ya tiene una reserva en esta clase.",
+  active_waitlist_entry_exists: "La clienta ya está en la lista de espera.",
+  no_eligible_subscription: "La clienta no tiene clases disponibles en su plan.",
   booking_access_denied: "Solo puedes reservar en tus sucursales.",
   weekly_cap_reached: "Ya usaste tus clases de esta semana.",
 };
@@ -234,7 +234,7 @@ export function AssistantSessionDetailScreen({
             <BodyText style={styles.note}>La clienta ya tiene esta clase reservada.</BodyText>
           ) : full ? (
             waitlisted ? (
-              <BodyText style={styles.note}>El cliente ya está en la lista de espera.</BodyText>
+              <BodyText style={styles.note}>La clienta ya está en la lista de espera.</BodyText>
             ) : (
               <>
                 <Pressable
@@ -254,7 +254,7 @@ export function AssistantSessionDetailScreen({
                   />
                 </Pressable>
                 <BodyText style={styles.note}>
-                  Clase llena. Se avisará al cliente si se libera un cupo.
+                  Clase llena. Se avisará a la clienta si se libera un cupo.
                 </BodyText>
               </>
             )
@@ -272,7 +272,7 @@ export function AssistantSessionDetailScreen({
             <>
               <PrimaryButton disabled label="Reservar" />
               <BodyText style={styles.note}>
-                El cliente no tiene clases disponibles en su plan.
+                La clienta no tiene clases disponibles en su plan.
               </BodyText>
               <TextButton
                 label="Registrar pago"

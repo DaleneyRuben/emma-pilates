@@ -152,7 +152,7 @@ export function ClientSearchScreen() {
       ) : clients.length === 0 ? (
         <View style={styles.empty}>
           <Text style={styles.emptyTitle}>No se encontró ningún cliente.</Text>
-          <BodyText style={styles.hint}>Revisa el nombre o crea la cuenta del cliente.</BodyText>
+          <BodyText style={styles.hint}>Revisa el nombre o crea la cuenta de la clienta.</BodyText>
         </View>
       ) : (
         <ScrollView

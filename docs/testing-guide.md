@@ -1690,10 +1690,10 @@ plan**, **Evaluación nutricional**, **Mis evaluaciones**, **Mis referidos**,
 
 Tap **Mis referidos**. The card shows the code `REF-SOFIA` with a
 **Compartir** button that opens the system share sheet with a message that
-contains the code. Below it, one line: "Pronto podrás invitar a una amiga a una
-clase gratis." Nothing else: no Credit row, no list of invited friends, no
-amount (follow-up 136; «Invita a una amiga» arrives with BKM-014). Mariana
-sees the same screen with `REF-MARIANA`.
+contains the code. Below it, one line: "Comparte tu código. Tu amiga recibe una
+clase gratis, una sola vez. Cuando compre su primer plan, tú ganas una clase."
+Nothing else mentions Credit (PAY-005). Mariana sees the same screen with
+`REF-MARIANA`.
 
 ### B. Buy a Plan with a bank transfer
 
@@ -1793,15 +1793,15 @@ rosa tinte, "Llena" in grey on a neutral sand pill, never red (MOB-042,
 MOB-047).
 No match reads "No hay clases con estos filtros." / "Prueba otro día, otra
 sucursal u otro tipo de clase.". Tap a card: **Cancelar sesión** repeats the
-Session, "N clientes afectados", and an amber warning "Esto no se puede
+Session, "N clientas afectadas", and an amber warning "Esto no se puede
 deshacer" with the live counts ("Se cancelarán las 2 reservas de esta clase,
-se reembolsará una clase a cada cliente afectado — incluso si ya no podían
+se reembolsará una clase a cada clienta afectada — incluso si ya no podían
 cancelar por su cuenta — y se les notificará.", plus "También se notificará a
 las N en lista de espera." when someone waits) above the red **Sí, cancelar
 sesión** and the plain **Cancelar**. Confirming
-shows **Sesión cancelada** with "Se notificó a los N clientes afectados." ("Se
-notificó al cliente afectado." for one) and "Se reembolsó una clase a cada
-cliente."; **Volver** returns to the search.
+shows **Sesión cancelada** with "Se notificó a las N clientas afectadas." ("Se
+notificó a la clienta afectada." for one) and "Se reembolsó una clase a cada
+clienta."; **Volver** returns to the search.
 The fixtures ship no Bookings, so book a class from the Client app first
 (Test 7); cancelling a Session without Bookings answers
 `409 session_has_no_bookings` and the screen shows "No pudimos cancelar la
@@ -1830,7 +1830,10 @@ trimmed with an ellipsis when the row is narrower, MOB-046), and a Palo de
 rosa chevron (MOB-042); a still-pending Client carries a **Pendiente** tag
 before the chevron. With no match the screen
 reads "No se encontró ningún cliente." and keeps **+ Nuevo cliente** as the
-next step. Tap Lucía: the overview shows her Plan card ("Paquete de 8 clases",
+next step. The hint under that title says "Revisa el nombre o crea la cuenta
+de la clienta." Screen titles stay «cliente» («Buscar cliente», «Nuevo
+cliente», «Ver cliente», «Volver al cliente», «Selecciona un cliente…»); prose
+about the person says «clienta» (UX-005). Tap Lucía: the overview shows her Plan card ("Paquete de 8 clases",
 "N clases restantes", "Vence el …", **Activa**), her next reservation, the
 **Reservar clase** and **Registrar pago en efectivo** actions, **Ver
 reservas** (only while a Plan is active), and the **Historial** card with her
@@ -1882,9 +1885,9 @@ and a white box with «X de Y cupos disponibles» beside a **Con cupos** pill
 disponibles» beside **Completa** on the neutral sand pill, never red or green,
 and no bar is drawn (MOB-048; follow-up 87). **Reservar** books it for the Client and lands
 on **Reservas de la clienta** with the "Reserva confirmada" notice. A full
-class offers **Unirme a la lista de espera** ("Clase llena. Se avisará al
-cliente si se libera un cupo."); a Client without classes left sees **Reservar**
-disabled, "El cliente no tiene clases disponibles en su plan.", and
+class offers **Unirme a la lista de espera** ("Clase llena. Se avisará a la
+clienta si se libera un cupo."); a Client without classes left sees **Reservar**
+disabled, "La clienta no tiene clases disponibles en su plan.", and
 **Registrar pago**. After booking, **Volver** goes straight back to her
 overview, not to the Session you just booked. Rescheduling works the same
 way.
@@ -1914,7 +1917,7 @@ Lucía's is), **Registrar pago en efectivo** on the overview is disabled with
 "Podrá comprar otro plan cuando este termine." under it, so the picker never
 opens (UX-003); Isabel's Plan has no classes left and no Booking, so hers
 stays enabled. Should two Assistants race, the confirmation still answers
-"El cliente ya tiene un plan activo."
+"La clienta ya tiene un plan activo."
 
 ### E. Invite a new Client and manage the invitation
 
@@ -2835,14 +2838,15 @@ the admin web, exactly as Test 24 describes, and log in as
    `GET …/clients/{clientId}` (`404 client_not_found` for a closed or
    unknown one).
 4. **Personal.** Back Office → **Personal** lists every Staff Member with the
-   Role as a plain label (Entrenador, Asistente, Administrador, Nutricionista),
+   Role as a plain label (Entrenadora, Asistente, Administración, Nutricionista;
+the same four names as the Staff app and the user menu, UX-005),
    the contact, the Branches ("Todas" for an Administrator), and **Activo**,
    **Pendiente**, or **Desactivado**. The **Rol** filter shows one Role at a
    time and stays in the address (`?role=trainer`).
 5. **Nuevo miembro.** **+ Nuevo miembro** opens the 408 px panel: Nombre,
    Correo electrónico ("Le enviaremos un enlace de activación a este correo.
    Vence en 7 días."), Teléfono (opcional), the four Roles as a 2×2 choice, and
-   the Branches as chips. Choosing **Administrador** replaces the chips with
+   the Branches as chips. Choosing **Administración** replaces the chips with
    "Todas las sucursales (implícito por el rol)". **Guardar** with empty fields
    marks each one; an email of another Staff Member is marked on its field,
    and a Client's email says "Este correo pertenece a una cuenta de clienta. No
@@ -3160,7 +3164,7 @@ about thirty seconds:
 2. **Branch scope.** In Horario, next week shows Centro's Mat Pilates; after
    choosing Equipetrol in the top bar the grid shows Pilates Prenatal and no
    Mat Pilates, and the week in the address does not move.
-3. **A filtered table.** Personal narrowed to Entrenador puts
+3. **A filtered table.** Personal narrowed to Entrenadora puts
    `role=trainer` in the address, shows the three Trainers, and keeps both
    after a reload.
 4. **A mutation.** Gastos starts empty on the fresh database; an Expense of
@@ -4902,7 +4906,7 @@ the tab bar kept (MOB-061, design follow-up 94): nothing for 400 ms, a 300 ms
 fade, then a slow breath every 2.8 s; 240 pt wide on phones and 300 pt from
 768 pt wide (the iPad, where the Staff split shows it in the detail panel).
 Screen readers hear the screen's own label («Cargando notificaciones»,
-«Cargando cliente», …) as progress. The plain «Cargando…» text is gone; the
+«Cargando clienta», …) as progress. The plain «Cargando…» text is gone; the
 Promotions placeholder card and the receipt's «Cargando el comprobante…» stay.
 The launch screen before any screen, on a cold start, is Test 65.
 
@@ -5709,7 +5713,7 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    API again and tap
    **Reintentar**: the screen loads. In the Staff app as
    `camila.rojas@example.com` the search result's overview reads «No
-   pudimos cargar al cliente.» (on the iPad, inside the right panel), the
+   pudimos cargar a la clienta.» (on the iPad, inside the right panel), the
    Trainer's root «No pudimos cargar tu agenda.», the roster «No pudimos
    cargar la lista de asistencia.», the Administrator's root «No pudimos
    cargar los pagos pendientes.», and the Nutritionist's **Mi

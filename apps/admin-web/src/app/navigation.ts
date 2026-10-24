@@ -114,7 +114,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         list: true,
         subPages: ["/back-office/clientes/campana"],
         coordinator: true,
-        studioWide: "los clientes son del estudio, no de una sede.",
+        studioWide: "las clientas son del estudio, no de una sede.",
       },
       {
         label: "Para contactar",

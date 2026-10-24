@@ -36,7 +36,7 @@ test("a narrow browser gets the drawer, the bottom-sheet selector, and card rows
   await expect(page.getByText("Mostrando 1–7 de 7 miembros")).toBeVisible();
   // The header row is hidden and each cell carries its column name.
   await expect(page.getByRole("columnheader", { name: "Rol" })).toBeHidden();
-  const roleCell = page.getByRole("cell", { name: "Administrador" });
+  const roleCell = page.getByRole("cell", { name: "Administración" });
   await expect(roleCell).toHaveAttribute("data-label", "Rol");
   await expect(roleCell).toBeVisible();
   expect(

@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { signIn } from "./support/session";
 
+// UX-005: the 1440 px desktop reference names the Roles as the rest of the
+// product does. Desktop Chrome's default viewport is 1280, so this walk sets
+// the width the design review uses.
+test.use({ viewport: { width: 1440, height: 900 } });
+
 // AW23/AW24 through the real backend: an invitation sent (the worker
 // captures its email locally), the pending member reopened, and an active
 // member deactivated after the confirmation.
@@ -9,6 +14,24 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
 }) => {
   await signIn(page, "/back-office/personal");
   await expect(page.getByRole("cell", { name: /Camila Rojas/ })).toBeVisible();
+  expect(page.viewportSize()).toEqual({ width: 1440, height: 900 });
+  const roleFilter = page.getByLabel("Rol");
+  await expect(roleFilter.locator("option")).toHaveText([
+    "Todos",
+    "Entrenadora",
+    "Asistente",
+    "Administración",
+    "Nutricionista",
+    "Coordinador",
+  ]);
+  await expect(
+    page.getByRole("row", { name: /Emma Vargas/ }).getByText("Entrenadora"),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("row", { name: /Paola Mendoza/ })
+      .getByText("Administración"),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Nuevo miembro" }).click();
   const panel = page.getByRole("dialog", { name: "Nuevo miembro" });
