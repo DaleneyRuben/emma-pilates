@@ -1,11 +1,9 @@
 import type { MatrixRow } from './authorization-matrix';
 
-const administratorOnly = (): Pick<
-  MatrixRow,
-  'administrator' | 'coordinator'
-> => ({
+const administratorOnly = (extra: Partial<MatrixRow> = {}): MatrixRow => ({
   administrator: 'allow',
   coordinator: 'deny',
+  ...extra,
 });
 
 const bothDenied = (): Pick<MatrixRow, 'administrator' | 'coordinator'> => ({
