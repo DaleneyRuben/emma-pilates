@@ -108,12 +108,16 @@ describe('recommendations', () => {
     const today = new Date('2026-10-23T00:00:00.000Z');
     await recomputeRecommendations(prisma, { month, today });
     const listed = await readRecommendations(prisma, { month });
-    const weak = listed.find((row) => row.rule === 'weak_schedule');
+    const weak = listed.find(
+      (row) => row.rule === 'weak_schedule' && row.subject === `${trainerId}:2`,
+    );
     expect(weak).toBeDefined();
 
     await dismissRecommendation(prisma, { id: weak!.id });
     await recomputeRecommendations(prisma, { month, today });
-    const again = await readRecommendations(prisma, { month });
+    const again = (await readRecommendations(prisma, { month })).filter(
+      (row) => row.subject === clientId || row.subject === `${trainerId}:2`,
+    );
 
     expect(again.find((row) => row.id === weak!.id)?.state).toBe('dismissed');
     expect(again).toHaveLength(2);
