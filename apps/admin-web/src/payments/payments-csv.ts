@@ -15,6 +15,7 @@ const stateLabels: Record<AdminPaymentDto["state"], string> = {
   pending: "Pendiente",
   confirmed: "Confirmado",
   rejected: "Rechazado",
+  voided: "Anulado",
 };
 
 const civilDay = (instant: string): string =>
