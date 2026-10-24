@@ -1037,7 +1037,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | STU-002 | P2 | Backend/admin web | Accrued versus cash revenue by validity days, deferred revenue, classes still owed | STU-001, BKO-005 | 2–3 d | ready |
 | STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | ready |
 | STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | done |
-| STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | in progress |
+| STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | done |
 | STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | ready |
 | STU-007 | P3 | Backend/admin web | AI: a narrated monthly report and natural-language questions over the aggregates | STU-006 | 4–6 d | ready |
 | MOB-071 | P3 | Client app | Inicio offline: persist the profile so Inicio renders from cache | — | 0.5 d | ready |
@@ -1168,9 +1168,25 @@ Decisions (blanket approval, 2026-10-23):
 - The page is hidden from anyone who is not an Administrator, in the sidebar and on the page. The Coordinator role is not wired on this branch (IDN-009), so the hide uses the three roles the profile can carry today: Assistant, Trainer, and Nutritionist.
 - Nothing is saved, and the calculation makes no server call. The Branch selector stays and says the page does not read a Branch.
 
-Open question: the diagnosis's section 3.4 also asks for the break-even in students per class, occupancy, and clients. This page shows it in bolivianos. STU-005 owns the projections that need the other expressions.
+Open question: the diagnosis's section 3.4 also asks for the break-even in students per class, occupancy, and clients. This page shows it in bolivianos. STU-005 repeats the month and does not add those expressions.
 
 Evidence: commits `4435f40a` (the package), `d651f879` (the page), `c97a3009` (AW37 and follow-up 202). The package's check is 3,626,786 centavos, derivation `(21175 + 9290) / 0.84 = 36267.86`, and a higher tax rate moves the break-even up. The page's opening month derives `(21175 + 9295) / 0.84 = 36273.81`. Verified: studio-economics 2 passed; admin simulator, router, and shell specs 27 passed; admin-web typecheck passed. Playwright Chromium at 1440 and 420, admin web on 5206, API on 3140, `pilates_stu004_dev`: Paola signs in, opens Simulador, sees Resultado Bs 761,20, Punto de equilibrio Bs 36.273,81, and the derivation; raising the tax to 20 moves the break-even to Bs 38.087,50 and the derivation to `(21175 + 9295) / 0.8 = 38087.50`. The only write was the login. At 420 the fields and figures stack and the sidebar opens from «Abrir menú». The database was dropped. Follow-ups 202 and AW37 stay pending: the design session was not run. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/192.
+
+#### STU-005 · Projections at 3, 6, and 12 months
+
+Acceptance criteria: the package projects the simulator month at 3, 6, and
+12 months in three scenarios, and the admin web shows that table. Nothing
+is saved.
+
+Decisions (blanket approval, 2026-10-23):
+
+- The studio has fewer than three months of measured facts, so the projection repeats the simulator month instead of the diagnosis's trend. The page says so. Base is that month. Low is 80 % of its students per class. High is 120 %, capped at the class capacity the caller passes (default 12). Price and fixed costs do not change.
+- Variable cost stays trainer pay, classes times the price per class, the formula `simulateMonth` already uses. A month is the weekly schedule times 4.33, rounded. The constant lives in the package. The page still has its own copy, left alone so its tests stay the proof of that copy.
+- Students may be fractional before the month's class-students round to an integer. Tax is `round(revenue * rate / 100)` over the horizon, so a horizon that divides evenly is that many times the month. The break-even is the package's one-month figure, reused, not multiplied.
+- The table sits on Simulador, under the derivation. Only the Administrator sees it, the same gate as the page. Nothing is saved. The section is computed from the form, so it has no spinner and no network error of its own. An invalid field is the page's existing alert, and the table hides with the figures.
+- The break-even in students per class, occupancy, and clients stays unbuilt. The diagnosis asks for it; this item does not draw it.
+
+Evidence: commits `41156c36` (in progress), `59a85e70` (red package), `eabd2f99` (green package), `b3653e61` (red page), `30e46ae4` (green page), `012cd19c` (Playwright), `ea30c049` (follow-up 205 and Test 83). The opening 1-month base is the page's Resultado, Bs 761,20 (revenue 3,718,000 centavos, 143 classes). The 3-month base result is three times that, Bs 2.283,60. Low revenue is below base and high is above it. Tax 20 lowers the 12-month base result. Verified: studio-economics 5 passed; admin simulator, router, and shell specs 27 passed. Admin-web typecheck fails in `indicators-page.spec.tsx` line 126, a STU-003 file this item does not touch. Playwright Chromium at 1440 and 420, admin web on 5208, API on 3142, `pilates_stu005_dev`: Paola signs in with Correo and Contraseña, opens Simulador, and sees the nine rows. At 1440, 3 Base is Bs 111.540,00 and 12 Alto is Bs 102.828,00. At 420 the rows are labelled cards and the sidebar opens from «Abrir menú», which lists Simulador. The only write was the login. Databases `pilates_stu005_dev` and `pilates_test_stu005` on port 5433 were dropped. No migration. Follow-up 205 and AW37 stay pending: the design session was not run. The page still multiplies a week by its own 4.33; the package holds the same constant. Open question: the break-even in students per class, occupancy, and clients is still not drawn. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/200.
 
 ### Summary (2026-10-23)
 
