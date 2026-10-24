@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S26 · Rol: entrenadora</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Reportar una falla</h1>
+    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#766D69;">Se abre desde «Reportar una falla» en la lista de asistentes (S03). La entrenadora elige el equipo de la sucursal de esa clase, cuenta qué pasó y si se puede usar; la administración lo ve en Equipos (AW37) y lo marca resuelto.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Elegir equipo</div>
+          <div style="font-size:12px;color:#766D69;">Reformer 3 elegido · «No se puede usar» marcado</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 16px;display:flex;flex-direction:column;gap:16px;background:#FAF7F2;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:27px;font-weight:400;line-height:1.15;">Reportar una falla</div>
+              <div style="font-size:13px;line-height:1.5;color:#766D69;">Reformer Intermedio · Sucursal Equipetrol · 07:00 – 08:00</div>
+            </div>
+          </div>
+          <div style="padding:22px 20px 24px;display:flex;flex-direction:column;gap:18px;">
+            <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Qué equipo?</span>
+            <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#766D69;">Reformers</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 1</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 2</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#B78380;border:1px solid #B78380;color:#FFFFFF;">Reformer 3</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 4</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 5<span style="font-size:12px;color:#B25D4B;">&nbsp;· fuera de servicio</span></span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 6</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 7</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 8</span></div></div><div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#766D69;">Cadillacs</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 1</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 2</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 3</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 4</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 5</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 6</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 7</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 8</span></div></div><div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#766D69;">Mats</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 1</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 2</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 3</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 4</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 5</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 6</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 7</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 8</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 9</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 10</span></div></div>
+            <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Qué pasó?</span><div style="min-height:104px;padding:12px 14px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;font-size:15px;line-height:1.5;color:#4A4A4A;">El resorte rojo se soltó y la plataforma no frena.</div></div>
+            <div style="display:flex;align-items:flex-start;gap:12px;min-height:44px;"><span style="width:22px;height:22px;flex:none;border-radius:6px;background:#B78380;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5,12.5 10,17 19,7.5"></polyline></svg></span><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">No se puede usar</span><span style="font-size:13px;line-height:1.55;color:#7A716D;">Márcalo si nadie debería usarlo hasta que lo arreglen.</span></div></div>
+          </div>
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FAF7F2;border-top:1px solid #D8C9BB;padding:16px 20px 34px;">
+            <button style="height:54px;width:100%;border:none;border-radius:10px;font-size:16px;font-weight:500;cursor:pointer;background:#B78380;color:#FFFFFF;box-shadow:0 2px 8px rgba(183,131,128,0.22);">Enviar reporte</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Enviado</div>
+          <div style="font-size:12px;color:#766D69;">El formulario se reemplaza por el estado de éxito</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 16px;display:flex;flex-direction:column;gap:16px;background:#FAF7F2;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:27px;font-weight:400;line-height:1.15;">Reportar una falla</div>
+              <div style="font-size:13px;line-height:1.5;color:#766D69;">Reformer Intermedio · Sucursal Equipetrol · 07:00 – 08:00</div>
+            </div>
+          </div>
+          <div style="flex:1;padding:40px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;">
+            <span style="width:56px;height:56px;border-radius:50%;background:rgba(124,148,115,0.14);display:flex;align-items:center;justify-content:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#7C9473" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5,12.5 10,17 19,7.5"></polyline></svg></span>
+            <span style="font-family:Lora,Georgia,serif;font-size:21px;">Gracias por avisar</span>
+            <span style="font-size:13px;line-height:1.55;color:#7A716D;">Administración ya puede ver la falla de Reformer 3.</span>
+          </div>
+          <div style="padding:16px 20px 34px;">
+            <button style="height:54px;width:100%;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;">Volver a la lista</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Elegir equipo</div>
+          <div style="font-size:12px;color:#766D69;">Clase de mat: los mats primero · sin elegir todavía</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:44px 20px 16px;display:flex;flex-direction:column;gap:16px;background:#FAF7F2;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:27px;font-weight:400;line-height:1.15;">Reportar una falla</div>
+              <div style="font-size:13px;line-height:1.5;color:#766D69;">Mat Pilates · Sucursal Urubó · 09:30 – 10:30</div>
+            </div>
+          </div>
+          <div style="padding:22px 20px 24px;display:flex;flex-direction:column;gap:18px;">
+            <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Qué equipo?</span>
+            <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#766D69;">Mats</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 1</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 2</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 3</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 4</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 5</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 6</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 7</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 8</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 9</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 10</span></div></div><div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#766D69;">Reformers</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 1</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 2</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 3</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 4</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 5<span style="font-size:12px;color:#B25D4B;">&nbsp;· fuera de servicio</span></span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 6</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 7</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 8</span></div></div><div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#766D69;">Cadillacs</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 1</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 2</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 3</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 4</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 5</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 6</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 7</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 8</span></div></div>
+            <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Qué pasó?</span><div style="min-height:104px;padding:12px 14px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;font-size:15px;line-height:1.5;color:#7A716D;">Ej.: el resorte rojo se soltó</div></div>
+            <div style="display:flex;align-items:flex-start;gap:12px;min-height:44px;"><span style="width:22px;height:22px;flex:none;border-radius:6px;border:1px solid #D8C9BB;background:#FFFFFF;"></span><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">No se puede usar</span><span style="font-size:13px;line-height:1.55;color:#7A716D;">Márcalo si nadie debería usarlo hasta que lo arreglen.</span></div></div>
+          </div>
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FAF7F2;border-top:1px solid #D8C9BB;padding:16px 20px 34px;">
+            <button style="height:54px;width:100%;border:none;border-radius:10px;font-size:16px;font-weight:500;cursor:pointer;background:#E7DCD8;color:#B3A9A5;">Enviar reporte</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Tablet · Elegir equipo</div>
+          <div style="font-size:12px;color:#766D69;">iPad Pro 11 · el formulario centrado en una columna de 560 px</div>
+        </div>
+      </sc-if>
+    <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
+      <div style="height:768px;border-radius:18px;overflow:hidden;background:#FAF7F2;display:flex;justify-content:center;">
+        <div style="width:560px;display:flex;flex-direction:column;">
+          <div style="padding:24px 20px 16px;display:flex;flex-direction:column;gap:16px;background:#FAF7F2;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:27px;font-weight:400;line-height:1.15;">Reportar una falla</div>
+              <div style="font-size:13px;line-height:1.5;color:#766D69;">Reformer Intermedio · Sucursal Equipetrol · 07:00 – 08:00</div>
+            </div>
+          </div>
+          <div style="padding:22px 20px 24px;display:flex;flex-direction:column;gap:18px;">
+            <span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Qué equipo?</span>
+            <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#766D69;">Reformers</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 1</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 2</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#B78380;border:1px solid #B78380;color:#FFFFFF;">Reformer 3</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 4</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 5<span style="font-size:12px;color:#B25D4B;">&nbsp;· fuera de servicio</span></span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 6</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 7</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Reformer 8</span></div></div><div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#766D69;">Cadillacs</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 1</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 2</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 3</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 4</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 5</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 6</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 7</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Cadillac 8</span></div></div><div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#766D69;">Mats</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 1</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 2</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 3</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 4</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 5</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 6</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 7</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 8</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 9</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;font-size:14px;background:#FFFFFF;border:1px solid #D8C9BB;color:#4A4A4A;">Mat 10</span></div></div>
+            <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Qué pasó?</span><div style="min-height:104px;padding:12px 14px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;font-size:15px;line-height:1.5;color:#4A4A4A;">El resorte rojo se soltó y la plataforma no frena.</div></div>
+            <div style="display:flex;align-items:flex-start;gap:12px;min-height:44px;"><span style="width:22px;height:22px;flex:none;border-radius:6px;background:#B78380;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5,12.5 10,17 19,7.5"></polyline></svg></span><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">No se puede usar</span><span style="font-size:13px;line-height:1.55;color:#7A716D;">Márcalo si nadie debería usarlo hasta que lo arreglen.</span></div></div>
+          </div>
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FAF7F2;border-top:1px solid #D8C9BB;padding:16px 20px 34px;">
+            <button style="height:54px;width:100%;border:none;border-radius:10px;font-size:16px;font-weight:500;cursor:pointer;background:#B78380;color:#FFFFFF;box-shadow:0 2px 8px rgba(183,131,128,0.22);">Enviar reporte</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Sin equipos</div>
+          <div style="font-size:12px;color:#766D69;">La sucursal todavía no tiene equipos registrados</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 16px;display:flex;flex-direction:column;gap:16px;background:#FAF7F2;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg></button>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:27px;font-weight:400;line-height:1.15;">Reportar una falla</div>
+              <div style="font-size:13px;line-height:1.5;color:#766D69;">Reformer Intermedio · Sucursal Equipetrol · 07:00 – 08:00</div>
+            </div>
+          </div>
+          <div style="flex:1;padding:60px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#C9BCB2" stroke-width="1.1" stroke-linecap="round"><rect x="3" y="9" width="18" height="6" rx="2"></rect><path d="M6 15v4M18 15v4M8 9V6h8v3"></path></svg>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;">Sin equipos registrados</span>
+            <span style="font-size:13px;line-height:1.55;color:#7A716D;">Administración todavía no cargó los equipos de esta sucursal.</span>
+          </div>
+        </div>
+      </x-import>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Orden de los equipos</span>Primero el tipo que usa la clase (Reformers en una clase de reformer, Mats en una de mat), después los demás.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Fuera de servicio</span>Un equipo que ya está fuera de servicio se puede elegir igual: una falla nueva sigue siendo noticia.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Enviar reporte</span>Se habilita con un equipo elegido y algo escrito en «¿Qué pasó?» (hasta 500 caracteres).</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Error</span>Si el envío falla, «No pudimos enviar el reporte. Inténtalo de nuevo.» sobre el botón, y lo escrito se conserva.</div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+const ROSTER = ["Valeria Áñez", "María Fernanda Áñez", "Lucía Justiniano", "Paola Suárez", "Andrea Roca", "Carla Mendoza", "Daniela Vaca", "Sofía Peña"];
+
+class Component extends DCLogic {
+  state = { marks: {} };
+  renderVals() {
+    const marks = this.state.marks;
+    const done = ROSTER.filter((_, i) => marks[i]).length;
+    const missing = ROSTER.length - done;
+    const set = (i, v) => () => this.setState(s => ({ marks: Object.assign({}, s.marks, { [i]: s.marks[i] === v ? null : v }) }));
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      progressLabel: done + " de " + ROSTER.length + " marcadas",
+      pending: missing > 0,
+      pendingLabel: missing === 1 ? "Falta marcar 1 clienta." : "Falta marcar " + missing + " clientas.",
+      saveBg: missing > 0 ? "#D8BDB8" : "#B78380",
+      roster: ROSTER.map((name, i) => {
+        const v = marks[i];
+        return {
+          name, initial: name.charAt(0),
+          onYes: set(i, "yes"), onNo: set(i, "no"),
+          yesBg: v === "yes" ? "rgba(124,148,115,0.16)" : "#FFFFFF",
+          yesBorder: v === "yes" ? "#7C9473" : "#D8C9BB",
+          yesColor: v === "yes" ? "#5F7457" : "#766D69",
+          noBg: v === "no" ? "rgba(178,93,75,0.10)" : "#FFFFFF",
+          noBorder: v === "no" ? "#B25D4B" : "#D8C9BB",
+          noColor: v === "no" ? "#94493A" : "#766D69"
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

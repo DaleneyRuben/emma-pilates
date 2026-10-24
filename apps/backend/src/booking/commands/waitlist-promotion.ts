@@ -1,8 +1,8 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { WaitlistClosureReason } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
-import { boliviaDate } from '../../time/bolivia-time';
 import { promoteWaitlist } from './promote-waitlist';
+import { findCoveringSubscription } from './eligible-subscription';
 import { fundBooking } from './weekly-cap-funding';
 import { readWeeklyCapPosition } from './weekly-cap-count';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
@@ -62,22 +62,10 @@ export const promoteWaitlistInTransaction = (
           orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
         }),
       findEligibleSubscription: async ({ clientId, onDate }) => {
-        const subscription = await transaction.subscription.findFirst({
-          where: {
-            clientId,
-            state: 'ACTIVE',
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-            OR: [
-              { remainingClassAllowance: { gt: 0 } },
-              {
-                allowanceAdjustments: {
-                  some: { deletedAt: null, classes: { gt: 0 } },
-                },
-              },
-            ],
-          },
-          select: { id: true },
+        const subscription = await findCoveringSubscription(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: true,
         });
         if (subscription === null) return null;
         return {

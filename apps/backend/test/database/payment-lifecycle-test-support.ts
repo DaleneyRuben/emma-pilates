@@ -45,7 +45,6 @@ export const startPaymentWorld = async () => {
   const commands = (at: Date = now) =>
     createPrismaPaymentCommands(prisma, {
       now: () => at,
-      referralRewardCentavos: 6000,
     });
 
   const staffPrincipal = async (
@@ -137,6 +136,7 @@ export const startPaymentWorld = async () => {
           planPriceCentavos: plan.priceCentavos,
           creditAppliedCentavos: 0,
           amountDueCentavos: plan.priceCentavos,
+          startsOn: today,
           method: 'CASH',
           state: 'CONFIRMED',
           collectedAtBranchId: fixtures.branches[0].id,

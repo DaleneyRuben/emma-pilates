@@ -17,7 +17,6 @@ import {
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
 import {
@@ -31,10 +30,16 @@ import {
   promoteWaitlistInTransaction,
 } from './waitlist-promotion';
 import { rescheduleBooking } from './reschedule-booking';
+import { recordAttendanceCorrections } from './attendance-audit';
 import { recordAttendance } from './record-attendance';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
 import { fundBooking } from './weekly-cap-funding';
 import { readWeeklyCapPosition } from './weekly-cap-count';
+import {
+  findCoveringSubscription,
+  findNotYetStartedSubscription,
+} from './eligible-subscription';
+import { decideGuestPassBooking } from '../payments/guest-pass';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -644,6 +649,7 @@ export class PrismaBookingCommands {
             where: { id: sessionId },
             select: {
               id: true,
+              branchId: true,
               trainerStaffMemberId: true,
               endsAt: true,
               state: true,
@@ -663,7 +669,19 @@ export class PrismaBookingCommands {
               select: { id: true },
             })
           ).map(({ id }) => id),
-        save: async ({ outcomes, recordedByAccountId }) => {
+        save: async ({
+          sessionId,
+          branchId,
+          outcomes,
+          recordedByAccountId,
+        }) => {
+          await recordAttendanceCorrections(transaction, {
+            sessionId,
+            branchId,
+            outcomes,
+            principal,
+            occurredAt: this.now(),
+          });
           await Promise.all(
             outcomes.map(({ bookingId, outcome }) =>
               transaction.attendanceRecord.upsert({
@@ -764,7 +782,13 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        this.findSubscriptionForBooking(transaction, { clientId, onDate }),
+        this.findSubscriptionForBooking(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: false,
+        }),
+      findNotYetStartedSubscription: ({ clientId, onDate }) =>
+        findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasLiveBooking: ({ sessionId, clientId }) =>
         transaction.booking
           .findFirst({
@@ -803,7 +827,13 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        this.findSubscriptionForBooking(transaction, { clientId, onDate }),
+        this.findSubscriptionForBooking(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: true,
+        }),
+      findNotYetStartedSubscription: ({ clientId, onDate }) =>
+        findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
         transaction.booking
           .findFirst({
@@ -819,10 +849,32 @@ export class PrismaBookingCommands {
           })
           .then((booking) => booking !== null),
       create: async (input) => {
+        const pass = await transaction.guestPass.findFirst({
+          where: {
+            friendClientId: input.clientId,
+            bookingId: null,
+            deletedAt: null,
+          },
+          select: { id: true, courtesySubscriptionId: true },
+        });
         const session = await transaction.session.findUniqueOrThrow({
           where: { id: input.sessionId },
-          select: { startsAt: true },
+          select: { startsAt: true, capacity: true },
         });
+        if (
+          pass !== null &&
+          pass.courtesySubscriptionId === input.subscriptionId
+        ) {
+          const taken = await transaction.booking.count({
+            where: { sessionId: input.sessionId, state: 'BOOKED' },
+          });
+          const decision = decideGuestPassBooking({
+            placesLeft: session.capacity - taken,
+            guestPassesAlreadyUsed: 0,
+          });
+          if (decision !== null) throw new Error(decision.code);
+        }
+
         const booking = await fundBooking(transaction, {
           subscriptionId: input.subscriptionId,
           clientId: input.clientId,
@@ -832,7 +884,27 @@ export class PrismaBookingCommands {
           createBooking: () =>
             transaction.booking.create({ data: input, select: { id: true } }),
         });
-        if (booking === null) throw new Error('No eligible Subscription');
+        if (booking === null) {
+          const spent = await transaction.guestPass.findFirst({
+            where: {
+              friendClientId: input.clientId,
+              bookingId: { not: null },
+              deletedAt: null,
+            },
+            select: { id: true },
+          });
+          throw new Error(
+            spent === null
+              ? 'No eligible Subscription'
+              : 'guest_pass_already_used',
+          );
+        }
+        if (pass !== null) {
+          await transaction.guestPass.update({
+            where: { id: pass.id },
+            data: { bookingId: booking.id },
+          });
+        }
         return booking;
       },
       now: this.now,
@@ -841,25 +913,9 @@ export class PrismaBookingCommands {
 
   private async findSubscriptionForBooking(
     transaction: Prisma.TransactionClient,
-    input: { clientId: string; onDate: Date },
+    input: { clientId: string; onDate: Date; needsAllowance: boolean },
   ) {
-    const subscription = await transaction.subscription.findFirst({
-      where: {
-        clientId: input.clientId,
-        state: 'ACTIVE',
-        startsOn: { lte: boliviaDate(input.onDate) },
-        endsOn: { gte: boliviaDate(input.onDate) },
-        OR: [
-          { remainingClassAllowance: { gt: 0 } },
-          {
-            allowanceAdjustments: {
-              some: { deletedAt: null, classes: { gt: 0 } },
-            },
-          },
-        ],
-      },
-      select: { id: true },
-    });
+    const subscription = await findCoveringSubscription(transaction, input);
     if (subscription === null) return null;
     return {
       id: subscription.id,

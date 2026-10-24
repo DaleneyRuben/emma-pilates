@@ -1,3 +1,4 @@
+import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
 import { BookingAccessDeniedError } from './create-booking';
@@ -66,9 +67,8 @@ const assertAccess = (
   }
 
   if (
-    principal.identity.role === 'assistant' &&
-    principal.identity.branchIds.includes(booking.session.branchId) &&
-    principal.identity.branchIds.includes(target.branchId)
+    actsForClientsAt(principal, booking.session.branchId) &&
+    actsForClientsAt(principal, target.branchId)
   ) {
     return;
   }

@@ -45,6 +45,9 @@ describe('worker entrypoint', () => {
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
+      founderMemberships: {
+        execute: jest.fn().mockResolvedValue({ ended: 0 }),
+      },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
@@ -98,6 +101,9 @@ describe('worker entrypoint', () => {
     const subscriptionReminders = {
       execute: jest.fn().mockResolvedValue({ reminded: 1 }),
     };
+    const founderMemberships = {
+      execute: jest.fn().mockResolvedValue({ ended: 0 }),
+    };
     const purchaseIntentExpiry = {
       execute: jest.fn().mockResolvedValue({ expired: 1 }),
     };
@@ -116,6 +122,7 @@ describe('worker entrypoint', () => {
       pendingAccountCleanup,
       imageUploadCleanup,
       subscriptionReminders,
+      founderMemberships,
       purchaseIntentExpiry,
       ...occurrenceJobs(),
       serviceVersion: '1.2.3',
@@ -127,17 +134,20 @@ describe('worker entrypoint', () => {
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(1);
     expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(1);
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(1);
+    expect(founderMemberships.execute).toHaveBeenCalledTimes(1);
     expect(purchaseIntentExpiry.execute).toHaveBeenCalledTimes(1);
 
     // Purchase Intents expire on a five-minute sweep, the rest hourly.
     await jest.advanceTimersByTimeAsync(5 * 60 * 1_000);
     expect(purchaseIntentExpiry.execute).toHaveBeenCalledTimes(2);
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(1);
+    expect(founderMemberships.execute).toHaveBeenCalledTimes(1);
 
     await jest.advanceTimersByTimeAsync(55 * 60 * 1_000);
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
     expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(2);
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(2);
+    expect(founderMemberships.execute).toHaveBeenCalledTimes(2);
 
     await stopWorker();
     await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
@@ -180,6 +190,9 @@ describe('worker entrypoint', () => {
           .fn()
           .mockResolvedValueOnce({ reminded: 0 })
           .mockRejectedValueOnce(new Error('sensitive database failure')),
+      },
+      founderMemberships: {
+        execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
@@ -235,6 +248,9 @@ describe('worker entrypoint', () => {
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      founderMemberships: {
+        execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
@@ -294,6 +310,9 @@ describe('worker entrypoint', () => {
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      founderMemberships: {
+        execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),

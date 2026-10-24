@@ -35,7 +35,12 @@ function PlanCard({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
         <Text style={styles.planName}>{plan.name}</Text>
         <BodyText>{describePlanTerms(plan)}</BodyText>
       </View>
-      <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
+      <View style={styles.prices}>
+        {plan.listPriceCentavos === undefined ? null : (
+          <Text style={styles.listPrice}>{formatBolivianos(plan.listPriceCentavos)}</Text>
+        )}
+        <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
+      </View>
     </Pressable>
   );
 }
@@ -91,10 +96,16 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyLarge,
     fontWeight: "500",
   },
+  listPrice: {
+    color: colors.textSubtle,
+    fontSize: typography.note,
+    textDecorationLine: "line-through",
+  },
   price: {
     color: colors.text,
     fontFamily: "Lora_500Medium",
     fontSize: typography.titleSecondary,
   },
+  prices: { alignItems: "flex-end" },
   screen: { gap: spacing.lg },
 });

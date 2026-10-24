@@ -10,6 +10,7 @@ import {
 } from './create-authentication-session';
 import { sourceDigests } from '../security/request-source';
 import { getLoginThrottle } from './login-throttle-policy';
+import { opensAdminWebSessions } from './staff-role';
 
 export class LoginThrottledError extends Error {
   constructor(readonly retryAfterSeconds: number) {
@@ -25,12 +26,13 @@ export type LoginCommand = {
   surface?: AuthenticationSurface;
 };
 
-// ADR-0053/ADR-0084: only an Administrator may open an admin-web session;
-// everyone else receives the same neutral failure after the same work.
+// ADR-0053/ADR-0084/ADR-0102: only an Administrator or the Coordinator may
+// open an admin-web session; everyone else receives the same neutral failure
+// after the same work.
 const canOpenSessionOn =
   (surface: AuthenticationSurface) =>
   (account: AccountCredentials): boolean =>
-    surface !== 'admin_web' || account.staffRole === 'ADMINISTRATOR';
+    surface !== 'admin_web' || opensAdminWebSessions(account.staffRole);
 
 type LoginThrottleDigests = {
   loginLaneDigest: Uint8Array;

@@ -103,14 +103,44 @@ describe("Refreshed Mi plan (Client 12)", () => {
     expect(screen.getByText("Suscripción actual")).toBeOnTheScreen();
     expect(screen.getByText("25 de agosto de 2026")).toBeOnTheScreen();
     expect(screen.getByText("24 de septiembre de 2026")).toBeOnTheScreen();
-    expect(screen.getByText("Podrás comprar un plan nuevo cuando este termine.")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Renovar plan" })).toBeOnTheScreen();
   });
 
-  it("adds the informational renewal line while expiring soon", async () => {
+  it("names the next Plan when a future Subscription exists", async () => {
+    const screen = await openSubscription({
+      ...subscription("active", 5),
+      nextSubscription: {
+        id: "subscription-2",
+        planName: "Paquete de 8 clases",
+        originalClassAllowance: 8,
+        remainingClassAllowance: 8,
+        startsOn: "2026-09-25",
+        endsOn: "2026-10-24",
+      },
+    });
+
+    const nextPlan = screen.getByText("Siguiente plan desde 25 de septiembre de 2026");
+    expect(nextPlan).toBeOnTheScreen();
+    // A long date must shrink inside the row, or it runs into the label on a phone.
+    expect(nextPlan).toHaveStyle({ flexShrink: 1 });
+  });
+
+  it("names the founder renewal deadline from the current Subscription", async () => {
+    const screen = await openSubscription({
+      ...subscription("active", 5),
+      founderRenewalDeadline: "2026-10-01",
+    });
+
+    expect(screen.getByText("Renueva antes del 1 de octubre de 2026.")).toBeOnTheScreen();
+  });
+
+  it("invites renewal while expiring soon", async () => {
     const screen = await openSubscription(subscription("expiring_soon", 2));
 
-    expect(screen.getByText("Podrás comprar uno nuevo apenas termine.")).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Comprar un plan" })).not.toBeOnTheScreen();
+    expect(
+      screen.getByText("Renueva cuando quieras y elige tu fecha de inicio."),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Renovar plan" })).toBeOnTheScreen();
   });
 
   it("shows the last Plan as expired with its end date and the only purchase action", async () => {

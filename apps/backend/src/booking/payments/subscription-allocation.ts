@@ -1,23 +1,31 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { SubscriptionState } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
+import { boliviaDate } from '../../time/bolivia-time';
 import type { ActiveSubscriptionFacts } from './purchase-eligibility';
 
 type Transaction = Prisma.TransactionClient;
 
 // Shared by every way a Subscription is allocated (a sale or Courtesy
-// Access): the Client's active Subscription with what decides whether it is
-// still effective.
+// Access): the Client's current Subscription, the one already in force, with
+// what decides whether it is still effective. A future Subscription is a
+// separate row and must not hide this one.
 export const loadActiveSubscription = async (
   transaction: Transaction,
   clientId: string,
   now: Date,
 ): Promise<ActiveSubscriptionFacts | null> => {
+  const today = boliviaDate(now);
   const active = await transaction.subscription.findFirst({
-    where: { clientId, state: SubscriptionState.ACTIVE },
+    where: {
+      clientId,
+      state: SubscriptionState.ACTIVE,
+      startsOn: { lte: today },
+    },
     orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
     select: {
       id: true,
+      startsOn: true,
       endsOn: true,
       remainingClassAllowance: true,
       _count: {
@@ -33,6 +41,7 @@ export const loadActiveSubscription = async (
     ? null
     : {
         id: active.id,
+        startsOn: active.startsOn,
         endsOn: active.endsOn,
         remainingClassAllowance: active.remainingClassAllowance,
         futureBookedCount: active._count.bookings,

@@ -31,6 +31,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { formatCivilDate } from "../home/home-format";
 import { CapacityBlock } from "./capacity-block";
 import { formatSessionDate, formatSessionMinutes, formatTimeRange } from "@pilates/mobile-core";
 
@@ -64,6 +65,11 @@ const bookingProblems: Record<string, string> = {
 function problemMessage(body: unknown): string | null {
   if (typeof body !== "object" || body === null) return null;
   const code = (body as { code?: unknown }).code;
+  const detail = (body as { detail?: unknown }).detail;
+  if (code === "booking_before_start_date" && typeof detail === "string") {
+    const date = /: (\d{4}-\d{2}-\d{2})$/.exec(detail)?.[1];
+    if (date !== undefined) return `Podrás reservar a partir del ${formatCivilDate(date)}.`;
+  }
   return typeof code === "string" ? (bookingProblems[code] ?? null) : null;
 }
 

@@ -1,4 +1,6 @@
+import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { bookingBeforeStartMessage } from './booking-before-start';
 import { assertWeeklyCapAllows } from './weekly-cap-decision';
 
 export class BookingAccessDeniedError extends Error {
@@ -31,6 +33,10 @@ type CreateBookingDependencies = {
     clientId: string;
     onDate: Date;
   }): Promise<WeeklyCapSubscription | null>;
+  findNotYetStartedSubscription?(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ startsOn: Date } | null>;
   hasOverlappingBooking(input: {
     clientId: string;
     startsAt: Date;
@@ -67,9 +73,8 @@ const resolveClientId = (
   }
 
   if (
-    principal.identity.role !== 'assistant' ||
     command.clientId === undefined ||
-    !principal.identity.branchIds.includes(session.branchId)
+    !actsForClientsAt(principal, session.branchId)
   ) {
     throw new BookingAccessDeniedError();
   }
@@ -103,6 +108,15 @@ export const createBooking = async (
   });
 
   if (subscription === null) {
+    const pending = dependencies.findNotYetStartedSubscription
+      ? await dependencies.findNotYetStartedSubscription({
+          clientId,
+          onDate: session.startsAt,
+        })
+      : null;
+    if (pending !== null) {
+      throw new Error(bookingBeforeStartMessage(pending.startsOn));
+    }
     throw new Error('No eligible Subscription');
   }
 

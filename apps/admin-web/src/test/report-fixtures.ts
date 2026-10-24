@@ -17,23 +17,29 @@ const range = {
   generatedAt: "2026-09-24T15:00:00.000Z",
 };
 
+const noDiscount = { listPriceCentavos: 0, discountCentavos: 0, sales: [] };
+
 export const studioIncome: IncomeReportDto = {
   ...range,
   branchId: null,
   totalCentavos: 228_000,
+  ...noDiscount,
   byMethod: { cash: 78_000, transfer: 150_000, credit_only: 0 },
   months: [
     { month: "2026-08-01", totalCentavos: 78_000 },
     { month: "2026-09-01", totalCentavos: 150_000 },
   ],
+  voided: [],
 };
 
 export const centroIncome: IncomeReportDto = {
   ...range,
   branchId: centro.id,
   totalCentavos: 78_000,
+  ...noDiscount,
   byMethod: { cash: 78_000, transfer: 0, credit_only: 0 },
   months: [{ month: "2026-08-01", totalCentavos: 78_000 }],
+  voided: [],
 };
 
 export const studioExpenses: ExpenseReportDto = {
@@ -74,8 +80,10 @@ export const emptyIncome = (branchId: string | null): IncomeReportDto => ({
   ...range,
   branchId,
   totalCentavos: 0,
+  ...noDiscount,
   byMethod: { cash: 0, transfer: 0, credit_only: 0 },
   months: [],
+  voided: [],
 });
 
 export const emptyExpenses = (branchId: string | null): ExpenseReportDto => ({

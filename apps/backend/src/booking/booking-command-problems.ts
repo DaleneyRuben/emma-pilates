@@ -14,6 +14,14 @@ export const commandProblem = (error: Error): HttpException | null => {
 
   const problems: Record<string, [string, string]> = {
     'Session is full': ['session_full', 'Session is full'],
+    guest_pass_already_used: [
+      'guest_pass_already_used',
+      'A Guest Pass is once in a lifetime',
+    ],
+    guest_pass_last_place: [
+      'guest_pass_last_place',
+      'A Guest Pass cannot take the last place',
+    ],
     'No eligible Subscription': [
       'no_eligible_subscription',
       'No eligible Subscription',
@@ -64,6 +72,19 @@ export const commandProblem = (error: Error): HttpException | null => {
       'Attendance roster is incomplete',
     ],
   };
+  const beforeStart =
+    /^Booking is before the Start Date: (\d{4}-\d{2}-\d{2})$/.exec(
+      error.message,
+    );
+  if (beforeStart !== null) {
+    return new HttpException(
+      {
+        code: 'booking_before_start_date',
+        detail: `Booking is before the Start Date: ${beforeStart[1]}`,
+      },
+      HttpStatus.CONFLICT,
+    );
+  }
   const problem = problems[error.message];
 
   return problem === undefined

@@ -82,9 +82,20 @@ export class AdminReferralDto {
   referrerReferralCount!: number;
   @ApiProperty() referredName!: string;
   @ApiProperty({ format: 'date-time' }) registeredAt!: Date;
-  @ApiProperty({ type: String, format: 'date-time', nullable: true })
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    deprecated: true,
+    description: 'Deprecated (PAY-005): no Referral is awarded any more',
+  })
   awardedAt!: Date | null;
-  @ApiProperty({ enum: ['pending', 'awarded'] }) state!: 'pending' | 'awarded';
+  @ApiProperty({
+    enum: ['pending', 'awarded'],
+    deprecated: true,
+    description: 'Deprecated (PAY-005): no Referral is awarded any more',
+  })
+  state!: 'pending' | 'awarded';
 }
 
 export class AdminReferralPageDto {
@@ -94,7 +105,9 @@ export class AdminReferralPageDto {
   @ApiProperty() pageSize!: number;
   @ApiProperty() totalItems!: number;
   @ApiProperty({
-    description: "The studio's awarded Referrals, whatever the search",
+    deprecated: true,
+    description:
+      "Deprecated (PAY-005): the studio's Referrals awarded before Credit was retired",
   })
   awardedCount!: number;
   @ApiProperty({
@@ -103,33 +116,14 @@ export class AdminReferralPageDto {
   pendingCount!: number;
 }
 
-export class AdminCreditBalanceDto {
-  @ApiProperty({ format: 'uuid' }) clientId!: string;
-  @ApiProperty() clientName!: string;
-  @ApiProperty({ description: 'BOB centavos' }) availableCentavos!: number;
-  @ApiProperty({ format: 'date-time' }) lastMovementAt!: Date;
-  @ApiProperty({
-    enum: ['earned', 'reserved', 'spent', 'returned'],
-    description:
-      'The last ledger entry: a Referral award, a reservation for an open purchase, its spend at confirmation, or its release',
-  })
-  lastMovementKind!: 'earned' | 'reserved' | 'spent' | 'returned';
-}
-
-export class AdminCreditPageDto {
-  @ApiProperty({ type: AdminCreditBalanceDto, isArray: true })
-  items!: AdminCreditBalanceDto[];
-  @ApiProperty() page!: number;
-  @ApiProperty() pageSize!: number;
-  @ApiProperty() totalItems!: number;
-  @ApiProperty({ description: 'Studio-wide available Credit, BOB centavos' })
-  outstandingCentavos!: number;
-}
-
 export class IncomeByMethodDto {
   @ApiProperty() cash!: number;
   @ApiProperty() transfer!: number;
-  @ApiProperty() credit_only!: number;
+  @ApiProperty({
+    deprecated: true,
+    description: 'Deprecated (PAY-005): Credit-only Payments carry no money',
+  })
+  credit_only!: number;
 }
 
 export class IncomeMonthDto {
@@ -141,6 +135,42 @@ export class IncomeMonthDto {
   @ApiProperty() totalCentavos!: number;
 }
 
+export class FounderMembershipDto {
+  @ApiProperty({ format: 'uuid' }) membershipId!: string;
+  @ApiProperty({ minimum: 1, maximum: 40 }) number!: number;
+  @ApiProperty() clientName!: string;
+  @ApiProperty({ format: 'date-time' }) since!: Date;
+  @ApiProperty({ enum: ['active', 'lost'] }) status!: 'active' | 'lost';
+}
+
+export class FounderMembershipPageDto {
+  @ApiProperty({ type: FounderMembershipDto, isArray: true })
+  items!: FounderMembershipDto[];
+  @ApiProperty() granted!: number;
+  @ApiProperty() places!: number;
+}
+
+export class IncomeSaleDto {
+  @ApiProperty({ format: 'uuid' }) paymentId!: string;
+  @ApiProperty({ description: 'List price, BOB centavos' })
+  planPriceCentavos!: number;
+  @ApiProperty({ description: 'Discount stored on the Payment, BOB centavos' })
+  discountCentavos!: number;
+  @ApiProperty({ type: String, nullable: true }) discountReason!: string | null;
+  @ApiProperty({ description: 'Amount paid, BOB centavos' })
+  amountDueCentavos!: number;
+}
+
+export class VoidedIncomeDto {
+  @ApiProperty({ format: 'uuid' }) paymentId!: string;
+  @ApiProperty({ format: 'uuid' }) clientId!: string;
+  @ApiProperty({ description: 'Why the Administrator voided the sale' })
+  voidReason!: string;
+  @ApiProperty({ description: 'Left out of the totals, BOB centavos' })
+  amountDueCentavos!: number;
+  @ApiProperty({ format: 'date-time' }) voidedAt!: Date;
+}
+
 export class IncomeReportDto {
   @ApiProperty({ format: 'date-time' }) from!: Date;
   @ApiProperty({ format: 'date-time' }) until!: Date;
@@ -148,8 +178,29 @@ export class IncomeReportDto {
     string | null;
   @ApiProperty({ description: 'Confirmed Payments, BOB centavos' })
   totalCentavos!: number;
+  @ApiProperty({
+    description: 'List price of the confirmed sales, BOB centavos',
+  })
+  listPriceCentavos!: number;
+  @ApiProperty({
+    description: 'Discounts on the confirmed sales, BOB centavos',
+  })
+  discountCentavos!: number;
   @ApiProperty({ type: IncomeByMethodDto }) byMethod!: IncomeByMethodDto;
   @ApiProperty({ type: IncomeMonthDto, isArray: true })
   months!: IncomeMonthDto[];
+  @ApiProperty({
+    type: IncomeSaleDto,
+    isArray: true,
+    description: 'Sales that carry a discount, with list price and amount paid',
+  })
+  sales!: IncomeSaleDto[];
   @ApiProperty({ format: 'date-time' }) generatedAt!: Date;
+  @ApiProperty({
+    type: VoidedIncomeDto,
+    isArray: true,
+    description:
+      'Voided sales in the window. Visible with their reason, never in the totals.',
+  })
+  voided!: VoidedIncomeDto[];
 }
