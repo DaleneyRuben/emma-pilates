@@ -22,8 +22,7 @@ const routes = (referrals: unknown[]) => ({
   "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
   "/api/v1/clients/current/credit": () =>
     jsonResponse({ availableCentavos: 0, reservedCentavos: 0, activity: [] }),
-  "/api/v1/clients/current/referrals": () =>
-    jsonResponse({ referralCode: "REF-LUCIA", referrals }),
+  "/api/v1/clients/current/referrals": () => jsonResponse({ referralCode: "REF-LUCIA", referrals }),
 });
 
 async function openInvita(fetcher: ReturnType<typeof routeFetcher>) {
