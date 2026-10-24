@@ -1,12 +1,20 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
+import { formatCancellationWindow } from "../studio-rules/studio-rules-format";
+import { studioRulesQueryOptions } from "../studio-rules/studio-rules-queries";
 import { cancelledNotice } from "./schedule-notices";
 import { scheduleProblem } from "./schedule-problems";
 import { useScheduleChange } from "./use-schedule-change";
 
-const refundCopy = (session: AdministratorSessionAvailabilityDto) => {
+// The window comes from the Studio Settings (BKM-004); while it is unknown
+// the sentence leaves it out rather than guess.
+const refundCopy = (
+  session: AdministratorSessionAvailabilityDto,
+  cancellationWindowMinutes: number | undefined,
+) => {
   const bookings =
     session.bookedCount === 1
       ? "Se cancela la reserva y la clienta recupera su clase"
@@ -17,7 +25,11 @@ const refundCopy = (session: AdministratorSessionAvailabilityDto) => {
       : session.waitlistCount === 1
         ? "Avisamos a cada clienta y a la persona en lista de espera."
         : `Avisamos a cada clienta y a las ${session.waitlistCount} personas en lista de espera.`;
-  return `${bookings}, aunque falten menos de 2 h 30. ${waitlist} No se puede deshacer.`;
+  const window =
+    cancellationWindowMinutes === undefined
+      ? ""
+      : `, aunque falten menos de ${formatCancellationWindow(cancellationWindowMinutes)}`;
+  return `${bookings}${window}. ${waitlist} No se puede deshacer.`;
 };
 
 // AW03 and S14: the last-resort cancellation of a Session that has Bookings
@@ -36,6 +48,7 @@ export function CancelSessionAction({
   onFailure: (message: string) => void;
 }) {
   const change = useScheduleChange(branchId);
+  const studioRules = useQuery(studioRulesQueryOptions());
   const [confirming, setConfirming] = useState(false);
 
   if (session.bookedCount === 0) {
@@ -80,7 +93,9 @@ export function CancelSessionAction({
         busy={change.isPending}
         onConfirm={() => void cancel()}
       >
-        <p>{refundCopy(session)}</p>
+        <p>
+          {refundCopy(session, studioRules.data?.cancellationWindowMinutes)}
+        </p>
       </ConfirmDialog>
     </>
   );

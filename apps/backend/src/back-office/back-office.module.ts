@@ -7,12 +7,18 @@ import {
   backOfficeOperations,
   type BackOfficeOperations,
 } from './back-office.controller';
+import { createPrismaCashCloses } from './cash-close/prisma-cash-closes';
+import { createPrismaEquipment } from './equipment/prisma-equipment';
+import { createPrismaSessionEquipment } from './equipment/prisma-session-equipment';
 import { createPrismaExpenses } from './expenses/prisma-expenses';
+import { createPrismaFinance } from './finance/prisma-finance';
+import { monthFacts } from './finance/month-facts';
 import { createPrismaSalaryPayments } from './payroll/prisma-salary-payments';
 import { createPrismaExpenseReport } from './reports/prisma-expense-report';
 import { createPrismaSupplies } from './supplies/prisma-supplies';
 
-// Admin-only inventory, payroll, and expenses (Back Office context, BKO-002).
+// Inventory, payroll, expenses (BKO-002), equipment (BKO-004), and the daily
+// Cash Close (BKO-003).
 @Module({
   imports: [SystemIdentityModule],
   controllers: backOfficeControllers,
@@ -27,6 +33,12 @@ import { createPrismaSupplies } from './supplies/prisma-supplies';
           salaryPayments: createPrismaSalaryPayments(prisma, { now }),
           expenses: createPrismaExpenses(prisma, { now }),
           report: createPrismaExpenseReport(prisma, { now }),
+          finance: createPrismaFinance(prisma, {
+            ofMonth: (from, until) => monthFacts(prisma, from, until),
+          }),
+          equipment: createPrismaEquipment(prisma, { now }),
+          sessionEquipment: createPrismaSessionEquipment(prisma, { now }),
+          cashCloses: createPrismaCashCloses(prisma, { now }),
         };
       },
     },

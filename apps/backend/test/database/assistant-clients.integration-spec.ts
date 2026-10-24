@@ -156,13 +156,6 @@ describe('Assistant Client repository', () => {
     ]);
   });
 
-  it('reads the available Credit from the ledger', async () => {
-    await expect(repository().readAvailableCredit(sofia.id)).resolves.toBe(
-      6_000,
-    );
-    await expect(repository().readAvailableCredit(lucia.id)).resolves.toBe(0);
-  });
-
   it('hides a removed Client from search and lookup', async () => {
     const removedId = await createPendingClient(
       'Retirada Prueba',

@@ -15,7 +15,9 @@ import { createPrismaRetentionSweeps } from './system-identity/retention/prisma-
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
 import { createNotificationRecorder } from './notifications/prisma-notification-store';
 import { createPushDeliveryRuntime } from './notifications/push/push-delivery-runtime';
+import { createFirst90DaysJob } from './booking/first-90-days/prisma-first-90-days';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
+import { createFounderMembershipJob } from './booking/payments/founder-membership-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
 import { PrismaClientRegistrationUnitOfWork } from './system-identity/registration/prisma-client-registration-unit-of-work';
 import { AuthenticationLinkCipher } from './system-identity/security/authentication-link-cipher';
@@ -101,10 +103,15 @@ async function bootstrap(): Promise<void> {
       now,
       recordNotification,
     ),
+    founderMemberships: createFounderMembershipJob(
+      prisma,
+      now,
+      recordNotification,
+    ),
+    first90Days: createFirst90DaysJob(prisma, now, recordNotification),
     purchaseIntentExpiry: createPurchaseIntentExpiryJob(
       prisma,
       now,
-      environment.REFERRAL_REWARD_CENTAVOS,
       recordNotification,
     ),
     sessionSchedules: {
@@ -112,10 +119,16 @@ async function bootstrap(): Promise<void> {
     },
     evaluationSlots: { execute: () => evaluations.materializeAvailability() },
     evaluationReminders: {
-      execute: () => evaluations.sendDueEvaluationReminders(),
+      execute: async () => {
+        await evaluations.releaseExpiredEvaluationHolds();
+        return evaluations.sendDueEvaluationReminders();
+      },
     },
-    emptySessionChecks: {
-      execute: () => sessionStartChecks.checkEmptySessions(),
+    minimumBookingsChecks: {
+      execute: () => sessionStartChecks.checkMinimumBookings(),
+    },
+    windowCloseSnapshots: {
+      execute: () => sessionStartChecks.recordWindowCloseBookings(),
     },
     startedSessionWaitlists: {
       execute: () => sessionStartChecks.closeStartedWaitlists(),

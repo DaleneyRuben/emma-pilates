@@ -1,9 +1,5 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import { containsPattern } from '../search-pattern';
-import {
-  summarizeCredit,
-  type CreditLedgerKind,
-} from '../payments/credit-summary';
 import type {
   AssistantClientSummary,
   ClientAccountStatus,
@@ -15,7 +11,6 @@ export type AssistantClientRepository = {
     limit: number;
   }): Promise<AssistantClientSummary[]>;
   findClient(clientId: string): Promise<AssistantClientSummary | null>;
-  readAvailableCredit(clientId: string): Promise<number>;
 };
 
 const clientSelect = {
@@ -99,19 +94,4 @@ export const createAssistantClientRepository = (
         select: clientSelect,
       })
       .then((row) => (row === null ? null : toSummary(row))),
-  readAvailableCredit: (clientId) =>
-    prisma.creditLedgerEntry
-      .findMany({
-        where: { clientId },
-        select: { kind: true, amountCentavos: true },
-      })
-      .then(
-        (entries) =>
-          summarizeCredit(
-            entries.map((entry) => ({
-              kind: entry.kind.toLowerCase() as CreditLedgerKind,
-              amountCentavos: entry.amountCentavos,
-            })),
-          ).availableCentavos,
-      ),
 });

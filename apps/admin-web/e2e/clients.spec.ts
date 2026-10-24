@@ -10,7 +10,7 @@ test("refuses to close a Client with a transfer in review, then closes another",
 }) => {
   await sendTransfer("sofia@example.com");
   await signIn(page, "/back-office/clientes");
-  await expect(page.getByText("Mostrando 5 de 5 clientas")).toBeVisible();
+  await expect(page.getByText("Mostrando 6 de 6 clientas")).toBeVisible();
 
   await page.getByRole("button", { name: "Sofía Guzmán" }).click();
   const sofia = page.getByRole("dialog", { name: "Sofía Guzmán" });
@@ -66,10 +66,10 @@ test("refuses to close a Client with a transfer in review, then closes another",
   await expect(
     page.getByRole("button", { name: "Lucía Fernández" }),
   ).toHaveCount(0);
-  await expect(page.getByText("Mostrando 4 de 4 clientas")).toBeVisible();
+  await expect(page.getByText("Mostrando 5 de 5 clientas")).toBeVisible();
 
   // Closed for good: the list stays without her after a reload.
   await page.reload();
-  await expect(page.getByText("Mostrando 4 de 4 clientas")).toBeVisible();
+  await expect(page.getByText("Mostrando 5 de 5 clientas")).toBeVisible();
   await expect(page.getByText("lucia@example.com")).toHaveCount(0);
 });

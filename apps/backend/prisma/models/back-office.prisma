@@ -69,6 +69,20 @@ model SalaryPayment {
   @@schema("back_office")
 }
 
+// BKO-005: the fixed-cost budget, one row per line. Contingencies are not a
+// row; they are a percent of the subtotal, computed when the month is read.
+model CostBudgetLine {
+  id               String   @id @default(uuid()) @db.Uuid
+  name             String
+  monthlyCentavos  Int      @map("monthly_centavos")
+  position         Int      @db.SmallInt
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("cost_budget_lines")
+  @@schema("back_office")
+}
+
 model ExpenseCategory {
   id        String    @id @default(uuid()) @db.Uuid
   name      String
@@ -99,5 +113,78 @@ model Expense {
   @@index([expenseCategoryId])
   @@index([recordedByAccountId])
   @@map("expenses")
+  @@schema("back_office")
+}
+
+enum EquipmentKind {
+  REFORMER @map("reformer")
+  CADILLAC @map("cadillac")
+  MAT      @map("mat")
+
+  @@schema("back_office")
+}
+
+// BKO-004 (ADR-0106): a numbered machine of a Branch. (branch, kind, number)
+// is unique among Equipment not archived: a partial index in the migration.
+model Equipment {
+  id                 String           @id @default(uuid()) @db.Uuid
+  branchId           String           @map("branch_id") @db.Uuid
+  kind               EquipmentKind
+  number             Int              @db.SmallInt
+  createdByAccountId String           @map("created_by_account_id") @db.Uuid
+  createdAt          DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+  archivedAt         DateTime?        @map("archived_at") @db.Timestamptz(3)
+  branch             Branch           @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  createdByAccount   Account          @relation("EquipmentCreatedBy", fields: [createdByAccountId], references: [id], onDelete: Restrict)
+  issues             EquipmentIssue[]
+
+  @@index([branchId, kind])
+  @@index([createdByAccountId])
+  @@map("equipment")
+  @@schema("back_office")
+}
+
+// A fault on one piece of Equipment; resolving it is its only change.
+model EquipmentIssue {
+  id                  String    @id @default(uuid()) @db.Uuid
+  equipmentId         String    @map("equipment_id") @db.Uuid
+  description         String
+  outOfService        Boolean   @map("out_of_service")
+  reportedByAccountId String    @map("reported_by_account_id") @db.Uuid
+  reportedAt          DateTime  @default(now()) @map("reported_at") @db.Timestamptz(3)
+  resolvedByAccountId String?   @map("resolved_by_account_id") @db.Uuid
+  resolvedAt          DateTime? @map("resolved_at") @db.Timestamptz(3)
+  equipment           Equipment @relation(fields: [equipmentId], references: [id], onDelete: Restrict)
+  reportedByAccount   Account   @relation("EquipmentIssueReportedBy", fields: [reportedByAccountId], references: [id], onDelete: Restrict)
+  resolvedByAccount   Account?  @relation("EquipmentIssueResolvedBy", fields: [resolvedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([equipmentId, resolvedAt])
+  @@index([reportedAt])
+  @@index([reportedByAccountId])
+  @@index([resolvedByAccountId])
+  @@map("equipment_issues")
+  @@schema("back_office")
+}
+
+// BKO-003: one Cash Close a day per Branch, immutable once made.
+model CashClose {
+  id                String   @id @default(uuid()) @db.Uuid
+  branchId          String   @map("branch_id") @db.Uuid
+  businessDate      DateTime @map("business_date") @db.Date
+  expectedCentavos  Int      @map("expected_centavos")
+  cashPaymentCount  Int      @map("cash_payment_count")
+  countedCentavos   Int      @map("counted_centavos")
+  note              String?
+  closedByAccountId String   @map("closed_by_account_id") @db.Uuid
+  closedAt          DateTime @map("closed_at") @db.Timestamptz(3)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  branch            Branch   @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  closedByAccount   Account  @relation("CashCloseClosedBy", fields: [closedByAccountId], references: [id], onDelete: Restrict)
+
+  @@unique([branchId, businessDate])
+  @@index([businessDate])
+  @@index([closedByAccountId])
+  @@map("cash_closes")
   @@schema("back_office")
 }

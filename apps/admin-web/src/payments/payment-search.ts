@@ -6,13 +6,16 @@ export const paymentStatuses = [
   "pending",
   "confirmed",
   "rejected",
+  "voided",
 ] as const;
 export type PaymentStatusFilter = (typeof paymentStatuses)[number];
 
 // AW28: the Estado filter starts on Pendiente (the review queue) and the
 // search looks for the Client's name (ADR-0062, the backend's allowlist).
+// PAY-007's «Factura» filter is in the address only while it narrows.
 export const paymentSearchSchema = listSearchSchema.extend({
   status: z.enum(paymentStatuses).catch("pending"),
+  invoice: z.literal("unissued").optional().catch(undefined),
   q: z.string().trim().min(1).max(100).optional().catch(undefined),
 });
 export type PaymentSearch = z.infer<typeof paymentSearchSchema>;

@@ -62,11 +62,22 @@ const plansRoute = createRoute({
   ),
 });
 
+// AW36 (BKM-004): opened from the account menu, not the sidebar.
+const studioRulesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/reglas-del-estudio",
+  component: lazyRouteComponent(
+    () => import("../studio-rules/studio-rules-route"),
+    "StudioRulesRoute",
+  ),
+});
+
 const pageRoutes = [
   scheduleRoute,
   branchesRoute,
   classTypesRoute,
   plansRoute,
+  studioRulesRoute,
   ...backOfficeRoutes,
   ...oversightRoutes,
   ...reportRoutes,

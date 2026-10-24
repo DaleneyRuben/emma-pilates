@@ -4,10 +4,14 @@ import {
   type PrincipalResolver,
 } from '../system-identity/authentication/bearer-principal';
 import { BackOfficeError } from './back-office-errors';
+import type { CashCloses } from './cash-close/prisma-cash-closes';
 import { parseUuidValue } from './back-office.dto';
+import type { EquipmentOperations } from './equipment/prisma-equipment';
+import type { SessionEquipment } from './equipment/prisma-session-equipment';
 import type { Expenses } from './expenses/prisma-expenses';
 import type { SalaryPayments } from './payroll/prisma-salary-payments';
 import type { ExpenseReport } from './reports/prisma-expense-report';
+import type { Finance } from './finance/prisma-finance';
 import type { Supplies } from './supplies/prisma-supplies';
 
 // What every Back Office controller shares: the operations it calls, bearer
@@ -19,6 +23,10 @@ export type BackOfficeOperations = {
   salaryPayments: SalaryPayments;
   expenses: Expenses;
   report: ExpenseReport;
+  finance: Finance;
+  equipment: EquipmentOperations;
+  sessionEquipment: SessionEquipment;
+  cashCloses: CashCloses;
 };
 
 export const idempotencyHeader = {

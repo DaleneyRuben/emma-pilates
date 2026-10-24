@@ -9,6 +9,7 @@ import {
   useMockServer,
 } from "../../test/msw";
 import {
+  acquisitionHandler,
   clientPage,
   clientsPath,
   lucia,
@@ -47,10 +48,10 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     detailReads.length = 0;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), acquisitionHandler());
   });
 
-  it("summarizes contact, the current Plan, Credit, and referrals read-only", async () => {
+  it("summarizes contact, the current Plan, and referrals read-only, without Credit (PAY-005)", async () => {
     server.use(...handlers(() => jsonResponse(luciaDetail)));
     const { panel } = await openLucia();
 
@@ -66,7 +67,11 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
       within(panel).getByText("01/09/2026 – 30/09/2026"),
     ).toBeInTheDocument();
     expect(within(panel).getByText("5 de 8")).toBeInTheDocument();
-    expect(within(panel).getByText("Bs 1.050,00")).toBeInTheDocument();
+    expect(within(panel).queryByText("Crédito")).not.toBeInTheDocument();
+    expect(within(panel).queryByText("Bs 1.050,00")).not.toBeInTheDocument();
+    expect(
+      within(panel).queryByText("Clases extra: 1 · Regalo de bienvenida"),
+    ).not.toBeInTheDocument();
     expect(within(panel).getByText("3")).toBeInTheDocument();
     expect(within(panel).getByText("LUCIA25")).toBeInTheDocument();
     expect(within(panel).queryByRole("textbox")).not.toBeInTheDocument();
@@ -74,6 +79,27 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
       within(panel).queryByRole("button", { name: "Guardar" }),
     ).not.toBeInTheDocument();
     expect(detailReads).toEqual([lucia.id]);
+  });
+
+  it("shows the gift class with its origin on the Client summary", async () => {
+    server.use(
+      ...handlers(() =>
+        jsonResponse(
+          withPlan({
+            status: "active",
+            subscription: {
+              ...luciaDetail.subscription.subscription!,
+              extraClassesLine: "Clases extra: 1 · Regalo de bienvenida",
+            },
+          }),
+        ),
+      ),
+    );
+    const { panel } = await openLucia();
+
+    expect(
+      await within(panel).findByText("Clases extra: 1 · Regalo de bienvenida"),
+    ).toBeInTheDocument();
   });
 
   it("says it is loading while the summary is on its way", async () => {
@@ -116,7 +142,6 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
       within(panel).getByText("Último plan vencido el 30/06/2026."),
     ).toBeInTheDocument();
     expect(within(panel).queryByText(/de 8/)).not.toBeInTheDocument();
-    expect(within(panel).getByText("Bs 0,00")).toBeInTheDocument();
     expect(within(panel).getByText("Ninguna todavía")).toBeInTheDocument();
     expect(within(panel).getByText("Sin teléfono")).toBeInTheDocument();
   });
@@ -201,7 +226,7 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
 describe("AW22 Detalle de cliente on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() => server.use(...signedInHandlers(), acquisitionHandler()));
 
   it("fills the screen with the same summary", async () => {
     server.use(...handlers(() => jsonResponse(luciaDetail)));

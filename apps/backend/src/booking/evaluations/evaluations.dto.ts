@@ -33,9 +33,21 @@ export class EvaluationSlotDto {
 
   @ApiProperty({
     description:
-      'Published, unbooked, more than 3 hours away, and in a month the Client has not used',
+      'Published, unbooked, more than 3 hours away, and covered by an active Subscription',
   })
   bookable!: boolean;
+
+  @ApiProperty({
+    description:
+      'True when the covering Plan of 90 days or longer still includes its Evaluation',
+  })
+  included!: boolean;
+
+  @ApiProperty({
+    description:
+      'Settings price in centavos; 0 when the Evaluation is included',
+  })
+  priceCentavos!: number;
 }
 
 export class EvaluationDayDto {
@@ -83,8 +95,17 @@ export class ClientEvaluationDto {
   @ApiProperty({ format: 'uuid' })
   slotId!: string;
 
-  @ApiProperty({ enum: ['booked', 'cancelled'] })
-  state!: 'booked' | 'cancelled';
+  @ApiProperty()
+  included!: boolean;
+
+  @ApiProperty({ description: 'Charged centavos; 0 when included or unpaid' })
+  priceCentavos!: number;
+
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  paymentId!: string | null;
+
+  @ApiProperty({ enum: ['booked', 'cancelled', 'no_show'] })
+  state!: 'booked' | 'cancelled' | 'no_show';
 
   @ApiProperty({ format: 'date-time' })
   startsAt!: Date;

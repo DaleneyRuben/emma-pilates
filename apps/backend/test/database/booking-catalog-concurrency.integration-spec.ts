@@ -42,7 +42,7 @@ describe('booking catalog concurrent writes', () => {
       data: {
         id: planId,
         name: planId,
-        durationMonths: 1,
+        durationDays: 30,
         classAllowance: 8,
         priceCentavos: 30000,
         displayOrder: 0,
@@ -109,20 +109,59 @@ describe('booking catalog concurrent writes', () => {
     expect(await prisma.session.count({ where: { classTypeId } })).toBe(1);
   });
 
-  it('allows only one active Subscription to commit for a Client', async () => {
+  it('allows only one current Subscription to commit for a Client', async () => {
     const insert = `INSERT INTO booking.subscriptions
-      (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot,
+      (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot,
        original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at)
-      VALUES ($1, $2, $3, 'Test', 1, 8, 8, '2026-09-01', '2026-10-01', now(), now())`;
-    await expectBlockedConflict(
+      VALUES ($1, $2, $3, 'Test', 30, 8, 8, '2026-09-01', '2026-10-01', '2026-09-21T15:00:00Z', now())`;
+    await expectConstraintRefusal(
       context,
       insert,
       [randomUUID(), clientId, planId],
       [randomUUID(), clientId, planId],
       '23505',
-      'subscriptions_one_active_per_client_key',
+      'subscriptions_one_current',
     );
     expect(await prisma.subscription.count({ where: { clientId } })).toBe(1);
+  });
+
+  it('allows a future Subscription beside the current one and refuses a second future', async () => {
+    const futureClientId = randomUUID();
+    await prisma.client.create({
+      data: {
+        id: futureClientId,
+        name: 'Future',
+        referralCode: futureClientId,
+      },
+    });
+    await prisma.subscription.create({
+      data: {
+        clientId: futureClientId,
+        planId,
+        planNameSnapshot: 'Test',
+        durationDaysSnapshot: 30,
+        originalClassAllowance: 8,
+        remainingClassAllowance: 8,
+        startsOn: new Date('2026-09-01'),
+        endsOn: new Date('2026-10-01'),
+        activatedAt: new Date(),
+      },
+    });
+    const future = `INSERT INTO booking.subscriptions
+      (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot,
+       original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at)
+      VALUES ($1, $2, $3, 'Test', 30, 8, 8, '2026-11-01', '2026-12-01', '2026-09-21T15:00:00Z', now())`;
+    await expectConstraintRefusal(
+      context,
+      future,
+      [randomUUID(), futureClientId, planId],
+      [randomUUID(), futureClientId, planId],
+      '23505',
+      'subscriptions_one_future',
+    );
+    expect(
+      await prisma.subscription.count({ where: { clientId: futureClientId } }),
+    ).toBe(2);
   });
 
   it('prevents duplicate source occurrences even after cancellation', async () => {
@@ -145,6 +184,28 @@ describe('booking catalog concurrent writes', () => {
     ).toBe(1);
   });
 });
+
+// The subscription pair is a constraint trigger, so the second insert fails
+// as soon as it runs rather than waiting on the first transaction's row lock.
+async function expectConstraintRefusal(
+  context: DatabaseTestContext,
+  statement: string,
+  firstValues: string[],
+  secondValues: string[],
+  code: string,
+  constraint: string,
+): Promise<void> {
+  const client = await context.pool.connect();
+  try {
+    await client.query(statement, firstValues);
+    await expect(client.query(statement, secondValues)).rejects.toMatchObject({
+      code,
+      constraint,
+    });
+  } finally {
+    client.release();
+  }
+}
 
 async function expectBlockedConflict(
   context: DatabaseTestContext,
