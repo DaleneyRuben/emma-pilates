@@ -14,6 +14,14 @@ const reviewSelect = {
   subscription: { select: { planNameSnapshot: true } },
 } as const;
 
+// @db.Date arrives as local midnight. toISOString() throws on that before UTC.
+const civilDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const toReview = (row: {
   id: string;
   startsOn: Date;
@@ -26,8 +34,8 @@ const toReview = (row: {
   id: row.id,
   clientName: row.client.name,
   planName: row.subscription.planNameSnapshot,
-  startsOn: row.startsOn.toISOString().slice(0, 10),
-  endsOn: row.endsOn.toISOString().slice(0, 10),
+  startsOn: civilDate(row.startsOn),
+  endsOn: civilDate(row.endsOn),
   reason: row.reason,
   state: row.state.toLowerCase() as 'requested' | 'approved' | 'refused',
 });
