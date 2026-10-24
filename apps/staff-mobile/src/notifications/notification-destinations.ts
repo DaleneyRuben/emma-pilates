@@ -4,6 +4,7 @@ export type StaffRole = Exclude<AppRole, "client">;
 
 export type StaffNotificationRoute =
   | readonly ["Agenda"]
+  | readonly ["ClientOverview", { clientId: string }]
   | readonly ["Payments"]
   | readonly ["ReviewPayment", { paymentId: string }]
   | readonly ["Freezes"]
@@ -11,7 +12,8 @@ export type StaffNotificationRoute =
 
 // The one map from a notification's destination to a Staff screen, shared by
 // the inbox and push taps (NOT-002). Mi agenda is the root of the Trainer and
-// Nutritionist stacks; the Administrator reviews a submitted payment.
+// Nutritionist stacks; the Administrator reviews a submitted payment; the
+// Assistant opens the named Client.
 export function staffNotificationDestination(
   role: StaffRole,
   destinationType: string | null,
@@ -25,6 +27,9 @@ export function staffNotificationDestination(
   }
   if (role === "administrator" && destinationType === "payment") {
     return destinationId === null ? ["Payments"] : ["ReviewPayment", { paymentId: destinationId }];
+  }
+  if (role === "assistant" && destinationType === "client" && destinationId !== null) {
+    return ["ClientOverview", { clientId: destinationId }];
   }
   if (role === "administrator" && destinationType === "freeze") {
     return destinationId === null ? ["Freezes"] : ["ReviewFreeze", { freezeId: destinationId }];

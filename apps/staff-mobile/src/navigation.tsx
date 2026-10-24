@@ -52,11 +52,11 @@ import { StaffChangePasswordScreen } from "./profile/staff-change-password-scree
 import { StaffFeedbackScreen } from "./profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
+import { StaffFetcherContext, unavailableFetcher } from "./staff-fetcher";
+import { StaffRoleContext } from "./staff-role";
 import { ReportFaultScreen } from "./trainer/report-fault-screen";
 import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
 import { TrainerRosterScreen } from "./trainer/trainer-roster-screen";
-import { StaffFetcherContext, unavailableFetcher } from "./staff-fetcher";
-import { StaffRoleContext } from "./staff-role";
 
 const accountScreens = {
   Profile: StaffProfileScreen,

@@ -1,6 +1,7 @@
 import { staffNotificationDestination } from "./notification-destinations";
 
 const paymentId = "22222222-2222-4222-8222-222222222222";
+const clientId = "33333333-3333-4333-8333-333333333333";
 
 describe("staffNotificationDestination", () => {
   it("opens Mi agenda for the Trainer's and Nutritionist's schedule notices", () => {
@@ -21,6 +22,17 @@ describe("staffNotificationDestination", () => {
     expect(staffNotificationDestination("administrator", "payment", null)).toEqual(["Payments"]);
   });
 
+  it("opens the named Client for the Assistant", () => {
+    expect(staffNotificationDestination("assistant", "client", clientId)).toEqual([
+      "ClientOverview",
+      { clientId },
+    ]);
+  });
+
+  it("opens nothing for an Assistant notice that names no Client", () => {
+    expect(staffNotificationDestination("assistant", "client", null)).toBeNull();
+  });
+
   it("opens the Freeze review for the Administrator", () => {
     expect(staffNotificationDestination("administrator", "freeze", paymentId)).toEqual([
       "ReviewFreeze",
@@ -31,6 +43,7 @@ describe("staffNotificationDestination", () => {
   it.each([
     ["assistant", "payment"],
     ["trainer", "nutritionist_agenda"],
+    ["trainer", "client"],
     ["administrator", "trainer_schedule"],
     ["trainer", null],
   ] as const)("opens nothing for a %s notice about %s", (role, destinationType) => {
