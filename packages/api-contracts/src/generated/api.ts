@@ -170,6 +170,7 @@ import type {
   ListNotificationsParams,
   ListNutritionistAgendaParams,
   ListPayStatementsParams,
+  ListRecommendationsParams,
   ListSessionAvailabilityParams,
   ListSessionSchedulesParams,
   ListStaffMembersParams,
@@ -204,6 +205,9 @@ import type {
   PromotionsConsentDto,
   PurchaseIntentDto,
   ReadinessResponseDto,
+  RecommendationDto,
+  RecommendationListDto,
+  RecommendationRecomputeDto,
   RecordAllowanceAdjustmentDto,
   RecordCashPaymentDto,
   RecordFrontDeskTransferDto,
@@ -32838,6 +32842,458 @@ export function useGetMonthKpis<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type listRecommendationsResponse200 = {
+  data: RecommendationListDto;
+  status: 200;
+};
+
+export type listRecommendationsResponseSuccess =
+  listRecommendationsResponse200 & {
+    headers: Headers;
+  };
+export type listRecommendationsResponse = listRecommendationsResponseSuccess;
+
+export const getListRecommendationsUrl = (
+  params: ListRecommendationsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/recommendations?${stringifiedParams}`
+    : `/api/v1/administrator/recommendations`;
+};
+
+export const listRecommendations = async (
+  params: ListRecommendationsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listRecommendationsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListRecommendationsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listRecommendationsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listRecommendationsResponse;
+};
+
+export const getListRecommendationsQueryKey = (
+  params?: ListRecommendationsParams,
+) => {
+  return [
+    `/api/v1/administrator/recommendations`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListRecommendationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listRecommendations>>,
+  TError = unknown,
+>(
+  params: ListRecommendationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listRecommendations>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListRecommendationsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listRecommendations>>
+  > = ({ signal }) =>
+    listRecommendations(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listRecommendations>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListRecommendationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listRecommendations>>
+>;
+export type ListRecommendationsQueryError = unknown;
+
+export function useListRecommendations<
+  TData = Awaited<ReturnType<typeof listRecommendations>>,
+  TError = unknown,
+>(
+  params: ListRecommendationsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listRecommendations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listRecommendations>>,
+          TError,
+          Awaited<ReturnType<typeof listRecommendations>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListRecommendations<
+  TData = Awaited<ReturnType<typeof listRecommendations>>,
+  TError = unknown,
+>(
+  params: ListRecommendationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listRecommendations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listRecommendations>>,
+          TError,
+          Awaited<ReturnType<typeof listRecommendations>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListRecommendations<
+  TData = Awaited<ReturnType<typeof listRecommendations>>,
+  TError = unknown,
+>(
+  params: ListRecommendationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listRecommendations>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListRecommendations<
+  TData = Awaited<ReturnType<typeof listRecommendations>>,
+  TError = unknown,
+>(
+  params: ListRecommendationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listRecommendations>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListRecommendationsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type recomputeRecommendationsResponse200 = {
+  data: RecommendationRecomputeDto;
+  status: 200;
+};
+
+export type recomputeRecommendationsResponseSuccess =
+  recomputeRecommendationsResponse200 & {
+    headers: Headers;
+  };
+export type recomputeRecommendationsResponse =
+  recomputeRecommendationsResponseSuccess;
+
+export const getRecomputeRecommendationsUrl = () => {
+  return `/api/v1/administrator/recommendations/recompute`;
+};
+
+export const recomputeRecommendations = async (
+  studioRecomputeInputDto: StudioRecomputeInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recomputeRecommendationsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRecomputeRecommendationsUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(studioRecomputeInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recomputeRecommendationsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recomputeRecommendationsResponse;
+};
+
+export const getRecomputeRecommendationsMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recomputeRecommendations>>,
+    TError,
+    RecomputeRecommendationsMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recomputeRecommendations>>,
+  TError,
+  RecomputeRecommendationsMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recomputeRecommendations"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recomputeRecommendations>>,
+    RecomputeRecommendationsMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return recomputeRecommendations(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecomputeRecommendationsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recomputeRecommendations>>
+>;
+export type RecomputeRecommendationsMutationBody = StudioRecomputeInputDto;
+export type RecomputeRecommendationsMutationError = unknown;
+export type RecomputeRecommendationsMutationVariables = {
+  data: StudioRecomputeInputDto;
+};
+
+export const useRecomputeRecommendations = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recomputeRecommendations>>,
+      TError,
+      RecomputeRecommendationsMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recomputeRecommendations>>,
+  TError,
+  RecomputeRecommendationsMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRecomputeRecommendationsMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type dismissRecommendationResponse200 = {
+  data: RecommendationDto;
+  status: 200;
+};
+
+export type dismissRecommendationResponseSuccess =
+  dismissRecommendationResponse200 & {
+    headers: Headers;
+  };
+export type dismissRecommendationResponse =
+  dismissRecommendationResponseSuccess;
+
+export const getDismissRecommendationUrl = (id: string) => {
+  return `/api/v1/administrator/recommendations/${id}/dismiss`;
+};
+
+export const dismissRecommendation = async (
+  id: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<dismissRecommendationResponse> => {
+  const res = await (fetchFn ?? fetch)(getDismissRecommendationUrl(id), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: dismissRecommendationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as dismissRecommendationResponse;
+};
+
+export const getDismissRecommendationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof dismissRecommendation>>,
+    TError,
+    DismissRecommendationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof dismissRecommendation>>,
+  TError,
+  DismissRecommendationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["dismissRecommendation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof dismissRecommendation>>,
+    DismissRecommendationMutationVariables
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return dismissRecommendation(id, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DismissRecommendationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof dismissRecommendation>>
+>;
+
+export type DismissRecommendationMutationError = unknown;
+export type DismissRecommendationMutationVariables = { id: string };
+
+export const useDismissRecommendation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof dismissRecommendation>>,
+      TError,
+      DismissRecommendationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof dismissRecommendation>>,
+  TError,
+  DismissRecommendationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getDismissRecommendationMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type createPendingUploadResponse201 = {
   data: PendingUploadDto;

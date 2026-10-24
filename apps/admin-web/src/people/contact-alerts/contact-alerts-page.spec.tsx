@@ -164,6 +164,7 @@ describe("AW39 Para contactar", () => {
       "Para contactar",
       "Personal",
       "Indicadores",
+      "Recomendaciones",
     ]);
   });
 });

@@ -27,6 +27,7 @@ test.describe("the Coordinator's admin web", () => {
       "Para contactar3",
       "Personal",
       "Indicadores",
+      "Recomendaciones",
     ]);
     await expect(
       page.getByRole("heading", { level: 1, name: "Horario" }),

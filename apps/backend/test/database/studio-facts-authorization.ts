@@ -25,4 +25,25 @@ export const studioFactsAuthorizationRows = (): Record<string, MatrixRow> => ({
     query: '?month=2026-10',
     bearer: true,
   },
+  // STU-006: both roles read the findings. v1 has no money rule. The month
+  // has to parse, or the Role check never runs.
+  'GET /api/v1/administrator/recommendations': {
+    administrator: 'allow',
+    coordinator: 'allow',
+    query: '?month=2026-10',
+    bearer: true,
+  },
+  // Recompute and dismiss stay with the Administrator. A missing id is 404
+  // after her Role passes; the Coordinator is refused before that lookup.
+  'POST /api/v1/administrator/recommendations/recompute': {
+    administrator: 'allow',
+    coordinator: 'deny',
+    body: { month: '2026-10' },
+    bearer: true,
+  },
+  'POST /api/v1/administrator/recommendations/{id}/dismiss': {
+    administrator: 'allow',
+    coordinator: 'deny',
+    bearer: true,
+  },
 });

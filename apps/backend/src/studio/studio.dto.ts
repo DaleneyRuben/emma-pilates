@@ -35,6 +35,27 @@ export class MonthKpisDto {
   @ApiProperty({ required: false }) classesStillOwed?: number;
 }
 
+export class RecommendationDto {
+  @ApiProperty() id!: string;
+  @ApiProperty({ enum: ['weak_schedule', 'inactive_client'] }) rule!: string;
+  @ApiProperty() subject!: string;
+  @ApiProperty({ example: '2026-10-01' }) period!: string;
+  @ApiProperty() detail!: string;
+  @ApiProperty({ enum: ['new', 'seen', 'dismissed', 'resolved'] })
+  state!: string;
+}
+
+export class RecommendationListDto {
+  @ApiProperty({ example: '2026-10' }) month!: string;
+  @ApiProperty({ type: [RecommendationDto] })
+  recommendations!: RecommendationDto[];
+}
+
+export class RecommendationRecomputeDto {
+  @ApiProperty({ example: '2026-10' }) month!: string;
+  @ApiProperty() written!: number;
+}
+
 export class RevenueReportDto {
   @ApiProperty({ example: '2026-10' }) month!: string;
   @ApiProperty({ description: 'Cash collected in the month, BOB centavos' })

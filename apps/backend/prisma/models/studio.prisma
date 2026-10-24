@@ -36,3 +36,20 @@ model ClientMonthFact {
   @@map("client_month_facts")
   @@schema("studio")
 }
+
+// STU-006 findings. rule + subject + period is unique among live rows.
+model Recommendation {
+  id        String    @id @default(uuid()) @db.Uuid
+  rule      String
+  subject   String
+  period    DateTime  @db.Date
+  detail    String
+  state     String    @default("new")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([period])
+  @@map("recommendations")
+  @@schema("studio")
+}

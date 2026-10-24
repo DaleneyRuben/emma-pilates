@@ -75,12 +75,19 @@ describe('month kpi endpoint (e2e)', () => {
             const operations = createStudioOperations({
               readKpis: kpis,
               readRevenue: revenue,
+              readRecommendations: () => Promise.resolve([]),
+              recomputeRecommendations: () => Promise.resolve({ written: 0 }),
+              dismissRecommendation: () => Promise.resolve(null),
             });
             return {
               recompute: () => Promise.reject(new Error('unused')),
               revenue: () => Promise.reject(new Error('unused')),
               kpis: (input: { month: string }, actor: AuthenticatedPrincipal) =>
                 operations.kpis(input, actor, {} as never),
+              recommendations: () => Promise.reject(new Error('unused')),
+              recomputeRecommendations: () =>
+                Promise.reject(new Error('unused')),
+              dismissRecommendation: () => Promise.reject(new Error('unused')),
             };
           },
         },

@@ -8519,6 +8519,116 @@
         ]
       }
     },
+    "/api/v1/administrator/recommendations": {
+      "get": {
+        "operationId": "listRecommendations",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/api/v1/administrator/recommendations/recompute": {
+      "post": {
+        "operationId": "recomputeRecommendations",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudioRecomputeInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationRecomputeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/api/v1/administrator/recommendations/{id}/dismiss": {
+      "post": {
+        "operationId": "dismissRecommendation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -16246,6 +16356,83 @@
           "newClients",
           "renewedClients",
           "renewalPercent"
+        ]
+      },
+      "RecommendationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "rule": {
+            "type": "string",
+            "enum": [
+              "weak_schedule",
+              "inactive_client"
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "period": {
+            "type": "string",
+            "example": "2026-10-01"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "new",
+              "seen",
+              "dismissed",
+              "resolved"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "rule",
+          "subject",
+          "period",
+          "detail",
+          "state"
+        ]
+      },
+      "RecommendationListDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-10"
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecommendationDto"
+            }
+          }
+        },
+        "required": [
+          "month",
+          "recommendations"
+        ]
+      },
+      "RecommendationRecomputeDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-10"
+          },
+          "written": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "month",
+          "written"
         ]
       },
       "CreatePendingUploadDto": {

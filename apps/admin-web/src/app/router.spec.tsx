@@ -39,7 +39,10 @@ describe("admin navigation", () => {
           "Categorías de gasto",
         ],
       },
-      { label: null, items: ["Reporte", "Indicadores", "Simulador"] },
+      {
+        label: null,
+        items: ["Reporte", "Indicadores", "Recomendaciones", "Simulador"],
+      },
       { label: "Promociones", items: ["Promociones", "Referidos"] },
       { label: null, items: ["Comentarios"] },
     ]);
@@ -73,6 +76,7 @@ describe("admin navigation", () => {
       "AW15",
       "AW16",
       "AW43",
+      "AW44",
       "AW42",
       "AW17",
       "AW26",
@@ -97,6 +101,7 @@ describe("admin navigation", () => {
       "Nómina",
       "Categorías de gasto",
       "Indicadores",
+      "Recomendaciones",
       "Simulador",
       "Referidos",
       "Comentarios",

@@ -6,8 +6,9 @@ import { renderAdmin } from "../test/render-admin";
 import { coordinatorHandlers } from "../test/session-handlers";
 
 // IDN-009 / ADR-0102 (follow-up 155): the Coordinator's admin web is the
-// schedule, Clientes, Personal, and the counts-only Indicadores page.
-// Money pages are neither shown nor opened.
+// schedule, Clientes, Personal, the counts-only Indicadores page, and the
+// recommendations list. Money pages are neither shown nor opened. Descartar
+// stays off her recommendations page.
 describe("the admin web for the Coordinator", () => {
   useMockServer();
   beforeEach(() => server.use(...coordinatorHandlers()));
@@ -30,6 +31,7 @@ describe("the admin web for the Coordinator", () => {
       "Para contactar",
       "Personal",
       "Indicadores",
+      "Recomendaciones",
     ]);
     expect(within(sidebar).queryByText("Catálogo")).not.toBeInTheDocument();
     expect(within(sidebar).queryByText("Promociones")).not.toBeInTheDocument();
@@ -80,6 +82,37 @@ describe("the admin web for the Coordinator", () => {
     expect(screen.queryByText(/Bs/)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Simulador" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Reporte" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Recomendaciones" })).toBeVisible();
+  });
+
+  it("opens Recomendaciones without Descartar", async () => {
+    server.use(
+      http.get(apiUrl("/api/v1/administrator/recommendations"), () =>
+        jsonResponse({
+          month: "2026-10",
+          recommendations: [
+            {
+              id: "11111111-1111-4111-8111-111111111111",
+              rule: "weak_schedule",
+              subject: "trainer:2",
+              period: "2026-10-01",
+              detail: "Revisa el horario del martes: promedia 1,7 alumnas.",
+              state: "new",
+            },
+          ],
+        }),
+      ),
+    );
+    renderAdmin("/recomendaciones");
+
+    await heading("Recomendaciones");
+    expect(
+      await screen.findByText(
+        "Revisa el horario del martes: promedia 1,7 alumnas.",
+      ),
+    ).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Descartar" })).toBeNull();
+    expect(screen.queryByText(/Bs/)).not.toBeInTheDocument();
   });
 
   it("opens Clientes", async () => {
