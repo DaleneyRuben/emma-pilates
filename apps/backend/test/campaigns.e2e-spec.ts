@@ -21,17 +21,16 @@ const key = '33333333-3333-4333-8333-333333333333';
 const principal = (
   role:
     'assistant' | 'administrator' | 'trainer' | 'nutritionist' | 'coordinator',
-): AuthenticatedPrincipal =>
-  ({
-    accountId: `${role}-account`,
-    authenticationSessionId: 'session',
-    identity: {
-      kind: 'staff',
-      staffMemberId: `${role}-staff`,
-      role,
-      branchIds: [],
-    },
-  }) as AuthenticatedPrincipal;
+): AuthenticatedPrincipal => ({
+  accountId: `${role}-account`,
+  authenticationSessionId: 'session',
+  identity: {
+    kind: 'staff',
+    staffMemberId: `${role}-staff`,
+    role,
+    branchIds: [],
+  },
+});
 
 describe('campaign endpoint', () => {
   let app: INestApplication<App>;
