@@ -105,7 +105,7 @@ function SubscriptionCard({
           subscription.originalClassAllowance,
         )}
       </BodyText>
-      <BodyText>{`Pagado hasta el ${formatCivilDate(subscription.endsOn)}`}</BodyText>
+      <BodyText>{`Vence el ${formatCivilDate(subscription.endsOn)}`}</BodyText>
       <Pressable
         accessibilityLabel="Ver detalle"
         accessibilityRole="button"

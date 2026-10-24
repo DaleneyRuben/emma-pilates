@@ -33,6 +33,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { ClassHistoryEntryDto, parseUuid } from '../booking.dto';
 import type { ClientSubscriptionSummary } from '../client/client-subscription';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import type { InvoiceData } from '../payments/invoice-data/invoice-data';
 import { runPaymentCommand } from '../payments/payments.controller';
 import {
   ClientNotFoundError,
@@ -52,6 +53,7 @@ import {
   PlanQuotesDto,
   RecordCashPaymentDto,
 } from './assistant.dto';
+import { deprecatedDurationMonths } from '../catalog/plan-validity';
 
 export const assistantClientOperations = Symbol('assistantClientOperations');
 
@@ -77,7 +79,12 @@ export type AssistantClientOperations = {
     principal: AuthenticatedPrincipal,
   ) => Promise<PlanQuotes>;
   recordCashPayment: (
-    command: { clientId: string; planId: string; branchId: string },
+    command: {
+      clientId: string;
+      planId: string;
+      branchId: string;
+      invoiceData: InvoiceData | null;
+    },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ) => Promise<AssistantCashPaymentResult>;
@@ -238,7 +245,9 @@ export class AssistantClientsController {
       plans: quotes.plans.map((plan) => ({
         id: plan.id,
         name: plan.name,
-        durationMonths: plan.durationMonths,
+        durationDays: plan.durationDays,
+        weeklyClassCap: plan.weeklyClassCap,
+        durationMonths: deprecatedDurationMonths(plan.durationDays),
         classAllowance: plan.classAllowance,
         priceCentavos: plan.priceCentavos,
         creditAppliedCentavos: plan.creditAppliedCentavos,
@@ -269,12 +278,19 @@ export class AssistantClientsController {
     const key = requireIdempotencyKey(idempotencyKey);
     const parsed = parseRecordCashPayment(body);
     if (parsed === null) {
-      throw invalidRequest('Cash Payment needs a Plan and a Branch');
+      throw invalidRequest(
+        'Cash Payment needs a Plan, a Branch, and valid Invoice Data if any',
+      );
     }
     const principal = await this.authenticate(authorization);
     const result = await run(() =>
       this.operations.recordCashPayment(
-        { clientId: id, planId: parsed.planId, branchId: parsed.branchId },
+        {
+          clientId: id,
+          planId: parsed.planId,
+          branchId: parsed.branchId,
+          invoiceData: parsed.invoiceData,
+        },
         principal,
         key,
       ),

@@ -1,17 +1,14 @@
 import {
-  completeCreditPurchase,
   createPurchaseIntent,
   getCurrentPurchaseIntent,
-  getGetCurrentClientCreditQueryKey,
-  getGetCurrentClientSubscriptionQueryKey,
-  getGetCurrentPaymentQueryKey,
   getGetCurrentPurchaseIntentQueryKey,
-  useGetCurrentClientCredit,
   useGetPlan,
 } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
+  describeValidity,
+  describeWeeklyCap,
   formatCancellationWindow,
   LoadingState,
   PrimaryButton,
@@ -30,7 +27,7 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { describeValidity, formatBolivianos } from "./plan-format";
+import { formatBolivianos } from "./plan-format";
 
 type PlanDetailNavigation = {
   goBack: () => void;
@@ -47,10 +44,10 @@ const problemCode = (data: unknown): string | null =>
     ? String((data as { code: unknown }).code)
     : null;
 
-const validityCopy = (durationMonths: number): string =>
-  durationMonths === 1
-    ? "Un mes de vigencia desde que se confirma tu pago."
-    : `${durationMonths} meses de vigencia desde que se confirma tu pago.`;
+// Follow-up 176: validity in days (booking ADR-0005); BKM-006 replaces the
+// confirmation day with the chosen Start Date.
+const validityCopy = (durationDays: number): string =>
+  `${durationDays} días de vigencia desde que se confirma tu pago.`;
 
 export function PlanDetailScreen({ route }: { route: { params: { planId: string } } }) {
   const navigation = useNavigation<PlanDetailNavigation>();
@@ -58,10 +55,6 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
   const queryClient = useQueryClient();
   const studioRules = useStudioRules(fetcher);
   const plan = useGetPlan(route.params.planId, {
-    fetcher,
-    query: { refetchOnMount: "always" },
-  });
-  const credit = useGetCurrentClientCredit({
     fetcher,
     query: { refetchOnMount: "always" },
   });
@@ -88,37 +81,14 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
 
   const detail = plan.data.data;
   const price = formatBolivianos(detail.priceCentavos);
-  const available = credit.data?.status === 200 ? credit.data.data.availableCentavos : 0;
-  const applied = Math.min(available, detail.priceCentavos);
-  const total = detail.priceCentavos - applied;
 
-  // Credit that covers the whole price activates the Plan at once; otherwise
-  // a Purchase Intent freezes the amount to transfer.
+  // A Purchase Intent freezes the amount to transfer: the Plan's full price,
+  // since Credit is retired (PAY-005).
   const continueToPayment = async () => {
     setError(null);
     setBusy(true);
     const headers = { "idempotency-key": randomUUID() };
     try {
-      if (total === 0) {
-        const purchase = await completeCreditPurchase({ planId: detail.id }, { headers }, fetcher);
-        if (purchase.status !== 201) {
-          setError(
-            purchaseErrorCopy[problemCode(purchase.data) ?? ""] ??
-              "No pudimos completar la compra. Inténtalo de nuevo.",
-          );
-          return;
-        }
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: getGetCurrentPaymentQueryKey() }),
-          queryClient.invalidateQueries({ queryKey: getGetCurrentClientCreditQueryKey() }),
-          queryClient.invalidateQueries({
-            queryKey: getGetCurrentClientSubscriptionQueryKey(),
-          }),
-        ]);
-        navigation.navigate("PaymentStatus");
-        return;
-      }
-
       const created = await createPurchaseIntent({ planId: detail.id }, { headers }, fetcher);
       if (created.status === 201) {
         await queryClient.invalidateQueries({ queryKey: getGetCurrentPurchaseIntentQueryKey() });
@@ -151,7 +121,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
           <Text style={styles.planName}>{detail.name}</Text>
-          <BodyText>{describeValidity(detail.durationMonths)}</BodyText>
+          <BodyText>{describeValidity(detail.durationDays)}</BodyText>
           <Text style={styles.price}>{price}</Text>
         </View>
         <View style={styles.section}>
@@ -162,7 +132,10 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
               {`Cancelación sin costo hasta ${formatCancellationWindow(studioRules.cancellationWindowMinutes)} antes de cada clase.`}
             </BodyText>
           )}
-          <BodyText>{validityCopy(detail.durationMonths)}</BodyText>
+          <BodyText>{validityCopy(detail.durationDays)}</BodyText>
+          {detail.weeklyClassCap === null ? null : (
+            <BodyText>{`${describeWeeklyCap(detail.weeklyClassCap)}.`}</BodyText>
+          )}
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Desglose</Text>
@@ -170,23 +143,16 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
             <BodyText>Precio del plan</BodyText>
             <BodyText>{price}</BodyText>
           </View>
-          {applied > 0 ? (
-            <View style={styles.row}>
-              <BodyText>Crédito aplicado</BodyText>
-              <BodyText style={styles.creditValue}>{`−${formatBolivianos(applied)}`}</BodyText>
-            </View>
-          ) : null}
           <View style={[styles.row, styles.totalRow]}>
             <Text style={styles.totalLabel}>Total a pagar</Text>
-            <Text style={styles.total}>{formatBolivianos(total)}</Text>
+            <Text style={styles.total}>{price}</Text>
           </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Siguiente paso</Text>
           <BodyText>
-            {total === 0
-              ? "Tu crédito cubre todo el plan: se activa al instante, sin transferencia."
-              : "Pagas por transferencia con el QR del estudio y subes tu comprobante. El plan se activa cuando el estudio confirma tu pago."}
+            Pagas por transferencia con el QR del estudio y subes tu comprobante. El plan se activa
+            cuando el estudio confirma tu pago.
           </BodyText>
         </View>
         {error === null ? null : (
@@ -212,7 +178,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  creditValue: { color: colors.successText },
   error: { color: colors.errorText },
   planName: {
     color: colors.text,

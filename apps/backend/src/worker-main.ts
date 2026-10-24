@@ -104,7 +104,6 @@ async function bootstrap(): Promise<void> {
     purchaseIntentExpiry: createPurchaseIntentExpiryJob(
       prisma,
       now,
-      environment.REFERRAL_REWARD_CENTAVOS,
       recordNotification,
     ),
     sessionSchedules: {

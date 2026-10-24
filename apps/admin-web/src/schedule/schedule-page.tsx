@@ -39,7 +39,11 @@ function BranchSchedule({
   const monday = weekStartOf(search.week ?? today);
   const narrow = useIsNarrowViewport();
   const [panel, setPanel] = useState<SessionPanelState>({ mode: "closed" });
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(
+    search.aviso === "sin-acceso"
+      ? "Esa sección es solo para administración."
+      : null,
+  );
   const [day, setDay] = useState<string | null>(null);
   const sessions = useQuery(weekSessionsQueryOptions(branch.id, monday));
 

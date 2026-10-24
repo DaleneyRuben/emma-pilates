@@ -12,7 +12,9 @@ import { LoginPage } from "../auth/login-page";
 import { RecoverPasswordPage } from "../auth/recover-password-page";
 import { NotFoundPage } from "../pages/not-found-page";
 import { StartupErrorPage } from "../pages/startup-error-page";
+import { adminRoleOf } from "../session/admin-role";
 import { readSignedInSession } from "../session/session-queries";
+import { coordinatorMayOpen } from "./navigation";
 import { AdminShell } from "../shell/admin-shell";
 import { RootLayout } from "./startup-state";
 
@@ -70,13 +72,22 @@ export const authenticatedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "authenticated",
   beforeLoad: async ({ context, location }) => {
-    if ((await readSignedInSession(context.queryClient)) === null) {
+    const session = await readSignedInSession(context.queryClient);
+    if (session === null) {
       throw redirect({
         to: "/iniciar-sesion",
         search: { redirect: location.href },
       });
     }
     context.sessionExpiry.reset();
+    // ADR-0102 (follow-up 155): a money page opened by address returns the
+    // Coordinator to Horario with a notice.
+    if (
+      adminRoleOf(session) === "coordinator" &&
+      !coordinatorMayOpen(location.pathname)
+    ) {
+      throw redirect({ to: "/", search: { aviso: "sin-acceso" } });
+    }
   },
   errorComponent: StartupErrorPage,
   component: AdminShell,

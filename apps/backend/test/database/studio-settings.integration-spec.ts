@@ -95,14 +95,14 @@ describe('Studio Settings on PostgreSQL', () => {
       data: [
         {
           name: 'Clase suelta',
-          durationMonths: 1,
+          durationDays: 30,
           classAllowance: 1,
           priceCentavos: 8_000,
           displayOrder: 1,
         },
         {
           name: 'Pase de prueba',
-          durationMonths: 1,
+          durationDays: 30,
           classAllowance: 16,
           priceCentavos: 0,
           displayOrder: 2,
@@ -110,7 +110,7 @@ describe('Studio Settings on PostgreSQL', () => {
         },
         {
           name: '8 clases',
-          durationMonths: 1,
+          durationDays: 30,
           classAllowance: 8,
           priceCentavos: 59_000,
           displayOrder: 3,

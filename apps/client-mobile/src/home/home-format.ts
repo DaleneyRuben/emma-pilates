@@ -44,9 +44,9 @@ export function evaluationShortcut(nextStartsAt: string | undefined): string {
     : `Próxima: ${dayMonthFormatter.format(new Date(nextStartsAt))}`;
 }
 
-// The reward is Credit (Bs 60), not classes (PAY-001).
+// Credit is retired (PAY-005): the shortcut invites sharing the code.
 export function referralShortcut(count: number | undefined): string {
-  if (count === undefined || count === 0) return "Invita amigas y gana crédito";
+  if (count === undefined || count === 0) return "Comparte tu código";
   return count === 1 ? "1 amiga invitada" : `${count} amigas invitadas`;
 }
 

@@ -57,7 +57,8 @@ describe("AW28 Pagos on a desktop browser", () => {
     const amount = within(sofia).getByRole("cell", { name: /Bs 500,00/ });
     expect(amount).toHaveAttribute("data-label", "Monto");
     expect(amount).toHaveClass("md:text-right");
-    expect(within(amount).getByText("con Bs 60,00 de crédito")).toBeVisible();
+    // Credit is retired (PAY-005): an older Payment's Credit is not shown.
+    expect(within(amount).queryByText(/de crédito/)).not.toBeInTheDocument();
     expect(
       within(sofia).getByRole("cell", { name: "Paquete de 8 clases" }),
     ).toBeInTheDocument();

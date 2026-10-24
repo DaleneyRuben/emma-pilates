@@ -16,7 +16,7 @@ describe('booking catalog migration', () => {
     await context?.stop();
   });
 
-  it('enforces the 44 approved rejection cases and permits valid transitions', async () => {
+  it('enforces the 49 approved rejection cases and permits valid transitions', async () => {
     const client = await context.pool.connect();
     try {
       await client.query('BEGIN');
@@ -25,7 +25,7 @@ describe('booking catalog migration', () => {
         'utf8',
       );
       expect(assertions.match(/SELECT pg_temp.expect_failure/g)).toHaveLength(
-        44,
+        49,
       );
       await expect(client.query(assertions)).resolves.toBeDefined();
     } finally {
