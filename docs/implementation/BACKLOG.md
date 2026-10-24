@@ -1350,13 +1350,14 @@ today. Administrator only: an Assistant and a cast Coordinator get
 `403 studio_access_denied`. Reporte shows the three figures under «Ingreso
 devengado». A Payment of Bs 300 from 2026-10-20 to 2026-11-19 accrues
 Bs 120 in October and Bs 180 in November, and the months sum to Bs 300.
-The last month absorbs the remainder.
+The last month absorbs the remainder. A month after the Subscription ended
+stays at zero when half-up rounding already used the whole amount.
 
 No migration. Open questions: store-review exclusion waits for REL-016's
-flag, so nothing is excluded; extra classes (BKM-008) are not on this
-branch, so classes still owed count the base remaining allowance only.
-The Coordinator role is IDN-009's, so the 403 is proven by casting the
-role in the e2e suite. [Pull request #195](https://github.com/DaleneyRuben/emma-pilates/pull/195).
+flag, so nothing is excluded; extra classes (BKM-008) are not counted in
+classes still owed. The Coordinator role is on the rollout (IDN-009):
+Carolina gets `403 studio_access_denied` and her sidebar has no money.
+[Pull request #195](https://github.com/DaleneyRuben/emma-pilates/pull/195).
 
 #### STU-004 · The studio economics package and the simulator
 

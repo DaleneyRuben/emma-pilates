@@ -5979,12 +5979,14 @@ remainder, so the two months sum to Bs 300. Use a disposable database.
    runs from 2026-10-20 to 2026-11-19. October shows Caja Bs 300,00 and
    Devengado Bs 120,00. November shows Caja Bs 0,00 and Devengado
    Bs 180,00. On 23 October, Diferido is Bs 270,00: today is exclusive, so
-   3 of 30 days have accrued.
+   3 of 30 days have accrued. A month after the Subscription ended shows
+   Devengado Bs 0,00 even when half-up rounding already used the whole
+   amount in the earlier months.
 3. **Who may read it.** An Assistant (`camila.rojas@example.com`) and a
-   Coordinator get `403 studio_access_denied` from
-   `GET /api/v1/administrator/reports/revenue?month=YYYY-MM`. A month that
-   is not `YYYY-MM` gets `400 invalid_request`. The Coordinator role is not
-   on this branch (IDN-009), so the refusal is the e2e suite's.
+   Coordinator (`carolina.rivas@example.com`) get `403 studio_access_denied`
+   from `GET /api/v1/administrator/reports/revenue?month=YYYY-MM`. A month
+   that is not `YYYY-MM` gets `400 invalid_request`. Carolina's sidebar has
+   no Reporte and no money.
    [Pull request #195](https://github.com/DaleneyRuben/emma-pilates/pull/195).
 
 The migration `20261023240000_studio_facts` needs owner approval before it
