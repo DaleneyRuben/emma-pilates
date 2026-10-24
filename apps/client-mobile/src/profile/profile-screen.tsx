@@ -29,6 +29,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { appVersionLabel } from "./app-version";
 import { ProfileRowIcon, type ProfileRowIconName } from "./profile-row-icons";
 import { subscriptionBadge } from "../home/home-format";
 import { ClientAvatar } from "./client-avatar";
@@ -197,7 +198,9 @@ export function ProfileScreen() {
         >
           <Text style={styles.closeAccountText}>Cerrar mi cuenta</Text>
         </Pressable>
-        <BodyText style={styles.footer}>Emma Pilates Studio · versión 1.0</BodyText>
+        <BodyText
+          style={styles.footer}
+        >{`Emma Pilates Studio · versión ${appVersionLabel()}`}</BodyText>
       </ScrollView>
       <LogoutConfirmationSheet
         logout={identity.logout}

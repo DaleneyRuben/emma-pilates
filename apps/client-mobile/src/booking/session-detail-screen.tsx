@@ -22,6 +22,8 @@ import {
   TextButton,
   typography,
   usePushNotifications,
+  useStudioRules,
+  isInsideCancellationWindow,
   weeklyClassesLeftLine,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -86,6 +88,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const studioRules = useStudioRules(fetcher);
   const subscription = useGetCurrentClientSubscription({ fetcher });
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -127,6 +130,11 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
     (view.status === "active" || view.status === "expiring_soon") &&
     (view.subscription?.remainingClassAllowance ?? 0) > 0;
   const full = forcedFull || detail.availableSeats === 0;
+  // Joining inside the window is refused (the server answers 403), so the
+  // offer stays hidden until the window length is known and still open.
+  const waitlistOpen =
+    studioRules !== undefined &&
+    !isInsideCancellationWindow(detail.startsAt, new Date(), studioRules.cancellationWindowMinutes);
   const classesLeftLine = weeklyClassesLeftLine(detail.classesLeftThisWeek);
 
   const book = async () => {
@@ -267,6 +275,10 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
         {full ? (
           waitlisted ? (
             <BodyText style={styles.note}>Ya estás en la lista de espera.</BodyText>
+          ) : !waitlistOpen ? (
+            <BodyText style={styles.note}>
+              Falta poco para la clase, así que la lista de espera ya cerró.
+            </BodyText>
           ) : (
             <>
               <Pressable

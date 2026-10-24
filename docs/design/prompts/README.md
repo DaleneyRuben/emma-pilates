@@ -239,6 +239,7 @@ Each of these was sent as the next message in the existing design session for th
 
 | [130](./followups/130-aw33-studio-rules-entry.md) | `AW33`'s menu gains a first row «Reglas del estudio» that opens the new `AW36` (BKM-004, ADR-0101), above «Cambiar contraseña»; the README gains the `AW36` row and the `AW33 → AW36` navigation | ✅ applied (Claude Design canvas, 2026-10-23, `55bbe4cc`, with `AW36`; the admin web is built in BKM-004) |
 | [131](./followups/131-rules-copy-from-studio-settings.md) | README only: «Studio rules in copy» says the «2 h 30» of `05`/`09`/`S21`/`AW03` and `02`'s «Paquetes desde» price are Studio Settings values read from the API, with what each screen shows while they are unknown; no numbered screen changes (BKM-004, ADR-0101) | ✅ applied (README only, same canvas and commit `55bbe4cc`; the apps are built in BKM-004) |
+
 | [135](./followups/135-plan-and-payment-without-credit.md) | `08` and `09` without Credit (PAY-005, booking ADR-0009): the «Con crédito» frames and notes go, one catalogue and one price breakdown where the total is the Plan price | ✅ applied (Claude Design export 2026-10-23, `4657e3b7`; canvas deleted) |
 | [136](./followups/136-referrals-code-only.md) | `16` shows only the code, «Compartir», and «Pronto podrás invitar a una amiga a una clase gratis.» (PAY-005); `17` Mi crédito retired with a banner; `18` loses «Mi crédito»; `02`'s referral shortcut reads «Comparte tu código» | ✅ applied (Claude Design export 2026-10-23, `b6508462`; canvas deleted) |
 | [137](./followups/137-close-account-without-credit.md) | `24` Cerrar mi cuenta drops «Pierdes tu crédito de Bs 120,00.» and every Credit caption (PAY-005) | ✅ applied (Claude Design export 2026-10-23, `91c44607`; canvas deleted) |
@@ -293,6 +294,7 @@ Each of these was sent as the next message in the existing design session for th
 | [212](./followups/205-aw37-proyeccion.md) | Simulador (`AW42`; AW37 is Equipos) gains a **Proyección** table under the derivation: 3, 6, and 12 months, Bajo, Base, and Alto (STU-005) | 🕓 pending |
 | [213](./followups/205-sidebar-recomendaciones.md) | The sidebar gains **Recomendaciones** after **Indicadores** (STU-006). AW40 is Fundadoras, so the page is AW44 | 🕓 pending |
 | [214](./followups/206-indicadores-informe.md) | Indicadores (`AW43`; AW39 is Para contactar) gains «Informe del mes» under the chart (STU-007): two paragraphs, one cited action, and «Pregunta sobre el mes». The Coordinator frame does not gain it | 🕓 pending |
+| [215](./followups/132-client-diagnosis-states.md) | Client diagnosis states (MOB-070): `04` drops «Unirme a la lista de espera» inside the window for «Falta poco para la clase, así que la lista de espera ya cerró.»; `05` and `06` name a refused cancellation or reschedule by its problem code; `18`'s footer reads the app version; `22` refuses a phone that is not a Bolivian mobile | 🕓 pending |
 
 ## Status
 
