@@ -109,6 +109,7 @@ import type {
   GetCurrentClientPhotoParams,
   GetExpenseReportParams,
   GetIncomeReportParams,
+  GetMonthKpisParams,
   GetPaymentReceiptParams,
   GetRevenueReportParams,
   ImpersonationDto,
@@ -138,6 +139,7 @@ import type {
   ListTrainerScheduleParams,
   LivenessResponseDto,
   MarkedNotificationsDto,
+  MonthKpisDto,
   NotificationPageDto,
   NutritionistAgendaPageDto,
   PasswordRecoveryRequestResultDto,
@@ -25683,6 +25685,187 @@ export function useGetRevenueReport<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetRevenueReportQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getMonthKpisResponse200 = {
+  data: MonthKpisDto;
+  status: 200;
+};
+
+export type getMonthKpisResponseSuccess = getMonthKpisResponse200 & {
+  headers: Headers;
+};
+export type getMonthKpisResponse = getMonthKpisResponseSuccess;
+
+export const getGetMonthKpisUrl = (params: GetMonthKpisParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/reports/kpis?${stringifiedParams}`
+    : `/api/v1/administrator/reports/kpis`;
+};
+
+export const getMonthKpis = async (
+  params: GetMonthKpisParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getMonthKpisResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetMonthKpisUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getMonthKpisResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getMonthKpisResponse;
+};
+
+export const getGetMonthKpisQueryKey = (params?: GetMonthKpisParams) => {
+  return [
+    `/api/v1/administrator/reports/kpis`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetMonthKpisQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMonthKpis>>,
+  TError = unknown,
+>(
+  params: GetMonthKpisParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthKpis>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMonthKpisQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMonthKpis>>> = ({
+    signal,
+  }) => getMonthKpis(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMonthKpis>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMonthKpisQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMonthKpis>>
+>;
+export type GetMonthKpisQueryError = unknown;
+
+export function useGetMonthKpis<
+  TData = Awaited<ReturnType<typeof getMonthKpis>>,
+  TError = unknown,
+>(
+  params: GetMonthKpisParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthKpis>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMonthKpis>>,
+          TError,
+          Awaited<ReturnType<typeof getMonthKpis>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMonthKpis<
+  TData = Awaited<ReturnType<typeof getMonthKpis>>,
+  TError = unknown,
+>(
+  params: GetMonthKpisParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthKpis>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMonthKpis>>,
+          TError,
+          Awaited<ReturnType<typeof getMonthKpis>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMonthKpis<
+  TData = Awaited<ReturnType<typeof getMonthKpis>>,
+  TError = unknown,
+>(
+  params: GetMonthKpisParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthKpis>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetMonthKpis<
+  TData = Awaited<ReturnType<typeof getMonthKpis>>,
+  TError = unknown,
+>(
+  params: GetMonthKpisParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMonthKpis>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetMonthKpisQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

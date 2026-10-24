@@ -6723,6 +6723,43 @@
         ]
       }
     },
+    "/api/v1/administrator/reports/kpis": {
+      "get": {
+        "operationId": "getMonthKpis",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthKpisDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "RevenueReport"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -12169,6 +12206,68 @@
           "accruedCentavos",
           "deferredCentavos",
           "classesStillOwed"
+        ]
+      },
+      "MonthKpisDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-10"
+          },
+          "sessionsHeld": {
+            "type": "number"
+          },
+          "occupancyPercent": {
+            "type": "number"
+          },
+          "averageStudentsTimes10": {
+            "type": "number",
+            "description": "Average bookings at window close, in tenths"
+          },
+          "averageAttendanceTimes10": {
+            "type": "number",
+            "description": "Average attendance, in tenths"
+          },
+          "noShowPercent": {
+            "type": "number"
+          },
+          "activeClients": {
+            "type": "number"
+          },
+          "newClients": {
+            "type": "number"
+          },
+          "renewedClients": {
+            "type": "number"
+          },
+          "renewalPercent": {
+            "type": "number"
+          },
+          "cashCentavos": {
+            "type": "number"
+          },
+          "accruedCentavos": {
+            "type": "number"
+          },
+          "deferredCentavos": {
+            "type": "number"
+          },
+          "classesStillOwed": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "month",
+          "sessionsHeld",
+          "occupancyPercent",
+          "averageStudentsTimes10",
+          "averageAttendanceTimes10",
+          "noShowPercent",
+          "activeClients",
+          "newClients",
+          "renewedClients",
+          "renewalPercent"
         ]
       },
       "CreatePendingUploadDto": {
