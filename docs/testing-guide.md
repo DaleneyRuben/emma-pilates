@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
@@ -88,12 +88,14 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 79, 85, 89 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90 |
+| AW39 Para contactar | 84 |
 | AW40 Fundadoras | 88 |
 | AW23–AW24 Personal | 26, 31, 72, 79 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89 |
 | AW38 Comentarios | 80 |
+| AW151 Caja | 76 |
 
 ## Before you begin
 
@@ -6675,3 +6677,22 @@ gains one `invite_converted` adjustment, and a second approval adds nothing.
 A host with no current Subscription gets it on the next one she buys. The
 friend's own first real Payment still gets the gift class: the free class
 never counted as a first Plan.
+
+## Test 90: campaign extra classes (BKM-015)
+
+A campaign grants extra classes with reason `campaign` to every Client whose
+live Subscription covers today in Bolivia. A Client without one is skipped
+and named. It never changes a price. It composes with the gift class
+(Test 85); it does not replace it.
+
+A. **The page (AW21).** Log in as `paola.mendoza@example.com` /
+   `emma-local-2026`. On **Clientes**, at 1440 px and at 420 px (open the
+   menu with «Abrir menú»), press **Dar clases de campaña**. The page says
+   how many clientas will receive it and names who has no live Plan. Write
+   «Inicio de año», leave **Clases extra** at 1, press **Dar las clases**,
+   then **Confirmar campaña**. The result names how many received a class
+   and who was skipped. Open one recipient's detail: «Clases extra: 1 ·
+   Campaña» when the campaign is her first grant.
+B. **The denial.** The same `POST /api/v1/administrator/campaigns` as Camila
+   answers `403` and writes nothing. The header `Idempotency-Key` is a UUID;
+   sending the same call again grants nothing more.

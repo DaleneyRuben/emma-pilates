@@ -275,6 +275,7 @@ Each of these was sent as the next message in the existing design session for th
 | [199](./followups/196-front-desk-receipt-and-invoice.md) | `S10` gains the front-desk receipt photograph and the smallest «Datos para la factura» card (PAY-006, decisions §4.2 and §4.5) | 🕓 pending |
 | [200](./followups/197-void-sale-on-payments.md) | `AW28` gains «Anular venta» with a required reason and an «Anulado» filter (PAY-006, decisions §4.3) | 🕓 pending |
 | [201](./followups/198-courtesy-form-on-client-detail.md) | `AW22` gains courtesy and class-return buttons; amends 195, which said not to add the form (PAY-006) | 🕓 pending |
+| [202](./followups/196-admin-campaign-grant.md) | `AW21` gains «Dar clases de campaña», opening the campaign grant on the same screen's address; no new screen and no sidebar entry (BKM-015, decisions §5.4) | 🕓 pending |
 
 ## Status
 

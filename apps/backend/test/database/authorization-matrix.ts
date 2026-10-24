@@ -1,3 +1,5 @@
+import { campaignAuthorizationRows } from './campaign-authorization';
+
 // IDN-009 / ADR-0102: every endpoint the API serves, with an explicit
 // decision for the Administrator and the Coordinator. «allow» means the Role
 // passes authorization (the request may still fail on its data); «deny»
@@ -476,6 +478,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
       outOfService: true,
     },
   }),
+  ...campaignAuthorizationRows(),
 };
 
 /** A concrete address for a templated path. */

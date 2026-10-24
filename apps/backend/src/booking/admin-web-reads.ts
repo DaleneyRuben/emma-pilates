@@ -5,6 +5,8 @@ import { AdministratorPaymentListController } from './payments/administrator-pay
 import { administratorPaymentProvider } from './payments/administrator-payment-operations';
 import { allowanceAdjustmentProvider } from './payments/allowance-adjustment-provider';
 import { AllowanceAdjustmentController } from './payments/allowance-adjustment.controller';
+import { campaignGrantProvider } from './payments/campaign-grant-provider';
+import { CampaignController } from './payments/campaign.controller';
 import { VoidSaleController } from './payments/void-sale.controller';
 import { voidSaleProvider } from './payments/void-sale-provider';
 import { CourtesyAccessController } from './payments/courtesy-access.controller';
@@ -19,6 +21,7 @@ export const adminWebReads = {
     AdministratorPaymentListController,
     CourtesyAccessController,
     AllowanceAdjustmentController,
+    CampaignController,
     VoidSaleController,
   ],
   providers: (prismaToken: symbol): Provider[] => [
@@ -26,6 +29,7 @@ export const adminWebReads = {
     administratorPaymentProvider(prismaToken),
     courtesyAccessProvider(prismaToken),
     allowanceAdjustmentProvider(prismaToken),
+    ...campaignGrantProvider(prismaToken),
     voidSaleProvider(prismaToken),
   ],
 };
