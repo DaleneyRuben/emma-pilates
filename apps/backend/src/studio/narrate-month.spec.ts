@@ -107,10 +107,7 @@ describe('answer question', () => {
   });
 
   it('answers active clients from an accented question', () => {
-    const result = answerQuestion(
-      '¿Cuántas clientas activas hay?',
-      aggregates,
-    );
+    const result = answerQuestion('¿Cuántas clientas activas hay?', aggregates);
 
     expect(result.refused).toBe(false);
     expect(result.answer).toContain('8');
