@@ -103,6 +103,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW34](./admin-web/34-branch-selector.md) | Selector de sucursal | `AW34` | ✅ |
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
 | [AW36](./admin-web/36-reglas-del-estudio.md) | Reglas del estudio | `AW36` | ✅ (Claude Design canvas, 2026-10-23, `55bbe4cc`; the admin web is built in BKM-004) |
+| [AW37](./admin-web/37-simulador.md) | Simulador | — | not yet generated |
 
 ## Follow-ups (`followups/`)
 
@@ -240,6 +241,7 @@ Each of these was sent as the next message in the existing design session for th
 | [199](./followups/199-evaluation-price-and-history.md) | `13` and `14` name an included Evaluation or the settings price; `15` stops saying every past Evaluation is «Realizada» (NUT-003) | 🕓 pending |
 | [200](./followups/200-evaluation-income-apart.md) | `AW16` splits Plan income and Evaluation income under the method line (NUT-003) | 🕓 pending |
 | [201](./followups/201-aw16-finanzas-tab.md) | `AW16` gains Reporte and Finanzas tabs; Finanzas shows the month's cash income, tax, budget against actual, Nutritionist cost, result, and break-even (BKO-005) | 🕓 pending |
+| [202](./followups/202-sidebar-simulador.md) | The admin sidebar and the design-system sample gain **Simulador** after **Reporte** (STU-004, AW37) | 🕓 pending |
 
 ## Status
 
