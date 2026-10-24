@@ -8,6 +8,18 @@ import { createClassReminderJob } from '../../src/notifications/class-reminder-j
 import { recordNotification } from '../../src/notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../src/time/bolivia-time';
+
+const boliviaClock = (instant: Date): string => {
+  const parts = new Intl.DateTimeFormat('es-BO', {
+    timeZone: 'America/La_Paz',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(instant);
+  const field = (type: string) =>
+    parts.find((part) => part.type === type)?.value ?? '';
+  return `${field('hour')}:${field('minute')}`;
+};
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -104,7 +116,7 @@ describe('class reminder worker', () => {
         type: 'class_reminder_day',
         businessEventKey: `class-reminder-day:${booking.id}`,
         title: 'Recordatorio',
-        message: `Mañana tienes ${classType.name} a las 02:00.`,
+        message: `Mañana tienes ${classType.name} a las ${boliviaClock(startsAt)}.`,
         destinationType: 'booking',
         destinationId: booking.id,
       }),
