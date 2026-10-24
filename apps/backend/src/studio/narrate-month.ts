@@ -76,6 +76,23 @@ export const narrateMonth = (input: {
   };
 };
 
+export const narrativeFromReads = (input: {
+  month: string;
+  kpis: MonthKpiCounts;
+  recommendations: readonly { rule: string; detail: string; subject: string }[];
+}): MonthNarrative =>
+  narrateMonth({
+    month: input.month,
+    kpis: input.kpis,
+    recommendations: input.recommendations,
+    subject: input.recommendations.map((item) => item.subject).join(' '),
+  });
+
+export const questionFromCounts = (
+  question: string,
+  kpis: Pick<MonthKpiCounts, 'occupancyPercent' | 'activeClients'>,
+) => answerQuestion(question, kpis);
+
 export const answerQuestion = (
   question: string,
   aggregates: Pick<MonthKpiCounts, 'occupancyPercent' | 'activeClients'>,

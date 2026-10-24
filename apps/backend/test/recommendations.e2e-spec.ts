@@ -111,6 +111,8 @@ describe('recommendations endpoint (e2e)', () => {
                 input: { id: string },
                 actor: AuthenticatedPrincipal,
               ) => operations.dismiss(input, actor, {} as never),
+              narrative: () => Promise.reject(new Error('unused')),
+              question: () => Promise.reject(new Error('unused')),
             };
           },
         },

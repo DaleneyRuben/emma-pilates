@@ -100,6 +100,8 @@ describe('month kpi endpoint (e2e)', () => {
               revenue: () => Promise.reject(new Error('unused')),
               kpis: (input: { month: string }, actor: AuthenticatedPrincipal) =>
                 operations.kpis(input, actor, {} as never),
+              narrative: () => Promise.reject(new Error('unused')),
+              question: () => Promise.reject(new Error('unused')),
             };
           },
         },

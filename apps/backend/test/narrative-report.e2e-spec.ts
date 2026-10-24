@@ -24,6 +24,16 @@ const createStudioOperations = createStudioOperationsUntyped as (deps: {
   recomputeRecommendations: () => Promise<{ written: number }>;
   dismissRecommendation: () => Promise<null>;
 }) => {
+  narrative: (
+    input: { month: string },
+    principal: AuthenticatedPrincipal,
+    prisma: PrismaClient,
+  ) => Promise<unknown>;
+  question: (
+    input: { month: string; question: string },
+    principal: AuthenticatedPrincipal,
+    prisma: PrismaClient,
+  ) => Promise<unknown>;
   kpis: (
     input: { month: string },
     principal: AuthenticatedPrincipal,
@@ -124,6 +134,14 @@ describe('narrative report endpoint (e2e)', () => {
               recomputeRecommendations: () =>
                 Promise.reject(new Error('unused')),
               dismissRecommendation: () => Promise.reject(new Error('unused')),
+              narrative: (
+                input: { month: string },
+                actor: AuthenticatedPrincipal,
+              ) => operations.narrative(input, actor, {} as PrismaClient),
+              question: (
+                input: { month: string; question: string },
+                actor: AuthenticatedPrincipal,
+              ) => operations.question(input, actor, {} as PrismaClient),
             };
           },
         },
