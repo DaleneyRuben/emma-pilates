@@ -29,7 +29,12 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
   const decide = async (decision: "approved" | "refused") => {
     setPending(decision);
     try {
-      const response = await decideFreeze(route.params.freezeId, { decision }, { fetcher });
+      const response = await decideFreeze(
+        route.params.freezeId,
+        { decision },
+        undefined,
+        fetcher,
+      );
       setNotice(
         response.status === 200
           ? "Listo. La clienta ya fue avisada."
