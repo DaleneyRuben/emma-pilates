@@ -4,17 +4,16 @@ import { voidSale } from './void-sale';
 const staff = (
   role:
     'assistant' | 'administrator' | 'trainer' | 'nutritionist' | 'coordinator',
-): AuthenticatedPrincipal =>
-  ({
-    accountId: `${role}-account`,
-    authenticationSessionId: 'session',
-    identity: {
-      kind: 'staff',
-      staffMemberId: `${role}-staff`,
-      role,
-      branchIds: role === 'administrator' ? [] : ['branch'],
-    },
-  }) as AuthenticatedPrincipal;
+): AuthenticatedPrincipal => ({
+  accountId: `${role}-account`,
+  authenticationSessionId: 'session',
+  identity: {
+    kind: 'staff',
+    staffMemberId: `${role}-staff`,
+    role,
+    branchIds: role === 'administrator' ? [] : ['branch'],
+  },
+});
 
 const dependencies = (principal: AuthenticatedPrincipal) => ({
   principal,

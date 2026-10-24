@@ -1,0 +1,48 @@
+# Critical journey: at the end of the day the Assistant counts the drawer and
+# closes Centro's cash (S25, BKO-003). It runs after
+# assistant-cash-payment-and-booking, so the day has a cash sale; a Branch
+# closes once a day, so a second run the same day opens on «Caja cerrada».
+appId: ${APP_ID}
+env:
+  EMAIL: camila.rojas@example.com
+---
+- runFlow: subflows/login.yaml
+- runFlow: subflows/park-dev-gear.yaml
+- extendedWaitUntil:
+    visible:
+      id: "cash-close-entry"
+    timeout: 30000
+- tapOn:
+    id: "cash-close-entry"
+- extendedWaitUntil:
+    visible: "EFECTIVO ESPERADO|Caja cerrada"
+    timeout: 15000
+- runFlow:
+    when:
+      visible: "EFECTIVO ESPERADO"
+    commands:
+      - takeScreenshot: staff-cash-close-1-form
+      - tapOn:
+          id: "cash-close-counted"
+      - waitForAnimationToEnd
+      - inputText: "100"
+      - extendedWaitUntil:
+          visible: "Diferencia.*"
+          timeout: 5000
+      - tapOn:
+          id: "cash-close-note"
+      - waitForAnimationToEnd
+      - inputText: "Prueba de cierre"
+      - hideKeyboard
+      - takeScreenshot: staff-cash-close-2-counted
+      - scrollUntilVisible:
+          element:
+            id: "cash-close-submit"
+          direction: DOWN
+      - tapOn:
+          id: "cash-close-submit"
+- extendedWaitUntil:
+    visible: "Caja cerrada"
+    timeout: 15000
+- assertVisible: "Cerrada por .*"
+- takeScreenshot: staff-cash-close-3-closed

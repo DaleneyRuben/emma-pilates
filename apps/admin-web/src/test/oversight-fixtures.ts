@@ -1,6 +1,4 @@
 import type {
-  AdminCreditBalanceDto,
-  AdminCreditPageDto,
   AdminEvaluationDto,
   AdminEvaluationPageDto,
   AdminReferralDto,
@@ -11,7 +9,6 @@ import { centro } from "./booking-handlers";
 
 export const evaluationsPath = "/api/v1/administrator/evaluations";
 export const referralsPath = "/api/v1/administrator/referrals";
-export const creditsPath = "/api/v1/administrator/credits";
 
 const nutritionist = (
   suffix: string,
@@ -125,37 +122,5 @@ export const referralPage = (
   totalItems: items.length,
   awardedCount: 27,
   pendingCount: 7,
-  ...extra,
-});
-
-export const creditRow = (
-  suffix: string,
-  clientName: string,
-  availableCentavos: number,
-  extra: Partial<AdminCreditBalanceDto> = {},
-): AdminCreditBalanceDto => ({
-  clientId: `c2000000-0000-5000-8000-0000000000${suffix}`,
-  clientName,
-  availableCentavos,
-  lastMovementAt: "2026-08-13T15:00:00.000Z",
-  lastMovementKind: "earned",
-  ...extra,
-});
-
-export const nataliaCredit = creditRow("01", "Natalia Aguilera", 16_000);
-export const danielaCredit = creditRow("02", "Daniela Rojas Peña", 8_000, {
-  lastMovementAt: "2026-08-01T23:30:00.000Z",
-  lastMovementKind: "spent",
-});
-
-export const creditPage = (
-  items: AdminCreditBalanceDto[],
-  extra: Partial<AdminCreditPageDto> = {},
-): AdminCreditPageDto => ({
-  items,
-  page: 1,
-  pageSize: 20,
-  totalItems: items.length,
-  outstandingCentavos: 64_000,
   ...extra,
 });

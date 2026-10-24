@@ -79,7 +79,7 @@ describe('worker sweeps', () => {
           steps: [
             { job: 'evaluation_reminders', execute: reminders },
             {
-              job: 'empty_session_check',
+              job: 'minimum_bookings_check',
               execute: jest.fn().mockRejectedValue(new Error('P1001')),
             },
           ],
@@ -101,7 +101,7 @@ describe('worker sweeps', () => {
         lastSuccessAt: new Date('2026-10-14T12:01:00.000Z'),
       },
       {
-        job: 'empty_session_check',
+        job: 'minimum_bookings_check',
         intervalMs: 60_000,
         lastSuccessAt: new Date('2026-10-14T12:00:00.000Z'),
       },

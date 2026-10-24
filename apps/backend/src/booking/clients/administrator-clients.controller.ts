@@ -1,15 +1,18 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   Header,
   Headers,
   Inject,
   Param,
+  Patch,
   Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -31,6 +34,8 @@ import {
   AdminClientDetailDto,
   AdminClientPageDto,
   parseClientDirectoryQuery,
+  parseUpdateAdminClientProfile,
+  UpdateAdminClientProfileDto,
 } from './administrator-clients.dto';
 
 export const administratorClientOperations = Symbol(
@@ -46,12 +51,54 @@ export type AdministratorClientOperations = {
     command: { clientId: string },
     principal: AuthenticatedPrincipal,
   ) => Promise<AdministratorClientDetail>;
+  /** Saves the correction and answers the refreshed detail. */
+  updateProfile: (
+    command: { clientId: string; name: string; phone: string | null },
+    principal: AuthenticatedPrincipal,
+  ) => Promise<AdministratorClientDetail>;
 };
 
 const civil = (date: Date): string => date.toISOString().slice(0, 10);
 
-// WEB-004 (AW21/AW22): read-only Client oversight for Administrators. The
-// responses carry personal data, so nothing is cached (ADR-0063).
+const toDetailDto = (
+  client: AdministratorClientDetail,
+): AdminClientDetailDto => {
+  const current = client.subscription.subscription;
+  return {
+    ...client,
+    clientSince: civil(client.clientSince),
+    subscription: {
+      status: client.subscription.status,
+      nextSubscription: null,
+      founderRenewalDeadline: client.subscription.founderRenewalDeadline,
+      freeze: client.subscription.freeze ?? null,
+      canRequestFreeze: client.subscription.canRequestFreeze ?? false,
+      subscription:
+        current === null
+          ? null
+          : {
+              ...current,
+              startsOn: civil(current.startsOn),
+              endsOn: civil(current.endsOn),
+            },
+    },
+  };
+};
+
+const requireClientId = (clientId: string): string => {
+  const id = parseUuid(clientId);
+  if (id === null) {
+    throw new BadRequestException({
+      code: 'invalid_request',
+      detail: 'Invalid Client identifier',
+    });
+  }
+  return id;
+};
+
+// WEB-004 (AW21/AW22): Client oversight for the Administrator and the
+// Coordinator (ADR-0102), with IDN-009's profile correction. The responses
+// carry personal data, so nothing is cached (ADR-0063).
 @Controller({ path: 'administrator/clients', version: '1' })
 @ApiBearerAuth()
 export class AdministratorClientsController {
@@ -95,33 +142,36 @@ export class AdministratorClientsController {
     @Param('clientId') clientId: string,
     @Headers('authorization') authorization: string | undefined,
   ): Promise<AdminClientDetailDto> {
-    const id = parseUuid(clientId);
-    if (id === null) {
-      throw new BadRequestException({
-        code: 'invalid_request',
-        detail: 'Invalid Client identifier',
-      });
-    }
+    const id = requireClientId(clientId);
     const principal = await this.authenticate(authorization);
-    const client = await run(() =>
-      this.operations.read({ clientId: id }, principal),
+    return toDetailDto(
+      await run(() => this.operations.read({ clientId: id }, principal)),
     );
-    const current = client.subscription.subscription;
-    return {
-      ...client,
-      clientSince: civil(client.clientSince),
-      subscription: {
-        status: client.subscription.status,
-        nextSubscription: null,
-        subscription:
-          current === null
-            ? null
-            : {
-                ...current,
-                startsOn: civil(current.startsOn),
-                endsOn: civil(current.endsOn),
-              },
-      },
-    };
+  }
+
+  // IDN-009: the Administrator and the Coordinator correct a Client's name
+  // and phone (ADR-0102).
+  @Patch(':clientId')
+  @ApiOperation({ operationId: 'updateAdminClientProfile' })
+  @ApiParam({ name: 'clientId', format: 'uuid' })
+  @ApiBody({ type: UpdateAdminClientProfileDto })
+  @ApiOkResponse({ type: AdminClientDetailDto })
+  @Header('Cache-Control', 'no-store')
+  async updateProfile(
+    @Param('clientId') clientId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: unknown,
+  ): Promise<AdminClientDetailDto> {
+    const id = requireClientId(clientId);
+    const changes = parsed(
+      parseUpdateAdminClientProfile(body),
+      'Invalid profile correction',
+    );
+    const principal = await this.authenticate(authorization);
+    return toDetailDto(
+      await run(() =>
+        this.operations.updateProfile({ clientId: id, ...changes }, principal),
+      ),
+    );
   }
 }

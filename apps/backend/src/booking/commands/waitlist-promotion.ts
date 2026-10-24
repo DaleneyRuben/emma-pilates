@@ -3,6 +3,8 @@ import { WaitlistClosureReason } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { promoteWaitlist } from './promote-waitlist';
 import { findCoveringSubscription } from './eligible-subscription';
+import { fundBooking } from './weekly-cap-funding';
+import { readWeeklyCapPosition } from './weekly-cap-count';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
 
 export type WaitlistPromotionDependencies = {
@@ -59,12 +61,21 @@ export const promoteWaitlistInTransaction = (
           },
           orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
         }),
-      findEligibleSubscription: ({ clientId, onDate }) =>
-        findCoveringSubscription(transaction, {
+      findEligibleSubscription: async ({ clientId, onDate }) => {
+        const subscription = await findCoveringSubscription(transaction, {
           clientId,
           onDate,
           needsAllowance: true,
-        }),
+        });
+        if (subscription === null) return null;
+        return {
+          id: subscription.id,
+          ...(await readWeeklyCapPosition(transaction, {
+            subscriptionId: subscription.id,
+            startsAt: onDate,
+          })),
+        };
+      },
       hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
         transaction.booking
           .findFirst({
@@ -80,23 +91,21 @@ export const promoteWaitlistInTransaction = (
           })
           .then((booking) => booking !== null),
       createBooking: async (input) => {
-        const consumed = await transaction.subscription.updateMany({
-          where: {
-            id: input.subscriptionId,
-            clientId: input.clientId,
-            remainingClassAllowance: { gt: 0 },
-          },
-          data: { remainingClassAllowance: { decrement: 1 } },
+        const session = await transaction.session.findUniqueOrThrow({
+          where: { id: input.sessionId },
+          select: { startsAt: true },
         });
-
-        if (consumed.count !== 1) {
-          throw new Error('No eligible Subscription');
-        }
-
-        return transaction.booking.create({
-          data: input,
-          select: { id: true },
+        const booking = await fundBooking(transaction, {
+          subscriptionId: input.subscriptionId,
+          clientId: input.clientId,
+          authorAccountId: input.createdByAccountId,
+          startsAt: session.startsAt,
+          now: now(),
+          createBooking: () =>
+            transaction.booking.create({ data: input, select: { id: true } }),
         });
+        if (booking === null) throw new Error('No eligible Subscription');
+        return booking;
       },
       closeAsPromoted: async ({ entryId, bookingId }) => {
         const closedAt = new Date();

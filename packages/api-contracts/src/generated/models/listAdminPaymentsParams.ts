@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ListAdminPaymentsInvoice } from "./listAdminPaymentsInvoice";
 import type { ListAdminPaymentsStatus } from "./listAdminPaymentsStatus";
 
 export type ListAdminPaymentsParams = {
@@ -11,6 +12,10 @@ export type ListAdminPaymentsParams = {
    * Client name fragment, accents and case ignored
    */
   q?: unknown;
+  /**
+   * «unissued»: confirmed sales with Invoice Data not marked «Factura emitida»
+   */
+  invoice?: ListAdminPaymentsInvoice;
   status?: ListAdminPaymentsStatus;
   pageSize?: number;
   page?: number;

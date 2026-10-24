@@ -73,9 +73,7 @@ describe("Client Plans", () => {
     await waitFor(() => {
       expect(screen.getByText("Válido por 90 días")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByText("90 días de vigencia desde que se confirma tu pago."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("90 días de vigencia desde la fecha de inicio.")).toBeOnTheScreen();
     expect(screen.getByText("Hasta 4 clases por semana.")).toBeOnTheScreen();
     expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
     // 09's bar names the Plan once it loads (MOB-034).
@@ -85,6 +83,44 @@ describe("Client Plans", () => {
     expect(screen.getByText("36 clases en cualquier sucursal del estudio.")).toBeOnTheScreen();
     expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Continuar al pago" })).toBeOnTheScreen();
+  });
+
+  it("shows a founder the discounted price and the struck list price", async () => {
+    const founderPlans = [
+      {
+        ...plans[0],
+        priceCentavos: 47_600,
+        listPriceCentavos: 56_000,
+      },
+      { ...plans[1], classAllowance: 1, priceCentavos: 8_000 },
+    ];
+    const fetcher = routeFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse({ status: "none", subscription: null }),
+      "/api/v1/plans": () => jsonResponse(founderPlans),
+      "/api/v1/plans/plan-8": () => jsonResponse(founderPlans[0]),
+    });
+    const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Bs 476")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("Bs 560")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 80")).toBeOnTheScreen();
+    expect(screen.getAllByText("Bs 560")).toHaveLength(1);
+
+    await fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
+    await waitFor(() => {
+      expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
+    });
+    expect(screen.getAllByText("Bs 476").length).toBeGreaterThan(0);
+    expect(screen.getByText("Bs 560")).toBeOnTheScreen();
   });
 
   it("shows an empty state when no Plan is visible", async () => {

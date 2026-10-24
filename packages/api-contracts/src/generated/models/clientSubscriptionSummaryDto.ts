@@ -19,4 +19,10 @@ export interface ClientSubscriptionSummaryDto {
    * @nullable
    */
   extraClassesLine?: string | null;
+  /**
+   * Classes left this week from the base allowance. Absent without a cap.
+   * @minimum 0
+   * @nullable
+   */
+  classesLeftThisWeek?: number | null;
 }

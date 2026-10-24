@@ -1,6 +1,7 @@
 import type {
   AdminClientDetailDto,
   AdminClientDto,
+  ClientAcquisitionDto,
   StaffMemberDto,
 } from "@pilates/api-contracts";
 import { http } from "msw";
@@ -91,7 +92,7 @@ export const luciaDetail: AdminClientDetailDto = {
   },
 };
 
-const member = (
+export const member = (
   suffix: string,
   name: string,
   extra: Partial<StaffMemberDto> = {},
@@ -148,3 +149,34 @@ export const allBranchesHandler = () =>
       totalItems: 3,
     });
   });
+
+// BKM-011: how Lucía found the studio, for AW22's «¿Cómo nos conociste?».
+export const luciaAcquisition: ClientAcquisitionDto = {
+  clientId: lucia.id,
+  channel: "trainer",
+  declaredChannel: "instagram",
+  referralCode: "EMMA",
+  referrer: {
+    kind: "trainer",
+    id: "5f000000-0000-5000-8000-000000000002",
+    name: "Emma Vargas",
+  },
+};
+
+export const acquisitionHandler = (
+  body: ClientAcquisitionDto = luciaAcquisition,
+) =>
+  http.get(apiUrl(`${clientsPath}/:clientId/acquisition`), () =>
+    jsonResponse(body),
+  );
+
+// BKM-011: a Trainer's personal code on AW24; none by default.
+export const referralCodeHandler = (referralCode: string | null = null) =>
+  http.get(
+    apiUrl(`${staffMembersPath}/:staffMemberId/referral-code`),
+    ({ params }) =>
+      jsonResponse({
+        staffMemberId: String(params.staffMemberId),
+        referralCode,
+      }),
+  );
