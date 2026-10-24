@@ -320,7 +320,7 @@ describe("admin shell", () => {
         { timeout: 5_000 },
       );
       expect(
-        within(sidebar).getByRole("link", { name: "Pagos", exact: true }),
+        within(sidebar).getByRole("link", { name: /^Pagos$/ }),
       ).toHaveTextContent(/^Pagos$/);
       expect(
         within(sidebar).getByRole("link", { name: "Insumos" }),
