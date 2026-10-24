@@ -907,7 +907,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | ready |
 | STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | ready |
 | STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | done |
-| STU-007 | P3 | Backend/admin web | AI: a narrated monthly report and natural-language questions over the aggregates | STU-006 | 4–6 d | ready |
+| STU-007 | P3 | Backend/admin web | AI: a narrated monthly report and natural-language questions over the aggregates | STU-006 | 4–6 d | in progress |
 | MOB-071 | P3 | Client app | Inicio offline: persist the profile so Inicio renders from cache | — | 0.5 d | ready |
 | UX-005 to UX-014 | P2–P3 | All surfaces | *Existing rows.* The rest of the UX polish queue | UX-001 | 6–9 d | ready |
 | REL-008 | P3 | Delivery | *Existing row.* Release workflows in GitHub Actions | — | 2–3 d | later |
@@ -1073,6 +1073,12 @@ recomputes facts only, and the recompute endpoint is the trigger. The
 Coordinator role is IDN-009's; this path accepts a cast `coordinator`, and a
 real login waits. Design follow-up 205 and prompt AW40 stay pending; the
 export was not run.
+
+#### STU-007 · Evidence
+
+In progress 2026-10-23. Stacked on STU-006. The narrated report is a pure
+function over the month's KPI counts and recommendation sentences. No model
+is called and no key is added.
 
 ### Summary (2026-10-23)
 
