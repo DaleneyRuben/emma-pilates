@@ -7,6 +7,7 @@ type RecordAttendanceDependencies = {
   principal: AuthenticatedPrincipal;
   loadSession(sessionId: string): Promise<{
     id: string;
+    branchId: string;
     trainerStaffMemberId: string;
     endsAt: Date;
     state: 'scheduled' | 'cancelled';
@@ -14,6 +15,7 @@ type RecordAttendanceDependencies = {
   loadBookedIds(sessionId: string): Promise<string[]>;
   save(input: {
     sessionId: string;
+    branchId: string;
     outcomes: { bookingId: string; outcome: AttendanceOutcome }[];
     recordedByAccountId: string;
   }): Promise<void>;
@@ -52,6 +54,7 @@ export const recordAttendance = async (
 
   await dependencies.save({
     sessionId: session.id,
+    branchId: session.branchId,
     outcomes: command.outcomes,
     recordedByAccountId: dependencies.principal.accountId,
   });

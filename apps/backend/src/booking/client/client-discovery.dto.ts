@@ -96,6 +96,15 @@ export class ClientSubscriptionSummaryDto {
       '«Clases extra: 1 · Regalo de bienvenida» when extra classes remain',
   })
   extraClassesLine?: string | null;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 0,
+    nullable: true,
+    description:
+      'Classes left this week from the base allowance. Absent without a cap.',
+  })
+  classesLeftThisWeek?: number | null;
 }
 
 export class ClientSubscriptionDto {
@@ -112,6 +121,43 @@ export class ClientSubscriptionDto {
       'The one future Subscription from an Early Renewal. Absent when there is none.',
   })
   nextSubscription?: ClientSubscriptionSummaryDto | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description:
+      'A founder renews before this date. Absent when she is not a founder or has no current Subscription.',
+  })
+  founderRenewalDeadline?: string | null;
+
+  @ApiPropertyOptional({
+    type: () => ClientFreezeDto,
+    nullable: true,
+    description:
+      'The one Freeze of the current Subscription. Absent when there is none.',
+  })
+  freeze?: ClientFreezeDto | null;
+
+  @ApiPropertyOptional({
+    description:
+      'True when the current Plan lasts 90 days or more and has no Freeze yet.',
+  })
+  canRequestFreeze?: boolean;
+}
+
+export class ClientFreezeDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ enum: ['requested', 'approved', 'refused'] })
+  state!: 'requested' | 'approved' | 'refused';
+
+  @ApiProperty({ format: 'date' })
+  startsOn!: string;
+
+  @ApiProperty({ format: 'date' })
+  endsOn!: string;
 }
 
 export class PlanDto {
@@ -144,6 +190,13 @@ export class PlanDto {
 
   @ApiProperty({ minimum: 0, description: 'Money Amount in BOB centavos' })
   priceCentavos!: number;
+
+  @ApiPropertyOptional({
+    minimum: 0,
+    description:
+      'List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it.',
+  })
+  listPriceCentavos?: number;
 }
 
 export class BranchDto {
@@ -206,4 +259,13 @@ export class SessionDetailDto {
 
   @ApiProperty({ minimum: 0 })
   waitlistCount!: number;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 0,
+    nullable: true,
+    description:
+      'Classes left this week from the base allowance. Absent without a cap.',
+  })
+  classesLeftThisWeek?: number | null;
 }

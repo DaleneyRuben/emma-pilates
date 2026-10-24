@@ -260,6 +260,74 @@ describe('Booking commands', () => {
     });
   });
 
+  it('audits an Attendance correction with the previous outcome and the new one', async () => {
+    const fixture = await createFixture(prisma, { now: clock });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const booking = await commands.create(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+    const trainerAccount = await prisma.account.create({
+      data: {
+        email: `${randomUUID()}@example.com`,
+        staffMemberId: fixture.trainerId,
+      },
+    });
+    await prisma.session.update({
+      where: { id: fixture.sessionId },
+      data: {
+        startsAt: new Date(fixture.now.getTime() - 2 * 60 * 60 * 1_000),
+        endsAt: new Date(fixture.now.getTime() - 60 * 60 * 1_000),
+      },
+    });
+    const trainer = {
+      accountId: trainerAccount.id,
+      authenticationSessionId: randomUUID(),
+      identity: {
+        kind: 'staff' as const,
+        staffMemberId: fixture.trainerId,
+        role: 'trainer' as const,
+        branchIds: [fixture.branchId],
+      },
+    };
+    const roster = (outcome: 'attended' | 'no_show') =>
+      commands.recordAttendance(
+        {
+          sessionId: fixture.sessionId,
+          outcomes: [{ bookingId: booking.id, outcome }],
+        },
+        trainer,
+      );
+
+    await roster('attended');
+    await roster('no_show');
+
+    const audits = await prisma.auditRecord.findMany({
+      where: { actionCode: 'attendance.corrected', targetId: booking.id },
+      select: { metadata: true, actorAccountId: true, actorRole: true },
+    });
+    expect(audits).toEqual([
+      {
+        actorAccountId: trainerAccount.id,
+        actorRole: 'TRAINER',
+        metadata: {
+          previousOutcome: 'attended',
+          outcome: 'no_show',
+        },
+      },
+    ]);
+    await expect(
+      prisma.attendanceRecord.findUniqueOrThrow({
+        where: { bookingId: booking.id },
+        select: { outcome: true },
+      }),
+    ).resolves.toEqual({ outcome: 'NO_SHOW' });
+  });
+
   it('writes the idempotency records from the injected clock even when it lies far in the past', async () => {
     const pastNow = new Date('2026-09-01T12:00:00.000Z');
     const fixture = await createFixture(prisma, { capacity: 1, now: clock });

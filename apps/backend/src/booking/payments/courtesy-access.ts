@@ -38,5 +38,19 @@ export const evaluateCourtesyGrant = (
       'Access must end between today and one year from today',
     );
   }
-  return evaluateAllocationEligibility(context);
+  const allocation = evaluateAllocationEligibility(context);
+  // Courtesy Access is not a renewal. A Plan still in use blocks it; a
+  // purchase of a real Plan continues and shortens that Plan instead.
+  if (
+    context.activeSubscription !== null &&
+    context.activeSubscription.endsOn.getTime() >= context.today.getTime() &&
+    (context.activeSubscription.remainingClassAllowance > 0 ||
+      context.activeSubscription.futureBookedCount > 0)
+  ) {
+    throw new PaymentRuleError(
+      'subscription_not_expired',
+      'The current Subscription is still active',
+    );
+  }
+  return allocation;
 };

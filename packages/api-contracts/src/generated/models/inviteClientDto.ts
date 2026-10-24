@@ -4,10 +4,15 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { InviteClientDtoAcquisitionChannel } from "./inviteClientDtoAcquisitionChannel";
 
 export interface InviteClientDto {
   name: string;
   email: string;
   /** @nullable */
   phone?: string | null;
+  /** «¿Cómo nos conociste?» Required by current builds; a build that omits it records `unknown` (BKM-011) */
+  acquisitionChannel?: InviteClientDtoAcquisitionChannel;
+  /** Referral Code of the Client or Trainer who brought her; it decides the Acquisition Channel */
+  referralCode?: string;
 }

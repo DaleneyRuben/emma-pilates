@@ -5,7 +5,7 @@
 //
 //   API_URL=http://127.0.0.1:3100 node .maestro/seed.mjs
 //
-// - Mariana (no Plan yet) and Sofía (expired Plan, Bs 60 of Credit) each buy
+// - Mariana (no Plan yet) and Sofía (expired Plan) each buy
 //   the 8-class Plan by transfer and send a receipt, for
 //   administrator-review-payments.yaml to confirm one and reject the other.
 //   A Client whose Plan is still active cannot buy, so this needs the

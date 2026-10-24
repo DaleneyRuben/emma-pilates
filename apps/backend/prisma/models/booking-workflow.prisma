@@ -55,7 +55,9 @@ model Booking {
   rescheduledTo          Booking?                  @relation("BookingRescheduleChain", fields: [rescheduledToBookingId], references: [id], onDelete: Restrict)
   rescheduledFrom        Booking?                  @relation("BookingRescheduleChain")
   attendanceRecord       AttendanceRecord?
+  guestPasses            GuestPass[]
   promotedWaitlistEntry  WaitlistEntry?            @relation("WaitlistPromotion")
+  allowanceAdjustment    AllowanceAdjustment?
 
   @@unique([id, sessionId, clientId])
   @@unique([id, clientId, subscriptionId])

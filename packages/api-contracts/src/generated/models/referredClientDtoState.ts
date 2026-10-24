@@ -5,6 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Deprecated (PAY-005): Credit was retired; a Referral made since stays pending
+ * @deprecated
+ */
 export type ReferredClientDtoState =
   (typeof ReferredClientDtoState)[keyof typeof ReferredClientDtoState];
 

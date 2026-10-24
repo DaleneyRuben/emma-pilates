@@ -8,6 +8,8 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
+import { acquisitionProblem } from '../../booking/acquisition/acquisition-errors';
+import { guestPassProblem } from '../../booking/payments/open-guest-pass';
 import { referralProblem } from '../../booking/payments/referral-attribution';
 import {
   ApiAcceptedResponse,
@@ -125,7 +127,10 @@ export class ClientRegistrationController {
         ...result,
       };
     } catch (error) {
-      const problem = referralProblem(error);
+      const problem =
+        referralProblem(error) ??
+        acquisitionProblem(error) ??
+        guestPassProblem(error);
       if (problem !== null) {
         throw new HttpException(
           { code: problem.code, detail: problem.detail },

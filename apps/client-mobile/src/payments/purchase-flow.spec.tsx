@@ -26,7 +26,7 @@ describe("Client purchase flow", () => {
     jest.mocked(FileSystem.readAsStringAsync).mockReset();
   });
 
-  it("applies available Credit on the Plan detail and opens the transfer payment", async () => {
+  it("shows the full price on the Plan detail, never Credit, and opens the transfer payment (PAY-005)", async () => {
     const created = jest.fn();
     const instructionsRequested = jest.fn(() => jsonResponse(instructions));
     const fetcher = routeFetcher({
@@ -39,9 +39,10 @@ describe("Client purchase flow", () => {
     });
     const screen = await openPlanDetail(fetcher);
 
-    expect(screen.getByText("Crédito aplicado")).toBeOnTheScreen();
-    expect(screen.getByText("−Bs 60")).toBeOnTheScreen();
-    expect(screen.getByText("Bs 500")).toBeOnTheScreen();
+    // A store build's API answer may still carry a balance; it is ignored.
+    expect(screen.queryByText("Crédito aplicado")).toBeNull();
+    expect(screen.queryByText(/crédito/)).toBeNull();
+    expect(screen.getAllByText("Bs 560").length).toBeGreaterThan(0);
 
     await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
 
@@ -50,9 +51,10 @@ describe("Client purchase flow", () => {
     });
     expect(created).toHaveBeenCalledWith(
       expect.objectContaining({ "idempotency-key": expect.any(String) }),
-      { planId: "plan-8" },
+      { planId: "plan-8", startsOn: "2026-10-08" },
     );
-    expect(screen.getAllByText("Bs 500").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Bs 560").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/crédito/)).toBeNull();
     expect(
       screen.getByText("Escanea el código con tu app bancaria y transfiere el monto exacto."),
     ).toBeOnTheScreen();
@@ -175,37 +177,26 @@ describe("Client purchase flow", () => {
     });
   });
 
-  it("activates immediately through Credit when it covers the whole Plan", async () => {
+  it("never buys with Credit, even when an older API reports enough of it (PAY-005)", async () => {
     const purchased = jest.fn();
-    const confirmed = {
-      ...payment,
-      method: "credit_only",
-      state: "confirmed",
-      creditAppliedCentavos: 56_000,
-      amountDueCentavos: 0,
-      decidedAt: "2026-09-21T16:00:00.000Z",
-      subscriptionId: "subscription-1",
-    };
     const fetcher = routeFetcher({
       ...baseRoutes(60_000),
-      "POST /api/v1/credit-purchases": (init) => {
-        purchased(JSON.parse(String(init?.body)));
-        return jsonResponse(confirmed, 201);
+      "POST /api/v1/credit-purchases": () => {
+        purchased();
+        return jsonResponse({}, 409);
       },
-      "/api/v1/payments/current": () => jsonResponse(confirmed),
+      "POST /api/v1/purchase-intents": () => jsonResponse(intent, 201),
     });
     const screen = await openPlanDetail(fetcher);
 
-    expect(screen.getByText("−Bs 560")).toBeOnTheScreen();
-    expect(screen.getByText("Bs 0")).toBeOnTheScreen();
+    expect(screen.queryByText("−Bs 560")).toBeNull();
+    expect(screen.queryByText("Bs 0")).toBeNull();
     await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
 
     await waitFor(() => {
-      expect(screen.getByText("¡Pago confirmado!")).toBeOnTheScreen();
+      expect(screen.getByText("Pago por transferencia")).toBeOnTheScreen();
     });
-    expect(purchased).toHaveBeenCalledWith({ planId: "plan-8" });
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Ir al inicio" })).toBeOnTheScreen();
+    expect(purchased).not.toHaveBeenCalled();
   });
 
   it("explains a rejected transfer and offers a new receipt", async () => {
@@ -260,6 +251,7 @@ describe("Client purchase flow", () => {
       expect(screen.getByText("Tu comprobante fue rechazado")).toBeOnTheScreen();
     });
     expect(screen.getByText("El monto no coincide con el plan.")).toBeOnTheScreen();
+    expect(screen.queryByText(/crédito/)).toBeNull();
     expect(screen.getByRole("button", { name: "Subir un nuevo comprobante" })).toBeOnTheScreen();
   });
 });

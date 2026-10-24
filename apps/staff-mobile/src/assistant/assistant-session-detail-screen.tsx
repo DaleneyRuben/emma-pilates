@@ -56,6 +56,7 @@ const bookingProblems: Record<string, string> = {
   active_waitlist_entry_exists: "El cliente ya está en la lista de espera.",
   no_eligible_subscription: "El cliente no tiene clases disponibles en su plan.",
   booking_access_denied: "Solo puedes reservar en tus sucursales.",
+  weekly_cap_reached: "Ya usaste tus clases de esta semana.",
 };
 
 const fallback = "No pudimos completar la reserva. Inténtalo de nuevo.";
@@ -126,6 +127,13 @@ export function AssistantSessionDetailScreen({
     ]);
 
   const describe = (error: unknown): string => {
+    if (error instanceof AssistantApiError && error.code === "booking_during_freeze") {
+      const date =
+        error.detail === null ? null : /until (\d{4}-\d{2}-\d{2})$/.exec(error.detail)?.[1];
+      if (date !== undefined && date !== null) {
+        return `Tu plan está congelado hasta el ${formatCivilDate(date)}.`;
+      }
+    }
     if (error instanceof AssistantApiError && error.code === "booking_before_start_date") {
       const date = error.detail === null ? null : /: (\d{4}-\d{2}-\d{2})$/.exec(error.detail)?.[1];
       if (date !== undefined && date !== null) {

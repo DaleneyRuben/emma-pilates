@@ -29,10 +29,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
-      api: ${{ github.event_name != 'pull_request' || steps.filter.outputs.api == 'true' }}
-      web: ${{ github.event_name != 'pull_request' || steps.filter.outputs.web == 'true' }}
-      mobile: ${{ github.event_name != 'pull_request' || steps.filter.outputs.mobile == 'true' }}
-      public: ${{ github.event_name != 'pull_request' || steps.filter.outputs.public == 'true' }}
+      api: ${{ github.event_name != 'pull_request' || steps.filter.outputs.api == 'true' || steps.filter.outputs.workflow == 'true' }}
+      web: ${{ github.event_name != 'pull_request' || steps.filter.outputs.web == 'true' || steps.filter.outputs.workflow == 'true' }}
+      mobile: ${{ github.event_name != 'pull_request' || steps.filter.outputs.mobile == 'true' || steps.filter.outputs.workflow == 'true' }}
+      public: ${{ github.event_name != 'pull_request' || steps.filter.outputs.public == 'true' || steps.filter.outputs.workflow == 'true' }}
     steps:
       - uses: dorny/paths-filter@v3
         id: filter
@@ -63,6 +63,8 @@ jobs:
             public:
               - .github/**
               - apps/public-site/**
+            workflow:
+              - .github/workflows/ci.yml
 
   # EXT-019: the security checks. Each runs on every pull request and push,
   # because an advisory or a leaked value is not tied to a surface.

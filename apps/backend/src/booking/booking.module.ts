@@ -16,6 +16,7 @@ import {
 } from './booking.controller';
 import {
   classHistory,
+  classesLeftThisWeekQuery,
   sessionAvailability,
   trainerSchedule,
   trainerSessionRoster,
@@ -26,6 +27,7 @@ import {
   TrainerSessionRosterController,
 } from './trainer.controller';
 import { boliviaDate } from '../time/bolivia-time';
+import { classesLeftThisWeek } from './commands/weekly-cap-remaining';
 import { createCatalogRepository } from './catalog/prisma-catalog-repository';
 import {
   BranchCatalogController,
@@ -66,6 +68,10 @@ import {
   receiptObjectStorage,
 } from './payments/administrator.controller';
 import {
+  AdministratorFreezesController,
+  ClientFreezesController,
+} from './payments/freeze.controller';
+import {
   ClientCreditController,
   ClientPaymentsController,
   ClientReferralsController,
@@ -77,6 +83,10 @@ import {
   type TransferInstructions,
 } from './payments/payments.controller';
 import { createPrismaPaymentCommands } from './payments/prisma-payment-commands';
+import {
+  priceFounderPlanList,
+  readFounderRenewal,
+} from './payments/prisma-founder-membership';
 import {
   ClientEvaluationsController,
   evaluationCommands,
@@ -150,9 +160,12 @@ import { adminWebReads } from './admin-web-reads';
 import { receiptReadProvider } from './payments/prisma-receipt-read';
 import { promotionContactsWiring } from './promotion-contacts/promotion-contacts-wiring';
 import { promotionsConsentWiring } from './promotions-consent/promotions-consent-wiring';
+import { acquisitionWiring } from './acquisition/acquisition-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
 import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
+import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
+import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
 
 @Module({
   imports: [SystemIdentityModule, NotificationsModule],
@@ -182,6 +195,8 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ClientReferralsController,
     TransferInstructionsController,
     AdministratorPaymentsController,
+    AdministratorFreezesController,
+    ClientFreezesController,
     AdministratorSessionsController,
     AssistantClientsController,
     ...adminWebReads.controllers,
@@ -189,8 +204,11 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionsWiring.controllers,
     ...promotionContactsWiring.controllers,
     ...promotionsConsentWiring.controllers,
+    ...acquisitionWiring.controllers,
     ...studioSettingsWiring.controllers,
     ...clientPhotoWiring.controllers,
+    ...first90DaysWiring.controllers,
+    ...invoiceDataWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
     NutritionistEvaluationsController,
@@ -322,6 +340,12 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
       useFactory: (prisma: PrismaClient) => listSessionAvailability(prisma),
     },
     {
+      provide: classesLeftThisWeekQuery,
+      inject: [PRISMA_CLIENT],
+      useFactory: (prisma: PrismaClient) => (clientId: string, at: Date) =>
+        classesLeftThisWeek(prisma, clientId, at),
+    },
+    {
       provide: clientProfile,
       inject: [PRISMA_CLIENT],
       useFactory:
@@ -443,7 +467,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
           principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
         ) => {
           const repository = createCatalogRepository(prisma);
-          const toSummary = (
+          const toSummary = async (
             subscription: NonNullable<
               Awaited<ReturnType<typeof repository.findLatestSubscription>>
             >,
@@ -455,6 +479,14 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
             startsOn: subscription.startsOn,
             endsOn: subscription.endsOn,
             extraClassesLine: subscription.extraClassesLine,
+            classesLeftThisWeek:
+              principal.identity.kind === 'client'
+                ? await classesLeftThisWeek(
+                    prisma,
+                    principal.identity.clientId,
+                    new Date(),
+                  )
+                : null,
           });
 
           return loadClientSubscription({
@@ -472,17 +504,70 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
               repository
                 .findFutureSubscription(clientId, after)
                 .then((found) => (found === null ? null : toSummary(found))),
+            readFounderRenewal: (clientId) =>
+              readFounderRenewal(prisma, clientId),
+            readFreeze: (subscriptionId) =>
+              prisma.freeze
+                .findFirst({
+                  where: { subscriptionId, deletedAt: null },
+                  select: {
+                    id: true,
+                    state: true,
+                    startsOn: true,
+                    endsOn: true,
+                  },
+                })
+                .then((row) =>
+                  row === null
+                    ? null
+                    : {
+                        id: row.id,
+                        state: row.state.toLowerCase() as
+                          'requested' | 'approved' | 'refused',
+                        startsOn: row.startsOn.toISOString().slice(0, 10),
+                        endsOn: row.endsOn.toISOString().slice(0, 10),
+                      },
+                ),
+            readPlanDurationDays: (subscriptionId) =>
+              prisma.subscription
+                .findUnique({
+                  where: { id: subscriptionId },
+                  select: { durationDaysSnapshot: true },
+                })
+                .then((row) => row?.durationDaysSnapshot ?? null),
           });
         },
     },
     {
       provide: planCatalog,
       inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient): PlanCatalogHandler => ({
-        list: () => createCatalogRepository(prisma).listVisiblePlans(),
-        find: (planId) =>
-          createCatalogRepository(prisma).findVisiblePlan(planId),
-      }),
+      useFactory: (prisma: PrismaClient): PlanCatalogHandler => {
+        const clientIdOf = (
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) =>
+          principal.identity.kind === 'client'
+            ? principal.identity.clientId
+            : null;
+        return {
+          list: async (principal) =>
+            priceFounderPlanList(
+              prisma,
+              clientIdOf(principal),
+              await createCatalogRepository(prisma).listVisiblePlans(),
+            ),
+          find: async (planId, principal) => {
+            const plan =
+              await createCatalogRepository(prisma).findVisiblePlan(planId);
+            if (plan === null) return null;
+            const [priced] = await priceFounderPlanList(
+              prisma,
+              clientIdOf(principal),
+              [plan],
+            );
+            return priced ?? null;
+          },
+        };
+      },
     },
     {
       provide: branchCatalog,
@@ -504,15 +589,13 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     },
     {
       provide: paymentCommands,
-      inject: [PRISMA_CLIENT, ConfigService, NOTIFICATION_RECORDER],
+      inject: [PRISMA_CLIENT, NOTIFICATION_RECORDER],
       useFactory: (
         prisma: PrismaClient,
-        config: ConfigService<Environment, true>,
         recordNotification: NotificationRecorder,
       ) =>
         createPrismaPaymentCommands(prisma, {
           now: () => new Date(),
-          referralRewardCentavos: config.getOrThrow('REFERRAL_REWARD_CENTAVOS'),
           recordNotification,
         }),
     },
@@ -589,8 +672,11 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionsWiring.providers(PRISMA_CLIENT),
     ...promotionContactsWiring.providers(PRISMA_CLIENT),
     ...promotionsConsentWiring.providers(PRISMA_CLIENT),
+    ...acquisitionWiring.providers(PRISMA_CLIENT),
     ...studioSettingsWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
+    ...first90DaysWiring.providers(PRISMA_CLIENT),
+    ...invoiceDataWiring.providers(PRISMA_CLIENT),
   ],
 })
 export class BookingModule {}

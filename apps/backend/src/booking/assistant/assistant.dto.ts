@@ -7,6 +7,11 @@ import {
   ClientSubscriptionSummaryDto,
   PlanDto,
 } from '../client/client-discovery.dto';
+import type { InvoiceData } from '../payments/invoice-data/invoice-data';
+import {
+  InvoiceDataDto,
+  invoiceDataField,
+} from '../payments/invoice-data/invoice-data.dto';
 import { PaymentDto } from '../payments/payments.dto';
 import type { ClientAccountStatus } from './assistant-clients';
 
@@ -63,12 +68,20 @@ export class ClientOverviewDto {
   @ApiProperty({ type: ClassHistoryEntryDto, isArray: true })
   recentHistory!: ClassHistoryEntryDto[];
 
-  @ApiProperty({ minimum: 0, description: 'Available Credit in BOB centavos' })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description: 'Deprecated (PAY-005): Credit was retired; always 0',
+  })
   creditAvailableCentavos!: number;
 }
 
 export class PlanQuoteDto extends PlanDto {
-  @ApiProperty({ minimum: 0, description: 'Credit this purchase would spend' })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description: 'Deprecated (PAY-005): Credit was retired; always 0',
+  })
   creditAppliedCentavos!: number;
 
   @ApiProperty({ minimum: 0, description: 'Cash to collect in BOB centavos' })
@@ -76,7 +89,11 @@ export class PlanQuoteDto extends PlanDto {
 }
 
 export class PlanQuotesDto {
-  @ApiProperty({ minimum: 0 })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description: 'Deprecated (PAY-005): Credit was retired; always 0',
+  })
   creditAvailableCentavos!: number;
 
   @ApiProperty({ type: PlanQuoteDto, isArray: true })
@@ -99,16 +116,30 @@ export class RecordCashPaymentDto {
       'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
   })
   startsOn?: string;
+
+  @ApiPropertyOptional({
+    type: InvoiceDataDto,
+    nullable: true,
+    description:
+      'PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»',
+  })
+  invoiceData?: InvoiceDataDto | null;
 }
 
 export const parseRecordCashPayment = (
   value: unknown,
-): RecordCashPaymentDto | null => {
+): {
+  planId: string;
+  branchId: string;
+  startsOn?: string;
+  invoiceData: InvoiceData | null;
+} | null => {
   const result = z
     .strictObject({
       planId: uuid,
       branchId: uuid,
       startsOn: z.iso.date().optional(),
+      invoiceData: invoiceDataField,
     })
     .safeParse(value);
   return result.success ? result.data : null;
