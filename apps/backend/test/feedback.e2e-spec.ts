@@ -145,7 +145,7 @@ describe('Feedback endpoints (e2e, REL-012)', () => {
       ['a missing version', { ...message, appVersion: undefined }],
       [
         'a version over 40 characters',
-        { ...message, osVersion: '1'.repeat(41) },
+        { ...message, osVersion: `v${'1'.repeat(40)}` },
       ],
       [
         'an extra field such as the Role',

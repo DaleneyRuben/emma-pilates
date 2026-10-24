@@ -97,6 +97,9 @@ type WorkerDependencies = {
   evaluationReminders: {
     execute(): Promise<{ sent: number }>;
   };
+  classReminders: {
+    execute(): Promise<{ sent: number }>;
+  };
   minimumBookingsChecks: {
     execute(): Promise<{ checked: number; cancelled: number }>;
   };
@@ -234,6 +237,10 @@ export const startWorker = async (
           {
             job: 'evaluation_reminders',
             execute: () => dependencies.evaluationReminders.execute(),
+          },
+          {
+            job: 'class_reminders',
+            execute: () => dependencies.classReminders.execute(),
           },
         ],
       },

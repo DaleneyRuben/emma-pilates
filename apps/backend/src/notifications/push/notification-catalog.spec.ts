@@ -7,6 +7,8 @@ const audible = [
   'session_assigned',
   'evaluation_reminder_day',
   'evaluation_reminder_hour',
+  'class_reminder_day',
+  'class_reminder_hour',
   'evaluation_cancelled_by_studio',
   'payment_submitted',
   'payment_rejected',
@@ -25,6 +27,8 @@ const silent = [
 const privateTypes = [
   'evaluation_reminder_day',
   'evaluation_reminder_hour',
+  'class_reminder_day',
+  'class_reminder_hour',
   'evaluation_cancelled_by_studio',
   'evaluation_booked',
   'evaluation_cancelled',

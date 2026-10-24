@@ -34,7 +34,7 @@ you are starting with no project knowledge.
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
-| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
+| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation, class, and Plan reminders (Tests 7 and 105), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
@@ -57,7 +57,7 @@ can be found by its design name.
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
-| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 104 |
 | 25 Enviar comentarios | 19, 80 |
@@ -5531,8 +5531,12 @@ removes it, and a pg-boss runtime error, which the worker only logs as
    on the back-dated row answers `409 purchase_intent_expired`). A new
    Intent can be opened at once.
 4. **`subscription_reminders` (hourly)** records «Plan por vencer» / «Tu
-   plan vence en 3 días.» once per Subscription that ends in three days
-   (Valeria's fixture, Test 7); a second run adds nothing.
+   plan vence en 3 días.» once per active Subscription that ends today or
+   within three days and has not been reminded yet (Valeria's fixture ends
+   in three days, Test 7; Isabel's ends in fifteen, so moving her
+   `ends_on` to tomorrow and restarting the worker records it too). A
+   second run adds nothing. The message stays «en 3 días» even when fewer
+   days remain.
 
 Drop the copy afterwards: `dropdb pilates_test_sweeps`.
 
@@ -5940,6 +5944,40 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 105: the class reminders
+
+The worker's `class_reminders` sweep runs once at start and then every
+minute, beside the Evaluation reminders (`apps/backend/src/worker.ts`). A
+booked Client gets one inbox entry and one push 24 hours before her
+Session, and another 2 hours before. Restarting the worker in between
+does not send either one twice: the key is the Booking plus the kind
+(`class-reminder-day:{bookingId}`, `class-reminder-hour:{bookingId}`).
+
+Use a copy of the fixtures, never a database you keep
+(`createdb -T pilates_dev_sim pilates_test_class_reminders`), start the API
+and the worker on it, and sign in as `lucia@example.com` (Test 5). No
+device is required for the inbox; a real push still needs a development
+build (Test 46).
+
+1. **24 hours before.** Book a class that starts in about 26 hours (Test 5
+   B). In the database, move that Session to 23 hours from now:
+   `update booking.sessions set starts_at = now() + interval '23 hours', ends_at = now() + interval '23 hours 50 minutes' where id = '<session>'`.
+   Within a minute her inbox (Perfil → Notificaciones, screen 19) shows
+   «Recordatorio» / «Mañana tienes {clase} a las {hora}.», with the Bolivia
+   time. Restart the worker: the inbox still has one entry.
+2. **2 hours before.** Move the same Session to 90 minutes from now. The
+   inbox gains «Tu clase de {clase} empieza en 2 horas.» A second restart
+   adds nothing. A Booking made inside the last 24 hours gets only this
+   one, never «Mañana».
+3. **Nothing after a cancellation.** Cancel the Booking before the window
+   (Mis reservas → Cancelar). Moving the Session into either window leaves
+   her inbox without a new reminder.
+4. **The push**, when a development build is registered (Test 46), plays
+   the standard sound and shows «Recordatorio» / «Tienes una clase próxima.
+   Abre la app para ver el detalle.» The class name stays in the inbox.
+
+Drop the copy afterwards: `dropdb pilates_test_class_reminders`.
 
 ## Test 98: recompute the studio facts
 

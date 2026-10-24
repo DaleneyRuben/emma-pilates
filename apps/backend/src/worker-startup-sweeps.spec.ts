@@ -54,6 +54,7 @@ describe('worker startup sweeps (EXT-002)', () => {
         sessionSchedules: idle({ schedules: 0, created: 0, skipped: 0 }),
         evaluationSlots: idle({ blocks: 0, created: 0, skipped: 0 }),
         evaluationReminders: idle({ sent: 0 }),
+        classReminders: idle({ sent: 0 }),
         minimumBookingsChecks: idle({ checked: 0, cancelled: 0 }),
         windowCloseSnapshots: idle({ recorded: 0 }),
         startedSessionWaitlists: idle({ closed: 0 }),

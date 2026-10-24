@@ -1163,7 +1163,7 @@ Acceptance criteria: at least 12 testers opted in on the day REL-006's closed re
 | MOB-070 | P1 | Client app | Diagnosis fixes in the Client app: Reschedule idempotency, the waitlist offered inside the window, specific rejection messages, phone validation, hard-coded copy | BKM-004 | 1.5–2 d | done |
 | STAFF-005 | P1 | Staff app | Diagnosis fixes in the Staff app: HTTP errors on the Trainer screens, a failed receipt download, notification taps for the Assistant, the version label | — | 1.5–2 d | ready |
 | UX-003, UX-004 | P1 | Apps | *Existing rows.* Early refusals for the Assistant, refetch on focus | UX-001 | 1–2 d left | ready |
-| NOT-003 | P1 | Backend/apps | Class reminders 24 h and 2 h before; fix the exact-date expiry reminder | — | 1–2 d | ready |
+| NOT-003 | P1 | Backend/apps | Class reminders 24 h and 2 h before; fix the exact-date expiry reminder | — | 1–2 d | done |
 | REL-014 | P1 | Mobile release | Apple Developer Program as an individual (gate 9), bundle IDs, APNs key, App Store Connect records | — | 0.5 d + Apple's wait | ready |
 | REL-016 | P1 | Production | Store-review Accounts for Apple and Google: a Client with an active Plan and a Trainer, marked `store_review` and created after the reset | REL-014, REL-019 | 0.5–1 d | ready |
 | REL-015 | P1 | Mobile release | Client app on the App Store: iOS builds, TestFlight smoke test, listing, App Privacy, review notes, Universal Links, iOS push | REL-014, REL-016, the business rules | 2.5–3.5 d + review | ready |
@@ -1237,6 +1237,63 @@ line from `classesLeftThisWeek`.
 
 Acceptance criteria: worker tests cover a restart in the middle without a
 duplicate reminder.
+
+Decisions (blanket approval, 2026-10-23), taken before the code:
+
+- Idempotency is the existing `system.notifications` unique key
+  `(account_id, business_event_key)`, already used by `createNotificationRecorder`
+  so a repeated record neither inserts nor queues a second push. No reminder
+  column and no migration. Keys: `class-reminder-day:{bookingId}` and
+  `class-reminder-hour:{bookingId}` (Booking plus kind, as specified).
+- Windows follow the Evaluation reminder rule (NUT-001 D18): the 24 h reminder
+  is due from `starts_at − 24 h` until `starts_at − 2 h`, and only when the
+  Booking was created before that window; the 2 h reminder is due from
+  `starts_at − 2 h` until the Session starts. A restart inside either window
+  finds the same key already recorded. A Booking made inside the 24 h window
+  gets only the 2 h reminder. A cancelled, rescheduled, or already-started
+  Booking gets neither.
+- Copy, for owner approval: title «Recordatorio» for both; 24 h
+  «Mañana tienes {clase} a las {hora}.»; 2 h
+  «Tu clase de {clase} empieza en 2 horas.». `{hora}` is the Bolivia wall
+  clock (`HH:mm`). Category `reminder`. Destination `{ type: 'booking', id }`
+  so an inbox tap opens the Booking the way other booking notices do.
+- Push follows ADR-0070 (Session reminders are audible) and ADR-0025 (the
+  lock screen does not name the class): sound on, lock-screen title
+  «Recordatorio», body «Tienes una clase próxima. Abre la app para ver el
+  detalle.». The existing push dispatch transport is unchanged.
+- The expiry reminder stays one per Subscription
+  (`subscription-expiring:{subscriptionId}`). It matches an active
+  Subscription whose `ends_on` is today through three Bolivia days ahead,
+  and whose Account has no live `subscription_expiring` row for that key.
+  The message stays «Tu plan vence en 3 días.» even when fewer days remain,
+  so the inbox copy already on screen 19 does not change.
+- The class-reminder sweep runs every minute on the existing worker runner,
+  beside the Evaluation reminder sweep. The expiry sweep stays hourly: a
+  missed day is recovered by the window, not by a tighter interval.
+- Screen 19 already renders `notification.message`, so the new sentences
+  appear in the inbox without a design change. No follow-up.
+
+The hand steps are Test 105. The rollout already uses Test 75 for the studio
+rules (BKM-004). The worker keeps this sweep beside the Evaluation reminders
+and keeps the rollout's Minimum Bookings check, window-close snapshot, and
+first-90-days job.
+
+Evidence: [pull request 177](https://github.com/DaleneyRuben/emma-pilates/pull/177).
+Red `12545e8a` (rules fail closed) → green `90a951eb` (windows and
+copy) → `e8590f0e` (worker sweep, expiry window, restart test). **Verified:**
+unit `class-reminders`, `remind-expiring-subscriptions`, worker wiring, and
+the push catalog; integration `class-reminders` (restart inside the day
+window sends one, the hour reminder once, a cancelled Booking none, a late
+Booking no day reminder) and `notifications` (Valeria once, Isabel the day
+after her exact date, second run 0) on disposable `pilates_test_not003_*`
+databases. End to end on `pilates_not003_dev` (dropped afterwards): booked
+Lucía into a Session starting in 2 hours through the API on port 3134, ran
+the job, and `GET /api/v1/notifications` returned one unread
+`class_reminder_hour` («Tu clase de Reformer Pilates empieza en 2 horas.»);
+a second run sent 0. **Not verified:** a device walk and a real push (not
+required; the existing dispatch transport is unchanged).
+**Open for owner approval:** the Spanish texts above, and that no migration
+was added. No design follow-up.
 
 #### REL-014 · Apple Developer Program (individual)
 
