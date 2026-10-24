@@ -1,5 +1,11 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { dehydrate, onlineManager, QueryClient } from "@tanstack/react-query";
+import {
+  clearMobileQueryCache,
+  clearPersistedAccountCache,
+  createMobilePersister,
+  persistedCacheVersion,
+} from "@pilates/mobile-core";
 
 import App from "../../App";
 import {
@@ -28,10 +34,34 @@ const activeSubscription = {
   },
 };
 
+const persistedProfile = {
+  data: profile,
+  status: 200,
+};
+
+const persistedSubscription = {
+  data: activeSubscription,
+  status: 200,
+};
+
+async function persistSeenQueries(): Promise<void> {
+  const seeded = new QueryClient();
+  seeded.setQueryData(["/api/v1/clients/current"], persistedProfile);
+  seeded.setQueryData(["/api/v1/clients/current/subscription"], persistedSubscription);
+  await createMobilePersister("account-1").persistClient({
+    buster: persistedCacheVersion,
+    clientState: dehydrate(seeded),
+    timestamp: Date.now(),
+  });
+  seeded.clear();
+}
+
 describe("Client Home", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
+    onlineManager.setOnline(true);
+    await clearPersistedAccountCache("account-1");
   });
 
   it("greets the Client and shows an active Subscription", async () => {
@@ -114,5 +144,77 @@ describe("Client Home", () => {
     await waitFor(() => {
       expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     });
+  });
+
+  it("renders Inicio from the last loaded profile when the network fails", async () => {
+    await persistSeenQueries();
+    const fetcher = createFetcher({
+      "/api/v1/clients/current": () => {
+        throw new TypeError("Network request failed");
+      },
+      "/api/v1/clients/current/subscription": () => {
+        throw new TypeError("Network request failed");
+      },
+    });
+    const screen = await render(<App runtime={createRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Sin conexión. Mostrando tus datos de la última vez."),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText("No pudimos cargar tu inicio.")).not.toBeOnTheScreen();
+  });
+
+  it("shows the load error when nothing was persisted and the network fails", async () => {
+    const fetcher = createFetcher({
+      "/api/v1/clients/current": () => {
+        throw new TypeError("Network request failed");
+      },
+      "/api/v1/clients/current/subscription": () => {
+        throw new TypeError("Network request failed");
+      },
+    });
+    const screen = await render(<App runtime={createRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("No pudimos cargar tu inicio.")).toBeOnTheScreen();
+    });
+    expect(
+      screen.queryByText("Sin conexión. Mostrando tus datos de la última vez."),
+    ).not.toBeOnTheScreen();
+    expect(screen.queryByText("Hola, Lucía")).not.toBeOnTheScreen();
+  });
+
+  it("drops the offline banner and shows the fresh profile when the connection returns", async () => {
+    await persistSeenQueries();
+    let offline = true;
+    const fetcher = createFetcher({
+      "/api/v1/clients/current": () => {
+        if (offline) throw new TypeError("Network request failed");
+        return jsonResponse({ ...profile, name: "Lucía Actualizada" });
+      },
+      "/api/v1/clients/current/subscription": () => {
+        if (offline) throw new TypeError("Network request failed");
+        return jsonResponse(activeSubscription);
+      },
+    });
+    onlineManager.setOnline(false);
+    const screen = await render(<App runtime={createRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
+    });
+    offline = false;
+    await act(async () => {
+      onlineManager.setOnline(true);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(
+      screen.queryByText("Sin conexión. Mostrando tus datos de la última vez."),
+    ).not.toBeOnTheScreen();
   });
 });

@@ -95,6 +95,10 @@ describe("MobileQueryProvider", () => {
 
     await act(async () => {
       providedClient?.setQueryData(["/api/v1/bookings"], [{ bookingId: "booking-2" }]);
+      providedClient?.setQueryData(["/api/v1/clients/current"], {
+        data: { name: "Lucía Fernández" },
+        status: 200,
+      });
       providedClient?.setQueryData(["/api/v1/notifications", { limit: 50 }], {
         items: [{ id: "n-secret" }],
       });
@@ -104,6 +108,7 @@ describe("MobileQueryProvider", () => {
       async () => {
         const stored = await AsyncStorage.getItem(getPersistedCacheKey("account-2"));
         expect(stored).toContain("booking-2");
+        expect(stored).toContain("Lucía Fernández");
         expect(stored).not.toContain("n-secret");
       },
       { timeout: 4_000 },
