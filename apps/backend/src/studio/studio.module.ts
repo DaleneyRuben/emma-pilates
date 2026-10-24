@@ -7,6 +7,7 @@ import {
   recomputeStudioFacts,
   currentStudioMonth,
 } from './prisma-studio-facts';
+import { readRevenueMonth } from './prisma-revenue-report';
 import {
   studioControllers,
   studioOperations,
@@ -27,6 +28,15 @@ import {
           const result = await recomputeStudioFacts(prisma, {
             month: new Date(Date.UTC(year, month - 1, 1)),
             now: () => new Date(),
+          });
+          return { month: input.month, ...result };
+        },
+        revenue: async (input, principal) => {
+          requireStudioAdministrator(principal);
+          const [year, month] = input.month.split('-').map(Number);
+          const result = await readRevenueMonth(prisma, {
+            month: new Date(Date.UTC(year, month - 1, 1)),
+            today: new Date(),
           });
           return { month: input.month, ...result };
         },

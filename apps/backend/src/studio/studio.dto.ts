@@ -15,3 +15,21 @@ export class StudioRecomputeDto {
   @ApiProperty() sessions!: number;
   @ApiProperty() clientMonths!: number;
 }
+
+export class RevenueReportDto {
+  @ApiProperty({ example: '2026-10' }) month!: string;
+  @ApiProperty({ description: 'Cash collected in the month, BOB centavos' })
+  cashCentavos!: number;
+  @ApiProperty({
+    description: 'Revenue accrued by validity days, BOB centavos',
+  })
+  accruedCentavos!: number;
+  @ApiProperty({
+    description: 'Cash not yet accrued through today, BOB centavos',
+  })
+  deferredCentavos!: number;
+  @ApiProperty({
+    description: 'Remaining class allowance of Subscriptions covering today',
+  })
+  classesStillOwed!: number;
+}
