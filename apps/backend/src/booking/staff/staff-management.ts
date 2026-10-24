@@ -2,12 +2,14 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import {
   activationWindow,
   audit,
+  holdsEveryBranch,
   requireActivationEmailRoom,
   requireAdministrator,
   requireManageable,
   requireNoTrainerCommitments,
   requireNotLastAdministrator,
   reread,
+  requireStaffReader,
   resolveBranches,
   StaffManagementError,
   type StaffManagementDependencies,
@@ -130,13 +132,13 @@ export const changeStaffRole = async (
     );
     if (member.role === command.role) return member;
 
-    // Leaving Administrator needs an explicit Branch set; other changes keep
-    // the current Branches unless the command replaces them.
+    // Leaving an every-Branch Role needs an explicit Branch set; other
+    // changes keep the current Branches unless the command replaces them.
     const branchIds = await resolveBranches(
       transaction,
       command.role,
       command.branchIds ??
-        (member.role === 'administrator' ? [] : member.branchIds),
+        (holdsEveryBranch(member.role) ? [] : member.branchIds),
     );
     await requireNotLastAdministrator(transaction, member);
     if (member.role === 'trainer') {
@@ -187,7 +189,7 @@ export const changeStaffBranches = async (
       actor,
       command.staffMemberId,
     );
-    if (member.role === 'administrator') {
+    if (holdsEveryBranch(member.role)) {
       throw new StaffManagementError('invalid_branch_assignment');
     }
     const branchIds = await resolveBranches(
@@ -297,7 +299,7 @@ export const listStaffMembers = async (
   principal: AuthenticatedPrincipal,
   directory: StaffDirectory,
 ): Promise<StaffDirectoryPage> => {
-  requireAdministrator(principal);
+  requireStaffReader(principal);
   return directory.list(query);
 };
 
@@ -306,7 +308,7 @@ export const readStaffMember = async (
   principal: AuthenticatedPrincipal,
   directory: StaffDirectory,
 ): Promise<StaffMemberRecord> => {
-  requireAdministrator(principal);
+  requireStaffReader(principal);
   const member = await directory.read(command.staffMemberId);
   if (member === null) throw new StaffManagementError('staff_member_not_found');
   return member;

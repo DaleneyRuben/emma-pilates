@@ -8,55 +8,34 @@ import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
-import type { PrismaClient } from '../src/generated/prisma/client';
 import {
   dismissRecommendation,
   readRecommendations,
   recomputeRecommendations,
+  type StoredRecommendation,
 } from '../src/studio/prisma-recommendations';
 import {
   studioControllers,
   studioOperations,
 } from '../src/studio/studio.controller';
-import { createStudioOperations as createStudioOperationsUntyped } from '../src/studio/studio.module';
-
-type RecommendationOperation = (
-  input: { month: string },
-  principal: AuthenticatedPrincipal,
-  prisma: PrismaClient,
-) => Promise<unknown>;
-
-const createStudioOperations = createStudioOperationsUntyped as (deps: {
-  readRecommendations: typeof readRecommendations;
-  recomputeRecommendations: typeof recomputeRecommendations;
-  dismissRecommendation: typeof dismissRecommendation;
-}) => {
-  list: RecommendationOperation;
-  recomputeRecommendations: RecommendationOperation;
-  dismiss: (
-    input: { id: string },
-    principal: AuthenticatedPrincipal,
-    prisma: PrismaClient,
-  ) => Promise<unknown>;
-};
+import { createStudioOperations } from '../src/studio/studio.module';
 
 const bearer = `Bearer ${'a'.repeat(43)}`;
 
 const principal = (
   role: 'administrator' | 'assistant' | 'coordinator',
-): AuthenticatedPrincipal =>
-  ({
-    accountId: 'account',
-    authenticationSessionId: 'session',
-    identity: {
-      kind: 'staff',
-      staffMemberId: 'staff',
-      role,
-      branchIds: [],
-    },
-  }) as AuthenticatedPrincipal;
+): AuthenticatedPrincipal => ({
+  accountId: 'account',
+  authenticationSessionId: 'session',
+  identity: {
+    kind: 'staff',
+    staffMemberId: 'staff',
+    role,
+    branchIds: [],
+  },
+});
 
-const finding = {
+const finding: StoredRecommendation = {
   id: '11111111-1111-4111-8111-111111111111',
   rule: 'weak_schedule',
   subject: 'trainer:2',
@@ -90,6 +69,8 @@ describe('recommendations endpoint (e2e)', () => {
           provide: studioOperations,
           useFactory: () => {
             const operations = createStudioOperations({
+              readKpis: () => Promise.reject(new Error('unused')),
+              readRevenue: () => Promise.reject(new Error('unused')),
               readRecommendations: read,
               recomputeRecommendations: recompute,
               dismissRecommendation: dismiss,

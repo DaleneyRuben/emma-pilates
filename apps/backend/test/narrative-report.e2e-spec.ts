@@ -8,69 +8,31 @@ import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
-import type { PrismaClient } from '../src/generated/prisma/client';
 import { readMonthKpis } from '../src/studio/prisma-month-kpis';
-import { readRecommendations } from '../src/studio/prisma-recommendations';
+import {
+  readRecommendations,
+  type StoredRecommendation,
+} from '../src/studio/prisma-recommendations';
 import {
   studioControllers,
   studioOperations,
 } from '../src/studio/studio.controller';
-import { createStudioOperations as createStudioOperationsUntyped } from '../src/studio/studio.module';
-
-const createStudioOperations = createStudioOperationsUntyped as (deps: {
-  readKpis: typeof readMonthKpis;
-  readRecommendations: typeof readRecommendations;
-  readRevenue: () => Promise<never>;
-  recomputeRecommendations: () => Promise<{ written: number }>;
-  dismissRecommendation: () => Promise<null>;
-}) => {
-  narrative: (
-    input: { month: string },
-    principal: AuthenticatedPrincipal,
-    prisma: PrismaClient,
-  ) => Promise<unknown>;
-  question: (
-    input: { month: string; question: string },
-    principal: AuthenticatedPrincipal,
-    prisma: PrismaClient,
-  ) => Promise<unknown>;
-  kpis: (
-    input: { month: string },
-    principal: AuthenticatedPrincipal,
-    prisma: PrismaClient,
-  ) => Promise<Record<string, unknown>>;
-  list: (
-    input: { month: string },
-    principal: AuthenticatedPrincipal,
-    prisma: PrismaClient,
-  ) => Promise<{
-    month: string;
-    recommendations: {
-      id: string;
-      rule: string;
-      subject: string;
-      period: string;
-      detail: string;
-      state: string;
-    }[];
-  }>;
-};
+import { createStudioOperations } from '../src/studio/studio.module';
 
 const bearer = `Bearer ${'a'.repeat(43)}`;
 
 const principal = (
   role: 'administrator' | 'assistant' | 'coordinator',
-): AuthenticatedPrincipal =>
-  ({
-    accountId: 'account',
-    authenticationSessionId: 'session',
-    identity: {
-      kind: 'staff',
-      staffMemberId: 'staff',
-      role,
-      branchIds: [],
-    },
-  }) as AuthenticatedPrincipal;
+): AuthenticatedPrincipal => ({
+  accountId: 'account',
+  authenticationSessionId: 'session',
+  identity: {
+    kind: 'staff',
+    staffMemberId: 'staff',
+    role,
+    branchIds: [],
+  },
+});
 
 const counts = {
   sessionsHeld: 20,
@@ -84,7 +46,7 @@ const counts = {
   renewalPercent: 50,
 };
 
-const finding = {
+const finding: StoredRecommendation = {
   id: '11111111-1111-4111-8111-111111111111',
   rule: 'inactive_client',
   subject: '11111111-1111-4111-8111-111111111111',
@@ -137,11 +99,11 @@ describe('narrative report endpoint (e2e)', () => {
               narrative: (
                 input: { month: string },
                 actor: AuthenticatedPrincipal,
-              ) => operations.narrative(input, actor, {} as PrismaClient),
+              ) => operations.narrative(input, actor, {} as never),
               question: (
                 input: { month: string; question: string },
                 actor: AuthenticatedPrincipal,
-              ) => operations.question(input, actor, {} as PrismaClient),
+              ) => operations.question(input, actor, {} as never),
             };
           },
         },

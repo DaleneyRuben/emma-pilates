@@ -8,44 +8,28 @@ import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
-import type { PrismaClient } from '../src/generated/prisma/client';
 import { readMonthKpis } from '../src/studio/prisma-month-kpis';
 import { readRevenueMonth } from '../src/studio/prisma-revenue-report';
 import {
   studioControllers,
   studioOperations,
 } from '../src/studio/studio.controller';
-import { createStudioOperations as createStudioOperationsUntyped } from '../src/studio/studio.module';
-
-type KpiOperation = (
-  input: { month: string },
-  principal: AuthenticatedPrincipal,
-  prisma: PrismaClient,
-) => Promise<Record<string, unknown>>;
-
-const createStudioOperations = createStudioOperationsUntyped as (deps: {
-  readKpis: typeof readMonthKpis;
-  readRevenue: typeof readRevenueMonth;
-  readRecommendations: () => Promise<never[]>;
-  recomputeRecommendations: () => Promise<{ written: number }>;
-  dismissRecommendation: () => Promise<null>;
-}) => { kpis: KpiOperation };
+import { createStudioOperations } from '../src/studio/studio.module';
 
 const bearer = `Bearer ${'a'.repeat(43)}`;
 
 const principal = (
   role: 'administrator' | 'assistant' | 'trainer' | 'coordinator',
-): AuthenticatedPrincipal =>
-  ({
-    accountId: 'account',
-    authenticationSessionId: 'session',
-    identity: {
-      kind: 'staff',
-      staffMemberId: 'staff',
-      role,
-      branchIds: [],
-    },
-  }) as AuthenticatedPrincipal;
+): AuthenticatedPrincipal => ({
+  accountId: 'account',
+  authenticationSessionId: 'session',
+  identity: {
+    kind: 'staff',
+    staffMemberId: 'staff',
+    role,
+    branchIds: [],
+  },
+});
 
 const counts = {
   sessionsHeld: 2,
@@ -100,6 +84,10 @@ describe('month kpi endpoint (e2e)', () => {
               revenue: () => Promise.reject(new Error('unused')),
               kpis: (input: { month: string }, actor: AuthenticatedPrincipal) =>
                 operations.kpis(input, actor, {} as never),
+              recommendations: () => Promise.reject(new Error('unused')),
+              recomputeRecommendations: () =>
+                Promise.reject(new Error('unused')),
+              dismissRecommendation: () => Promise.reject(new Error('unused')),
               narrative: () => Promise.reject(new Error('unused')),
               question: () => Promise.reject(new Error('unused')),
             };

@@ -1,6 +1,5 @@
 import type { AuthenticatedPrincipal } from './resolve-authenticated-principal';
-
-type StaffRole = 'TRAINER' | 'NUTRITIONIST' | 'ASSISTANT' | 'ADMINISTRATOR';
+import type { StaffRoleCode as StaffRole } from './staff-role';
 
 export type AuditActor = {
   accountId: string;

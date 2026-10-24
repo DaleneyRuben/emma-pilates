@@ -13,4 +13,5 @@ export const ListStaffMembersRole = {
   nutritionist: "nutritionist",
   assistant: "assistant",
   administrator: "administrator",
+  coordinator: "coordinator",
 } as const;

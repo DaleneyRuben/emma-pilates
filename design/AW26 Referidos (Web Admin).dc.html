@@ -26,14 +26,14 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW26</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Referidos</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Lista de consulta para soporte y cuadre: el referido se crea solo cuando una clienta se registra con el código de otra, así que no hay alta manual. El crédito se otorga al confirmarse el primer pago de la referida; hasta entonces la fila queda pendiente. Mismo armazón que AW02, con "Promociones" expandido y "Referidos" activo.</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Lista de consulta para soporte y cuadre: el referido se crea solo cuando una clienta se registra con el código de otra, así que no hay alta manual. Mismo armazón que AW02, con "Promociones" expandido y "Referidos" activo.</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
-        <div style="font-size:12px;color:#766D69;">Tabla de cuatro columnas · solo lectura</div>
+        <div style="font-size:12px;color:#766D69;">Tabla de tres columnas · solo lectura</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -93,13 +93,12 @@
           <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Promociones</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Referidos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
         </nav>
 
         <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
           <div style="display:flex;flex-direction:column;gap:5px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Referidos</h2>
-            <div style="font-size:12.5px;color:#766D69;">34 referidos · 27 con crédito otorgado, 7 pendientes</div>
+            <div style="font-size:12.5px;color:#766D69;">34 referidos</div>
           </div>
 
           <div style="display:flex;align-items:center;gap:10px;">
@@ -110,14 +109,13 @@
           </div>
 
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
-            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr 170px;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
+            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
               <div>Cliente que refiere</div>
               <div>Cliente referido</div>
               <div>Fecha de registro</div>
-              <div>Estado</div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr 170px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
+            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;align-items:center;gap:11px;min-width:0;">
                 <div style="width:30px;height:30px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">AC</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
@@ -127,10 +125,9 @@
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Camila Vargas Ortiz</div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">02/08/2026</div>
-              <div><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11.5px;font-weight:500;white-space:nowrap;">Crédito otorgado</span></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr 170px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
+            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;align-items:center;gap:11px;min-width:0;">
                 <div style="width:30px;height:30px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">AC</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
@@ -140,10 +137,9 @@
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Valeria Terceros</div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">11/08/2026</div>
-              <div><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:11.5px;font-weight:500;white-space:nowrap;">Pendiente</span></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr 170px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
+            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;align-items:center;gap:11px;min-width:0;">
                 <div style="width:30px;height:30px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">DR</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
@@ -153,10 +149,9 @@
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Mariana Paz Suárez</div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">28/07/2026</div>
-              <div><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11.5px;font-weight:500;white-space:nowrap;">Crédito otorgado</span></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr 170px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
+            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;align-items:center;gap:11px;min-width:0;">
                 <div style="width:30px;height:30px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">NA</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
@@ -166,10 +161,9 @@
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Fernanda Salvatierra</div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">19/07/2026</div>
-              <div><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11.5px;font-weight:500;white-space:nowrap;">Crédito otorgado</span></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr 170px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
+            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;align-items:center;gap:11px;min-width:0;">
                 <div style="width:30px;height:30px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">NA</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
@@ -179,10 +173,9 @@
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Gabriela Quiroga</div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">13/08/2026</div>
-              <div><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:11.5px;font-weight:500;white-space:nowrap;">Pendiente</span></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr 170px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
+            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;align-items:center;gap:11px;min-width:0;">
                 <div style="width:30px;height:30px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MP</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
@@ -192,10 +185,9 @@
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Lucía Mendoza</div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">05/07/2026</div>
-              <div><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11.5px;font-weight:500;white-space:nowrap;">Crédito otorgado</span></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr 170px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
+            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;align-items:center;gap:11px;min-width:0;">
                 <div style="width:30px;height:30px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">CV</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
@@ -205,10 +197,9 @@
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Paula Montero</div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">14/08/2026</div>
-              <div><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:11.5px;font-weight:500;white-space:nowrap;">Pendiente</span></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr 170px;align-items:center;gap:16px;padding:14px 20px;">
+            <div style="display:grid;grid-template-columns:1.7fr 1.7fr 1.1fr;align-items:center;gap:16px;padding:14px 20px;">
               <div style="display:flex;align-items:center;gap:11px;min-width:0;">
                 <div style="width:30px;height:30px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">GQ</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
@@ -218,13 +209,11 @@
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Rosario Ibáñez</div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">21/06/2026</div>
-              <div><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11.5px;font-weight:500;white-space:nowrap;">Crédito otorgado</span></div>
             </div>
           </div>
 
           <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:12px;color:#7A716D;">
             <span>Mostrando 1–8 de 34 referidos</span>
-            <span>El crédito se otorga solo cuando se confirma el primer pago de la referida.</span>
           </div>
         </main>
       </div>
@@ -241,9 +230,9 @@
         </div>
       </sc-if>
       <div style="width:1100px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
-        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Referidos</h2><div style="font-size:12.5px;color:#766D69;">34 referidos · 27 con crédito otorgado, 7 pendientes</div></div>
+        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Referidos</h2><div style="font-size:12.5px;color:#766D69;">34 referidos</div></div>
         <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
-          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;"><div>Cliente que refiere</div><div>Cliente referido</div><div>Fecha de registro</div><div>Estado</div></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;"><div>Cliente que refiere</div><div>Cliente referido</div><div>Fecha de registro</div></div>
           <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">No se encontró ningún referido.</span><span style="font-size:13px;color:#766D69;">Revisa cómo escribiste el nombre de la clienta.</span><span style="font-size:13px;color:#766D69;">Un referido nace cuando una clienta se registra con el código de otra.</span></div>
         </div>
         <div style="font-size:12px;color:#7A716D;">Sin resultados</div>
@@ -278,7 +267,7 @@
         <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;flex-direction:column;gap:3px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.15;">Referidos</h2>
-            <span style="font-size:12px;color:#766D69;">34 referidos · 27 con crédito otorgado, 7 pendientes</span>
+            <span style="font-size:12px;color:#766D69;">34 referidos</span>
           </div>
           <div style="height:40px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
@@ -288,7 +277,6 @@
             <div style="display:flex;flex-direction:column;gap:10px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
                 <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">02/08/2026</span>
-                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11px;font-weight:500;white-space:nowrap;">Crédito otorgado</span>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <span style="font-size:14.5px;font-weight:500;">Andrea Céspedes</span>
@@ -299,7 +287,6 @@
             <div style="display:flex;flex-direction:column;gap:10px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
                 <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">11/08/2026</span>
-                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:11px;font-weight:500;white-space:nowrap;">Pendiente</span>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <span style="font-size:14.5px;font-weight:500;">Andrea Céspedes</span>
@@ -310,7 +297,6 @@
             <div style="display:flex;flex-direction:column;gap:10px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
                 <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">28/07/2026</span>
-                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11px;font-weight:500;white-space:nowrap;">Crédito otorgado</span>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <span style="font-size:14.5px;font-weight:500;">Daniela Rojas Peña</span>
@@ -321,7 +307,6 @@
             <div style="display:flex;flex-direction:column;gap:10px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
                 <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">14/08/2026</span>
-                <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:11px;font-weight:500;white-space:nowrap;">Pendiente</span>
               </div>
               <div style="display:flex;align-items:center;gap:10px;">
                 <span style="font-size:14.5px;font-weight:500;">Camila Vargas Ortiz</span>
@@ -336,7 +321,6 @@
 
     <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Registro automático</span>La fila nace cuando alguien se registra con un código: no hay alta ni edición manual.</div>
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Dos estados</span>"Crédito otorgado" en éxito y "Pendiente" en advertencia: el pago confirmado es lo que cambia la píldora.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Filas sin clic</span>La fila es el registro completo, así que no hay panel de detalle al que ir.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Quién refiere, repetido</span>Una clienta aparece tantas veces como referidas tenga; la segunda línea da su total.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Conteos del estudio</span>El subtítulo cuenta todo el estudio aunque haya una búsqueda; sin ninguno dice «Todavía no hay referidos en el estudio». Sin coincidencias, la tabla dice «No se encontró ningún referido.» y el pie «Sin resultados».</div>

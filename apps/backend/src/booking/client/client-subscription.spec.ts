@@ -27,8 +27,16 @@ describe('loadClientSubscription', () => {
         today,
         findActiveSubscription: jest.fn().mockResolvedValue(active),
         findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn().mockResolvedValue(null),
       }),
-    ).resolves.toEqual({ status: 'active', subscription: active });
+    ).resolves.toEqual({
+      status: 'active',
+      subscription: active,
+      nextSubscription: null,
+      founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
+    });
   });
 
   it('reports expiring soon from three days before the paid-through date', async () => {
@@ -41,8 +49,16 @@ describe('loadClientSubscription', () => {
         today,
         findActiveSubscription,
         findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn().mockResolvedValue(null),
       }),
-    ).resolves.toEqual({ status: 'expiring_soon', subscription: expiring });
+    ).resolves.toEqual({
+      status: 'expiring_soon',
+      subscription: expiring,
+      nextSubscription: null,
+      founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
+    });
     expect(findActiveSubscription).toHaveBeenCalledWith('client-id', today);
   });
 
@@ -56,8 +72,16 @@ describe('loadClientSubscription', () => {
         today,
         findActiveSubscription: jest.fn().mockResolvedValue(null),
         findLatestSubscription,
+        findFutureSubscription: jest.fn(),
       }),
-    ).resolves.toEqual({ status: 'expired', subscription: expired });
+    ).resolves.toEqual({
+      status: 'expired',
+      subscription: expired,
+      nextSubscription: null,
+      founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
+    });
     expect(findLatestSubscription).toHaveBeenCalledWith('client-id');
   });
 
@@ -68,8 +92,60 @@ describe('loadClientSubscription', () => {
         today,
         findActiveSubscription: jest.fn().mockResolvedValue(null),
         findLatestSubscription: jest.fn().mockResolvedValue(null),
+        findFutureSubscription: jest.fn(),
       }),
-    ).resolves.toEqual({ status: 'none', subscription: null });
+    ).resolves.toEqual({
+      status: 'none',
+      subscription: null,
+      nextSubscription: null,
+      founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
+    });
+  });
+
+  it('names the future Subscription when one is already queued', async () => {
+    const active = subscription(10);
+    const next = subscription(40);
+
+    await expect(
+      loadClientSubscription({
+        principal,
+        today,
+        findActiveSubscription: jest.fn().mockResolvedValue(active),
+        findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn().mockResolvedValue(next),
+      }),
+    ).resolves.toEqual({
+      status: 'active',
+      subscription: active,
+      nextSubscription: next,
+      founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
+    });
+  });
+
+  it('names the founder renewal deadline from the current Subscription real end', async () => {
+    const active = subscription(4);
+
+    await expect(
+      loadClientSubscription({
+        principal,
+        today,
+        findActiveSubscription: jest.fn().mockResolvedValue(active),
+        findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn().mockResolvedValue(null),
+        readFounderRenewal: jest.fn().mockResolvedValue({ gapDays: 7 }),
+      }),
+    ).resolves.toEqual({
+      status: 'active',
+      subscription: active,
+      nextSubscription: null,
+      founderRenewalDeadline: '2026-10-02',
+      freeze: null,
+      canRequestFreeze: false,
+    });
   });
 
   it('denies Staff principals', async () => {
@@ -87,6 +163,7 @@ describe('loadClientSubscription', () => {
         today,
         findActiveSubscription: jest.fn(),
         findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn(),
       }),
     ).rejects.toBeInstanceOf(BookingAccessDeniedError);
   });

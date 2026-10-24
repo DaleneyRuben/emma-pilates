@@ -43,8 +43,8 @@ describe('accrued revenue report', () => {
     );
     await context.pool.query(
       `INSERT INTO booking.plans
-         (id, name, duration_months, class_allowance, price_centavos, display_order, updated_at)
-       VALUES ($1, 'Test Plan', 1, 8, 30000, 1, CURRENT_TIMESTAMP)`,
+         (id, name, duration_days, class_allowance, price_centavos, display_order, updated_at)
+       VALUES ($1, 'Test Plan', 30, 8, 30000, 1, CURRENT_TIMESTAMP)`,
       [planId],
     );
     await context.pool.query(
@@ -65,23 +65,23 @@ describe('accrued revenue report', () => {
     await context.pool.query(
       `INSERT INTO booking.payments
          (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot,
-          class_allowance_snapshot, plan_price_centavos, credit_applied_centavos,
-          amount_due_centavos, method, state, collected_at_branch_id,
-          submitted_by_account_id, submitted_at, decided_by_account_id, decided_at,
-          updated_at)
-       VALUES ($1, $2, $3, 'Test Plan', 1, 8, 30000, 0, 30000, 'cash', 'confirmed',
-          $4, $5, '2026-10-20T04:00:00.000Z', $5, '2026-10-20T04:00:00.000Z',
-          CURRENT_TIMESTAMP)`,
+          duration_days_snapshot, class_allowance_snapshot, plan_price_centavos,
+          credit_applied_centavos, amount_due_centavos, starts_on, method, state,
+          collected_at_branch_id, submitted_by_account_id, submitted_at,
+          decided_by_account_id, decided_at, updated_at)
+       VALUES ($1, $2, $3, 'Test Plan', 1, 30, 8, 30000, 0, 30000, '2026-10-20',
+          'cash', 'confirmed', $4, $5, '2026-10-20T04:00:00.000Z', $5,
+          '2026-10-20T04:00:00.000Z', CURRENT_TIMESTAMP)`,
       [paymentId, clientId, planId, branchId, accountId],
     );
     await context.pool.query(
       `INSERT INTO booking.subscriptions
          (id, client_id, plan_id, payment_id, plan_name_snapshot,
-          duration_months_snapshot, original_class_allowance,
-          remaining_class_allowance, starts_on, ends_on, state, activated_at,
-          updated_at)
-       VALUES ($1, $2, $3, $4, 'Test Plan', 1, 8, 5, '2026-10-20', '2026-11-19',
-          'active', '2026-10-20T04:00:00.000Z', CURRENT_TIMESTAMP)`,
+          duration_months_snapshot, duration_days_snapshot,
+          original_class_allowance, remaining_class_allowance, starts_on,
+          ends_on, state, activated_at, updated_at)
+       VALUES ($1, $2, $3, $4, 'Test Plan', 1, 30, 8, 5, '2026-10-20',
+          '2026-11-19', 'active', '2026-10-20T04:00:00.000Z', CURRENT_TIMESTAMP)`,
       [subscriptionId, clientId, planId, paymentId],
     );
     await context.pool.query('COMMIT');

@@ -54,8 +54,10 @@ ALTER TABLE booking.subscriptions
     (state = 'active' AND expired_at IS NULL)
     OR (state = 'expired' AND expired_at IS NOT NULL)
   );
-CREATE UNIQUE INDEX subscriptions_one_active_per_client_key
-  ON booking.subscriptions (client_id) WHERE state = 'active';
+-- BKM-006 replaced this index: a Client may hold the current active
+-- Subscription and one future active Subscription. now() is not immutable, so
+-- the pair is a pair of BEFORE INSERT triggers (subscriptions_one_current,
+-- subscriptions_one_future) rather than partial unique indexes.
 
 ALTER TABLE booking.promotions
   ADD CONSTRAINT promotions_values_check CHECK (

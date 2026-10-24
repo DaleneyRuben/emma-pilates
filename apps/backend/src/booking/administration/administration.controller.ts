@@ -43,6 +43,7 @@ import {
   parseBranchInput,
   parseClassTypeInput,
   parsePlanInput,
+  toAdminPlanDto,
   parsePlanVisibility,
   parseScheduleEnd,
   parseScheduleInput,
@@ -235,7 +236,9 @@ export class AdministratorPlansController extends AdministrationController {
   ): Promise<AdminPlanDto> {
     const input = parsed(parsePlanInput(body), 'Invalid Plan');
     const principal = await this.authenticate(authorization);
-    return run(() => this.operations.catalog.createPlan(input, principal));
+    return run(() =>
+      this.operations.catalog.createPlan(input, principal).then(toAdminPlanDto),
+    );
   }
 
   @Put(':planId')
@@ -253,7 +256,9 @@ export class AdministratorPlansController extends AdministrationController {
     const input = parsed(parsePlanInput(body), 'Invalid Plan');
     const principal = await this.authenticate(authorization);
     return run(() =>
-      this.operations.catalog.updatePlan({ ...input, planId: id }, principal),
+      this.operations.catalog
+        .updatePlan({ ...input, planId: id }, principal)
+        .then(toAdminPlanDto),
     );
   }
 
@@ -272,10 +277,9 @@ export class AdministratorPlansController extends AdministrationController {
     const input = parsed(parsePlanVisibility(body), 'Invalid visibility');
     const principal = await this.authenticate(authorization);
     return run(() =>
-      this.operations.catalog.setPlanVisibility(
-        { planId: id, visible: input.visible },
-        principal,
-      ),
+      this.operations.catalog
+        .setPlanVisibility({ planId: id, visible: input.visible }, principal)
+        .then(toAdminPlanDto),
     );
   }
 }

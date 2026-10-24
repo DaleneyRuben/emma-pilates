@@ -26,7 +26,6 @@ describe('administration oversight endpoints (e2e)', () => {
   const oversight = {
     listEvaluations: operation(),
     listReferrals: operation(),
-    listCredits: operation(),
     incomeReport: operation(),
   };
   const principal: AuthenticatedPrincipal = {
@@ -72,6 +71,13 @@ describe('administration oversight endpoints (e2e)', () => {
   afterEach(async () => {
     await app.close();
     jest.clearAllMocks();
+  });
+
+  it('no longer serves the retired Credit list (PAY-005)', async () => {
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/credits')
+      .set('authorization', bearer)
+      .expect(404);
   });
 
   it('narrows the Evaluation list to one Branch without caching it', async () => {

@@ -84,6 +84,45 @@ describe("Client Evaluations", () => {
     expect(screen.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
   });
 
+  it("shows an 8-class Client the settings price and starts the QR payment", async () => {
+    const paid = {
+      included: false,
+      priceCentavos: 7_000,
+    };
+    const fetcher = routeFetcher(
+      baseRoutes({
+        "/api/v1/evaluation-slots": () =>
+          jsonResponse({
+            ...availability,
+            days: availability.days.map((day) => ({
+              ...day,
+              slots: day.slots.map((entry) => ({ ...entry, ...paid })),
+            })),
+          }),
+        "POST /api/v1/evaluation-slots/slot-2/evaluation-payments": () =>
+          jsonResponse(
+            upcomingEvaluation("evaluation-paid", boliviaInstant(firstDay, "09:45"), {
+              ...paid,
+              paymentId: "payment-1",
+            }),
+            201,
+          ),
+      }),
+    );
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
+    await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:45" }));
+    expect(
+      await screen.findByText("Cuesta Bs 70. La pagas por QR o en recepción."),
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+    await waitFor(() => {
+      expect(fetcher).toHaveBeenCalledWith(
+        "/api/v1/evaluation-slots/slot-2/evaluation-payments",
+        expect.objectContaining({ method: "POST" }),
+      );
+    });
+  });
+
   it("offers notifications once the Evaluation is confirmed", async () => {
     const { platform } = createMemoryPushPlatform("undetermined");
     const bookedStart = boliviaInstant(firstDay, "09:45");
@@ -244,7 +283,7 @@ describe("Client Evaluations", () => {
     });
     expect(screen.getByText("Puedes cancelar hasta 3 horas antes.")).toBeOnTheScreen();
     expect(await screen.findByText("Anteriores")).toBeOnTheScreen();
-    expect(screen.getByText("Realizada")).toBeOnTheScreen();
+    expect(screen.getByText("Incluida")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar" }));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));

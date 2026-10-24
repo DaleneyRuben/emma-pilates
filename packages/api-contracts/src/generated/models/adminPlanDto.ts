@@ -4,11 +4,20 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { AdminPlanDtoDurationDays } from "./adminPlanDtoDurationDays";
 import type { AdminPlanDtoDurationMonths } from "./adminPlanDtoDurationMonths";
+import type { AdminPlanDtoWeeklyClassCap } from "./adminPlanDtoWeeklyClassCap";
 
 export interface AdminPlanDto {
   id: string;
   name: string;
+  durationDays: AdminPlanDtoDurationDays;
+  /** @nullable */
+  weeklyClassCap: AdminPlanDtoWeeklyClassCap;
+  /**
+   * durationDays / 30, for builds that still read months
+   * @deprecated
+   */
   durationMonths: AdminPlanDtoDurationMonths;
   classAllowance: number;
   /** BOB centavos */

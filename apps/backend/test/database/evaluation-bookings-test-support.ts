@@ -86,6 +86,39 @@ export const createCarlaBlocks = async (
   };
 };
 
+// The development fixtures give Lucía and Isabel 30-day Plans. NUT-003
+// includes the Evaluation only on a 90-day Plan, so these specs grant one.
+export const grantQuarterlySubscription = async (
+  prisma: PrismaClient,
+  email: string,
+): Promise<void> => {
+  const client = await prisma.client.findFirstOrThrow({
+    where: { account: { email, deletedAt: null } },
+    select: { id: true },
+  });
+  const plan = await prisma.plan.findFirstOrThrow({
+    where: { durationDays: 90, hiddenAt: null },
+    select: { id: true, name: true, classAllowance: true },
+  });
+  await prisma.subscription.updateMany({
+    where: { clientId: client.id, state: 'ACTIVE' },
+    data: { state: 'EXPIRED', expiredAt: at('2026-09-21T15:00:00.000Z') },
+  });
+  await prisma.subscription.create({
+    data: {
+      clientId: client.id,
+      planId: plan.id,
+      planNameSnapshot: plan.name,
+      durationDaysSnapshot: 90,
+      originalClassAllowance: plan.classAllowance,
+      remainingClassAllowance: 5,
+      startsOn: civil('2026-09-11'),
+      endsOn: civil('2026-12-09'),
+      activatedAt: at('2026-09-11T16:00:00.000Z'),
+    },
+  });
+};
+
 // Isabel has no classes left; a future booked Session keeps her eligible.
 export const bookIsabelFutureSession = async (
   world: EvaluationTestWorld,
