@@ -1,4 +1,5 @@
-import { screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http } from "msw";
 import {
   apiUrl,
@@ -9,6 +10,7 @@ import {
 } from "../test/msw";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
+import { RecommendationsPage } from "./recommendations-page";
 
 const listPath = "/api/v1/administrator/recommendations";
 
@@ -54,7 +56,7 @@ describe("AW40 Recomendaciones", () => {
     ).toHaveAttribute("aria-current", "page");
     expect(await screen.findByText(finding.detail)).toBeVisible();
     expect(screen.getByText(inactive.detail)).toBeVisible();
-    expect(screen.getByText("Nueva")).toBeVisible();
+    expect(screen.getAllByText("Nueva")).toHaveLength(2);
     const row = screen.getByText(finding.detail).closest("li");
     expect(row).not.toBeNull();
     server.use(
@@ -70,7 +72,14 @@ describe("AW40 Recomendaciones", () => {
 
   it("hides Descartar when the page is read only", async () => {
     server.use(list([finding]));
-    renderAdmin("/recomendaciones", { readOnly: true });
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RecommendationsPage readOnly />
+      </QueryClientProvider>,
+    );
 
     expect(await screen.findByText(finding.detail)).toBeVisible();
     expect(screen.queryByRole("button", { name: "Descartar" })).toBeNull();
@@ -99,12 +108,12 @@ describe("AW40 Recomendaciones", () => {
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeVisible();
   });
 
-  it("shows the loading notice before the list arrives", () => {
-    server.use(
-      http.get(apiUrl(listPath), () => new Promise(() => undefined)),
-    );
+  it("shows the loading notice before the list arrives", async () => {
+    server.use(http.get(apiUrl(listPath), () => new Promise(() => undefined)));
     renderAdmin("/recomendaciones");
 
-    expect(screen.getByText("Cargando las recomendaciones…")).toBeVisible();
+    expect(
+      await screen.findByText("Cargando las recomendaciones…"),
+    ).toBeVisible();
   });
 });
