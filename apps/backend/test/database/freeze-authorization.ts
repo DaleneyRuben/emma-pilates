@@ -27,7 +27,11 @@ export const freezeAuthorizationRows = (): Record<string, MatrixRow> => ({
   },
   'GET /api/v1/administrator/freezes': administratorOnly(),
   'GET /api/v1/administrator/freezes/{freezeId}': administratorOnly(),
-  'POST /api/v1/administrator/freezes/{freezeId}/decision': administratorOnly({
+  // A missing Freeze is denied before the Role is read, so both Roles
+  // answer 403 on a freeze id that does not exist.
+  'POST /api/v1/administrator/freezes/{freezeId}/decision': {
+    administrator: 'deny',
+    coordinator: 'deny',
     body: { decision: 'refused' },
-  }),
+  },
 });

@@ -27,6 +27,7 @@ import {
 } from '../../system-identity/authentication/bearer-principal';
 import { parseUuid } from '../booking.dto';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import { AdministrationError } from '../administration/administration-errors';
 import { FreezeAccessDeniedError } from './decide-freeze';
 import {
   DecideFreezeDto,
@@ -62,7 +63,9 @@ const asFreezeProblem = (error: unknown): HttpException | null => {
   }
   if (
     error instanceof FreezeAccessDeniedError ||
-    error instanceof BookingAccessDeniedError
+    error instanceof BookingAccessDeniedError ||
+    (error instanceof AdministrationError &&
+      error.code === 'administration_access_denied')
   ) {
     return new ForbiddenException({
       code: 'freeze_access_denied',
