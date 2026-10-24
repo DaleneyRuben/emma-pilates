@@ -19,6 +19,9 @@ importers:
       '@pilates/api-contracts':
         specifier: workspace:*
         version: link:../../packages/api-contracts
+      '@pilates/studio-economics':
+        specifier: workspace:*
+        version: link:../../packages/studio-economics
       '@sentry/react':
         specifier: 11.0.0
         version: 11.0.0(react@19.2.3)

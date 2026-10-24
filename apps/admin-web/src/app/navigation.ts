@@ -17,6 +17,7 @@ export type AdminPath =
   | "/back-office/gastos"
   | "/back-office/categorias-de-gasto"
   | "/reporte"
+  | "/simulador"
   | "/promociones"
   | "/promociones/referidos"
   | "/promociones/creditos"
@@ -52,6 +53,12 @@ export type NavigationItem = {
    * (AW16), so the top bar shows a note instead of the shell's.
    */
   ownBranchFilter?: true;
+  /**
+   * Amounts. The Coordinator sees counts only (ADR-0102, ADR-0103), so the
+   * shell hides this entry from anyone who is not an Administrator. The
+   * Coordinator Role is not wired on this branch (IDN-009).
+   */
+  administratorOnly?: true;
 };
 
 export type NavigationGroup = {
@@ -151,6 +158,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/reporte",
         screen: "AW16",
         ownBranchFilter: true,
+      },
+      {
+        label: "Simulador",
+        to: "/simulador",
+        screen: "AW37",
+        studioWide: "el simulador no lee una sede.",
+        administratorOnly: true,
       },
     ],
   },
