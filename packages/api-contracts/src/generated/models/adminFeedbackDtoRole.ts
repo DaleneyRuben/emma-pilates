@@ -17,4 +17,5 @@ export const AdminFeedbackDtoRole = {
   assistant: "assistant",
   nutritionist: "nutritionist",
   administrator: "administrator",
+  coordinator: "coordinator",
 } as const;

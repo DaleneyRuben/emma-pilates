@@ -4,7 +4,7 @@ import {
   boliviaToday,
   formatCivilDate,
 } from "../../lib/bolivia-time";
-import { toCsv } from "../../lib/csv";
+import { csvDocument } from "../../lib/csv";
 
 /** AW35's «Tipo»: a live Client, or a former Client (follow-up 104). */
 export const kindLabel = (contact: AdminPromotionContactDto): string =>
@@ -14,13 +14,11 @@ export const kindLabel = (contact: AdminPromotionContactDto): string =>
 export const consentDate = (contact: AdminPromotionContactDto): string =>
   formatCivilDate(boliviaParts(contact.consentedAt).date);
 
-/**
- * AW35's «Exportar CSV»: the table's columns.
- */
+/** AW35's «Exportar CSV»: the table's columns. */
 export const promotionContactsCsv = (
   contacts: readonly AdminPromotionContactDto[],
 ): string =>
-  toCsv([
+  csvDocument([
     ["Nombre", "Tipo", "Correo", "Teléfono", "Aceptó el"],
     ...contacts.map((contact) => [
       contact.name,

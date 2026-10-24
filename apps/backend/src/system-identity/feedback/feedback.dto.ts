@@ -21,6 +21,7 @@ const feedbackRoles = [
   'assistant',
   'nutritionist',
   'administrator',
+  'coordinator',
 ] as const;
 
 export class SendFeedbackDto {

@@ -272,10 +272,37 @@ describe('assistant clients (e2e)', () => {
         });
       });
     expect(operations.recordCashPayment).toHaveBeenCalledWith(
-      { clientId, planId, branchId },
+      { clientId, planId, branchId, invoiceData: null },
       assistant,
       idempotencyKey,
     );
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/assistant/clients/${clientId}/cash-payments`)
+      .set('authorization', bearer)
+      .set('idempotency-key', idempotencyKey)
+      .send({
+        planId,
+        branchId,
+        invoiceData: { taxId: '1020304050', name: 'Estudio SRL' },
+      })
+      .expect(201);
+    expect(operations.recordCashPayment).toHaveBeenLastCalledWith(
+      {
+        clientId,
+        planId,
+        branchId,
+        invoiceData: { taxId: '1020304050', name: 'Estudio SRL' },
+      },
+      assistant,
+      idempotencyKey,
+    );
+    await request(app.getHttpServer())
+      .post(`/api/v1/assistant/clients/${clientId}/cash-payments`)
+      .set('authorization', bearer)
+      .set('idempotency-key', idempotencyKey)
+      .send({ planId, branchId, invoiceData: { taxId: '', name: 'Ana' } })
+      .expect(400);
 
     await request(app.getHttpServer())
       .post(`/api/v1/assistant/clients/${clientId}/cash-payments`)

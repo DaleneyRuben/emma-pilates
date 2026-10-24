@@ -230,6 +230,68 @@
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Coordinación</div>
+          <div style="font-size:12px;color:#766D69;">Rol «Coordinación», todas las sucursales, sin «Ver la app como…» (IDN-009)</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Perfil</span>
+          </div>
+
+          <div style="flex:1;padding:28px 20px 40px;display:flex;flex-direction:column;gap:26px;">
+
+            <div style="display:flex;flex-direction:column;gap:14px;padding:22px 18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:center;gap:16px;">
+                <div style="width:64px;height:64px;flex:none;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:23px;font-weight:500;">CR</div>
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;line-height:1.2;">Carolina Rivas</span>
+                  <span style="font-size:13.5px;color:#766D69;">carolina.rivas@emmapilates.bo</span>
+                  <span style="font-size:13.5px;color:#766D69;font-variant-numeric:tabular-nums;">+591 708 33104</span>
+                </div>
+              </div>
+              <div style="padding-top:14px;border-top:1px solid #EFE7DE;font-size:13px;line-height:1.55;color:#7A716D;text-wrap:pretty;">Tus datos los actualiza administración.</div>
+            </div>
+
+            <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:56px;padding:14px 18px;border-bottom:1px solid #EFE7DE;">
+                <span style="font-size:13px;color:#766D69;">Rol</span>
+                <span style="font-size:15px;color:#4A4A4A;">Coordinación</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:56px;padding:14px 18px;">
+                <span style="font-size:13px;color:#766D69;flex:none;">Sucursales</span>
+                <span style="font-size:15px;color:#4A4A4A;text-align:right;">Todas las sucursales</span>
+              </div>
+            </div>
+
+            <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z"></path><path d="M10.5 18.5a2 2 0 0 0 3 0"></path></svg>
+                <span style="flex:1;font-size:16px;color:#4A4A4A;">Notificaciones</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><rect x="4" y="10" width="16" height="10.5" rx="2.5"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+                <span style="flex:1;font-size:16px;color:#4A4A4A;">Cambiar contraseña</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+            </div>
+
+            <button style="height:52px;width:100%;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:15px;font-weight:500;cursor:pointer;" style-hover="border-color:#B25D4B;color:#B25D4B;" style-active="border-color:#B25D4B;color:#B25D4B;background:rgba(178,93,75,0.06);">Cerrar sesión</button>
+
+            <div style="text-align:center;font-size:12px;color:#7A716D;">Emma Pilates Studio · versión 1.0</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Android · Entrenadora</div>
           <div style="font-size:12px;color:#766D69;">Mismo contenido, encabezado con altura de Android · confirmación antes de salir</div>
         </div>

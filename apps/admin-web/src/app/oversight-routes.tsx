@@ -49,16 +49,6 @@ const referralsRoute = createRoute({
   ),
 });
 
-const creditsRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/promociones/creditos",
-  validateSearch: optionalSearch(nameSearchSchema),
-  component: lazyRouteComponent(
-    () => import("../oversight/credits/credits-route"),
-    "CreditsRoute",
-  ),
-});
-
 // AW38 (REL-012): the feedback from both apps, studio-wide.
 const feedbackRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
@@ -75,6 +65,5 @@ export const oversightRoutes = [
   promotionsRoute,
   promotionContactsRoute,
   referralsRoute,
-  creditsRoute,
   feedbackRoute,
 ];

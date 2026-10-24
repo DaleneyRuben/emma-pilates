@@ -1,5 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import {
+  declaredAcquisitionChannels,
+  type DeclaredAcquisitionChannel,
+} from '../../booking/acquisition/acquisition';
+import type { InviteClientCommand } from './client-invitations-model';
 
 const optionalPhone = z
   .string()
@@ -14,6 +19,8 @@ const inviteClientSchema = z.strictObject({
   name: z.string().trim().min(1).max(120),
   email: z.email(),
   phone: optionalPhone,
+  acquisitionChannel: z.enum(declaredAcquisitionChannels).optional(),
+  referralCode: z.string().trim().min(1).max(64).optional(),
 });
 
 const correctEmailSchema = z.strictObject({ email: z.email() });
@@ -31,11 +38,25 @@ export class InviteClientDto {
     example: '+591 70000000',
   })
   phone?: string | null;
+
+  @ApiPropertyOptional({
+    enum: declaredAcquisitionChannels,
+    description:
+      '«¿Cómo nos conociste?» Required by current builds; a build that omits it records `unknown` (BKM-011)',
+  })
+  acquisitionChannel?: DeclaredAcquisitionChannel;
+
+  @ApiPropertyOptional({
+    example: 'CARLA',
+    description:
+      'Referral Code of the Client or Trainer who brought her; it decides the Acquisition Channel',
+  })
+  referralCode?: string;
 }
 
 export const parseInviteClient = (
   value: unknown,
-): { name: string; email: string; phone: string | null } | null => {
+): InviteClientCommand | null => {
   const result = inviteClientSchema.safeParse(value);
   return result.success ? result.data : null;
 };

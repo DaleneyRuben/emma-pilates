@@ -1,0 +1,83 @@
+import { hash } from 'argon2';
+import type { PrismaClient } from '../../src/generated/prisma/client';
+import { deterministicId } from '../../src/development-fixtures/deterministic-id';
+import type { RealIds } from './authorization-matrix';
+
+const day = 24 * 60 * 60 * 1_000;
+
+// The fixtures are dated September 2026 and the API runs on the real clock,
+// so the Booking rows of the matrix get two future Sessions of their own, a
+// Booking, and a Waitlist Entry for Bea, whose test Plan is still active.
+export const findRealIds = async (prisma: PrismaClient): Promise<RealIds> => {
+  const bea = deterministicId('test-client:bea');
+  const subscription = await prisma.subscription.findFirstOrThrow({
+    where: { clientId: bea },
+    select: { id: true },
+  });
+  const camila = await prisma.account.findFirstOrThrow({
+    where: { email: 'camila.rojas@example.com' },
+    select: { id: true },
+  });
+  const sessionAt = async (offsetDays: number) => {
+    const startsAt = new Date(Date.now() + offsetDays * day);
+    return prisma.session.create({
+      data: {
+        branchId: deterministicId('branch:urubo'),
+        classTypeId: deterministicId('class-type:mat'),
+        trainerStaffMemberId: deterministicId('staff-member:daniela'),
+        startsAt,
+        endsAt: new Date(startsAt.getTime() + 50 * 60_000),
+        capacity: 8,
+        isException: true,
+      },
+      select: { id: true },
+    });
+  };
+  const [session, other, waitlisted] = await Promise.all([
+    sessionAt(2),
+    sessionAt(3),
+    sessionAt(4),
+  ]);
+  // A Booking holds one class of the Plan, so cancelling it can return it.
+  await prisma.subscription.update({
+    where: { id: subscription.id },
+    data: { remainingClassAllowance: { decrement: 2 } },
+  });
+  // Password-checking rows need a real hash to compare against.
+  await prisma.account.updateMany({
+    where: {
+      email: {
+        in: ['paola.mendoza@example.com', 'carolina.rivas@example.com'],
+      },
+    },
+    data: { passwordHash: await hash('matrix password') },
+  });
+  const bookOn = (sessionId: string) =>
+    prisma.booking.create({
+      data: {
+        sessionId,
+        clientId: bea,
+        subscriptionId: subscription.id,
+        createdByAccountId: camila.id,
+      },
+      select: { id: true },
+    });
+  const booking = await bookOn(session.id);
+  const rescheduled = await bookOn(waitlisted.id);
+  const entry = await prisma.waitlistEntry.create({
+    data: {
+      sessionId: waitlisted.id,
+      clientId: bea,
+      joinedByAccountId: camila.id,
+    },
+    select: { id: true },
+  });
+  return {
+    sessionId: session.id,
+    otherSessionId: other.id,
+    bookingId: booking.id,
+    rescheduleBookingId: rescheduled.id,
+    waitlistEntryId: entry.id,
+    clientId: bea,
+  };
+};

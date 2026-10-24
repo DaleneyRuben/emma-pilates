@@ -1,9 +1,12 @@
+import { randomUUID } from 'node:crypto';
 import { Prisma, type PrismaClient } from '../../generated/prisma/client';
-import { boliviaDate } from '../../time/bolivia-time';
 import {
-  accountStatus,
-  createAssistantClientRepository,
-} from '../assistant/prisma-assistant-client-repository';
+  AuditActorKind,
+  AuditOutcome,
+  StaffRole,
+} from '../../generated/prisma/enums';
+import { boliviaDate } from '../../time/bolivia-time';
+import { accountStatus } from '../assistant/prisma-assistant-client-repository';
 import { closureScope } from '../account-closure/closure-scope';
 import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { toSubscriptionSummary } from '../client/client-subscription';
@@ -55,9 +58,8 @@ export const createPrismaAdministratorClients = (
   prisma: PrismaClient,
 ): AdministratorClientDirectory => {
   const catalog = createCatalogRepository(prisma);
-  const credit = createAssistantClientRepository(prisma);
 
-  return {
+  const directory: AdministratorClientDirectory = {
     list: async ({ page, pageSize, query, today }) => {
       const search = searchCondition(query);
       const [matches, [counted], studioClientCount, activePlanClientCount] =
@@ -161,7 +163,6 @@ export const createPrismaAdministratorClients = (
         .then(toSubscriptionSummary),
     findLatestSubscription: (clientId) =>
       catalog.findLatestSubscription(clientId).then(toSubscriptionSummary),
-    readAvailableCredit: (clientId) => credit.readAvailableCredit(clientId),
     readClosureOutlook: async (clientId, now) => {
       const [bookings, waitlist, evaluations, pending] = await Promise.all([
         prisma.booking.count({
@@ -182,5 +183,40 @@ export const createPrismaAdministratorClients = (
         transferPaymentPending: pending > 0,
       };
     },
+
+    // The audit names which fields changed, never their values (ADR-0055).
+    saveProfile: async (input) => {
+      const changedFields = [
+        ...(input.previous.name === input.name ? [] : ['name']),
+        ...(input.previous.phone === input.phone ? [] : ['phone']),
+      ];
+      await prisma.$transaction(async (transaction) => {
+        await transaction.client.update({
+          where: { id: input.clientId },
+          data: { name: input.name, phone: input.phone },
+        });
+        await transaction.auditRecord.create({
+          data: {
+            actionCode: 'client.profile_corrected',
+            outcome: AuditOutcome.SUCCEEDED,
+            actorKind: AuditActorKind.ACCOUNT,
+            actorAccountId: input.actorAccountId,
+            actorRole:
+              input.actorRole === 'coordinator'
+                ? StaffRole.COORDINATOR
+                : StaffRole.ADMINISTRATOR,
+            targetType: 'client',
+            targetId: input.clientId,
+            correlationId: randomUUID(),
+            occurredAt: input.occurredAt,
+            metadata: { changedFields },
+          },
+        });
+      });
+      const saved = await directory.read(input.clientId);
+      if (saved === null) throw new Error('Client vanished after its update');
+      return saved;
+    },
   };
+  return directory;
 };

@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from "@testing-library/react-native";
+import { Keyboard } from "react-native";
 
 import { AuthenticationApiError, type AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
@@ -36,6 +37,7 @@ async function fillForm(
   await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "lucia@example.com");
   await fireEvent.changeText(screen.getByLabelText("Contraseña"), "pilates2026");
   await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), confirmation);
+  await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
 }
 
 describe("Client registration (01)", () => {
@@ -89,6 +91,7 @@ describe("Client registration (01)", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
     expect(api.register).toHaveBeenCalledWith({
+      acquisitionChannel: "instagram",
       email: "lucia@example.com",
       name: "Lucía Mendoza",
       password: "pilates2026",
@@ -113,6 +116,68 @@ describe("Client registration (01)", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
     expect(screen.getByRole("alert", { name: "Revisa el código de referido." })).toBeOnTheScreen();
+  });
+});
+
+// BKM-011: «¿Cómo nos conociste?» is required on every new registration.
+describe("Client registration (01) acquisition channel", () => {
+  it("offers the eight answers and sends the one she picks", async () => {
+    const api = createApiMock();
+    const screen = await openRegistration(api);
+
+    expect(screen.getByText("¿Cómo nos conociste?")).toBeOnTheScreen();
+    expect(screen.getAllByRole("radio").map((option) => option.props.accessibilityLabel)).toEqual([
+      "Instagram",
+      "TikTok",
+      "Facebook",
+      "Google",
+      "Recomendación de una amiga",
+      "Una instructora",
+      "Pasé por el estudio",
+      "Otro",
+    ]);
+    await fillForm(screen);
+    await fireEvent.press(screen.getByRole("radio", { name: "Pasé por el estudio" }));
+
+    expect(screen.getByRole("radio", { name: "Pasé por el estudio" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Instagram" })).not.toBeChecked();
+    await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+
+    expect(api.register).toHaveBeenCalledWith(
+      expect.objectContaining({ acquisitionChannel: "walk_in" }),
+    );
+  });
+
+  it("asks for an answer before creating the account", async () => {
+    const api = createApiMock();
+    const screen = await openRegistration(api);
+
+    await fireEvent.changeText(screen.getByLabelText("Nombre"), "Lucía Mendoza");
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "lucia@example.com");
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "pilates2026");
+    await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "pilates2026");
+    await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+
+    expect(screen.getByRole("alert", { name: "Elige cómo nos conociste." })).toBeOnTheScreen();
+    expect(api.register).not.toHaveBeenCalled();
+  });
+
+  it("closes the keyboard when she picks an answer, so «Crear cuenta» shows", async () => {
+    const dismiss = jest.spyOn(Keyboard, "dismiss");
+    const screen = await openRegistration(createApiMock());
+
+    await fireEvent.press(screen.getByRole("radio", { name: "Google" }));
+
+    expect(dismiss).toHaveBeenCalled();
+    dismiss.mockRestore();
+  });
+
+  it("says the code can be a friend's or the instructor's", async () => {
+    const screen = await openRegistration(createApiMock());
+
+    await fireEvent.press(screen.getByRole("button", { name: "¿Tienes un código de referido?" }));
+
+    expect(screen.getByText("De una amiga o de tu instructora.")).toBeOnTheScreen();
   });
 });
 

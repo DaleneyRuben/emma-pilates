@@ -197,6 +197,7 @@ model Account {
   createdPurchaseIntents    PurchaseIntent[]        @relation("PurchaseIntentCreatedBy")
   submittedPayments         Payment[]               @relation("PaymentSubmittedBy")
   decidedPayments           Payment[]               @relation("PaymentDecidedBy")
+  invoiceIssuedPayments     Payment[]               @relation("PaymentInvoiceIssuedBy")
   creditLedgerEntries       CreditLedgerEntry[]     @relation("CreditLedgerActor")
   createdAvailabilityBlocks AvailabilityBlock[]     @relation("AvailabilityBlockCreatedBy")
   endedAvailabilityBlocks   AvailabilityBlock[]     @relation("AvailabilityBlockEndedBy")
@@ -205,9 +206,11 @@ model Account {
   createdSupplies           Supply[]                @relation("SupplyCreatedBy")
   recordedWithdrawals       Withdrawal[]            @relation("WithdrawalRecordedBy")
   recordedSupplyRestocks    SupplyRestock[]         @relation("SupplyRestockRecordedBy")
+  studioSettingsVersions    StudioSettingsVersion[] @relation("StudioSettingsVersionCreatedBy")
   recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
   feedback                  Feedback[]
+  closedCashCloses          CashClose[]             @relation("CashCloseClosedBy")
 
   @@map("accounts")
   @@schema("system")

@@ -32,6 +32,7 @@ export const roleLabels: Record<AdminFeedbackDtoRole, string> = {
   assistant: "Asistente",
   nutritionist: "Nutricionista",
   administrator: "Administrador",
+  coordinator: "Coordinación",
 };
 
 const systems = { android: "Android", ios: "iOS" } as const;

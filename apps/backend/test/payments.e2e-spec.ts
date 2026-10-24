@@ -97,12 +97,9 @@ describe('client payments (e2e)', () => {
       receiptAttached: true,
     });
     commands.submitTransfer.mockResolvedValue(payment);
-    commands.completeCreditPurchase.mockResolvedValue({
-      ...payment,
-      method: 'credit_only',
-      state: 'confirmed',
-      amountDueCentavos: 0,
-    });
+    commands.completeCreditPurchase.mockRejectedValue(
+      new PaymentRuleError('credit_insufficient', 'Credit was retired'),
+    );
     commands.readOpenPurchaseIntent.mockResolvedValue(intent);
     commands.readCurrentPayment.mockResolvedValue(payment);
     commands.readCreditSummary.mockResolvedValue({
@@ -215,6 +212,46 @@ describe('client payments (e2e)', () => {
       .expect(({ body }) => {
         expect(body).toMatchObject({ method: 'transfer', state: 'pending' });
       });
+    // A release before PAY-007 sends no body: the sale is «Sin factura».
+    expect(commands.submitTransfer).toHaveBeenLastCalledWith(
+      { purchaseIntentId: intentId, invoiceData: null },
+      expect.objectContaining({ accountId: 'account-id' }),
+      key,
+    );
+  });
+
+  it('submits the transfer with the Invoice Data the Client typed, tidied', async () => {
+    await request(app.getHttpServer())
+      .post(`/api/v1/purchase-intents/${intentId}/submit`)
+      .set('authorization', bearer)
+      .set('idempotency-key', key)
+      .send({ invoiceData: { taxId: ' 4567891-1a ', name: ' Ana  Pérez ' } })
+      .expect(201);
+    expect(commands.submitTransfer).toHaveBeenLastCalledWith(
+      {
+        purchaseIntentId: intentId,
+        invoiceData: { taxId: '4567891-1A', name: 'Ana Pérez' },
+      },
+      expect.anything(),
+      key,
+    );
+
+    for (const body of [
+      { invoiceData: { taxId: '4567891' } },
+      { invoiceData: { taxId: 'sin numero', name: 'Ana' } },
+      { invoiceData: null, extra: true },
+    ]) {
+      await request(app.getHttpServer())
+        .post(`/api/v1/purchase-intents/${intentId}/submit`)
+        .set('authorization', bearer)
+        .set('idempotency-key', key)
+        .send(body)
+        .expect(400)
+        .expect(({ body: problem }: { body: { code: string } }) =>
+          expect(problem.code).toBe('invalid_request'),
+        );
+    }
+    expect(commands.submitTransfer).toHaveBeenCalledTimes(1);
   });
 
   it('serves the current Purchase Intent, Payment, Credit, and referrals', async () => {
@@ -260,18 +297,15 @@ describe('client payments (e2e)', () => {
       });
   });
 
-  it('completes a Credit-only purchase', async () => {
+  it('refuses the deprecated Credit-only purchase with a stable code (PAY-005)', async () => {
     await request(app.getHttpServer())
       .post('/api/v1/credit-purchases')
       .set('authorization', bearer)
       .set('idempotency-key', key)
       .send({ planId })
-      .expect(201)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          method: 'credit_only',
-          amountDueCentavos: 0,
-        });
+      .expect(409)
+      .expect(({ body }: { body: { code: string } }) => {
+        expect(body.code).toBe('credit_insufficient');
       });
   });
 

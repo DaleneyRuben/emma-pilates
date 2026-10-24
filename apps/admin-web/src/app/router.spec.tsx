@@ -24,6 +24,7 @@ describe("admin navigation", () => {
         items: [
           "Clientes",
           "Pagos",
+          "Caja",
           "Insumos",
           "Evaluaciones nutricionales",
           "Personal",
@@ -33,7 +34,7 @@ describe("admin navigation", () => {
         ],
       },
       { label: null, items: ["Reporte"] },
-      { label: "Promociones", items: ["Promociones", "Referidos", "Créditos"] },
+      { label: "Promociones", items: ["Promociones", "Referidos"] },
       { label: null, items: ["Comentarios"] },
     ]);
     expect(navigationItems.map((item) => item.label)).not.toContain(
@@ -51,6 +52,7 @@ describe("admin navigation", () => {
       "AW19",
       "AW21",
       "AW28",
+      "AW151",
       "AW08",
       "AW25",
       "AW23",
@@ -60,8 +62,8 @@ describe("admin navigation", () => {
       "AW16",
       "AW17",
       "AW26",
-      "AW27",
       "AW38",
+      "AW36",
     ]);
   });
 
@@ -76,9 +78,13 @@ describe("admin navigation", () => {
       "Nómina",
       "Categorías de gasto",
       "Referidos",
-      "Créditos",
       "Comentarios",
+      "Reglas del estudio",
     ]);
+  });
+
+  it("no longer lists the retired Créditos page (PAY-005)", () => {
+    expect(navigationItems.map((item) => item.label)).not.toContain("Créditos");
   });
 });
 
@@ -110,7 +116,7 @@ describe("admin routes", () => {
     const listPaths = navigationItems
       .filter((item) => item.list)
       .map((item) => item.to);
-    expect(listPaths).toHaveLength(14);
+    expect(listPaths).toHaveLength(13);
     expect(listPaths).not.toContain("/");
     expect(listPaths).not.toContain("/reporte");
     // AW17 is the carousel: unpaged cards, not a table (WEB-006).

@@ -1,3 +1,4 @@
+import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from './create-booking';
 
@@ -24,16 +25,15 @@ type LeaveWaitlistDependencies = {
   now(): Date;
 };
 
-// The Client leaves their own entry; an Assistant leaves it for the Client at
-// an assigned Branch, mirroring who may join the Waitlist.
+// The Client leaves their own entry; the Assistant (at an assigned Branch) or
+// the Coordinator leaves it for the Client, mirroring who may join it.
 const mayLeave = (
   principal: AuthenticatedPrincipal,
   entry: WaitlistEntryForLeaving,
 ): boolean =>
   principal.identity.kind === 'client'
     ? principal.identity.clientId === entry.clientId
-    : principal.identity.role === 'assistant' &&
-      principal.identity.branchIds.includes(entry.session.branchId);
+    : actsForClientsAt(principal, entry.session.branchId);
 
 export const leaveWaitlist = async (
   command: { waitlistEntryId: string },

@@ -1,3 +1,4 @@
+export * from "./acquisition/acquisition-channel-field";
 export * from "./account/change-password-screen";
 export * from "./account/email-change-link-screen";
 export * from "./account/feedback-metadata";
@@ -19,11 +20,13 @@ export * from "./auth/session-api";
 export * from "./auth/session-manager";
 export * from "./booking/seat-pill";
 export * from "./booking/session-card";
+export * from "./booking/studio-rules";
 export * from "./encoding/base64";
 export * from "./history/class-history-groups";
 export * from "./history/class-history-list";
 export * from "./ingress/verified-link";
 export * from "./money/bolivianos";
+export * from "./payments/invoice-data-card";
 export { startErrorReporting } from "./monitoring/start-error-reporting";
 export * from "./notifications/notification-time";
 export * from "./notifications/notifications-screen";

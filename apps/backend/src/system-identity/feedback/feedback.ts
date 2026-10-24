@@ -13,7 +13,12 @@ export type FeedbackStatus = (typeof feedbackStatuses)[number];
 export type FeedbackApp = (typeof feedbackApps)[number];
 export type FeedbackPlatform = (typeof feedbackPlatforms)[number];
 export type FeedbackRole =
-  'client' | 'trainer' | 'assistant' | 'nutritionist' | 'administrator';
+  | 'client'
+  | 'trainer'
+  | 'assistant'
+  | 'nutritionist'
+  | 'administrator'
+  | 'coordinator';
 
 export const feedbackTextLength = { min: 10, max: 2_000 } as const;
 export const feedbackNoteMaxLength = 2_000;
@@ -128,8 +133,8 @@ const sender = (
     ? { app: 'client', role: 'client' }
     : { app: 'staff', role: principal.identity.role };
 
-// ADR-0054: triage is the Administrator's (ADR-0102 leaves the Coordinator's
-// access to the item that adds her Role).
+// ADR-0054: triage is the Administrator's; the Coordinator may send feedback
+// (operations) but cannot open the admin list (ADR-0102).
 const requireAdministrator = (
   principal: AuthenticatedPrincipal,
 ): FeedbackActor => {
