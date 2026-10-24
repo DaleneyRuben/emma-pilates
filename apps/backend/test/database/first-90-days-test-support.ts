@@ -14,7 +14,14 @@ export const createPlan = (
       classAllowance: 8,
       priceCentavos: extra.priceCentavos ?? 56_000,
       displayOrder: 0,
-      hiddenAt: extra.hiddenAt ?? null,
+      // A free Plan must be hidden (plans_free_only_hidden_check). A priced
+      // hidden Plan stays hidden; a priced visible Plan stays visible.
+      hiddenAt:
+        extra.hiddenAt !== undefined
+          ? extra.hiddenAt
+          : (extra.priceCentavos ?? 56_000) === 0
+            ? new Date('2026-10-08T16:00:00.000Z')
+            : null,
     },
   });
 

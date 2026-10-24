@@ -330,6 +330,7 @@ describe('Prisma payment commands', () => {
         referredClientId: sofiaId,
         referredName: 'Sofía G.',
         state: 'awarded',
+        invitationStatus: 'registered',
         createdAt: now,
         awardedAt: now,
         awardCentavos: 6000,

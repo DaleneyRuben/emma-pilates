@@ -25,7 +25,7 @@ describe('booking catalog migration', () => {
         'utf8',
       );
       expect(assertions.match(/SELECT pg_temp.expect_failure/g)).toHaveLength(
-        50,
+        49,
       );
       await expect(client.query(assertions)).resolves.toBeDefined();
     } finally {

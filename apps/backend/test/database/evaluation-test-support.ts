@@ -98,17 +98,29 @@ export const startEvaluationTestWorld =
             },
           },
           subscriptions: {
-            create: {
-              planId: plan.id,
-              planNameSnapshot: plan.name,
-              durationDaysSnapshot:
-                key === 'ana' || key === 'bea' ? 90 : plan.durationDays,
-              originalClassAllowance: plan.classAllowance,
-              remainingClassAllowance: plan.classAllowance,
-              startsOn: new Date('2026-09-01T00:00:00.000Z'),
-              endsOn: new Date('2026-11-30T00:00:00.000Z'),
-              activatedAt: new Date('2026-09-01T12:00:00.000Z'),
-            },
+            create: [
+              {
+                planId: plan.id,
+                planNameSnapshot: plan.name,
+                durationDaysSnapshot: 30,
+                originalClassAllowance: plan.classAllowance,
+                remainingClassAllowance: plan.classAllowance,
+                startsOn: new Date('2026-09-01T00:00:00.000Z'),
+                endsOn: new Date('2026-09-30T00:00:00.000Z'),
+                activatedAt: new Date('2026-09-01T12:00:00.000Z'),
+              },
+              // The later included Evaluation needs its own Subscription.
+              {
+                planId: plan.id,
+                planNameSnapshot: plan.name,
+                durationDaysSnapshot: 30,
+                originalClassAllowance: plan.classAllowance,
+                remainingClassAllowance: plan.classAllowance,
+                startsOn: new Date('2026-10-01T00:00:00.000Z'),
+                endsOn: new Date('2026-10-30T00:00:00.000Z'),
+                activatedAt: new Date('2026-10-01T12:00:00.000Z'),
+              },
+            ],
           },
         },
       });

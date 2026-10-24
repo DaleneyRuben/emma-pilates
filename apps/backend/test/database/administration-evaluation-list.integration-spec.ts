@@ -27,7 +27,7 @@ describe('Prisma administration Evaluation list for AW25', () => {
       where: { id: deterministicId(`test-client:${clientKey}`) },
       select: {
         id: true,
-        subscriptions: { select: { id: true } },
+        subscriptions: { select: { id: true }, orderBy: { startsOn: 'asc' } },
         account: { select: { id: true } },
       },
     });
@@ -47,7 +47,9 @@ describe('Prisma administration Evaluation list for AW25', () => {
         clientId: client.id,
         evaluationSlotId: slot.id,
         eligibilityMonth: new Date(`2026-${month}-01T00:00:00.000Z`),
-        subscriptionId: client.subscriptions[0].id,
+        // One included Evaluation per Subscription. October uses the later
+        // Subscription so the kind is still derived from the earlier booking.
+        subscriptionId: client.subscriptions[month === '09' ? 0 : 1].id,
         createdByAccountId: client.account!.id,
       },
     });

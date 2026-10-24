@@ -108,9 +108,9 @@ describe('guest pass reward', () => {
       );
 
     await invite(await friend());
-    await expect(invite(await friend())).rejects.toThrow(
-      'guest_pass_monthly_limit',
-    );
+    await expect(invite(await friend())).rejects.toMatchObject({
+      code: 'guest_pass_monthly_limit',
+    });
   });
 
   it('allows an invitation in the next calendar month', async () => {
