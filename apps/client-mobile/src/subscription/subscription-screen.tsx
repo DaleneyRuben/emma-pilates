@@ -162,6 +162,9 @@ export function SubscriptionScreen() {
             )}
           </BodyText>
           <BodyText>{allowanceMessage(subscription.remainingClassAllowance, expired)}</BodyText>
+          {subscription.extraClassesLine ? (
+            <BodyText>{subscription.extraClassesLine}</BodyText>
+          ) : null}
         </View>
         <View style={styles.dates}>
           <View style={styles.dateRow}>

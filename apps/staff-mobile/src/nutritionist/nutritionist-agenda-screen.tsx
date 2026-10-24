@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { HeaderAction } from "../ui/header-action";
 import { RootHeader } from "../ui/root-header";
 import {
   agendaDayLabel,
@@ -56,20 +57,6 @@ const groupByDay = (entries: NutritionistAgendaEntryDto[]) =>
     return groups;
   }, []);
 
-function AvailabilityAction({ onPress }: { onPress: () => void }) {
-  return (
-    <Pressable
-      accessibilityLabel="Mi disponibilidad"
-      accessibilityRole="button"
-      hitSlop={spacing.xs}
-      onPress={onPress}
-      style={styles.headerAction}
-    >
-      <Text style={styles.headerActionText}>Mi disponibilidad</Text>
-    </Pressable>
-  );
-}
-
 export function NutritionistAgendaScreen() {
   const navigation = useNavigation<AgendaNavigation>();
   const fetcher = useStaffFetcher();
@@ -98,7 +85,12 @@ export function NutritionistAgendaScreen() {
   const title = firstName === undefined ? "Hola" : `Hola, ${firstName}`;
   const header = (
     <RootHeader
-      action={<AvailabilityAction onPress={() => navigation.navigate("Availability")} />}
+      action={
+        <HeaderAction
+          label="Mi disponibilidad"
+          onPress={() => navigation.navigate("Availability")}
+        />
+      }
       eyebrow="Nutricionista"
       label="Mi agenda"
       title={title}
@@ -297,14 +289,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
     textTransform: "uppercase",
   },
-  headerAction: {
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  headerActionText: { color: colors.primaryDeep, fontSize: typography.note },
   list: { gap: spacing.xl, paddingBottom: spacing.xxl },
   muted: { color: colors.textMuted, fontSize: typography.note },
   notice: {

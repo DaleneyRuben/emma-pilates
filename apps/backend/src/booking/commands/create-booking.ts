@@ -1,7 +1,9 @@
+import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { bookingDuringFreezeMessage } from '../payments/freeze';
 
 import { bookingBeforeStartMessage } from './booking-before-start';
+import { assertWeeklyCapAllows } from './weekly-cap-decision';
 
 export class BookingAccessDeniedError extends Error {
   constructor() {
@@ -18,6 +20,13 @@ type SessionForBooking = {
   state: 'scheduled' | 'cancelled';
 };
 
+export type WeeklyCapSubscription = {
+  id: string;
+  weeklyClassCap?: number | null;
+  baseFundedBookingsThisWeek?: number;
+  extraClasses?: number;
+};
+
 type CreateBookingDependencies = {
   principal: AuthenticatedPrincipal;
   loadSession(sessionId: string): Promise<SessionForBooking | null>;
@@ -25,7 +34,7 @@ type CreateBookingDependencies = {
   findEligibleSubscription(input: {
     clientId: string;
     onDate: Date;
-  }): Promise<{ id: string } | null>;
+  }): Promise<WeeklyCapSubscription | null>;
   findApprovedFreeze?(input: {
     clientId: string;
     onDate: Date;
@@ -70,9 +79,8 @@ const resolveClientId = (
   }
 
   if (
-    principal.identity.role !== 'assistant' ||
     command.clientId === undefined ||
-    !principal.identity.branchIds.includes(session.branchId)
+    !actsForClientsAt(principal, session.branchId)
   ) {
     throw new BookingAccessDeniedError();
   }
@@ -126,6 +134,8 @@ export const createBooking = async (
     }
     throw new Error('No eligible Subscription');
   }
+
+  assertWeeklyCapAllows(subscription);
 
   if (
     await dependencies.hasOverlappingBooking({

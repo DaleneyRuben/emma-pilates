@@ -30,7 +30,6 @@ import {
   type AdministrationOperations,
 } from './administration-http';
 import {
-  AdminCreditPageDto,
   AdminEvaluationPageDto,
   AdminReferralPageDto,
   FounderMembershipPageDto,
@@ -119,22 +118,6 @@ export class AdministratorOversightController extends AdministrationController {
     );
     const principal = await this.authenticate(authorization);
     return run(() => this.operations.oversight.listReferrals(input, principal));
-  }
-
-  @Get('credits')
-  @ApiOperation({ operationId: 'listAdminCredits' })
-  @ApiQuery({ name: 'query', required: false })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number })
-  @ApiOkResponse({ type: AdminCreditPageDto })
-  @Header('Cache-Control', 'no-store')
-  async credits(
-    @Headers('authorization') authorization: string | undefined,
-    @Query() query: unknown,
-  ): Promise<AdminCreditPageDto> {
-    const input = parsed(parseSearchListQuery(query), 'Invalid Credit filters');
-    const principal = await this.authenticate(authorization);
-    return run(() => this.operations.oversight.listCredits(input, principal));
   }
 
   @Get('founder-memberships')

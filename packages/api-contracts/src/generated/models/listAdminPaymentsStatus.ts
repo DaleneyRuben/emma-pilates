@@ -13,4 +13,5 @@ export const ListAdminPaymentsStatus = {
   pending: "pending",
   confirmed: "confirmed",
   rejected: "rejected",
+  voided: "voided",
 } as const;

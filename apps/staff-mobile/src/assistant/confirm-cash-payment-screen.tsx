@@ -1,7 +1,6 @@
 import {
   getGetAssistantClientOverviewQueryKey,
-  useGetCurrentStaffMemberProfile,
-  useListBranches,
+  useGetAssistantClientInvoiceData,
   type AssistantCashPaymentDto,
   type PlanQuoteDto,
 } from "@pilates/api-contracts";
@@ -12,7 +11,12 @@ import {
   describePlanTerms,
   boliviaCivilDate,
   formatBolivianos,
+  FormScrollView,
   Heading,
+  InvoiceDataCard,
+  invoiceChoiceFrom,
+  invoiceDataPayload,
+  type InvoiceChoice,
   PrimaryButton,
   radii,
   Screen,
@@ -25,15 +29,17 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { BranchChips, useCashBranches } from "../ui/branch-chips";
 import { CenteredCard } from "./assistant-layout";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { describeClasses, formatCivilDate } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
+import { FrontDeskReceiptCard, type FrontDeskReceipt } from "./front-desk-receipt-card";
 
 type ConfirmNavigation = {
   goBack: () => void;
@@ -82,30 +88,65 @@ export function ConfirmCashPaymentScreen({
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
-  const profile = useGetCurrentStaffMemberProfile({ fetcher });
-  const assigned = profile.data?.status === 200 ? profile.data.data.branches : [];
-  // Administrators have no assignments and choose among every Branch.
-  const branches = useListBranches({
-    fetcher,
-    query: { enabled: profile.data?.status === 200 && assigned.length === 0 },
-  });
-  const options =
-    assigned.length > 0 ? assigned : branches.data?.status === 200 ? branches.data.data : [];
-  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
-  const branchId = selectedBranchId ?? options[0]?.id ?? null;
+  const branches = useCashBranches();
+  const branchId = branches.branch?.id ?? null;
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [result, setResult] = useState<AssistantCashPaymentDto | null>(null);
   const studioRules = useStudioRules(fetcher);
   const today = boliviaCivilDate(new Date());
   const [startsOn, setStartsOn] = useState(today);
+  const [receipt, setReceipt] = useState<FrontDeskReceipt | null>(null);
+  const [receiptPending, setReceiptPending] = useState(false);
+  // PAY-007: prefilled from the Client's last sale; a failed read leaves «Sin factura».
+  const lastInvoice = useGetAssistantClientInvoiceData(clientId, { fetcher });
+  const [invoiceEdit, setInvoiceEdit] = useState<InvoiceChoice | null>(null);
+  const invoice =
+    invoiceEdit ??
+    invoiceChoiceFrom(
+      lastInvoice.data?.status === 200 ? (lastInvoice.data.data.invoiceData ?? null) : null,
+    );
+  const invoiceData = invoiceDataPayload(invoice);
+
+  const photograph = async () => {
+    if (branchId === null || receiptPending) return;
+    setReceiptPending(true);
+    setFailure(null);
+    try {
+      const photographed = await api.photographTransferReceipt();
+      if (photographed === null) return;
+      await api.recordFrontDeskTransfer(
+        clientId,
+        quote.id,
+        branchId,
+        photographed.imageAssetId,
+        startsOn,
+      );
+      setReceipt(photographed);
+      setFailure("Comprobante enviado. Queda pendiente de revisión.");
+    } catch (error) {
+      const code = error instanceof AssistantApiError ? error.code : null;
+      setFailure(
+        (code !== null ? paymentProblems[code] : undefined) ??
+          "No pudimos enviar el comprobante. Inténtalo de nuevo.",
+      );
+    } finally {
+      setReceiptPending(false);
+    }
+  };
 
   const confirm = async () => {
-    if (branchId === null) return;
+    if (branchId === null || invoiceData === "incomplete") return;
     setSubmitting(true);
     setFailure(null);
     try {
-      const recorded = await api.recordCashPayment(clientId, quote.id, branchId, startsOn);
+      const recorded = await api.recordCashPayment(
+        clientId,
+        quote.id,
+        branchId,
+        startsOn,
+        invoiceData,
+      );
       await queryClient.invalidateQueries({
         queryKey: getGetAssistantClientOverviewQueryKey(clientId),
       });
@@ -171,22 +212,17 @@ export function ConfirmCashPaymentScreen({
           Confirmar pago en efectivo
         </Heading>
         <ClientBanner action="Registrando pago para" clientName={clientName} />
-        <ScrollView contentContainerStyle={styles.content}>
+        <FormScrollView contentContainerStyle={styles.content}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>{quote.name}</Text>
             <BodyText>{describePlanTerms(quote)}</BodyText>
             <Line label="Precio del plan" value={formatBolivianos(quote.priceCentavos)} />
-            {quote.creditAppliedCentavos > 0 ? (
-              <Line
-                label="Crédito aplicado"
-                value={formatBolivianos(quote.creditAppliedCentavos)}
-              />
-            ) : null}
             <View style={styles.divider} />
+            {/* Credit is retired (PAY-005): the cash collected is the full price. */}
             <Line
               label="Monto a cobrar en efectivo"
               strong
-              value={formatBolivianos(quote.amountDueCentavos)}
+              value={formatBolivianos(quote.priceCentavos)}
             />
           </View>
           {studioRules === undefined ? null : (
@@ -198,31 +234,21 @@ export function ConfirmCashPaymentScreen({
               onSelect={setStartsOn}
             />
           )}
-          {options.length > 1 ? (
-            <View style={styles.branches}>
-              <BodyText style={styles.muted}>Sucursal donde recibes el efectivo</BodyText>
-              <View style={styles.chips}>
-                {options.map((branch) => {
-                  const selected = branch.id === branchId;
-                  return (
-                    <Pressable
-                      accessibilityLabel={branch.name}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected }}
-                      key={branch.id}
-                      onPress={() => setSelectedBranchId(branch.id)}
-                      style={[styles.chip, selected && styles.chipSelected]}
-                      testID={`cash-branch-${branch.id}`}
-                    >
-                      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
-                        {branch.name}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
-          ) : null}
+          <BranchChips
+            label="Sucursal donde recibes el efectivo"
+            onSelect={branches.select}
+            options={branches.options}
+            selectedId={branchId}
+            testIDPrefix="cash-branch"
+          />
+          <InvoiceDataCard
+            noInvoiceNote="La venta se registra sin datos de factura."
+            onChange={setInvoiceEdit}
+            prefilledNote="Datos de su última compra. Confírmalos con la clienta."
+            raised
+            value={invoice}
+          />
+          <FrontDeskReceiptCard onPhotograph={() => void photograph()} receipt={receipt} />
           <BodyText style={styles.muted}>
             Confirma solo cuando tengas el efectivo en mano. El plan se activa al instante.
           </BodyText>
@@ -233,19 +259,18 @@ export function ConfirmCashPaymentScreen({
           ) : null}
           <PrimaryButton
             busy={submitting}
-            disabled={branchId === null}
+            disabled={branchId === null || invoiceData === "incomplete"}
             label="Confirmar pago recibido"
             onPress={() => void confirm()}
             testID="cash-confirm"
           />
-        </ScrollView>
+        </FormScrollView>
       </CenteredCard>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  branches: { gap: spacing.sm },
   card: {
     ...surfaces.card,
     gap: spacing.sm,
@@ -253,17 +278,6 @@ const styles = StyleSheet.create({
   },
   cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   centered: { textAlign: "center" },
-  chip: {
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  chipLabel: { color: colors.textSecondary, fontSize: typography.note },
-  chipLabelSelected: { color: colors.white },
-  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   divider: { backgroundColor: colors.border, height: 1 },
   failure: { color: colors.errorText },

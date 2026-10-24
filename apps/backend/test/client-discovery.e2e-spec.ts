@@ -18,6 +18,7 @@ import {
   SessionDetailController,
   sessionDetail,
 } from '../src/booking/client/client-discovery.controller';
+import { classesLeftThisWeekQuery } from '../src/booking/booking-controller-support';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
@@ -136,6 +137,10 @@ describe('client discovery (e2e)', () => {
             ]),
         },
         { provide: sessionDetail, useValue: findSessionDetail },
+        {
+          provide: classesLeftThisWeekQuery,
+          useValue: () => Promise.resolve(null),
+        },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
@@ -196,6 +201,7 @@ describe('client discovery (e2e)', () => {
       .expect(200)
       .expect({
         status: 'active',
+        nextSubscription: null,
         founderRenewalDeadline: null,
         subscription: {
           id: 'subscription-id',

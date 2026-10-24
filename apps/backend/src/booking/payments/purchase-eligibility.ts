@@ -70,9 +70,13 @@ export const evaluateAllocationEligibility = (
     );
   }
   // A Subscription that still holds is shortened by the renewal when it has
-  // no classes left, not expired. One that no longer holds is reported so the
-  // caller expires it; ending it early is only the renewal that starts today.
-  if (isSubscriptionEffective(context.activeSubscription, context.today)) {
+  // no classes left, not expired. One whose paid-through date has passed is
+  // reported so the caller expires it. Ending it early is only the renewal
+  // that starts today, and that still needs the row active.
+  if (
+    isSubscriptionEffective(context.activeSubscription, context.today) ||
+    context.activeSubscription.endsOn.getTime() >= context.today.getTime()
+  ) {
     return { subscriptionIdToExpire: null };
   }
 

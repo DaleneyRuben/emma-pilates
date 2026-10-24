@@ -14,11 +14,22 @@ export const commandProblem = (error: Error): HttpException | null => {
 
   const problems: Record<string, [string, string]> = {
     'Session is full': ['session_full', 'Session is full'],
+    guest_pass_already_used: [
+      'guest_pass_already_used',
+      'A Guest Pass is once in a lifetime',
+    ],
+    guest_pass_last_place: [
+      'guest_pass_last_place',
+      'A Guest Pass cannot take the last place',
+    ],
     'No eligible Subscription': [
       'no_eligible_subscription',
       'No eligible Subscription',
     ],
-
+    'Weekly cap reached': [
+      'weekly_cap_reached',
+      'Ya usaste tus clases de esta semana.',
+    ],
     'Client already has an overlapping Booking': [
       'booking_overlap',
       'Client already has an overlapping Booking',

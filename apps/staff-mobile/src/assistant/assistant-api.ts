@@ -13,8 +13,12 @@ import {
   type AssistantCashPaymentDto,
   type ClientInvitationDto,
   type ClientInvitationResultDto,
+  type InviteClientDto,
+  type InvoiceDataDto,
 } from "@pilates/api-contracts";
 import { randomUUID } from "expo-crypto";
+
+import { photographTransferReceipt } from "./front-desk-receipt-upload";
 
 // Failures keep the stable Problem Details code so screens can word them.
 export class AssistantApiError extends Error {
@@ -34,18 +38,23 @@ export type AssistantApi = {
   cancelBooking: (bookingId: string) => Promise<void>;
   cancelInvitation: (clientId: string) => Promise<void>;
   correctInvitationEmail: (clientId: string, email: string) => Promise<ClientInvitationDto>;
-  inviteClient: (input: {
-    name: string;
-    email: string;
-    phone: string | null;
-  }) => Promise<ClientInvitationResultDto>;
+  inviteClient: (input: InviteClientDto) => Promise<ClientInvitationResultDto>;
   leaveWaitlist: (waitlistEntryId: string) => Promise<void>;
   recordCashPayment: (
     clientId: string,
     planId: string,
     branchId: string,
-    startsOn?: string,
+    startsOn: string | undefined,
+    invoiceData: InvoiceDataDto | null,
   ) => Promise<AssistantCashPaymentDto>;
+  photographTransferReceipt: () => Promise<{ imageAssetId: string } | null>;
+  recordFrontDeskTransfer: (
+    clientId: string,
+    planId: string,
+    branchId: string,
+    imageAssetId: string,
+    startsOn?: string,
+  ) => Promise<{ id: string; state: string }>;
   rescheduleBooking: (bookingId: string, targetSessionId: string) => Promise<{ id: string }>;
   resendInvitation: (clientId: string) => Promise<ClientInvitationDto>;
   sendVerification: (clientId: string) => Promise<void>;
@@ -112,10 +121,35 @@ export function createAssistantApi(fetcher: typeof globalThis.fetch): AssistantA
     async leaveWaitlist(waitlistEntryId) {
       requireSuccess(await leaveWaitlist(waitlistEntryId, undefined, fetcher));
     },
-    async recordCashPayment(clientId, planId, branchId, startsOn) {
+    photographTransferReceipt() {
+      return photographTransferReceipt(fetcher);
+    },
+    async recordFrontDeskTransfer(clientId, planId, branchId, imageAssetId, startsOn) {
+      const response = await fetcher(`/api/v1/assistant/clients/${clientId}/transfer-payments`, {
+        method: "POST",
+        headers: idempotent(),
+        body: JSON.stringify({
+          planId,
+          branchId,
+          imageAssetId,
+          ...(startsOn === undefined ? {} : { startsOn }),
+        }),
+      });
+      return requireSuccess({
+        status: response.status,
+        data: await response.json().catch(() => null),
+        headers: response.headers,
+      }) as { id: string; state: string };
+    },
+    async recordCashPayment(clientId, planId, branchId, startsOn, invoiceData) {
       const response = await recordAssistantCashPayment(
         clientId,
-        { planId, branchId, ...(startsOn === undefined ? {} : { startsOn }) },
+        {
+          planId,
+          branchId,
+          ...(startsOn === undefined ? {} : { startsOn }),
+          invoiceData,
+        },
         { headers: idempotent() },
         fetcher,
       );

@@ -5,7 +5,6 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { ClientFreezeDto } from "./clientFreezeDto";
-import type { ClientSubscriptionDtoFounderRenewalDeadline } from "./clientSubscriptionDtoFounderRenewalDeadline";
 import type { ClientSubscriptionDtoStatus } from "./clientSubscriptionDtoStatus";
 import type { ClientSubscriptionSummaryDto } from "./clientSubscriptionSummaryDto";
 
@@ -18,8 +17,11 @@ export interface ClientSubscriptionDto {
    * @nullable
    */
   nextSubscription?: ClientSubscriptionSummaryDto | null;
-  /** A founder renews before this date. Absent when she is not a founder or has no current Subscription. */
-  founderRenewalDeadline?: ClientSubscriptionDtoFounderRenewalDeadline;
+  /**
+   * A founder renews before this date. Absent when she is not a founder or has no current Subscription.
+   * @nullable
+   */
+  founderRenewalDeadline?: string | null;
   /**
    * The one Freeze of the current Subscription. Absent when there is none.
    * @nullable

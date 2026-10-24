@@ -50,6 +50,7 @@ export type SubscriptionSummary = {
   remainingClassAllowance: number;
   startsOn: Date;
   endsOn: Date;
+  extraClassesLine: string | null;
 };
 
 export type PromotionSummary = {

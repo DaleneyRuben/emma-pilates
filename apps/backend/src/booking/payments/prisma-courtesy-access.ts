@@ -24,6 +24,7 @@ import { deprecatedDurationMonths } from '../catalog/plan-validity';
 import { courtesyAccessPlan, evaluateCourtesyGrant } from './courtesy-access';
 import { PaymentRuleError } from './payment-errors';
 import type { PaymentView } from './prisma-payment-commands';
+import { grantGiftClass } from './allowance-adjustments';
 import {
   allocateStartDate,
   endSubscriptionEarly,
@@ -195,6 +196,20 @@ export const createPrismaCourtesyAccess = (
       paymentId: payment.id,
       now,
       courtesy: true,
+    });
+    // Courtesy Access is never a first Plan, so the gift decision declines it.
+    await grantGiftClass(transaction, {
+      clientId: command.clientId,
+      subscriptionId: subscription.id,
+      paymentId: payment.id,
+      method: 'courtesy',
+      hidden: true,
+      priceCentavos: 0,
+      founder: false,
+      earlierRealPayment: false,
+      authorAccountId: principal.accountId,
+      authorRole: auditActorOf(principal).role,
+      now,
     });
 
     const actor = auditActorOf(principal);

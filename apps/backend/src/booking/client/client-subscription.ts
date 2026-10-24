@@ -9,6 +9,10 @@ export type ClientSubscriptionSummary = {
   remainingClassAllowance: number;
   startsOn: Date;
   endsOn: Date;
+  /** «Clases extra: 1 · Regalo de bienvenida», or null when none remain. */
+  extraClassesLine: string | null;
+  /** Classes left this week. Null when the Plan has no cap. */
+  classesLeftThisWeek?: number | null;
 };
 
 export const toSubscriptionSummary = (
@@ -23,6 +27,7 @@ export const toSubscriptionSummary = (
         remainingClassAllowance: subscription.remainingClassAllowance,
         startsOn: subscription.startsOn,
         endsOn: subscription.endsOn,
+        extraClassesLine: subscription.extraClassesLine,
       };
 
 export type ClientSubscriptionStatus =

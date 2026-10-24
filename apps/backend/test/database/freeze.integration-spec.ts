@@ -69,7 +69,6 @@ describe('freeze', () => {
     });
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => now,
-      referralRewardCentavos: 6000,
     });
 
     const requested = await commands.requestFreeze(
@@ -125,7 +124,6 @@ describe('freeze', () => {
     });
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => now,
-      referralRewardCentavos: 6000,
     });
 
     await expect(
@@ -195,7 +193,6 @@ describe('freeze', () => {
 
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => new Date('2026-09-22T15:00:00.000Z'),
-      referralRewardCentavos: 6000,
     });
     const requested = await commands.requestFreeze(
       {
@@ -230,7 +227,6 @@ describe('freeze', () => {
     });
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => now,
-      referralRewardCentavos: 6000,
     });
     const requested = await commands.requestFreeze(
       {
@@ -274,7 +270,6 @@ describe('freeze', () => {
     });
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => new Date('2026-09-22T15:00:00.000Z'),
-      referralRewardCentavos: 6000,
     });
     const requested = await commands.requestFreeze(
       {
@@ -313,7 +308,6 @@ describe('freeze', () => {
     });
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => now,
-      referralRewardCentavos: 6000,
     });
     const requested = await commands.requestFreeze(
       {

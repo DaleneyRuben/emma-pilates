@@ -66,6 +66,8 @@ const catalog: Record<string, PushPresentation> = {
   },
   payment_confirmed: { sound: false, lockScreen: 'entry' },
   subscription_expiring: { sound: false, lockScreen: 'entry' },
+  // REL-012: names only the type and the app, never the text or the sender.
+  feedback_received: { sound: false, lockScreen: 'entry' },
 };
 
 // A type added without a catalog entry stays silent and private until its

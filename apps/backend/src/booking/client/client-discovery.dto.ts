@@ -88,6 +88,23 @@ export class ClientSubscriptionSummaryDto {
 
   @ApiProperty({ format: 'date' })
   endsOn!: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description:
+      '«Clases extra: 1 · Regalo de bienvenida» when extra classes remain',
+  })
+  extraClassesLine?: string | null;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 0,
+    nullable: true,
+    description:
+      'Classes left this week from the base allowance. Absent without a cap.',
+  })
+  classesLeftThisWeek?: number | null;
 }
 
 export class ClientSubscriptionDto {
@@ -106,7 +123,9 @@ export class ClientSubscriptionDto {
   nextSubscription?: ClientSubscriptionSummaryDto | null;
 
   @ApiPropertyOptional({
+    type: String,
     format: 'date',
+    nullable: true,
     description:
       'A founder renews before this date. Absent when she is not a founder or has no current Subscription.',
   })
@@ -240,4 +259,13 @@ export class SessionDetailDto {
 
   @ApiProperty({ minimum: 0 })
   waitlistCount!: number;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 0,
+    nullable: true,
+    description:
+      'Classes left this week from the base allowance. Absent without a cap.',
+  })
+  classesLeftThisWeek?: number | null;
 }

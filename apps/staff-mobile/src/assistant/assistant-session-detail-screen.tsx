@@ -56,6 +56,7 @@ const bookingProblems: Record<string, string> = {
   active_waitlist_entry_exists: "El cliente ya está en la lista de espera.",
   no_eligible_subscription: "El cliente no tiene clases disponibles en su plan.",
   booking_access_denied: "Solo puedes reservar en tus sucursales.",
+  weekly_cap_reached: "Ya usaste tus clases de esta semana.",
 };
 
 const fallback = "No pudimos completar la reserva. Inténtalo de nuevo.";

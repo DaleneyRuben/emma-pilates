@@ -1853,7 +1853,8 @@
                 "trainer",
                 "nutritionist",
                 "assistant",
-                "administrator"
+                "administrator",
+                "coordinator"
               ],
               "type": "string"
             }
@@ -3293,56 +3294,6 @@
         ]
       }
     },
-    "/api/v1/administrator/credits": {
-      "get": {
-        "operationId": "listAdminCredits",
-        "parameters": [
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "query",
-            "required": false,
-            "in": "query",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminCreditPageDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": [
-          "AdministratorOversight"
-        ]
-      }
-    },
     "/api/v1/administrator/founder-memberships": {
       "get": {
         "operationId": "listFounderMemberships",
@@ -3575,6 +3526,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitTransferDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "",
@@ -3600,6 +3561,8 @@
     },
     "/api/v1/credit-purchases": {
       "post": {
+        "deprecated": true,
+        "description": "Credit was retired (PAY-005): always refused with credit_insufficient",
         "operationId": "completeCreditPurchase",
         "parameters": [
           {
@@ -3674,6 +3637,8 @@
     },
     "/api/v1/clients/current/credit": {
       "get": {
+        "deprecated": true,
+        "description": "Credit was retired (PAY-005): reads zero with no activity",
         "operationId": "getCurrentClientCredit",
         "parameters": [],
         "responses": {
@@ -4430,6 +4395,62 @@
         ]
       }
     },
+    "/api/v1/assistant/clients/{clientId}/transfer-payments": {
+      "post": {
+        "operationId": "recordAssistantFrontDeskTransfer",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordFrontDeskTransferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClients"
+        ]
+      }
+    },
     "/api/v1/administrator/clients": {
       "get": {
         "operationId": "listAdminClients",
@@ -4516,6 +4537,51 @@
         "tags": [
           "AdministratorClients"
         ]
+      },
+      "patch": {
+        "operationId": "updateAdminClientProfile",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminClientProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminClientDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClients"
+        ]
       }
     },
     "/api/v1/administrator/payments": {
@@ -4530,6 +4596,19 @@
             "schema": {}
           },
           {
+            "name": "invoice",
+            "required": false,
+            "in": "query",
+            "description": "«unissued»: confirmed sales with Invoice Data not marked «Factura emitida»",
+            "schema": {
+              "enum": [
+                "all",
+                "unissued"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "status",
             "required": false,
             "in": "query",
@@ -4538,7 +4617,8 @@
                 "all",
                 "pending",
                 "confirmed",
-                "rejected"
+                "rejected",
+                "voided"
               ],
               "type": "string"
             }
@@ -4636,6 +4716,174 @@
         "summary": "",
         "tags": [
           "CourtesyAccess"
+        ]
+      }
+    },
+    "/api/v1/administrator/clients/{clientId}/allowance-adjustments": {
+      "post": {
+        "operationId": "recordAllowanceAdjustment",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordAllowanceAdjustmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllowanceAdjustmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AllowanceAdjustment"
+        ]
+      }
+    },
+    "/api/v1/administrator/campaigns/preview": {
+      "get": {
+        "operationId": "previewCampaign",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignPreviewDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Campaign"
+        ]
+      }
+    },
+    "/api/v1/administrator/campaigns": {
+      "post": {
+        "operationId": "grantCampaign",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantCampaignDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Campaign"
+        ]
+      }
+    },
+    "/api/v1/administrator/payments/{paymentId}/void": {
+      "post": {
+        "operationId": "voidPayment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoidSaleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoidedSaleDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "VoidSale"
         ]
       }
     },
@@ -5285,6 +5533,170 @@
         ]
       }
     },
+    "/api/v1/administrator/clients/{clientId}/acquisition": {
+      "get": {
+        "operationId": "getClientAcquisition",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientAcquisitionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClientAcquisition"
+        ]
+      },
+      "put": {
+        "operationId": "correctClientAcquisition",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectClientAcquisitionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientAcquisitionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClientAcquisition"
+        ]
+      }
+    },
+    "/api/v1/administrator/staff-members/{staffMemberId}/referral-code": {
+      "get": {
+        "operationId": "getStaffMemberReferralCode",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainerReferralCodeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorTrainerReferralCode"
+        ]
+      },
+      "put": {
+        "operationId": "setStaffMemberReferralCode",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetTrainerReferralCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainerReferralCodeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorTrainerReferralCode"
+        ]
+      }
+    },
     "/api/v1/administrator/studio-settings": {
       "get": {
         "operationId": "getStudioSettings",
@@ -5460,6 +5872,199 @@
         "summary": "",
         "tags": [
           "ClientPhoto"
+        ]
+      }
+    },
+    "/api/v1/administrator/contact-alerts": {
+      "get": {
+        "operationId": "listContactAlerts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactAlertListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ContactAlerts"
+        ]
+      }
+    },
+    "/api/v1/administrator/contact-alerts/{clientId}/contacted": {
+      "post": {
+        "operationId": "markClientContacted",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ContactAlerts"
+        ]
+      }
+    },
+    "/api/v1/clients/current/invoice-data": {
+      "get": {
+        "operationId": "getCurrentClientInvoiceData",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LastInvoiceDataDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientInvoiceData"
+        ]
+      }
+    },
+    "/api/v1/assistant/clients/{clientId}/invoice-data": {
+      "get": {
+        "operationId": "getAssistantClientInvoiceData",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LastInvoiceDataDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantInvoiceData"
+        ]
+      }
+    },
+    "/api/v1/administrator/payments/{paymentId}/invoice-issued": {
+      "post": {
+        "operationId": "markPaymentInvoiceIssued",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceIssuedDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorInvoiceIssued"
+        ]
+      },
+      "delete": {
+        "operationId": "unmarkPaymentInvoiceIssued",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceIssuedDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorInvoiceIssued"
         ]
       }
     },
@@ -6125,6 +6730,401 @@
         "summary": "",
         "tags": [
           "Devices"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment": {
+      "get": {
+        "operationId": "listEquipment",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipment"
+        ]
+      },
+      "post": {
+        "operationId": "createEquipment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipment"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment/{equipmentId}/archive": {
+      "post": {
+        "operationId": "archiveEquipment",
+        "parameters": [
+          {
+            "name": "equipmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipment"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment/{equipmentId}/issues": {
+      "post": {
+        "operationId": "reportEquipmentIssue",
+        "parameters": [
+          {
+            "name": "equipmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentIssueInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssueDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipment"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-issues": {
+      "get": {
+        "operationId": "listEquipmentIssues",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "open",
+                "resolved"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssuePageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentIssues"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-issues/{issueId}/resolve": {
+      "post": {
+        "operationId": "resolveEquipmentIssue",
+        "parameters": [
+          {
+            "name": "issueId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssueDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentIssues"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-flags": {
+      "get": {
+        "operationId": "listEquipmentFlaggedSessions",
+        "parameters": [
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EquipmentFlaggedSessionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentFlags"
+        ]
+      }
+    },
+    "/api/v1/trainer/sessions/{sessionId}/equipment": {
+      "get": {
+        "operationId": "listTrainerSessionEquipment",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionEquipmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerSessionEquipment"
+        ]
+      }
+    },
+    "/api/v1/trainer/sessions/{sessionId}/equipment-issues": {
+      "post": {
+        "operationId": "reportTrainerEquipmentIssue",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionEquipmentIssueInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssueDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerSessionEquipment"
         ]
       }
     },
@@ -6967,6 +7967,133 @@
         ]
       }
     },
+    "/api/v1/cash-closes/today": {
+      "get": {
+        "operationId": "getTodayCashClose",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashTodayDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CashCloses"
+        ]
+      }
+    },
+    "/api/v1/cash-closes": {
+      "post": {
+        "operationId": "recordCashClose",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashCloseInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashCloseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CashCloses"
+        ]
+      }
+    },
+    "/api/v1/administrator/cash-closes": {
+      "get": {
+        "operationId": "listAdminCashCloses",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashCloseHistoryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorCashCloses"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -7114,6 +8241,199 @@
         "summary": "",
         "tags": [
           "Uploads"
+        ]
+      }
+    },
+    "/api/v1/feedback": {
+      "post": {
+        "description": "The app and Role come from the Account; at most 10 in 24 hours (429 feedback_limit_reached)",
+        "operationId": "sendFeedback",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendFeedbackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackReceiptDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Feedback"
+        ]
+      }
+    },
+    "/api/v1/administrator/feedback": {
+      "get": {
+        "operationId": "listAdminFeedback",
+        "parameters": [
+          {
+            "name": "app",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "client",
+                "staff"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "new",
+                "reviewed",
+                "resolved"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFeedbackPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFeedback"
+        ]
+      }
+    },
+    "/api/v1/administrator/feedback/export": {
+      "get": {
+        "description": "Every Feedback, newest first; audited",
+        "operationId": "exportAdminFeedback",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFeedbackExportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFeedback"
+        ]
+      }
+    },
+    "/api/v1/administrator/feedback/{feedbackId}/triage": {
+      "post": {
+        "description": "Sets the status and «Qué cambiamos»; audited",
+        "operationId": "triageAdminFeedback",
+        "parameters": [
+          {
+            "name": "feedbackId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriageFeedbackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFeedbackDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFeedback"
         ]
       }
     }
@@ -7368,7 +8688,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -7423,7 +8744,8 @@
             "enum": [
               "trainer",
               "assistant",
-              "nutritionist"
+              "nutritionist",
+              "coordinator"
             ]
           },
           "expiresAt": {
@@ -7511,6 +8833,25 @@
             "type": "string",
             "nullable": true,
             "example": "+591 70000000"
+          },
+          "acquisitionChannel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other"
+            ],
+            "description": "«¿Cómo nos conociste?» Required by current builds; a build that omits it records `unknown` (BKM-011)"
+          },
+          "referralCode": {
+            "type": "string",
+            "example": "CARLA",
+            "description": "Referral Code of the Client or Trainer who brought her; it decides the Acquisition Channel"
           }
         },
         "required": [
@@ -7864,7 +9205,21 @@
           "referralCode": {
             "type": "string",
             "example": "REF-LUCIA",
-            "description": "Referral code of the Client who invited this person"
+            "description": "Referral Code of the Client or Trainer who brought this person; it decides the Acquisition Channel (BKM-011)"
+          },
+          "acquisitionChannel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other"
+            ],
+            "description": "«¿Cómo nos conociste?» Required by current builds; a build that omits it registers as `unknown` (BKM-011)"
           }
         },
         "required": [
@@ -7949,6 +9304,12 @@
           "waitlistCount": {
             "type": "number",
             "minimum": 0
+          },
+          "classesLeftThisWeek": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Classes left this week from the base allowance. Absent when the Plan has no cap or the caller is not a Client."
           }
         },
         "required": [
@@ -8219,6 +9580,17 @@
           "endsOn": {
             "type": "string",
             "format": "date"
+          },
+          "extraClassesLine": {
+            "type": "string",
+            "nullable": true,
+            "description": "«Clases extra: 1 · Regalo de bienvenida» when extra classes remain"
+          },
+          "classesLeftThisWeek": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Classes left this week from the base allowance. Absent without a cap."
           }
         },
         "required": [
@@ -8293,8 +9665,9 @@
             ]
           },
           "founderRenewalDeadline": {
-            "type": "object",
+            "type": "string",
             "format": "date",
+            "nullable": true,
             "description": "A founder renews before this date. Absent when she is not a founder or has no current Subscription."
           },
           "freeze": {
@@ -8464,6 +9837,12 @@
           "waitlistCount": {
             "type": "number",
             "minimum": 0
+          },
+          "classesLeftThisWeek": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Classes left this week from the base allowance. Absent without a cap."
           }
         },
         "required": [
@@ -8574,7 +9953,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branches": {
@@ -8620,7 +10000,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -8714,7 +10095,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -8753,7 +10135,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -9513,14 +10896,18 @@
           "awardedAt": {
             "type": "string",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): no Referral is awarded any more"
           },
           "state": {
             "type": "string",
             "enum": [
               "pending",
               "awarded"
-            ]
+            ],
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): no Referral is awarded any more"
           }
         },
         "required": [
@@ -9553,7 +10940,8 @@
           },
           "awardedCount": {
             "type": "number",
-            "description": "The studio's awarded Referrals, whatever the search"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): the studio's Referrals awarded before Credit was retired"
           },
           "pendingCount": {
             "type": "number",
@@ -9567,74 +10955,6 @@
           "totalItems",
           "awardedCount",
           "pendingCount"
-        ]
-      },
-      "AdminCreditBalanceDto": {
-        "type": "object",
-        "properties": {
-          "clientId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "clientName": {
-            "type": "string"
-          },
-          "availableCentavos": {
-            "type": "number",
-            "description": "BOB centavos"
-          },
-          "lastMovementAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "lastMovementKind": {
-            "type": "string",
-            "enum": [
-              "earned",
-              "reserved",
-              "spent",
-              "returned"
-            ],
-            "description": "The last ledger entry: a Referral award, a reservation for an open purchase, its spend at confirmation, or its release"
-          }
-        },
-        "required": [
-          "clientId",
-          "clientName",
-          "availableCentavos",
-          "lastMovementAt",
-          "lastMovementKind"
-        ]
-      },
-      "AdminCreditPageDto": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AdminCreditBalanceDto"
-            }
-          },
-          "page": {
-            "type": "number"
-          },
-          "pageSize": {
-            "type": "number"
-          },
-          "totalItems": {
-            "type": "number"
-          },
-          "outstandingCentavos": {
-            "type": "number",
-            "description": "Studio-wide available Credit, BOB centavos"
-          }
-        },
-        "required": [
-          "items",
-          "page",
-          "pageSize",
-          "totalItems",
-          "outstandingCentavos"
         ]
       },
       "FounderMembershipDto": {
@@ -9704,7 +11024,9 @@
             "type": "number"
           },
           "credit_only": {
-            "type": "number"
+            "type": "number",
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit-only Payments carry no money"
           }
         },
         "required": [
@@ -9762,6 +11084,38 @@
           "amountDueCentavos"
         ]
       },
+      "VoidedIncomeDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "voidReason": {
+            "type": "string",
+            "description": "Why the Administrator voided the sale"
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "description": "Left out of the totals, BOB centavos"
+          },
+          "voidedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "paymentId",
+          "clientId",
+          "voidReason",
+          "amountDueCentavos",
+          "voidedAt"
+        ]
+      },
       "IncomeReportDto": {
         "type": "object",
         "properties": {
@@ -9809,6 +11163,13 @@
           "generatedAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "voided": {
+            "description": "Voided sales in the window. Visible with their reason, never in the totals.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoidedIncomeDto"
+            }
           }
         },
         "required": [
@@ -9821,7 +11182,8 @@
           "byMethod",
           "months",
           "sales",
-          "generatedAt"
+          "generatedAt",
+          "voided"
         ]
       },
       "AdminBranchPageDto": {
@@ -9963,7 +11325,8 @@
           "creditReservedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit held for this purchase"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0, kept for store builds"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -10023,6 +11386,42 @@
           "imageAssetId"
         ]
       },
+      "InvoiceDataDto": {
+        "type": "object",
+        "properties": {
+          "taxId": {
+            "type": "string",
+            "description": "NIT or CI: digits, capital letters, and hyphens",
+            "minLength": 1,
+            "maxLength": 20
+          },
+          "name": {
+            "type": "string",
+            "description": "Name or business name for the invoice",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        },
+        "required": [
+          "taxId",
+          "name"
+        ]
+      },
+      "SubmitTransferDto": {
+        "type": "object",
+        "properties": {
+          "invoiceData": {
+            "nullable": true,
+            "description": "PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
+          }
+        }
+      },
       "PaymentDto": {
         "type": "object",
         "properties": {
@@ -10037,14 +11436,16 @@
               "cash",
               "credit_only",
               "courtesy"
-            ]
+            ],
+            "description": "`courtesy` is a Bs 0 Courtesy Access grant (REL-011)."
           },
           "state": {
             "type": "string",
             "enum": [
               "pending",
               "confirmed",
-              "rejected"
+              "rejected",
+              "voided"
             ]
           },
           "planId": {
@@ -10082,7 +11483,9 @@
           },
           "creditAppliedCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -10164,14 +11567,19 @@
         "properties": {
           "availableCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Always 0"
           },
           "reservedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit held for a Payment under review"
+            "deprecated": true,
+            "description": "Always 0"
           },
           "activity": {
+            "deprecated": true,
+            "description": "Always empty",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreditActivityDto"
@@ -10200,7 +11608,18 @@
             "enum": [
               "pending",
               "awarded"
-            ]
+            ],
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; a Referral made since stays pending"
+          },
+          "invitationStatus": {
+            "type": "string",
+            "enum": [
+              "registered",
+              "class_booked",
+              "bought"
+            ],
+            "description": "BKM-014: the invitation's status. Older releases ignore it and read state."
           },
           "createdAt": {
             "format": "date-time",
@@ -10209,17 +11628,20 @@
           "awardedAt": {
             "type": "string",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           },
           "awardCentavos": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           }
         },
         "required": [
           "referredClientId",
           "referredName",
           "state",
+          "invitationStatus",
           "createdAt"
         ]
       },
@@ -10340,14 +11762,16 @@
               "cash",
               "credit_only",
               "courtesy"
-            ]
+            ],
+            "description": "`courtesy` is a Bs 0 Courtesy Access grant (REL-011)."
           },
           "state": {
             "type": "string",
             "enum": [
               "pending",
               "confirmed",
-              "rejected"
+              "rejected",
+              "voided"
             ]
           },
           "planId": {
@@ -10385,7 +11809,9 @@
           },
           "creditAppliedCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -10633,6 +12059,12 @@
             "type": "number",
             "minimum": 0
           },
+          "classesLeftThisWeek": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Classes left this week from the base allowance. Absent when the Plan has no cap or the caller is not a Client."
+          },
           "sessionScheduleId": {
             "type": "string",
             "format": "uuid",
@@ -10733,7 +12165,8 @@
           "creditAvailableCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Available Credit in BOB centavos"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           }
         },
         "required": [
@@ -10857,7 +12290,8 @@
           "creditAppliedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit this purchase would spend"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -10882,7 +12316,9 @@
         "properties": {
           "creditAvailableCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           },
           "plans": {
             "type": "array",
@@ -10912,6 +12348,16 @@
             "type": "string",
             "format": "date",
             "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
+          },
+          "invoiceData": {
+            "nullable": true,
+            "description": "PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
           }
         },
         "required": [
@@ -10937,6 +12383,35 @@
         },
         "required": [
           "payment"
+        ]
+      },
+      "RecordFrontDeskTransferDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Branch of the front desk"
+          },
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The photographed transfer receipt, already READY"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
+          }
+        },
+        "required": [
+          "planId",
+          "branchId",
+          "imageAssetId"
         ]
       },
       "AdminClientDto": {
@@ -11101,7 +12576,8 @@
           "creditAvailableCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Available Credit in BOB centavos"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           },
           "referralCode": {
             "type": "string"
@@ -11126,6 +12602,42 @@
           "referralCode",
           "referredClientCount",
           "closure"
+        ]
+      },
+      "UpdateAdminClientProfileDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 30
+          }
+        },
+        "required": [
+          "name",
+          "phone"
+        ]
+      },
+      "InvoiceIssuedMarkDto": {
+        "type": "object",
+        "properties": {
+          "issuedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "issuedByName": {
+            "type": "string",
+            "description": "The Administrator who marked it"
+          }
+        },
+        "required": [
+          "issuedAt",
+          "issuedByName"
         ]
       },
       "AdminPaymentDto": {
@@ -11153,19 +12665,21 @@
           "creditAppliedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit taken off the Plan price"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; 0 on every Payment made since"
           },
           "amountDueCentavos": {
             "type": "number",
             "minimum": 1,
-            "description": "The Plan price less the Credit applied: what was transferred"
+            "description": "What was paid: the Plan price (Credit is retired; always the full price since PAY-005)"
           },
           "state": {
             "type": "string",
             "enum": [
               "pending",
               "confirmed",
-              "rejected"
+              "rejected",
+              "voided"
             ]
           },
           "submittedAt": {
@@ -11180,6 +12694,38 @@
           "receiptAvailable": {
             "type": "boolean",
             "description": "Whether the receipt image is still retained"
+          },
+          "voidReason": {
+            "type": "string",
+            "nullable": true,
+            "description": "Why the sale was voided; null unless the state is voided"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "transfer",
+              "cash"
+            ]
+          },
+          "invoiceData": {
+            "nullable": true,
+            "description": "NIT or CI and name for the invoice; null is «Sin factura»",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
+          },
+          "invoiceIssued": {
+            "nullable": true,
+            "description": "The «Factura emitida» mark: who and when",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceIssuedMarkDto"
+              }
+            ]
           }
         },
         "required": [
@@ -11193,7 +12739,11 @@
           "state",
           "submittedAt",
           "decidedAt",
-          "receiptAvailable"
+          "receiptAvailable",
+          "voidReason",
+          "method",
+          "invoiceData",
+          "invoiceIssued"
         ]
       },
       "AdminPaymentPageDto": {
@@ -11251,6 +12801,171 @@
           "endsOn"
         ]
       },
+      "RecordAllowanceAdjustmentDto": {
+        "type": "object",
+        "properties": {
+          "classes": {
+            "type": "number",
+            "description": "A signed number of classes, never zero"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "courtesy",
+              "class_return"
+            ]
+          }
+        },
+        "required": [
+          "classes",
+          "reason"
+        ]
+      },
+      "AllowanceAdjustmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classes": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "courtesy",
+              "class_return"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "classes",
+          "reason"
+        ]
+      },
+      "CampaignClientDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientId",
+          "name"
+        ]
+      },
+      "CampaignPreviewDto": {
+        "type": "object",
+        "properties": {
+          "recipientCount": {
+            "type": "number"
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignClientDto"
+            }
+          }
+        },
+        "required": [
+          "recipientCount",
+          "skipped"
+        ]
+      },
+      "GrantCampaignDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The campaign name, kept in the audit"
+          },
+          "classes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4
+          }
+        },
+        "required": [
+          "name",
+          "classes"
+        ]
+      },
+      "CampaignResultDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "classes": {
+            "type": "number"
+          },
+          "granted": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignClientDto"
+            }
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignClientDto"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "classes",
+          "granted",
+          "skipped"
+        ]
+      },
+      "VoidSaleDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Why the sale is voided. Required, at most 300 characters."
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "VoidedSaleDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "voided"
+            ]
+          },
+          "voidReason": {
+            "type": "string"
+          },
+          "cancelledBookings": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "paymentId",
+          "state",
+          "voidReason",
+          "cancelledBookings"
+        ]
+      },
       "CloseAccountRequestDto": {
         "type": "object",
         "properties": {
@@ -11293,7 +13008,8 @@
           "forfeitedCreditCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit forfeited through the account_closure ledger entry"
+            "description": "Deprecated (PAY-005): always 0 since Credit was retired; kept for store builds",
+            "deprecated": true
           }
         },
         "required": [
@@ -11623,6 +13339,148 @@
           "consented"
         ]
       },
+      "AcquisitionReferrerDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "client",
+              "trainer"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "name"
+        ]
+      },
+      "ClientAcquisitionDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other",
+              "unknown"
+            ],
+            "description": "The attribution: a Referral Code makes it `friend` (a Client’s) or `trainer` (a Trainer’s); `unknown` before the question existed"
+          },
+          "declaredChannel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other",
+              "unknown"
+            ],
+            "description": "What she answered to «¿Cómo nos conociste?»"
+          },
+          "referralCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "referrer": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AcquisitionReferrerDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "clientId",
+          "channel",
+          "declaredChannel",
+          "referralCode",
+          "referrer"
+        ]
+      },
+      "CorrectClientAcquisitionDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other"
+            ]
+          },
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "A Client’s or Trainer’s Referral Code; it wins over the channel"
+          }
+        },
+        "required": [
+          "channel",
+          "referralCode"
+        ]
+      },
+      "TrainerReferralCodeDto": {
+        "type": "object",
+        "properties": {
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "CARLA"
+          }
+        },
+        "required": [
+          "staffMemberId",
+          "referralCode"
+        ]
+      },
+      "SetTrainerReferralCodeDto": {
+        "type": "object",
+        "properties": {
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "CARLA",
+            "description": "3 to 20 letters, digits, or hyphens, not starting with REF-; null removes the code"
+          }
+        },
+        "required": [
+          "referralCode"
+        ]
+      },
       "StudioSettingsDto": {
         "type": "object",
         "properties": {
@@ -11822,6 +13680,104 @@
         },
         "required": [
           "imageAssetId"
+        ]
+      },
+      "ContactAlertItemDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "startedOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Start Date of the first real Plan, Bolivia civil date"
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "no_booking_7_days",
+                "fewer_than_2_classes_by_day_15",
+                "fewer_than_4_classes_in_first_30_days"
+              ]
+            }
+          }
+        },
+        "required": [
+          "clientId",
+          "name",
+          "phone",
+          "startedOn",
+          "reasons"
+        ]
+      },
+      "ContactAlertListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactAlertItemDto"
+            }
+          },
+          "totalItems": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "items",
+          "totalItems"
+        ]
+      },
+      "LastInvoiceDataDto": {
+        "type": "object",
+        "properties": {
+          "invoiceData": {
+            "nullable": true,
+            "description": "The Invoice Data of the Client's latest sale that carried any, to prefill the next one",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "invoiceData"
+        ]
+      },
+      "InvoiceIssuedDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "invoiceIssued": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceIssuedMarkDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "paymentId",
+          "invoiceIssued"
         ]
       },
       "EvaluationSlotDto": {
@@ -12405,6 +14361,280 @@
           "installationId"
         ]
       },
+      "EquipmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ]
+          },
+          "number": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "working",
+              "faulty",
+              "out_of_service"
+            ],
+            "description": "out_of_service with an open Issue that takes it out of service, faulty with only other open Issues"
+          },
+          "openIssueCount": {
+            "type": "number"
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "kind",
+          "number",
+          "status",
+          "openIssueCount",
+          "archivedAt"
+        ]
+      },
+      "EquipmentListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "EquipmentInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ]
+          },
+          "number": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          }
+        },
+        "required": [
+          "branchId",
+          "kind",
+          "number"
+        ]
+      },
+      "EquipmentIssueInputDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "outOfService": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "description",
+          "outOfService"
+        ]
+      },
+      "EquipmentIssueDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "equipmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "equipmentKind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ]
+          },
+          "equipmentNumber": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "outOfService": {
+            "type": "boolean"
+          },
+          "reportedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reportedByName": {
+            "type": "string"
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "resolvedByName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "equipmentId",
+          "equipmentKind",
+          "equipmentNumber",
+          "description",
+          "outOfService",
+          "reportedAt",
+          "reportedByName",
+          "resolvedAt",
+          "resolvedByName"
+        ]
+      },
+      "EquipmentIssuePageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentIssueDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalItems": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems"
+        ]
+      },
+      "EquipmentFlaggedSessionDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ]
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "workingCount": {
+            "type": "number",
+            "description": "Working Equipment of the kind at the Branch"
+          }
+        },
+        "required": [
+          "sessionId",
+          "kind",
+          "capacity",
+          "workingCount"
+        ]
+      },
+      "SessionEquipmentDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ],
+            "nullable": true,
+            "description": "The kind its Class Type uses; null when it uses none"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentDto"
+            }
+          }
+        },
+        "required": [
+          "sessionId",
+          "kind",
+          "items"
+        ]
+      },
+      "SessionEquipmentIssueInputDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "outOfService": {
+            "type": "boolean"
+          },
+          "equipmentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "description",
+          "outOfService",
+          "equipmentId"
+        ]
+      },
       "AdminSupplyDto": {
         "type": "object",
         "properties": {
@@ -12980,6 +15210,253 @@
           "generatedAt"
         ]
       },
+      "CashCloseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil day closed"
+          },
+          "expectedCentavos": {
+            "type": "number",
+            "description": "Confirmed cash Payments at the Branch that day, at the close"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "countedCentavos": {
+            "type": "number"
+          },
+          "differenceCentavos": {
+            "type": "number",
+            "description": "Counted minus expected"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "closedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closedByName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "businessDate",
+          "expectedCentavos",
+          "cashPaymentCount",
+          "countedCentavos",
+          "differenceCentavos",
+          "note",
+          "closedAt",
+          "closedByName"
+        ]
+      },
+      "CashTodayDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Today in Bolivia"
+          },
+          "expectedCentavos": {
+            "type": "number",
+            "description": "Confirmed cash Payments at the Branch today, so far"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "close": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CashCloseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "branchId",
+          "businessDate",
+          "expectedCentavos",
+          "cashPaymentCount",
+          "close"
+        ]
+      },
+      "CashCloseInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "countedCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Cash counted in the drawer"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "branchId",
+          "countedCentavos"
+        ]
+      },
+      "CashCloseHistoryEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil day closed"
+          },
+          "expectedCentavos": {
+            "type": "number",
+            "description": "Confirmed cash Payments at the Branch that day, at the close"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "countedCentavos": {
+            "type": "number"
+          },
+          "differenceCentavos": {
+            "type": "number",
+            "description": "Counted minus expected"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "closedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closedByName": {
+            "type": "string"
+          },
+          "adjustmentCentavos": {
+            "type": "number",
+            "description": "How the day’s cash sales moved after the close: a sale voided later (−) or recorded later (+)"
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "businessDate",
+          "expectedCentavos",
+          "cashPaymentCount",
+          "countedCentavos",
+          "differenceCentavos",
+          "note",
+          "closedAt",
+          "closedByName",
+          "adjustmentCentavos"
+        ]
+      },
+      "CashDayDto": {
+        "type": "object",
+        "properties": {
+          "businessDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "closed",
+              "missing",
+              "open"
+            ],
+            "description": "missing: a past day with cash sales and no close"
+          },
+          "cashSalesCentavos": {
+            "type": "number",
+            "description": "The day’s confirmed cash Payments now"
+          },
+          "cashPaymentCount": {
+            "type": "number"
+          },
+          "close": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CashCloseHistoryEntryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "businessDate",
+          "status",
+          "cashSalesCentavos",
+          "cashPaymentCount",
+          "close"
+        ]
+      },
+      "CashCloseHistoryDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "month": {
+            "type": "string",
+            "example": "2026-10",
+            "description": "Bolivia month"
+          },
+          "missingDays": {
+            "type": "number",
+            "description": "Past days with cash sales and no close"
+          },
+          "days": {
+            "description": "Days with cash sales or a close, newest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CashDayDto"
+            }
+          }
+        },
+        "required": [
+          "branchId",
+          "month",
+          "missingDays",
+          "days"
+        ]
+      },
       "CreatePendingUploadDto": {
         "type": "object",
         "properties": {
@@ -13088,6 +15565,245 @@
         "required": [
           "id",
           "state"
+        ]
+      },
+      "SendFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "problem",
+              "suggestion",
+              "other"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 2000,
+            "description": "Counted after trimming"
+          },
+          "appVersion": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "1.0.1"
+          },
+          "appBuild": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "3"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "android",
+              "ios"
+            ]
+          },
+          "osVersion": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "14"
+          }
+        },
+        "required": [
+          "type",
+          "text",
+          "appVersion",
+          "appBuild",
+          "platform",
+          "osVersion"
+        ]
+      },
+      "FeedbackReceiptDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "createdAt"
+        ]
+      },
+      "AdminFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "app": {
+            "type": "string",
+            "enum": [
+              "client",
+              "staff"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "client",
+              "trainer",
+              "assistant",
+              "nutritionist",
+              "administrator",
+              "coordinator"
+            ],
+            "description": "The sender’s Role when it was sent"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "problem",
+              "suggestion",
+              "other"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "appVersion": {
+            "type": "string"
+          },
+          "appBuild": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "android",
+              "ios"
+            ]
+          },
+          "osVersion": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "reviewed",
+              "resolved"
+            ]
+          },
+          "changeNote": {
+            "type": "string",
+            "nullable": true,
+            "description": "«Qué cambiamos», the Administrators’ internal note"
+          },
+          "senderEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "The sender’s login email"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "triagedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "app",
+          "role",
+          "type",
+          "text",
+          "appVersion",
+          "appBuild",
+          "platform",
+          "osVersion",
+          "status",
+          "changeNote",
+          "senderEmail",
+          "createdAt",
+          "triagedAt"
+        ]
+      },
+      "AdminFeedbackPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFeedbackDto"
+            }
+          },
+          "page": {
+            "type": "number",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalItems": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Feedback matching the filters"
+          },
+          "newCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Every Feedback still «Nuevo»"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "newCount"
+        ]
+      },
+      "AdminFeedbackExportDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "Every Feedback, newest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFeedbackDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "TriageFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "reviewed",
+              "resolved"
+            ]
+          },
+          "changeNote": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000,
+            "description": "«Qué cambiamos»; blank clears it"
+          }
+        },
+        "required": [
+          "status",
+          "changeNote"
         ]
       }
     }

@@ -56,7 +56,7 @@ const listed = (availableSeats: number) => ({
   waitlistCount: 0,
 });
 
-const detail = (availableSeats: number) => ({
+const detail = (availableSeats: number, classesLeftThisWeek?: number | null) => ({
   id: "session-1",
   branch,
   classType,
@@ -67,6 +67,7 @@ const detail = (availableSeats: number) => ({
   bookedCount: 12 - availableSeats,
   availableSeats,
   waitlistCount: 0,
+  ...(classesLeftThisWeek === undefined ? {} : { classesLeftThisWeek }),
 });
 
 async function openDetail(
@@ -221,6 +222,14 @@ describe("Client Session detail", () => {
     });
   });
 
+  it("shows the classes left this week from the Session field", async () => {
+    const { screen } = await openDetail({
+      "/api/v1/sessions/session-1": () => jsonResponse(detail(3, 0)),
+    });
+
+    expect(screen.getByText("Te quedan 0 clases esta semana")).toBeOnTheScreen();
+  });
+
   it("explains a rejected Booking with the problem code", async () => {
     const { screen } = await openDetail({
       "POST /api/v1/sessions/session-1/bookings": () =>
@@ -231,6 +240,19 @@ describe("Client Session detail", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Ya tienes una reserva a esa hora.")).toBeOnTheScreen();
+    });
+  });
+
+  it("explains a weekly cap refusal from the problem code", async () => {
+    const { screen } = await openDetail({
+      "POST /api/v1/sessions/session-1/bookings": () =>
+        jsonResponse({ code: "weekly_cap_reached", status: 409, title: "Conflict" }, 409),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Ya usaste tus clases de esta semana.")).toBeOnTheScreen();
     });
   });
 });
