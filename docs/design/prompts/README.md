@@ -113,6 +113,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW39](./admin-web/39-para-contactar.md) | Para contactar | `AW39` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
 | [AW40](./admin-web/40-fundadoras.md) | Fundadoras | `AW40` | not yet generated (BKM-010; the admin web is built from the prompt; AW37 is Equipos) |
 | [AW41](./admin-web/41-congelamientos.md) | Congelamientos | `AW41` | not yet generated (BKM-012; the admin web is built from the prompt; AW38 is Comentarios) |
+| [AW42](./admin-web/37-simulador.md) | Simulador | — | not yet generated (STU-004; the admin web is built from the prompt; AW37 is Equipos) |
 | [AW151](./admin-web/151-cierres-de-caja.md) | Cierres de caja | `AW151` | ✅ (Claude Design canvas, 2026-10-23, `1e4dee1e`; BKO-003, numbered from its assigned block 150–154) |
 
 ## Follow-ups (`followups/`)
@@ -284,6 +285,7 @@ Each of these was sent as the next message in the existing design session for th
 | [207](./followups/200-evaluation-income-apart.md) | `AW16` splits Plan income and Evaluation income under the method line (NUT-003) | 🕓 pending |
 | [208](./followups/201-aw16-finanzas-tab.md) | `AW16` gains Reporte and Finanzas tabs; Finanzas shows the month's cash income, tax, budget against actual, Nutritionist cost, result, and break-even (BKO-005) | 🕓 pending |
 | [209](./followups/202-trainer-pay-statements.md) | A new «Pagos a instructoras» page beside `AW11`, and «Mis pagos» on the Trainer frame of `S23` (BKO-006) | 🕓 pending |
+| [210](./followups/202-sidebar-simulador.md) | The admin sidebar and the design-system sample gain **Simulador** after **Reporte** (STU-004; AW37 is Equipos, so the page is AW42) | 🕓 pending |
 
 ## Status
 

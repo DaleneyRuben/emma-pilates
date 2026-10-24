@@ -1278,7 +1278,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | STU-001 | P2 | Backend | Studio Management context: `studio` schema, `session_facts`, `client_month_facts`, nightly and on-demand recompute | DOC-008, REL-016 | 3–4 d | ready |
 | STU-002 | P2 | Backend/admin web | Accrued versus cash revenue by validity days, deferred revenue, classes still owed | STU-001, BKO-005 | 2–3 d | ready |
 | STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | ready |
-| STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | ready |
+| STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | done |
 | STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | ready |
 | STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | ready |
 | STU-007 | P3 | Backend/admin web | AI: a narrated monthly report and natural-language questions over the aggregates | STU-006 | 4–6 d | ready |
@@ -1299,6 +1299,24 @@ As the diagnosis's part 3 describes, with these adjustments:
 Each item's acceptance criteria: the formulas are unit-tested against the
 diagnosis's worked examples, and every chart has its loading, empty, and error
 states.
+
+#### STU-004 · The studio economics package and the simulator
+
+Acceptance criteria: the owner's check is a unit test of the package, and the
+admin web shows a simulator that edits the month and shows the result and the
+break-even with the derivation. Nothing is saved.
+
+Decisions (blanket approval, 2026-10-23):
+
+- The page edits five numbers: classes per week, students per class, price per class, fixed costs, and the tax rate. Plan prices, the plan mix, occupancy as a percent, and the fixed-cost lines one by one stay with later items. The opening values are the owner's: 33 classes a week, 4 students, Bs 65, fixed costs Bs 21,175, tax 16 %.
+- A month is the weekly schedule times 4.33, rounded, so 33 classes a week is the owner's 143. Trainer pay is the only variable cost, classes times the price per class. Income is classes times students times that price. The result is income less the tax, the fixed costs, and the trainer pay.
+- The break-even and its derivation come from `@pilates/studio-economics`. 143 classes at Bs 65 are Bs 9,295, so the page derives `(21175 + 9295) / 0.84 = 36273.81` and shows Bs 36.273,81. The package's own check uses variable costs of Bs 9,290 and derives `(21175 + 9290) / 0.84 = 36267.86`. The page does not rewrite the arithmetic to force that string.
+- The page is hidden from anyone who is not an Administrator. On the rollout the Coordinator's sidebar already has no money (ADR-0102), so Simulador stays out of her group, and typing `/simulador` returns to Horario. The page itself still refuses a signed-in role that is not the Administrator.
+- Nothing is saved, and the calculation makes no server call. The Branch selector stays and says the page does not read a Branch.
+
+Open question: the diagnosis's section 3.4 also asks for the break-even in students per class, occupancy, and clients. This page shows it in bolivianos. STU-005 owns the projections that need the other expressions.
+
+Evidence: commits `4435f40a` (the package), `d651f879` (the page), `c97a3009` (the prompt and follow-up 202, renumbered 210 because 202 is trainer pay). AW37 is Equipos, so the page is AW42 and the walk is Test 97. The package's check is 3,626,786 centavos, derivation `(21175 + 9290) / 0.84 = 36267.86`, and a higher tax rate moves the break-even up. The page's opening month derives `(21175 + 9295) / 0.84 = 36273.81`. Verified: studio-economics 2 passed; admin simulator, router, and shell specs 27 passed; admin-web typecheck passed. Playwright Chromium at 1440 and 420, admin web on 5206, API on 3140, `pilates_stu004_dev`: Paola signs in, opens Simulador, sees Resultado Bs 761,20, Punto de equilibrio Bs 36.273,81, and the derivation; raising the tax to 20 moves the break-even to Bs 38.087,50 and the derivation to `(21175 + 9295) / 0.8 = 38087.50`. The only write was the login. At 420 the fields and figures stack and the sidebar opens from «Abrir menú». The database was dropped. Follow-ups 202 and AW37 stay pending: the design session was not run. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/192.
 
 ### Summary (2026-10-23)
 

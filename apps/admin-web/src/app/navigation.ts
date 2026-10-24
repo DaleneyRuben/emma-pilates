@@ -27,6 +27,7 @@ export type AdminPath =
   | "/back-office/gastos"
   | "/back-office/categorias-de-gasto"
   | "/reporte"
+  | "/simulador"
   | "/promociones"
   | "/promociones/referidos"
   | "/comentarios"
@@ -64,6 +65,11 @@ export type NavigationItem = {
   ownBranchFilter?: true;
   /** Open to the Coordinator too (ADR-0102): operations, never money. */
   coordinator?: true;
+  /**
+   * Amounts. The sidebar and the address guard hide this from anyone who
+   * is not an Administrator (ADR-0102, ADR-0103).
+   */
+  administratorOnly?: true;
 };
 
 export type NavigationGroup = {
@@ -207,6 +213,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         screen: "AW16",
         ownBranchFilter: true,
       },
+      {
+        label: "Simulador",
+        to: "/simulador",
+        screen: "AW42",
+        studioWide: "el simulador no lee una sede.",
+        administratorOnly: true,
+      },
     ],
   },
   {
@@ -277,22 +290,29 @@ export const navigationItemOf = (
       : (item.subPages?.includes(pathname) ?? false),
   );
 
-/** The sidebar a Role sees: the Coordinator's holds no money (follow-up 155). */
+/** The sidebar a Role sees: anyone but the Administrator holds no money. */
 export const navigationGroupsFor = (
   role: AdminRole,
 ): readonly NavigationGroup[] =>
-  role === "administrator"
-    ? navigationGroups
-    : navigationGroups
-        .map((group) => ({
-          ...group,
-          items: group.items.filter((item) => item.coordinator === true),
-        }))
-        .filter((group) => group.items.length > 0);
+  navigationGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter(
+        (item) =>
+          (item.administratorOnly !== true || role === "administrator") &&
+          (role === "administrator" || item.coordinator === true),
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
 
 /** Whether the Coordinator may open a page; the API refuses the rest. */
 const coordinatorDeniedPaths = ["/back-office/clientes/campana"];
 
-export const coordinatorMayOpen = (pathname: string): boolean =>
-  navigationItemOf(pathname)?.coordinator === true &&
-  !coordinatorDeniedPaths.includes(pathname);
+export const coordinatorMayOpen = (pathname: string): boolean => {
+  const item = navigationItemOf(pathname);
+  return (
+    item?.administratorOnly !== true &&
+    item?.coordinator === true &&
+    !coordinatorDeniedPaths.includes(pathname)
+  );
+};

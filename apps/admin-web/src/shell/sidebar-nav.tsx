@@ -11,6 +11,7 @@ import { cn } from "../lib/cn";
 import { contactAlertCountQueryOptions } from "../people/contact-alerts/contact-alert-queries";
 import { pendingPaymentCountQueryOptions } from "../payments/payment-queries";
 import { useAdminRole } from "../session/admin-role";
+import { staffProfileQueryOptions } from "../session/staff-profile-query";
 import { useBranchSelection } from "./branch/use-branch-selection";
 
 // AW28: the transfers waiting for review, beside Pagos; nothing when none
@@ -63,29 +64,38 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     lowStock: useLowStockCount(administrator),
     contactAlerts: useContactAlertCount(),
   };
+  // The session Role is administrator or coordinator. A profile that has
+  // answered and is neither still reaches this shell, so an amount stays
+  // hidden from it. Until the profile answers, the session Role decides.
+  const { data: profile } = useQuery(staffProfileQueryOptions());
+  const seesMoney =
+    role === "administrator" &&
+    (profile === undefined || profile.role === "administrator");
 
   return (
     <nav aria-label="Secciones" className="flex flex-col gap-5 px-3 py-4">
-      {navigationGroupsFor(role).map((group, index) => (
-        <div
-          key={group.label ?? `group-${index}`}
-          className="flex flex-col gap-0.5"
-        >
-          {group.label === undefined ? null : (
-            <p className="px-3 pb-1.5 text-etiqueta-campo font-medium tracking-[0.14em] text-texto-muy-tenue uppercase">
-              {group.label}
-            </p>
-          )}
-          {group.items.map((item) => (
-            <SidebarLink
-              key={item.to}
-              item={item}
-              count={item.badge === undefined ? 0 : counts[item.badge]}
-              onNavigate={onNavigate}
-            />
-          ))}
-        </div>
-      ))}
+      {navigationGroupsFor(seesMoney ? "administrator" : "coordinator").map(
+        (group, index) => (
+          <div
+            key={group.label ?? `group-${index}`}
+            className="flex flex-col gap-0.5"
+          >
+            {group.label === undefined ? null : (
+              <p className="px-3 pb-1.5 text-etiqueta-campo font-medium tracking-[0.14em] text-texto-muy-tenue uppercase">
+                {group.label}
+              </p>
+            )}
+            {group.items.map((item) => (
+              <SidebarLink
+                key={item.to}
+                item={item}
+                count={item.badge === undefined ? 0 : counts[item.badge]}
+                onNavigate={onNavigate}
+              />
+            ))}
+          </div>
+        ),
+      )}
     </nav>
   );
 }
