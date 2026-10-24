@@ -16,6 +16,10 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { parseCivilDate } from "../components/form/civil-date";
+import { CivilDateInput } from "../components/form/civil-date-input";
+import { CivilTimeInput } from "../components/form/civil-time-input";
+import { parseCivilTime } from "../components/form/civil-time";
 import { wholeNumberField } from "../components/form/number-field";
 import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
@@ -36,12 +40,17 @@ const seriesSchema = (earliest: string) =>
   z.object({
     trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
     weekday: z.string().regex(/^[1-7]$/, "Elige un día."),
-    time: z.string().regex(/^\d{2}:\d{2}$/, "Elige la hora."),
+    time: z
+      .string()
+      .refine((time) => parseCivilTime(time) !== null, "Elige la hora."),
     durationMinutes: sessionMinutesField,
     capacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares."),
     effectiveFrom: z
       .string()
-      .min(1, "Elige desde qué fecha rige.")
+      .refine(
+        (date) => parseCivilDate(date) !== null,
+        "Elige desde qué fecha rige.",
+      )
       .refine(
         (date) => date >= earliest,
         "Elige una fecha desde hoy y posterior al inicio de la serie.",
@@ -174,7 +183,7 @@ export function SeriesForm({
                 <FormItem>
                   <FormLabel>Hora</FormLabel>
                   <FormControl>
-                    <Input type="time" step={300} {...field} />
+                    <CivilTimeInput {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -202,7 +211,7 @@ export function SeriesForm({
               <FormItem>
                 <FormLabel>Vigente desde</FormLabel>
                 <FormControl>
-                  <Input type="date" min={earliest} {...field} />
+                  <CivilDateInput {...field} />
                 </FormControl>
                 <FormDescription>
                   Fecha en hora de Bolivia. Las sesiones anteriores no cambian.

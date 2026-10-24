@@ -1,6 +1,10 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { boliviaInstant, boliviaToday } from "../lib/bolivia-time";
+import {
+  boliviaInstant,
+  boliviaToday,
+  formatCivilDate,
+} from "../lib/bolivia-time";
 import {
   branchesPath,
   centro,
@@ -239,8 +243,12 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(incomeReads[0]?.get("from")).toBe(
       boliviaInstant(range.from, "00:00"),
     );
-    expect(screen.getByLabelText("Desde")).toHaveValue(range.from);
-    expect(screen.getByLabelText("Hasta")).toHaveValue(range.to);
+    expect(screen.getByLabelText("Desde")).toHaveValue(
+      formatCivilDate(range.from),
+    );
+    expect(screen.getByLabelText("Hasta")).toHaveValue(
+      formatCivilDate(range.to),
+    );
   });
 
   it("keeps a new range in the address and refuses one that ends before it starts", async () => {
@@ -251,7 +259,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     ).findByText("Bs 2.280,00");
 
     fireEvent.change(screen.getByLabelText("Desde"), {
-      target: { value: "2026-09-01" },
+      target: { value: "01/09/2026" },
     });
     await waitFor(() =>
       expect(incomeReads.at(-1)?.get("from")).toBe("2026-09-01T04:00:00.000Z"),
@@ -263,7 +271,7 @@ describe("AW16 Reporte on a desktop browser", () => {
 
     const reads = incomeReads.length;
     fireEvent.change(screen.getByLabelText("Hasta"), {
-      target: { value: "2026-08-15" },
+      target: { value: "15/08/2026" },
     });
     expect(
       await screen.findByText(
