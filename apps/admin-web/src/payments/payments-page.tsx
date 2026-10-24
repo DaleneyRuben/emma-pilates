@@ -121,22 +121,12 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
       <span className="text-texto-secundario">{methodLabels[getValue()]}</span>
     ),
   }),
-  // The amount asked is the Plan price less the Credit applied (ADR-0082).
+  // The amount paid (ADR-0082); Credit is retired (PAY-005).
   columns.accessor("amountDueCentavos", {
     header: "Monto",
     meta: { align: "right" },
-    cell: ({ row }) => (
-      <span className="inline-flex flex-col md:items-end">
-        <span className="text-texto tabular">
-          {formatBolivianos(row.original.amountDueCentavos)}
-        </span>
-        {row.original.creditAppliedCentavos > 0 ? (
-          <span className="text-ayuda text-texto-tenue tabular">
-            con {formatBolivianos(row.original.creditAppliedCentavos)} de
-            crédito
-          </span>
-        ) : null}
-      </span>
+    cell: ({ getValue }) => (
+      <span className="text-texto tabular">{formatBolivianos(getValue())}</span>
     ),
   }),
   columns.accessor("submittedAt", {

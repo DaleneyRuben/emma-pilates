@@ -10,6 +10,7 @@ enum PaymentMethod {
   TRANSFER    @map("transfer")
   CASH        @map("cash")
   CREDIT_ONLY @map("credit_only")
+  COURTESY    @map("courtesy")
 
   @@schema("booking")
 }

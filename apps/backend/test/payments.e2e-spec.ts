@@ -97,12 +97,9 @@ describe('client payments (e2e)', () => {
       receiptAttached: true,
     });
     commands.submitTransfer.mockResolvedValue(payment);
-    commands.completeCreditPurchase.mockResolvedValue({
-      ...payment,
-      method: 'credit_only',
-      state: 'confirmed',
-      amountDueCentavos: 0,
-    });
+    commands.completeCreditPurchase.mockRejectedValue(
+      new PaymentRuleError('credit_insufficient', 'Credit was retired'),
+    );
     commands.readOpenPurchaseIntent.mockResolvedValue(intent);
     commands.readCurrentPayment.mockResolvedValue(payment);
     commands.readCreditSummary.mockResolvedValue({
@@ -300,18 +297,15 @@ describe('client payments (e2e)', () => {
       });
   });
 
-  it('completes a Credit-only purchase', async () => {
+  it('refuses the deprecated Credit-only purchase with a stable code (PAY-005)', async () => {
     await request(app.getHttpServer())
       .post('/api/v1/credit-purchases')
       .set('authorization', bearer)
       .set('idempotency-key', key)
       .send({ planId })
-      .expect(201)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          method: 'credit_only',
-          amountDueCentavos: 0,
-        });
+      .expect(409)
+      .expect(({ body }: { body: { code: string } }) => {
+        expect(body.code).toBe('credit_insufficient');
       });
   });
 

@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Confirmación</div>
-          <div style="font-size:12px;color:#766D69;">Desglose con crédito aplicado</div>
+          <div style="font-size:12px;color:#766D69;">Precio del plan y monto a cobrar</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -65,14 +65,10 @@
                   <span style="font-size:15px;color:#6E6663;">Precio del plan</span>
                   <span style="font-size:16px;font-variant-numeric:tabular-nums;">Bs 350</span>
                 </div>
-                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
-                  <span style="font-size:15px;color:#5F7457;">Crédito aplicado</span>
-                  <span style="font-size:16px;color:#5F7457;font-variant-numeric:tabular-nums;">− Bs 60</span>
-                </div>
               </div>
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-top:18px;border-top:1px solid #EFE7DE;">
                 <span style="font-size:15px;font-weight:500;">Monto a cobrar en efectivo</span>
-                <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 290</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 350</span>
               </div>
             </div>
 
@@ -163,7 +159,7 @@
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7C9473" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="5,12.5 10,17.5 19,7"></polyline></svg>
             </div>
             <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;">¡Pago registrado!</div>
-            <div style="font-size:14px;line-height:1.6;color:#766D69;max-width:280px;">Se cobraron Bs 290 en efectivo a Valeria Áñez. Su plan ya está activo.</div>
+            <div style="font-size:14px;line-height:1.6;color:#766D69;max-width:280px;">Se cobraron Bs 350 en efectivo a Valeria Áñez. Su plan ya está activo.</div>
           </div>
 
           <div style="display:flex;flex-direction:column;gap:16px;padding:22px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
@@ -223,11 +219,10 @@
                 </div>
                 <div style="display:flex;flex-direction:column;gap:12px;padding-top:18px;border-top:1px solid #EFE7DE;">
                   <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;"><span style="font-size:15px;color:#6E6663;">Precio del plan</span><span style="font-size:16px;font-variant-numeric:tabular-nums;">Bs 350</span></div>
-                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;"><span style="font-size:15px;color:#5F7457;">Crédito aplicado</span><span style="font-size:16px;color:#5F7457;font-variant-numeric:tabular-nums;">− Bs 60</span></div>
                 </div>
                 <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-top:18px;border-top:1px solid #EFE7DE;">
                   <span style="font-size:15px;font-weight:500;">Monto a cobrar en efectivo</span>
-                  <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 290</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 350</span>
                 </div>
                 <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Confirmar pago recibido</button>
                 <span style="font-size:13px;line-height:1.55;color:#766D69;text-align:center;">Confirma solo cuando tengas el efectivo en mano: el plan se activa de inmediato.</span>
@@ -241,7 +236,6 @@
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin estado pendiente</span>A diferencia de la transferencia del cliente, el efectivo queda confirmado al registrarlo.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Crédito</span>La línea de crédito solo aparece si hay saldo; el total nunca baja de Bs 0.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Pantalla de éxito</span>Sin flecha de retroceso: la única salida es "Volver al cliente" (S06).</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Factura</span>Con «Con factura», NIT o CI y nombre son obligatorios antes de «Confirmar pago recibido»; vienen de la última compra de la clienta que los tuvo. «Sin factura» registra la venta sin datos (PAY-007).</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Registro</span>El pago aparece de inmediato en el historial de administración con la asistente que lo cobró.</div>

@@ -42,12 +42,18 @@ export class AdminPaymentDto {
   @ApiProperty({ minimum: 1, description: 'Money Amount in BOB centavos' })
   planPriceCentavos!: number;
 
-  @ApiProperty({ minimum: 0, description: 'Credit taken off the Plan price' })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description:
+      'Deprecated (PAY-005): Credit was retired; 0 on every Payment made since',
+  })
   creditAppliedCentavos!: number;
 
   @ApiProperty({
     minimum: 1,
-    description: 'The Plan price less the Credit applied: what was paid',
+    description:
+      'What was paid: the Plan price (Credit is retired; always the full price since PAY-005)',
   })
   amountDueCentavos!: number;
 

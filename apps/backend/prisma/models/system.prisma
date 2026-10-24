@@ -206,8 +206,10 @@ model Account {
   createdSupplies           Supply[]                @relation("SupplyCreatedBy")
   recordedWithdrawals       Withdrawal[]            @relation("WithdrawalRecordedBy")
   recordedSupplyRestocks    SupplyRestock[]         @relation("SupplyRestockRecordedBy")
+  studioSettingsVersions    StudioSettingsVersion[] @relation("StudioSettingsVersionCreatedBy")
   recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
+  closedCashCloses          CashClose[]             @relation("CashCloseClosedBy")
 
   @@map("accounts")
   @@schema("system")

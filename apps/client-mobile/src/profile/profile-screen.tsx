@@ -1,9 +1,7 @@
 import {
-  getGetCurrentClientCreditQueryKey,
   getGetCurrentClientProfileQueryKey,
   getGetCurrentClientSubscriptionQueryKey,
   getGetUnreadNotificationCountQueryKey,
-  useGetCurrentClientCredit,
   useGetCurrentClientProfile,
   useGetCurrentClientSubscription,
   useGetUnreadNotificationCount,
@@ -33,7 +31,6 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import { ProfileRowIcon, type ProfileRowIconName } from "./profile-row-icons";
 import { subscriptionBadge } from "../home/home-format";
-import { formatBolivianos } from "../plans/plan-format";
 import { ClientAvatar } from "./client-avatar";
 import { PromotionsSwitch } from "./promotions-switch";
 import { useClientPhoto } from "./use-client-photo";
@@ -47,7 +44,6 @@ type ProfileNavigation = {
       | "ChangePassword"
       | "CloseAccount"
       | "Referrals"
-      | "Credit"
       | "EvaluationAvailability"
       | "MyEvaluations",
   ) => void;
@@ -93,12 +89,10 @@ export function ProfileScreen() {
   const profile = useGetCurrentClientProfile(queryOptions);
   const subscription = useGetCurrentClientSubscription(queryOptions);
   const unread = useGetUnreadNotificationCount(queryOptions);
-  const credit = useGetCurrentClientCredit(queryOptions);
   useRefetchOnFocus([
     getGetCurrentClientProfileQueryKey(),
     getGetCurrentClientSubscriptionQueryKey(),
     getGetUnreadNotificationCountQueryKey(),
-    getGetCurrentClientCreditQueryKey(),
   ]);
   const photoUri = useClientPhoto(
     profile.data?.status === 200 ? (profile.data.data.photo?.imageAssetId ?? null) : null,
@@ -127,8 +121,6 @@ export function ProfileScreen() {
   const client = profile.data.data;
   const status = subscription.data?.status === 200 ? subscription.data.data.status : null;
   const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : undefined;
-  const availableCredit =
-    credit.data?.status === 200 ? credit.data.data.availableCentavos : undefined;
 
   return (
     <Screen style={styles.screen}>
@@ -164,12 +156,6 @@ export function ProfileScreen() {
             icon="referrals"
             label="Mis referidos"
             onPress={() => navigation.navigate("Referrals")}
-          />
-          <MenuRow
-            icon="credit"
-            label="Mi crédito"
-            onPress={() => navigation.navigate("Credit")}
-            value={availableCredit === undefined ? undefined : formatBolivianos(availableCredit)}
           />
           <MenuRow
             badge={unreadCount}

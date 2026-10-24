@@ -37,19 +37,11 @@ export const isSubscriptionEffective = (
   (subscription.remainingClassAllowance > 0 ||
     subscription.futureBookedCount > 0);
 
-export const evaluatePurchaseEligibility = (
-  context: PurchaseEligibilityContext,
+// What blocks any new Subscription for the Client, however it is granted: an
+// open Intent, a pending Payment, or a Subscription still in use.
+export const evaluateAllocationEligibility = (
+  context: Omit<PurchaseEligibilityContext, 'plan'>,
 ): PurchaseEligibility => {
-  if (
-    context.plan === null ||
-    context.plan.hiddenAt !== null ||
-    context.plan.priceCentavos <= 0
-  ) {
-    throw new PaymentRuleError(
-      'plan_not_purchasable',
-      'Plan is not available for purchase',
-    );
-  }
   if (context.openPurchaseIntentId !== null) {
     throw new PaymentRuleError(
       'purchase_intent_open_exists',
@@ -73,4 +65,20 @@ export const evaluatePurchaseEligibility = (
   }
 
   return { subscriptionIdToExpire: context.activeSubscription.id };
+};
+
+export const evaluatePurchaseEligibility = (
+  context: PurchaseEligibilityContext,
+): PurchaseEligibility => {
+  if (
+    context.plan === null ||
+    context.plan.hiddenAt !== null ||
+    context.plan.priceCentavos <= 0
+  ) {
+    throw new PaymentRuleError(
+      'plan_not_purchasable',
+      'Plan is not available for purchase',
+    );
+  }
+  return evaluateAllocationEligibility(context);
 };

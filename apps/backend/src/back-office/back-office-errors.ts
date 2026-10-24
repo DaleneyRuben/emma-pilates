@@ -16,6 +16,8 @@ export type BackOfficeErrorCode =
   | 'expense_category_not_found'
   | 'expense_category_name_taken'
   | 'expense_category_in_use'
+  | 'branch_not_assigned'
+  | 'cash_close_already_recorded'
   | 'idempotency_key_reused';
 
 const statuses: Record<BackOfficeErrorCode, number> = {
@@ -34,6 +36,8 @@ const statuses: Record<BackOfficeErrorCode, number> = {
   expense_category_not_found: 404,
   expense_category_name_taken: 409,
   expense_category_in_use: 409,
+  branch_not_assigned: 403,
+  cash_close_already_recorded: 409,
   idempotency_key_reused: 409,
 };
 

@@ -7,12 +7,21 @@
 import type { CreditActivityDto } from "./creditActivityDto";
 
 export interface CreditDto {
-  /** @minimum 0 */
+  /**
+   * Always 0
+   * @deprecated
+   * @minimum 0
+   */
   availableCentavos: number;
   /**
-   * Credit held for a Payment under review
+   * Always 0
+   * @deprecated
    * @minimum 0
    */
   reservedCentavos: number;
+  /**
+   * Always empty
+   * @deprecated
+   */
   activity: CreditActivityDto[];
 }

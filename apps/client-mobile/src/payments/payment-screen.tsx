@@ -141,11 +141,6 @@ export function PaymentScreen() {
         <View style={styles.amountCard}>
           <BodyText>Monto exacto a transferir</BodyText>
           <Text style={styles.amount}>{formatBolivianos(current.amountDueCentavos)}</Text>
-          {current.creditReservedCentavos > 0 ? (
-            <BodyText style={styles.credit}>
-              {`Ya aplicamos ${formatBolivianos(current.creditReservedCentavos)} de tu crédito.`}
-            </BodyText>
-          ) : null}
         </View>
         <TransferQrCard fetcher={fetcher} />
         <Pressable
@@ -215,7 +210,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  credit: { color: colors.successText },
   error: { color: colors.errorText },
   screen: { gap: spacing.lg },
   thumbnail: { borderRadius: radii.control, height: 120, width: 90 },

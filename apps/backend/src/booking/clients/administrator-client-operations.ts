@@ -3,6 +3,7 @@ import type { PrismaClient } from '../../generated/prisma/client';
 import {
   listAdministratorClients,
   readAdministratorClient,
+  updateAdministratorClientProfile,
 } from './administrator-clients';
 import {
   administratorClientOperations,
@@ -24,6 +25,18 @@ export const administratorClientProvider = (prismaToken: symbol): Provider => ({
         listAdministratorClients(query, principal, dependencies),
       read: (command, principal) =>
         readAdministratorClient(command, principal, dependencies),
+      updateProfile: async (command, principal) => {
+        await updateAdministratorClientProfile(
+          command,
+          principal,
+          dependencies,
+        );
+        return readAdministratorClient(
+          { clientId: command.clientId },
+          principal,
+          dependencies,
+        );
+      },
     };
   },
 });
