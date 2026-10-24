@@ -474,7 +474,7 @@ wait for Google, Apple, and testers.
 | BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | ready |
 | BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | ready |
 | PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | ready |
-| PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | ready |
+| PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | done (cd03688c storage and mark, fcc8fabd API, bad49a81 Staff app, 6fc42238 Client app, 73534ba8 AW28, caf26876 design 145–147; evidence below) |
 | BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | done (c39d73a3 backend, 3ae735e5 Staff app S25, 4510368c admin web AW151, 1e4dee1e design export; iPhone 16 Pro, iPad Pro 11 (M4), Android emulator, browser at 1440/420 px) |
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | done (22c81c81; evidence below). Schema `e8390f9d`; admin-web session red `4b83f3e7` → `91f12934`; staff red `6684d0df` → `56eebbde`; operations red `fd06a8ad` → `db534ca6`; schedule red `0534aa8c` → `05fd60c0`; profile endpoint red `7fcb5de5` → `722ad126`; authorization matrix `41f5e250`; contracts `329a9415`; admin web red `0843bbd1`/`8073598e`/`ebbb2d6a` → `30d676c0`/`0f96e7b9`/`950bbabc`; Playwright `cc200115`; Staff app red `ec115e2e` → `e1511505`; Maestro `c357c97c`; testing guide Test 75 `e8938f7a`. Verified: backend unit 975, e2e 268, integration 92 suites / 367 tests (6 skipped, pre-existing), the matrix over all 170 endpoints for both Roles; `check:api` and `check:api-compat` clean; admin-web Jest 531, Playwright 19/19 (new coordinator journey finds no «Bs»); staff-mobile Jest 155, mobile-core 116; lint, Prettier, tsc clean. Browser walk at 1440 and 420 px as Carolina (Horario edit panel, money URL notice, Clientes «Editar perfil» saved, no «Bs», Personal read-only, drawer) and as Paola (Coordinador role option with implicit Branches). API curl as Carolina: Client search 200, payments 403. Walked on 2026-10-23 as Carolina on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator: Client search, a Client's overview without cash or «Nuevo cliente», and «Cancelar clase». Decisions: counts-only statistics deferred to STU-003 (ADR-0103 rejects on-the-fly indicators); Coordinator reads Staff but never invites or changes Roles/Branches; reads Branches and Class Types, not the Plan list; Assistant overview sends her Credit 0 (ADR-0016), the admin detail omits it; Evaluations oversight stays with the Administrator until NUT-003. Open questions: should the Coordinator see AW25 Evaluations and correct pending staff emails? development-fixtures.ts (oversized) grew by one staff entry.) |
 | NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
@@ -647,6 +647,21 @@ income report and stays visible with its reason.
 
 Acceptance criteria: the mark can be set and undone only by the Administrator,
 both actions audited. The filter and the CSV match.
+
+Done on 2026-10-23. The card was walked without submitting, so no Payment was
+recorded. The Client app shows «Datos para la factura» on «Pago por
+transferencia» with «Con factura» and «Sin factura» («Tu compra se registra
+sin datos de factura.») for Sofía, on the iPhone 16 Pro, the iPad Pro 11-inch
+(M4), and the Android emulator. The Staff app shows the same card on
+«Confirmar pago en efectivo», reached from Sofía's overview, on the same three
+devices («La venta se registra sin datos de factura.»). Chromium at 1440 and
+420 px and the Playwright journey covered AW28 earlier. Decisions: the prefill
+takes the latest sale that carried Invoice Data; the mark applies to confirmed
+sales only and «Sin factura emitida» lists confirmed sales with data and no
+mark; AW28 lists cash sales; the CSV pages through the same list; closing an
+Account erases the NIT or CI and name and keeps the mark. Open questions:
+erasing data of a sale not yet invoiced on closure; a date range for the
+accountant CSV; front-desk QR receipts of PAY-006 need the same card.
 
 #### BKO-003 · Daily cash close
 

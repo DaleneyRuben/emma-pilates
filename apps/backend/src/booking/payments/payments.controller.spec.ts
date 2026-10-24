@@ -156,11 +156,11 @@ describe('PurchaseIntentsController', () => {
       principal,
       key,
     );
-    await expect(controller.submit(intentId, bearer, key)).resolves.toEqual(
+    await expect(controller.submit(intentId, bearer, key, {})).resolves.toEqual(
       payment,
     );
     expect(handlers.submitTransfer).toHaveBeenCalledWith(
-      { purchaseIntentId: intentId },
+      { purchaseIntentId: intentId, invoiceData: null },
       principal,
       key,
     );

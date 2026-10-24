@@ -42,8 +42,10 @@ import {
   PaymentDto,
   parseAttachReceipt,
   parseCreatePurchaseIntent,
+  parseSubmitTransfer,
   PurchaseIntentDto,
   ReferralsDto,
+  SubmitTransferDto,
   TransferInstructionsDto,
 } from './payments.dto';
 import type { PaymentCommands } from './prisma-payment-commands';
@@ -214,20 +216,24 @@ export class PurchaseIntentsController extends AuthenticatedPaymentController {
   @ApiOperation({ operationId: 'submitPurchaseIntentTransfer' })
   @ApiParam({ name: 'purchaseIntentId', format: 'uuid' })
   @ApiHeader(idempotencyHeader)
+  @ApiBody({ type: SubmitTransferDto, required: false })
   @ApiCreatedResponse({ type: PaymentDto })
   @Header('Cache-Control', 'no-store')
   async submit(
     @Param('purchaseIntentId') purchaseIntentId: string,
     @Headers('authorization') authorization: string | undefined,
     @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Body() body: unknown,
   ): Promise<PaymentDto> {
+    const parsed = parseSubmitTransfer(body);
+    if (parsed === null) throw invalidRequest('Invalid Invoice Data');
     const intentId = requireIntentId(purchaseIntentId);
     const key = requireIdempotencyKey(idempotencyKey);
     const principal = await this.authenticate(authorization);
 
     return runPaymentCommand(() =>
       this.commands.submitTransfer(
-        { purchaseIntentId: intentId },
+        { purchaseIntentId: intentId, invoiceData: parsed.invoiceData },
         principal,
         key,
       ),

@@ -349,6 +349,7 @@ describe('Assistant Plan quotes and cash Payment', () => {
           planId: 'plan-8',
           branchId: 'branch-centro',
           idempotencyKey: 'idempotency-key',
+          invoiceData: { taxId: '4567891', name: 'Ana Pérez' },
         },
         {
           principal: assistant,
@@ -358,7 +359,12 @@ describe('Assistant Plan quotes and cash Payment', () => {
       ),
     ).resolves.toEqual({ payment, subscription: activated });
     expect(recordCashPayment).toHaveBeenCalledWith(
-      { clientId: 'client-id', planId: 'plan-8', branchId: 'branch-centro' },
+      {
+        clientId: 'client-id',
+        planId: 'plan-8',
+        branchId: 'branch-centro',
+        invoiceData: { taxId: '4567891', name: 'Ana Pérez' },
+      },
       assistant,
       'idempotency-key',
     );

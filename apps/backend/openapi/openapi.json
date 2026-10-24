@@ -3499,6 +3499,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitTransferDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "",
@@ -4350,6 +4360,19 @@
             "in": "query",
             "description": "Client name fragment, accents and case ignored",
             "schema": {}
+          },
+          {
+            "name": "invoice",
+            "required": false,
+            "in": "query",
+            "description": "«unissued»: confirmed sales with Invoice Data not marked «Factura emitida»",
+            "schema": {
+              "enum": [
+                "all",
+                "unissued"
+              ],
+              "type": "string"
+            }
           },
           {
             "name": "status",
@@ -5282,6 +5305,142 @@
         "summary": "",
         "tags": [
           "ClientPhoto"
+        ]
+      }
+    },
+    "/api/v1/clients/current/invoice-data": {
+      "get": {
+        "operationId": "getCurrentClientInvoiceData",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LastInvoiceDataDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientInvoiceData"
+        ]
+      }
+    },
+    "/api/v1/assistant/clients/{clientId}/invoice-data": {
+      "get": {
+        "operationId": "getAssistantClientInvoiceData",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LastInvoiceDataDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantInvoiceData"
+        ]
+      }
+    },
+    "/api/v1/administrator/payments/{paymentId}/invoice-issued": {
+      "post": {
+        "operationId": "markPaymentInvoiceIssued",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceIssuedDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorInvoiceIssued"
+        ]
+      },
+      "delete": {
+        "operationId": "unmarkPaymentInvoiceIssued",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceIssuedDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorInvoiceIssued"
         ]
       }
     },
@@ -9678,6 +9837,42 @@
           "imageAssetId"
         ]
       },
+      "InvoiceDataDto": {
+        "type": "object",
+        "properties": {
+          "taxId": {
+            "type": "string",
+            "description": "NIT or CI: digits, capital letters, and hyphens",
+            "minLength": 1,
+            "maxLength": 20
+          },
+          "name": {
+            "type": "string",
+            "description": "Name or business name for the invoice",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        },
+        "required": [
+          "taxId",
+          "name"
+        ]
+      },
+      "SubmitTransferDto": {
+        "type": "object",
+        "properties": {
+          "invoiceData": {
+            "nullable": true,
+            "description": "PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
+          }
+        }
+      },
       "PaymentDto": {
         "type": "object",
         "properties": {
@@ -10406,6 +10601,16 @@
             "type": "string",
             "format": "uuid",
             "description": "Branch where the cash was collected"
+          },
+          "invoiceData": {
+            "nullable": true,
+            "description": "PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
           }
         },
         "required": [
@@ -10642,6 +10847,23 @@
           "phone"
         ]
       },
+      "InvoiceIssuedMarkDto": {
+        "type": "object",
+        "properties": {
+          "issuedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "issuedByName": {
+            "type": "string",
+            "description": "The Administrator who marked it"
+          }
+        },
+        "required": [
+          "issuedAt",
+          "issuedByName"
+        ]
+      },
       "AdminPaymentDto": {
         "type": "object",
         "properties": {
@@ -10673,7 +10895,7 @@
           "amountDueCentavos": {
             "type": "number",
             "minimum": 1,
-            "description": "What was transferred: the Plan price"
+            "description": "What was paid: the Plan price (Credit is retired; always the full price since PAY-005)"
           },
           "state": {
             "type": "string",
@@ -10695,6 +10917,33 @@
           "receiptAvailable": {
             "type": "boolean",
             "description": "Whether the receipt image is still retained"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "transfer",
+              "cash"
+            ]
+          },
+          "invoiceData": {
+            "nullable": true,
+            "description": "NIT or CI and name for the invoice; null is «Sin factura»",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
+          },
+          "invoiceIssued": {
+            "nullable": true,
+            "description": "The «Factura emitida» mark: who and when",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceIssuedMarkDto"
+              }
+            ]
           }
         },
         "required": [
@@ -10708,7 +10957,10 @@
           "state",
           "submittedAt",
           "decidedAt",
-          "receiptAvailable"
+          "receiptAvailable",
+          "method",
+          "invoiceData",
+          "invoiceIssued"
         ]
       },
       "AdminPaymentPageDto": {
@@ -11333,6 +11585,46 @@
         },
         "required": [
           "imageAssetId"
+        ]
+      },
+      "LastInvoiceDataDto": {
+        "type": "object",
+        "properties": {
+          "invoiceData": {
+            "nullable": true,
+            "description": "The Invoice Data of the Client's latest sale that carried any, to prefill the next one",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "invoiceData"
+        ]
+      },
+      "InvoiceIssuedDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "invoiceIssued": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceIssuedMarkDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "paymentId",
+          "invoiceIssued"
         ]
       },
       "EvaluationSlotDto": {
