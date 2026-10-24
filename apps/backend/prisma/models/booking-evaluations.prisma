@@ -109,6 +109,7 @@ model Evaluation {
   @@index([clientId, state])
   @@index([evaluationSlotId])
   @@index([subscriptionId])
+  @@index([paymentId])
   @@index([createdByAccountId])
   @@index([cancelledByAccountId])
   @@map("evaluations")
