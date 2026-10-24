@@ -126,7 +126,13 @@ export function ConfirmCashPaymentScreen({
     try {
       const photographed = await api.photographTransferReceipt();
       if (photographed === null) return;
-      await api.recordFrontDeskTransfer(clientId, quote.id, branchId, photographed.imageAssetId, startsOn);
+      await api.recordFrontDeskTransfer(
+        clientId,
+        quote.id,
+        branchId,
+        photographed.imageAssetId,
+        startsOn,
+      );
       setReceipt(photographed);
       setFailure("Comprobante enviado. Queda pendiente de revisión.");
     } catch (error) {

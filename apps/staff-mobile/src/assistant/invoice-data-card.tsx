@@ -33,9 +33,7 @@ export const invoiceChoiceFrom = (): InvoiceChoice => ({
  * What a later reconcile with PAY-007 would send. This branch does not
  * persist it: the card is the front-desk shape only.
  */
-export const invoiceDataPayload = (
-  choice: InvoiceChoice,
-): InvoiceData | null | "incomplete" => {
+export const invoiceDataPayload = (choice: InvoiceChoice): InvoiceData | null | "incomplete" => {
   if (!choice.wantsInvoice) return null;
   const taxId = choice.taxId.trim();
   const name = choice.name.trim();
