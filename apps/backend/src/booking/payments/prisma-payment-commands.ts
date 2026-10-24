@@ -69,7 +69,6 @@ import {
 
 type Transaction = Prisma.TransactionClient;
 
-
 const mediaTypes: Record<ImageMediaType, string> = {
   [ImageMediaType.JPEG]: 'image/jpeg',
   [ImageMediaType.PNG]: 'image/png',
