@@ -18,14 +18,14 @@ function Tile({
     <section
       aria-label={name}
       className={cn(
-        "flex flex-col gap-1.5 rounded-tarjeta border border-borde border-t-[3px] bg-blanco px-5 py-4",
+        "flex min-w-0 flex-col gap-1.5 rounded-tarjeta border border-borde border-t-[3px] bg-blanco px-5 py-4 lg:px-3 xl:px-5",
         rule,
       )}
     >
-      <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+      <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] whitespace-nowrap text-texto-tenue uppercase">
         {name}
       </h2>
-      <p className="font-serif text-[32px] leading-tight text-texto tabular">
+      <p className="font-serif text-[32px] leading-tight whitespace-nowrap text-texto tabular lg:text-[26px] xl:text-[32px]">
         {figure}
       </p>
       {children}
@@ -53,7 +53,7 @@ export function ReportTiles({
   branchName: string | undefined;
 }) {
   return (
-    <div className="grid gap-3 md:grid-cols-3">
+    <div className="grid gap-3 md:grid-cols-3 lg:gap-2 xl:gap-3">
       <Tile
         name="Ingresos"
         rule="border-t-exito"

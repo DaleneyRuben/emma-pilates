@@ -140,6 +140,15 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(
       within(september).getByRole("cell", { name: "−Bs 2.480,50" }),
     ).toHaveAttribute("data-label", "Neto");
+    // UX-011: a 1024 px «Totales por mes» must not wrap a month or an amount.
+    for (const name of ["septiembre de 2026", "Bs 1.500,00", "−Bs 2.480,50"]) {
+      expect(within(months).getAllByText(name)[0]).toHaveClass(
+        "whitespace-nowrap",
+      );
+    }
+    expect(
+      within(tile("Ingresos")).getByRole("heading", { name: "Ingresos" }),
+    ).toHaveClass("whitespace-nowrap");
 
     expect(Object.fromEntries(incomeReads[0] ?? [])).toEqual({
       from: "2026-08-01T04:00:00.000Z",
