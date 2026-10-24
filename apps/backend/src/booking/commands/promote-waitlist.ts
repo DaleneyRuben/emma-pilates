@@ -1,3 +1,5 @@
+import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
+
 type WaitlistSession = {
   id: string;
   startsAt: Date;
@@ -32,10 +34,9 @@ type PromoteWaitlistDependencies = {
     createdByAccountId: string;
   }): Promise<{ id: string }>;
   closeAsPromoted(input: { entryId: string; bookingId: string }): Promise<void>;
+  cancellationWindowMinutes(): Promise<number>;
   now(): Date;
 };
-
-const cancellationWindowMilliseconds = 2.5 * 60 * 60 * 1_000;
 
 export const promoteWaitlist = async (
   command: { sessionId: string },
@@ -46,8 +47,11 @@ export const promoteWaitlist = async (
   if (
     session === null ||
     session.state !== 'scheduled' ||
-    session.startsAt.getTime() - dependencies.now().getTime() <=
-      cancellationWindowMilliseconds
+    isInsideCancellationWindow(
+      session.startsAt,
+      dependencies.now(),
+      await dependencies.cancellationWindowMinutes(),
+    )
   ) {
     return [];
   }

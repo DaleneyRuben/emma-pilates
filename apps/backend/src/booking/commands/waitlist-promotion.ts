@@ -1,8 +1,9 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { WaitlistClosureReason } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
-import { boliviaDate } from '../../time/bolivia-time';
 import { promoteWaitlist } from './promote-waitlist';
+import { findCoveringSubscription } from './eligible-subscription';
+import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
 
 export type WaitlistPromotionDependencies = {
   now: () => Date;
@@ -59,15 +60,10 @@ export const promoteWaitlistInTransaction = (
           orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        transaction.subscription.findFirst({
-          where: {
-            clientId,
-            state: 'ACTIVE',
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-            remainingClassAllowance: { gt: 0 },
-          },
-          select: { id: true },
+        findCoveringSubscription(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: true,
         }),
       hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
         transaction.booking
@@ -132,6 +128,8 @@ export const promoteWaitlistInTransaction = (
           });
         }
       },
+      cancellationWindowMinutes: () =>
+        readCancellationWindowMinutes(transaction),
       now,
     },
   );

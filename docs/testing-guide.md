@@ -45,11 +45,11 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70 |
-| 12 Mi plan | 5, 18, 71 |
-| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 76, 77 |
+| 12 Mi plan | 5, 18, 71, 76, 77, 78 |
+| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 80 |
 | 16 Mis referidos, 17 Mi crédito | 10, 18 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
@@ -59,11 +59,11 @@ can be found by its design name.
 | --- | --- |
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 77 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 77, 79 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
-| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
+| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 80 |
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
@@ -71,17 +71,20 @@ can be found by its design name.
 | Admin web | Tests |
 | --- | --- |
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
+| AW36 Reglas del estudio (from AW33) | 75 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
-| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72 |
+| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 76 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 76 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 80, 81 |
+| AW37 Simulador | 82 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 78, 79 |
 | AW23–AW24 Personal | 26, 31, 72 |
-| AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
-| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
+| AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72, 80 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 79 |
 
 ## Before you begin
 
@@ -530,8 +533,8 @@ resets every fixture Session to its scheduled start and end time while keeping
 cancellations, so run it again if class times ever look shifted by four hours.
 It creates three Branches (Centro, Equipetrol, Urubó), three Class Types, the
 four designed Plans (Paquete de 8 clases, Bs 560; Paquete de 12 clases,
-Bs 780; Mensual 16 clases, Bs 1 050; Trimestral 36 clases, Bs 2 100 for three
-months), weekly Session Schedules with the next 30 days of
+Bs 780; Mensual 16 clases, Bs 1 050, each valid 30 days; Trimestral 36 clases,
+Bs 2 100, valid 90 days with a Weekly Cap of 4), weekly Session Schedules with the next 30 days of
 Sessions, Gabriela's weekly Availability Blocks with their next 30 days of
 Evaluation slots, and these active Accounts. Every fixture Account uses the password `emma-local-2026`.
 
@@ -1859,7 +1862,7 @@ crossed out). Tap one: **Confirmar pago en efectivo** breaks down **Precio del
 plan**, **Crédito aplicado**, and **Monto a cobrar en efectivo**; when you are
 assigned to several Branches a chip row asks where you received the cash.
 **Confirmar pago recibido** activates the Plan at once and shows
-"¡Pago registrado!" with the Plan, its classes, and "Válido hasta el …";
+"¡Pago registrado!" with the Plan, its classes, and "Vence el …";
 **Volver al cliente** returns to the overview, now **Activa**, and **Volver**
 from there goes back to **Buscar cliente**. While a Client's Plan is still
 in force (paid through today with classes left or an upcoming Booking, as
@@ -2156,8 +2159,8 @@ In the Client app as `lucia@example.com`:
    otherwise "Agenda tu cita del mes"; it opens Mis evaluaciones or the
    availability) and **Mis referidos** (a person icon; "N amigas invitadas" or
    "Invita amigas y gana crédito").
-2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with dates such as
-   "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
+2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with **Inicio** and
+   **Vence el** dates such as "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
    termine."; while expiring, an amber banner; once expired, "Último plan",
    "Venció el …", and **Comprar un plan**. As `isabel@example.com` (no
    classes left) the classes line reads "Sin clases disponibles". Mi plan
@@ -2703,8 +2706,10 @@ Bolivia time, whatever time zone your computer uses.
    depends on it, so renaming moves nothing, and its **Archivar sucursal**
    dialog says it leaves the selector, receives no new Sessions, and keeps
    its history. Plans
-   show prices as `Bs 1.050,00`, last 1, 3, 6, or 12 months, and always carry
-   a class count; **Ocultar en la app** hides one from the Client catalog.
+   show prices as `Bs 1.050,00`, last 30, 60, or 90 days (**Vigencia**), may
+   carry a **Tope semanal** of 3 or 4 only when they last 60 or 90 days, and
+   always carry a class count (Test 76); **Ocultar en la app** hides one from
+   the Client catalog.
    A Class Type needs a description, and a taken name is marked on its field.
    Tipos de clase has no Duración column and its form no Duración field: the
    length of a class is chosen in Horario. Both apps' Session detail shows
@@ -3318,6 +3323,17 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
+
+- the Weekly Cap at booking: BKM-005 stores and shows it («hasta 3 por
+  semana»), but a fourth Booking in the same week still goes through until
+  BKM-007;
+- accrued revenue by validity days: decisions §11 asks for it beside the
+  cash view, and Test 81 shows only cash. STU-002 owns the accrued view;
+- the break-even in students per class, occupancy, and clients: Test 82
+  shows it in bolivianos. The diagnosis's section 3.4 asks for the other
+  expressions, and STU-005 owns the projections that need them;
+- the Coordinator's view of the simulator: the role is not wired (IDN-009),
+  so Test 82 only hides the page from the roles that exist today;
 
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
@@ -5931,3 +5947,346 @@ and never an amount. Use a disposable database.
    denominator is an open question; do not treat 50 % as the coordinator's
    bonus base.
    [Pull request #199](https://github.com/DaleneyRuben/emma-pilates/pull/199).
+## Test 75: the studio rules (BKM-004)
+
+The rules the apps and the API follow live in one versioned Studio Settings
+record ([ADR-0101](./adr/0101-keep-studio-rules-in-studio-settings.md)).
+Migration `20261023104000_studio_settings` seeds version 1 with today's
+values: a 2 h 30 Cancellation Window, 2 Minimum Bookings checked 3 h before,
+Start Dates up to 14 days ahead, 40 Founder places at 15 % lost after 7 days
+without a Plan, one Guest Pass per person, one invite a month, +1 class when
+a guest buys, 16 % tax, Bs 70 per Paid Evaluation, Bs 50 to the
+Nutritionist, renewal targets 80/85/90 %, and no Opening Date. Run the API
+and the admin web as in Tests 2 and 24.
+
+A. **The public rules.** `curl -i http://127.0.0.1:3100/api/v1/studio-rules`
+   answers without a credential, with `Cache-Control: public, max-age=60` and
+   an `ETag`:
+   `{"cancellationWindowMinutes":150,"evaluationPriceCentavos":7000,"plansFromPriceCentavos":56000,"startDateLimitDays":14,"openingDate":null}`.
+   `plansFromPriceCentavos` is the cheapest visible Plan (hidden Plans do not
+   count; `null` when none is visible). Sending the `ETag` back as
+   `If-None-Match` answers `304`.
+B. **Reglas del estudio (AW36).** Log in as `paola.mendoza@example.com`, open
+   the account menu (your name, top right) and choose **Reglas del
+   estudio**. «Puedes cambiar» shows Mínimo de reservas por clase 2,
+   Impuestos sobre las ventas (%) 16, the three renewal targets 80/85/90,
+   an empty Fecha de apertura, and «Versión 1 · valores iniciales».
+   «Reglas fijas» lists «2 h 30 antes de cada clase», «3 h antes de cada
+   clase», «Hasta 14 días después de la compra», «40 lugares · 15 % de
+   descuento · se pierde con más de 7 días sin plan», «1 clase de invitada
+   por persona · 1 invitación al mes · +1 clase cuando la amiga compra», and
+   «Bs 70,00 · Bs 50,00 para la nutricionista».
+   - Type 0 in the minimum and 120 in the tax and press **Guardar
+     cambios**: «Entre 1 y 20 reservas.» and «Un porcentaje entre 0 y
+     100.», and nothing is saved.
+   - Type 3 and pick 01/12/2026 as the opening date, then save: «Guardamos
+     las reglas del estudio.», «Versión 2 · guardada el … por Paola
+     Mendoza», and `GET /api/v1/studio-rules` now shows
+     `"openingDate":"2026-12-01"`. The audit table has a
+     `studio_settings.updated` row whose metadata holds the old and new
+     values (`previousMinimumBookings: 2`, `minimumBookings: 3`, …), and
+     `booking.studio_settings_versions` has a second row; neither row can be
+     updated or deleted (the trigger answers «append-only»).
+   - Open the page in two tabs, save a change in one, then save in the
+     other: «Alguien guardó otras reglas mientras editabas…» and the second
+     tab shows the newer values.
+   - At 420 px every field takes the full width and each fixed rule stacks
+     its value under its label; the account menu is a bottom sheet whose
+     first row is **Reglas del estudio**.
+   - Without a session `GET /api/v1/administrator/studio-settings` answers
+     `401`; as Camila (Assistant) it answers `403
+     administration_access_denied`.
+C. **The apps follow the settings without a build.** The Cancellation
+   Window is not editable on the web (it changes with a release), so append
+   a version by hand on a development database to see the apps follow it:
+
+   ```sql
+   insert into booking.studio_settings_versions
+     select gen_random_uuid(), version + 1, 360, minimum_bookings,
+       minimum_bookings_check_lead_minutes, start_date_limit_days,
+       founder_places, founder_discount_percent, founder_gap_days,
+       guest_passes_per_client, invites_per_host_per_month,
+       invite_reward_classes, tax_rate_percent, evaluation_price_centavos,
+       nutritionist_fee_centavos, renewal_target_months_1_to_6_percent,
+       renewal_target_months_7_to_12_percent,
+       renewal_target_from_month_13_percent, opening_date,
+       (select id from system.accounts where email = 'paola.mendoza@example.com'),
+       now()
+     from booking.studio_settings_versions order by version desc limit 1;
+   ```
+
+   Within a minute (pull to refresh), a booking 5 hours away shows **No
+   cancelable** and **Reprogramar** in Mis reservas (05) and in the
+   Assistant's «Reservas de la clienta» (S21); 09 Detalle del plan reads
+   «Cancelación sin costo hasta 6 h antes de cada clase.»; AW03's «Cancelar
+   sesión» confirmation says «aunque falten menos de 6 h»; and
+   `DELETE /api/v1/bookings/{id}` for that booking answers `409
+   booking_cancellation_window`. Append another version with `150` to go
+   back. 02 Inicio's buy card reads «Paquetes desde Bs 560. Puedes pagar en
+   el estudio o desde la app.» on the fixtures (the cheapest visible Plan);
+   hide that Plan on AW04 and the price follows.
+D. **When the rules cannot be read** (stop the API while an app is open on
+   a screen that has not loaded them yet), 02 says only «Puedes pagar en el
+   estudio o desde la app.», 09 leaves the cancellation line out, and 05 and
+   S21 show no **Cancelar** or **Reprogramar** until the rules load.
+
+Only these values are stored and shown by BKM-004; the rules that use the
+others (the 2-booking check, Start Dates, founders, invites, tax, the paid
+Evaluation, the renewal bonus) arrive with their own backlog items.
+
+## Test 76: Plans by days and the Weekly Cap (BKM-005)
+
+A Plan now lasts **30, 60, or 90 days** and the 60- and 90-day Plans may
+carry a **Weekly Cap** of 3 or 4 classes
+([booking ADR-0005](../booking/docs/adr/0005-validity-in-days-with-a-chosen-start-date.md),
+[ADR-0006](../booking/docs/adr/0006-weekly-cap-and-extra-classes.md)). A
+Subscription ends on its start plus the days minus one. Run the API, the
+fixtures, and the admin web as in Tests 2 and 24, and the apps as in Tests 9
+and 11.
+
+A. **The migration.** On a copy of a database made before BKM-005, apply
+   `20261023120000_plans_by_days`: every Plan gets `duration_days` (1 month →
+   30, 3 months → 90, 6 and 12 months → 90) and is **hidden** (`hidden_at`
+   set, never deleted); Purchase Intents, Payments, and Subscriptions get the
+   same `duration_days_snapshot`, and Subscriptions keep their dates. Running
+   the fixtures afterwards shows the four fixture Plans again, in days.
+B. **Planes (AW04) and the Plan form (AW05).** As
+   `paola.mendoza@example.com` open **Catálogo › Planes**: the columns read
+   **Vigencia** («30 días», «90 días») and **Tope semanal** («4 por semana»
+   for Trimestral 36 clases, a grey «Sin tope» for the others). **Nuevo
+   plan**: **Vigencia** offers 30, 60, and 90 días; **Tope semanal** is
+   disabled on «Sin tope» while Vigencia is 30 días and offers «3 clases por
+   semana» and «4 clases por semana» at 60 or 90. Create «Bimestral 16
+   clases», 60 días, 3 clases por semana, 16 clases, `1.120,00`: the row
+   reads «60 días · 3 por semana». Edit it back to 30 días: the cap returns to
+   «Sin tope». At 420 px each row is a card with Vigencia and Tope semanal
+   lines and the form is a full-screen sheet. Through the API
+   `POST /api/v1/administrator/plans` with `durationDays: 30` and
+   `weeklyClassCap: 3`, or with `durationDays: 45`, answers `400`; as Camila
+   it answers `403 administration_access_denied`.
+C. **The contract.** `GET /api/v1/plans` (as any Client) returns
+   `durationDays`, `weeklyClassCap` (`null` without a cap), and the
+   deprecated `durationMonths` that store builds still read (30 → 1, 60 → 2,
+   90 → 3). The Payment, Purchase Intent, and Assistant quote responses
+   carry `durationDays` too.
+D. **Elige tu plan (08) and Detalle del plan (09).** As Sofía, **Comprar un
+   plan**: each card reads «8 clases · válido por 30 días»; a capped Plan
+   adds « · hasta 3 por semana». Its detail shows «Válido por 60 días», «60
+   días de vigencia desde que se confirma tu pago.», and «Hasta 3 clases por
+   semana.». No Plan line says «mes» or «meses».
+E. **The end date.** As Camila register cash for a Client on the 60-day Plan
+   (Test 11): **Elige un plan** (S09) and **Confirmar pago en efectivo** (S10)
+   show «16 clases · válido por 60 días · hasta 3 por semana», and «¡Pago
+   registrado!» reads «Vence el …» 59 days after today (bought on 23 October,
+   it ends on 21 December; bought on 1 December, on 29 January). That
+   Client's Home (02) reads «Vence el …» and **Mi plan** (12) shows the
+   **Inicio** and **Vence el** dates; the Assistant's overview (S06) reads
+   «Vence el …» too.
+
+The cap is only stored and shown here: booking more than the cap in one week
+still works until BKM-007.
+
+## Test 77: the Start Date and early renewal (BKM-006)
+
+A Plan starts on the date chosen at purchase, from today up to 14 days later,
+and a Client with a Plan in force can buy the next one
+([booking ADR-0005](../booking/docs/adr/0005-validity-in-days-with-a-chosen-start-date.md)).
+Run the API and the fixtures as in Tests 2 and 5, and the apps as in Tests 9
+and 11.
+
+A. **The chip row (09 and S10).** As Lucía, open **Mi plan** (12) and tap
+   **Renovar plan**. **Elige tu plan** (08) still reads «válido por 30 días».
+   Open **Paquete de 8 clases**: under **Qué incluye** a row labelled
+   **Fecha de inicio** offers chips from **Hoy** through 14 days, and **Hoy**
+   starts selected. The row scrolls sideways. As Camila, search Sofía, tap
+   **Registrar pago en efectivo**, and open the same Plan: **Confirmar pago
+   en efectivo** (S10) shows the same row above **Confirmar pago recibido**.
+B. **The chosen date.** As Sofía, `POST /api/v1/purchase-intents` with the
+   Plan id and `startsOn` inside the window answers `201` and echoes
+   `startsOn`. A date past today + 14 answers `409`.
+C. **The next Plan (12).** Give a Client a second active Subscription that
+   starts after the current one ends (a disposable database only). **Mi
+   plan** adds a line **Siguiente plan** whose value reads «Siguiente plan
+   desde {fecha}», and the date wraps inside the card on a phone. The
+   **Renovar plan** button stays.
+D. **A booking before the Start Date (04).** End the current Subscription
+   before the next one starts, then open a Session dated in the gap and tap
+   **Reservar**. The screen answers «Podrás reservar a partir del {fecha}.»
+   and the API answers `409` `booking_before_start_date`. A Session the
+   current Plan still covers books as before.
+
+The reminder that names the renewal arrives with the worker's Plan reminder
+(Test 7). An Evaluation booked before the Start Date still answers the
+existing ineligible-subscription refusal.
+
+## Test 78: extra classes (BKM-008)
+
+An extra class is an `AllowanceAdjustment` on the Subscription: a signed
+number of classes, a reason, an author, and a time
+([booking ADR-0006](../booking/docs/adr/0006-weekly-cap-and-extra-classes.md)).
+The line a person sees names the first grant: «Clases extra: 1 · Cortesía»,
+«Clases extra: 1 · Regalo de bienvenida», «Clases extra: 1 · Invitación»,
+«Clases extra: 1 · Campaña», or «Clases extra: 1 · Clase devuelta». Run the
+API and the fixtures as in Tests 2 and 5.
+
+A. **The Administrator records one.** As Paola,
+   `POST /api/v1/administrator/clients/{clientId}/allowance-adjustments`
+   with `{ "classes": 1, "reason": "courtesy" }` answers `201`. The same call
+   as Camila answers `403`. `class_return` is the other reason the endpoint
+   accepts; any other reason answers `400`.
+B. **The three surfaces.** Open that Client's **Mi plan** (12), her summary
+   as Camila (S06), and her detail in the admin web (AW22, at 1440 px and at
+   420 px). Each reads «Clases extra: 1 · Cortesía». A Client with no extra
+   class shows no line.
+C. **The gift.** The first approved Payment in a Client's life adds one
+   class with reason `gift_new_client`, and the line then reads «Clases extra:
+   1 · Regalo de bienvenida». A founder and a courtesy Plan do not get it,
+   and a second Payment does not add it again. The automated suites cover
+   that grant; no screen records the first cash Payment's gift yet (PAY-006
+   adds the form).
+
+Spending an extra class waits for the base allowance to run out, and for the
+Weekly Cap (BKM-007). Cancelling a Booking funded by an extra class restores
+the class to the base pool.
+
+## Test 79: payment controls (PAY-006)
+
+A sale stays as it was recorded. The Assistant cannot edit or delete a
+Payment. Only the Administrator voids one, and only with a reason
+([decisions §4.3](./decisiones-emma-pilates.md),
+[booking ADR-0012](../booking/docs/adr/0012-sales-controls-and-invoice-data.md)).
+A void corrects a mistake: no money is returned. Run the API and the
+fixtures as in Tests 2 and 5. Paola is the Administrator and Camila the
+Assistant.
+
+A. **Front-desk receipt.** As Camila, open a Client and **Confirmar pago en
+   efectivo** (S10). **Fotografiar comprobante** sends the receipt. The
+   Payment stays pending. As Paola, the same receipt appears on **Revisar
+   pago** (S12) and on **Pagos** (AW28). Approving it uses that existing
+   review. Cash still confirms on the spot with **Confirmar pago recibido**,
+   and an older build that omits the new fields still confirms cash.
+B. **Invoice card.** On that same S10 screen, **Datos para la factura**
+   starts on **Sin factura**. **Con factura** asks for **NIT o CI** and
+   **Nombre o razón social**. Both can stay empty. This branch does not
+   store them; PAY-007 owns the columns and the «Factura emitida» mark.
+C. **Anular venta.** As Paola, on **Pagos**, filter **Confirmado** and press
+   **Anular venta**. The button stays disabled until **Motivo** has text.
+   After the void the row is **Anulado** and shows the reason. The income
+   report drops that amount from the totals and lists the sale under
+   **Ventas anuladas** with the same reason. The Subscription no longer
+   covers today, future Bookings are cancelled, and Attendance already
+   taken stays. A second void is refused.
+D. **Courtesy.** On the Client detail (AW22), with an active Plan,
+   **Agregar clase de cortesía** and **Devolver una clase** record one
+   class. Camila, a Trainer, and a Nutritionist get `403` on that endpoint
+   and on the void. The Coordinator Role is not on this branch; the denial
+   covers a cast principal the use case rejects.
+
+The migrations `20261023190000_void_payment_values` and
+`20261023190100_void_payment` need owner approval before they run on a
+shared database.
+
+## Test 80: nutritionist rules (NUT-003)
+
+A Plan of 90 days or longer includes one Evaluation, used inside its
+dates. Every other active Plan pays the Studio Settings price, Bs 70 in
+the fixtures. A Client with no active Plan cannot book. A paid Evaluation
+is its own Payment, with no Subscription
+([decisions §6](./decisiones-emma-pilates.md),
+[booking ADR-0011](../booking/docs/adr/0011-paid-evaluations.md)).
+Paola is the Administrator, Gabriela the Nutritionist, Lucía holds
+Paquete de 8 clases.
+
+A. **Included once.** Give a Client a 90-day Plan and book an Evaluation.
+   The confirmation says it is free and it does not consume a class. A
+   second Evaluation in the same Plan is offered at Bs 70. An early
+   cancellation frees the included one. A cancellation inside 3 hours, or
+   a no-show recorded by Gabriela or Paola after the start, counts it as
+   used and refunds nothing.
+B. **QR.** As Lucía, the slot shows Bs 70 and confirming starts a
+   transfer. The slot stays held for 24 hours. Paola approves it on the
+   existing payment review; the Evaluation is then held and no Subscription
+   is created. If the transfer is still pending after 24 hours, the worker
+   releases the slot and rejects the Payment. Cash at the front desk is
+   not on this branch.
+C. **Cost and income.** Three held Evaluations in a month record Bs 150
+   owed to the Nutritionist. On **Reporte** (AW16), under the method line,
+   Plan income and Evaluation income are separate. Mis evaluaciones labels
+   a past row «Incluida», «Pagada», «No asistió», or «Cancelada».
+
+The migrations `20261023210000_evaluation_payments` and
+`20261023210100_evaluation_payment_constraints` need owner approval before
+they run on a shared database. Follow-ups 199 and 200 stay pending.
+
+## Test 81: the month result and the break-even (BKO-005)
+
+**Reporte** (AW16) now has two tabs. **Reporte** is the income and expense
+report of Test 30. **Finanzas** is one Bolivia month: cash income, the tax
+from the studio rules, the fixed-cost budget against what was spent, the
+Nutritionist's cost, the result, and the break-even
+([decisions §11](./decisiones-emma-pilates.md)). Paola is the Administrator.
+Camila, the Assistant, gets `403` on both endpoints. Log in as Test 24
+describes.
+
+1. **Tabs.** **Reporte** opens on the **Reporte** tab, with Desde, Hasta,
+   and Sucursal as before. **Finanzas** replaces those controls with a month
+   stepper that cannot go past the current month. The address keeps the tab
+   (`?vista=finanzas&month=2026-10`). The top bar still says "El reporte usa
+   su propio filtro de sucursal" on a wide window and leaves that line out
+   at a phone width.
+2. **Empty budget.** With no budget loaded, the four figures read Bs 0,00
+   and the page says "Aún no hay presupuesto." with one button, **Cargar
+   presupuesto de apertura**. Press it once. The ten opening lines appear
+   (Alquiler Bs 8.500,00 through Insumos Bs 400,00), **Imprevistos (10 %)**
+   reads Bs 1.925,00 with "—" under Gastado, and **Total** reads
+   Bs 21.175,00. Pressing it again does not add lines.
+3. **The month.** **Ingresos en caja** is the confirmed Payments of that
+   month. **Impuesto** is 16 % of them ("16 % de los ingresos en caja").
+   **Resultado** is cash income less the tax, the spent lines, and the
+   Nutritionist's cost, with a minus sign when it is a loss. **Punto de
+   equilibrio** is the cash income that covers the budget and that cost
+   after tax. With no Nutritionist cost it reads Bs 25.208,33. The line
+   under the figures names the cost ("Costo de la nutricionista Bs 0,00").
+   Money is written `Bs 1.925,00`, never in centavos.
+4. **One expense.** Record a Gasto whose category is named exactly like a
+   budget line (Alquiler) in the month on screen. Gastado on that row grows
+   by the amount, and Resultado falls by it. A category with another name
+   does not move a budget row.
+5. **Narrow browser.** At 420 px the figures stack and the budget table
+   becomes labelled cards (Línea, Presupuesto, Gastado). The sidebar opens
+   from **Abrir menú**.
+
+The migration `20261023230000_cost_budget_lines` needs owner approval before
+it runs on a shared database. The accrued-revenue view (decisions §11) is
+not on this page.
+
+## Test 82: simulate a month (STU-004)
+
+**Simulador** (AW37) is a calculator. It sits in the sidebar after
+**Reporte**, and only the Administrator sees it. Nothing is saved: changing
+a number recalculates in the browser, and leaving the page forgets the
+change. Paola is the Administrator. Log in as Test 24 describes. The
+Coordinator role is not wired yet (IDN-009), so this test does not sign in
+as one.
+
+1. **The opening month.** The five fields read 33, 4, 65, 21175, and 16.
+   **Resultado** reads Bs 761,20, with the line "143 clases · ingreso
+   Bs 37.180,00". **Punto de equilibrio** reads Bs 36.273,81. Under the
+   figures the derivation reads `(21175 + 9295) / 0.84 = 36273.81`. Open the
+   Branch selector: it says "Esta página no se filtra por sucursal — el
+   simulador no lee una sede."
+2. **A change.** Set **Impuestos (%)** to 20. **Punto de equilibrio** rises
+   to Bs 38.087,50 and the derivation becomes
+   `(21175 + 9295) / 0.8 = 38087.50`. **Resultado** becomes a loss,
+   −Bs 726,00. Set **Clases por semana** to 20 and both figures move again.
+   Reload the page: the five fields are back to the opening values.
+3. **Nothing is saved.** The browser's network panel shows no request while
+   you edit. There is no save button.
+4. **Narrow browser.** At 420 px the fields and the two figures stack. The
+   sidebar opens from **Abrir menú** and lists **Simulador**.
+
+The package's own check uses variable costs of Bs 9.290 and derives
+`(21175 + 9290) / 0.84 = 36267.86`. The page's 143 classes at Bs 65 come to
+Bs 9.295, so its derivation differs by those Bs 5. The break-even in
+students per class, occupancy, and clients is not on this page. Pull
+request: https://github.com/DaleneyRuben/emma-pilates/pull/192.

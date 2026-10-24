@@ -11,4 +11,9 @@ export interface ClientSubscriptionDto {
   status: ClientSubscriptionDtoStatus;
   /** @nullable */
   subscription?: ClientSubscriptionSummaryDto | null;
+  /**
+   * The one future Subscription from an Early Renewal. Absent when there is none.
+   * @nullable
+   */
+  nextSubscription?: ClientSubscriptionSummaryDto | null;
 }

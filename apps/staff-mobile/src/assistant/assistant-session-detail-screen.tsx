@@ -32,6 +32,7 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { CenteredCard } from "./assistant-layout";
 import { CapacitySummary } from "./capacity-summary";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
+import { formatCivilDate } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import { useClientBookedSessionIds } from "./client-booked-sessions";
 import { useShowClientBookings } from "./show-client-bookings";
@@ -125,6 +126,12 @@ export function AssistantSessionDetailScreen({
     ]);
 
   const describe = (error: unknown): string => {
+    if (error instanceof AssistantApiError && error.code === "booking_before_start_date") {
+      const date = error.detail === null ? null : /: (\d{4}-\d{2}-\d{2})$/.exec(error.detail)?.[1];
+      if (date !== undefined && date !== null) {
+        return `Podrás reservar a partir del ${formatCivilDate(date)}.`;
+      }
+    }
     const code = error instanceof AssistantApiError ? error.code : null;
     return (code !== null ? bookingProblems[code] : undefined) ?? fallback;
   };

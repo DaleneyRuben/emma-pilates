@@ -16,6 +16,8 @@ import {
 } from "@pilates/api-contracts";
 import { randomUUID } from "expo-crypto";
 
+import { photographTransferReceipt } from "./front-desk-receipt-upload";
+
 // Failures keep the stable Problem Details code so screens can word them.
 export class AssistantApiError extends Error {
   constructor(
@@ -23,6 +25,7 @@ export class AssistantApiError extends Error {
     readonly code: string | null,
     /** The server wait of a limited email (Retry-After), 0 when none. */
     readonly retryAfterSeconds = 0,
+    readonly detail: string | null = null,
   ) {
     super(`The Assistant request failed with ${status}`);
   }
@@ -43,7 +46,16 @@ export type AssistantApi = {
     clientId: string,
     planId: string,
     branchId: string,
+    startsOn?: string,
   ) => Promise<AssistantCashPaymentDto>;
+  photographTransferReceipt: () => Promise<{ imageAssetId: string } | null>;
+  recordFrontDeskTransfer: (
+    clientId: string,
+    planId: string,
+    branchId: string,
+    imageAssetId: string,
+    startsOn?: string,
+  ) => Promise<{ id: string; state: string }>;
   rescheduleBooking: (bookingId: string, targetSessionId: string) => Promise<{ id: string }>;
   resendInvitation: (clientId: string) => Promise<ClientInvitationDto>;
   sendVerification: (clientId: string) => Promise<void>;
@@ -53,10 +65,10 @@ export type AssistantApi = {
 const jsonHeaders = { "Content-Type": "application/json" };
 const idempotent = () => ({ ...jsonHeaders, "idempotency-key": randomUUID() });
 
-function problemCode(body: unknown): string | null {
+function problemField(body: unknown, field: "code" | "detail"): string | null {
   if (typeof body !== "object" || body === null) return null;
-  const code = (body as { code?: unknown }).code;
-  return typeof code === "string" ? code : null;
+  const value = (body as { code?: unknown; detail?: unknown })[field];
+  return typeof value === "string" ? value : null;
 }
 
 function retryAfter(headers: Headers | undefined): number {
@@ -69,8 +81,9 @@ function requireSuccess(response: { status: number; data: unknown; headers?: Hea
   if (response.status < 200 || response.status >= 300) {
     throw new AssistantApiError(
       response.status,
-      problemCode(response.data),
+      problemField(response.data, "code"),
       retryAfter(response.headers),
+      problemField(response.data, "detail"),
     );
   }
   return response.data;
@@ -109,10 +122,30 @@ export function createAssistantApi(fetcher: typeof globalThis.fetch): AssistantA
     async leaveWaitlist(waitlistEntryId) {
       requireSuccess(await leaveWaitlist(waitlistEntryId, undefined, fetcher));
     },
-    async recordCashPayment(clientId, planId, branchId) {
+    photographTransferReceipt() {
+      return photographTransferReceipt(fetcher);
+    },
+    async recordFrontDeskTransfer(clientId, planId, branchId, imageAssetId, startsOn) {
+      const response = await fetcher(`/api/v1/assistant/clients/${clientId}/transfer-payments`, {
+        method: "POST",
+        headers: idempotent(),
+        body: JSON.stringify({
+          planId,
+          branchId,
+          imageAssetId,
+          ...(startsOn === undefined ? {} : { startsOn }),
+        }),
+      });
+      return requireSuccess({
+        status: response.status,
+        data: await response.json().catch(() => null),
+        headers: response.headers,
+      }) as { id: string; state: string };
+    },
+    async recordCashPayment(clientId, planId, branchId, startsOn) {
       const response = await recordAssistantCashPayment(
         clientId,
-        { planId, branchId },
+        { planId, branchId, ...(startsOn === undefined ? {} : { startsOn }) },
         { headers: idempotent() },
         fetcher,
       );

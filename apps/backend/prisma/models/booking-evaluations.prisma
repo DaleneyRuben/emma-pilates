@@ -8,6 +8,7 @@ enum EvaluationSlotState {
 enum EvaluationState {
   BOOKED    @map("booked")
   CANCELLED @map("cancelled")
+  NO_SHOW   @map("no_show")
 
   @@schema("booking")
 }
@@ -16,6 +17,10 @@ enum EvaluationCancellationCause {
   CLIENT_REQUEST  @map("client_request")
   STAFF_CANCELLED @map("staff_cancelled")
   ACCOUNT_CLOSED  @map("account_closed")
+  // A transfer was not approved within 24 hours (booking ADR-0011).
+  PAYMENT_EXPIRED @map("payment_expired")
+  // The Administrator voided the Evaluation Payment.
+  PAYMENT_VOIDED  @map("payment_voided")
 
   @@schema("booking")
 }
@@ -80,7 +85,11 @@ model Evaluation {
   clientId               String                       @map("client_id") @db.Uuid
   evaluationSlotId       String                       @map("evaluation_slot_id") @db.Uuid
   eligibilityMonth       DateTime                     @map("eligibility_month") @db.Date
-  subscriptionId         String                       @map("subscription_id") @db.Uuid
+  subscriptionId         String?                      @map("subscription_id") @db.Uuid
+  // Null while a transfer holds the slot; set when the Evaluation is held.
+  paymentId              String?                      @unique @map("payment_id") @db.Uuid
+  // Written when the Evaluation is held, read by BKO-005.
+  nutritionistCostCentavos Int?                       @map("nutritionist_cost_centavos")
   state                  EvaluationState              @default(BOOKED)
   createdByAccountId     String                       @map("created_by_account_id") @db.Uuid
   cancelledAt            DateTime?                    @map("cancelled_at") @db.Timestamptz(3)
@@ -92,7 +101,8 @@ model Evaluation {
   updatedAt              DateTime                     @updatedAt @map("updated_at") @db.Timestamptz(3)
   client                 Client                       @relation(fields: [clientId], references: [id], onDelete: Restrict)
   slot                   EvaluationSlot               @relation(fields: [evaluationSlotId, eligibilityMonth], references: [id, localMonth], onDelete: Restrict, map: "evaluations_slot_month_fkey")
-  subscription           Subscription                 @relation(fields: [subscriptionId, clientId], references: [id, clientId], onDelete: Restrict, map: "evaluations_subscription_client_fkey")
+  subscription           Subscription?                @relation(fields: [subscriptionId, clientId], references: [id, clientId], onDelete: Restrict, map: "evaluations_subscription_client_fkey")
+  payment                Payment?                     @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   createdByAccount       Account                      @relation("EvaluationCreatedBy", fields: [createdByAccountId], references: [id], onDelete: Restrict)
   cancelledByAccount     Account?                     @relation("EvaluationCancelledBy", fields: [cancelledByAccountId], references: [id], onDelete: Restrict)
 

@@ -3,15 +3,26 @@ import { z } from 'zod';
 
 const uuid = z.uuid();
 
+const civilDate = z.iso.date();
+
 export class CreatePurchaseIntentDto {
   @ApiProperty({ format: 'uuid' })
   planId!: string;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
+  })
+  startsOn?: string;
 }
 
 export const parseCreatePurchaseIntent = (
   value: unknown,
 ): CreatePurchaseIntentDto | null => {
-  const result = z.strictObject({ planId: uuid }).safeParse(value);
+  const result = z
+    .strictObject({ planId: uuid, startsOn: civilDate.optional() })
+    .safeParse(value);
   return result.success ? result.data : null;
 };
 
@@ -35,7 +46,14 @@ export class PurchaseIntentDto {
   @ApiProperty()
   planName!: string;
 
-  @ApiProperty({ enum: [1, 3, 6, 12] })
+  @ApiProperty({ enum: [30, 60, 90] })
+  durationDays!: number;
+
+  @ApiProperty({
+    enum: [1, 2, 3],
+    deprecated: true,
+    description: 'durationDays / 30, for builds that still read months',
+  })
   durationMonths!: number;
 
   @ApiProperty({ minimum: 1 })
@@ -64,17 +82,23 @@ export class PurchaseIntentDto {
 
   @ApiProperty({ format: 'date-time' })
   expiresAt!: Date;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description: 'Chosen Start Date. Absent on responses older builds ignore.',
+  })
+  startsOn?: string;
 }
 
 export class PaymentDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
 
-  @ApiProperty({ enum: ['transfer', 'cash', 'credit_only'] })
-  method!: 'transfer' | 'cash' | 'credit_only';
+  @ApiProperty({ enum: ['transfer', 'cash', 'credit_only', 'courtesy'] })
+  method!: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
 
-  @ApiProperty({ enum: ['pending', 'confirmed', 'rejected'] })
-  state!: 'pending' | 'confirmed' | 'rejected';
+  @ApiProperty({ enum: ['pending', 'confirmed', 'rejected', 'voided'] })
+  state!: 'pending' | 'confirmed' | 'rejected' | 'voided';
 
   @ApiProperty({ format: 'uuid' })
   planId!: string;
@@ -82,7 +106,14 @@ export class PaymentDto {
   @ApiProperty()
   planName!: string;
 
-  @ApiProperty({ enum: [1, 3, 6, 12] })
+  @ApiProperty({ enum: [30, 60, 90] })
+  durationDays!: number;
+
+  @ApiProperty({
+    enum: [1, 2, 3],
+    deprecated: true,
+    description: 'durationDays / 30, for builds that still read months',
+  })
   durationMonths!: number;
 
   @ApiProperty({ minimum: 1 })
@@ -96,6 +127,12 @@ export class PaymentDto {
 
   @ApiProperty({ minimum: 0 })
   amountDueCentavos!: number;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description: 'Chosen Start Date. Absent on responses older builds ignore.',
+  })
+  startsOn?: string;
 
   @ApiProperty({ format: 'date-time' })
   submittedAt!: Date;

@@ -3,6 +3,7 @@ import { branchSuppliesHandler } from "./back-office-fixtures";
 import { activeBranchesHandler } from "./booking-handlers";
 import { apiUrl, jsonResponse, problemResponse } from "./msw";
 import { pendingBadgeHandler } from "./payment-fixtures";
+import { studioRulesHandler } from "./studio-settings-fixtures";
 
 export const currentSessionPath =
   "/api/v1/admin-web/authentication-sessions/current";
@@ -31,7 +32,8 @@ export const paolaProfile = {
 // the backend would answer these reads from it). Every shell page also
 // reads the active Branches for the selector, and Horario (the landing page)
 // reads an empty week unless a spec says otherwise; the Pagos badge reads no
-// pending transfers and the Insumos badge a Branch without Supplies.
+// pending transfers and the Insumos badge a Branch without Supplies; the
+// public studio rules (BKM-004) are today's.
 export const signedInHandlers = () => [
   http.get(apiUrl(currentSessionPath), () => jsonResponse(paolaPrincipal)),
   http.get(apiUrl(staffProfilePath), () => jsonResponse(paolaProfile)),
@@ -39,6 +41,7 @@ export const signedInHandlers = () => [
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
   pendingBadgeHandler(),
   branchSuppliesHandler(),
+  studioRulesHandler(),
 ];
 
 export const signedOutHandlers = () => [

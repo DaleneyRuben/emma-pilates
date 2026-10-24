@@ -123,6 +123,7 @@ export const readAdministratorClient = async (
         directory.findActiveSubscription(clientId, onDate),
       findLatestSubscription: (clientId) =>
         directory.findLatestSubscription(clientId),
+      findFutureSubscription: () => Promise.resolve(null),
     }),
     directory.readAvailableCredit(client.id),
     directory.readClosureOutlook(client.id, instant),

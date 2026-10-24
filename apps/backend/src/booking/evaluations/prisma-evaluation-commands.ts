@@ -36,6 +36,12 @@ import {
   evaluationCancelledNotice,
   evaluationReminderNotice,
 } from './evaluation-notifications';
+import { evaluationOffer } from './evaluation-offer';
+import {
+  confirmEvaluationTransfer as confirmEvaluationPayment,
+  releaseExpiredEvaluationHolds as releaseHolds,
+  startEvaluationTransfer,
+} from './evaluation-payment';
 import {
   assertBlockValues,
   cancellableUntil,
@@ -95,6 +101,9 @@ export type EvaluationSlotView = {
   branchName: string;
   nutritionistName: string;
   bookable: boolean;
+  // Additive (ADR-0016): an older build ignores both.
+  included: boolean;
+  priceCentavos: number;
 };
 
 export type EvaluationMonthSummary = {
@@ -111,7 +120,10 @@ export type BookableSlots = {
 export type ClientEvaluationView = {
   id: string;
   slotId: string;
-  state: 'booked' | 'cancelled';
+  included: boolean;
+  priceCentavos: number;
+  paymentId: string | null;
+  state: 'booked' | 'cancelled' | 'no_show';
   startsAt: Date;
   endsAt: Date;
   durationMinutes: number;
@@ -257,6 +269,8 @@ const evaluationSelect = {
   id: true,
   state: true,
   evaluationSlotId: true,
+  paymentId: true,
+  payment: { select: { amountDueCentavos: true, state: true } },
   slot: { select: slotSelect },
 } as const;
 
@@ -837,6 +851,7 @@ export const createPrismaEvaluationCommands = (
   const toSlotView = (
     slot: Prisma.EvaluationSlotGetPayload<{ select: typeof slotSelect }>,
     bookable: boolean,
+    offer: { included: boolean; priceCentavos: number },
   ): EvaluationSlotView => ({
     id: slot.id,
     startsAt: slot.startsAt,
@@ -846,6 +861,8 @@ export const createPrismaEvaluationCommands = (
     branchName: slot.branch.name,
     nutritionistName: slot.nutritionist.name,
     bookable,
+    included: offer.included,
+    priceCentavos: offer.priceCentavos,
   });
 
   const toClientEvaluationView = (
@@ -854,7 +871,18 @@ export const createPrismaEvaluationCommands = (
   ): ClientEvaluationView => ({
     id: row.id,
     slotId: row.evaluationSlotId,
-    state: row.state === EvaluationState.BOOKED ? 'booked' : 'cancelled',
+    included: row.paymentId === null,
+    priceCentavos:
+      row.payment?.state === 'CONFIRMED' || row.payment?.state === 'PENDING'
+        ? row.payment.amountDueCentavos
+        : 0,
+    paymentId: row.paymentId,
+    state:
+      row.state === EvaluationState.BOOKED
+        ? 'booked'
+        : row.state === EvaluationState.NO_SHOW
+          ? 'no_show'
+          : 'cancelled',
     startsAt: row.slot.startsAt,
     endsAt: row.slot.endsAt,
     durationMinutes: evaluationSlotMinutes,
@@ -866,6 +894,63 @@ export const createPrismaEvaluationCommands = (
       row.state === EvaluationState.BOOKED &&
       isEvaluationBookable(row.slot.startsAt, now),
   });
+
+  const studioPrice = async (database: Database) => {
+    const settings = await database.studioSettingsVersion.findFirstOrThrow({
+      orderBy: { version: 'desc' },
+      select: {
+        evaluationPriceCentavos: true,
+        nutritionistFeeCentavos: true,
+        founderDiscountPercent: true,
+      },
+    });
+    return settings;
+  };
+
+  // The Subscription that covers the slot date, and whether it still includes
+  // its one Evaluation (booking ADR-0011). Null when none covers the date.
+  const evaluationQuote = async (
+    database: Database,
+    clientId: string,
+    slotDate: Date,
+  ) => {
+    const subscription = await database.subscription.findFirst({
+      where: {
+        clientId,
+        state: SubscriptionState.ACTIVE,
+        startsOn: { lte: slotDate },
+        endsOn: { gte: slotDate },
+      },
+      orderBy: [{ endsOn: 'desc' }, { id: 'asc' }],
+      select: {
+        id: true,
+        planId: true,
+        planNameSnapshot: true,
+        durationDaysSnapshot: true,
+        weeklyClassCapSnapshot: true,
+        originalClassAllowance: true,
+        startsOn: true,
+        evaluations: {
+          where: {
+            state: { in: [EvaluationState.BOOKED, EvaluationState.NO_SHOW] },
+          },
+          select: { id: true },
+        },
+      },
+    });
+    if (subscription === null) return null;
+    const settings = await studioPrice(database);
+    return {
+      subscription,
+      offer: evaluationOffer({
+        durationDays: subscription.durationDaysSnapshot,
+        includedAlreadyUsed: subscription.evaluations.length > 0,
+        priceCentavos: settings.evaluationPriceCentavos,
+        founderDiscountPercent: settings.founderDiscountPercent,
+      }),
+      feeCentavos: settings.nutritionistFeeCentavos,
+    };
+  };
 
   const usedMonths = (database: Database, clientId: string, months: Date[]) =>
     database.evaluation.findMany({
@@ -913,6 +998,15 @@ export const createPrismaEvaluationCommands = (
     const months = monthsBetween(from, through);
     const used = await usedMonths(prisma, clientId, months);
     const usedKeys = new Set(used.map((row) => row.eligibilityMonth.getTime()));
+    const offerFor = async (slotDate: Date) => {
+      const quote = await evaluationQuote(prisma, clientId, slotDate);
+      return (
+        quote?.offer ?? {
+          included: false,
+          priceCentavos: (await studioPrice(prisma)).evaluationPriceCentavos,
+        }
+      );
+    };
 
     const slots =
       from > through
@@ -925,7 +1019,6 @@ export const createPrismaEvaluationCommands = (
                 lt: boliviaInstant(addCivilDays(through, 1), 0),
                 gt: new Date(now.getTime() + 3 * hourMilliseconds),
               },
-              localMonth: { notIn: used.map((row) => row.eligibilityMonth) },
               evaluations: { none: { state: EvaluationState.BOOKED } },
               branch: { archivedAt: null },
               ...(query.branchId === undefined
@@ -937,11 +1030,17 @@ export const createPrismaEvaluationCommands = (
           });
 
     const days = new Map<number, BookableSlots['days'][number]>();
+    const offers = new Map<
+      number,
+      { included: boolean; priceCentavos: number }
+    >();
     for (const slot of slots) {
       if (!isEvaluationBookable(slot.startsAt, now)) continue;
       const date = boliviaDate(slot.startsAt);
+      const offer = offers.get(date.getTime()) ?? (await offerFor(date));
+      offers.set(date.getTime(), offer);
       const day = days.get(date.getTime()) ?? { date, slots: [] };
-      day.slots.push(toSlotView(slot, true));
+      day.slots.push(toSlotView(slot, true, offer));
       days.set(date.getTime(), day);
     }
 
@@ -983,15 +1082,22 @@ export const createPrismaEvaluationCommands = (
     if (slot === null) {
       throw rule('evaluation_slot_not_found', 'Evaluation slot not found');
     }
-    const monthUsed =
-      (await usedMonths(prisma, clientId, [slot.localMonth])).length > 0;
-
+    const quote = await evaluationQuote(
+      prisma,
+      clientId,
+      boliviaDate(slot.startsAt),
+    );
+    const settings = await studioPrice(prisma);
     return toSlotView(
       slot,
       slot.state === EvaluationSlotState.PUBLISHED &&
         slot._count.evaluations === 0 &&
         isEvaluationBookable(slot.startsAt, now) &&
-        !monthUsed,
+        quote !== null,
+      quote?.offer ?? {
+        included: false,
+        priceCentavos: settings.evaluationPriceCentavos,
+      },
     );
   };
 
@@ -1106,13 +1212,17 @@ export const createPrismaEvaluationCommands = (
               'An active Subscription covering the Evaluation date is required',
             );
           }
-          if (
-            (await usedMonths(transaction, clientId, [slot.localMonth]))
-              .length > 0
-          ) {
+          const quote = await evaluationQuote(transaction, clientId, slotDate);
+          if (quote === null) {
             throw rule(
-              'evaluation_month_used',
-              'The Evaluation for that month is already booked',
+              'no_eligible_subscription',
+              'An active Subscription covering the Evaluation date is required',
+            );
+          }
+          if (!quote.offer.included) {
+            throw rule(
+              'evaluation_payment_required',
+              'This Evaluation is paid',
             );
           }
 
@@ -1123,7 +1233,8 @@ export const createPrismaEvaluationCommands = (
                 clientId,
                 evaluationSlotId: slot.id,
                 eligibilityMonth: slot.localMonth,
-                subscriptionId: subscription.id,
+                subscriptionId: quote.subscription.id,
+                nutritionistCostCentavos: quote.feeCentavos,
                 createdByAccountId: principal.accountId,
                 createdAt: now,
               },
@@ -1131,10 +1242,12 @@ export const createPrismaEvaluationCommands = (
             });
           } catch (error) {
             const cause = databaseCause(error);
-            if (cause.includes('evaluations_one_booked_per_client_month_key')) {
+            if (
+              cause.includes('evaluations_one_included_per_subscription_key')
+            ) {
               throw rule(
-                'evaluation_month_used',
-                'The Evaluation for that month is already booked',
+                'evaluation_included_used',
+                'The included Evaluation of this Plan is already booked',
               );
             }
             if (
@@ -1172,6 +1285,162 @@ export const createPrismaEvaluationCommands = (
         }),
         now,
       );
+    });
+  };
+
+  const bookPaidEvaluation = async (
+    slotId: string,
+    principal: AuthenticatedPrincipal,
+    idempotencyKey: string,
+  ): Promise<ClientEvaluationView> => {
+    const clientId = requireClient(principal);
+    const now = dependencies.now();
+    return transact(async (transaction) => {
+      const { evaluationId } = await withIdempotency(
+        transaction,
+        {
+          accountId: principal.accountId,
+          command: 'book_paid_evaluation',
+          idempotencyKey,
+          request: { slotId },
+        },
+        async () => {
+          await lockClient(transaction, clientId);
+          if (!(await lockSlot(transaction, slotId))) {
+            throw rule(
+              'evaluation_slot_not_found',
+              'Evaluation slot not found',
+            );
+          }
+          const slot = await transaction.evaluationSlot.findUniqueOrThrow({
+            where: { id: slotId },
+            select: {
+              id: true,
+              startsAt: true,
+              localMonth: true,
+              state: true,
+              _count: {
+                select: {
+                  evaluations: { where: { state: EvaluationState.BOOKED } },
+                },
+              },
+            },
+          });
+          if (
+            slot.state !== EvaluationSlotState.PUBLISHED ||
+            slot._count.evaluations > 0 ||
+            !isEvaluationBookable(slot.startsAt, now)
+          ) {
+            throw rule(
+              'evaluation_slot_unavailable',
+              'The Evaluation slot is no longer available',
+            );
+          }
+          const quote = await evaluationQuote(
+            transaction,
+            clientId,
+            boliviaDate(slot.startsAt),
+          );
+          if (quote === null) {
+            throw rule(
+              'no_eligible_subscription',
+              'An active Subscription covering the Evaluation date is required',
+            );
+          }
+          if (quote.offer.included || quote.offer.priceCentavos <= 0) {
+            throw rule(
+              'evaluation_payment_required',
+              'This Evaluation is included',
+            );
+          }
+          const started = await startEvaluationTransfer(transaction, {
+            clientId,
+            slotId: slot.id,
+            eligibilityMonth: slot.localMonth,
+            quote: {
+              priceCentavos: quote.offer.priceCentavos,
+              feeCentavos: quote.feeCentavos,
+              planId: quote.subscription.planId,
+              planName: quote.subscription.planNameSnapshot,
+              durationDays: quote.subscription.durationDaysSnapshot,
+              weeklyClassCap: quote.subscription.weeklyClassCapSnapshot,
+              classAllowance: quote.subscription.originalClassAllowance,
+              startsOn: quote.subscription.startsOn,
+            },
+            principal,
+            now,
+          });
+          return { evaluationId: started.evaluationId };
+        },
+      );
+      return toClientEvaluationView(
+        await transaction.evaluation.findUniqueOrThrow({
+          where: { id: evaluationId },
+          select: evaluationSelect,
+        }),
+        now,
+      );
+    });
+  };
+
+  const confirmEvaluationTransfer = async (
+    paymentId: string,
+    principal: AuthenticatedPrincipal,
+  ): Promise<void> => {
+    const settings = await studioPrice(prisma);
+    await transact((transaction) =>
+      confirmEvaluationPayment(transaction, {
+        paymentId,
+        principal,
+        now: dependencies.now(),
+        feeCentavos: settings.nutritionistFeeCentavos,
+      }),
+    );
+  };
+
+  const releaseExpiredEvaluationHolds = async (): Promise<number> =>
+    transact((transaction) => releaseHolds(transaction, dependencies.now()));
+
+  const recordEvaluationNoShow = async (
+    evaluationId: string,
+    principal: AuthenticatedPrincipal,
+  ): Promise<void> => {
+    const identity = principal.identity;
+    if (
+      identity.kind !== 'staff' ||
+      (identity.role !== 'nutritionist' && identity.role !== 'administrator')
+    ) {
+      throw new BookingAccessDeniedError();
+    }
+    const now = dependencies.now();
+    await transact(async (transaction) => {
+      const evaluation = await transaction.evaluation.findUnique({
+        where: { id: evaluationId },
+        select: {
+          id: true,
+          state: true,
+          slot: {
+            select: { startsAt: true, nutritionistStaffMemberId: true },
+          },
+        },
+      });
+      if (evaluation === null) {
+        throw rule('evaluation_not_found', 'Evaluation not found');
+      }
+      if (
+        identity.role === 'nutritionist' &&
+        evaluation.slot.nutritionistStaffMemberId !== identity.staffMemberId
+      ) {
+        throw new BookingAccessDeniedError();
+      }
+      if (evaluation.state === EvaluationState.NO_SHOW) return;
+      if (now < evaluation.slot.startsAt) {
+        throw rule('evaluation_started', 'The Evaluation has not started');
+      }
+      await transaction.evaluation.update({
+        where: { id: evaluation.id },
+        data: { state: EvaluationState.NO_SHOW },
+      });
     });
   };
 
@@ -1549,6 +1818,10 @@ export const createPrismaEvaluationCommands = (
     listBookableSlots,
     readEvaluationSlot,
     bookEvaluation,
+    bookPaidEvaluation,
+    confirmEvaluationTransfer,
+    releaseExpiredEvaluationHolds,
+    recordEvaluationNoShow,
     listClientEvaluations,
     cancelClientEvaluation,
     cancelEvaluationAsStaff,

@@ -253,19 +253,39 @@ describe('Prisma catalog administration', () => {
     const plan = await catalog().createPlan(
       {
         name: 'Paquete de 4 clases',
-        durationMonths: 1,
+        durationDays: 30,
+        weeklyClassCap: null,
         classAllowance: 4,
         priceCentavos: 32_000,
         displayOrder: 9,
       },
       admin,
     );
+    expect(plan).toMatchObject({ durationDays: 30, weeklyClassCap: null });
     await expect(
       catalog().updatePlan(
-        { ...plan, planId: plan.id, priceCentavos: 30_000 },
+        {
+          ...plan,
+          planId: plan.id,
+          durationDays: 60,
+          weeklyClassCap: 3,
+          priceCentavos: 30_000,
+        },
         admin,
       ),
-    ).resolves.toMatchObject({ priceCentavos: 30_000 });
+    ).resolves.toMatchObject({
+      durationDays: 60,
+      weeklyClassCap: 3,
+      priceCentavos: 30_000,
+    });
+    await expect(
+      codeOf(
+        catalog().updatePlan(
+          { ...plan, planId: plan.id, durationDays: 30, weeklyClassCap: 3 },
+          admin,
+        ),
+      ),
+    ).resolves.toBe('invalid_catalog_value');
     await expect(
       catalog().setPlanVisibility({ planId: plan.id, visible: false }, admin),
     ).resolves.toMatchObject({ hiddenAt: expect.any(Date) as Date });
@@ -274,7 +294,8 @@ describe('Prisma catalog administration', () => {
         catalog().createPlan(
           {
             name: 'Raro',
-            durationMonths: 2,
+            durationDays: 45,
+            weeklyClassCap: null,
             classAllowance: 4,
             priceCentavos: 1,
             displayOrder: 1,

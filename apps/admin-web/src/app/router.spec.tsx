@@ -32,7 +32,7 @@ describe("admin navigation", () => {
           "Categorías de gasto",
         ],
       },
-      { label: null, items: ["Reporte", "Indicadores"] },
+      { label: null, items: ["Reporte", "Indicadores", "Simulador"] },
       { label: "Promociones", items: ["Promociones", "Referidos", "Créditos"] },
     ]);
     expect(navigationItems.map((item) => item.label)).not.toContain(
@@ -58,9 +58,11 @@ describe("admin navigation", () => {
       "AW15",
       "AW16",
       "AW39",
+      "AW37",
       "AW17",
       "AW26",
       "AW27",
+      "AW36",
     ]);
   });
 
@@ -75,8 +77,10 @@ describe("admin navigation", () => {
       "Nómina",
       "Categorías de gasto",
       "Indicadores",
+      "Simulador",
       "Referidos",
       "Créditos",
+      "Reglas del estudio",
     ]);
   });
 });

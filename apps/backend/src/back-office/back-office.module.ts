@@ -8,6 +8,8 @@ import {
   type BackOfficeOperations,
 } from './back-office.controller';
 import { createPrismaExpenses } from './expenses/prisma-expenses';
+import { createPrismaFinance } from './finance/prisma-finance';
+import { monthFacts } from './finance/month-facts';
 import { createPrismaSalaryPayments } from './payroll/prisma-salary-payments';
 import { createPrismaExpenseReport } from './reports/prisma-expense-report';
 import { createPrismaSupplies } from './supplies/prisma-supplies';
@@ -27,6 +29,9 @@ import { createPrismaSupplies } from './supplies/prisma-supplies';
           salaryPayments: createPrismaSalaryPayments(prisma, { now }),
           expenses: createPrismaExpenses(prisma, { now }),
           report: createPrismaExpenseReport(prisma, { now }),
+          finance: createPrismaFinance(prisma, {
+            ofMonth: (from, until) => monthFacts(prisma, from, until),
+          }),
         };
       },
     },

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { AdminPlanDto, PlanInputDto } from "@pilates/api-contracts";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { isApiError } from "../../api/problem";
 import {
@@ -25,16 +25,21 @@ import {
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Select } from "../../components/ui/select";
-import { durationLabel, planDurations } from "./plan-format";
+import { durationLabel, planDurations, weeklyClassCaps } from "./plan-format";
 import { usePlanChange } from "./plan-queries";
 
 const priceMessage = "Escribe un monto como 1.050,00.";
 
 const planSchema = z.object({
   name: z.string().trim().min(1, "Escribe el nombre.").max(80),
-  durationMonths: z
-    .enum(["1", "3", "6", "12"])
-    .transform((months) => Number(months) as PlanInputDto["durationMonths"]),
+  durationDays: z
+    .enum(["30", "60", "90"])
+    .transform((days) => Number(days) as PlanInputDto["durationDays"]),
+  weeklyClassCap: z
+    .enum(["", "3", "4"])
+    .transform((cap) =>
+      cap === "" ? null : (Number(cap) as PlanInputDto["weeklyClassCap"]),
+    ),
   classAllowance: wholeNumberField(1, 1000, "Entre 1 y 1.000 clases."),
   priceCentavos: bolivianosField({
     invalid: priceMessage,
@@ -75,7 +80,8 @@ const helpers: Partial<Record<keyof PlanInput, string>> = {
   displayOrder: "Los planes se muestran a las clientas de menor a mayor.",
 };
 
-// AW05: name, a 1/3/6/12-month duration, a fixed class count, and the price.
+// AW05: name, a 30/60/90-day validity with an optional Weekly Cap on the
+// 60- and 90-day Plans (follow-up 175), a fixed class count, and the price.
 // Prices are audited and never touch Subscriptions or open purchases
 // (ADM-001 A3); hiding a Plan only removes it from the Client catalog.
 export function PlanPanelForm({
@@ -91,9 +97,12 @@ export function PlanPanelForm({
     resolver: zodResolver(planSchema),
     defaultValues: {
       name: plan?.name ?? "",
-      durationMonths: String(
-        plan?.durationMonths ?? 1,
-      ) as PlanInput["durationMonths"],
+      durationDays: String(
+        plan?.durationDays ?? 30,
+      ) as PlanInput["durationDays"],
+      weeklyClassCap: String(
+        plan?.weeklyClassCap ?? "",
+      ) as PlanInput["weeklyClassCap"],
       classAllowance: plan === undefined ? "" : String(plan.classAllowance),
       priceCentavos:
         plan === undefined ? "" : bolivianosText(plan.priceCentavos),
@@ -122,6 +131,8 @@ export function PlanPanelForm({
   );
 
   const [nameField, ...numberFields] = textFields;
+  const shortPlan =
+    useWatch({ control: form.control, name: "durationDays" }) === "30";
   const renderText = ([
     name,
     label,
@@ -152,19 +163,50 @@ export function PlanPanelForm({
           {renderText(nameField)}
           <FormField
             control={form.control}
-            name="durationMonths"
+            name="durationDays"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Duración</FormLabel>
+                <FormLabel>Vigencia</FormLabel>
                 <FormControl>
-                  <Select {...field}>
-                    {planDurations.map((months) => (
-                      <option key={months} value={String(months)}>
-                        {durationLabel(months)}
+                  <Select
+                    {...field}
+                    onChange={(event) => {
+                      field.onChange(event);
+                      if (event.target.value === "30") {
+                        form.setValue("weeklyClassCap", "");
+                      }
+                    }}
+                  >
+                    {planDurations.map((days) => (
+                      <option key={days} value={String(days)}>
+                        {durationLabel(days)}
                       </option>
                     ))}
                   </Select>
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="weeklyClassCap"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tope semanal</FormLabel>
+                <FormControl>
+                  <Select {...field} disabled={shortPlan}>
+                    <option value="">Sin tope</option>
+                    {weeklyClassCaps.map((cap) => (
+                      <option key={cap} value={String(cap)}>
+                        {`${cap} clases por semana`}
+                      </option>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormDescription>
+                  Solo en planes de 60 y 90 días. Las clases extra no cuentan.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

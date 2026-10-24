@@ -14,7 +14,8 @@ export const recordAdministratorAudit = (
   actor: AdministratorActor,
   record: {
     actionCode: string;
-    targetType: 'branch' | 'class_type' | 'plan' | 'session';
+    targetType:
+      'branch' | 'class_type' | 'plan' | 'session' | 'studio_settings';
     targetId: string;
     branchId?: string;
     metadata: Prisma.InputJsonObject;

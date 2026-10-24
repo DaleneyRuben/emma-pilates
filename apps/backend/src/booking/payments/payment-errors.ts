@@ -16,7 +16,10 @@ export type PaymentRuleCode =
   | 'referral_code_invalid'
   | 'referral_self_reference'
   | 'idempotency_key_reused'
-  | 'payment_confirmation_conflict';
+  | 'payment_confirmation_conflict'
+  | 'courtesy_end_date_invalid'
+  | 'start_date_out_of_window'
+  | 'future_subscription_exists';
 
 const statuses: Record<PaymentRuleCode, number> = {
   subscription_not_expired: 409,
@@ -37,6 +40,9 @@ const statuses: Record<PaymentRuleCode, number> = {
   referral_self_reference: 400,
   idempotency_key_reused: 409,
   payment_confirmation_conflict: 409,
+  courtesy_end_date_invalid: 400,
+  start_date_out_of_window: 400,
+  future_subscription_exists: 409,
 };
 
 export class PaymentRuleError extends Error {

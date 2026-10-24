@@ -132,6 +132,12 @@ export class IncomeByMethodDto {
   @ApiProperty() credit_only!: number;
 }
 
+export class IncomeByKindDto {
+  @ApiProperty({ description: 'Plan Payments, BOB centavos' }) plan!: number;
+  @ApiProperty({ description: 'Evaluation Payments, BOB centavos' })
+  evaluation!: number;
+}
+
 export class IncomeMonthDto {
   @ApiProperty({
     format: 'date',
@@ -139,6 +145,16 @@ export class IncomeMonthDto {
   })
   month!: string;
   @ApiProperty() totalCentavos!: number;
+}
+
+export class VoidedIncomeDto {
+  @ApiProperty({ format: 'uuid' }) paymentId!: string;
+  @ApiProperty({ format: 'uuid' }) clientId!: string;
+  @ApiProperty({ description: 'Why the Administrator voided the sale' })
+  voidReason!: string;
+  @ApiProperty({ description: 'Left out of the totals, BOB centavos' })
+  amountDueCentavos!: number;
+  @ApiProperty({ format: 'date-time' }) voidedAt!: Date;
 }
 
 export class IncomeReportDto {
@@ -149,7 +165,15 @@ export class IncomeReportDto {
   @ApiProperty({ description: 'Confirmed Payments, BOB centavos' })
   totalCentavos!: number;
   @ApiProperty({ type: IncomeByMethodDto }) byMethod!: IncomeByMethodDto;
+  @ApiProperty({ type: IncomeByKindDto }) byKind!: IncomeByKindDto;
   @ApiProperty({ type: IncomeMonthDto, isArray: true })
   months!: IncomeMonthDto[];
   @ApiProperty({ format: 'date-time' }) generatedAt!: Date;
+  @ApiProperty({
+    type: VoidedIncomeDto,
+    isArray: true,
+    description:
+      'Voided sales in the window. Visible with their reason, never in the totals.',
+  })
+  voided!: VoidedIncomeDto[];
 }

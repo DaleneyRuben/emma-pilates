@@ -57,6 +57,7 @@ import {
   SalaryPaymentInputDto,
   WithdrawalPageDto,
 } from './back-office.dto';
+import { AdministratorFinanceController } from './finance/finance.controller';
 import { AdministratorSuppliesController } from './supplies/supplies.controller';
 
 export {
@@ -385,4 +386,5 @@ export const backOfficeControllers = [
   AdministratorExpenseCategoriesController,
   AdministratorExpensesController,
   AdministratorExpenseReportController,
+  AdministratorFinanceController,
 ];

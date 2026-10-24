@@ -17,7 +17,6 @@ import {
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
 import {
@@ -32,6 +31,12 @@ import {
 } from './waitlist-promotion';
 import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendance } from './record-attendance';
+import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
+import {
+  findCoveringSubscription,
+  findNotYetStartedSubscription,
+} from './eligible-subscription';
+import { consumeOneClass } from './consume-allowance';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -505,6 +510,8 @@ export class PrismaBookingCommands {
               );
             },
             now: this.now,
+            cancellationWindowMinutes: () =>
+              readCancellationWindowMinutes(transaction),
           });
         },
         { isolationLevel: 'Serializable' },
@@ -606,6 +613,8 @@ export class PrismaBookingCommands {
               return replacement;
             },
             now: this.now,
+            cancellationWindowMinutes: () =>
+              readCancellationWindowMinutes(transaction),
           });
         },
         { isolationLevel: 'Serializable' },
@@ -748,15 +757,13 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        transaction.subscription.findFirst({
-          where: {
-            clientId,
-            state: 'ACTIVE',
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-          },
-          select: { id: true },
+        findCoveringSubscription(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: false,
         }),
+      findNotYetStartedSubscription: ({ clientId, onDate }) =>
+        findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasLiveBooking: ({ sessionId, clientId }) =>
         transaction.booking
           .findFirst({
@@ -777,6 +784,8 @@ export class PrismaBookingCommands {
           select: { id: true },
         }),
       now: this.now,
+      cancellationWindowMinutes: () =>
+        readCancellationWindowMinutes(transaction),
     });
   }
 
@@ -793,16 +802,13 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        transaction.subscription.findFirst({
-          where: {
-            clientId,
-            state: 'ACTIVE',
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-            remainingClassAllowance: { gt: 0 },
-          },
-          select: { id: true },
+        findCoveringSubscription(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: true,
         }),
+      findNotYetStartedSubscription: ({ clientId, onDate }) =>
+        findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
         transaction.booking
           .findFirst({
@@ -818,16 +824,14 @@ export class PrismaBookingCommands {
           })
           .then((booking) => booking !== null),
       create: async (input) => {
-        const consumed = await transaction.subscription.updateMany({
-          where: {
-            id: input.subscriptionId,
-            clientId: input.clientId,
-            remainingClassAllowance: { gt: 0 },
-          },
-          data: { remainingClassAllowance: { decrement: 1 } },
+        const consumed = await consumeOneClass(transaction, {
+          subscriptionId: input.subscriptionId,
+          clientId: input.clientId,
+          authorAccountId: input.createdByAccountId,
+          now: this.now(),
         });
 
-        if (consumed.count !== 1) {
+        if (!consumed) {
           throw new Error('No eligible Subscription');
         }
 

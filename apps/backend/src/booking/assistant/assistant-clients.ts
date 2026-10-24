@@ -122,6 +122,10 @@ export const readClientOverview = async (
     findLatestSubscription(
       clientId: string,
     ): Promise<ClientSubscriptionSummary | null>;
+    findFutureSubscription(
+      clientId: string,
+      after: Date,
+    ): Promise<ClientSubscriptionSummary | null>;
     findUpcoming(input: {
       clientId: string;
       from: Date;
@@ -230,12 +234,18 @@ export const recordAssistantCashPayment = async (
     clientId: string;
     planId: string;
     branchId: string;
+    startsOn?: string;
     idempotencyKey: string;
   },
   dependencies: {
     principal: AuthenticatedPrincipal;
     recordCashPayment(
-      command: { clientId: string; planId: string; branchId: string },
+      command: {
+        clientId: string;
+        planId: string;
+        branchId: string;
+        startsOn?: string;
+      },
       principal: AuthenticatedPrincipal,
       idempotencyKey: string,
     ): Promise<PaymentView>;
@@ -249,6 +259,7 @@ export const recordAssistantCashPayment = async (
       clientId: command.clientId,
       planId: command.planId,
       branchId: command.branchId,
+      ...(command.startsOn === undefined ? {} : { startsOn: command.startsOn }),
     },
     dependencies.principal,
     command.idempotencyKey,
