@@ -107,6 +107,8 @@ export const planQuotes = {
     {
       id: "plan-8",
       name: "Paquete de 8 clases",
+      durationDays: 30,
+      weeklyClassCap: null,
       durationMonths: 1,
       classAllowance: 8,
       priceCentavos: 56_000,
@@ -116,6 +118,8 @@ export const planQuotes = {
     {
       id: "plan-12",
       name: "Paquete de 12 clases",
+      durationDays: 30,
+      weeklyClassCap: null,
       durationMonths: 1,
       classAllowance: 12,
       priceCentavos: 78_000,

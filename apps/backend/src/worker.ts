@@ -89,8 +89,11 @@ type WorkerDependencies = {
   evaluationReminders: {
     execute(): Promise<{ sent: number }>;
   };
-  emptySessionChecks: {
+  minimumBookingsChecks: {
     execute(): Promise<{ checked: number; cancelled: number }>;
+  };
+  windowCloseSnapshots: {
+    execute(): Promise<{ recorded: number }>;
   };
   startedSessionWaitlists: {
     execute(): Promise<{ closed: number }>;
@@ -207,15 +210,21 @@ export const startWorker = async (
           },
         ],
       },
-      // The one-time empty check and the Session-start Waitlist closure are
-      // each swept every minute (ADR-0058). The check runs first so one the
-      // worker missed settles before its Session's Waitlist closes.
+      // The one-time Minimum Bookings check, the window-close snapshot, and
+      // the Session-start Waitlist closure are each swept every minute
+      // (ADR-0058, booking ADR-0007). The check runs first so one the worker
+      // missed settles before its Session is snapshotted or its Waitlist
+      // closes, and a Session it cancels gets no snapshot.
       {
         intervalMs: sessionStartCheckIntervalMs,
         steps: [
           {
-            job: 'empty_session_check',
-            execute: () => dependencies.emptySessionChecks.execute(),
+            job: 'minimum_bookings_check',
+            execute: () => dependencies.minimumBookingsChecks.execute(),
+          },
+          {
+            job: 'window_close_snapshot',
+            execute: () => dependencies.windowCloseSnapshots.execute(),
           },
           {
             job: 'started_waitlist_closure',

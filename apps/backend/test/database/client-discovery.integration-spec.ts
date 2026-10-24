@@ -122,7 +122,8 @@ describe('Client discovery reads', () => {
     await expect(repository.findVisiblePlan(plan.id)).resolves.toEqual({
       id: plan.id,
       name: 'Paquete de 8 clases',
-      durationMonths: 1,
+      durationDays: 30,
+      weeklyClassCap: null,
       classAllowance: 8,
       priceCentavos: 56_000,
       displayOrder: 0,

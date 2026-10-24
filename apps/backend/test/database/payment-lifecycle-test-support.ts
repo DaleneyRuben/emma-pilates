@@ -45,7 +45,6 @@ export const startPaymentWorld = async () => {
   const commands = (at: Date = now) =>
     createPrismaPaymentCommands(prisma, {
       now: () => at,
-      referralRewardCentavos: 6000,
     });
 
   const staffPrincipal = async (
@@ -132,7 +131,7 @@ export const startPaymentWorld = async () => {
           clientId: referred.clientId,
           planId: plan.id,
           planNameSnapshot: plan.name,
-          durationMonthsSnapshot: plan.durationMonths,
+          durationDaysSnapshot: plan.durationDays,
           classAllowanceSnapshot: plan.classAllowance,
           planPriceCentavos: plan.priceCentavos,
           creditAppliedCentavos: 0,
@@ -153,7 +152,7 @@ export const startPaymentWorld = async () => {
           planId: plan.id,
           paymentId: payment.id,
           planNameSnapshot: plan.name,
-          durationMonthsSnapshot: plan.durationMonths,
+          durationDaysSnapshot: plan.durationDays,
           originalClassAllowance: plan.classAllowance,
           remainingClassAllowance: plan.classAllowance,
           startsOn: today,

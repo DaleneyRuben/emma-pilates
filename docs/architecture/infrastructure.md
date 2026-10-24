@@ -433,7 +433,13 @@ Values never go in the repository or a chat. «Mac» means the user's own
   included (the development tooling runs in CI with the repository's
   secrets); an advisory whose fix is not published yet is ignored in
   `pnpm-workspace.yaml` (`auditConfig.ignoreGhsas`, one comment each) and
-  reviewed when the next run or Dependabot names it. `secrets` runs gitleaks
+  reviewed when the next run or Dependabot names it. The ignored advisories
+  today are `GHSA-vfj7-8cjw-p6xm` (braces), `GHSA-86w9-cpqp-85rv`
+  (node-forge), and `GHSA-2883-xcg3-v3hh` (js-yaml). `GHSA-q7qp-rjg7-q26m`
+  (multer) and `GHSA-27r3-jxmh-p828` (body-parser) are pinned in
+  `pnpm-workspace.yaml` (`multer` 2.5.0, `body-parser` 2.4.0) because
+  `@nestjs/platform-express` and Express 5.2.1 still resolve the vulnerable
+  ranges. `secrets` runs gitleaks
   over the pull request's commits (or the pushed ones) with the allowlists in
   `.gitleaks.toml` (the Firebase client keys in `google-services.json`, the
   CI and test database URLs, S3Mock's fixed credentials, generated design

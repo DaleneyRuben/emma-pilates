@@ -1,20 +1,14 @@
-export type SubscriptionDurationMonths = 1 | 3 | 6 | 12;
-
 export type SubscriptionTerm = { startsOn: Date; endsOn: Date };
 
-// Dates are Bolivia civil dates encoded at UTC midnight. The paid-through day
-// is the same day of month after the snapshotted months, clamped to the last
-// day when that month is shorter (January 31 + 1 month = February 28).
+const dayMilliseconds = 24 * 60 * 60 * 1000;
+
+// Dates are Bolivia civil dates encoded at UTC midnight. The Start Date is
+// the first of the snapshotted days, so the end is the start plus the days
+// minus one (booking ADR-0005).
 export const computeSubscriptionTerm = (
   startsOn: Date,
-  durationMonths: SubscriptionDurationMonths,
-): SubscriptionTerm => {
-  const year = startsOn.getUTCFullYear();
-  const monthIndex = startsOn.getUTCMonth() + durationMonths;
-  const lastDayOfTargetMonth = new Date(
-    Date.UTC(year, monthIndex + 1, 0),
-  ).getUTCDate();
-  const day = Math.min(startsOn.getUTCDate(), lastDayOfTargetMonth);
-
-  return { startsOn, endsOn: new Date(Date.UTC(year, monthIndex, day)) };
-};
+  durationDays: number,
+): SubscriptionTerm => ({
+  startsOn,
+  endsOn: new Date(startsOn.getTime() + (durationDays - 1) * dayMilliseconds),
+});

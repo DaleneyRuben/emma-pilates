@@ -24,7 +24,9 @@ describe("admin navigation", () => {
         items: [
           "Clientes",
           "Pagos",
+          "Caja",
           "Insumos",
+          "Equipos",
           "Evaluaciones nutricionales",
           "Personal",
           "Nómina",
@@ -33,7 +35,8 @@ describe("admin navigation", () => {
         ],
       },
       { label: null, items: ["Reporte"] },
-      { label: "Promociones", items: ["Promociones", "Referidos", "Créditos"] },
+      { label: "Promociones", items: ["Promociones", "Referidos"] },
+      { label: null, items: ["Comentarios"] },
     ]);
     expect(navigationItems.map((item) => item.label)).not.toContain(
       "Descuentos",
@@ -50,7 +53,9 @@ describe("admin navigation", () => {
       "AW19",
       "AW21",
       "AW28",
+      "AW151",
       "AW08",
+      "AW37",
       "AW25",
       "AW23",
       "AW11",
@@ -59,7 +64,8 @@ describe("admin navigation", () => {
       "AW16",
       "AW17",
       "AW26",
-      "AW27",
+      "AW38",
+      "AW36",
     ]);
   });
 
@@ -74,8 +80,13 @@ describe("admin navigation", () => {
       "Nómina",
       "Categorías de gasto",
       "Referidos",
-      "Créditos",
+      "Comentarios",
+      "Reglas del estudio",
     ]);
+  });
+
+  it("no longer lists the retired Créditos page (PAY-005)", () => {
+    expect(navigationItems.map((item) => item.label)).not.toContain("Créditos");
   });
 });
 

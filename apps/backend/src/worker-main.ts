@@ -104,7 +104,6 @@ async function bootstrap(): Promise<void> {
     purchaseIntentExpiry: createPurchaseIntentExpiryJob(
       prisma,
       now,
-      environment.REFERRAL_REWARD_CENTAVOS,
       recordNotification,
     ),
     sessionSchedules: {
@@ -114,8 +113,11 @@ async function bootstrap(): Promise<void> {
     evaluationReminders: {
       execute: () => evaluations.sendDueEvaluationReminders(),
     },
-    emptySessionChecks: {
-      execute: () => sessionStartChecks.checkEmptySessions(),
+    minimumBookingsChecks: {
+      execute: () => sessionStartChecks.checkMinimumBookings(),
+    },
+    windowCloseSnapshots: {
+      execute: () => sessionStartChecks.recordWindowCloseBookings(),
     },
     startedSessionWaitlists: {
       execute: () => sessionStartChecks.closeStartedWaitlists(),
