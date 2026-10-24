@@ -5,8 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type ListAdminCreditsParams = {
-  pageSize?: number;
-  page?: number;
-  query?: unknown;
+export type ListAdminCashClosesParams = {
+  month: unknown;
+  branchId: unknown;
 };

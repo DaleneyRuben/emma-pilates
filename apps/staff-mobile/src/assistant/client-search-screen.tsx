@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { HeaderAction } from "../ui/header-action";
 import { RootHeader } from "../ui/root-header";
 import { describeContact } from "./assistant-format";
 import { useAssistantWorkspace } from "./assistant-workspace";
@@ -29,7 +30,7 @@ import { ClientDetailPanel } from "./client-panel";
 
 export type ClientSearchNavigation = {
   navigate: {
-    (screen: "NewClient"): void;
+    (screen: "NewClient" | "CashClose"): void;
     (screen: "ClientOverview", params: { clientId: string }): void;
   };
 };
@@ -87,7 +88,17 @@ export function ClientSearchScreen() {
 
   const search = (
     <>
-      <RootHeader label="Buscar cliente" title="Buscar cliente" />
+      <RootHeader
+        action={
+          <HeaderAction
+            label="Cerrar caja"
+            onPress={() => navigation.navigate("CashClose")}
+            testID="cash-close-entry"
+          />
+        }
+        label="Buscar cliente"
+        title="Buscar cliente"
+      />
       <TextInput
         accessibilityLabel={placeholder}
         autoCapitalize="none"

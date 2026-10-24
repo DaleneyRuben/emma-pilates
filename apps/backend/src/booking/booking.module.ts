@@ -499,15 +499,13 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     },
     {
       provide: paymentCommands,
-      inject: [PRISMA_CLIENT, ConfigService, NOTIFICATION_RECORDER],
+      inject: [PRISMA_CLIENT, NOTIFICATION_RECORDER],
       useFactory: (
         prisma: PrismaClient,
-        config: ConfigService<Environment, true>,
         recordNotification: NotificationRecorder,
       ) =>
         createPrismaPaymentCommands(prisma, {
           now: () => new Date(),
-          referralRewardCentavos: config.getOrThrow('REFERRAL_REWARD_CENTAVOS'),
           recordNotification,
         }),
     },

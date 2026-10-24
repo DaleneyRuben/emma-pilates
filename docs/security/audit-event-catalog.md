@@ -58,7 +58,6 @@ beyond what the table below names.
 | `payment.transfer_confirmed` | Booking & Membership | An Administrator confirms a transfer Payment | Administrator | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `payment.transfer_rejected` | Booking & Membership | An Administrator rejects a transfer Payment | Administrator | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `payment.cash_confirmed` | Booking & Membership | An Assistant or Administrator records a cash Payment | Staff Account and Role | `payment` | Collection Branch | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
-| `payment.credit_only_confirmed` | Booking & Membership | A Client completes a purchase entirely with Credit | Client Account | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `session.cancelled` | Booking & Membership | An Administrator cancels a Session with Bookings (last resort) | Administrator | `session` | Session Branch | `cause`, `cancelledBookings`, `closedWaitlistEntries` |
 | `session.created` | Booking & Membership | An Administrator creates a one-off Session («Una sola vez», follow-up 39 §1) outside any Session Schedule | Administrator | `session` | Session Branch | `classTypeId`, `trainerStaffMemberId`, `startsAt`, `durationMinutes`, `capacity` |
 | `session.updated` | Booking & Membership | An Administrator edits one Session (Trainer swap, new start, or capacity) | Administrator | `session` | Session Branch | previous and new `trainerStaffMemberId`, `startsAt`, `capacity` (only those changed) |
@@ -76,6 +75,7 @@ beyond what the table below names.
 | `salary_payment.updated` | Back Office | An Administrator corrects a Salary Payment | Administrator | `salary_payment` | — | previous and new `staffMemberId`, `amountCentavos`, `paidOn` (only those changed) |
 | `expense.recorded` | Back Office | An Administrator records a Branch Expense | Administrator | `expense` | Expense Branch | `amountCentavos`, `incurredOn`, `expenseCategoryId` |
 | `expense.updated` | Back Office | An Administrator corrects an Expense (the Branch never changes) | Administrator | `expense` | Expense Branch | previous and new `expenseCategoryId`, `amountCentavos`, `incurredOn` (only those changed) |
+| `cash_close.recorded` | Back Office | An Assistant (at her Branch) or an Administrator makes the day's Cash Close; it is never edited afterwards (BKO-003) | Staff Account and Role (the Administrator, with the Impersonation, while she sees the app as an Assistant) | `cash_close` | Cash Close Branch | `businessDate`, `expectedCentavos`, `countedCentavos`, `differenceCentavos` |
 
 Back Office money records follow BKO-001 D17: Salary Payments and Expenses are audited; Supplies, Withdrawals, Restocks, and Expense Categories are not (below).
 
@@ -87,6 +87,10 @@ names the acted-as Staff Member. Rows that are not audited (a Booking's
 keep the Staff Member's Account, as the screen showed it, and are attributed
 to the Administrator through the Impersonation's `started_at`–`ended_at`
 window.
+
+## Retired codes
+
+- `payment.credit_only_confirmed` was written when a Client paid a whole Plan with Credit. PAY-005 retired Credit (booking ADR-0009), so nothing writes it any more; the records written before stay.
 
 ## Considered and not audited
 

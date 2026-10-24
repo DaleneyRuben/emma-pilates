@@ -5,10 +5,9 @@ import {
   type EvaluationTestWorld,
 } from './evaluation-test-support';
 
-// WEB-008 (AW26, AW27): the counts and the last Credit movement the two
-// read-only lists show. The fixtures give Sofía an awarded and a pending
-// Referral and the Bs 60 of Credit the awarded one earned.
-describe('Prisma administration Referral and Credit lists for AW26 and AW27', () => {
+// WEB-008 (AW26): the counts the read-only Referral list shows. AW27's
+// Credit list went with Credit (PAY-005).
+describe('Prisma administration Referral list for AW26', () => {
   let world: EvaluationTestWorld;
   const oversight = () =>
     createPrismaOversight(world.prisma, { now: () => fixtureNow });
@@ -22,7 +21,7 @@ describe('Prisma administration Referral and Credit lists for AW26 and AW27', ()
     await world?.stop();
   });
 
-  it("counts the studio's awarded and pending Referrals and each referrer's total", async () => {
+  it("counts the studio's Referrals, none awarded since PAY-005, and each referrer's total", async () => {
     const all = await oversight().listReferrals(
       { page: 1, pageSize: 20 },
       await administrator(),
@@ -30,8 +29,8 @@ describe('Prisma administration Referral and Credit lists for AW26 and AW27', ()
 
     expect(all).toMatchObject({
       totalItems: 2,
-      awardedCount: 1,
-      pendingCount: 1,
+      awardedCount: 0,
+      pendingCount: 2,
     });
     expect(all.items.map((item) => item.referrerReferralCount)).toEqual([2, 2]);
   });
@@ -50,8 +49,8 @@ describe('Prisma administration Referral and Credit lists for AW26 and AW27', ()
 
     expect(narrowed).toMatchObject({
       totalItems: 1,
-      awardedCount: 1,
-      pendingCount: 1,
+      awardedCount: 0,
+      pendingCount: 2,
       items: [
         expect.objectContaining({
           referredName: first.referredName,
@@ -59,19 +58,5 @@ describe('Prisma administration Referral and Credit lists for AW26 and AW27', ()
         }),
       ],
     });
-  });
-
-  it('says whether the last Credit movement earned, reserved, spent, or returned it', async () => {
-    const credits = await oversight().listCredits(
-      { page: 1, pageSize: 20 },
-      await administrator(),
-    );
-
-    expect(credits.items).toEqual([
-      expect.objectContaining({
-        clientName: 'Sofía Guzmán',
-        lastMovementKind: 'earned',
-      }),
-    ]);
   });
 });

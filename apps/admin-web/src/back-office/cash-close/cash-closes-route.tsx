@@ -1,12 +1,12 @@
 import { getRouteApi } from "@tanstack/react-router";
-import { CreditsPage } from "./credits-page";
+import { CashClosesPage } from "./cash-closes-page";
 
-const route = getRouteApi("/authenticated/promociones/creditos");
+const route = getRouteApi("/authenticated/back-office/caja");
 
-export function CreditsRoute() {
+export function CashClosesRoute() {
   const navigate = route.useNavigate();
   return (
-    <CreditsPage
+    <CashClosesPage
       search={route.useSearch()}
       onSearchChange={(change) =>
         void navigate({ search: (previous) => ({ ...previous, ...change }) })

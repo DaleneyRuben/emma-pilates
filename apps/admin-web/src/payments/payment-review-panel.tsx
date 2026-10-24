@@ -11,28 +11,14 @@ import { paymentReviewQueryOptions } from "./payment-queries";
 import { PaymentStatePill } from "./payment-state-pill";
 import { ReceiptViewer } from "./receipt-viewer";
 
-// The amount asked is the Plan price less the Credit applied (booking
-// CONTEXT, Payment), so a reduced transfer is not mistaken for a short one.
+// The amount asked is what the Client transferred. Credit is retired
+// (PAY-005), so no Credit line is shown, even on an older Payment.
 function PaymentSummary({ review }: { review: PaymentReviewDto }) {
   return (
     <SummaryBlock title="Resumen">
       <SummaryRow label="Monto a verificar" figure>
         {formatBolivianos(review.amountDueCentavos)}
       </SummaryRow>
-      {review.creditAppliedCentavos > 0 ? (
-        <>
-          <SummaryRow label="Precio del plan">
-            <span className="tabular">
-              {formatBolivianos(review.planPriceCentavos)}
-            </span>
-          </SummaryRow>
-          <SummaryRow label="Crédito aplicado">
-            <span className="tabular">
-              −{formatBolivianos(review.creditAppliedCentavos)}
-            </span>
-          </SummaryRow>
-        </>
-      ) : null}
       <SummaryRow label="Fecha">
         <span className="tabular">{formatCivilMoment(review.submittedAt)}</span>
       </SummaryRow>

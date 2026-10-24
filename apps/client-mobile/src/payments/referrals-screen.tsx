@@ -1,19 +1,13 @@
 import {
-  getGetCurrentClientCreditQueryKey,
   getGetCurrentClientReferralsQueryKey,
-  type ReferredClientDto,
-  useGetCurrentClientCredit,
   useGetCurrentClientReferrals,
 } from "@pilates/api-contracts";
 import {
   BodyText,
-  Chevron,
   colors,
-  initials,
   LoadingState,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
   spacing,
@@ -23,63 +17,28 @@ import {
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Share, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { formatBolivianos } from "../plans/plan-format";
-import { formatReferralDate } from "./referral-format";
-
-type ReferralsNavigation = {
-  goBack: () => void;
-  navigate: (screen: "Credit") => void;
-};
-
-// The design system defines tints as the semantic color at low alpha.
-const successTint = "rgba(124, 148, 115, 0.16)";
-const warningTint = "rgba(201, 154, 78, 0.16)";
 
 const shareMessage = (code: string): string =>
   `Únete a Emma Pilates Studio con mi código ${code}: regístrate en la app y úsalo al crear tu cuenta.`;
 
-function ReferredRow({ entry }: { entry: ReferredClientDto }) {
-  const awarded = entry.state === "awarded";
-  const detail =
-    awarded && entry.awardedAt
-      ? `Primer pago el ${formatReferralDate(entry.awardedAt)}`
-      : `Se registró el ${formatReferralDate(entry.createdAt)}`;
-
-  return (
-    <View style={styles.row}>
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{initials(entry.referredName)}</Text>
-      </View>
-      <View style={styles.rowBody}>
-        <Text style={styles.name}>{entry.referredName}</Text>
-        <BodyText style={styles.detail}>{detail}</BodyText>
-      </View>
-      <View style={[styles.badge, awarded ? styles.awarded : styles.pending]}>
-        <Text style={[styles.badgeText, awarded ? styles.awardedText : styles.pendingText]}>
-          {awarded ? "Crédito ganado" : "Esperando su primer pago"}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
+// 16 after PAY-005 (follow-up 136): the Client's referral code and a promise.
+// Credit is retired; «Invita a una amiga» (BKM-014) brings the guest pass.
 export function ReferralsScreen() {
-  const navigation = useNavigation<ReferralsNavigation>();
+  const navigation = useNavigation<{ goBack: () => void }>();
   const fetcher = useClientFetcher();
-  const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
-  const referrals = useGetCurrentClientReferrals(queryOptions);
-  const credit = useGetCurrentClientCredit(queryOptions);
-  const queryKeys = [getGetCurrentClientReferralsQueryKey(), getGetCurrentClientCreditQueryKey()];
+  const referrals = useGetCurrentClientReferrals({
+    fetcher,
+    query: { refetchOnMount: "always" },
+  });
+  const queryKeys = [getGetCurrentClientReferralsQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
 
   const header = (
-    <>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mis referidos" />
-    </>
+    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mis referidos" />
   );
 
   if (referrals.isPending) {
@@ -95,16 +54,14 @@ export function ReferralsScreen() {
       <Screen style={styles.screen}>
         {header}
         <QueryFailure
-          label="No pudimos cargar tus referidos."
+          label="No pudimos cargar tu código."
           onRetry={() => void referrals.refetch()}
         />
       </Screen>
     );
   }
 
-  const { referralCode, referrals: referred } = referrals.data.data;
-  const available = credit.data?.status === 200 ? credit.data.data.availableCentavos : 0;
-  const creditValue = formatBolivianos(available);
+  const { referralCode } = referrals.data.data;
 
   return (
     <Screen style={styles.screen}>
@@ -119,61 +76,14 @@ export function ReferralsScreen() {
           />
         </View>
         <BodyText style={styles.explanation}>
-          Comparte tu código. Cuando un amigo se registre y haga su primer pago, ganas crédito.
+          Pronto podrás invitar a una amiga a una clase gratis.
         </BodyText>
-        <Pressable
-          accessibilityLabel={`Tu crédito: ${creditValue}`}
-          accessibilityRole="button"
-          onPress={() => navigation.navigate("Credit")}
-          style={styles.creditRow}
-        >
-          <Text style={styles.creditLabel}>Tu crédito</Text>
-          <View style={styles.creditTrailing}>
-            <Text style={styles.creditValue}>{creditValue}</Text>
-            <Chevron />
-          </View>
-        </Pressable>
-        {referred.length === 0 ? (
-          <View style={styles.emptyState}>
-            <BodyText style={styles.empty}>
-              Aún no has invitado a nadie. ¡Comparte tu código!
-            </BodyText>
-          </View>
-        ) : (
-          <View style={styles.list}>
-            <Text style={styles.sectionTitle}>Tus invitaciones</Text>
-            {referred.map((entry) => (
-              <ReferredRow entry={entry} key={entry.referredClientId} />
-            ))}
-          </View>
-        )}
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  avatar: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 40,
-    justifyContent: "center",
-    width: 40,
-  },
-  avatarText: {
-    color: colors.primaryOnTint,
-    fontSize: typography.note,
-    fontWeight: "600",
-  },
-  awarded: { backgroundColor: successTint },
-  awardedText: { color: colors.successText },
-  badge: {
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smd,
-    paddingVertical: spacing.xxs,
-  },
-  badgeText: { fontSize: typography.label, fontWeight: "500" },
   code: {
     color: colors.text,
     fontFamily: "Lora_500Medium",
@@ -193,43 +103,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  creditLabel: { color: colors.text, fontSize: typography.body },
-  creditRow: {
-    ...surfaces.flatCard,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    minHeight: 56,
-    paddingHorizontal: spacing.lg,
-  },
-  creditTrailing: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  creditValue: {
-    color: colors.primaryDeep,
-    fontFamily: "Lora_500Medium",
-    fontSize: typography.bodyLarge,
-  },
-  detail: { color: colors.textMuted, fontSize: typography.note },
-  empty: { color: colors.textMuted, textAlign: "center" },
-  emptyState: { gap: spacing.xxs, paddingVertical: spacing.lg },
-  explanation: { textAlign: "center" },
-  list: { gap: spacing.sm },
-  name: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
-  pending: { backgroundColor: warningTint },
-  pendingText: { color: colors.warningText },
-  row: {
-    ...surfaces.flatCard,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    minHeight: 64,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  rowBody: { flex: 1, gap: spacing.xxs },
+  explanation: { color: colors.textMuted, textAlign: "center" },
   screen: { gap: spacing.lg },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-  },
 });

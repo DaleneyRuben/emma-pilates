@@ -28,7 +28,6 @@ describe('Administrator receipt read (PostgreSQL)', () => {
   const commands = (clock: Date) =>
     createPrismaPaymentCommands(prisma, {
       now: () => clock,
-      referralRewardCentavos: 6000,
     });
   const read = () => createPrismaReceiptRead(prisma);
 

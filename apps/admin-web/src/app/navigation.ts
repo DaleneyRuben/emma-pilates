@@ -10,6 +10,7 @@ export type AdminPath =
   | "/catalogo/sucursales"
   | "/back-office/clientes"
   | "/back-office/pagos"
+  | "/back-office/caja"
   | "/back-office/insumos"
   | "/back-office/evaluaciones-nutricionales"
   | "/back-office/personal"
@@ -19,7 +20,6 @@ export type AdminPath =
   | "/reporte"
   | "/promociones"
   | "/promociones/referidos"
-  | "/promociones/creditos"
   | "/reglas-del-estudio";
 
 export type NavigationItem = {
@@ -44,7 +44,7 @@ export type NavigationItem = {
   /**
    * Its sub-pages keep it marked: every page under it (AW31 is a view of
    * Insumos), or only the listed ones where siblings share its prefix
-   * (AW35 under Promociones, beside Referidos and Créditos).
+   * (AW35 under Promociones, beside Referidos).
    */
   subPages?: true | readonly string[];
   /**
@@ -101,6 +101,11 @@ export const navigationGroups: readonly NavigationGroup[] = [
         list: true,
         badge: "pendingPayments",
         studioWide: "los pagos son del estudio, no de una sede.",
+      },
+      {
+        label: "Caja",
+        to: "/back-office/caja",
+        screen: "AW151",
       },
       {
         label: "Insumos",
@@ -171,13 +176,6 @@ export const navigationGroups: readonly NavigationGroup[] = [
         screen: "AW26",
         list: true,
         studioWide: "los referidos son del estudio, no de una sede.",
-      },
-      {
-        label: "Créditos",
-        to: "/promociones/creditos",
-        screen: "AW27",
-        list: true,
-        studioWide: "los créditos son del estudio, no de una sede.",
       },
     ],
   },

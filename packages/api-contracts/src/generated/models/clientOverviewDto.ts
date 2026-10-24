@@ -16,7 +16,8 @@ export interface ClientOverviewDto {
   nextBooking?: UpcomingBookingDto | null;
   recentHistory: ClassHistoryEntryDto[];
   /**
-   * Available Credit in BOB centavos
+   * Deprecated (PAY-005): Credit was retired; always 0
+   * @deprecated
    * @minimum 0
    */
   creditAvailableCentavos: number;

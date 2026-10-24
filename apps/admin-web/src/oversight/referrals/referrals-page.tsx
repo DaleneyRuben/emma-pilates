@@ -4,7 +4,6 @@ import { CatalogPage } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { countFormat, pageRangeLabel } from "../../components/table/pagination";
 import { SearchFilter } from "../../components/table/search-filter";
-import { StatusPill } from "../../components/ui/status-pill";
 import { boliviaParts, formatCivilDate } from "../../lib/bolivia-time";
 import type { NameSearch } from "../oversight-search";
 import {
@@ -17,10 +16,11 @@ const count = (value: number, one: string, many: string) =>
 
 // The studio's Referrals, whatever the search (follow-up 28 counts people
 // in the feminine; a Referral is a link, so it counts in the masculine).
-const studioSummary = (awarded: number, pending: number) =>
-  awarded + pending === 0
+// Credit is retired (PAY-005), so the count no longer splits by award.
+const studioSummary = (total: number) =>
+  total === 0
     ? "Todavía no hay referidos en el estudio"
-    : `${count(awarded + pending, "referido", "referidos")} · ${countFormat.format(awarded)} con crédito otorgado, ${count(pending, "pendiente", "pendientes")}`;
+    : count(total, "referido", "referidos");
 
 const columns = createColumnHelper<ReferralRow>();
 
@@ -56,17 +56,6 @@ const referralColumns = () => [
         {formatCivilDate(boliviaParts(getValue()).date)}
       </span>
     ),
-  }),
-  // Credit is granted when the referred Client's first Payment is
-  // confirmed (booking/CONTEXT.md, Referral).
-  columns.accessor("state", {
-    header: "Estado",
-    cell: ({ getValue }) =>
-      getValue() === "awarded" ? (
-        <StatusPill tone="exito">Crédito otorgado</StatusPill>
-      ) : (
-        <StatusPill tone="advertencia">Pendiente</StatusPill>
-      ),
   }),
 ];
 
@@ -107,7 +96,7 @@ export function ReferralsPage({
       subtitle={
         query.data === undefined
           ? undefined
-          : studioSummary(query.data.awardedCount, query.data.pendingCount)
+          : studioSummary(query.data.awardedCount + query.data.pendingCount)
       }
       loadingMessage="Cargando referidos…"
       what="los referidos"

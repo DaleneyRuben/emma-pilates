@@ -208,6 +208,7 @@ model Account {
   studioSettingsVersions    StudioSettingsVersion[] @relation("StudioSettingsVersionCreatedBy")
   recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
+  closedCashCloses          CashClose[]             @relation("CashCloseClosedBy")
 
   @@map("accounts")
   @@schema("system")

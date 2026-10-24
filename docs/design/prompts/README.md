@@ -61,6 +61,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S22](./staff/22-assistant-client-history.md) | Historial de la clienta (Asistente) | `S22` | ✅ |
 | [S23](./staff/23-staff-profile.md) | Perfil (todos los roles) | `S23` | ✅ |
 | [S24](./staff/24-administrator-view-as.md) | Ver la app como… (Administración) | `S24` | ✅ (Claude Design canvas, 2026-10-22, `e81417e9`; the app side is stage 3 of FUT-001) |
+| [S25](./staff/25-cash-close.md) | Cerrar caja (Asistente y Administración) | `S25` | ✅ (Claude Design canvas, 2026-10-23, `1e4dee1e`; BKO-003) |
 
 ## Admin web (`admin-web/`)
 
@@ -103,6 +104,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW34](./admin-web/34-branch-selector.md) | Selector de sucursal | `AW34` | ✅ |
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
 | [AW36](./admin-web/36-reglas-del-estudio.md) | Reglas del estudio | `AW36` | ✅ (Claude Design canvas, 2026-10-23, `55bbe4cc`; the admin web is built in BKM-004) |
+| [AW151](./admin-web/151-cierres-de-caja.md) | Cierres de caja | `AW151` | ✅ (Claude Design canvas, 2026-10-23, `1e4dee1e`; BKO-003, numbered from its assigned block 150–154) |
 
 ## Follow-ups (`followups/`)
 
@@ -224,6 +226,12 @@ Each of these was sent as the next message in the existing design session for th
 | [115](./followups/115-lists-refresh-on-focus-and-pull.md) | Every list refreshes when it regains focus and on pull (UX-004, UX-001 finding C1): one bullet in the README's «Loading state (Client and Staff)» naming the background refetch and the native pull-to-refresh control in Palo de rosa; no numbered screen changes (109–114 are reserved by UX-003, UX-005, UX-006, UX-009, UX-010 and UX-012) | ✅ applied (Claude Design canvas, 2026-10-22, `7b761df1`; the apps are built in UX-004) |
 | [130](./followups/130-aw33-studio-rules-entry.md) | `AW33`'s menu gains a first row «Reglas del estudio» that opens the new `AW36` (BKM-004, ADR-0101), above «Cambiar contraseña»; the README gains the `AW36` row and the `AW33 → AW36` navigation | ✅ applied (Claude Design canvas, 2026-10-23, `55bbe4cc`, with `AW36`; the admin web is built in BKM-004) |
 | [131](./followups/131-rules-copy-from-studio-settings.md) | README only: «Studio rules in copy» says the «2 h 30» of `05`/`09`/`S21`/`AW03` and `02`'s «Paquetes desde» price are Studio Settings values read from the API, with what each screen shows while they are unknown; no numbered screen changes (BKM-004, ADR-0101) | ✅ applied (README only, same canvas and commit `55bbe4cc`; the apps are built in BKM-004) |
+| [135](./followups/135-plan-and-payment-without-credit.md) | `08` and `09` without Credit (PAY-005, booking ADR-0009): the «Con crédito» frames and notes go, one catalogue and one price breakdown where the total is the Plan price | ✅ applied (Claude Design export 2026-10-23, `4657e3b7`; canvas deleted) |
+| [136](./followups/136-referrals-code-only.md) | `16` shows only the code, «Compartir», and «Pronto podrás invitar a una amiga a una clase gratis.» (PAY-005); `17` Mi crédito retired with a banner; `18` loses «Mi crédito»; `02`'s referral shortcut reads «Comparte tu código» | ✅ applied (Claude Design export 2026-10-23, `b6508462`; canvas deleted) |
+| [137](./followups/137-close-account-without-credit.md) | `24` Cerrar mi cuenta drops «Pierdes tu crédito de Bs 120,00.» and every Credit caption (PAY-005) | ✅ applied (Claude Design export 2026-10-23, `91c44607`; canvas deleted) |
+| [138](./followups/138-assistant-cash-without-credit.md) | `S09` and `S10` without Credit (PAY-005): no credit notice, no «Con crédito aplicado» lines, the cash summary is the full price | ✅ applied (Claude Design export 2026-10-23, `3e23cd55`; canvas deleted) |
+| [139](./followups/139-admin-web-without-credit.md) | The admin web without Credit (PAY-005): «Créditos» leaves the sidebar (correcting checklist 30), `AW27` retired with a banner, `AW22` loses its Crédito block and closure line, `AW26` its Estado column and Credit subtitle, `AW28`/`AW29` their Credit lines | ✅ applied (Claude Design export 2026-10-23, `2df9bc5a`; canvas deleted) |
+| [150](./followups/150-cash-close-entries.md) | The daily Cash Close (BKO-003): a «Cerrar caja» header pill on `S04` and `S11`, drawn as `S15`'s «Mi disponibilidad», opening the new `S25`; the admin sidebar's Back Office group gains «Caja» after «Pagos», opening the new `AW151`; both are added to the entry points of invariant 6 | 🟡 partly applied (Claude Design canvas, 2026-10-23, `1e4dee1e`): §1 `S04`, §2 `S11`, and the «Caja» row in `AW151`'s sidebar are drawn; the design-system sidebar card, the other admin screens' sidebars, and the handoff `design/README.md` rows take it at their next regeneration |
 
 ## Status
 
