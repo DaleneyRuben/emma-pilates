@@ -1,3 +1,4 @@
+import { runsOperations } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 
@@ -15,11 +16,6 @@ export const listAdministratorSessions = async <Session>(
   principal: AuthenticatedPrincipal,
   read: (query: AdministratorSessionQuery) => Promise<Session[]>,
 ): Promise<Session[]> => {
-  if (
-    principal.identity.kind !== 'staff' ||
-    principal.identity.role !== 'administrator'
-  ) {
-    throw new BookingAccessDeniedError();
-  }
+  if (!runsOperations(principal)) throw new BookingAccessDeniedError();
   return read(query);
 };

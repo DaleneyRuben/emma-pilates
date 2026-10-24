@@ -26,6 +26,7 @@ describe('foundation migration', () => {
     `);
 
     expect(result.rows.map(({ table_name: tableName }) => tableName)).toEqual([
+      'back_office.cash_closes',
       'back_office.expense_categories',
       'back_office.expenses',
       'back_office.salary_payments',
@@ -37,6 +38,7 @@ describe('foundation migration', () => {
       'booking.bookings',
       'booking.branches',
       'booking.class_types',
+      'booking.client_acquisitions',
       'booking.client_promotions_consents',
       'booking.clients',
       'booking.credit_ledger_entries',
@@ -64,6 +66,7 @@ describe('foundation migration', () => {
       'system.authentication_throttle_events',
       'system.authentication_tokens',
       'system.email_suppressions',
+      'system.feedback',
       'system.idempotency_records',
       'system.image_assets',
       'system.image_variants',

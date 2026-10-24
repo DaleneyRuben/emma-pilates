@@ -37,12 +37,18 @@ const ledger = (): AdministratorPaymentLedger => ({
 });
 
 describe('Administrator Payment list', () => {
-  it('pages the studio’s transfer Payments for an Administrator with a trimmed search', async () => {
+  it('pages the studio’s sales for an Administrator with a trimmed search', async () => {
     const payments = ledger();
 
     await expect(
       listAdministratorPayments(
-        { page: 2, pageSize: 10, status: 'pending', query: '  sofía  ' },
+        {
+          page: 2,
+          pageSize: 10,
+          status: 'pending',
+          invoice: 'unissued',
+          query: '  sofía  ',
+        },
         administrator,
         { ledger: payments },
       ),
@@ -51,6 +57,7 @@ describe('Administrator Payment list', () => {
       page: 2,
       pageSize: 10,
       status: 'pending',
+      invoice: 'unissued',
       query: 'sofía',
     });
   });
@@ -59,7 +66,7 @@ describe('Administrator Payment list', () => {
     const payments = ledger();
 
     await listAdministratorPayments(
-      { page: 1, pageSize: 20, status: 'all', query: '   ' },
+      { page: 1, pageSize: 20, status: 'all', invoice: 'all', query: '   ' },
       administrator,
       { ledger: payments },
     );
@@ -68,6 +75,7 @@ describe('Administrator Payment list', () => {
       page: 1,
       pageSize: 20,
       status: 'all',
+      invoice: 'all',
     });
   });
 
@@ -83,7 +91,7 @@ describe('Administrator Payment list', () => {
 
       await expect(
         listAdministratorPayments(
-          { page: 1, pageSize: 20, status: 'all' },
+          { page: 1, pageSize: 20, status: 'all', invoice: 'all' },
           principal,
           { ledger: payments },
         ),

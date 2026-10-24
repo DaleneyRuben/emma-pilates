@@ -111,7 +111,8 @@ describe("a page that fails while drawing (WEB-032, follow-up 105)", () => {
     const { user } = renderShellWith();
     await screen.findByRole("button", { name: "Reintentar" });
 
-    await user.click(screen.getByRole("link", { name: "Planes" }));
+    // The sidebar shows the money sections once the session names the Role.
+    await user.click(await screen.findByRole("link", { name: "Planes" }));
 
     expect(
       await screen.findByRole("heading", { level: 1, name: "Planes" }),

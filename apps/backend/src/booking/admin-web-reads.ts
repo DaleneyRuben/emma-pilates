@@ -3,8 +3,8 @@ import { administratorClientProvider } from './clients/administrator-client-oper
 import { AdministratorClientsController } from './clients/administrator-clients.controller';
 import { AdministratorPaymentListController } from './payments/administrator-payment-list.controller';
 import { administratorPaymentProvider } from './payments/administrator-payment-operations';
-import { courtesyAccessProvider } from './payments/courtesy-access-provider';
 import { CourtesyAccessController } from './payments/courtesy-access.controller';
+import { courtesyAccessProvider } from './payments/courtesy-access-provider';
 
 // The admin web's oversight reads (WEB-004 Clients, WEB-005 Payments) and the
 // Client detail's «Acceso de prueba» grant (REL-011), wired here so

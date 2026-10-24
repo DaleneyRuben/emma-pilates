@@ -1,5 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import type { InvoiceData } from './invoice-data/invoice-data';
+import {
+  InvoiceDataDto,
+  invoiceDataField,
+} from './invoice-data/invoice-data.dto';
 
 const uuid = z.uuid();
 
@@ -22,6 +27,26 @@ export class AttachReceiptDto {
 
 export const parseAttachReceipt = (value: unknown): AttachReceiptDto | null => {
   const result = z.strictObject({ imageAssetId: uuid }).safeParse(value);
+  return result.success ? result.data : null;
+};
+
+export class SubmitTransferDto {
+  @ApiPropertyOptional({
+    type: InvoiceDataDto,
+    nullable: true,
+    description:
+      'PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»',
+  })
+  invoiceData?: InvoiceDataDto | null;
+}
+
+// Releases before PAY-007 send no body at all.
+export const parseSubmitTransfer = (
+  value: unknown,
+): { invoiceData: InvoiceData | null } | null => {
+  const result = z
+    .strictObject({ invoiceData: invoiceDataField })
+    .safeParse(value ?? {});
   return result.success ? result.data : null;
 };
 
@@ -51,7 +76,12 @@ export class PurchaseIntentDto {
   @ApiProperty({ minimum: 1, description: 'Money Amount in BOB centavos' })
   planPriceCentavos!: number;
 
-  @ApiProperty({ minimum: 0, description: 'Credit held for this purchase' })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description:
+      'Deprecated (PAY-005): Credit was retired; always 0, kept for store builds',
+  })
   creditReservedCentavos!: number;
 
   @ApiProperty({
@@ -77,7 +107,10 @@ export class PaymentDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
 
-  @ApiProperty({ enum: ['transfer', 'cash', 'credit_only', 'courtesy'] })
+  @ApiProperty({
+    enum: ['transfer', 'cash', 'credit_only', 'courtesy'],
+    description: '`courtesy` is a Bs 0 Courtesy Access grant (REL-011).',
+  })
   method!: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
 
   @ApiProperty({ enum: ['pending', 'confirmed', 'rejected'] })
@@ -105,7 +138,12 @@ export class PaymentDto {
   @ApiProperty({ minimum: 1 })
   planPriceCentavos!: number;
 
-  @ApiProperty({ minimum: 0 })
+  @ApiProperty({
+    minimum: 0,
+    deprecated: true,
+    description:
+      'Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds',
+  })
   creditAppliedCentavos!: number;
 
   @ApiProperty({ minimum: 0 })
@@ -149,17 +187,20 @@ export class CreditActivityDto {
   occurredAt!: Date;
 }
 
+// Deprecated with its endpoint (PAY-005): every value reads as zero or empty.
 export class CreditDto {
-  @ApiProperty({ minimum: 0 })
+  @ApiProperty({ minimum: 0, deprecated: true, description: 'Always 0' })
   availableCentavos!: number;
 
-  @ApiProperty({
-    minimum: 0,
-    description: 'Credit held for a Payment under review',
-  })
+  @ApiProperty({ minimum: 0, deprecated: true, description: 'Always 0' })
   reservedCentavos!: number;
 
-  @ApiProperty({ type: CreditActivityDto, isArray: true })
+  @ApiProperty({
+    type: CreditActivityDto,
+    isArray: true,
+    deprecated: true,
+    description: 'Always empty',
+  })
   activity!: CreditActivityDto[];
 }
 
@@ -170,16 +211,25 @@ export class ReferredClientDto {
   @ApiProperty({ description: 'First name and surname initial' })
   referredName!: string;
 
-  @ApiProperty({ enum: ['pending', 'awarded'] })
+  @ApiProperty({
+    enum: ['pending', 'awarded'],
+    deprecated: true,
+    description: `${'Deprecated (PAY-005): Credit was retired'}; a Referral made since stays pending`,
+  })
   state!: 'pending' | 'awarded';
 
   @ApiProperty({ format: 'date-time' })
   createdAt!: Date;
 
-  @ApiPropertyOptional({ type: String, format: 'date-time', nullable: true })
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    deprecated: true,
+  })
   awardedAt!: Date | null;
 
-  @ApiPropertyOptional({ type: Number, nullable: true })
+  @ApiPropertyOptional({ type: Number, nullable: true, deprecated: true })
   awardCentavos!: number | null;
 }
 
