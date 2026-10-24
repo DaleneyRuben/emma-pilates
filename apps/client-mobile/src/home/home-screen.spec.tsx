@@ -76,7 +76,8 @@ describe("Client Home", () => {
     });
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("5 de 8 clases")).toBeOnTheScreen();
-    expect(screen.getByText("Pagado hasta el 11 de octubre")).toBeOnTheScreen();
+    // Follow-up 177: the end is an expiry, «Vence el».
+    expect(screen.getByText("Vence el 11 de octubre")).toBeOnTheScreen();
     expect(screen.getByText("Activa")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeEnabled();
     // MOB-041: 02 ends its full-width «Reservar una clase» shortcut in a Palo

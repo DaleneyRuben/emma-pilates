@@ -6,7 +6,8 @@ export type StaffProfile = {
   name: string;
   email: string;
   phone: string | null;
-  role: 'trainer' | 'nutritionist' | 'assistant' | 'administrator';
+  role:
+    'trainer' | 'nutritionist' | 'assistant' | 'administrator' | 'coordinator';
   branches: { id: string; name: string }[];
 };
 

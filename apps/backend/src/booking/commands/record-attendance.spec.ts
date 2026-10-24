@@ -23,6 +23,7 @@ describe('recordAttendance', () => {
           },
           loadSession: jest.fn().mockResolvedValue({
             id: 'session-id',
+            branchId: 'branch-id',
             trainerStaffMemberId: 'trainer-id',
             endsAt: new Date('2026-09-10T11:00:00Z'),
             state: 'scheduled',
@@ -36,6 +37,7 @@ describe('recordAttendance', () => {
 
     expect(save).toHaveBeenCalledWith({
       sessionId: 'session-id',
+      branchId: 'branch-id',
       outcomes: [{ bookingId: 'booking-id', outcome: 'attended' }],
       recordedByAccountId: 'trainer-account-id',
     });

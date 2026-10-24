@@ -14,6 +14,7 @@ import {
 import {
   BodyText,
   colors,
+  formatBolivianos,
   Heading,
   LoadingState,
   PrimaryButton,
@@ -26,6 +27,7 @@ import {
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
+  useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
@@ -107,7 +109,7 @@ function SubscriptionCard({
           subscription.originalClassAllowance,
         )}
       </BodyText>
-      <BodyText>{`Pagado hasta el ${formatCivilDate(subscription.endsOn)}`}</BodyText>
+      <BodyText>{`Vence el ${formatCivilDate(subscription.endsOn)}`}</BodyText>
       <Pressable
         accessibilityLabel="Ver detalle"
         accessibilityRole="button"
@@ -128,13 +130,26 @@ function OfflineHomeBanner() {
   );
 }
 
-function PurchaseCard({ onPurchase }: { onPurchase: () => void }) {
+// «Paquetes desde» is the cheapest visible Plan (GET /studio-rules, BKM-004);
+// while it is unknown the card leaves the price out.
+function purchaseCopy(plansFromPriceCentavos: number | null | undefined): string {
+  const payment = "Puedes pagar en el estudio o desde la app.";
+  return plansFromPriceCentavos === null || plansFromPriceCentavos === undefined
+    ? payment
+    : `Paquetes desde ${formatBolivianos(plansFromPriceCentavos)}. ${payment}`;
+}
+
+function PurchaseCard({
+  onPurchase,
+  plansFromPriceCentavos,
+}: {
+  onPurchase: () => void;
+  plansFromPriceCentavos: number | null | undefined;
+}) {
   return (
     <View style={[styles.card, styles.purchaseCard]}>
       <Text style={styles.purchaseTitle}>Elige tu plan y vuelve al mat</Text>
-      <BodyText style={styles.purchaseBody}>
-        Paquetes desde Bs 560. Puedes pagar en el estudio o desde la app.
-      </BodyText>
+      <BodyText style={styles.purchaseBody}>{purchaseCopy(plansFromPriceCentavos)}</BodyText>
       <PrimaryButton label="Comprar un plan" onPress={onPurchase} testID="home-buy-plan" />
     </View>
   );
@@ -150,6 +165,7 @@ export function HomeScreen() {
   const evaluations = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const referrals = useGetCurrentClientReferrals(queryOptions);
   const promotions = useListPromotions(queryOptions);
+  const studioRules = useStudioRules(fetcher);
   const queryKeys = [
     getGetCurrentClientProfileQueryKey(),
     getGetCurrentClientSubscriptionQueryKey(),
@@ -235,7 +251,10 @@ export function HomeScreen() {
             subscription={view.subscription!}
           />
         ) : (
-          <PurchaseCard onPurchase={() => navigation.navigate("Plans")} />
+          <PurchaseCard
+            onPurchase={() => navigation.navigate("Plans")}
+            plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
+          />
         )}
         <ShortcutSection>
           <ShortcutRow
@@ -258,7 +277,7 @@ export function HomeScreen() {
             />
             <ShortcutTile
               icon="person"
-              label="Mis referidos"
+              label="Invita a una amiga"
               onPress={() => navigation.navigate("Referrals")}
               summary={referralShortcut(referralCount)}
             />

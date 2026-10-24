@@ -27,13 +27,14 @@ import { Keyboard, StyleSheet, View } from "react-native";
 import { z } from "zod";
 
 import { useClientFetcher } from "../client-fetcher";
+import { bolivianMobileSchema } from "./bolivian-mobile";
 import { EmailChangeSection, normalizeEmail } from "./email-change-section";
 import { ProfilePhotoSection } from "./profile-photo-section";
 
 const profileSchema = z.object({
   name: z.string().trim().min(1, "Escribe tu nombre."),
   email: z.string().trim().email("Escribe un correo válido."),
-  phone: z.string(),
+  phone: bolivianMobileSchema,
 });
 
 type ProfileValues = z.infer<typeof profileSchema>;
@@ -146,6 +147,7 @@ function EditProfileForm({
         name="phone"
         render={({ field }) => (
           <FormField
+            error={errors.phone?.message}
             keyboardType="phone-pad"
             label="Teléfono"
             onBlur={field.onBlur}

@@ -1,5 +1,6 @@
 import {
   bookEvaluation,
+  bookPaidEvaluation,
   getListEvaluationSlotsQueryKey,
   getListEvaluationsQueryKey,
   type ClientEvaluationDto,
@@ -8,6 +9,7 @@ import {
 import {
   BodyText,
   colors,
+  formatBolivianos,
   initials,
   PrimaryButton,
   radii,
@@ -68,7 +70,8 @@ export function BookEvaluationScreen({
     setSubmitting(true);
     setMessage(null);
     try {
-      const response = await bookEvaluation(
+      const book = slot.included ? bookEvaluation : bookPaidEvaluation;
+      const response = await book(
         slot.id,
         { headers: { "idempotency-key": idempotencyKey.current } },
         fetcher,
@@ -113,7 +116,11 @@ export function BookEvaluationScreen({
           </View>
         </View>
         <View style={styles.free}>
-          <Text style={styles.freeText}>Es gratuita — no usa clases de tu plan.</Text>
+          <Text style={styles.freeText}>
+            {slot.included
+              ? "Es gratuita — no usa clases de tu plan."
+              : `Cuesta ${formatBolivianos(slot.priceCentavos)}. La pagas por QR o en recepción.`}
+          </Text>
         </View>
         <View style={styles.note}>
           <BodyText>Te avisaremos un día antes y una hora antes de tu cita.</BodyText>
