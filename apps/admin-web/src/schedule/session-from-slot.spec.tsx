@@ -1,6 +1,11 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { addDays, boliviaInstant, boliviaToday } from "../lib/bolivia-time";
+import {
+  addDays,
+  boliviaInstant,
+  boliviaToday,
+  formatCivilDate,
+} from "../lib/bolivia-time";
 import { centro } from "../test/booking-handlers";
 import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
 import { renderAdmin } from "../test/render-admin";
@@ -61,7 +66,9 @@ describe("AW02 empty slots on a desktop browser", () => {
       within(panel).getByText("Sucursal Centro · sala única"),
     ).toBeVisible();
     expect(within(panel).getByLabelText("Una sola vez")).toBeChecked();
-    expect(within(panel).getByLabelText("Fecha")).toHaveValue(dayOfNextWeek(1));
+    expect(within(panel).getByLabelText("Fecha")).toHaveValue(
+      formatCivilDate(dayOfNextWeek(1)),
+    );
     expect(within(panel).getByLabelText("Hora")).toHaveValue("10:00");
     expect(within(panel).getByLabelText("Tipo de clase")).toHaveValue("");
     expect(within(panel).getByLabelText("Entrenadora")).toHaveValue("");
@@ -104,7 +111,7 @@ describe("AW02 empty slots on a desktop browser", () => {
     expect(within(panel).getByLabelText("Día, fila 1")).toHaveValue("4");
     expect(within(panel).getByLabelText("Hora, fila 1")).toHaveValue("18:00");
     expect(within(panel).getByLabelText("Vigente desde")).toHaveValue(
-      dayOfNextWeek(3),
+      formatCivilDate(dayOfNextWeek(3)),
     );
   });
 

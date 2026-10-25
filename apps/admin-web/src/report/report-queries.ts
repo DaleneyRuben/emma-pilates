@@ -2,10 +2,13 @@ import {
   getExpenseReport,
   getGetExpenseReportQueryKey,
   getGetIncomeReportQueryKey,
+  getGetRevenueReportQueryKey,
   getIncomeReport,
+  getRevenueReport,
   type AdminBranchDto,
   type ExpenseReportDto,
   type IncomeReportDto,
+  type RevenueReportDto,
 } from "@pilates/api-contracts";
 import { queryOptions } from "@tanstack/react-query";
 import { adminFetch } from "../api/fetcher";
@@ -41,6 +44,14 @@ export const incomeReportQueryOptions = (
         .data as IncomeReportDto,
   });
 };
+
+export const revenueReportQueryOptions = (month: string) =>
+  queryOptions({
+    queryKey: getGetRevenueReportQueryKey({ month }),
+    queryFn: async ({ signal }) =>
+      (await getRevenueReport({ month }, { signal }, adminFetch))
+        .data as RevenueReportDto,
+  });
 
 export const expenseReportQueryOptions = (
   range: ReportRange,

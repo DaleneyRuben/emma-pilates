@@ -13,6 +13,10 @@ export interface EvaluationSlotDto {
   branchId: string;
   branchName: string;
   nutritionistName: string;
-  /** Published, unbooked, more than 3 hours away, and in a month the Client has not used */
+  /** Published, unbooked, more than 3 hours away, and covered by an active Subscription */
   bookable: boolean;
+  /** True when the covering Plan of 90 days or longer still includes its Evaluation */
+  included: boolean;
+  /** Settings price in centavos; 0 when the Evaluation is included */
+  priceCentavos: number;
 }

@@ -1,3 +1,5 @@
+import type { StaffRoleCode } from './staff-role';
+
 export class AuthenticationFailedError extends Error {}
 
 export type AccountCredentials = {
@@ -6,7 +8,7 @@ export type AccountCredentials = {
   emailVerifiedAt: Date | null;
   activatedAt: Date | null;
   disabledAt: Date | null;
-  staffRole: 'TRAINER' | 'NUTRITIONIST' | 'ASSISTANT' | 'ADMINISTRATOR' | null;
+  staffRole: StaffRoleCode | null;
 };
 
 type AuthenticateCredentialsDependencies = {

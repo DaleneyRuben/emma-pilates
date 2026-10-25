@@ -72,6 +72,8 @@ describe("busy submit buttons (WEB-023, follow-up 93)", () => {
     const mensual = {
       id: "7a1b2c3d-0000-5000-8000-000000000003",
       name: "Mensual 16 clases",
+      durationDays: 30,
+      weeklyClassCap: null,
       durationMonths: 1,
       classAllowance: 16,
       priceCentavos: 105_000,

@@ -6,8 +6,8 @@ import {
   FormItem,
   FormMessage,
 } from "../components/form/form";
+import { CivilTimeInput } from "../components/form/civil-time-input";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
 import { MinutesInput } from "./duration-field";
 import { WeekdayOptions } from "./session-options";
@@ -58,9 +58,7 @@ export function WeeklyRowsField() {
                   )}
                 />
                 <FormControl>
-                  <Input
-                    type="time"
-                    step={300}
+                  <CivilTimeInput
                     aria-label={`Hora, fila ${index + 1}`}
                     {...time}
                   />

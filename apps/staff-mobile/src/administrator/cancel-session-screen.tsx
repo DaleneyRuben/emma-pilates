@@ -66,10 +66,10 @@ export function CancelSessionScreen({
         <View style={styles.receipt}>
           <BodyText>
             {affected === 1
-              ? "Se notificó al cliente afectado."
-              : `Se notificó a los ${affected} clientes afectados.`}
+              ? "Se notificó a la clienta afectada."
+              : `Se notificó a las ${affected} clientas afectadas.`}
           </BodyText>
-          <BodyText>Se reembolsó una clase a cada cliente.</BodyText>
+          <BodyText>Se reembolsó una clase a cada clienta.</BodyText>
         </View>
         <TextButton label="Volver" onPress={() => navigation.goBack()} />
       </Screen>
@@ -85,7 +85,7 @@ export function CancelSessionScreen({
         <BodyText>{session.trainerName}</BodyText>
         <BodyText>{session.branchName}</BodyText>
         <Text style={styles.affected}>
-          {describeCount(session.bookedCount, "cliente afectado", "clientes afectados")}
+          {describeCount(session.bookedCount, "clienta afectada", "clientas afectadas")}
         </Text>
       </View>
       <View style={styles.warning}>

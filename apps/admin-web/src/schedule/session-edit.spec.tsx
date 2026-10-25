@@ -1,6 +1,10 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { boliviaInstant, formatSessionMoment } from "../lib/bolivia-time";
+import {
+  boliviaInstant,
+  formatCivilDate,
+  formatSessionMoment,
+} from "../lib/bolivia-time";
 import { centro } from "../test/booking-handlers";
 import {
   apiUrl,
@@ -147,7 +151,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
       "1",
     );
     expect(within(panel).getByLabelText("Vigente desde")).toHaveValue(
-      dayOfNextWeek(0),
+      formatCivilDate(dayOfNextWeek(0)),
     );
     expect(
       within(panel).getByText(
@@ -202,7 +206,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
     });
     expect(
       within(confirm).getByLabelText("Deja de repetirse desde"),
-    ).toHaveValue(dayOfNextWeek(0));
+    ).toHaveValue(formatCivilDate(dayOfNextWeek(0)));
     await user.click(
       within(confirm).getByRole("button", { name: "Terminar serie" }),
     );

@@ -25,9 +25,12 @@ const Amount = ({
 }) => (
   <TableCell
     data-label={label}
-    className={cn("tabular md:text-right", strong && "font-medium")}
+    className={cn(
+      "whitespace-nowrap tabular md:text-right",
+      strong && "font-medium",
+    )}
   >
-    {children}
+    <span className="whitespace-nowrap">{children}</span>
   </TableCell>
 );
 
@@ -132,7 +135,11 @@ export function MonthTable({ months }: { months: readonly ReportMonth[] }) {
         <TableBody>
           {months.map((month) => (
             <TableRow key={month.month}>
-              <TableCell data-label="Mes">{formatMonth(month.month)}</TableCell>
+              <TableCell data-label="Mes">
+                <span className="whitespace-nowrap">
+                  {formatMonth(month.month)}
+                </span>
+              </TableCell>
               <Amount label="Ingresos">
                 {formatBolivianos(month.incomeCentavos)}
               </Amount>

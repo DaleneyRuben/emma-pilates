@@ -9,7 +9,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { boliviaDate, boliviaInstant } from '../../time/bolivia-time';
 import {
   AdministrationError,
-  requireAdministrator,
+  requireOperations,
   type AdministratorActor,
 } from './administration-errors';
 import {
@@ -127,7 +127,7 @@ export const createPrismaScheduleAdministration = (
       input: { branchId?: string },
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      requireOperations(principal);
       const today = boliviaDate(dependencies.now());
       return prisma.sessionSchedule.findMany({
         where: {
@@ -147,7 +147,7 @@ export const createPrismaScheduleAdministration = (
       input: ScheduleInput & { effectiveFrom: Date },
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      requireOperations(principal);
       requireScheduleValues(input);
       const now = dependencies.now();
       if (input.effectiveFrom < boliviaDate(now)) {
@@ -167,7 +167,7 @@ export const createPrismaScheduleAdministration = (
       input: ScheduleInput & { sessionScheduleId: string; effectiveFrom: Date },
       principal: AuthenticatedPrincipal,
     ) => {
-      const actor = requireAdministrator(principal);
+      const actor = requireOperations(principal);
       requireScheduleValues(input);
       const now = dependencies.now();
       return transact(async (transaction) => {
@@ -205,7 +205,7 @@ export const createPrismaScheduleAdministration = (
       input: { sessionScheduleId: string; effectiveFrom: Date },
       principal: AuthenticatedPrincipal,
     ) => {
-      const actor = requireAdministrator(principal);
+      const actor = requireOperations(principal);
       const now = dependencies.now();
       return transact(async (transaction) => {
         const old = await findSchedule(transaction, input.sessionScheduleId);

@@ -22,22 +22,35 @@ describe('soft delete schema', () => {
     const result = await context.pool.query<{ table_name: string }>(`
       SELECT table_schema || '.' || table_name AS table_name
       FROM information_schema.columns
-      WHERE table_schema IN ('back_office', 'booking', 'system')
+      WHERE table_schema IN ('back_office', 'booking', 'studio', 'system')
         AND column_name = 'deleted_at'
       ORDER BY 1
     `);
 
     expect(result.rows.map(({ table_name: name }) => name)).toEqual([
       'back_office.expense_categories',
+      'back_office.pay_statement_lines',
+      'back_office.pay_statements',
+      'booking.allowance_adjustments',
+      'booking.client_acquisitions',
       'booking.client_promotions_consents',
       'booking.clients',
+      'booking.contact_alerts',
+      'booking.founder_memberships',
+      'booking.freezes',
+      'booking.guest_passes',
+      'booking.lifecycle_messages',
       'booking.promotion_contacts',
       'booking.staff_branch_assignments',
       'booking.staff_members',
+      'studio.client_month_facts',
+      'studio.recommendations',
+      'studio.session_facts',
       'system.account_email_changes',
       'system.accounts',
       'system.authentication_sessions',
       'system.authentication_throttle_events',
+      'system.feedback',
       'system.idempotency_records',
       'system.image_assets',
       'system.image_variants',
@@ -51,7 +64,7 @@ describe('soft delete schema', () => {
       SELECT conrelid::regclass::text || '.' || conname AS name
       FROM pg_constraint
       WHERE contype = 'f'
-        AND connamespace::regnamespace::text IN ('back_office', 'booking', 'system')
+        AND connamespace::regnamespace::text IN ('back_office', 'booking', 'studio', 'system')
         AND confdeltype IN ('c', 'n', 'd')
       ORDER BY 1
     `);

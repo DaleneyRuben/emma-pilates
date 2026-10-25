@@ -1,5 +1,10 @@
 import { expect, test } from "@playwright/test";
-import { addDays, boliviaToday, weekStartOf } from "./support/bolivia";
+import {
+  addDays,
+  boliviaToday,
+  formatCivilDate,
+  weekStartOf,
+} from "./support/bolivia";
 import { signIn } from "./support/session";
 
 // AW03 through the real backend: a one-off Session created next Saturday
@@ -50,7 +55,7 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
   // A one-off Session belongs to no series: no «Solo esta sesión» choice.
   await expect(edit.getByLabel("Solo esta sesión")).toHaveCount(0);
   await expect(edit.getByText("Reformer Pilates")).toBeVisible();
-  await expect(edit.getByLabel("Fecha")).toHaveValue(saturday);
+  await expect(edit.getByLabel("Fecha")).toHaveValue(formatCivilDate(saturday));
   await expect(edit.getByLabel("Duración")).toHaveValue("75");
   await expect(
     edit.getByText(

@@ -35,7 +35,7 @@ describe('environment configuration', () => {
     ).toThrow('AUTHENTICATION_LINK_ENCRYPTION_KEY');
   });
 
-  it('defaults the transfer QR and referral reward for local development', () => {
+  it('defaults the transfer QR for local development', () => {
     const environment = validateEnvironment({
       DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
       NODE_ENV: 'test',
@@ -43,7 +43,6 @@ describe('environment configuration', () => {
 
     expect(environment).toMatchObject({
       TRANSFER_QR_IMAGE_PATH: '.data/transfer-qr.png',
-      REFERRAL_REWARD_CENTAVOS: 6000,
     });
   });
 
@@ -96,14 +95,14 @@ describe('environment configuration', () => {
     });
   });
 
-  it('accepts only the approved Bs 60 referral reward', () => {
-    expect(() =>
-      validateEnvironment({
-        DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
-        NODE_ENV: 'test',
-        REFERRAL_REWARD_CENTAVOS: '5000',
-      }),
-    ).toThrow('REFERRAL_REWARD_CENTAVOS');
+  it('ignores a REFERRAL_REWARD_CENTAVOS a host still sets, since the reward is retired (PAY-005)', () => {
+    const environment = validateEnvironment({
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+      REFERRAL_REWARD_CENTAVOS: '5000',
+    });
+
+    expect(environment).not.toHaveProperty('REFERRAL_REWARD_CENTAVOS');
   });
 
   it('defaults the local upload storage root when not configured', () => {

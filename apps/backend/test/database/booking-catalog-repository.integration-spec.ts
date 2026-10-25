@@ -66,7 +66,8 @@ describe('Booking catalog repository', () => {
     await withRollback(async (tx) => {
       const ids = [randomUUID(), randomUUID()].sort();
       const plan = {
-        durationMonths: 1,
+        durationDays: 30,
+        weeklyClassCap: null,
         classAllowance: 8,
         priceCentavos: 15050,
         displayOrder: 1,
@@ -192,7 +193,7 @@ describe('Booking catalog repository', () => {
       const plan = await tx.plan.create({
         data: {
           name: 'Renamed hidden Plan',
-          durationMonths: 3,
+          durationDays: 90,
           classAllowance: 24,
           priceCentavos: 90000,
           displayOrder: 0,
@@ -203,7 +204,7 @@ describe('Booking catalog repository', () => {
         id: randomUUID(),
         planId: plan.id,
         planNameSnapshot: 'Original Plan',
-        durationMonthsSnapshot: 1,
+        durationDaysSnapshot: 30,
         originalClassAllowance: 8,
         remainingClassAllowance: 0,
         startsOn: new Date('2026-01-31'),
@@ -217,12 +218,17 @@ describe('Booking catalog repository', () => {
         },
       });
       const repository = createCatalogRepository(tx);
+      const read = {
+        ...data,
+        allowanceAdjustments: [],
+        extraClassesLine: null,
+      };
       expect(
         await repository.findActiveSubscription(client.id, data.startsOn),
-      ).toEqual(data);
+      ).toEqual(read);
       expect(
         await repository.findActiveSubscription(client.id, data.endsOn),
-      ).toEqual(data);
+      ).toEqual(read);
       expect(
         await repository.findActiveSubscription(
           client.id,

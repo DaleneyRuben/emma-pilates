@@ -62,6 +62,7 @@ const payment = {
   state: 'confirmed',
   planId,
   planName: 'Paquete de 8 clases',
+  durationDays: 30,
   durationMonths: 1,
   classAllowance: 8,
   planPriceCentavos: 56_000,
@@ -106,7 +107,14 @@ describe('assistant clients (e2e)', () => {
     operations.search.mockResolvedValue([client]);
     operations.overview.mockResolvedValue({
       client,
-      subscription: { status: 'active', subscription },
+      subscription: {
+        status: 'active',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
+      },
       nextBooking: booking,
       recentHistory: [historyEntry],
       creditAvailableCentavos: 6_000,
@@ -119,7 +127,8 @@ describe('assistant clients (e2e)', () => {
         {
           id: planId,
           name: 'Paquete de 8 clases',
-          durationMonths: 1,
+          durationDays: 30,
+          weeklyClassCap: null,
           classAllowance: 8,
           priceCentavos: 56_000,
           displayOrder: 1,
@@ -182,6 +191,10 @@ describe('assistant clients (e2e)', () => {
           client,
           subscription: {
             status: 'active',
+            nextSubscription: null,
+            founderRenewalDeadline: null,
+            freeze: null,
+            canRequestFreeze: false,
             subscription: {
               ...subscription,
               startsOn: '2026-09-10',
@@ -272,10 +285,37 @@ describe('assistant clients (e2e)', () => {
         });
       });
     expect(operations.recordCashPayment).toHaveBeenCalledWith(
-      { clientId, planId, branchId },
+      { clientId, planId, branchId, invoiceData: null },
       assistant,
       idempotencyKey,
     );
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/assistant/clients/${clientId}/cash-payments`)
+      .set('authorization', bearer)
+      .set('idempotency-key', idempotencyKey)
+      .send({
+        planId,
+        branchId,
+        invoiceData: { taxId: '1020304050', name: 'Estudio SRL' },
+      })
+      .expect(201);
+    expect(operations.recordCashPayment).toHaveBeenLastCalledWith(
+      {
+        clientId,
+        planId,
+        branchId,
+        invoiceData: { taxId: '1020304050', name: 'Estudio SRL' },
+      },
+      assistant,
+      idempotencyKey,
+    );
+    await request(app.getHttpServer())
+      .post(`/api/v1/assistant/clients/${clientId}/cash-payments`)
+      .set('authorization', bearer)
+      .set('idempotency-key', idempotencyKey)
+      .send({ planId, branchId, invoiceData: { taxId: '', name: 'Ana' } })
+      .expect(400);
 
     await request(app.getHttpServer())
       .post(`/api/v1/assistant/clients/${clientId}/cash-payments`)

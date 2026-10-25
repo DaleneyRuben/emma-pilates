@@ -132,8 +132,8 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
     );
     const { panel, user } = await openCreate();
     expect(within(panel).getByLabelText("Fecha")).toHaveAttribute(
-      "max",
-      boliviaToday(),
+      "placeholder",
+      "dd/mm/aaaa",
     );
     await fill(panel, user, {
       staffMemberId: emma.id,
@@ -176,7 +176,7 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
     let panel = await screen.findByRole("dialog", { name: "Editar pago" });
     expect(within(panel).getByLabelText("Empleado")).toHaveValue(emma.id);
     expect(within(panel).getByLabelText("Monto")).toHaveValue("3.500,00");
-    expect(within(panel).getByLabelText("Fecha")).toHaveValue("2026-09-20");
+    expect(within(panel).getByLabelText("Fecha")).toHaveValue("20/09/2026");
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(puts).toEqual([]);
