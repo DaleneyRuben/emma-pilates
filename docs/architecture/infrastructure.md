@@ -424,8 +424,9 @@ Values never go in the repository or a chat. «Mac» means the user's own
   quality, unit, contract, e2e, and integration jobs per surface, the
   database jobs on `postgres:18-alpine`. The API integration suite, the
   longest, starts right after `quality-api` and runs as three shards
-  (`api-integration (1/3)` to `(3/3)`), each with its own PostgreSQL and
-  S3Mock (EXT-022). Deploys nothing. Since EXT-019 it also runs the security
+  (`api-integration (1/6)` to `(6/6)`, plus `api-integration (backup)`),
+  each with its own PostgreSQL and S3Mock (EXT-022, EXT-023). `mobile-unit`
+  runs one job per package. Deploys nothing. Since EXT-019 it also runs the security
   checks below, and a push to `main` is never cancelled by the next one
   (only a pull request's run is replaced by a newer push).
 - **Security checks in `ci.yml` (EXT-019):** `audit` runs

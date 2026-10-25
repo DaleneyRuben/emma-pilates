@@ -221,15 +221,15 @@ jobs:
   # database that lives and dies with the runner; the S3 adapter runs against
   # S3Mock (ADR-0088). The critical path of the workflow, so it starts right
   # after quality-api and splits its spec files across shards, each with its
-  # own runner, PostgreSQL, and S3Mock (EXT-022); nothing names the check, so
-  # the shards report on their own
+  # own runner, PostgreSQL, and S3Mock (EXT-022, EXT-023); nothing names the
+  # check, so the shards report on their own
   api-integration:
-    name: api-integration (${{ matrix.shard }}/3)
+    name: api-integration (${{ matrix.shard }}/6)
     needs: quality-api
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4, 5, 6]
     timeout-minutes: 20
     services:
       postgres:
@@ -253,13 +253,51 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: psql postgresql://postgres:postgres@localhost:5432/postgres -c 'create database pilates_test_ci'
-      - run: pnpm --filter @pilates/backend test:integration --shard=${{ matrix.shard }}/3
+      - run: pnpm --filter @pilates/backend test:integration --shard=${{ matrix.shard }}/6 --testPathIgnorePatterns s3-backup-store
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilates_test_ci
           OBJECT_STORAGE_TEST_ENDPOINT: http://localhost:9090
           OBJECT_STORAGE_TEST_ACCESS_KEY_ID: s3mock
           OBJECT_STORAGE_TEST_SECRET_ACCESS_KEY: s3mock
           # the in-band ESM run grows past Node's default heap on the runner
+          NODE_OPTIONS: --max-old-space-size=4096
+
+  # s3-backup-store alone took 30 s of the 218 s test step on shard 2/3
+  # (run 40238092203), so it runs beside the six shards instead of landing
+  # in one of them
+  api-integration-backup:
+    name: api-integration (backup)
+    needs: quality-api
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      s3:
+        image: adobe/s3mock:5.2.3
+        env:
+          COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: pilates-test
+        ports:
+          - 9090:9090
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: psql postgresql://postgres:postgres@localhost:5432/postgres -c 'create database pilates_test_ci'
+      - run: pnpm --filter @pilates/backend test:integration s3-backup-store
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilates_test_ci
+          OBJECT_STORAGE_TEST_ENDPOINT: http://localhost:9090
+          OBJECT_STORAGE_TEST_ACCESS_KEY_ID: s3mock
+          OBJECT_STORAGE_TEST_SECRET_ACCESS_KEY: s3mock
           NODE_OPTIONS: --max-old-space-size=4096
 
   web-unit:
@@ -316,17 +354,21 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  # one job per package: on run 40238092203 the three suites took 55 s,
+  # 56 s, and 30 s one after another, plus 36 s of checkout and setup
   mobile-unit:
+    name: mobile-unit (${{ matrix.package }})
     needs: quality-mobile
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    strategy:
+      matrix:
+        package: ["@pilates/client-mobile", "@pilates/staff-mobile", "@pilates/mobile-core"]
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      # the runner has two cores, so Jest runs each suite in band and every
-      # timer a spec leaves behind holds the process; each package's
+      # the runner has two cores, so Jest runs the suite in band and every
+      # timer a spec leaves behind holds the process; the package's
       # jest.setup.ts keeps TanStack's timers from doing so (MOB-057), and the
-      # suites exit on their own
-      - run: pnpm --filter @pilates/client-mobile exec jest --ci
-      - run: pnpm --filter @pilates/staff-mobile exec jest --ci
-      - run: pnpm --filter @pilates/mobile-core exec jest --ci
+      # suite exits on its own
+      - run: pnpm --filter ${{ matrix.package }} exec jest --ci
