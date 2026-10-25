@@ -65,7 +65,7 @@ can be found by its design name.
 | Staff app | Tests |
 | --- | --- |
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
-| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109 |
+| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109, 110 |
 | S26 Reportar una falla (Entrenadora) | 82 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89 |
@@ -1998,15 +1998,17 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    list is empty.
 2. Tap a Session to open its roster ("Centro · 07:00 – 07:50" under the
    title): every booked Client with **Asistió** and
-   **No asistió** choices, or "No hay reservas para esta sesión." A Session
-   that has not ended yet shows "Podrás marcar asistencia cuando termine la
-   clase." instead of the choices (the API answers `403` before the end,
-   Test 61).
+   **No asistió** choices. A past Session with no bookings centres the plain
+   empty state (quiet calendar, **Sin reservas**, "No hay reservas para esta
+   sesión.") and leaves **Guardar asistencia** disabled, because there is
+   nothing to save (UX-009, Test 75). A Session that has not ended yet shows
+   the names and "Podrás marcar asistencia cuando termine la clase." instead
+   of the choices (the API answers `403` before the end, Test 61).
 3. Mark every Client and tap **Guardar asistencia** (enabled only once every
-   Client has an outcome): "Asistencia guardada." appears under the button
-   ("No pudimos guardar la asistencia." if the API refused). "Asistió"
-   classes then appear in the Client's **Ver historial** as «Ha asistido a»
-   with the month group of Test 5 B.
+   Client has an outcome, and never while the roster is empty): "Asistencia
+   guardada." appears under the button ("No pudimos guardar la asistencia."
+   if the API refused). "Asistió" classes then appear in the Client's **Ver
+   historial** as «Ha asistido a» with the month group of Test 5 B.
 4. Open the roster again: the saved outcomes are restored, and a changed
    outcome can be saved as a correction. A correction writes an audit record
    naming both outcomes (Test 83); the first save does not.
@@ -5987,6 +5989,30 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 110: an empty attendance list disables Guardar asistencia (UX-009)
+
+Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
+1B) and log in as `emma.vargas@example.com` with `emma-local-2026`.
+
+1. On **Mi agenda**, open a Session that already ended and has no bookings
+   (a class nobody reserved, or one whose bookings were all cancelled). The
+   roster centres the plain empty state: a quiet calendar, **Sin reservas**
+   in Lora, and "No hay reservas para esta sesión." There are no names and
+   no **Asistió** / **No asistió** choices.
+2. **Guardar asistencia** is still at the bottom, and it is disabled (dusty
+   rose, not the solid Palo de rosa). Tapping it does nothing and the list
+   does not change to "Asistencia guardada."
+3. Open a past Session that does have bookings: the names and the choices
+   are back, **Sin reservas** is gone, and **Guardar asistencia** follows
+   the roster as Test 12 describes (enabled only once every Client has an
+   outcome).
+4. Open a Session that has not ended and has bookings: the names stay
+   read-only, "Podrás marcar asistencia cuando termine la clase." is under
+   the list, and there is no **Guardar asistencia** button.
+
+The empty frame is design follow-up 112, still pending, so the exported
+`S03` does not draw it yet. The app does.
 
 ## Test 109: the Trainer agenda eyebrow and weekday chips
 

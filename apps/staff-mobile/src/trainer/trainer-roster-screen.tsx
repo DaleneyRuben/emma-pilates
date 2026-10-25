@@ -7,6 +7,7 @@ import {
   BackLink,
   BodyText,
   colors,
+  EmptyState,
   fontFamilies,
   formatTimeRange,
   Heading,
@@ -83,6 +84,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
   const session = roster.data.data;
   const outcomes = { ...savedOutcomes(session.bookings), ...edits };
   const isPostSession = new Date(session.endsAt).getTime() <= openedAt;
+  const empty = session.bookings.length === 0;
   const complete = session.bookings.every((booking) => outcomes[booking.bookingId] !== undefined);
   const saveAttendance = async () => {
     setSaveError(false);
@@ -115,44 +117,50 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
       >
         <Text style={styles.reportFaultText}>Reportar una falla</Text>
       </Pressable>
-      <ScrollView contentContainerStyle={styles.list}>
-        {session.bookings.length === 0 ? (
-          <BodyText>No hay reservas para esta sesión.</BodyText>
-        ) : null}
-        {session.bookings.map((booking) => (
-          <View key={booking.bookingId} style={styles.rosterRow}>
-            <Text style={styles.clientName}>{booking.clientName}</Text>
-            {isPostSession ? (
-              <View style={styles.segmented}>
-                {(["attended", "no_show"] as const).map((outcome) => {
-                  const label = outcome === "attended" ? "Asistió" : "No asistió";
-                  const selected = outcomes[booking.bookingId] === outcome;
-                  return (
-                    <Pressable
-                      accessibilityLabel={`${booking.clientName}: ${label}`}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected }}
-                      key={outcome}
-                      testID={`roster-${outcome}-${booking.bookingId}`}
-                      onPress={() =>
-                        setEdits((current) => ({
-                          ...current,
-                          [booking.bookingId]: outcome,
-                        }))
-                      }
-                      style={[styles.segment, selected && styles.segmentSelected]}
-                    >
-                      <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>
-                        {label}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            ) : null}
-          </View>
-        ))}
-      </ScrollView>
+      {empty ? (
+        <EmptyState
+          icon="calendar"
+          message="No hay reservas para esta sesión."
+          title="Sin reservas"
+          variant="plain"
+        />
+      ) : (
+        <ScrollView contentContainerStyle={styles.list}>
+          {session.bookings.map((booking) => (
+            <View key={booking.bookingId} style={styles.rosterRow}>
+              <Text style={styles.clientName}>{booking.clientName}</Text>
+              {isPostSession ? (
+                <View style={styles.segmented}>
+                  {(["attended", "no_show"] as const).map((outcome) => {
+                    const label = outcome === "attended" ? "Asistió" : "No asistió";
+                    const selected = outcomes[booking.bookingId] === outcome;
+                    return (
+                      <Pressable
+                        accessibilityLabel={`${booking.clientName}: ${label}`}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected }}
+                        key={outcome}
+                        testID={`roster-${outcome}-${booking.bookingId}`}
+                        onPress={() =>
+                          setEdits((current) => ({
+                            ...current,
+                            [booking.bookingId]: outcome,
+                          }))
+                        }
+                        style={[styles.segment, selected && styles.segmentSelected]}
+                      >
+                        <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>
+                          {label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              ) : null}
+            </View>
+          ))}
+        </ScrollView>
+      )}
       {!isPostSession ? (
         <BodyText>Podrás marcar asistencia cuando termine la clase.</BodyText>
       ) : null}
@@ -162,7 +170,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
       {saved ? <BodyText>Asistencia guardada.</BodyText> : null}
       {isPostSession ? (
         <PrimaryButton
-          disabled={!complete}
+          disabled={empty || !complete}
           label="Guardar asistencia"
           onPress={() => void saveAttendance()}
           testID="roster-save"
