@@ -37,6 +37,7 @@ you are starting with no project knowledge.
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation, class, and Plan reminders (Tests 7 and 105), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); Inicio from the last profile when the phone has no connection (Test 75); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
+| Accessibility                | The code audit of Dynamic Type, reading order, Reduce Motion, and admin keyboard order (Test 115) | The device pass was not run: VoiceOver, TalkBack, and the largest text size are still unread |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); the mobile release workflows refuse to publish without the owner secret (Test 108); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
 | Weekly cap                   | Book up to the cap snapshotted on a Plan, see `classesLeftThisWeek` count down, and get `409 weekly_cap_reached` on the next Booking or Waitlist join unless an extra class remains (Test 91) | The «Te quedan N clases esta semana» line on Reservar is follow-up 203 and is still pending; the mobile screens were not walked on a device |
 | Money format                 | Whole bolivianos in both apps («Bs 560») and centavos on the admin web («Bs 560,00») (Test 112) | A leftover fraction of a boliviano is not in the fixtures; the unit tests cover the rounding. Credit is retired (PAY-005), so no screen shows a credit line |
@@ -51,8 +52,8 @@ can be found by its design name.
 
 | Client app | Tests |
 | --- | --- |
-| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113 |
+| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79, 115 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
@@ -66,7 +67,7 @@ can be found by its design name.
 | Staff app | Tests |
 | --- | --- |
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
-| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109, 110 |
+| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109, 110, 115 |
 | S26 Reportar una falla (Entrenadora) | 82 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112 |
@@ -91,7 +92,7 @@ can be found by its design name.
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111 |
-| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras | 88 |
 | AW41 Congelamientos | 92 |
@@ -3523,7 +3524,10 @@ The following are not ready for manual product testing:
   tables they need are not on this branch. The nightly recommendation pass
   is not a worker job;
 - a model-written report (Test 103): no model is called and no key is
-  configured. The sentences are the pure function over the month's counts.
+  configured. The sentences are the pure function over the month's counts;
+- Dynamic Type, VoiceOver, and TalkBack on a device (Test 115): the audit
+  is a code reading, so the largest text size and the screen readers have
+  not been walked.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -6040,6 +6044,43 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 115: the accessibility audit, read from the code
+
+The audit ([`docs/design/UX-013-accessibility-audit.md`](./design/UX-013-accessibility-audit.md))
+is a reading of the Client app, the Staff app, `packages/mobile-core`, and
+the admin web. It was not a device walk. The launch queue held the Simulator
+lock, so this session did not start a Simulator, an emulator, Metro, or the
+API, and did not turn on VoiceOver, TalkBack, the largest text size, or
+Reduce Motion. Do not treat a green Jest run as that pass.
+
+What the code reading checked, and what you can re-check by eye once a
+device is free:
+
+1. **Largest text.** Nothing sets `allowFontScaling={false}`. On the iPhone
+   16 Pro and the Android emulator, set the largest text size and open
+   Inicio, Reservar, one session detail, and the Trainer agenda. The titles
+   in the top bar are one line (`numberOfLines={1}`), the unread count pill
+   is 18 pt tall, and headings set a `lineHeight` only a little above the
+   font size, so those are the places a glyph can clip. The Reservar day
+   chips and the Trainer day strip do not fix a height and should grow.
+2. **Reading order.** The sampled buttons carry a Spanish label, and the
+   decorative icons are hidden. A screen reader on Reservar should be
+   checked against the seat pill: the card's label is the class type and
+   the time, and the pill sits inside the same button, so the reader can
+   skip «3 cupos». The Trainer card's label is the class type alone.
+3. **Reduce Motion.** The loading logo already stays still: mobile reads
+   `AccessibilityInfo.isReduceMotionEnabled` and skips the breath
+   (`packages/mobile-core`, asserted in `loading-state.spec.tsx`), and the
+   admin web's `.carga-logo` has a `prefers-reduced-motion` rule (Test 66).
+   The launch splash's 300 ms fade does not read the setting; that needs a
+   build that shows the splash, not Expo Go (Test 65).
+4. **Admin keyboard.** Open Detalle de cliente and Nueva sesión with the
+   keyboard. Focus moves into the panel, onto «Cerrar», not onto the first
+   field. Escape closes the panel. Tab order follows the form.
+
+The leftovers are UX-016 to UX-020. UX-002, UX-003, and UX-007 rewrite
+screens this reading sampled; walk those again after they merge.
 
 ## Test 113: the copy and layout leftovers
 
