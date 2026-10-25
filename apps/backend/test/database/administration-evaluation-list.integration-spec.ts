@@ -22,12 +22,16 @@ describe('Prisma administration Evaluation list for AW25', () => {
     pageSize: 20,
   };
 
-  const book = async (clientKey: 'ana' | 'bea', month: '09' | '10') => {
+  const book = async (
+    clientKey: 'ana' | 'bea',
+    month: '09' | '10',
+    included: boolean,
+  ) => {
     const client = await world.prisma.client.findUniqueOrThrow({
       where: { id: deterministicId(`test-client:${clientKey}`) },
       select: {
         id: true,
-        subscriptions: { select: { id: true } },
+        subscriptions: { select: { id: true, planId: true } },
         account: { select: { id: true } },
       },
     });
@@ -42,12 +46,40 @@ describe('Prisma administration Evaluation list for AW25', () => {
       },
       orderBy: { startsAt: 'asc' },
     });
+    // One included Evaluation per Subscription. A later one is its own
+    // Payment and names no Subscription.
+    const payment = included
+      ? null
+      : await world.prisma.payment.create({
+          data: {
+            clientId: client.id,
+            planId: client.subscriptions[0].planId,
+            kind: 'EVALUATION',
+            method: 'TRANSFER',
+            state: 'CONFIRMED',
+            planNameSnapshot: 'Evaluación',
+            durationMonthsSnapshot: 3,
+            durationDaysSnapshot: 90,
+            classAllowanceSnapshot: 1,
+            planPriceCentavos: 7_000,
+            creditAppliedCentavos: 0,
+            amountDueCentavos: 7_000,
+            startsOn: new Date(`2026-${month}-01T00:00:00.000Z`),
+            submittedByAccountId: client.account!.id,
+            submittedAt: fixtureNow,
+            decidedByAccountId: client.account!.id,
+            decidedAt: fixtureNow,
+          },
+          select: { id: true },
+        });
     await world.prisma.evaluation.create({
       data: {
         clientId: client.id,
         evaluationSlotId: slot.id,
         eligibilityMonth: new Date(`2026-${month}-01T00:00:00.000Z`),
-        subscriptionId: client.subscriptions[0].id,
+        subscriptionId: included ? client.subscriptions[0].id : null,
+        paymentId: payment?.id ?? null,
+        nutritionistCostCentavos: 5_000,
         createdByAccountId: client.account!.id,
       },
     });
@@ -55,9 +87,9 @@ describe('Prisma administration Evaluation list for AW25', () => {
 
   beforeAll(async () => {
     world = await startEvaluationTestWorld();
-    await book('ana', '09');
-    await book('ana', '10');
-    await book('bea', '09');
+    await book('ana', '09', true);
+    await book('ana', '10', false);
+    await book('bea', '09', true);
   });
 
   afterAll(async () => {

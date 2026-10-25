@@ -7,4 +7,6 @@
 
 export interface CreatePurchaseIntentDto {
   planId: string;
+  /** Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it. */
+  startsOn?: string;
 }

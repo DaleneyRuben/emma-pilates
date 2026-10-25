@@ -18,7 +18,8 @@ export interface AccountClosureSummaryDto {
    */
   forfeitedClasses: number;
   /**
-   * Credit forfeited through the account_closure ledger entry
+   * Deprecated (PAY-005): always 0 since Credit was retired; kept for store builds
+   * @deprecated
    * @minimum 0
    */
   forfeitedCreditCentavos: number;

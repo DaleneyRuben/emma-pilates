@@ -5,6 +5,7 @@ import {
   bookIsabelFutureSession,
   civil,
   createCarlaBlocks,
+  grantQuarterlySubscription,
   notificationsTo,
   slotIdAt,
 } from './evaluation-bookings-test-support';
@@ -37,6 +38,7 @@ describe('Prisma evaluation booking commands', () => {
       world,
       commands(),
     ));
+    await grantQuarterlySubscription(world.prisma, 'lucia@example.com');
   });
 
   afterAll(async () => {
@@ -70,6 +72,8 @@ describe('Prisma evaluation booking commands', () => {
           branchName: 'Centro',
           nutritionistName: 'Carla Rivas',
           bookable: true,
+          included: true,
+          priceCentavos: 0,
         },
       ],
     });
@@ -151,20 +155,17 @@ describe('Prisma evaluation booking commands', () => {
       ),
     ).resolves.toBe('idempotency_key_reused');
 
-    // September 30 at 20:15 in Bolivia is October 1 in UTC but still September.
+    // The included Evaluation is one per Plan, including a later month.
     await expect(
       codeOf(
         commands().bookEvaluation(
-          await slotAt(wednesdayBlockId, '2026-10-01T00:15:00.000Z'),
+          await slotAt(mondayBlockId, '2026-10-05T13:00:00.000Z'),
           lucia,
           randomUUID(),
         ),
       ),
-    ).resolves.toBe('evaluation_month_used');
+    ).resolves.toBe('evaluation_payment_required');
     const browse = await commands().listBookableSlots({}, lucia);
-    expect(browse.days.every((day) => day.date >= civil('2026-10-01'))).toBe(
-      true,
-    );
     expect(browse.months).toEqual([
       {
         month: civil('2026-09-01'),
@@ -173,14 +174,6 @@ describe('Prisma evaluation booking commands', () => {
       },
       { month: civil('2026-10-01'), status: 'available', evaluation: null },
     ]);
-
-    ids.luciaOctober = (
-      await commands().bookEvaluation(
-        await slotAt(mondayBlockId, '2026-10-05T13:00:00.000Z'),
-        lucia,
-        randomUUID(),
-      )
-    ).id;
   });
 
   it('refuses taken, closed, and missing slots, ineligible Subscriptions, and staff callers', async () => {
@@ -224,6 +217,7 @@ describe('Prisma evaluation booking commands', () => {
     ).resolves.toBe('booking_access_denied');
 
     await bookIsabelFutureSession(world);
+    await grantQuarterlySubscription(world.prisma, 'isabel@example.com');
     ids.isabelSeptember = (
       await commands().bookEvaluation(
         await slotAt(mondayBlockId, '2026-09-28T14:30:00.000Z'),
@@ -239,7 +233,7 @@ describe('Prisma evaluation booking commands', () => {
     await expect(
       commands().listClientEvaluations({ scope: 'upcoming' }, lucia),
     ).resolves.toMatchObject({
-      items: [{ id: ids.luciaSeptember }, { id: ids.luciaOctober }],
+      items: [{ id: ids.luciaSeptember }],
       nextCursor: null,
     });
     await expect(
@@ -254,13 +248,13 @@ describe('Prisma evaluation booking commands', () => {
       codeOf(commands().cancelClientEvaluation(randomUUID(), lucia)),
     ).resolves.toBe('evaluation_not_found');
 
-    await commands().cancelClientEvaluation(ids.luciaOctober, lucia);
+    await commands().cancelClientEvaluation(ids.luciaSeptember, lucia);
     await expect(
-      commands().cancelClientEvaluation(ids.luciaOctober, lucia),
+      commands().cancelClientEvaluation(ids.luciaSeptember, lucia),
     ).resolves.toBeUndefined();
     await expect(
       world.prisma.evaluation.findUniqueOrThrow({
-        where: { id: ids.luciaOctober },
+        where: { id: ids.luciaSeptember },
         select: {
           state: true,
           cancellationCause: true,
@@ -275,13 +269,13 @@ describe('Prisma evaluation booking commands', () => {
     await expect(
       notificationsOf('carla@example.com', 'evaluation_cancelled'),
     ).resolves.toMatchObject([
-      { businessEventKey: `evaluation-cancelled:${ids.luciaOctober}` },
+      { businessEventKey: `evaluation-cancelled:${ids.luciaSeptember}` },
     ]);
     await expect(
       commands().listClientEvaluations({ scope: 'upcoming' }, lucia),
-    ).resolves.toMatchObject({ items: [{ id: ids.luciaSeptember }] });
+    ).resolves.toMatchObject({ items: [] });
 
-    // The freed slot is bookable again, as her October follow-up.
+    // An early cancellation frees the included Evaluation.
     ids.luciaFollowUp = (
       await commands().bookEvaluation(
         await slotAt(mondayBlockId, '2026-10-05T13:00:00.000Z'),
@@ -300,29 +294,20 @@ describe('Prisma evaluation booking commands', () => {
     );
     expect(firstPage.items).toEqual([
       expect.objectContaining({
-        evaluationId: ids.luciaSeptember,
-        clientName: 'Lucía Fernández',
-        startsAt: at('2026-09-28T13:45:00.000Z'),
+        evaluationId: ids.isabelSeptember,
+        clientName: 'Isabel Arce',
+        startsAt: at('2026-09-28T14:30:00.000Z'),
         durationMinutes: 45,
         branchName: 'Centro',
         kind: 'first',
       }),
       expect.objectContaining({
-        evaluationId: ids.isabelSeptember,
-        clientName: 'Isabel Arce',
+        evaluationId: ids.luciaFollowUp,
+        clientName: 'Lucía Fernández',
         kind: 'first',
       }),
     ]);
-    expect(firstPage.hasMore).toBe(true);
-    await expect(
-      commands().listNutritionistAgenda(
-        { limit: 2, cursor: firstPage.nextCursor! },
-        carla,
-      ),
-    ).resolves.toMatchObject({
-      items: [{ evaluationId: ids.luciaFollowUp, kind: 'follow_up' }],
-      hasMore: false,
-    });
+    expect(firstPage.hasMore).toBe(false);
     await expect(
       commands().listNutritionistAgenda(
         {},

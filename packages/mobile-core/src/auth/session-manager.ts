@@ -1,6 +1,7 @@
 import type { CurrentAuthenticationPrincipalDto } from "@pilates/api-contracts";
 
-export type AppRole = "client" | "trainer" | "assistant" | "administrator" | "nutritionist";
+export type AppRole =
+  "client" | "trainer" | "assistant" | "administrator" | "nutritionist" | "coordinator";
 
 /** FUT-001: the Administrator is seeing the Staff app as this Staff Member. */
 export type MobileImpersonation = NonNullable<CurrentAuthenticationPrincipalDto["impersonation"]>;

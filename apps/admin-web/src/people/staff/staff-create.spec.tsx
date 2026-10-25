@@ -75,7 +75,13 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       within(roles)
         .getAllByRole("radio")
         .map((radio) => radio.getAttribute("value")),
-    ).toEqual(["trainer", "assistant", "administrator", "nutritionist"]);
+    ).toEqual([
+      "trainer",
+      "assistant",
+      "administrator",
+      "nutritionist",
+      "coordinator",
+    ]);
     expect(within(roles).queryByRole("radio", { checked: true })).toBeNull();
 
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
@@ -83,7 +89,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     expect(within(panel).getByText("Escribe un correo válido.")).toBeVisible();
     expect(within(panel).getByText("Elige un rol.")).toBeVisible();
 
-    await user.click(within(roles).getByRole("radio", { name: "Entrenador" }));
+    await user.click(within(roles).getByRole("radio", { name: "Entrenadora" }));
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(
       await within(panel).findByText("Elige al menos una sucursal."),
@@ -104,7 +110,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     ).toHaveLength(3);
 
     await user.click(
-      within(panel).getByRole("radio", { name: "Administrador" }),
+      within(panel).getByRole("radio", { name: "Administración" }),
     );
 
     expect(
@@ -179,7 +185,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       "+591 70000000",
     );
     await user.click(
-      within(panel).getByRole("radio", { name: "Administrador" }),
+      within(panel).getByRole("radio", { name: "Administración" }),
     );
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
@@ -230,7 +236,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       "sara@emmapilates.bo",
     );
     await user.click(
-      within(panel).getByRole("radio", { name: "Administrador" }),
+      within(panel).getByRole("radio", { name: "Administración" }),
     );
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 

@@ -6,6 +6,7 @@ import {
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useIdempotencyKey } from "../api/idempotency-key";
+import { CivilDateInput } from "../components/form/civil-date-input";
 import {
   Form,
   FormControl,
@@ -224,7 +225,7 @@ export function PromotionPanelForm({
                 <FormItem>
                   <FormLabel>Fecha de inicio</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <CivilDateInput {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -237,7 +238,7 @@ export function PromotionPanelForm({
                 <FormItem>
                   <FormLabel>Fecha de fin</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <CivilDateInput {...field} />
                   </FormControl>
                   <FormDescription>
                     Entre esas dos fechas la promoción aparece en el inicio de

@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
+import appConfig from "../app.json";
 import App from "../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "./test-support";
 
@@ -77,7 +78,10 @@ describe("Staff Perfil", () => {
     expect(screen.queryByRole("button", { name: "Editar" })).not.toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cambiar contraseña" })).toBeOnTheScreen();
-    expect(screen.getByText("Emma Pilates Studio · versión 1.0")).toBeOnTheScreen();
+    expect(
+      screen.getByText(`Emma Pilates Studio · versión ${appConfig.expo.version}`),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText("Emma Pilates Studio · versión 1.0")).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     await waitFor(() => {

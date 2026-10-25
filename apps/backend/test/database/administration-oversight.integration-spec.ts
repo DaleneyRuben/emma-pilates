@@ -100,25 +100,6 @@ describe('Prisma administration oversight reads', () => {
     expect(sofia.totalItems).toBe(2);
   });
 
-  it('lists Clients with available Credit and the studio-wide total', async () => {
-    const credits = await oversight().listCredits(
-      { page: 1, pageSize: 20 },
-      await administrator(),
-    );
-
-    expect(credits).toMatchObject({
-      totalItems: 1,
-      outstandingCentavos: 6_000,
-      items: [
-        expect.objectContaining({
-          clientName: 'Sofía Guzmán',
-          availableCentavos: 6_000,
-          lastMovementAt: expect.any(Date) as Date,
-        }),
-      ],
-    });
-  });
-
   it('sums confirmed income by month and method, attributing only cash to a Branch', async () => {
     const range = {
       from: new Date('2026-08-01T04:00:00.000Z'),
@@ -144,6 +125,9 @@ describe('Prisma administration oversight reads', () => {
       everywhere.byMethod.cash +
         everywhere.byMethod.transfer +
         everywhere.byMethod.credit_only,
+    );
+    expect(everywhere.byKind.plan + everywhere.byKind.evaluation).toBe(
+      everywhere.totalCentavos,
     );
     expect(centro.byMethod).toEqual({
       cash: everywhere.byMethod.cash,

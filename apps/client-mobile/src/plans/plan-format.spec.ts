@@ -1,4 +1,4 @@
-import { describePlanTerms, describeValidity, formatBolivianos } from "./plan-format";
+import { formatBolivianos } from "./plan-format";
 
 describe("Plan formatting", () => {
   it("formats centavos as whole Bolivianos with es-BO grouping", () => {
@@ -12,15 +12,5 @@ describe("Plan formatting", () => {
     expect(formatBolivianos(210_049)).toBe("Bs 2.100");
     expect(formatBolivianos(50)).toBe("Bs 1");
     expect(formatBolivianos(49)).toBe("Bs 0");
-  });
-
-  it("describes validity by month count", () => {
-    expect(describeValidity(1)).toBe("Válido por 1 mes");
-    expect(describeValidity(3)).toBe("Válido por 3 meses");
-  });
-
-  it("summarizes classes and validity for a Plan card", () => {
-    expect(describePlanTerms(8, 1)).toBe("8 clases · válido por 1 mes");
-    expect(describePlanTerms(36, 3)).toBe("36 clases · válidas por 3 meses");
   });
 });

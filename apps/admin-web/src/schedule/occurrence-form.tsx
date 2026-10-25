@@ -13,6 +13,10 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { parseCivilDate } from "../components/form/civil-date";
+import { CivilDateInput } from "../components/form/civil-date-input";
+import { CivilTimeInput } from "../components/form/civil-time-input";
+import { parseCivilTime } from "../components/form/civil-time";
 import { wholeNumberField } from "../components/form/number-field";
 import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
@@ -37,9 +41,11 @@ const occurrenceSchema = (today: string, booked: number) =>
     trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
     date: z
       .string()
-      .min(1, "Elige la fecha.")
+      .refine((date) => parseCivilDate(date) !== null, "Elige la fecha.")
       .refine((date) => date >= today, "Elige una fecha desde hoy."),
-    time: z.string().regex(/^\d{2}:\d{2}$/, "Elige la hora."),
+    time: z
+      .string()
+      .refine((time) => parseCivilTime(time) !== null, "Elige la hora."),
     durationMinutes: sessionMinutesField,
     capacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares.").refine(
       (capacity) => capacity >= booked,
@@ -162,7 +168,7 @@ export function OccurrenceForm({
                 <FormItem>
                   <FormLabel>Fecha</FormLabel>
                   <FormControl>
-                    <Input type="date" min={today} {...field} />
+                    <CivilDateInput {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -175,7 +181,7 @@ export function OccurrenceForm({
                 <FormItem>
                   <FormLabel>Hora</FormLabel>
                   <FormControl>
-                    <Input type="time" step={300} {...field} />
+                    <CivilTimeInput {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
