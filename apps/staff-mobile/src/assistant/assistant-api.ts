@@ -18,8 +18,6 @@ import {
 } from "@pilates/api-contracts";
 import { randomUUID } from "expo-crypto";
 
-import { photographTransferReceipt } from "./front-desk-receipt-upload";
-
 // Failures keep the stable Problem Details code so screens can word them.
 export class AssistantApiError extends Error {
   constructor(
@@ -47,7 +45,6 @@ export type AssistantApi = {
     startsOn: string | undefined,
     invoiceData: InvoiceDataDto | null,
   ) => Promise<AssistantCashPaymentDto>;
-  photographTransferReceipt: () => Promise<{ imageAssetId: string } | null>;
   recordFrontDeskTransfer: (
     clientId: string,
     planId: string,
@@ -120,9 +117,6 @@ export function createAssistantApi(fetcher: typeof globalThis.fetch): AssistantA
     },
     async leaveWaitlist(waitlistEntryId) {
       requireSuccess(await leaveWaitlist(waitlistEntryId, undefined, fetcher));
-    },
-    photographTransferReceipt() {
-      return photographTransferReceipt(fetcher);
     },
     async recordFrontDeskTransfer(clientId, planId, branchId, imageAssetId, startsOn) {
       const response = await fetcher(`/api/v1/assistant/clients/${clientId}/transfer-payments`, {

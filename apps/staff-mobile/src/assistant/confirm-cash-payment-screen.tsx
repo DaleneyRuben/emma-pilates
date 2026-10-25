@@ -113,7 +113,10 @@ export function ConfirmCashPaymentScreen({
     setReceiptPending(true);
     setFailure(null);
     try {
-      const photographed = await api.photographTransferReceipt();
+      // Loaded only here: the receipt modules are native, and importing them
+      // from the navigation graph crashes every Staff role at startup.
+      const { photographTransferReceipt } = await import("./front-desk-receipt-upload");
+      const photographed = await photographTransferReceipt(fetcher);
       if (photographed === null) return;
       await api.recordFrontDeskTransfer(
         clientId,
