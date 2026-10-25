@@ -11,7 +11,9 @@ const dockerfile = readFileSync(
 // (Northflank migrate build quickest-grape-4221, release ea883a4d).
 describe('the backend image workspace', () => {
   it('copies every workspace package manifest before the frozen install', () => {
-    const packages = readdirSync(path.resolve(__dirname, '../../../../packages'));
+    const packages = readdirSync(
+      path.resolve(__dirname, '../../../../packages'),
+    );
     const missing = packages.filter(
       (name) => !dockerfile.includes(`COPY packages/${name}/package.json`),
     );
