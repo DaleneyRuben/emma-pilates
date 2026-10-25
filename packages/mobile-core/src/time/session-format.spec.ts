@@ -1,6 +1,7 @@
 import {
   boliviaCivilDate,
   civilDateRange,
+  agendaDayChipLabel,
   dayChipLabel,
   formatMonthHeading,
   formatSessionDate,
@@ -51,6 +52,13 @@ describe("Session formatting", () => {
   it("labels day chips with the Spanish weekday and day number", () => {
     expect(dayChipLabel("2026-09-21")).toEqual({ weekday: "lun", day: "21" });
     expect(dayChipLabel("2026-09-27")).toEqual({ weekday: "dom", day: "27" });
+  });
+
+  it("labels a civil date as S02 writes a day chip", () => {
+    expect(agendaDayChipLabel("2026-10-21")).toEqual({ weekday: "Mié", day: "21" });
+    expect(agendaDayChipLabel("2026-10-24")).toEqual({ weekday: "Sáb", day: "24" });
+    expect(agendaDayChipLabel("2026-10-25")).toEqual({ weekday: "Dom", day: "25" });
+    expect(agendaDayChipLabel("2026-10-19")).toEqual({ weekday: "Lun", day: "19" });
   });
 
   it("converts a civil date into the instant range the API expects", () => {

@@ -6,6 +6,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  agendaDayChipLabel,
   boliviaCivilDate,
   CardFooter,
   Chevron,
@@ -116,7 +117,11 @@ export function TrainerAgendaScreen() {
 
   const firstName = profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
   const header = (
-    <RootHeader label="Mi agenda" title={firstName === undefined ? "Hola" : `Hola, ${firstName}`} />
+    <RootHeader
+      eyebrow="Entrenadora"
+      label="Mi agenda"
+      title={firstName === undefined ? "Hola" : `Hola, ${firstName}`}
+    />
   );
 
   if (schedule.isPending)
@@ -147,20 +152,25 @@ export function TrainerAgendaScreen() {
         showsHorizontalScrollIndicator={false}
         style={styles.strip}
       >
-        {dates.map((date) => (
-          <Pressable
-            accessibilityLabel={date}
-            accessibilityRole="button"
-            accessibilityState={{ selected: date === selectedDate }}
-            key={date}
-            onPress={() => setSelectedDate(date)}
-            style={[styles.dateButton, date === selectedDate && styles.dateButtonSelected]}
-          >
-            <Text style={[styles.dateLabel, date === selectedDate && styles.dateLabelSelected]}>
-              {date.slice(8)}
-            </Text>
-          </Pressable>
-        ))}
+        {dates.map((date) => {
+          const { weekday, day } = agendaDayChipLabel(date);
+          const selected = date === selectedDate;
+          return (
+            <Pressable
+              accessibilityLabel={`${weekday} ${day}`}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              key={date}
+              onPress={() => setSelectedDate(date)}
+              style={[styles.dateButton, selected && styles.dateButtonSelected]}
+            >
+              <Text style={[styles.dateWeekday, selected && styles.dateLabelSelected]}>
+                {weekday}
+              </Text>
+              <Text style={[styles.dateLabel, selected && styles.dateLabelSelected]}>{day}</Text>
+            </Pressable>
+          );
+        })}
       </ScrollView>
       {sessions.length === 0 ? (
         <ScrollView contentContainerStyle={styles.centered} refreshControl={refreshControl}>
@@ -197,13 +207,25 @@ const styles = StyleSheet.create({
   centered: { alignItems: "center", flex: 1, gap: spacing.lg, justifyContent: "center" },
   dateButton: {
     alignItems: "center",
-    borderRadius: radii.pill,
-    minWidth: 44,
-    padding: spacing.sm,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
+    borderWidth: 1,
+    minWidth: 56,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.md,
   },
-  dateButtonSelected: { backgroundColor: colors.primary },
-  dateLabel: { color: colors.textSecondary, fontSize: typography.body },
+  dateButtonSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  dateLabel: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.heading,
+    fontSize: typography.titleSmall,
+  },
   dateLabelSelected: { color: colors.white },
+  dateWeekday: {
+    color: colors.textMuted,
+    fontSize: typography.tabLabel,
+    letterSpacing: 0.88,
+  },
   datePicker: { gap: spacing.sm, paddingVertical: spacing.lg },
   header: {
     alignItems: "flex-start",
