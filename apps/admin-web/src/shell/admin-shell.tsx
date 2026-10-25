@@ -61,7 +61,7 @@ export function AdminShell() {
       </a>
       <div className="flex min-h-svh bg-arena text-texto">
         {narrow ? null : (
-          <aside className="sticky top-0 hidden h-svh w-[236px] shrink-0 overflow-y-auto border-r border-borde bg-blanco lg:block">
+          <aside className="sticky top-0 hidden h-svh w-[168px] shrink-0 overflow-y-auto border-r border-borde bg-blanco lg:block xl:w-[236px]">
             <div className="flex h-14 items-center border-b border-borde px-6 font-serif text-titulo-2">
               Emma
             </div>
@@ -74,7 +74,7 @@ export function AdminShell() {
             id="contenido"
             ref={main}
             tabIndex={-1}
-            className="flex-1 bg-superficie px-4 py-5 outline-none focus-visible:shadow-none lg:px-8 lg:py-7"
+            className="flex-1 bg-superficie px-4 py-5 outline-none focus-visible:shadow-none lg:px-4 lg:py-5 xl:px-8 xl:py-7"
           >
             <CatchBoundary
               getResetKey={() => pageKey}

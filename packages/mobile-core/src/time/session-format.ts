@@ -48,6 +48,21 @@ export function dayChipLabel(civilDate: string): {
   };
 }
 
+// S02 writes «Mié 21»: a capitalized short weekday, accent kept. The
+// Assistant strip uppercases dayChipLabel instead, so the two stay apart.
+const agendaWeekdays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"] as const;
+
+export function agendaDayChipLabel(civilDate: string): {
+  weekday: string;
+  day: string;
+} {
+  const date = new Date(`${civilDate}T12:00:00.000Z`);
+  return {
+    weekday: agendaWeekdays[date.getUTCDay()],
+    day: String(date.getUTCDate()),
+  };
+}
+
 export function civilDateRange(civilDate: string): {
   from: string;
   until: string;
@@ -73,10 +88,13 @@ export function hasStarted(startsAt: string, now: Date): boolean {
   return new Date(startsAt).getTime() <= now.getTime();
 }
 
-const cancellationWindowMs = 2.5 * 60 * 60 * 1_000;
-
-export function isInsideCancellationWindow(startsAt: string, now: Date): boolean {
-  return new Date(startsAt).getTime() - now.getTime() <= cancellationWindowMs;
+// The window's length is a Studio Setting (BKM-004), read through useStudioRules.
+export function isInsideCancellationWindow(
+  startsAt: string,
+  now: Date,
+  cancellationWindowMinutes: number,
+): boolean {
+  return new Date(startsAt).getTime() - now.getTime() <= cancellationWindowMinutes * 60_000;
 }
 
 const monthFormatter = new Intl.DateTimeFormat("es-BO", {

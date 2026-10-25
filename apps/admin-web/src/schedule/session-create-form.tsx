@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { ChoiceChips } from "../components/form/choice-chips";
+import { CivilDateInput } from "../components/form/civil-date-input";
+import { CivilTimeInput } from "../components/form/civil-time-input";
 import {
   Form,
   FormControl,
@@ -207,7 +209,7 @@ export function SessionCreateForm({
                   <FormItem>
                     <FormLabel>Fecha</FormLabel>
                     <FormControl>
-                      <Input type="date" min={today} {...field} />
+                      <CivilDateInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -220,7 +222,7 @@ export function SessionCreateForm({
                   <FormItem>
                     <FormLabel>Hora</FormLabel>
                     <FormControl>
-                      <Input type="time" step={300} {...field} />
+                      <CivilTimeInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -258,7 +260,7 @@ export function SessionCreateForm({
                 <FormItem>
                   <FormLabel>Vigente desde</FormLabel>
                   <FormControl>
-                    <Input type="date" min={today} {...field} />
+                    <CivilDateInput {...field} />
                   </FormControl>
                   <FormDescription>Fecha en hora de Bolivia.</FormDescription>
                   <FormMessage />

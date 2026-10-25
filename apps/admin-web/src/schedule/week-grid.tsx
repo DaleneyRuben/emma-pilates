@@ -53,9 +53,9 @@ export function WeekGrid({
     >
       <div
         role="row"
-        className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))] border-b border-borde bg-superficie-sutil"
+        className="grid grid-cols-[44px_repeat(7,minmax(0,1fr))] border-b border-borde bg-superficie-sutil lg:grid-cols-7 xl:grid-cols-[56px_repeat(7,minmax(0,1fr))]"
       >
-        <span aria-hidden="true" />
+        <span aria-hidden="true" className="lg:hidden xl:block" />
         {days.map((day) => {
           const tab = formatDayTab(day);
           return (
@@ -63,7 +63,7 @@ export function WeekGrid({
               key={day}
               role="columnheader"
               className={cn(
-                "flex items-baseline gap-1.5 px-3 py-2.5 text-cabecera-tabla font-medium tracking-[0.14em] text-texto-tenue uppercase",
+                "flex items-baseline gap-1 px-1.5 py-2.5 text-cabecera-tabla font-medium tracking-[0.08em] text-texto-tenue uppercase lg:gap-1 lg:px-1 lg:tracking-[0.04em] xl:gap-1.5 xl:px-3 xl:tracking-[0.14em]",
                 day === today && "text-primario",
               )}
             >
@@ -78,8 +78,15 @@ export function WeekGrid({
           );
         })}
       </div>
-      <div role="row" className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))]">
-        <div aria-hidden="true" className="relative" style={{ height }}>
+      <div
+        role="row"
+        className="grid grid-cols-[44px_repeat(7,minmax(0,1fr))] lg:grid-cols-7 xl:grid-cols-[56px_repeat(7,minmax(0,1fr))]"
+      >
+        <div
+          aria-hidden="true"
+          className="relative lg:hidden xl:block"
+          style={{ height }}
+        >
           {hours.map((hour, index) => (
             <span
               key={hour}

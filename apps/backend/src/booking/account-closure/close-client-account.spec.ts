@@ -55,7 +55,6 @@ const fakeTransaction = (overrides: Partial<ClosureTransaction> = {}): Fake => {
     cancelFutureEvaluations: record('cancelFutureEvaluations', 1),
     releaseOpenPurchaseIntent: record('releaseOpenPurchaseIntent', true),
     endSubscription: record('endSubscription', { forfeitedClasses: 4 }),
-    forfeitCredit: record('forfeitCredit', 6000),
     promoteWaitlists: record('promoteWaitlists', undefined),
     endPromotionsConsent: record('endPromotionsConsent', null),
     keepPromotionContact: record('keepPromotionContact', undefined),
@@ -117,7 +116,6 @@ describe('closeClientAccount', () => {
       'cancelFutureEvaluations',
       'releaseOpenPurchaseIntent',
       'endSubscription',
-      'forfeitCredit',
       'promoteWaitlists',
       'endPromotionsConsent',
       'closeAccount',
@@ -129,7 +127,7 @@ describe('closeClientAccount', () => {
       cancelledBookings: 3,
       cancelledEvaluations: 1,
       forfeitedClasses: 4,
-      forfeitedCreditCentavos: 6000,
+      forfeitedCreditCentavos: 0,
     });
   });
 
@@ -157,7 +155,7 @@ describe('closeClientAccount', () => {
           cancelledBookings: 3,
           cancelledEvaluations: 1,
           forfeitedClasses: 4,
-          forfeitedCreditCentavos: 6000,
+          forfeitedCreditCentavos: 0,
           keptPromotionContact: false,
           endedPromotionsConsent: false,
         },

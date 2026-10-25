@@ -10,7 +10,7 @@ import type {
   PlanVisibility,
   SearchChange,
 } from "../catalog-search";
-import { allowanceLabel, durationLabel } from "./plan-format";
+import { allowanceLabel, durationLabel, weeklyCapLabel } from "./plan-format";
 import { PlanPanelForm } from "./plan-panel";
 import { planListQueryOptions } from "./plan-queries";
 
@@ -29,9 +29,20 @@ const planColumns = (open: (row: AdminPlanDto) => void) => [
       <RowOpener label={row.original.name} onOpen={() => open(row.original)} />
     ),
   }),
-  columns.accessor("durationMonths", {
-    header: "Duración",
+  columns.accessor("durationDays", {
+    header: "Vigencia",
     cell: ({ getValue }) => durationLabel(getValue()),
+  }),
+  columns.accessor("weeklyClassCap", {
+    header: "Tope semanal",
+    cell: ({ getValue }) => {
+      const cap = getValue();
+      return cap === null ? (
+        <span className="text-texto-tenue">{weeklyCapLabel(cap)}</span>
+      ) : (
+        weeklyCapLabel(cap)
+      );
+    },
   }),
   columns.accessor("classAllowance", {
     header: "Clases incluidas",

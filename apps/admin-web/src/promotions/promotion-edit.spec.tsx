@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { addDays, boliviaToday } from "../lib/bolivia-time";
+import { addDays, boliviaToday, formatCivilDate } from "../lib/bolivia-time";
 import { imageFile, useImageDimensions } from "../test/image-stubs";
 import {
   apiUrl,
@@ -108,10 +108,10 @@ describe("AW18 Editar promoción (follow-up 39)", () => {
       showing.description,
     );
     expect(within(panel).getByLabelText("Fecha de inicio")).toHaveValue(
-      showing.displayStartsOn,
+      formatCivilDate(showing.displayStartsOn),
     );
     expect(within(panel).getByLabelText("Fecha de fin")).toHaveValue(
-      showing.displayEndsOn,
+      formatCivilDate(showing.displayEndsOn),
     );
     expect(
       within(panel).getByRole("img", { name: "Vista previa de la imagen" }),

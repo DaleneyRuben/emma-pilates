@@ -1,6 +1,10 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { boliviaInstant, boliviaToday } from "../lib/bolivia-time";
+import {
+  boliviaInstant,
+  boliviaToday,
+  formatCivilDate,
+} from "../lib/bolivia-time";
 import {
   branchesPath,
   centro,
@@ -22,6 +26,7 @@ import {
   emptyIncome,
   expenseReportPath,
   incomeReportPath,
+  revenueReportPath,
   studioExpenses,
   studioIncome,
   urubo,
@@ -48,6 +53,15 @@ const reports = (
     expenseReads.push(params);
     return expenses(params);
   }),
+  http.get(apiUrl(revenueReportPath), () =>
+    jsonResponse({
+      month: "2026-10",
+      cashCentavos: 30_000,
+      accruedCentavos: 12_000,
+      deferredCentavos: 18_000,
+      classesStillOwed: 5,
+    }),
+  ),
   // The report's own selector also offers archived Branches (their history).
   http.get(apiUrl(branchesPath), ({ request }) =>
     new URL(request.url).searchParams.get("status") === "all"
@@ -91,6 +105,11 @@ describe("AW16 Reporte on a desktop browser", () => {
         "Efectivo Bs 780,00 · Transferencias Bs 1.500,00",
       ),
     ).toBeVisible();
+    expect(
+      within(tile("Ingresos")).getByText(
+        "Planes Bs 2.210,00 · Evaluaciones Bs 70,00",
+      ),
+    ).toBeVisible();
     expect(within(tile("Gastos")).getByText("Bs 4.380,50")).toBeVisible();
     expect(
       within(tile("Gastos")).getByText(
@@ -98,6 +117,19 @@ describe("AW16 Reporte on a desktop browser", () => {
       ),
     ).toBeVisible();
     expect(within(tile("Neto")).getByText("−Bs 2.100,50")).toBeVisible();
+    const accrued = screen.getByRole("region", { name: "Ingreso devengado" });
+    expect(
+      within(accrued).getByRole("region", { name: "Caja" }),
+    ).toHaveTextContent("Bs 300,00");
+    expect(
+      within(accrued).getByRole("region", { name: "Devengado" }),
+    ).toHaveTextContent("Bs 120,00");
+    expect(
+      within(accrued).getByRole("region", { name: "Diferido" }),
+    ).toHaveTextContent("Bs 180,00");
+    expect(
+      within(accrued).getByText("Clases pendientes de dar hoy: 5"),
+    ).toBeVisible();
     expect(
       screen.getByText("01/08/2026 – 30/09/2026 · Todas las sucursales"),
     ).toBeVisible();
@@ -140,6 +172,15 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(
       within(september).getByRole("cell", { name: "−Bs 2.480,50" }),
     ).toHaveAttribute("data-label", "Neto");
+    // UX-011: a 1024 px «Totales por mes» must not wrap a month or an amount.
+    for (const name of ["septiembre de 2026", "Bs 1.500,00", "−Bs 2.480,50"]) {
+      expect(within(months).getAllByText(name)[0]).toHaveClass(
+        "whitespace-nowrap",
+      );
+    }
+    expect(
+      within(tile("Ingresos")).getByRole("heading", { name: "Ingresos" }),
+    ).toHaveClass("whitespace-nowrap");
 
     expect(Object.fromEntries(incomeReads[0] ?? [])).toEqual({
       from: "2026-08-01T04:00:00.000Z",
@@ -187,6 +228,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       branch: centro.id,
       from: "2026-08-01",
       to: "2026-09-30",
+      vista: "reporte",
     });
     expect(
       screen.getByText("01/08/2026 – 30/09/2026 · Sucursal Centro"),
@@ -239,8 +281,12 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(incomeReads[0]?.get("from")).toBe(
       boliviaInstant(range.from, "00:00"),
     );
-    expect(screen.getByLabelText("Desde")).toHaveValue(range.from);
-    expect(screen.getByLabelText("Hasta")).toHaveValue(range.to);
+    expect(screen.getByLabelText("Desde")).toHaveValue(
+      formatCivilDate(range.from),
+    );
+    expect(screen.getByLabelText("Hasta")).toHaveValue(
+      formatCivilDate(range.to),
+    );
   });
 
   it("keeps a new range in the address and refuses one that ends before it starts", async () => {
@@ -251,7 +297,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     ).findByText("Bs 2.280,00");
 
     fireEvent.change(screen.getByLabelText("Desde"), {
-      target: { value: "2026-09-01" },
+      target: { value: "01/09/2026" },
     });
     await waitFor(() =>
       expect(incomeReads.at(-1)?.get("from")).toBe("2026-09-01T04:00:00.000Z"),
@@ -263,7 +309,7 @@ describe("AW16 Reporte on a desktop browser", () => {
 
     const reads = incomeReads.length;
     fireEvent.change(screen.getByLabelText("Hasta"), {
-      target: { value: "2026-08-15" },
+      target: { value: "15/08/2026" },
     });
     expect(
       await screen.findByText(
@@ -286,6 +332,9 @@ describe("AW16 Reporte on a desktop browser", () => {
     const chart = screen.getByRole("figure", { name: "Mes por mes" });
     expect(within(chart).getByText("Ingresos")).toBeVisible();
     expect(within(chart).getByText("Gastos")).toBeVisible();
+    expect(within(chart).getByText("Bs 0,00")).toBeVisible();
+    expect(within(chart).getByText("Bs 2.500,00")).toBeVisible();
+    expect(within(chart).getByText("Bs 5.000,00")).toBeVisible();
     const september = within(chart).getByRole("img", {
       name: "septiembre de 2026: ingresos Bs 1.500,00, gastos Bs 3.980,50",
     });

@@ -64,10 +64,6 @@ describe("AW29 Revisar pago on a desktop browser", () => {
     ).toBeInTheDocument();
     expect(await within(panel).findByText("Monto a verificar")).toBeVisible();
     expect(within(panel).getByText("Bs 500,00")).toBeInTheDocument();
-    expect(within(panel).getByText("Precio del plan")).toBeInTheDocument();
-    expect(within(panel).getByText("Bs 560,00")).toBeInTheDocument();
-    expect(within(panel).getByText("Crédito aplicado")).toBeInTheDocument();
-    expect(within(panel).getByText("−Bs 60,00")).toBeInTheDocument();
     expect(within(panel).getByText("21/09/2026 · 14:05")).toBeInTheDocument();
     expect(within(panel).getByText("Transferencia")).toBeInTheDocument();
     const receipt = within(panel).getByRole("img", {
@@ -87,11 +83,11 @@ describe("AW29 Revisar pago on a desktop browser", () => {
     expect(reviewReads).toEqual([sofiaPayment.id]);
   });
 
-  it("leaves out the Credit lines when the Client paid the whole price", async () => {
+  it("never shows Credit lines, even on a Payment from before Credit was retired (PAY-005)", async () => {
     server.use(...answerReviews());
-    const { panel } = await open("Lucía Fernández");
+    const { panel } = await open("Sofía Guzmán");
 
-    expect(await within(panel).findByText("Bs 1.050,00")).toBeInTheDocument();
+    expect(await within(panel).findByText("Bs 500,00")).toBeInTheDocument();
     expect(
       within(panel).queryByText("Crédito aplicado"),
     ).not.toBeInTheDocument();

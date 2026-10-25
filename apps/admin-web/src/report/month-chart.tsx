@@ -1,12 +1,10 @@
 import { useId, useState } from "react";
-import { countFormat } from "../components/table/pagination";
 import { formatMonth } from "../lib/bolivia-time";
 import { cn } from "../lib/cn";
 import { formatBolivianos } from "../lib/money";
 import { chartScale, type ReportMonth } from "./report-range";
 
-const axisLabel = (centavos: number) =>
-  `Bs ${countFormat.format(centavos / 100)}`;
+const axisLabel = (centavos: number) => formatBolivianos(centavos);
 
 const shortMonth = (month: string) => {
   const name = formatMonth(month);
