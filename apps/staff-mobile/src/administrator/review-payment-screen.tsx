@@ -20,8 +20,8 @@ import {
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
@@ -38,6 +38,7 @@ const stateLabels = {
   pending: "Pendiente",
   confirmed: "Confirmado",
   rejected: "Rechazado",
+  voided: "Anulado",
 } as const;
 
 export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: string } } }) {
@@ -50,29 +51,24 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
     query: { refetchOnMount: "always" },
   });
   const receiptUrl = review.data?.status === 200 ? (review.data.data.receiptUrl ?? null) : null;
-  const [receiptUri, setReceiptUri] = useState<string | null>(null);
-  const [receiptRatio, setReceiptRatio] = useState(1);
+  const receipt = useQuery({
+    queryKey: ["payment-receipt", route.params.paymentId, receiptUrl],
+    queryFn: async () => {
+      const loaded = await api.loadReceipt(receiptUrl ?? "");
+      if (loaded === null) {
+        throw new Error("The receipt could not be loaded");
+      }
+      return loaded;
+    },
+    enabled: receiptUrl !== null,
+  });
+  const receiptUri = receipt.data?.uri ?? null;
+  const receiptRatio = receipt.data?.aspectRatio ?? 1;
   const [enlarged, setEnlarged] = useState(false);
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (receiptUrl === null) return;
-    let active = true;
-    void api
-      .loadReceipt(receiptUrl)
-      .then((receipt) => {
-        if (!active || receipt === null) return;
-        setReceiptUri(receipt.uri);
-        setReceiptRatio(receipt.aspectRatio);
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [api, receiptUrl]);
 
   const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Revisar pago" />;
 
@@ -140,11 +136,18 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
             )}
           </View>
           {receiptUri === null ? (
-            <BodyText>
-              {payment.receipt
-                ? "Cargando el comprobante…"
-                : "El comprobante ya no está disponible."}
-            </BodyText>
+            receipt.isError ? (
+              <QueryFailure
+                label="No pudimos mostrar el comprobante."
+                onRetry={() => void receipt.refetch()}
+              />
+            ) : (
+              <BodyText>
+                {payment.receipt
+                  ? "Cargando el comprobante…"
+                  : "El comprobante ya no está disponible."}
+              </BodyText>
+            )
           ) : (
             <Pressable
               accessibilityLabel="Ampliar comprobante"
@@ -209,6 +212,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
           <View style={styles.actions}>
             <PrimaryButton
               busy={submitting}
+              disabled={receiptUri === null}
               label="Confirmar pago"
               onPress={() => void decide(() => api.confirmPayment(payment.id), "Pago confirmado")}
               testID="review-confirm"

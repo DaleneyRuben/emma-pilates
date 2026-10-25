@@ -26,7 +26,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 24</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Cerrar mi cuenta</h1>
-    <p style="margin:0;max-width:860px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Se abre desde el enlace discreto «Cerrar mi cuenta» bajo «Cerrar sesión» en la pantalla 18. Es la clienta cerrando su propia cuenta: antes de confirmar ve exactamente qué pasa con sus reservas, su plan y su crédito, y confirma con su contraseña. No es «Cerrar sesión» (eso solo termina esta sesión). Sin barra de pestañas: la flecha y «Cancelar» regresan al perfil sin hacer nada.</p>
+    <p style="margin:0;max-width:860px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Se abre desde el enlace discreto «Cerrar mi cuenta» bajo «Cerrar sesión» en la pantalla 18. Es la clienta cerrando su propia cuenta: antes de confirmar ve exactamente qué pasa con sus reservas, su plan, y confirma con su contraseña. No es «Cerrar sesión» (eso solo termina esta sesión). Sin barra de pestañas: la flecha y «Cancelar» regresan al perfil sin hacer nada.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:44px;">
@@ -34,7 +34,7 @@
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:13px;font-weight:500;">iOS · Con plan, reservas y crédito</div>
+          <div style="font-size:13px;font-weight:500;">iOS · Con plan y reservas</div>
           <div style="font-size:12px;color:#766D69;">Todas las consecuencias · contraseña vacía · botón deshabilitado</div>
         </div>
       </sc-if>
@@ -64,7 +64,6 @@
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
                   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"></rect><line x1="3.5" y1="11" x2="20.5" y2="11"></line></svg>
-                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Pierdes tu crédito de Bs 120,00.</span>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
                   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="6" y="3.5" width="12" height="17" rx="2.5"></rect><line x1="10.5" y1="17.5" x2="13.5" y2="17.5"></line></svg>
@@ -104,7 +103,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Sin nada pendiente</div>
-          <div style="font-size:12px;color:#766D69;">Sin plan, reservas ni crédito: solo las dos líneas de siempre y la nota</div>
+          <div style="font-size:12px;color:#766D69;">Sin plan ni reservas: solo las dos líneas de siempre y la nota</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -186,7 +185,6 @@
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
                   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"></rect><line x1="3.5" y1="11" x2="20.5" y2="11"></line></svg>
-                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Pierdes tu crédito de Bs 120,00.</span>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
                   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="6" y="3.5" width="12" height="17" rx="2.5"></rect><line x1="10.5" y1="17.5" x2="13.5" y2="17.5"></line></svg>
@@ -293,7 +291,6 @@
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
                   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"></rect><line x1="3.5" y1="11" x2="20.5" y2="11"></line></svg>
-                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Pierdes tu crédito de Bs 120,00.</span>
                 </div>
                 <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
                   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="6" y="3.5" width="12" height="17" rx="2.5"></rect><line x1="10.5" y1="17.5" x2="13.5" y2="17.5"></line></svg>

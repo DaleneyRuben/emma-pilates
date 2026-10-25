@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useIdempotencyKey } from "../../api/idempotency-key";
+import { CivilDateInput } from "../../components/form/civil-date-input";
 import { pastCivilDateField } from "../../components/form/date-field";
 import {
   Form,
@@ -25,7 +26,6 @@ import {
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Select } from "../../components/ui/select";
-import { boliviaToday } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
 import { backOfficeProblem } from "../back-office-problems";
 import { staffOptionLabel } from "./payroll-format";
@@ -169,7 +169,7 @@ export function SalaryPaymentPanelForm({
               <FormItem>
                 <FormLabel>Fecha</FormLabel>
                 <FormControl>
-                  <Input type="date" max={boliviaToday()} {...field} />
+                  <CivilDateInput {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

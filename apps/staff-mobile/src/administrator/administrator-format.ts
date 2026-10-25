@@ -19,8 +19,8 @@ export function describeCount(count: number, singular: string, plural: string): 
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
-// S14: the cancellation, the refund even inside the 2 h 30 Cancellation
-// Window, and who is told, with the Session's live counts.
+// S14: the cancellation, the refund even inside the Cancellation Window, and
+// who is told, with the Session's live counts.
 export function describeSessionCancellation({
   bookedCount,
   waitlistCount,
@@ -32,8 +32,8 @@ export function describeSessionCancellation({
 
   const bookings =
     bookedCount === 1
-      ? "Se cancelará la única reserva de esta clase, se reembolsará la clase al cliente afectado, incluso si ya no podía cancelar por su cuenta, y se le notificará."
-      : `Se cancelarán las ${bookedCount} reservas de esta clase, se reembolsará una clase a cada cliente afectado, incluso si ya no podían cancelar por su cuenta, y se les notificará.`;
+      ? "Se cancelará la única reserva de esta clase, se reembolsará la clase a la clienta afectada, incluso si ya no podía cancelar por su cuenta, y se le notificará."
+      : `Se cancelarán las ${bookedCount} reservas de esta clase, se reembolsará una clase a cada clienta afectada, incluso si ya no podían cancelar por su cuenta, y se les notificará.`;
   if (waitlistCount === 0) return bookings;
 
   const waitlist =

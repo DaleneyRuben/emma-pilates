@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-nati
 import { clearMobileQueryCache, createMemoryPushPlatform } from "@pilates/mobile-core";
 
 import App from "../../App";
-import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
+import { createClientRuntime, jsonResponse, routeFetcher, studioRules } from "../test-support";
 import { boliviaCivilDate, civilDateRange } from "@pilates/mobile-core";
 
 jest.setTimeout(20_000);
@@ -36,8 +36,10 @@ const classType = {
   // (WEB-027, booking ADR-0004).
   durationMinutes: 60,
 };
-const startsAt = new Date(Date.now() + 60 * 60 * 1_000);
+// Outside the seeded 2 h 30 window, so a full Session still offers the Waitlist.
+const startsAt = new Date(Date.now() + 4 * 60 * 60 * 1_000);
 const endsAt = new Date(startsAt.getTime() + 75 * 60 * 1_000);
+const insideWindowStartsAt = new Date(Date.now() + 60 * 60 * 1_000);
 const { from, until } = civilDateRange(boliviaCivilDate(new Date()));
 const listUrl = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
 
@@ -56,7 +58,7 @@ const listed = (availableSeats: number) => ({
   waitlistCount: 0,
 });
 
-const detail = (availableSeats: number) => ({
+const detail = (availableSeats: number, classesLeftThisWeek?: number | null) => ({
   id: "session-1",
   branch,
   classType,
@@ -67,6 +69,7 @@ const detail = (availableSeats: number) => ({
   bookedCount: 12 - availableSeats,
   availableSeats,
   waitlistCount: 0,
+  ...(classesLeftThisWeek === undefined ? {} : { classesLeftThisWeek }),
 });
 
 async function openDetail(
@@ -74,6 +77,7 @@ async function openDetail(
   remaining = 5,
   availableSeats = 3,
   runtime: Parameters<typeof createClientRuntime>[1] = {},
+  sessionStartsAt = startsAt,
 ) {
   let subscriptionRemaining = remaining;
   const fetcher = routeFetcher({
@@ -81,8 +85,20 @@ async function openDetail(
     "/api/v1/clients/current/subscription": () => jsonResponse(subscription(subscriptionRemaining)),
     "/api/v1/branches": () => jsonResponse([branch]),
     "/api/v1/class-types": () => jsonResponse([classType]),
-    [listUrl]: () => jsonResponse([listed(availableSeats)]),
-    "/api/v1/sessions/session-1": () => jsonResponse(detail(availableSeats)),
+    [listUrl]: () =>
+      jsonResponse([
+        {
+          ...listed(availableSeats),
+          startsAt: sessionStartsAt.toISOString(),
+          endsAt: new Date(sessionStartsAt.getTime() + 75 * 60 * 1_000).toISOString(),
+        },
+      ]),
+    "/api/v1/sessions/session-1": () =>
+      jsonResponse({
+        ...detail(availableSeats),
+        startsAt: sessionStartsAt.toISOString(),
+        endsAt: new Date(sessionStartsAt.getTime() + 75 * 60 * 1_000).toISOString(),
+      }),
     ...routes,
   });
   const screen = await render(<App runtime={createClientRuntime(fetcher, runtime)} />);
@@ -146,6 +162,28 @@ describe("Client Session detail", () => {
     });
     expect(booked).toHaveBeenCalledWith(expect.stringMatching(/^[0-9a-f-]{36}$/));
     expect(screen.getByText("Te quedan 4 clases en tu plan")).toBeOnTheScreen();
+  });
+
+  // MOB-070: joining inside the Cancellation Window is refused, so the
+  // detail must not offer it. The window length comes from the studio rules.
+  it("does not offer the Waitlist inside the Cancellation Window", async () => {
+    const { screen } = await openDetail(
+      {
+        "/api/v1/studio-rules": () =>
+          jsonResponse({ ...studioRules, cancellationWindowMinutes: 90 }),
+      },
+      5,
+      0,
+      {},
+      insideWindowStartsAt,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Unirme a la lista de espera" }),
+    ).not.toBeOnTheScreen();
+    expect(
+      screen.getByText("Falta poco para la clase, así que la lista de espera ya cerró."),
+    ).toBeOnTheScreen();
   });
 
   it("offers the Waitlist when the Session is full", async () => {
@@ -223,6 +261,14 @@ describe("Client Session detail", () => {
     });
   });
 
+  it("shows the classes left this week from the Session field", async () => {
+    const { screen } = await openDetail({
+      "/api/v1/sessions/session-1": () => jsonResponse(detail(3, 0)),
+    });
+
+    expect(screen.getByText("Te quedan 0 clases esta semana")).toBeOnTheScreen();
+  });
+
   it("explains a rejected Booking with the problem code", async () => {
     const { screen } = await openDetail({
       "POST /api/v1/sessions/session-1/bookings": () =>
@@ -233,6 +279,19 @@ describe("Client Session detail", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Ya tienes una reserva a esa hora.")).toBeOnTheScreen();
+    });
+  });
+
+  it("explains a weekly cap refusal from the problem code", async () => {
+    const { screen } = await openDetail({
+      "POST /api/v1/sessions/session-1/bookings": () =>
+        jsonResponse({ code: "weekly_cap_reached", status: 409, title: "Conflict" }, 409),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Ya usaste tus clases de esta semana.")).toBeOnTheScreen();
     });
   });
 });

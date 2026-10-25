@@ -1,6 +1,7 @@
 import {
   boliviaCivilDate,
   civilDateRange,
+  agendaDayChipLabel,
   dayChipLabel,
   formatMonthHeading,
   formatSessionDate,
@@ -11,12 +12,20 @@ import {
 } from "./session-format";
 
 describe("Session formatting", () => {
-  it("treats the last 2 h 30 before a Session as the Cancellation Window", () => {
+  it("treats the configured minutes before a Session as the Cancellation Window", () => {
     const now = new Date("2026-09-21T12:00:00.000Z");
 
-    expect(isInsideCancellationWindow("2026-09-21T14:30:00.000Z", now)).toBe(true);
-    expect(isInsideCancellationWindow("2026-09-21T14:30:00.001Z", now)).toBe(false);
-    expect(isInsideCancellationWindow("2026-09-21T11:00:00.000Z", now)).toBe(true);
+    expect(isInsideCancellationWindow("2026-09-21T14:30:00.000Z", now, 150)).toBe(true);
+    expect(isInsideCancellationWindow("2026-09-21T14:30:00.001Z", now, 150)).toBe(false);
+    expect(isInsideCancellationWindow("2026-09-21T11:00:00.000Z", now, 150)).toBe(true);
+  });
+
+  // BKM-004: the window is a Studio Setting, so changing it moves the edge.
+  it("follows a changed Cancellation Window", () => {
+    const now = new Date("2026-09-21T12:00:00.000Z");
+
+    expect(isInsideCancellationWindow("2026-09-21T15:00:00.000Z", now, 150)).toBe(false);
+    expect(isInsideCancellationWindow("2026-09-21T15:00:00.000Z", now, 240)).toBe(true);
   });
 
   // MOB-044: a Session that has started can no longer be booked or cancelled.
@@ -43,6 +52,13 @@ describe("Session formatting", () => {
   it("labels day chips with the Spanish weekday and day number", () => {
     expect(dayChipLabel("2026-09-21")).toEqual({ weekday: "lun", day: "21" });
     expect(dayChipLabel("2026-09-27")).toEqual({ weekday: "dom", day: "27" });
+  });
+
+  it("labels a civil date as S02 writes a day chip", () => {
+    expect(agendaDayChipLabel("2026-10-21")).toEqual({ weekday: "Mié", day: "21" });
+    expect(agendaDayChipLabel("2026-10-24")).toEqual({ weekday: "Sáb", day: "24" });
+    expect(agendaDayChipLabel("2026-10-25")).toEqual({ weekday: "Dom", day: "25" });
+    expect(agendaDayChipLabel("2026-10-19")).toEqual({ weekday: "Lun", day: "19" });
   });
 
   it("converts a civil date into the instant range the API expects", () => {

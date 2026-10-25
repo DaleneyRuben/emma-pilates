@@ -173,6 +173,14 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
     expect(
       within(panel).getByLabelText("Tipo de clase"),
     ).toHaveAccessibleDescription("Elige un tipo de clase.");
+    expect(within(panel).getByLabelText("Hora")).toHaveAttribute(
+      "placeholder",
+      "hh:mm",
+    );
+    expect(within(panel).getByLabelText("Fecha")).toHaveAttribute(
+      "placeholder",
+      "dd/mm/aaaa",
+    );
     expect(within(panel).getByLabelText("Hora")).toHaveAccessibleDescription(
       "Elige la hora.",
     );

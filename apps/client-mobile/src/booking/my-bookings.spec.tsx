@@ -206,7 +206,10 @@ describe("Client My Bookings", () => {
       [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
         () => jsonResponse([alternative]),
       "POST /api/v1/bookings/booking-soon/reschedule": (init) => {
-        rescheduled(JSON.parse(String(init?.body)));
+        rescheduled(
+          JSON.parse(String(init?.body)),
+          new Headers(init?.headers).get("idempotency-key"),
+        );
         upcoming = [{ ...insideWindow, bookingId: "booking-new", ...facts(at(3 * hour)) }];
         return jsonResponse({ id: "booking-new" }, 201);
       },
@@ -239,8 +242,62 @@ describe("Client My Bookings", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Confirmar cambio" }));
 
     await waitFor(() => {
-      expect(rescheduled).toHaveBeenCalledWith({ targetSessionId: "session-alt" });
+      expect(rescheduled).toHaveBeenCalledWith(
+        { targetSessionId: "session-alt" },
+        expect.stringMatching(/^[0-9a-f-]{36}$/),
+      );
       expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
     });
+  });
+
+  // MOB-070: a double tap must replay the same Reschedule, as Reservar and
+  // the Waitlist already do, so the key is sent and reused.
+  it("sends one Idempotency-Key and reuses it when Confirmar cambio is tapped twice", async () => {
+    const { from, until } = civilDateRange(boliviaCivilDate(new Date(insideWindow.startsAt)));
+    const alternative = {
+      id: "session-alt",
+      branchId: "branch-centro",
+      classTypeId: "class-reformer",
+      trainerStaffMemberId: "trainer-1",
+      classTypeName: "Reformer Pilates",
+      trainerName: "Emma Vargas",
+      ...facts(at(3 * hour)),
+      capacity: 12,
+      bookedCount: 4,
+      availableSeats: 8,
+      waitlistCount: 0,
+    };
+    const keys: Array<string | null> = [];
+    const screen = await openMyBookings({
+      ...baseRoutes(() => [insideWindow]),
+      "/api/v1/branches": () =>
+        jsonResponse([{ id: "branch-centro", name: "Centro", address: "Calle 1" }]),
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+        () => jsonResponse([alternative]),
+      "POST /api/v1/bookings/booking-soon/reschedule": (init) => {
+        keys.push(new Headers(init?.headers).get("idempotency-key"));
+        return jsonResponse({ code: "reschedule_target_ineligible", status: 409 }, 409);
+      },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Reprogramar" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar cambio" }));
+    await waitFor(() => {
+      expect(keys).toHaveLength(1);
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar cambio" }));
+
+    await waitFor(() => {
+      expect(keys).toHaveLength(2);
+    });
+    expect(keys[0]).toEqual(expect.stringMatching(/^[0-9a-f-]{36}$/));
+    expect(keys[1]).toBe(keys[0]);
   });
 });

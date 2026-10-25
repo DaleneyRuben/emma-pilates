@@ -17,6 +17,7 @@
     "deactivateStaffMember",
     "listAdminClients",
     "getAdminClient",
+    "updateAdminClientProfile",
     "listAdminPayments",
     "listAdminBranches",
     "createBranch",
@@ -39,7 +40,7 @@
     "listAdminEvaluations",
     "cancelAdminEvaluation",
     "listAdminReferrals",
-    "listAdminCredits",
+    "listFounderMemberships",
     "getIncomeReport",
     "listAdminSupplies",
     "createSupply",
@@ -58,6 +59,10 @@
     "recordExpense",
     "updateExpense",
     "getExpenseReport",
+    "listCoordinatorPayStatements",
+    "listPayStatements",
+    "draftPayStatements",
+    "approvePayStatement",
     "listAdminPromotions",
     "createPromotion",
     "reorderPromotions",
@@ -65,6 +70,14 @@
     "publishPromotion",
     "unpublishPromotion",
     "deletePromotion",
-    "getAdminPromotionImage"
+    "getAdminPromotionImage",
+    "recomputeStudioFacts",
+    "getRevenueReport",
+    "getMonthKpis",
+    "listRecommendations",
+    "recomputeRecommendations",
+    "dismissRecommendation",
+    "getNarrativeReport",
+    "askNarrativeQuestion"
   ]
 }

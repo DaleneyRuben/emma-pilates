@@ -30,18 +30,19 @@ instructions» once per app:
 | Name | `Revisión Google Play` | `Revisión Google Play` |
 | Username | a Client Account made for Google on production | a Trainer Account made for Google on production |
 | Password | typed only into this form, never stored in the repository | same |
-| Other information | «Inicia sesión con este correo y contraseña. La cuenta no tiene un plan activo: puedes ver el horario, el flujo de compra con QR y el perfil; reservar una clase requiere un plan pagado.» | «Inicia sesión con este correo y contraseña. La cuenta es de una instructora de prueba sin clases asignadas.» |
+| Other information | «Inicia sesión con este correo y contraseña. La cuenta tiene un plan de prueba de 16 clases, otorgado por la administración, así que puedes reservar una clase, ver Mi plan y el perfil.» | «Inicia sesión con este correo y contraseña. La cuenta es de una instructora de prueba sin clases asignadas.» |
 | Login needed every time | No (the session stays signed in) | No |
 
 The reviewer Accounts are made for Google, never a real person's, under an
 address on our domain (for example `revision-play@emmapilatesstudio.com`
-through Email Routing). The Client Account has **no Plan**: a confirmed Payment
-would count as income in the reports, and a reviewer only needs to reach the
-screens (the schedule, Mi plan with the QR purchase flow, Perfil). The Staff
-Account is a Trainer with **no Sessions**, since a real Session would be
-bookable by Clients; a Trainer rather than an Administrator keeps the reviewer
-away from payments and Account management. Close both Accounts if the apps are
-ever withdrawn.
+through Email Routing). The Client Account gets the hidden tester Plan of 16
+classes (REL-011), granted by the Administrator, so the reviewer can book a
+class. That grant is a courtesy Payment of Bs 0 and counts toward no income
+report. REL-016 replaces both Accounts after the production reset, marked
+`store_review`, so they never count toward founders, the gift class, or pay
+statements. The Staff Account is a Trainer with **no Sessions**, since a real
+Session would be bookable by Clients; a Trainer rather than an Administrator
+keeps the reviewer away from payments and Account management.
 
 ## Content rating (IARC questionnaire)
 

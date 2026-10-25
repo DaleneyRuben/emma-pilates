@@ -182,6 +182,69 @@ describe('createBooking', () => {
     expect(create).not.toHaveBeenCalled();
   });
 
+  it('refuses a Booking once the weekly cap is reached and no extra class is left', async () => {
+    const create = jest.fn();
+
+    await expect(
+      createBooking(
+        { sessionId: session.id },
+        {
+          principal: {
+            accountId: 'account-id',
+            authenticationSessionId: 'authentication-session-id',
+            identity: { kind: 'client', clientId: 'client-id' },
+          },
+          loadSession: jest.fn().mockResolvedValue(session),
+          countLiveBookings: jest.fn().mockResolvedValue(0),
+          findEligibleSubscription: jest.fn().mockResolvedValue({
+            id: 'subscription-id',
+            weeklyClassCap: 3,
+            baseFundedBookingsThisWeek: 3,
+            extraClasses: 0,
+          }),
+          hasOverlappingBooking: jest.fn().mockResolvedValue(false),
+          create,
+          now: () => new Date('2026-09-10T12:00:00Z'),
+        },
+      ),
+    ).rejects.toThrow('Weekly cap reached');
+
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('books past the cap when an extra class is left', async () => {
+    const create = jest.fn().mockResolvedValue({ id: 'booking-id' });
+
+    await expect(
+      createBooking(
+        { sessionId: session.id, clientId: 'client-id' },
+        {
+          principal: {
+            accountId: 'assistant-account-id',
+            authenticationSessionId: 'authentication-session-id',
+            identity: {
+              kind: 'staff',
+              staffMemberId: 'assistant-id',
+              role: 'assistant',
+              branchIds: [session.branchId],
+            },
+          },
+          loadSession: jest.fn().mockResolvedValue(session),
+          countLiveBookings: jest.fn().mockResolvedValue(0),
+          findEligibleSubscription: jest.fn().mockResolvedValue({
+            id: 'subscription-id',
+            weeklyClassCap: 3,
+            baseFundedBookingsThisWeek: 3,
+            extraClasses: 1,
+          }),
+          hasOverlappingBooking: jest.fn().mockResolvedValue(false),
+          create,
+          now: () => new Date('2026-09-10T12:00:00Z'),
+        },
+      ),
+    ).resolves.toEqual({ id: 'booking-id' });
+  });
+
   it('rejects a Booking that overlaps the Client’s existing Session', async () => {
     const create = jest.fn();
 

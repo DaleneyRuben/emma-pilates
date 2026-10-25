@@ -1,7 +1,8 @@
 import type { AdminSessionScheduleDto } from "@pilates/api-contracts";
 import { useId, useState } from "react";
+import { parseCivilDate } from "../components/form/civil-date";
+import { CivilDateInput } from "../components/form/civil-date-input";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
-import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { endedNotice } from "./schedule-notices";
 import { scheduleProblem } from "./schedule-problems";
@@ -31,7 +32,7 @@ export function EndSeriesAction({
   const change = useScheduleChange(branchId);
   const [date, setDate] = useState(defaultDate);
   const dateId = useId();
-  const valid = date !== "" && date >= earliest;
+  const valid = parseCivilDate(date) !== null && date >= earliest;
 
   const end = async () => {
     onFailure(null);
@@ -68,13 +69,7 @@ export function EndSeriesAction({
       </p>
       <div className="flex flex-col gap-1.5 pt-1">
         <Label htmlFor={dateId}>Deja de repetirse desde</Label>
-        <Input
-          id={dateId}
-          type="date"
-          min={earliest}
-          value={date}
-          onChange={(event) => setDate(event.target.value)}
-        />
+        <CivilDateInput id={dateId} value={date} onChange={setDate} />
       </div>
     </ConfirmDialog>
   );
