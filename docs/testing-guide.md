@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111); tell an expired Plan from a Client who never bought one on Clientes (Test 113) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111); tell an expired Plan from a Client who never bought one on Clientes (Test 113); read Horario and the report at 1024 px (Test 114) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
@@ -83,12 +83,12 @@ can be found by its design name.
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
 | AW36 Reglas del estudio (from AW33) | 75, 112 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
-| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82, 111 |
+| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82, 111, 114 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81, 112 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW37 Equipos | 82 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112 |
-| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113 |
@@ -1475,7 +1475,7 @@ version):
   dies with the runner) side by side, each waiting for both contracts and
   api-unit;
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
-  **web-unit** (the admin-web Jest suite) and **web-e2e** (the seventeen
+  **web-unit** (the admin-web Jest suite) and **web-e2e** (the nineteen
   Playwright journeys of Test 31 through the built backend and the built admin web, on
   a `postgres:18-alpine` service container with a `pilates_test_ci` admin
   database, WEB-017) side by side;
@@ -2728,7 +2728,9 @@ Bolivia time, whatever time zone your computer uses.
 1. **Horario.** The landing page shows the selected Branch's week: seven day
    columns, a time axis, and one block per Session with the Class Type, the
    start and end time, the Trainer, and the booked seats ("0/12"); a full
-   Session reads "Llena · 3 en espera". The subtitle counts the week's
+   Session reads "Llena · 3 en espera". On a 1024 px laptop the Class Type
+   sits on its own line and reads in full ("Reformer Pilates", never
+   "Refo…"), the time on the next, and the seats on a third (Test 75). The subtitle counts the week's
    Sessions ("Sucursal Centro · sala única · 10 sesiones esta semana"). The
    arrows and **Hoy** move between weeks and the address remembers the week
    (`/?week=2026-09-28`). Choosing another Branch in the top bar redraws the
@@ -3120,7 +3122,9 @@ dates whatever your computer's time zone.
 3. **Mes por mes.** One pair of bars per month of the range, empty months
    included, green for income and red for expenses; pointing at a month (or
    tabbing to it) shows its two figures. **Totales por mes** lists the same
-   numbers exactly, with a total.
+   numbers exactly, with a total. A month name ("mayo de 2026") and an amount
+   ("Bs 780,00") stay on one line at 1024 px, and so does each tile caption
+   (Test 75).
 4. **Gastos por categoría.** In Todas las sucursales the first row is
    **Nómina** ("Viene de Nómina, no de las categorías"), then each Expense
    Category, then **Total de gastos**.
@@ -3143,6 +3147,32 @@ dates whatever your computer's time zone.
    its pairs, and both tables become cards.
 
 Date pickers follow the browser's language, as Test 25 notes.
+
+## Test 114: read Horario and the report on a 1024 px laptop
+
+The design draws the admin web at 1440 px and at 420 px only. A 13-inch
+laptop is 1024 px wide, and that width used to cut every Session block to
+"Refo…" and wrap the report's month names. Start the backend and the admin
+web as Test 24 describes, log in as `paola.mendoza@example.com`, and set the
+browser window to 1024 × 900.
+
+1. **Horario.** The sidebar stays (168 px, narrower than the 236 px one at
+   1440; it still collapses only below 1024 px, behind "Abrir menú"). Each
+   Session block is three
+   lines: the Class Type in full ("Reformer Pilates", not "Refo…"), then the
+   time ("07:00 – 07:50") with the Trainer, then the seats ("0/12", or
+   "Llena · 3 en espera"). Neither the type nor the time wraps.
+2. **Reporte.** Open **Reporte**. In **Totales por mes**, "mayo de 2026" and
+   "Bs 780,00" each stay on one line. The three tiles stay in one row, and
+   their captions ("Ingresos", "Gastos", "Neto") stay on one line; only the
+   sentence under a figure may wrap.
+3. **The drawn widths.** At 1440 px the sidebar is the wide one again and the
+   same block still names the Class Type and the time on their own lines. At
+   420 px the sidebar is gone behind "Abrir menú", the week is day tabs, and
+   the report's month names and amounts still do not wrap inside their cards.
+
+Playwright covers the same three widths (`e2e/laptop.spec.ts`, inside Test
+31's suite).
 
 ## Test 31: run the admin web's critical journeys with Playwright
 
@@ -3169,7 +3199,7 @@ process ids (the API, the worker, and the preview server), the ports, and
 the `pilates_test_*` database name it made, and its teardown stops the three
 servers and drops that database. Since WEB-034 the worker runs too, because
 the payment journeys send a real transfer receipt the way the Client app
-does, and only the worker turns it into variants. The seventeen journeys take
+does, and only the worker turns it into variants. The nineteen journeys take
 about thirty seconds:
 
 1. **Sessions.** Paola signs in and lands on Horario; the
@@ -3245,11 +3275,17 @@ about thirty seconds:
 14. **Security headers (WEB-030, WEB-037).** Every response carries the
     policy of Test 62 and the overlays lock the page behind them; that test
     reads the journey.
+15. **A 1024 px laptop (UX-011, Test 75).** Horario at 1024 × 900 keeps the
+    sidebar and a Reformer block whose type reads «Reformer Pilates» in full,
+    on its own line, without wrapping; Reporte keeps a month name and an
+    amount in «Totales por mes», and the three tile captions, on one line.
+    The same block is checked at 1440, where the sidebar is the wide one,
+    and at 420 the sidebar is gone behind «Abrir menú».
 
 Three of these files hold more than one case: `session.spec.ts` is the
 three parts of item 1 and `authorization.spec.ts` the two of item 5 (the
-neutral rejection and the untrusted origin), which is how fourteen files
-make seventeen journeys.
+neutral rejection and the untrusted origin), which is how fifteen files
+make nineteen journeys.
 
 To run one file or watch the browser, use Playwright directly from
 `apps/admin-web`, for example
@@ -3269,7 +3305,7 @@ Set `TEST_DATABASE_URL` to another `pilates_test_*` admin database, or
 `E2E_API_PORT` and `E2E_WEB_PORT` to other ports, when the defaults collide
 with something on your machine.
 
-CI runs the same seventeen journeys in the **web-e2e** job of
+CI runs the same nineteen journeys in the **web-e2e** job of
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (WEB-017), beside
 the web-unit job as soon as quality-web passed (EXT-005), on every pull
 request that touches the admin web and on every push to `main`. The job runs

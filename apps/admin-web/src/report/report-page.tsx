@@ -270,7 +270,7 @@ export function ReportPage({
               )}
             />
           )}
-          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="grid gap-5 min-[1100px]:grid-cols-2">
             <CategoryTable
               expenses={expenses.data}
               allBranches={branchId === undefined}
