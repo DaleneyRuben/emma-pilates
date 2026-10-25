@@ -41,7 +41,7 @@ test.describe("a 1024 px laptop", () => {
   test.use({ viewport: { width: 1024, height: 900 } });
 
   test("keeps the week and the report readable", async ({ page }) => {
-    const monday = weekStartOf(boliviaToday());
+    const monday = addDays(weekStartOf(boliviaToday()), 7);
     await signIn(page, `/?week=${monday}`);
     await expect(
       page.getByRole("heading", { level: 1, name: "Horario" }),
@@ -71,7 +71,7 @@ test.describe("a 1024 px laptop", () => {
 test.describe("the drawn widths", () => {
   test("keep the sidebar at 1440 and the drawer at 420", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    const monday = addDays(weekStartOf(boliviaToday()), 0);
+    const monday = addDays(weekStartOf(boliviaToday()), 7);
     await signIn(page, `/?week=${monday}`);
     await expect(sidebar(page)).toBeVisible();
     await fullType(page);

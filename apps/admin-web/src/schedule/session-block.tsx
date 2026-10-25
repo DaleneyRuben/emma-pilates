@@ -63,10 +63,10 @@ export function SessionBlock({
         className,
       )}
     >
-      <span className="w-full text-[11.5px] leading-tight font-medium whitespace-nowrap text-texto xl:text-[12.5px]">
+      <span className="w-full text-ayuda leading-tight font-medium whitespace-nowrap text-texto xl:text-[12.5px]">
         {session.classTypeName}
       </span>
-      <span className="w-full text-[11px] leading-tight whitespace-nowrap text-texto-secundario tabular lg:text-[11.5px] xl:text-ayuda">
+      <span className="w-full text-[11px] leading-tight whitespace-nowrap text-texto-secundario tabular lg:text-ayuda">
         {start} – {end}
         <span className="text-texto-tenue"> · {session.trainerName}</span>
       </span>
