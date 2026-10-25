@@ -1,9 +1,12 @@
 import { z } from "zod";
+import { parseCivilDate } from "../components/form/civil-date";
+import { parseCivilTime } from "../components/form/civil-time";
 import { wholeNumberField } from "../components/form/number-field";
 import { sessionMinutesMessage } from "./duration-minutes";
 import { rowClash } from "./weekly-rows";
 
-const wallClock = /^\d{2}:\d{2}$/;
+const wallClock = (value: string): boolean => parseCivilTime(value) !== null;
+const civilDate = (value: string): boolean => parseCivilDate(value) !== null;
 
 const isSessionMinutes = (value: string): boolean =>
   /^\d+$/.test(value.trim()) && Number(value) >= 5 && Number(value) <= 240;
@@ -35,12 +38,12 @@ export const createSchema = (today: string) =>
         context.addIssue({ code: "custom", path, message });
       const requireDate = (path: "date" | "effectiveFrom", missing: string) => {
         const value = values[path];
-        if (value === "") issue([path], missing);
+        if (!civilDate(value)) issue([path], missing);
         else if (value < today) issue([path], "Elige una fecha desde hoy.");
       };
       if (values.frequency === "once") {
         requireDate("date", "Elige la fecha.");
-        if (!wallClock.test(values.time)) issue(["time"], "Elige la hora.");
+        if (!wallClock(values.time)) issue(["time"], "Elige la hora.");
         if (!isSessionMinutes(values.durationMinutes)) {
           issue(["durationMinutes"], sessionMinutesMessage);
         }
@@ -52,7 +55,7 @@ export const createSchema = (today: string) =>
           complete = false;
           issue(["rows", index, "weekday"], "Elige un día.");
         }
-        if (!wallClock.test(row.time)) {
+        if (!wallClock(row.time)) {
           complete = false;
           issue(["rows", index, "time"], "Elige la hora.");
         }

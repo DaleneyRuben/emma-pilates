@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
@@ -82,14 +82,14 @@ can be found by its design name.
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
 | AW36 Reglas del estudio (from AW33) | 75 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
-| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82 |
+| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82, 111 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW37 Equipos | 82 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96 |
-| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111 |
 | AW42 Simulador | 97, 101 |
-| AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
+| AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras | 88 |
@@ -2001,7 +2001,7 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    **No asistió** choices. A past Session with no bookings centres the plain
    empty state (quiet calendar, **Sin reservas**, "No hay reservas para esta
    sesión.") and leaves **Guardar asistencia** disabled, because there is
-   nothing to save (UX-009, Test 75). A Session that has not ended yet shows
+   nothing to save (UX-009, Test 110). A Session that has not ended yet shows
    the names and "Podrás marcar asistencia cuando termine la clase." instead
    of the choices (the API answers `403` before the end, Test 61).
 3. Mark every Client and tap **Guardar asistencia** (enabled only once every
@@ -2730,6 +2730,8 @@ Bolivia time, whatever time zone your computer uses.
    vez** asks for Tipo de clase, Entrenadora (only Trainers assigned to the
    Branch), Fecha, Hora, **Duración** (60 minutes to start, 5 to 240, with a
    fixed "min" inside the box), and Capacidad (filled from the Class Type).
+   Fecha and Hora are typed, not the browser's calendar: `21102026` shows
+   `21/10/2026` and `0900` shows `09:00`, on an English computer too (Test 111).
    A Class Type has no duration (WEB-027): every Session chooses its own, so
    a one-off Saturday 18:00 Mat Pilates of 75 minutes shows 18:00 – 19:15 on
    the grid. **Cada semana** swaps Fecha and Hora for **Días y horas** and
@@ -2802,9 +2804,9 @@ Bolivia time, whatever time zone your computer uses.
    day's Sessions, tables become one card per row, and every panel fills the
    screen.
 
-Browsers show the date and time pickers in the format of their own language,
-so an English Chrome shows `09/29/2026` and `09:00 AM`; the values sent and
-shown elsewhere stay Bolivia dates and 24-hour times. The changes you make stay
+Fecha, Hora, and Vigente desde are the studio's own fields (Test 111): they
+show `dd/mm/aaaa` and `09:00`, never the browser's `mm/dd/yyyy` or `09:00 AM`.
+The changes you make stay
 in `pilates_dev_sim`; run the fixtures command again to restore the fixture
 Accounts and catalog (it does not remove Sessions or schedules you created).
 
@@ -3019,13 +3021,16 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    **Empleado**, **Monto**, and **Fecha**, and an **Empleado** filter.
    **+ Registrar pago** asks for the Staff Member (a deactivated one is
    listed as "(cuenta desactivada)" for a final payment), the amount (`3.500`
-   or `3.500,00`), and the date, which cannot be after today. Clicking a row
+   or `3.500,00`), and the date, which cannot be after today. The date is
+   typed as `dd/mm/aaaa` (Test 111), not chosen from the browser's calendar.
+   Clicking a row
    corrects it ("Guardamos la corrección del pago de …"); a payment is never
    deleted, and each record and correction writes an audit record.
 8. **Gastos.** Back Office → **Gastos** lists the selected Branch's Expenses
    with a **Categoría** filter. **+ Nuevo gasto** says which Branch it is
    recorded in ("Se registra en la sucursal Centro."), and **+ Nueva
    categoría** opens a row to add a category without leaving the form; the
+   date is typed as `dd/mm/aaaa` (Test 111). The
    new one is chosen at once. A correction changes the category, amount, or
    date, never the Branch. A pasted address naming a category (or, in
    Nómina, a Staff Member) the studio does not have falls back to **Todas**
@@ -3096,7 +3101,7 @@ income; record an Expense in two Branches and a Salary Payment first (Test
 dates whatever your computer's time zone.
 
 1. **Opening.** **Reporte** opens on **Todas las sucursales** and the last six
-   months up to today (**Desde** / **Hasta**; the subtitle repeats them). The
+   months up to today (**Desde** / **Hasta**, typed as `dd/mm/aaaa`, Test 111; the subtitle repeats them). The
    top bar shows "El reporte usa su propio filtro de sucursal" instead of the
    Branch cell.
 2. **Three figures.** **Ingresos** (green rule) is every confirmed Payment in
@@ -3370,7 +3375,8 @@ crop).
    its discarded edges dimmed and says which ones are lost. A file smaller
    than 1200 × 675, another format, or one over 20 MB is refused under the
    target before anything is uploaded. Fill **Título** (80 characters),
-   **Descripción** (280), **Fecha de inicio**, and **Fecha de fin**;
+   **Descripción** (280), **Fecha de inicio**, and **Fecha de fin** (both
+   typed as `dd/mm/aaaa`, Test 111);
    **Publicar** stays disabled until all of them and the image exist, while
    **Guardar borrador** saves a private draft at any time (an empty submit
    marks each missing field; an end date before the start is refused on its
@@ -6013,6 +6019,32 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
 
 The empty frame is design follow-up 112, still pending, so the exported
 `S03` does not draw it yet. The app does.
+
+## Test 111: type dates and times in the admin web
+
+Start the backend and the admin web as Test 24 describes and log in as
+`paola.mendoza@example.com` / `emma-local-2026`. The computer's language does
+not matter: an English browser used to show `mm/dd/yyyy` and `09:00 AM` in
+these fields, beside text that always reads `dd/mm/aaaa`.
+
+1. **Nueva sesión.** Horario → **+ Nueva sesión**. **Fecha** shows the
+   placeholder `dd/mm/aaaa` and **Hora** shows `hh:mm`. Type `21102026`: the
+   field reads `21/10/2026` as you type, with the slashes added. Type `0900`:
+   it reads `09:00`, never `09:00 AM`. `32132026` stays `32/13/2026` and
+   **Guardar** does not create the Session. A real past date says "Elige una
+   fecha desde hoy." under Fecha. The same two fields are on **Editar
+   sesión**, on **Vigente desde**, on each row of **Días y horas**, and on
+   **Deja de repetirse desde**.
+2. **The other forms.** Nómina → **Registrar pago**, Gastos → **Nuevo gasto**,
+   Promociones → **Nueva promoción** (**Fecha de inicio** and **Fecha de
+   fin**), and Reporte (**Desde** and **Hasta**) use the same date field. A
+   stored date opens as `20/09/2026`, not `2026-09-20`. What is saved is still
+   a Bolivia date: the payroll row, the expense row, and the report subtitle
+   keep reading `dd/mm/aaaa`.
+3. **Narrow browser.** At 420 px the sidebar is behind **Abrir menú**. Open
+   Horario from the drawer and repeat step 1: the same placeholders, the same
+   `21/10/2026`, and the same `09:00`. The panel fills the screen; the fields
+   do not become the phone's native pickers.
 
 ## Test 109: the Trainer agenda eyebrow and weekday chips
 

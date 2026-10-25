@@ -5,7 +5,8 @@ import { PageHeader } from "../components/page/page-header";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { ListFilter } from "../components/table/list-filter";
 import { useKnownOption } from "../components/table/use-known-option";
-import { Input } from "../components/ui/input";
+import { parseCivilDate } from "../components/form/civil-date";
+import { CivilDateInput } from "../components/form/civil-date-input";
 import {
   boliviaMonth,
   boliviaToday,
@@ -48,11 +49,10 @@ function DateField({
       >
         {label}
       </label>
-      <Input
+      <CivilDateInput
         id={id}
-        type="date"
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={onChange}
         className="h-[34px] w-auto text-nota"
       />
     </div>
@@ -77,7 +77,11 @@ function RangeFields({
   const backwards = draft.from > draft.to;
   const change = (next: ReportRange) => {
     setDraft(next);
-    if (next.from !== "" && next.to !== "" && next.from <= next.to) {
+    if (
+      parseCivilDate(next.from) !== null &&
+      parseCivilDate(next.to) !== null &&
+      next.from <= next.to
+    ) {
       onChange(next);
     }
   };
