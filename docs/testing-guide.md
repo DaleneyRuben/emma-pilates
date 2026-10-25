@@ -3527,7 +3527,10 @@ The following are not ready for manual product testing:
   configured. The sentences are the pure function over the month's counts;
 - Dynamic Type, VoiceOver, and TalkBack on a device (Test 115): the audit
   is a code reading, so the largest text size and the screen readers have
-  not been walked.
+  not been walked;
+- photographing a front-desk transfer receipt (Test 116): the installed
+  Staff binary does not contain `expo-image-manipulator`, so that path still
+  needs a new development build.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -7558,3 +7561,19 @@ E. **The version and the price.** Perfil's footer reads «Emma Pilates Studio
    · versión 1.0.1», the version in `apps/client-mobile/app.json`, not a
    fixed «versión 1.0». Inicio's buy card still prices «Paquetes desde» from
    the cheapest visible Plan (Test 75 C).
+
+## Test 116: the Staff app opens without the receipt modules (MOB-072)
+
+Load the fixtures (Test 5A) and start the API and the Staff app (Test 5B)
+against a development build from before PAY-006. That binary does not contain
+`expo-image-manipulator`.
+
+A. **Every role reaches its home.** Log in as `emma.vargas@example.com`,
+   `camila.rojas@example.com`, `carolina.rivas@example.com`,
+   `gabriela.flores@example.com`, and `paola.mendoza@example.com`. Each lands
+   on her home. None of them sees the red «Cannot find native module
+   ExpoImageManipulator» screen.
+B. **Photographing a receipt still needs a new build.** As Camila, open a
+   Client and start a front-desk transfer. Photographing the receipt loads
+   the native modules only then, so on the old binary that one action fails.
+   A binary built from this branch includes the modules and that action works.
