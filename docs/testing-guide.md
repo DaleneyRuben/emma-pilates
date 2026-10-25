@@ -7,8 +7,8 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment with the invoice data, Mi plan, the referral code, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
-| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); report an equipment fault from a Session as a Trainer (Test 82) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment with the invoice data, Mi plan, the referral code, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18); the Trainer credential, the tablet no-plan card, and the cancel-sheet sentence (Test 113) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); report an equipment fault from a Session as a Trainer (Test 82); the bare Branch on S13, the S14 commas, and the receipt's own ratio (Test 113) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111); tell an expired Plan from a Client who never bought one on Clientes (Test 113) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
@@ -52,8 +52,8 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112 |
-| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113 |
+| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93, 112 |
@@ -70,8 +70,8 @@ can be found by its design name.
 | S26 Reportar una falla (Entrenadora) | 82 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112 |
-| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112 |
-| S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
+| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112, 113 |
+| S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20, 113 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93 |
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 95, 106 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
@@ -91,7 +91,7 @@ can be found by its design name.
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111 |
-| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras | 88 |
 | AW41 Congelamientos | 92 |
@@ -562,7 +562,7 @@ Evaluation slots, and these active Accounts. Every fixture Account uses the pass
 | `valeria@example.com`        | Client        | Active Plan expiring in 3 days, 2 classes left; paid in cash; referred by Sofía |
 | `isabel@example.com`         | Client        | Active Plan with no classes left              |
 | `sofia@example.com`          | Client        | Expired Plan; referred Valeria and Mariana (both pending: PAY-005 retired the Bs 60 Credit; a database loaded before it keeps an old award row that nothing shows) |
-| `mariana@example.com`        | Client        | Never purchased a Plan; referred by Sofía     |
+| `mariana@example.com`        | Client        | Never purchased a Plan; referred by Sofía; Inicio shows the no-plan card (Test 113) |
 | `emma.vargas@example.com`    | Trainer       | Leads Sessions in all three Branches          |
 | `daniela.ortiz@example.com`  | Trainer       | Leads Sessions in Centro and Urubó            |
 | `andrea.suarez@example.com`  | Trainer       | Leads Pilates Prenatal in Equipetrol          |
@@ -628,7 +628,9 @@ list is open) opens «Elige una sucursal» with the current Branch's name in
 Palo de rosa profundo and a check on its right. The day and Class Type chip
 rows keep their height whether the Branch list is open or the day has no
 classes, on the iPhone and the iPad alike.
-Tapping a Session opens its detail. Under the facts card the capacity is a
+Tapping a Session opens its detail. Under the title the Trainer is her
+initials in a circle, her name, and «Entrenadora certificada» on the line
+under the name (UX-012). Under the facts card the capacity is a
 bare block, not a card (MOB-049): «N de M cupos disponibles» with the number
 in Lora, «N reservados» in small grey text on the right, and a thin Palo de
 rosa bar under them on a Palo de rosa tinte track, filled by the booked
@@ -645,7 +647,8 @@ the disabled button with a link to the Plans.
 
 **Mis reservas** lists upcoming Bookings and Waitlist entries. A Booking more
 than 2 h 30 before its start offers **Cancelar** behind a confirmation sheet
-(the class returns to the balance); one inside that window shows **No
+(the class returns to the balance, «el lugar queda libre para otra clienta.
+Para volver a reservarlo tendrá que seguir habiendo cupo.»); one inside that window shows **No
 cancelable** and **Reprogramar** to another Session of the same day; a
 Waitlist entry offers **Salir de la lista de espera**. **Reprogramar** opens
 **Reprogramar clase**: the current Booking in a muted box, then the day's
@@ -1760,10 +1763,12 @@ transferencia nueva.".
 Tap Sofía's card. **Revisar pago** shows name and Plan, **Monto a verificar**
 with `Bs 560`, the **Pendiente** badge, "Transferencia · enviado el 22 de
 septiembre, 14:05", and the **Comprobante** image loaded through the
-authenticated API. If that download fails the screen says «No pudimos
-mostrar el comprobante.» with **Reintentar**, and **Confirmar pago** stays
-disabled until the image is on screen (Test 81); **Rechazar** stays
-available. **Ampliar** (or tapping the image) opens it full screen
+authenticated API, drawn at the receipt's own proportions (a portrait
+receipt is tall, not letterboxed in a square; UX-012, Test 113). If that
+download fails the screen says «No pudimos mostrar el comprobante.» with
+**Reintentar**, and **Confirmar pago** stays disabled until the image is on
+screen (Test 81); **Rechazar** stays available. **Ampliar** (or tapping the
+image) opens it full screen
 with pinch zoom; close it with the ✕ in the top-right corner, below the status
 bar. Scroll down: **Confirmar pago** returns to the list with a two-second
 "Pago confirmado" notice and the card gone. **Rechazar**, under it, does not
@@ -1788,7 +1793,8 @@ chip, and a Class Type chip (**Todas** by default); the list shows every
 Session of that day including full ones, except the ones that already
 started (the backend refuses to cancel those, MOB-044). Each card ends in a Palo de rosa
 chevron beside the time and the Class Type in Lora, names the Trainer after a
-person icon and «Sucursal …» after a pin, and closes with "N reservas" and
+person icon and the bare Branch name («Centro») after a pin (the pill
+already says «Sucursal:»; UX-012), and closes with "N reservas" and
 the seat pill under a thin rule: "N cupos" in Palo de rosa oscuro on Palo de
 rosa tinte, "Llena" in grey on a neutral sand pill, never red (MOB-042,
 MOB-047).
@@ -1796,9 +1802,10 @@ No match reads "No hay clases con estos filtros." / "Prueba otro día, otra
 sucursal u otro tipo de clase.". Tap a card: **Cancelar sesión** repeats the
 Session, "N clientas afectadas", and an amber warning "Esto no se puede
 deshacer" with the live counts ("Se cancelarán las 2 reservas de esta clase,
-se reembolsará una clase a cada clienta afectada — incluso si ya no podían
-cancelar por su cuenta — y se les notificará.", plus "También se notificará a
-las N en lista de espera." when someone waits) above the red **Sí, cancelar
+se reembolsará una clase a cada clienta afectada, incluso si ya no podían
+cancelar por su cuenta, y se les notificará.", plus "También se notificará a
+las N en lista de espera." when someone waits; commas, no em dashes, UX-012,
+Test 113) above the red **Sí, cancelar
 sesión** and the plain **Cancelar**. Confirming
 shows **Sesión cancelada** with "Se notificó a las N clientas afectadas." ("Se
 notificó a la clienta afectada." for one) and "Se reembolsó una clase a cada
@@ -2821,8 +2828,9 @@ the admin web, exactly as Test 24 describes, and log in as
    read-only: no **+ Nuevo** button, because accounts are born in the Staff app
    or by registration. The subtitle counts them in the feminine ("6 clientas ·
    5 con plan activo") and the footer says "Mostrando 6 de 6 clientas". Each
-   row shows the name, the email and phone, the current Plan (or "Sin plan
-   activo"), and **Activo**, **Expirado** (had a Plan before), or **Sin plan**
+   row shows the name, the email and phone, the current Plan (or **Vencido**
+   when the last Plan expired, or **Sin plan** when she never bought one),
+   and **Activo**, **Expirado** (had a Plan before), or **Sin plan**
    (never bought one). The Branch selector says this page is not filtered by
    Branch.
 2. **Search.** Type in **Buscar por nombre, correo o teléfono**: after a
@@ -5996,6 +6004,43 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 113: the copy and layout leftovers
+
+These are the small leftovers of the 2026-10-22 audit (UX-012). Follow-up
+114 is still pending, so the generated frames may still show the old copy.
+The rollout already uses Test 75 for the studio rules.
+
+1. **04, the Trainer line.** As Lucía, open a class from Reservar. Under the
+   title, the initials sit beside the Trainer's name, and the line under the
+   name reads «Entrenadora certificada».
+2. **02, the no-plan card on a tablet.** As Mariana (`mariana@example.com`),
+   Inicio shows «Elige tu plan y vuelve al mat» in Palo de rosa. On an iPad
+   the card stops at 720 px and stays centred; on a phone it fills the
+   column. The carousel, when a Promotion is published, takes the same cap.
+3. **05, the cancel sheet.** As Lucía, open Mis reservas and tap Cancelar on
+   a class more than 2 h 30 away. The note reads «La clase vuelve al saldo
+   de tu plan y el lugar queda libre para otra clienta. Para volver a
+   reservarlo tendrá que seguir habiendo cupo.» The title, the class line,
+   **Sí, cancelar reserva**, and **Volver** stay.
+4. **S13, the Branch on the row.** As Paola, open Cancelar una clase. The
+   pill still reads «Sucursal: Centro». Each Session row names the Branch
+   alone («Centro»), with no «Sucursal » in front of it. S02 and S07 are
+   unchanged.
+5. **S14, the warning.** Open a Session that has Bookings. The amber note
+   uses commas, not em dashes, and says «clienta»: «…a cada clienta
+   afectada, incluso si ya no podían cancelar por su cuenta, y se les
+   notificará.»
+6. **S12, the receipt.** Open Revisar pago for a transfer whose receipt is a
+   portrait photo. The thumbnail is as tall as the photo's own ratio, not a
+   square with white bars, and **Ampliar** still opens the full-screen view.
+   A failed download still says «No pudimos mostrar el comprobante.» with
+   **Reintentar** (Test 81).
+7. **AW21, the Plan column.** Clientes shows the Plan name for a current
+   Plan, **Vencido** for Sofía (her Plan expired), and **Sin plan** for
+   Mariana (she never bought one). The Estado column still reads **Activo**,
+   **Expirado**, and the neutral **Sin plan**. Detalle de cliente is
+   unchanged and still says «Sin plan activo» when there is no current Plan.
 
 ## Test 112: one money format per surface (UX-010)
 

@@ -147,6 +147,8 @@ describe("Client Session detail", () => {
     });
 
     expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
+    // UX-012 / C4: 04 writes the credential under the Trainer's name.
+    expect(screen.getByText("Entrenadora certificada")).toBeOnTheScreen();
     expect(screen.getByText("Centro")).toBeOnTheScreen();
     expect(screen.getByText("75 minutos")).toBeOnTheScreen();
     expect(screen.getByText("3 de 12 cupos disponibles")).toBeOnTheScreen();

@@ -43,12 +43,18 @@ const clientColumns = (open: (row: AdminClientDto) => void) => [
   }),
   columns.accessor("planName", {
     header: "Plan",
-    cell: ({ getValue }) => {
-      const plan = getValue();
-      return plan === null ? (
-        <span className="text-texto-muy-tenue">Sin plan activo</span>
-      ) : (
-        <span className="text-texto-secundario">{plan}</span>
+    cell: ({ row }) => {
+      const plan = row.original.planName;
+      if (plan !== null) {
+        return <span className="text-texto-secundario">{plan}</span>;
+      }
+      // expired had a Plan; none never bought one (AdminClientDto.subscriptionStatus).
+      return (
+        <span className="text-texto-muy-tenue">
+          {row.original.subscriptionStatus === "expired"
+            ? "Vencido"
+            : "Sin plan"}
+        </span>
       );
     },
   }),

@@ -23,7 +23,8 @@ function seatsTag(session: SessionAvailabilityDto): string {
 /**
  * S13's Session card (MOB-042): the chevron beside the time and title, the
  * Trainer and Branch lines, then the booked count and the seat pill under a
- * rule. The label names the Branch only while every Branch is listed.
+ * rule. The line is the bare Branch name: the pill above already says
+ * «Sucursal:». The label names the Branch only while every Branch is listed.
  */
 export function CancelClassCard({
   branchName,
@@ -57,7 +58,7 @@ export function CancelClassCard({
           {session.trainerName}
         </DetailLine>
         <DetailLine icon="pin" iconSize={15} style={styles.branch}>
-          {`Sucursal ${branchName}`}
+          {branchName}
         </DetailLine>
       </View>
       <CardFooter paddingTop={13}>

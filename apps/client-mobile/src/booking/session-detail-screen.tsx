@@ -232,7 +232,10 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initials(detail.trainerName)}</Text>
           </View>
-          <Text style={styles.trainerName}>{detail.trainerName}</Text>
+          <View>
+            <Text style={styles.trainerName}>{detail.trainerName}</Text>
+            <Text style={styles.trainerCredential}>Entrenadora certificada</Text>
+          </View>
         </View>
         <View style={styles.facts}>
           <View style={styles.factRow}>
@@ -364,5 +367,6 @@ const styles = StyleSheet.create({
   screen: { gap: spacing.md },
   sectionTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   trainer: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  trainerCredential: { color: colors.textMuted, fontSize: typography.note },
   trainerName: { color: colors.text, fontSize: typography.bodyLarge },
 });

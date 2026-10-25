@@ -54,15 +54,16 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
   const receipt = useQuery({
     queryKey: ["payment-receipt", route.params.paymentId, receiptUrl],
     queryFn: async () => {
-      const uri = await api.loadReceipt(receiptUrl ?? "");
-      if (uri === null) {
+      const loaded = await api.loadReceipt(receiptUrl ?? "");
+      if (loaded === null) {
         throw new Error("The receipt could not be loaded");
       }
-      return uri;
+      return loaded;
     },
     enabled: receiptUrl !== null,
   });
-  const receiptUri = receipt.data ?? null;
+  const receiptUri = receipt.data?.uri ?? null;
+  const receiptRatio = receipt.data?.aspectRatio ?? 1;
   const [enlarged, setEnlarged] = useState(false);
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState("");
@@ -157,7 +158,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
                 accessibilityLabel="Comprobante de transferencia"
                 resizeMode="contain"
                 source={{ uri: receiptUri }}
-                style={styles.receipt}
+                style={[styles.receipt, { aspectRatio: receiptRatio }]}
               />
             </Pressable>
           )}
@@ -229,6 +230,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
         )}
       </FormScrollView>
       <FullScreenImage
+        aspectRatio={receiptRatio}
         label="Comprobante ampliado"
         onClose={() => setEnlarged(false)}
         uri={receiptUri}
@@ -292,7 +294,6 @@ const styles = StyleSheet.create({
   reasonInput: { minHeight: 96, paddingTop: spacing.md, textAlignVertical: "top" },
   receipt: {
     ...surfaces.flatCard,
-    height: 320,
     width: "100%",
   },
   receiptHeader: {

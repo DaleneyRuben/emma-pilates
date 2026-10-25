@@ -116,6 +116,12 @@ describe("Client Home", () => {
     expect(screen.getByText("Necesitas un plan activo para reservar")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeDisabled();
     expect(screen.queryByText("Activa")).not.toBeOnTheScreen();
+    // UX-012 / C5: the no-plan card takes the carousel's 720 px tablet cap.
+    expect(screen.getByTestId("home-purchase-card")).toHaveStyle({
+      alignSelf: "center",
+      maxWidth: 720,
+      width: "100%",
+    });
     // MOB-041: the disabled shortcut ends in the quiet lock instead of the chevron.
     const lock = screen.getByTestId("shortcut-lock", { includeHiddenElements: true });
     expect(lock).toHaveProp("stroke", "#C4BAB6");
