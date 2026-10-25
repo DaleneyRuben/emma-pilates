@@ -20,6 +20,7 @@ COPY apps/client-mobile/package.json apps/client-mobile/
 COPY apps/staff-mobile/package.json apps/staff-mobile/
 COPY packages/api-contracts/package.json packages/api-contracts/
 COPY packages/mobile-core/package.json packages/mobile-core/
+COPY packages/studio-economics/package.json packages/studio-economics/
 COPY packages/tooling/package.json packages/tooling/
 RUN pnpm install --frozen-lockfile --filter @pilates/backend
 COPY apps/backend apps/backend
