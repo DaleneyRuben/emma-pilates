@@ -1473,7 +1473,8 @@ version):
   **api-integration** (the Prisma repositories and PostgreSQL behaviour
   against a `postgres:18-alpine` service container, through
   `TEST_DATABASE_URL` on a `pilates_test_ci` admin database that lives and
-  dies with the runner) side by side, each waiting for both contracts and
+  dies with the runner; six Jest shards plus the backup spec, each on its
+  own runner, EXT-023) side by side, each waiting for both contracts and
   api-unit;
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
   **web-unit** (the admin-web Jest suite) and **web-e2e** (the nineteen
@@ -1481,8 +1482,8 @@ version):
   a `postgres:18-alpine` service container with a `pilates_test_ci` admin
   database, WEB-017) side by side;
 - **quality-mobile** (tooling lint; lint, `format:check`, and typecheck of
-  mobile-core, client-mobile, and staff-mobile) → **mobile-unit** (their
-  three Jest suites).
+  mobile-core, client-mobile, and staff-mobile) → **mobile-unit** (one job
+  per package: client-mobile, staff-mobile, and mobile-core, EXT-023).
 
 Two rules order the jobs: no test level starts before its surface's quality
 job passed, and no database run (api-integration) and no e2e run against the
@@ -1510,8 +1511,9 @@ A push to `main` always runs everything. Jobs that never started show as
 skipped.
 
 A clean run of all three chains takes about nine minutes of wall clock, set
-by the api chain, whose integration suite alone runs five minutes on the
-two-core runner. Measured on the last run of the previous shape (eight jobs,
+by the api chain. EXT-023 splits that integration suite into six shards plus
+the backup spec, and splits mobile-unit into one job per package; the times
+below are the shape before that split. Measured on the last run of the previous shape (eight jobs,
 `main` run 37854052558) and the first green run of this one (eleven jobs,
 run 37939483154 of EXT-005's pull request), job durations as GitHub reports
 them, chains from the first quality job's start to the chain's last job's end:
