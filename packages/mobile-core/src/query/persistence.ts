@@ -1,13 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 
-// ADR-0035: only Session schedules, upcoming Bookings, and the Subscription
-// summary may survive offline. Keys are the generated request paths.
+// ADR-0035: only Session schedules, upcoming Bookings, the Subscription
+// summary, and the signed-in Client's own profile may survive offline.
+// Keys are the generated request paths, matched exactly, so a sibling such
+// as the photo bytes or another Client's record stays out.
 const persistableQueryPaths = new Set([
   "/api/v1/sessions",
   "/api/v1/trainer/sessions",
   "/api/v1/bookings",
   "/api/v1/clients/current/subscription",
+  "/api/v1/clients/current",
 ]);
 
 export const persistedCacheVersion = "1";

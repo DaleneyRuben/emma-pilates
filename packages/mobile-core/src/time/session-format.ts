@@ -88,10 +88,13 @@ export function hasStarted(startsAt: string, now: Date): boolean {
   return new Date(startsAt).getTime() <= now.getTime();
 }
 
-const cancellationWindowMs = 2.5 * 60 * 60 * 1_000;
-
-export function isInsideCancellationWindow(startsAt: string, now: Date): boolean {
-  return new Date(startsAt).getTime() - now.getTime() <= cancellationWindowMs;
+// The window's length is a Studio Setting (BKM-004), read through useStudioRules.
+export function isInsideCancellationWindow(
+  startsAt: string,
+  now: Date,
+  cancellationWindowMinutes: number,
+): boolean {
+  return new Date(startsAt).getTime() - now.getTime() <= cancellationWindowMinutes * 60_000;
 }
 
 const monthFormatter = new Intl.DateTimeFormat("es-BO", {

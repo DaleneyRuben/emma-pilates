@@ -26,7 +26,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW05</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Formulario de plan</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Panel lateral sobre la tabla de AW04, con la misma anatomía y densidad que el formulario de sesión de AW03: encabezado con cierre, campos, y "Guardar" al pie. La duración es una elección entre 1, 3, 6 y 12 meses; las clases incluidas son un número fijo.</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Panel lateral sobre la tabla de AW04, con la misma anatomía y densidad que el formulario de sesión de AW03: encabezado con cierre, campos, y "Guardar" al pie. La vigencia es una elección entre 30, 60 y 90 días, con un tope semanal opcional en los planes de 60 y 90 días; las clases incluidas son un número fijo.</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
@@ -67,7 +67,7 @@
         </div>
       </div>
 
-      <div style="display:flex;align-items:stretch;height:660px;">
+      <div style="display:flex;align-items:stretch;height:760px;">
         <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
           <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
@@ -93,25 +93,26 @@
           <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
         </nav>
 
         <main style="flex:1;min-width:0;position:relative;background:#FAF7F2;overflow:hidden;">
           <div style="padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Planes</h2>
-              <div style="font-size:12.5px;color:#766D69;">6 planes · 6 visibles en la app</div>
+              <div style="font-size:12.5px;color:#766D69;">8 planes · 8 visibles en la app</div>
             </div>
             <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
               <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
-                <div>Nombre</div><div>Duración</div><div>Clases incluidas</div><div style="text-align:right;">Precio</div>
+                <div>Nombre</div><div>Vigencia</div><div>Clases incluidas</div><div style="text-align:right;">Precio</div>
               </div>
-              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Paquete de 8 clases</span><span>1 mes</span><span>8 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 560</span></div>
-              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Paquete de 12 clases</span><span>1 mes</span><span>12 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 780</span></div>
-              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Mensual 16 clases</span><span>1 mes</span><span>16 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 1.050</span></div>
-              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Trimestral 36 clases</span><span>3 meses</span><span>36 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 2.100</span></div>
-              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Semestral 90 clases</span><span>6 meses</span><span>90 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 5.400</span></div>
-              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Anual 180 clases</span><span>12 meses</span><span>180 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 9.600</span></div>
+              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Clase suelta</span><span>30 días</span><span>1 clase</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 80</span></div>
+              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">4 clases</span><span>30 días</span><span>4 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 290</span></div>
+              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">8 clases</span><span>30 días</span><span>8 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 590</span></div>
+              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">12 clases</span><span>30 días</span><span>12 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 820</span></div>
+              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Bimestral 16 clases</span><span>60 días</span><span>16 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 1.120</span></div>
+              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Bimestral 24 clases</span><span>60 días</span><span>24 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 1.560</span></div>
+              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Trimestral 24 clases</span><span>90 días</span><span>24 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 1.590</span></div>
+              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Trimestral 36 clases</span><span>90 días</span><span>36 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 2.190</span></div>
             </div>
           </div>
           <div style="position:absolute;inset:0;background:rgba(74,58,48,0.22);"></div>
@@ -129,16 +130,24 @@
             <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:18px;overflow:hidden;">
               <label style="display:flex;flex-direction:column;gap:7px;">
                 <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
-                <input type="text" placeholder="Paquete de 8 clases" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+                <input type="text" placeholder="8 clases" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <div style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Duración</span>
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">1</span><span style="font-size:10px;color:#7A716D;">mes</span></button>
-                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">3</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
-                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">6</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
-                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">12</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Vigencia</span>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">30</span><span style="font-size:10px;color:#7A716D;">días</span></button>
+                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">60</span><span style="font-size:10px;color:#7A716D;">días</span></button>
+                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">90</span><span style="font-size:10px;color:#7A716D;">días</span></button>
                 </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Tope semanal</span>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                  <button disabled="" style="height:44px;border:1px solid #E4D8CC;border-radius:8px;background:#F6F1EB;color:#A69C95;cursor:not-allowed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:15px;">Sin</span><span style="font-size:10px;">tope</span></button>
+                  <button disabled="" style="height:44px;border:1px solid #E4D8CC;border-radius:8px;background:#F6F1EB;color:#A69C95;cursor:not-allowed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:15px;">3</span><span style="font-size:10px;">por semana</span></button>
+                  <button disabled="" style="height:44px;border:1px solid #E4D8CC;border-radius:8px;background:#F6F1EB;color:#A69C95;cursor:not-allowed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:15px;">4</span><span style="font-size:10px;">por semana</span></button>
+                </div>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Solo en planes de 60 y 90 días. Las clases extra no cuentan.</span>
               </div>
               <label style="display:flex;flex-direction:column;gap:7px;">
                 <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Clases incluidas</span>
@@ -149,7 +158,7 @@
                 <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Precio</span>
                 <div style="display:flex;align-items:center;height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;overflow:hidden;">
                   <span style="width:44px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:12.5px;color:#766D69;">Bs</span>
-                  <input type="text" placeholder="560" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
+                  <input type="text" placeholder="590" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
                 </div>
               </label>
               <label style="display:flex;flex-direction:column;gap:7px;">
@@ -173,15 +182,15 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · Editar plan</div>
-          <div style="font-size:12px;color:#766D69;">Valores precargados · duración 1 mes seleccionada</div>
+          <div style="font-size:12px;color:#766D69;">Valores precargados · 60 días y 3 clases por semana seleccionados</div>
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
-        <div style="width:408px;height:770px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+        <div style="width:408px;height:880px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar plan</h3>
-              <span style="font-size:11.5px;color:#766D69;">34 clientas con este plan activo</span>
+              <span style="font-size:11.5px;color:#766D69;">12 clientas con este plan activo</span>
             </div>
             <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -190,27 +199,35 @@
           <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:18px;overflow:hidden;">
             <label style="display:flex;flex-direction:column;gap:7px;">
               <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
-              <input type="text" value="Paquete de 8 clases" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <input type="text" value="Bimestral 16 clases" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
             </label>
             <div style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Duración</span>
-              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-                <button style="height:44px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:15px;font-weight:600;">1</span><span style="font-size:10px;">mes</span></button>
-                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">3</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
-                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">6</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
-                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">12</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Vigencia</span>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">30</span><span style="font-size:10px;color:#7A716D;">días</span></button>
+                <button style="height:44px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:15px;font-weight:600;">60</span><span style="font-size:10px;">días</span></button>
+                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">90</span><span style="font-size:10px;color:#7A716D;">días</span></button>
               </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Tope semanal</span>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">Sin</span><span style="font-size:10px;color:#7A716D;">tope</span></button>
+                <button style="height:44px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:15px;font-weight:600;">3</span><span style="font-size:10px;">por semana</span></button>
+                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">4</span><span style="font-size:10px;color:#7A716D;">por semana</span></button>
+              </div>
+              <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Solo en planes de 60 y 90 días. Las clases extra no cuentan.</span>
             </div>
             <label style="display:flex;flex-direction:column;gap:7px;">
               <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Clases incluidas</span>
-              <input type="number" value="8" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <input type="number" value="16" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               <span style="font-size:11.5px;color:#7A716D;">Cantidad fija para todo el periodo; ningún plan es ilimitado.</span>
             </label>
             <label style="display:flex;flex-direction:column;gap:7px;">
               <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Precio</span>
               <div style="display:flex;align-items:center;height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;overflow:hidden;">
                 <span style="width:44px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:12.5px;color:#766D69;">Bs</span>
-                <input type="text" value="560" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
+                <input type="text" value="1.120" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
               </div>
             </label>
             <label style="display:flex;flex-direction:column;gap:7px;">
@@ -251,26 +268,34 @@
         <div style="padding:18px 16px 22px;display:flex;flex-direction:column;gap:18px;">
           <label style="display:flex;flex-direction:column;gap:7px;">
             <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
-            <input type="text" value="Paquete de 8 clases" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
+            <input type="text" value="Bimestral 16 clases" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
           </label>
           <div style="display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Duración</span>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-              <button style="height:48px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;font-weight:600;">1</span><span style="font-size:10px;">mes</span></button>
-              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">3</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
-              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">6</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
-              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">12</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Vigencia</span>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">30</span><span style="font-size:10px;color:#7A716D;">días</span></button>
+              <button style="height:48px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;font-weight:600;">60</span><span style="font-size:10px;">días</span></button>
+              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">90</span><span style="font-size:10px;color:#7A716D;">días</span></button>
             </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Tope semanal</span>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">Sin</span><span style="font-size:10px;color:#7A716D;">tope</span></button>
+              <button style="height:48px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;font-weight:600;">3</span><span style="font-size:10px;">por semana</span></button>
+              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">4</span><span style="font-size:10px;color:#7A716D;">por semana</span></button>
+            </div>
+            <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Solo en planes de 60 y 90 días. Las clases extra no cuentan.</span>
           </div>
           <label style="display:flex;flex-direction:column;gap:7px;">
             <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Clases incluidas</span>
-            <input type="number" value="8" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
+            <input type="number" value="16" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
           </label>
           <label style="display:flex;flex-direction:column;gap:7px;">
             <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Precio</span>
             <div style="display:flex;align-items:center;height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;overflow:hidden;">
               <span style="width:46px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:13px;color:#766D69;">Bs</span>
-              <input type="text" value="560" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:15px;outline:none;" />
+              <input type="text" value="1.120" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:15px;outline:none;" />
             </div>
           </label>
           <label style="display:flex;flex-direction:column;gap:7px;">
@@ -286,7 +311,7 @@
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Duración cerrada</span>Solo 1, 3, 6 o 12 meses: cuatro botones, sin campo libre que invente vigencias.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Vigencia cerrada</span>Solo 30, 60 o 90 días: tres botones, sin campo libre que invente vigencias. El tope semanal (3 o 4 clases por semana) solo se elige en los planes de 60 y 90 días; con 30 días queda en «Sin tope» y deshabilitado.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Precio en bolivianos</span>Prefijo "Bs" fijo en el campo, para que nadie lo escriba dentro del número.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cambios de precio</span>Las suscripciones vigentes y las compras ya iniciadas conservan su precio; el nuevo rige para compras futuras.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Ocultar en vez de borrar</span>Un plan nunca se borra: «Ocultar en la app» lo retira de Elegir plan y «Mostrar en la app» lo devuelve. «Orden en la app» decide su lugar, de menor a mayor.</div>

@@ -1,0 +1,102 @@
+name: Publish OTA
+
+# REL-008 (ADR-0101, amending ADR-0039). Manual only. A push to main never
+# publishes an update. The workflow stops before any Expo call when the
+# EXPO_TOKEN secret is absent; creating that robot token is an owner action.
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: Which app receives the update
+        required: true
+        type: choice
+        options: [client, staff, both]
+      channel:
+        description: preview first; production only after a preview of this same commit
+        required: true
+        type: choice
+        options: [preview, production]
+      message:
+        description: Update message testers and the operator will see
+        required: true
+        type: string
+      rollout_percentage:
+        description: Production rollout percentage (1-100). Preview ignores it.
+        required: true
+        default: "10"
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: mobile-ota-${{ inputs.app }}-${{ inputs.channel }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Refuse a dispatch that is not on main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "OTA publishes only from main (ADR-0039)."
+          exit 1
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Require a green CI run of this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          conclusion=$(gh run list --workflow CI --commit "${{ github.sha }}" --branch main --json conclusion --jq '[.[] | select(.conclusion == "success")] | length')
+          if [ "$conclusion" = "0" ]; then
+            echo "No successful CI run for ${{ github.sha }} on main."
+            exit 1
+          fi
+
+      - name: Stop until the owner stores EXPO_TOKEN
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "EXPO_TOKEN is not set. Create an Expo robot user for emma-pilates and store its token as the EXPO_TOKEN GitHub secret. This workflow publishes nothing until then."
+            exit 1
+          fi
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Publish the update
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          apps=()
+          case "${{ inputs.app }}" in
+            client) apps=(client-mobile) ;;
+            staff) apps=(staff-mobile) ;;
+            both) apps=(client-mobile staff-mobile) ;;
+          esac
+          for app in "${apps[@]}"; do
+            if [ "${{ inputs.channel }}" = "production" ]; then
+              node scripts/mobile-ota-guard.mjs "$app" "${{ github.sha }}"
+              cd "apps/$app"
+              pnpm exec eas update --channel production --environment production --message "${{ inputs.message }}" --rollout-percentage "${{ inputs.rollout_percentage }}" --non-interactive
+              cd ../..
+            else
+              cd "apps/$app"
+              pnpm exec eas update --channel preview --environment preview --message "${{ inputs.message }}" --non-interactive
+              cd ../..
+              git notes add -f -m "preview-ota:${app}:${{ github.sha }}" "${{ github.sha }}"
+              git push origin refs/notes/commits
+            fi
+          done

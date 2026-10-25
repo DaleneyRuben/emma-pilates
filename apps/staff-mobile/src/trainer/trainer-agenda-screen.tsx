@@ -1,5 +1,6 @@
 import {
   getListTrainerScheduleQueryKey,
+  listTrainerSchedule,
   useGetCurrentStaffMemberProfile,
   useListTrainerSchedule,
 } from "@pilates/api-contracts";
@@ -30,6 +31,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
+import { requireOk } from "./require-ok";
 
 type TrainerAgendaNavigation = {
   navigate: (screen: "Roster", params: { sessionId: string }) => void;
@@ -94,7 +96,16 @@ export function TrainerAgendaScreen() {
   const [selectedDate, setSelectedDate] = useState(() => boliviaCivilDate(new Date()));
   const schedule = useListTrainerSchedule(
     { on: selectedDate },
-    { fetcher, query: { refetchOnMount: "always" } },
+    {
+      fetcher,
+      query: {
+        queryFn: ({ signal }) =>
+          listTrainerSchedule({ on: selectedDate }, { signal }, fetcher).then((response) =>
+            requireOk(response, "The agenda could not be loaded"),
+          ),
+        refetchOnMount: "always",
+      },
+    },
   );
   const dates = useMemo(
     () => [-2, -1, 0, 1, 2, 3, 4].map((offset) => addDays(selectedDate, offset)),
@@ -120,7 +131,7 @@ export function TrainerAgendaScreen() {
         <LoadingState label="Cargando agenda" />
       </Screen>
     );
-  if (schedule.isError)
+  if (schedule.isError || schedule.data.status !== 200)
     return (
       <Screen>
         {header}
