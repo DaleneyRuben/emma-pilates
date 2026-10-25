@@ -16,10 +16,11 @@ describe("mobile query persistence", () => {
     expect(shouldPersistQuery(["/api/v1/trainer/sessions", { on: "d" }])).toBe(true);
     expect(shouldPersistQuery(["/api/v1/bookings"])).toBe(true);
     expect(shouldPersistQuery(["/api/v1/clients/current/subscription"])).toBe(true);
+    expect(shouldPersistQuery(["/api/v1/clients/current"])).toBe(true);
     expect(shouldPersistQuery(["/api/v1/sessions/session-1"])).toBe(false);
     expect(shouldPersistQuery(["/api/v1/notifications", { limit: 50 }])).toBe(false);
     expect(shouldPersistQuery(["/api/v1/payments"])).toBe(false);
-    expect(shouldPersistQuery(["/api/v1/clients/current"])).toBe(false);
+    expect(shouldPersistQuery(["/api/v1/clients/current/photo"])).toBe(false);
   });
 
   it("clears only the signed-out Account cache", async () => {

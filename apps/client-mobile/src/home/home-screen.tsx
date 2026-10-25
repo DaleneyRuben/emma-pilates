@@ -14,10 +14,12 @@ import {
 import {
   BodyText,
   colors,
+  formatBolivianos,
   Heading,
   LoadingState,
   PrimaryButton,
   QueryFailure,
+  useIsOnline,
   radii,
   Screen,
   spacing,
@@ -25,8 +27,10 @@ import {
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
+  useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect, useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import {
@@ -38,6 +42,7 @@ import {
   subscriptionBadge,
 } from "./home-format";
 import { ShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
+import { promotionCardMaxWidth } from "./promotion-image";
 import { PromotionsCarousel } from "./promotions-carousel";
 
 type HomeNavigation = {
@@ -51,6 +56,8 @@ type HomeNavigation = {
       | "Referrals",
   ) => void;
 };
+
+const offlineBannerCopy = "Sin conexión. Mostrando tus datos de la última vez.";
 
 const badgeStyles = {
   active: { background: "rgba(124,148,115,0.14)", text: colors.successText },
@@ -103,7 +110,7 @@ function SubscriptionCard({
           subscription.originalClassAllowance,
         )}
       </BodyText>
-      <BodyText>{`Pagado hasta el ${formatCivilDate(subscription.endsOn)}`}</BodyText>
+      <BodyText>{`Vence el ${formatCivilDate(subscription.endsOn)}`}</BodyText>
       <Pressable
         accessibilityLabel="Ver detalle"
         accessibilityRole="button"
@@ -116,13 +123,34 @@ function SubscriptionCard({
   );
 }
 
-function PurchaseCard({ onPurchase }: { onPurchase: () => void }) {
+function OfflineHomeBanner() {
   return (
-    <View style={[styles.card, styles.purchaseCard]}>
+    <View accessibilityRole="alert" style={styles.offlineBanner}>
+      <Text style={styles.offlineBannerText}>{offlineBannerCopy}</Text>
+    </View>
+  );
+}
+
+// «Paquetes desde» is the cheapest visible Plan (GET /studio-rules, BKM-004);
+// while it is unknown the card leaves the price out.
+function purchaseCopy(plansFromPriceCentavos: number | null | undefined): string {
+  const payment = "Puedes pagar en el estudio o desde la app.";
+  return plansFromPriceCentavos === null || plansFromPriceCentavos === undefined
+    ? payment
+    : `Paquetes desde ${formatBolivianos(plansFromPriceCentavos)}. ${payment}`;
+}
+
+function PurchaseCard({
+  onPurchase,
+  plansFromPriceCentavos,
+}: {
+  onPurchase: () => void;
+  plansFromPriceCentavos: number | null | undefined;
+}) {
+  return (
+    <View style={[styles.card, styles.purchaseCard]} testID="home-purchase-card">
       <Text style={styles.purchaseTitle}>Elige tu plan y vuelve al mat</Text>
-      <BodyText style={styles.purchaseBody}>
-        Paquetes desde Bs 560. Puedes pagar en el estudio o desde la app.
-      </BodyText>
+      <BodyText style={styles.purchaseBody}>{purchaseCopy(plansFromPriceCentavos)}</BodyText>
       <PrimaryButton label="Comprar un plan" onPress={onPurchase} testID="home-buy-plan" />
     </View>
   );
@@ -131,12 +159,14 @@ function PurchaseCard({ onPurchase }: { onPurchase: () => void }) {
 export function HomeScreen() {
   const navigation = useNavigation<HomeNavigation>();
   const fetcher = useClientFetcher();
+  const online = useIsOnline();
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const profile = useGetCurrentClientProfile(queryOptions);
   const subscription = useGetCurrentClientSubscription(queryOptions);
   const evaluations = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const referrals = useGetCurrentClientReferrals(queryOptions);
   const promotions = useListPromotions(queryOptions);
+  const studioRules = useStudioRules(fetcher);
   const queryKeys = [
     getGetCurrentClientProfileQueryKey(),
     getGetCurrentClientSubscriptionQueryKey(),
@@ -147,9 +177,29 @@ export function HomeScreen() {
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
 
-  const retry = () => {
+  const refetchHome = () => {
     void Promise.all([profile.refetch(), subscription.refetch()]);
   };
+  const refetchHomeRef = useRef(refetchHome);
+  // A mount while already online is not a connection returning, so the first
+  // observed state only records itself. A later change from offline refetches.
+  const wasOffline = useRef(online ? false : null);
+  useEffect(() => {
+    refetchHomeRef.current = refetchHome;
+    if (online && wasOffline.current === true) refetchHomeRef.current();
+    wasOffline.current = !online;
+  });
+
+  // A network failure keeps the last successful answer (TanStack leaves it in
+  // `data`) and reports the error. Inicio renders that answer instead of the
+  // failure, and says so, only while the refresh has not succeeded again.
+  const loadedProfile = profile.data?.status === 200 ? profile.data : undefined;
+  const loadedSubscription = subscription.data?.status === 200 ? subscription.data : undefined;
+  const showingCachedHome =
+    profile.isError &&
+    subscription.isError &&
+    loadedProfile !== undefined &&
+    loadedSubscription !== undefined;
 
   if (profile.isPending || subscription.isPending) {
     return (
@@ -162,21 +212,16 @@ export function HomeScreen() {
     );
   }
 
-  if (
-    profile.isError ||
-    subscription.isError ||
-    profile.data.status !== 200 ||
-    subscription.data.status !== 200
-  ) {
+  if (loadedProfile === undefined || loadedSubscription === undefined) {
     return (
       <Screen>
         <Heading accessibilityLabel="Inicio">Inicio</Heading>
-        <QueryFailure label="No pudimos cargar tu inicio." onRetry={retry} />
+        <QueryFailure label="No pudimos cargar tu inicio." onRetry={refetchHome} />
       </Screen>
     );
   }
 
-  const view = subscription.data.data;
+  const view = loadedSubscription.data;
   const nextEvaluation =
     evaluations.data?.status === 200 ? evaluations.data.data.items[0] : undefined;
   const referralCount =
@@ -193,7 +238,8 @@ export function HomeScreen() {
         refreshControl={refreshControl}
         testID="home-scroll"
       >
-        <Heading accessibilityLabel="Inicio">{`Hola, ${firstName(profile.data.data.name)}`}</Heading>
+        {showingCachedHome ? <OfflineHomeBanner /> : null}
+        <Heading accessibilityLabel="Inicio">{`Hola, ${firstName(loadedProfile.data.name)}`}</Heading>
         <PromotionsCarousel
           loading={promotions.isPending}
           onImageMissing={() => void promotions.refetch()}
@@ -206,7 +252,10 @@ export function HomeScreen() {
             subscription={view.subscription!}
           />
         ) : (
-          <PurchaseCard onPurchase={() => navigation.navigate("Plans")} />
+          <PurchaseCard
+            onPurchase={() => navigation.navigate("Plans")}
+            plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
+          />
         )}
         <ShortcutSection>
           <ShortcutRow
@@ -229,7 +278,7 @@ export function HomeScreen() {
             />
             <ShortcutTile
               icon="person"
-              label="Mis referidos"
+              label="Invita a una amiga"
               onPress={() => navigation.navigate("Referrals")}
               summary={referralShortcut(referralCount)}
             />
@@ -266,6 +315,13 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     textDecorationLine: "underline",
   },
+  offlineBanner: {
+    backgroundColor: colors.warning,
+    borderRadius: radii.inset,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  offlineBannerText: { color: colors.white, fontSize: typography.note, fontWeight: "500" },
   planName: {
     color: colors.text,
     fontSize: typography.titleSecondary,
@@ -283,7 +339,14 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   purchaseBody: { color: colors.white },
-  purchaseCard: { backgroundColor: colors.primary, borderColor: colors.primary },
+  // UX-012: the tablet carousel stops at 720 px; the no-plan card takes the same cap.
+  purchaseCard: {
+    alignSelf: "center",
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    maxWidth: promotionCardMaxWidth,
+    width: "100%",
+  },
   purchaseTitle: {
     color: colors.white,
     fontSize: typography.titleSecondary,

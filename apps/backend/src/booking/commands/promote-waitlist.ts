@@ -1,3 +1,7 @@
+import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
+import type { WeeklyCapSubscription } from './create-booking';
+import { weeklyCapBlocks } from './weekly-cap-decision';
+
 type WaitlistSession = {
   id: string;
   startsAt: Date;
@@ -19,7 +23,7 @@ type PromoteWaitlistDependencies = {
   findEligibleSubscription(input: {
     clientId: string;
     onDate: Date;
-  }): Promise<{ id: string } | null>;
+  }): Promise<WeeklyCapSubscription | null>;
   hasOverlappingBooking(input: {
     clientId: string;
     startsAt: Date;
@@ -32,10 +36,9 @@ type PromoteWaitlistDependencies = {
     createdByAccountId: string;
   }): Promise<{ id: string }>;
   closeAsPromoted(input: { entryId: string; bookingId: string }): Promise<void>;
+  cancellationWindowMinutes(): Promise<number>;
   now(): Date;
 };
-
-const cancellationWindowMilliseconds = 2.5 * 60 * 60 * 1_000;
 
 export const promoteWaitlist = async (
   command: { sessionId: string },
@@ -46,8 +49,11 @@ export const promoteWaitlist = async (
   if (
     session === null ||
     session.state !== 'scheduled' ||
-    session.startsAt.getTime() - dependencies.now().getTime() <=
-      cancellationWindowMilliseconds
+    isInsideCancellationWindow(
+      session.startsAt,
+      dependencies.now(),
+      await dependencies.cancellationWindowMinutes(),
+    )
   ) {
     return [];
   }
@@ -72,7 +78,7 @@ export const promoteWaitlist = async (
       onDate: session.startsAt,
     });
 
-    if (subscription === null) {
+    if (subscription === null || weeklyCapBlocks(subscription)) {
       continue;
     }
 

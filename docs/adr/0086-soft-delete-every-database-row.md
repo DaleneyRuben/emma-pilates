@@ -1,6 +1,6 @@
 # Soft-delete every database row
 
-Status: accepted
+Status: accepted; one-off exception before launch in [ADR-0104](./0104-reset-production-once-after-the-closed-test.md)
 
 No application table row is ever physically deleted. When something is removed, cancelled, expired, closed, swept for retention, or detached, its row stays and records the removal. Either an existing domain end state already says so (`archived_at`, `ended_at`, `revoked_at`, a cancelled or closed state, the image `deleted` state) or a nullable `deleted_at timestamptz(3)` column does. There are no exceptions for retention sweeps, pending registrations, invitations, email changes, image variants, Branch assignments, or Expense Categories.
 

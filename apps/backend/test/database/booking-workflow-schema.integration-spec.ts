@@ -25,7 +25,7 @@ describe('booking workflow migration', () => {
         'utf8',
       );
       expect(assertions.match(/SELECT pg_temp.expect_failure/g)).toHaveLength(
-        8,
+        9,
       );
       await expect(client.query(assertions)).resolves.toBeDefined();
     } finally {

@@ -1,10 +1,16 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
 import { boliviaParts } from "../lib/bolivia-time";
 import { cn } from "../lib/cn";
+import {
+  flagLabel,
+  useEquipmentFlag,
+  type EquipmentFlag,
+} from "./equipment-flag-data";
+import { EquipmentFlagLine } from "./equipment-flags";
 
 type Session = AdministratorSessionAvailabilityDto;
 
-const sessionLabel = (session: Session): string =>
+const sessionLabel = (session: Session, flag?: EquipmentFlag): string =>
   [
     session.classTypeName,
     boliviaParts(session.startsAt).time,
@@ -13,6 +19,7 @@ const sessionLabel = (session: Session): string =>
     ...(session.waitlistCount > 0
       ? [`${session.waitlistCount} en lista de espera`]
       : []),
+    ...(flag === undefined ? [] : [flagLabel(flag)]),
   ].join(", ");
 
 const occupancy = (session: Session): string =>
@@ -23,7 +30,8 @@ const occupancy = (session: Session): string =>
     : `${session.bookedCount}/${session.capacity}`;
 
 // AW02: each block names the Class Type, the Bolivia start time, and the
-// Trainer; a full Session reads as such, with its waitlist.
+// Trainer; a full Session reads as such, with its waitlist. A Session with
+// more places than working Equipment carries the warning (follow-up 170).
 export function SessionBlock({
   session,
   onOpen,
@@ -36,13 +44,14 @@ export function SessionBlock({
   style?: React.CSSProperties;
 }) {
   const full = session.bookedCount >= session.capacity;
+  const flag = useEquipmentFlag(session.id);
   const start = boliviaParts(session.startsAt).time;
   const end = boliviaParts(session.endsAt).time;
 
   return (
     <button
       type="button"
-      aria-label={sessionLabel(session)}
+      aria-label={sessionLabel(session, flag)}
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
@@ -50,6 +59,7 @@ export function SessionBlock({
         full
           ? "border-advertencia bg-advertencia/12"
           : "border-primario bg-primario-tinte",
+        flag === undefined ? null : "border-advertencia",
         className,
       )}
     >
@@ -68,6 +78,7 @@ export function SessionBlock({
       >
         {occupancy(session)}
       </span>
+      {flag === undefined ? null : <EquipmentFlagLine flag={flag} />}
     </button>
   );
 }

@@ -41,9 +41,11 @@ describe("AuthenticationFlow", () => {
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "local password");
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "local password");
+    await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
     expect(register).toHaveBeenCalledWith({
+      acquisitionChannel: "instagram",
       email: "ana@example.com",
       name: "Ana Clienta",
       password: "local password",
@@ -85,6 +87,7 @@ describe("AuthenticationFlow", () => {
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "password");
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "password");
+    await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
     await fireEvent.press(screen.getByRole("button", { name: "Cambiar correo" }));
     await fireEvent.changeText(

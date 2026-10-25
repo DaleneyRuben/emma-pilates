@@ -20,29 +20,43 @@ describe('foundation migration', () => {
     const result = await context.pool.query<{ table_name: string }>(`
       SELECT table_schema || '.' || table_name AS table_name
       FROM information_schema.tables
-      WHERE table_schema IN ('back_office', 'booking', 'system')
+      WHERE table_schema IN ('back_office', 'booking', 'studio', 'system')
         AND table_type = 'BASE TABLE'
       ORDER BY table_schema, table_name
     `);
 
     expect(result.rows.map(({ table_name: tableName }) => tableName)).toEqual([
+      'back_office.cash_closes',
+      'back_office.cost_budget_lines',
+      'back_office.equipment',
+      'back_office.equipment_issues',
       'back_office.expense_categories',
       'back_office.expenses',
+      'back_office.pay_rate_rules',
+      'back_office.pay_statement_lines',
+      'back_office.pay_statements',
       'back_office.salary_payments',
       'back_office.supplies',
       'back_office.supply_restocks',
       'back_office.withdrawals',
+      'booking.allowance_adjustments',
       'booking.attendance_records',
       'booking.availability_blocks',
       'booking.bookings',
       'booking.branches',
       'booking.class_types',
+      'booking.client_acquisitions',
       'booking.client_promotions_consents',
       'booking.clients',
+      'booking.contact_alerts',
       'booking.credit_ledger_entries',
       'booking.credit_reservations',
       'booking.evaluation_slots',
       'booking.evaluations',
+      'booking.founder_memberships',
+      'booking.freezes',
+      'booking.guest_passes',
+      'booking.lifecycle_messages',
       'booking.payments',
       'booking.plans',
       'booking.promotion_contacts',
@@ -53,8 +67,12 @@ describe('foundation migration', () => {
       'booking.sessions',
       'booking.staff_branch_assignments',
       'booking.staff_members',
+      'booking.studio_settings_versions',
       'booking.subscriptions',
       'booking.waitlist_entries',
+      'studio.client_month_facts',
+      'studio.recommendations',
+      'studio.session_facts',
       'system.account_devices',
       'system.account_email_changes',
       'system.accounts',
@@ -63,6 +81,7 @@ describe('foundation migration', () => {
       'system.authentication_throttle_events',
       'system.authentication_tokens',
       'system.email_suppressions',
+      'system.feedback',
       'system.idempotency_records',
       'system.image_assets',
       'system.image_variants',

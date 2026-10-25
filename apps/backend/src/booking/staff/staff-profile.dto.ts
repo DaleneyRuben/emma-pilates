@@ -6,6 +6,7 @@ export const staffRoles: [StaffProfile['role'], ...StaffProfile['role'][]] = [
   'nutritionist',
   'assistant',
   'administrator',
+  'coordinator',
 ];
 
 export class StaffBranchDto {

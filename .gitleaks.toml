@@ -23,6 +23,7 @@ regexes = [
   '''postgresql://postgres:postgres@localhost:5432/''',
   '''postgresql://nobody@127\.0\.0\.1:1/''',
   '''postgresql://[a-z]+@localhost:5433/pilates_''',
+  '''pilates_[a-z0-9]+_(dev|walk)''',
   '''OBJECT_STORAGE_TEST_(ACCESS_KEY_ID|SECRET_ACCESS_KEY): s3mock''',
 ]
 

@@ -183,7 +183,7 @@ describe("AW14 Expense form on a desktop browser", () => {
     const panel = await screen.findByRole("dialog", { name: "Editar gasto" });
     expect(within(panel).getByLabelText("Categoría")).toHaveValue(repair.id);
     expect(within(panel).getByLabelText("Monto")).toHaveValue("450,50");
-    expect(within(panel).getByLabelText("Fecha")).toHaveValue("2026-09-15");
+    expect(within(panel).getByLabelText("Fecha")).toHaveValue("15/09/2026");
     expect(
       within(panel).getByText(
         "Sucursal Centro: un gasto no cambia de sucursal.",

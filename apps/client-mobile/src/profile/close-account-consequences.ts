@@ -1,9 +1,6 @@
-import { formatBolivianos } from "@pilates/mobile-core";
-
 export type ClosureInputs = {
-  availableCreditCentavos: number;
   bookings: { kind: "booking" | "waitlist" }[];
-  evaluations: { state: "booked" | "cancelled" }[];
+  evaluations: { state: "booked" | "cancelled" | "no_show" }[];
   latestPayment: { method: string; state: string } | null;
   subscription: {
     status: "active" | "expiring_soon" | "expired" | "none";
@@ -72,9 +69,6 @@ export const describeAccountClosure = (inputs: ClosureInputs): ClosureDescriptio
               : `Sales de ${waitlists} listas de espera.`,
           ]),
       ...planLine(inputs.subscription),
-      ...(inputs.availableCreditCentavos > 0
-        ? [`Pierdes tu crédito de ${formatBolivianos(inputs.availableCreditCentavos)}.`]
-        : []),
       ...alwaysLines,
     ],
   };

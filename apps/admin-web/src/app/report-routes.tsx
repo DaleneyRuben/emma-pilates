@@ -14,4 +14,26 @@ const reportRoute = createRoute({
   ),
 });
 
-export const reportRoutes = [reportRoute];
+const indicatorsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/reporte/indicadores",
+  component: lazyRouteComponent(
+    () => import("../indicators/indicators-route"),
+    "IndicatorsRoute",
+  ),
+});
+
+const recommendationsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/recomendaciones",
+  component: lazyRouteComponent(
+    () => import("../recommendations/recommendations-route"),
+    "RecommendationsRoute",
+  ),
+});
+
+export const reportRoutes = [
+  reportRoute,
+  indicatorsRoute,
+  recommendationsRoute,
+];

@@ -11,6 +11,7 @@ describe("formatBolivianos", () => {
     expect(formatBolivianos(960_000)).toBe("Bs 9.600,00");
     expect(formatBolivianos(15_050)).toBe("Bs 150,50");
     expect(formatBolivianos(5)).toBe("Bs 0,05");
+    expect(formatBolivianos(1_200_000)).toBe("Bs 12.000,00");
   });
 });
 

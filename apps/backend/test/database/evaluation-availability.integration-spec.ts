@@ -3,6 +3,7 @@ import {
   createPrismaEvaluationCommands,
   endNutritionistAvailability,
 } from '../../src/booking/evaluations/prisma-evaluation-commands';
+import { grantQuarterlySubscription } from './evaluation-bookings-test-support';
 import {
   branchIdOf,
   codeOf,
@@ -48,6 +49,7 @@ describe('Prisma evaluation availability commands', () => {
 
   beforeAll(async () => {
     world = await startEvaluationTestWorld();
+    await grantQuarterlySubscription(world.prisma, 'lucia@example.com');
   });
 
   afterAll(async () => {

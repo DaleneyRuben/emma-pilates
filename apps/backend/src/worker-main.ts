@@ -15,7 +15,10 @@ import { createPrismaRetentionSweeps } from './system-identity/retention/prisma-
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
 import { createNotificationRecorder } from './notifications/prisma-notification-store';
 import { createPushDeliveryRuntime } from './notifications/push/push-delivery-runtime';
+import { createClassReminderJob } from './notifications/class-reminder-job';
+import { createFirst90DaysJob } from './booking/first-90-days/prisma-first-90-days';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
+import { createFounderMembershipJob } from './booking/payments/founder-membership-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
 import { PrismaClientRegistrationUnitOfWork } from './system-identity/registration/prisma-client-registration-unit-of-work';
 import { AuthenticationLinkCipher } from './system-identity/security/authentication-link-cipher';
@@ -23,6 +26,11 @@ import { cleanupAbandonedUploads } from './uploads/cleanup-abandoned-uploads';
 import { createObjectStorage } from './uploads/create-object-storage';
 import { createUploadCleanupGateway } from './uploads/prisma-upload-cleanup-gateway';
 import { createFinalizeUploadJobCommands } from './uploads/prisma-upload-commands';
+import { coordinatorMonthFacts } from './back-office/payroll/coordinator-pay-facts';
+import { createPrismaPayStatements } from './back-office/payroll/prisma-pay-statements';
+import { trainerMonthFacts } from './back-office/payroll/trainer-pay-facts';
+import { recomputeCurrentStudioMonth } from './studio/studio.module';
+import { boliviaDate } from './time/bolivia-time';
 import { startWorker } from './worker';
 
 async function bootstrap(): Promise<void> {
@@ -101,10 +109,15 @@ async function bootstrap(): Promise<void> {
       now,
       recordNotification,
     ),
+    founderMemberships: createFounderMembershipJob(
+      prisma,
+      now,
+      recordNotification,
+    ),
+    first90Days: createFirst90DaysJob(prisma, now, recordNotification),
     purchaseIntentExpiry: createPurchaseIntentExpiryJob(
       prisma,
       now,
-      environment.REFERRAL_REWARD_CENTAVOS,
       recordNotification,
     ),
     sessionSchedules: {
@@ -112,10 +125,17 @@ async function bootstrap(): Promise<void> {
     },
     evaluationSlots: { execute: () => evaluations.materializeAvailability() },
     evaluationReminders: {
-      execute: () => evaluations.sendDueEvaluationReminders(),
+      execute: async () => {
+        await evaluations.releaseExpiredEvaluationHolds();
+        return evaluations.sendDueEvaluationReminders();
+      },
     },
-    emptySessionChecks: {
-      execute: () => sessionStartChecks.checkEmptySessions(),
+    classReminders: createClassReminderJob(prisma, now, recordNotification),
+    minimumBookingsChecks: {
+      execute: () => sessionStartChecks.checkMinimumBookings(),
+    },
+    windowCloseSnapshots: {
+      execute: () => sessionStartChecks.recordWindowCloseBookings(),
     },
     startedSessionWaitlists: {
       execute: () => sessionStartChecks.closeStartedWaitlists(),
@@ -126,6 +146,26 @@ async function bootstrap(): Promise<void> {
       expoAccessToken: environment.EXPO_ACCESS_TOKEN,
       now,
     }),
+    studioFacts: { execute: () => recomputeCurrentStudioMonth(prisma) },
+    trainerPayDrafts: {
+      execute: async () => {
+        const statements = createPrismaPayStatements(prisma, {
+          now,
+          factsOfMonth: (from, until) => trainerMonthFacts(prisma, from, until),
+          coordinatorFactsOfMonth: (from, until) =>
+            coordinatorMonthFacts(prisma, from, until),
+        });
+        const current = boliviaDate(now());
+        const previous = new Date(
+          Date.UTC(current.getUTCFullYear(), current.getUTCMonth() - 1, 1),
+        );
+        const [past, present] = await Promise.all([
+          statements.draftMonth(previous),
+          statements.draftMonth(current),
+        ]);
+        return { drafted: past.drafted + present.drafted };
+      },
+    },
     retentionSweeps: createPrismaRetentionSweeps(prisma, { now }),
     serviceVersion: process.env.npm_package_version ?? 'local',
     emit,

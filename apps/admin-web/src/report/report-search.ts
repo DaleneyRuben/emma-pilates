@@ -7,6 +7,13 @@ export const reportSearchSchema = z.object({
   branch: z.union([z.literal("all"), z.uuid()]).catch("all"),
   from: z.iso.date().optional().catch(undefined),
   to: z.iso.date().optional().catch(undefined),
+  // Follow-up 201: Reporte stays the page; Finanzas is the month result.
+  vista: z.enum(["reporte", "finanzas"]).catch("reporte"),
+  month: z
+    .string()
+    .regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+    .optional()
+    .catch(undefined),
 });
 export type ReportSearch = z.infer<typeof reportSearchSchema>;
 
