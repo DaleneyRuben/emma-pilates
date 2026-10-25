@@ -1,6 +1,6 @@
 import { loadPrivateImage, loadPrivateImageWithRatio } from "./private-image";
 
-const pngBytes = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+const pngBytes = Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10]);
 
 describe("loadPrivateImage", () => {
   it("fetches an authenticated image through the API fetcher and returns it as a data URI", async () => {
@@ -32,7 +32,7 @@ describe("loadPrivateImage", () => {
 });
 
 // A PNG signature followed by an IHDR chunk for the given size.
-function pngHeader(width: number, height: number): Uint8Array {
+function pngHeader(width: number, height: number): Uint8Array<ArrayBuffer> {
   const bytes = new Uint8Array(33);
   bytes.set([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82]);
   const view = new DataView(bytes.buffer);
@@ -43,11 +43,12 @@ function pngHeader(width: number, height: number): Uint8Array {
 
 describe("loadPrivateImageWithRatio", () => {
   it("reads the image's own aspect ratio from its header", async () => {
-    const fetcher = jest
-      .fn()
-      .mockResolvedValue(
-        new Response(pngHeader(420, 600), { headers: { "Content-Type": "image/png" }, status: 200 }),
-      );
+    const fetcher = jest.fn().mockResolvedValue(
+      new Response(pngHeader(420, 600), {
+        headers: { "Content-Type": "image/png" },
+        status: 200,
+      }),
+    );
 
     await expect(loadPrivateImageWithRatio(fetcher, "/receipt")).resolves.toMatchObject({
       aspectRatio: 420 / 600,
