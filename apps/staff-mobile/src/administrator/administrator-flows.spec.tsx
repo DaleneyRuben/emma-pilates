@@ -58,6 +58,7 @@ const review = (payment: typeof carla, state = "pending") => ({
   state,
   planId: "plan-1",
   planName: payment.planName,
+  durationDays: 30,
   durationMonths: 1,
   classAllowance: 8,
   planPriceCentavos: payment.amountDueCentavos,
@@ -304,7 +305,7 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Cancelar sesión")).toBeOnTheScreen();
     });
-    expect(screen.getByText("6 clientes afectados")).toBeOnTheScreen();
+    expect(screen.getByText("6 clientas afectadas")).toBeOnTheScreen();
     expect(screen.getByText("Esto no se puede deshacer")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar sesión" }));
@@ -312,8 +313,8 @@ describe("Administrator payments and Session cancellation", () => {
       expect(cancelled).toHaveBeenCalled();
       expect(screen.getByText("Sesión cancelada")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Se notificó a los 6 clientes afectados.")).toBeOnTheScreen();
-    expect(screen.getByText("Se reembolsó una clase a cada cliente.")).toBeOnTheScreen();
+    expect(screen.getByText("Se notificó a las 6 clientas afectadas.")).toBeOnTheScreen();
+    expect(screen.getByText("Se reembolsó una clase a cada clienta.")).toBeOnTheScreen();
 
     // S14's result has the bar's chevron and the «Volver» button under it (MOB-034).
     const backs = screen.getAllByRole("button", { name: "Volver" });

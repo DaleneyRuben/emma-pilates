@@ -179,6 +179,28 @@ export class EvaluationSlotsController {
       this.commands.bookEvaluation(id, principal, key),
     );
   }
+
+  @Post(':slotId/evaluation-payments')
+  @ApiOperation({ operationId: 'bookPaidEvaluation' })
+  @ApiParam({ name: 'slotId', format: 'uuid' })
+  @ApiHeader(idempotencyHeader)
+  @ApiCreatedResponse({ type: ClientEvaluationDto })
+  @Header('Cache-Control', 'no-store')
+  async bookPaid(
+    @Param('slotId') slotId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Headers('idempotency-key') idempotencyKey: string | undefined,
+  ): Promise<ClientEvaluationDto> {
+    const id = requireId(slotId, 'Invalid Evaluation slot identifier');
+    const key = requireIdempotencyKey(idempotencyKey);
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    return runEvaluationCommand(() =>
+      this.commands.bookPaidEvaluation(id, principal, key),
+    );
+  }
 }
 
 @Controller({ path: 'evaluations', version: '1' })

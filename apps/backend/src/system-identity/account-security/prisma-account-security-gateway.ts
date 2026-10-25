@@ -11,7 +11,6 @@ import {
   AuthenticationThrottleEventKind,
   AuthenticationThrottlePurpose,
   AuthenticationTokenPurpose,
-  StaffRole,
 } from '../../generated/prisma/enums';
 import { scheduleAuthenticationEmail } from '../../jobs/authentication-email/schedule-authentication-email';
 import {
@@ -20,6 +19,7 @@ import {
 } from './authentication-links';
 import type { PasswordChangeGateway } from './change-password';
 import type { PasswordRecoveryGateway } from './password-recovery';
+import { opensAdminWebSessions } from '../authentication/staff-role';
 import {
   cancelPendingEmailChange,
   canIssueRecoveryEmail,
@@ -334,7 +334,7 @@ export class PrismaAccountSecurityGateway
             });
       const sessionOpened =
         input.sessionEligibility === 'any' ||
-        staffMember?.role === StaffRole.ADMINISTRATOR;
+        opensAdminWebSessions(staffMember?.role);
 
       if (sessionOpened) {
         await transaction.authenticationSession.create({

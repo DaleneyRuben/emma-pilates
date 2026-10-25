@@ -113,7 +113,24 @@ describe("Client Browse Sessions", () => {
     expect(screen.getAllByText("Emma Vargas")).toHaveLength(2);
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
     expect(screen.getByText("Lleno")).toBeOnTheScreen();
+    expect(screen.queryByText(/clases esta semana/)).not.toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
+  });
+
+  it("shows the classes left this week from the Session field", async () => {
+    const capped = {
+      ...session("session-1", "class-reformer", inOneHour, 3),
+      classesLeftThisWeek: 2,
+    };
+    const screen = await openBrowse({
+      ...baseRoutes(),
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+        () => jsonResponse([capped]),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Te quedan 2 clases esta semana")).toBeOnTheScreen();
+    });
   });
 
   it("filters the list by Class Type and shows an empty state", async () => {

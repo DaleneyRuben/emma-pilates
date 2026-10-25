@@ -1,9 +1,14 @@
-import { useGetTrainerSessionRoster, type TrainerRosterBookingDto } from "@pilates/api-contracts";
+import {
+  getTrainerSessionRoster,
+  useGetTrainerSessionRoster,
+  type TrainerRosterBookingDto,
+} from "@pilates/api-contracts";
 import {
   BackLink,
   BodyText,
   colors,
   EmptyState,
+  fontFamilies,
   formatTimeRange,
   Heading,
   LoadingState,
@@ -21,9 +26,13 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createTrainerApi } from "../trainer-api";
+import { requireOk } from "./require-ok";
 
 type AttendanceOutcome = "attended" | "no_show";
-type TrainerRosterNavigation = { goBack: () => void };
+type TrainerRosterNavigation = {
+  goBack: () => void;
+  navigate: (screen: "ReportFault", params: { sessionId: string }) => void;
+};
 
 function savedOutcomes(bookings: TrainerRosterBookingDto[]): Record<string, AttendanceOutcome> {
   return Object.fromEntries(
@@ -35,12 +44,19 @@ function savedOutcomes(bookings: TrainerRosterBookingDto[]): Record<string, Atte
   );
 }
 
+// S03: the attendance list of a Session the Trainer leads.
 export function TrainerRosterScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<TrainerRosterNavigation>();
   const fetcher = useStaffFetcher();
   const roster = useGetTrainerSessionRoster(route.params.sessionId, {
     fetcher,
-    query: { refetchOnMount: "always" },
+    query: {
+      queryFn: ({ signal }) =>
+        getTrainerSessionRoster(route.params.sessionId, { signal }, fetcher).then((response) =>
+          requireOk(response, "The roster could not be loaded"),
+        ),
+      refetchOnMount: "always",
+    },
   });
   // The Trainer's taps sit over the saved outcomes, so a refetch never undoes a tap.
   const [edits, setEdits] = useState<Record<string, AttendanceOutcome>>({});
@@ -55,7 +71,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
         <LoadingState label="Cargando lista" />
       </Screen>
     );
-  if (roster.isError || roster.data === undefined)
+  if (roster.isError || roster.data === undefined || roster.data.status !== 200)
     return (
       <Screen>
         <QueryFailure
@@ -91,6 +107,16 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
       <BackLink onPress={() => navigation.goBack()} />
       <Heading accessibilityLabel={session.classTypeName}>{session.classTypeName}</Heading>
       <BodyText>{`${session.branchName} · ${formatTimeRange(session.startsAt, session.endsAt)}`}</BodyText>
+      {/* Follow-up 171: a fault can be found at any time, before or after the class. */}
+      <Pressable
+        accessibilityLabel="Reportar una falla"
+        accessibilityRole="button"
+        onPress={() => navigation.navigate("ReportFault", { sessionId: session.sessionId })}
+        style={styles.reportFault}
+        testID="roster-report-fault"
+      >
+        <Text style={styles.reportFaultText}>Reportar una falla</Text>
+      </Pressable>
       {empty ? (
         <EmptyState
           icon="calendar"
@@ -155,6 +181,13 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
 }
 
 const styles = StyleSheet.create({
+  reportFault: { alignSelf: "flex-start", justifyContent: "center", minHeight: 44 },
+  reportFaultText: {
+    color: colors.primary,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.body,
+    fontWeight: "500",
+  },
   centered: {
     alignItems: "center",
     flex: 1,

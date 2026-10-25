@@ -1,11 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import {
+  declaredAcquisitionChannels,
+  type DeclaredAcquisitionChannel,
+} from '../../booking/acquisition/acquisition';
 
 const startClientRegistrationSchema = z.strictObject({
   name: z.string().trim().min(1),
   email: z.email(),
   password: z.string().min(1),
   referralCode: z.string().trim().min(1).max(64).optional(),
+  acquisitionChannel: z.enum(declaredAcquisitionChannels).optional(),
 });
 
 const correctPendingClientEmailSchema = z.strictObject({
@@ -29,9 +34,17 @@ export class StartClientRegistrationDto {
 
   @ApiPropertyOptional({
     example: 'REF-LUCIA',
-    description: 'Referral code of the Client who invited this person',
+    description:
+      'Referral Code of the Client or Trainer who brought this person; it decides the Acquisition Channel (BKM-011)',
   })
   referralCode?: string;
+
+  @ApiPropertyOptional({
+    enum: declaredAcquisitionChannels,
+    description:
+      '«¿Cómo nos conociste?» Required by current builds; a build that omits it registers as `unknown` (BKM-011)',
+  })
+  acquisitionChannel?: DeclaredAcquisitionChannel;
 }
 
 export class PendingClientRegistrationDto {

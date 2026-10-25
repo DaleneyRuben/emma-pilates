@@ -83,6 +83,34 @@ describe('createStaffMember', () => {
     );
   });
 
+  it('creates a Coordinator without Branch rows: she holds every Branch (ADR-0102)', async () => {
+    const transaction = createTransaction();
+
+    await createStaffMember(
+      { ...command, role: 'coordinator', branchIds: ['centro'] },
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.createPendingStaffMember).toHaveBeenCalledWith(
+      expect.objectContaining({ role: 'coordinator', branchIds: [] }),
+    );
+  });
+
+  it('leaves inviting Staff to the Administrator, never the Coordinator', async () => {
+    const transaction = createTransaction();
+
+    await rejectsWith(
+      createStaffMember(
+        command,
+        principal('coordinator'),
+        dependencies(transaction),
+      ),
+      'staff_access_denied',
+    );
+    expect(transaction.createPendingStaffMember).not.toHaveBeenCalled();
+  });
+
   it.each([
     [
       'a non-Administrator',
@@ -200,6 +228,23 @@ describe('staff directory reads', () => {
     ).resolves.toMatchObject({ totalItems: 1 });
     await expect(
       readStaffMember({ staffMemberId: 'staff-1' }, administrator, directory),
+    ).resolves.toMatchObject({ id: 'staff-1' });
+  });
+
+  it('lets the Coordinator list and read Staff Members (ADR-0102)', async () => {
+    await expect(
+      listStaffMembers(
+        { page: 1, pageSize: 20 },
+        principal('coordinator'),
+        directory,
+      ),
+    ).resolves.toMatchObject({ totalItems: 1 });
+    await expect(
+      readStaffMember(
+        { staffMemberId: 'staff-1' },
+        principal('coordinator'),
+        directory,
+      ),
     ).resolves.toMatchObject({ id: 'staff-1' });
   });
 

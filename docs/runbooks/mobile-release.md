@@ -161,3 +161,30 @@ Only JavaScript, copy, style, and asset fixes that need no native change:
 3. Review launch and error signals; expand with `eas update:edit` or roll back
    with `eas update:republish` of the previous group. Never promote only
    because time passed.
+
+## From GitHub Actions (REL-008, ADR-0101)
+
+Three workflows replace the workstation commands above. Each is
+`workflow_dispatch` only. None runs on merge. All three stop before calling
+Expo when the `EXPO_TOKEN` secret is absent. That token is an Expo robot user
+of the `emma-pilates` organization, stored by the owner as a GitHub Actions
+secret. Until the owner creates it, dispatching a workflow fails at that
+check and publishes nothing.
+
+- **Publish OTA** (`mobile-publish-ota.yml`), from `main` only, after that
+  commit's CI run is green. Channel `preview` first. Channel `production`
+  is refused unless the preview dispatch of the same commit recorded a git
+  note `preview-ota:<app>:<sha>`. Rollout percentage applies to production.
+- **Create native release** (`mobile-create-release.yml`) opens a pull
+  request from `release/<app>-x.y.z` that bumps that app's `expo.version`.
+  Merge it only after the store version is published. Merging earlier stops
+  OTA updates from reaching installed builds of the previous version.
+- **Store deploy** (`mobile-store-deploy.yml`) runs from that release branch.
+  Android builds with `eas build --profile production --auto-submit` to
+  Play's internal track and spends one free-plan build. iOS is refused
+  until gate 9 (the Apple Developer account). The workflow does not promote
+  a track to production.
+
+A local `eas build` remains the fallback when Actions, EAS, or the free
+allocation is unavailable. State the build count before dispatching a native
+build.

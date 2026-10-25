@@ -5,13 +5,13 @@ import {
   useGetCurrentPayment,
 } from "@pilates/api-contracts";
 import {
+  BackLink,
   BodyText,
   colors,
   Heading,
   LoadingState,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   spacing,
   surfaces,
@@ -24,9 +24,9 @@ import { randomUUID } from "expo-crypto";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDate } from "../home/home-format";
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "@pilates/mobile-core";
+import { formatCivilDate } from "../home/home-format";
+import { PaymentStatusView } from "./payment-status-view";
 
 type StatusNavigation = {
   goBack: () => void;
@@ -93,9 +93,7 @@ export function PaymentStatusScreen() {
     return (
       <Screen style={styles.screen}>
         <ScrollView contentContainerStyle={styles.content}>
-          <View style={[styles.badge, styles.successBadge]}>
-            <Text style={styles.badgeIcon}>✓</Text>
-          </View>
+          <PaymentStatusView state="confirmed" />
           <Heading accessibilityLabel="Pago confirmado" style={styles.centered}>
             ¡Pago confirmado!
           </Heading>
@@ -116,9 +114,7 @@ export function PaymentStatusScreen() {
     return (
       <Screen style={styles.screen}>
         <ScrollView contentContainerStyle={styles.content}>
-          <View style={[styles.badge, styles.errorBadge]}>
-            <Text style={styles.badgeIcon}>!</Text>
-          </View>
+          <PaymentStatusView state="rejected" />
           <Heading accessibilityLabel="Comprobante rechazado" style={styles.centered}>
             Tu comprobante fue rechazado
           </Heading>
@@ -127,7 +123,7 @@ export function PaymentStatusScreen() {
             <Text style={styles.reason}>{current.rejectionReason}</Text>
           </View>
           <BodyText style={styles.centered}>
-            Sube un nuevo comprobante para activar tu plan. Tu crédito volvió a estar disponible.
+            Sube un nuevo comprobante para activar tu plan.
           </BodyText>
           {error === null ? null : (
             <BodyText accessibilityRole="alert" style={styles.error}>
@@ -148,9 +144,7 @@ export function PaymentStatusScreen() {
   return (
     <Screen style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={[styles.badge, styles.warningBadge]}>
-          <Text style={styles.badgeIcon}>⏳</Text>
-        </View>
+        <PaymentStatusView state="pending" />
         <Heading accessibilityLabel="Pago en revisión" style={styles.centered}>
           Tu pago está en revisión
         </Heading>
@@ -164,15 +158,6 @@ export function PaymentStatusScreen() {
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    alignItems: "center",
-    alignSelf: "center",
-    borderRadius: radii.pill,
-    height: 72,
-    justifyContent: "center",
-    width: 72,
-  },
-  badgeIcon: { color: colors.white, fontSize: typography.title },
   card: {
     ...surfaces.card,
     gap: spacing.xs,
@@ -181,11 +166,8 @@ const styles = StyleSheet.create({
   centered: { textAlign: "center" },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl, paddingTop: spacing.xxl },
   error: { color: colors.errorText, textAlign: "center" },
-  errorBadge: { backgroundColor: colors.error },
   planName: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
   reason: { color: colors.text, fontSize: typography.body },
   reasonLabel: { color: colors.textMuted, fontSize: typography.note },
   screen: { gap: spacing.lg },
-  successBadge: { backgroundColor: colors.success },
-  warningBadge: { backgroundColor: colors.warning },
 });

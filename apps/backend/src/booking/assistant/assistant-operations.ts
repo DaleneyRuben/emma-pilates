@@ -3,6 +3,7 @@ import { boliviaDate } from '../../time/bolivia-time';
 import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { toSubscriptionSummary } from '../client/client-subscription';
 import type { PaymentCommands } from '../payments/prisma-payment-commands';
+import { priceFounderPlanList } from '../payments/prisma-founder-membership';
 import {
   listAssistantClientBookings,
   listAssistantClientHistory,
@@ -18,7 +19,10 @@ import { createAssistantClientRepository } from './prisma-assistant-client-repos
 // payment commands; every operation receives the authenticated principal.
 export const createAssistantClientOperations = (input: {
   prisma: PrismaClient;
-  payments: Pick<PaymentCommands, 'recordCashPayment'>;
+  payments: Pick<
+    PaymentCommands,
+    'recordCashPayment' | 'recordFrontDeskTransfer'
+  >;
   now(): Date;
 }): AssistantClientOperations => {
   const catalog = createCatalogRepository(input.prisma);
@@ -27,6 +31,10 @@ export const createAssistantClientOperations = (input: {
     findActiveSubscription: (clientId: string, onDate: Date) =>
       catalog
         .findActiveSubscription(clientId, onDate)
+        .then(toSubscriptionSummary),
+    findFutureSubscription: (clientId: string, after: Date) =>
+      catalog
+        .findFutureSubscription(clientId, after)
         .then(toSubscriptionSummary),
     findLatestSubscription: (clientId: string) =>
       catalog.findLatestSubscription(clientId).then(toSubscriptionSummary),
@@ -48,8 +56,6 @@ export const createAssistantClientOperations = (input: {
         findUpcoming: (range) => catalog.findUpcomingClientBookings(range),
         findAttendedBookings: (clientId) =>
           catalog.findAttendedBookings(clientId),
-        readAvailableCredit: (clientId) =>
-          clients.readAvailableCredit(clientId),
       }),
     bookings: (command, principal) =>
       listAssistantClientBookings(command, {
@@ -69,9 +75,12 @@ export const createAssistantClientOperations = (input: {
       quotePlansForClient(command, {
         principal,
         findClient: (clientId) => clients.findClient(clientId),
-        listVisiblePlans: () => catalog.listVisiblePlans(),
-        readAvailableCredit: (clientId) =>
-          clients.readAvailableCredit(clientId),
+        listVisiblePlans: async (clientId) =>
+          priceFounderPlanList(
+            input.prisma,
+            clientId,
+            await catalog.listVisiblePlans(),
+          ),
       }),
     recordCashPayment: (command, principal, idempotencyKey) =>
       recordAssistantCashPayment(
@@ -82,6 +91,12 @@ export const createAssistantClientOperations = (input: {
             input.payments.recordCashPayment(cash, actor, key),
           findLatestSubscription: subscriptions.findLatestSubscription,
         },
+      ),
+    recordFrontDeskTransfer: (command, principal, idempotencyKey) =>
+      input.payments.recordFrontDeskTransfer(
+        command,
+        principal,
+        idempotencyKey,
       ),
   };
 };

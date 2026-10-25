@@ -82,3 +82,10 @@ export function boliviaMonth(instant: Date | string = new Date()): string {
 export function monthPhrase(month: string): string {
   return month === boliviaMonth() ? "este mes" : monthName(month);
 }
+
+// NUT-003: a past Evaluation is not always «Realizada». The label is derived.
+export function evaluationHistoryLabel(evaluation: { state: string; included: boolean }): string {
+  if (evaluation.state === "cancelled") return "Cancelada";
+  if (evaluation.state === "no_show") return "No asistió";
+  return evaluation.included ? "Incluida" : "Pagada";
+}

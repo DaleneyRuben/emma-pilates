@@ -13,4 +13,5 @@ export const CreateStaffMemberDtoRole = {
   nutritionist: "nutritionist",
   assistant: "assistant",
   administrator: "administrator",
+  coordinator: "coordinator",
 } as const;

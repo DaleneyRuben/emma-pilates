@@ -3,15 +3,12 @@ import {
   getGetIncomeReportQueryKey,
   getGetPaymentReviewQueryKey,
   getListAdminClientsQueryKey,
-  getListAdminCreditsQueryKey,
   getListAdminPaymentsQueryKey,
-  getListAdminReferralsQueryKey,
 } from "@pilates/api-contracts";
 import type { QueryClient } from "@tanstack/react-query";
 
 export type DecisionOutcome = "confirmed" | "rejected" | "unknown";
 
-const clientsPath = getListAdminClientsQueryKey()[0];
 const incomeReportPath = getGetIncomeReportQueryKey()[0];
 
 // A confirmed transfer is studio-wide income: it counts only in the
@@ -22,13 +19,12 @@ const isStudioIncomeKey = ({ queryKey }: { queryKey: readonly unknown[] }) =>
 
 /**
  * ADR-0042: exactly the cached reads a decision changes. Every Payment list
- * (Pagos and the sidebar count) and the review; a confirmation starts the
- * Client's Plan (the Clientes directory and her detail) and a first Payment
- * may award Credit to her referrer, whom the admin web cannot name, so every
- * Client detail and the Referral and Credit lists; a rejection releases only
- * her reserved Credit (her detail and the Credit list). A confirmed
- * transfer also adds to the all-Branches income report. A decision taken
- * elsewhere (a conflict) may have been either.
+ * (Pagos and the sidebar count), the review, and the Client's detail (it
+ * no longer shows a transfer awaiting review); a confirmation also starts
+ * her Plan (the Clientes directory) and adds to the all-Branches income
+ * report. No Credit is awarded or spent since PAY-005, so the Referral list
+ * and other Clients stay as they are. A decision taken elsewhere (a
+ * conflict) may have been either.
  */
 export async function refreshAfterDecision(
   queryClient: QueryClient,
@@ -41,27 +37,15 @@ export async function refreshAfterDecision(
     queryClient.invalidateQueries({
       queryKey: getGetPaymentReviewQueryKey(change.paymentId),
     }),
-    queryClient.invalidateQueries({ queryKey: getListAdminCreditsQueryKey() }),
+    queryClient.invalidateQueries({
+      queryKey: getGetAdminClientQueryKey(change.clientId),
+    }),
   ];
-  if (change.outcome === "rejected") {
-    refreshes.push(
-      queryClient.invalidateQueries({
-        queryKey: getGetAdminClientQueryKey(change.clientId),
-      }),
-    );
-  } else {
+  if (change.outcome !== "rejected") {
     refreshes.push(
       queryClient.invalidateQueries({
         queryKey: getListAdminClientsQueryKey(),
         exact: false,
-      }),
-      queryClient.invalidateQueries({
-        predicate: ({ queryKey }) =>
-          typeof queryKey[0] === "string" &&
-          queryKey[0].startsWith(`${clientsPath}/`),
-      }),
-      queryClient.invalidateQueries({
-        queryKey: getListAdminReferralsQueryKey(),
       }),
       queryClient.invalidateQueries({ predicate: isStudioIncomeKey }),
     );

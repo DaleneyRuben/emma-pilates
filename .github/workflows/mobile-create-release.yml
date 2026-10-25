@@ -1,0 +1,54 @@
+name: Create native release
+
+# REL-008 (ADR-0101, amending ADR-0038). Manual only. Opens a pull request
+# that bumps one app's expo.version. The branch merges after that store
+# version is published, because the appVersion runtime policy would otherwise
+# stop OTA updates from reaching installed builds.
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: Which app gets the new version
+        required: true
+        type: choice
+        options: [client, staff]
+      version:
+        description: New expo.version, x.y.z
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  open-release-pr:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Refuse a version that is not x.y.z
+        run: |
+          echo "${{ inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || {
+            echo "version must be x.y.z"
+            exit 1
+          }
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump expo.version and open the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          app="${{ inputs.app }}"
+          version="${{ inputs.version }}"
+          folder="apps/${app}-mobile"
+          branch="release/${app}-${version}"
+          git checkout -b "$branch"
+          node scripts/bump-expo-version.mjs "$folder/app.json" "$version"
+          git add "$folder/app.json"
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "bump the ${app} app to ${version}"
+          git push --set-upstream origin "$branch"
+          gh pr create --base main --head "$branch" --title "release ${app} ${version}" --body "Bumps ${folder} expo.version to ${version}. Merge only after this version is published in the stores. The appVersion runtime policy stops OTA updates from reaching installed builds of the previous version once this merges (ADR-0039, ADR-0101)."

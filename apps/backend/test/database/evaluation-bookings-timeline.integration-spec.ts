@@ -5,6 +5,7 @@ import {
   bookIsabelFutureSession,
   civil,
   createCarlaBlocks,
+  grantQuarterlySubscription,
   notificationsTo,
   settle,
   slotIdAt,
@@ -33,14 +34,15 @@ describe('Prisma evaluation booking commands (races and reminders)', () => {
     notificationsTo(world.prisma, email, type);
 
   // Replays the state the evaluation-bookings spec leaves behind: Lucía's
-  // September Evaluation, her cancelled October one and the follow-up on its
-  // freed slot, and Isabel's September Evaluation.
+  // cancelled September Evaluation, her October follow-up, and Isabel's
+  // September Evaluation. Both hold a 90-day Plan.
   beforeAll(async () => {
     world = await startEvaluationTestWorld();
     ({ mondayBlockId, wednesdayBlockId } = await createCarlaBlocks(
       world,
       commands(),
     ));
+    await grantQuarterlySubscription(world.prisma, 'lucia@example.com');
     const lucia = await world.principalOf('lucia@example.com');
     const book = async (startsAt: string, principal = lucia) =>
       (
@@ -51,10 +53,9 @@ describe('Prisma evaluation booking commands (races and reminders)', () => {
         )
       ).id;
     ids.luciaSeptember = await book('2026-09-28T13:45:00.000Z');
-    const luciaOctober = await book('2026-10-05T13:00:00.000Z');
-    await commands().cancelClientEvaluation(luciaOctober, lucia);
-    ids.luciaFollowUp = await book('2026-10-05T13:00:00.000Z');
+    ids.luciaFollowUp = ids.luciaSeptember;
     await bookIsabelFutureSession(world);
+    await grantQuarterlySubscription(world.prisma, 'isabel@example.com');
     ids.isabelSeptember = await book(
       '2026-09-28T14:30:00.000Z',
       await world.principalOf('isabel@example.com'),
@@ -67,7 +68,6 @@ describe('Prisma evaluation booking commands (races and reminders)', () => {
 
   it('serializes competing bookings of one slot, one month, and a slot being withdrawn', async () => {
     const bea = await world.principalOf('bea@example.com');
-    const isabel = await world.principalOf('isabel@example.com');
     const ana = await world.principalOf('ana@example.com');
 
     const sameSlot = await slotAt(mondayBlockId, '2026-10-19T13:00:00.000Z');
@@ -100,7 +100,7 @@ describe('Prisma evaluation booking commands (races and reminders)', () => {
     expect(monthRace.filter((outcome) => outcome.ok)).toHaveLength(1);
     expect(monthRace.find((outcome) => !outcome.ok)).toEqual({
       ok: false,
-      code: 'evaluation_month_used',
+      code: 'evaluation_payment_required',
     });
 
     const noa = await world.principalOf('noa@example.com');
@@ -116,8 +116,10 @@ describe('Prisma evaluation booking commands (races and reminders)', () => {
       randomUUID(),
     );
     const contested = await slotAt(tuesday.id, '2026-10-06T13:00:00.000Z');
+    await grantQuarterlySubscription(world.prisma, 'valeria@example.com');
+    const valeria = await world.principalOf('valeria@example.com');
     const [booking, ending] = await Promise.all([
-      settle(commands().bookEvaluation(contested, isabel, randomUUID())),
+      settle(commands().bookEvaluation(contested, valeria, randomUUID())),
       settle(
         commands().endAvailabilityBlock(
           { blockId: tuesday.id, effectiveFrom: civil('2026-10-06') },
@@ -281,18 +283,8 @@ describe('Prisma evaluation booking commands (races and reminders)', () => {
       lucia,
     );
     expect(first).toMatchObject({
-      items: [{ id: ids.luciaFollowUp, cancellable: false }],
-      hasMore: true,
-    });
-    await expect(
-      commands().listClientEvaluations(
-        { scope: 'past', limit: 1, cursor: first.nextCursor! },
-        lucia,
-      ),
-    ).resolves.toMatchObject({
-      items: [{ id: ids.luciaSeptember }],
+      items: [{ id: ids.luciaSeptember, cancellable: false }],
       hasMore: false,
-      nextCursor: null,
     });
     await expect(
       commands().listClientEvaluations({ scope: 'upcoming' }, lucia),

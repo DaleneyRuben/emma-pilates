@@ -27,6 +27,8 @@ export const glyphShapes = {
       <Line x1={3.5} x2={20.5} y1={10} y2={10} />
     </>
   ),
+  // 11's confirmed payment (follow-up 111), the check the icon row draws.
+  check: <Polyline points="4.5,12.5 9.5,17.5 19.5,7" />,
   clock: (
     <>
       <Circle cx={12} cy={12} r={8.5} />
@@ -37,6 +39,13 @@ export const glyphShapes = {
     <>
       <Rect height={12} rx={2.5} width={17} x={3.5} y={6.5} />
       <Line x1={3.5} x2={20.5} y1={11} y2={11} />
+    </>
+  ),
+  // 11's rejected payment (follow-up 111).
+  cross: (
+    <>
+      <Line x1={6.5} x2={17.5} y1={6.5} y2={17.5} />
+      <Line x1={17.5} x2={6.5} y1={6.5} y2={17.5} />
     </>
   ),
   // Follow-up 92's password eye (MOB-059): open while the field is hidden.
@@ -53,6 +62,13 @@ export const glyphShapes = {
       <Line x1={4} x2={20} y1={4} y2={20} />
     </>
   ),
+  // 11's pending payment (follow-up 111): two triangles and a lower fill.
+  hourglass: (
+    <>
+      <Path d="M7 4.5h10M7 19.5h10M8 4.5l4 6.2 4-6.2M8 19.5l4-6.2 4 6.2" />
+      <Line x1={10.2} x2={13.8} y1={16.8} y2={16.8} />
+    </>
+  ),
   leaf: (
     <>
       <Path d="M5.5 18.5c0-7.5 5-12.5 13-13.5-.6 8.3-5.6 13.5-13 13.5z" />
@@ -65,6 +81,10 @@ export const glyphShapes = {
       <Rect height={9.5} rx={2.5} width={14} x={5} y={10.5} />
       <Path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
     </>
+  ),
+  // «Enviar comentarios» on 18 (REL-012): a speech bubble.
+  message: (
+    <Path d="M6.5 5h11a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-6l-4.5 3.5v-3.5h-.5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
   ),
   // 18's «Cambiar contraseña» row.
   password: (
