@@ -5,6 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Deprecated (PAY-005): no Referral is awarded any more
+ * @deprecated
+ */
 export type AdminReferralDtoState =
   (typeof AdminReferralDtoState)[keyof typeof AdminReferralDtoState];
 

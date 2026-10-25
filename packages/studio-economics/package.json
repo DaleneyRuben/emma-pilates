@@ -1,0 +1,12 @@
+{
+  "name": "@pilates/studio-economics",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/break-even.ts",
+    "./project-months": "./src/project-months.ts"
+  },
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint src"
+  }
+}

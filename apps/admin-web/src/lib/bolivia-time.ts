@@ -154,6 +154,14 @@ export function formatWeekdayMoment(instant: string): string {
   return `${weekday} ${parts.date.slice(8, 10)}/${parts.date.slice(5, 7)} · ${parts.time}`;
 }
 
+/** "vie 23/10": a civil day inside a month already on screen (AW151). */
+export function formatWeekdayDay(date: string): string {
+  const weekday = (shortWeekdays[weekdayOf(date) - 1] ?? "").toLocaleLowerCase(
+    "es",
+  );
+  return `${weekday} ${date.slice(8, 10)}/${date.slice(5, 7)}`;
+}
+
 /** The Bolivia month `YYYY-MM` an instant falls in. */
 export const boliviaMonth = (now: Date = new Date()): string =>
   boliviaParts(now).date.slice(0, 7);

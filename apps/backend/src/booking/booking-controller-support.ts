@@ -15,6 +15,7 @@ export const recordAttendanceCommand = Symbol('recordAttendanceCommand');
 export const trainerSchedule = Symbol('trainerSchedule');
 export const trainerSessionRoster = Symbol('trainerSessionRoster');
 export const sessionAvailability = Symbol('sessionAvailability');
+export const classesLeftThisWeekQuery = Symbol('classesLeftThisWeekQuery');
 
 export type CommandHandler = (
   command: { sessionId: string; clientId?: string },

@@ -7,7 +7,13 @@ import { ListFilter } from "../components/table/list-filter";
 import { useKnownOption } from "../components/table/use-known-option";
 import { parseCivilDate } from "../components/form/civil-date";
 import { CivilDateInput } from "../components/form/civil-date-input";
-import { boliviaToday, formatCivilDate } from "../lib/bolivia-time";
+import {
+  boliviaMonth,
+  boliviaToday,
+  formatCivilDate,
+} from "../lib/bolivia-time";
+import { cn } from "../lib/cn";
+import { FinancePanel } from "./finance-panel";
 import { MonthChart } from "./month-chart";
 import {
   expenseReportQueryOptions,
@@ -22,6 +28,8 @@ import {
 } from "./report-search";
 import { CategoryTable, MonthTable } from "./report-tables";
 import { ReportTiles } from "./report-tiles";
+import { RevenueSection } from "./revenue-section";
+import { VoidedSales } from "./voided-sales";
 
 function DateField({
   label,
@@ -101,6 +109,43 @@ function RangeFields({
   );
 }
 
+function ReportTabs({
+  vista,
+  onChange,
+}: {
+  vista: ReportSearch["vista"];
+  onChange: (vista: ReportSearch["vista"]) => void;
+}) {
+  const tabs = [
+    { value: "reporte", label: "Reporte" },
+    { value: "finanzas", label: "Finanzas" },
+  ] as const;
+  return (
+    <div role="tablist" aria-label="Vistas del reporte" className="flex gap-1">
+      {tabs.map((tab) => {
+        const selected = vista === tab.value;
+        return (
+          <button
+            key={tab.value}
+            type="button"
+            role="tab"
+            aria-selected={selected}
+            onClick={() => onChange(tab.value)}
+            className={cn(
+              "rounded-control border px-3 py-1.5 text-nota",
+              selected
+                ? "border-primario bg-primario-tinte font-medium text-primario-profundo"
+                : "border-borde bg-blanco text-texto-secundario",
+            )}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // AW16: confirmed income (Booking & Membership) against Expenses and Salary
 // Payments (Back Office) for a Bolivia date range, for every Branch or one.
 // Its own selector adds «Todas las sucursales» (the shell's is replaced).
@@ -112,6 +157,7 @@ export function ReportPage({
   onSearchChange: SearchChange<ReportSearch>;
 }) {
   const range = resolveReportRange(search, boliviaToday());
+  const finance = search.vista === "finanzas";
   const branches = useQuery(reportBranchesQueryOptions());
   const branchId = search.branch === "all" ? undefined : search.branch;
   const branch = branches.data?.find((option) => option.id === branchId);
@@ -120,8 +166,14 @@ export function ReportPage({
   useKnownOption(branchId, branches.data, () =>
     onSearchChange({ branch: "all" }),
   );
-  const income = useQuery(incomeReportQueryOptions(range, branchId));
-  const expenses = useQuery(expenseReportQueryOptions(range, branchId));
+  const income = useQuery({
+    ...incomeReportQueryOptions(range, branchId),
+    enabled: !finance,
+  });
+  const expenses = useQuery({
+    ...expenseReportQueryOptions(range, branchId),
+    enabled: !finance,
+  });
   const failed = income.isError ? income : expenses.isError ? expenses : null;
   const scope =
     branchId === undefined
@@ -133,38 +185,57 @@ export function ReportPage({
     <article className="flex flex-col gap-5">
       <PageHeader
         title="Reporte de ingresos y gastos"
-        subtitle={`${formatCivilDate(range.from)} – ${formatCivilDate(range.to)} · ${scope}`}
+        subtitle={
+          finance
+            ? "Caja del mes · Todas las sucursales"
+            : `${formatCivilDate(range.from)} – ${formatCivilDate(range.to)} · ${scope}`
+        }
         actions={
-          <div className="flex flex-wrap items-start gap-3">
-            <RangeFields
-              range={range}
-              onChange={(next) => onSearchChange(next)}
-            />
-            <ListFilter
-              label="Sucursal"
-              value={search.branch}
-              options={[
-                { value: "all", label: "Todas las sucursales" },
-                ...(branches.data ?? []).map((option) => ({
-                  value: option.id,
-                  label:
-                    option.archivedAt === null
-                      ? option.name
-                      : `${option.name} (archivada)`,
-                })),
-              ]}
-              onChange={(value) => onSearchChange({ branch: value })}
-            />
-          </div>
+          finance ? undefined : (
+            <div className="flex flex-wrap items-start gap-3">
+              <RangeFields
+                range={range}
+                onChange={(next) => onSearchChange(next)}
+              />
+              <ListFilter
+                label="Sucursal"
+                value={search.branch}
+                options={[
+                  { value: "all", label: "Todas las sucursales" },
+                  ...(branches.data ?? []).map((option) => ({
+                    value: option.id,
+                    label:
+                      option.archivedAt === null
+                        ? option.name
+                        : `${option.name} (archivada)`,
+                  })),
+                ]}
+                onChange={(value) => onSearchChange({ branch: value })}
+              />
+            </div>
+          )
         }
       />
-      {branchId === undefined ? null : (
+      <ReportTabs
+        vista={search.vista}
+        onChange={(vista) => onSearchChange({ vista })}
+      />
+      {finance ? (
+        <div role="tabpanel" aria-label="Finanzas">
+          <FinancePanel
+            month={search.month ?? boliviaMonth()}
+            onMonthChange={(month) => onSearchChange({ month })}
+          />
+        </div>
+      ) : null}
+      {finance || branchId === undefined ? null : (
         <p className="text-nota text-texto-tenue">
           La nómina y los ingresos por transferencia se ven solo en «Todas las
           sucursales».
         </p>
       )}
-      {failed !== null ? (
+      <RevenueSection active={search.vista !== undefined && !finance} />
+      {finance ? null : failed !== null ? (
         <QueryFailure
           error={failed.error}
           what="el reporte"
@@ -177,6 +248,7 @@ export function ReportPage({
         <LoadingNotice>Cargando el reporte…</LoadingNotice>
       ) : (
         <>
+          <VoidedSales sales={income.data.voided} />
           <ReportTiles
             income={income.data}
             expenses={expenses.data}

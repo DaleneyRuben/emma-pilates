@@ -80,7 +80,6 @@ describe('administration endpoints (e2e)', () => {
   const oversight = {
     listEvaluations: operation(),
     listReferrals: operation(),
-    listCredits: operation(),
     incomeReport: operation(),
   };
   const cancelEvaluation = operation();
@@ -100,15 +99,6 @@ describe('administration endpoints (e2e)', () => {
     catalog.archiveBranch.mockRejectedValue(
       new AdministrationError('branch_in_use'),
     );
-    catalog.setPlanVisibility.mockResolvedValue({
-      id,
-      name: 'Paquete de 8 clases',
-      durationMonths: 1,
-      classAllowance: 8,
-      priceCentavos: 56_000,
-      displayOrder: 0,
-      hiddenAt: new Date('2026-09-23T12:00:00.000Z'),
-    });
     schedules.createSchedule.mockResolvedValue({
       schedule,
       created: 5,
@@ -122,8 +112,10 @@ describe('administration endpoints (e2e)', () => {
       branchId: null,
       totalCentavos: 78_000,
       byMethod: { cash: 78_000, transfer: 0, credit_only: 0 },
+      byKind: { plan: 78_000, evaluation: 0 },
       months: [{ month: '2026-09-01', totalCentavos: 78_000 }],
       generatedAt: new Date('2026-09-23T12:00:00.000Z'),
+      voided: [],
     });
     oversight.listReferrals.mockResolvedValue({
       items: [],
@@ -175,21 +167,6 @@ describe('administration endpoints (e2e)', () => {
       .expect(({ body }: { body: { code: string } }) =>
         expect(body.code).toBe('branch_in_use'),
       );
-  });
-
-  it('hides a Plan', async () => {
-    await request(app.getHttpServer())
-      .put(`/api/v1/administrator/plans/${id}/visibility`)
-      .set('authorization', bearer)
-      .send({ visible: false })
-      .expect(200)
-      .expect(({ body }: { body: { hiddenAt: string } }) =>
-        expect(body.hiddenAt).toBe('2026-09-23T12:00:00.000Z'),
-      );
-    expect(catalog.setPlanVisibility).toHaveBeenCalledWith(
-      { planId: id, visible: false },
-      expect.anything(),
-    );
   });
 
   it('creates a weekly schedule from a civil date and reports its occurrences', async () => {

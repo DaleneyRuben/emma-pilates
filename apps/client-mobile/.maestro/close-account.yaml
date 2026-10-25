@@ -22,7 +22,8 @@ env:
 - extendedWaitUntil:
     visible: ".*Esto es lo que va a pasar.*"
     timeout: 15000
-- assertVisible: ".*Pierdes tu crédito de Bs 60.*"
+# PAY-005: Credit is retired, so no consequence mentions it.
+- assertNotVisible: ".*crédito.*"
 - assertVisible: "Cerramos tu sesión en todos tus dispositivos."
 - takeScreenshot: client-close-2-consecuencias
 # On a phone the password field sits under the pinned footer: scroll the
