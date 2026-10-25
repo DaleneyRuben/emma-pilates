@@ -323,6 +323,9 @@ describe("AW16 Reporte on a desktop browser", () => {
     const chart = screen.getByRole("figure", { name: "Mes por mes" });
     expect(within(chart).getByText("Ingresos")).toBeVisible();
     expect(within(chart).getByText("Gastos")).toBeVisible();
+    expect(within(chart).getByText("Bs 0,00")).toBeVisible();
+    expect(within(chart).getByText("Bs 2.500,00")).toBeVisible();
+    expect(within(chart).getByText("Bs 5.000,00")).toBeVisible();
     const september = within(chart).getByRole("img", {
       name: "septiembre de 2026: ingresos Bs 1.500,00, gastos Bs 3.980,50",
     });

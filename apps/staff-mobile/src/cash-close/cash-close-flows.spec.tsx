@@ -65,7 +65,7 @@ describe("Cerrar caja (S25)", () => {
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "520");
     expect(screen.getByText("Diferencia · Bs 0 · Cuadra")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "525,50");
-    expect(screen.getByText("Diferencia · +Bs 5,50 · Sobra efectivo")).toBeOnTheScreen();
+    expect(screen.getByText("Diferencia · +Bs 6 · Sobra efectivo")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "510");
     expect(screen.getByText("Diferencia · −Bs 10 · Falta efectivo")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Nota (opcional)"), "Faltó cambio");

@@ -9,7 +9,8 @@ export function parseCountedCentavos(text: string): number | null {
   return Number(match[1]) * 100 + Number(fraction);
 }
 
-// «Bs 0», «+Bs 5,50», «−Bs 10» (a true minus sign, as S25 writes it).
+// «Bs 0», «+Bs 6», «−Bs 10» (a true minus sign, as S25 writes it).
+// The Staff app rounds a leftover fraction to a whole boliviano (UX-010).
 export function formatSignedBolivianos(centavos: number): string {
   if (centavos === 0) return formatBolivianos(0);
   return `${centavos > 0 ? "+" : "−"}${formatBolivianos(Math.abs(centavos))}`;

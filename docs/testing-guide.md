@@ -39,6 +39,7 @@ you are starting with no project knowledge.
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); Inicio from the last profile when the phone has no connection (Test 75); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); the mobile release workflows refuse to publish without the owner secret (Test 108); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
 | Weekly cap                   | Book up to the cap snapshotted on a Plan, see `classesLeftThisWeek` count down, and get `409 weekly_cap_reached` on the next Booking or Waitlist join unless an extra class remains (Test 91) | The «Te quedan N clases esta semana» line on Reservar is follow-up 203 and is still pending; the mobile screens were not walked on a device |
+| Money format                 | Whole bolivianos in both apps («Bs 560») and centavos on the admin web («Bs 560,00») (Test 112) | A leftover fraction of a boliviano is not in the fixtures; the unit tests cover the rounding. Credit is retired (PAY-005), so no screen shows a credit line |
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 83) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
@@ -51,11 +52,11 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 81, 87, 88, 89 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
-| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93 |
+| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93, 112 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
@@ -68,8 +69,8 @@ can be found by its design name.
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109, 110 |
 | S26 Reportar una falla (Entrenadora) | 82 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89 |
-| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112 |
+| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93 |
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 95, 106 |
@@ -80,14 +81,14 @@ can be found by its design name.
 | Admin web | Tests |
 | --- | --- |
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
-| AW36 Reglas del estudio (from AW33) | 75 |
+| AW36 Reglas del estudio (from AW33) | 75, 112 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82, 111 |
-| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81 |
+| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81, 112 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW37 Equipos | 82 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111 |
-| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90 |
@@ -96,9 +97,9 @@ can be found by its design name.
 | AW41 Congelamientos | 92 |
 | AW23–AW24 Personal | 26, 31, 72, 79 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72, 93 |
-| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89, 112 |
 | AW38 Comentarios | 80 |
-| AW151 Caja | 76 |
+| AW151 Caja | 76, 112 |
 
 ## Before you begin
 
@@ -5995,6 +5996,33 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 112: one money format per surface (UX-010)
+
+Money is stored as centavos everywhere (ADR-0082). What a person reads
+depends on the surface, and only on the surface. Credit is retired
+(PAY-005), so no screen shows a credit line or a reduced total.
+
+1. **Client app.** As Sofía, open **Elige tu plan**: the four prices read
+   `Bs 560`, `Bs 780`, `Bs 1.050`, and `Bs 2.100`, with a dot for thousands
+   and no decimals. **Detalle del plan** for Paquete de 8 clases reads
+   `Bs 560`, and that is the amount to pay. Inicio's note still says
+   «Paquetes desde Bs 560». A paid Evaluation names its price the same way
+   (`Bs 70`).
+2. **Staff app.** As Paola, **Pagos pendientes** reads `Bs 560` on a row
+   and the total with no decimals. As the Assistant, **Elegir plan** and
+   **Confirmar pago en efectivo** use the full price (`Bs 560`), with no
+   credit notice.
+3. **Admin web.** Planes shows `Bs 1.050,00` (Test 25). Pagos shows
+   `Bs 560,00` (Test 27). The report's tiles, tables, and chart axis use
+   the same centavos form (`Bs 0,00`, `Bs 1.200,00`), including a negative
+   net written `−Bs 1.200,00` (Test 30). Nómina, Gastos, Caja, and Reglas
+   del estudio use the same centavos form.
+
+A leftover fraction (an amount not divisible by 100) is not in the fixtures.
+The apps round it half up to a whole boliviano and never print the
+centavos; the admin web keeps them. The unit tests lock that case. Nothing
+about how money is stored or sent changes.
 
 ## Test 110: an empty attendance list disables Guardar asistencia (UX-009)
 
