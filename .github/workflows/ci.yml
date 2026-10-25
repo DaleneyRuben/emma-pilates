@@ -253,7 +253,10 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: psql postgresql://postgres:postgres@localhost:5432/postgres -c 'create database pilates_test_ci'
-      - run: pnpm --filter @pilates/backend test:integration --shard=${{ matrix.shard }}/6 --testPathIgnorePatterns s3-backup-store
+      # Jest's --shard groups by sorted path, which put the slow files in
+      # shards 1 and 6 (2m 53s and 3m 03s on run 40238852703). The pattern
+      # spreads the measured files instead.
+      - run: pnpm --filter @pilates/backend test:integration --testPathPattern="$(node scripts/print-integration-shard.mjs ${{ matrix.shard }})"
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilates_test_ci
           OBJECT_STORAGE_TEST_ENDPOINT: http://localhost:9090
