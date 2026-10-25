@@ -20,7 +20,9 @@ describe("staff receipt native modules", () => {
       source("./self-registered-notice.tsx"),
     ].join("\n");
 
-    expect(startup).not.toMatch(/front-desk-receipt-upload|expo-image-manipulator|expo-image-picker/);
+    expect(startup).not.toMatch(
+      /front-desk-receipt-upload|expo-image-manipulator|expo-image-picker/,
+    );
     expect(source("./confirm-cash-payment-screen.tsx")).toMatch(
       /import\(\s*["']\.\/front-desk-receipt-upload["']\s*\)/,
     );
