@@ -128,7 +128,7 @@ other local project.
 Open Terminal and move into the project:
 
 ```sh
-cd /Users/rubendaleney/projects/Pilates
+cd /Users/rubendaleney/projects/emma
 ```
 
 Install the project dependencies:
@@ -224,7 +224,9 @@ the development LogBox still opens over it with a dismissible «Render Error»
 and the boundary's «Console Error» (React Native treats a component error as
 fatal for LogBox even when a boundary catches it); tap **Dismiss** on each to
 see the recovery screen. A release build has no LogBox. The error and its
-component stack go to `console.error` only; no crash reporter is wired.
+component stack go to `console.error`, and the boundary also reports the
+error when the bundle was built with `EXPO_PUBLIC_ERROR_REPORTING_DSN`
+(Test 47). Expo Go has no such DSN, so there the report stays in the console.
 
 ### B. Open the Staff app
 
@@ -1007,7 +1009,7 @@ same key again returns the same result instead of a duplicate.
 
 | Step | Endpoint                                              | What you should see                                                                     |
 | ---- | ----------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| 1    | `GET /api/v1/transfer-instructions`                   | Beneficiary, bank, account number, and `qrImageUrl` (`…/transfer-instructions/qr`)      |
+| 1    | `GET /api/v1/transfer-instructions`                   | `qrImageUrl` (`…/transfer-instructions/qr`); the three bank fields stay empty (Test 41) |
 | 2    | `POST /api/v1/purchase-intents` `{ "planId": … }`     | `201` with frozen Plan snapshots, `amountDueCentavos`, `state: open`, 24 h `expiresAt`  |
 | 3    | `GET /api/v1/purchase-intents/current`                | The same open Intent; `404 purchase_intent_not_found` once it is submitted or expired    |
 | 4    | `POST /api/v1/uploads` + `PUT …/object` + `…/finalize`| A `TRANSFER_RECEIPT` image asset that the worker leaves `READY` (Test 32 has the upload steps) |
@@ -1445,9 +1447,11 @@ What they mean:
 - `lint` checks code-style and common programming mistakes in every package
   with a `lint` script (the backend, the admin web, and since MOB-050 the three
   mobile packages, which print nothing since MOB-052, see
-  «Mobile automated tests»); the admin web and the mobile packages keep
-  Prettier as a separate `format:check` script, the backend runs it through
-  ESLint;
+  «Mobile automated tests»); the admin web, the mobile packages, and the
+  backend each keep Prettier as a separate `format:check` script
+  (`pnpm --filter @pilates/backend format:check` for the backend). The
+  backend's ESLint config also runs Prettier, so `pnpm lint` already fails
+  on a formatting difference there; CI runs `format:check` as well;
 - `typecheck` checks TypeScript types without running the apps;
 - `build` proves that the current applications compile; and
 - `check:api` proves that the committed OpenAPI document and generated API
@@ -1457,82 +1461,84 @@ What they mean:
 
 Every pull request and every push to `main` runs
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on GitHub Actions
-(EXT-004). It checks; it deploys nothing, and it needs no secret. Eleven jobs
-run as three independent chains, one per surface, with one job per test level
-named `<surface>-<level>` (EXT-005), each job on a fresh Ubuntu runner after
-the shared setup in `.github/actions/setup/action.yml` (Node from `.nvmrc`,
-pnpm from the root `packageManager` field, cached pnpm store,
-`pnpm install --frozen-lockfile`, `prisma generate`, and, for the job that
-asks for it, Playwright's pinned Chromium from a cache keyed by the Playwright
-version):
+(EXT-004). It checks; it deploys nothing, and it needs no secret. The test
+jobs are one per surface and level, named `<surface>-<level>` (EXT-005).
+Each job runs on a fresh Ubuntu runner after the shared setup in
+`.github/actions/setup/action.yml` (Node from `.nvmrc`, pnpm from the root
+`packageManager` field, cached pnpm store, `pnpm install --frozen-lockfile`,
+`prisma generate`, and, for the job that asks for it, Playwright's pinned
+Chromium from a cache keyed by the Playwright version).
 
-- **quality-api** (backend lint, typecheck, and build; api-contracts typecheck
-  and build) → **contracts** (`check:api`, `check:api-compat`) and
-  **api-unit** (the backend unit suite) side by side → **api-e2e** (the
-  supertest suites, which boot the application without a database) and
-  **api-integration** (the Prisma repositories and PostgreSQL behaviour
+Two jobs run on every pull request and every push, because an advisory or a
+leaked value is not tied to a surface (EXT-019). Test 73 says how to run
+them on the Mac:
+
+- **audit** runs `pnpm audit --audit-level high`;
+- **secrets** runs gitleaks over the pull request's commits, or the pushed
+  ones.
+
+The rest wait for a **changes** job, which reads the pull request's whole
+list of changed files. A push to `main` runs every chain. The three surface
+chains are:
+
+- **quality-api** (backend lint, `format:check`, typecheck, and build;
+  api-contracts typecheck and build) → **contracts** (`check:api`,
+  `check:api-compat`), **api-unit** (the backend unit suite), and
+  **api-integration** side by side. **api-e2e** (the supertest suites, which
+  boot the application without a database) waits for contracts and api-unit.
+  **api-integration** is the Prisma repositories and PostgreSQL behaviour
   against a `postgres:18-alpine` service container, through
   `TEST_DATABASE_URL` on a `pilates_test_ci` admin database that lives and
-  dies with the runner; six Jest shards plus the backup spec, each on its
-  own runner, EXT-023) side by side, each waiting for both contracts and
-  api-unit;
+  dies with the runner. Since EXT-023 it is six shards,
+  `api-integration (1/6)` through `(6/6)`, plus **api-integration (backup)**
+  for the backup spec. Each has its own runner, PostgreSQL, and S3Mock, and
+  each starts as soon as quality-api passed. The six shards pick files by
+  measured time (`scripts/print-integration-shard.mjs`), so a slow file
+  does not land with the others;
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
-  **web-unit** (the admin-web Jest suite) and **web-e2e** (the nineteen
-  Playwright journeys of Test 31 through the built backend and the built admin web, on
-  a `postgres:18-alpine` service container with a `pilates_test_ci` admin
-  database, WEB-017) side by side;
+  **web-unit** (the admin-web Jest suite). **web-e2e** (the twenty-six
+  Playwright journeys of Test 31 through the built backend and the built
+  admin web, on a `postgres:18-alpine` service container with a
+  `pilates_test_ci` admin database, WEB-017) starts from the path filter
+  when the pull request touches the admin web or the backend;
 - **quality-mobile** (tooling lint; lint, `format:check`, and typecheck of
-  mobile-core, client-mobile, and staff-mobile) → **mobile-unit** (one job
-  per package: client-mobile, staff-mobile, and mobile-core, EXT-023).
+  mobile-core, client-mobile, and staff-mobile) → **mobile-unit**, one job
+  per package (`mobile-unit (@pilates/client-mobile)`, staff-mobile, and
+  mobile-core, EXT-023).
 
-Two rules order the jobs: no test level starts before its surface's quality
-job passed, and no database run (api-integration) and no e2e run against the
-backend (api-e2e) starts before the contracts job and the unit suite passed.
-A lint or type error therefore costs one two-minute job and the tests never
-start; a stale contract or a failing unit suite stops the api chain before the
-database run. web-e2e needs only quality-web: its journeys go through the
-built backend, so a contract drift surfaces there as a failed journey, not as
-a skipped job. No job mixes levels, so a job carries only what its level
-needs: api-unit, api-e2e, web-unit, and mobile-unit have no service container
-and no database variable; api-integration and web-e2e each have their own
-service container and `TEST_DATABASE_URL`. There is no mobile-e2e job by
-decision: Maestro on a macOS runner belongs to REL-001.
+The same path filter starts two more checks: **migrations** when the API
+paths change (Test 73), and **public-site** when `apps/public-site/**` or
+`.github/**` changes. A change to `.github/workflows/ci.yml` starts every
+chain.
 
-On a pull request a first `changes` job also reads the pull request's whole
-list of changed files and starts only the chains of the surfaces it touches:
-`apps/backend/**` for api, `apps/admin-web/**` for web, the three mobile
-packages for mobile, `packages/tooling/**` for mobile (its only consumers
-today), `packages/api-contracts/**` for all three (every contract change
-touches the committed generated client), and the shared files
-(`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.nvmrc`,
-`.github/**`) for all three. A docs-only pull request therefore runs nothing,
-and a backend fix that does not change the contract runs the api chain alone.
+contracts, api-unit, api-integration, web-unit, and mobile-unit start only
+after their surface's quality job passed. **api-e2e** also waits for the
+contracts job and the unit suite. **api-integration** starts beside those
+two, as soon as quality-api passed, so a stale contract still lets the
+database shards run. **web-e2e** builds the backend itself and starts from
+the path filter. A lint or type error in quality-api therefore stops
+contracts, api-unit, api-e2e, and the integration shards. No job mixes
+levels, so a job carries only what its level needs: api-unit, api-e2e,
+web-unit, and mobile-unit have no service container and no database
+variable; each api-integration shard and web-e2e have their own service
+container and `TEST_DATABASE_URL`. There is no mobile-e2e job by decision:
+Maestro on a macOS runner belongs to REL-001.
+
+On a pull request the **changes** job starts a chain only for the surfaces
+it touches: `apps/backend/**` for api (and for web-e2e), `apps/admin-web/**`
+for web, the three mobile packages for mobile, `packages/tooling/**` for
+mobile (its only consumers today), `packages/api-contracts/**` for all three
+(every contract change touches the committed generated client), and the
+shared files (`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`,
+`.nvmrc`, `.github/**`) for all three. A docs-only pull request still runs
+**changes**, **audit**, and **secrets**; the surface chains stay skipped.
 A push to `main` always runs everything. Jobs that never started show as
 skipped.
 
-A clean run of all three chains takes about nine minutes of wall clock, set
-by the api chain. EXT-023 splits that integration suite into six shards plus
-the backup spec, and splits mobile-unit into one job per package; the times
-below are the shape before that split. Measured on the last run of the previous shape (eight jobs,
-`main` run 37854052558) and the first green run of this one (eleven jobs,
-run 37939483154 of EXT-005's pull request), job durations as GitHub reports
-them, chains from the first quality job's start to the chain's last job's end:
-
-| Chain  | Before                                                   | After                                                                                 |
-| ------ | -------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| api    | quality-api 1:52 → contracts 0:57 → api 6:52; **9:47**   | quality-api 1:24 → contracts 1:28 ‖ api-unit 1:02 → api-e2e 1:12 ‖ api-integration 6:11; **9:09** |
-| web    | quality-web 1:36 → web 2:25 → web-e2e 2:35; **6:43**     | quality-web 1:37 → web-unit 2:27 ‖ web-e2e 2:19; **4:08**                              |
-| mobile | quality-mobile 1:37 → mobile 2:20; **4:00**              | quality-mobile 1:27 → mobile-unit 2:57; **4:27**                                       |
-| run    | wall clock 9:55, 20 m 19 s of runner time over 9 jobs   | wall clock 9:16, 22 m 08 s of runner time over 11 jobs                                 |
-
-The two extra jobs cost about two runner minutes: the shared setup step is
-35 to 45 s on every job (about 1 m 10 s with the browser), and api-unit and
-api-e2e each pay it once more than the old api job did. The web chain is two
-and a half minutes shorter because web-e2e no longer waits for the Jest
-suite, and the api chain's e2e suite runs beside the integration suite
-instead of before it. Jest's own times move with the runner (unit 9 s, e2e
-26 s, integration 5 m 12 s on this run against 2 s, 4 s, and 2 m 02 s on a
-Mac), so compare chains between runs of the same shape, not single steps.
+A full run is set by the slowest integration shard. On run 40238852703,
+before the files were spread by measured time, shards 1 and 6 took 2
+minutes 53 seconds and 3 minutes 3 seconds. Jest's own times move with the
+runner, so compare shards between runs of the same shape.
 
 The four frontend Jest steps run with `--ci` alone and exit on their own:
 the runner has two cores, so Jest runs each suite in band and every handle a
@@ -1547,17 +1553,21 @@ api-integration job raises Node's heap (`NODE_OPTIONS=--max-old-space-size=4096`
 because the in-band ESM run grows past the runner's default limit; the
 backend scripts keep the shell's `NODE_OPTIONS` next to their own
 `--experimental-vm-modules` for that reason. The web-e2e job needs no flag
-of its own: the global setup's teardown stops both servers and drops the
-database, and the step exits with Playwright's result. Its failures are read
-through the `web-e2e-test-results` artifact (Test 31).
+of its own: the global setup's teardown stops the API, the worker, and the
+preview server and drops the database, and the step exits with Playwright's
+result. Its failures are read through the `web-e2e-test-results` artifact
+(Test 31).
 
-A newer push to the same branch cancels the run in progress. To read a failed
-run, open the pull request's "Checks" tab or run
-`gh run list --branch <branch>` and `gh run view <run-id> --log-failed`: the
-failing job names the script that failed, and the log of that step is the same
-output you would see locally from the commands in the subsections above. Each
-job has a timeout (15 minutes, 20 for api-integration), so a hung step fails
-instead of waiting forever.
+A newer push to a pull request replaces the run in progress. A push to
+`main` never cancels the run already going, because Release Staging waits
+for CI on that exact commit (EXT-019). To read a failed run, open the pull
+request's "Checks" tab or run `gh run list --branch <branch>` and
+`gh run view <run-id> --log-failed`: the failing job names the script that
+failed, and the log of that step is the same output you would see locally
+from the commands in the subsections above. Each job has a timeout (15
+minutes for the quality and test jobs, 20 for each api-integration shard,
+10 for migrations, 5 for audit, secrets, public-site, and changes), so a
+hung step fails instead of waiting forever.
 
 ## Test 9: try Perfil, the inbox, and password change in the apps
 
@@ -3185,8 +3195,10 @@ for itself, loads the development fixtures into, and drops at the end. They
 cover only what the Jest tests cannot: a real cookie, the real proxy, the real
 backend rules.
 
-You need PostgreSQL running locally with the `pilates_test_fixtures` admin
-database (Test 8 creates it), the `psql` command on your PATH, and the
+You need PostgreSQL running locally with an admin database whose name
+starts with `pilates_test_` (Test 8 creates `pilates_test_admin`; any other
+name with that prefix works, including `pilates_test_fixtures`), the `psql`
+command on your PATH, and the
 Chromium build Playwright caches (`pnpm --filter @pilates/admin-web exec
 playwright install chromium` downloads it once; this project pins
 Playwright 1.61.0, whose Chromium is build 1228). Nothing else may be
@@ -3202,8 +3214,8 @@ process ids (the API, the worker, and the preview server), the ports, and
 the `pilates_test_*` database name it made, and its teardown stops the three
 servers and drops that database. Since WEB-034 the worker runs too, because
 the payment journeys send a real transfer receipt the way the Client app
-does, and only the worker turns it into variants. The nineteen journeys take
-about thirty seconds:
+does, and only the worker turns it into variants. The twenty-six journeys
+take about a minute:
 
 1. **Sessions.** Paola signs in and lands on Horario; the
    `__Host-emma-admin-session` cookie is HttpOnly, Secure, SameSite Lax, and
@@ -3284,18 +3296,34 @@ about thirty seconds:
     amount in «Totales por mes», and the three tile captions, on one line.
     The same block is checked at 1440, where the sidebar is the wide one,
     and at 420 the sidebar is gone behind «Abrir menú».
+16. **Dates and times (UX-008, Test 111).** Nueva sesión at 1440 and at 420
+    types `21/10/2026` and `09:00` into Fecha and Hora. The fields show
+    those values, with placeholders `dd/mm/aaaa` and `hh:mm`, and never a
+    month-first date or AM/PM.
+17. **The Coordinator (IDN-009, Test 77).** She signs in and reaches Horario,
+    Clientes, and Personal, and the page holds no «Bs». A money address
+    returns her to Horario, and the API refuses that data.
+18. **Unbilled sales (PAY-007, Test 27).** A cash sale with invoice data
+    waits under «Sin factura emitida». The CSV holds what the filter shows,
+    and «Marcar emitida» records who marked it.
+19. **The month report (STU-007, Test 103).** Indicadores at 1440 and at 420
+    shows «Informe del mes», and a question on that report gets an answer.
+20. **The simulator (STU-005, Test 101).** Simulador shows the three horizons
+    (3, 6, and 12 months) at 1440 and at 420.
 
-Three of these files hold more than one case: `session.spec.ts` is the
-three parts of item 1 and `authorization.spec.ts` the two of item 5 (the
-neutral rejection and the untrusted origin), which is how fifteen files
-make nineteen journeys.
+`session.spec.ts` is the three parts of item 1. `authorization.spec.ts` is
+the two parts of item 5. `laptop.spec.ts` is the two widths of item 15.
+`date-fields.spec.ts` runs item 16 at both widths, and `simulator.spec.ts`
+runs item 20 at both widths. That is how twenty files make twenty-six
+journeys.
 
 To run one file or watch the browser, use Playwright directly from
 `apps/admin-web`, for example
 `pnpm exec playwright test e2e/session.spec.ts --headed`. A failed journey
 leaves a screenshot and a trace under `apps/admin-web/test-results/`
-(`pnpm exec playwright show-trace <file>` opens it). The two servers'
-stderr goes to `apps/admin-web/test-results/e2e-backend.stderr.log`,
+(`pnpm exec playwright show-trace <file>` opens it). The API, the worker,
+and the preview server write their stderr to
+`apps/admin-web/test-results/e2e-backend.stderr.log`,
 `e2e-worker.stderr.log`, and `e2e-preview.stderr.log`, so a backend that crashed at startup ("The backend
 did not answer…") can be read there; `E2E_DEBUG=1 pnpm test:admin-e2e`
 prints it in the terminal instead. If a run is killed
@@ -3308,10 +3336,10 @@ Set `TEST_DATABASE_URL` to another `pilates_test_*` admin database, or
 `E2E_API_PORT` and `E2E_WEB_PORT` to other ports, when the defaults collide
 with something on your machine.
 
-CI runs the same nineteen journeys in the **web-e2e** job of
-[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (WEB-017), beside
-the web-unit job as soon as quality-web passed (EXT-005), on every pull
-request that touches the admin web and on every push to `main`. The job runs
+CI runs the same twenty-six journeys in the **web-e2e** job of
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (WEB-017). The job
+starts from the path filter when the pull request touches the admin web or
+the backend, and on every push to `main`. The job runs
 `pnpm test:admin-e2e` exactly as above, on a `postgres:18-alpine` service
 container: a `psql` step first creates the `pilates_test_ci` admin database
 the api-integration job also uses, and
@@ -3325,7 +3353,7 @@ fifteen seconds to download when the cache is cold) and its system packages
 (`playwright install-deps chromium`, about fifteen seconds on every run).
 The backend starts with its development defaults: no secret is needed. A
 failed run uploads `apps/admin-web/test-results/` (the traces, the
-screenshots, and both servers' stderr) as the `web-e2e-test-results`
+screenshots, and the API, worker, and preview stderr) as the `web-e2e-test-results`
 artifact, kept for seven days, from the run's summary page; download it,
 unzip it, and open a trace with `pnpm exec playwright show-trace <file>`. A
 green run uploads nothing. The job takes about three minutes (the setup
