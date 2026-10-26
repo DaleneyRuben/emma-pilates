@@ -1893,7 +1893,8 @@ under the quiet clock, with no supporting line.
 
 **Reservar clase** opens **Reservar una clase** with the banner "Reservando
 para: Lucía Fernández", the **Sucursal:** pill, the seven day chips, and the
-Class Type chips; the Session cards look exactly like the Client's (Test 5 B:
+Class Type chips (each chip shows its name, including **Todas**; UX-015);
+the Session cards look exactly like the Client's (Test 5 B:
 the time and the Lora Class Type, the seat pill in the same tones with
 **Llena** for a full class, the Trainer after a person icon, the chevron), and
 like the Client's list it leaves out today's Sessions
@@ -6101,16 +6102,19 @@ device is free:
    font size, so those are the places a glyph can clip. The Reservar day
    chips and the Trainer day strip do not fix a height and should grow.
 2. **Reading order.** The sampled buttons carry a Spanish label, and the
-   decorative icons are hidden. A screen reader on Reservar should be
-   checked against the seat pill: the card's label is the class type and
-   the time, and the pill sits inside the same button, so the reader can
-   skip «3 cupos». The Trainer card's label is the class type alone.
+   decorative icons are hidden. On Reservar the card's label includes the
+   class type, the time, the Trainer, and the seats (UX-017), so a reader
+   does not have to find the seat pill. The Trainer card's label includes
+   the time, the branch, and the booked count. The unread pill hides its
+   digits where the tab or the row already speaks the count (UX-020, Test 9).
 3. **Reduce Motion.** The loading logo already stays still: mobile reads
    `AccessibilityInfo.isReduceMotionEnabled` and skips the breath
    (`packages/mobile-core`, asserted in `loading-state.spec.tsx`), and the
    admin web's `.carga-logo` has a `prefers-reduced-motion` rule (Test 66).
-   The launch splash's 300 ms fade does not read the setting; that needs a
-   build that shows the splash, not Expo Go (Test 65).
+   The launch splash reads the same setting (UX-019): when Reduce Motion is
+   on, `holdLaunchSplash` sets fade off and duration 0 before the first
+   screen hides it. A development build that shows the native splash is the
+   only place to see that fade; Expo Go has no splash (Test 65).
 4. **Admin keyboard (UX-018).** Open Nueva sesión. Focus is on **Una sola
    vez**, the first field, and «Cerrar» stays in the corner. Open Detalle
    de cliente. Focus is on the Client's name, because that panel has no
@@ -6245,7 +6249,11 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    "Mié 21": the short weekday with its accent, a capital first letter, then
    the day number. Saturday reads **Sáb** and Sunday **Dom**, so the two are
    not the same bare number. Today is the filled Palo de rosa chip; tapping
-   another day selects it and lists that day's classes.
+   another day selects it and lists that day's classes. On Android the day
+   number sits fully inside the chip, including the baseline (UX-015).
+3. A class card's name includes the type, the time, the branch, and the
+   seats, for example "Reformer Pilates, 10:00 – 11:00, Sopocachi, 6 de 8
+   reservados, Con cupos" (UX-017). A full class ends in **Completa**.
 
 ## Test 107: Inicio without a connection
 
