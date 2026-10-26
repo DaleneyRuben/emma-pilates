@@ -66,7 +66,13 @@ function MenuRow({
 }) {
   return (
     <Pressable
-      accessibilityLabel={value === undefined ? label : `${label}: ${value}`}
+      accessibilityLabel={
+        badge !== undefined && badge > 0
+          ? `${label}, ${badge} ${badge === 1 ? "notificación sin leer" : "notificaciones sin leer"}`
+          : value === undefined
+            ? label
+            : `${label}: ${value}`
+      }
       accessibilityRole="button"
       onPress={onPress}
       style={styles.row}

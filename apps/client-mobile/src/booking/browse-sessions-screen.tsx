@@ -233,7 +233,7 @@ export function BrowseSessionsScreen() {
             return (
               <View key={session.id}>
                 <SessionCard
-                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
+                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.trainerName}, ${seatsTag(session.availableSeats)}`}
                   onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
                   tag={
                     <SeatPill full={session.availableSeats === 0}>
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     minWidth: 56,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.lg,
   },
   dayNumber: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   dayWeekday: { color: colors.textMuted, fontSize: typography.label },

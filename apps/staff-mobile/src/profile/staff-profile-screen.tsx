@@ -52,7 +52,11 @@ function MenuRow({
 }) {
   return (
     <Pressable
-      accessibilityLabel={label}
+      accessibilityLabel={
+        badge > 0
+          ? `${label}, ${badge} ${badge === 1 ? "notificación sin leer" : "notificaciones sin leer"}`
+          : label
+      }
       accessibilityRole="button"
       onPress={onPress}
       style={styles.row}

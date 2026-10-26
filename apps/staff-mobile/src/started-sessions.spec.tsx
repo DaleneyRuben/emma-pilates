@@ -120,7 +120,7 @@ describe("started Sessions on the Staff lists", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Mat Pilates" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Mat Pilates,/ })).toBeOnTheScreen();
     });
   });
 });

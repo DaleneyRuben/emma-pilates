@@ -35,7 +35,7 @@ async function openRoster(bookings: unknown[], endsAt = session.endsAt) {
   });
   const screen = await render(<App runtime={createStaffRuntime(fetcher)} />);
   await waitFor(() => expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen());
-  await fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
   return { fetcher, screen };
 }
 

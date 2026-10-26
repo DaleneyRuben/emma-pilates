@@ -70,4 +70,18 @@ describe("Trainer agenda header", () => {
     expect(screen.queryByLabelText("2026-10-24")).toBeNull();
     expect(screen.queryByLabelText("2026-10-25")).toBeNull();
   });
+
+  // UX-015: the day number sits under the weekday. A fixed line box clips it
+  // on Android, so neither line fixes its height.
+  it("lets the day number grow under the weekday", async () => {
+    const screen = await renderTrainer();
+
+    await waitFor(() => {
+      expect(screen.getByText("21")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("21")).not.toHaveStyle({ lineHeight: 18 });
+    expect(screen.getByText("Mié").parent).not.toHaveStyle({
+      paddingVertical: 12,
+    });
+  });
 });

@@ -76,7 +76,9 @@ describe("Staff Perfil", () => {
     expect(screen.getByText("Sucursales")).toBeOnTheScreen();
     expect(screen.getByText("Centro, Equipetrol")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Editar" })).not.toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", { name: "Notificaciones, 1 notificación sin leer" }),
+    ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cambiar contraseña" })).toBeOnTheScreen();
     expect(
       screen.getByText(`Emma Pilates Studio · versión ${appConfig.expo.version}`),
@@ -116,7 +118,9 @@ describe("Staff Perfil", () => {
   it("opens the staff inbox with its own empty state", async () => {
     const screen = await openProfile();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Notificaciones, 1 notificación sin leer" }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText("No tienes notificaciones.")).toBeOnTheScreen();

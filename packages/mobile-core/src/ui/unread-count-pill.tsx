@@ -21,7 +21,12 @@ export function UnreadCountPill({
   if (count <= 0) return null;
 
   return (
-    <View style={[styles.pill, ring && styles.ring]} testID={testID}>
+    <View
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={[styles.pill, ring && styles.ring]}
+      testID={testID}
+    >
       <Text style={styles.label}>{unreadCountLabel(count)}</Text>
     </View>
   );
