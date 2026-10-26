@@ -1584,7 +1584,9 @@ evaluaciones**, **Mis referidos**, **Notificaciones**, and
 (the installed app version, Test 76).
 With unread notifications the Notificaciones row shows the count in a Palo de
 rosa profundo pill («9+» above nine), and so does the **Perfil** tab itself
-from every screen (VoiceOver reads "Perfil, 2 notificaciones sin leer").
+from every screen (VoiceOver reads "Perfil, 2 notificaciones sin leer"
+and skips the pill's digits, UX-020). The Notificaciones row says the same
+count, so a reader does not hear the digits twice.
 
 **Profile photo (MOB-020).** The summary card's circle shows two initials
 until a photo is attached. Put an image into the Simulator's library first
