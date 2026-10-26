@@ -37,6 +37,10 @@ test("refuses to close a Client with a transfer in review, then closes another",
 
   await page.getByRole("button", { name: "Lucía Fernández" }).click();
   const lucia = page.getByRole("dialog", { name: "Lucía Fernández" });
+  // UX-018: a panel with no field opens on its heading.
+  await expect(
+    lucia.getByRole("heading", { name: "Lucía Fernández" }),
+  ).toBeFocused();
   await expect(lucia.getByText("5 de 8")).toBeVisible();
   await lucia.getByRole("button", { name: "Cerrar cuenta" }).click();
   const dialog = page.getByRole("alertdialog", {

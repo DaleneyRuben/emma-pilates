@@ -40,6 +40,7 @@ export function SidePanel({
           className="overflow-y-auto"
           onOpenAutoFocus={(event) => {
             const panel = event.currentTarget;
+            if (!(panel instanceof HTMLElement)) return;
             if (panel.querySelector("input, select, textarea")) return;
             event.preventDefault();
             panel

@@ -12,6 +12,20 @@ test("a narrow browser gets the drawer, the bottom-sheet selector, and card rows
   await expect(sidebar(page)).toHaveCount(0);
 
   await page.getByRole("button", { name: "Abrir menú" }).click();
+  await page
+    .getByRole("dialog", { name: "Menú" })
+    .getByRole("link", { name: "Clientes" })
+    .click();
+  await page.getByRole("button", { name: "Lucía Fernández" }).click();
+  const client = page.getByRole("dialog", { name: "Lucía Fernández" });
+  await expect(client).toHaveAttribute("data-presentation", "full-screen");
+  await expect(
+    client.getByRole("heading", { name: "Lucía Fernández" }),
+  ).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(client).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Abrir menú" }).click();
   const drawer = page.getByRole("dialog", { name: "Menú" });
   await expect(drawer.getByRole("link", { name: "Horario" })).toBeVisible();
   await drawer.getByRole("link", { name: "Gastos" }).click();
