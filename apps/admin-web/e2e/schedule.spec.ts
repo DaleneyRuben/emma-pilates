@@ -29,6 +29,8 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
   await page.getByRole("button", { name: "Nueva sesión", exact: true }).click();
   const panel = page.getByRole("dialog", { name: "Nueva sesión" });
   await expect(panel.getByText("Sucursal Centro · sala única")).toBeVisible();
+  // UX-018: a create panel opens on its first field, not on «Cerrar».
+  await expect(panel.getByLabel("Una sola vez")).toBeFocused();
   await expect(panel.getByLabel("Una sola vez")).toBeChecked();
   await panel
     .getByLabel("Tipo de clase")

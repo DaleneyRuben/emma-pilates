@@ -103,7 +103,12 @@ export function SheetTitle({
 }: ComponentProps<typeof SheetPrimitive.Title>) {
   return (
     <SheetPrimitive.Title
-      className={cn("font-serif text-titulo-panel text-texto", className)}
+      data-slot="sheet-title"
+      tabIndex={-1}
+      className={cn(
+        "font-serif text-titulo-panel text-texto outline-none",
+        className,
+      )}
       {...props}
     />
   );
