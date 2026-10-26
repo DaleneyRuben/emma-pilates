@@ -16,11 +16,13 @@ test("a narrow browser gets the drawer, the bottom-sheet selector, and card rows
     .getByRole("dialog", { name: "Menú" })
     .getByRole("link", { name: "Clientes" })
     .click();
-  await page.getByRole("button", { name: "Lucía Fernández" }).click();
-  const client = page.getByRole("dialog", { name: "Lucía Fernández" });
+  // Isabel stays. The clients journey closes Lucía, and the suite shares
+  // one database, so this walk cannot depend on her still being there.
+  await page.getByRole("button", { name: "Isabel Arce" }).click();
+  const client = page.getByRole("dialog", { name: "Isabel Arce" });
   await expect(client).toHaveAttribute("data-presentation", "full-screen");
   await expect(
-    client.getByRole("heading", { name: "Lucía Fernández" }),
+    client.getByRole("heading", { name: "Isabel Arce" }),
   ).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(client).toHaveCount(0);
