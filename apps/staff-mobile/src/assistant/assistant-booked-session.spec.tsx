@@ -37,7 +37,11 @@ describe("Assistant booked Session", () => {
   it("marks the Client's own booking on the list with the neutral «Ya reservada» pill", async () => {
     const screen = await openBrowse(bookedRoutes());
 
-    const card = within(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+    const card = within(
+      screen.getByRole("button", {
+        name: /^Reformer Pilates \d.*, Ya reservada$/,
+      }),
+    );
     await waitFor(() => {
       expect(card.getByText("Ya reservada")).toBeOnTheScreen();
     });

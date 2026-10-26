@@ -71,7 +71,11 @@ describe("Trainer agenda rows", () => {
     expect(screen.getAllByTestId("card-footer")[0]).toHaveStyle({ paddingTop: 13 });
     // MOB-047: follow-up 84's seat pill — «Con cupos» on Palo de rosa tinte,
     // «Completa» on the neutral pill (never Éxito green), 12 pt weight 500.
-    const open = within(screen.getByRole("button", { name: "Reformer Pilates" }));
+    const open = within(
+      screen.getByRole("button", {
+        name: "Reformer Pilates, 10:00 – 11:00, Sopocachi, 6 de 8 reservados, Con cupos",
+      }),
+    );
     expect(open.getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "#EFE0DC",
       borderRadius: 999,
@@ -81,7 +85,11 @@ describe("Trainer agenda rows", () => {
       fontSize: 12,
       fontWeight: "500",
     });
-    const full = within(screen.getByRole("button", { name: "Mat Pilates" }));
+    const full = within(
+      screen.getByRole("button", {
+        name: "Mat Pilates, 10:00 – 11:00, Sopocachi, 8 de 8 reservados, Completa",
+      }),
+    );
     expect(full.getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "rgba(216,201,187,0.34)",
     });

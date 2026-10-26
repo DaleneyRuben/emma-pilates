@@ -59,7 +59,7 @@ describe("Trainer agenda and attendance", () => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
       expect(screen.getByText("6 de 8 reservados")).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
 
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Ana Pérez: Asistió" })).toHaveProp(
@@ -122,7 +122,7 @@ describe("Trainer agenda and attendance", () => {
     await waitFor(() => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Ana Pérez: Asistió" })).toHaveProp(
         "accessibilityState",

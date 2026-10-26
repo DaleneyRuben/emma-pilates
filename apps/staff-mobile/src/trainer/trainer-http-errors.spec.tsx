@@ -81,7 +81,7 @@ describe("Trainer screens on an HTTP error", () => {
     await waitFor(() => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent(

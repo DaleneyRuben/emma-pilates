@@ -63,7 +63,7 @@ function AgendaCard({
   const full = session.bookedCount >= session.capacity;
   return (
     <Pressable
-      accessibilityLabel={session.classTypeName}
+      accessibilityLabel={`${session.classTypeName}, ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.branchName}, ${session.bookedCount} de ${session.capacity} reservados, ${full ? "Completa" : "Con cupos"}`}
       accessibilityRole="button"
       onPress={onPress}
       style={styles.card}

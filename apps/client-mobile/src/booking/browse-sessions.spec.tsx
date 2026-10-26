@@ -108,7 +108,11 @@ describe("Client Browse Sessions", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
+      expect(
+        screen.getByRole("button", {
+          name: /^Reformer Pilates \d.*Emma Vargas, 3 cupos$/,
+        }),
+      ).toBeOnTheScreen();
     });
     expect(screen.getAllByText("Emma Vargas")).toHaveLength(2);
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();

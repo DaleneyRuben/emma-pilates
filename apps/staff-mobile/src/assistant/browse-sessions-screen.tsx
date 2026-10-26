@@ -224,7 +224,9 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
           <TabletGrid testID="assistant-session-grid">
             {visible.map((session) => (
               <SessionCard
-                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
+                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${
+                  bookedSessionIds.has(session.id) ? "Ya reservada" : seatsTag(session)
+                }`}
                 key={session.id}
                 onPress={() =>
                   navigation.navigate("SessionDetail", {

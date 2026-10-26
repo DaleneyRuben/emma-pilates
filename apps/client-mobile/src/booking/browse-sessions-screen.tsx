@@ -233,7 +233,7 @@ export function BrowseSessionsScreen() {
             return (
               <View key={session.id}>
                 <SessionCard
-                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
+                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.trainerName}, ${seatsTag(session.availableSeats)}`}
                   onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
                   tag={
                     <SeatPill full={session.availableSeats === 0}>
