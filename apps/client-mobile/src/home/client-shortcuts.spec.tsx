@@ -169,9 +169,13 @@ describe("Client Home quick actions and notification destinations", () => {
     const screen = await openApp(routeFetcher(routes()));
     await fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
+      expect(
+        screen.getByRole("button", { name: "Notificaciones, 2 notificaciones sin leer" }),
+      ).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Notificaciones, 2 notificaciones sin leer" }),
+    );
     await waitFor(() => {
       expect(screen.getByText("El estudio canceló tu evaluación nutricional.")).toBeOnTheScreen();
     });
