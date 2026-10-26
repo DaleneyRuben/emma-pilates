@@ -1,5 +1,6 @@
 import { renderHook } from "@testing-library/react-native";
 import * as SplashScreen from "expo-splash-screen";
+import { AccessibilityInfo } from "react-native";
 
 import { holdLaunchSplash, useReleaseLaunchSplash } from "./launch-splash";
 
@@ -23,6 +24,16 @@ describe("launch splash", () => {
 
     expect(mocked.setOptions).toHaveBeenCalledWith({ fade: true, duration: 300 });
     expect(mocked.preventAutoHideAsync).toHaveBeenCalledTimes(1);
+  });
+
+  // UX-019: a person who asked for less motion gets no fade.
+  it("skips the fade when Reduce Motion is on", async () => {
+    jest.spyOn(AccessibilityInfo, "isReduceMotionEnabled").mockResolvedValue(true);
+
+    holdLaunchSplash();
+    await Promise.resolve();
+
+    expect(mocked.setOptions).toHaveBeenCalledWith({ fade: false, duration: 0 });
   });
 
   it("keeps holding while the first screen is not ready", async () => {
