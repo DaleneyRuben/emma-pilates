@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     minWidth: 56,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.lg,
   },
   dayNumber: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   dayWeekday: { color: colors.textMuted, fontSize: typography.label },

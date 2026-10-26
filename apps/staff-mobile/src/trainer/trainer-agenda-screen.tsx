@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     minWidth: 56,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.lg,
   },
   dateButtonSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
   dateLabel: {
