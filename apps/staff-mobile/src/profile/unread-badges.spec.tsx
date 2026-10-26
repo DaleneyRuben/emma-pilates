@@ -58,9 +58,22 @@ describe("Staff unread language", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("notifications-row-badge")).toBeOnTheScreen();
+      expect(
+        screen.getByTestId("notifications-row-badge", {
+          includeHiddenElements: true,
+        }),
+      ).toBeOnTheScreen();
     });
-    expect(screen.getByText("9+")).toBeOnTheScreen();
+    expect(screen.getByText("9+", { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", {
+        name: "Notificaciones, 12 notificaciones sin leer",
+      }),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByText("9+", { includeHiddenElements: true })[0]?.parent).toHaveProp(
+      "importantForAccessibility",
+      "no-hide-descendants",
+    );
     // MOB-041: S23's three menu rows end in the 19 pt Icono tenue chevron.
     const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
     expect(chevrons).toHaveLength(3);

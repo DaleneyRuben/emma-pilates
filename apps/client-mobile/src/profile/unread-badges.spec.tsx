@@ -30,7 +30,7 @@ describe("Client unread badges", () => {
         screen.getByRole("button", { name: /^Perfil, 2 notificaciones sin leer/ }),
       ).toBeOnTheScreen();
     });
-    expect(screen.getByTestId("profile-tab-badge")).toHaveStyle({
+    expect(screen.getByTestId("profile-tab-badge", { includeHiddenElements: true })).toHaveStyle({
       backgroundColor: "#8A5D59",
     });
   });
@@ -41,18 +41,37 @@ describe("Client unread badges", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Perfil, tab/ })).toBeOnTheScreen();
     });
-    expect(screen.queryByTestId("profile-tab-badge")).not.toBeOnTheScreen();
+    expect(
+      screen.queryByTestId("profile-tab-badge", { includeHiddenElements: true }),
+    ).not.toBeOnTheScreen();
   });
 
   it("caps the Notificaciones row count at 9+ in Palo de rosa profundo", async () => {
     const screen = await openProfile(withUnread(12));
 
     await waitFor(() => {
-      expect(screen.getByTestId("notifications-row-badge")).toBeOnTheScreen();
+      expect(
+        screen.getByTestId("notifications-row-badge", {
+          includeHiddenElements: true,
+        }),
+      ).toBeOnTheScreen();
     });
-    expect(screen.getByTestId("notifications-row-badge")).toHaveStyle({
+    expect(
+      screen.getByTestId("notifications-row-badge", {
+        includeHiddenElements: true,
+      }),
+    ).toHaveStyle({
       backgroundColor: "#8A5D59",
     });
-    expect(screen.getAllByText("9+").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("9+", { includeHiddenElements: true }).length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole("button", {
+        name: "Notificaciones, 12 notificaciones sin leer",
+      }),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByText("9+", { includeHiddenElements: true })[0]?.parent).toHaveProp(
+      "importantForAccessibility",
+      "no-hide-descendants",
+    );
   });
 });

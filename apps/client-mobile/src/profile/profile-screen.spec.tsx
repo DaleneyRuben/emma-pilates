@@ -211,12 +211,20 @@ describe("Client Profile", () => {
 
     // The row and the Perfil tab both carry the count (follow-up 73).
     await waitFor(() => {
-      expect(screen.getByTestId("notifications-row-badge")).toHaveTextContent("2");
+      expect(
+        screen.getByTestId("notifications-row-badge", {
+          includeHiddenElements: true,
+        }),
+      ).toHaveTextContent("2");
     });
     // MOB-070: the footer reads the installed app version, not a hard-coded 1.0.
     expect(screen.getByText("Emma Pilates Studio · versión 1.0.1")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
+    await fireEvent.press(
+      screen.getByRole("button", {
+        name: "Notificaciones, 2 notificaciones sin leer",
+      }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText("Sin leer")).toBeOnTheScreen();
