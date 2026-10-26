@@ -57,6 +57,9 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
 
     expect(panel).toHaveAttribute("data-presentation", "side-panel");
     expect(
+      within(panel).getByRole("heading", { name: "Lucía Fernández" }),
+    ).toHaveFocus();
+    expect(
       await within(panel).findByText("Cliente desde 12/04/2024"),
     ).toBeInTheDocument();
     expect(within(panel).getByText("lucia@example.com")).toBeInTheDocument();

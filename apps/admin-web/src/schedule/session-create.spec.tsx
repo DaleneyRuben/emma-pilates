@@ -66,6 +66,9 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
 
     expect(panel).toHaveAttribute("data-presentation", "side-panel");
     expect(
+      within(panel).getByRole("radio", { name: "Una sola vez" }),
+    ).toHaveFocus();
+    expect(
       within(panel).getByText("Sucursal Centro · sala única"),
     ).toBeVisible();
     expect(within(panel).getByLabelText("Una sola vez")).toBeChecked();

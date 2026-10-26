@@ -38,6 +38,14 @@ export function SidePanel({
             ? { "aria-describedby": undefined }
             : {})}
           className="overflow-y-auto"
+          onOpenAutoFocus={(event) => {
+            const panel = event.currentTarget;
+            if (panel.querySelector("input, select, textarea")) return;
+            event.preventDefault();
+            panel
+              .querySelector<HTMLElement>("[data-slot=sheet-title]")
+              ?.focus();
+          }}
         >
           <SheetHeader className="pr-12">
             <SheetTitle>{title}</SheetTitle>

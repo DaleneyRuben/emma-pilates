@@ -45,4 +45,33 @@ describe("SidePanel", () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
     viewer.remove();
   });
+
+  // UX-018: opening a create panel lands on its first field. Radix otherwise
+  // focuses the dialog content, whose first tab stop is «Cerrar».
+  it("moves focus to the first field when the panel opens", () => {
+    render(
+      <SidePanel open onOpenChange={() => undefined} title="Nueva sesión">
+        <input aria-label="Tipo de clase" />
+      </SidePanel>,
+    );
+
+    expect(
+      screen.getByRole("textbox", { name: "Tipo de clase" }),
+    ).toHaveFocus();
+  });
+
+  // A read-only panel such as Detalle de cliente has no field. Focus lands
+  // on the heading, and «Cerrar» stays the named close control.
+  it("moves focus to the heading when the panel has no field", () => {
+    render(
+      <SidePanel open onOpenChange={() => undefined} title="Lucía Fernández">
+        <p>Resumen</p>
+      </SidePanel>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Lucía Fernández" }),
+    ).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Cerrar" })).toBeInTheDocument();
+  });
 });
