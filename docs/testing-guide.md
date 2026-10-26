@@ -2749,7 +2749,8 @@ Bolivia time, whatever time zone your computer uses.
    (`/?week=2026-09-28`). Choosing another Branch in the top bar redraws the
    grid for it without leaving the page: "Cargando el horario…" first, then
    that Branch's Sessions, never the previous Branch's under the new name.
-2. **Nueva sesión.** **+ Nueva sesión** opens the 408 px side panel. **Una sola
+2. **Nueva sesión.** **+ Nueva sesión** opens the 408 px side panel, and
+   focus lands on **Una sola vez** (UX-018). **Una sola
    vez** asks for Tipo de clase, Entrenadora (only Trainers assigned to the
    Branch), Fecha, Hora, **Duración** (60 minutes to start, 5 to 240, with a
    fixed "min" inside the box), and Capacidad (filled from the Class Type).
@@ -2856,7 +2857,7 @@ the admin web, exactly as Test 24 describes, and log in as
    accounts come from, with "Mostrando 0 de 6 clientas" and both page buttons
    disabled.
 3. **Detalle de cliente.** Click a Client: the side panel (the whole screen on
-   a phone) shows "Cliente desde dd/mm/aaaa", the contact, the Plan with its
+   a phone) opens with focus on her name (UX-018) and shows "Cliente desde dd/mm/aaaa", the contact, the Plan with its
    dates and remaining classes ("5 de 8"), how many Clients she referred, and
    her referral code; there is no Crédito block (PAY-005). Without an active Plan the
    block reads "Sin plan activo", plus "Último plan vencido el dd/mm/aaaa." if
@@ -6108,9 +6109,10 @@ device is free:
    admin web's `.carga-logo` has a `prefers-reduced-motion` rule (Test 66).
    The launch splash's 300 ms fade does not read the setting; that needs a
    build that shows the splash, not Expo Go (Test 65).
-4. **Admin keyboard.** Open Detalle de cliente and Nueva sesión with the
-   keyboard. Focus moves into the panel, onto «Cerrar», not onto the first
-   field. Escape closes the panel. Tab order follows the form.
+4. **Admin keyboard (UX-018).** Open Nueva sesión. Focus is on **Una sola
+   vez**, the first field, and «Cerrar» stays in the corner. Open Detalle
+   de cliente. Focus is on the Client's name, because that panel has no
+   field. Escape closes either panel. Tab order follows the form.
 
 The leftovers are UX-016 to UX-020. UX-002, UX-003, and UX-007 rewrite
 screens this reading sampled; walk those again after they merge.
