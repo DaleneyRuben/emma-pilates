@@ -3,6 +3,11 @@
 This guide explains what you can test in the Pilates project today. It assumes
 you are starting with no project knowledge.
 
+The Spanish hand walk, from an empty database and through every screen, is
+[`guia-de-recorrido.md`](./guia-de-recorrido.md). It does not load fixtures.
+This file stays the technical guide: fixture Accounts, API checks, and the
+numbered tests.
+
 ## What is ready to test?
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
