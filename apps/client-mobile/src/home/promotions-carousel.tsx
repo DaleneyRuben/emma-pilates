@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   copy: { gap: spacing.smd, padding: spacing.lg },
-  description: { fontSize: typography.note, lineHeight: 20 },
+  description: { fontSize: typography.note },
   descriptionPlaceholder: {
     backgroundColor: colors.divider,
     borderRadius: radii.control,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     gap: spacing.smd,
     minHeight: spacing.md,
   },
-  headline: { fontSize: 18, lineHeight: 24 },
+  headline: { fontSize: 18 },
   headlinePlaceholder: {
     backgroundColor: colors.primaryTint,
     borderRadius: radii.control,

@@ -37,21 +37,20 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 11,
     fontWeight: "600",
-    lineHeight: 14,
   },
   pill: {
     alignItems: "center",
     backgroundColor: colors.primaryDeep,
     borderRadius: radii.pill,
-    height: 18,
     justifyContent: "center",
+    minHeight: 18,
     minWidth: 18,
     paddingHorizontal: 5,
   },
   ring: {
     borderColor: colors.white,
     borderWidth: 2,
-    height: 22,
+    minHeight: 22,
     minWidth: 22,
   },
 });

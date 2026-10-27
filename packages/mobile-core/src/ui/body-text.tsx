@@ -12,7 +12,6 @@ export function BodyText({ style, ...props }: TextProps) {
           color: colors.textSecondary,
           fontFamily: fontFamilies.body,
           fontSize: typography.body,
-          lineHeight: 24,
         },
         style,
       ]}

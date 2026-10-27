@@ -13,7 +13,6 @@ export function Heading({ style, ...props }: TextProps) {
           fontFamily: fontFamilies.heading,
           fontSize: typography.title,
           fontWeight: "500",
-          lineHeight: 36,
         },
         style,
       ]}

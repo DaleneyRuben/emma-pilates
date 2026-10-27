@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   empty: { gap: spacing.lg, paddingTop: spacing.xl },
   failure: { color: colors.errorText },
-  header: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
+  header: { alignItems: "flex-start", gap: spacing.sm },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
   notice: {
     backgroundColor: "rgba(124,148,115,0.14)",

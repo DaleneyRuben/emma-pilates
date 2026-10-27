@@ -21,9 +21,10 @@ export function PaymentStatusView({ state }: { state: PaymentStatusState }) {
         alignSelf: "center",
         backgroundColor: status.disc,
         borderRadius: radii.pill,
-        height: 72,
         justifyContent: "center",
-        width: 72,
+        minHeight: 72,
+        minWidth: 72,
+        padding: 16,
       }}
       testID={`payment-status-disc-${state}`}
     >
