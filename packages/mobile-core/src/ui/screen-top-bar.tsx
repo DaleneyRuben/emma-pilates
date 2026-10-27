@@ -26,31 +26,33 @@ export function ScreenTopBar({
   const context = tone === "context";
   return (
     <View style={[styles.bar, fullBleed && styles.fullBleed]} testID="screen-top-bar">
-      <Pressable
-        accessibilityLabel="Volver"
-        accessibilityRole="button"
-        onPress={onBack}
-        style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
-      >
-        <LineIcon color={colors.text} size={22} strokeWidth={1.3}>
-          <Polyline points="14.5,5 7.5,12 14.5,19" />
-        </LineIcon>
-      </Pressable>
+      <View style={styles.controls}>
+        <Pressable
+          accessibilityLabel="Volver"
+          accessibilityRole="button"
+          onPress={onBack}
+          style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
+        >
+          <LineIcon color={colors.text} size={22} strokeWidth={1.3}>
+            <Polyline points="14.5,5 7.5,12 14.5,19" />
+          </LineIcon>
+        </Pressable>
+        {action === undefined ? null : <View style={styles.action}>{action}</View>}
+      </View>
       <Text
         accessibilityLabel={title}
         accessibilityRole={context ? undefined : "header"}
-        numberOfLines={1}
         style={context ? styles.context : styles.title}
       >
         {title}
       </Text>
-      {action === undefined ? null : <View style={styles.action}>{action}</View>}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   action: {
+    flexShrink: 0,
     marginLeft: "auto",
   },
   back: {
@@ -64,20 +66,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   bar: {
-    alignItems: "center",
     borderBottomColor: colors.rule,
     borderBottomWidth: 1,
-    flexDirection: "row",
-    gap: spacing.smd,
+    gap: spacing.xs,
     paddingBottom: spacing.md,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.smd,
   },
+  controls: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   context: {
     color: colors.textMuted,
-    flexShrink: 1,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: 14,
+    paddingHorizontal: spacing.sm,
   },
   // `Screen` pads by spacing.lg on every side.
   fullBleed: {
@@ -86,8 +91,8 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    flexShrink: 1,
     fontFamily: fontFamilies.heading,
     fontSize: 19,
+    paddingHorizontal: spacing.sm,
   },
 });

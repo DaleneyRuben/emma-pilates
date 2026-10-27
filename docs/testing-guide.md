@@ -6120,8 +6120,31 @@ device is free:
    de cliente. Focus is on the Client's name, because that panel has no
    field. Escape closes either panel. Tab order follows the form.
 
-The leftovers are UX-016 to UX-020. UX-002, UX-003, and UX-007 rewrite
-screens this reading sampled; walk those again after they merge.
+The leftovers are UX-017 to UX-020. UX-016 is the line boxes below.
+UX-002, UX-003, and UX-007 rewrite screens this reading sampled; walk those
+again after they merge.
+
+## Test 115 B: the line boxes grow with the text (UX-016)
+
+Follow-up 208 is still pending, so the generated frames stay at the default
+text size. The apps no longer pin the boxes the audit named.
+
+1. **A screen title wraps.** As Camila, open Lucía and **Ver reservas**.
+   «Reservas de la clienta» is the full title. At the largest text size it
+   wraps onto a second line instead of ending in an ellipsis. The back
+   chevron stays tappable.
+2. **Headings and body lines.** On Inicio, «Hola, Lucía» and a Promotion
+   headline and description keep their descenders. A Home tile title does
+   the same. Nothing sets `allowFontScaling={false}`.
+3. **The unread pill and the payment disc.** With an unread notification,
+   the Perfil count stays a circle around the digits. On Estado del pago
+   the disc stays a circle at least 72 pt around the hourglass, check, or
+   cross.
+4. **What still truncates on purpose.** The impersonation banner, the
+   view-as branch line, and an Assistant search contact stay on one line
+   with an ellipsis.
+
+Credit (screen 17) is retired, so there is no amount to grow.
 
 ## Test 113: the copy and layout leftovers
 

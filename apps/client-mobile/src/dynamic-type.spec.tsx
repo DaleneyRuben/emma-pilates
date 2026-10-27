@@ -33,10 +33,11 @@ describe("Dynamic Type on Client screens", () => {
         role="client"
       />,
     );
-    const tab = screen.getByRole("button", { name: /^Inicio, tab/ });
-    const item = StyleSheet.flatten(tab.props.style);
+    const label = within(screen.getByRole("button", { name: /^Inicio, tab/ })).getByText("Inicio");
+    const style = StyleSheet.flatten(label.props.style);
 
-    expect(item.minHeight).toBeGreaterThanOrEqual(49);
+    expect(style.fontSize).toBe(11);
+    expect(style.lineHeight).toBeUndefined();
   });
 
   it("sizes the payment-status disc from the glyph", async () => {

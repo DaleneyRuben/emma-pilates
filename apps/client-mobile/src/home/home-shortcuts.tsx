@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontFamily: fontFamilies.heading,
     fontSize: typography.bodyMedium,
-    lineHeight: 21,
   },
   tiles: { flexDirection: "row", gap: spacing.md },
 });

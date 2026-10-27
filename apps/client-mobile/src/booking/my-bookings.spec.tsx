@@ -108,6 +108,7 @@ describe("Client My Bookings", () => {
     expect(screen.getByText("En lista de espera")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Salir de la lista de espera" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Ver historial" })).toBeOnTheScreen();
+    expect(screen.getByLabelText("Mis reservas")).toBeOnTheScreen();
   });
 
   it("shows an empty state that leads to booking", async () => {
