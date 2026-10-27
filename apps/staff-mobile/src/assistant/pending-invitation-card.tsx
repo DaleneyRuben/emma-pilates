@@ -6,6 +6,7 @@ import {
 import {
   BodyText,
   colors,
+  ConfirmationSheet,
   FormField,
   OutlinedButton,
   PrimaryButton,
@@ -18,7 +19,7 @@ import {
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Modal, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
@@ -215,29 +216,16 @@ export function PendingInvitationCard({
           )}
         </View>
       )}
-      <Modal
-        animationType="slide"
-        onRequestClose={() => setConfirmingCancel(false)}
-        transparent
+      <ConfirmationSheet
+        busy={busy}
+        confirmLabel="Sí, cancelar invitación"
+        note="Se anularán los enlaces enviados, se liberará el correo y la cuenta pendiente desaparecerá."
+        onConfirm={() => void cancel()}
+        onDismiss={() => setConfirmingCancel(false)}
+        testID="cancel-invitation-sheet"
+        title={`¿Cancelar la invitación de ${clientName}?`}
         visible={confirmingCancel}
-      >
-        <View style={styles.sheetBackdrop}>
-          <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>{`¿Cancelar la invitación de ${clientName}?`}</Text>
-            <BodyText>
-              Se anularán los enlaces enviados, se liberará el correo y la cuenta pendiente
-              desaparecerá.
-            </BodyText>
-            <OutlinedButton
-              busy={busy}
-              label="Sí, cancelar invitación"
-              onPress={() => void cancel()}
-              tone="error"
-            />
-            <TextButton label="Volver" onPress={() => setConfirmingCancel(false)} />
-          </View>
-        </View>
-      </Modal>
+      />
     </View>
   );
 }
@@ -260,18 +248,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingTop: 10,
   },
-  sheet: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: radii.frame,
-    borderTopRightRadius: radii.frame,
-    gap: spacing.md,
-    padding: spacing.xl,
-  },
-  sheetBackdrop: {
-    backgroundColor: colors.scrim,
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheetTitle: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
   success: { color: colors.successText, fontSize: typography.note },
 });

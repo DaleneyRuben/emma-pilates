@@ -10,6 +10,7 @@ import {
 import {
   BodyText,
   colors,
+  ConfirmationSheet,
   Heading,
   LoadingState,
   PrimaryButton,
@@ -28,7 +29,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
@@ -269,34 +270,22 @@ export function BookingsScreen({
           ))}
         </ScrollView>
       )}
-      <Modal
-        animationType="slide"
-        onRequestClose={() => setCancelling(null)}
-        transparent
+      <ConfirmationSheet
+        confirmLabel="Sí, cancelar reserva"
+        confirmTestID="booking-cancel-confirm"
+        note="La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para volver a reservarlo tendrá que seguir habiendo cupo."
+        onConfirm={() => void confirmCancel()}
+        onDismiss={() => setCancelling(null)}
+        testID="booking-cancel-sheet"
+        title="¿Cancelar esta reserva?"
         visible={cancelling !== null}
       >
-        <View style={styles.sheetBackdrop}>
-          <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>¿Cancelar esta reserva?</Text>
-            {cancelling !== null ? (
-              <BodyText>
-                {`${cancelling.classTypeName} · ${formatSessionDate(cancelling.startsAt)} · ${formatTimeRange(cancelling.startsAt, cancelling.endsAt)} · ${cancelling.trainerName} · ${cancelling.branchName}`}
-              </BodyText>
-            ) : null}
-            <BodyText>
-              La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para
-              volver a reservarlo tendrá que seguir habiendo cupo.
-            </BodyText>
-            <OutlinedAction
-              label="Sí, cancelar reserva"
-              onPress={() => void confirmCancel()}
-              testID="booking-cancel-confirm"
-              tone="error"
-            />
-            <TextButton label="Volver" onPress={() => setCancelling(null)} />
-          </View>
-        </View>
-      </Modal>
+        {cancelling !== null ? (
+          <BodyText>
+            {`${cancelling.classTypeName} · ${formatSessionDate(cancelling.startsAt)} · ${formatTimeRange(cancelling.startsAt, cancelling.endsAt)} · ${cancelling.trainerName} · ${cancelling.branchName}`}
+          </BodyText>
+        ) : null}
+      </ConfirmationSheet>
     </Screen>
   );
 }
@@ -347,17 +336,4 @@ const styles = StyleSheet.create({
   noticeBody: { color: colors.successText, fontSize: typography.note },
   noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
   screen: { gap: spacing.lg },
-  sheet: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: radii.frame,
-    borderTopRightRadius: radii.frame,
-    gap: spacing.md,
-    padding: spacing.xl,
-  },
-  sheetBackdrop: {
-    backgroundColor: colors.scrim,
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheetTitle: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
 });

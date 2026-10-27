@@ -1,8 +1,8 @@
 import {
   BodyText,
   colors,
+  ConfirmationSheet,
   PickerCheck,
-  PrimaryButton,
   radii,
   spacing,
   TextButton,
@@ -12,7 +12,6 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 
 import { civilDateLong, displayTime, quarterHours } from "./nutritionist-format";
 import { keptLine } from "./availability-block-form-parts";
-import { RemoveBlockButton } from "./remove-block-button";
 
 export type TimeField = "start" | "end";
 export type Confirmation = "replace" | "end";
@@ -82,26 +81,21 @@ export function BlockChangeSheet({
   onRemove: () => void;
   onClose: () => void;
 }) {
+  const ending = confirming === "end";
   return (
-    <Modal animationType="slide" onRequestClose={onClose} transparent visible={confirming !== null}>
-      <View style={styles.sheetBackdrop}>
-        <View style={styles.sheet} testID="block-change-sheet">
-          <Text style={styles.sheetTitle}>
-            {confirming === "end" ? "¿Quitar este horario?" : "¿Aplicar el cambio?"}
-          </Text>
-          <BodyText>
-            {`${confirming === "end" ? "Quitar" : "Aplicar"} desde el ${civilDateLong(effectiveFrom)}.`}
-          </BodyText>
-          {booked > 0 ? <BodyText>{keptLine(booked)}</BodyText> : null}
-          {confirming === "end" ? (
-            <RemoveBlockButton busy={busy} onPress={onRemove} />
-          ) : (
-            <PrimaryButton busy={busy} label="Aplicar cambio" onPress={onApply} />
-          )}
-          <TextButton label="Volver" onPress={onClose} />
-        </View>
-      </View>
-    </Modal>
+    <ConfirmationSheet
+      busy={busy}
+      confirmLabel={ending ? "Quitar horario" : "Aplicar cambio"}
+      note={`${ending ? "Quitar" : "Aplicar"} desde el ${civilDateLong(effectiveFrom)}.`}
+      onConfirm={ending ? onRemove : onApply}
+      onDismiss={onClose}
+      testID="block-change-sheet"
+      title={ending ? "¿Quitar este horario?" : "¿Aplicar el cambio?"}
+      tone={ending ? "destructive" : "primary"}
+      visible={confirming !== null}
+    >
+      {booked > 0 ? <BodyText>{keptLine(booked)}</BodyText> : null}
+    </ConfirmationSheet>
   );
 }
 

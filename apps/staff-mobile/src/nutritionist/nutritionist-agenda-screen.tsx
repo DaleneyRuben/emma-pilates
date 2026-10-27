@@ -9,6 +9,7 @@ import {
   BodyText,
   Chevron,
   colors,
+  ConfirmationSheet,
   fontFamilies,
   LoadingState,
   QueryFailure,
@@ -16,7 +17,6 @@ import {
   Screen,
   spacing,
   surfaces,
-  TextButton,
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -24,7 +24,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { HeaderAction } from "../ui/header-action";
@@ -216,37 +216,25 @@ export function NutritionistAgendaScreen() {
           ))}
         </ScrollView>
       )}
-      <Modal
-        animationType="slide"
-        onRequestClose={() => setCancelling(null)}
-        transparent
+      <ConfirmationSheet
+        confirmLabel="Sí, cancelar evaluación"
+        note={
+          cancelling === null
+            ? ""
+            : `Le avisaremos a ${cancelling.clientName} y el horario quedará libre.`
+        }
+        onConfirm={() => void confirmCancel()}
+        onDismiss={() => setCancelling(null)}
+        testID="cancel-evaluation-sheet"
+        title="¿Cancelar esta evaluación?"
         visible={cancelling !== null}
       >
-        <View style={styles.sheetBackdrop}>
-          <View style={styles.sheet} testID="cancel-evaluation-sheet">
-            <Text style={styles.sheetTitle}>¿Cancelar esta evaluación?</Text>
-            {cancelling !== null ? (
-              <>
-                <BodyText>
-                  {`${civilDateLong(civilDateOf(cancelling.startsAt))}, ${clockTime(cancelling.startsAt)} · ${cancelling.clientName}`}
-                </BodyText>
-                <BodyText>
-                  {`Le avisaremos a ${cancelling.clientName} y el horario quedará libre.`}
-                </BodyText>
-              </>
-            ) : null}
-            <Pressable
-              accessibilityLabel="Sí, cancelar evaluación"
-              accessibilityRole="button"
-              onPress={() => void confirmCancel()}
-              style={styles.destructive}
-            >
-              <Text style={styles.destructiveText}>Sí, cancelar evaluación</Text>
-            </Pressable>
-            <TextButton label="Volver" onPress={() => setCancelling(null)} />
-          </View>
-        </View>
-      </Modal>
+        {cancelling !== null ? (
+          <BodyText>
+            {`${civilDateLong(civilDateOf(cancelling.startsAt))}, ${clockTime(cancelling.startsAt)} · ${cancelling.clientName}`}
+          </BodyText>
+        ) : null}
+      </ConfirmationSheet>
     </Screen>
   );
 }
@@ -268,15 +256,6 @@ const styles = StyleSheet.create({
   divider: { backgroundColor: colors.rule, height: 38, width: 1 },
   duration: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.label },
   kind: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  destructive: {
-    alignItems: "center",
-    borderColor: colors.error,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 44,
-  },
-  destructiveText: { color: colors.errorText, fontSize: typography.body },
   empty: { gap: spacing.sm, paddingTop: spacing.xl },
   emptyTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   failure: { color: colors.errorText },
@@ -300,19 +279,6 @@ const styles = StyleSheet.create({
   noticeBody: { color: colors.successText, fontSize: typography.note },
   noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
   screen: { gap: spacing.lg },
-  sheet: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: radii.frame,
-    borderTopRightRadius: radii.frame,
-    gap: spacing.md,
-    padding: spacing.xl,
-  },
-  sheetBackdrop: {
-    backgroundColor: colors.scrim,
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheetTitle: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
   time: {
     color: colors.text,
     fontFamily: fontFamilies.heading,
