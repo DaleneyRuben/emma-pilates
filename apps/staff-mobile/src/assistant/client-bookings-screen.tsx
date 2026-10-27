@@ -7,6 +7,7 @@ import {
 import {
   BodyText,
   colors,
+  ConfirmationSheet,
   EmptyState,
   formatSessionDate,
   formatTimeRange,
@@ -19,7 +20,6 @@ import {
   ScreenTopBar,
   spacing,
   surfaces,
-  TextButton,
   typography,
   useStudioRules,
   useTransientNotice,
@@ -27,7 +27,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAssistantApi } from "./assistant-api";
@@ -241,30 +241,21 @@ export function ClientBookingsScreen({
           ))}
         </ScrollView>
       )}
-      <Modal
-        animationType="slide"
-        onRequestClose={() => setCancelling(null)}
-        transparent
+      <ConfirmationSheet
+        confirmLabel="Sí, cancelar reserva"
+        note="La clase vuelve al saldo del plan y el cupo se libera."
+        onConfirm={() => void confirmCancel()}
+        onDismiss={() => setCancelling(null)}
+        testID="assistant-cancel-booking-sheet"
+        title={`¿Cancelar esta reserva de ${clientName}?`}
         visible={cancelling !== null}
       >
-        <View style={styles.sheetBackdrop}>
-          <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>{`¿Cancelar esta reserva de ${clientName}?`}</Text>
-            {cancelling !== null ? (
-              <BodyText>
-                {`${cancelling.classTypeName} · ${formatSessionDate(cancelling.startsAt)} · ${formatTimeRange(cancelling.startsAt, cancelling.endsAt)}`}
-              </BodyText>
-            ) : null}
-            <BodyText>La clase vuelve al saldo del plan y el cupo se libera.</BodyText>
-            <OutlinedAction
-              label="Sí, cancelar reserva"
-              onPress={() => void confirmCancel()}
-              tone="error"
-            />
-            <TextButton label="Volver" onPress={() => setCancelling(null)} />
-          </View>
-        </View>
-      </Modal>
+        {cancelling !== null ? (
+          <BodyText>
+            {`${cancelling.classTypeName} · ${formatSessionDate(cancelling.startsAt)} · ${formatTimeRange(cancelling.startsAt, cancelling.endsAt)}`}
+          </BodyText>
+        ) : null}
+      </ConfirmationSheet>
     </Screen>
   );
 }
@@ -314,17 +305,4 @@ const styles = StyleSheet.create({
   noticeBody: { color: colors.successText, fontSize: typography.note },
   noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
   screen: { gap: spacing.md },
-  sheet: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: radii.frame,
-    borderTopRightRadius: radii.frame,
-    gap: spacing.md,
-    padding: spacing.xl,
-  },
-  sheetBackdrop: {
-    backgroundColor: colors.scrim,
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheetTitle: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
 });

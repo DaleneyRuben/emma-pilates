@@ -649,8 +649,9 @@ A Client without remaining classes sees
 the disabled button with a link to the Plans.
 
 **Mis reservas** lists upcoming Bookings and Waitlist entries. A Booking more
-than 2 h 30 before its start offers **Cancelar** behind a confirmation sheet
-(the class returns to the balance, «el lugar queda libre para otra clienta.
+than 2 h 30 before its start offers **Cancelar** behind the shared
+confirmation sheet (UX-014: the same white sheet as «¿Cerrar sesión?», with a
+Lora title; the class returns to the balance, «el lugar queda libre para otra clienta.
 Para volver a reservarlo tendrá que seguir habiendo cupo.»); one inside that window shows **No
 cancelable** and **Reprogramar** to another Session of the same day; a
 Waitlist entry offers **Salir de la lista de espera**. **Reprogramar** opens
@@ -1877,7 +1878,8 @@ option cards as the Client's (Test 5 B: the shared Session card with the
 selected; MOB-048). Items
 at a Branch you are not assigned to keep their action disabled with "Solo en
 tus sucursales". Cancelling asks "¿Cancelar esta reserva de Lucía Fernández?"
-first. With nothing upcoming the screen centres a quiet calendar, "Esta
+on the shared confirmation sheet (UX-014), then **Sí, cancelar reserva** and
+**Volver**. With nothing upcoming the screen centres a quiet calendar, "Esta
 clienta no tiene reservas próximas." in Lora 21, the line "Puedes reservarle
 una clase desde el horario del estudio.", and **Reservar una clase** under
 them (MOB-041; `lucia@example.com` has a Plan and no upcoming Booking in the
@@ -6140,7 +6142,8 @@ The rollout already uses Test 75 for the studio rules.
    a class more than 2 h 30 away. The note reads «La clase vuelve al saldo
    de tu plan y el lugar queda libre para otra clienta. Para volver a
    reservarlo tendrá que seguir habiendo cupo.» The title, the class line,
-   **Sí, cancelar reserva**, and **Volver** stay.
+   **Sí, cancelar reserva**, and **Volver** stay. The sheet is the shared
+   one (UX-014), the same white sheet as «¿Cerrar sesión?».
 4. **S13, the Branch on the row.** As Paola, open Cancelar una clase. The
    pill still reads «Sucursal: Centro». Each Session row names the Branch
    alone («Centro»), with no «Sucursal » in front of it. S02 and S07 are

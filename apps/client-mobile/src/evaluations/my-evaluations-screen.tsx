@@ -8,6 +8,7 @@ import {
 import {
   BodyText,
   colors,
+  ConfirmationSheet,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -16,7 +17,6 @@ import {
   ScreenTopBar,
   spacing,
   surfaces,
-  TextButton,
   typography,
   useMountedAt,
   usePullToRefresh,
@@ -26,7 +26,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import {
@@ -233,38 +233,26 @@ export function MyEvaluationsScreen({
           </>
         ) : null}
       </ScrollView>
-      <Modal
-        animationType="slide"
-        onRequestClose={() => setCancelling(null)}
-        transparent
+      <ConfirmationSheet
+        confirmLabel="Sí, cancelar evaluación"
+        note="El horario queda libre y otras clientas podrán reservarlo."
+        onConfirm={() => void confirmCancel()}
+        onDismiss={() => setCancelling(null)}
+        testID="cancel-evaluation-sheet"
+        title="¿Cancelar esta evaluación?"
         visible={cancelling !== null}
       >
-        <View style={styles.sheetBackdrop}>
-          <View style={styles.sheet} testID="cancel-evaluation-sheet">
-            <Text style={styles.sheetTitle}>¿Cancelar esta evaluación?</Text>
-            {cancelling !== null ? (
-              <BodyText>
-                {`${evaluationDate(cancelling.startsAt)}, ${clockTime(cancelling.startsAt)} · ${cancelling.durationMinutes} min · ${cancelling.nutritionistName}`}
-              </BodyText>
-            ) : null}
-            <BodyText>El horario queda libre y otras clientas podrán reservarlo.</BodyText>
-            {cancelling !== null ? (
-              <BodyText>
-                {`Podrás reservar otra evaluación para ${monthPhrase(boliviaMonth(cancelling.startsAt))}.`}
-              </BodyText>
-            ) : null}
-            <Pressable
-              accessibilityLabel="Sí, cancelar evaluación"
-              accessibilityRole="button"
-              onPress={() => void confirmCancel()}
-              style={styles.destructive}
-            >
-              <Text style={styles.destructiveText}>Sí, cancelar evaluación</Text>
-            </Pressable>
-            <TextButton label="Volver" onPress={() => setCancelling(null)} />
-          </View>
-        </View>
-      </Modal>
+        {cancelling !== null ? (
+          <>
+            <BodyText>
+              {`${evaluationDate(cancelling.startsAt)}, ${clockTime(cancelling.startsAt)} · ${cancelling.durationMinutes} min · ${cancelling.nutritionistName}`}
+            </BodyText>
+            <BodyText>
+              {`Podrás reservar otra evaluación para ${monthPhrase(boliviaMonth(cancelling.startsAt))}.`}
+            </BodyText>
+          </>
+        ) : null}
+      </ConfirmationSheet>
     </Screen>
   );
 }
@@ -294,15 +282,6 @@ const styles = StyleSheet.create({
   cardBody: { flex: 1, gap: spacing.xs },
   cardHighlighted: { borderLeftColor: colors.success },
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  destructive: {
-    alignItems: "center",
-    borderColor: colors.error,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 44,
-  },
-  destructiveText: { color: colors.errorText, fontSize: typography.body },
   empty: { gap: spacing.lg, paddingTop: spacing.xl },
   emptyTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   failure: { color: colors.errorText },
@@ -332,18 +311,5 @@ const styles = StyleSheet.create({
   },
   pastText: { flex: 1 },
   screen: { gap: spacing.lg },
-  sheet: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: radii.frame,
-    borderTopRightRadius: radii.frame,
-    gap: spacing.md,
-    padding: spacing.xl,
-  },
-  sheetBackdrop: {
-    backgroundColor: colors.scrim,
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheetTitle: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
   time: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
 });
