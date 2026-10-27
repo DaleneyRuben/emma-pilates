@@ -92,8 +92,13 @@ compartida.
    ```
 
    ```sh
-   pnpm --filter @pilates/backend start:worker
+   cd apps/backend
+   pnpm build
+   node --env-file=.env dist/src/worker-main.js
    ```
+
+   `pnpm start:worker` no lee `apps/backend/.env`. Sin `--env-file` el
+   worker se detiene al validar `DATABASE_URL` y no escribe los correos.
 
    ```sh
    pnpm dev:admin
@@ -119,14 +124,17 @@ Nadie puede registrarse como administradora desde la web. La primera cuenta
 nace con un comando, una sola vez por base. El comando no inventa una
 contraseña y no la imprime.
 
-Desde la raíz del repositorio, con la misma `DATABASE_URL` que usa la API:
+Desde `apps/backend`, con el `.env` que usa la API:
 
 ```sh
 cd apps/backend
 BOOTSTRAP_ADMINISTRATOR_EMAIL=ana@example.com \
 BOOTSTRAP_ADMINISTRATOR_NAME="Ana Méndez" \
-pnpm admin:bootstrap
+node --env-file=.env dist/src/administrator-bootstrap-main.js
 ```
+
+Si esa ruta no existe, corre antes `pnpm build` en `apps/backend`. El
+script `pnpm admin:bootstrap` no lee el `.env`.
 
 La línea que imprime dice `administrator_bootstrap_completed` y
 `status: created`. Si lo corres otra vez con el mismo correo, renueva el
