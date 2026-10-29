@@ -25,6 +25,17 @@ export const repointFounderReservation = (
     },
   });
 
+const reservationSale = (input: {
+  purchaseIntentId?: string;
+  paymentId?: string;
+}): { purchaseIntentId: string } | { paymentId: string } => {
+  if (input.purchaseIntentId !== undefined) {
+    return { purchaseIntentId: input.purchaseIntentId };
+  }
+  if (input.paymentId !== undefined) return { paymentId: input.paymentId };
+  throw new Error('A founder reservation release names the sale');
+};
+
 export const releaseFounderReservationOf = (
   transaction: Transaction,
   input: {
@@ -37,9 +48,7 @@ export const releaseFounderReservationOf = (
     where: {
       status: FounderMembershipStatus.RESERVED,
       deletedAt: null,
-      ...(input.purchaseIntentId !== undefined
-        ? { purchaseIntentId: input.purchaseIntentId }
-        : { paymentId: input.paymentId }),
+      ...reservationSale(input),
     },
     data: { deletedAt: input.now },
   });
