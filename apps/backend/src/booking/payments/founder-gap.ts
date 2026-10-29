@@ -5,6 +5,10 @@ import {
   FounderMembershipStatus,
   PaymentMethod,
 } from '../../generated/prisma/client';
+import {
+  recordNotification as defaultNotificationRecorder,
+  type NotificationRecorder,
+} from '../../notifications/prisma-notification-store';
 import { decideFounderGap, type FounderRules } from './founder-membership';
 import { priceFounderSale } from './prisma-founder-membership';
 
@@ -99,8 +103,16 @@ export const priceTransferForGap = async (
 
 export const loseFounderForGap = async (
   transaction: Transaction,
-  input: { clientId: string; nextStart: Date; today: Date; now: Date },
+  input: {
+    clientId: string;
+    nextStart: Date;
+    today: Date;
+    now: Date;
+    recordNotification?: NotificationRecorder;
+  },
 ): Promise<boolean> => {
+  const recordNotification =
+    input.recordNotification ?? defaultNotificationRecorder;
   if (!(await founderGapWouldLose(transaction, input))) return false;
   const held = await transaction.founderMembership.findFirstOrThrow({
     where: {
@@ -130,5 +142,22 @@ export const loseFounderForGap = async (
       metadata: { reason: 'gap' },
     },
   });
+  const account = await transaction.account.findFirst({
+    where: { clientId: input.clientId, deletedAt: null },
+    select: { id: true },
+  });
+  const rules = await readRules(transaction);
+  if (account !== null) {
+    await recordNotification(transaction, {
+      accountId: account.id,
+      category: 'reminder',
+      type: 'founder_membership_lost',
+      businessEventKey: `founder-membership-lost:${held.id}`,
+      title: 'Membresía fundadora',
+      message: `Pasaron más de ${rules.founderGapDays} días sin plan, así que tu membresía fundadora se perdió.`,
+      destination: { type: 'subscription', id: null },
+      occurredAt: input.now,
+    });
+  }
   return true;
 };
