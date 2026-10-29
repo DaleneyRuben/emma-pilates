@@ -77,7 +77,9 @@ describe("freeze review", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Aprobar" }));
     await waitFor(() =>
       expect(
-        screen.getByText("El congelamiento ya empezó. Recházalo y pide uno desde hoy."),
+        screen.getByText(
+          "El congelamiento ya empezó. Recházalo. Este plan no se congela.",
+        ),
       ).toBeOnTheScreen(),
     );
   });
