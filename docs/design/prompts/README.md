@@ -99,7 +99,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | AW25 | Evaluaciones nutricionales | `AW25` | ✅ |
 | AW26 | Referidos | `AW26` | ✅ |
 | AW27 | Créditos | `AW27` | ✅ |
-| AW28 | Pagos | `AW28` | ✅ |
+| AW28 | Pagos | `AW28` | ✅ (follow-up 216 pending: Tipo and decision date) |
 | AW29 | Revisar pago | `AW29` | ✅ |
 | [AW30](./admin-web/30-recover-password.md) | Recuperar contraseña | `AW30` | ✅ |
 | [AW31](./admin-web/31-retiros-consumo.md) | Retiros e insumos consumidos | `AW31` | ✅ |
@@ -244,6 +244,8 @@ Each of these was sent as the next message in the existing design session for th
 | [116](./followups/116-staff-version-from-config.md) | `S23`'s footer reads the Staff app config (STAFF-005): «Emma Pilates Studio · versión 1.0» becomes «Emma Pilates Studio · versión 1.0.1» on every frame that draws it; the Client footer stays | 🕓 pending |
 | [208](./followups/208-dynamic-type-line-boxes.md) | Line boxes grow with Dynamic Type (UX-016, UX-013 findings A1 and A2): a screen title wraps, headings and body lines take the font's own line box, the unread pill and the payment-status disc grow, and the Client tab item stays tall enough; the README records it. Numbered 208 because 207 is the admin loading state | 🕓 pending |
 | [204](./followups/204-admin-1024-breakpoint.md) | The admin web at 1024 px (UX-011, UX-001 findings A3 and A4): a width the design does not draw, so the README's shell and «Responsive» gain the rule — sidebar 168 px and 16 px main padding from 1024 px up to just under 1280 px, an `AW02` Session block on three lines (type, time, occupancy) with no wrap, and `AW16` month names, amounts, and tile captions on one line, with the two tables stacked below 1100 px; 1440 and 420 stay as drawn. Numbered 204 because 114 is UX-012's | 🕓 pending |
+| [216](./followups/216-aw28-payment-kind-and-decision-date.md) | `AW28` names the sale and dates it by the decision (FIX-003): a «Tipo» column («Plan» or «Evaluación») after «Cliente», «Fecha» and the CSV use the decision date once the sale is decided, and the CSV gains «Tipo»; the Plan name stays | 🕓 pending |
+| [217](./followups/217-paid-evaluation-receipt.md) | `14` asks for the transfer receipt on a paid Evaluation (FIX-003, booking ADR-0011): the same upload control as `10`, «Confirmar» stays disabled until it is attached; an included Evaluation draws neither | 🕓 pending |
 
 | [130](./followups/130-aw33-studio-rules-entry.md) | `AW33`'s menu gains a first row «Reglas del estudio» that opens the new `AW36` (BKM-004, ADR-0101), above «Cambiar contraseña»; the README gains the `AW36` row and the `AW33 → AW36` navigation | ✅ applied (Claude Design canvas, 2026-10-23, `55bbe4cc`, with `AW36`; the admin web is built in BKM-004) |
 | [131](./followups/131-rules-copy-from-studio-settings.md) | README only: «Studio rules in copy» says the «2 h 30» of `05`/`09`/`S21`/`AW03` and `02`'s «Paquetes desde» price are Studio Settings values read from the API, with what each screen shows while they are unknown; no numbered screen changes (BKM-004, ADR-0101) | ✅ applied (README only, same canvas and commit `55bbe4cc`; the apps are built in BKM-004) |
