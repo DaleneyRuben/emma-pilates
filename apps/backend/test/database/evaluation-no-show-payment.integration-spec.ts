@@ -129,7 +129,7 @@ describe('no show evaluation payment', () => {
       now: () => new Date(fixtureNow.getTime() + 24 * 60 * 60 * 1_000),
     });
 
-    await expect(later.releaseExpiredEvaluationHolds()).resolves.toBe(1);
+    await expect(later.releaseExpiredEvaluationHolds()).resolves.toBe(0);
     await expect(
       world.prisma.evaluation.findUniqueOrThrow({
         where: { id: booked.id },

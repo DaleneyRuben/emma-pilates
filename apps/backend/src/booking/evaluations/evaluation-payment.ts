@@ -80,7 +80,8 @@ export const releaseExpiredEvaluationHolds = async (
 ): Promise<number> => {
   const due = await transaction.evaluation.findMany({
     where: {
-      state: { in: [EvaluationState.BOOKED, EvaluationState.NO_SHOW] },
+      state: EvaluationState.BOOKED,
+      slot: { startsAt: { gt: now } },
       payment: {
         kind: PaymentKind.EVALUATION,
         state: PaymentState.PENDING,
@@ -90,8 +91,6 @@ export const releaseExpiredEvaluationHolds = async (
     select: { id: true, paymentId: true, state: true },
   });
   for (const row of due) {
-    // A no-show is a final outcome. The hold still expires: the Payment is
-    // rejected and the Evaluation stays marked.
     if (row.state === EvaluationState.BOOKED) {
       await transaction.evaluation.update({
         where: { id: row.id },
