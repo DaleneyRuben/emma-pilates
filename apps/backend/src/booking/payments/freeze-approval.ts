@@ -10,6 +10,7 @@ import {
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
 import { boliviaDate } from '../../time/bolivia-time';
+import { restoreBookedClass } from '../commands/restore-class';
 import { decideFreezeRequest } from './freeze';
 import { loadQueuedRenewalStart } from './freeze-window';
 import { PaymentRuleError } from './payment-errors';
@@ -59,6 +60,7 @@ export const cancelBookingsInsideFreeze = async (
     onFreezeDate(booking.session.startsAt, input.startsOn, input.endsOn),
   );
   if (inside.length === 0) return 0;
+  const now = new Date();
   const cancelled = await transaction.booking.updateMany({
     where: {
       id: { in: inside.map((booking) => booking.id) },
@@ -66,15 +68,19 @@ export const cancelBookingsInsideFreeze = async (
     },
     data: {
       state: BookingState.CANCELLED,
-      cancelledAt: new Date(),
+      cancelledAt: now,
       cancelledByAccountId: input.decidedByAccountId,
       cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
     },
   });
-  await transaction.subscription.update({
-    where: { id: input.subscriptionId },
-    data: { remainingClassAllowance: { increment: cancelled.count } },
-  });
+  for (const booking of inside) {
+    await restoreBookedClass(transaction, {
+      bookingId: booking.id,
+      subscriptionId: input.subscriptionId,
+      clientId: input.clientId,
+      now,
+    });
+  }
   return cancelled.count;
 };
 
