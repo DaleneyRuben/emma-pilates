@@ -63,6 +63,12 @@ export const cancelBookingsInsideFreeze = async (
       booking.session.startsAt.getTime() > input.decidedAt.getTime(),
   );
   if (inside.length === 0) return 0;
+  // The state check requires cancelled_at >= created_at. The clock that
+  // booked the class can sit after the clock that approves the Freeze.
+  const cancelledAt = await cancellationInstant(transaction, {
+    bookingIds: inside.map((booking) => booking.id),
+    decidedAt: input.decidedAt,
+  });
   const cancelled = await transaction.booking.updateMany({
     where: {
       id: { in: inside.map((booking) => booking.id) },
@@ -70,7 +76,7 @@ export const cancelBookingsInsideFreeze = async (
     },
     data: {
       state: BookingState.CANCELLED,
-      cancelledAt: input.decidedAt,
+      cancelledAt,
       cancelledByAccountId: input.decidedByAccountId,
       cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
     },
@@ -109,15 +115,48 @@ export const closeWaitlistInsideFreeze = async (
     onFreezeDate(entry.session.startsAt, input.startsOn, input.endsOn),
   );
   if (inside.length === 0) return 0;
+  const closedAt = await closureInstant(transaction, {
+    entryIds: inside.map((entry) => entry.id),
+    decidedAt: input.decidedAt,
+  });
   const closed = await transaction.waitlistEntry.updateMany({
     where: { id: { in: inside.map((entry) => entry.id) }, closedAt: null },
     data: {
-      closedAt: input.decidedAt,
+      closedAt,
       closureReason: WaitlistClosureReason.SESSION_CANCELLED,
     },
   });
   return closed.count;
 };
+
+// The row checks require the end instant to be at or after the row was
+// written. A walk clock and the approval clock are not the same clock.
+const cancellationInstant = async (
+  transaction: Transaction,
+  input: { bookingIds: string[]; decidedAt: Date },
+): Promise<Date> => {
+  const latest = await transaction.booking.aggregate({
+    where: { id: { in: input.bookingIds } },
+    _max: { createdAt: true },
+  });
+  return laterOf(input.decidedAt, latest._max.createdAt);
+};
+
+const closureInstant = async (
+  transaction: Transaction,
+  input: { entryIds: string[]; decidedAt: Date },
+): Promise<Date> => {
+  const latest = await transaction.waitlistEntry.aggregate({
+    where: { id: { in: input.entryIds } },
+    _max: { joinedAt: true },
+  });
+  return laterOf(input.decidedAt, latest._max.joinedAt);
+};
+
+const laterOf = (decidedAt: Date, writtenAt: Date | null): Date =>
+  writtenAt !== null && writtenAt.getTime() > decidedAt.getTime()
+    ? writtenAt
+    : decidedAt;
 
 const writeAudit = (
   transaction: Transaction,

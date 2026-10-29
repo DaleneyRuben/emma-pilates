@@ -170,7 +170,10 @@ describe("AW29 Revisar pago on a desktop browser", () => {
       ...handlers(() =>
         jsonResponse(
           reviewOf(sofiaPayment, {
-            receipt: { mediaType: "image/jpeg" },
+            receipt: {
+              imageAssetId: "11111111-1111-4111-8111-111111111111",
+              mediaType: "image/jpeg",
+            },
             receiptUrl: null,
           }),
         ),
