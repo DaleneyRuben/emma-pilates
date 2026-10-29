@@ -206,4 +206,74 @@ describe('guest pass rebook and reward landing', () => {
       }),
     ).resolves.toEqual({ rewardOwed: true, rewardSubscriptionId: null });
   });
+
+  it('keeps an owed reward off the host guest pass when her next plan is that pass', async () => {
+    const host = await prisma.client.create({
+      data: {
+        name: 'Anfitriona que cobra',
+        referralCode: `REF-${randomUUID()}`,
+      },
+    });
+    const author = await prisma.account.findFirstOrThrow({
+      where: { email: 'emma.vargas@example.com', deletedAt: null },
+      select: { id: true },
+    });
+    const friend = await prisma.client.create({
+      data: { name: 'Amiga ya compró', referralCode: `REF-${randomUUID()}` },
+    });
+    await prisma.$transaction((transaction) =>
+      openGuestPass(transaction, {
+        hostClientId: host.id,
+        friendClientId: friend.id,
+        authorAccountId: author.id,
+        now,
+      }),
+    );
+    await prisma.guestPass.updateMany({
+      where: { friendClientId: friend.id, deletedAt: null },
+      data: { rewardOwed: true },
+    });
+
+    const inviter = await prisma.client.create({
+      data: { name: 'Quien la invita', referralCode: `REF-${randomUUID()}` },
+    });
+    const opened = await prisma.$transaction((transaction) =>
+      openGuestPass(transaction, {
+        hostClientId: inviter.id,
+        friendClientId: host.id,
+        authorAccountId: author.id,
+        now,
+      }),
+    );
+    // The pass is not the Subscription the class waits for. Her own cash plan
+    // is the next one, and that one collects it.
+    await prisma.subscription.updateMany({
+      where: { clientId: host.id, state: 'ACTIVE' },
+      data: { state: 'EXPIRED', expiredAt: now },
+    });
+    await pay(host.id);
+
+    const landed = await prisma.guestPass.findFirstOrThrow({
+      where: { id: opened.id },
+      select: { courtesySubscriptionId: true },
+    });
+    await expect(
+      prisma.allowanceAdjustment.count({
+        where: {
+          subscriptionId: landed.courtesySubscriptionId,
+          reason: 'INVITE_CONVERTED',
+          deletedAt: null,
+        },
+      }),
+    ).resolves.toBe(0);
+    const collected = await prisma.guestPass.findFirstOrThrow({
+      where: { friendClientId: friend.id, deletedAt: null },
+      select: { rewardOwed: true, rewardSubscriptionId: true },
+    });
+    expect(collected.rewardOwed).toBe(false);
+    expect(collected.rewardSubscriptionId).not.toBe(
+      landed.courtesySubscriptionId,
+    );
+    expect(collected.rewardSubscriptionId).toEqual(expect.any(String));
+  });
 });

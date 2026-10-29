@@ -43,8 +43,10 @@ const sharedContextSlices = [
   'booking/acquisition/acquisition-errors',
   'booking/acquisition/record-client-acquisition',
   // Registration opens the friend's Guest Pass in the same transaction
-  // (BKM-014).
+  // (BKM-014). Verification and invitation activation call the same command
+  // through the slice that finds the referrer.
   'booking/payments/open-guest-pass',
+  'booking/payments/open-verified-guest-pass',
   // Finanzas asks Booking for the month's Nutritionist cost (ADR-0103).
   'booking/evaluations/nutritionist-cost',
   // Staff management creates, reissues, and disables the Staff Member's
