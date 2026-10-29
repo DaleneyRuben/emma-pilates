@@ -1,4 +1,5 @@
 import {
+  attachEvaluationReceipt,
   cancelEvaluation,
   getListEvaluationSlotsQueryKey,
   getListEvaluationsQueryKey,
@@ -29,6 +30,8 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { pickReceipt } from "../payments/receipt-upload";
+import { idempotency, uploadImage } from "../uploads/image-upload";
 import {
   boliviaMonth,
   clockTime,
@@ -62,10 +65,12 @@ function UpcomingCard({
   evaluation,
   highlighted,
   onCancel,
+  onAttachReceipt,
 }: {
   evaluation: ClientEvaluationDto;
   highlighted: boolean;
   onCancel: () => void;
+  onAttachReceipt: () => void;
 }) {
   // The server's flag is a snapshot; the 3-hour limit is judged again when the card appears.
   const shownAt = useMountedAt();
@@ -83,6 +88,20 @@ function UpcomingCard({
         <BodyText style={styles.muted}>
           {`${evaluation.nutritionistName} · Sucursal ${evaluation.branchName}`}
         </BodyText>
+        {!evaluation.included && evaluation.receiptAttached === false ? (
+          <Pressable
+            accessibilityLabel="Sube tu comprobante de transferencia"
+            accessibilityRole="button"
+            hitSlop={spacing.sm}
+            onPress={onAttachReceipt}
+            style={styles.cancel}
+          >
+            <Text style={styles.attachText}>Sube tu comprobante de transferencia</Text>
+          </Pressable>
+        ) : null}
+        {!evaluation.included && evaluation.receiptAttached === true ? (
+          <BodyText style={styles.muted}>Comprobante listo.</BodyText>
+        ) : null}
         {cancellable ? (
           <>
             <BodyText style={styles.muted}>Puedes cancelar hasta 3 horas antes.</BodyText>
@@ -117,12 +136,38 @@ export function MyEvaluationsScreen({
   );
   const [cancelling, setCancelling] = useState<ClientEvaluationDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  const [receiptReady, setReceiptReady] = useState<Record<string, true>>({});
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const upcoming = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const past = useListEvaluations({ scope: "past" }, queryOptions);
   const queryKeys = [getListEvaluationsQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
+
+  const attachReceipt = async (evaluation: ClientEvaluationDto) => {
+    setFailure(null);
+    try {
+      const picked = await pickReceipt();
+      if (picked === null) return;
+      const imageAssetId = await uploadImage(picked, "transfer_receipt", fetcher);
+      const attached = await attachEvaluationReceipt(
+        evaluation.id,
+        { imageAssetId },
+        idempotency(),
+        fetcher,
+      );
+      if (attached.status !== 204) {
+        setFailure("No pudimos adjuntar el comprobante. Inténtalo de nuevo.");
+        return;
+      }
+      setReceiptReady((current) => ({ ...current, [evaluation.id]: true }));
+      await queryClient.invalidateQueries({
+        queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
+      });
+    } catch {
+      setFailure("No pudimos adjuntar el comprobante. Inténtalo de nuevo.");
+    }
+  };
 
   const confirmCancel = async () => {
     if (cancelling === null) return;
@@ -210,9 +255,14 @@ export function MyEvaluationsScreen({
             <Text style={styles.label}>{items.length === 1 ? "Próxima" : "Próximas"}</Text>
             {items.map((evaluation) => (
               <UpcomingCard
-                evaluation={evaluation}
+                evaluation={{
+                  ...evaluation,
+                  receiptAttached:
+                    receiptReady[evaluation.id] === true || evaluation.receiptAttached === true,
+                }}
                 highlighted={confirmed?.id === evaluation.id}
                 key={evaluation.id}
+                onAttachReceipt={() => void attachReceipt(evaluation)}
                 onCancel={() => setCancelling(evaluation)}
               />
             ))}
@@ -269,6 +319,7 @@ const styles = StyleSheet.create({
   },
   badgeDay: { color: colors.primaryOnTint, fontSize: typography.bodyLarge, fontWeight: "600" },
   badgeMonth: { color: colors.primaryOnTint, fontSize: typography.label },
+  attachText: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
   cancel: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center" },
   cancelText: { color: colors.errorText, fontSize: typography.body, fontWeight: "500" },
   card: {

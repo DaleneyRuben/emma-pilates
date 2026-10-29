@@ -44,6 +44,7 @@ import {
   evaluationCancelledNotice,
   evaluationReminderNotice,
 } from './evaluation-notifications';
+import { toClientEvaluationView } from './client-evaluation-view';
 import { evaluationOffer } from './evaluation-offer';
 import {
   releaseExpiredEvaluationHolds as releaseHolds,
@@ -51,7 +52,6 @@ import {
 } from './evaluation-payment';
 import {
   assertBlockValues,
-  cancellableUntil,
   dueReminders,
   evaluationSlotMinutes,
   isEvaluationBookable,
@@ -130,6 +130,7 @@ export type ClientEvaluationView = {
   included: boolean;
   priceCentavos: number;
   paymentId: string | null;
+  receiptAttached: boolean;
   state: 'booked' | 'cancelled' | 'no_show';
   startsAt: Date;
   endsAt: Date;
@@ -277,11 +278,13 @@ const evaluationSelect = {
   state: true,
   evaluationSlotId: true,
   paymentId: true,
-  payment: { select: { amountDueCentavos: true, state: true } },
+  payment: {
+    select: { amountDueCentavos: true, state: true, receiptImageAssetId: true },
+  },
   slot: { select: slotSelect },
 } as const;
 
-type EvaluationRow = Prisma.EvaluationGetPayload<{
+export type ClientEvaluationRow = Prisma.EvaluationGetPayload<{
   select: typeof evaluationSelect;
 }>;
 
@@ -870,36 +873,6 @@ export const createPrismaEvaluationCommands = (
     bookable,
     included: offer.included,
     priceCentavos: offer.priceCentavos,
-  });
-
-  const toClientEvaluationView = (
-    row: EvaluationRow,
-    now: Date,
-  ): ClientEvaluationView => ({
-    id: row.id,
-    slotId: row.evaluationSlotId,
-    included: row.paymentId === null,
-    priceCentavos:
-      row.payment?.state === 'CONFIRMED' || row.payment?.state === 'PENDING'
-        ? row.payment.amountDueCentavos
-        : 0,
-    paymentId: row.paymentId,
-    state:
-      row.state === EvaluationState.BOOKED
-        ? 'booked'
-        : row.state === EvaluationState.NO_SHOW
-          ? 'no_show'
-          : 'cancelled',
-    startsAt: row.slot.startsAt,
-    endsAt: row.slot.endsAt,
-    durationMinutes: evaluationSlotMinutes,
-    branchId: row.slot.branchId,
-    branchName: row.slot.branch.name,
-    nutritionistName: row.slot.nutritionist.name,
-    cancellableUntil: cancellableUntil(row.slot.startsAt),
-    cancellable:
-      row.state === EvaluationState.BOOKED &&
-      isEvaluationBookable(row.slot.startsAt, now),
   });
 
   const studioPrice = async (database: Database) => {

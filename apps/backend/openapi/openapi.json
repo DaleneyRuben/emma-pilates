@@ -14635,6 +14635,10 @@
             "format": "uuid",
             "nullable": true
           },
+          "receiptAttached": {
+            "type": "boolean",
+            "description": "A paid Evaluation still needs its transfer receipt. Older builds ignore it."
+          },
           "state": {
             "type": "string",
             "enum": [
@@ -14680,6 +14684,7 @@
           "included",
           "priceCentavos",
           "paymentId",
+          "receiptAttached",
           "state",
           "startsAt",
           "endsAt",

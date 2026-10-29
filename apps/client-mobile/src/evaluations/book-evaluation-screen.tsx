@@ -90,6 +90,7 @@ export function BookEvaluationScreen({
     if (!slot.included && receipt === null) return;
     setSubmitting(true);
     setMessage(null);
+    let booked = false;
     try {
       const book = slot.included ? bookEvaluation : bookPaidEvaluation;
       const response = await book(
@@ -97,6 +98,15 @@ export function BookEvaluationScreen({
         { headers: { "idempotency-key": idempotencyKey.current } },
         fetcher,
       );
+      if (response.status === 201) {
+        booked = true;
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: getListEvaluationSlotsQueryKey() }),
+          queryClient.invalidateQueries({
+            queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
+          }),
+        ]);
+      }
       if (response.status === 201 && !slot.included && receipt !== null) {
         const attached = await attachEvaluationReceipt(
           response.data.id,
@@ -110,19 +120,17 @@ export function BookEvaluationScreen({
         }
       }
       if (response.status === 201) {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: getListEvaluationSlotsQueryKey() }),
-          queryClient.invalidateQueries({
-            queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
-          }),
-        ]);
         offerPushPermission();
         navigation.navigate("MyEvaluations", { confirmed: response.data });
         return;
       }
       setMessage(problemMessage(response.data));
     } catch {
-      setMessage("No pudimos reservar la evaluación. Inténtalo de nuevo.");
+      setMessage(
+        booked
+          ? "Reservamos la evaluación, pero no pudimos adjuntar el comprobante."
+          : "No pudimos reservar la evaluación. Inténtalo de nuevo.",
+      );
     } finally {
       setSubmitting(false);
     }

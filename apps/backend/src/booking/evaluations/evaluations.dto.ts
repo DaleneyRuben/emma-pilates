@@ -104,6 +104,12 @@ export class ClientEvaluationDto {
   @ApiProperty({ type: String, format: 'uuid', nullable: true })
   paymentId!: string | null;
 
+  @ApiProperty({
+    description:
+      'A paid Evaluation still needs its transfer receipt. Older builds ignore it.',
+  })
+  receiptAttached!: boolean;
+
   @ApiProperty({ enum: ['booked', 'cancelled', 'no_show'] })
   state!: 'booked' | 'cancelled' | 'no_show';
 
