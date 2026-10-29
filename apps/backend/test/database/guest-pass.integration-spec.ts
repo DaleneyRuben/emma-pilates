@@ -106,7 +106,7 @@ describe('guest pass reward', () => {
 
     await invite(await friend());
     await expect(invite(await friend())).rejects.toThrow(
-      /guest_pass_monthly_limit|one friend a month/,
+      'A host invites one friend each calendar month',
     );
   });
 
