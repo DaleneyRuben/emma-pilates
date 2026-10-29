@@ -974,7 +974,7 @@ Evidence (BKM-012, 2026-10-23, branch `feature/bkm-012-freeze`, stacked on `feat
 
 Decisions taken:
 
-- A Freeze is once per Subscription. A refused request still counts, so a second ask is `freeze_not_allowed`.
+- A Freeze is once per Subscription. Once counts a requested or an approved Freeze. A refusal does not spend it (owner decision 2026-10-29).
 - Inclusive days: the start and the end both count. Ten days is `2026-11-01` through `2026-11-10`.
 - A start in the past is compared as a Bolivia civil date, not as a UTC timestamp.
 - `freeze_not_allowed` answers `409` with «Este plan no se puede congelar.» `booking_during_freeze` answers `409` with «Tu plan está congelado hasta el {fecha}.» Clients branch on the code.
@@ -1018,7 +1018,7 @@ Evidence (FIX-006, 2026-10-28, branch `fix/fix-006-freeze`, from `main` at `0623
 
 Decisions taken:
 
-- A late approval is refused, not trimmed to today. The decisions document says the Freeze never starts in the past, and silently dropping past days would still cancel classes already taught. The code is `freeze_start_in_past`. The desk copy says to refuse it and that this Plan does not freeze: a refused row still holds the one Freeze per Subscription, so asking again answers `freeze_not_allowed`.
+- A late approval is refused, not trimmed to today. The decisions document says the Freeze never starts in the past, and silently dropping past days would still cancel classes already taught. The code is `freeze_start_in_past`. The desk copy says to refuse it and ask again from today. A refused Freeze does not spend the one Freeze (owner decision 2026-10-29).
 - A window that would overlap a queued renewal is `freeze_outside_term`, not `freeze_not_allowed`, so the Client can tell it from a Plan that cannot freeze.
 - A second approval is `freeze_already_decided`. The claim is an update where the state is still `REQUESTED`, inside a Serializable transaction.
 - Waitlist entries closed by a Freeze use `session_cancelled`. That closure names no Account, which is what the existing check allows. No new closure reason and no migration.
@@ -1033,7 +1033,7 @@ Verified:
 Open:
 
 - Promotion during a Freeze is covered by the unit test and by closing the entry on approval. An integration case that reopens the entry and frees a seat was not kept: writing the cancelled state by hand broke `bookings_state_fields_check`.
-- A freeze request that the plan cannot take answers `409` `freeze_not_allowed`, including a past start and a window outside the term (`82dae4c3`, `3259cc2d`). The approval of a start that is already today still keeps that morning's class and still extends the plan. A refused freeze still uses the one freeze; that point waits for the owner.
+- A freeze request that the plan cannot take answers `409` `freeze_not_allowed`, including a past start and a window outside the term (`82dae4c3`, `3259cc2d`). The approval of a start that is already today still keeps that morning's class and still extends the plan. A refused freeze does not use the one freeze (`d19426e4` red, green follows). The desk copy is «El congelamiento ya empezó. Recházalo y pide uno desde hoy.»
 
 #### BKM-014 · Invita a una amiga
 

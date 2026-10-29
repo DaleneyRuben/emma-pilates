@@ -35,6 +35,12 @@ describe('decideFreezeRequest', () => {
 
     expect(
       decideFreezeRequest({ ...allowed, existingRequest: 'refused' }).allowed,
+    ).toBe(true);
+    expect(
+      decideFreezeRequest({ ...allowed, existingRequest: 'requested' }).allowed,
+    ).toBe(false);
+    expect(
+      decideFreezeRequest({ ...allowed, existingRequest: 'approved' }).allowed,
     ).toBe(false);
     expect(decideFreezeRequest({ ...allowed, durationDays: 60 }).allowed).toBe(
       false,

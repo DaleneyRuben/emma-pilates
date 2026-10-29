@@ -42,7 +42,7 @@ function DecisionCell({
       ? "No puedes decidir un congelamiento."
       : mutation.error instanceof ApiError &&
           mutation.error.code === "freeze_start_in_past"
-        ? "El congelamiento ya empezó. Recházalo. Este plan no se congela."
+        ? "El congelamiento ya empezó. Recházalo y pide uno desde hoy."
         : mutation.error instanceof ApiError &&
             mutation.error.code === "freeze_already_decided"
           ? "Este congelamiento ya fue decidido."
