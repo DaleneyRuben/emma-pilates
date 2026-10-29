@@ -219,6 +219,71 @@ describe('freeze', () => {
     ).resolves.toMatchObject({ remainingClassAllowance: before });
   });
 
+  it('returns an extra funded class to its pool when the freeze is approved', async () => {
+    const client = await world.newClient('Clase extra congelada');
+    const sale = await cash(client.clientId, quarterly.id);
+    const subscription = await prisma.subscription.findFirstOrThrow({
+      where: { paymentId: sale.id },
+    });
+    await prisma.subscription.update({
+      where: { id: subscription.id },
+      data: { remainingClassAllowance: 0 },
+    });
+    const author = await prisma.account.findFirstOrThrow({
+      where: { email: 'paola.mendoza@example.com' },
+      select: { id: true },
+    });
+    await prisma.allowanceAdjustment.create({
+      data: {
+        subscriptionId: subscription.id,
+        clientId: client.clientId,
+        classes: 1,
+        reason: 'GIFT_NEW_CLIENT',
+        authorAccountId: author.id,
+        createdAt: now,
+      },
+    });
+    const session = await prisma.session.findFirstOrThrow({
+      where: {
+        startsAt: { gte: new Date('2026-10-01'), lt: new Date('2026-10-11') },
+      },
+    });
+    const bookings = new PrismaBookingCommands(
+      prisma,
+      () => new Date('2026-09-21T15:00:00.000Z'),
+    );
+    const booking = await bookings.create({ sessionId: session.id }, client);
+    const commands = createPrismaPaymentCommands(prisma, {
+      now: () => new Date('2026-09-22T15:00:00.000Z'),
+    });
+    const requested = await commands.requestFreeze(
+      {
+        subscriptionId: subscription.id,
+        startsOn: '2026-10-01',
+        endsOn: '2026-10-10',
+        reason: 'Viaje',
+      },
+      client,
+    );
+    await commands.decideFreeze(
+      { freezeId: requested.id, decision: 'approved' },
+      await world.staffPrincipal('paola.mendoza@example.com'),
+    );
+
+    await expect(
+      prisma.subscription.findUniqueOrThrow({ where: { id: subscription.id } }),
+    ).resolves.toMatchObject({ remainingClassAllowance: 0 });
+    await expect(
+      prisma.allowanceAdjustment.count({
+        where: {
+          bookingId: booking.id,
+          reason: 'CONSUMPTION',
+          deletedAt: null,
+        },
+      }),
+    ).resolves.toBe(0);
+  });
+
   it('refuses a Booking during the Freeze with its own code', async () => {
     const client = await world.newClient('Bloqueada');
     const sale = await cash(client.clientId, quarterly.id);
