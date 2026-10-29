@@ -173,6 +173,32 @@ describe('closing a Client Account with Payments and Credit (PostgreSQL)', () =>
     ).resolves.toBe(0);
   });
 
+  it('releases the founder reservation when the open intent expires with the Account', async () => {
+    const ana = await world.newClient('Ana Fundadora', { subscription: false });
+    const chosen = await plan();
+    await payments().createPurchaseIntent(
+      { planId: chosen.id },
+      ana.principal,
+      randomUUID(),
+    );
+    await expect(
+      world.prisma.founderMembership.findFirst({
+        where: { clientId: ana.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({ status: 'RESERVED' });
+
+    await closure().close(
+      { clientId: ana.clientId, password: closurePassword },
+      ana.principal,
+    );
+
+    await expect(
+      world.prisma.founderMembership.findFirst({
+        where: { clientId: ana.clientId, deletedAt: null },
+      }),
+    ).resolves.toBeNull();
+  });
+
   it('forfeits nothing and writes no ledger entry even when an old Credit balance remains (PAY-005)', async () => {
     const ana = await world.newClient('Ana Justiniano');
     await awardCredit(ana);
