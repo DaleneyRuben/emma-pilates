@@ -54,7 +54,7 @@ export const decideFreezeRequest = (
     return refused('freeze_not_allowed');
   }
   if (facts.startsOn.getTime() < today.getTime()) {
-    return refused('freeze_start_in_past');
+    return refused('freeze_not_allowed');
   }
   const extensionReachesRenewal =
     facts.renewalStartsOn !== undefined &&
@@ -67,7 +67,7 @@ export const decideFreezeRequest = (
     facts.endsOnRequest.getTime() > facts.endsOn.getTime() ||
     extensionReachesRenewal
   ) {
-    return refused('freeze_outside_term');
+    return refused('freeze_not_allowed');
   }
   return {
     allowed: true,

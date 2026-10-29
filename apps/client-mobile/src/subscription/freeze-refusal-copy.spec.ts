@@ -6,10 +6,7 @@ describe("freeze request failure", () => {
       "Este plan no se puede congelar.",
     );
     expect(freezeRequestFailure({ code: "freeze_start_in_past" })).toBe(
-      "Elige una fecha de hoy en adelante.",
-    );
-    expect(freezeRequestFailure({ code: "freeze_outside_term" })).toBe(
-      "Esas fechas quedan fuera de tu plan.",
+      "Este plan no se puede congelar.",
     );
     expect(freezeRequestFailure({ code: "invalid_civil_date" })).toBe(
       "Esas fechas no son válidas.",

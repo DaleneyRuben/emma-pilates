@@ -63,7 +63,6 @@ export const cancelBookingsInsideFreeze = async (
       booking.session.startsAt.getTime() > input.decidedAt.getTime(),
   );
   if (inside.length === 0) return 0;
-  const now = new Date();
   const cancelled = await transaction.booking.updateMany({
     where: {
       id: { in: inside.map((booking) => booking.id) },
@@ -71,7 +70,7 @@ export const cancelBookingsInsideFreeze = async (
     },
     data: {
       state: BookingState.CANCELLED,
-      cancelledAt: now,
+      cancelledAt: input.decidedAt,
       cancelledByAccountId: input.decidedByAccountId,
       cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
     },
@@ -81,7 +80,7 @@ export const cancelBookingsInsideFreeze = async (
       bookingId: booking.id,
       subscriptionId: input.subscriptionId,
       clientId: input.clientId,
-      now,
+      now: input.decidedAt,
     });
   }
   return cancelled.count;
@@ -95,6 +94,7 @@ export const closeWaitlistInsideFreeze = async (
     clientId: string;
     startsOn: Date;
     endsOn: Date;
+    decidedAt: Date;
   },
 ): Promise<number> => {
   const entries = await transaction.waitlistEntry.findMany({
@@ -112,7 +112,7 @@ export const closeWaitlistInsideFreeze = async (
   const closed = await transaction.waitlistEntry.updateMany({
     where: { id: { in: inside.map((entry) => entry.id) }, closedAt: null },
     data: {
-      closedAt: new Date(),
+      closedAt: input.decidedAt,
       closureReason: WaitlistClosureReason.SESSION_CANCELLED,
     },
   });
@@ -205,6 +205,7 @@ export const approveFreeze = async (
     clientId: row.clientId,
     startsOn: row.startsOn,
     endsOn: row.endsOn,
+    decidedAt: input.decidedAt,
   });
   const auditRecordId = await writeAudit(transaction, {
     actionCode: 'freeze.approved',

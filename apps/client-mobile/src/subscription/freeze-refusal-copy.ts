@@ -1,7 +1,5 @@
 const freezeRefusalCopy: Record<string, string> = {
   freeze_not_allowed: "Este plan no se puede congelar.",
-  freeze_start_in_past: "Elige una fecha de hoy en adelante.",
-  freeze_outside_term: "Esas fechas quedan fuera de tu plan.",
   invalid_civil_date: "Esas fechas no son válidas.",
 };
 
