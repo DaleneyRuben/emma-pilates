@@ -1033,7 +1033,7 @@ Verified:
 Open:
 
 - Promotion during a Freeze is covered by the unit test and by closing the entry on approval. An integration case that reopens the entry and frees a seat was not kept: writing the cancelled state by hand broke `bookings_state_fields_check`.
-- The Client app still shows `freeze_start_in_past` as the generic send failure. The request form already refuses a past start before it is sent.
+- A freeze request that the plan cannot take answers `409` `freeze_not_allowed`, including a past start and a window outside the term (`82dae4c3`, `3259cc2d`). The approval of a start that is already today still keeps that morning's class and still extends the plan. A refused freeze still uses the one freeze; that point waits for the owner.
 
 #### BKM-014 · Invita a una amiga
 

@@ -7104,11 +7104,10 @@ A. **The request (12).** As a Client with **Trimestral 36 clases**, open
    request inside the current term is accepted and the screen says it is in
    review. A 30-day or 60-day Plan, a second request, or more than 15 days
    answers `409` `freeze_not_allowed` and «Este plan no se puede congelar.»
-   A start already in the past answers `409` `freeze_start_in_past` with the
-   same sentence. A window outside the current term, or one whose extension
-   would reach a queued renewal, answers `409` `freeze_outside_term`. A date
-   that is not a calendar day, such as `2026-02-31`, answers `400`
-   `invalid_civil_date`.
+   A start already in the past, a window outside the current term, and an
+   extension that would reach a queued renewal answer the same code and the
+   same sentence. A date that is not a calendar day, such as `2026-02-31`,
+   answers `400` `invalid_civil_date` and the same sentence.
 B. **The decision.** Paola opens **Back Office → Congelamientos**. The card
    names the Client, the Plan, the dates, and the reason, with **Aprobar**
    and **Rechazar**. Approving on or before the start moves the Subscription
