@@ -32,6 +32,8 @@ import {
   evaluatePurchaseEligibility,
   isSubscriptionEffective,
 } from './purchase-eligibility';
+import { loseFounderForGap } from './founder-gap';
+import { priceFounderSale } from './prisma-founder-membership';
 
 const hour = 60 * 60 * 1_000;
 const intentLifetime = 24 * hour;
@@ -182,10 +184,28 @@ export const createFrontDeskTransfer = (
               amountCentavos: entry.amountCentavos,
             })),
           );
+          await loseFounderForGap(transaction, {
+            clientId: command.clientId,
+            nextStart: allocated.startsOn,
+            today,
+            now,
+          });
+          const priced = await priceFounderSale(transaction, {
+            clientId: command.clientId,
+            classAllowance: plan!.classAllowance,
+            priceCentavos: plan!.priceCentavos,
+            creditAppliedCentavos: 0,
+            now,
+            courtesy: false,
+            hidden: plan!.hiddenAt !== null,
+            activate: false,
+          });
           const reserved = Math.min(
             credit.availableCentavos,
-            plan!.priceCentavos,
+            plan!.priceCentavos - priced.discountCentavos,
           );
+          const amountDueCentavos =
+            plan!.priceCentavos - priced.discountCentavos - reserved;
           const intent = await transaction.purchaseIntent.create({
             data: {
               clientId: command.clientId,
@@ -196,7 +216,9 @@ export const createFrontDeskTransfer = (
               classAllowanceSnapshot: plan!.classAllowance,
               planPriceCentavos: plan!.priceCentavos,
               creditReservedCentavos: reserved,
-              amountDueCentavos: plan!.priceCentavos - reserved,
+              discountCentavos: priced.discountCentavos,
+              discountReason: priced.discountReason,
+              amountDueCentavos,
               startsOn: allocated.startsOn,
               receiptImageAssetId: command.imageAssetId,
               state: PurchaseIntentState.SUBMITTED,
@@ -207,6 +229,17 @@ export const createFrontDeskTransfer = (
             },
             select: { id: true },
           });
+          if (priced.discountReason === 'founder') {
+            await transaction.founderMembership.updateMany({
+              where: {
+                clientId: command.clientId,
+                status: 'RESERVED',
+                deletedAt: null,
+                purchaseIntentId: null,
+              },
+              data: { purchaseIntentId: intent.id },
+            });
+          }
           if (reserved > 0) {
             const reservation = await transaction.creditReservation.create({
               data: {
@@ -249,7 +282,9 @@ export const createFrontDeskTransfer = (
               classAllowanceSnapshot: plan!.classAllowance,
               planPriceCentavos: plan!.priceCentavos,
               creditAppliedCentavos: reserved,
-              amountDueCentavos: plan!.priceCentavos - reserved,
+              discountCentavos: priced.discountCentavos,
+              discountReason: priced.discountReason,
+              amountDueCentavos,
               startsOn: allocated.startsOn,
               method: PaymentMethod.TRANSFER,
               state: PaymentState.PENDING,
@@ -297,7 +332,7 @@ export const createFrontDeskTransfer = (
               metadata: {
                 clientId: command.clientId,
                 method: 'transfer',
-                amountDueCentavos: plan!.priceCentavos - reserved,
+                amountDueCentavos,
               },
             },
           });

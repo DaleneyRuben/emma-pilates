@@ -97,7 +97,7 @@ const renewalDeadline = async (
 ): Promise<string | null> => {
   const founder = await dependencies.readFounderRenewal?.(clientId);
   if (founder == null) return null;
-  return new Date(realEnd.getTime() + founder.gapDays * dayMilliseconds)
+  return new Date(realEnd.getTime() + (founder.gapDays + 1) * dayMilliseconds)
     .toISOString()
     .slice(0, 10);
 };

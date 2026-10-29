@@ -22,7 +22,7 @@ describe('endLapsedFounderMemberships', () => {
             clientId: 'client-1',
             accountId: 'account-1',
             number: 4,
-            latestRealEnd: new Date('2026-10-15T00:00:00.000Z'),
+            latestRealEnd: new Date('2026-10-14T00:00:00.000Z'),
             nextStart: null,
           },
         ]),

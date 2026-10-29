@@ -1,6 +1,7 @@
 enum FounderMembershipStatus {
-  ACTIVE @map("active")
-  LOST   @map("lost")
+  ACTIVE   @map("active")
+  LOST     @map("lost")
+  RESERVED @map("reserved")
 
   @@schema("booking")
 }
@@ -59,22 +60,30 @@ model Client {
   @@schema("booking")
 }
 
-// BKM-010 / booking ADR-0008: one membership per Client, numbered 1–40 in
-// confirmation order. A lost membership stays; the number is never reused.
+// BKM-010 / booking ADR-0008: one live membership per Client. A place is
+// reserved when the sale is priced and becomes final at confirmation. A lost
+// or released row stays; the number is never reused. The unique client is
+// partial so a released reservation can be reserved again (FIX-001).
 model FounderMembership {
-  id         String                  @id @default(uuid()) @db.Uuid
-  clientId   String                  @unique @map("client_id") @db.Uuid
-  number     Int                     @unique @db.SmallInt
-  since      DateTime                @db.Timestamptz(3)
-  status     FounderMembershipStatus @default(ACTIVE)
-  reason     String?
-  lostAt     DateTime?               @map("lost_at") @db.Timestamptz(3)
-  createdAt  DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt  DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
-  deletedAt  DateTime?               @map("deleted_at") @db.Timestamptz(3)
-  client     Client                  @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  id               String                  @id @default(uuid()) @db.Uuid
+  clientId         String                  @unique @map("client_id") @db.Uuid
+  number           Int                     @unique @db.SmallInt
+  since            DateTime                @db.Timestamptz(3)
+  status           FounderMembershipStatus @default(ACTIVE)
+  reason           String?
+  lostAt           DateTime?               @map("lost_at") @db.Timestamptz(3)
+  purchaseIntentId String?                 @unique @map("purchase_intent_id") @db.Uuid
+  paymentId        String?                 @unique @map("payment_id") @db.Uuid
+  createdAt        DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt        DateTime?               @map("deleted_at") @db.Timestamptz(3)
+  client           Client                  @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  purchaseIntent   PurchaseIntent?         @relation(fields: [purchaseIntentId], references: [id], onDelete: Restrict)
+  payment          Payment?                @relation(fields: [paymentId], references: [id], onDelete: Restrict)
 
   @@index([status, number])
+  @@index([purchaseIntentId])
+  @@index([paymentId])
   @@map("founder_memberships")
   @@schema("booking")
 }

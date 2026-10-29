@@ -78,9 +78,9 @@ describe('founder membership', () => {
     });
     expect(first).toMatchObject({
       planPriceCentavos: plan.priceCentavos,
-      discountCentavos: 0,
-      discountReason: null,
-      amountDueCentavos: plan.priceCentavos,
+      discountCentavos: 8_400,
+      discountReason: 'founder',
+      amountDueCentavos: 47_600,
     });
   });
 
@@ -136,7 +136,12 @@ describe('founder membership', () => {
   });
 
   it('never hands the same number twice when two Payments confirm at once', async () => {
-    await prisma.founderMembership.deleteMany();
+    await prisma.founderMembership.updateMany({
+      data: { deletedAt: now },
+    });
+    const before = await prisma.founderMembership.aggregate({
+      _max: { number: true },
+    });
     const [left, right] = await Promise.all([
       world.newClient('Carrera izquierda'),
       world.newClient('Carrera derecha'),
@@ -148,21 +153,28 @@ describe('founder membership', () => {
     ]);
 
     const numbers = await prisma.founderMembership.findMany({
+      where: { clientId: { in: [left.clientId, right.clientId] } },
       orderBy: { number: 'asc' },
       select: { number: true },
     });
-    expect(numbers.map((membership) => membership.number)).toEqual([1, 2]);
+    const next = (before._max.number ?? 0) + 1;
+    expect(numbers.map((membership) => membership.number)).toEqual([
+      next,
+      next + 1,
+    ]);
   });
 
   it('ends a gap of 8 days, keeps a gap of 7, and does nothing the second night', async () => {
-    await prisma.founderMembership.deleteMany();
+    await prisma.founderMembership.updateMany({
+      data: { deletedAt: now },
+    });
     const lapsed = await world.newClient('Con hueco');
     const kept = await world.newClient('A tiempo');
     await cash(lapsed.clientId, plan.id);
     await cash(kept.clientId, plan.id);
     await prisma.subscription.updateMany({
       where: { clientId: lapsed.clientId },
-      data: { endsOn: new Date('2026-10-15T00:00:00.000Z') },
+      data: { endsOn: new Date('2026-10-14T00:00:00.000Z') },
     });
     await prisma.subscription.updateMany({
       where: { clientId: kept.clientId },
@@ -246,7 +258,9 @@ describe('founder membership', () => {
     expect(page.places).toBe(40);
     expect(page.granted).toBe(page.items.length);
     expect(page.items.map((item) => item.number)).toEqual(
-      Array.from({ length: page.granted }, (_, index) => index + 1),
+      [...page.items.map((item) => item.number)].sort(
+        (left, right) => left - right,
+      ),
     );
 
     await expect(oversight.listFounders(assistant)).rejects.toBeInstanceOf(

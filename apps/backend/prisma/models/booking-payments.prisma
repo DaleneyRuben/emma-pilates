@@ -94,6 +94,7 @@ model PurchaseIntent {
   createdByAccount       Account             @relation("PurchaseIntentCreatedBy", fields: [createdByAccountId], references: [id], onDelete: Restrict)
   payment                Payment?
   creditReservation      CreditReservation?
+  founderMembership      FounderMembership?
 
   @@unique([id, clientId])
   @@unique([id, clientId, planId])
@@ -149,6 +150,7 @@ model Payment {
   evaluation             Evaluation?
   creditReservation      CreditReservation?
   qualifiedReferral      Referral?
+  founderMembership      FounderMembership?
   // PAY-007 (ADR-0012): the NIT or CI and the name or business name for the
   // invoice, both or neither («Sin factura»), and the «Factura emitida» mark.
   invoiceTaxId             String?   @map("invoice_tax_id")

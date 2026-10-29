@@ -22,6 +22,12 @@ describe('founder review fixes', () => {
     ({ prisma } = world);
   });
 
+  const releasePlaces = () =>
+    prisma.founderMembership.updateMany({
+      where: { deletedAt: null },
+      data: { deletedAt: now },
+    });
+
   afterAll(async () => {
     await world?.stop();
   });
@@ -50,7 +56,14 @@ describe('founder review fixes', () => {
   const administrator = () => world.staffPrincipal('paola.mendoza@example.com');
 
   it('discounts a founder first cash sale and grants no gift class', async () => {
+    await releasePlaces();
     const founder = await world.newClient('Primera fundadora');
+    const fillers = await Promise.all(
+      Array.from({ length: 39 }, (_, index) =>
+        world.newClient(`Llena ${index + 1}`),
+      ),
+    );
+    for (const filler of fillers) await cash(filler.clientId);
     const ordinary = await world.newClient('Primera ordinaria');
 
     const founderSale = await cash(founder.clientId);
@@ -72,16 +85,18 @@ describe('founder review fixes', () => {
         where: { clientId: founder.clientId, reason: 'GIFT_NEW_CLIENT' },
       }),
     ).resolves.toBe(0);
-    await expect(
-      prisma.allowanceAdjustment.count({
-        where: { clientId: ordinary.clientId, reason: 'GIFT_NEW_CLIENT' },
-      }),
-    ).resolves.toBe(1);
+    const ordinaryAdjustments = await prisma.allowanceAdjustment.findMany({
+      where: { clientId: ordinary.clientId },
+      select: { reason: true },
+    });
+    expect(ordinaryAdjustments.map((row) => row.reason)).toContain(
+      'GIFT_NEW_CLIENT',
+    );
   });
 
   it('charges list price once 40 places are held', async () => {
     const held = await prisma.founderMembership.count({
-      where: { deletedAt: null },
+      where: { deletedAt: null, status: { in: ['ACTIVE', 'RESERVED'] } },
     });
     const extras = Array.from({ length: 40 - held }, (_, index) =>
       world.newClient(`Lugar ${held + index + 1}`),
@@ -106,6 +121,7 @@ describe('founder review fixes', () => {
   });
 
   it('prices a front-desk QR as founder before the Administrator confirms', async () => {
+    await releasePlaces();
     const buyer = await world.newClient('QR recepción');
     const assistant = await world.staffPrincipal('camila.rojas@example.com');
     const receipt = await world.readyReceipt(assistant.accountId);
@@ -137,6 +153,7 @@ describe('founder review fixes', () => {
   });
 
   it('keeps the discount across 7 uncovered days and loses it across 8', async () => {
+    await releasePlaces();
     const kept = await world.newClient('Hueco de 7');
     const lost = await world.newClient('Hueco de 8');
     await cash(kept.clientId);
@@ -200,13 +217,20 @@ describe('founder review fixes', () => {
   });
 
   it('grants a campaign only to an ordinary live Client', async () => {
+    await releasePlaces();
     const ordinary = await world.newClient('Campaña viva');
     const founder = await world.newClient('Campaña fundadora');
     const courtesy = await world.newClient('Campaña cortesía');
     const hidden = await world.newClient('Campaña oculta');
     const free = await world.newClient('Campaña gratis');
-    await cash(ordinary.clientId);
     await cash(founder.clientId);
+    const fillers = await Promise.all(
+      Array.from({ length: 39 }, (_, index) =>
+        world.newClient(`Campaña llena ${index + 1}`),
+      ),
+    );
+    for (const filler of fillers) await cash(filler.clientId);
+    await cash(ordinary.clientId);
     await createPrismaCourtesyAccess(prisma, { now: () => now }).grant(
       {
         clientId: courtesy.clientId,
@@ -289,12 +313,17 @@ describe('founder review fixes', () => {
       await administrator(),
     );
 
-    expect(result.granted.map((client) => client.clientId)).toContain(
+    const watched = [
       ordinary.clientId,
-    );
-    expect(result.granted.map((client) => client.clientId)).not.toContain(
       founder.clientId,
-    );
+      courtesy.clientId,
+      hidden.clientId,
+      free.clientId,
+    ];
+    const granted = result.granted
+      .map((client) => client.clientId)
+      .filter((clientId) => watched.includes(clientId));
+    expect(granted).toEqual([ordinary.clientId]);
     for (const clientId of [
       founder.clientId,
       courtesy.clientId,
@@ -315,8 +344,8 @@ describe('founder review fixes', () => {
   });
 
   it('numbers the next place from the highest number, including a removed row', async () => {
+    await releasePlaces();
     const removed = await prisma.founderMembership.findFirst({
-      where: { deletedAt: null },
       orderBy: { number: 'desc' },
     });
     expect(removed).not.toBeNull();

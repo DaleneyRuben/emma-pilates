@@ -23,11 +23,13 @@ const addDays = (date: Date, days: number): Date =>
 // The real end is the stored end. A Freeze does not count as a gap; BKM-012
 // will pass the frozen days when it exists.
 const realEnd = (
-  subscriptions: { endsOn: Date; startsOn: Date }[],
+  subscriptions: { endsOn: Date; startsOn: Date; state: string }[],
   today: Date,
 ): { latestRealEnd: Date | null; nextStart: Date | null } => {
   const started = subscriptions.filter(
-    (subscription) => subscription.startsOn.getTime() <= today.getTime(),
+    (subscription) =>
+      subscription.startsOn.getTime() <= today.getTime() ||
+      subscription.state !== 'ACTIVE',
   );
   const latestRealEnd = started.reduce<Date | null>(
     (latest, subscription) =>
@@ -81,10 +83,12 @@ export const createFounderMembershipJob = (
                 account: { select: { id: true } },
                 subscriptions: {
                   where: {
-                    state: 'ACTIVE',
-                    payment: { method: { not: PaymentMethod.COURTESY } },
+                    payment: {
+                      state: { not: 'VOIDED' },
+                      method: { not: PaymentMethod.COURTESY },
+                    },
                   },
-                  select: { startsOn: true, endsOn: true },
+                  select: { startsOn: true, endsOn: true, state: true },
                 },
               },
             },

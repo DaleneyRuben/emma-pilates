@@ -202,9 +202,9 @@ export const createPrismaOversight = (
         clientName: row.client.name,
         since: row.since,
         status:
-          row.status === FounderMembershipStatus.ACTIVE
-            ? ('active' as const)
-            : ('lost' as const),
+          row.status === FounderMembershipStatus.LOST
+            ? ('lost' as const)
+            : ('active' as const),
       })),
       granted,
       places: settings?.founderPlaces ?? 40,

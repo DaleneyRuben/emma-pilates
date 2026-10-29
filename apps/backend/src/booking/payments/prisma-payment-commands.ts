@@ -82,10 +82,12 @@ import {
 
 import { grantGiftClass } from './allowance-adjustments';
 import { createFrontDeskTransfer } from './front-desk-transfer';
+import { loseFounderForGap } from './founder-gap';
 import {
-  grantFounderPlace,
+  confirmFounderPlace,
   priceFounderSale,
   readIsFounder,
+  releaseFounderReservation,
 } from './prisma-founder-membership';
 import {
   collectOwedInviteReward,
@@ -397,6 +399,7 @@ export function createPrismaPaymentCommands(
     payment: PaymentRow,
     principal: AuthenticatedPrincipal,
     now: Date,
+    founder: boolean,
   ): Promise<string> => {
     const term = subscriptionTermFor(
       payment.startsOn,
@@ -448,7 +451,7 @@ export function createPrismaPaymentCommands(
       method: paymentMethods[payment.method],
       hidden: payment.plan.hiddenAt !== null,
       priceCentavos: payment.planPriceCentavos,
-      founder: await readIsFounder(transaction, payment.clientId),
+      founder,
       earlierRealPayment: await hasEarlierRealPayment(transaction, {
         clientId: payment.clientId,
         paymentId: payment.id,
@@ -509,11 +512,21 @@ export function createPrismaPaymentCommands(
       today: eligible.today,
       active: eligible.active,
     });
+    await loseFounderForGap(transaction, {
+      clientId: input.clientId,
+      nextStart: allocated.startsOn,
+      today: eligible.today,
+      now,
+    });
     const priced = await priceFounderSale(transaction, {
       clientId: input.clientId,
       classAllowance: plan.classAllowance,
       priceCentavos: plan.priceCentavos,
       creditAppliedCentavos: 0,
+      now,
+      courtesy: false,
+      hidden: plan.hiddenAt !== null,
+      activate: true,
     });
 
     const payment = await transaction.payment.create({
@@ -542,6 +555,11 @@ export function createPrismaPaymentCommands(
       },
       select: paymentSelect,
     });
+    await confirmFounderPlace(transaction, {
+      clientId: input.clientId,
+      paymentId: payment.id,
+      now,
+    });
 
     if (
       allocated.subscriptionIdToEndEarly !== null &&
@@ -561,13 +579,8 @@ export function createPrismaPaymentCommands(
       payment,
       input.principal,
       now,
+      await readIsFounder(transaction, input.clientId),
     );
-    await grantFounderPlace(transaction, {
-      clientId: input.clientId,
-      paymentId: payment.id,
-      now,
-      courtesy: false,
-    });
     await recordPaymentAudit(transaction, {
       actionCode: 'payment.cash_confirmed',
       principal: input.principal,
@@ -684,11 +697,21 @@ export function createPrismaPaymentCommands(
               active: eligible.active,
             });
             const now = dependencies.now();
+            await loseFounderForGap(transaction, {
+              clientId,
+              nextStart: allocated.startsOn,
+              today: eligible.today,
+              now,
+            });
             const priced = await priceFounderSale(transaction, {
               clientId,
               classAllowance: plan.classAllowance,
               priceCentavos: plan.priceCentavos,
               creditAppliedCentavos: 0,
+              now,
+              courtesy: false,
+              hidden: plan.hiddenAt !== null,
+              activate: false,
             });
 
             const intent = await transaction.purchaseIntent.create({
@@ -713,7 +736,17 @@ export function createPrismaPaymentCommands(
               },
               select: { id: true },
             });
-
+            if (priced.discountReason === 'founder') {
+              await transaction.founderMembership.updateMany({
+                where: {
+                  clientId,
+                  status: 'RESERVED',
+                  deletedAt: null,
+                  purchaseIntentId: null,
+                },
+                data: { purchaseIntentId: intent.id },
+              });
+            }
             return { id: intent.id };
           },
         ),
@@ -939,6 +972,10 @@ export function createPrismaPaymentCommands(
           actor: { kind: CreditLedgerActorKind.WORKER, accountId: null },
           correlationId: id,
         });
+        await releaseFounderReservation(transaction, {
+          clientId: intent.clientId,
+          now,
+        });
         await scheduleReceiptDeletion(
           transaction,
           intent.receiptImageAssetId,
@@ -1075,18 +1112,18 @@ export function createPrismaPaymentCommands(
         },
         correlationId: payment.id,
       });
+      await confirmFounderPlace(transaction, {
+        clientId: payment.clientId,
+        paymentId: payment.id,
+        now,
+      });
       const subscriptionId = await activateSubscription(
         transaction,
         payment,
         principal,
         now,
+        await readIsFounder(transaction, payment.clientId),
       );
-      await grantFounderPlace(transaction, {
-        clientId: payment.clientId,
-        paymentId: payment.id,
-        now,
-        courtesy: false,
-      });
       await recordPaymentAudit(transaction, {
         actionCode: 'payment.transfer_confirmed',
         principal,
@@ -1161,6 +1198,10 @@ export function createPrismaPaymentCommands(
           accountId: principal.accountId,
         },
         correlationId: payment.id,
+      });
+      await releaseFounderReservation(transaction, {
+        clientId: payment.clientId,
+        now,
       });
       await recordPaymentAudit(transaction, {
         actionCode: 'payment.transfer_rejected',

@@ -70,6 +70,7 @@ describe('founder places', () => {
       decideFounderPlace({
         places: 40,
         assigned: 39,
+        nextNumber: 40,
         alreadyHeld: false,
         courtesy: false,
       }),
@@ -78,6 +79,7 @@ describe('founder places', () => {
       decideFounderPlace({
         places: 40,
         assigned: 40,
+        nextNumber: 41,
         alreadyHeld: false,
         courtesy: false,
       }),
@@ -89,6 +91,7 @@ describe('founder places', () => {
       decideFounderPlace({
         places: 40,
         assigned: 3,
+        nextNumber: 4,
         alreadyHeld: false,
         courtesy: true,
       }),
@@ -97,6 +100,7 @@ describe('founder places', () => {
       decideFounderPlace({
         places: 40,
         assigned: 3,
+        nextNumber: 4,
         alreadyHeld: true,
         courtesy: false,
       }),
@@ -187,7 +191,7 @@ describe('founder gap', () => {
 describe('founder renewal deadline', () => {
   it('is the real end plus the allowed gap', () => {
     expect(founderRenewalDeadline(civil('2026-10-23'), rules)).toEqual(
-      civil('2026-10-30'),
+      civil('2026-10-31'),
     );
   });
 });
