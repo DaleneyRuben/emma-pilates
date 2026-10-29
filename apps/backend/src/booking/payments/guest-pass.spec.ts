@@ -2,6 +2,7 @@ import {
   decideGuestPassBooking,
   decideInvitation,
   decideInviteReward,
+  isMonthlyInviteSpent,
 } from './guest-pass';
 
 // BKM-014, decisions §5.3: a Guest Pass is one free class in a lifetime, and
@@ -55,6 +56,15 @@ describe('decideInvitation', () => {
         invitesPerMonth: 1,
       }),
     ).toBeNull();
+  });
+
+  it('treats a changed monthly-limit sentence as the same refusal', () => {
+    expect(
+      isMonthlyInviteSpent({
+        code: 'guest_pass_monthly_limit',
+        message: 'The studio changed how it explains the monthly invite',
+      }),
+    ).toBe(true);
   });
 
   it('counts an invitation at 20:30 La Paz on the last day as this month', () => {

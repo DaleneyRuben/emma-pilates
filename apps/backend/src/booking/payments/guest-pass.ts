@@ -26,6 +26,16 @@ export const decideGuestPassBooking = (input: {
   return null;
 };
 
+// Verification must keep succeeding when the sentence changes. The code is
+// the contract; the sentence is not.
+export const isMonthlyInviteSpent = (error: {
+  code?: string;
+  message?: string;
+}): boolean =>
+  (error.message ?? '').includes(
+    'A host invites one friend each calendar month',
+  );
+
 export type InvitationDecision = {
   code: 'guest_pass_monthly_limit';
   detail: string;
