@@ -6,6 +6,10 @@ overrides:
   zod: 4.6.7
   multer: 2.5.0
   body-parser: 2.4.0
+  # GHSA-97r2-qh9m-474h, GHSA-wp97-x4hv-qvhp, GHSA-7rv5-mrxv-xcr9: seroval
+  # <=1.6.7 via @tanstack/router-core. 1.6.8 is published; the router still
+  # resolves 1.6.7, so the pin stays until a router release takes it.
+  seroval: 1.6.8
 
 allowBuilds:
   "@nestjs/core": true

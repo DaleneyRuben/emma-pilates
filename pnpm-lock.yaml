@@ -8,6 +8,7 @@ overrides:
   zod: 4.6.7
   multer: 2.5.0
   body-parser: 2.4.0
+  seroval: 1.6.8
 
 importers:
 
@@ -8750,8 +8751,8 @@ packages:
     peerDependencies:
       seroval: ^1.0
 
-  seroval@1.6.7:
-    resolution: {integrity: sha512-AeDcLh0yO2SFm9W71essgnSzLV9DI8ZH0x0knXn2DMnUZj728mpLbxjlbB6IqKCmqh8JA3cEqRyGoNkt584JcQ==}
+  seroval@1.6.8:
+    resolution: {integrity: sha512-HlSgSAkTk4EqHcje1ptJjfZi1YDv5KbhVJ/d3P7T/nAXua2VmDu+AKDX5VTdFfZf48nDkWB2TKYt0DrCSa+3wg==}
     engines: {node: '>=10'}
 
   serve-static@1.16.3:
@@ -13945,7 +13946,7 @@ snapshots:
     dependencies:
       '@tanstack/history': 1.162.4
       cookie-es: 3.1.1
-      seroval: 1.6.7
+      seroval: 1.6.8
       seroval-plugins: 1.6.7(seroval@1.6.7)
 
   '@tanstack/store@0.11.1': {}
@@ -19257,9 +19258,9 @@ snapshots:
 
   seroval-plugins@1.6.7(seroval@1.6.7):
     dependencies:
-      seroval: 1.6.7
+      seroval: 1.6.8
 
-  seroval@1.6.7: {}
+  seroval@1.6.8: {}
 
   serve-static@1.16.3(supports-color@8.1.1):
     dependencies:
