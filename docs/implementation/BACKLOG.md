@@ -497,6 +497,7 @@ wait for Google, Apple, and testers.
 | BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | done |
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
 | FIX-006 | P0 | Backend/admin web | Enforce the Freeze on the Waitlist and on Reschedule, and refuse a late approval | BKM-012 | 1 d | done |
+| FIX-003 | P0 | Backend/admin web/client app | Paid Evaluation payment lifecycle: reject and cancel settle the Payment, confirm audits and notifies, the receipt is visible, an exhausted Plan cannot buy one, cancelled Evaluations skip the Bs 50, AW28 names the sale and dates it by the decision, and a pending Evaluation Payment is not the current Plan Payment | NUT-003 | 1 d | done (`2cf368e4` red, `e834caac` green; evidence below) |
 
 #### Closed-test enablement
 
@@ -933,6 +934,31 @@ Open: the inbox card draws the message body and not the title («Tu primera
 semana» never appears; the push carries the title). The four titles need the
 owner's approval. A Client leaves the list as soon as she books, and a
 cancellation can put her back.
+
+#### FIX-003 · Paid Evaluation payment lifecycle
+
+Done on 2026-10-28, branch `fix/fix-003-paid-evaluations`. Red
+`2cf368e4`. Green `e834caac`. Migration
+`20261028120000_evaluation_payment_decision` (needs owner approval before a
+shared database): `payment_rejected`, a receipt on the Evaluation Payment,
+and an Administrator may reject that Payment.
+
+Verified: `paid-evaluation-lifecycle.integration-spec.ts` 8 failed before the
+fix and 8 passed after, on PostgreSQL 18 through
+`TEST_DATABASE_URL` on port 5433. `nutritionist-cost.spec.ts` failed, then
+passed. Admin CSV spec passed. ESLint clean on the staged backend, admin-web,
+and client files.
+
+Decisions: the Evaluation reject and confirm live in
+`evaluation-payment-decision.ts` so the oversized command files only call in.
+The receipt reuses `TRANSFER_RECEIPT` and lives on the Payment because an
+Evaluation transfer has no Purchase Intent. A pending Evaluation Payment does
+not block a Plan purchase and is not `GET /payments/current`. Cancelled
+Evaluations stay out of the Nutritionist cost. Follow-ups 216 and 217 stay
+pending; `design/` was not edited.
+
+Not verified: the admin web in a browser at 1440 and 420 px, and the Client
+receipt step on the iPhone, the iPad, and the Android emulator.
 
 #### NUT-003 · Nutritionist rules
 
