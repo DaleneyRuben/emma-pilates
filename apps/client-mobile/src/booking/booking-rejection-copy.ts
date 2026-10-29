@@ -11,6 +11,7 @@ const bookingRejections: Record<string, string> = {
   weekly_cap_reached: "Ya usaste tus clases de esta semana.",
   booking_before_start_date:
     "Tu plan todavía no empieza: podrás reservar desde su fecha de inicio.",
+  booking_during_freeze: "Tu plan está congelado en esa fecha.",
 };
 
 export function bookingRejectionMessage(code: string | undefined): string | null {
