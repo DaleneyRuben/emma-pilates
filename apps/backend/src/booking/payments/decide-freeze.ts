@@ -1,5 +1,6 @@
 import type { NewNotification } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { PaymentRuleError } from './payment-errors';
 
 export class FreezeAccessDeniedError extends Error {
   readonly code = 'freeze_access_denied';
@@ -14,7 +15,7 @@ type RequestedFreeze = {
   id: string;
   clientAccountId: string;
   subscriptionId: string;
-  state: 'requested';
+  state: 'requested' | 'approved' | 'refused';
   endsOn: Date;
 };
 
@@ -51,6 +52,12 @@ export const decideFreeze = async (
   requireAdministrator(dependencies.principal);
   const freeze = await dependencies.loadFreeze(command.freezeId);
   if (freeze === null) throw new FreezeAccessDeniedError();
+  if (freeze.state !== 'requested') {
+    throw new PaymentRuleError(
+      'freeze_already_decided',
+      'Este congelamiento ya fue decidido.',
+    );
+  }
   const decidedAt = dependencies.now();
   const input = {
     freezeId: freeze.id,

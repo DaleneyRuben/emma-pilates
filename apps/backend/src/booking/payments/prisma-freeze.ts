@@ -169,7 +169,6 @@ export const createFreezeCommands = (
               const row = await transaction.freeze.findFirst({
                 where: {
                   id: freezeId,
-                  state: FreezeState.REQUESTED,
                   deletedAt: null,
                 },
                 select: {
@@ -178,6 +177,7 @@ export const createFreezeCommands = (
                   clientId: true,
                   startsOn: true,
                   endsOn: true,
+                  state: true,
                   client: { select: { account: { select: { id: true } } } },
                 },
               });
@@ -186,7 +186,8 @@ export const createFreezeCommands = (
                 id: row.id,
                 clientAccountId: row.client.account.id,
                 subscriptionId: row.subscriptionId,
-                state: 'requested',
+                state: row.state.toLowerCase() as
+                  'requested' | 'approved' | 'refused',
                 endsOn: row.endsOn,
               };
             },
