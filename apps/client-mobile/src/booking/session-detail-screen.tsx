@@ -62,6 +62,8 @@ const bookingProblems: Record<string, string> = {
   no_eligible_subscription: "No te quedan clases en tu plan.",
   session_has_capacity: "La clase tiene cupos: puedes reservar directamente.",
   weekly_cap_reached: "Ya usaste tus clases de esta semana.",
+  guest_pass_last_place: "Un pase de invitada no puede tomar el último lugar.",
+  guest_pass_already_used: "Tu pase de invitada ya se usó.",
 };
 
 function problemMessage(body: unknown): string | null {

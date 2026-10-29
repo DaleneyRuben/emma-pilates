@@ -303,6 +303,22 @@ describe("Client Session detail", () => {
     });
   });
 
+  it.each([
+    ["guest_pass_last_place", "Un pase de invitada no puede tomar el último lugar."],
+    ["guest_pass_already_used", "Tu pase de invitada ya se usó."],
+  ])("names a refused guest pass booking by %s", async (code, message) => {
+    const { screen } = await openDetail({
+      "POST /api/v1/sessions/session-1/bookings": () =>
+        jsonResponse({ code, status: 409, title: "Conflict" }, 409),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+
+    await waitFor(() => {
+      expect(screen.getByText(message)).toBeOnTheScreen();
+    });
+  });
+
   it("explains a weekly cap refusal from the problem code", async () => {
     const { screen } = await openDetail({
       "POST /api/v1/sessions/session-1/bookings": () =>
