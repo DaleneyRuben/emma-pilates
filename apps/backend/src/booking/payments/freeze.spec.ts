@@ -77,7 +77,7 @@ describe('decideFreezeRequest bounds', () => {
         subscriptionStartsOn: civil('2026-09-22'),
         renewalStartsOn: null,
       }),
-    ).toEqual({ allowed: false, code: 'freeze_not_allowed' });
+    ).toEqual({ allowed: false, code: 'freeze_start_in_past' });
   });
 
   it('refuses a window outside the Subscription term', () => {
@@ -94,7 +94,7 @@ describe('decideFreezeRequest bounds', () => {
         subscriptionStartsOn: civil('2026-09-22'),
         renewalStartsOn: null,
       }),
-    ).toEqual({ allowed: false, code: 'freeze_not_allowed' });
+    ).toEqual({ allowed: false, code: 'freeze_outside_term' });
   });
 
   it('refuses a window that would overlap a queued renewal', () => {
@@ -111,7 +111,7 @@ describe('decideFreezeRequest bounds', () => {
         subscriptionStartsOn: civil('2026-09-22'),
         renewalStartsOn: civil('2026-11-21'),
       }),
-    ).toEqual({ allowed: false, code: 'freeze_not_allowed' });
+    ).toEqual({ allowed: false, code: 'freeze_outside_term' });
   });
 
   it('refuses a mid-term window whose extension would overlap a queued renewal', () => {
@@ -128,6 +128,6 @@ describe('decideFreezeRequest bounds', () => {
         subscriptionStartsOn: civil('2026-09-22'),
         renewalStartsOn: civil('2026-12-21'),
       }),
-    ).toEqual({ allowed: false, code: 'freeze_not_allowed' });
+    ).toEqual({ allowed: false, code: 'freeze_outside_term' });
   });
 });

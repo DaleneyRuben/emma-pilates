@@ -54,7 +54,9 @@ export const decideFreezeRequest = (
     return refused('freeze_not_allowed');
   }
   if (facts.startsOn.getTime() < today.getTime()) {
-    return refused('freeze_not_allowed');
+    // The approval path keeps the finer code. An installed build still
+    // understands it, and the request path maps it before answering.
+    return refused('freeze_start_in_past');
   }
   const extensionReachesRenewal =
     facts.renewalStartsOn !== undefined &&
@@ -67,7 +69,7 @@ export const decideFreezeRequest = (
     facts.endsOnRequest.getTime() > facts.endsOn.getTime() ||
     extensionReachesRenewal
   ) {
-    return refused('freeze_not_allowed');
+    return refused('freeze_outside_term');
   }
   return {
     allowed: true,
