@@ -238,6 +238,61 @@ describe('founder place release', () => {
     ).resolves.toBeNull();
   });
 
+  it('refuses a founder priced confirmation when the last place is gone', async () => {
+    await releasePlaces();
+    const buyer = await world.newClient('Sin lugar al confirmar');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+    const pending = await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro().id,
+        imageAssetId: receipt.id,
+      },
+      assistant,
+      randomUUID(),
+    );
+    expect(pending).toMatchObject({ discountReason: 'founder' });
+    await prisma.founderMembership.updateMany({
+      where: { clientId: buyer.clientId, status: 'RESERVED' },
+      data: { deletedAt: now },
+    });
+    const holders = await Promise.all(
+      Array.from({ length: 40 }, (_, index) =>
+        world.newClient(`Ocupa ${index + 1}`),
+      ),
+    );
+    for (const holder of holders) {
+      await world.commands().recordCashPayment(
+        {
+          clientId: holder.clientId,
+          planId: plan.id,
+          branchId: centro().id,
+        },
+        assistant,
+        randomUUID(),
+      );
+    }
+
+    await expect(
+      world
+        .commands()
+        .confirmTransfer(
+          { paymentId: pending.id },
+          await world.staffPrincipal('paola.mendoza@example.com'),
+        ),
+    ).rejects.toMatchObject({ code: 'payment_confirmation_conflict' });
+    await expect(
+      prisma.payment.findUniqueOrThrow({ where: { id: pending.id } }),
+    ).resolves.toMatchObject({ state: 'PENDING' });
+    await expect(
+      prisma.allowanceAdjustment.count({
+        where: { clientId: buyer.clientId, reason: 'GIFT_NEW_CLIENT' },
+      }),
+    ).resolves.toBe(0);
+  });
+
   it('still grants a place on the first plan after a single class', async () => {
     await releasePlaces();
     const buyer = await world.newClient('Clase suelta primero');
