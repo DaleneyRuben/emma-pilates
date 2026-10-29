@@ -7688,8 +7688,13 @@ B. **Review.** As Paola, Pagos shows **Tipo** **Evaluación**, the receipt,
    **Tipo** and dates a decided sale by the decision date.
 C. **Cancel and confirm.** Cancelling the pending Evaluation rejects its
    Payment with «La evaluación fue cancelada». Confirming after that answers
-   `409` `payment_confirmation_conflict` and leaves the Payment pending, with
-   no Nutritionist cost. A cancelled Evaluation does not add the Bs 50.
+   `409` `payment_confirmation_conflict` and leaves the Payment rejected, with
+   no Nutritionist cost. A cancelled Evaluation does not add the Bs 50. A
+   no-show, or a booked Evaluation whose slot has already started, keeps the
+   Payment pending so it can still be confirmed. Mis evaluaciones offers
+   **Sube tu comprobante** only while that Payment is still pending. Revisar
+   pago says **Todavía no hay comprobante.** when none was attached, and
+   **El comprobante ya no está disponible.** once it was dropped.
 D. **The Plan stays buyable.** `GET /api/v1/payments/current` does not return
    the pending Evaluation Payment. Starting a Plan purchase while that
    Payment is pending succeeds. A Client whose Plan has no classes left and

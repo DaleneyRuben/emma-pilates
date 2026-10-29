@@ -16,6 +16,8 @@ const formats: Record<string, string> = {
 type ReceiptViewerProps = {
   /** The authenticated, never-cached receipt route; null once deleted. */
   receiptUrl: string | null;
+  /** False when the transfer never had a receipt. */
+  receiptMissing?: boolean;
   mediaType: string | undefined;
   clientName: string;
   /** Reads the review again, so an ended session or a deleted receipt shows. */
@@ -30,6 +32,7 @@ type ReceiptViewerProps = {
  */
 export function ReceiptViewer({
   receiptUrl,
+  receiptMissing = false,
   mediaType,
   clientName,
   onRetry,
@@ -45,7 +48,9 @@ export function ReceiptViewer({
     return (
       <ReceiptSection>
         <p className="rounded-control border border-divisor bg-superficie px-3 py-6 text-center text-nota text-texto-tenue">
-          El comprobante ya no está disponible.
+          {receiptMissing
+            ? "Todavía no hay comprobante."
+            : "El comprobante ya no está disponible."}
         </p>
       </ReceiptSection>
     );

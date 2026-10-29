@@ -217,6 +217,29 @@ describe("Paid Evaluation receipt", () => {
     expect(screen.getByText("Comprobante listo.")).toBeOnTheScreen();
   });
 
+  it("hides the receipt upload once the paid Evaluation is confirmed", async () => {
+    const fetcher = routeFetcher(
+      baseRoutes({
+        "/api/v1/evaluations?scope=upcoming": () =>
+          jsonResponse(
+            page([
+              upcomingEvaluation("evaluation-paid", bookedStart(), {
+                ...paid,
+                paymentId: "payment-1",
+                receiptAttached: false,
+                priceCentavos: 0,
+              }),
+            ]),
+          ),
+      }),
+    );
+    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+
+    expect(
+      screen.queryByRole("button", { name: "Sube tu comprobante de transferencia" }),
+    ).toBeNull();
+  });
+
   it("names a network failure after the booking as an attach failure", async () => {
     chooseReceipt();
     const fetcher = routeFetcher(
