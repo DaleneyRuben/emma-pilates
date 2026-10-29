@@ -100,4 +100,14 @@ describe('decideInviteReward', () => {
       }),
     ).toBeNull();
   });
+
+  it("owes the class when the host's only Subscription is her own Guest Pass", () => {
+    expect(
+      decideInviteReward({
+        alreadyRewarded: false,
+        currentSubscriptionId: 'host-guest-pass',
+        currentSubscriptionIsGuestPass: true,
+      }),
+    ).toEqual({ subscriptionId: null, owed: true });
+  });
 });
