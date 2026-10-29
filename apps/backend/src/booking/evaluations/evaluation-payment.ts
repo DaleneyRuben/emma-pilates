@@ -104,7 +104,7 @@ export const releaseExpiredEvaluationHolds = async (
     await rejectPaymentOfCancelledEvaluation(transaction, {
       evaluationId: row.id,
       now,
-      accountId: null,
+      actor: null,
       reason: evaluationPaymentReason,
     });
   }

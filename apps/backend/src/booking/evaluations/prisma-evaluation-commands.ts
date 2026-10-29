@@ -1539,7 +1539,7 @@ export const createPrismaEvaluationCommands = (
       await rejectPaymentOfCancelledEvaluation(transaction, {
         evaluationId: evaluation.id,
         now,
-        accountId: principal.accountId,
+        actor: auditActorOf(principal),
       });
       if (evaluation.slot.nutritionist.account !== null) {
         await recordNotification(
@@ -1608,7 +1608,7 @@ export const createPrismaEvaluationCommands = (
       await rejectPaymentOfCancelledEvaluation(transaction, {
         evaluationId: evaluation.id,
         now,
-        accountId: principal.accountId,
+        actor: auditActorOf(principal),
       });
       if (evaluation.client.account !== null) {
         await recordNotification(

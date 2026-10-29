@@ -6,6 +6,7 @@ import {
   EvaluationState,
   PaymentKind,
   PaymentState,
+  type StaffRole,
 } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
@@ -177,7 +178,11 @@ export const rejectPaymentOfCancelledEvaluation = async (
   input: {
     evaluationId: string;
     now: Date;
-    accountId: string | null;
+    actor?: {
+      accountId: string;
+      role: StaffRole | null;
+      impersonationId: string | null;
+    } | null;
     reason?: string;
   },
 ): Promise<void> => {
@@ -202,7 +207,7 @@ export const rejectPaymentOfCancelledEvaluation = async (
     data: {
       state: PaymentState.REJECTED,
       decidedAt: input.now,
-      decidedByAccountId: null,
+      decidedByAccountId: input.actor?.accountId ?? null,
       rejectionReason: input.reason ?? cancellationReason,
     },
   });
@@ -210,7 +215,13 @@ export const rejectPaymentOfCancelledEvaluation = async (
     data: {
       actionCode: 'payment.transfer_rejected',
       outcome: AuditOutcome.SUCCEEDED,
-      actorKind: AuditActorKind.SYSTEM,
+      actorKind:
+        input.actor === undefined || input.actor === null
+          ? AuditActorKind.WORKER
+          : AuditActorKind.ACCOUNT,
+      actorAccountId: input.actor?.accountId ?? null,
+      actorRole: input.actor?.role ?? null,
+      impersonationId: input.actor?.impersonationId ?? null,
       targetType: 'payment',
       targetId: payment.id,
       correlationId: payment.id,
