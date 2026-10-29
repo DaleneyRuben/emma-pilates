@@ -6,6 +6,7 @@ import {
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import { rejectPaymentOfCancelledEvaluation } from './evaluation-payment-decision';
 import { evaluationHoldExpiresAt } from './evaluation-rules';
 
 type Transaction = Prisma.TransactionClient;
@@ -147,16 +148,12 @@ export const releaseExpiredEvaluationHolds = async (
         cancellationCause: 'PAYMENT_EXPIRED',
       },
     });
-    if (row.paymentId !== null) {
-      await transaction.payment.update({
-        where: { id: row.paymentId },
-        data: {
-          state: PaymentState.REJECTED,
-          decidedAt: now,
-          rejectionReason: evaluationPaymentReason,
-        },
-      });
-    }
+    await rejectPaymentOfCancelledEvaluation(transaction, {
+      evaluationId: row.id,
+      now,
+      accountId: null,
+      reason: evaluationPaymentReason,
+    });
   }
   return due.length;
 };

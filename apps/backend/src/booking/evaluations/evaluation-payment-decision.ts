@@ -174,11 +174,26 @@ const rejectEvaluationTransfer = async (
 // transaction. A later confirm must not book income on a cancelled one.
 export const rejectPaymentOfCancelledEvaluation = async (
   transaction: Transaction,
-  input: { evaluationId: string; now: Date; accountId: string | null },
+  input: {
+    evaluationId: string;
+    now: Date;
+    accountId: string | null;
+    reason?: string;
+  },
 ): Promise<void> => {
   const evaluation = await transaction.evaluation.findUnique({
     where: { id: input.evaluationId },
-    select: { payment: { select: { id: true, state: true } } },
+    select: {
+      payment: {
+        select: {
+          id: true,
+          state: true,
+          amountDueCentavos: true,
+          creditAppliedCentavos: true,
+          receiptImageAssetId: true,
+        },
+      },
+    },
   });
   const payment = evaluation?.payment ?? null;
   if (payment === null || payment.state !== PaymentState.PENDING) return;
@@ -187,10 +202,36 @@ export const rejectPaymentOfCancelledEvaluation = async (
     data: {
       state: PaymentState.REJECTED,
       decidedAt: input.now,
-      decidedByAccountId: input.accountId,
-      rejectionReason: cancellationReason,
+      decidedByAccountId: null,
+      rejectionReason: input.reason ?? cancellationReason,
     },
   });
+  await transaction.auditRecord.create({
+    data: {
+      actionCode: 'payment.transfer_rejected',
+      outcome: AuditOutcome.SUCCEEDED,
+      actorKind: AuditActorKind.SYSTEM,
+      targetType: 'payment',
+      targetId: payment.id,
+      correlationId: payment.id,
+      occurredAt: input.now,
+      metadata: {
+        method: 'transfer',
+        priorState: 'pending',
+        newState: 'rejected',
+        amountDueCentavos: payment.amountDueCentavos,
+        creditAppliedCentavos: payment.creditAppliedCentavos,
+        kind: 'evaluation',
+        reason: 'evaluation_cancelled',
+      },
+    },
+  });
+  await scheduleReceiptDeletion(
+    transaction,
+    payment.receiptImageAssetId,
+    input.now,
+    true,
+  );
 };
 
 type EvaluationPayment = {
