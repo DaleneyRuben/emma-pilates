@@ -28,7 +28,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -154,6 +154,7 @@ export function BookingsScreen({
   );
   const [cancelling, setCancelling] = useState<UpcomingBookingDto | null>(null);
   const [cancelInFlight, setCancelInFlight] = useState(false);
+  const cancelStarted = useRef(false);
   const [failure, setFailure] = useState<string | null>(null);
   const upcoming = useListUpcomingBookings({
     fetcher,
@@ -177,7 +178,15 @@ export function BookingsScreen({
     ]);
 
   const confirmCancel = async () => {
-    if (cancelInFlight || cancelling === null || cancelling.bookingId === undefined) return;
+    if (
+      cancelStarted.current ||
+      cancelInFlight ||
+      cancelling === null ||
+      cancelling.bookingId === undefined
+    ) {
+      return;
+    }
+    cancelStarted.current = true;
     setCancelInFlight(true);
     setFailure(null);
     try {
@@ -191,6 +200,7 @@ export function BookingsScreen({
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
     } finally {
+      cancelStarted.current = false;
       setCancelInFlight(false);
       setCancelling(null);
       await refresh();
