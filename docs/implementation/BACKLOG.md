@@ -497,7 +497,7 @@ wait for Google, Apple, and testers.
 | BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | done |
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
 | FIX-006 | P0 | Backend/admin web | Enforce the Freeze on the Waitlist and on Reschedule, and refuse a late approval | BKM-012 | 1 d | done |
-| FIX-003 | P0 | Backend/admin web/client app | Paid Evaluation payment lifecycle: reject and cancel settle the Payment, confirm audits and notifies, the receipt is visible, an exhausted Plan cannot buy one, cancelled Evaluations skip the Bs 50, AW28 names the sale and dates it by the decision, and a pending Evaluation Payment is not the current Plan Payment | NUT-003 | 1 d | done (`2cf368e4` red, `e834caac` green; evidence below) |
+| FIX-003 | P0 | Backend/admin web/client app | Paid Evaluation payment lifecycle: reject and cancel settle the Payment, confirm audits and notifies, the receipt is visible, an exhausted Plan cannot buy one, cancelled Evaluations skip the Bs 50, AW28 names the sale and dates it by the decision, and a pending Evaluation Payment is not the current Plan Payment | NUT-003 | 1 d | done (`5122791d`/`d7b383af` hide the receipt upload once the payment is confirmed; `1004a767`/`64cb24de` show Subiendo and ignore a second tap. Device walk still open) |
 
 #### Closed-test enablement
 
