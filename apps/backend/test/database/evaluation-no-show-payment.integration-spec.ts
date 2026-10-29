@@ -85,4 +85,64 @@ describe('no show evaluation payment', () => {
       }),
     ).resolves.toEqual({ state: 'CONFIRMED' });
   });
+
+  it('rejects the payment of an expired no show and keeps the outcome', async () => {
+    await world.prisma.client.create({
+      data: {
+        name: 'Nora Paz',
+        referralCode: `REF-${randomUUID().slice(0, 8)}`,
+        account: {
+          create: {
+            email: 'nora@example.com',
+            activatedAt: fixtureNow,
+            emailVerifiedAt: fixtureNow,
+          },
+        },
+        subscriptions: {
+          create: {
+            planId: deterministicId('plan:paquete-8'),
+            planNameSnapshot: 'Paquete de 8 clases',
+            durationDaysSnapshot: 30,
+            originalClassAllowance: 8,
+            remainingClassAllowance: 8,
+            startsOn: new Date('2026-09-01T00:00:00.000Z'),
+            endsOn: new Date('2026-11-30T00:00:00.000Z'),
+            activatedAt: fixtureNow,
+          },
+        },
+      },
+    });
+    const client = await world.principalOf('nora@example.com');
+    const slotId = await slotIdAt(
+      world.prisma,
+      mondayBlockId,
+      '2026-10-12T13:45:00.000Z',
+    );
+    const booked = await createPrismaEvaluationCommands(world.prisma, {
+      now: () => fixtureNow,
+    }).bookPaidEvaluation(slotId, client, randomUUID());
+    await world.prisma.evaluation.update({
+      where: { id: booked.id },
+      data: { state: 'NO_SHOW', nutritionistCostCentavos: 5_000 },
+    });
+    const later = createPrismaEvaluationCommands(world.prisma, {
+      now: () => new Date(fixtureNow.getTime() + 24 * 60 * 60 * 1_000),
+    });
+
+    await expect(later.releaseExpiredEvaluationHolds()).resolves.toBe(1);
+    await expect(
+      world.prisma.evaluation.findUniqueOrThrow({
+        where: { id: booked.id },
+        select: {
+          state: true,
+          cancellationCause: true,
+          payment: { select: { state: true } },
+        },
+      }),
+    ).resolves.toEqual({
+      state: 'NO_SHOW',
+      cancellationCause: null,
+      payment: { state: 'REJECTED' },
+    });
+  });
 });
