@@ -73,6 +73,23 @@ describe('founder membership', () => {
       ),
     ).toBe(false);
 
+    const granted = await prisma.founderMembership.findFirstOrThrow({
+      where: { clientId: buyers[0].clientId },
+    });
+    const grantedPayment = await prisma.payment.findFirstOrThrow({
+      where: { clientId: buyers[0].clientId, state: 'CONFIRMED' },
+    });
+    expect(granted.paymentId).toBe(grantedPayment.id);
+    expect(
+      await prisma.auditRecord.count({
+        where: {
+          actionCode: 'founder_membership.granted',
+          targetId: granted.id,
+          correlationId: grantedPayment.id,
+        },
+      }),
+    ).toBe(1);
+
     const first = await prisma.payment.findFirstOrThrow({
       where: { clientId: buyers[0].clientId, state: 'CONFIRMED' },
     });
