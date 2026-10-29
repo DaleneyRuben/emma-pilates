@@ -41,6 +41,15 @@ export const founderDiscount = (input: {
   };
 };
 
+// The list shows the founder price to anyone who would take a place on her
+// first real Plan, and to a founder who still holds hers. A lost membership
+// and a full list of 40 see the list price.
+export const showFounderPrice = (input: {
+  held: 'active' | 'lost' | 'none';
+  placesRemaining: boolean;
+}): boolean =>
+  input.held === 'active' || (input.held === 'none' && input.placesRemaining);
+
 export const decideFounderPlace = (input: {
   places: number;
   assigned: number;

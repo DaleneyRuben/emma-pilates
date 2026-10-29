@@ -5,6 +5,7 @@ import {
   founderRenewalDeadline,
   isFounder,
   priceFounderPlans,
+  showFounderPrice,
 } from './founder-membership';
 
 const day = 24 * 60 * 60 * 1_000;
@@ -32,6 +33,21 @@ describe('founder discount', () => {
         percent: 15,
       }),
     ).toEqual({ discountCentavos: 1_500, amountDueCentavos: 8_501 });
+  });
+
+  it('shows the founder price on a first Plan while a place remains', () => {
+    expect(showFounderPrice({ held: 'none', placesRemaining: true })).toBe(
+      true,
+    );
+    expect(showFounderPrice({ held: 'active', placesRemaining: false })).toBe(
+      true,
+    );
+    expect(showFounderPrice({ held: 'none', placesRemaining: false })).toBe(
+      false,
+    );
+    expect(showFounderPrice({ held: 'lost', placesRemaining: true })).toBe(
+      false,
+    );
   });
 
   it('shows a founder the discounted price and keeps the list price beside it', () => {

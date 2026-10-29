@@ -10,6 +10,7 @@ import {
   founderDiscount,
   isFounder,
   priceFounderPlans,
+  showFounderPrice,
   type FounderRules,
 } from './founder-membership';
 
@@ -55,6 +56,8 @@ export const readIsFounder = async (
   );
 };
 
+// A Client who would take a place on her first real Plan sees the founder
+// price before she buys. The sale still claims the place under the lock.
 export const priceFounderPlanList = async <
   T extends {
     classAllowance: number;
@@ -65,10 +68,34 @@ export const priceFounderPlanList = async <
   clientId: string | null,
   plans: T[],
 ): Promise<Array<T & { listPriceCentavos?: number }>> => {
-  if (clientId === null || !(await readIsFounder(transaction, clientId))) {
+  if (clientId === null) return plans;
+  const rules = await readRules(transaction);
+  const held = await transaction.founderMembership.findFirst({
+    where: { clientId, deletedAt: null },
+    select: { status: true },
+  });
+  const heldStatus =
+    held === null
+      ? 'none'
+      : held.status === FounderMembershipStatus.LOST
+        ? 'lost'
+        : 'active';
+  const placesTaken = await transaction.founderMembership.count({
+    where: {
+      deletedAt: null,
+      status: {
+        in: [FounderMembershipStatus.ACTIVE, FounderMembershipStatus.RESERVED],
+      },
+    },
+  });
+  if (
+    !showFounderPrice({
+      held: heldStatus,
+      placesRemaining: placesTaken < rules.founderPlaces,
+    })
+  ) {
     return plans;
   }
-  const rules = await readRules(transaction);
   return priceFounderPlans(plans, {
     founder: true,
     percent: rules.founderDiscountPercent,
