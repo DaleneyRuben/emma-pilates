@@ -252,8 +252,18 @@ describe('freeze approval bounds', () => {
     const succeeded = [first, second].filter(
       (result) => result.status === 'fulfilled',
     );
+    const failed = [first, second].filter(
+      (result) => result.status === 'rejected',
+    );
 
     expect(succeeded).toHaveLength(1);
+    expect(failed).toHaveLength(1);
+    expect(
+      failed[0]?.status === 'rejected' &&
+        failed[0].reason instanceof PaymentRuleError
+        ? failed[0].reason.code
+        : null,
+    ).toBe('freeze_already_decided');
     await expect(
       prisma.subscription.findUniqueOrThrow({ where: { id: subscription.id } }),
     ).resolves.toMatchObject({
