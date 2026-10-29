@@ -211,7 +211,11 @@ describe('guest pass opens at email verification', () => {
     await register(first, host.referralCode);
     await register(second, host.referralCode);
 
-    await Promise.allSettled([verify(first), verify(second)]);
+    const raced = await Promise.allSettled([verify(first), verify(second)]);
+    expect(raced).toEqual([
+      { status: 'fulfilled', value: { status: 'verified' } },
+      { status: 'fulfilled', value: { status: 'verified' } },
+    ]);
 
     await expect(
       prisma.guestPass.count({
