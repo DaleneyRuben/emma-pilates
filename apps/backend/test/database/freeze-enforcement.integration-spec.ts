@@ -188,4 +188,72 @@ describe('freeze enforcement on waitlist and reschedule', () => {
       ),
     ).rejects.toThrow(/Booking is before the Start Date/);
   });
+
+  it('cancels a late La Paz session on the last freeze day and keeps the evening before', async () => {
+    const client = await world.newClient('Noche de La Paz');
+    const sale = await cash(client.clientId);
+    const subscription = await prisma.subscription.findFirstOrThrow({
+      where: { paymentId: sale.id },
+    });
+    const sample = await prisma.session.findFirstOrThrow({
+      where: { state: 'SCHEDULED' },
+    });
+    const lastNight = await prisma.session.create({
+      data: {
+        branchId: sample.branchId,
+        classTypeId: sample.classTypeId,
+        trainerStaffMemberId: sample.trainerStaffMemberId,
+        startsAt: new Date('2026-10-01T00:00:00.000Z'),
+        endsAt: new Date('2026-10-01T03:59:00.000Z'),
+        capacity: 8,
+        state: 'SCHEDULED',
+      },
+    });
+    const eveningBefore = await prisma.session.create({
+      data: {
+        branchId: sample.branchId,
+        classTypeId: sample.classTypeId,
+        trainerStaffMemberId: sample.trainerStaffMemberId,
+        startsAt: new Date('2026-09-22T00:00:00.000Z'),
+        endsAt: new Date('2026-09-22T03:59:00.000Z'),
+        capacity: 8,
+        state: 'SCHEDULED',
+      },
+    });
+    const bookings = new PrismaBookingCommands(
+      prisma,
+      () => new Date('2026-09-21T15:00:00.000Z'),
+    );
+    const lastBooking = await bookings.create(
+      { sessionId: lastNight.id },
+      clientPrincipal(client),
+    );
+    const earlierBooking = await bookings.create(
+      { sessionId: eveningBefore.id },
+      clientPrincipal(client),
+    );
+    const commands = createPrismaPaymentCommands(prisma, {
+      now: () => new Date('2026-09-21T16:00:00.000Z'),
+    });
+    const requested = await commands.requestFreeze(
+      {
+        subscriptionId: subscription.id,
+        startsOn: '2026-09-22',
+        endsOn: '2026-09-30',
+        reason: 'Viaje',
+      },
+      clientPrincipal(client),
+    );
+    await commands.decideFreeze(
+      { freezeId: requested.id, decision: 'approved' },
+      await world.staffPrincipal('paola.mendoza@example.com'),
+    );
+
+    await expect(
+      prisma.booking.findUniqueOrThrow({ where: { id: lastBooking.id } }),
+    ).resolves.toMatchObject({ state: 'CANCELLED' });
+    await expect(
+      prisma.booking.findUniqueOrThrow({ where: { id: earlierBooking.id } }),
+    ).resolves.toMatchObject({ state: 'BOOKED' });
+  });
 });
