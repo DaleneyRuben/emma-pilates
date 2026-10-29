@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache, encodeBase64 } from "@pilates/mobile-core";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -156,6 +156,7 @@ describe("Paid Evaluation receipt", () => {
                       ...paid,
                       paymentId: "payment-1",
                       receiptAttached: false,
+                      receiptUploadable: true,
                     }),
                   ]
                 : [],
@@ -186,16 +187,19 @@ describe("Paid Evaluation receipt", () => {
     const fetcher = routeFetcher(
       baseRoutes({
         ...uploadRoutes(),
-        "/api/v1/evaluations?scope=upcoming": () =>
-          jsonResponse(
+        "/api/v1/evaluations?scope=upcoming": () => {
+          const uploaded = attached.length > 0;
+          return jsonResponse(
             page([
               upcomingEvaluation("evaluation-paid", bookedStart(), {
                 ...paid,
                 paymentId: "payment-1",
-                receiptAttached: false,
+                receiptAttached: uploaded,
+                receiptUploadable: !uploaded,
               }),
             ]),
-          ),
+          );
+        },
         "POST /api/v1/evaluations/evaluation-paid/receipt": (init) => {
           attached.push(String(init?.body));
           return new Response(null, { status: 204 });
@@ -217,6 +221,71 @@ describe("Paid Evaluation receipt", () => {
     expect(screen.getByText("Comprobante listo.")).toBeOnTheScreen();
   });
 
+  it("shows Subiendo and ignores a second tap while the receipt uploads", async () => {
+    let releasePicker: () => void = () => {};
+    const pickerHeld = new Promise<void>((resolve) => {
+      releasePicker = resolve;
+    });
+    jest.mocked(ImagePicker.launchImageLibraryAsync).mockImplementation(async () => {
+      await pickerHeld;
+      return {
+        canceled: false,
+        assets: [
+          {
+            uri: "file:///receipt.png",
+            mimeType: "image/png",
+            fileSize: receiptBytes.byteLength,
+            width: 10,
+            height: 10,
+          },
+        ],
+      } as never;
+    });
+    jest
+      .mocked(ImageManipulator.manipulateAsync)
+      .mockResolvedValue({ uri: "file:///receipt.jpg", width: 10, height: 10 });
+    jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(encodeBase64(receiptBytes));
+    const attached: string[] = [];
+    const fetcher = routeFetcher(
+      baseRoutes({
+        ...uploadRoutes(),
+        "/api/v1/evaluations?scope=upcoming": () =>
+          jsonResponse(
+            page([
+              upcomingEvaluation("evaluation-paid", bookedStart(), {
+                ...paid,
+                paymentId: "payment-1",
+                receiptAttached: false,
+                receiptUploadable: true,
+              }),
+            ]),
+          ),
+        "POST /api/v1/evaluations/evaluation-paid/receipt": (init) => {
+          attached.push(String(init?.body));
+          return new Response(null, { status: 204 });
+        },
+      }),
+    );
+    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const upload = await screen.findByRole("button", {
+      name: "Sube tu comprobante de transferencia",
+    });
+
+    await act(async () => {
+      fireEvent.press(upload);
+    });
+    expect(await screen.findByText("Subiendo comprobante…")).toBeOnTheScreen();
+
+    await act(async () => {
+      fireEvent.press(upload);
+    });
+    expect(attached).toEqual([]);
+    releasePicker();
+    await waitFor(() => {
+      expect(attached).toEqual([JSON.stringify({ imageAssetId: "asset-1" })]);
+    });
+  });
+
   it("hides the receipt upload once the paid Evaluation is confirmed", async () => {
     const fetcher = routeFetcher(
       baseRoutes({
@@ -227,7 +296,7 @@ describe("Paid Evaluation receipt", () => {
                 ...paid,
                 paymentId: "payment-1",
                 receiptAttached: false,
-                priceCentavos: 0,
+                receiptUploadable: false,
               }),
             ]),
           ),

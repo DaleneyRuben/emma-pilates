@@ -8,6 +8,7 @@ import {
   evaluationSlotMinutes,
   isEvaluationBookable,
 } from './evaluation-rules';
+import { receiptUploadable } from './receipt-uploadable';
 
 export const toClientEvaluationView = (
   row: ClientEvaluationRow,
@@ -22,6 +23,7 @@ export const toClientEvaluationView = (
       : 0,
   paymentId: row.paymentId,
   receiptAttached: row.payment?.receiptImageAssetId != null,
+  receiptUploadable: receiptUploadable(row.payment),
   state:
     row.state === EvaluationState.BOOKED
       ? 'booked'

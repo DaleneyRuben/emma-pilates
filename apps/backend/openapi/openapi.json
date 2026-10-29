@@ -14639,6 +14639,10 @@
             "type": "boolean",
             "description": "A paid Evaluation still needs its transfer receipt. Older builds ignore it."
           },
+          "receiptUploadable": {
+            "type": "boolean",
+            "description": "True only while the payment is pending and has no receipt. Older builds ignore it."
+          },
           "state": {
             "type": "string",
             "enum": [
@@ -14685,6 +14689,7 @@
           "priceCentavos",
           "paymentId",
           "receiptAttached",
+          "receiptUploadable",
           "state",
           "startsAt",
           "endsAt",
