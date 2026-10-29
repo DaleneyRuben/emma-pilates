@@ -1067,7 +1067,7 @@ Verified:
 Open:
 
 - Promotion during a Freeze is covered by the unit test and by closing the entry on approval. An integration case that reopens the entry and frees a seat was not kept: writing the cancelled state by hand broke `bookings_state_fields_check`.
-- A freeze request that the plan cannot take answers `409` `freeze_not_allowed`, including a past start and a window outside the term (`82dae4c3`, `3259cc2d`). The approval of a start that is already today still keeps that morning's class and still extends the plan. A refused freeze does not use the one freeze (`d19426e4` red, `54e912e9` green). Migration `20261029200000_freeze_refused_does_not_count` replaces `freezes_subscription_id_key` with a partial unique index (`state <> 'refused' AND deleted_at IS NULL`). Needs owner approval before a shared database. The desk copy is «El congelamiento ya empezó. Recházalo y pide uno desde hoy.»
+- A freeze request that the plan cannot take answers `409` `freeze_not_allowed`, including a past start and a window outside the term (`82dae4c3`, `3259cc2d`). The approval of a start that is already today still keeps that morning's class and still extends the plan. A refused freeze does not use the one freeze (`d19426e4` red, `54e912e9` green, `cb914acf` counts only requested or approved). Migration `20261029200000_freeze_refused_does_not_count` replaces `freezes_subscription_id_key` with a partial unique index (`state <> 'refused' AND deleted_at IS NULL`). Needs owner approval before a shared database. The desk copy is «El congelamiento ya empezó. Recházalo y pide uno desde hoy.»
 
 #### BKM-014 · Invita a una amiga
 
