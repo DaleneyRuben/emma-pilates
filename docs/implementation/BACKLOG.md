@@ -1018,7 +1018,7 @@ Evidence (FIX-006, 2026-10-28, branch `fix/fix-006-freeze`, from `main` at `0623
 
 Decisions taken:
 
-- A late approval is refused, not trimmed to today. The decisions document says the Freeze never starts in the past, and silently dropping past days would still cancel classes already taught. The code is `freeze_start_in_past`.
+- A late approval is refused, not trimmed to today. The decisions document says the Freeze never starts in the past, and silently dropping past days would still cancel classes already taught. The code is `freeze_start_in_past`. The desk copy says to refuse it and that this Plan does not freeze: a refused row still holds the one Freeze per Subscription, so asking again answers `freeze_not_allowed`.
 - A window that would overlap a queued renewal is `freeze_outside_term`, not `freeze_not_allowed`, so the Client can tell it from a Plan that cannot freeze.
 - A second approval is `freeze_already_decided`. The claim is an update where the state is still `REQUESTED`, inside a Serializable transaction.
 - Waitlist entries closed by a Freeze use `session_cancelled`. That closure names no Account, which is what the existing check allows. No new closure reason and no migration.
