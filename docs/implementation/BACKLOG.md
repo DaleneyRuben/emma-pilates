@@ -496,6 +496,7 @@ wait for Google, Apple, and testers.
 | BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | done |
 | BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | done |
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
+| FIX-006 | P0 | Backend/admin web | Enforce the Freeze on the Waitlist and on Reschedule, and refuse a late approval | BKM-012 | 1 d | done |
 
 #### Closed-test enablement
 
@@ -999,6 +1000,40 @@ Open:
 - IDN-009 makes Coordinator a real role for the decision.
 - The Client app and the Staff app were not walked on a device. PAY-006 may be walking the devices, and this item did not take the simulator lock.
 - Migration `20261023200000_freezes` needs the owner's approval before any shared database. It was applied only to disposable databases created for this item.
+
+#### FIX-006 · Freeze on the Waitlist, on Reschedule, and on a late approval
+
+Review findings H15 and H16, and the Freeze medium bullets, from
+`REVIEW-2026-10-28.md`.
+
+- Joining a Waitlist, being promoted from it, and rescheduling into an approved Freeze use the same check as booking. Approval closes Waitlist entries whose Session falls inside the window.
+- A Reschedule before the Start Date is refused the same way a Booking is.
+- An approval whose start is already a past Bolivia date is refused with `409` `freeze_start_in_past` and changes nothing. It does not cancel or return classes already taught.
+- The window must lie inside the current term. A queued renewal caps it so the extension cannot reach that renewal's Start Date (`freeze_outside_term`).
+- A second approval finds the row no longer `REQUESTED` and answers `freeze_already_decided`. It does not extend the plan again.
+- The classes cancelled on approval are those whose Session falls on a Bolivia civil date inside the window, not a UTC midnight range.
+- A date that is not a calendar day answers `400` `invalid_civil_date`.
+
+Evidence (FIX-006, 2026-10-28, branch `fix/fix-006-freeze`, from `main` at `0623829c`). Red `e3b13159`, green `e824c1df`.
+
+Decisions taken:
+
+- A late approval is refused, not trimmed to today. The decisions document says the Freeze never starts in the past, and silently dropping past days would still cancel classes already taught. The code is `freeze_start_in_past`.
+- A window that would overlap a queued renewal is `freeze_outside_term`, not `freeze_not_allowed`, so the Client can tell it from a Plan that cannot freeze.
+- A second approval is `freeze_already_decided`. The claim is an update where the state is still `REQUESTED`, inside a Serializable transaction.
+- Waitlist entries closed by a Freeze use `session_cancelled`. That closure names no Account, which is what the existing check allows. No new closure reason and no migration.
+- The shared rule is `decideFreezeRequest`. Request and approval both call it. Booking, joining, promotion, and reschedule share the approved-Freeze lookup already used by `createBooking`.
+
+Verified:
+
+- Unit: freeze rules, the invalid-date controller, join, promotion, and reschedule, 20 passed. The new cases failed before `e824c1df`.
+- Integration on PostgreSQL 18, port 5433, databases named `pilates_test_*`: 11 passed, including late approval, queued renewal, a double approval, Waitlist close, and Reschedule into the Freeze and before the Start Date.
+- Admin web copy for `freeze_start_in_past` and `freeze_already_decided` was not opened in a browser. The Client app and the Staff app were not walked. No migration.
+
+Open:
+
+- Promotion during a Freeze is covered by the unit test and by closing the entry on approval. An integration case that reopens the entry and frees a seat was not kept: writing the cancelled state by hand broke `bookings_state_fields_check`.
+- The Client app still shows `freeze_start_in_past` as the generic send failure. The request form already refuses a past start before it is sent.
 
 #### BKM-014 · Invita a una amiga
 
