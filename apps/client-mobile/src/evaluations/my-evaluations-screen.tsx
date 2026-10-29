@@ -64,11 +64,13 @@ function DateBadge({ instant }: { instant: string }) {
 function UpcomingCard({
   evaluation,
   highlighted,
+  uploading,
   onCancel,
   onAttachReceipt,
 }: {
   evaluation: ClientEvaluationDto;
   highlighted: boolean;
+  uploading: boolean;
   onCancel: () => void;
   onAttachReceipt: () => void;
 }) {
@@ -92,11 +94,15 @@ function UpcomingCard({
           <Pressable
             accessibilityLabel="Sube tu comprobante de transferencia"
             accessibilityRole="button"
+            accessibilityState={{ disabled: uploading, busy: uploading }}
+            disabled={uploading}
             hitSlop={spacing.sm}
             onPress={onAttachReceipt}
             style={styles.cancel}
           >
-            <Text style={styles.attachText}>Sube tu comprobante de transferencia</Text>
+            <Text style={styles.attachText}>
+              {uploading ? "Subiendo comprobante…" : "Sube tu comprobante de transferencia"}
+            </Text>
           </Pressable>
         ) : null}
         {!evaluation.included && evaluation.receiptAttached === true ? (
@@ -137,6 +143,7 @@ export function MyEvaluationsScreen({
   const [cancelling, setCancelling] = useState<ClientEvaluationDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [receiptReady, setReceiptReady] = useState<Record<string, true>>({});
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const upcoming = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const past = useListEvaluations({ scope: "past" }, queryOptions);
@@ -145,7 +152,9 @@ export function MyEvaluationsScreen({
   const refreshControl = usePullToRefresh(queryKeys);
 
   const attachReceipt = async (evaluation: ClientEvaluationDto) => {
+    if (uploadingId !== null) return;
     setFailure(null);
+    setUploadingId(evaluation.id);
     try {
       const picked = await pickReceipt();
       if (picked === null) return;
@@ -166,6 +175,8 @@ export function MyEvaluationsScreen({
       });
     } catch {
       setFailure("No pudimos adjuntar el comprobante. Inténtalo de nuevo.");
+    } finally {
+      setUploadingId(null);
     }
   };
 
@@ -263,6 +274,7 @@ export function MyEvaluationsScreen({
                 highlighted={confirmed?.id === evaluation.id}
                 key={evaluation.id}
                 onAttachReceipt={() => void attachReceipt(evaluation)}
+                uploading={uploadingId === evaluation.id}
                 onCancel={() => setCancelling(evaluation)}
               />
             ))}

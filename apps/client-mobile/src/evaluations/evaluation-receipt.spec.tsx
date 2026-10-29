@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache, encodeBase64 } from "@pilates/mobile-core";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -222,11 +222,29 @@ describe("Paid Evaluation receipt", () => {
   });
 
   it("shows Subiendo and ignores a second tap while the receipt uploads", async () => {
-    chooseReceipt();
-    let releaseUpload: () => void = () => {};
-    const uploadStarted = new Promise<void>((resolve) => {
-      releaseUpload = resolve;
+    let releasePicker: () => void = () => {};
+    const pickerHeld = new Promise<void>((resolve) => {
+      releasePicker = resolve;
     });
+    jest.mocked(ImagePicker.launchImageLibraryAsync).mockImplementation(async () => {
+      await pickerHeld;
+      return {
+        canceled: false,
+        assets: [
+          {
+            uri: "file:///receipt.png",
+            mimeType: "image/png",
+            fileSize: receiptBytes.byteLength,
+            width: 10,
+            height: 10,
+          },
+        ],
+      } as never;
+    });
+    jest
+      .mocked(ImageManipulator.manipulateAsync)
+      .mockResolvedValue({ uri: "file:///receipt.jpg", width: 10, height: 10 });
+    jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(encodeBase64(receiptBytes));
     const attached: string[] = [];
     const fetcher = routeFetcher(
       baseRoutes({
@@ -242,9 +260,8 @@ describe("Paid Evaluation receipt", () => {
               }),
             ]),
           ),
-        "POST /api/v1/evaluations/evaluation-paid/receipt": async (init) => {
+        "POST /api/v1/evaluations/evaluation-paid/receipt": (init) => {
           attached.push(String(init?.body));
-          await uploadStarted;
           return new Response(null, { status: 204 });
         },
       }),
@@ -254,12 +271,16 @@ describe("Paid Evaluation receipt", () => {
       name: "Sube tu comprobante de transferencia",
     });
 
-    fireEvent.press(upload);
-    fireEvent.press(upload);
-
+    await act(async () => {
+      fireEvent.press(upload);
+    });
     expect(await screen.findByText("Subiendo comprobante…")).toBeOnTheScreen();
+
+    await act(async () => {
+      fireEvent.press(upload);
+    });
     expect(attached).toEqual([]);
-    releaseUpload();
+    releasePicker();
     await waitFor(() => {
       expect(attached).toEqual([JSON.stringify({ imageAssetId: "asset-1" })]);
     });
