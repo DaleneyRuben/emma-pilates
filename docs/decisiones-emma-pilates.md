@@ -252,3 +252,7 @@ La dueña resolvió las preguntas abiertas de la revisión del lanzamiento. Esta
 4. **Cierre de caja y anulaciones.** Una venta en efectivo anulada sigue en el efectivo esperado del cierre de caja, porque no se devuelve dinero. Aparece en su propia línea: «Ventas anuladas (efectivo en caja): Bs N». Si alguna vez se devuelve dinero, la administradora lo registra como una salida.
 5. **«Renovó» para el bono.** Se mide por la fecha de compra, como ya dice la sección 9. Una renovación es otro plan real cuyo pago se aprobó (fecha de Bolivia) antes del fin del anterior, o hasta 7 días después, sea cual sea la fecha de inicio que ella eligió. El bono y los indicadores usan esta única definición.
 6. **Sucursales de una instructora.** La coordinadora puede asignar las sucursales de una instructora (`PUT /staff-members/{id}/branches` y el control de la web de administración). Cualquier otra escritura sobre el personal sigue siendo de la administradora.
+
+## 17. Addendum del 2026-10-29
+
+7. **Un rechazo no gasta el congelamiento (§2.4).** «Una vez por plan» cuenta solo los congelamientos solicitados o aprobados. Un congelamiento rechazado no gasta el único del plan. La clienta puede volver a pedirlo con fechas nuevas.

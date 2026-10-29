@@ -88,11 +88,12 @@ model FounderMembership {
   @@schema("booking")
 }
 
-// BKM-012 / booking ADR-0010: one request per Subscription. A refused request
-// still counts, so the unique live row is the once-per-Plan rule.
+// BKM-012 / booking ADR-0010: one requested or approved Freeze per
+// Subscription. A refused row does not count, so the unique index is partial
+// (migration 20261029200000). Prisma cannot model that predicate.
 model Freeze {
   id                 String      @id @default(uuid()) @db.Uuid
-  subscriptionId     String      @unique @map("subscription_id") @db.Uuid
+  subscriptionId     String      @map("subscription_id") @db.Uuid
   clientId           String      @map("client_id") @db.Uuid
   startsOn           DateTime    @map("starts_on") @db.Date
   endsOn             DateTime    @map("ends_on") @db.Date

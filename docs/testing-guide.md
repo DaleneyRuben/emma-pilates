@@ -7120,8 +7120,10 @@ B. **The decision.** Paola opens **Back Office → Congelamientos**. The card
    amount does not change. The Client receives a push and an inbox
    notification. Approving after the start has passed answers `409`
    `freeze_start_in_past` and changes nothing: «El congelamiento ya empezó.
-   Recházalo. Este plan no se congela.» A refused Freeze still occupies the
-   one row per Subscription, so the Client cannot ask again. A second approval answers `409`
+   Recházalo y pide uno desde hoy.» A refused Freeze does not spend the one
+   Freeze, so she can ask again with dates from today, and that request can
+   be approved. A second request while one is requested or approved still
+   answers `409` `freeze_not_allowed`. A second approval answers `409`
    `freeze_already_decided` and does not move the end again.
 C. **The booking.** A Session inside an approved Freeze answers `409`
    `booking_during_freeze` and «Tu plan está congelado hasta el {fecha}.»
