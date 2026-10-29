@@ -1,7 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import { createCatalogRepository } from '../../src/booking/catalog/prisma-catalog-repository';
 import { priceFounderPlanList } from '../../src/booking/payments/prisma-founder-membership';
 import { readCurrentStudioSettings } from '../../src/booking/studio-settings/prisma-studio-settings';
 import {
+  fixtures,
+  now,
   plan,
   startPaymentWorld,
   type PaymentWorld,
@@ -60,5 +63,34 @@ describe('founder plan list price', () => {
     const full = await pricesFor('sofia@example.com');
     expect(full).toMatchObject({ priceCentavos: 56_000 });
     expect(full?.listPriceCentavos).toBeUndefined();
+  });
+
+  it('shows the list price to a Client who already bought a plan', async () => {
+    const buyer = await world.newClient('Ya compró');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const centro = fixtures.branches.find(
+      (branch) => branch.name === 'Centro',
+    )!;
+    await world.commands().recordCashPayment(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro.id,
+      },
+      assistant,
+      randomUUID(),
+    );
+    await world.prisma.subscription.updateMany({
+      where: { clientId: buyer.clientId },
+      data: { state: 'EXPIRED', expiredAt: now },
+    });
+    const account = await world.prisma.account.findFirstOrThrow({
+      where: { clientId: buyer.clientId, deletedAt: null },
+      select: { email: true },
+    });
+
+    const priced = await pricesFor(account.email);
+    expect(priced).toMatchObject({ priceCentavos: 56_000 });
+    expect(priced?.listPriceCentavos).toBeUndefined();
   });
 });

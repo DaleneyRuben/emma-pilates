@@ -12,8 +12,8 @@ import {
   showFounderPrice,
   type FounderRules,
 } from './founder-membership';
+import { hasEarlierPlanPayment } from './founder-plan-history';
 import { reclaimMissingFounderPlace } from './founder-grant-audit';
-import { hasEarlierRealPayment } from './gift-class-history';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -70,6 +70,9 @@ export const priceFounderPlanList = async <
   plans: T[],
 ): Promise<Array<T & { listPriceCentavos?: number }>> => {
   if (clientId === null) return plans;
+  if (await hasEarlierPlanPayment(transaction, { clientId })) {
+    return plans;
+  }
   const rules = await readRules(transaction);
   const held = await transaction.founderMembership.findFirst({
     where: { clientId, deletedAt: null },
@@ -263,7 +266,7 @@ export const claimFounderPlace = async (
     return { founder: false, number: null };
   }
   if (
-    await hasEarlierRealPayment(transaction, {
+    await hasEarlierPlanPayment(transaction, {
       clientId: input.clientId,
       paymentId: input.paymentId,
     })
