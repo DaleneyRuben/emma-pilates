@@ -10,7 +10,6 @@ import {
   boliviaMonth,
 } from '../../time/bolivia-time';
 import { recordAllowanceAdjustment } from './allowance-adjustments';
-import { collectOwedInviteReward } from './grant-invite-reward';
 import { decideInvitation } from './guest-pass';
 
 type Transaction = Prisma.TransactionClient;
@@ -163,15 +162,6 @@ export const openGuestPass = async (
       createdAt: input.now,
     },
     select: { id: true },
-  });
-  // The row exists first, so collection can see this Subscription is her own
-  // Guest Pass and leave the owed class for her next real Plan.
-  await collectOwedInviteReward(transaction, {
-    hostClientId: input.friendClientId,
-    subscriptionId: subscription.id,
-    author: { accountId: input.authorAccountId, role: null },
-    now: input.now,
-    correlationId: payment.id,
   });
   return pass;
 };
