@@ -178,7 +178,8 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       planName: 'Paquete de 8 clases',
       planPriceCentavos: plan.priceCentavos,
       creditAppliedCentavos: 0,
-      amountDueCentavos: plan.priceCentavos,
+      // Sofía's first real Plan reserves a founder place, so the due is 15 % off.
+      amountDueCentavos: plan.priceCentavos - 8_400,
       state: 'pending',
       submittedAt: at('14:00'),
       decidedAt: null,

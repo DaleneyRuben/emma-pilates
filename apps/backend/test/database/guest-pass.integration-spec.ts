@@ -354,6 +354,8 @@ describe('guest pass reward', () => {
       data: { state: 'EXPIRED', expiredAt: now },
     });
     await pay(friend.id);
+    // That cash sale is her first real Plan and places remain, so she is a
+    // founder. A founder does not get the gift class.
     await expect(
       prisma.allowanceAdjustment.count({
         where: {
@@ -362,6 +364,6 @@ describe('guest pass reward', () => {
           deletedAt: null,
         },
       }),
-    ).resolves.toBe(1);
+    ).resolves.toBe(0);
   });
 });
