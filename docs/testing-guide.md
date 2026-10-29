@@ -7527,21 +7527,29 @@ Credit is retired (PAY-005); this screen never shows it. Use the fixtures (Test 
 ### B. The rules, through the API
 
 Register a friend with the host's code (Test 79 B, or the Assistant's S05).
-The answer is `202`, and `booking.guest_passes` gains one row. A second
-friend of the same host in the same calendar month answers `409`
-`guest_pass_monthly_limit`; the same invitation in the next month answers
-`202`. A second registration of the same friend is already refused by the
-one-Referral rule.
+The answer is `202`, and `booking.guest_passes` stays empty until she
+verifies the email (or, for the Assistant's invitation, until she activates
+the account). Then the pass opens. An unverified registration does not spend
+the host's month. A second friend of the same host in the same calendar
+month still answers `202`: she is registered, and no pass opens. The same
+invitation in the next month opens a pass. A second registration of the same
+friend is already refused by the one-Referral rule. The monthly limit never
+answers `409` on registration.
 
 The friend books a Session with exactly one place left: `409`
 `guest_pass_last_place`. A Client with a Plan takes that place as usual.
 Her second booking answers `409` `guest_pass_already_used`.
 
-When her first real Payment is approved, the host's current Subscription
-gains one `invite_converted` adjustment, and a second approval adds nothing.
-A host with no current Subscription gets it on the next one she buys. The
-friend's own first real Payment still gets the gift class: the free class
-never counted as a first Plan.
+If she cancels that free class in time, the pass is restored. She can book
+another Session, and the last-place rule applies again. A cancellation
+inside the window is still refused, and the class stays spent.
+
+When her first real Payment is approved, the host's current real
+Subscription gains one `invite_converted` adjustment, and a second approval
+adds nothing. A host whose only Subscription is her own guest pass, or who
+has none, gets it on the next real Plan she buys. The friend's own first
+real Payment still gets the gift class: the free class never counted as a
+first Plan.
 
 ## Test 90: campaign extra classes (BKM-015)
 
