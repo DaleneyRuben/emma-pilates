@@ -2956,9 +2956,10 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    (`?status=all`; the page reads
    `GET /api/v1/administrator/payments?status=…&q=…&page=…&pageSize=…`,
    while the Staff app's list is `…/payments/pending`, Test 7). Each row
-   shows the Client, the Plan, the amount she
+   shows the Client, **Tipo** (**Plan** or **Evaluación**), the Plan, the amount she
    transferred as `Bs 560,00` on the right (never a Credit line, even on a
-   Payment from before PAY-005), the date and time sent in Bolivia time
+   Payment from before PAY-005), the decision date in Bolivia time once the
+   sale is decided and the submission date while it is pending
    (`23/09/2026 · 22:51`), and **Pendiente**, **Confirmado**, or **Rechazado**.
    A **Método** column says **Transferencia** or **Efectivo**; Credit-only
    Payments never appear. **Buscar por cliente** finds a name without accents
@@ -2968,7 +2969,9 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
 4. **Revisar pago.** Click a pending Client: the side panel (the whole screen
    on a phone) shows the Client and Plan, **Monto a verificar**, the date,
    **Transferencia**,
-   and the receipt image read straight from the API (never cached). **Ver en
+   and the receipt image read straight from the API (never cached). A paid
+   Evaluation uses the same panel: its receipt lives on the Payment, and
+   confirming or rejecting it does not activate a Plan. **Ver en
    grande** (or a click on the image) opens it above everything; Esc, the ✕,
    or a click outside returns to the panel as it was.
 5. **Confirmar pago** asks first ("¿Confirmar el pago de Mariana Peña?"); after
@@ -7650,3 +7653,32 @@ B. **Photographing a receipt still needs a new build.** As Camila, open a
    Client and start a front-desk transfer. Photographing the receipt loads
    the native modules only then, so on the old binary that one action fails.
    A binary built from this branch includes the modules and that action works.
+
+## Test 117: a paid Evaluation's payment (FIX-003)
+
+A paid Evaluation is its own transfer. It holds no Purchase Intent and it
+does not activate a Plan (booking ADR-0011). Run the API and the fixtures as
+in Tests 2 and 5. The Client needs an effective Plan: classes left, or a
+future class already booked, and an end date that still covers the slot.
+
+A. **The receipt.** On Confirmar evaluación for a paid slot, **Confirmar**
+   stays disabled until **Sube tu comprobante de transferencia** attaches
+   the same receipt a Plan transfer uses. An included Evaluation shows no
+   receipt control. `POST /api/v1/evaluations/{id}/receipt` stores it on the
+   Payment.
+B. **Review.** As Paola, Pagos shows **Tipo** **Evaluación**, the receipt,
+   and the submission date while the transfer is pending. Confirming writes
+   the audit `payment.transfer_confirmed` and tells the Client «Tu pago fue
+   confirmado. Tu evaluación quedó reservada.» It does not create a
+   Subscription. Rejecting cancels the Evaluation with cause
+   `payment_rejected` and writes `payment.transfer_rejected`. The CSV gains
+   **Tipo** and dates a decided sale by the decision date.
+C. **Cancel and confirm.** Cancelling the pending Evaluation rejects its
+   Payment with «La evaluación fue cancelada». Confirming after that answers
+   `409` `payment_confirmation_conflict` and leaves the Payment pending, with
+   no Nutritionist cost. A cancelled Evaluation does not add the Bs 50.
+D. **The Plan stays buyable.** `GET /api/v1/payments/current` does not return
+   the pending Evaluation Payment. Starting a Plan purchase while that
+   Payment is pending succeeds. A Client whose Plan has no classes left and
+   no future booking cannot book the paid Evaluation
+   (`no_eligible_subscription`).
