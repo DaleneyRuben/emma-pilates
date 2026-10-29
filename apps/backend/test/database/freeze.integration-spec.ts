@@ -170,7 +170,7 @@ describe('freeze', () => {
           quarterlyClient,
         ),
       ),
-    ).resolves.toBe('freeze_start_in_past');
+    ).resolves.toBe('freeze_not_allowed');
   });
 
   it('cancels a Booking inside the Freeze and returns the class', async () => {
