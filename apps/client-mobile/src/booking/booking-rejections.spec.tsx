@@ -105,6 +105,28 @@ describe("Client booking rejection messages", () => {
     ).not.toBeOnTheScreen();
   });
 
+  it("clears the failure after a cancellation succeeds", async () => {
+    let cancelled = false;
+    const screen = await openMyBookings({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () => jsonResponse(active),
+      "/api/v1/bookings": () => jsonResponse(cancelled ? [] : [cancellable]),
+      "DELETE /api/v1/bookings/booking-far": () => {
+        cancelled = true;
+        return new Response(null, { status: 204 });
+      },
+    });
+    await fireEvent.press(await screen.findByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar reserva" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Aún no tienes reservas próximas.")).toBeOnTheScreen();
+    });
+    expect(
+      screen.queryByText("No pudimos cancelar la reserva. Inténtalo de nuevo."),
+    ).not.toBeOnTheScreen();
+  });
+
   it.each([
     ["reschedule_outside_window", "Solo puedes reprogramar dentro de la ventana de cancelación."],
     ["reschedule_target_ineligible", "Esa clase no está disponible para reprogramar."],
