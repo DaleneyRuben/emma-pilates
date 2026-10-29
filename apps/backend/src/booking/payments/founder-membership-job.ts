@@ -4,6 +4,7 @@ import {
   AuditOutcome,
   FounderMembershipStatus,
   PaymentMethod,
+  PaymentState,
 } from '../../generated/prisma/client';
 import { boliviaDate } from '../../time/bolivia-time';
 
@@ -22,8 +23,16 @@ const addDays = (date: Date, days: number): Date =>
 
 // The real end is the stored end. A Freeze does not count as a gap; BKM-012
 // will pass the frozen days when it exists.
+const earliest = (dates: Date[]): Date | null =>
+  dates.reduce<Date | null>(
+    (soonest, date) =>
+      soonest === null || date.getTime() < soonest.getTime() ? date : soonest,
+    null,
+  );
+
 const realEnd = (
   subscriptions: { endsOn: Date; startsOn: Date; state: string }[],
+  pendingStarts: Date[],
   today: Date,
 ): { latestRealEnd: Date | null; nextStart: Date | null } => {
   const started = subscriptions.filter(
@@ -38,16 +47,14 @@ const realEnd = (
         : latest,
     null,
   );
-  const nextStart = subscriptions
-    .filter((subscription) => subscription.startsOn.getTime() > today.getTime())
-    .reduce<Date | null>(
-      (earliest, subscription) =>
-        earliest === null ||
-        subscription.startsOn.getTime() < earliest.getTime()
-          ? subscription.startsOn
-          : earliest,
-      null,
-    );
+  const nextStart = earliest([
+    ...subscriptions
+      .filter(
+        (subscription) => subscription.startsOn.getTime() > today.getTime(),
+      )
+      .map((subscription) => subscription.startsOn),
+    ...pendingStarts,
+  ]);
   return { latestRealEnd, nextStart };
 };
 
@@ -90,12 +97,20 @@ export const createFounderMembershipJob = (
                   },
                   select: { startsOn: true, endsOn: true, state: true },
                 },
+                payments: {
+                  where: { state: PaymentState.PENDING },
+                  select: { startsOn: true },
+                },
               },
             },
           },
         });
         return rows.map((row) => {
-          const ends = realEnd(row.client.subscriptions, today);
+          const ends = realEnd(
+            row.client.subscriptions,
+            row.client.payments.map((payment) => payment.startsOn),
+            today,
+          );
           return {
             id: row.id,
             clientId: row.clientId,
