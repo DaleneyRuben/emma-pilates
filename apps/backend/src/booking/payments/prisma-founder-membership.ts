@@ -351,6 +351,7 @@ export const confirmFounderPlace = async (
     where: { id: held.id },
     data: {
       status: FounderMembershipStatus.ACTIVE,
+      since: input.now,
       paymentId: input.paymentId,
       purchaseIntentId: null,
     },

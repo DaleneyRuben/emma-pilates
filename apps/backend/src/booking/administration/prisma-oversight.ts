@@ -179,7 +179,12 @@ export const createPrismaOversight = (
     requireAdministrator(principal);
     const [rows, granted, settings] = await Promise.all([
       prisma.founderMembership.findMany({
-        where: { deletedAt: null },
+        where: {
+          deletedAt: null,
+          status: {
+            in: [FounderMembershipStatus.ACTIVE, FounderMembershipStatus.LOST],
+          },
+        },
         orderBy: { number: 'asc' },
         select: {
           id: true,
@@ -189,7 +194,17 @@ export const createPrismaOversight = (
           client: { select: { name: true } },
         },
       }),
-      prisma.founderMembership.count({ where: { deletedAt: null } }),
+      prisma.founderMembership.count({
+        where: {
+          deletedAt: null,
+          status: {
+            in: [
+              FounderMembershipStatus.ACTIVE,
+              FounderMembershipStatus.RESERVED,
+            ],
+          },
+        },
+      }),
       prisma.studioSettingsVersion.findFirst({
         orderBy: { version: 'desc' },
         select: { founderPlaces: true },
