@@ -440,7 +440,9 @@ Values never go in the repository or a chat. «Mac» means the user's own
   (multer) and `GHSA-27r3-jxmh-p828` (body-parser) are pinned in
   `pnpm-workspace.yaml` (`multer` 2.5.0, `body-parser` 2.4.0) because
   `@nestjs/platform-express` and Express 5.2.1 still resolve the vulnerable
-  ranges. `secrets` runs gitleaks
+  ranges. `seroval` is pinned to 1.6.8 because `@tanstack/router-core` still
+  resolves 1.6.7 (`GHSA-97r2-qh9m-474h`, `GHSA-wp97-x4hv-qvhp`,
+  `GHSA-7rv5-mrxv-xcr9`). `secrets` runs gitleaks
   over the pull request's commits (or the pushed ones) with the allowlists in
   `.gitleaks.toml` (the Firebase client keys in `google-services.json`, the
   CI and test database URLs, S3Mock's fixed credentials, generated design
