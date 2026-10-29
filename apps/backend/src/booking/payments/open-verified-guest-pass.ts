@@ -1,5 +1,5 @@
 import type { Prisma } from '../../generated/prisma/client';
-import { openGuestPass } from './open-guest-pass';
+import { GuestPassError, openGuestPass } from './open-guest-pass';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -29,8 +29,8 @@ export const openGuestPassForVerifiedClient = async (
     });
   } catch (error) {
     if (
-      error instanceof Error &&
-      error.message.includes('one friend a month')
+      error instanceof GuestPassError &&
+      error.code === 'guest_pass_monthly_limit'
     ) {
       return;
     }

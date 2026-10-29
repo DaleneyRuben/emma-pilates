@@ -173,6 +173,32 @@ describe('guest pass opens at email verification', () => {
     ).resolves.toBe(1);
   });
 
+  it('verifies a second friend when the monthly limit message changes', async () => {
+    const host = await prisma.client.create({
+      data: { name: 'Anfitriona texto', referralCode: code() },
+    });
+    const author = await prisma.account.findFirstOrThrow({
+      where: { email: 'emma.vargas@example.com', deletedAt: null },
+      select: { id: true },
+    });
+    const taken = await prisma.client.create({
+      data: { name: 'Ya invitada texto', referralCode: `REF-${randomUUID()}` },
+    });
+    await prisma.$transaction((transaction) =>
+      openGuestPass(transaction, {
+        hostClientId: host.id,
+        friendClientId: taken.id,
+        authorAccountId: author.id,
+        now,
+      }),
+    );
+    const email = `wording-${randomUUID()}@example.com`;
+    await expect(register(email, host.referralCode)).resolves.toEqual(
+      expect.objectContaining({ email }),
+    );
+    await expect(verify(email)).resolves.toEqual({ status: 'verified' });
+  });
+
   it('opens one pass when two friends verify at the same time', async () => {
     const host = await prisma.client.create({
       data: {
