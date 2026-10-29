@@ -13,6 +13,7 @@ import {
   showFounderPrice,
   type FounderRules,
 } from './founder-membership';
+import { hasEarlierRealPayment } from './gift-class-history';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -244,6 +245,14 @@ export const claimFounderPlace = async (
   input: PlaceClaim,
 ): Promise<{ founder: boolean; number: number | null }> => {
   if (!qualifiesForAPlace(input)) return { founder: false, number: null };
+  if (
+    await hasEarlierRealPayment(transaction, {
+      clientId: input.clientId,
+      paymentId: input.paymentId,
+    })
+  ) {
+    return { founder: false, number: null };
+  }
   await lockFounderPlaces(transaction);
 
   const held = await transaction.founderMembership.findFirst({
