@@ -44,6 +44,7 @@ export const cancelBookingsInsideFreeze = async (
     clientId: string;
     startsOn: Date;
     endsOn: Date;
+    decidedAt: Date;
     decidedByAccountId: string;
   },
 ): Promise<number> => {
@@ -56,8 +57,10 @@ export const cancelBookingsInsideFreeze = async (
     },
     select: { id: true, session: { select: { startsAt: true } } },
   });
-  const inside = bookings.filter((booking) =>
-    onFreezeDate(booking.session.startsAt, input.startsOn, input.endsOn),
+  const inside = bookings.filter(
+    (booking) =>
+      onFreezeDate(booking.session.startsAt, input.startsOn, input.endsOn) &&
+      booking.session.startsAt.getTime() > input.decidedAt.getTime(),
   );
   if (inside.length === 0) return 0;
   const now = new Date();
@@ -195,6 +198,7 @@ export const approveFreeze = async (
     clientId: row.clientId,
     startsOn: row.startsOn,
     endsOn: row.endsOn,
+    decidedAt: input.decidedAt,
     decidedByAccountId: input.decidedByAccountId,
   });
   const closedWaitlistEntries = await closeWaitlistInsideFreeze(transaction, {
