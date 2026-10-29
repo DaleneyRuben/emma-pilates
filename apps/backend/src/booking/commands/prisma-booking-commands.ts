@@ -575,6 +575,19 @@ export class PrismaBookingCommands {
               transaction.booking.count({
                 where: { sessionId, state: BookingState.BOOKED },
               }),
+            findApprovedFreeze: ({ clientId, onDate }) =>
+              transaction.freeze.findFirst({
+                where: {
+                  clientId,
+                  state: 'APPROVED',
+                  deletedAt: null,
+                  startsOn: { lte: boliviaDate(onDate) },
+                  endsOn: { gte: boliviaDate(onDate) },
+                },
+                select: { endsOn: true },
+              }),
+            findNotYetStartedSubscription: ({ clientId, onDate }) =>
+              findNotYetStartedSubscription(transaction, { clientId, onDate }),
             weeklyCapBlocksDestination: async (input) => {
               const position = await readWeeklyCapPosition(transaction, input);
               return (
@@ -787,6 +800,17 @@ export class PrismaBookingCommands {
           clientId,
           onDate,
           needsAllowance: false,
+        }),
+      findApprovedFreeze: ({ clientId, onDate }) =>
+        transaction.freeze.findFirst({
+          where: {
+            clientId,
+            state: 'APPROVED',
+            deletedAt: null,
+            startsOn: { lte: boliviaDate(onDate) },
+            endsOn: { gte: boliviaDate(onDate) },
+          },
+          select: { endsOn: true },
         }),
       findNotYetStartedSubscription: ({ clientId, onDate }) =>
         findNotYetStartedSubscription(transaction, { clientId, onDate }),

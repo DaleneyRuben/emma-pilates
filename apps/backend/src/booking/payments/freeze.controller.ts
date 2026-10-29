@@ -34,6 +34,7 @@ import {
   FreezeDecisionDto,
   FreezeRequestDto,
   FreezeReviewDto,
+  isCivilDate,
   parseDecideFreeze,
   parseRequestFreeze,
   RequestFreezeDto,
@@ -42,11 +43,8 @@ import { PaymentRuleError } from './payment-errors';
 import { paymentCommands } from './payments.controller';
 import type { PaymentCommands } from './prisma-payment-commands';
 
-const invalidRequest = (detail: string) =>
-  new HttpException(
-    { code: 'invalid_request', detail },
-    HttpStatus.BAD_REQUEST,
-  );
+const invalidRequest = (detail: string, code = 'invalid_request') =>
+  new HttpException({ code, detail }, HttpStatus.BAD_REQUEST);
 
 const requireId = (value: string, detail: string): string => {
   const parsed = parseUuid(value);
@@ -106,7 +104,22 @@ export class ClientFreezesController {
     @Body() body: unknown,
   ): Promise<FreezeRequestDto> {
     const parsed = parseRequestFreeze(body);
-    if (parsed === null) throw invalidRequest('Invalid Freeze request');
+    if (parsed === null) {
+      const bodyRecord =
+        typeof body === 'object' && body !== null
+          ? (body as { startsOn?: unknown; endsOn?: unknown })
+          : {};
+      const dates = [bodyRecord.startsOn, bodyRecord.endsOn].filter(
+        (value): value is string => typeof value === 'string',
+      );
+      if (dates.some((value) => !isCivilDate(value))) {
+        throw invalidRequest(
+          'Freeze dates are not civil dates',
+          'invalid_civil_date',
+        );
+      }
+      throw invalidRequest('Invalid Freeze request');
+    }
     const principal = await authenticateBearer(
       this.principalResolver,
       authorization,

@@ -1,48 +1,77 @@
-import { boliviaDate } from '../../time/bolivia-time';
-
-const dayMilliseconds = 24 * 60 * 60 * 1_000;
+import { addCivilDays, boliviaDate } from '../../time/bolivia-time';
 
 export const bookingDuringFreezeMessage = (endsOn: Date): string =>
   `Booking is during a Freeze until ${endsOn.toISOString().slice(0, 10)}`;
 
+const dayMilliseconds = 24 * 60 * 60 * 1_000;
+
 const daysBetween = (from: Date, until: Date): number =>
   (until.getTime() - from.getTime()) / dayMilliseconds + 1;
+
+export type FreezeRefusalCode =
+  'freeze_not_allowed' | 'freeze_start_in_past' | 'freeze_outside_term';
 
 export type FreezeRequestFacts = {
   subscriptionId: string;
   clientId: string;
   durationDays: number;
+  /** Current term end, before this Freeze extends it. */
   endsOn: Date;
+  /** Bolivia civil date of the request, or of the approval. */
   today: Date;
   startsOn: Date;
   endsOnRequest: Date;
   existingRequest: 'requested' | 'approved' | 'refused' | null;
+  /** Current term start. Absent only for a caller that has not loaded it. */
+  subscriptionStartsOn?: Date;
+  /**
+   * Start Date of a queued renewal. The Freeze must end before that day, so
+   * extending the current term cannot overlap it.
+   */
+  renewalStartsOn?: Date | null;
 };
 
-const refused = { allowed: false, code: 'freeze_not_allowed' } as const;
+const refused = (code: FreezeRefusalCode) =>
+  ({ allowed: false, code }) as const;
 
 // booking ADR-0010: once per Subscription, on a Plan of 90 days or more, for
-// at most 15 days, and never starting before today.
+// at most 15 days, never starting before today, and inside the current term.
+// A queued renewal caps the window so the extension cannot reach its start.
 export const decideFreezeRequest = (
   facts: FreezeRequestFacts,
 ):
   | { allowed: true; frozenDays: number; extendedEndsOn: Date }
-  | { allowed: false; code: 'freeze_not_allowed' } => {
+  | { allowed: false; code: FreezeRefusalCode } => {
+  const today = boliviaDate(facts.today);
   const frozenDays = daysBetween(facts.startsOn, facts.endsOnRequest);
   if (
+    !Number.isInteger(frozenDays) ||
     facts.existingRequest !== null ||
     facts.durationDays < 90 ||
     frozenDays < 1 ||
-    frozenDays > 15 ||
-    facts.startsOn.getTime() < boliviaDate(facts.today).getTime()
+    frozenDays > 15
   ) {
-    return refused;
+    return refused('freeze_not_allowed');
+  }
+  if (facts.startsOn.getTime() < today.getTime()) {
+    return refused('freeze_start_in_past');
+  }
+  const renewalCap =
+    facts.renewalStartsOn === undefined || facts.renewalStartsOn === null
+      ? facts.endsOn
+      : addCivilDays(facts.renewalStartsOn, -(frozenDays + 1));
+  const lastAllowed =
+    renewalCap.getTime() < facts.endsOn.getTime() ? renewalCap : facts.endsOn;
+  if (
+    (facts.subscriptionStartsOn !== undefined &&
+      facts.startsOn.getTime() < facts.subscriptionStartsOn.getTime()) ||
+    facts.endsOnRequest.getTime() > lastAllowed.getTime()
+  ) {
+    return refused('freeze_outside_term');
   }
   return {
     allowed: true,
     frozenDays,
-    extendedEndsOn: new Date(
-      facts.endsOn.getTime() + frozenDays * dayMilliseconds,
-    ),
+    extendedEndsOn: addCivilDays(facts.endsOn, frozenDays),
   };
 };

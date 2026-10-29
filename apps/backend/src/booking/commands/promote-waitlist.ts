@@ -24,6 +24,10 @@ type PromoteWaitlistDependencies = {
     clientId: string;
     onDate: Date;
   }): Promise<WeeklyCapSubscription | null>;
+  findApprovedFreeze?(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ endsOn: Date } | null>;
   hasOverlappingBooking(input: {
     clientId: string;
     startsAt: Date;
@@ -79,6 +83,16 @@ export const promoteWaitlist = async (
     });
 
     if (subscription === null || weeklyCapBlocks(subscription)) {
+      continue;
+    }
+
+    const freeze = dependencies.findApprovedFreeze
+      ? await dependencies.findApprovedFreeze({
+          clientId: entry.clientId,
+          onDate: session.startsAt,
+        })
+      : null;
+    if (freeze !== null) {
       continue;
     }
 

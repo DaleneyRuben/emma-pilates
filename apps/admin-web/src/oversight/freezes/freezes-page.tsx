@@ -40,9 +40,15 @@ function DecisionCell({
     mutation.error instanceof ApiError &&
     mutation.error.code === "freeze_access_denied"
       ? "No puedes decidir un congelamiento."
-      : mutation.isError
-        ? "No pudimos guardar la decisión. Inténtalo de nuevo."
-        : null;
+      : mutation.error instanceof ApiError &&
+          mutation.error.code === "freeze_start_in_past"
+        ? "El congelamiento ya empezó. Recházalo y pide uno desde hoy."
+        : mutation.error instanceof ApiError &&
+            mutation.error.code === "freeze_already_decided"
+          ? "Este congelamiento ya fue decidido."
+          : mutation.isError
+            ? "No pudimos guardar la decisión. Inténtalo de nuevo."
+            : null;
 
   return (
     <span className="flex flex-col items-start gap-2">
