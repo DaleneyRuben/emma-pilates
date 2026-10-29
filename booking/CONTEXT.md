@@ -109,7 +109,7 @@ How a Client found the studio, asked at registration and at the front desk: Inst
 _Avoid_: Source, lead source
 
 **Guest Pass**:
-A friend's single free class, given once in her life, when she registers with a Client's Referral Code (in the app or at the front desk) and verifies her email. It is for a Session with a free place that is not the last one, and each host may invite one friend a month. Cancelling that class in time lets her book another one under the same rules (owner, 2026-10-28). If the friend buys a Plan, the host gets one extra class on her current real Subscription, or on her next one if she has none, never on the host's own Guest Pass. A Guest Pass is not a current Plan.
+A friend's single free class, given once in her life, when she registers with a Client's Referral Code (in the app or at the front desk) and verifies her email, or activates the account the Assistant invited. It is for a Session with a free place that is not the last one, and each host may invite one friend a month. An unverified registration does not spend that month. Cancelling that class in time lets her book another one under the same rules (owner, 2026-10-28). If the friend buys a Plan, the host gets one extra class on her current real Subscription, or on her next one if she has none, never on the host's own Guest Pass. A Guest Pass is not a current Plan.
 _Avoid_: Referral reward, free trial, invite (without the Guest Pass qualifier)
 
 **Purchase Intent**:
