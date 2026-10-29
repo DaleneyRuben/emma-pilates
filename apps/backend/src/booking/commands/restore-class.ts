@@ -43,11 +43,11 @@ export const restoreBookedClass = async (
 // A same-week reschedule keeps the class already spent. The consumption
 // moves to the replacement Booking, so the weekly cap does not see a new
 // extra class.
-export const moveConsumptionToBooking = (
+export const moveConsumptionToBooking = async (
   transaction: Transaction,
   input: { fromBookingId: string; toBookingId: string },
-): Promise<unknown> =>
-  transaction.allowanceAdjustment.updateMany({
+): Promise<void> => {
+  await transaction.allowanceAdjustment.updateMany({
     where: {
       bookingId: input.fromBookingId,
       reason: AllowanceAdjustmentReason.CONSUMPTION,
@@ -55,3 +55,8 @@ export const moveConsumptionToBooking = (
     },
     data: { bookingId: input.toBookingId },
   });
+  await transaction.guestPass.updateMany({
+    where: { bookingId: input.fromBookingId, deletedAt: null },
+    data: { bookingId: input.toBookingId },
+  });
+};
