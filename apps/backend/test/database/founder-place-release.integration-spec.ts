@@ -151,4 +151,57 @@ describe('founder place release', () => {
       }),
     ).resolves.toMatchObject({ status: 'ACTIVE', paymentId: qr.id });
   });
+
+  it('does not make a founder of a renewal after her first plan missed the places', async () => {
+    await releasePlaces();
+    const holders = await Promise.all(
+      Array.from({ length: 40 }, (_, index) =>
+        world.newClient(`Cupo ${index + 1}`),
+      ),
+    );
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    for (const holder of holders) {
+      await world.commands().recordCashPayment(
+        {
+          clientId: holder.clientId,
+          planId: plan.id,
+          branchId: centro().id,
+        },
+        assistant,
+        randomUUID(),
+      );
+    }
+    const late = await world.newClient('Llegó tarde');
+    const first = await world
+      .commands()
+      .recordCashPayment(
+        { clientId: late.clientId, planId: plan.id, branchId: centro().id },
+        assistant,
+        randomUUID(),
+      );
+    expect(first).toMatchObject({ discountReason: null });
+
+    await prisma.founderMembership.updateMany({
+      where: { clientId: holders[0].clientId },
+      data: { deletedAt: now },
+    });
+    await prisma.subscription.updateMany({
+      where: { clientId: late.clientId },
+      data: { state: 'EXPIRED', expiredAt: now },
+    });
+
+    const renewal = await world
+      .commands()
+      .recordCashPayment(
+        { clientId: late.clientId, planId: plan.id, branchId: centro().id },
+        assistant,
+        randomUUID(),
+      );
+    expect(renewal).toMatchObject({ discountReason: null });
+    await expect(
+      prisma.founderMembership.findFirst({
+        where: { clientId: late.clientId, deletedAt: null },
+      }),
+    ).resolves.toBeNull();
+  });
 });
