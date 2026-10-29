@@ -57,6 +57,9 @@ export type InviteRewardDecision = {
 export const decideInviteReward = (input: {
   alreadyRewarded: boolean;
   currentSubscriptionId: string | null;
+  // The host's own Guest Pass is never a real Subscription. The +1 waits
+  // for her current real Plan, or her next one (FIX-005).
+  currentSubscriptionIsGuestPass?: boolean;
 }): InviteRewardDecision | null => {
   if (input.alreadyRewarded) return null;
   return {
