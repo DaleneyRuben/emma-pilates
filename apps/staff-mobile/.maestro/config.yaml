@@ -21,6 +21,8 @@ executionOrder:
     - trainer-agenda-and-inbox
     - send-feedback
     - administrator-review-payments
+    - fix003-confirm
+    - fix003-reject
     - administrator-cancel-session
     - assistant-create-client
     - assistant-cash-payment-and-booking
