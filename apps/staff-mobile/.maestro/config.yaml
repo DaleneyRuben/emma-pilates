@@ -21,6 +21,7 @@ executionOrder:
     - trainer-agenda-and-inbox
     - send-feedback
     - administrator-review-payments
+    - fix006-late-freeze
     - administrator-cancel-session
     - assistant-create-client
     - assistant-cash-payment-and-booking
