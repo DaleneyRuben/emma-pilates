@@ -4,6 +4,7 @@ import {
   AuditOutcome,
   FounderMembershipStatus,
 } from '../../generated/prisma/client';
+import { PaymentRuleError } from './payment-errors';
 import { claimFounderPlace } from './prisma-founder-membership';
 
 type Transaction = Prisma.TransactionClient;
@@ -61,7 +62,7 @@ export const reclaimMissingFounderPlace = async (
     },
   });
   if (payment?.discountReason !== 'founder' || payment.plan === null) return;
-  await claimFounderPlace(transaction, {
+  const claimed = await claimFounderPlace(transaction, {
     clientId: input.clientId,
     now: input.now,
     courtesy: false,
@@ -71,5 +72,24 @@ export const reclaimMissingFounderPlace = async (
     paymentId: input.paymentId,
     activate: true,
   });
-  await auditCashFounderGrant(transaction, input);
+  if (!claimed.founder) {
+    throw new PaymentRuleError(
+      'payment_confirmation_conflict',
+      'No founder place remains for this confirmation',
+    );
+  }
+  const held = await transaction.founderMembership.findFirst({
+    where: {
+      clientId: input.clientId,
+      status: FounderMembershipStatus.ACTIVE,
+      deletedAt: null,
+    },
+    select: { id: true, paymentId: true },
+  });
+  if (held !== null && held.paymentId === null) {
+    await transaction.founderMembership.update({
+      where: { id: held.id },
+      data: { paymentId: input.paymentId },
+    });
+  }
 };
