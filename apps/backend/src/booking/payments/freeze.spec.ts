@@ -1,4 +1,4 @@
-import { decideFreezeRequest } from './freeze';
+import { countedFreezeRequest, decideFreezeRequest } from './freeze';
 
 const civil = (date: string): Date => new Date(`${date}T00:00:00.000Z`);
 
@@ -10,6 +10,18 @@ const quarterly = {
   today: civil('2026-10-23'),
   existingRequest: null,
 };
+
+describe('countedFreezeRequest', () => {
+  it('counts a requested or an approved Freeze and ignores a refusal', () => {
+    expect(countedFreezeRequest([])).toBeNull();
+    expect(countedFreezeRequest([{ state: 'REFUSED' }])).toBeNull();
+    expect(countedFreezeRequest([{ state: 'requested' }])).toBe('requested');
+    expect(countedFreezeRequest([{ state: 'APPROVED' }])).toBe('approved');
+    expect(
+      countedFreezeRequest([{ state: 'refused' }, { state: 'requested' }]),
+    ).toBe('requested');
+  });
+});
 
 describe('decideFreezeRequest', () => {
   it('moves the end date by exactly the frozen days', () => {

@@ -34,6 +34,20 @@ export type FreezeRequestFacts = {
 const refused = (code: FreezeRefusalCode) =>
   ({ allowed: false, code }) as const;
 
+// Once counts a requested or an approved Freeze. A refusal does not.
+export const countedFreezeRequest = (
+  freezes: readonly { state: string }[],
+): 'requested' | 'approved' | null => {
+  const counted = freezes.find((freeze) => {
+    const state = freeze.state.toLowerCase();
+    return state === 'requested' || state === 'approved';
+  });
+  if (counted === undefined) {
+    return null;
+  }
+  return counted.state.toLowerCase() === 'approved' ? 'approved' : 'requested';
+};
+
 // booking ADR-0010: once per Subscription, on a Plan of 90 days or more, for
 // at most 15 days, never starting before today, and inside the current term.
 // A queued renewal caps the window so the extension cannot reach its start.
