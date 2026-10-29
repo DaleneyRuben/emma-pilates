@@ -70,8 +70,11 @@ export const assertFreezeRequestAllowed = async (
   };
   const decision = decideFreezeRequest(facts);
   if (!decision.allowed) {
+    // ADR-0016: the request path answers one code. An installed build that
+    // still knows the finer codes keeps working, and the approval path
+    // still sends them.
     throw new PaymentRuleError(
-      decision.code,
+      'freeze_not_allowed',
       'Este plan no se puede congelar.',
     );
   }

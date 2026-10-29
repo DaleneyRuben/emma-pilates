@@ -215,7 +215,7 @@ describe('freeze approval bounds', () => {
           client,
         ),
       ),
-    ).resolves.toBe('freeze_outside_term');
+    ).resolves.toBe('freeze_not_allowed');
   });
 
   it('does not extend the plan a second time when approval races', async () => {
