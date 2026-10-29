@@ -113,4 +113,21 @@ describe('decideFreezeRequest bounds', () => {
       }),
     ).toEqual({ allowed: false, code: 'freeze_outside_term' });
   });
+
+  it('refuses a mid-term window whose extension would overlap a queued renewal', () => {
+    expect(
+      decideFreezeRequest({
+        subscriptionId: 'subscription-1',
+        clientId: 'client-1',
+        durationDays: 90,
+        endsOn: civil('2026-12-20'),
+        today: civil('2026-11-01'),
+        startsOn: civil('2026-11-11'),
+        endsOnRequest: civil('2026-11-20'),
+        existingRequest: null,
+        subscriptionStartsOn: civil('2026-09-22'),
+        renewalStartsOn: civil('2026-12-21'),
+      }),
+    ).toEqual({ allowed: false, code: 'freeze_outside_term' });
+  });
 });

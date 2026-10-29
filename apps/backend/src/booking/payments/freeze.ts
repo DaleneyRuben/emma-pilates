@@ -56,16 +56,16 @@ export const decideFreezeRequest = (
   if (facts.startsOn.getTime() < today.getTime()) {
     return refused('freeze_start_in_past');
   }
-  const renewalCap =
-    facts.renewalStartsOn === undefined || facts.renewalStartsOn === null
-      ? facts.endsOn
-      : addCivilDays(facts.renewalStartsOn, -(frozenDays + 1));
-  const lastAllowed =
-    renewalCap.getTime() < facts.endsOn.getTime() ? renewalCap : facts.endsOn;
+  const extensionReachesRenewal =
+    facts.renewalStartsOn !== undefined &&
+    facts.renewalStartsOn !== null &&
+    addCivilDays(facts.endsOn, frozenDays).getTime() >=
+      facts.renewalStartsOn.getTime();
   if (
     (facts.subscriptionStartsOn !== undefined &&
       facts.startsOn.getTime() < facts.subscriptionStartsOn.getTime()) ||
-    facts.endsOnRequest.getTime() > lastAllowed.getTime()
+    facts.endsOnRequest.getTime() > facts.endsOn.getTime() ||
+    extensionReachesRenewal
   ) {
     return refused('freeze_outside_term');
   }
