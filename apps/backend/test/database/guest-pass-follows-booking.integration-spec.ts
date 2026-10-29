@@ -161,7 +161,7 @@ describe('guest pass follows the booking', () => {
     );
 
     await afterBooking.cancelSession(
-      { sessionId: fixture.sessionId, reason: 'La sala se cerró' },
+      { sessionId: fixture.sessionId },
       {
         accountId: fixture.accountId,
         authenticationSessionId: randomUUID(),
