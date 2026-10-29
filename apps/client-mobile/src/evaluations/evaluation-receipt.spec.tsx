@@ -221,6 +221,50 @@ describe("Paid Evaluation receipt", () => {
     expect(screen.getByText("Comprobante listo.")).toBeOnTheScreen();
   });
 
+  it("shows Subiendo and ignores a second tap while the receipt uploads", async () => {
+    chooseReceipt();
+    let releaseUpload: () => void = () => {};
+    const uploadStarted = new Promise<void>((resolve) => {
+      releaseUpload = resolve;
+    });
+    const attached: string[] = [];
+    const fetcher = routeFetcher(
+      baseRoutes({
+        ...uploadRoutes(),
+        "/api/v1/evaluations?scope=upcoming": () =>
+          jsonResponse(
+            page([
+              upcomingEvaluation("evaluation-paid", bookedStart(), {
+                ...paid,
+                paymentId: "payment-1",
+                receiptAttached: false,
+                receiptUploadable: true,
+              }),
+            ]),
+          ),
+        "POST /api/v1/evaluations/evaluation-paid/receipt": async (init) => {
+          attached.push(String(init?.body));
+          await uploadStarted;
+          return new Response(null, { status: 204 });
+        },
+      }),
+    );
+    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const upload = await screen.findByRole("button", {
+      name: "Sube tu comprobante de transferencia",
+    });
+
+    fireEvent.press(upload);
+    fireEvent.press(upload);
+
+    expect(await screen.findByText("Subiendo comprobante…")).toBeOnTheScreen();
+    expect(attached).toEqual([]);
+    releaseUpload();
+    await waitFor(() => {
+      expect(attached).toEqual([JSON.stringify({ imageAssetId: "asset-1" })]);
+    });
+  });
+
   it("hides the receipt upload once the paid Evaluation is confirmed", async () => {
     const fetcher = routeFetcher(
       baseRoutes({
