@@ -14,6 +14,7 @@ This is the tool-neutral entrypoint for any AI-assisted work in this repository.
 - [`coding-standards`](./.agents/skills/coding-standards/SKILL.md) is always active for code, tests, database work, business logic, and engineering documentation.
 - [`commit`](./.agents/skills/commit/SKILL.md) is mandatory for every commit. Invoke `$commit` in Codex, `/commit` in clients that expose slash skills, or follow the linked workflow directly when native skill invocation is unavailable.
 - [`design-workflow`](./.agents/skills/design-workflow/SKILL.md) is mandatory before inspecting or changing design prompts or generated design output.
+- [`surface-verification`](./.agents/skills/surface-verification/SKILL.md) is mandatory before walking a change on the Simulators, the emulator, or the admin web, and before writing walk evidence. It covers the databases, ports, devices, Maestro, and Playwright.
 - [`bootstrap-standards`](./.agents/skills/bootstrap-standards/SKILL.md) applies only when importing or resynchronizing engineering standards from another repository.
 
 ## Generated design output
