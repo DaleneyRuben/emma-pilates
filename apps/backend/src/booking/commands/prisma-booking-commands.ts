@@ -35,6 +35,7 @@ import { recordAttendance } from './record-attendance';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
 import { fundBooking } from './weekly-cap-funding';
 import { readWeeklyCapPosition } from './weekly-cap-count';
+import { weeklyCapBlocksReschedule } from './reschedule-cap';
 import {
   findCoveringSubscription,
   findApprovedFreeze,
@@ -579,26 +580,8 @@ export class PrismaBookingCommands {
               findApprovedFreeze(transaction, { clientId, onDate }),
             findNotYetStartedSubscription: ({ clientId, onDate }) =>
               findNotYetStartedSubscription(transaction, { clientId, onDate }),
-            weeklyCapBlocksDestination: async (input) => {
-              const moved = await transaction.allowanceAdjustment.findFirst({
-                where: {
-                  bookingId: input.excludeBookingId,
-                  reason: 'CONSUMPTION',
-                  deletedAt: null,
-                },
-                select: { id: true },
-              });
-              // The class was already extra-funded. Moving it is not a new
-              // use of the weekly cap.
-              if (moved !== null) return false;
-              const position = await readWeeklyCapPosition(transaction, input);
-              return (
-                position.weeklyClassCap !== null &&
-                position.baseFundedBookingsThisWeek >=
-                  position.weeklyClassCap &&
-                position.extraClasses <= 0
-              );
-            },
+            weeklyCapBlocksDestination: (input) =>
+              weeklyCapBlocksReschedule(transaction, input),
             hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
               transaction.booking
                 .findFirst({
