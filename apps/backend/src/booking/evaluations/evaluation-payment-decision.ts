@@ -89,10 +89,10 @@ const confirmBookedEvaluation = async (
   },
 ): Promise<void> => {
   if (input.payment.state === PaymentState.CONFIRMED) return;
-  if (
-    input.payment.state !== PaymentState.PENDING ||
-    input.payment.evaluation.state !== EvaluationState.BOOKED
-  ) {
+  const held =
+    input.payment.evaluation.state === EvaluationState.BOOKED ||
+    input.payment.evaluation.state === EvaluationState.NO_SHOW;
+  if (input.payment.state !== PaymentState.PENDING || !held) {
     throw conflict('The Evaluation is no longer booked');
   }
   await transaction.payment.update({
