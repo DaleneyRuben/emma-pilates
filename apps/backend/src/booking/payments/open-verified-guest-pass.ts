@@ -1,4 +1,5 @@
 import type { Prisma } from '../../generated/prisma/client';
+import { isMonthlyInviteSpent } from './guest-pass';
 import { GuestPassError, openGuestPass } from './open-guest-pass';
 
 type Transaction = Prisma.TransactionClient;
@@ -28,10 +29,7 @@ export const openGuestPassForVerifiedClient = async (
       now: input.now,
     });
   } catch (error) {
-    if (
-      error instanceof GuestPassError &&
-      error.code === 'guest_pass_monthly_limit'
-    ) {
+    if (error instanceof GuestPassError && isMonthlyInviteSpent(error)) {
       return;
     }
     throw error;

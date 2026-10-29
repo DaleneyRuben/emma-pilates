@@ -31,10 +31,7 @@ export const decideGuestPassBooking = (input: {
 export const isMonthlyInviteSpent = (error: {
   code?: string;
   message?: string;
-}): boolean =>
-  (error.message ?? '').includes(
-    'A host invites one friend each calendar month',
-  );
+}): boolean => error.code === 'guest_pass_monthly_limit';
 
 export type InvitationDecision = {
   code: 'guest_pass_monthly_limit';
