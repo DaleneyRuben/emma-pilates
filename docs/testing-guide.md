@@ -7100,18 +7100,30 @@ device for this item. The admin approval is the browser check.
 
 A. **The request (12).** As a Client with **Trimestral 36 clases**, open
    **Mi plan**. The form asks for a start, an end, and a reason. A 10-day
-   request is accepted and the screen says it is in review. A 30-day or
-   60-day Plan, a second request, more than 15 days, or a start in the past
+   request inside the current term is accepted and the screen says it is in
+   review. A 30-day or 60-day Plan, a second request, or more than 15 days
    answers `409` `freeze_not_allowed` and «Este plan no se puede congelar.»
+   A start already in the past answers `409` `freeze_start_in_past` with the
+   same sentence. A window outside the current term, or one whose extension
+   would reach a queued renewal, answers `409` `freeze_outside_term`. A date
+   that is not a calendar day, such as `2026-02-31`, answers `400`
+   `invalid_civil_date`.
 B. **The decision.** Paola opens **Back Office → Congelamientos**. The card
    names the Client, the Plan, the dates, and the reason, with **Aprobar**
-   and **Rechazar**. Approving moves the Subscription end by exactly the
-   frozen days and cancels Bookings already inside the window; the class
-   returns the same way a cancellation does. The Payment amount does not
-   change. The Client receives a push and an inbox notification.
+   and **Rechazar**. Approving on or before the start moves the Subscription
+   end by exactly the frozen days, cancels Bookings whose Session falls
+   inside the window in La Paz, and closes Waitlist entries for those
+   Sessions. The class returns the same way a cancellation does. The Payment
+   amount does not change. The Client receives a push and an inbox
+   notification. Approving after the start has passed answers `409`
+   `freeze_start_in_past` and changes nothing: «El congelamiento ya empezó.
+   Recházalo y pide uno desde hoy.» A second approval answers `409`
+   `freeze_already_decided` and does not move the end again.
 C. **The booking.** A Session inside an approved Freeze answers `409`
    `booking_during_freeze` and «Tu plan está congelado hasta el {fecha}.»
-   A Session outside it books as before.
+   Joining its Waitlist, being promoted from it, and rescheduling into it
+   answer the same code. A Reschedule before the Start Date answers `409`
+   `booking_before_start_date`. A Session outside the Freeze books as before.
 D. **The founder.** A founder whose Subscription was frozen is not ended by
    the nightly job: the stored end already includes the frozen days.
 E. **Who decides.** An Assistant, a Trainer, a Nutritionist, and a Client
