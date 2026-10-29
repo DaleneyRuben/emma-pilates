@@ -91,7 +91,10 @@ describe("Paid Evaluation receipt", () => {
         ...uploadRoutes(),
         "POST /api/v1/evaluation-slots/slot-2/evaluation-payments": () =>
           jsonResponse(
-            upcomingEvaluation("evaluation-paid", bookedStart(), { ...paid, paymentId: "payment-1" }),
+            upcomingEvaluation("evaluation-paid", bookedStart(), {
+              ...paid,
+              paymentId: "payment-1",
+            }),
             201,
           ),
         "POST /api/v1/evaluations/evaluation-paid/receipt": (init) => {
@@ -136,7 +139,10 @@ describe("Paid Evaluation receipt", () => {
         "POST /api/v1/evaluation-slots/slot-2/evaluation-payments": () => {
           listed = true;
           return jsonResponse(
-            upcomingEvaluation("evaluation-paid", bookedStart(), { ...paid, paymentId: "payment-1" }),
+            upcomingEvaluation("evaluation-paid", bookedStart(), {
+              ...paid,
+              paymentId: "payment-1",
+            }),
             201,
           );
         },
@@ -203,7 +209,9 @@ describe("Paid Evaluation receipt", () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryByRole("button", { name: "Sube tu comprobante de transferencia" })).toBeNull();
+      expect(
+        screen.queryByRole("button", { name: "Sube tu comprobante de transferencia" }),
+      ).toBeNull();
     });
     expect(attached).toEqual([JSON.stringify({ imageAssetId: "asset-1" })]);
     expect(screen.getByText("Comprobante listo.")).toBeOnTheScreen();
@@ -217,7 +225,10 @@ describe("Paid Evaluation receipt", () => {
         ...uploadRoutes(),
         "POST /api/v1/evaluation-slots/slot-2/evaluation-payments": () =>
           jsonResponse(
-            upcomingEvaluation("evaluation-paid", bookedStart(), { ...paid, paymentId: "payment-1" }),
+            upcomingEvaluation("evaluation-paid", bookedStart(), {
+              ...paid,
+              paymentId: "payment-1",
+            }),
             201,
           ),
         "POST /api/v1/evaluations/evaluation-paid/receipt": () => {
