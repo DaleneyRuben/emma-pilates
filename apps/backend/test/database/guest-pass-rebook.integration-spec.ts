@@ -142,6 +142,84 @@ describe('guest pass rebook and reward landing', () => {
     expect(again.id).toEqual(expect.any(String));
   });
 
+  it('restores the pass rules when the studio cancels her class', async () => {
+    const bookedAt = new Date();
+    const fixture = await createFixture(prisma, {
+      capacity: 8,
+      now: new Date(bookedAt.getTime() + 48 * 60 * 60 * 1_000),
+    });
+    const host = await prisma.client.create({
+      data: { name: 'Anfitriona estudio', referralCode: `REF-${randomUUID()}` },
+    });
+    const friend = await prisma.client.create({
+      data: {
+        name: 'Invitada de estudio',
+        referralCode: `REF-${randomUUID()}`,
+      },
+    });
+    await prisma.$transaction((transaction) =>
+      openGuestPass(transaction, {
+        hostClientId: host.id,
+        friendClientId: friend.id,
+        authorAccountId: fixture.accountId,
+        now: bookedAt,
+      }),
+    );
+    const friendAccount = await prisma.account.create({
+      data: { email: `${randomUUID()}@example.com`, clientId: friend.id },
+    });
+    const commands = new PrismaBookingCommands(prisma, () => bookedAt);
+    const principal = {
+      accountId: friendAccount.id,
+      authenticationSessionId: randomUUID(),
+      identity: { kind: 'client' as const, clientId: friend.id },
+    };
+    await commands.create({ sessionId: fixture.sessionId }, principal);
+    const afterBooking = new PrismaBookingCommands(
+      prisma,
+      () => new Date(bookedAt.getTime() + 60_000),
+    );
+
+    await afterBooking.cancelSession(
+      { sessionId: fixture.sessionId, reason: 'La sala se cerró' },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: {
+          kind: 'staff',
+          staffMemberId: fixture.trainerId,
+          role: 'administrator',
+          branchIds: [fixture.branchId],
+        },
+      },
+    );
+
+    const pass = await prisma.guestPass.findFirstOrThrow({
+      where: { friendClientId: friend.id, deletedAt: null },
+      select: { bookingId: true },
+    });
+    expect(pass.bookingId).toBeNull();
+
+    const source = await prisma.session.findUniqueOrThrow({
+      where: { id: fixture.sessionId },
+      select: { classTypeId: true },
+    });
+    const lastPlace = await prisma.session.create({
+      data: {
+        branchId: fixture.branchId,
+        classTypeId: source.classTypeId,
+        trainerStaffMemberId: fixture.trainerId,
+        startsAt: new Date(bookedAt.getTime() + 96 * 60 * 60 * 1_000),
+        endsAt: new Date(bookedAt.getTime() + 97 * 60 * 60 * 1_000),
+        capacity: 1,
+      },
+      select: { id: true },
+    });
+    await expect(
+      afterBooking.create({ sessionId: lastPlace.id }, principal),
+    ).rejects.toThrow('guest_pass_last_place');
+  });
+
   it("owes the reward when the host's only Subscription is her own guest pass", async () => {
     const host = await prisma.client.create({
       data: {
