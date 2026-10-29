@@ -77,9 +77,7 @@ function problemMessage(body: unknown): string | null {
     const date = /: (\d{4}-\d{2}-\d{2})$/.exec(detail)?.[1];
     if (date !== undefined) return `Podrás reservar a partir del ${formatCivilDate(date)}.`;
   }
-  return typeof code === "string"
-    ? (bookingProblems[code] ?? bookingRejectionMessage(code))
-    : null;
+  return typeof code === "string" ? (bookingProblems[code] ?? bookingRejectionMessage(code)) : null;
 }
 
 export function SessionDetailScreen({ route }: { route: { params: { sessionId: string } } }) {
