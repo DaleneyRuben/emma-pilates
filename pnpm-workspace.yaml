@@ -37,3 +37,4 @@ auditConfig:
     - GHSA-vfj7-8cjw-p6xm # braces <=3.0.3 via jest: 3.0.4 is not on npm
     - GHSA-86w9-cpqp-85rv # node-forge <=1.4.0 via expo: 1.4.1 is not on npm
     - GHSA-2883-xcg3-v3hh # js-yaml 4.3.1 pinned by orval 8.26.0; upgrading orval regenerates the client
+    - GHSA-qr28-fpjm-wq7f # decode-uri-component 0.2.2 via @react-navigation/core > query-string 7: the fix (0.5.1) is ESM-only and query-string 7 requires it
