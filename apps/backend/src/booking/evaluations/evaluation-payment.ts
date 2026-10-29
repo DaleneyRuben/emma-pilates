@@ -6,7 +6,6 @@ import {
   PaymentState,
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { BookingAccessDeniedError } from '../commands/create-booking';
 import { rejectPaymentOfCancelledEvaluation } from './evaluation-payment-decision';
 import { evaluationHoldExpiresAt } from './evaluation-rules';
 
@@ -74,56 +73,6 @@ export const startEvaluationTransfer = async (
 
 export const evaluationTransferHoldUntil = (submittedAt: Date): Date =>
   evaluationHoldExpiresAt(submittedAt);
-
-export const confirmEvaluationTransfer = async (
-  transaction: Transaction,
-  input: {
-    paymentId: string;
-    principal: AuthenticatedPrincipal;
-    now: Date;
-    feeCentavos: number;
-  },
-): Promise<void> => {
-  if (
-    input.principal.identity.kind !== 'staff' ||
-    input.principal.identity.role !== 'administrator'
-  ) {
-    throw new BookingAccessDeniedError();
-  }
-  const payment = await transaction.payment.findUnique({
-    where: { id: input.paymentId },
-    select: {
-      id: true,
-      kind: true,
-      state: true,
-      method: true,
-      evaluation: { select: { id: true, state: true } },
-    },
-  });
-  if (
-    payment === null ||
-    payment.kind !== PaymentKind.EVALUATION ||
-    payment.evaluation === null
-  ) {
-    throw new BookingAccessDeniedError();
-  }
-  if (payment.state === PaymentState.CONFIRMED) return;
-  if (payment.state !== PaymentState.PENDING) {
-    throw new BookingAccessDeniedError();
-  }
-  await transaction.payment.update({
-    where: { id: payment.id },
-    data: {
-      state: PaymentState.CONFIRMED,
-      decidedByAccountId: input.principal.accountId,
-      decidedAt: input.now,
-    },
-  });
-  await transaction.evaluation.update({
-    where: { id: payment.evaluation.id },
-    data: { nutritionistCostCentavos: input.feeCentavos },
-  });
-};
 
 export const releaseExpiredEvaluationHolds = async (
   transaction: Transaction,

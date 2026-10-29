@@ -24,10 +24,7 @@ import {
 } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { isSubscriptionEffective } from '../payments/purchase-eligibility';
-import {
-  decideEvaluationTransfer,
-  rejectPaymentOfCancelledEvaluation,
-} from './evaluation-payment-decision';
+import { rejectPaymentOfCancelledEvaluation } from './evaluation-payment-decision';
 import {
   attachEvaluationReceipt as attachPaidEvaluationReceipt,
   coveringSubscription,
@@ -1365,22 +1362,6 @@ export const createPrismaEvaluationCommands = (
     );
   };
 
-  const confirmEvaluationTransfer = async (
-    paymentId: string,
-    principal: AuthenticatedPrincipal,
-  ): Promise<void> => {
-    const settings = await studioPrice(prisma);
-    await transact((transaction) =>
-      decideEvaluationTransfer(transaction, recordNotification, {
-        paymentId,
-        principal,
-        now: dependencies.now(),
-        feeCentavos: settings.nutritionistFeeCentavos,
-        decision: 'confirm',
-      }),
-    );
-  };
-
   const releaseExpiredEvaluationHolds = async (): Promise<number> =>
     transact((transaction) => releaseHolds(transaction, dependencies.now()));
 
@@ -1813,7 +1794,6 @@ export const createPrismaEvaluationCommands = (
     bookEvaluation,
     bookPaidEvaluation,
     attachEvaluationReceipt,
-    confirmEvaluationTransfer,
     releaseExpiredEvaluationHolds,
     recordEvaluationNoShow,
     listClientEvaluations,

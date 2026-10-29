@@ -939,9 +939,17 @@ cancellation can put her back.
 
 Done on 2026-10-28, branch `fix/fix-003-paid-evaluations`. Red
 `2cf368e4`. Green `e834caac`. Migration
-`20261028120000_evaluation_payment_decision` (needs owner approval before a
+`20261029120000_evaluation_payment_decision` (needs owner approval before a
 shared database): `payment_rejected`, a receipt on the Evaluation Payment,
-and an Administrator may reject that Payment.
+and an Administrator may reject that Payment. Renamed from
+`20261028120000` so it no longer shares a stamp with FIX-001.
+
+A Payment already pending on an Evaluation cancelled before this fix stays
+pending. There is no production data yet. Before the first shared database,
+reject each of those rows by hand: state `rejected`, `decided_at` at or after
+`submitted_at`, `decided_by_account_id` null, and reason
+`La evaluación fue cancelada`. Then schedule the receipt for deletion if one
+is attached.
 
 Verified: `paid-evaluation-lifecycle.integration-spec.ts` 8 failed before the
 fix and 8 passed after, on PostgreSQL 18 through
