@@ -1,0 +1,76 @@
+# Lucía's open Purchase Intent was back-dated on a disposable copy and the
+# worker expired it. Buying again shows the studio QR at the founder price.
+# The desk records that QR and the Administrator confirms it in
+# apps/staff-mobile/.maestro/fix227-expired-confirm.yaml.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+  APP_LINK: emmapilates-client://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8187
+---
+- launchApp:
+    appId: ${APP_ID}
+    clearKeychain: true
+- openLink: ${APP_LINK}
+- repeat:
+    times: 6
+    while:
+      notVisible:
+        id: "login-email"
+    commands:
+      - tapOn:
+          text: "Open"
+          optional: true
+      - tapOn:
+          text: "Continue"
+          optional: true
+      - tapOn:
+          text: "Close"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "login-email"
+          timeout: 15000
+          optional: true
+- tapOn:
+    text: "Dismiss"
+    optional: true
+- tapOn:
+    id: "login-email"
+- waitForAnimationToEnd
+- inputText: ${EMAIL}
+- tapOn:
+    id: "login-password"
+- waitForAnimationToEnd
+- inputText: ${PASSWORD}
+- tapOn:
+    id: "login-submit"
+- tapOn:
+    text: "Not Now"
+    optional: true
+- runFlow: subflows/dismiss-push-permission.yaml
+- tapOn:
+    text: "Close"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "home-buy-plan"
+    timeout: 20000
+- tapOn:
+    id: "home-buy-plan"
+- extendedWaitUntil:
+    visible: "Elige tu plan"
+    timeout: 20000
+- tapOn: "Paquete de 8 clases"
+- extendedWaitUntil:
+    visible:
+      id: "plan-continue-to-payment"
+    timeout: 15000
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- tapOn:
+    id: "plan-continue-to-payment"
+- extendedWaitUntil:
+    visible: "Pago por transferencia"
+    timeout: 20000
+- takeScreenshot: fix227-expired-payment
