@@ -19,6 +19,16 @@ import { useStaffFetcher } from "../staff-fetcher";
 
 type ReviewNavigation = { goBack: () => void };
 
+const decisionNotice = (body: unknown): string => {
+  const code = (body as { code?: unknown } | null)?.code;
+  if (code === "freeze_start_in_past") {
+    return "El congelamiento ya empezó. Recházalo y pide uno desde hoy.";
+  }
+  if (code === "freeze_already_decided") return "Este congelamiento ya fue decidido.";
+  if (code === "freeze_access_denied") return "No puedes decidir un congelamiento.";
+  return "No pudimos guardar la decisión.";
+};
+
 export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: string } } }) {
   const navigation = useNavigation<ReviewNavigation>();
   const fetcher = useStaffFetcher();
@@ -33,7 +43,7 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
       setNotice(
         response.status === 200
           ? "Listo. La clienta ya fue avisada."
-          : "No pudimos guardar la decisión.",
+          : decisionNotice(response.data),
       );
     } catch {
       setNotice("No pudimos guardar la decisión.");
