@@ -33,7 +33,7 @@ numbered tests.
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
-| Founder membership           | The first 40 Clients whose first real Payment is confirmed get 15 % off later Plans except the single class, a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; the first Payment itself is at list price |
+| Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
@@ -7052,32 +7052,33 @@ existing ineligible-subscription refusal.
 
 ## Test 88: founder membership (BKM-010)
 
-The first 40 Clients whose first real Payment is confirmed hold a Founder
-Membership: 15 % off every Plan except the single class, lost for good after
-a gap of more than 7 days
+The first 40 Clients whose first real Plan is priced hold a Founder
+Membership: 15 % from that first Plan, except the single class, lost for good
+after more than 7 uncovered days
 ([booking ADR-0008](../booking/docs/adr/0008-founder-membership.md)).
 Run the API and the fixtures as in Tests 2 and 5. The Client app and the
 Staff app were not walked on a device for this item; the prices and the
 banner are covered by their unit tests. The admin list is the browser check.
 
-A. **The place.** Confirm a real Payment (cash or an approved transfer) for
-   a Client who has never paid. She receives the next number, from 1 to 40.
-   The 41st distinct Client receives none. A Courtesy Access (Bs 0) takes
-   no place. A second real Payment for a founder does not take a second
-   number.
+A. **The place.** Price a real Plan (cash, an in-app transfer, or a
+   front-desk QR) for a Client who has never paid, while a place remains.
+   She receives the next number. The 41st distinct Client receives none. A
+   Courtesy Access (Bs 0), a hidden Plan, and a Bs 0 Plan take no place. A
+   rejected or expired transfer releases the reservation. A second real
+   Payment for a founder does not take a second number.
 B. **The price (08, 09, S09).** As a founder, **Elige tu plan** shows the
    discounted price, with the list price struck through under it. The
    single class (1 class, Bs 80) shows only its list price. A Client who is
    not a founder sees only the list price. The Assistant's quote shows the
    same pair, and the cash to collect is the discounted price minus any
-   credit. The first real Payment itself is at list price; the discount
-   starts on the next purchase.
+   credit. The first real Plan is already discounted. A front-desk QR for a
+   founder is pending at the discounted amount.
 C. **The banner (12).** As a founder with a current Subscription, **Mi
-   plan** shows «Renueva antes del {fecha}.» The date is the current
-   Subscription's real end plus 7 days. No banner when she has no current
+   plan** shows «Renueva antes del {fecha}.» The date is the day after 7
+   uncovered days: the real end plus 8 days. No banner when she has no current
    Subscription, or when the membership is lost.
-D. **The gap.** A nightly job ends a membership when more than 7 days pass
-   after the stored end with no next Start Date. A gap of 7 days keeps it.
+D. **The gap.** A nightly job ends a membership when more than 7 days are
+   uncovered after the stored end. A gap of exactly 7 uncovered days keeps it.
    A lost membership does not return on a later Payment. Running the job
    twice ends nothing the second time. The Client receives a push and an
    inbox notification titled «Membresía fundadora».
