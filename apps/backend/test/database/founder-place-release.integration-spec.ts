@@ -1,0 +1,110 @@
+import { randomUUID } from 'node:crypto';
+import { PrismaClient } from '../../src/generated/prisma/client';
+import {
+  fixtures,
+  now,
+  PaymentWorld,
+  plan,
+  startPaymentWorld,
+} from './payment-lifecycle-test-support';
+
+const hour = 60 * 60 * 1_000;
+
+// A place reserved at pricing must come back when the sale does not finish,
+// or an unpaid intent can hold place 40 for good.
+describe('founder place release', () => {
+  let world: PaymentWorld;
+  let prisma: PrismaClient;
+
+  beforeAll(async () => {
+    world = await startPaymentWorld();
+    ({ prisma } = world);
+  });
+
+  afterAll(async () => {
+    await world?.stop();
+  });
+
+  const centro = () =>
+    fixtures.branches.find((branch) => branch.name === 'Centro')!;
+
+  const releasePlaces = () =>
+    prisma.founderMembership.updateMany({
+      where: { deletedAt: null },
+      data: { deletedAt: now },
+    });
+
+  const reservedPlace = (clientId: string) =>
+    prisma.founderMembership.findFirst({
+      where: { clientId, status: 'RESERVED', deletedAt: null },
+    });
+
+  const nextBuyerTakesThePlace = async () => {
+    const next = await world.newClient('Lugar liberado');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    await world
+      .commands()
+      .recordCashPayment(
+        { clientId: next.clientId, planId: plan.id, branchId: centro().id },
+        assistant,
+        randomUUID(),
+      );
+    await expect(
+      prisma.founderMembership.findFirst({
+        where: { clientId: next.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({ status: 'ACTIVE' });
+  };
+
+  it('frees the reserved place when the purchase intent expires', async () => {
+    await releasePlaces();
+    const buyer = await world.newClient('Intención vencida');
+
+    const intent = await world
+      .commands()
+      .createPurchaseIntent({ planId: plan.id }, buyer, randomUUID());
+    await expect(reservedPlace(buyer.clientId)).resolves.toMatchObject({
+      status: 'RESERVED',
+    });
+
+    const later = new Date(now.getTime() + 25 * hour);
+    await world.commands(later).expirePurchaseIntents();
+
+    await expect(reservedPlace(buyer.clientId)).resolves.toBeNull();
+    await expect(
+      prisma.purchaseIntent.findUniqueOrThrow({ where: { id: intent.id } }),
+    ).resolves.toMatchObject({ state: 'EXPIRED' });
+    await nextBuyerTakesThePlace();
+  });
+
+  it('frees the reserved place when the transfer is rejected', async () => {
+    await releasePlaces();
+    const buyer = await world.newClient('Comprobante rechazado');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+
+    const pending = await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro().id,
+        imageAssetId: receipt.id,
+      },
+      assistant,
+      randomUUID(),
+    );
+    await expect(reservedPlace(buyer.clientId)).resolves.toMatchObject({
+      status: 'RESERVED',
+    });
+
+    await world
+      .commands()
+      .rejectTransfer(
+        { paymentId: pending.id, reason: 'El monto no coincide' },
+        await world.staffPrincipal('paola.mendoza@example.com'),
+      );
+
+    await expect(reservedPlace(buyer.clientId)).resolves.toBeNull();
+    await nextBuyerTakesThePlace();
+  });
+});
