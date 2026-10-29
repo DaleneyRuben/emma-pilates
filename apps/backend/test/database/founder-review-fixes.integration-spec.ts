@@ -196,6 +196,69 @@ describe('founder review fixes', () => {
       discountReason: null,
       amountDueCentavos: plan.priceCentavos,
     });
+  });
+
+  it('keeps the place when a gapped transfer is priced and never confirmed', async () => {
+    await releasePlaces();
+    const founder = await world.newClient('Transferencia abandonada');
+    await cash(founder.clientId);
+    const ended = new Date('2026-09-13T00:00:00.000Z');
+    await prisma.subscription.updateMany({
+      where: { clientId: founder.clientId },
+      data: {
+        state: 'EXPIRED',
+        expiredAt: now,
+        startsOn: new Date(ended.getTime() - 29 * day),
+        endsOn: ended,
+      },
+    });
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+
+    const pending = await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: founder.clientId,
+        planId: plan.id,
+        branchId: centro().id,
+        imageAssetId: receipt.id,
+        startsOn: '2026-09-22',
+      },
+      assistant,
+      randomUUID(),
+    );
+
+    expect(pending).toMatchObject({ discountReason: null });
+    await expect(
+      prisma.founderMembership.findFirstOrThrow({
+        where: { clientId: founder.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({ status: 'ACTIVE' });
+
+    await world
+      .commands()
+      .rejectTransfer(
+        { paymentId: pending.id, reason: 'Se arrepintió' },
+        await world.staffPrincipal('paola.mendoza@example.com'),
+      );
+    const kept = await cash(founder.clientId, plan.id, '2026-09-20');
+    expect(kept).toMatchObject({ discountReason: 'founder' });
+  });
+
+  it('records the loss when the gapped cash sale is confirmed', async () => {
+    await releasePlaces();
+    const lost = await world.newClient('Hueco confirmado');
+    await cash(lost.clientId);
+    const ended = new Date('2026-09-13T00:00:00.000Z');
+    await prisma.subscription.updateMany({
+      where: { clientId: lost.clientId },
+      data: {
+        state: 'EXPIRED',
+        expiredAt: now,
+        startsOn: new Date(ended.getTime() - 29 * day),
+        endsOn: ended,
+      },
+    });
+    await cash(lost.clientId, plan.id, '2026-09-22');
     await expect(
       prisma.founderMembership.findFirstOrThrow({
         where: { clientId: lost.clientId },
