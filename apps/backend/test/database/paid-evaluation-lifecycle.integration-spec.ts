@@ -301,6 +301,29 @@ describe('paid Evaluation payment lifecycle', () => {
     expect(listed.items.find((row) => row.id === hold.paymentId)).toMatchObject(
       { receiptAvailable: true, kind: 'evaluation' },
     );
+
+    await evaluations().cancelClientEvaluation(hold.evaluationId, buyer);
+
+    await expect(
+      world.prisma.payment.findUniqueOrThrow({
+        where: { id: hold.paymentId },
+        select: { state: true, decidedByAccountId: true },
+      }),
+    ).resolves.toEqual({ state: 'REJECTED', decidedByAccountId: null });
+    await expect(
+      world.prisma.auditRecord.count({
+        where: {
+          actionCode: 'payment.transfer_rejected',
+          targetId: hold.paymentId,
+        },
+      }),
+    ).resolves.toBe(1);
+    await expect(
+      world.prisma.imageAsset.findUniqueOrThrow({
+        where: { id: receipt.id },
+        select: { deletionDueAt: true },
+      }),
+    ).resolves.toMatchObject({ deletionDueAt: expect.any(Date) as Date });
   });
 
   it('refuses a paid Evaluation when the covering Plan is not effective', async () => {
