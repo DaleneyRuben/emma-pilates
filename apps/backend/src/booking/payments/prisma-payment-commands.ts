@@ -87,9 +87,12 @@ import {
   confirmFounderPlace,
   priceFounderSale,
   readIsFounder,
-  releaseFounderReservation,
 } from './prisma-founder-membership';
 import { auditCashFounderGrant } from './founder-grant-audit';
+import {
+  releaseFounderReservationOf,
+  repointFounderReservation,
+} from './founder-reservation';
 import {
   collectOwedInviteReward,
   grantInviteReward,
@@ -743,14 +746,9 @@ export function createPrismaPaymentCommands(
               select: { id: true },
             });
             if (priced.discountReason === 'founder') {
-              await transaction.founderMembership.updateMany({
-                where: {
-                  clientId,
-                  status: 'RESERVED',
-                  deletedAt: null,
-                  purchaseIntentId: null,
-                },
-                data: { purchaseIntentId: intent.id },
+              await repointFounderReservation(transaction, {
+                clientId,
+                purchaseIntentId: intent.id,
               });
             }
             return { id: intent.id };
@@ -978,8 +976,8 @@ export function createPrismaPaymentCommands(
           actor: { kind: CreditLedgerActorKind.WORKER, accountId: null },
           correlationId: id,
         });
-        await releaseFounderReservation(transaction, {
-          clientId: intent.clientId,
+        await releaseFounderReservationOf(transaction, {
+          purchaseIntentId: id,
           now,
         });
         await scheduleReceiptDeletion(
@@ -1205,8 +1203,8 @@ export function createPrismaPaymentCommands(
         },
         correlationId: payment.id,
       });
-      await releaseFounderReservation(transaction, {
-        clientId: payment.clientId,
+      await releaseFounderReservationOf(transaction, {
+        paymentId: payment.id,
         now,
       });
       await recordPaymentAudit(transaction, {

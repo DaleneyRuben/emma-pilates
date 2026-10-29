@@ -34,6 +34,7 @@ import {
 } from './purchase-eligibility';
 import { loseFounderForGap } from './founder-gap';
 import { priceFounderSale } from './prisma-founder-membership';
+import { repointFounderReservation } from './founder-reservation';
 
 const hour = 60 * 60 * 1_000;
 const intentLifetime = 24 * hour;
@@ -230,14 +231,9 @@ export const createFrontDeskTransfer = (
             select: { id: true },
           });
           if (priced.discountReason === 'founder') {
-            await transaction.founderMembership.updateMany({
-              where: {
-                clientId: command.clientId,
-                status: 'RESERVED',
-                deletedAt: null,
-                purchaseIntentId: null,
-              },
-              data: { purchaseIntentId: intent.id },
+            await repointFounderReservation(transaction, {
+              clientId: command.clientId,
+              purchaseIntentId: intent.id,
             });
           }
           if (reserved > 0) {
@@ -294,6 +290,13 @@ export const createFrontDeskTransfer = (
             },
             select: { id: true },
           });
+          if (priced.discountReason === 'founder') {
+            await repointFounderReservation(transaction, {
+              clientId: command.clientId,
+              purchaseIntentId: intent.id,
+              paymentId: payment.id,
+            });
+          }
           const administrators = await transaction.account.findMany({
             where: {
               activatedAt: { not: null },

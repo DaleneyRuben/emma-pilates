@@ -140,7 +140,7 @@ describe('founder place release', () => {
       paymentId: qr.id,
     });
     await world
-      .commands()
+      .commands(later)
       .confirmTransfer(
         { paymentId: qr.id },
         await world.staffPrincipal('paola.mendoza@example.com'),
