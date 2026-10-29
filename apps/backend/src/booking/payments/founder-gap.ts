@@ -6,6 +6,7 @@ import {
   PaymentMethod,
 } from '../../generated/prisma/client';
 import { decideFounderGap, type FounderRules } from './founder-membership';
+import { priceFounderSale } from './prisma-founder-membership';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -25,12 +26,13 @@ const readRules = async (transaction: Transaction): Promise<FounderRules> => {
   return version;
 };
 
-// A future start that opens more than the allowed gap loses the membership
-// before the sale is priced, so that sale is not a founder sale. Voided and
-// courtesy Subscriptions are not a real end.
-export const loseFounderForGap = async (
+// A future start that opens more than the allowed gap loses the membership.
+// Pricing asks first, so an abandoned transfer pays list without losing the
+// place. The loss is written when the sale is confirmed. Voided and courtesy
+// Subscriptions are not a real end.
+export const founderGapWouldLose = async (
   transaction: Transaction,
-  input: { clientId: string; nextStart: Date; today: Date; now: Date },
+  input: { clientId: string; nextStart: Date; today: Date },
 ): Promise<boolean> => {
   const held = await transaction.founderMembership.findFirst({
     where: {
@@ -66,12 +68,53 @@ export const loseFounderForGap = async (
     latestRealEnd: latestRealEnd === null ? null : civil(latestRealEnd),
     nextStart: civil(input.nextStart),
   });
-  if (!decision.lose) return false;
+  return decision.lose;
+};
+
+// A gapped transfer pays list and leaves the membership untouched. The loss
+// is written later, when that sale is confirmed.
+export const priceTransferForGap = async (
+  transaction: Transaction,
+  input: {
+    clientId: string;
+    nextStart: Date;
+    today: Date;
+    classAllowance: number;
+    priceCentavos: number;
+    now: Date;
+    hidden: boolean;
+  },
+) =>
+  priceFounderSale(transaction, {
+    clientId: input.clientId,
+    skipClaim: await founderGapWouldLose(transaction, input),
+    classAllowance: input.classAllowance,
+    priceCentavos: input.priceCentavos,
+    creditAppliedCentavos: 0,
+    now: input.now,
+    courtesy: false,
+    hidden: input.hidden,
+    activate: false,
+  });
+
+export const loseFounderForGap = async (
+  transaction: Transaction,
+  input: { clientId: string; nextStart: Date; today: Date; now: Date },
+): Promise<boolean> => {
+  if (!(await founderGapWouldLose(transaction, input))) return false;
+  const held = await transaction.founderMembership.findFirstOrThrow({
+    where: {
+      clientId: input.clientId,
+      deletedAt: null,
+      status: FounderMembershipStatus.ACTIVE,
+    },
+    select: { id: true },
+  });
   await transaction.founderMembership.update({
     where: { id: held.id },
     data: {
       status: FounderMembershipStatus.LOST,
-      reason: decision.reason,
+      reason: 'gap',
       lostAt: input.now,
     },
   });
@@ -84,7 +127,7 @@ export const loseFounderForGap = async (
       targetId: held.id,
       correlationId: held.id,
       occurredAt: input.now,
-      metadata: { reason: decision.reason },
+      metadata: { reason: 'gap' },
     },
   });
   return true;

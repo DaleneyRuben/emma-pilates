@@ -32,8 +32,7 @@ import {
   evaluatePurchaseEligibility,
   isSubscriptionEffective,
 } from './purchase-eligibility';
-import { loseFounderForGap } from './founder-gap';
-import { priceFounderSale } from './prisma-founder-membership';
+import { priceTransferForGap } from './founder-gap';
 import { repointFounderReservation } from './founder-reservation';
 
 const hour = 60 * 60 * 1_000;
@@ -185,21 +184,14 @@ export const createFrontDeskTransfer = (
               amountCentavos: entry.amountCentavos,
             })),
           );
-          await loseFounderForGap(transaction, {
+          const priced = await priceTransferForGap(transaction, {
             clientId: command.clientId,
             nextStart: allocated.startsOn,
             today,
-            now,
-          });
-          const priced = await priceFounderSale(transaction, {
-            clientId: command.clientId,
             classAllowance: plan!.classAllowance,
             priceCentavos: plan!.priceCentavos,
-            creditAppliedCentavos: 0,
             now,
-            courtesy: false,
             hidden: plan!.hiddenAt !== null,
-            activate: false,
           });
           const reserved = Math.min(
             credit.availableCentavos,

@@ -123,6 +123,7 @@ export const priceFounderSale = async (
     now: Date;
     courtesy: boolean;
     hidden: boolean;
+    skipClaim?: boolean;
     activate: boolean;
     purchaseIntentId?: string;
     paymentId?: string;
@@ -133,6 +134,7 @@ export const priceFounderSale = async (
     now: input.now,
     courtesy: input.courtesy,
     hidden: input.hidden,
+    skipClaim: input.skipClaim === true,
     priceCentavos: input.priceCentavos,
     classAllowance: input.classAllowance,
     purchaseIntentId: input.purchaseIntentId,
@@ -231,6 +233,7 @@ type PlaceClaim = {
   now: Date;
   courtesy: boolean;
   hidden: boolean;
+  skipClaim?: boolean;
   priceCentavos: number;
   classAllowance: number;
   purchaseIntentId?: string;
@@ -244,13 +247,7 @@ export const claimFounderPlace = async (
   transaction: Transaction,
   input: PlaceClaim,
 ): Promise<{ founder: boolean; number: number | null }> => {
-  if (!qualifiesForAPlace(input)) return { founder: false, number: null };
-  if (
-    await hasEarlierRealPayment(transaction, {
-      clientId: input.clientId,
-      paymentId: input.paymentId,
-    })
-  ) {
+  if (!qualifiesForAPlace(input) || input.skipClaim === true) {
     return { founder: false, number: null };
   }
   await lockFounderPlaces(transaction);
@@ -263,6 +260,14 @@ export const claimFounderPlace = async (
     return { founder: true, number: held.number };
   }
   if (held?.status === FounderMembershipStatus.LOST) {
+    return { founder: false, number: null };
+  }
+  if (
+    await hasEarlierRealPayment(transaction, {
+      clientId: input.clientId,
+      paymentId: input.paymentId,
+    })
+  ) {
     return { founder: false, number: null };
   }
   if (held?.status === FounderMembershipStatus.RESERVED) {

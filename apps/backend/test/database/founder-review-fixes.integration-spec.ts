@@ -240,7 +240,7 @@ describe('founder review fixes', () => {
         { paymentId: pending.id, reason: 'Se arrepintió' },
         await world.staffPrincipal('paola.mendoza@example.com'),
       );
-    const kept = await cash(founder.clientId, plan.id, '2026-09-20');
+    const kept = await cash(founder.clientId, plan.id, '2026-09-21');
     expect(kept).toMatchObject({ discountReason: 'founder' });
   });
 

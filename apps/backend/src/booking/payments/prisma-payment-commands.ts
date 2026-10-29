@@ -82,7 +82,7 @@ import {
 
 import { grantGiftClass } from './allowance-adjustments';
 import { createFrontDeskTransfer } from './front-desk-transfer';
-import { loseFounderForGap } from './founder-gap';
+import { loseFounderForGap, priceTransferForGap } from './founder-gap';
 import {
   confirmFounderPlace,
   priceFounderSale,
@@ -706,21 +706,14 @@ export function createPrismaPaymentCommands(
               active: eligible.active,
             });
             const now = dependencies.now();
-            await loseFounderForGap(transaction, {
+            const priced = await priceTransferForGap(transaction, {
               clientId,
               nextStart: allocated.startsOn,
               today: eligible.today,
-              now,
-            });
-            const priced = await priceFounderSale(transaction, {
-              clientId,
               classAllowance: plan.classAllowance,
               priceCentavos: plan.priceCentavos,
-              creditAppliedCentavos: 0,
               now,
-              courtesy: false,
               hidden: plan.hiddenAt !== null,
-              activate: false,
             });
 
             const intent = await transaction.purchaseIntent.create({
@@ -1098,6 +1091,12 @@ export function createPrismaPaymentCommands(
         });
       }
 
+      await loseFounderForGap(transaction, {
+        clientId: payment.clientId,
+        nextStart: payment.startsOn,
+        today,
+        now,
+      });
       await transaction.payment.update({
         where: { id: payment.id },
         data: {
