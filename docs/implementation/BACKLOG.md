@@ -498,6 +498,48 @@ wait for Google, Apple, and testers.
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
 | FIX-006 | P0 | Backend/admin web | Enforce the Freeze on the Waitlist and on Reschedule, and refuse a late approval | BKM-012 | 1 d | done |
 | FIX-003 | P0 | Backend/admin web/client app | Paid Evaluation payment lifecycle: reject and cancel settle the Payment, confirm audits and notifies, the receipt is visible, an exhausted Plan cannot buy one, cancelled Evaluations skip the Bs 50, AW28 names the sale and dates it by the decision, and a pending Evaluation Payment is not the current Plan Payment | NUT-003 | 1 d | done (`2cf368e4` red, `e834caac` green; evidence below) |
+| FIX-005 | P0 | Backend | Allowance net, extra-class refund and reschedule, and guest-pass rebook and verification | BKM-008, BKM-014 | 1 d | done (`dcec6e9a` red, `982f6de2` green, `c49ca7fa` decision, `3cba3cfe` guide; evidence below) |
+
+#### FIX-005 · Allowance net, extra-class refund, and guest-pass rebook
+
+Review findings H13, the extra-class refund and reschedule mediums, the guest-pass verification medium, the invite-reward landing, and owner decision 2 of 2026-10-28. Branch `fix/fix-005-allowance-and-booking`. No migration.
+
+Commits: `dcec6e9a` failing regressions, `982f6de2` the fix, `c49ca7fa` the cancelled-pass decision, `3cba3cfe` Test 86. `0afc89a8` merges `origin/main` (`fb08536e`, the seroval pin) into this branch.
+
+Findings:
+
+- H13. A queued Client whose extra classes are already spent no longer blocks the Session. Spendable extra is the signed sum of live allowance adjustments. Waitlist promotion skips a Client who cannot be funded.
+- A refund of an extra-funded class soft-deletes the linked consumption. A base-funded class still returns to `remainingClassAllowance`. Reschedule moves that consumption onto the replacement booking and does not count it as a new weekly-cap use.
+- Decision 2. A timely cancellation clears `guestPass.bookingId`. She can book another free class, and the last-place rule applies again. A late cancellation still spends the class.
+- The monthly invite opens at email verification, or at account activation for an invited friend. An unverified registration does not spend the month, and the monthly limit never fails registration. `openGuestPass` locks the host Client row. The host's +1 class lands on her current real Subscription or is owed until the next real one, never on her own Guest Pass.
+
+Decisions:
+
+- Net spendable extra is the signed sum of live allowance adjustments. A spent gift (+1 and −1) is not spendable.
+- A Client who cannot be funded is skipped during waitlist promotion. The catch stays for the race between the eligibility read and funding.
+- An extra-funded refund soft-deletes the linked `CONSUMPTION` row. A base-funded class increments remaining. The unique `bookingId` includes soft-deleted rows, so the same booking does not gain a second consumption row.
+- Reschedule moves the consumption row's `bookingId` to the replacement and does not treat that move as a new weekly-cap use.
+- A timely client cancellation clears `guestPass.bookingId`. Late cancellation still throws before the refund, so the class stays spent.
+- A spent Guest Pass still makes its courtesy Subscription eligible, so a second class answers `guest_pass_already_used`.
+- The monthly invite opens at email verification or account activation. Registration never throws `guest_pass_monthly_limit`. If the month is already used, verification succeeds and no pass is created. The host row is locked with `SELECT … FOR UPDATE`.
+- The invite reward refuses the host's own Guest Pass courtesy Subscription. If that is her only current Subscription, the class is owed until a real Subscription is activated. The courtesy link identifies it.
+- No HTTP contract change. No migration. The session-cancel refund uses the same restore helper. A dedicated session-cancel integration case was not added; `cancelBelowMinimum` covers the worker refund.
+- Freeze refund stays out of this item.
+
+Verified on PostgreSQL 18, port 5433, disposable `pilates_test_` databases:
+
+- Red, before the fix: unit `guest-pass.spec` expected the reward owed and received the host's Guest Pass id; unit `promote-waitlist.spec` rejected with `No eligible Subscription`. Integration: a client cancel left remaining at 1; `cancelBelowMinimum` did the same; the rescheduled booking had no consumption row; waitlist cancel threw `No eligible Subscription`; a timely guest-pass cancel left `bookingId` set; the invite reward wrote an adjustment on the courtesy Subscription; registration opened a pass; a second friend the same month threw `A host invites one friend a month`; concurrent verification threw that error at registration; assistant activation left `hostClientId` null.
+- Green, after the fix: unit 3 suites, 16 tests (`net-allowance`, `guest-pass`, `promote-waitlist`). Integration 14 suites, 60 tests (`guest-pass`, `booking-command`, `booking-command-waitlist`, `weekly-cap`, `allowance-consumption`, `guest-pass-verification`, `guest-pass-rebook`, `allowance-refund`, `session-start-checks`, `client-registration`, `client-invitations`, `client-acquisition-registration`, `session-cancellation`, `courtesy-access-bookings`).
+
+The Test 86 API journey was not run. Staging stayed paused. The Client app and the Staff app were not walked.
+
+Open:
+
+- The monthly-limit skip matches the error message `one friend a month`. A wording change would reopen the failure.
+- `collectOwedInviteReward` was not taught to skip a Guest Pass Subscription. The grant path is what the tests cover.
+- Waitlist promotion still does not know the last-place rule (BKM-014).
+- The courtesy adjustment's author being the friend herself stays an open question from BKM-014.
+- Freeze refund still increments the base remaining by the cancelled count.
 
 #### Closed-test enablement
 
@@ -1108,8 +1150,8 @@ Open questions:
 - The courtesy adjustment's author is the friend's own new Account at self-registration, or the Assistant's Account at the front desk, with role null on the registration path. The reward's author is the Account that approved the friend's Payment, matching the gift. The pass's courtesy author being the friend herself is odd; it stays because the adjustment requires an Account and registration has no staff actor.
 - A second `openGuestPass` for the same friend is refused by the unique index (Prisma P2002) and is not translated into a named `GuestPassError`. A second registration of the same friend is already refused by the one-Referral rule, so the index is a backstop. The acceptance test covers the second class, not a second registration.
 - The Coordinator Role does not exist (IDN-009).
-- A cancelled guest-pass Booking does not clear `bookingId` or restore the courtesy class. Cancelling restores the base allowance, so a cancelled pass class still counts as used.
 - Waitlist promotion does not know the last-place rule. A guest pass could be promoted into the last place.
+- The 2026-10-23 notes that registration opens the pass, that a second registration answers `409` `guest_pass_monthly_limit`, and that a cancelled guest-pass Booking leaves `bookingId` set are superseded by FIX-005.
 - The confirmation still writes the Bs 60 credit ledger entry. PAY-005 (#157) removes it. This branch does not.
 
 #### BKM-013 · First 90 days
