@@ -21,6 +21,16 @@ const stateLabels: Record<AdminPaymentDto["state"], string> = {
 const civilDay = (instant: string): string =>
   formatCivilDate(boliviaParts(instant).date);
 
+const kindLabels: Record<AdminPaymentDto["kind"], string> = {
+  plan: "Plan",
+  evaluation: "Evaluación",
+};
+
+// Reports bucket income by the decision date. A pending transfer has none
+// yet, so the list and the CSV use the submission date until it is decided.
+const paymentDate = (row: AdminPaymentDto): string =>
+  civilDay(row.decidedAt ?? row.submittedAt);
+
 // A plain decimal a spreadsheet sums as a number.
 const amount = (centavos: number): string => (centavos / 100).toFixed(2);
 
@@ -30,6 +40,7 @@ export const paymentsCsv = (rows: readonly AdminPaymentDto[]): string =>
     [
       "Fecha",
       "Cliente",
+      "Tipo",
       "Plan",
       "Método",
       "Monto (Bs)",
@@ -41,8 +52,9 @@ export const paymentsCsv = (rows: readonly AdminPaymentDto[]): string =>
       "Emitida el",
     ],
     ...rows.map((row) => [
-      civilDay(row.submittedAt),
+      paymentDate(row),
       row.clientName,
+      kindLabels[row.kind],
       row.planName,
       methodLabels[row.method],
       amount(row.amountDueCentavos),

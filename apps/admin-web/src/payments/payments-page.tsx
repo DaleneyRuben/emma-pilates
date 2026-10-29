@@ -113,6 +113,14 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
       </span>
     ),
   }),
+  columns.accessor("kind", {
+    header: "Tipo",
+    cell: ({ getValue }) => (
+      <span className="text-texto-secundario">
+        {getValue() === "evaluation" ? "Evaluación" : "Plan"}
+      </span>
+    ),
+  }),
   columns.accessor("planName", {
     header: "Plan",
     cell: ({ getValue }) => (
@@ -133,7 +141,8 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
       <span className="text-texto tabular">{formatBolivianos(getValue())}</span>
     ),
   }),
-  columns.accessor("submittedAt", {
+  columns.accessor((row) => row.decidedAt ?? row.submittedAt, {
+    id: "fecha",
     header: "Fecha",
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">

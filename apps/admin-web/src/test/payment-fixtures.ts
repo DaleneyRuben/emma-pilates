@@ -17,6 +17,7 @@ export const paymentRow = (
   clientId: `c1000000-0000-5000-8000-0000000000${suffix}`,
   clientName,
   planName: "Paquete de 8 clases",
+  kind: "plan",
   planPriceCentavos: 56_000,
   creditAppliedCentavos: 0,
   amountDueCentavos: 56_000,

@@ -251,12 +251,14 @@ describe('paid Evaluation payment lifecycle', () => {
   it('carries the same receipt image a Plan transfer uses', async () => {
     const buyer = await eightClassClient('Sara Paz', 'sara@example.com');
     const hold = await paidHold('sara@example.com', '2026-10-05T16:00:00.000Z');
+    const receiptId = randomUUID();
     const receipt = await world.prisma.imageAsset.create({
       data: {
+        id: receiptId,
         ownerAccountId: buyer.accountId,
         purpose: 'TRANSFER_RECEIPT',
         state: 'READY',
-        pendingObjectKey: `pending/${randomUUID()}`,
+        pendingObjectKey: `pending/transfer_receipt/${receiptId}`,
         declaredMediaType: 'JPEG',
         declaredByteSize: 1234,
         declaredChecksum: toPrismaBytes(Buffer.alloc(32, 1)),

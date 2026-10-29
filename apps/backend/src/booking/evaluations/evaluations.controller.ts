@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   ForbiddenException,
@@ -16,6 +17,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiHeader,
   ApiNoContentResponse,
@@ -31,6 +33,8 @@ import {
 } from '../../system-identity/authentication/bearer-principal';
 import { parseUuid } from '../booking.dto';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import { PaymentRuleError } from '../payments/payment-errors';
+import { AttachReceiptDto, parseAttachReceipt } from '../payments/payments.dto';
 import { EvaluationRuleError } from './evaluation-errors';
 import {
   ClientEvaluationDto,
@@ -77,6 +81,12 @@ export const runEvaluationCommand = async <Result>(
         code: 'booking_access_denied',
         detail: 'Booking access is denied',
       });
+    }
+    if (error instanceof PaymentRuleError) {
+      throw new HttpException(
+        { code: error.code, detail: error.message },
+        error.status,
+      );
     }
     if (error instanceof InvalidEvaluationCursorError) {
       throw invalidRequest('Invalid cursor');
@@ -231,6 +241,36 @@ export class ClientEvaluationsController {
     );
     return runEvaluationCommand(() =>
       this.commands.listClientEvaluations(parsed, principal),
+    );
+  }
+
+  @Post(':evaluationId/receipt')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ operationId: 'attachEvaluationReceipt' })
+  @ApiParam({ name: 'evaluationId', format: 'uuid' })
+  @ApiHeader(idempotencyHeader)
+  @ApiBody({ type: AttachReceiptDto })
+  @ApiNoContentResponse()
+  @Header('Cache-Control', 'no-store')
+  async attachReceipt(
+    @Param('evaluationId') evaluationId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Body() body: unknown,
+  ): Promise<void> {
+    const parsed = parseAttachReceipt(body);
+    if (parsed === null) throw invalidRequest('Invalid receipt request');
+    const id = requireId(evaluationId, 'Invalid Evaluation identifier');
+    requireIdempotencyKey(idempotencyKey);
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    await runEvaluationCommand(() =>
+      this.commands.attachEvaluationReceipt(
+        { evaluationId: id, imageAssetId: parsed.imageAssetId },
+        principal,
+      ),
     );
   }
 

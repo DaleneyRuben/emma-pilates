@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { AdminPaymentDtoKind } from "./adminPaymentDtoKind";
 import type { AdminPaymentDtoMethod } from "./adminPaymentDtoMethod";
 import type { AdminPaymentDtoState } from "./adminPaymentDtoState";
 import type { InvoiceDataDto } from "./invoiceDataDto";
@@ -14,6 +15,8 @@ export interface AdminPaymentDto {
   clientId: string;
   clientName: string;
   planName: string;
+  /** Plan sale or paid Evaluation */
+  kind: AdminPaymentDtoKind;
   /**
    * Money Amount in BOB centavos
    * @minimum 1

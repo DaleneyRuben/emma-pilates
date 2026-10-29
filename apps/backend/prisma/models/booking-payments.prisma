@@ -136,6 +136,9 @@ model Payment {
   voidedAt               DateTime?          @map("voided_at") @db.Timestamptz(3)
   voidedByAccountId      String?            @map("voided_by_account_id") @db.Uuid
   voidReason             String?            @map("void_reason")
+  // An Evaluation transfer has no Purchase Intent, so its receipt lives here
+  // (booking ADR-0011). A Plan receipt stays on the Purchase Intent.
+  receiptImageAssetId    String?            @unique @map("receipt_image_asset_id") @db.Uuid
   createdAt              DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt              DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
   client                 Client             @relation(fields: [clientId], references: [id], onDelete: Restrict)
@@ -145,6 +148,7 @@ model Payment {
   submittedByAccount     Account            @relation("PaymentSubmittedBy", fields: [submittedByAccountId], references: [id], onDelete: Restrict)
   decidedByAccount       Account?           @relation("PaymentDecidedBy", fields: [decidedByAccountId], references: [id], onDelete: Restrict)
   voidedByAccount        Account?           @relation("PaymentVoidedBy", fields: [voidedByAccountId], references: [id], onDelete: Restrict)
+  receiptImageAsset      ImageAsset?        @relation("PaymentReceipt", fields: [receiptImageAssetId], references: [id], onDelete: Restrict)
   subscription           Subscription?
   evaluation             Evaluation?
   creditReservation      CreditReservation?

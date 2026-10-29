@@ -20,6 +20,7 @@ const row = {
   clientId: '22222222-2222-4222-8222-222222222222',
   clientName: 'Sofía Guzmán',
   planName: 'Paquete de 8 clases',
+  kind: 'plan',
   planPriceCentavos: 56_000,
   creditAppliedCentavos: 6_000,
   amountDueCentavos: 50_000,
