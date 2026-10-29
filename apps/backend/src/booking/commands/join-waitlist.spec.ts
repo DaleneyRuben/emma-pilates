@@ -1,4 +1,5 @@
 import { joinWaitlist } from './join-waitlist';
+import { bookingDuringFreezeMessage } from '../payments/freeze';
 
 describe('joinWaitlist', () => {
   it('adds the authenticated Client to a full Session without consuming allowance', async () => {
@@ -94,6 +95,45 @@ describe('joinWaitlist', () => {
         },
       ),
     ).resolves.toEqual({ id: 'waitlist-entry-id' });
+  });
+
+  it('refuses a Session that falls inside an approved Freeze', async () => {
+    const create = jest.fn();
+
+    await expect(
+      joinWaitlist(
+        { sessionId: 'session-id' },
+        {
+          principal: {
+            accountId: 'account-id',
+            authenticationSessionId: 'authentication-session-id',
+            identity: { kind: 'client', clientId: 'client-id' },
+          },
+          loadSession: jest.fn().mockResolvedValue({
+            id: 'session-id',
+            branchId: 'branch-id',
+            startsAt: new Date('2026-11-05T15:00:00.000Z'),
+            capacity: 1,
+            state: 'scheduled',
+          }),
+          countLiveBookings: jest.fn().mockResolvedValue(1),
+          findEligibleSubscription: jest
+            .fn()
+            .mockResolvedValue({ id: 'subscription-id' }),
+          findApprovedFreeze: jest.fn().mockResolvedValue({
+            endsOn: new Date('2026-11-10T00:00:00.000Z'),
+          }),
+          hasLiveBooking: jest.fn().mockResolvedValue(false),
+          hasActiveEntry: jest.fn().mockResolvedValue(false),
+          create,
+          cancellationWindowMinutes: () => Promise.resolve(150),
+          now: () => new Date('2026-10-23T15:00:00.000Z'),
+        },
+      ),
+    ).rejects.toThrow(
+      bookingDuringFreezeMessage(new Date('2026-11-10T00:00:00.000Z')),
+    );
+    expect(create).not.toHaveBeenCalled();
   });
 
   it('rejects a Client who is already waiting for the Session', async () => {

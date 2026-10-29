@@ -61,3 +61,56 @@ describe('decideFreezeRequest', () => {
     });
   });
 });
+
+describe('decideFreezeRequest bounds', () => {
+  it('refuses a start already past with its own code', () => {
+    expect(
+      decideFreezeRequest({
+        subscriptionId: 'subscription-1',
+        clientId: 'client-1',
+        durationDays: 90,
+        endsOn: civil('2026-12-20'),
+        today: civil('2026-10-05'),
+        startsOn: civil('2026-10-01'),
+        endsOnRequest: civil('2026-10-10'),
+        existingRequest: null,
+        subscriptionStartsOn: civil('2026-09-22'),
+        renewalStartsOn: null,
+      }),
+    ).toEqual({ allowed: false, code: 'freeze_start_in_past' });
+  });
+
+  it('refuses a window outside the Subscription term', () => {
+    expect(
+      decideFreezeRequest({
+        subscriptionId: 'subscription-1',
+        clientId: 'client-1',
+        durationDays: 90,
+        endsOn: civil('2026-12-20'),
+        today: civil('2026-10-23'),
+        startsOn: civil('2026-12-15'),
+        endsOnRequest: civil('2026-12-24'),
+        existingRequest: null,
+        subscriptionStartsOn: civil('2026-09-22'),
+        renewalStartsOn: null,
+      }),
+    ).toEqual({ allowed: false, code: 'freeze_outside_term' });
+  });
+
+  it('refuses a window that would overlap a queued renewal', () => {
+    expect(
+      decideFreezeRequest({
+        subscriptionId: 'subscription-1',
+        clientId: 'client-1',
+        durationDays: 90,
+        endsOn: civil('2026-11-20'),
+        today: civil('2026-10-23'),
+        startsOn: civil('2026-11-15'),
+        endsOnRequest: civil('2026-11-20'),
+        existingRequest: null,
+        subscriptionStartsOn: civil('2026-09-22'),
+        renewalStartsOn: civil('2026-11-21'),
+      }),
+    ).toEqual({ allowed: false, code: 'freeze_outside_term' });
+  });
+});
