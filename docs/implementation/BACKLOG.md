@@ -1413,6 +1413,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 | UX-005 to UX-013 | P2–P3 | All surfaces | *Existing rows.* The rest of the UX polish queue through the accessibility audit | UX-001 | 6–9 d | done |
 | UX-014 | P3 | Mobile core | *Existing row.* Shared confirmation sheet for the five hand-drawn sheets | UX-002 | — | done |
 | REL-008 | P3 | Delivery | *Existing row.* Release workflows in GitHub Actions | — | 2–3 d | later |
+| FIX-000 | P0 | Docs | Record the owner's six decisions of 2026-10-28 (founder discount from the first Plan, a cancelled guest-pass class may be rebooked, a void undoes everything from that sale, a voided cash sale stays in expected cash, «renovó» by purchase date, the Coordinator assigns a Trainer's Branches) | — | 0.5 d | done |
 | PAY-004 | P3 | Backend | *Existing row.* Remove the deprecated bank fields | — | 0.5 d | later |
 
 #### STU-001 to STU-007 · Studio Management
