@@ -102,13 +102,34 @@ describe('founder places', () => {
       }),
     ).toEqual({ assign: false });
   });
+
+  it('numbers from the provided next number, not from the live count', () => {
+    expect(
+      decideFounderPlace({
+        places: 40,
+        assigned: 1,
+        nextNumber: 5,
+        alreadyHeld: false,
+        courtesy: false,
+      }),
+    ).toEqual({ assign: true, number: 5 });
+  });
 });
 
 describe('founder gap', () => {
   const membership = { status: 'active' as const, lostAt: null };
 
-  it('ends it after more than 7 days and keeps it at 7', () => {
+  it('ends it after more than 7 uncovered days and keeps exactly 7', () => {
     const today = civil('2026-10-23');
+    expect(
+      decideFounderGap({
+        today,
+        rules,
+        membership,
+        latestRealEnd: new Date(today.getTime() - 9 * day),
+        nextStart: null,
+      }),
+    ).toEqual({ lose: true, reason: 'gap' });
     expect(
       decideFounderGap({
         today,
@@ -117,7 +138,7 @@ describe('founder gap', () => {
         latestRealEnd: new Date(today.getTime() - 8 * day),
         nextStart: null,
       }),
-    ).toEqual({ lose: true, reason: 'gap' });
+    ).toEqual({ lose: false });
     expect(
       decideFounderGap({
         today,
@@ -129,14 +150,14 @@ describe('founder gap', () => {
     ).toEqual({ lose: false });
   });
 
-  it('counts from the real end to the next Start Date, and a lost membership stays lost', () => {
+  it('counts uncovered days as next start minus end minus one, and a lost membership stays lost', () => {
     expect(
       decideFounderGap({
         today: civil('2026-11-01'),
         rules,
         membership,
         latestRealEnd: civil('2026-10-20'),
-        nextStart: civil('2026-10-27'),
+        nextStart: civil('2026-10-28'),
       }),
     ).toEqual({ lose: false });
     expect(
@@ -145,7 +166,7 @@ describe('founder gap', () => {
         rules,
         membership,
         latestRealEnd: civil('2026-10-20'),
-        nextStart: civil('2026-10-28'),
+        nextStart: civil('2026-10-29'),
       }),
     ).toEqual({ lose: true, reason: 'gap' });
     expect(
