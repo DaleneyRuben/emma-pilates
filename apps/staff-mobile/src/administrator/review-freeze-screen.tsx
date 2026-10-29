@@ -22,7 +22,7 @@ type ReviewNavigation = { goBack: () => void };
 const decisionNotice = (body: unknown): string => {
   const code = (body as { code?: unknown } | null)?.code;
   if (code === "freeze_start_in_past") {
-    return "El congelamiento ya empezó. Recházalo. Este plan no se congela.";
+    return "El congelamiento ya empezó. Recházalo y pide uno desde hoy.";
   }
   if (code === "freeze_already_decided") return "Este congelamiento ya fue decidido.";
   if (code === "freeze_access_denied") return "No puedes decidir un congelamiento.";

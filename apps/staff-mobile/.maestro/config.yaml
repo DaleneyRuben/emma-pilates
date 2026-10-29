@@ -21,6 +21,7 @@ executionOrder:
     - trainer-agenda-and-inbox
     - send-feedback
     - administrator-review-payments
+    - fix006-late-freeze
     - fix003-confirm
     - fix003-reject
     - administrator-cancel-session
