@@ -372,6 +372,14 @@ describe('founder place release', () => {
       paymentId: pending.id,
     });
     await expect(
+      prisma.auditRecord.count({
+        where: {
+          actionCode: 'founder_membership.granted',
+          correlationId: pending.id,
+        },
+      }),
+    ).resolves.toBe(1);
+    await expect(
       prisma.allowanceAdjustment.count({
         where: { clientId: buyer.clientId, reason: 'GIFT_NEW_CLIENT' },
       }),
