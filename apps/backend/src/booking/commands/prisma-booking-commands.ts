@@ -613,6 +613,28 @@ export class PrismaBookingCommands {
                 })
                 .then((booking) => booking !== null),
             reschedule: async (input) => {
+              const pass = await transaction.guestPass.findFirst({
+                where: {
+                  bookingId: input.bookingId,
+                  friendClientId: input.clientId,
+                  deletedAt: null,
+                },
+                select: { id: true },
+              });
+              if (pass !== null) {
+                const target = await transaction.session.findUniqueOrThrow({
+                  where: { id: input.targetSessionId },
+                  select: { capacity: true },
+                });
+                const taken = await transaction.booking.count({
+                  where: { sessionId: input.targetSessionId, state: 'BOOKED' },
+                });
+                const decision = decideGuestPassBooking({
+                  placesLeft: target.capacity - taken,
+                  guestPassesAlreadyUsed: 0,
+                });
+                if (decision !== null) throw new Error(decision.code);
+              }
               const replacement = await transaction.booking.create({
                 data: {
                   sessionId: input.targetSessionId,

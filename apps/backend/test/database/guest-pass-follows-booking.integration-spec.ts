@@ -199,4 +199,62 @@ describe('guest pass follows the booking', () => {
       afterBooking.create({ sessionId: lastPlace.id }, principal),
     ).rejects.toThrow('guest_pass_last_place');
   });
+
+  it('refuses a guest pass reschedule onto the last place', async () => {
+    const bookedAt = new Date('2026-09-23T15:00:00.000Z');
+    const fixture = await createFixture(prisma, {
+      capacity: 8,
+      startsAt: new Date('2026-09-23T16:00:00.000Z'),
+      now: bookedAt,
+    });
+    const host = await prisma.client.create({
+      data: { name: 'Anfitriona último', referralCode: `REF-${randomUUID()}` },
+    });
+    const friend = await prisma.client.create({
+      data: { name: 'Invitada último', referralCode: `REF-${randomUUID()}` },
+    });
+    const friendAccount = await prisma.account.create({
+      data: { email: `${randomUUID()}@example.com`, clientId: friend.id },
+    });
+    await prisma.$transaction((transaction) =>
+      openGuestPass(transaction, {
+        hostClientId: host.id,
+        friendClientId: friend.id,
+        authorAccountId: fixture.accountId,
+        now: bookedAt,
+      }),
+    );
+    const commands = new PrismaBookingCommands(prisma, () => bookedAt);
+    const principal = {
+      accountId: friendAccount.id,
+      authenticationSessionId: randomUUID(),
+      identity: { kind: 'client' as const, clientId: friend.id },
+    };
+    const booked = await commands.create(
+      { sessionId: fixture.sessionId },
+      principal,
+    );
+    const source = await prisma.session.findUniqueOrThrow({
+      where: { id: fixture.sessionId },
+      select: { classTypeId: true },
+    });
+    const lastPlace = await prisma.session.create({
+      data: {
+        branchId: fixture.branchId,
+        classTypeId: source.classTypeId,
+        trainerStaffMemberId: fixture.trainerId,
+        startsAt: new Date('2026-09-23T20:00:00.000Z'),
+        endsAt: new Date('2026-09-23T21:00:00.000Z'),
+        capacity: 1,
+      },
+      select: { id: true },
+    });
+
+    await expect(
+      commands.reschedule(
+        { bookingId: booked.id, targetSessionId: lastPlace.id },
+        principal,
+      ),
+    ).rejects.toThrow('guest_pass_last_place');
+  });
 });
