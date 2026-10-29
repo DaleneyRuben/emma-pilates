@@ -142,7 +142,55 @@ describe('no show evaluation payment', () => {
     ).resolves.toEqual({
       state: 'NO_SHOW',
       cancellationCause: null,
-      payment: { state: 'REJECTED' },
+      payment: { state: 'PENDING' },
+    });
+  });
+
+  it('leaves a past booked evaluation pending when the hold expires', async () => {
+    await world.prisma.client.create({
+      data: {
+        name: 'Nadia Paz',
+        referralCode: `REF-${randomUUID().slice(0, 8)}`,
+        account: {
+          create: {
+            email: 'nadia@example.com',
+            activatedAt: fixtureNow,
+            emailVerifiedAt: fixtureNow,
+          },
+        },
+        subscriptions: {
+          create: {
+            planId: deterministicId('plan:paquete-8'),
+            planNameSnapshot: 'Paquete de 8 clases',
+            durationDaysSnapshot: 30,
+            originalClassAllowance: 8,
+            remainingClassAllowance: 8,
+            startsOn: new Date('2026-09-01T00:00:00.000Z'),
+            endsOn: new Date('2026-11-30T00:00:00.000Z'),
+            activatedAt: fixtureNow,
+          },
+        },
+      },
+    });
+    const client = await world.principalOf('nadia@example.com');
+    const startsAt = '2026-10-12T14:30:00.000Z';
+    const slotId = await slotIdAt(world.prisma, mondayBlockId, startsAt);
+    const booked = await createPrismaEvaluationCommands(world.prisma, {
+      now: () => fixtureNow,
+    }).bookPaidEvaluation(slotId, client, randomUUID());
+    const afterSlot = createPrismaEvaluationCommands(world.prisma, {
+      now: () => new Date(new Date(startsAt).getTime() + 25 * 60 * 60 * 1_000),
+    });
+
+    await expect(afterSlot.releaseExpiredEvaluationHolds()).resolves.toBe(0);
+    await expect(
+      world.prisma.evaluation.findUniqueOrThrow({
+        where: { id: booked.id },
+        select: { state: true, payment: { select: { state: true } } },
+      }),
+    ).resolves.toEqual({
+      state: 'BOOKED',
+      payment: { state: 'PENDING' },
     });
   });
 });
