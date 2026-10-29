@@ -204,4 +204,47 @@ describe('founder place release', () => {
       }),
     ).resolves.toBeNull();
   });
+
+  it('reclaims the place when a founder priced payment has no reservation', async () => {
+    await releasePlaces();
+    const buyer = await world.newClient('Pago sin reserva');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+    const pending = await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro().id,
+        imageAssetId: receipt.id,
+      },
+      assistant,
+      randomUUID(),
+    );
+    expect(pending).toMatchObject({ discountReason: 'founder' });
+    await prisma.founderMembership.updateMany({
+      where: { clientId: buyer.clientId, status: 'RESERVED' },
+      data: { deletedAt: now },
+    });
+
+    await world
+      .commands()
+      .confirmTransfer(
+        { paymentId: pending.id },
+        await world.staffPrincipal('paola.mendoza@example.com'),
+      );
+
+    await expect(
+      prisma.founderMembership.findFirst({
+        where: { clientId: buyer.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({
+      status: 'ACTIVE',
+      paymentId: pending.id,
+    });
+    await expect(
+      prisma.allowanceAdjustment.count({
+        where: { clientId: buyer.clientId, reason: 'GIFT_NEW_CLIENT' },
+      }),
+    ).resolves.toBe(0);
+  });
 });
