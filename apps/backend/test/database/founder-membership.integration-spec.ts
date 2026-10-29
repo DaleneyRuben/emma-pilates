@@ -234,6 +234,51 @@ describe('founder membership', () => {
     ).resolves.toMatchObject({ status: 'LOST' });
   });
 
+  it('keeps the place while a pending transfer covers the gap', async () => {
+    await prisma.founderMembership.updateMany({
+      data: { deletedAt: now },
+    });
+    const waiting = await world.newClient('Transferencia en revisión');
+    await cash(waiting.clientId, plan.id);
+    await prisma.subscription.updateMany({
+      where: { clientId: waiting.clientId },
+      data: {
+        endsOn: new Date('2026-10-20T00:00:00.000Z'),
+        state: 'EXPIRED',
+        expiredAt: now,
+      },
+    });
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+    const centro = fixtures.branches.find(
+      (branch) => branch.name === 'Centro',
+    )!;
+    await world
+      .commands(new Date('2026-10-22T15:00:00.000Z'))
+      .recordFrontDeskTransfer(
+        {
+          clientId: waiting.clientId,
+          planId: plan.id,
+          branchId: centro.id,
+          imageAssetId: receipt.id,
+          startsOn: '2026-10-22',
+        },
+        assistant,
+        randomUUID(),
+      );
+
+    const job = createFounderMembershipJob(
+      prisma,
+      () => new Date('2026-10-29T15:00:00.000Z'),
+    );
+    await expect(job.execute()).resolves.toEqual({ ended: 0 });
+    await expect(
+      prisma.founderMembership.findFirstOrThrow({
+        where: { clientId: waiting.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({ status: 'ACTIVE' });
+  });
+
   it('shows the list price, the discount, and the amount paid', async () => {
     const founder = await world.newClient('Informe');
     await cash(founder.clientId, plan.id);
