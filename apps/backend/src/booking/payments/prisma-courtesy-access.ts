@@ -2,6 +2,7 @@ import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import {
   AuditActorKind,
   AuditOutcome,
+  PaymentKind,
   PaymentMethod,
   PaymentState,
   PurchaseIntentState,
@@ -117,7 +118,11 @@ export const createPrismaCourtesyAccess = (
         select: { id: true },
       }),
       transaction.payment.findFirst({
-        where: { clientId: command.clientId, state: PaymentState.PENDING },
+        where: {
+          clientId: command.clientId,
+          state: PaymentState.PENDING,
+          kind: PaymentKind.PLAN,
+        },
         select: { id: true },
       }),
     ]);

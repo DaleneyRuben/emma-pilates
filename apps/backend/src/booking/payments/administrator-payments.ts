@@ -20,6 +20,8 @@ export type AdministratorPaymentRow = {
   clientId: string;
   clientName: string;
   planName: string;
+  /** Plan sale or paid Evaluation (booking ADR-0011). */
+  kind: 'plan' | 'evaluation';
   method: 'transfer' | 'cash';
   planPriceCentavos: number;
   creditAppliedCentavos: number;

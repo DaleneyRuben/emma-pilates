@@ -11,6 +11,7 @@ export const nutritionistCostOfMonth = async (
   const rows = await reader.evaluation.findMany({
     where: {
       nutritionistCostCentavos: { not: null },
+      state: { not: 'CANCELLED' },
       slot: { localMonth: month },
     },
     select: { nutritionistCostCentavos: true },

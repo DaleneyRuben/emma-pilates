@@ -25,7 +25,8 @@ import {
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
-import { confirmEvaluationTransfer as confirmEvaluationPayment } from '../evaluations/evaluation-payment';
+import { decideEvaluationTransfer } from '../evaluations/evaluation-payment-decision';
+import { evaluationReceiptOf } from '../evaluations/evaluation-payment-receipt';
 import { createFreezeCommands } from './prisma-freeze';
 import { createFreezeReads } from './prisma-freeze-reads';
 import {
@@ -281,6 +282,7 @@ export function createPrismaPaymentCommands(
         where: {
           clientId: input.clientId,
           state: PaymentState.PENDING,
+          kind: PaymentKind.PLAN,
           ...(input.ignorePaymentId
             ? { id: { not: input.ignorePaymentId } }
             : {}),
@@ -1023,11 +1025,12 @@ export function createPrismaPaymentCommands(
             orderBy: { version: 'desc' },
             select: { nutritionistFeeCentavos: true },
           });
-        await confirmEvaluationPayment(transaction, {
+        await decideEvaluationTransfer(transaction, recordNotification, {
           paymentId: payment.id,
           principal,
           now: dependencies.now(),
           feeCentavos: settings.nutritionistFeeCentavos,
+          decision: 'confirm',
         });
         return payment.id;
       }
@@ -1172,6 +1175,17 @@ export function createPrismaPaymentCommands(
 
     const paymentId = await serializable(async (transaction) => {
       const payment = await loadTransferPayment(transaction, command.paymentId);
+      if (payment.kind === PaymentKind.EVALUATION) {
+        await decideEvaluationTransfer(transaction, recordNotification, {
+          paymentId: payment.id,
+          principal,
+          now: dependencies.now(),
+          feeCentavos: 0,
+          decision: 'reject',
+          reason,
+        });
+        return payment.id;
+      }
       if (payment.state === PaymentState.REJECTED) {
         if (payment.rejectionReason === reason) return payment.id;
         throw rule(
@@ -1273,7 +1287,7 @@ export function createPrismaPaymentCommands(
   ): Promise<PaymentView | null> => {
     const clientId = requireClient(principal);
     const payment = await prisma.payment.findFirst({
-      where: { clientId },
+      where: { clientId, kind: PaymentKind.PLAN },
       orderBy: [{ submittedAt: 'desc' }, { id: 'desc' }],
       select: paymentSelect,
     });
@@ -1410,6 +1424,7 @@ export function createPrismaPaymentCommands(
         purchaseIntent: {
           select: { receiptImageAsset: { select: receiptSelect } },
         },
+        receiptImageAsset: { select: receiptSelect },
       },
     });
     if (row === null) throw rule('payment_not_found', 'Payment not found');
@@ -1422,7 +1437,9 @@ export function createPrismaPaymentCommands(
   ): Promise<PaymentReview> => {
     requireAdministrator(principal);
     const row = await loadReview(command.paymentId);
-    const receipt = receiptOf(row.purchaseIntent?.receiptImageAsset);
+    const receipt = evaluationReceiptOf(
+      row.receiptImageAsset ?? row.purchaseIntent?.receiptImageAsset,
+    );
     return {
       ...toPaymentView(row),
       clientName: row.client.name,

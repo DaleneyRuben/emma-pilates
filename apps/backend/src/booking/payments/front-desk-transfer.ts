@@ -7,6 +7,7 @@ import {
   CreditLedgerEntryKind,
   ImageAssetPurpose,
   ImageAssetState,
+  PaymentKind,
   PaymentMethod,
   PaymentState,
   PurchaseIntentState,
@@ -134,6 +135,7 @@ export const createFrontDeskTransfer = (
               where: {
                 clientId: command.clientId,
                 state: PaymentState.PENDING,
+                kind: PaymentKind.PLAN,
               },
               select: { id: true },
             }),

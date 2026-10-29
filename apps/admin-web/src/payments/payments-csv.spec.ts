@@ -22,9 +22,9 @@ const pendingTransfer = paymentRow("12", "Lucía Fernández", {
 describe("the Pagos CSV", () => {
   it("writes one row per sale with its invoice data and mark, in Bolivia dates", () => {
     expect(paymentsCsv([issuedCash, pendingTransfer])).toBe(
-      "\uFEFFFecha,Cliente,Plan,Método,Monto (Bs),Estado,NIT o CI,Nombre o razón social,Factura emitida,Emitida por,Emitida el\r\n" +
-        "21/09/2026,Ana Pérez,Paquete de 8 clases,Efectivo,1050.00,Confirmado,4567891,Ana Pérez,Sí,Paola Mendoza,22/10/2026\r\n" +
-        "21/09/2026,Lucía Fernández,Paquete de 8 clases,Transferencia,500.00,Pendiente,,,No,,\r\n",
+      "\uFEFFFecha,Cliente,Tipo,Plan,Método,Monto (Bs),Estado,NIT o CI,Nombre o razón social,Factura emitida,Emitida por,Emitida el\r\n" +
+        "22/10/2026,Ana Pérez,Plan,Paquete de 8 clases,Efectivo,1050.00,Confirmado,4567891,Ana Pérez,Sí,Paola Mendoza,22/10/2026\r\n" +
+        "21/09/2026,Lucía Fernández,Plan,Paquete de 8 clases,Transferencia,500.00,Pendiente,,,No,,\r\n",
     );
   });
 

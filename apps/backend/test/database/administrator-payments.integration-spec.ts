@@ -176,6 +176,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       clientId: expect.any(String) as string,
       clientName: expect.stringMatching(/^Sofía/) as string,
       planName: 'Paquete de 8 clases',
+      kind: 'plan',
       planPriceCentavos: plan.priceCentavos,
       creditAppliedCentavos: 0,
       // Sofía's first real Plan reserves a founder place, so the due is 15 % off.

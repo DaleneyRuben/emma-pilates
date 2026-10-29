@@ -6303,6 +6303,55 @@
         ]
       }
     },
+    "/api/v1/evaluations/{evaluationId}/receipt": {
+      "post": {
+        "operationId": "attachEvaluationReceipt",
+        "parameters": [
+          {
+            "name": "evaluationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachReceiptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientEvaluations"
+        ]
+      }
+    },
     "/api/v1/evaluations/{evaluationId}": {
       "delete": {
         "operationId": "cancelEvaluation",
@@ -13287,6 +13336,14 @@
           "planName": {
             "type": "string"
           },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "plan",
+              "evaluation"
+            ],
+            "description": "Plan sale or paid Evaluation"
+          },
           "planPriceCentavos": {
             "type": "number",
             "minimum": 1,
@@ -13363,6 +13420,7 @@
           "clientId",
           "clientName",
           "planName",
+          "kind",
           "planPriceCentavos",
           "creditAppliedCentavos",
           "amountDueCentavos",

@@ -494,6 +494,7 @@ model ImageAsset {
   promotions        Promotion[]
   variants          ImageVariant[]
   receiptPurchaseIntent PurchaseIntent? @relation("PurchaseIntentReceipt")
+  receiptPayment        Payment?        @relation("PaymentReceipt")
 
   @@index([ownerAccountId, state])
   @@index([state, expiresAt])

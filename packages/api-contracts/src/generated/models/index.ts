@@ -37,6 +37,7 @@ export * from "./adminFeedbackExportDto";
 export * from "./adminFeedbackPageDto";
 export * from "./administratorSessionAvailabilityDto";
 export * from "./adminPaymentDto";
+export * from "./adminPaymentDtoKind";
 export * from "./adminPaymentDtoMethod";
 export * from "./adminPaymentDtoState";
 export * from "./adminPaymentPageDto";

@@ -25,6 +25,14 @@ import {
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { isSubscriptionEffective } from '../payments/purchase-eligibility';
 import {
+  decideEvaluationTransfer,
+  rejectPaymentOfCancelledEvaluation,
+} from './evaluation-payment-decision';
+import {
+  attachEvaluationReceipt as attachPaidEvaluationReceipt,
+  coveringSubscription,
+} from './evaluation-payment-receipt';
+import {
   EvaluationRuleError,
   type EvaluationRuleCode,
 } from './evaluation-errors';
@@ -38,7 +46,6 @@ import {
 } from './evaluation-notifications';
 import { evaluationOffer } from './evaluation-offer';
 import {
-  confirmEvaluationTransfer as confirmEvaluationPayment,
   releaseExpiredEvaluationHolds as releaseHolds,
   startEvaluationTransfer,
 } from './evaluation-payment';
@@ -914,29 +921,12 @@ export const createPrismaEvaluationCommands = (
     clientId: string,
     slotDate: Date,
   ) => {
-    const subscription = await database.subscription.findFirst({
-      where: {
-        clientId,
-        state: SubscriptionState.ACTIVE,
-        startsOn: { lte: slotDate },
-        endsOn: { gte: slotDate },
-      },
-      orderBy: [{ endsOn: 'desc' }, { id: 'asc' }],
-      select: {
-        id: true,
-        planId: true,
-        planNameSnapshot: true,
-        durationDaysSnapshot: true,
-        weeklyClassCapSnapshot: true,
-        originalClassAllowance: true,
-        startsOn: true,
-        evaluations: {
-          where: {
-            state: { in: [EvaluationState.BOOKED, EvaluationState.NO_SHOW] },
-          },
-          select: { id: true },
-        },
-      },
+    const now = dependencies.now();
+    const subscription = await coveringSubscription(database, {
+      clientId,
+      slotDate,
+      today: boliviaDate(now),
+      now,
     });
     if (subscription === null) return null;
     const settings = await studioPrice(database);
@@ -1383,17 +1373,37 @@ export const createPrismaEvaluationCommands = (
     });
   };
 
+  const attachEvaluationReceipt = async (
+    command: {
+      paymentId?: string;
+      evaluationId?: string;
+      imageAssetId: string;
+    },
+    principal: AuthenticatedPrincipal,
+  ): Promise<void> => {
+    await transact((transaction) =>
+      attachPaidEvaluationReceipt(transaction, {
+        paymentId: command.paymentId,
+        evaluationId: command.evaluationId,
+        imageAssetId: command.imageAssetId,
+        principal,
+        now: dependencies.now(),
+      }),
+    );
+  };
+
   const confirmEvaluationTransfer = async (
     paymentId: string,
     principal: AuthenticatedPrincipal,
   ): Promise<void> => {
     const settings = await studioPrice(prisma);
     await transact((transaction) =>
-      confirmEvaluationPayment(transaction, {
+      decideEvaluationTransfer(transaction, recordNotification, {
         paymentId,
         principal,
         now: dependencies.now(),
         feeCentavos: settings.nutritionistFeeCentavos,
+        decision: 'confirm',
       }),
     );
   };
@@ -1572,6 +1582,11 @@ export const createPrismaEvaluationCommands = (
         },
       });
       await releaseSlot(transaction, evaluation.evaluationSlotId, now);
+      await rejectPaymentOfCancelledEvaluation(transaction, {
+        evaluationId: evaluation.id,
+        now,
+        accountId: principal.accountId,
+      });
       if (evaluation.slot.nutritionist.account !== null) {
         await recordNotification(
           transaction,
@@ -1636,6 +1651,11 @@ export const createPrismaEvaluationCommands = (
         },
       });
       await releaseSlot(transaction, evaluation.evaluationSlotId, now);
+      await rejectPaymentOfCancelledEvaluation(transaction, {
+        evaluationId: evaluation.id,
+        now,
+        accountId: principal.accountId,
+      });
       if (evaluation.client.account !== null) {
         await recordNotification(
           transaction,
@@ -1819,6 +1839,7 @@ export const createPrismaEvaluationCommands = (
     readEvaluationSlot,
     bookEvaluation,
     bookPaidEvaluation,
+    attachEvaluationReceipt,
     confirmEvaluationTransfer,
     releaseExpiredEvaluationHolds,
     recordEvaluationNoShow,
