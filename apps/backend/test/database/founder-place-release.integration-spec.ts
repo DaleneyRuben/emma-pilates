@@ -108,6 +108,39 @@ describe('founder place release', () => {
     await nextBuyerTakesThePlace();
   });
 
+  it('frees the reserved place when an app transfer is rejected', async () => {
+    await releasePlaces();
+    const buyer = await world.newClient('Transferencia de la app');
+    const intent = await world
+      .commands()
+      .createPurchaseIntent({ planId: plan.id }, buyer, randomUUID());
+    const receipt = await world.readyReceipt(buyer.accountId);
+    await world
+      .commands()
+      .attachReceipt(
+        { purchaseIntentId: intent.id, imageAssetId: receipt.id },
+        buyer,
+        randomUUID(),
+      );
+    const pending = await world
+      .commands()
+      .submitTransfer({ purchaseIntentId: intent.id }, buyer, randomUUID());
+    await expect(reservedPlace(buyer.clientId)).resolves.toMatchObject({
+      status: 'RESERVED',
+      paymentId: pending.id,
+    });
+
+    await world
+      .commands()
+      .rejectTransfer(
+        { paymentId: pending.id, reason: 'El monto no coincide' },
+        await world.staffPrincipal('paola.mendoza@example.com'),
+      );
+
+    await expect(reservedPlace(buyer.clientId)).resolves.toBeNull();
+    await nextBuyerTakesThePlace();
+  });
+
   it('keeps the place with the front desk QR when an older intent expires', async () => {
     await releasePlaces();
     const buyer = await world.newClient('Intención vieja y QR');
