@@ -107,4 +107,48 @@ describe('founder place release', () => {
     await expect(reservedPlace(buyer.clientId)).resolves.toBeNull();
     await nextBuyerTakesThePlace();
   });
+
+  it('keeps the place with the front desk QR when an older intent expires', async () => {
+    await releasePlaces();
+    const buyer = await world.newClient('Intención vieja y QR');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+
+    await world
+      .commands()
+      .createPurchaseIntent({ planId: plan.id }, buyer, randomUUID());
+    const later = new Date(now.getTime() + 25 * hour);
+    const qr = await world.commands(later).recordFrontDeskTransfer(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro().id,
+        imageAssetId: receipt.id,
+      },
+      assistant,
+      randomUUID(),
+    );
+    await expect(reservedPlace(buyer.clientId)).resolves.toMatchObject({
+      status: 'RESERVED',
+      paymentId: qr.id,
+    });
+
+    await world.commands(later).expirePurchaseIntents();
+
+    await expect(reservedPlace(buyer.clientId)).resolves.toMatchObject({
+      status: 'RESERVED',
+      paymentId: qr.id,
+    });
+    await world
+      .commands()
+      .confirmTransfer(
+        { paymentId: qr.id },
+        await world.staffPrincipal('paola.mendoza@example.com'),
+      );
+    await expect(
+      prisma.founderMembership.findFirstOrThrow({
+        where: { clientId: buyer.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({ status: 'ACTIVE', paymentId: qr.id });
+  });
 });
