@@ -89,6 +89,7 @@ import {
   readIsFounder,
   releaseFounderReservation,
 } from './prisma-founder-membership';
+import { auditCashFounderGrant } from './founder-grant-audit';
 import {
   collectOwedInviteReward,
   grantInviteReward,
@@ -556,6 +557,11 @@ export function createPrismaPaymentCommands(
       select: paymentSelect,
     });
     await confirmFounderPlace(transaction, {
+      clientId: input.clientId,
+      paymentId: payment.id,
+      now,
+    });
+    await auditCashFounderGrant(transaction, {
       clientId: input.clientId,
       paymentId: payment.id,
       now,
