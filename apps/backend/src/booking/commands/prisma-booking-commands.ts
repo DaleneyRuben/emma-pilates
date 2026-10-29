@@ -33,11 +33,11 @@ import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendanceCorrections } from './attendance-audit';
 import { recordAttendance } from './record-attendance';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
-import { boliviaDate } from '../../time/bolivia-time';
 import { fundBooking } from './weekly-cap-funding';
 import { readWeeklyCapPosition } from './weekly-cap-count';
 import {
   findCoveringSubscription,
+  findApprovedFreeze,
   findNotYetStartedSubscription,
 } from './eligible-subscription';
 import { decideGuestPassBooking } from '../payments/guest-pass';
@@ -576,16 +576,7 @@ export class PrismaBookingCommands {
                 where: { sessionId, state: BookingState.BOOKED },
               }),
             findApprovedFreeze: ({ clientId, onDate }) =>
-              transaction.freeze.findFirst({
-                where: {
-                  clientId,
-                  state: 'APPROVED',
-                  deletedAt: null,
-                  startsOn: { lte: boliviaDate(onDate) },
-                  endsOn: { gte: boliviaDate(onDate) },
-                },
-                select: { endsOn: true },
-              }),
+              findApprovedFreeze(transaction, { clientId, onDate }),
             findNotYetStartedSubscription: ({ clientId, onDate }) =>
               findNotYetStartedSubscription(transaction, { clientId, onDate }),
             weeklyCapBlocksDestination: async (input) => {
@@ -802,16 +793,7 @@ export class PrismaBookingCommands {
           needsAllowance: false,
         }),
       findApprovedFreeze: ({ clientId, onDate }) =>
-        transaction.freeze.findFirst({
-          where: {
-            clientId,
-            state: 'APPROVED',
-            deletedAt: null,
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-          },
-          select: { endsOn: true },
-        }),
+        findApprovedFreeze(transaction, { clientId, onDate }),
       findNotYetStartedSubscription: ({ clientId, onDate }) =>
         findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasLiveBooking: ({ sessionId, clientId }) =>
@@ -858,16 +840,7 @@ export class PrismaBookingCommands {
           needsAllowance: true,
         }),
       findApprovedFreeze: ({ clientId, onDate }) =>
-        transaction.freeze.findFirst({
-          where: {
-            clientId,
-            state: 'APPROVED',
-            deletedAt: null,
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-          },
-          select: { endsOn: true },
-        }),
+        findApprovedFreeze(transaction, { clientId, onDate }),
       findNotYetStartedSubscription: ({ clientId, onDate }) =>
         findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>

@@ -35,6 +35,23 @@ export const findCoveringSubscription = (
     select: { id: true },
   });
 
+// One approved Freeze covers a Client on a Bolivia date. Booking, waitlist
+// join, promotion, and reschedule all ask the same question.
+export const findApprovedFreeze = (
+  transaction: Transaction,
+  input: { clientId: string; onDate: Date },
+) =>
+  transaction.freeze.findFirst({
+    where: {
+      clientId: input.clientId,
+      state: 'APPROVED',
+      deletedAt: null,
+      startsOn: { lte: boliviaDate(input.onDate) },
+      endsOn: { gte: boliviaDate(input.onDate) },
+    },
+    select: { endsOn: true },
+  });
+
 export const findNotYetStartedSubscription = (
   transaction: Transaction,
   input: { clientId: string; onDate: Date },
