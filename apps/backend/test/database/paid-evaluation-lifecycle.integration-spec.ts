@@ -309,7 +309,10 @@ describe('paid Evaluation payment lifecycle', () => {
         where: { id: hold.paymentId },
         select: { state: true, decidedByAccountId: true },
       }),
-    ).resolves.toEqual({ state: 'REJECTED', decidedByAccountId: null });
+    ).resolves.toEqual({
+      state: 'REJECTED',
+      decidedByAccountId: buyer.accountId,
+    });
     await expect(
       world.prisma.auditRecord.count({
         where: {
