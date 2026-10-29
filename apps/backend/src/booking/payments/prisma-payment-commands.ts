@@ -930,6 +930,11 @@ export function createPrismaPaymentCommands(
             where: { id: intent.id },
             data: { state: PurchaseIntentState.SUBMITTED, submittedAt: now },
           });
+          await repointFounderReservation(transaction, {
+            clientId,
+            purchaseIntentId: intent.id,
+            paymentId: payment.id,
+          });
           await notifyAdministrators(transaction, payment.id, now);
 
           return { id: payment.id };
