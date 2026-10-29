@@ -62,8 +62,12 @@ export const decideInviteReward = (input: {
   currentSubscriptionIsGuestPass?: boolean;
 }): InviteRewardDecision | null => {
   if (input.alreadyRewarded) return null;
+  const realSubscriptionId =
+    input.currentSubscriptionIsGuestPass === true
+      ? null
+      : input.currentSubscriptionId;
   return {
-    subscriptionId: input.currentSubscriptionId,
-    owed: input.currentSubscriptionId === null,
+    subscriptionId: realSubscriptionId,
+    owed: realSubscriptionId === null,
   };
 };

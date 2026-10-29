@@ -35,3 +35,19 @@ export const restoreBookedClass = async (
     throw new Error('Booking Subscription is unavailable');
   }
 };
+
+// A same-week reschedule keeps the class already spent. The consumption
+// moves to the replacement Booking, so the weekly cap does not see a new
+// extra class.
+export const moveConsumptionToBooking = (
+  transaction: Transaction,
+  input: { fromBookingId: string; toBookingId: string },
+): Promise<unknown> =>
+  transaction.allowanceAdjustment.updateMany({
+    where: {
+      bookingId: input.fromBookingId,
+      reason: AllowanceAdjustmentReason.CONSUMPTION,
+      deletedAt: null,
+    },
+    data: { bookingId: input.toBookingId },
+  });

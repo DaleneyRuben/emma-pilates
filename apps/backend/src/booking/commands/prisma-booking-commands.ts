@@ -41,6 +41,7 @@ import {
   findNotYetStartedSubscription,
 } from './eligible-subscription';
 import { decideGuestPassBooking } from '../payments/guest-pass';
+import { moveConsumptionToBooking, restoreBookedClass } from './restore-class';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -242,6 +243,7 @@ export class PrismaBookingCommands {
           where: { state: BookingState.BOOKED },
           select: {
             id: true,
+            clientId: true,
             subscriptionId: true,
             client: { select: { account: { select: { id: true } } } },
           },
@@ -291,9 +293,11 @@ export class PrismaBookingCommands {
           cancellationCause: BookingCancellationCause.SESSION_CANCELLED,
         },
       });
-      await transaction.subscription.update({
-        where: { id: booking.subscriptionId },
-        data: { remainingClassAllowance: { increment: 1 } },
+      await restoreBookedClass(transaction, {
+        bookingId: booking.id,
+        subscriptionId: booking.subscriptionId,
+        clientId: booking.clientId,
+        now,
       });
       if (booking.client.account !== null) {
         await notify(
@@ -491,17 +495,20 @@ export class PrismaBookingCommands {
                 throw new Error('Booking is not cancellable');
               }
 
-              const restored = await transaction.subscription.updateMany({
-                where: {
-                  id: input.subscriptionId,
-                  clientId: input.clientId,
-                },
-                data: { remainingClassAllowance: { increment: 1 } },
+              await restoreBookedClass(transaction, {
+                bookingId: input.bookingId,
+                subscriptionId: input.subscriptionId,
+                clientId: input.clientId,
+                now: this.now(),
               });
-
-              if (restored.count !== 1) {
-                throw new Error('Booking Subscription is unavailable');
-              }
+              await transaction.guestPass.updateMany({
+                where: {
+                  bookingId: input.bookingId,
+                  friendClientId: input.clientId,
+                  deletedAt: null,
+                },
+                data: { bookingId: null },
+              });
 
               const cancelledBooking =
                 await transaction.booking.findUniqueOrThrow({
@@ -580,6 +587,17 @@ export class PrismaBookingCommands {
             findNotYetStartedSubscription: ({ clientId, onDate }) =>
               findNotYetStartedSubscription(transaction, { clientId, onDate }),
             weeklyCapBlocksDestination: async (input) => {
+              const moved = await transaction.allowanceAdjustment.findFirst({
+                where: {
+                  bookingId: input.excludeBookingId,
+                  reason: 'CONSUMPTION',
+                  deletedAt: null,
+                },
+                select: { id: true },
+              });
+              // The class was already extra-funded. Moving it is not a new
+              // use of the weekly cap.
+              if (moved !== null) return false;
               const position = await readWeeklyCapPosition(transaction, input);
               return (
                 position.weeklyClassCap !== null &&
@@ -626,6 +644,11 @@ export class PrismaBookingCommands {
               if (updated.count !== 1) {
                 throw new Error('Booking is not reschedulable');
               }
+
+              await moveConsumptionToBooking(transaction, {
+                fromBookingId: input.bookingId,
+                toBookingId: replacement.id,
+              });
 
               return replacement;
             },

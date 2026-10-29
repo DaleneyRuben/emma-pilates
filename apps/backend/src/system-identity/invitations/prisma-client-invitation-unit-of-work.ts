@@ -1,6 +1,5 @@
 import type { PgBoss } from 'pg-boss';
 import { recordClientAcquisition } from '../../booking/acquisition/record-client-acquisition';
-import { openGuestPass } from '../../booking/payments/open-guest-pass';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
   AuditActorKind,
@@ -177,20 +176,13 @@ const createInvitationTransaction = (
         },
       },
     });
-    // BKM-011 records the channel; a Client's code also opens the Guest Pass.
-    const holder = await recordClientAcquisition(transaction, {
+    // BKM-011 records the channel. The Guest Pass opens when she activates,
+    // so an invitation she never accepts does not burn the host's month.
+    await recordClientAcquisition(transaction, {
       clientId: invitation.clientId,
       declaredChannel: invitation.acquisitionChannel,
       referralCode: invitation.referredByCode,
     });
-    if (holder?.kind === 'client') {
-      await openGuestPass(transaction, {
-        hostClientId: holder.clientId,
-        friendClientId: invitation.clientId,
-        authorAccountId: invitation.accountId,
-        now: now(),
-      });
-    }
   },
   replaceStaffInvitationActivation: (input) =>
     registration.replaceStaffInvitationActivation(input),

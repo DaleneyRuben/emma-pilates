@@ -30,6 +30,7 @@ import type {
 import { cleanupExpiredPendingAccounts } from './prisma-expired-pending-account-cleanup';
 import { removePendingAccount } from './remove-pending-account';
 
+import { openGuestPassForVerifiedClient } from '../../booking/payments/open-verified-guest-pass';
 import { PrismaClientRegistrationTransaction } from './prisma-client-registration-transaction';
 
 export { PrismaClientRegistrationTransaction } from './prisma-client-registration-transaction';
@@ -354,6 +355,11 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
           activatedAt: verification.now,
           pendingExpiresAt: null,
         },
+      });
+      await openGuestPassForVerifiedClient(transaction, {
+        friendClientId: token.account.clientId,
+        authorAccountId: token.account.id,
+        now: verification.now,
       });
 
       return 'verified';
