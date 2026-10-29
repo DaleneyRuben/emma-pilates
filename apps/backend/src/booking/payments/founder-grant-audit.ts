@@ -4,6 +4,7 @@ import {
   AuditOutcome,
   FounderMembershipStatus,
 } from '../../generated/prisma/client';
+import { claimFounderPlace } from './prisma-founder-membership';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -43,4 +44,32 @@ export const auditCashFounderGrant = async (
       },
     },
   });
+};
+
+// Confirmation of a founder-priced transfer whose reservation was released
+// claims the place again. A list-price payment is left alone.
+export const reclaimMissingFounderPlace = async (
+  transaction: Transaction,
+  input: { clientId: string; paymentId: string; now: Date },
+): Promise<void> => {
+  const payment = await transaction.payment.findUnique({
+    where: { id: input.paymentId },
+    select: {
+      discountReason: true,
+      planPriceCentavos: true,
+      plan: { select: { classAllowance: true, hiddenAt: true } },
+    },
+  });
+  if (payment?.discountReason !== 'founder' || payment.plan === null) return;
+  await claimFounderPlace(transaction, {
+    clientId: input.clientId,
+    now: input.now,
+    courtesy: false,
+    hidden: payment.plan.hiddenAt !== null,
+    priceCentavos: payment.planPriceCentavos,
+    classAllowance: payment.plan.classAllowance,
+    paymentId: input.paymentId,
+    activate: true,
+  });
+  await auditCashFounderGrant(transaction, input);
 };

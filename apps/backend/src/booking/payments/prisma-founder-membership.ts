@@ -3,7 +3,6 @@ import {
   AuditActorKind,
   AuditOutcome,
   FounderMembershipStatus,
-  PaymentMethod,
 } from '../../generated/prisma/client';
 import {
   decideFounderPlace,
@@ -13,6 +12,7 @@ import {
   showFounderPrice,
   type FounderRules,
 } from './founder-membership';
+import { reclaimMissingFounderPlace } from './founder-grant-audit';
 import { hasEarlierRealPayment } from './gift-class-history';
 
 type Transaction = Prisma.TransactionClient;
@@ -346,7 +346,11 @@ export const confirmFounderPlace = async (
     where: { clientId: input.clientId, deletedAt: null },
     select: { id: true, status: true, number: true },
   });
-  if (held === null || held.status !== FounderMembershipStatus.RESERVED) return;
+  if (held === null) {
+    await reclaimMissingFounderPlace(transaction, input);
+    return;
+  }
+  if (held.status !== FounderMembershipStatus.RESERVED) return;
   await transaction.founderMembership.update({
     where: { id: held.id },
     data: {
@@ -363,55 +367,4 @@ export const confirmFounderPlace = async (
     paymentId: input.paymentId,
     now: input.now,
   });
-};
-
-export const releaseFounderReservation = async (
-  transaction: Transaction,
-  input: { clientId: string; now: Date },
-): Promise<void> => {
-  await transaction.founderMembership.updateMany({
-    where: {
-      clientId: input.clientId,
-      status: FounderMembershipStatus.RESERVED,
-      deletedAt: null,
-    },
-    data: { deletedAt: input.now },
-  });
-};
-
-export { loseFounderForGap } from './founder-gap';
-
-export const founderSaleOf = (input: {
-  method: PaymentMethod;
-  classAllowance: number;
-  priceCentavos: number;
-  creditAppliedCentavos: number;
-  discount: FounderSale;
-}): {
-  creditAppliedCentavos: number;
-  discountCentavos: number;
-  discountReason: string | null;
-  amountDueCentavos: number;
-  method: PaymentMethod;
-} => {
-  const creditAppliedCentavos = Math.min(
-    input.creditAppliedCentavos,
-    input.priceCentavos - input.discount.discountCentavos,
-  );
-  const amountDueCentavos =
-    input.priceCentavos -
-    input.discount.discountCentavos -
-    creditAppliedCentavos;
-  return {
-    creditAppliedCentavos,
-    discountCentavos: input.discount.discountCentavos,
-    discountReason: input.discount.discountReason,
-    amountDueCentavos,
-    method:
-      input.method === PaymentMethod.COURTESY
-        ? input.method
-        : amountDueCentavos === 0
-          ? PaymentMethod.CREDIT_ONLY
-          : input.method,
-  };
 };
