@@ -1,5 +1,6 @@
 import type { Prisma } from '../../generated/prisma/client';
 import {
+  EvaluationState,
   PaymentKind,
   PaymentMethod,
   PaymentState,
@@ -130,24 +131,28 @@ export const releaseExpiredEvaluationHolds = async (
 ): Promise<number> => {
   const due = await transaction.evaluation.findMany({
     where: {
-      state: 'BOOKED',
+      state: { in: [EvaluationState.BOOKED, EvaluationState.NO_SHOW] },
       payment: {
         kind: PaymentKind.EVALUATION,
         state: PaymentState.PENDING,
         submittedAt: { lte: new Date(now.getTime() - 24 * 60 * 60 * 1_000) },
       },
     },
-    select: { id: true, paymentId: true },
+    select: { id: true, paymentId: true, state: true },
   });
   for (const row of due) {
-    await transaction.evaluation.update({
-      where: { id: row.id },
-      data: {
-        state: 'CANCELLED',
-        cancelledAt: now,
-        cancellationCause: 'PAYMENT_EXPIRED',
-      },
-    });
+    // A no-show is a final outcome. The hold still expires: the Payment is
+    // rejected and the Evaluation stays marked.
+    if (row.state === EvaluationState.BOOKED) {
+      await transaction.evaluation.update({
+        where: { id: row.id },
+        data: {
+          state: 'CANCELLED',
+          cancelledAt: now,
+          cancellationCause: 'PAYMENT_EXPIRED',
+        },
+      });
+    }
     await rejectPaymentOfCancelledEvaluation(transaction, {
       evaluationId: row.id,
       now,
