@@ -15,7 +15,12 @@ describe('nutritionistCostOfMonth', () => {
       ]);
 
     await expect(
-      nutritionistCostOfMonth({ evaluation: { findMany } }, month),
+      nutritionistCostOfMonth(
+        { evaluation: { findMany } } as unknown as Parameters<
+          typeof nutritionistCostOfMonth
+        >[0],
+        month,
+      ),
     ).resolves.toBe(10_000);
     expect(findMany).toHaveBeenCalledWith({
       where: {
