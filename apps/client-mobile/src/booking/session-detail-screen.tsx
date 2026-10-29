@@ -128,7 +128,8 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   const hasAllowance =
     view !== null &&
     (view.status === "active" || view.status === "expiring_soon") &&
-    (view.subscription?.remainingClassAllowance ?? 0) > 0;
+    ((view.subscription?.remainingClassAllowance ?? 0) > 0 ||
+      (view.subscription?.extraClassesLine ?? null) !== null);
   const full = forcedFull || detail.availableSeats === 0;
   // Joining inside the window is refused (the server answers 403), so the
   // offer stays hidden until the window length is known and still open.
