@@ -1,3 +1,4 @@
+import { openGuestPassForVerifiedClient } from '../../booking/payments/open-verified-guest-pass';
 import { revokeAuthenticationSessions } from '../authentication/revoke-authentication-sessions';
 import { randomUUID } from 'node:crypto';
 import type { PrismaClient } from '../../generated/prisma/client';
@@ -204,8 +205,15 @@ export class PrismaAccountSecurityGateway
           activatedAt: input.completedAt,
           pendingExpiresAt: null,
         },
-        select: { clientId: true },
+        select: { id: true, clientId: true },
       });
+      if (account.clientId !== null) {
+        await openGuestPassForVerifiedClient(transaction, {
+          friendClientId: account.clientId,
+          authorAccountId: account.id,
+          now: input.completedAt,
+        });
+      }
       const auditRecordId = randomUUID();
       await transaction.auditRecord.create({
         data: {

@@ -68,6 +68,12 @@ const findOrCreatePassPlan = async (transaction: Transaction, now: Date) => {
 // invitation by the same host in the same La Paz month is refused, and so is
 // a second pass for the same friend. The class is a courtesy adjustment on a
 // hidden Subscription, so it is never a first Plan.
+const lockHost = (transaction: Transaction, hostClientId: string) =>
+  transaction.$queryRaw`
+    SELECT id FROM booking.clients
+    WHERE id = ${hostClientId}::uuid
+    FOR UPDATE`;
+
 export const openGuestPass = async (
   transaction: Transaction,
   input: {
@@ -77,6 +83,8 @@ export const openGuestPass = async (
     now: Date;
   },
 ): Promise<{ id: string }> => {
+  // Two verifications of the same host must not both spend the month.
+  await lockHost(transaction, input.hostClientId);
   const earlier = await transaction.guestPass.findMany({
     where: { hostClientId: input.hostClientId, deletedAt: null },
     select: { createdAt: true },

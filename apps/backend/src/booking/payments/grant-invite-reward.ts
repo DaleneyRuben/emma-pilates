@@ -37,9 +37,20 @@ export const grantInviteReward = async (
     orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
     select: { id: true },
   });
+  const guestPass =
+    current === null
+      ? null
+      : await transaction.guestPass.findFirst({
+          where: {
+            courtesySubscriptionId: current.id,
+            deletedAt: null,
+          },
+          select: { id: true },
+        });
   const decision = decideInviteReward({
     alreadyRewarded: pass.rewardedAt !== null,
     currentSubscriptionId: current?.id ?? null,
+    currentSubscriptionIsGuestPass: guestPass !== null,
   });
   if (decision === null) return;
   if (decision.subscriptionId === null) {
