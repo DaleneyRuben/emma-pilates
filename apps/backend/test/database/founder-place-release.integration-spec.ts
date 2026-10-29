@@ -238,6 +238,48 @@ describe('founder place release', () => {
     ).resolves.toBeNull();
   });
 
+  it('still grants a place on the first plan after a single class', async () => {
+    await releasePlaces();
+    const buyer = await world.newClient('Clase suelta primero');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const single = await prisma.plan.create({
+      data: {
+        name: `Clase suelta ${randomUUID()}`,
+        durationDays: 30,
+        classAllowance: 1,
+        priceCentavos: 8_000,
+        displayOrder: 0,
+      },
+      select: { id: true },
+    });
+    const dropIn = await world.commands().recordCashPayment(
+      {
+        clientId: buyer.clientId,
+        planId: single.id,
+        branchId: centro().id,
+      },
+      assistant,
+      randomUUID(),
+    );
+    expect(dropIn).toMatchObject({ discountReason: null });
+
+    const firstPlan = await world.commands().recordCashPayment(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro().id,
+      },
+      assistant,
+      randomUUID(),
+    );
+    expect(firstPlan).toMatchObject({ discountReason: 'founder' });
+    await expect(
+      prisma.founderMembership.findFirst({
+        where: { clientId: buyer.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({ status: 'ACTIVE' });
+  });
+
   it('reclaims the place when a founder priced payment has no reservation', async () => {
     await releasePlaces();
     const buyer = await world.newClient('Pago sin reserva');
