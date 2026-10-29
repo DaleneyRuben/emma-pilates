@@ -343,4 +343,36 @@ describe('founder membership', () => {
       AdministrationError,
     );
   });
+
+  it('counts a reservation and leaves it off the founder list', async () => {
+    await prisma.founderMembership.updateMany({
+      data: { deletedAt: now },
+    });
+    const buyer = await world.newClient('Reserva sin pago');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+    const centro = fixtures.branches.find(
+      (branch) => branch.name === 'Centro',
+    )!;
+    await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro.id,
+        imageAssetId: receipt.id,
+      },
+      assistant,
+      randomUUID(),
+    );
+    const administrator = await world.staffPrincipal(
+      'paola.mendoza@example.com',
+    );
+
+    const page = await createPrismaOversight(prisma, {
+      now: () => now,
+    }).listFounders(administrator);
+
+    expect(page.granted).toBe(1);
+    expect(page.items).toEqual([]);
+  });
 });
