@@ -7,13 +7,14 @@ const subscriptionId = '22222222-2222-4222-8222-222222222222';
 describe('requestFreeze civil dates', () => {
   it('answers 400 for a calendar date that does not exist', async () => {
     const requestFreeze = jest.fn();
-    const controller = new ClientFreezesController({ requestFreeze } as never, {
-      resolve: jest.fn().mockResolvedValue({
+    const controller = new ClientFreezesController(
+      { requestFreeze } as never,
+      jest.fn().mockResolvedValue({
         accountId: 'account-id',
         authenticationSessionId: 'authentication-session-id',
         identity: { kind: 'client', clientId: 'client-id' },
       }),
-    });
+    );
 
     await expect(
       controller.request(bearer, {
