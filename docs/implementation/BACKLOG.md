@@ -1012,7 +1012,7 @@ Review findings H15 and H16, and the Freeze medium bullets, from
 - The classes cancelled on approval are those whose Session falls on a Bolivia civil date inside the window, not a UTC midnight range.
 - A date that is not a calendar day answers `400` `invalid_civil_date`.
 
-Evidence (FIX-006, 2026-10-28, branch `fix/fix-006-freeze`, from `main` at `0623829c`). Red `e3b13159`, green `e824c1df`.
+Evidence (FIX-006, 2026-10-28, branch `fix/fix-006-freeze`, from `main` at `0623829c`, [PR #228](https://github.com/DaleneyRuben/emma-pilates/pull/228)). Red `e3b13159`, green `e824c1df`, docs `60654e7e`.
 
 Decisions taken:
 
