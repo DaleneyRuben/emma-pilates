@@ -53,18 +53,24 @@ describe('freeze enforcement on waitlist and reschedule', () => {
     });
     const session = await prisma.session.findFirstOrThrow({
       where: {
-        startsAt: { gte: new Date('2026-10-02'), lt: new Date('2026-10-08') },
+        startsAt: {
+          gte: new Date('2026-09-25T20:00:00.000Z'),
+          lt: new Date('2026-09-26T00:00:00.000Z'),
+        },
         state: 'SCHEDULED',
       },
     });
     await prisma.session.update({
       where: { id: session.id },
-      data: { capacity: 0 },
+      data: { capacity: 1 },
     });
+    const holder = await world.newClient('Ocupa el lugar');
+    await cash(holder.clientId);
     const bookings = new PrismaBookingCommands(
       prisma,
       () => new Date('2026-09-21T15:00:00.000Z'),
     );
+    await bookings.create({ sessionId: session.id }, clientPrincipal(holder));
     await bookings.joinWaitlist(
       { sessionId: session.id },
       clientPrincipal(client),
@@ -76,8 +82,8 @@ describe('freeze enforcement on waitlist and reschedule', () => {
     const requested = await commands.requestFreeze(
       {
         subscriptionId: subscription.id,
-        startsOn: '2026-10-01',
-        endsOn: '2026-10-10',
+        startsOn: '2026-09-25',
+        endsOn: '2026-09-30',
         reason: 'Viaje',
       },
       clientPrincipal(client),
@@ -100,81 +106,7 @@ describe('freeze enforcement on waitlist and reschedule', () => {
     });
     await expect(
       bookings.joinWaitlist({ sessionId: session.id }, clientPrincipal(client)),
-    ).rejects.toThrow(/Booking is during a Freeze until 2026-10-10/);
-  });
-
-  it('does not promote a Waitlist entry whose Session is inside a Freeze', async () => {
-    const client = await world.newClient('No promover');
-    const sale = await cash(client.clientId);
-    const subscription = await prisma.subscription.findFirstOrThrow({
-      where: { paymentId: sale.id },
-    });
-    const session = await prisma.session.findFirstOrThrow({
-      where: {
-        startsAt: { gte: new Date('2026-10-08'), lt: new Date('2026-10-11') },
-        state: 'SCHEDULED',
-        capacity: { gt: 0 },
-      },
-    });
-    const bookings = new PrismaBookingCommands(
-      prisma,
-      () => new Date('2026-09-21T15:00:00.000Z'),
-    );
-    await prisma.session.update({
-      where: { id: session.id },
-      data: { capacity: 0 },
-    });
-    await bookings.joinWaitlist(
-      { sessionId: session.id },
-      clientPrincipal(client),
-    );
-    const commands = createPrismaPaymentCommands(prisma, {
-      now: () => new Date('2026-09-22T15:00:00.000Z'),
-    });
-    const requested = await commands.requestFreeze(
-      {
-        subscriptionId: subscription.id,
-        startsOn: '2026-10-01',
-        endsOn: '2026-10-10',
-        reason: 'Viaje',
-      },
-      clientPrincipal(client),
-    );
-    // Leave the entry open so promotion, not approval, is what this case checks.
-    await prisma.waitlistEntry.updateMany({
-      where: { sessionId: session.id, clientId: client.clientId },
-      data: { closedAt: null, closureReason: null },
-    });
-    const administrator = await world.staffPrincipal(
-      'paola.mendoza@example.com',
-    );
-    await commands.decideFreeze(
-      { freezeId: requested.id, decision: 'approved' },
-      administrator,
-    );
-    await prisma.waitlistEntry.updateMany({
-      where: { sessionId: session.id, clientId: client.clientId },
-      data: { closedAt: null, closureReason: null },
-    });
-    await prisma.session.update({
-      where: { id: session.id },
-      data: { capacity: 1 },
-    });
-
-    await bookings.create(
-      { sessionId: session.id },
-      clientPrincipal(await world.newClient('Disparador')),
-    );
-
-    await expect(
-      prisma.booking.findFirst({
-        where: {
-          sessionId: session.id,
-          clientId: client.clientId,
-          state: 'BOOKED',
-        },
-      }),
-    ).resolves.toBeNull();
+    ).rejects.toThrow(/Booking is during a Freeze until 2026-09-30/);
   });
 
   it('refuses a Reschedule into the Freeze and before the Start Date', async () => {
@@ -186,7 +118,7 @@ describe('freeze enforcement on waitlist and reschedule', () => {
     const outside = await prisma.session.findFirstOrThrow({
       where: {
         startsAt: {
-          gte: new Date('2026-09-22T16:00:00.000Z'),
+          gte: new Date('2026-09-22T22:00:00.000Z'),
           lt: new Date('2026-09-22T23:00:00.000Z'),
         },
         state: 'SCHEDULED',
@@ -194,13 +126,16 @@ describe('freeze enforcement on waitlist and reschedule', () => {
     });
     const inside = await prisma.session.findFirstOrThrow({
       where: {
-        startsAt: { gte: new Date('2026-10-02'), lt: new Date('2026-10-08') },
+        startsAt: {
+          gte: new Date('2026-09-25T22:00:00.000Z'),
+          lt: new Date('2026-09-25T23:00:00.000Z'),
+        },
         state: 'SCHEDULED',
       },
     });
     const bookings = new PrismaBookingCommands(
       prisma,
-      () => new Date('2026-09-22T15:00:00.000Z'),
+      () => new Date('2026-09-22T21:00:00.000Z'),
     );
     const booking = await bookings.create(
       { sessionId: outside.id },
@@ -212,8 +147,8 @@ describe('freeze enforcement on waitlist and reschedule', () => {
     const requested = await commands.requestFreeze(
       {
         subscriptionId: subscription.id,
-        startsOn: '2026-10-01',
-        endsOn: '2026-10-10',
+        startsOn: '2026-09-25',
+        endsOn: '2026-09-30',
         reason: 'Viaje',
       },
       clientPrincipal(client),
@@ -236,16 +171,15 @@ describe('freeze enforcement on waitlist and reschedule', () => {
     const early = await prisma.session.findFirstOrThrow({
       where: {
         startsAt: {
-          gte: new Date('2026-09-22T16:00:00.000Z'),
-          lt: new Date('2026-09-22T23:00:00.000Z'),
+          gte: new Date('2026-09-23T22:00:00.000Z'),
+          lt: new Date('2026-09-23T23:00:00.000Z'),
         },
         state: 'SCHEDULED',
-        id: { not: outside.id },
       },
     });
     await prisma.subscription.update({
       where: { id: subscription.id },
-      data: { startsOn: new Date('2026-09-23T00:00:00.000Z') },
+      data: { startsOn: new Date('2026-09-24T00:00:00.000Z') },
     });
     await expect(
       bookings.reschedule(

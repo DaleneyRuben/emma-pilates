@@ -74,7 +74,9 @@ describe('freeze approval bounds', () => {
         identity: { kind: 'client', clientId: client.clientId },
       },
     );
-    const before = subscription.remainingClassAllowance;
+    const booked = await prisma.subscription.findUniqueOrThrow({
+      where: { id: subscription.id },
+    });
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => new Date('2026-09-22T15:00:00.000Z'),
     });
@@ -108,7 +110,7 @@ describe('freeze approval bounds', () => {
     await expect(
       prisma.subscription.findUniqueOrThrow({ where: { id: subscription.id } }),
     ).resolves.toMatchObject({
-      remainingClassAllowance: before,
+      remainingClassAllowance: booked.remainingClassAllowance,
       endsOn: subscription.endsOn,
     });
     await expect(

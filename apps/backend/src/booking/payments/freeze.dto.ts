@@ -1,7 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 
-const civilDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+// A shape match is not a calendar date: 2026-02-31 rolls into March.
+export const isCivilDate = (value: string): boolean =>
+  /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+  new Date(`${value}T00:00:00.000Z`).toISOString().slice(0, 10) === value;
+
+const civilDate = z.string().refine(isCivilDate);
 
 const requestFreezeSchema = z.strictObject({
   subscriptionId: z.uuid(),

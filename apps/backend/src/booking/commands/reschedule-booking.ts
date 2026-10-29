@@ -1,6 +1,8 @@
 import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
+import { bookingDuringFreezeMessage } from '../payments/freeze';
+import { bookingBeforeStartMessage } from './booking-before-start';
 import { BookingAccessDeniedError } from './create-booking';
 import { boliviaWeek } from './weekly-cap';
 
@@ -36,6 +38,14 @@ type RescheduleBookingDependencies = {
     startsAt: Date;
     excludeBookingId: string;
   }): Promise<boolean>;
+  findApprovedFreeze?(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ endsOn: Date } | null>;
+  findNotYetStartedSubscription?(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ startsOn: Date } | null>;
   hasOverlappingBooking(input: {
     clientId: string;
     startsAt: Date;
@@ -117,6 +127,26 @@ export const rescheduleBooking = async (
     !sameBoliviaWeek(target.startsAt, booking.session.startsAt)
   ) {
     throw new Error('Target Session is not eligible for Reschedule');
+  }
+
+  const freeze = dependencies.findApprovedFreeze
+    ? await dependencies.findApprovedFreeze({
+        clientId: booking.clientId,
+        onDate: target.startsAt,
+      })
+    : null;
+  if (freeze !== null) {
+    throw new Error(bookingDuringFreezeMessage(freeze.endsOn));
+  }
+
+  const pending = dependencies.findNotYetStartedSubscription
+    ? await dependencies.findNotYetStartedSubscription({
+        clientId: booking.clientId,
+        onDate: target.startsAt,
+      })
+    : null;
+  if (pending !== null) {
+    throw new Error(bookingBeforeStartMessage(pending.startsOn));
   }
 
   // A same-week move frees the source Booking and takes one place in the

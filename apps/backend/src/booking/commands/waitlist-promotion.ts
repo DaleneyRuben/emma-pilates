@@ -3,6 +3,7 @@ import { WaitlistClosureReason } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { promoteWaitlist } from './promote-waitlist';
 import { findCoveringSubscription } from './eligible-subscription';
+import { boliviaDate } from '../../time/bolivia-time';
 import { fundBooking } from './weekly-cap-funding';
 import { readWeeklyCapPosition } from './weekly-cap-count';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
@@ -60,6 +61,17 @@ export const promoteWaitlistInTransaction = (
             joinedByAccountId: true,
           },
           orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
+        }),
+      findApprovedFreeze: ({ clientId, onDate }) =>
+        transaction.freeze.findFirst({
+          where: {
+            clientId,
+            state: 'APPROVED',
+            deletedAt: null,
+            startsOn: { lte: boliviaDate(onDate) },
+            endsOn: { gte: boliviaDate(onDate) },
+          },
+          select: { endsOn: true },
         }),
       findEligibleSubscription: async ({ clientId, onDate }) => {
         const subscription = await findCoveringSubscription(transaction, {

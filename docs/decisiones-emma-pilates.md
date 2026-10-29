@@ -51,9 +51,10 @@ Mismo precio para reformer, cadillac y mat.
 - **Solo en planes trimestrales** (y en planes más largos, si se agregan).
 - Una vez por plan, hasta 15 días.
 - La clienta lo solicita desde la app con fechas y motivo; **la administradora lo aprueba** (notificación push).
-- No puede empezar en el pasado.
-- La fecha de fin del plan se extiende exactamente los días congelados.
-- Durante el congelamiento no se puede reservar.
+- No puede empezar en el pasado. Si la administradora aprueba cuando el inicio ya pasó, la aprobación se rechaza y no cancela ni devuelve clases ya dictadas.
+- La ventana queda dentro del plan actual. Una renovación ya comprada limita el congelamiento para que la extensión no la pise.
+- La fecha de fin del plan se extiende exactamente los días congelados. Una segunda aprobación no extiende otra vez.
+- Durante el congelamiento no se puede reservar, ni entrar a la lista de espera, ni ser promovida desde ella, ni reprogramar hacia un día congelado.
 - Las fundadoras no pierden su beneficio por congelar.
 
 ### 2.5 Otras reglas

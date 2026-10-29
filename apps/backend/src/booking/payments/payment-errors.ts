@@ -20,7 +20,11 @@ export type PaymentRuleCode =
   | 'courtesy_end_date_invalid'
   | 'start_date_out_of_window'
   | 'future_subscription_exists'
-  | 'freeze_not_allowed';
+  | 'freeze_not_allowed'
+  | 'freeze_start_in_past'
+  | 'freeze_outside_term'
+  | 'freeze_already_decided'
+  | 'invalid_civil_date';
 
 const statuses: Record<PaymentRuleCode, number> = {
   subscription_not_expired: 409,
@@ -45,6 +49,10 @@ const statuses: Record<PaymentRuleCode, number> = {
   start_date_out_of_window: 400,
   future_subscription_exists: 409,
   freeze_not_allowed: 409,
+  freeze_start_in_past: 409,
+  freeze_outside_term: 409,
+  freeze_already_decided: 409,
+  invalid_civil_date: 400,
 };
 
 export class PaymentRuleError extends Error {
