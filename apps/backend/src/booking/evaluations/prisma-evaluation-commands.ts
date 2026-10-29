@@ -128,6 +128,7 @@ export type ClientEvaluationView = {
   priceCentavos: number;
   paymentId: string | null;
   receiptAttached: boolean;
+  receiptUploadable: boolean;
   state: 'booked' | 'cancelled' | 'no_show';
   startsAt: Date;
   endsAt: Date;

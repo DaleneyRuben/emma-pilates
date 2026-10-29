@@ -16,6 +16,8 @@ export interface ClientEvaluationDto {
   paymentId: string | null;
   /** A paid Evaluation still needs its transfer receipt. Older builds ignore it. */
   receiptAttached: boolean;
+  /** True only while the payment is pending and has no receipt. Older builds ignore it. */
+  receiptUploadable: boolean;
   state: ClientEvaluationDtoState;
   startsAt: string;
   endsAt: string;

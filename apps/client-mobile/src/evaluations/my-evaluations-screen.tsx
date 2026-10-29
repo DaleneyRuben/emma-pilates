@@ -88,9 +88,7 @@ function UpcomingCard({
         <BodyText style={styles.muted}>
           {`${evaluation.nutritionistName} · Sucursal ${evaluation.branchName}`}
         </BodyText>
-        {!evaluation.included &&
-        evaluation.priceCentavos > 0 &&
-        evaluation.receiptAttached === false ? (
+        {evaluation.receiptUploadable === true ? (
           <Pressable
             accessibilityLabel="Sube tu comprobante de transferencia"
             accessibilityRole="button"

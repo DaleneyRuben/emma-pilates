@@ -187,17 +187,19 @@ describe("Paid Evaluation receipt", () => {
     const fetcher = routeFetcher(
       baseRoutes({
         ...uploadRoutes(),
-        "/api/v1/evaluations?scope=upcoming": () =>
-          jsonResponse(
+        "/api/v1/evaluations?scope=upcoming": () => {
+          const uploaded = attached.length > 0;
+          return jsonResponse(
             page([
               upcomingEvaluation("evaluation-paid", bookedStart(), {
                 ...paid,
                 paymentId: "payment-1",
-                receiptAttached: false,
-                receiptUploadable: true,
+                receiptAttached: uploaded,
+                receiptUploadable: !uploaded,
               }),
             ]),
-          ),
+          );
+        },
         "POST /api/v1/evaluations/evaluation-paid/receipt": (init) => {
           attached.push(String(init?.body));
           return new Response(null, { status: 204 });

@@ -110,6 +110,12 @@ export class ClientEvaluationDto {
   })
   receiptAttached!: boolean;
 
+  @ApiProperty({
+    description:
+      'True only while the payment is pending and has no receipt. Older builds ignore it.',
+  })
+  receiptUploadable!: boolean;
+
   @ApiProperty({ enum: ['booked', 'cancelled', 'no_show'] })
   state!: 'booked' | 'cancelled' | 'no_show';
 
