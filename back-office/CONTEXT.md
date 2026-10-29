@@ -29,11 +29,11 @@ A Trainer's or the Coordinator's monthly pay, drafted by the system from the Pay
 _Avoid_: Payslip, nómina (in code)
 
 **Renewal Rate**:
-The share of Clients whose Subscription ended in a month who bought another Plan before that end or within 7 days after it.
+The share of Clients whose real Plan ended in a month who bought another real Plan whose Payment was approved, on the Bolivia date, before that end or within 7 days after it, whatever Start Date she chose. Guest Passes, Courtesy Access, and other non-real Subscriptions are not renewals. The Coordinator's bonus and the KPIs use this one definition (owner, 2026-10-28).
 _Avoid_: Retention (retention is measured at 90 days)
 
 **Cash Close**:
-The end-of-day count of a Branch's cash: the expected cash (the day's confirmed cash Payments there, up to the close), the cash counted, the difference, and a note. One a day per Branch, made by an Assistant at her Branch or an Administrator, and never edited; a sale voided after the close, or a cash sale recorded after it the same day, shows as an adjustment. A past day with cash sales and no close is flagged. Only an Administrator sees the history.
+The end-of-day count of a Branch's cash: the expected cash (the day's confirmed cash Payments there, up to the close, including a cash sale voided later, because no money is returned), the cash counted, the difference, and a note. A voided cash sale stays in the expected cash and appears on its own line, «Ventas anuladas (efectivo en caja)»; if money is ever given back, the Administrator records it as an outflow (owner, 2026-10-28). One a day per Branch, made by an Assistant at her Branch or an Administrator, and never edited; a cash sale recorded after the close the same day shows as an adjustment. A past day with cash sales and no close is flagged. Only an Administrator sees the history.
 _Avoid_: Arqueo (in code), shift close
 
 **Equipment**:

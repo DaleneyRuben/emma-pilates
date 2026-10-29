@@ -1693,6 +1693,14 @@ the export was not run.
 | 3. After opening | 21 (9 + 12); UX-005 to UX-014 are done | 34–49 d |
 | **Total** | **66** | **≈120–165 d** |
 
+### Review fixes (2026-10-28)
+
+The findings in [`docs/reviews/2026-10-28-launch-review.md`](../reviews/2026-10-28-launch-review.md). FIX-000 records the owner's six decisions; FIX-001 through FIX-012 implement them.
+
+| ID | Priority | Surface | Work item | Depends on | Effort | Status | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| FIX-000 | P0 | Docs | Record the owner's six decisions of 2026-10-28 (founder discount from the first Plan, a cancelled guest-pass class may be rebooked, a void undoes everything from that sale, a voided cash sale stays in expected cash, «renovó» by purchase date, the Coordinator assigns a Trainer's Branches) | — | 0.5 d | done | `8f750d3d` |
+
 ## Deferred
 
 Nothing is deferred today. FUT-001, the only row this table ever held, moved to the mobile-first queue on 2026-10-22 when the user chose to build it.

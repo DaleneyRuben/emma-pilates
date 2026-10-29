@@ -240,3 +240,14 @@ La coordinadora usa la web de administración (secciones operativas) y la app de
 
 - Detalles del convenio de catering.
 - Horarios exactos de las clases (se cargan desde la web).
+
+## 16. Addendum del 2026-10-28
+
+La dueña resolvió las preguntas abiertas de la revisión del lanzamiento. Estas seis decisiones ganan sobre cualquier lectura anterior de este documento.
+
+1. **Descuento de fundadora desde el primer plan.** Una fundadora recibe el 15 % desde su primer plan, no desde el segundo. El lugar se decide, bajo el candado que ya existe, cuando se cotiza la venta (intención de compra, venta en efectivo o QR en recepción), mientras queden lugares. Se vuelve definitivo al confirmar el pago. Una fundadora nunca recibe la clase de regalo ni las clases de campaña.
+2. **Clase de pase de invitada cancelada.** Si la amiga cancela a tiempo su clase gratis, puede reservar otra. Vuelven a aplicar las reglas del pase: una clase con cupo que no sea el último cupo.
+3. **Qué deshace una anulación.** La anulación deshace todo lo que salió de esa venta: el lugar de fundadora, si esa venta lo otorgó (el lugar queda libre); la clase de regalo y la clase de recompensa de la anfitriona, si aún no se usaron; las consultas incluidas en la suscripción anulada (se cancelan, así que su costo de 50 Bs deja de contar); las entradas en lista de espera de la clienta atadas a esa suscripción; y las reservas futuras, como hoy. Cada reversión queda auditada.
+4. **Cierre de caja y anulaciones.** Una venta en efectivo anulada sigue en el efectivo esperado del cierre de caja, porque no se devuelve dinero. Aparece en su propia línea: «Ventas anuladas (efectivo en caja): Bs N». Si alguna vez se devuelve dinero, la administradora lo registra como una salida.
+5. **«Renovó» para el bono.** Se mide por la fecha de compra, como ya dice la sección 9. Una renovación es otro plan real cuyo pago se aprobó (fecha de Bolivia) antes del fin del anterior, o hasta 7 días después, sea cual sea la fecha de inicio que ella eligió. El bono y los indicadores usan esta única definición.
+6. **Sucursales de una instructora.** La coordinadora puede asignar las sucursales de una instructora (`PUT /staff-members/{id}/branches` y el control de la web de administración). Cualquier otra escritura sobre el personal sigue siendo de la administradora.
