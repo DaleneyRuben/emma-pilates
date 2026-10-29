@@ -25,15 +25,19 @@ export const restoreBookedClass = async (
     },
     data: { deletedAt: input.now },
   });
-  if (reversed.count > 0) return;
-
-  const restored = await transaction.subscription.updateMany({
-    where: { id: input.subscriptionId, clientId: input.clientId },
-    data: { remainingClassAllowance: { increment: 1 } },
-  });
-  if (restored.count !== 1) {
-    throw new Error('Booking Subscription is unavailable');
+  if (reversed.count === 0) {
+    const restored = await transaction.subscription.updateMany({
+      where: { id: input.subscriptionId, clientId: input.clientId },
+      data: { remainingClassAllowance: { increment: 1 } },
+    });
+    if (restored.count !== 1) {
+      throw new Error('Booking Subscription is unavailable');
+    }
   }
+  await transaction.guestPass.updateMany({
+    where: { bookingId: input.bookingId, deletedAt: null },
+    data: { bookingId: null },
+  });
 };
 
 // A same-week reschedule keeps the class already spent. The consumption

@@ -501,14 +501,6 @@ export class PrismaBookingCommands {
                 clientId: input.clientId,
                 now: this.now(),
               });
-              await transaction.guestPass.updateMany({
-                where: {
-                  bookingId: input.bookingId,
-                  friendClientId: input.clientId,
-                  deletedAt: null,
-                },
-                data: { bookingId: null },
-              });
 
               const cancelledBooking =
                 await transaction.booking.findUniqueOrThrow({
