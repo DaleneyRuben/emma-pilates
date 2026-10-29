@@ -153,6 +153,7 @@ export function BookingsScreen({
     navigation.setParams({ confirmed: undefined }),
   );
   const [cancelling, setCancelling] = useState<UpcomingBookingDto | null>(null);
+  const [cancelInFlight, setCancelInFlight] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const upcoming = useListUpcomingBookings({
     fetcher,
@@ -176,7 +177,8 @@ export function BookingsScreen({
     ]);
 
   const confirmCancel = async () => {
-    if (cancelling === null || cancelling.bookingId === undefined) return;
+    if (cancelInFlight || cancelling === null || cancelling.bookingId === undefined) return;
+    setCancelInFlight(true);
     setFailure(null);
     try {
       const response = await cancelBooking(cancelling.bookingId, undefined, fetcher);
@@ -189,6 +191,7 @@ export function BookingsScreen({
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
     } finally {
+      setCancelInFlight(false);
       setCancelling(null);
       await refresh();
     }
@@ -274,7 +277,10 @@ export function BookingsScreen({
         confirmLabel="Sí, cancelar reserva"
         confirmTestID="booking-cancel-confirm"
         note="La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para volver a reservarlo tendrá que seguir habiendo cupo."
-        onConfirm={() => void confirmCancel()}
+        onConfirm={() => {
+          if (cancelInFlight) return;
+          void confirmCancel();
+        }}
         onDismiss={() => setCancelling(null)}
         testID="booking-cancel-sheet"
         title="¿Cancelar esta reserva?"

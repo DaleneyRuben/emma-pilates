@@ -12,6 +12,8 @@ const bookingRejections: Record<string, string> = {
   booking_before_start_date:
     "Tu plan todavía no empieza: podrás reservar desde su fecha de inicio.",
   booking_during_freeze: "Tu plan está congelado en esa fecha.",
+  guest_pass_last_place: "Un pase de invitada no puede tomar el último lugar.",
+  guest_pass_already_used: "Tu pase de invitada ya se usó.",
 };
 
 export function bookingRejectionMessage(code: string | undefined): string | null {

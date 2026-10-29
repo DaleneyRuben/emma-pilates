@@ -43,7 +43,7 @@ export const decideInvitation = (input: {
   if (invitationsThisMonth >= input.invitesPerMonth) {
     return {
       code: 'guest_pass_monthly_limit',
-      detail: 'A host invites one friend a month',
+      detail: 'A host invites one friend each calendar month',
     };
   }
   return null;

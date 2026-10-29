@@ -43,7 +43,7 @@ describe('decideInvitation', () => {
       }),
     ).toEqual({
       code: 'guest_pass_monthly_limit',
-      detail: 'A host invites one friend a month',
+      detail: 'A host invites one friend each calendar month',
     });
   });
 
@@ -66,7 +66,7 @@ describe('decideInvitation', () => {
       }),
     ).toEqual({
       code: 'guest_pass_monthly_limit',
-      detail: 'A host invites one friend a month',
+      detail: 'A host invites one friend each calendar month',
     });
   });
 });

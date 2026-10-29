@@ -15,7 +15,7 @@ import { decideInvitation } from './guest-pass';
 type Transaction = Prisma.TransactionClient;
 
 const details = {
-  guest_pass_monthly_limit: 'A host invites one friend a month',
+  guest_pass_monthly_limit: 'A host invites one friend each calendar month',
   guest_pass_already_used: 'A Guest Pass is once in a lifetime',
 } as const;
 

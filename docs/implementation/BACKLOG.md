@@ -498,7 +498,7 @@ wait for Google, Apple, and testers.
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
 | FIX-006 | P0 | Backend/admin web | Enforce the Freeze on the Waitlist and on Reschedule, and refuse a late approval | BKM-012 | 1 d | done |
 | FIX-003 | P0 | Backend/admin web/client app | Paid Evaluation payment lifecycle: reject and cancel settle the Payment, confirm audits and notifies, the receipt is visible, an exhausted Plan cannot buy one, cancelled Evaluations skip the Bs 50, AW28 names the sale and dates it by the decision, and a pending Evaluation Payment is not the current Plan Payment | NUT-003 | 1 d | done (`2cf368e4` red, `e834caac` green; evidence below) |
-| FIX-005 | P0 | Backend | Allowance net, extra-class refund and reschedule, and guest-pass rebook and verification | BKM-008, BKM-014 | 1 d | done (`dcec6e9a` red, `982f6de2` green, `c49ca7fa` decision, `3cba3cfe` guide; evidence below) |
+| FIX-005 | P0 | Backend | Allowance net, extra-class refund and reschedule, and guest-pass rebook and verification | BKM-008, BKM-014 | 1 d | done (second review on `8577ec10`: `c0a86505` the monthly refusal names the calendar month; the last-place check lives beside capacity; reschedule uses the shared guest-pass copy; a second cancel tap does not send another DELETE. Device walk still open) |
 
 #### FIX-005 · Allowance net, extra-class refund, and guest-pass rebook
 

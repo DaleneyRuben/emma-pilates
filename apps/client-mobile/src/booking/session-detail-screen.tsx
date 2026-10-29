@@ -1,3 +1,4 @@
+import { bookingRejectionMessage } from "./booking-rejection-copy";
 import {
   createBooking,
   getGetCurrentClientSubscriptionQueryKey,
@@ -62,8 +63,6 @@ const bookingProblems: Record<string, string> = {
   no_eligible_subscription: "No te quedan clases en tu plan.",
   session_has_capacity: "La clase tiene cupos: puedes reservar directamente.",
   weekly_cap_reached: "Ya usaste tus clases de esta semana.",
-  guest_pass_last_place: "Un pase de invitada no puede tomar el último lugar.",
-  guest_pass_already_used: "Tu pase de invitada ya se usó.",
 };
 
 function problemMessage(body: unknown): string | null {
@@ -78,7 +77,9 @@ function problemMessage(body: unknown): string | null {
     const date = /: (\d{4}-\d{2}-\d{2})$/.exec(detail)?.[1];
     if (date !== undefined) return `Podrás reservar a partir del ${formatCivilDate(date)}.`;
   }
-  return typeof code === "string" ? (bookingProblems[code] ?? null) : null;
+  return typeof code === "string"
+    ? (bookingProblems[code] ?? bookingRejectionMessage(code))
+    : null;
 }
 
 export function SessionDetailScreen({ route }: { route: { params: { sessionId: string } } }) {
