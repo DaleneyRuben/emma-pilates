@@ -248,6 +248,27 @@ describe("Client Session detail", () => {
     });
   });
 
+  it("lets a guest pass book from the courtesy class", async () => {
+    const { screen } = await openDetail({
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse({
+          status: "active",
+          subscription: {
+            id: "pass-1",
+            planName: "Pase de invitada",
+            originalClassAllowance: 1,
+            remainingClassAllowance: 0,
+            startsOn: "2026-10-29",
+            endsOn: "2026-11-27",
+            extraClassesLine: "Clases extra: 1 · Cortesía",
+          },
+        }),
+    });
+
+    expect(screen.getByRole("button", { name: "Reservar" })).toBeEnabled();
+    expect(screen.queryByText("No te quedan clases en tu plan.")).toBeNull();
+  });
+
   it("disables booking without remaining classes and links to the Plans", async () => {
     const { screen } = await openDetail({}, 0, 3);
 
