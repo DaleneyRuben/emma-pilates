@@ -118,6 +118,57 @@ describe('freeze approval bounds', () => {
     ).resolves.toMatchObject({ state: 'REQUESTED' });
   });
 
+  it('keeps a class already taught on the morning the freeze is approved', async () => {
+    const client = await world.newClient('Mañana dictada');
+    const sale = await cash(client.clientId, quarterly.id);
+    const subscription = await prisma.subscription.findFirstOrThrow({
+      where: { paymentId: sale.id },
+    });
+    const session = await prisma.session.findFirstOrThrow({
+      where: {
+        startsAt: {
+          gte: new Date('2026-10-01T11:00:00.000Z'),
+          lt: new Date('2026-10-01T13:00:00.000Z'),
+        },
+      },
+    });
+    const bookings = new PrismaBookingCommands(
+      prisma,
+      () => new Date('2026-09-21T15:00:00.000Z'),
+    );
+    const booking = await bookings.create({ sessionId: session.id }, client);
+    const booked = await prisma.subscription.findUniqueOrThrow({
+      where: { id: subscription.id },
+    });
+    const requested = await createPrismaPaymentCommands(prisma, {
+      now: () => new Date('2026-09-22T15:00:00.000Z'),
+    }).requestFreeze(
+      {
+        subscriptionId: subscription.id,
+        startsOn: '2026-10-01',
+        endsOn: '2026-10-10',
+        reason: 'Viaje',
+      },
+      client,
+    );
+
+    await createPrismaPaymentCommands(prisma, {
+      now: () => new Date('2026-10-01T22:00:00.000Z'),
+    }).decideFreeze(
+      { freezeId: requested.id, decision: 'approved' },
+      await world.staffPrincipal('paola.mendoza@example.com'),
+    );
+
+    await expect(
+      prisma.booking.findUniqueOrThrow({ where: { id: booking.id } }),
+    ).resolves.toMatchObject({ state: 'BOOKED' });
+    await expect(
+      prisma.subscription.findUniqueOrThrow({ where: { id: subscription.id } }),
+    ).resolves.toMatchObject({
+      remainingClassAllowance: booked.remainingClassAllowance,
+    });
+  });
+
   it('refuses a Freeze that would overlap a queued renewal', async () => {
     const client = await world.newClient('Renovada');
     const sale = await cash(client.clientId, quarterly.id);
