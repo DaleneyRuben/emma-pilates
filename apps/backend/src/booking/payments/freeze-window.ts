@@ -1,6 +1,10 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { SubscriptionState } from '../../generated/prisma/client';
-import { decideFreezeRequest, type FreezeRequestFacts } from './freeze';
+import {
+  countedFreezeRequest,
+  decideFreezeRequest,
+  type FreezeRequestFacts,
+} from './freeze';
 import { isCivilDate } from './freeze.dto';
 import { PaymentRuleError } from './payment-errors';
 
@@ -60,11 +64,7 @@ export const assertFreezeRequestAllowed = async (
     today: input.today,
     startsOn: parseFreezeCivilDate(input.startsOn),
     endsOnRequest: parseFreezeCivilDate(input.endsOn),
-    existingRequest:
-      input.subscription.freezes[0] === undefined
-        ? null
-        : (input.subscription.freezes[0].state.toLowerCase() as
-            'requested' | 'approved' | 'refused'),
+    existingRequest: countedFreezeRequest(input.subscription.freezes),
     subscriptionStartsOn: input.subscription.startsOn,
     renewalStartsOn,
   };
