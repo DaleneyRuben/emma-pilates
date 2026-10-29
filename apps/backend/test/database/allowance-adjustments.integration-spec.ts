@@ -99,7 +99,7 @@ describe('allowance adjustments', () => {
     ).rejects.toThrow();
   });
 
-  it('grants the gift once on the first real Payment and not on the next', async () => {
+  it('withholds the gift from a founder and still withholds it on the next Payment', async () => {
     const mariana = await prisma.account.findFirstOrThrow({
       where: { email: 'sofia@example.com', deletedAt: null },
       select: { id: true, clientId: true },
@@ -146,15 +146,15 @@ describe('allowance adjustments', () => {
         },
       });
 
+    // Sofía's first real Payment makes her a founder, so the Gift Class is
+    // withheld (owner decision 1). A later real Payment still grants nothing.
     await pay();
-    await expect(gifts()).resolves.toBe(1);
-    // The first sale leaves an effective Subscription; end it so a second
-    // real Payment can be confirmed, which must not grant the gift again.
+    await expect(gifts()).resolves.toBe(0);
     await prisma.subscription.updateMany({
       where: { clientId: mariana.clientId!, state: 'ACTIVE' },
       data: { state: 'EXPIRED', expiredAt: now },
     });
     await pay();
-    await expect(gifts()).resolves.toBe(1);
+    await expect(gifts()).resolves.toBe(0);
   });
 });

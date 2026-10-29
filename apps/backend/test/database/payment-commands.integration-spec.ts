@@ -82,7 +82,8 @@ describe('Prisma payment commands', () => {
       classAllowance: 8,
       planPriceCentavos: 56_000,
       creditReservedCentavos: 0,
-      amountDueCentavos: 56_000,
+      discountCentavos: 8_400,
+      amountDueCentavos: 47_600,
       state: 'open',
       receiptAttached: false,
       expiresAt: new Date('2026-09-22T15:00:00.000Z'),
@@ -139,7 +140,8 @@ describe('Prisma payment commands', () => {
       state: 'open',
       startsOn: '2026-09-21',
       creditReservedCentavos: 0,
-      amountDueCentavos: 56_000,
+      discountCentavos: 8_400,
+      amountDueCentavos: 47_600,
     });
   });
 
@@ -290,7 +292,8 @@ describe('Prisma payment commands', () => {
 
     expect(intent).toMatchObject({
       creditReservedCentavos: 0,
-      amountDueCentavos: 56_000,
+      discountCentavos: 8_400,
+      amountDueCentavos: 47_600,
     });
     await expect(
       prisma.creditReservation.findUnique({
