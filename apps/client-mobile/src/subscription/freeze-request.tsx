@@ -4,14 +4,7 @@ import { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-
-const problemMessage = (body: unknown): string => {
-  if (typeof body === "object" && body !== null) {
-    const code = (body as { code?: unknown }).code;
-    if (code === "freeze_not_allowed") return "Este plan no se puede congelar.";
-  }
-  return "No pudimos enviar la solicitud. Inténtalo de nuevo.";
-};
+import { freezeRequestFailure } from "./freeze-refusal-copy";
 
 export function FreezeRequest({
   subscriptionId,
@@ -40,7 +33,7 @@ export function FreezeRequest({
         onRequested();
         return;
       }
-      setMessage(problemMessage(response.data));
+      setMessage(freezeRequestFailure(response.data));
     } catch {
       setMessage("No pudimos enviar la solicitud. Inténtalo de nuevo.");
     } finally {
