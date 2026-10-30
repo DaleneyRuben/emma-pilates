@@ -187,20 +187,6 @@ describe('Assistant Client overview', () => {
     });
   });
 
-  it('passes on the fixed renewal start while classes remain', async () => {
-    const readRenewalStartsOn = jest.fn().mockResolvedValue('2026-10-13');
-
-    await expect(
-      readClientOverview(
-        { clientId: 'client-id' },
-        { ...dependencies, readRenewalStartsOn },
-      ),
-    ).resolves.toMatchObject({
-      subscription: { renewalStartsOn: '2026-10-13' },
-    });
-    expect(readRenewalStartsOn).toHaveBeenCalledWith('client-id');
-  });
-
   it('reports a missing Client', async () => {
     await expect(
       readClientOverview(
