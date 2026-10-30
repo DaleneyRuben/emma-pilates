@@ -66,7 +66,7 @@ new `13` frame, «iOS · Confirmar el cambio».
 
 - Title: «¿Mover tu evaluación?»
 - Two lines with the old and the new turno: «Antes: jueves 3 de
-  septiembre, 16:00» and «Ahora: lunes 7 de septiembre, 10:15», then
+  septiembre, 16:00» and «Ahora: lunes 7 de septiembre, 10:00», then
   «45 min · Carla Peña».
 - Consequences: «El pago se mantiene: no pagas de nuevo.» and «El horario
   anterior queda libre para otras clientas.»
