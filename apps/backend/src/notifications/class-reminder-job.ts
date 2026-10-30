@@ -24,7 +24,8 @@ export const createClassReminderJob = (
     // [starts_at − 2 h, starts_at); the day one [starts_at − 24 h,
     // starts_at − 2 h), for a Booking made before it. Only reminders not yet
     // in the inbox come back, so a sweep with nothing due opens no
-    // transaction.
+    // transaction. A reminder counts as sent even once deleted, as the unique
+    // (account, business event key) index does.
     const due = await prisma.$queryRaw<DueReminder[]>`
       SELECT * FROM (
         SELECT booking.id AS "bookingId",
@@ -52,7 +53,6 @@ export const createClassReminderJob = (
           WHERE notification.account_id = reminder."accountId"
             AND notification.business_event_key =
               'class-reminder-' || reminder.kind || ':' || reminder."bookingId"
-            AND notification.deleted_at IS NULL
         )
       ORDER BY reminder."bookingId"`;
     let sent = 0;
@@ -78,7 +78,6 @@ export const createClassReminderJob = (
                 where: {
                   accountId: row.accountId,
                   businessEventKey: `class-reminder-${row.kind}:${row.bookingId}`,
-                  deletedAt: null,
                 },
               });
               if (count > 0) return 0;
