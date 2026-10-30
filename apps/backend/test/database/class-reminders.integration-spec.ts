@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { randomUUID } from 'node:crypto';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { PrismaBookingCommands } from '../../src/booking/commands/prisma-booking-commands';
@@ -69,6 +70,29 @@ describe('class reminder worker', () => {
         capacity: 10,
       },
     });
+
+  // Booked straight in the table: the reminder does not care how, and the
+  // fixture Plan has no classes left for the later cases.
+  const bookDirectly = async (
+    principal: AuthenticatedPrincipal,
+    startsAt: Date,
+  ) => {
+    if (principal.identity.kind !== 'client') throw new Error('not a Client');
+    const { clientId } = principal.identity;
+    const subscription = await prisma.subscription.findFirstOrThrow({
+      where: { clientId },
+      select: { id: true },
+    });
+    return prisma.booking.create({
+      data: {
+        sessionId: (await createSession(startsAt)).id,
+        clientId,
+        subscriptionId: subscription.id,
+        createdByAccountId: principal.accountId,
+        createdAt: new Date(startsAt.getTime() - 48 * hour),
+      },
+    });
+  };
 
   const remindersOf = (accountId: string) =>
     prisma.notification.findMany({
@@ -203,5 +227,47 @@ describe('class reminder worker', () => {
         },
       }),
     ).resolves.toEqual([]);
+  });
+
+  it('opens no transaction once the due reminder was sent', async () => {
+    const lucia = await principalOf('lucia@example.com');
+    const startsAt = new Date(base.getTime() + 200 * hour);
+    await bookDirectly(lucia, startsAt);
+    clock = new Date(startsAt.getTime() - 20 * hour);
+    await expect(job().execute()).resolves.toEqual({ sent: 1 });
+    const transactions = jest.spyOn(prisma, '$transaction');
+
+    try {
+      clock = new Date(startsAt.getTime() - 10 * hour);
+      await expect(job().execute()).resolves.toEqual({ sent: 0 });
+      expect(transactions).not.toHaveBeenCalled();
+    } finally {
+      transactions.mockRestore();
+    }
+  });
+
+  it('sends the other reminders when one cannot be recorded, then reports it', async () => {
+    const lucia = await principalOf('lucia@example.com');
+    const first = new Date(base.getTime() + 150 * hour);
+    const broken = await bookDirectly(lucia, first);
+    const fine = await bookDirectly(lucia, new Date(first.getTime() + hour));
+    clock = new Date(first.getTime() - hour);
+
+    await expect(
+      createClassReminderJob(
+        prisma,
+        () => clock,
+        (transaction, notice) =>
+          notice.businessEventKey.endsWith(broken.id)
+            ? Promise.reject(new Error('notice broke'))
+            : recordNotification(transaction, notice),
+      ).execute(),
+    ).rejects.toThrow(`class_reminders failed for 1 item: ${broken.id}`);
+    await expect(
+      prisma.notification.findMany({
+        where: { businessEventKey: { endsWith: fine.id } },
+        select: { type: true },
+      }),
+    ).resolves.toEqual([{ type: 'class_reminder_hour' }]);
   });
 });
