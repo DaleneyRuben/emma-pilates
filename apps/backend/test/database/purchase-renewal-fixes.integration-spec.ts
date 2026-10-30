@@ -146,6 +146,44 @@ describe('purchase and renewal fixes', () => {
     });
   });
 
+  it('keeps a founder place when her transfer is confirmed late (H6)', async () => {
+    await prisma.founderMembership.updateMany({
+      where: { deletedAt: null },
+      data: { deletedAt: now },
+    });
+    const founder = await world.newClient('Fundadora revisada tarde');
+    await cash(founder.clientId);
+    await prisma.subscription.updateMany({
+      where: { clientId: founder.clientId },
+      data: { startsOn: date('2026-08-27'), endsOn: date('2026-09-25') },
+    });
+    const intent = await world
+      .commands()
+      .createPurchaseIntent({ planId: plan.id }, founder, randomUUID());
+    const receipt = await world.readyReceipt(founder.accountId);
+    await world
+      .commands()
+      .attachReceipt(
+        { purchaseIntentId: intent.id, imageAssetId: receipt.id },
+        founder,
+        randomUUID(),
+      );
+    const pending = await world
+      .commands()
+      .submitTransfer({ purchaseIntentId: intent.id }, founder, randomUUID());
+    expect(pending.startsOn).toBe('2026-09-26');
+
+    await world
+      .commands(new Date('2026-10-05T13:00:00.000Z'))
+      .confirmTransfer({ paymentId: pending.id }, await administrator());
+
+    await expect(
+      prisma.founderMembership.findFirstOrThrow({
+        where: { clientId: founder.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({ status: 'ACTIVE' });
+  });
+
   it('treats a renewal with extra classes left as one that still holds (H14)', async () => {
     const buyer = await world.newClient('Con clases extra');
     const current = await currentPlan(buyer.clientId, {
@@ -200,6 +238,14 @@ describe('purchase and renewal fixes', () => {
       select: { courtesySubscription: { select: { endsOn: true } } },
     });
     expect(pass.courtesySubscription.endsOn).toEqual(date('2026-09-20'));
+    // Open question (backlog FIX-002): the booked guest class stays booked on
+    // the ended pass.
+    await expect(
+      prisma.booking.findFirstOrThrow({
+        where: { sessionId: fixture.sessionId },
+        select: { state: true },
+      }),
+    ).resolves.toMatchObject({ state: 'BOOKED' });
   });
 
   it('renews a spent Plan on the day it started instead of failing (500)', async () => {
@@ -257,6 +303,21 @@ describe('purchase and renewal fixes', () => {
       remaining: 3,
     });
     await cash(renewed.clientId);
+    const queuedTester = await world.newClient('Cortesía en cola');
+    await currentPlan(queuedTester.clientId, {
+      startsOn: '2026-08-24',
+      endsOn: '2026-09-23',
+      remaining: 3,
+    });
+    await createPrismaCourtesyAccess(prisma, { now: () => now }).grant(
+      {
+        clientId: queuedTester.clientId,
+        startsOn: date('2026-09-24'),
+        endsOn: date('2026-10-20'),
+      },
+      await administrator(),
+      randomUUID(),
+    );
     await createPrismaCourtesyAccess(prisma, { now: () => now }).grant(
       { clientId: tester.clientId, endsOn: date('2026-09-23') },
       await administrator(),
@@ -269,11 +330,18 @@ describe('purchase and renewal fixes', () => {
       where: {
         type: 'subscription_expiring',
         accountId: {
-          in: [plain.accountId, renewed.accountId, tester.accountId],
+          in: [
+            plain.accountId,
+            renewed.accountId,
+            tester.accountId,
+            queuedTester.accountId,
+          ],
         },
       },
       select: { accountId: true },
     });
-    expect(reminded.map((row) => row.accountId)).toEqual([plain.accountId]);
+    expect(reminded.map((row) => row.accountId).sort()).toEqual(
+      [plain.accountId, queuedTester.accountId].sort(),
+    );
   });
 });
