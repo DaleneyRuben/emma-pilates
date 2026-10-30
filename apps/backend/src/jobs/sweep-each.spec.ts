@@ -8,8 +8,9 @@ describe('sweepEach', () => {
       'class_reminders',
       ['a', 'b'],
       (id) => id,
-      async (id) => {
+      (id) => {
         seen.push(id);
+        return Promise.resolve();
       },
     );
 
@@ -24,9 +25,9 @@ describe('sweepEach', () => {
       'class_reminders',
       ['a', 'b', 'c'],
       (id) => id,
-      async (id) => {
+      (id) => {
         seen.push(id);
-        if (id === 'b') throw broken;
+        return id === 'b' ? Promise.reject(broken) : Promise.resolve();
       },
     );
 
