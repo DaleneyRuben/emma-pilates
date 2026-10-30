@@ -2080,13 +2080,15 @@ Load the fixtures (Test 5A), start the backend, and start the worker with
   Session that started before the worker could check it is left alone.
 - **Sessions whose Cancellation Window has closed** (2.5 hours before the
   start, from Studio Settings). Each scheduled Session records its live
-  Bookings in `bookings_at_window_close` once. A cancellation that lands
-  after the window closed still counted at that instant, so a late sweep
-  adds those cancelled Bookings back. A cancellation before the close, a
-  Reschedule, and a worker restart do not change the number once it is
-  written. Trainer pay (BKO-006) counts this number. A cancelled Session
-  gets none. One Session whose own settlement throws does not stop the
-  rest of that sweep.
+  Bookings in `bookings_at_window_close` once, as they stood at the close:
+  a cancellation after the close still counts, and a Booking made after
+  it does not, however late the sweep runs. A cancellation before the
+  close, a Reschedule, and a worker restart do not change the number once
+  it is written. Trainer pay (BKO-006) counts this number. A cancelled
+  Session gets none. One Session whose settlement fails, for any reason,
+  does not stop the rest of that sweep; the worker logs
+  `minimum_bookings_check_failed` with its id and the next sweep retries
+  it.
 - **Sessions that have started.** Their remaining open Waitlist Entries close
   as `session_started`, without a notification.
 
@@ -7251,8 +7253,10 @@ The messages arrive in **Notificaciones** (Perfil) from 09:00 La Paz, never
 at midnight. The four titles are «Tu segunda clase», «Tu primera semana»,
 «Tu primer mes», and «Tres meses con nosotras». A catch-up records every
 missed milestone and pushes only the latest, so a Client does not get a
-burst of old messages. The day-15 and day-30 alerts count classes that
-start inside those days of her first Plan. The inbox card draws the
+burst of old messages. The 90 days run from her first real Plan: a
+renewal never restarts them. The day-15 and day-30 alerts count classes
+that start inside those days of her first Plan, on the La Paz calendar
+(a class at 23:30 on day 15 counts). The inbox card draws the
 message body and not the title (noted on the BKM-013 row; the title is
 what the push shows).
 
