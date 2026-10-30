@@ -339,8 +339,8 @@ describe('freeze', () => {
     const requested = await commands.requestFreeze(
       {
         subscriptionId: subscription.id,
-        startsOn: '2026-09-22',
-        endsOn: '2026-10-01',
+        startsOn: '2026-09-23',
+        endsOn: '2026-10-02',
         reason: 'Viaje',
       },
       client,
