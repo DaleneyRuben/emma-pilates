@@ -126,36 +126,36 @@ describe('payroll and finance review fixes', () => {
     const renews = await newClient('KPI renueva');
     await sell({
       clientId: renews,
-      decidedAt: new Date('2027-11-01T15:00:00.000Z'),
-      startsOn: civil('2027-11-01'),
+      decidedAt: new Date('2028-03-01T15:00:00.000Z'),
+      startsOn: civil('2028-03-01'),
     });
     await sell({
       clientId: renews,
-      decidedAt: new Date('2027-11-28T15:00:00.000Z'),
-      startsOn: civil('2027-12-01'),
+      decidedAt: new Date('2028-03-28T15:00:00.000Z'),
+      startsOn: civil('2028-04-01'),
     });
     const leaves = await newClient('KPI no renueva');
     await sell({
       clientId: leaves,
-      decidedAt: new Date('2027-11-02T15:00:00.000Z'),
-      startsOn: civil('2027-11-02'),
+      decidedAt: new Date('2028-02-28T15:00:00.000Z'),
+      startsOn: civil('2028-02-28'),
     });
-    // Two more Clients in force all November whose Plans do not end in it.
+    // Two more Clients in force all March whose Plans do not end in it.
     for (const name of ['KPI activa uno', 'KPI activa dos']) {
       await sell({
         clientId: await newClient(name),
-        decidedAt: new Date('2027-10-20T15:00:00.000Z'),
-        startsOn: civil('2027-10-20'),
+        decidedAt: new Date('2028-02-20T15:00:00.000Z'),
+        startsOn: civil('2028-02-20'),
         durationDays: 60,
       });
     }
-    const november = civil('2027-11-01');
+    const march = civil('2028-03-01');
     await recomputeStudioFacts(world.prisma, {
-      month: november,
-      now: () => new Date('2027-12-10T15:00:00.000Z'),
+      month: march,
+      now: () => new Date('2028-04-10T15:00:00.000Z'),
     });
 
-    const kpis = await readMonthKpis(world.prisma, { month: november });
+    const kpis = await readMonthKpis(world.prisma, { month: march });
 
     expect(kpis.renewalPercent).toBe(50);
   });
