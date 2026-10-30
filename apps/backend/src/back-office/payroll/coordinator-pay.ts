@@ -63,8 +63,6 @@ export const coordinatorPay = (facts: {
   };
 };
 
-const dayMs = 24 * 60 * 60 * 1_000;
-
 // Months of operation counted from the Opening Date: the month it falls in
 // is month 1, whatever day of that month it is.
 export const monthOfOperation = (openingDate: Date, month: Date): number =>
@@ -79,17 +77,4 @@ export const renewalTargetPercent = (
   if (monthOfOperationNumber <= 6) return targets.months1To6Percent;
   if (monthOfOperationNumber <= 12) return targets.months7To12Percent;
   return targets.fromMonth13Percent;
-};
-
-// Renewed means the next Plan starts before the end or within 7 days after
-// it. A month with nothing ending has no rate, so no bonus.
-export const renewalRatePercent = (
-  ending: { endsOn: Date; nextPlanStartsOn: Date | null }[],
-): number | null => {
-  if (ending.length === 0) return null;
-  const renewed = ending.filter((plan) => {
-    if (plan.nextPlanStartsOn === null) return false;
-    return plan.nextPlanStartsOn.getTime() - plan.endsOn.getTime() <= 7 * dayMs;
-  }).length;
-  return Math.round((renewed * 100) / ending.length);
 };
