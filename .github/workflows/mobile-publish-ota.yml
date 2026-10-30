@@ -38,6 +38,11 @@ concurrency:
   group: mobile-ota-${{ inputs.app }}-${{ inputs.channel }}
   cancel-in-progress: false
 
+# eas-cli is no dependency of the apps, so the workflow runs one pinned
+# version through npx. Raise it here, in both mobile workflows.
+env:
+  EAS_CLI_VERSION: 27.2.0
+
 jobs:
   publish:
     runs-on: ubuntu-24.04
@@ -103,13 +108,13 @@ jobs:
             if [ "$OTA_CHANNEL" = "production" ]; then
               node scripts/mobile-ota-guard.mjs "$app" "$OTA_SHA"
               cd "apps/$app"
-              pnpm exec eas update --channel production --environment production --message "$OTA_MESSAGE" --rollout-percentage "$OTA_ROLLOUT" --non-interactive
+              npx --yes eas-cli@"$EAS_CLI_VERSION" update --channel production --environment production --message "$OTA_MESSAGE" --rollout-percentage "$OTA_ROLLOUT" --non-interactive
               cd ../..
             else
               cd "apps/$app"
               # The staging builds are the staging variant (eas.json), which
               # changes the fingerprint: publish for that runtime.
-              APP_VARIANT=staging pnpm exec eas update --channel staging --environment preview --message "$OTA_MESSAGE" --non-interactive
+              APP_VARIANT=staging npx --yes eas-cli@"$EAS_CLI_VERSION" update --channel staging --environment preview --message "$OTA_MESSAGE" --non-interactive
               cd ../..
               git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" notes append -m "preview-ota:${app}:${OTA_SHA}" "$OTA_SHA"
               git push origin refs/notes/commits
