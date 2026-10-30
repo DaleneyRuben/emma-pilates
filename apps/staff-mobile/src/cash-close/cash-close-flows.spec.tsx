@@ -93,8 +93,8 @@ describe("Cerrar caja (S25)", () => {
       [centroToday]: () => jsonResponse({ ...today, voidedCashCentavos: 29_000 }),
     });
 
-    expect(screen.getByText("Bs 520")).toBeOnTheScreen();
-    expect(screen.getByText("Ventas anuladas (efectivo en caja): Bs 290")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 520,00")).toBeOnTheScreen();
+    expect(screen.getByText("Ventas anuladas (efectivo en caja): Bs 290,00")).toBeOnTheScreen();
   });
 
   it("shows no voided line when nothing was voided", async () => {
