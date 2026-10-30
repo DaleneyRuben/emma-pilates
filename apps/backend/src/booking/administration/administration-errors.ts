@@ -1,3 +1,4 @@
+import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 
 export type AdministrationErrorCode =
@@ -62,7 +63,11 @@ export class AdministrationError extends Error {
   }
 }
 
-export type AdministratorActor = { accountId: string; staffMemberId: string };
+export type AdministratorActor = {
+  accountId: string;
+  staffMemberId: string;
+  impersonationId?: string | null;
+};
 
 export const requireAdministrator = (
   principal: AuthenticatedPrincipal,
@@ -73,9 +78,11 @@ export const requireAdministrator = (
   ) {
     throw new AdministrationError('administration_access_denied');
   }
+  const actor = auditActorOf(principal);
   return {
-    accountId: principal.accountId,
+    accountId: actor.accountId,
     staffMemberId: principal.identity.staffMemberId,
+    impersonationId: actor.impersonationId,
   };
 };
 
@@ -95,10 +102,12 @@ export const requireOperations = (
   ) {
     throw new AdministrationError('administration_access_denied');
   }
+  const actor = auditActorOf(principal);
   return {
-    accountId: principal.accountId,
+    accountId: actor.accountId,
     staffMemberId: principal.identity.staffMemberId,
     role: principal.identity.role,
+    impersonationId: actor.impersonationId,
   };
 };
 

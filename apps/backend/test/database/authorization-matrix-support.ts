@@ -64,6 +64,21 @@ export const findRealIds = async (prisma: PrismaClient): Promise<RealIds> => {
     });
   const booking = await bookOn(session.id);
   const rescheduled = await bookOn(waitlisted.id);
+  const freeze = await prisma.freeze.create({
+    data: {
+      subscriptionId: subscription.id,
+      clientId: bea,
+      startsOn: new Date('2026-11-01T00:00:00.000Z'),
+      endsOn: new Date('2026-11-10T00:00:00.000Z'),
+      reason: 'Viaje',
+    },
+    select: { id: true },
+  });
+  const slot = await prisma.evaluationSlot.findFirstOrThrow({
+    where: { state: 'PUBLISHED' },
+    orderBy: { startsAt: 'desc' },
+    select: { id: true },
+  });
   const entry = await prisma.waitlistEntry.create({
     data: {
       sessionId: waitlisted.id,
@@ -79,5 +94,7 @@ export const findRealIds = async (prisma: PrismaClient): Promise<RealIds> => {
     rescheduleBookingId: rescheduled.id,
     waitlistEntryId: entry.id,
     clientId: bea,
+    freezeId: freeze.id,
+    slotId: slot.id,
   };
 };

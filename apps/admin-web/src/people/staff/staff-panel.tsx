@@ -23,6 +23,7 @@ import { useCountdown } from "../../auth/use-countdown";
 import { currentSessionQueryOptions } from "../../session/session-queries";
 import { holdsEveryBranch } from "../people-search";
 import { adminRoleOf } from "../../session/admin-role";
+import { StaffBranchForm } from "./staff-branch-form";
 import { StaffEditForm } from "./staff-edit-form";
 import {
   emptyStaffForm,
@@ -154,10 +155,15 @@ export function StaffPanelForm({
       ? principal.identity.staffMemberId
       : undefined;
 
-  // ADR-0102: the Coordinator reads Staff details; access stays with the
+  // ADR-0102: the Coordinator reads Staff details. Decision 6 lets her
+  // assign a Trainer's Branches; inviting and Roles stay with the
   // Administrator.
   if (principal !== undefined && adminRoleOf(principal) === "coordinator") {
-    return member === undefined ? null : (
+    if (member === undefined) return null;
+    if (member.role === "trainer" && member.status === "active") {
+      return <StaffBranchForm member={member} onDone={onDone} />;
+    }
+    return (
       <StaffReadOnly
         member={member}
         note="Solo administración invita y cambia roles."

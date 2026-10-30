@@ -47,6 +47,7 @@ describe('cancelSession', () => {
     expect(deps.cancel).toHaveBeenCalledWith({
       sessionId: 'session-1',
       cancelledByAccountId: 'admin-account',
+      impersonationId: null,
     });
   });
 

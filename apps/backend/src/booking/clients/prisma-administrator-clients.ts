@@ -202,9 +202,12 @@ export const createPrismaAdministratorClients = (
             actorKind: AuditActorKind.ACCOUNT,
             actorAccountId: input.actorAccountId,
             actorRole:
-              input.actorRole === 'coordinator'
-                ? StaffRole.COORDINATOR
-                : StaffRole.ADMINISTRATOR,
+              input.impersonationId !== null
+                ? StaffRole.ADMINISTRATOR
+                : input.actorRole === 'coordinator'
+                  ? StaffRole.COORDINATOR
+                  : StaffRole.ADMINISTRATOR,
+            impersonationId: input.impersonationId,
             targetType: 'client',
             targetId: input.clientId,
             correlationId: randomUUID(),

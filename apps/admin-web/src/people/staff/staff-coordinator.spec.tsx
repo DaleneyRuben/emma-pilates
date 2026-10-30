@@ -70,7 +70,37 @@ describe("the Coordinator Role in Personal", () => {
     ]);
   });
 
-  it("shows the Coordinator Personal read-only", async () => {
+  it("lets the Coordinator assign a Trainer's Branches and nothing else", async () => {
+    const saved: unknown[] = [];
+    server.use(
+      ...coordinatorHandlers(),
+      allBranchesHandler(),
+      ...staffHandlers(),
+      http.put(
+        apiUrl(`${staffMembersPath}/${emma.id}/branches`),
+        async ({ request }) => {
+          saved.push(await request.json());
+          return jsonResponse({ ...emma });
+        },
+      ),
+    );
+    const { user } = renderAdmin("/back-office/personal");
+
+    await user.click(
+      await screen.findByRole("button", { name: "Emma Vargas" }),
+    );
+    const panel = await screen.findByRole("dialog", { name: "Emma Vargas" });
+    expect(
+      within(panel).queryByRole("radio", { name: "Coordinador" }),
+    ).not.toBeInTheDocument();
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await screen.findByText(/Guardamos las sucursales/);
+    expect(saved).toEqual([
+      expect.objectContaining({ branchIds: emma.branchIds }),
+    ]);
+  });
+
+  it("shows the Coordinator Personal read-only for anyone who is not a Trainer", async () => {
     server.use(
       ...coordinatorHandlers(),
       allBranchesHandler(),

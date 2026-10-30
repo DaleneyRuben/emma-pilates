@@ -113,8 +113,8 @@ export const createPrismaSessionExceptions = (
 
     // Solo esta sesión: a future scheduled Session changes its Trainer (the
     // swap), start, duration, or capacity and becomes an exception. A new
-    // start keeps the duration unless one is given and reopens the 2-hour
-    // empty check (BOOK-004).
+    // start keeps the duration unless one is given. The minimum-bookings
+    // check (BKM-009) is recorded once and is not reopened here.
     updateSession: async (
       input: {
         sessionId: string;
@@ -250,6 +250,7 @@ export const createPrismaSessionExceptions = (
             actorKind: AuditActorKind.ACCOUNT,
             actorAccountId: actor.accountId,
             actorRole: StaffRole[auditRoleOf(actor)],
+            impersonationId: actor.impersonationId ?? null,
             targetType: 'session',
             targetId: session.id,
             branchId: session.branchId,

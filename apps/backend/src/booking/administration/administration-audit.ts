@@ -34,6 +34,7 @@ export const recordAdministratorAudit = (
       actorKind: AuditActorKind.ACCOUNT,
       actorAccountId: actor.accountId,
       actorRole: StaffRole[auditRoleOf(actor)],
+      impersonationId: actor.impersonationId ?? null,
       targetType: record.targetType,
       targetId: record.targetId,
       branchId: record.branchId ?? null,

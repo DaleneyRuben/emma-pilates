@@ -31,6 +31,7 @@ describe('markClientContacted', () => {
       clientId: 'client-1',
       accountId: 'administrator-account',
       actorRole: 'administrator',
+      impersonationId: null,
       occurredAt: now,
     });
 
@@ -42,6 +43,7 @@ describe('markClientContacted', () => {
       clientId: 'client-1',
       accountId: 'coordinator-account',
       actorRole: 'coordinator',
+      impersonationId: null,
       occurredAt: now,
     });
   });

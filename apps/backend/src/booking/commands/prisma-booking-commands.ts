@@ -217,7 +217,7 @@ export class PrismaBookingCommands {
                   };
             },
             cancel: (input) =>
-              this.executeSessionCancellation(transaction, input, principal),
+              this.executeSessionCancellation(transaction, input),
             now: this.now,
           }),
         { isolationLevel: 'Serializable' },
@@ -230,8 +230,11 @@ export class PrismaBookingCommands {
   // and queued Clients plus the assigned Trainer.
   private async executeSessionCancellation(
     transaction: Prisma.TransactionClient,
-    input: { sessionId: string; cancelledByAccountId: string },
-    principal: AuthenticatedPrincipal,
+    input: {
+      sessionId: string;
+      cancelledByAccountId: string;
+      impersonationId: string | null;
+    },
   ): Promise<SessionCancellationResult> {
     const now = this.now();
     const session = await transaction.session.findUniqueOrThrow({
@@ -337,10 +340,8 @@ export class PrismaBookingCommands {
         outcome: AuditOutcome.SUCCEEDED,
         actorKind: AuditActorKind.ACCOUNT,
         actorAccountId: input.cancelledByAccountId,
-        actorRole:
-          principal.identity.kind === 'staff'
-            ? (principal.identity.role.toUpperCase() as StaffRole)
-            : null,
+        actorRole: StaffRole.ADMINISTRATOR,
+        impersonationId: input.impersonationId,
         targetType: 'session',
         targetId: session.id,
         branchId: session.branchId,

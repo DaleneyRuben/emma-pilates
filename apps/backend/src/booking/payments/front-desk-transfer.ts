@@ -15,6 +15,7 @@ import {
 } from '../../generated/prisma/client';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import { retrySerializable } from '../../database/retry-serializable';
+import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { recordNotification as defaultNotificationRecorder } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
@@ -310,11 +311,14 @@ export const createFrontDeskTransfer = (
               actionCode: 'payment.front_desk_transfer_submitted',
               outcome: AuditOutcome.SUCCEEDED,
               actorKind: AuditActorKind.ACCOUNT,
-              actorAccountId: principal.accountId,
+              actorAccountId: auditActorOf(principal).accountId,
               actorRole:
-                principal.identity.kind === 'staff'
-                  ? (principal.identity.role.toUpperCase() as StaffRole)
-                  : null,
+                principal.impersonation === undefined
+                  ? principal.identity.kind === 'staff'
+                    ? (principal.identity.role.toUpperCase() as StaffRole)
+                    : null
+                  : StaffRole.ADMINISTRATOR,
+              impersonationId: auditActorOf(principal).impersonationId,
               targetType: 'payment',
               targetId: payment.id,
               branchId: command.branchId,

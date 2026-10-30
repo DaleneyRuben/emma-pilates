@@ -5,6 +5,7 @@ import {
   holdsEveryBranch,
   requireActivationEmailRoom,
   requireAdministrator,
+  requireBranchAssigner,
   requireManageable,
   requireNoTrainerCommitments,
   requireNotLastAdministrator,
@@ -180,7 +181,7 @@ export const changeStaffBranches = async (
   principal: AuthenticatedPrincipal,
   dependencies: StaffManagementDependencies,
 ): Promise<StaffMemberRecord> => {
-  const actor = requireAdministrator(principal);
+  const actor = requireBranchAssigner(principal);
   const now = dependencies.now();
 
   return dependencies.unitOfWork.execute(async (transaction) => {

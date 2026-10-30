@@ -159,8 +159,9 @@ export type StaffManagementDependencies = {
 
 export type Actor = { accountId: string; staffMemberId: string };
 
-// ADR-0102: the Coordinator reads Staff details for the schedule; inviting,
-// Role, Branch, and access changes stay with the Administrator.
+// ADR-0102: the Coordinator reads Staff details for the schedule. Inviting,
+// Role, and access changes stay with the Administrator. Decision 6 lets her
+// assign a Trainer's Branches.
 export const requireStaffReader = (principal: AuthenticatedPrincipal): void => {
   if (
     principal.identity.kind !== 'staff' ||
@@ -169,6 +170,23 @@ export const requireStaffReader = (principal: AuthenticatedPrincipal): void => {
   ) {
     throw new StaffManagementError('staff_access_denied');
   }
+};
+
+// Decision 6: assigning Branches is an operation, not a money decision.
+export const requireBranchAssigner = (
+  principal: AuthenticatedPrincipal,
+): Actor => {
+  if (
+    principal.identity.kind !== 'staff' ||
+    (principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
+  ) {
+    throw new StaffManagementError('staff_access_denied');
+  }
+  return {
+    accountId: principal.accountId,
+    staffMemberId: principal.identity.staffMemberId,
+  };
 };
 
 export const requireAdministrator = (

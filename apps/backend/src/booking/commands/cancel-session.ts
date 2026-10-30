@@ -1,3 +1,4 @@
+import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import { runsOperations } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from './create-booking';
@@ -18,6 +19,7 @@ type CancelSessionDependencies = {
   cancel(input: {
     sessionId: string;
     cancelledByAccountId: string;
+    impersonationId: string | null;
   }): Promise<SessionCancellationResult>;
   now(): Date;
 };
@@ -45,8 +47,10 @@ export const cancelSession = async (
     throw new Error('Session has no Bookings');
   }
 
+  const actor = auditActorOf(dependencies.principal);
   return dependencies.cancel({
     sessionId: session.id,
-    cancelledByAccountId: dependencies.principal.accountId,
+    cancelledByAccountId: actor.accountId,
+    impersonationId: actor.impersonationId,
   });
 };

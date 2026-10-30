@@ -2,7 +2,7 @@
 
 Status: accepted
 
-An Administrator signed in to the Staff app may see and act in it as one active Trainer, Assistant, or Nutritionist for at most 30 minutes (FUT-001, [proposal](../implementation/FUT-001-impersonation-proposal.md)). [ADR-0030](./0030-use-opaque-server-side-authentication-sessions.md) left the scope of this feature open while requiring it to be «explicit server-side state»; this decision fills it in.
+An Administrator signed in to the Staff app may see and act in it as one active Trainer, Assistant, Nutritionist, or Coordinator for at most 30 minutes (FUT-001, [proposal](../implementation/FUT-001-impersonation-proposal.md), [ADR-0102](./0102-coordinator-role-without-money.md)). [ADR-0030](./0030-use-opaque-server-side-authentication-sessions.md) left the scope of this feature open while requiring it to be «explicit server-side state»; this decision fills it in.
 
 - **An Impersonation is a row, not a credential.** `system.impersonation_sessions` ties the Administrator's own mobile Authentication Session to the acting Staff Member with a start, an absolute expiry 30 minutes later, an end time, and an end reason (`exited`, `expired`, `logged_out`, `revoked`). The app keeps its one bearer credential. A session holds at most one active Impersonation.
 - **The principal is swapped, not flagged.** While the Impersonation is unexpired, every request resolves to the Staff Member's Account, current Role, and current Branches ([ADR-0054](./0054-enforce-contextual-authorization-in-use-cases.md)), with `impersonation: { id, administratorAccountId }` beside it. Use cases therefore apply the Staff Member's rights unchanged, and the Administrator's rights are off for the duration; no business rule checks a flag.

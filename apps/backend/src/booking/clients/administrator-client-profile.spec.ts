@@ -102,6 +102,7 @@ describe('updateAdministratorClientProfile', () => {
         phone: null,
         actorAccountId: `${role}-account`,
         actorRole: role,
+        impersonationId: null,
         occurredAt: now,
         previous: { name: 'Lucía Fernández', phone: '+591 70011001' },
       });

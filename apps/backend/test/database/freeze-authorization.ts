@@ -38,6 +38,6 @@ export const freezeAuthorizationRows = (): Record<string, MatrixRow> => ({
     coordinator: 'deny',
     bearer: true,
     realIds: { freezeId: 'freezeId' },
-    body: { decision: 'refused', reason: 'Fuera de término' },
+    body: { decision: 'refused' },
   },
 });
