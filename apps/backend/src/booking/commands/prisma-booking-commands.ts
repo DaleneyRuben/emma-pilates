@@ -1,49 +1,27 @@
 import { createHash } from 'node:crypto';
 import type { Prisma } from '../../generated/prisma/client';
 import {
-  AuditActorKind,
-  AuditOutcome,
-  BookingCancellationCause,
   BookingState,
-  AttendanceOutcome,
   PrismaClient,
-  SessionCancellationCause,
-  SessionState,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
 import {
   recordNotification as defaultNotificationRecorder,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
-import type { AuditActor } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { createBooking } from './create-booking';
-import { cancelBooking } from './cancel-booking';
 import {
   cancelSession,
   type SessionCancellationResult,
 } from './cancel-session';
-import { joinWaitlist } from './join-waitlist';
+import { executeCancelBooking } from './execute-cancel-booking';
+import { executeCreate as executeCreateBooking } from './execute-create-booking';
+import { executeJoinWaitlist } from './execute-join-waitlist';
+import { executeRecordAttendance } from './execute-record-attendance';
+import { executeReschedule } from './execute-reschedule';
+import { executeSessionCancellation } from './execute-session-cancellation';
 import { leaveWaitlist } from './leave-waitlist';
-import {
-  loadSession,
-  promoteWaitlistInTransaction,
-} from './waitlist-promotion';
-import { rescheduleBooking } from './reschedule-booking';
-import { recordAttendanceCorrections } from './attendance-audit';
-import { recordAttendance } from './record-attendance';
-import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
-import { fundBooking } from './weekly-cap-funding';
-import { readWeeklyCapPosition } from './weekly-cap-count';
-import { weeklyCapBlocksReschedule } from './reschedule-cap';
-import {
-  findCoveringSubscription,
-  findApprovedFreeze,
-  findNotYetStartedSubscription,
-} from './eligible-subscription';
-import { decideGuestPassBooking } from '../payments/guest-pass';
-import { refuseGuestPassLastPlace } from './guest-pass-reschedule';
-import { moveConsumptionToBooking, restoreBookedClass } from './restore-class';
+import { promoteWaitlistInTransaction } from './waitlist-promotion';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -63,7 +41,12 @@ export class PrismaBookingCommands {
           await this.executeWaitlistPromotion(transaction, command.sessionId);
 
           try {
-            return await this.executeCreate(transaction, command, principal);
+            return await executeCreateBooking(
+              transaction,
+              command,
+              principal,
+              this.now,
+            );
           } catch (error) {
             if (error instanceof Error && error.message === 'Session is full') {
               return null;
@@ -133,7 +116,12 @@ export class PrismaBookingCommands {
           let created: { id: string };
 
           try {
-            created = await this.executeCreate(transaction, command, principal);
+            created = await executeCreateBooking(
+              transaction,
+              command,
+              principal,
+              this.now,
+            );
           } catch (error) {
             if (error instanceof Error && error.message === 'Session is full') {
               return null;
@@ -175,7 +163,7 @@ export class PrismaBookingCommands {
     return retrySerializable(() =>
       this.prisma.$transaction(
         async (transaction) =>
-          this.executeJoinWaitlist(transaction, command, principal),
+          executeJoinWaitlist(transaction, command, principal, this.now),
         { isolationLevel: 'Serializable' },
       ),
     );
@@ -217,145 +205,15 @@ export class PrismaBookingCommands {
                   };
             },
             cancel: (input) =>
-              this.executeSessionCancellation(transaction, input),
+              executeSessionCancellation(transaction, input, {
+                now: this.now,
+                recordNotification: this.recordNotification,
+              }),
             now: this.now,
           }),
         { isolationLevel: 'Serializable' },
       ),
     );
-  }
-
-  // Cancels every live Booking as session_cancelled, refunds one unit to each
-  // Subscription, closes the active waitlist, audits, and notifies the booked
-  // and queued Clients plus the assigned Trainer.
-  private async executeSessionCancellation(
-    transaction: Prisma.TransactionClient,
-    input: {
-      sessionId: string;
-      cancelledByAccountId: string;
-      audit: AuditActor;
-    },
-  ): Promise<SessionCancellationResult> {
-    const now = this.now();
-    const session = await transaction.session.findUniqueOrThrow({
-      where: { id: input.sessionId },
-      select: {
-        id: true,
-        branchId: true,
-        classType: { select: { name: true } },
-        trainer: { select: { account: { select: { id: true } } } },
-        bookings: {
-          where: { state: BookingState.BOOKED },
-          select: {
-            id: true,
-            clientId: true,
-            subscriptionId: true,
-            client: { select: { account: { select: { id: true } } } },
-          },
-        },
-        waitlistEntries: {
-          where: { closedAt: null },
-          select: {
-            id: true,
-            client: { select: { account: { select: { id: true } } } },
-          },
-        },
-      },
-    });
-
-    const cancelled = await transaction.session.updateMany({
-      where: { id: session.id, state: SessionState.SCHEDULED },
-      data: {
-        state: SessionState.CANCELLED,
-        cancellationCause: SessionCancellationCause.NO_SUBSTITUTE_TRAINER,
-        cancelledAt: now,
-        cancelledByAccountId: input.cancelledByAccountId,
-      },
-    });
-    if (cancelled.count !== 1) {
-      throw new Error('Session is not cancellable');
-    }
-
-    const notify = (accountId: string, message: string) =>
-      this.recordNotification(transaction, {
-        accountId,
-        category: 'booking_schedule',
-        type: 'session_cancelled',
-        businessEventKey: `session-cancelled:${session.id}`,
-        title: 'Clase cancelada',
-        message,
-        destination: { type: 'session', id: session.id },
-        occurredAt: now,
-      });
-
-    for (const booking of session.bookings) {
-      await transaction.booking.update({
-        where: { id: booking.id },
-        data: {
-          state: BookingState.CANCELLED,
-          cancelledAt: now,
-          cancelledByAccountId: input.cancelledByAccountId,
-          cancellationCause: BookingCancellationCause.SESSION_CANCELLED,
-        },
-      });
-      await restoreBookedClass(transaction, {
-        bookingId: booking.id,
-        subscriptionId: booking.subscriptionId,
-        clientId: booking.clientId,
-        now,
-      });
-      if (booking.client.account !== null) {
-        await notify(
-          booking.client.account.id,
-          `Tu clase de ${session.classType.name} fue cancelada. Tu clase fue reembolsada a tu plan.`,
-        );
-      }
-    }
-
-    await transaction.waitlistEntry.updateMany({
-      where: { sessionId: session.id, closedAt: null },
-      data: {
-        closedAt: now,
-        closureReason: WaitlistClosureReason.SESSION_CANCELLED,
-      },
-    });
-    for (const entry of session.waitlistEntries) {
-      if (entry.client.account !== null) {
-        await notify(
-          entry.client.account.id,
-          `La clase de ${session.classType.name} a la que estabas en lista de espera fue cancelada.`,
-        );
-      }
-    }
-    if (session.trainer.account !== null) {
-      await notify(
-        session.trainer.account.id,
-        `Tu clase de ${session.classType.name} fue cancelada por administración.`,
-      );
-    }
-
-    await transaction.auditRecord.create({
-      data: {
-        actionCode: 'session.cancelled',
-        outcome: AuditOutcome.SUCCEEDED,
-        actorKind: AuditActorKind.ACCOUNT,
-        actorAccountId: input.audit.accountId,
-        actorRole: input.audit.role,
-        impersonationId: input.audit.impersonationId,
-        targetType: 'session',
-        targetId: session.id,
-        branchId: session.branchId,
-        correlationId: session.id,
-        occurredAt: now,
-        metadata: {
-          cause: 'no_substitute_trainer',
-          cancelledBookings: session.bookings.length,
-          closedWaitlistEntries: session.waitlistEntries.length,
-        },
-      },
-    });
-
-    return { affectedBookings: session.bookings.length };
   }
 
   async joinWaitlistIdempotent(
@@ -404,10 +262,11 @@ export class PrismaBookingCommands {
             throw new Error('Stored idempotency response is invalid');
           }
 
-          const result = await this.executeJoinWaitlist(
+          const result = await executeJoinWaitlist(
             transaction,
             command,
             principal,
+            this.now,
           );
           const createdAt = this.now();
           await transaction.idempotencyRecord.create({
@@ -448,78 +307,11 @@ export class PrismaBookingCommands {
   ): Promise<void> {
     await retrySerializable(() =>
       this.prisma.$transaction(
-        async (transaction) => {
-          await cancelBooking(command, {
-            principal,
-            loadBooking: async (bookingId) => {
-              const booking = await transaction.booking.findUnique({
-                where: { id: bookingId },
-                select: {
-                  id: true,
-                  clientId: true,
-                  subscriptionId: true,
-                  state: true,
-                  session: {
-                    select: {
-                      id: true,
-                      branchId: true,
-                      startsAt: true,
-                      state: true,
-                    },
-                  },
-                },
-              });
-
-              return booking === null
-                ? null
-                : {
-                    ...booking,
-                    state: booking.state.toLowerCase() as
-                      'booked' | 'cancelled' | 'rescheduled',
-                    session: {
-                      ...booking.session,
-                      state: booking.session.state.toLowerCase() as
-                        'scheduled' | 'cancelled',
-                    },
-                  };
-            },
-            cancel: async (input) => {
-              const cancelled = await transaction.booking.updateMany({
-                where: { id: input.bookingId, state: BookingState.BOOKED },
-                data: {
-                  state: BookingState.CANCELLED,
-                  cancelledAt: new Date(),
-                  cancelledByAccountId: input.cancelledByAccountId,
-                  cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
-                },
-              });
-
-              if (cancelled.count !== 1) {
-                throw new Error('Booking is not cancellable');
-              }
-
-              await restoreBookedClass(transaction, {
-                bookingId: input.bookingId,
-                subscriptionId: input.subscriptionId,
-                clientId: input.clientId,
-                now: this.now(),
-              });
-
-              const cancelledBooking =
-                await transaction.booking.findUniqueOrThrow({
-                  where: { id: input.bookingId },
-                  select: { sessionId: true },
-                });
-              await this.executeWaitlistPromotion(
-                transaction,
-                cancelledBooking.sessionId,
-              );
-            },
+        (transaction) =>
+          executeCancelBooking(transaction, command, principal, {
             now: this.now,
-            cancellationWindowMinutes: () =>
-              readCancellationWindowMinutes(transaction),
-          });
-        },
+            recordNotification: this.recordNotification,
+          }),
         { isolationLevel: 'Serializable' },
       ),
     );
@@ -537,103 +329,7 @@ export class PrismaBookingCommands {
             command.targetSessionId,
           );
 
-          return rescheduleBooking(command, {
-            principal,
-            loadBooking: async (bookingId) => {
-              const booking = await transaction.booking.findUnique({
-                where: { id: bookingId },
-                select: {
-                  id: true,
-                  clientId: true,
-                  subscriptionId: true,
-                  state: true,
-                  session: {
-                    select: {
-                      id: true,
-                      branchId: true,
-                      startsAt: true,
-                      state: true,
-                    },
-                  },
-                },
-              });
-
-              return booking === null
-                ? null
-                : {
-                    ...booking,
-                    state: booking.state.toLowerCase() as
-                      'booked' | 'cancelled' | 'rescheduled',
-                    session: {
-                      ...booking.session,
-                      state: booking.session.state.toLowerCase() as
-                        'scheduled' | 'cancelled',
-                    },
-                  };
-            },
-            loadSession: (sessionId) =>
-              this.loadSession(transaction, sessionId),
-            countLiveBookings: (sessionId) =>
-              transaction.booking.count({
-                where: { sessionId, state: BookingState.BOOKED },
-              }),
-            findApprovedFreeze: ({ clientId, onDate }) =>
-              findApprovedFreeze(transaction, { clientId, onDate }),
-            findNotYetStartedSubscription: ({ clientId, onDate }) =>
-              findNotYetStartedSubscription(transaction, { clientId, onDate }),
-            weeklyCapBlocksDestination: (input) =>
-              weeklyCapBlocksReschedule(transaction, input),
-            hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
-              transaction.booking
-                .findFirst({
-                  where: {
-                    clientId,
-                    state: BookingState.BOOKED,
-                    session: {
-                      startsAt: { lt: endsAt },
-                      endsAt: { gt: startsAt },
-                    },
-                  },
-                  select: { id: true },
-                })
-                .then((booking) => booking !== null),
-            reschedule: async (input) => {
-              await refuseGuestPassLastPlace(transaction, input);
-              const replacement = await transaction.booking.create({
-                data: {
-                  sessionId: input.targetSessionId,
-                  clientId: input.clientId,
-                  subscriptionId: input.subscriptionId,
-                  createdByAccountId: input.rescheduledByAccountId,
-                },
-                select: { id: true },
-              });
-
-              const updated = await transaction.booking.updateMany({
-                where: { id: input.bookingId, state: BookingState.BOOKED },
-                data: {
-                  state: BookingState.RESCHEDULED,
-                  rescheduledAt: new Date(),
-                  rescheduledByAccountId: input.rescheduledByAccountId,
-                  rescheduledToBookingId: replacement.id,
-                },
-              });
-
-              if (updated.count !== 1) {
-                throw new Error('Booking is not reschedulable');
-              }
-
-              await moveConsumptionToBooking(transaction, {
-                fromBookingId: input.bookingId,
-                toBookingId: replacement.id,
-              });
-
-              return replacement;
-            },
-            now: this.now,
-            cancellationWindowMinutes: () =>
-              readCancellationWindowMinutes(transaction),
-          });
+          return executeReschedule(transaction, command, principal, this.now);
         },
         { isolationLevel: 'Serializable' },
       ),
@@ -647,73 +343,8 @@ export class PrismaBookingCommands {
     },
     principal: AuthenticatedPrincipal,
   ): Promise<void> {
-    await this.prisma.$transaction(async (transaction) =>
-      recordAttendance(command, {
-        principal,
-        loadSession: async (sessionId) => {
-          const session = await transaction.session.findUnique({
-            where: { id: sessionId },
-            select: {
-              id: true,
-              branchId: true,
-              trainerStaffMemberId: true,
-              endsAt: true,
-              state: true,
-            },
-          });
-          return session === null
-            ? null
-            : {
-                ...session,
-                state: session.state.toLowerCase() as 'scheduled' | 'cancelled',
-              };
-        },
-        loadBookedIds: async (sessionId) =>
-          (
-            await transaction.booking.findMany({
-              where: { sessionId, state: BookingState.BOOKED },
-              select: { id: true },
-            })
-          ).map(({ id }) => id),
-        save: async ({
-          sessionId,
-          branchId,
-          outcomes,
-          recordedByAccountId,
-        }) => {
-          await recordAttendanceCorrections(transaction, {
-            sessionId,
-            branchId,
-            outcomes,
-            principal,
-            occurredAt: this.now(),
-          });
-          await Promise.all(
-            outcomes.map(({ bookingId, outcome }) =>
-              transaction.attendanceRecord.upsert({
-                where: { bookingId },
-                create: {
-                  bookingId,
-                  outcome:
-                    outcome === 'attended'
-                      ? AttendanceOutcome.ATTENDED
-                      : AttendanceOutcome.NO_SHOW,
-                  recordedByAccountId,
-                  recordedAt: new Date(),
-                },
-                update: {
-                  outcome:
-                    outcome === 'attended'
-                      ? AttendanceOutcome.ATTENDED
-                      : AttendanceOutcome.NO_SHOW,
-                  recordedByAccountId,
-                },
-              }),
-            ),
-          );
-        },
-        now: this.now,
-      }),
+    await this.prisma.$transaction((transaction) =>
+      executeRecordAttendance(transaction, command, principal, this.now),
     );
   }
 
@@ -773,173 +404,5 @@ export class PrismaBookingCommands {
       },
       now: this.now,
     });
-  }
-
-  private executeJoinWaitlist(
-    transaction: Prisma.TransactionClient,
-    command: { sessionId: string; clientId?: string },
-    principal: AuthenticatedPrincipal,
-  ): Promise<{ id: string }> {
-    return joinWaitlist(command, {
-      principal,
-      loadSession: (sessionId) => this.loadSession(transaction, sessionId),
-      countLiveBookings: (sessionId) =>
-        transaction.booking.count({
-          where: { sessionId, state: 'BOOKED' },
-        }),
-      findEligibleSubscription: ({ clientId, onDate }) =>
-        this.findSubscriptionForBooking(transaction, {
-          clientId,
-          onDate,
-          needsAllowance: false,
-        }),
-      findApprovedFreeze: ({ clientId, onDate }) =>
-        findApprovedFreeze(transaction, { clientId, onDate }),
-      findNotYetStartedSubscription: ({ clientId, onDate }) =>
-        findNotYetStartedSubscription(transaction, { clientId, onDate }),
-      hasLiveBooking: ({ sessionId, clientId }) =>
-        transaction.booking
-          .findFirst({
-            where: { sessionId, clientId, state: 'BOOKED' },
-            select: { id: true },
-          })
-          .then((booking) => booking !== null),
-      hasActiveEntry: ({ sessionId, clientId }) =>
-        transaction.waitlistEntry
-          .findFirst({
-            where: { sessionId, clientId, closedAt: null },
-            select: { id: true },
-          })
-          .then((entry) => entry !== null),
-      create: (input) =>
-        transaction.waitlistEntry.create({
-          data: input,
-          select: { id: true },
-        }),
-      now: this.now,
-      cancellationWindowMinutes: () =>
-        readCancellationWindowMinutes(transaction),
-    });
-  }
-
-  private executeCreate(
-    transaction: Prisma.TransactionClient,
-    command: { sessionId: string; clientId?: string },
-    principal: AuthenticatedPrincipal,
-  ): Promise<{ id: string }> {
-    return createBooking(command, {
-      principal,
-      loadSession: (sessionId) => this.loadSession(transaction, sessionId),
-      countLiveBookings: (sessionId) =>
-        transaction.booking.count({
-          where: { sessionId, state: 'BOOKED' },
-        }),
-      findEligibleSubscription: ({ clientId, onDate }) =>
-        this.findSubscriptionForBooking(transaction, {
-          clientId,
-          onDate,
-          needsAllowance: true,
-        }),
-      findApprovedFreeze: ({ clientId, onDate }) =>
-        findApprovedFreeze(transaction, { clientId, onDate }),
-      findNotYetStartedSubscription: ({ clientId, onDate }) =>
-        findNotYetStartedSubscription(transaction, { clientId, onDate }),
-      hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
-        transaction.booking
-          .findFirst({
-            where: {
-              clientId,
-              state: 'BOOKED',
-              session: {
-                startsAt: { lt: endsAt },
-                endsAt: { gt: startsAt },
-              },
-            },
-            select: { id: true },
-          })
-          .then((booking) => booking !== null),
-      create: async (input) => {
-        const pass = await transaction.guestPass.findFirst({
-          where: {
-            friendClientId: input.clientId,
-            bookingId: null,
-            deletedAt: null,
-          },
-          select: { id: true, courtesySubscriptionId: true },
-        });
-        const session = await transaction.session.findUniqueOrThrow({
-          where: { id: input.sessionId },
-          select: { startsAt: true, capacity: true },
-        });
-        if (
-          pass !== null &&
-          pass.courtesySubscriptionId === input.subscriptionId
-        ) {
-          const taken = await transaction.booking.count({
-            where: { sessionId: input.sessionId, state: 'BOOKED' },
-          });
-          const decision = decideGuestPassBooking({
-            placesLeft: session.capacity - taken,
-            guestPassesAlreadyUsed: 0,
-          });
-          if (decision !== null) throw new Error(decision.code);
-        }
-
-        const booking = await fundBooking(transaction, {
-          subscriptionId: input.subscriptionId,
-          clientId: input.clientId,
-          authorAccountId: input.createdByAccountId,
-          startsAt: session.startsAt,
-          now: this.now(),
-          createBooking: () =>
-            transaction.booking.create({ data: input, select: { id: true } }),
-        });
-        if (booking === null) {
-          const spent = await transaction.guestPass.findFirst({
-            where: {
-              friendClientId: input.clientId,
-              bookingId: { not: null },
-              deletedAt: null,
-            },
-            select: { id: true },
-          });
-          throw new Error(
-            spent === null
-              ? 'No eligible Subscription'
-              : 'guest_pass_already_used',
-          );
-        }
-        if (pass !== null) {
-          await transaction.guestPass.update({
-            where: { id: pass.id },
-            data: { bookingId: booking.id },
-          });
-        }
-        return booking;
-      },
-      now: this.now,
-    });
-  }
-
-  private async findSubscriptionForBooking(
-    transaction: Prisma.TransactionClient,
-    input: { clientId: string; onDate: Date; needsAllowance: boolean },
-  ) {
-    const subscription = await findCoveringSubscription(transaction, input);
-    if (subscription === null) return null;
-    return {
-      id: subscription.id,
-      ...(await readWeeklyCapPosition(transaction, {
-        subscriptionId: subscription.id,
-        startsAt: input.onDate,
-      })),
-    };
-  }
-
-  private loadSession(
-    transaction: Prisma.TransactionClient,
-    sessionId: string,
-  ) {
-    return loadSession(transaction, sessionId);
   }
 }

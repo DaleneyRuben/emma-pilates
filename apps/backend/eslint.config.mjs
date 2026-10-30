@@ -43,7 +43,6 @@ export default tseslint.config(
     files: [
       'src/booking/booking.module.ts',
       'src/booking/administration/administration.controller.ts',
-      'src/booking/commands/prisma-booking-commands.ts',
       'src/booking/evaluations/prisma-evaluation-commands.ts',
       'src/booking/payments/prisma-payment-commands.ts',
       'src/development-fixtures/development-fixtures.ts',
