@@ -7774,3 +7774,41 @@ H. **Detalle del plan (Client 09, design follow-up 219).** From Mi plan,
    **Continuar al pago** sends no `startsOn`. With no classes left, the chips
    show and «Hoy» is selected. `GET /api/v1/clients/current/subscription`
    carries `renewalStartsOn` only in the first case.
+
+## Test 121: payroll and finance (FIX-007)
+
+Run the API, the worker and the fixtures as in Tests 2 and 5. The
+integration spec
+`apps/backend/test/database/payroll-finance-fixes.integration-spec.ts` builds
+every state below.
+
+A. **Salaries in «Resultado» (H10).** Record Salary Payments for the
+   Coordinator, reception and a Trainer in one month. In Reporte ›
+   Finanzas, «Coordinadora» and «Recepción» show those payments as their
+   actual. «Sueldos pagados Bs N» shows the month's total. «Resultado»
+   subtracts it: «Ingresos en caja menos impuesto, gastos, sueldos y
+   nutricionista».
+B. **One Salary Payment per statement (H11).** Approving a statement twice
+   at once, or while the hourly re-draft runs, leaves one Salary Payment.
+   An approved statement is never re-drafted.
+C. **«Renovó» (H18, owner decision 5).** A real Plan ending in the month
+   renewed when another real Plan was bought (approval date, Bolivia) before
+   its end or up to 7 days after it, whatever its Start Date. A Guest Pass,
+   Courtesy Access, a single class and a voided sale are never counted. The
+   Coordinator's bonus and Indicadores use the same definition.
+D. **Months in Bolivia.** A sale approved at 23:30 on the last day of the
+   month (La Paz) counts in that month, in Finanzas and in pay.
+E. **Approval waits for the month.** Approving before the month is over
+   answers `409` `pay_statement_month_open`. The Coordinator's statement
+   waits 7 more days for the renewal week.
+F. **Commissions.** A Trainer's commission is paid on the first real Plan of
+   a Client she brought. A single class is not a Plan. After a voided first
+   Plan, a later Plan opens no commission.
+G. **Coordinators.** Every active Coordinator gets her statement. A
+   deactivated one gets none.
+H. **Re-draft and seed.** The hourly re-draft writes nothing when the lines
+   did not change. Two «Cargar presupuesto inicial» requests at once seed the
+   ten lines once.
+I. **Month and settings.** `?month=2026-13` answers `400`. A month reads the
+   tax and the renewal targets of the Studio Settings version in force
+   then, not a later one.
