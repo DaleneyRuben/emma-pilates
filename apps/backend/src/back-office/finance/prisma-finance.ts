@@ -18,6 +18,32 @@ export type MonthFacts = {
 const monthStart = (month: Date) =>
   new Date(Date.UTC(month.getUTCFullYear(), month.getUTCMonth(), 1));
 
+// H10: the month's Salary Payments are a cost of their own. The Coordinator's
+// and reception's pay are the actual of their budget lines; a Trainer's pay
+// has no budget line and counts in the total only.
+const salaryLines: Record<string, string> = {
+  COORDINATOR: 'Coordinadora',
+  ASSISTANT: 'Recepción',
+};
+
+const salariesByLine = (
+  payments: { amountCentavos: number; staffMember: { role: string } }[],
+) => {
+  const byLineCentavos: Record<string, number> = {};
+  for (const payment of payments) {
+    const line = salaryLines[payment.staffMember.role];
+    if (line === undefined) continue;
+    byLineCentavos[line] = (byLineCentavos[line] ?? 0) + payment.amountCentavos;
+  }
+  return {
+    byLineCentavos,
+    totalCentavos: payments.reduce(
+      (total, payment) => total + payment.amountCentavos,
+      0,
+    ),
+  };
+};
+
 // BKO-005: «Finanzas». Cash income, the tax from Studio Settings, the fixed
 // cost budget against what was actually paid, the Nutritionist's cost, and
 // the month's result. The Administrator reads it; everyone else is denied.
@@ -25,20 +51,25 @@ export const createPrismaFinance = (
   prisma: PrismaClient,
   facts: { ofMonth: (from: Date, until: Date) => Promise<MonthFacts> },
 ) => ({
+  // One seed even when two requests race: the advisory lock makes the second
+  // see the first one's lines.
   seedOpeningBudget: async (principal: AuthenticatedPrincipal) => {
     requireAdministrator(principal);
-    const existing = await prisma.costBudgetLine.count();
-    if (existing > 0) return { seeded: false };
-    await prisma.costBudgetLine.createMany({
-      data: openingBudgetLines.map((line, position) => ({
-        id: randomUUID(),
-        name: line.name,
-        monthlyCentavos: line.monthlyCentavos,
-        position,
-        updatedAt: new Date(),
-      })),
+    return prisma.$transaction(async (transaction) => {
+      await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('opening-budget-seed'))`;
+      const existing = await transaction.costBudgetLine.count();
+      if (existing > 0) return { seeded: false };
+      await transaction.costBudgetLine.createMany({
+        data: openingBudgetLines.map((line, position) => ({
+          id: randomUUID(),
+          name: line.name,
+          monthlyCentavos: line.monthlyCentavos,
+          position,
+          updatedAt: new Date(),
+        })),
+      });
+      return { seeded: true };
     });
-    return { seeded: true };
   },
 
   monthResult: async (
@@ -50,7 +81,7 @@ export const createPrismaFinance = (
     const until = new Date(
       Date.UTC(from.getUTCFullYear(), from.getUTCMonth() + 1, 1),
     );
-    const [monthFacts, lines, expenses] = await Promise.all([
+    const [monthFacts, lines, expenses, salaryPayments] = await Promise.all([
       facts.ofMonth(from, until),
       prisma.costBudgetLine.findMany({ orderBy: { position: 'asc' } }),
       prisma.expense.findMany({
@@ -58,6 +89,13 @@ export const createPrismaFinance = (
         select: {
           amountCentavos: true,
           expenseCategory: { select: { name: true } },
+        },
+      }),
+      prisma.salaryPayment.findMany({
+        where: { paidOn: { gte: from, lt: until } },
+        select: {
+          amountCentavos: true,
+          staffMember: { select: { role: true } },
         },
       }),
     ]);
@@ -78,6 +116,7 @@ export const createPrismaFinance = (
         contingencyPercent,
         actualByLineCentavos,
         nutritionistCostCentavos: monthFacts.nutritionistCostCentavos,
+        salaries: salariesByLine(salaryPayments),
       }),
     };
   },
