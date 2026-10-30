@@ -192,12 +192,11 @@ export function HomeScreen() {
 
   // A network failure keeps the last successful answer (TanStack leaves it in
   // `data`) and reports the error. Inicio renders that answer instead of the
-  // failure, and says so, only while the refresh has not succeeded again.
+  // failure, and says so when either query failed over cached data (FIX-011).
   const loadedProfile = profile.data?.status === 200 ? profile.data : undefined;
   const loadedSubscription = subscription.data?.status === 200 ? subscription.data : undefined;
   const showingCachedHome =
-    profile.isError &&
-    subscription.isError &&
+    (profile.isError || subscription.isError) &&
     loadedProfile !== undefined &&
     loadedSubscription !== undefined;
 

@@ -9,20 +9,35 @@ type Branch = { id: string; name: string };
 
 // The Branches a person handles cash at: an Assistant's assignments, or every
 // Branch for an Administrator, who has none. The first is chosen until she
-// picks another.
+// picks another. Exposes pending/error so cash-close can retry instead of
+// spinning forever when the profile or Branch list fails (FIX-011).
 export function useCashBranches() {
   const fetcher = useStaffFetcher();
   const profile = useGetCurrentStaffMemberProfile({ fetcher });
   const assigned = profile.data?.status === 200 ? profile.data.data.branches : [];
+  const needsAllBranches = profile.data?.status === 200 && assigned.length === 0;
   const branches = useListBranches({
     fetcher,
-    query: { enabled: profile.data?.status === 200 && assigned.length === 0 },
+    query: { enabled: needsAllBranches },
   });
   const options: Branch[] =
     assigned.length > 0 ? assigned : branches.data?.status === 200 ? branches.data.data : [];
   const [selectedId, select] = useState<string | null>(null);
   const branch = options.find((option) => option.id === selectedId) ?? options[0] ?? null;
-  return { branch, options, select };
+  const isPending =
+    profile.isPending || (needsAllBranches && branches.isPending && options.length === 0);
+  const isError =
+    profile.isError ||
+    (profile.data !== undefined && profile.data.status !== 200) ||
+    (needsAllBranches &&
+      (branches.isError || (branches.data !== undefined && branches.data.status !== 200)));
+  const refetch = () => {
+    void profile.refetch();
+    if (needsAllBranches || (profile.data?.status === 200 && assigned.length === 0)) {
+      void branches.refetch();
+    }
+  };
+  return { branch, options, select, isPending, isError, refetch };
 }
 
 // S10's Branch chips; shown only when there is a choice to make.

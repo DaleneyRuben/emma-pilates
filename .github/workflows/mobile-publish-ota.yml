@@ -3,6 +3,10 @@ name: Publish OTA
 # REL-008 (ADR-0101, amending ADR-0039). Manual only. A push to main never
 # publishes an update. The workflow stops before any Expo call when the
 # EXPO_TOKEN secret is absent; creating that robot token is an owner action.
+# FIX-011: the preview gate publishes to the staging channel (testers use
+# staging builds; there is no preview channel), git notes are fetched and
+# appended so both apps can mark the same commit, and the message/rollout
+# pass through env so shell never interpolates workflow inputs.
 on:
   workflow_dispatch:
     inputs:
@@ -12,7 +16,7 @@ on:
         type: choice
         options: [client, staff, both]
       channel:
-        description: preview first; production only after a preview of this same commit
+        description: preview first (publishes to staging); production only after a preview of this same commit
         required: true
         type: choice
         options: [preview, production]
@@ -49,6 +53,9 @@ jobs:
         with:
           ref: main
 
+      - name: Fetch git notes for the production guard
+        run: git fetch origin refs/notes/commits:refs/notes/commits
+
       - name: Require a green CI run of this commit
         env:
           GH_TOKEN: ${{ github.token }}
@@ -79,24 +86,29 @@ jobs:
       - name: Publish the update
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          OTA_APP: ${{ inputs.app }}
+          OTA_CHANNEL: ${{ inputs.channel }}
+          OTA_MESSAGE: ${{ inputs.message }}
+          OTA_ROLLOUT: ${{ inputs.rollout_percentage }}
+          OTA_SHA: ${{ github.sha }}
         run: |
           apps=()
-          case "${{ inputs.app }}" in
+          case "$OTA_APP" in
             client) apps=(client-mobile) ;;
             staff) apps=(staff-mobile) ;;
             both) apps=(client-mobile staff-mobile) ;;
           esac
           for app in "${apps[@]}"; do
-            if [ "${{ inputs.channel }}" = "production" ]; then
-              node scripts/mobile-ota-guard.mjs "$app" "${{ github.sha }}"
+            if [ "$OTA_CHANNEL" = "production" ]; then
+              node scripts/mobile-ota-guard.mjs "$app" "$OTA_SHA"
               cd "apps/$app"
-              pnpm exec eas update --channel production --environment production --message "${{ inputs.message }}" --rollout-percentage "${{ inputs.rollout_percentage }}" --non-interactive
+              pnpm exec eas update --channel production --environment production --message "$OTA_MESSAGE" --rollout-percentage "$OTA_ROLLOUT" --non-interactive
               cd ../..
             else
               cd "apps/$app"
-              pnpm exec eas update --channel preview --environment preview --message "${{ inputs.message }}" --non-interactive
+              pnpm exec eas update --channel staging --environment preview --message "$OTA_MESSAGE" --non-interactive
               cd ../..
-              git notes add -f -m "preview-ota:${app}:${{ github.sha }}" "${{ github.sha }}"
+              git notes append -m "preview-ota:${app}:${OTA_SHA}" "$OTA_SHA"
               git push origin refs/notes/commits
             fi
           done
