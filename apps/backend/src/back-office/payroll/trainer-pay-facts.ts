@@ -1,4 +1,6 @@
 import type { PrismaClient } from '../../generated/prisma/client';
+import { boliviaInstant } from '../../time/bolivia-time';
+import { readFirstPlans } from './first-plans';
 import type { TrainerPayRates, TrainerPaySession } from './trainer-pay';
 
 export type TrainerMonthFacts = {
@@ -22,20 +24,25 @@ const cancellationCause = (
 // Booking owns Sessions and Payments. Back Office asks for them here and
 // never writes those tables (ADR-0103). A taught class needs its window-close
 // snapshot; a minimum_not_met cancellation pays instead. The commission is
-// the first confirmed Plan Payment of a Client the Trainer brought.
+// the first real Plan of a Client the Trainer brought (never a single class,
+// and never again after a voided first one). The month is cut in Bolivia.
 export const trainerMonthFacts = async (
   prisma: PrismaClient,
   from: Date,
   until: Date,
 ): Promise<TrainerMonthFacts> => {
-  const [rate, sessions, brought, payments] = await Promise.all([
+  const window = {
+    from: boliviaInstant(from, 0),
+    until: boliviaInstant(until, 0),
+  };
+  const [rate, sessions, brought, firsts] = await Promise.all([
     prisma.payRateRule.findFirst({
       where: { effectiveFrom: { lte: from } },
       orderBy: { effectiveFrom: 'desc' },
     }),
     prisma.session.findMany({
       where: {
-        startsAt: { gte: from, lt: until },
+        startsAt: { gte: window.from, lt: window.until },
         trainer: { role: 'TRAINER', deletedAt: null },
         OR: [
           { state: 'SCHEDULED', bookingsAtWindowClose: { not: null } },
@@ -57,20 +64,7 @@ export const trainerMonthFacts = async (
       },
       select: { clientId: true, referrerStaffMemberId: true },
     }),
-    prisma.payment.findMany({
-      where: {
-        state: 'CONFIRMED',
-        kind: 'PLAN',
-        method: { in: ['TRANSFER', 'CASH'] },
-        decidedAt: { not: null },
-      },
-      select: {
-        clientId: true,
-        amountDueCentavos: true,
-        decidedAt: true,
-      },
-      orderBy: { decidedAt: 'asc' },
-    }),
+    readFirstPlans(prisma),
   ]);
   if (rate === null) {
     throw new Error('pay_rate_rule_missing');
@@ -79,16 +73,6 @@ export const trainerMonthFacts = async (
   const trainerOfClient = new Map(
     brought.map((row) => [row.clientId, row.referrerStaffMemberId as string]),
   );
-  const firstPaid = new Map<string, { decidedAt: Date; amount: number }>();
-  for (const payment of payments) {
-    if (!trainerOfClient.has(payment.clientId)) continue;
-    if (firstPaid.has(payment.clientId)) continue;
-    firstPaid.set(payment.clientId, {
-      decidedAt: payment.decidedAt as Date,
-      amount: payment.amountDueCentavos,
-    });
-  }
-
   const byTrainer = new Map<
     string,
     { sessions: TrainerPaySession[]; firstPlanPaymentsCentavos: number[] }
@@ -106,11 +90,15 @@ export const trainerMonthFacts = async (
       cancellationCause: cancellationCause(session.cancellationCause),
     });
   }
-  for (const [clientId, paid] of firstPaid) {
-    if (paid.decidedAt < from || paid.decidedAt >= until) continue;
+  for (const [clientId, first] of firsts) {
+    if (first.decidedAt < window.from || first.decidedAt >= window.until) {
+      continue;
+    }
     const staffMemberId = trainerOfClient.get(clientId);
     if (staffMemberId === undefined) continue;
-    trainer(staffMemberId).firstPlanPaymentsCentavos.push(paid.amount);
+    trainer(staffMemberId).firstPlanPaymentsCentavos.push(
+      first.amountDueCentavos,
+    );
   }
 
   return {

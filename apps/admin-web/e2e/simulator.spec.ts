@@ -21,7 +21,7 @@ test("the administrator sees the three horizons", async ({ page }) => {
   await expect(
     projection.getByRole("row", { name: /12 meses Alto/ }),
   ).toBeVisible();
-  await expect(projection.getByText("Bs 111.540,00")).toBeVisible();
+  await expect(projection.getByText("Bs 120.120,00")).toBeVisible();
 });
 
 test("a narrow browser still shows the three horizons", async ({ page }) => {

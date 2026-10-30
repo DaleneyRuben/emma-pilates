@@ -1,4 +1,8 @@
 import { breakEven } from './break-even';
+import {
+  trainerPayPerClassCentavos,
+  type TrainerPayRates,
+} from './trainer-pay';
 
 // STU-005. The Simulador page (simulate-month.ts) still multiplies by its own
 // 4.33. This is the same constant; the page was left alone so its tests stay
@@ -11,10 +15,14 @@ const scenarios = ['low', 'base', 'high'] as const;
 
 export type ProjectionScenario = (typeof scenarios)[number];
 
+// What a Client pays per class and what a Trainer earns per class are two
+// numbers (FIX-008): income is students times the Client price, the variable
+// cost is the Trainer's pay for those students.
 export type ProjectionInput = {
   classesPerWeek: number;
   studentsPerClass: number;
-  pricePerClassCentavos: number;
+  clientPricePerClassCentavos: number;
+  trainerPay: TrainerPayRates;
   fixedCostsCentavos: number;
   taxRatePercent: number;
 };
@@ -52,10 +60,11 @@ const projectOne = (
     studentsFor(input.studentsPerClass, scenario, classCapacity),
   );
   const revenueCentavos =
-    input.pricePerClassCentavos * students * classes * months;
+    input.clientPricePerClassCentavos * students * classes * months;
+  const variableCostsCentavos =
+    trainerPayPerClassCentavos(input.trainerPay, students) * classes;
   const costCentavos =
-    input.fixedCostsCentavos * months +
-    input.pricePerClassCentavos * classes * months;
+    (input.fixedCostsCentavos + variableCostsCentavos) * months;
   const taxCentavos = Math.round(
     (revenueCentavos * input.taxRatePercent) / 100,
   );
@@ -68,7 +77,7 @@ const projectOne = (
     resultCentavos: revenueCentavos - taxCentavos - costCentavos,
     breakEvenCentavos: breakEven({
       fixedCostsCentavos: input.fixedCostsCentavos,
-      variableCostsCentavos: input.pricePerClassCentavos * classes,
+      variableCostsCentavos,
       taxRatePercent: input.taxRatePercent,
     }).breakEvenCentavos,
   };

@@ -3,10 +3,17 @@
   "version": "0.0.0",
   "exports": {
     ".": "./src/break-even.ts",
-    "./project-months": "./src/project-months.ts"
+    "./project-months": "./src/project-months.ts",
+    "./trainer-pay": "./src/trainer-pay.ts"
   },
   "scripts": {
     "test": "jest",
     "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.12",
+    "typescript": "^5.7.3"
   }
 }
