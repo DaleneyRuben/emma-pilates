@@ -1,4 +1,6 @@
 import type { PrismaClient } from '../../generated/prisma/client';
+import { realPlanSaleWhere } from '../../booking/payments/real-plan-sale';
+import { boliviaMonth } from '../../time/bolivia-time';
 
 export type FirstPlan = {
   clientId: string;
@@ -8,26 +10,31 @@ export type FirstPlan = {
   classAllowance: number;
 };
 
-// A Client's first real Plan: her first cash or transfer sale of more than
-// one class at a price. A single class is not a Plan. A voided first sale
-// stays her first, so a later sale opens no second commission. REL-016's
-// store-review flag joins this filter once the column exists.
+const voidedInItsMonth = (sale: {
+  decidedAt: Date | null;
+  voidedAt: Date | null;
+}): boolean =>
+  sale.voidedAt !== null &&
+  boliviaMonth(sale.voidedAt).getTime() ===
+    boliviaMonth(sale.decidedAt as Date).getTime();
+
+// A Client's first real Plan (booking's real-sale rule). A first sale voided
+// after its month was over stays her first, since its commission may have
+// been paid, so a later sale opens no second one.
 export const readFirstPlans = async (
   prisma: PrismaClient,
 ): Promise<Map<string, FirstPlan>> => {
   const sales = await prisma.payment.findMany({
     where: {
-      kind: 'PLAN',
+      ...realPlanSaleWhere,
       state: { in: ['CONFIRMED', 'VOIDED'] },
-      method: { in: ['TRANSFER', 'CASH'] },
-      planPriceCentavos: { gt: 0 },
-      classAllowanceSnapshot: { gt: 1 },
       decidedAt: { not: null },
     },
     select: {
       clientId: true,
       state: true,
       decidedAt: true,
+      voidedAt: true,
       amountDueCentavos: true,
       durationDaysSnapshot: true,
       classAllowanceSnapshot: true,
@@ -37,6 +44,9 @@ export const readFirstPlans = async (
   const firsts = new Map<string, FirstPlan | null>();
   for (const sale of sales) {
     if (firsts.has(sale.clientId)) continue;
+    // Voided within the month it was sold, no pay for it was approved yet
+    // (a month is paid once it is over): the next real Plan is her first.
+    if (sale.state === 'VOIDED' && voidedInItsMonth(sale)) continue;
     firsts.set(
       sale.clientId,
       sale.state === 'VOIDED'

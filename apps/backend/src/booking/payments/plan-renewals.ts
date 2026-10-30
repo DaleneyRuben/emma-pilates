@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
+import { realPlanSaleSql } from './real-plan-sale';
 
 type Database = PrismaClient | Prisma.TransactionClient;
 
@@ -9,16 +10,9 @@ export type PlanRenewal = {
   renewed: boolean;
 };
 
-// A real Plan: a confirmed cash or transfer sale of more than one class at
-// a price. A Guest Pass, Courtesy Access, a single class, and a voided sale
-// never end or renew a Plan. REL-016's store-review flag joins this filter
-// once the column exists.
+// A real Plan ends or renews; a voided sale does neither.
 const realPlanSale = (alias: string) =>
-  `${alias}.kind = 'plan'
-   AND ${alias}.state = 'confirmed'
-   AND ${alias}.method IN ('cash', 'transfer')
-   AND ${alias}.plan_price_centavos > 0
-   AND ${alias}.class_allowance_snapshot > 1`;
+  `${alias}.state = 'confirmed' AND ${realPlanSaleSql(alias)}`;
 
 // Owner decision 5 (2026-10-28), one definition for the Coordinator's bonus
 // and the KPIs: a real Plan ending in the month renewed when another real

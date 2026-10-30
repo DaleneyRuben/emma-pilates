@@ -52,6 +52,9 @@ const sharedContextSlices = [
   // One definition of «renovó» for the Coordinator's bonus and the KPIs
   // (owner decision 5, 2026-10-28).
   'booking/payments/plan-renewals',
+  // One real-sale rule, with REL-016's store-review seam, for first Plans,
+  // renewals, and income.
+  'booking/payments/real-plan-sale',
   // Staff management creates, reissues, and disables the Staff Member's
   // Account inside its own transaction through this System Identity slice
   // (IDN-007).

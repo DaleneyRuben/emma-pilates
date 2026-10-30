@@ -113,9 +113,14 @@ export const payrollFixtures = (
           voidReason: 'Error',
         },
       });
+      // As a real void: the Plan stops covering from the void's day.
+      const voidDay = civil(at.toISOString().slice(0, 10));
       await transaction.subscription.updateMany({
         where: { paymentId },
-        data: { endedByVoid: true },
+        data: {
+          endedByVoid: true,
+          endsOn: new Date(voidDay.getTime() - day),
+        },
       });
     });
 

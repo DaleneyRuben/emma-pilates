@@ -1,4 +1,5 @@
 import { nutritionistCostOfMonth } from '../../booking/evaluations/nutritionist-cost';
+import { storeReviewExclusion } from '../../booking/payments/real-plan-sale';
 import type { PrismaClient } from '../../generated/prisma/client';
 import { boliviaInstant } from '../../time/bolivia-time';
 import { settingsInForce } from '../settings-in-force';
@@ -21,6 +22,7 @@ export const monthFacts = async (
       where: {
         state: 'CONFIRMED',
         decidedAt: { gte: window.from, lt: window.until },
+        ...storeReviewExclusion,
       },
       select: { amountDueCentavos: true },
     }),
