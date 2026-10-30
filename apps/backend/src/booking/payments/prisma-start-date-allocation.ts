@@ -109,12 +109,14 @@ export const endSubscriptionEarly = async (
     select: { startsOn: true, endsOn: true, clientId: true },
   });
   const expired = input.endsOn.getTime() < current.startsOn.getTime();
+  // A Plan that already ended before the renewal's eve keeps its end.
+  if (!expired && input.endsOn.getTime() >= current.endsOn.getTime()) return;
   if (expired) {
     await transaction.subscription.update({
       where: { id: input.subscriptionId },
       data: { state: SubscriptionState.EXPIRED, expiredAt: input.now },
     });
-  } else if (input.endsOn.getTime() < current.endsOn.getTime()) {
+  } else {
     await transaction.subscription.update({
       where: { id: input.subscriptionId },
       data: { endsOn: input.endsOn },
@@ -140,6 +142,48 @@ export const endSubscriptionEarly = async (
         expired,
         renewalStartsOn: civil(input.startsOn),
         paymentId: input.paymentId,
+      },
+    },
+  });
+};
+
+// H6: a transfer reviewed after its Start Date has passed starts the day it
+// is confirmed. The Payment keeps the date it was sold with (its commercial
+// fields are immutable); the Subscription and this audit record carry the
+// move.
+export const startsOnAtConfirmation = (
+  soldStartsOn: Date,
+  today: Date,
+): Date => (soldStartsOn.getTime() < today.getTime() ? today : soldStartsOn);
+
+export const recordStartDateMoved = (
+  transaction: Transaction,
+  input: {
+    paymentId: string;
+    clientId: string;
+    soldStartsOn: Date;
+    startsOn: Date;
+    principal: AuthenticatedPrincipal;
+    now: Date;
+  },
+) => {
+  const actor = auditActorOf(input.principal);
+  return transaction.auditRecord.create({
+    data: {
+      actionCode: 'payment.start_date_moved',
+      outcome: AuditOutcome.SUCCEEDED,
+      actorKind: AuditActorKind.ACCOUNT,
+      actorAccountId: actor.accountId,
+      actorRole: actor.role,
+      impersonationId: actor.impersonationId,
+      targetType: 'payment',
+      targetId: input.paymentId,
+      correlationId: input.paymentId,
+      occurredAt: input.now,
+      metadata: {
+        clientId: input.clientId,
+        soldStartsOn: civil(input.soldStartsOn),
+        startsOn: civil(input.startsOn),
       },
     },
   });
