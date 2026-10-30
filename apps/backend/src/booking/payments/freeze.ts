@@ -20,8 +20,9 @@ export type FreezeRequestFacts = {
   /** Bolivia civil date of the request, or of the approval. */
   today: Date;
   /**
-   * Approval refuses a start of today: that morning's class would stay and
-   * the plan would still be extended. A request for today stays allowed.
+   * Approval of a start already past is refused. A start of today stays
+   * allowed: the morning's class is kept because its Session is already
+   * over, and classes that have not started yet are cancelled.
    */
   approving?: boolean;
   startsOn: Date;
@@ -81,8 +82,7 @@ export const decideFreezeRequest = (
     facts.startsOn.getUTCMonth(),
     facts.startsOn.getUTCDate(),
   );
-  const startsToday = facts.approving === true && startsOn === today.getTime();
-  if (startsOn < today.getTime() || startsToday) {
+  if (startsOn < today.getTime()) {
     return refused('freeze_start_in_past');
   }
   const extensionReachesRenewal =

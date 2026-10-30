@@ -7118,11 +7118,12 @@ B. **The decision.** Paola opens **Back Office → Congelamientos**. The card
    inside the window in La Paz, and closes Waitlist entries for those
    Sessions. The class returns the same way a cancellation does. The Payment
    amount does not change. The Client receives a push and an inbox
-   notification. Approving on the start day, or after the start has passed, answers `409`
-   `freeze_start_in_past` and changes nothing: «El congelamiento ya empezó.
-   Recházalo y pide uno desde mañana.» A refused Freeze does not spend the one
-   Freeze, so she can ask again with dates from today, and that request can
-   be approved. A second request while one is requested or approved still
+   notification. Approving on the start day keeps a class whose Session
+   already started and cancels the ones that have not. Approving after the
+   start has passed answers `409` `freeze_start_in_past` and changes nothing:
+   «El congelamiento ya empezó. Recházalo y pide uno desde mañana.» A refused
+   Freeze does not spend the one Freeze, so she can ask again with dates from
+   tomorrow, and that request can be approved. A second request while one is requested or approved still
    answers `409` `freeze_not_allowed`. A second approval answers `409`
    `freeze_already_decided` and does not move the end again.
 C. **The booking.** A Session inside an approved Freeze answers `409`
