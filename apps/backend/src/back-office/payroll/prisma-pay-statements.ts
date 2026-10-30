@@ -147,9 +147,11 @@ export const createPrismaPayStatements = (
     const facts = await dependencies.factsOfMonth(from, monthEnd(from));
     const now = dependencies.now();
     let drafted = 0;
+    const current = new Set<string>();
     for (const trainer of facts.trainers) {
       const pay = trainerPay(facts.rates, trainer);
       if (pay.lines.length === 0) continue;
+      current.add(trainer.staffMemberId);
       await prisma.$transaction((transaction) =>
         replaceDraft(transaction, {
           staffMemberId: trainer.staffMemberId,
@@ -165,6 +167,7 @@ export const createPrismaPayStatements = (
       ? await dependencies.coordinatorFactsOfMonth(from, monthEnd(from))
       : null;
     for (const staffMemberId of coordinatorFacts?.staffMemberIds ?? []) {
+      current.add(staffMemberId);
       const pay = coordinatorPay(coordinatorFacts!);
       await prisma.$transaction((transaction) =>
         replaceDraft(transaction, {
@@ -177,7 +180,47 @@ export const createPrismaPayStatements = (
       );
       drafted += 1;
     }
+    await withdrawStaleDrafts({
+      month: from,
+      current,
+      roles:
+        coordinatorFacts === null ? ['TRAINER'] : ['TRAINER', 'COORDINATOR'],
+      now,
+    });
     return { drafted };
+  };
+
+  // A draft whose lines are gone (a voided commission, a deactivated
+  // Coordinator) is withdrawn, so no stale amount stays approvable.
+  const withdrawStaleDrafts = async (input: {
+    month: Date;
+    current: Set<string>;
+    roles: ('TRAINER' | 'COORDINATOR')[];
+    now: Date;
+  }) => {
+    const stale = await prisma.payStatement.findMany({
+      where: {
+        month: input.month,
+        state: 'DRAFT',
+        deletedAt: null,
+        staffMemberId: { notIn: [...input.current] },
+        staffMember: { role: { in: input.roles } },
+      },
+      select: { id: true },
+    });
+    for (const statement of stale) {
+      await prisma.$transaction(async (transaction) => {
+        const withdrawn = await transaction.payStatement.updateMany({
+          where: { id: statement.id, state: 'DRAFT', deletedAt: null },
+          data: { deletedAt: input.now, updatedAt: input.now },
+        });
+        if (withdrawn.count === 0) return;
+        await transaction.payStatementLine.updateMany({
+          where: { payStatementId: statement.id, deletedAt: null },
+          data: { deletedAt: input.now },
+        });
+      });
+    }
   };
 
   const replaceDraft = async (
