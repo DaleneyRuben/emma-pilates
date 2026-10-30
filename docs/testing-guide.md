@@ -7774,3 +7774,46 @@ H. **Detalle del plan (Client 09, design follow-up 219).** From Mi plan,
    **Continuar al pago** sends no `startsOn`. With no classes left, the chips
    show and «Hoy» is selected. `GET /api/v1/clients/current/subscription`
    carries `renewalStartsOn` only in the first case.
+
+## Test 120: analytics review fixes (FIX-008)
+
+The analytics findings of the 2026-10-28 review. Use `pilates_dev_sim` with the
+API and the admin web (`pnpm dev:admin`) signed in as Paola (Administrator).
+The reports read the studio facts: after changing data, run **Recalcular**
+(`POST /api/v1/administrator/reports/studio-facts/recompute?month=YYYY-MM`) for
+the month first.
+
+A. **Accrued revenue (H12).** In Reporte → Indicadores for a month with a
+   30-day Plan of Bs 300 starting on the 20th: «Devengado» shows Bs 120 for
+   the first month (12 of 30 days, the end date counts) and Bs 180 for the
+   next. A Payment approved on the 1st counts in «Caja» of that month only.
+   «Diferido» shrinks every day and reads Bs 0 the day after the Plan ends;
+   for a past month it is measured at that month's end. A paid Evaluation
+   shows in «Caja» and «Devengado» of the month it was approved, as in the
+   income report, and never in «Diferido». A one-day Plan never shows NaN.
+B. **Only Sessions taught.** A Session cancelled this month, or one later
+   today or later in the month, is not counted in «Clases dictadas»,
+   occupancy, the averages, the weak-schedule recommendations, or the
+   narrative («se dictaron N clases»). Students per class come from the
+   Bookings when the Cancellation Window closed (what Trainer pay counts),
+   not from today's Bookings. A Client with only a future Booking this month
+   is not listed as «no reservó este mes».
+C. **Who counts as a Client.** A friend with only a Guest Pass, a Client with
+   only Courtesy Access, and a Client whose only sale was voided are not
+   counted in «Clientas activas», «Nuevas», or the inactive-client
+   recommendations.
+D. **The previous month is finalized.** Through day 8 of a month (La Paz
+   time) the worker's daily studio-facts run recomputes the previous month as
+   well, so a late attendance or a void shows in it. From day 9 the previous
+   month no longer changes.
+E. **Simulador (AW37).** The form now has «Precio por clase para la clienta
+   (Bs)» (70), «Pago por clase a la instructora (Bs)» (65), «Alumnas
+   incluidas en el pago» (4), and «Pago por alumna extra (Bs)» (8) instead of
+   the single «Precio por clase (Bs)». With the opening values «Resultado»
+   reads «Bs 3.163,60» (ingreso Bs 40.040,00), «Punto de equilibrio»
+   «Bs 36.273,81», and the derivation «(21175 + 9295) / 0.84 = 36273.81».
+   With 6 students per class, Trainer pay is Bs 81 a class: the derivation
+   reads «(21175 + 11583) / 0.84 = 38997.62». The Proyección's «3 meses
+   Base» income is «Bs 120.120,00»; «Alto» pays the extra student.
+F. **No float noise.** A tax of 7 % shows the divisor as «0.93», never
+   «0.9299999999999999».
