@@ -45,6 +45,8 @@ export type CashToday = {
   businessDate: Date;
   expectedCentavos: number;
   cashPaymentCount: number;
+  /** Voided cash sales still in the drawer: part of expectedCentavos. */
+  voidedCashCentavos: number;
   close: CashCloseView | null;
 };
 
@@ -53,6 +55,8 @@ export type CashDay = {
   status: CashDayStatus;
   cashSalesCentavos: number;
   cashPaymentCount: number;
+  /** Voided cash sales still in the drawer: part of cashSalesCentavos. */
+  voidedCashCentavos: number;
   close: (CashCloseView & { adjustmentCentavos: number }) | null;
 };
 
@@ -63,13 +67,13 @@ export type CashCloseHistory = {
   days: CashDay[];
 };
 
-// The seam for PAY-006: only a confirmed cash Payment is cash in the drawer,
-// so a sale voided after the close leaves this filter and shows as an
-// adjustment of the day it was sold.
+// Cash in the drawer: a confirmed cash Payment, and a voided one too, since a
+// void returns no money (owner decision 4, 2026-10-28). The voided part is
+// shown on its own line; money given back is recorded as an outflow.
 const cashIncome = (branchId: string, from: Date, until: Date) =>
   ({
     method: PaymentMethod.CASH,
-    state: PaymentState.CONFIRMED,
+    state: { in: [PaymentState.CONFIRMED, PaymentState.VOIDED] },
     collectedAtBranchId: branchId,
     decidedAt: { gte: from, lt: until },
   }) satisfies Prisma.PaymentWhereInput;
@@ -141,14 +145,24 @@ export const createPrismaCashCloses = (
     from: Date,
     until: Date,
   ) => {
-    const total = await database.payment.aggregate({
-      where: cashIncome(branchId, from, until),
-      _sum: { amountDueCentavos: true },
-      _count: { _all: true },
-    });
+    const [total, voided] = await Promise.all([
+      database.payment.aggregate({
+        where: cashIncome(branchId, from, until),
+        _sum: { amountDueCentavos: true },
+        _count: { _all: true },
+      }),
+      database.payment.aggregate({
+        where: {
+          ...cashIncome(branchId, from, until),
+          state: PaymentState.VOIDED,
+        },
+        _sum: { amountDueCentavos: true },
+      }),
+    ]);
     return {
       expectedCentavos: total._sum.amountDueCentavos ?? 0,
       cashPaymentCount: total._count._all,
+      voidedCashCentavos: voided._sum.amountDueCentavos ?? 0,
     };
   };
 
@@ -187,6 +201,7 @@ export const createPrismaCashCloses = (
         businessDate: day.businessDate,
         expectedCentavos: day.expectedCentavos,
         cashPaymentCount: day.cashPaymentCount,
+        voidedCashCentavos: day.voidedCashCentavos,
         close: close === null ? null : toCloseView(close),
       };
     },
@@ -277,7 +292,7 @@ export const createPrismaCashCloses = (
             boliviaInstant(first, 0),
             boliviaInstant(nextMonthStart(first), 0),
           ),
-          select: { amountDueCentavos: true, decidedAt: true },
+          select: { amountDueCentavos: true, decidedAt: true, state: true },
         }),
         prisma.cashClose.findMany({
           where: {
@@ -287,13 +302,21 @@ export const createPrismaCashCloses = (
           select: closeSelect,
         }),
       ]);
-      const sales = new Map<number, { total: number; count: number }>();
+      const sales = new Map<
+        number,
+        { total: number; count: number; voided: number }
+      >();
       for (const payment of payments) {
         const key = boliviaDate(payment.decidedAt!).getTime();
-        const day = sales.get(key) ?? { total: 0, count: 0 };
+        const day = sales.get(key) ?? { total: 0, count: 0, voided: 0 };
         sales.set(key, {
           total: day.total + payment.amountDueCentavos,
           count: day.count + 1,
+          voided:
+            day.voided +
+            (payment.state === PaymentState.VOIDED
+              ? payment.amountDueCentavos
+              : 0),
         });
       }
       const closesByDay = new Map(
@@ -304,7 +327,7 @@ export const createPrismaCashCloses = (
         .sort((left, right) => right - left)
         .map((key): CashDay => {
           const businessDate = new Date(key);
-          const sold = sales.get(key) ?? { total: 0, count: 0 };
+          const sold = sales.get(key) ?? { total: 0, count: 0, voided: 0 };
           const row = closesByDay.get(key);
           const close = row === undefined ? null : toCloseView(row);
           return {
@@ -316,6 +339,7 @@ export const createPrismaCashCloses = (
             }),
             cashSalesCentavos: sold.total,
             cashPaymentCount: sold.count,
+            voidedCashCentavos: sold.voided,
             close:
               close === null
                 ? null
