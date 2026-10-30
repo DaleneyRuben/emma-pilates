@@ -77,6 +77,25 @@ describe('ClientProfileController', () => {
     });
   });
 
+  it('passes on the fixed renewal start date', async () => {
+    loadSubscription.mockResolvedValue({
+      status: 'active',
+      subscription: {
+        id: 'subscription-id',
+        planName: 'Paquete de 8 clases',
+        originalClassAllowance: 8,
+        remainingClassAllowance: 5,
+        startsOn: new Date('2026-10-19T00:00:00.000Z'),
+        endsOn: new Date('2026-11-18T00:00:00.000Z'),
+      },
+      renewalStartsOn: '2026-11-19',
+    });
+
+    await expect(controller.subscription(bearer)).resolves.toMatchObject({
+      renewalStartsOn: '2026-11-19',
+    });
+  });
+
   it('returns none without a Subscription', async () => {
     loadSubscription.mockResolvedValue({
       status: 'none',
