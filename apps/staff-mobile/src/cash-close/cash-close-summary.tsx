@@ -2,7 +2,6 @@ import type { CashCloseDto } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
-  formatBolivianos,
   Heading,
   PrimaryButton,
   radii,
@@ -13,7 +12,11 @@ import {
 import { StyleSheet, Text, View } from "react-native";
 
 import { clockTime } from "../nutritionist/nutritionist-format";
-import { describeDifference, formatSignedBolivianos } from "./cash-close-format";
+import {
+  describeDifference,
+  formatCashCloseBolivianos,
+  formatSignedBolivianos,
+} from "./cash-close-format";
 
 function Line({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
@@ -36,8 +39,8 @@ export function CashCloseSummary({ close, onDone }: { close: CashCloseDto; onDon
         Caja cerrada
       </Heading>
       <View style={styles.card}>
-        <Line label="Efectivo esperado" value={formatBolivianos(close.expectedCentavos)} />
-        <Line label="Efectivo contado" value={formatBolivianos(close.countedCentavos)} />
+        <Line label="Efectivo esperado" value={formatCashCloseBolivianos(close.expectedCentavos)} />
+        <Line label="Efectivo contado" value={formatCashCloseBolivianos(close.countedCentavos)} />
         <Line
           color={difference.text}
           label="Diferencia"

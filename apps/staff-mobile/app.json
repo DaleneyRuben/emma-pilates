@@ -5,7 +5,7 @@
     "scheme": "emmapilates-staff",
     "version": "1.0.1",
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "fingerprint"
     },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -67,7 +67,7 @@
       [
         "expo-secure-store",
         {
-          "faceIDPermission": "Permite que Emma Pilates Staff use Face ID para proteger tu sesión."
+          "faceIDPermission": "Permite que Emma Pilates Staff use Face ID para proteger tu sesi\u00f3n."
         }
       ],
       [
@@ -77,6 +77,14 @@
         }
       ],
       "@pilates/mobile-core/launch-tap-plugin",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Permite que Emma Pilates Staff tome fotos de los comprobantes de transferencia.",
+          "photosPermission": "Permite que Emma Pilates Staff elija fotos de los comprobantes de transferencia.",
+          "microphonePermission": false
+        }
+      ],
       "@sentry/react-native/expo"
     ],
     "extra": {

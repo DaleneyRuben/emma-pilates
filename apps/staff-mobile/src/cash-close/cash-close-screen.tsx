@@ -11,7 +11,6 @@ import {
   fontFamilies,
   FormField,
   FormScrollView,
-  formatBolivianos,
   Heading,
   LoadingState,
   PrimaryButton,
@@ -37,6 +36,7 @@ import {
   cashCloseProblems,
   describeCashSales,
   describeDifference,
+  formatCashCloseBolivianos,
   formatSignedBolivianos,
   parseCountedCentavos,
 } from "./cash-close-format";
@@ -102,7 +102,7 @@ function CashCloseForm({
     <>
       <View style={styles.card}>
         <Text style={styles.eyebrow}>EFECTIVO ESPERADO</Text>
-        <Text style={styles.expected}>{formatBolivianos(expectedCentavos)}</Text>
+        <Text style={styles.expected}>{formatCashCloseBolivianos(expectedCentavos)}</Text>
         <BodyText style={styles.muted}>{describeCashSales(cashPaymentCount, branch.name)}</BodyText>
         {voidedCashCentavos > 0 ? (
           <BodyText style={styles.muted}>
@@ -188,13 +188,20 @@ export function CashCloseScreen() {
   };
 
   let body;
-  if (branches.branch === null || today.isPending) {
+  if (branches.isError) {
+    body = (
+      <QueryFailure label="No pudimos cargar la caja de hoy." onRetry={() => branches.refetch()} />
+    );
+  } else if (branches.isPending || branches.branch === null || today.isPending) {
     body = <LoadingState label="Cargando la caja de hoy" />;
   } else if (today.isError || day === undefined) {
     body = (
       <QueryFailure
         label="No pudimos cargar la caja de hoy."
-        onRetry={() => void today.refetch()}
+        onRetry={() => {
+          branches.refetch();
+          void today.refetch();
+        }}
       />
     );
   } else if (day.close !== null) {

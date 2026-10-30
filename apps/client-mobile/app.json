@@ -5,7 +5,7 @@
     "scheme": "emmapilates-client",
     "version": "1.0.1",
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "fingerprint"
     },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -70,7 +70,7 @@
       [
         "expo-secure-store",
         {
-          "faceIDPermission": "Permite que Emma Pilates use Face ID para proteger tu sesión."
+          "faceIDPermission": "Permite que Emma Pilates use Face ID para proteger tu sesi\u00f3n."
         }
       ],
       [

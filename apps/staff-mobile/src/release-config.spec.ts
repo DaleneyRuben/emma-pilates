@@ -7,10 +7,11 @@ import workspacePackageJson from "../../../package.json";
 // ADR-0038/0039: manual EAS Build and Submit releases and controlled EAS
 // Updates, isolated per application (ADR-0085).
 describe("staff release configuration", () => {
-  it("keeps its own store identity and ties updates to the app version", () => {
+  it("keeps its own store identity and ties updates to the native fingerprint", () => {
     expect(appConfig.expo.ios.bundleIdentifier).toBe("com.emmapilates.staff");
     expect(appConfig.expo.android.package).toBe("com.emmapilates.staff");
-    expect(appConfig.expo.runtimeVersion).toEqual({ policy: "appVersion" });
+    // FIX-011 / MOB-072: fingerprint so an OTA cannot land on a binary missing native modules.
+    expect(appConfig.expo.runtimeVersion).toEqual({ policy: "fingerprint" });
   });
 
   it("is linked to its own EAS project in the studio's Expo organization", () => {
@@ -55,7 +56,7 @@ describe("staff release configuration", () => {
       autoIncrement: true,
     });
     expect(JSON.stringify(build.production)).not.toContain("localhost");
-    expect(easConfig.cli.appVersionSource).toBe("local");
+    expect(easConfig.cli.appVersionSource).toBe("remote");
   });
 
   it("installs development builds on the iOS Simulator with the development client", () => {
@@ -107,6 +108,21 @@ describe("staff release configuration", () => {
     // The plugin's Gradle step runs the app's own node_modules/@sentry/cli,
     // which pnpm links only for a direct dependency.
     expect(packageJson.devDependencies).toHaveProperty("@sentry/cli");
+  });
+
+  // FIX-011: Staff photographs transfer receipts (front-desk), so the plugin
+  // asks for the camera and the photo library in Spanish and never the mic.
+  it("asks for the camera and photos in Spanish, never the microphone", () => {
+    expect(appConfig.expo.plugins).toContainEqual([
+      "expo-image-picker",
+      {
+        cameraPermission:
+          "Permite que Emma Pilates Staff tome fotos de los comprobantes de transferencia.",
+        photosPermission:
+          "Permite que Emma Pilates Staff elija fotos de los comprobantes de transferencia.",
+        microphonePermission: false,
+      },
+    ]);
   });
 
   it("submits only the production profile", () => {
