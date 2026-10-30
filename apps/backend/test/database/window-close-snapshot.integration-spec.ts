@@ -115,6 +115,26 @@ describe('Prisma Session start checks: Bookings at the window close', () => {
     });
   });
 
+  it('leaves out a Booking made after the close when the worker runs later', async () => {
+    const session = await world.createSession(slotStart(3));
+    const lucia = await world.principalOf('lucia@example.com');
+    const valeria = await world.principalOf('valeria@example.com');
+    await world.book(session.id, lucia, valeria);
+    const closes = new Date(session.startsAt.getTime() - window);
+    await world.prisma.booking.updateMany({
+      where: { sessionId: session.id, clientId: valeria.clientId },
+      data: { createdAt: new Date(closes.getTime() + minute) },
+    });
+    world.setClock(new Date(closes.getTime() + 30 * minute));
+
+    await expect(world.checks().recordWindowCloseBookings()).resolves.toEqual({
+      recorded: 1,
+    });
+    await expect(sessionRow(session.id)).resolves.toMatchObject({
+      bookingsAtWindowClose: 1,
+    });
+  });
+
   it('reads the Cancellation Window from Studio Settings', async () => {
     const session = await world.createSession(slotStart(1));
     await world.setStudioSettings({ cancellationWindowMinutes: 60 });
