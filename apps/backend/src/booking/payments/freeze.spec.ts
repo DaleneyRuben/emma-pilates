@@ -10,7 +10,7 @@ const quarterly = {
   clientId: 'client-1',
   durationDays: 90,
   endsOn: civil('2026-12-20'),
-  today: civil('2026-10-23'),
+  today: afternoon('2026-10-23'),
   existingRequest: null,
 };
 
@@ -119,6 +119,24 @@ describe('decideFreezeRequest bounds', () => {
     ).toEqual({ allowed: false, code: 'freeze_start_in_past' });
   });
 
+  it('approves a freeze that starts tomorrow', () => {
+    expect(
+      decideFreezeRequest({
+        subscriptionId: 'subscription-1',
+        clientId: 'client-1',
+        durationDays: 90,
+        endsOn: civil('2026-12-20'),
+        today: afternoon('2026-10-29'),
+        startsOn: civil('2026-10-30'),
+        endsOnRequest: civil('2026-11-01'),
+        existingRequest: null,
+        subscriptionStartsOn: civil('2026-09-22'),
+        renewalStartsOn: null,
+        approving: true,
+      }).allowed,
+    ).toBe(true);
+  });
+
   it('refuses a start already past with its own code', () => {
     expect(
       decideFreezeRequest({
@@ -143,7 +161,7 @@ describe('decideFreezeRequest bounds', () => {
         clientId: 'client-1',
         durationDays: 90,
         endsOn: civil('2026-12-20'),
-        today: civil('2026-10-23'),
+        today: afternoon('2026-10-23'),
         startsOn: civil('2026-12-15'),
         endsOnRequest: civil('2026-12-24'),
         existingRequest: null,
@@ -160,7 +178,7 @@ describe('decideFreezeRequest bounds', () => {
         clientId: 'client-1',
         durationDays: 90,
         endsOn: civil('2026-11-20'),
-        today: civil('2026-10-23'),
+        today: afternoon('2026-10-23'),
         startsOn: civil('2026-11-15'),
         endsOnRequest: civil('2026-11-20'),
         existingRequest: null,
@@ -177,7 +195,7 @@ describe('decideFreezeRequest bounds', () => {
         clientId: 'client-1',
         durationDays: 90,
         endsOn: civil('2026-12-20'),
-        today: civil('2026-11-01'),
+        today: afternoon('2026-11-01'),
         startsOn: civil('2026-11-11'),
         endsOnRequest: civil('2026-11-20'),
         existingRequest: null,
