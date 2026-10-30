@@ -7777,7 +7777,7 @@ H. **Detalle del plan (Client 09, design follow-up 219).** From Mi plan,
    **Continuar al pago** sends no `startsOn`. With no classes left, the chips
    show and «Hoy» is selected. `GET /api/v1/clients/current/subscription`
    carries `renewalStartsOn` only in the first case.
-I. **Confirmar pago en efectivo (Staff S10, design follow-up 220).** As
+I. **Confirmar pago en efectivo (Staff S10, design follow-up 223).** As
    Camila, open a Client whose Plan still has classes and tap **Registrar
    pago en efectivo**, then a Plan. S10 shows «El nuevo plan empieza el
    {date}, al terminar el actual.» and no «Fecha de inicio» chips; confirming
