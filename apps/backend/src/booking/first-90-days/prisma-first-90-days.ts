@@ -278,10 +278,12 @@ export const createFirst90DaysJob = (
     const instant = now();
     const today = boliviaDate(instant);
     const occurredAt = dateTriggeredPushInstant(instant);
+    // A lifecycle message that fails must not keep the alerts from opening:
+    // its failure is raised once the alerts are swept.
     const messages =
       occurredAt === null
-        ? { sent: 0 }
-        : await sendLifecycleMessages({
+        ? Promise.resolve({ sent: 0 })
+        : sendLifecycleMessages({
             today,
             occurredAt,
             findFirstRealPlans: () => findFirstRealPlans(prisma),
@@ -290,11 +292,16 @@ export const createFirst90DaysJob = (
                 recordLifecycle(transaction, recordNotification, send, instant),
               ),
           });
-    const alerts = await sweepContactAlerts({
-      today,
-      findClientStates: () => findClientAlertStates(prisma, instant),
-      open: (rows) => openContactAlerts(prisma, rows, instant),
-    });
-    return { messages: messages.sent, alerts: alerts.opened };
+    const [sending, alerts] = await Promise.allSettled([
+      messages,
+      sweepContactAlerts({
+        today,
+        findClientStates: () => findClientAlertStates(prisma, instant),
+        open: (rows) => openContactAlerts(prisma, rows, instant),
+      }),
+    ]);
+    if (sending.status === 'rejected') throw sending.reason;
+    if (alerts.status === 'rejected') throw alerts.reason;
+    return { messages: sending.value.sent, alerts: alerts.value.opened };
   },
 });
