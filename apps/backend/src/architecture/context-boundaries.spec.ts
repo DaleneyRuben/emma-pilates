@@ -49,6 +49,9 @@ const sharedContextSlices = [
   'booking/payments/open-verified-guest-pass',
   // Finanzas asks Booking for the month's Nutritionist cost (ADR-0103).
   'booking/evaluations/nutritionist-cost',
+  // One definition of «renovó» for the Coordinator's bonus and the KPIs
+  // (owner decision 5, 2026-10-28).
+  'booking/payments/plan-renewals',
   // Staff management creates, reissues, and disables the Staff Member's
   // Account inside its own transaction through this System Identity slice
   // (IDN-007).

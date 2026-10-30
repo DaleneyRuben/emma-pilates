@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
+import { readPlanRenewals } from '../booking/payments/plan-renewals';
 import { boliviaMonth } from '../time/bolivia-time';
 import {
   recomputeFacts,
@@ -24,7 +25,6 @@ type SourceRow = {
 type ClientRow = {
   client_id: string;
   plan_days: number;
-  renewed: boolean;
 };
 
 const monthEnd = (month: Date): Date =>
@@ -62,22 +62,16 @@ const readSource = async (
                AND s.ends_on >= ${month}::date
              ORDER BY s.starts_on DESC
              LIMIT 1
-           ), 0)::int AS plan_days,
-           EXISTS (
-             SELECT 1
-             FROM booking.subscriptions current_plan
-             JOIN booking.subscriptions next
-               ON next.client_id = current_plan.client_id
-              AND next.id <> current_plan.id
-              AND next.starts_on > current_plan.starts_on
-              AND next.starts_on <= current_plan.ends_on + 7
-             WHERE current_plan.client_id = c.id
-               AND current_plan.ends_on >= ${month}::date
-               AND current_plan.ends_on < ${until}::date
-           ) AS renewed
+           ), 0)::int AS plan_days
     FROM booking.clients c
     WHERE c.deleted_at IS NULL
   `;
+  // Owner decision 5: the KPIs read the same «renovó» as the bonus.
+  const renewedClients = new Set(
+    (await readPlanRenewals(prisma, month, until))
+      .filter((plan) => plan.renewed)
+      .map((plan) => plan.clientId),
+  );
   const sessions = new Map<string, FactSession>();
   for (const row of rows) {
     const session = sessions.get(row.session_id) ?? {
@@ -108,7 +102,7 @@ const readSource = async (
     clients: clients.map((row): FactClient => ({
       id: row.client_id,
       planDays: Number(row.plan_days),
-      renewed: row.renewed,
+      renewed: renewedClients.has(row.client_id),
       // REL-016 has not added the store-review flag. The seam takes it;
       // until the column exists every live Client is included.
       excludedFromAnalytics: false,

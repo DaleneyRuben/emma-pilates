@@ -100,6 +100,8 @@ describe('payroll and finance fixes', () => {
       clientId: client,
       decidedAt: new Date('2027-03-01T03:30:00.000Z'),
       startsOn: civil('2027-02-28'),
+      // Ends in May, out of the March renewal rate below.
+      durationDays: 90,
     });
     const current = await nextSettingsVersion({
       taxRatePercent: 25,
