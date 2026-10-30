@@ -56,4 +56,13 @@ describe('first-90-days lifecycle milestones', () => {
       ),
     ).toEqual(['day_30', 'day_90']);
   });
+
+  it('sends only the latest missed milestone after downtime, so a catch-up is not a burst', () => {
+    expect(
+      dueMilestones(startsOn, new Date('2026-12-30T00:00:00.000Z'), new Set()),
+    ).toEqual(['day_2', 'week_1', 'day_30', 'day_90']);
+    expect(
+      dueMilestones(startsOn, new Date('2026-10-31T00:00:00.000Z'), new Set()),
+    ).toEqual(['day_2', 'week_1', 'day_30']);
+  });
 });

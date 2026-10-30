@@ -2,6 +2,8 @@ import { sendLifecycleMessages } from './send-lifecycle-messages';
 
 const startsOn = new Date('2026-10-01T00:00:00.000Z');
 const today = new Date('2026-10-08T00:00:00.000Z');
+// 09:00 on the same day in La Paz, when date-triggered pushes go out.
+const occurredAt = new Date('2026-10-08T13:00:00.000Z');
 
 describe('sendLifecycleMessages', () => {
   it('records each due milestone once with destination none', async () => {
@@ -10,6 +12,7 @@ describe('sendLifecycleMessages', () => {
     await expect(
       sendLifecycleMessages({
         today,
+        occurredAt,
         findFirstRealPlans: jest.fn().mockResolvedValue([
           {
             clientId: 'client-1',
@@ -20,29 +23,31 @@ describe('sendLifecycleMessages', () => {
         ]),
         record,
       }),
-    ).resolves.toEqual({ sent: 2 });
+    ).resolves.toEqual({ sent: 1 });
 
     expect(record).toHaveBeenCalledTimes(2);
     expect(record).toHaveBeenCalledWith({
       clientId: 'client-1',
       accountId: 'account-1',
       milestone: 'day_2',
+      notification: null,
+    });
+    expect(record).toHaveBeenNthCalledWith(2, {
+      clientId: 'client-1',
+      accountId: 'account-1',
+      milestone: 'week_1',
       notification: {
         accountId: 'account-1',
         category: 'reminder',
-        type: 'lifecycle_day_2',
-        businessEventKey: 'lifecycle:day_2:client-1',
-        title: 'Tu segunda clase',
+        type: 'lifecycle_week_1',
+        businessEventKey: 'lifecycle:week_1:client-1',
+        title: 'Tu primera semana',
         message:
-          '¿Cómo te fue en tu primera clase? Tu segunda clase es el mejor momento para afianzar lo que aprendiste. Reserva cuando quieras: tu lugar te espera.',
+          '¿Cómo te sentiste en tus primeras clases? Si tienes alguna duda sobre los ejercicios o el nivel, cuéntale a tu instructora: estamos para acompañarte.',
         destination: null,
-        occurredAt: today,
+        occurredAt,
       },
     });
-    expect(record).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({ milestone: 'week_1' }),
-    );
   });
 
   it('skips milestones already sent so a rerun sends nothing twice', async () => {
@@ -51,6 +56,7 @@ describe('sendLifecycleMessages', () => {
     await expect(
       sendLifecycleMessages({
         today,
+        occurredAt,
         findFirstRealPlans: jest.fn().mockResolvedValue([
           {
             clientId: 'client-1',
@@ -71,6 +77,7 @@ describe('sendLifecycleMessages', () => {
     await expect(
       sendLifecycleMessages({
         today,
+        occurredAt,
         findFirstRealPlans: jest.fn().mockResolvedValue([
           {
             clientId: 'client-1',
@@ -82,5 +89,33 @@ describe('sendLifecycleMessages', () => {
         record,
       }),
     ).resolves.toEqual({ sent: 0 });
+  });
+
+  it('records the other Clients when one fails, then reports the one that failed', async () => {
+    const record = jest.fn(({ clientId }: { clientId: string }) =>
+      clientId === 'broken'
+        ? Promise.reject(new Error('insert failed'))
+        : Promise.resolve(true),
+    );
+    const plan = (clientId: string) => ({
+      clientId,
+      accountId: `account-${clientId}`,
+      startsOn,
+      sentMilestones: ['day_2'],
+    });
+
+    await expect(
+      sendLifecycleMessages({
+        today,
+        occurredAt,
+        findFirstRealPlans: jest
+          .fn()
+          .mockResolvedValue([plan('broken'), plan('fine')]),
+        record,
+      }),
+    ).rejects.toThrow('first_90_days failed for 1 item: broken');
+    expect(record).toHaveBeenLastCalledWith(
+      expect.objectContaining({ clientId: 'fine', milestone: 'week_1' }),
+    );
   });
 });
