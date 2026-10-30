@@ -81,6 +81,7 @@ export const createFounderMembershipJob = (
 
     return endLapsedFounderMemberships({
       today,
+      occurredAt,
       rules: version,
       findActive: async () => {
         const rows = await prisma.founderMembership.findMany({
@@ -133,10 +134,10 @@ export const createFounderMembershipJob = (
             data: {
               status: FounderMembershipStatus.LOST,
               reason: input.reason,
-              lostAt: occurredAt,
+              lostAt: input.occurredAt,
             },
           });
-          if (changed.count === 0) return;
+          if (changed.count === 0) return false;
           await transaction.auditRecord.create({
             data: {
               actionCode: 'founder_membership.lost',
@@ -149,7 +150,7 @@ export const createFounderMembershipJob = (
               metadata: { reason: input.reason },
             },
           });
-          if (input.accountId === null) return;
+          if (input.accountId === null) return true;
           await recordNotification(transaction, {
             accountId: input.accountId,
             category: 'reminder',
@@ -160,8 +161,8 @@ export const createFounderMembershipJob = (
             destination: { type: 'subscription', id: null },
             occurredAt,
           });
+          return true;
         }),
-      record: () => Promise.resolve(),
     });
   },
 });

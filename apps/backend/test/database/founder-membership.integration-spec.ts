@@ -241,7 +241,7 @@ describe('founder membership', () => {
     ).resolves.toMatchObject({ status: 'LOST' });
   });
 
-  it('keeps the place and writes no notice when the loss cannot be recorded', async () => {
+  it('keeps the place, writes no notice and reports it when the loss cannot be recorded', async () => {
     await prisma.founderMembership.updateMany({
       data: { deletedAt: now },
     });
@@ -271,7 +271,7 @@ describe('founder membership', () => {
           prisma,
           () => new Date('2026-10-23T15:00:00.000Z'),
         ).execute(),
-      ).resolves.toEqual({ ended: 0 });
+      ).rejects.toThrow('founder_memberships failed for 1 item');
       await expect(
         prisma.founderMembership.findFirstOrThrow({
           where: { clientId: lapsed.clientId },
