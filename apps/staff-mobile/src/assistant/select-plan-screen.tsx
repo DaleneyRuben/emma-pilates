@@ -38,9 +38,9 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
   const { clientId, clientName } = route.params;
   const navigation = useNavigation<SelectPlanNavigation>();
   const fetcher = useStaffFetcher();
+  // FIX-019: S10 names the fixed renewal start from the overview, so the Plans
+  // wait for it; without it a renewal would offer dates the server ignores.
   const overview = useGetAssistantClientOverview(clientId, { fetcher });
-  const renewalStartsOn =
-    overview.data?.status === 200 ? overview.data.data.subscription.renewalStartsOn : undefined;
   const quotes = useQuoteAssistantClientPlans(clientId, {
     fetcher,
     query: { refetchOnMount: "always" },
@@ -54,7 +54,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
     </>
   );
 
-  if (quotes.isPending) {
+  if (quotes.isPending || overview.isPending) {
     return (
       <Screen style={styles.screen}>
         {header}
@@ -62,14 +62,25 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
       </Screen>
     );
   }
-  if (quotes.isError || quotes.data.status !== 200) {
+  if (
+    quotes.isError ||
+    quotes.data.status !== 200 ||
+    overview.data === undefined ||
+    overview.data.status !== 200
+  ) {
+    const retry = () => {
+      void quotes.refetch();
+      void overview.refetch();
+    };
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure label="No pudimos cargar los planes." onRetry={() => void quotes.refetch()} />
+        <QueryFailure label="No pudimos cargar los planes." onRetry={retry} />
       </Screen>
     );
   }
+
+  const { renewalStartsOn } = overview.data.data.subscription;
 
   // Credit is retired (PAY-005): every Plan is collected at its full price.
   const { plans } = quotes.data.data;
