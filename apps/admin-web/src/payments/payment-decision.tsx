@@ -22,6 +22,7 @@ import { SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { Textarea } from "../components/ui/textarea";
+import { boliviaToday, formatLongDay } from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
 import {
   refreshAfterDecision,
@@ -102,13 +103,20 @@ export function PaymentDecision({
   });
   const reason = useWatch({ control: form.control, name: "reason" });
 
+  // A confirmation moves a Start Date already reached to today; a later one
+  // (a chosen date, a renewal queued after the current Plan) stays.
+  const startsWhen =
+    review.startsOn !== undefined && review.startsOn > boliviaToday()
+      ? `el ${formatLongDay(review.startsOn)}`
+      : "hoy";
+
   const decide = async (decision: Decision) => {
     setFailure(null);
     try {
       await mutation.mutateAsync(decision);
       onDone(
         decision.kind === "confirm"
-          ? `Pago de ${review.clientName} confirmado: su plan ${review.planName} empieza hoy.`
+          ? `Pago de ${review.clientName} confirmado: su plan ${review.planName} empieza ${startsWhen}.`
           : `Pago de ${review.clientName} rechazado: le avisamos el motivo.`,
       );
     } catch (error) {
@@ -222,8 +230,8 @@ export function PaymentDecision({
       >
         <p>
           Verifica que {formatBolivianos(review.amountDueCentavos)} llegó a la
-          cuenta del estudio. Al confirmar, su plan {review.planName} empieza
-          hoy y le avisamos.
+          cuenta del estudio. Al confirmar, su plan {review.planName} empieza{" "}
+          {startsWhen} y le avisamos.
         </p>
       </ConfirmDialog>
     </SidePanelFooter>
