@@ -3,6 +3,7 @@ import { PrismaClient } from '../../src/generated/prisma/client';
 import { createPrismaAdministratorPayments } from '../../src/booking/payments/prisma-administrator-payments';
 import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
 import { createPrismaVoidPayment } from '../../src/booking/payments/prisma-void-payment';
+import { auditActorOf } from '../../src/system-identity/authentication/audit-actor';
 import { createPrismaAdapter } from '../../src/database/prisma-adapter';
 import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
 import { buildDevelopmentFixtures } from '../../src/development-fixtures/development-fixtures';
@@ -75,7 +76,7 @@ describe('voided sale on the Administrator payment list (PostgreSQL)', () => {
     await createPrismaVoidPayment(prisma).voidPayment({
       paymentId: sale.id,
       reason: 'Se registró el plan equivocado',
-      actorAccountId: administrator.accountId,
+      actor: auditActorOf(administrator),
       now: today,
     });
 

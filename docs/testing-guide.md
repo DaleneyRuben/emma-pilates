@@ -7805,6 +7805,40 @@ I. **Confirmar pago en efectivo (Staff S10, design follow-up 223).** As
    `GET /api/v1/assistant/clients/{clientId}` carries the same optional
    `renewalStartsOn`. Older builds that ignore the field keep working.
 
+## Test 119: what a void undoes, and account closure after a void (FIX-004)
+
+Run the API, the worker and the fixtures as in Tests 2 and 5. Void a sale as
+Paola from the admin web's Pagos («Anular venta»). The integration specs
+`apps/backend/test/database/void-reversals.integration-spec.ts` and
+`account-closure-voided-invoice.integration-spec.ts` build every state.
+
+A. **Founder place.** Void the sale that granted a founder place: the place
+   is free again (`founder_membership.released`), so the next buyer can take
+   it. A place granted by an earlier sale stays.
+B. **Gift and invite reward.** Void a friend's first real Plan: her unused
+   gift class and the host's unused «Invitación convertida» class are
+   removed (`allowance_adjustment.removed`). The guest pass may reward the
+   host again on the friend's next real Plan. A class already used stays.
+C. **Included Evaluation.** The Evaluation the voided Plan included and that
+   is still ahead is cancelled with cause `payment_voided`
+   (`evaluation.cancelled_by_void`). It no longer counts the Bs 50. One
+   already held keeps its cost.
+D. **Waitlist.** Her open waitlist entries for days the voided Plan covered
+   close with reason `payment_voided` (`waitlist_entry.closed_by_void`),
+   unless another Plan in force covers that day.
+E. **Cash close.** Void a cash sale of today. In Staff S25 «Cerrar caja»,
+   «Efectivo esperado» still counts it, and a line under it reads «Ventas
+   anuladas (efectivo en caja): Bs N». In the admin web's Cierres de caja
+   (AW151), the day's «Esperado» shows the same line. A void after the
+   close does not change «Ajuste».
+F. **Account closure (H9).** A Client with a voided sale that carried
+   invoice data closes her Account: the closure succeeds and the sale keeps
+   its void, with no NIT or CI and no name. Any other change to a voided
+   sale is still refused.
+G. **Audit actor.** `payment.voided` and every reversal name the
+   Administrator who voided, her role, and the `impersonationId` while one
+   is open.
+
 ## Test 120: analytics review fixes (FIX-008)
 
 The analytics findings of the 2026-10-28 review. Use `pilates_dev_sim` with the
@@ -7847,6 +7881,7 @@ E. **Simulador (AW37).** The form now has «Precio por clase para la clienta
    Base» income is «Bs 120.120,00»; «Alto» pays the extra student.
 F. **No float noise.** A tax of 7 % shows the divisor as «0.93», never
    «0.9299999999999999».
+
 ## Test 121: payroll and finance (FIX-007)
 
 Run the API, the worker and the fixtures as in Tests 2 and 5. The

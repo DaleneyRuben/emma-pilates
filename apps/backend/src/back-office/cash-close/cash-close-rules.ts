@@ -34,8 +34,9 @@ export const requireCashCount = (input: {
 };
 
 // The difference is what the drawer held against what the day's sales said
-// at the close. The adjustment is how the day's sales moved after it: a sale
-// voided later (PAY-006) lowers them, a late sale raises them.
+// at the close. The adjustment is how the day's sales moved after it: a late
+// sale raises them. A void returns no money, so it moves nothing (owner
+// decision 4, FIX-004).
 export const describeCashClose = (close: {
   expectedCentavos: number;
   countedCentavos: number;

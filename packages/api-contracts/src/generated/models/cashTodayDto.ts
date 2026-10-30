@@ -10,9 +10,11 @@ export interface CashTodayDto {
   branchId: string;
   /** Today in Bolivia */
   businessDate: string;
-  /** Confirmed cash Payments at the Branch today, so far */
+  /** Cash Payments at the Branch today, so far: confirmed, and voided ones too, since a void returns no money */
   expectedCentavos: number;
   cashPaymentCount: number;
+  /** The voided cash sales inside expectedCentavos, shown on their own line («Ventas anuladas (efectivo en caja)») */
+  voidedCashCentavos?: number;
   /** @nullable */
   close: CashCloseDto | null;
 }
