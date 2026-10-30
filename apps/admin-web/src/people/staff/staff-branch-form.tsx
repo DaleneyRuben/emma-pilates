@@ -21,15 +21,14 @@ import { staffProblem } from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 import { StaffContact } from "./staff-read-only";
 import {
-  staffFormSchema,
-  type StaffFormInput,
-  type StaffFormOutput,
+  trainerBranchesSchema,
+  type TrainerBranchesInput,
 } from "./staff-form-schema";
 
 function BranchChips({
   field,
 }: {
-  field: ControllerRenderProps<StaffFormInput, "branchIds">;
+  field: ControllerRenderProps<TrainerBranchesInput, "branchIds">;
 }) {
   const branches = useQuery(activeBranchesQueryOptions());
   if (branches.isPending) {
@@ -68,15 +67,9 @@ export function StaffBranchForm({
 }) {
   const change = useStaffChange();
   const [failure, setFailure] = useState<string | null>(null);
-  const form = useForm<StaffFormInput, unknown, StaffFormOutput>({
-    resolver: zodResolver(staffFormSchema),
-    defaultValues: {
-      name: member.name,
-      email: member.email,
-      phone: member.phone ?? "",
-      role: "trainer",
-      branchIds: member.branchIds,
-    },
+  const form = useForm<TrainerBranchesInput>({
+    resolver: zodResolver(trainerBranchesSchema),
+    defaultValues: { branchIds: member.branchIds },
   });
 
   const submit = form.handleSubmit(async ({ branchIds }) => {
