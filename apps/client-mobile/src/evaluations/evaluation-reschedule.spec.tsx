@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse, routeFetcher } from "../test-support";
@@ -52,8 +52,10 @@ const setUp = () => {
   return { after, before, fetcher };
 };
 
-const rescheduleCalled = (fetcher: jest.Mock) =>
-  fetcher.mock.calls.some(([url]) => String(url).endsWith("/evaluation-paid/reschedule"));
+const rescheduleCalled = (fetcher: typeof globalThis.fetch) =>
+  jest
+    .mocked(fetcher)
+    .mock.calls.some(([url]) => String(url).endsWith("/evaluation-paid/reschedule"));
 
 const openPicker = async (fetcher: typeof globalThis.fetch) => {
   const screen = await openProfileRow(fetcher, "Mis evaluaciones");
@@ -100,7 +102,11 @@ describe("Rescheduling a paid Evaluation", () => {
     ).toBeOnTheScreen();
     expect(rescheduleCalled(fetcher)).toBe(false);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await fireEvent.press(
+      within(screen.getByTestId("reschedule-evaluation-sheet")).getByRole("button", {
+        name: "Volver",
+      }),
+    );
     await waitFor(() => {
       expect(screen.queryByText("¿Mover tu evaluación?")).toBeNull();
     });
