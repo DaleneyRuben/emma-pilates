@@ -53,11 +53,13 @@ function CashCloseForm({
   branch,
   expectedCentavos,
   cashPaymentCount,
+  voidedCashCentavos,
   onClosed,
 }: {
   branch: { id: string; name: string };
   expectedCentavos: number;
   cashPaymentCount: number;
+  voidedCashCentavos: number;
   onClosed: (close: CashCloseDto | null, failure: string | null) => Promise<void>;
 }) {
   const fetcher = useStaffFetcher();
@@ -102,6 +104,11 @@ function CashCloseForm({
         <Text style={styles.eyebrow}>EFECTIVO ESPERADO</Text>
         <Text style={styles.expected}>{formatBolivianos(expectedCentavos)}</Text>
         <BodyText style={styles.muted}>{describeCashSales(cashPaymentCount, branch.name)}</BodyText>
+        {voidedCashCentavos > 0 ? (
+          <BodyText style={styles.muted}>
+            {`Ventas anuladas (efectivo en caja): ${formatBolivianos(voidedCashCentavos)}`}
+          </BodyText>
+        ) : null}
       </View>
       <View style={styles.field}>
         <FormField
@@ -207,6 +214,7 @@ export function CashCloseScreen() {
         branch={branches.branch}
         cashPaymentCount={day.cashPaymentCount}
         expectedCentavos={day.expectedCentavos}
+        voidedCashCentavos={day.voidedCashCentavos ?? 0}
         key={branchId}
         onClosed={refresh}
       />

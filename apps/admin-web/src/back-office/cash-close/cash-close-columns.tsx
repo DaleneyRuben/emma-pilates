@@ -15,8 +15,16 @@ const statuses = {
   open: { tone: "neutral", label: "Abierta" },
 } as const;
 
+// A void returns no money, so it stays in the day's sales (owner decision 4).
 const adjustmentNote =
-  "Una venta anulada o registrada después del cierre cambió las ventas del día.";
+  "Una venta registrada después del cierre cambió las ventas del día.";
+
+const voidedLine = (day: CashDayDto) =>
+  (day.voidedCashCentavos ?? 0) > 0 ? (
+    <span className="block text-nota text-texto-secundario">
+      {`Ventas anuladas (efectivo en caja): ${formatBolivianos(day.voidedCashCentavos ?? 0)}`}
+    </span>
+  ) : null;
 
 const signed = (centavos: number): string =>
   centavos === 0
@@ -60,16 +68,20 @@ export const cashDayColumns = [
     id: "expected",
     header: "Esperado",
     meta: { align: "right" },
-    cell: ({ row }) =>
-      row.original.close === null ? (
-        <span className="text-texto-tenue tabular">
-          {formatBolivianos(row.original.cashSalesCentavos)}
-        </span>
-      ) : (
-        <span className="text-texto tabular">
-          {formatBolivianos(row.original.close.expectedCentavos)}
-        </span>
-      ),
+    cell: ({ row }) => (
+      <>
+        {row.original.close === null ? (
+          <span className="text-texto-tenue tabular">
+            {formatBolivianos(row.original.cashSalesCentavos)}
+          </span>
+        ) : (
+          <span className="text-texto tabular">
+            {formatBolivianos(row.original.close.expectedCentavos)}
+          </span>
+        )}
+        {voidedLine(row.original)}
+      </>
+    ),
   }),
   columns.display({
     id: "counted",
