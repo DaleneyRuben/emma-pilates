@@ -115,7 +115,7 @@ describe("Around a paid Evaluation move", () => {
       ),
     ).toBeOnTheScreen();
     expect(screen.queryByText("Necesitas un plan activo para reservar tu evaluación.")).toBeNull();
-    expect(screen.getByRole("button", { name: "Turno 15:00" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Turno 09:00" })).toBeOnTheScreen();
   });
 
   it("says no other turno is open instead of the used-month state", async () => {
