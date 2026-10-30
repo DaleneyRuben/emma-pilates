@@ -2,6 +2,9 @@
 // into shards 1 and 6 (2m 53s and 3m 03s on run 40238852703). These groups
 // spread the files whose CI time we measured. An unlisted file joins the
 // lightest group, so a new spec cannot recreate a long shard.
+// FIX-011: each piece is an anchored, regex-escaped basename so a longer
+// name (account-closure-promotions-consent…) never matches a shorter one
+// (promotions-consent…) under --testPathPattern.
 const measuredSeconds = {
   "interrupted-run.integration-spec.ts": 16.5,
   "database-test-context.integration-spec.ts": 13.1,
@@ -44,8 +47,15 @@ export function integrationShardPattern(files, shard) {
     groups[index].push(file);
     loads[index] += weight(file);
   }
-  const names = groups[shard - 1].map((file) => file.split("/").pop());
+  const names = groups[shard - 1].map((file) => {
+    const base = file.split("/").pop();
+    return `(^|/)${escapeRegExp(base)}$`;
+  });
   return names.join("|");
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function weight(file) {

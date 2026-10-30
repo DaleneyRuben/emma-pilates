@@ -1,4 +1,15 @@
-import { colors, formatBolivianos } from "@pilates/mobile-core";
+import { colors } from "@pilates/mobile-core";
+
+// Cash-close amounts keep two decimals (es-BO). Global formatBolivianos in
+// mobile-core still rounds to whole bolivianos (UX-010) for the rest of the app.
+const cashCloseBolivianos = new Intl.NumberFormat("es-BO", {
+  maximumFractionDigits: 2,
+  minimumFractionDigits: 2,
+});
+
+export function formatCashCloseBolivianos(centavos: number): string {
+  return `Bs ${cashCloseBolivianos.format(centavos / 100)}`;
+}
 
 // «520», «520,5», «520,50», or «520.50» typed into «Efectivo contado», in
 // centavos; anything else (thousands separators included) is unreadable.
@@ -9,11 +20,10 @@ export function parseCountedCentavos(text: string): number | null {
   return Number(match[1]) * 100 + Number(fraction);
 }
 
-// «Bs 0», «+Bs 6», «−Bs 10» (a true minus sign, as S25 writes it).
-// The Staff app rounds a leftover fraction to a whole boliviano (UX-010).
+// «Bs 0,00», «+Bs 5,50», «−Bs 10,00» (a true minus sign, as S25 writes it).
 export function formatSignedBolivianos(centavos: number): string {
-  if (centavos === 0) return formatBolivianos(0);
-  return `${centavos > 0 ? "+" : "−"}${formatBolivianos(Math.abs(centavos))}`;
+  if (centavos === 0) return formatCashCloseBolivianos(0);
+  return `${centavos > 0 ? "+" : "−"}${formatCashCloseBolivianos(Math.abs(centavos))}`;
 }
 
 export type DifferenceTone = { label: string; text: string; tint: string };

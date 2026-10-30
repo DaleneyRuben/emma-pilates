@@ -1,4 +1,8 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import {
+  auditActorOf,
+  type AuditActor,
+} from '../../system-identity/authentication/audit-actor';
 import { requireAdministrator } from '../administration/administration-errors';
 
 export type VoidedSale = {
@@ -45,7 +49,7 @@ type Dependencies = {
   voidPayment: (input: {
     paymentId: string;
     reason: string;
-    actorAccountId: string;
+    actor: AuditActor;
     now: Date;
   }) => Promise<VoidedSale>;
 };
@@ -56,12 +60,12 @@ export const voidSale = async (
   command: { paymentId: string; reason: string },
   dependencies: Dependencies,
 ): Promise<VoidedSale> => {
-  const actor = requireAdministrator(dependencies.principal);
+  requireAdministrator(dependencies.principal);
   const reason = normalizeVoidReason(command.reason);
   return dependencies.voidPayment({
     paymentId: command.paymentId,
     reason,
-    actorAccountId: actor.accountId,
+    actor: auditActorOf(dependencies.principal),
     now: dependencies.now,
   });
 };

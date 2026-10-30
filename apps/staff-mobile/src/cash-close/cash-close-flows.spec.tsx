@@ -57,17 +57,17 @@ describe("Cerrar caja (S25)", () => {
       },
     });
 
-    expect(screen.getByText("Bs 520")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 520,00")).toBeOnTheScreen();
     expect(screen.getByText("3 ventas en efectivo hoy en Centro")).toBeOnTheScreen();
     expect(screen.getByText("Viernes 23 de octubre · Centro")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cerrar caja" })).toBeDisabled();
 
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "520");
-    expect(screen.getByText("Diferencia · Bs 0 · Cuadra")).toBeOnTheScreen();
+    expect(screen.getByText("Diferencia · Bs 0,00 · Cuadra")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "525,50");
-    expect(screen.getByText("Diferencia · +Bs 6 · Sobra efectivo")).toBeOnTheScreen();
+    expect(screen.getByText("Diferencia · +Bs 5,50 · Sobra efectivo")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "510");
-    expect(screen.getByText("Diferencia · −Bs 10 · Falta efectivo")).toBeOnTheScreen();
+    expect(screen.getByText("Diferencia · −Bs 10,00 · Falta efectivo")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Nota (opcional)"), "Faltó cambio");
 
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar caja" }));
@@ -81,10 +81,29 @@ describe("Cerrar caja (S25)", () => {
         key: expect.any(String) as string,
       },
     ]);
-    expect(screen.getByText("Bs 510")).toBeOnTheScreen();
-    expect(screen.getByText("−Bs 10")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 510,00")).toBeOnTheScreen();
+    expect(screen.getByText("−Bs 10,00")).toBeOnTheScreen();
     expect(screen.getByText("Faltó cambio")).toBeOnTheScreen();
     expect(screen.getByText("Cerrada por Camila Rojas a las 19:05.")).toBeOnTheScreen();
+  });
+
+  it("names the voided cash sales still in the drawer on their own line (FIX-004)", async () => {
+    const screen = await openCashClose({
+      ...assistantRoutes(),
+      [centroToday]: () => jsonResponse({ ...today, voidedCashCentavos: 29_000 }),
+    });
+
+    expect(screen.getByText("Bs 520")).toBeOnTheScreen();
+    expect(screen.getByText("Ventas anuladas (efectivo en caja): Bs 290")).toBeOnTheScreen();
+  });
+
+  it("shows no voided line when nothing was voided", async () => {
+    const screen = await openCashClose({
+      ...assistantRoutes(),
+      [centroToday]: () => jsonResponse({ ...today, voidedCashCentavos: 0 }),
+    });
+
+    expect(screen.queryByText(/Ventas anuladas/)).toBeNull();
   });
 
   it("opens on the closed state when today is already closed", async () => {
@@ -175,5 +194,62 @@ describe("Cerrar caja (S25)", () => {
       }
       expect(requested).toContain("/api/v1/cash-closes/today?branchId=branch-urubo");
     });
+  });
+
+  it("keeps the cash close usable when a profile refetch fails over cached data", async () => {
+    let profileDown = false;
+    const routes = assistantRoutes();
+    const profile = routes["/api/v1/staff-members/current"];
+    const screen = await openCashClose({
+      ...routes,
+      "/api/v1/staff-members/current": () => {
+        if (profileDown) throw new TypeError("Network request failed");
+        return profile();
+      },
+      [centroToday]: () => jsonResponse(today),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    profileDown = true;
+    await fireEvent.press(await screen.findByTestId("cash-close-entry"));
+
+    expect(await screen.findByText("EFECTIVO ESPERADO")).toBeOnTheScreen();
+    expect(screen.queryByText("No pudimos cargar la caja de hoy.")).toBeNull();
+  });
+
+  it("shows the query failure when the Branch list cannot load, not an endless spinner", async () => {
+    const screen = await render(
+      <App
+        runtime={createStaffRuntime(
+          routeFetcher({
+            "/api/v1/staff-members/current": () =>
+              jsonResponse({
+                id: "staff-5",
+                name: "Paola Mendoza",
+                email: "paola.mendoza@example.com",
+                phone: null,
+                role: "administrator",
+                branches: [],
+              }),
+            "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
+            "/api/v1/administrator/payments/pending": () => jsonResponse([]),
+            "/api/v1/branches": () => {
+              throw new TypeError("Network request failed");
+            },
+          }),
+          "administrator",
+        )}
+      />,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId("cash-close-entry")).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByTestId("cash-close-entry"));
+
+    await waitFor(() => {
+      expect(screen.getByText("No pudimos cargar la caja de hoy.")).toBeOnTheScreen();
+    });
+    expect(screen.getByRole("button", { name: "Reintentar" })).toBeOnTheScreen();
+    expect(screen.queryByText("Cargando la caja de hoy")).toBeNull();
   });
 });

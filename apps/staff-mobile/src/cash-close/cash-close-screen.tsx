@@ -11,7 +11,6 @@ import {
   fontFamilies,
   FormField,
   FormScrollView,
-  formatBolivianos,
   Heading,
   LoadingState,
   PrimaryButton,
@@ -37,6 +36,7 @@ import {
   cashCloseProblems,
   describeCashSales,
   describeDifference,
+  formatCashCloseBolivianos,
   formatSignedBolivianos,
   parseCountedCentavos,
 } from "./cash-close-format";
@@ -53,11 +53,13 @@ function CashCloseForm({
   branch,
   expectedCentavos,
   cashPaymentCount,
+  voidedCashCentavos,
   onClosed,
 }: {
   branch: { id: string; name: string };
   expectedCentavos: number;
   cashPaymentCount: number;
+  voidedCashCentavos: number;
   onClosed: (close: CashCloseDto | null, failure: string | null) => Promise<void>;
 }) {
   const fetcher = useStaffFetcher();
@@ -100,8 +102,13 @@ function CashCloseForm({
     <>
       <View style={styles.card}>
         <Text style={styles.eyebrow}>EFECTIVO ESPERADO</Text>
-        <Text style={styles.expected}>{formatBolivianos(expectedCentavos)}</Text>
+        <Text style={styles.expected}>{formatCashCloseBolivianos(expectedCentavos)}</Text>
         <BodyText style={styles.muted}>{describeCashSales(cashPaymentCount, branch.name)}</BodyText>
+        {voidedCashCentavos > 0 ? (
+          <BodyText style={styles.muted}>
+            {`Ventas anuladas (efectivo en caja): ${formatBolivianos(voidedCashCentavos)}`}
+          </BodyText>
+        ) : null}
       </View>
       <View style={styles.field}>
         <FormField
@@ -181,13 +188,20 @@ export function CashCloseScreen() {
   };
 
   let body;
-  if (branches.branch === null || today.isPending) {
+  if (branches.isError) {
+    body = (
+      <QueryFailure label="No pudimos cargar la caja de hoy." onRetry={() => branches.refetch()} />
+    );
+  } else if (branches.isPending || branches.branch === null || today.isPending) {
     body = <LoadingState label="Cargando la caja de hoy" />;
   } else if (today.isError || day === undefined) {
     body = (
       <QueryFailure
         label="No pudimos cargar la caja de hoy."
-        onRetry={() => void today.refetch()}
+        onRetry={() => {
+          branches.refetch();
+          void today.refetch();
+        }}
       />
     );
   } else if (day.close !== null) {
@@ -207,6 +221,7 @@ export function CashCloseScreen() {
         branch={branches.branch}
         cashPaymentCount={day.cashPaymentCount}
         expectedCentavos={day.expectedCentavos}
+        voidedCashCentavos={day.voidedCashCentavos ?? 0}
         key={branchId}
         onClosed={refresh}
       />

@@ -16275,10 +16275,14 @@
           },
           "expectedCentavos": {
             "type": "number",
-            "description": "Confirmed cash Payments at the Branch today, so far"
+            "description": "Cash Payments at the Branch today, so far: confirmed, and voided ones too, since a void returns no money"
           },
           "cashPaymentCount": {
             "type": "number"
+          },
+          "voidedCashCentavos": {
+            "type": "number",
+            "description": "The voided cash sales inside expectedCentavos, shown on their own line («Ventas anuladas (efectivo en caja)»)"
           },
           "close": {
             "nullable": true,
@@ -16364,7 +16368,7 @@
           },
           "adjustmentCentavos": {
             "type": "number",
-            "description": "How the day’s cash sales moved after the close: a sale voided later (−) or recorded later (+)"
+            "description": "How the day’s cash sales moved after the close: a sale recorded later (+). A void returns no money, so it does not move them"
           }
         },
         "required": [
@@ -16399,10 +16403,14 @@
           },
           "cashSalesCentavos": {
             "type": "number",
-            "description": "The day’s confirmed cash Payments now"
+            "description": "The day’s cash Payments now, voided ones included"
           },
           "cashPaymentCount": {
             "type": "number"
+          },
+          "voidedCashCentavos": {
+            "type": "number",
+            "description": "The voided cash sales inside cashSalesCentavos"
           },
           "close": {
             "nullable": true,

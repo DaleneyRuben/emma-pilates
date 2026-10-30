@@ -11,9 +11,11 @@ export interface CashDayDto {
   businessDate: string;
   /** missing: a past day with cash sales and no close */
   status: CashDayDtoStatus;
-  /** The day’s confirmed cash Payments now */
+  /** The day’s cash Payments now, voided ones included */
   cashSalesCentavos: number;
   cashPaymentCount: number;
+  /** The voided cash sales inside cashSalesCentavos */
+  voidedCashCentavos?: number;
   /** @nullable */
   close: CashCloseHistoryEntryDto | null;
 }

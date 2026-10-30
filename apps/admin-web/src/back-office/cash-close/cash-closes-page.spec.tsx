@@ -151,6 +151,36 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
     ).toBeNull();
   });
 
+  it("names the voided cash sales still in the day's expected cash (FIX-004)", async () => {
+    server.use(
+      history(() =>
+        jsonResponse({
+          ...october,
+          missingDays: 0,
+          days: [
+            {
+              businessDate: "2026-10-23",
+              status: "closed",
+              cashSalesCentavos: 52_000,
+              cashPaymentCount: 3,
+              voidedCashCentavos: 29_000,
+              close: close("2026-10-23", {
+                expectedCentavos: 52_000,
+                countedCentavos: 52_000,
+              }),
+            },
+          ],
+        }),
+      ),
+    );
+    renderAdmin("/back-office/caja?month=2026-10");
+
+    const day = await rowOf("vie 23/10");
+    expect(
+      within(day).getByText("Ventas anuladas (efectivo en caja): Bs 290,00"),
+    ).toBeVisible();
+  });
+
   it("lists the month's days with their status, highlighting differences and flagging days left unclosed", async () => {
     server.use(history(() => jsonResponse(october)));
     renderAdmin("/back-office/caja?month=2026-10");
@@ -192,7 +222,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
     );
     expect(within(adjusted).getByText("−Bs 250,00")).toHaveAttribute(
       "title",
-      "Una venta anulada o registrada después del cierre cambió las ventas del día.",
+      "Una venta registrada después del cierre cambió las ventas del día.",
     );
 
     const over = await rowOf("mar 20/10");

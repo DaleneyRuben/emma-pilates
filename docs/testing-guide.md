@@ -5991,9 +5991,13 @@ before Expo:
 
 1. **Publish OTA** on a branch other than `main` fails with "OTA publishes
    only from main". On `main`, without `EXPO_TOKEN`, it fails with
-   "EXPO_TOKEN is not set" and no update is published. A production channel
-   dispatch of a commit with no `preview-ota:<app>:<sha>` git note fails
-   before `eas update`.
+   "EXPO_TOKEN is not set" and no update is published. The workflow input
+   channel `preview` publishes to the `staging` update channel with the
+   `preview` EAS environment (FIX-011; testers use staging builds). A
+   production channel dispatch of a commit with no `preview-ota:<app>:<sha>`
+   git note fails before `eas update` (notes are fetched after checkout so
+   the guard can see them, and a successful preview **appends** the note so
+   publishing both apps keeps both marks).
 2. **Create native release** with a version that is not `x.y.z` fails before
    it opens a branch.
 3. **Store deploy** from a branch that does not start with `release/` fails.
@@ -6306,7 +6310,10 @@ so the phone has a profile to keep: «Hola, Lucía» and her plan card.
    and open **Inicio** again (leave the app and come back, or pull to
    refresh). The greeting and the plan card stay, and a line on the screen
    reads «Sin conexión. Mostrando tus datos de la última vez.» The banner
-   of Test 71 still sits above the screen; this line is Inicio's own.
+   also appears when only one of the two refreshes fails (profile or
+   subscription) while the other still has cached data on screen (FIX-011).
+   The banner of Test 71 still sits above the screen; this line is Inicio's
+   own.
 2. **Nothing saved.** Sign out, cut the network before the next sign-in,
    and open **Inicio** on a phone that has never loaded it: «No pudimos
    cargar tu inicio.» with **Reintentar**, and no «última vez» line. A
@@ -6698,16 +6705,22 @@ Branch, up to the moment of the close.
    cash at Centro to a Client without one (Mariana or Sofía, Test 19).
 3. Press «Cerrar caja» beside the avatar on Buscar cliente. Expected: today
    and «Centro» under the title, «EFECTIVO ESPERADO» with the sale's amount
-   and «1 venta en efectivo hoy en Centro», and «Cerrar caja» disabled until a
-   count is typed.
-4. Type the expected amount, then less, then more. Expected: «Diferencia · Bs
-   0 · Cuadra» on green, «−Bs … · Falta efectivo» on red, «+Bs … · Sobra
-   efectivo» on amber; «12,345» is not read and keeps the button off.
+   in two decimals (for example «Bs 520,00»), «1 venta en efectivo hoy en
+   Centro», and «Cerrar caja» disabled until a count is typed. If the profile
+   or Branch list fails to load, the screen shows «No pudimos cargar la caja
+   de hoy.» with **Reintentar**, not an endless «Cargando la caja de hoy»
+   (FIX-011).
+4. Type the expected amount, then less, then more (including centavos such as
+   «525,50» against «520,00»). Expected: «Diferencia · Bs 0,00 · Cuadra» on
+   green, «−Bs 10,00 · Falta efectivo» on red, «+Bs 5,50 · Sobra efectivo» on
+   amber; «12,345» is not read and keeps the button off. Cash-close amounts
+   always show two decimals (es-BO); the rest of the Staff app still rounds
+   to whole bolivianos.
 5. Add a note and press «Cerrar caja». Expected: «Caja cerrada» with the
-   expected, counted, and difference lines, the note, and «Cerrada por Camila
-   Rojas a las hh:mm.», and in `psql` one `back_office.cash_closes` row plus a
-   `cash_close.recorded` audit record (actor role `ASSISTANT`, the Branch,
-   `businessDate`, the amounts).
+   expected, counted, and difference lines (still with two decimals), the
+   note, and «Cerrada por Camila Rojas a las hh:mm.», and in `psql` one
+   `back_office.cash_closes` row plus a `cash_close.recorded` audit record
+   (actor role `ASSISTANT`, the Branch, `businessDate`, the amounts).
 6. Open «Cerrar caja» again. Expected: the same closed state, no form. A second
    `POST /api/v1/cash-closes` for that Branch today with another
    Idempotency-Key answers `409` `cash_close_already_recorded`; the same key
@@ -7792,6 +7805,40 @@ H. **Detalle del plan (Client 09, design follow-up 219).** From Mi plan,
    show and «Hoy» is selected. `GET /api/v1/clients/current/subscription`
    carries `renewalStartsOn` only in the first case.
 
+## Test 119: what a void undoes, and account closure after a void (FIX-004)
+
+Run the API, the worker and the fixtures as in Tests 2 and 5. Void a sale as
+Paola from the admin web's Pagos («Anular venta»). The integration specs
+`apps/backend/test/database/void-reversals.integration-spec.ts` and
+`account-closure-voided-invoice.integration-spec.ts` build every state.
+
+A. **Founder place.** Void the sale that granted a founder place: the place
+   is free again (`founder_membership.released`), so the next buyer can take
+   it. A place granted by an earlier sale stays.
+B. **Gift and invite reward.** Void a friend's first real Plan: her unused
+   gift class and the host's unused «Invitación convertida» class are
+   removed (`allowance_adjustment.removed`). The guest pass may reward the
+   host again on the friend's next real Plan. A class already used stays.
+C. **Included Evaluation.** The Evaluation the voided Plan included and that
+   is still ahead is cancelled with cause `payment_voided`
+   (`evaluation.cancelled_by_void`). It no longer counts the Bs 50. One
+   already held keeps its cost.
+D. **Waitlist.** Her open waitlist entries for days the voided Plan covered
+   close with reason `payment_voided` (`waitlist_entry.closed_by_void`),
+   unless another Plan in force covers that day.
+E. **Cash close.** Void a cash sale of today. In Staff S25 «Cerrar caja»,
+   «Efectivo esperado» still counts it, and a line under it reads «Ventas
+   anuladas (efectivo en caja): Bs N». In the admin web's Cierres de caja
+   (AW151), the day's «Esperado» shows the same line. A void after the
+   close does not change «Ajuste».
+F. **Account closure (H9).** A Client with a voided sale that carried
+   invoice data closes her Account: the closure succeeds and the sale keeps
+   its void, with no NIT or CI and no name. Any other change to a voided
+   sale is still refused.
+G. **Audit actor.** `payment.voided` and every reversal name the
+   Administrator who voided, her role, and the `impersonationId` while one
+   is open.
+
 ## Test 120: analytics review fixes (FIX-008)
 
 The analytics findings of the 2026-10-28 review. Use `pilates_dev_sim` with the
@@ -7834,6 +7881,7 @@ E. **Simulador (AW37).** The form now has «Precio por clase para la clienta
    Base» income is «Bs 120.120,00»; «Alto» pays the extra student.
 F. **No float noise.** A tax of 7 % shows the divisor as «0.93», never
    «0.9299999999999999».
+
 ## Test 121: payroll and finance (FIX-007)
 
 Run the API, the worker and the fixtures as in Tests 2 and 5. The

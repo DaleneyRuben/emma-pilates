@@ -174,6 +174,25 @@ describe("Client Home", () => {
     expect(screen.queryByText("No pudimos cargar tu inicio.")).not.toBeOnTheScreen();
   });
 
+  it("shows the offline banner when only the subscription refresh fails over cached data", async () => {
+    await persistSeenQueries();
+    const fetcher = createFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () => {
+        throw new TypeError("Network request failed");
+      },
+    });
+    const screen = await render(<App runtime={createRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Sin conexión. Mostrando tus datos de la última vez."),
+    ).toBeOnTheScreen();
+  });
+
   it("shows the load error when nothing was persisted and the network fails", async () => {
     const fetcher = createFetcher({
       "/api/v1/clients/current": () => {

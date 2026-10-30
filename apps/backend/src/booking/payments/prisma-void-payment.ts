@@ -6,8 +6,8 @@ import {
   BookingState,
   PaymentState,
   SessionState,
-  StaffRole,
 } from '../../generated/prisma/client';
+import type { AuditActor } from '../../system-identity/authentication/audit-actor';
 import { retrySerializable } from '../../database/retry-serializable';
 import { closureScope } from '../account-closure/closure-scope';
 import { promoteWaitlistInTransaction } from '../commands/waitlist-promotion';
@@ -17,6 +17,7 @@ import {
 } from '../../notifications/prisma-notification-store';
 import { addCivilDays, boliviaDate } from '../../time/bolivia-time';
 import { VoidSaleError, type VoidedSale } from './void-sale';
+import { reverseWhatTheSaleGranted } from './void-reversals';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -32,7 +33,7 @@ export const createPrismaVoidPayment = (
   const voidPayment = async (input: {
     paymentId: string;
     reason: string;
-    actorAccountId: string;
+    actor: AuditActor;
     now: Date;
   }): Promise<VoidedSale> =>
     retrySerializable(() =>
@@ -47,7 +48,7 @@ export const createPrismaVoidPayment = (
     input: {
       paymentId: string;
       reason: string;
-      actorAccountId: string;
+      actor: AuditActor;
       now: Date;
     },
   ): Promise<VoidedSale> => {
@@ -81,13 +82,21 @@ export const createPrismaVoidPayment = (
       data: {
         state: PaymentState.VOIDED,
         voidedAt: input.now,
-        voidedByAccountId: input.actorAccountId,
+        voidedByAccountId: input.actor.accountId,
         voidReason: input.reason,
       },
     });
     await transaction.subscription.update({
       where: { id: payment.subscription.id },
       data: { endsOn, endedByVoid: true },
+    });
+    await reverseWhatTheSaleGranted(transaction, {
+      paymentId: payment.id,
+      clientId: payment.clientId,
+      subscriptionId: payment.subscription.id,
+      previousEndsOn: payment.subscription.endsOn,
+      actor: input.actor,
+      now: input.now,
     });
 
     const future = await transaction.booking.findMany({
@@ -103,7 +112,7 @@ export const createPrismaVoidPayment = (
         data: {
           state: BookingState.CANCELLED,
           cancelledAt: input.now,
-          cancelledByAccountId: input.actorAccountId,
+          cancelledByAccountId: input.actor.accountId,
           cancellationCause: BookingCancellationCause.PAYMENT_VOIDED,
         },
       });
@@ -126,8 +135,9 @@ export const createPrismaVoidPayment = (
         actionCode: 'payment.voided',
         outcome: AuditOutcome.SUCCEEDED,
         actorKind: AuditActorKind.ACCOUNT,
-        actorAccountId: input.actorAccountId,
-        actorRole: StaffRole.ADMINISTRATOR,
+        actorAccountId: input.actor.accountId,
+        actorRole: input.actor.role,
+        impersonationId: input.actor.impersonationId,
         targetType: 'payment',
         targetId: payment.id,
         correlationId: payment.id,

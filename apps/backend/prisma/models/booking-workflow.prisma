@@ -20,6 +20,8 @@ enum WaitlistClosureReason {
   PROMOTED          @map("promoted")
   SESSION_CANCELLED @map("session_cancelled")
   SESSION_STARTED   @map("session_started")
+  // The Administrator voided the sale whose Subscription covered it (FIX-004).
+  PAYMENT_VOIDED    @map("payment_voided")
 
   @@schema("booking")
 }
