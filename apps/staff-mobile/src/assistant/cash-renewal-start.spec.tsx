@@ -121,7 +121,7 @@ describe("Confirming cash for a renewal", () => {
 
     expect(
       await screen.findByText(
-        "La clienta tiene una clase de invitada reservada. Elige un inicio después de esa clase.",
+        "La clienta tiene una clase reservada con su acceso actual. Elige un inicio después de esa clase.",
       ),
     ).toBeOnTheScreen();
   });

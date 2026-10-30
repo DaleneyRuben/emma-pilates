@@ -269,6 +269,11 @@ describe("AW29 decisions on a desktop browser", () => {
       "Este pago ya no existe. Cierra el panel y vuelve a abrir la lista.",
     ],
     [
+      409,
+      "start_date_before_booked_class",
+      "No se puede confirmar: la clienta tiene una clase reservada con su acceso actual el día de inicio o después. Cancela esa clase o espera a que pase, y vuelve a confirmar.",
+    ],
+    [
       500,
       "unexpected_error",
       "No pudimos registrar la decisión. Inténtalo de nuevo.",

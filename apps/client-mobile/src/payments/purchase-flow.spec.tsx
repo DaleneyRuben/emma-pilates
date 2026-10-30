@@ -211,7 +211,7 @@ describe("Client purchase flow", () => {
 
     expect(
       await screen.findByText(
-        "Tienes una clase de invitada reservada. Elige un inicio después de esa clase.",
+        "Tienes una clase reservada con tu acceso actual. Elige un inicio después de esa clase.",
       ),
     ).toBeOnTheScreen();
   });
