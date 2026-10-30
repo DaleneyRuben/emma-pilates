@@ -37,6 +37,25 @@ describe('accrue revenue', () => {
     expect(october.accruedCentavos + november.accruedCentavos).toBe(30_000);
   });
 
+  it('defers what is not yet accrued, so the two never pass the amount by a centavo', () => {
+    // Bs 0,05 over two days, on the second: one day accrued, rounded half up
+    // to 3 centavos, so 2 are still owed.
+    const october = accrueRevenue(
+      [
+        payment({
+          amountCentavos: 5,
+          decidedOn: day('2026-10-20'),
+          startsOn: day('2026-10-20'),
+          endsOn: day('2026-10-21'),
+        }),
+      ],
+      month('2026-10'),
+      day('2026-10-21'),
+    );
+
+    expect(october.deferredCentavos).toBe(2);
+  });
+
   it('keeps every month non-negative when half-up rounding would overshoot the amount', () => {
     const crossing = payment({
       amountCentavos: 78_000,
