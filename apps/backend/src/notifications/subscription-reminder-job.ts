@@ -32,7 +32,11 @@ export const createSubscriptionReminderJob = (
               select: {
                 account: { select: { id: true } },
                 subscriptions: {
-                  where: { state: 'ACTIVE', startsOn: { gt: today } },
+                  where: {
+                    state: 'ACTIVE',
+                    startsOn: { gt: today },
+                    NOT: { payment: { is: { method: 'COURTESY' } } },
+                  },
                   select: { startsOn: true },
                 },
               },
