@@ -1,4 +1,5 @@
 import { campaignAuthorizationRows } from './campaign-authorization';
+import { catalogAuthorizationRows } from './catalog-authorization';
 import { evaluationAuthorizationRows } from './evaluation-authorization';
 import { payStatementAuthorizationRows } from './pay-statement-authorization';
 import { studioFactsAuthorizationRows } from './studio-facts-authorization';
@@ -25,6 +26,10 @@ export type RealIds = {
   rescheduleBookingId: string;
   waitlistEntryId: string;
   clientId: string;
+  /** A real Freeze, so the decision probe reaches the Role check. */
+  freezeId: string;
+  /** A real Evaluation slot, so the payment probe reaches the Role check. */
+  slotId: string;
 };
 
 export type MatrixRow = {
@@ -310,8 +315,6 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     administratorOnly(),
   'PUT /api/v1/administrator/staff-members/{staffMemberId}/role':
     administratorOnly(),
-  'PUT /api/v1/administrator/staff-members/{staffMemberId}/branches':
-    administratorOnly(),
   'POST /api/v1/administrator/staff-members/{staffMemberId}/deactivation':
     administratorOnly(),
 
@@ -328,17 +331,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'PATCH /api/v1/administrator/sessions/{sessionId}': both('allow'),
   'POST /api/v1/administrator/sessions/{sessionId}/cancel': both('allow'),
 
-  // The catalog: the schedule reads Branches and Class Types; changing the
-  // catalog, and the Plan list with its prices, stay the Administrator's.
-  'GET /api/v1/administrator/branches': both('allow'),
-  'POST /api/v1/administrator/branches': administratorOnly(),
-  'PUT /api/v1/administrator/branches/{branchId}': administratorOnly(),
-  'POST /api/v1/administrator/branches/{branchId}/archive': administratorOnly(),
-  'GET /api/v1/administrator/class-types': both('allow'),
-  'POST /api/v1/administrator/class-types': administratorOnly(),
-  'PUT /api/v1/administrator/class-types/{classTypeId}': administratorOnly(),
-  'POST /api/v1/administrator/class-types/{classTypeId}/archive':
-    administratorOnly(),
+  ...catalogAuthorizationRows(),
   'GET /api/v1/administrator/plans': administratorOnly(),
   // BKM-004: the Administrator edits the studio rules. The public rules
   // need no credential.

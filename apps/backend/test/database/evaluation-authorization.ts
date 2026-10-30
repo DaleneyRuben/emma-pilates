@@ -18,11 +18,12 @@ export const evaluationAuthorizationRows = (): Record<string, MatrixRow> => ({
   'GET /api/v1/evaluation-slots': both('deny'),
   'GET /api/v1/evaluation-slots/{slotId}': both('deny'),
   'POST /api/v1/evaluation-slots/{slotId}/evaluations': both('deny'),
-  // A slot id that does not exist is denied before the Role is read.
+  // A real slot reaches the Role check. A missing id was 404 before that
+  // check ran, so the probe never saw who may start the payment.
   'POST /api/v1/evaluation-slots/{slotId}/evaluation-payments': {
     ...both('deny'),
-    missingResource: true,
     bearer: true,
+    realIds: { slotId: 'slotId' },
   },
   'GET /api/v1/evaluations': both('deny'),
   // The Client attaches her own receipt. Staff is not that Client, so both

@@ -137,6 +137,28 @@ describe('changeStaffRole', () => {
 });
 
 describe('changeStaffBranches', () => {
+  it('lets the Coordinator assign a Trainer’s Branches (decision 6)', async () => {
+    const transaction = createTransaction();
+    const coordinator = principal('coordinator', 'coordinator-staff');
+
+    await changeStaffBranches(
+      { staffMemberId: 'staff-1', branchIds: ['centro'] },
+      coordinator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.replaceBranches).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      branchIds: ['centro'],
+    });
+    expect(transaction.recordAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actionCode: 'staff_member.branches_changed',
+        actorAccountId: 'admin-account',
+      }),
+    );
+  });
+
   it('ends a Nutritionist’s blocks only at removed Branches', async () => {
     const transaction = createTransaction({
       findStaffMember: jest

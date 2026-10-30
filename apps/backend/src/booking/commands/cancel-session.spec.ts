@@ -50,6 +50,35 @@ describe('cancelSession', () => {
     });
   });
 
+  it('names the Administrator when she cancels while seeing the app as the Coordinator', async () => {
+    const deps = {
+      ...dependencies(),
+      principal: {
+        ...administrator,
+        accountId: 'coordinator-account',
+        identity: {
+          ...administrator.identity,
+          role: 'coordinator' as const,
+          staffMemberId: 'coordinator-staff',
+        },
+        impersonation: {
+          id: 'impersonation-id',
+          administratorAccountId: 'admin-account',
+          staffMemberName: 'Carolina Rivas',
+          expiresAt: new Date('2026-09-21T15:30:00.000Z'),
+        },
+      },
+    };
+
+    await cancelSession({ sessionId: 'session-1' }, deps);
+
+    expect(deps.cancel).toHaveBeenCalledWith({
+      sessionId: 'session-1',
+      cancelledByAccountId: 'admin-account',
+      impersonationId: 'impersonation-id',
+    });
+  });
+
   it('denies every other role', async () => {
     const deps = { ...dependencies(), principal: trainer };
 
