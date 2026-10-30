@@ -8,6 +8,7 @@ import { decideRenewal } from './early-renewal';
 import { PaymentRuleError } from './payment-errors';
 import type { ActiveSubscriptionFacts } from './purchase-eligibility';
 import { resolveStartDate } from './start-date';
+import { loadActiveSubscription } from './subscription-allocation';
 import { computeSubscriptionTerm } from './subscription-term';
 
 type Transaction = Prisma.TransactionClient;
@@ -208,3 +209,25 @@ export const parseRequestedStartDate = (
 
 export const todayOf = (now: Date): Date => boliviaDate(now);
 
+// What the Client app shows instead of the Start Date chips: a Plan bought now
+// starts the day after the current one ends while it still holds classes
+// (booking ADR-0005). Null when she would choose the date, or cannot renew.
+export const readRenewalStartsOn = async (
+  transaction: Transaction,
+  clientId: string,
+  now: Date,
+): Promise<string | null> => {
+  const today = todayOf(now);
+  const active = await loadActiveSubscription(transaction, clientId, now);
+  if (active === null) return null;
+  if ((await loadFutureSubscriptionId(transaction, clientId, today)) !== null) {
+    return null;
+  }
+  const renewal = decideRenewal({
+    today,
+    current: active,
+    futureSubscriptionId: null,
+    requested: null,
+  });
+  return renewal.chosen ? null : civil(renewal.startsOn);
+};

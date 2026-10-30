@@ -87,6 +87,7 @@ import {
   priceFounderPlanList,
   readFounderRenewal,
 } from './payments/prisma-founder-membership';
+import { readRenewalStartsOn } from './payments/prisma-start-date-allocation';
 import {
   ClientEvaluationsController,
   evaluationCommands,
@@ -506,6 +507,8 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
                 .then((found) => (found === null ? null : toSummary(found))),
             readFounderRenewal: (clientId) =>
               readFounderRenewal(prisma, clientId),
+            readRenewalStartsOn: (clientId) =>
+              readRenewalStartsOn(prisma, clientId, new Date()),
             readFreeze: (subscriptionId) =>
               prisma.freeze
                 .findFirst({

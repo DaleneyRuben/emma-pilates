@@ -29,4 +29,6 @@ export interface ClientSubscriptionDto {
   freeze?: ClientFreezeDto | null;
   /** True when the current Plan lasts 90 days or more and has no Freeze yet. */
   canRequestFreeze?: boolean;
+  /** A Plan bought now starts on this date, the day after the current Plan ends, and no Start Date is chosen: the current Plan still has classes. Absent when she chooses the date. */
+  renewalStartsOn?: string;
 }

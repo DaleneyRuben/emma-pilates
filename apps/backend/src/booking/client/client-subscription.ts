@@ -47,6 +47,8 @@ export type ClientSubscriptionView = {
   founderRenewalDeadline: string | null;
   freeze: ClientFreezeSummary | null;
   canRequestFreeze: boolean;
+  /** Set while a Plan bought now starts after the current one, unchosen. */
+  renewalStartsOn?: string;
 };
 
 type LoadClientSubscriptionDependencies = {
@@ -66,6 +68,7 @@ type LoadClientSubscriptionDependencies = {
   readFounderRenewal?(clientId: string): Promise<{ gapDays: number } | null>;
   readFreeze?(subscriptionId: string): Promise<ClientFreezeSummary | null>;
   readPlanDurationDays?(subscriptionId: string): Promise<number | null>;
+  readRenewalStartsOn?(clientId: string): Promise<string | null>;
 };
 
 // The renewal reminder is sent 3 days before the paid-through date.
@@ -88,6 +91,7 @@ type SubscriptionLookup = {
   readFounderRenewal?(clientId: string): Promise<{ gapDays: number } | null>;
   readFreeze?(subscriptionId: string): Promise<ClientFreezeSummary | null>;
   readPlanDurationDays?(subscriptionId: string): Promise<number | null>;
+  readRenewalStartsOn?(clientId: string): Promise<string | null>;
 };
 
 const renewalDeadline = async (
@@ -123,6 +127,8 @@ export const describeSubscription = async (
     const freeze = (await dependencies.readFreeze?.(active.id)) ?? null;
     const durationDays =
       (await dependencies.readPlanDurationDays?.(active.id)) ?? 0;
+    const renewalStartsOn =
+      (await dependencies.readRenewalStartsOn?.(clientId)) ?? null;
     return {
       status: daysLeft <= renewalReminderDays ? 'expiring_soon' : 'active',
       subscription: active,
@@ -134,6 +140,7 @@ export const describeSubscription = async (
       ),
       freeze,
       canRequestFreeze: durationDays >= 90 && freeze === null,
+      ...(renewalStartsOn === null ? {} : { renewalStartsOn }),
     };
   }
 
