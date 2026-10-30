@@ -74,7 +74,13 @@ export const decideFreezeRequest = (
   ) {
     return refused('freeze_not_allowed');
   }
-  const startsOn = boliviaDate(facts.startsOn).getTime();
+  // Compare calendar days. A stored civil date is UTC midnight, so reading
+  // it again as an instant moves it to the previous evening in La Paz.
+  const startsOn = Date.UTC(
+    facts.startsOn.getUTCFullYear(),
+    facts.startsOn.getUTCMonth(),
+    facts.startsOn.getUTCDate(),
+  );
   const startsToday = facts.approving === true && startsOn === today.getTime();
   if (startsOn < today.getTime() || startsToday) {
     return refused('freeze_start_in_past');
