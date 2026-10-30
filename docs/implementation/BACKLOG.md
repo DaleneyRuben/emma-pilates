@@ -1009,7 +1009,7 @@ Review findings H15 and H16, and the Freeze medium bullets, from
 
 - Joining a Waitlist, being promoted from it, and rescheduling into an approved Freeze use the same check as booking. Approval closes Waitlist entries whose Session falls inside the window.
 - A Reschedule before the Start Date is refused the same way a Booking is.
-- An approval whose start is already a past Bolivia date is refused with `409` `freeze_start_in_past` and changes nothing. It does not cancel or return classes already taught.
+- An approval whose start is already a past Bolivia date is refused with `409` `freeze_start_in_past` and changes nothing. An approval on the start day keeps a class whose Session already started and cancels the ones that have not.
 - The window must lie inside the current term. A queued renewal caps it so the extension cannot reach that renewal's Start Date (`freeze_outside_term`).
 - A second approval finds the row no longer `REQUESTED` and answers `freeze_already_decided`. It does not extend the plan again.
 - The classes cancelled on approval are those whose Session falls on a Bolivia civil date inside the window, not a UTC midnight range.
@@ -1019,7 +1019,7 @@ Evidence (FIX-006, 2026-10-28, branch `fix/fix-006-freeze`, from `main` at `0623
 
 Decisions taken:
 
-- A late approval is refused, not trimmed to today. The decisions document says the Freeze never starts in the past, and silently dropping past days would still cancel classes already taught. The code is `freeze_start_in_past`. The desk copy says to refuse it and ask again from today. A refused Freeze does not spend the one Freeze (owner decision 2026-10-29).
+- A late approval, whose start is already a past Bolivia day, is refused, not trimmed to today. The code is `freeze_start_in_past`. The desk copy says to refuse it and ask again from tomorrow. Approving on the start day is allowed: a class already taught stays, and a class that has not started is cancelled. A refused Freeze does not spend the one Freeze (owner decision 2026-10-29).
 - A window that would overlap a queued renewal is `freeze_outside_term`, not `freeze_not_allowed`, so the Client can tell it from a Plan that cannot freeze.
 - A second approval is `freeze_already_decided`. The claim is an update where the state is still `REQUESTED`, inside a Serializable transaction.
 - Waitlist entries closed by a Freeze use `session_cancelled`. That closure names no Account, which is what the existing check allows. No new closure reason and no migration.
@@ -1034,7 +1034,7 @@ Verified:
 Open:
 
 - Promotion during a Freeze is covered by the unit test and by closing the entry on approval. An integration case that reopens the entry and frees a seat was not kept: writing the cancelled state by hand broke `bookings_state_fields_check`.
-- A freeze request that the plan cannot take answers `409` `freeze_not_allowed`, including a past start and a window outside the term (`82dae4c3`, `3259cc2d`). The approval of a start that is already today still keeps that morning's class and still extends the plan. A refused freeze does not use the one freeze (`d19426e4` red, `54e912e9` green, `cb914acf` counts only requested or approved). Migration `20261029200000_freeze_refused_does_not_count` replaces `freezes_subscription_id_key` with a partial unique index (`state <> 'refused' AND deleted_at IS NULL`). Needs owner approval before a shared database. The desk copy is «El congelamiento ya empezó. Recházalo y pide uno desde hoy.»
+- A freeze request that the plan cannot take answers `409` `freeze_not_allowed`, including a past start and a window outside the term (`82dae4c3`, `3259cc2d`). Approving a freeze that starts today keeps a class whose Session already started and cancels the ones that have not. Approving a start that is already a past Bolivia day is refused with `freeze_start_in_past` and changes nothing. A refused freeze does not use the one freeze (`d19426e4` red, `54e912e9` green, `cb914acf` counts only requested or approved). Migration `20261029200000_freeze_refused_does_not_count` replaces `freezes_subscription_id_key` with a partial unique index (`state <> 'refused' AND deleted_at IS NULL`). Needs owner approval before a shared database. The desk copy for a start already past is «El congelamiento ya empezó. Recházalo y pide uno desde mañana.»
 
 #### BKM-014 · Invita a una amiga
 
