@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { PrismaClient } from '../../src/generated/prisma/client';
+import { readCurrentStudioSettings } from '../../src/booking/studio-settings/prisma-studio-settings';
 import { createPurchaseIntentExpiryJob } from '../../src/booking/payments/purchase-intent-expiry-job';
 import {
   fixtures,
@@ -88,7 +89,7 @@ describe('founder place of an unreviewed transfer', () => {
     });
   });
 
-  it('confirms a late transfer for a Plan hidden since, with its founder place and gift', async () => {
+  it('confirms a late transfer for a Plan hidden since, with its founder place', async () => {
     const promo = await prisma.plan.create({
       data: {
         name: `Promo apertura ${randomUUID().slice(0, 8)}`,
@@ -118,6 +119,38 @@ describe('founder place of an unreviewed transfer', () => {
         select: { status: true },
       }),
     ).resolves.toMatchObject({ status: 'ACTIVE' });
+  });
+
+  // Last: it closes the founder places for the rest of this world.
+  it('grants the gift class on a late transfer for a Plan hidden since', async () => {
+    const current = await readCurrentStudioSettings(prisma);
+    const author = await world.staffPrincipal('paola.mendoza@example.com');
+    await prisma.studioSettingsVersion.create({
+      data: {
+        ...current,
+        version: current.version + 1,
+        founderPlaces: 0,
+        openingDate: null,
+        createdByAccountId: author.accountId,
+      },
+    });
+    const promo = await prisma.plan.create({
+      data: {
+        name: `Promo regalo ${randomUUID().slice(0, 8)}`,
+        durationDays: plan.durationDays,
+        classAllowance: plan.classAllowance,
+        priceCentavos: plan.priceCentavos,
+        displayOrder: 91,
+      },
+    });
+    const { buyer, pending } = await pendingTransfer('Regalo oculto', promo.id);
+    await prisma.plan.update({
+      where: { id: promo.id },
+      data: { hiddenAt: now },
+    });
+
+    await world.commands().confirmTransfer({ paymentId: pending.id }, author);
+
     await expect(
       prisma.allowanceAdjustment.count({
         where: { clientId: buyer.clientId, reason: 'GIFT_NEW_CLIENT' },
