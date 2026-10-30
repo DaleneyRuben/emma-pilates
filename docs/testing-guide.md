@@ -7006,10 +7006,10 @@ C. **The contract.** `GET /api/v1/plans` (as any Client) returns
    carry `durationDays` too.
 D. **Elige tu plan (08) and Detalle del plan (09).** As Sofía, **Comprar un
    plan**: each card reads «8 clases · válido por 30 días»; a capped Plan
-   adds « · hasta 3 por semana». VoiceOver reads the price in the card
-   («Paquete de 8 clases, Bs 560»), and a founder hears the list price too
-   («…, Bs 476, antes Bs 560»). The same labels are on the Assistant's
-   **Elige un plan** (S09). Its detail shows «Válido por 60 días», «60
+   adds « · hasta 3 por semana». VoiceOver names the Plan and reads the
+   price as the card hint («Bs 560»; a founder hears «Bs 476, antes Bs 560»).
+   The same hint is on the Assistant's **Elige un plan** (S09). Its detail
+   shows «Válido por 60 días», «60
    días de vigencia desde que se confirma tu pago.», and «Hasta 3 clases por
    semana.». No Plan line says «mes» or «meses».
 E. **The end date.** As Camila register cash for a Client on the 60-day Plan
