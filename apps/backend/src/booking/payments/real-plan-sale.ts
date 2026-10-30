@@ -5,7 +5,9 @@ import type { Prisma } from '../../generated/prisma/client';
 // such filter once the column exists; until then it excludes nothing.
 export const storeReviewExclusion: Prisma.PaymentWhereInput = {};
 
-const storeReviewExclusionSql = (_alias: string): string => 'TRUE';
+// Its SQL twin: `TRUE` until REL-016's column exists, when it becomes a
+// condition on the sale's Client.
+const storeReviewExclusionSql = 'TRUE';
 
 // A real Plan sale: a cash or transfer sale of more than one class at a
 // price. A Guest Pass, Courtesy Access, and a single class are not one.
@@ -23,4 +25,4 @@ export const realPlanSaleSql = (alias: string): string =>
    AND ${alias}.method IN ('cash', 'transfer')
    AND ${alias}.plan_price_centavos > 0
    AND ${alias}.class_allowance_snapshot > 1
-   AND ${storeReviewExclusionSql(alias)}`;
+   AND ${storeReviewExclusionSql}`;
