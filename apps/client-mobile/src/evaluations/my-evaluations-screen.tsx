@@ -49,9 +49,9 @@ type EvaluationsNavigation = {
   goBack: () => void;
   navigate: (
     screen: "EvaluationAvailability",
-    params?: { evaluationId: string; slotId: string },
+    params?: { evaluationId: string; slotId: string; startsAt: string },
   ) => void;
-  setParams: (params: { confirmed?: ClientEvaluationDto }) => void;
+  setParams: (params: { confirmed?: ClientEvaluationDto; moved?: boolean }) => void;
 };
 
 function DateBadge({ instant }: { instant: string }) {
@@ -151,13 +151,13 @@ function UpcomingCard({
 export function MyEvaluationsScreen({
   route,
 }: {
-  route: { params?: { confirmed?: ClientEvaluationDto } };
+  route: { params?: { confirmed?: ClientEvaluationDto; moved?: boolean } };
 }) {
   const navigation = useNavigation<EvaluationsNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
   const confirmed = useTransientNotice(route.params?.confirmed, noticeVisibleMs, () =>
-    navigation.setParams({ confirmed: undefined }),
+    navigation.setParams({ confirmed: undefined, moved: undefined }),
   );
   const [cancelling, setCancelling] = useState<ClientEvaluationDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
@@ -255,7 +255,9 @@ export function MyEvaluationsScreen({
       {header}
       {confirmed !== null ? (
         <View style={styles.notice}>
-          <Text style={styles.noticeTitle}>Evaluación confirmada</Text>
+          <Text style={styles.noticeTitle}>
+            {route.params?.moved === true ? "Evaluación reprogramada" : "Evaluación confirmada"}
+          </Text>
           <BodyText style={styles.noticeBody}>
             {`${evaluationDate(confirmed.startsAt)}, ${clockTime(confirmed.startsAt)}`}
           </BodyText>
@@ -299,6 +301,7 @@ export function MyEvaluationsScreen({
                   navigation.navigate("EvaluationAvailability", {
                     evaluationId: evaluation.id,
                     slotId: evaluation.slotId,
+                    startsAt: evaluation.startsAt,
                   })
                 }
               />
