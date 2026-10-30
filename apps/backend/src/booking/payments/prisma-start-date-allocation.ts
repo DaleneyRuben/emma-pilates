@@ -77,6 +77,20 @@ export const allocateStartDate = (input: {
     futureSubscriptionId: input.futureSubscriptionId,
     requested: input.requested,
   });
+  // A Guest Pass or Courtesy Access ends the day before the paid Plan, so a
+  // class it still holds must fall before that start (FIX-019, owner
+  // 2026-10-30): the class keeps its pass instead of hanging on an ended one.
+  const lastBookedOn = input.active.lastBookedOn ?? null;
+  if (
+    input.active.courtesy &&
+    lastBookedOn !== null &&
+    renewal.startsOn.getTime() <= lastBookedOn.getTime()
+  ) {
+    throw rule(
+      'start_date_before_booked_class',
+      'The Plan must start after the class the current pass holds',
+    );
+  }
   if (renewal.chosen) {
     resolveStartDate({
       today: input.today,
