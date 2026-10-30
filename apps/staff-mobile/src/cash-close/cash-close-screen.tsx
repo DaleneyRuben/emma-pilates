@@ -106,7 +106,7 @@ function CashCloseForm({
         <BodyText style={styles.muted}>{describeCashSales(cashPaymentCount, branch.name)}</BodyText>
         {voidedCashCentavos > 0 ? (
           <BodyText style={styles.muted}>
-            {`Ventas anuladas (efectivo en caja): ${formatBolivianos(voidedCashCentavos)}`}
+            {`Ventas anuladas (efectivo en caja): ${formatCashCloseBolivianos(voidedCashCentavos)}`}
           </BodyText>
         ) : null}
       </View>
