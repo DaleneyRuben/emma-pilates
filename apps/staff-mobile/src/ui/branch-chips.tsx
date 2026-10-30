@@ -26,11 +26,11 @@ export function useCashBranches() {
   const branch = options.find((option) => option.id === selectedId) ?? options[0] ?? null;
   const isPending =
     profile.isPending || (needsAllBranches && branches.isPending && options.length === 0);
-  const isError =
-    profile.isError ||
-    (profile.data !== undefined && profile.data.status !== 200) ||
-    (needsAllBranches &&
-      (branches.isError || (branches.data !== undefined && branches.data.status !== 200)));
+  // A failed refetch over data already loaded keeps the screen as it is: only
+  // a request with no usable answer is an error.
+  const failed = (query: { isError: boolean; data?: { status: number } }) =>
+    query.data?.status !== 200 && (query.isError || query.data !== undefined);
+  const isError = failed(profile) || (needsAllBranches && failed(branches));
   const refetch = () => {
     void profile.refetch();
     if (needsAllBranches || (profile.data?.status === 200 && assigned.length === 0)) {

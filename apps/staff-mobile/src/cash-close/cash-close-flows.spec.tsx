@@ -183,9 +183,9 @@ describe("Cerrar caja (S25)", () => {
     const profile = routes["/api/v1/staff-members/current"];
     const screen = await openCashClose({
       ...routes,
-      "/api/v1/staff-members/current": (init) => {
+      "/api/v1/staff-members/current": () => {
         if (profileDown) throw new TypeError("Network request failed");
-        return profile(init);
+        return profile();
       },
       [centroToday]: () => jsonResponse(today),
     });
