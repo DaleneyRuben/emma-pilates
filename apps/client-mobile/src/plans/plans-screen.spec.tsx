@@ -67,7 +67,7 @@ describe("Client Plans", () => {
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 2.100")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Trimestral 36 clases" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Trimestral 36 clases,/ }));
 
     // The loading state shares the «Detalle del plan» heading, so wait for the Plan itself.
     await waitFor(() => {
@@ -115,7 +115,7 @@ describe("Client Plans", () => {
     expect(screen.getByText("Bs 80")).toBeOnTheScreen();
     expect(screen.getAllByText("Bs 560")).toHaveLength(1);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Paquete de 8 clases,/ }));
     await waitFor(() => {
       expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
     });
@@ -141,12 +141,12 @@ describe("Client Plans", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
 
-    const founder = await screen.findByRole("button", { name: "Paquete de 8 clases" });
-    expect(founder).toHaveProp("accessibilityHint", "Bs 476, antes Bs 560");
-    expect(screen.getByRole("button", { name: "Trimestral 36 clases" })).toHaveProp(
-      "accessibilityHint",
-      "Bs 2.100",
-    );
+    expect(
+      await screen.findByRole("button", { name: "Paquete de 8 clases, Bs 476, antes Bs 560" }),
+    ).not.toHaveProp("accessibilityHint");
+    expect(
+      screen.getByRole("button", { name: "Trimestral 36 clases, Bs 2.100" }),
+    ).toBeOnTheScreen();
   });
 
   it("shows an empty state when no Plan is visible", async () => {

@@ -35,7 +35,7 @@ describe("Confirming cash for a renewal", () => {
     });
 
     await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Paquete de 8 clases" }));
+    await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
 
     await waitFor(() => {
       expect(screen.getByLabelText("Confirmar pago en efectivo")).toBeOnTheScreen();
