@@ -213,21 +213,15 @@ describe('purchase and renewal fixes', () => {
   });
 
   it('starts a friend’s paid Plan on her chosen date, not after her guest pass (H17)', async () => {
-    const fixture = await createFixture(prisma, { now });
-    const host = await world.newClient('Anfitriona');
-    const friend = await world.newClient('Invitada que compra');
-    const opened = new Date('2026-09-18T15:00:00.000Z');
-    await prisma.$transaction((transaction) =>
+    const host = await world.newClient('Anfitriona libre');
+    const friend = await world.newClient('Invitada sin reserva');
+    await prisma.$transaction(async (transaction) =>
       openGuestPass(transaction, {
         hostClientId: host.clientId,
         friendClientId: friend.clientId,
-        authorAccountId: fixture.accountId,
-        now: opened,
+        authorAccountId: (await assistant()).accountId,
+        now: new Date('2026-09-18T15:00:00.000Z'),
       }),
-    );
-    await new PrismaBookingCommands(prisma, () => now).create(
-      { sessionId: fixture.sessionId },
-      friend,
     );
 
     const sale = await cash(friend.clientId, '2026-09-21');
@@ -238,8 +232,37 @@ describe('purchase and renewal fixes', () => {
       select: { courtesySubscription: { select: { endsOn: true } } },
     });
     expect(pass.courtesySubscription.endsOn).toEqual(date('2026-09-20'));
-    // Open question (backlog FIX-002): the booked guest class stays booked on
-    // the ended pass.
+  });
+
+  it('refuses a paid Plan that starts before her booked guest class (FIX-019, owner 2026-10-30)', async () => {
+    const fixture = await createFixture(prisma, { now });
+    const host = await world.newClient('Anfitriona');
+    const friend = await world.newClient('Invitada que compra');
+    await prisma.$transaction((transaction) =>
+      openGuestPass(transaction, {
+        hostClientId: host.clientId,
+        friendClientId: friend.clientId,
+        authorAccountId: fixture.accountId,
+        now: new Date('2026-09-18T15:00:00.000Z'),
+      }),
+    );
+    // The guest class is today, 2026-09-21, later in the afternoon.
+    await new PrismaBookingCommands(prisma, () => now).create(
+      { sessionId: fixture.sessionId },
+      friend,
+    );
+
+    await expect(codeOf(cash(friend.clientId, '2026-09-21'))).resolves.toBe(
+      'start_date_before_booked_class',
+    );
+    const sale = await cash(friend.clientId, '2026-09-22');
+
+    expect(sale.startsOn).toBe('2026-09-22');
+    const pass = await prisma.guestPass.findFirstOrThrow({
+      where: { friendClientId: friend.clientId },
+      select: { courtesySubscription: { select: { endsOn: true } } },
+    });
+    expect(pass.courtesySubscription.endsOn).toEqual(date('2026-09-21'));
     await expect(
       prisma.booking.findFirstOrThrow({
         where: { sessionId: fixture.sessionId },
