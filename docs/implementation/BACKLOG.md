@@ -497,7 +497,7 @@ wait for Google, Apple, and testers.
 | BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | done |
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
 | FIX-006 | P0 | Backend/admin web | Enforce the Freeze on the Waitlist and on Reschedule, and refuse a late approval | BKM-012 | 1 d | done |
-| FIX-003 | P0 | Backend/admin web/client app | Paid Evaluation payment lifecycle: reject and cancel settle the Payment, confirm audits and notifies, the receipt is visible, an exhausted Plan cannot buy one, cancelled Evaluations skip the Bs 50, AW28 names the sale and dates it by the decision, and a pending Evaluation Payment is not the current Plan Payment | NUT-003 | 1 d | done (`5122791d`/`d7b383af` hide the receipt upload once the payment is confirmed; `1004a767`/`64cb24de` show Subiendo and ignore a second tap. Device walk still open) |
+| FIX-003 | P0 | Backend/admin web/client app | Paid Evaluation payment lifecycle: reject and cancel settle the Payment, confirm audits and notifies, the receipt is visible, an exhausted Plan cannot buy one, cancelled Evaluations skip the Bs 50, AW28 names the sale and dates it by the decision, and a pending Evaluation Payment is not the current Plan Payment | NUT-003 | 1 d | done (`a2a07b11`/`cb375760` one pending Payment per kind, 409 instead of P2002; `5cb29021` evaluation sales read as «Evaluación nutricional» and Pagos hides «Anular venta». Device walk still open) |
 
 #### Closed-test enablement
 
@@ -967,6 +967,28 @@ pending; `design/` was not edited.
 
 Not verified: the admin web in a browser at 1440 and 420 px, and the Client
 receipt step on the iPhone, the iPad, and the Android emulator.
+
+2026-10-29, after the device walk. A pending Evaluation Payment and a pending
+Plan Payment are different sales. Migration
+`20261029210000_pending_payment_per_kind` (needs owner approval before a
+shared database) replaces `payments_one_pending_per_client_key` with
+`payments_one_pending_per_client_kind_key` on `(client_id, kind)` where
+`state = 'pending'`. Payment has no `deleted_at`, so the predicate does not
+name one. Prisma cannot model the predicate, and the migrate diff does not
+report the index, so `known-drift.sql` stays as it was.
+
+A race that still hits the index answers 409: `payment_pending_exists` on a
+Plan submit and on the front-desk QR, `evaluation_payment_pending` on a
+second paid Evaluation. Staff review and the admin Plan column name an
+Evaluation sale «Evaluación nutricional». Pagos hides «Anular venta» when
+`kind` is `evaluation`.
+
+Verified: `pending-payment-kind.integration-spec.ts` and
+`second-paid-evaluation.integration-spec.ts` failed on P2002 before the index
+and passed after (4 tests) on PostgreSQL 18, port 5433, database
+`pilates_test_pending_kind`. `saleLabel` unit 2 and admin `void-sale.spec.tsx`
+3 passed. `check-migrations.sh` on a disposable database passed. Device walk
+of this head is still open.
 
 #### NUT-003 · Nutritionist rules
 
