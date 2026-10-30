@@ -7790,10 +7790,10 @@ C. **Extra classes count (H14).** A Client with no base classes left but a
    campaign or gift class still unused renews: the new Plan starts the day
    after the current one ends, and the current Plan keeps its end date and
    its extra class.
-D. **A guest pass is not a Plan (H17).** A friend with a Guest Pass (with or
-   without her free class booked) buys a Plan with «Hoy»: the Plan starts
-   today and the pass ends yesterday. It is never pushed to the day after
-   the pass.
+D. **A guest pass is not a Plan (H17).** A friend with a Guest Pass and no
+   class booked buys a Plan with «Hoy»: the Plan starts today and the pass
+   ends yesterday. It is never pushed to the day after the pass. With her
+   free class booked, see Test 122 C.
 E. **Renewing on the first day.** A Client whose Plan started today and has
    no classes left buys another with «Hoy»: the sale succeeds, the old Plan
    is expired, and `subscription.ended_early` carries `expired: true`.
@@ -7864,9 +7864,10 @@ first (`POST /api/v1/administrator/studio-facts/recompute` with
 `{"month": "YYYY-MM"}`).
 
 A. **Accrued revenue (H12).** In Indicadores (and Reporte) for a month with a
-   30-day Plan of Bs 300 starting on the 20th: «Devengado» shows Bs 120 for
-   the first month (12 of 30 days, the end date counts) and Bs 180 for the
-   next. A Payment approved on the 1st counts in «Caja» of that month only.
+   30-day Plan of Bs 300 starting on the 20th: once each month is over,
+   «Devengado» shows Bs 120 for the first month (12 of 30 days, the end date
+   counts) and Bs 180 for the next. A month still running counts only up to
+   today (Test 122 F). A Payment approved on the 1st counts in «Caja» of that month only.
    «Diferido» shrinks every day and reads Bs 0 the day after the Plan ends;
    for a past month it is measured at that month's end. A paid Evaluation
    shows in «Caja» and «Devengado» of the month it was approved, as in the
@@ -7935,3 +7936,52 @@ H. **Re-draft and seed.** The hourly re-draft writes nothing when the lines
 I. **Month and settings.** `?month=2026-13` answers `400`. A month reads the
    tax and the renewal targets of the Studio Settings version in force
    then, not a later one.
+
+## Test 122: the owner's decisions of 2026-10-30 (FIX-013, FIX-019, FIX-021, FIX-022)
+
+Run the API, the worker and the fixtures as in Tests 2 and 5. The
+integration specs named in each step build every state.
+
+A. **An unreviewed transfer frees its founder place (FIX-013).** A first
+   real Plan bought by transfer at the founder price reserves a place. While
+   nobody reviews it, the worker's purchase-intent pass (every 5 minutes)
+   keeps the place for 3 days, then frees it (`founder_membership.released`
+   with `reason: payment_unreviewed`, correlated to the Payment). The Payment
+   stays pending and keeps its founder price; nothing changes for the Client
+   or the desk. Spec: `founder-unreviewed-transfer.integration-spec.ts`.
+B. **A late confirmation over the cap (FIX-013).** Paola confirms that
+   transfer after the 40 places are gone: the sale is confirmed at the
+   founder price it charged and the Client becomes a founder with number 41
+   or above. It no longer answers `409` `payment_confirmation_conflict`.
+   Spec: `founder-place-release.integration-spec.ts`.
+C. **A booked guest class comes first (FIX-019).** A friend whose Guest Pass
+   class is booked for today buys a Plan with «Hoy»: the app shows «Tienes
+   una clase de invitada reservada. Elige un inicio después de esa clase.»
+   (Client 09) and Staff S10 shows «La clienta tiene una clase de invitada
+   reservada. Elige un inicio después de esa clase.» (`409`
+   `start_date_before_booked_class`). Starting the day after the class
+   works: the pass ends on the class day and the class stays booked. Spec:
+   `purchase-renewal-fixes.integration-spec.ts`.
+D. **No paid Evaluation on a courtesy plan (FIX-019).** A friend holding only
+   a Guest Pass, or a Client holding only Courtesy Access, cannot book a
+   nutrition Evaluation (`409` `no_eligible_subscription`, «Necesitas un plan
+   activo…» in the app). Spec: `evaluation-courtesy-plans.integration-spec.ts`.
+E. **Courtesy Access replaces an unused Guest Pass (FIX-019).** In the admin
+   web's client detail, **Acceso de prueba** → **Dar acceso** for a friend
+   whose Guest Pass has no class booked succeeds: the pass expires (`subscription.ended_early`) and the
+   access starts today. With her guest class booked it is still refused
+   («Ya tiene un plan en uso…»). Spec:
+   `courtesy-over-guest-pass.integration-spec.ts`.
+F. **«Devengado» up to today (FIX-022).** In Indicadores or Reporte, for the
+   running month, a 30-day Plan of Bs 300 that started on the 20th shows on
+   the 25th «Devengado» Bs 50 and «Diferido» Bs 250: the two add up to what
+   was paid. A month that has not started shows Bs 0. A past month is as in
+   Test 120 A. Spec: `accrue-revenue.spec.ts`,
+   `revenue-report.integration-spec.ts`.
+G. **A hidden first Plan still counts (FIX-021).** Hide, in AW04, the Plan a
+   Client bought first. Her renewal does not restart the first 90 days (no
+   «Tu segunda clase» or «Tu primera semana» again, no new Coordinator
+   alerts), gives no second gift class, and is not priced as a founder
+   first Plan. Specs:
+   `first-90-days-job.integration-spec.ts`,
+   `hidden-first-plan.integration-spec.ts`.
