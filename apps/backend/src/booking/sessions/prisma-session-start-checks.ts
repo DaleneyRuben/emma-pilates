@@ -7,6 +7,7 @@ import {
   recordNotification as defaultNotificationRecorder,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
+import { sweepEach } from '../../jobs/sweep-each';
 import { retrySerializable } from '../../database/retry-serializable';
 import { readCurrentStudioSettings } from '../studio-settings/prisma-studio-settings';
 import {
@@ -30,7 +31,7 @@ export const createPrismaSessionStartChecks = (
   // One-time Minimum Bookings check (ADR-0007, BKM-009): each due Session is
   // settled in its own transaction, and the completion marker makes reruns
   // and a restart mid-sweep no-ops for the Sessions already settled.
-  const checkSession = (
+  const settleSession = (
     sessionId: string,
     now: Date,
     rule: MinimumRule,
@@ -43,7 +44,7 @@ export const createPrismaSessionStartChecks = (
           // so a Booking landing now surfaces as a serialization retry
           // instead of a lock wait.
           await transaction.$queryRaw`
-            SELECT id FROM booking.sessions WHERE id = ${sessionId}::uuid FOR NO KEY UPDATE`;
+          SELECT id FROM booking.sessions WHERE id = ${sessionId}::uuid FOR NO KEY UPDATE`;
           const session = await transaction.session.findUniqueOrThrow({
             where: { id: sessionId },
             select: checkedSessionSelect,
@@ -102,12 +103,19 @@ export const createPrismaSessionStartChecks = (
     let checked = 0;
     let cancelled = 0;
 
-    for (const { id } of candidates) {
-      const outcome = await checkSession(id, now, rule);
-      if (outcome === 'skipped') continue;
-      checked += 1;
-      if (outcome === 'cancelled') cancelled += 1;
-    }
+    // One Session whose settlement fails must not stop the sweep; it is
+    // reported once the others are settled.
+    await sweepEach(
+      'minimum_bookings_check',
+      candidates,
+      ({ id }) => id,
+      async ({ id }) => {
+        const outcome = await settleSession(id, now, rule);
+        if (outcome === 'skipped') return;
+        checked += 1;
+        if (outcome === 'cancelled') cancelled += 1;
+      },
+    );
 
     return { checked, cancelled };
   };
@@ -126,7 +134,15 @@ export const createPrismaSessionStartChecks = (
       UPDATE booking.sessions AS session
       SET bookings_at_window_close = (
             SELECT count(*) FROM booking.bookings AS booking
-            WHERE booking.session_id = session.id AND booking.state = 'booked'
+            WHERE booking.session_id = session.id
+              AND booking.created_at <= session.starts_at - (${cancellationWindowMinutes} * interval '1 minute')
+              AND (
+                booking.state = 'booked'
+                OR (
+                  booking.state = 'cancelled'
+                  AND booking.cancelled_at > session.starts_at - (${cancellationWindowMinutes} * interval '1 minute')
+                )
+              )
           ),
           updated_at = ${now}
       WHERE session.state = 'scheduled'

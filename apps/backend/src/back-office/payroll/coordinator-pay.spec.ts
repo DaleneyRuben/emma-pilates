@@ -1,7 +1,7 @@
+import { renewalRateOf } from '../../booking/payments/plan-renewals';
 import {
   coordinatorPay,
   monthOfOperation,
-  renewalRatePercent,
   renewalTargetPercent,
 } from './coordinator-pay';
 
@@ -96,15 +96,16 @@ describe('coordinator pay', () => {
 });
 
 describe('renewal rate', () => {
-  it('counts a Plan bought on the seventh day after the end and not the eighth', () => {
-    const endsOn = new Date('2026-09-10T00:00:00.000Z');
+  it('rates the renewed share of the real Plans ending in the month, and none when none end', () => {
+    const plan = (renewed: boolean) => ({
+      clientId: 'client',
+      subscriptionId: 'subscription',
+      endsOn: new Date('2026-09-10T00:00:00.000Z'),
+      renewed,
+    });
 
-    expect(
-      renewalRatePercent([
-        { endsOn, nextPlanStartsOn: new Date('2026-09-17T00:00:00.000Z') },
-        { endsOn, nextPlanStartsOn: new Date('2026-09-18T00:00:00.000Z') },
-      ]),
-    ).toBe(50);
+    expect(renewalRateOf([plan(true), plan(false)])).toBe(50);
+    expect(renewalRateOf([])).toBeNull();
   });
 
   it('asks for 80 % in months 1 to 6, 85 % in months 7 to 12, and 90 % from month 13', () => {

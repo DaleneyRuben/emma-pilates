@@ -81,7 +81,7 @@ describe('accrued revenue report', () => {
           original_class_allowance, remaining_class_allowance, starts_on,
           ends_on, state, activated_at, updated_at)
        VALUES ($1, $2, $3, $4, 'Test Plan', 1, 30, 8, 5, '2026-10-20',
-          '2026-11-19', 'active', '2026-10-20T04:00:00.000Z', CURRENT_TIMESTAMP)`,
+          '2026-11-18', 'active', '2026-10-20T04:00:00.000Z', CURRENT_TIMESTAMP)`,
       [subscriptionId, clientId, planId, paymentId],
     );
     await context.pool.query('COMMIT');
@@ -105,5 +105,49 @@ describe('accrued revenue report', () => {
     expect(october.deferredCentavos).toBe(27_000);
     expect(october.classesStillOwed).toBe(5);
     expect(november.classesStillOwed).toBe(5);
+  });
+
+  it('puts Evaluations in «Caja» like the income report', async () => {
+    const clientId = randomUUID();
+    const [{ plan_id: planId, account_id: accountId }] = (
+      await context.pool.query<{ plan_id: string; account_id: string }>(
+        `SELECT (SELECT id FROM booking.plans LIMIT 1) AS plan_id,
+                (SELECT id FROM system.accounts LIMIT 1) AS account_id`,
+      )
+    ).rows;
+    const before = await readRevenueMonth(prisma, {
+      month: new Date('2026-10-01T00:00:00.000Z'),
+      today,
+    });
+
+    await context.pool.query(
+      `INSERT INTO booking.clients (id, name, referral_code, updated_at)
+       VALUES ($1, 'Evaluation Client', $2, CURRENT_TIMESTAMP)`,
+      [clientId, `ref-${clientId}`],
+    );
+    const sale = (method: string, kind: string, amount: number) =>
+      context.pool.query(
+        `INSERT INTO booking.payments
+           (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot,
+            duration_days_snapshot, class_allowance_snapshot, plan_price_centavos,
+            credit_applied_centavos, amount_due_centavos, starts_on, method,
+            kind, state, submitted_by_account_id, submitted_at,
+            decided_by_account_id, decided_at, updated_at)
+         VALUES ($1, $2, $3, 'Evaluación', 1, 30, 1, $6, 0, $6, '2026-10-21',
+            $4::booking."PaymentMethod", $5::booking."PaymentKind", 'confirmed',
+            $7, '2026-10-21T14:00:00.000Z', $7, '2026-10-21T14:00:00.000Z',
+            CURRENT_TIMESTAMP)`,
+        [randomUUID(), clientId, planId, method, kind, amount, accountId],
+      );
+    await sale('transfer', 'evaluation', 5_000);
+
+    const after = await readRevenueMonth(prisma, {
+      month: new Date('2026-10-01T00:00:00.000Z'),
+      today,
+    });
+
+    expect(after.cashCentavos - before.cashCentavos).toBe(5_000);
+    expect(after.accruedCentavos - before.accruedCentavos).toBe(5_000);
+    expect(after.deferredCentavos).toBe(before.deferredCentavos);
   });
 });

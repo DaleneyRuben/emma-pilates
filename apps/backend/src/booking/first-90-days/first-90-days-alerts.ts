@@ -1,3 +1,4 @@
+import { addCivilDays, boliviaDate } from '../../time/bolivia-time';
 import { elapsedCivilDays } from './first-90-days-milestones';
 
 export const contactAlertReasons = [
@@ -60,6 +61,21 @@ export const shouldReopenNoBooking7Days = (input: {
     input.lastBookedAt !== null &&
     input.lastBookedAt.getTime() > input.lastContactedAt.getTime()
   );
+};
+
+// A class counts for a milestone only when it starts inside that many civil
+// days of the first Plan, on the La Paz calendar, not whenever in her life
+// she booked it.
+export const classesInsideFirstDays = (
+  startsOn: Date,
+  days: number,
+  startsAt: readonly Date[],
+): number => {
+  const until = addCivilDays(startsOn, days).getTime();
+  return startsAt.filter((instant) => {
+    const day = boliviaDate(instant).getTime();
+    return day >= startsOn.getTime() && day < until;
+  }).length;
 };
 
 export const hasBookedSince = (

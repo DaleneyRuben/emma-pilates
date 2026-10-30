@@ -1,3 +1,4 @@
+import { parseCivilMonth } from '../civil-month';
 import {
   BadRequestException,
   Controller,
@@ -56,7 +57,8 @@ export class AdministratorPayStatementsController extends BackOfficeController {
     @Headers('authorization') authorization: string | undefined,
     @Query('month') month: string,
   ): Promise<PayStatementDto[]> {
-    if (!/^\d{4}-\d{2}$/.test(month)) {
+    const civilMonthStart = parseCivilMonth(month);
+    if (civilMonthStart === null) {
       throw new BadRequestException({
         code: 'invalid_request',
         detail: 'Invalid month',
@@ -65,7 +67,7 @@ export class AdministratorPayStatementsController extends BackOfficeController {
     const principal = await this.authenticate(authorization);
     const statements = await run(() =>
       this.operations.payStatements.listStatements(
-        { month: new Date(`${month}-01T00:00:00.000Z`) },
+        { month: civilMonthStart },
         principal,
       ),
     );
@@ -81,7 +83,8 @@ export class AdministratorPayStatementsController extends BackOfficeController {
     @Headers('authorization') authorization: string | undefined,
     @Query('month') month: string,
   ): Promise<PayStatementDraftDto> {
-    if (!/^\d{4}-\d{2}$/.test(month)) {
+    const civilMonthStart = parseCivilMonth(month);
+    if (civilMonthStart === null) {
       throw new BadRequestException({
         code: 'invalid_request',
         detail: 'Invalid month',
@@ -90,7 +93,7 @@ export class AdministratorPayStatementsController extends BackOfficeController {
     const principal = await this.authenticate(authorization);
     return run(() =>
       this.operations.payStatements.draftMonthAsAdministrator(
-        new Date(`${month}-01T00:00:00.000Z`),
+        civilMonthStart,
         principal,
       ),
     );

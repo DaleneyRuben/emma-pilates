@@ -111,6 +111,27 @@ describe("AW16 Finanzas on a desktop browser", () => {
     expect(screen.queryByLabelText("Desde")).toBeNull();
   });
 
+  it("names the month's salaries as their own cost in «Resultado» (FIX-007, H10)", async () => {
+    server.use(
+      ...finance((month) =>
+        jsonResponse({
+          ...seededMonthResult(month),
+          salariesCentavos: 1_200_000,
+        }),
+      ),
+    );
+    renderAdmin("/reporte?vista=finanzas&month=2026-10");
+
+    expect(
+      await screen.findByText("Sueldos pagados Bs 12.000,00"),
+    ).toBeVisible();
+    expect(
+      within(screen.getByRole("region", { name: "Resultado" })).getByText(
+        "Ingresos en caja menos impuesto, gastos, sueldos y nutricionista",
+      ),
+    ).toBeVisible();
+  });
+
   it("offers the opening budget when none is loaded, then shows the lines", async () => {
     let seeded = false;
     server.use(

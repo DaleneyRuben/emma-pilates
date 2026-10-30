@@ -1,3 +1,4 @@
+import { parseCivilMonth } from '../civil-month';
 import {
   BadRequestException,
   Controller,
@@ -50,7 +51,8 @@ export class AdministratorFinanceController extends BackOfficeController {
     @Headers('authorization') authorization: string | undefined,
     @Query('month') month: string,
   ): Promise<MonthResultDto> {
-    if (!/^\d{4}-\d{2}$/.test(month)) {
+    const civilMonthStart = parseCivilMonth(month);
+    if (civilMonthStart === null) {
       throw new BadRequestException({
         code: 'invalid_request',
         detail: 'Invalid month',
@@ -59,7 +61,7 @@ export class AdministratorFinanceController extends BackOfficeController {
     const principal = await this.authenticate(authorization);
     const result = await run(() =>
       this.operations.finance.monthResult(
-        { month: new Date(`${month}-01T00:00:00.000Z`) },
+        { month: civilMonthStart },
         principal,
       ),
     );

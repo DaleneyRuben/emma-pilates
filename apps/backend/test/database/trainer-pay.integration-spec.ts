@@ -28,9 +28,11 @@ const handCheckedTotalCentavos = 32_200;
 
 describe('trainer pay statements', () => {
   let world: EvaluationTestWorld;
-  const statements = () =>
+  // September is paid once it is over in Bolivia (FIX-007).
+  const afterSeptember = new Date('2026-10-01T13:00:00.000Z');
+  const statements = (now: Date = fixtureNow) =>
     createPrismaPayStatements(world.prisma, {
-      now: () => fixtureNow,
+      now: () => now,
       factsOfMonth: (from, until) =>
         trainerMonthFacts(world.prisma, from, until),
     });
@@ -153,13 +155,13 @@ describe('trainer pay statements', () => {
       totalCentavos: handCheckedTotalCentavos,
     });
 
-    const approved = await statements().approveStatement(
+    const approved = await statements(afterSeptember).approveStatement(
       { statementId: emmaStatement!.id },
       admin,
     );
     expect(approved.state).toBe('approved');
     expect(approved.salaryPaymentId).not.toBeNull();
-    const again = await statements().approveStatement(
+    const again = await statements(afterSeptember).approveStatement(
       { statementId: emmaStatement!.id },
       admin,
     );

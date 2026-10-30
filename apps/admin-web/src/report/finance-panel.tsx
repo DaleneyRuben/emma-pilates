@@ -186,7 +186,7 @@ export function FinancePanel({
                 result.resultCentavos < 0 ? "border-t-error" : "border-t-exito"
               }
               figure={formatSignedBolivianos(result.resultCentavos)}
-              line="Ingresos en caja menos impuesto, gastos y nutricionista"
+              line="Ingresos en caja menos impuesto, gastos, sueldos y nutricionista"
             />
             <Figure
               name="Punto de equilibrio"
@@ -197,6 +197,10 @@ export function FinancePanel({
           </div>
           <p className="text-nota text-texto-tenue tabular">
             {`Costo de la nutricionista ${formatBolivianos(result.nutritionistCostCentavos)}`}
+          </p>
+          {/* H10: the month's Salary Payments are a cost of their own. */}
+          <p className="text-nota text-texto-tenue tabular">
+            {`Sueldos pagados ${formatBolivianos(result.salariesCentavos ?? 0)}`}
           </p>
           {result.lines.length === 0 ? (
             <EmptyBudget month={month} />
