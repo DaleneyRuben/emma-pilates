@@ -54,3 +54,13 @@ export const evaluateCourtesyGrant = (
   return allocation;
 };
 
+// The start is only known once it is allocated (a later Start Date, or the
+// day after a Plan in force): an end before it is refused, not a 500.
+export const assertCourtesyTerm = (startsOn: Date, endsOn: Date): void => {
+  if (endsOn.getTime() < startsOn.getTime()) {
+    throw new PaymentRuleError(
+      'courtesy_end_date_invalid',
+      'Access must not end before it starts',
+    );
+  }
+};
