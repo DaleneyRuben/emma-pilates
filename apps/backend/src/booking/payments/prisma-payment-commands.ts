@@ -1110,9 +1110,11 @@ export function createPrismaPaymentCommands(
           now,
         });
       }
+      // The gap is judged on the date she bought for: a late review is the
+      // studio's delay, never hers.
       await loseFounderForGap(transaction, {
         clientId: payment.clientId,
-        nextStart: startsOn,
+        nextStart: payment.startsOn,
         today,
         now,
       });
