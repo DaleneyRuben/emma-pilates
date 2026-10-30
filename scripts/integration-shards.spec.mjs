@@ -21,6 +21,33 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+test("every integration spec lands in exactly one place", () => {
+  const files = specFiles(root);
+  const places = new Map();
+  const note = (file, place) => {
+    const seen = places.get(file) ?? [];
+    seen.push(place);
+    places.set(file, seen);
+  };
+  for (let shard = 1; shard <= 6; shard += 1) {
+    const regex = new RegExp(integrationShardPattern(files, shard));
+    for (const file of files) {
+      if (regex.test(file)) note(file, `shard ${shard}`);
+    }
+  }
+  // The backup job's argument is the unanchored basename Jest receives.
+  for (const file of files) {
+    if (/s3-backup-store/.test(file)) note(file, "backup job");
+  }
+  const doubled = [...places.entries()].filter(([, seen]) => seen.length !== 1);
+  const missing = files.filter((file) => !places.has(file));
+  assert.deepEqual(
+    doubled.map(([file, seen]) => `${file} → ${seen.join(", ")}`),
+    [],
+  );
+  assert.deepEqual(missing, []);
+});
+
 test("the six integration shards cover every spec once, except the backup job", () => {
   const files = specFiles(root);
   const seen = new Map();
