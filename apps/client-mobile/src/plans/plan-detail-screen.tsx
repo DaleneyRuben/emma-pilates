@@ -43,6 +43,8 @@ const purchaseErrorCopy: Record<string, string> = {
   plan_not_purchasable: "Este plan no está disponible para compra.",
   start_date_out_of_window: "Esa fecha de inicio no está disponible.",
   future_subscription_exists: "Ya tienes un plan siguiente.",
+  start_date_before_booked_class:
+    "Tienes una clase de invitada reservada. Elige un inicio después de esa clase.",
 };
 
 const problemCode = (data: unknown): string | null =>
