@@ -60,7 +60,9 @@ export const startSweeps = async (
     try {
       await runGroup(group);
     } finally {
-      running.delete(group);
+      const finished = [...running].filter((current) => current !== group);
+      running.clear();
+      for (const current of finished) running.add(current);
     }
   };
   for (const group of groups) {
