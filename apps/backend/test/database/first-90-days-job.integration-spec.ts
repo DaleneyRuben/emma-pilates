@@ -245,4 +245,28 @@ describe('first 90 days job (PostgreSQL)', () => {
       await prisma.contactAlert.count({ where: { clientId: client.clientId } }),
     ).toBe(0);
   });
+
+  it('still opens contact alerts when a lifecycle message cannot be recorded, then reports it', async () => {
+    const client = await createClientWithPlan(prisma, {
+      name: 'Mensaje roto',
+      startsOn,
+    });
+
+    await expect(
+      createFirst90DaysJob(
+        prisma,
+        () => first90DaysNow,
+        (transaction, notice) =>
+          notice.accountId === client.accountId
+            ? Promise.reject(new Error('notice broke'))
+            : recordNotification(transaction, notice),
+      ).execute(),
+    ).rejects.toThrow(`first_90_days failed for 1 item: ${client.clientId}`);
+    await expect(
+      prisma.contactAlert.findMany({
+        where: { clientId: client.clientId },
+        select: { reason: true },
+      }),
+    ).resolves.toEqual([{ reason: 'NO_BOOKING_7_DAYS' }]);
+  });
 });
