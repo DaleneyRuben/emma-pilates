@@ -7732,3 +7732,45 @@ E. **Move a confirmed paid Evaluation (FIX-014, FIX-016, design follow-up
    activo»), and with no other turno open the picker says «No hay horarios
    disponibles por ahora.» instead of the used-month state, keeping the
    refusal on screen when the last open turno was just taken.
+
+## Test 118: buying and renewing (FIX-002)
+
+Run the API and the fixtures as in Tests 2 and 5. Each step needs a Client in
+the state it names; the integration spec
+`apps/backend/test/database/purchase-renewal-fixes.integration-spec.ts` builds
+every one of them.
+
+A. **Front-desk QR keeps the Plan (H5).** A Client whose Plan is still in its
+   term but has no classes left buys at the desk by QR (Staff S10, the
+   receipt step) with a later Start Date. While the receipt waits, Mi plan
+   still shows her current Plan with its end date. Rejecting the receipt
+   leaves it exactly as it was. Confirming it ends the current Plan the day
+   before the new Start Date.
+B. **A transfer reviewed the next day (H6).** A Client buys at 21:00 with
+   «Hoy» and uploads the receipt. Paola confirms it the next morning: the
+   confirmation succeeds (no `400` `start_date_out_of_window`), the new Plan
+   starts that morning's date, and the audit `payment.start_date_moved`
+   records `soldStartsOn` and `startsOn`. The sale keeps the date it was sold
+   with.
+C. **Extra classes count (H14).** A Client with no base classes left but a
+   campaign or gift class still unused renews: the new Plan starts the day
+   after the current one ends, and the current Plan keeps its end date and
+   its extra class.
+D. **A guest pass is not a Plan (H17).** A friend with a Guest Pass (with or
+   without her free class booked) buys a Plan with «Hoy»: the Plan starts
+   today and the pass ends yesterday. It is never pushed to the day after
+   the pass.
+E. **Renewing on the first day.** A Client whose Plan started today and has
+   no classes left buys another with «Hoy»: the sale succeeds, the old Plan
+   is expired, and `subscription.ended_early` carries `expired: true`.
+F. **Courtesy Access dates.** Granting Courtesy Access whose end date falls
+   before its start answers `400` `courtesy_end_date_invalid`, never `500`.
+G. **The renewal reminder.** The «Tu plan vence en 3 días» reminder reaches
+   a real Plan ending within 3 days. It does not reach a Client whose next
+   Plan is already queued, nor a Guest Pass or Courtesy Access.
+H. **Detalle del plan (Client 09, design follow-up 219).** From Mi plan,
+   **Renovar plan** with classes left: the plan detail shows «Tu nuevo plan
+   empieza el {date}, al terminar el actual.» and no «Fecha de inicio» chips;
+   **Continuar al pago** sends no `startsOn`. With no classes left, the chips
+   show and «Hoy» is selected. `GET /api/v1/clients/current/subscription`
+   carries `renewalStartsOn` only in the first case.
