@@ -1,12 +1,9 @@
 import type { Prisma } from '../../generated/prisma/client';
 import {
-  AllowanceAdjustmentReason,
   AuditActorKind,
   AuditOutcome,
   EvaluationCancellationCause,
   EvaluationState,
-  PaymentMethod,
-  PaymentState,
   SubscriptionState,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
@@ -16,7 +13,8 @@ import {
   boliviaInstant,
   addCivilDays,
 } from '../../time/bolivia-time';
-import { netAllowanceClasses } from '../commands/net-allowance';
+import { releaseSlot } from '../evaluations/evaluation-slot-release';
+import { otherRealSale, reverseRewards } from './void-reward-reversals';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -30,15 +28,19 @@ export type VoidContext = {
   now: Date;
 };
 
+type VoidAuditRecord = {
+  actionCode: string;
+  targetType: string;
+  targetId: string;
+  metadata: Prisma.InputJsonObject;
+};
+
+export type VoidAudit = (record: VoidAuditRecord) => Promise<unknown>;
+
 const audit = (
   transaction: Transaction,
   context: VoidContext,
-  record: {
-    actionCode: string;
-    targetType: string;
-    targetId: string;
-    metadata: Prisma.InputJsonObject;
-  },
+  record: VoidAuditRecord,
 ) =>
   transaction.auditRecord.create({
     data: {
@@ -57,10 +59,12 @@ const audit = (
   });
 
 // The founder place this sale granted becomes free again; one granted by an
-// earlier sale stays (owner decision 3, 2026-10-28).
+// earlier sale stays. When another real sale of hers remains (a sale
+// recorded twice), the place now names that sale (owner decision 3).
 const releaseFounderPlace = async (
   transaction: Transaction,
   context: VoidContext,
+  other: { id: string } | null,
 ) => {
   const place = await transaction.founderMembership.findFirst({
     where: { paymentId: context.paymentId, deletedAt: null },
@@ -69,137 +73,20 @@ const releaseFounderPlace = async (
   if (place === null) return;
   await transaction.founderMembership.update({
     where: { id: place.id },
-    data: { deletedAt: context.now },
+    data: other === null ? { deletedAt: context.now } : { paymentId: other.id },
   });
   await audit(transaction, context, {
-    actionCode: 'founder_membership.released',
+    actionCode:
+      other === null
+        ? 'founder_membership.released'
+        : 'founder_membership.repointed',
     targetType: 'founder_membership',
     targetId: place.id,
-    metadata: { clientId: context.clientId, number: place.number },
-  });
-};
-
-const unusedOn = async (
-  transaction: Transaction,
-  subscriptionId: string,
-  classes: number,
-) => {
-  const live = await transaction.allowanceAdjustment.findMany({
-    where: { subscriptionId, deletedAt: null },
-    select: { classes: true },
-  });
-  return netAllowanceClasses(live) >= classes;
-};
-
-// The gift class and the host's invite reward this sale earned, when their
-// Subscription still holds them unspent. Each adjustment names its sale in
-// the audit record written with it (correlationId).
-const removeUnusedRewards = async (
-  transaction: Transaction,
-  context: VoidContext,
-) => {
-  const earned = await transaction.auditRecord.findMany({
-    where: {
-      actionCode: 'allowance_adjustment.recorded',
-      correlationId: context.paymentId,
-    },
-    select: { targetId: true },
-  });
-  const adjustments = await transaction.allowanceAdjustment.findMany({
-    where: {
-      id: { in: earned.flatMap(({ targetId }) => targetId ?? []) },
-      deletedAt: null,
-      reason: {
-        in: [
-          AllowanceAdjustmentReason.GIFT_NEW_CLIENT,
-          AllowanceAdjustmentReason.INVITE_CONVERTED,
-        ],
-      },
-    },
-    select: {
-      id: true,
-      subscriptionId: true,
-      clientId: true,
-      classes: true,
-      reason: true,
-    },
-  });
-  for (const adjustment of adjustments) {
-    if (
-      !(await unusedOn(
-        transaction,
-        adjustment.subscriptionId,
-        adjustment.classes,
-      ))
-    ) {
-      continue;
-    }
-    await transaction.allowanceAdjustment.update({
-      where: { id: adjustment.id },
-      data: { deletedAt: context.now },
-    });
-    if (adjustment.reason === AllowanceAdjustmentReason.INVITE_CONVERTED) {
-      // The friend's next real Plan may earn the host her class again.
-      await transaction.guestPass.updateMany({
-        where: {
-          friendClientId: context.clientId,
-          rewardSubscriptionId: adjustment.subscriptionId,
-          deletedAt: null,
-        },
-        data: { rewardedAt: null, rewardSubscriptionId: null },
-      });
-    }
-    await audit(transaction, context, {
-      actionCode: 'allowance_adjustment.removed',
-      targetType: 'allowance_adjustment',
-      targetId: adjustment.id,
-      metadata: {
-        clientId: adjustment.clientId,
-        subscriptionId: adjustment.subscriptionId,
-        classes: adjustment.classes,
-        reason: adjustment.reason.toLowerCase(),
-      },
-    });
-  }
-  await withdrawOwedReward(transaction, context);
-};
-
-// A reward owed to a host with no current Plan came from the friend's first
-// real Plan; with that sale voided and no other real one, nothing is owed.
-const withdrawOwedReward = async (
-  transaction: Transaction,
-  context: VoidContext,
-) => {
-  const owed = await transaction.guestPass.findFirst({
-    where: {
-      friendClientId: context.clientId,
-      rewardOwed: true,
-      rewardedAt: null,
-      deletedAt: null,
-    },
-    select: { id: true },
-  });
-  if (owed === null) return;
-  const otherSale = await transaction.payment.findFirst({
-    where: {
+    metadata: {
       clientId: context.clientId,
-      id: { not: context.paymentId },
-      state: PaymentState.CONFIRMED,
-      method: { not: PaymentMethod.COURTESY },
-      planPriceCentavos: { gt: 0 },
+      number: place.number,
+      ...(other === null ? {} : { remainingPaymentId: other.id }),
     },
-    select: { id: true },
-  });
-  if (otherSale !== null) return;
-  await transaction.guestPass.update({
-    where: { id: owed.id },
-    data: { rewardOwed: false },
-  });
-  await audit(transaction, context, {
-    actionCode: 'guest_pass.reward_withdrawn',
-    targetType: 'guest_pass',
-    targetId: owed.id,
-    metadata: { clientId: context.clientId },
   });
 };
 
@@ -228,6 +115,8 @@ const cancelIncludedEvaluations = async (
         cancellationCause: EvaluationCancellationCause.PAYMENT_VOIDED,
       },
     });
+    // As a Staff cancellation does: a slot past its block's end is withdrawn.
+    await releaseSlot(transaction, evaluation.evaluationSlotId, context.now);
     await audit(transaction, context, {
       actionCode: 'evaluation.cancelled_by_void',
       targetType: 'evaluation',
@@ -299,8 +188,14 @@ export const reverseWhatTheSaleGranted = async (
   transaction: Transaction,
   context: VoidContext,
 ): Promise<void> => {
-  await releaseFounderPlace(transaction, context);
-  await removeUnusedRewards(transaction, context);
+  const other = await otherRealSale(transaction, context);
+  await releaseFounderPlace(transaction, context, other);
+  await reverseRewards(
+    transaction,
+    context,
+    (record) => audit(transaction, context, record),
+    other,
+  );
   await cancelIncludedEvaluations(transaction, context);
   await closeWaitlistEntries(transaction, context);
 };
