@@ -1,14 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import {
-  AuditActorKind,
-  AuditOutcome,
-  StaffRole,
-} from '../../generated/prisma/enums';
+import { AuditActorKind, AuditOutcome } from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
-import {
-  auditRoleOf,
-  type AdministratorActor,
-  type OperationsActor,
+import type {
+  AdministratorActor,
+  OperationsActor,
 } from './administration-errors';
 
 // Catalog and schedule changes (the Administrator's, or the Coordinator's on
@@ -32,9 +27,9 @@ export const recordAdministratorAudit = (
       actionCode: record.actionCode,
       outcome: AuditOutcome.SUCCEEDED,
       actorKind: AuditActorKind.ACCOUNT,
-      actorAccountId: actor.accountId,
-      actorRole: StaffRole[auditRoleOf(actor)],
-      impersonationId: actor.impersonationId ?? null,
+      actorAccountId: actor.audit.accountId,
+      actorRole: actor.audit.role,
+      impersonationId: actor.audit.impersonationId,
       targetType: record.targetType,
       targetId: record.targetId,
       branchId: record.branchId ?? null,

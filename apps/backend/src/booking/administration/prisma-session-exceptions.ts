@@ -4,7 +4,6 @@ import {
   AuditOutcome,
   BookingState,
   SessionState,
-  StaffRole,
 } from '../../generated/prisma/enums';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import {
@@ -17,7 +16,6 @@ import { promoteWaitlistInTransaction } from '../commands/waitlist-promotion';
 import { recordAdministratorAudit } from './administration-audit';
 import {
   AdministrationError,
-  auditRoleOf,
   requireOperations,
 } from './administration-errors';
 import {
@@ -248,9 +246,9 @@ export const createPrismaSessionExceptions = (
             actionCode: 'session.updated',
             outcome: AuditOutcome.SUCCEEDED,
             actorKind: AuditActorKind.ACCOUNT,
-            actorAccountId: actor.accountId,
-            actorRole: StaffRole[auditRoleOf(actor)],
-            impersonationId: actor.impersonationId ?? null,
+            actorAccountId: actor.audit.accountId,
+            actorRole: actor.audit.role,
+            impersonationId: actor.audit.impersonationId,
             targetType: 'session',
             targetId: session.id,
             branchId: session.branchId,

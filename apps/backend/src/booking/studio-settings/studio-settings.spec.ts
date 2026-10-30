@@ -109,7 +109,11 @@ describe('updateStudioSettings', () => {
       {
         accountId: 'administrator-account',
         staffMemberId: 'administrator-staff',
-        impersonationId: null,
+        audit: {
+          accountId: 'administrator-account',
+          role: 'ADMINISTRATOR',
+          impersonationId: null,
+        },
       },
     );
   });

@@ -100,9 +100,11 @@ describe('updateAdministratorClientProfile', () => {
         clientId: 'client-id',
         name: 'Lucía Fernández Paz',
         phone: null,
-        actorAccountId: `${role}-account`,
-        actorRole: role,
-        impersonationId: null,
+        actor: {
+          accountId: `${role}-account`,
+          role: role.toUpperCase(),
+          impersonationId: null,
+        },
         occurredAt: now,
         previous: { name: 'Lucía Fernández', phone: '+591 70011001' },
       });

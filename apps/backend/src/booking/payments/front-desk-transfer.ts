@@ -79,6 +79,7 @@ export const createFrontDeskTransfer = (
     ) {
       throw rule('branch_not_assigned', 'Branch is not assigned');
     }
+    const audit = auditActorOf(principal);
 
     return retrySerializable(() =>
       prisma.$transaction(
@@ -311,14 +312,9 @@ export const createFrontDeskTransfer = (
               actionCode: 'payment.front_desk_transfer_submitted',
               outcome: AuditOutcome.SUCCEEDED,
               actorKind: AuditActorKind.ACCOUNT,
-              actorAccountId: auditActorOf(principal).accountId,
-              actorRole:
-                principal.impersonation === undefined
-                  ? principal.identity.kind === 'staff'
-                    ? (principal.identity.role.toUpperCase() as StaffRole)
-                    : null
-                  : StaffRole.ADMINISTRATOR,
-              impersonationId: auditActorOf(principal).impersonationId,
+              actorAccountId: audit.accountId,
+              actorRole: audit.role,
+              impersonationId: audit.impersonationId,
               targetType: 'payment',
               targetId: payment.id,
               branchId: command.branchId,

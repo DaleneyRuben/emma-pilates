@@ -1,4 +1,7 @@
-import { auditActorOf } from '../../system-identity/authentication/audit-actor';
+import {
+  auditActorOf,
+  type AuditActor,
+} from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 
 export type AdministrationErrorCode =
@@ -63,10 +66,12 @@ export class AdministrationError extends Error {
   }
 }
 
+// `accountId` is the acting Staff Member's own Account, for unaudited actor
+// columns; `audit` is who the audit record names (ADR-0100).
 export type AdministratorActor = {
   accountId: string;
   staffMemberId: string;
-  impersonationId?: string | null;
+  audit: AuditActor;
 };
 
 export const requireAdministrator = (
@@ -78,11 +83,10 @@ export const requireAdministrator = (
   ) {
     throw new AdministrationError('administration_access_denied');
   }
-  const actor = auditActorOf(principal);
   return {
-    accountId: actor.accountId,
+    accountId: principal.accountId,
     staffMemberId: principal.identity.staffMemberId,
-    impersonationId: actor.impersonationId,
+    audit: auditActorOf(principal),
   };
 };
 
@@ -102,22 +106,13 @@ export const requireOperations = (
   ) {
     throw new AdministrationError('administration_access_denied');
   }
-  const actor = auditActorOf(principal);
   return {
-    accountId: actor.accountId,
+    accountId: principal.accountId,
     staffMemberId: principal.identity.staffMemberId,
     role: principal.identity.role,
-    impersonationId: actor.impersonationId,
+    audit: auditActorOf(principal),
   };
 };
-
-// The audit actor Role of a schedule or catalog change (ADR-0055, ADR-0102).
-export const auditRoleOf = (
-  actor: AdministratorActor | OperationsActor,
-): 'ADMINISTRATOR' | 'COORDINATOR' =>
-  'role' in actor && actor.role === 'coordinator'
-    ? 'COORDINATOR'
-    : 'ADMINISTRATOR';
 
 // Constraint names arrive only in the driver cause (see NUT-002 notes).
 export const databaseCause = (error: unknown): string => {

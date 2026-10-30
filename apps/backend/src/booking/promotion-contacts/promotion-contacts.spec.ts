@@ -100,7 +100,11 @@ describe('exportPromotionContacts', () => {
       actor: {
         accountId: 'staff-account',
         staffMemberId: 'staff-id',
-        impersonationId: null,
+        audit: {
+          accountId: 'staff-account',
+          role: 'ADMINISTRATOR',
+          impersonationId: null,
+        },
       },
       contactCount: 1,
       occurredAt: now,
@@ -129,7 +133,11 @@ describe('withdrawPromotionContact', () => {
       actor: {
         accountId: 'staff-account',
         staffMemberId: 'staff-id',
-        impersonationId: null,
+        audit: {
+          accountId: 'staff-account',
+          role: 'ADMINISTRATOR',
+          impersonationId: null,
+        },
       },
       occurredAt: now,
     });

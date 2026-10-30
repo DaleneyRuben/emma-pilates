@@ -2,11 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { retrySerializable } from '../../database/retry-serializable';
 import { runIdempotent } from '../../database/run-idempotent';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
-import {
-  AuditActorKind,
-  AuditOutcome,
-  StaffRole,
-} from '../../generated/prisma/enums';
+import { AuditActorKind, AuditOutcome } from '../../generated/prisma/enums';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import {
@@ -77,8 +73,9 @@ export const createPrismaPromotionCommands = (
         actionCode: input.actionCode,
         outcome: AuditOutcome.SUCCEEDED,
         actorKind: AuditActorKind.ACCOUNT,
-        actorAccountId: actor.accountId,
-        actorRole: StaffRole.ADMINISTRATOR,
+        actorAccountId: actor.audit.accountId,
+        actorRole: actor.audit.role,
+        impersonationId: actor.audit.impersonationId,
         targetType: 'promotion',
         targetId: input.promotionId,
         correlationId: randomUUID(),

@@ -1,10 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { Prisma, type PrismaClient } from '../../generated/prisma/client';
-import {
-  AuditActorKind,
-  AuditOutcome,
-  StaffRole,
-} from '../../generated/prisma/enums';
+import { AuditActorKind, AuditOutcome } from '../../generated/prisma/enums';
 import { boliviaDate } from '../../time/bolivia-time';
 import { accountStatus } from '../assistant/prisma-assistant-client-repository';
 import { closureScope } from '../account-closure/closure-scope';
@@ -200,14 +196,9 @@ export const createPrismaAdministratorClients = (
             actionCode: 'client.profile_corrected',
             outcome: AuditOutcome.SUCCEEDED,
             actorKind: AuditActorKind.ACCOUNT,
-            actorAccountId: input.actorAccountId,
-            actorRole:
-              input.impersonationId !== null
-                ? StaffRole.ADMINISTRATOR
-                : input.actorRole === 'coordinator'
-                  ? StaffRole.COORDINATOR
-                  : StaffRole.ADMINISTRATOR,
-            impersonationId: input.impersonationId,
+            actorAccountId: input.actor.accountId,
+            actorRole: input.actor.role,
+            impersonationId: input.actor.impersonationId,
             targetType: 'client',
             targetId: input.clientId,
             correlationId: randomUUID(),

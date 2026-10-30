@@ -16,7 +16,12 @@ describe('Promotion Contacts with live Clients (PostgreSQL)', () => {
   let context: DatabaseTestContext;
   let prisma: PrismaClient;
   const store = () => createPrismaPromotionContacts(prisma);
-  const actor = { accountId: randomUUID(), staffMemberId: randomUUID() };
+  const accountId = randomUUID();
+  const actor = {
+    accountId,
+    staffMemberId: randomUUID(),
+    audit: { accountId, role: 'ADMINISTRATOR' as const, impersonationId: null },
+  };
   const ids = {
     lucia: randomUUID(),
     luciaConsent: randomUUID(),

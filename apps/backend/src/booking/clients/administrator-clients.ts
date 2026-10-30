@@ -1,4 +1,4 @@
-import { auditActorOf } from '../../system-identity/authentication/audit-actor';
+import type { AuditActor } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import {
@@ -93,9 +93,8 @@ export type ClientProfileCorrection = {
   clientId: string;
   name: string;
   phone: string | null;
-  actorAccountId: string;
-  actorRole: 'administrator' | 'coordinator';
-  impersonationId: string | null;
+  /** Who the audit record names (ADR-0100). */
+  actor: AuditActor;
   occurredAt: Date;
   previous: { name: string; phone: string | null };
 };
@@ -160,7 +159,6 @@ export const updateAdministratorClientProfile = async (
   { directory, now }: Dependencies,
 ): Promise<AdministratorClientRecord> => {
   const actor = requireOperations(principal);
-  const audited = auditActorOf(principal);
   const name = command.name.trim();
   if (name === '') throw new AdministrationError('client_name_required');
   const client = await directory.read(command.clientId);
@@ -169,9 +167,7 @@ export const updateAdministratorClientProfile = async (
     clientId: client.id,
     name,
     phone: normalizePhone(command.phone),
-    actorAccountId: audited.accountId,
-    actorRole: actor.role,
-    impersonationId: audited.impersonationId,
+    actor: actor.audit,
     occurredAt: now(),
     previous: { name: client.name, phone: client.phone },
   });
