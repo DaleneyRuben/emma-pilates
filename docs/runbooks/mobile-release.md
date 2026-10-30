@@ -166,7 +166,7 @@ Only JavaScript, copy, style, and asset fixes that need no native change:
    with `eas update:republish` of the previous group. Never promote only
    because time passed.
 
-## From GitHub Actions (REL-008, ADR-0101)
+## From GitHub Actions (REL-008, [ADR-0107](../adr/0107-trigger-mobile-releases-from-github-actions.md))
 
 Three workflows replace the workstation commands above. Each is
 `workflow_dispatch` only. None runs on merge. All three stop before calling
