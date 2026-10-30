@@ -29,14 +29,14 @@ describe('founder place of an unreviewed transfer', () => {
   const centro = () =>
     fixtures.branches.find((branch) => branch.name === 'Centro')!;
 
-  const pendingTransfer = async (name: string) => {
+  const pendingTransfer = async (name: string, planId = plan.id) => {
     const buyer = await world.newClient(name);
     const assistant = await world.staffPrincipal('camila.rojas@example.com');
     const receipt = await world.readyReceipt(assistant.accountId);
     const pending = await world.commands().recordFrontDeskTransfer(
       {
         clientId: buyer.clientId,
-        planId: plan.id,
+        planId,
         branchId: centro().id,
         imageAssetId: receipt.id,
       },
@@ -86,5 +86,42 @@ describe('founder place of an unreviewed transfer', () => {
       correlationId: pending.id,
       metadata: { clientId: buyer.clientId, reason: 'payment_unreviewed' },
     });
+  });
+
+  it('confirms a late transfer for a Plan hidden since, with its founder place and gift', async () => {
+    const promo = await prisma.plan.create({
+      data: {
+        name: `Promo apertura ${randomUUID().slice(0, 8)}`,
+        durationDays: plan.durationDays,
+        classAllowance: plan.classAllowance,
+        priceCentavos: plan.priceCentavos,
+        displayOrder: 90,
+      },
+    });
+    const { buyer, pending } = await pendingTransfer('Plan oculto', promo.id);
+    await sweepAt(new Date(now.getTime() + 72 * hour + 60_000));
+    await prisma.plan.update({
+      where: { id: promo.id },
+      data: { hiddenAt: now },
+    });
+
+    await world
+      .commands()
+      .confirmTransfer(
+        { paymentId: pending.id },
+        await world.staffPrincipal('paola.mendoza@example.com'),
+      );
+
+    await expect(
+      prisma.founderMembership.findFirst({
+        where: { clientId: buyer.clientId, deletedAt: null },
+        select: { status: true },
+      }),
+    ).resolves.toMatchObject({ status: 'ACTIVE' });
+    await expect(
+      prisma.allowanceAdjustment.count({
+        where: { clientId: buyer.clientId, reason: 'GIFT_NEW_CLIENT' },
+      }),
+    ).resolves.toBe(1);
   });
 });
