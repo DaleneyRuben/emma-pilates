@@ -33,7 +33,10 @@ const monthEnd = (month: Date): Date =>
   new Date(Date.UTC(month.getUTCFullYear(), month.getUTCMonth() + 1, 1));
 
 // Booking exposes no studio query yet, so Studio Management reads the booking
-// schema by name (ADR-0011) and never imports Booking's internals.
+// schema by name (ADR-0011) and never imports Booking's internals. Plan days
+// come only from a Plan she bought and that stands: a guest pass and Courtesy
+// Access are courtesy Payments, and a voided sale is no sale (booking
+// ADR-0009, ADR-0012). A Subscription from before Payments has none and counts.
 const readSource = async (
   prisma: PrismaClient,
   month: Date,
@@ -60,9 +63,13 @@ const readSource = async (
                  + 1
              )
              FROM booking.subscriptions s
+             LEFT JOIN booking.payments p ON p.id = s.payment_id
              WHERE s.client_id = c.id
                AND s.starts_on < ${until}::date
                AND s.ends_on >= ${month}::date
+               AND NOT s.ended_by_void
+               AND (s.payment_id IS NULL
+                 OR (p.state = 'confirmed' AND p.method <> 'courtesy'))
              ORDER BY s.starts_on DESC
              LIMIT 1
            ), 0)::int AS plan_days,
