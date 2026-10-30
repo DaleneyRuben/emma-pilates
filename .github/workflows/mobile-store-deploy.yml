@@ -25,6 +25,11 @@ concurrency:
   group: mobile-store-${{ inputs.app }}-${{ inputs.platform }}
   cancel-in-progress: false
 
+# eas-cli is no dependency of the apps, so the workflow runs one pinned
+# version through npx. Raise it here, in both mobile workflows.
+env:
+  EAS_CLI_VERSION: 27.2.0
+
 jobs:
   deploy:
     runs-on: ubuntu-24.04
@@ -65,4 +70,4 @@ jobs:
         working-directory: apps/${{ inputs.app }}-mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: pnpm exec eas build --profile production --platform android --auto-submit --non-interactive --no-wait
+        run: npx --yes eas-cli@"$EAS_CLI_VERSION" build --profile production --platform android --auto-submit --non-interactive --no-wait
