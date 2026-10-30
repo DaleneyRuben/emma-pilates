@@ -15,7 +15,7 @@ import {
 } from '../../notifications/prisma-notification-store';
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
+import { addCivilDays, boliviaDate } from '../../time/bolivia-time';
 import { grantFounderPlace } from './prisma-founder-membership';
 import {
   AdministrationError,
@@ -131,6 +131,18 @@ export const createPrismaCourtesyAccess = (
       }),
     ]);
     const today = boliviaDate(now);
+    // FIX-019 (4), owner 2026-10-30: Courtesy Access replaces a Guest Pass
+    // with no class booked; one with its class booked still blocks it.
+    const replacedGuestPassId =
+      active !== null && active.futureBookedCount === 0
+        ? ((
+            await transaction.guestPass.findFirst({
+              where: { courtesySubscriptionId: active.id, deletedAt: null },
+              select: { courtesySubscriptionId: true },
+            })
+          )?.courtesySubscriptionId ?? null)
+        : null;
+    const current = replacedGuestPassId === null ? active : null;
     const futureSubscriptionId = await loadFutureSubscriptionId(
       transaction,
       command.clientId,
@@ -139,7 +151,7 @@ export const createPrismaCourtesyAccess = (
     const eligibility = evaluateCourtesyGrant({
       today,
       endsOn: command.endsOn,
-      activeSubscription: active,
+      activeSubscription: current,
       futureSubscriptionId,
       openPurchaseIntentId: openIntent?.id ?? null,
       pendingPaymentId: pendingPayment?.id ?? null,
@@ -148,7 +160,7 @@ export const createPrismaCourtesyAccess = (
       today,
       requested: command.startsOn ?? today,
       rules: await readStartDateRules(transaction),
-      active,
+      active: current,
       futureSubscriptionId,
     });
     assertCourtesyTerm(allocated.startsOn, command.endsOn);
@@ -184,6 +196,17 @@ export const createPrismaCourtesyAccess = (
       },
       select: { id: true },
     });
+    // Before the new Subscription, which may not overlap the pass.
+    if (replacedGuestPassId !== null) {
+      await endSubscriptionEarly(transaction, {
+        subscriptionId: replacedGuestPassId,
+        endsOn: addCivilDays(allocated.startsOn, -1),
+        startsOn: allocated.startsOn,
+        principal,
+        now,
+        paymentId: payment.id,
+      });
+    }
     const subscription = await transaction.subscription.create({
       data: {
         clientId: command.clientId,
