@@ -58,7 +58,7 @@ export const reclaimMissingFounderPlace = async (
     select: {
       discountReason: true,
       planPriceCentavos: true,
-      plan: { select: { classAllowance: true, hiddenAt: true } },
+      plan: { select: { classAllowance: true } },
     },
   });
   if (payment?.discountReason !== 'founder' || payment.plan === null) return;
@@ -66,11 +66,16 @@ export const reclaimMissingFounderPlace = async (
     clientId: input.clientId,
     now: input.now,
     courtesy: false,
-    hidden: payment.plan.hiddenAt !== null,
+    // Priced at the sale, when the Plan was on sale: hiding it since never
+    // takes the place away (FIX-021).
+    hidden: false,
     priceCentavos: payment.planPriceCentavos,
     classAllowance: payment.plan.classAllowance,
     paymentId: input.paymentId,
     activate: true,
+    // The Client paid the founder price; a late review is the desk's fault,
+    // so she keeps it and the place, over the cap (owner 2026-10-30).
+    overCap: true,
   });
   if (!claimed.founder) {
     throw new PaymentRuleError(

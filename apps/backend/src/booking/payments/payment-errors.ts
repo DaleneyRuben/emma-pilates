@@ -19,6 +19,7 @@ export type PaymentRuleCode =
   | 'payment_confirmation_conflict'
   | 'courtesy_end_date_invalid'
   | 'start_date_out_of_window'
+  | 'start_date_before_booked_class'
   | 'future_subscription_exists'
   | 'freeze_not_allowed'
   | 'freeze_start_in_past'
@@ -47,6 +48,7 @@ const statuses: Record<PaymentRuleCode, number> = {
   payment_confirmation_conflict: 409,
   courtesy_end_date_invalid: 400,
   start_date_out_of_window: 400,
+  start_date_before_booked_class: 409,
   future_subscription_exists: 409,
   freeze_not_allowed: 409,
   freeze_start_in_past: 409,

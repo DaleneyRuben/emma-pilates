@@ -18,7 +18,6 @@ export const hasEarlierRealPayment = async (
       state: PaymentState.CONFIRMED,
       method: { not: PaymentMethod.COURTESY },
       planPriceCentavos: { gt: 0 },
-      plan: { hiddenAt: null },
     },
     select: { id: true },
   });

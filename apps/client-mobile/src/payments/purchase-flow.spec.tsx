@@ -199,6 +199,23 @@ describe("Client purchase flow", () => {
     expect(purchased).not.toHaveBeenCalled();
   });
 
+  it("explains a start before her booked guest class (FIX-019)", async () => {
+    const fetcher = routeFetcher({
+      ...baseRoutes(0),
+      "POST /api/v1/purchase-intents": () =>
+        jsonResponse({ code: "start_date_before_booked_class" }, 409),
+    });
+    const screen = await openPlanDetail(fetcher);
+
+    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+
+    expect(
+      await screen.findByText(
+        "Tienes una clase reservada con tu acceso actual. Elige un inicio después de esa clase.",
+      ),
+    ).toBeOnTheScreen();
+  });
+
   it("explains a rejected transfer and offers a new receipt", async () => {
     const fetcher = routeFetcher({
       ...baseRoutes(0),

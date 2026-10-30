@@ -458,7 +458,9 @@ export function createPrismaPaymentCommands(
       subscriptionId: subscription.id,
       paymentId: payment.id,
       method: paymentMethods[payment.method],
-      hidden: payment.plan.hiddenAt !== null,
+      // Only a Plan on sale can be sold; hiding it before the review never
+      // takes the gift away (FIX-021).
+      hidden: false,
       priceCentavos: payment.planPriceCentavos,
       founder,
       earlierRealPayment: await hasEarlierRealPayment(transaction, {

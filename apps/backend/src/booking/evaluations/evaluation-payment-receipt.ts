@@ -113,7 +113,9 @@ export const attachEvaluationReceipt = async (
 };
 
 // The same effectiveness check a class booking uses. A date range alone is
-// not enough: an exhausted Plan cannot buy a paid Evaluation.
+// not enough: an exhausted Plan cannot buy a paid Evaluation. Only a paid
+// Plan counts: a Guest Pass or Courtesy Access never covers an Evaluation
+// (FIX-019, owner 2026-10-30).
 export const coveringSubscription = async (
   transaction: Transaction,
   input: { clientId: string; slotDate: Date; today: Date; now: Date },
@@ -124,6 +126,8 @@ export const coveringSubscription = async (
       state: 'ACTIVE',
       startsOn: { lte: input.slotDate },
       endsOn: { gte: input.slotDate },
+      plan: { priceCentavos: { gt: 0 } },
+      NOT: { payment: { is: { method: 'COURTESY' } } },
     },
     orderBy: [{ endsOn: 'desc' }, { id: 'asc' }],
     select: {

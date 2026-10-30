@@ -75,24 +75,71 @@ describe('first 90 days job (PostgreSQL)', () => {
       priceCentavos: 0,
       hiddenAt: startsOn,
     });
+
+    await job().execute();
+    expect(
+      await prisma.lifecycleMessage.count({
+        where: { clientId: free.clientId },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.contactAlert.count({ where: { clientId: free.clientId } }),
+    ).toBe(0);
+  });
+
+  it('starts the clock from a first plan hidden since (FIX-021)', async () => {
     const hidden = await createClientWithPlan(prisma, {
-      name: 'Oculto',
+      name: 'Plan oculto',
       startsOn,
       hiddenAt: startsOn,
-      priceCentavos: 56_000,
     });
 
     await job().execute();
     expect(
       await prisma.lifecycleMessage.count({
-        where: { clientId: { in: [free.clientId, hidden.clientId] } },
+        where: { clientId: hidden.clientId },
       }),
-    ).toBe(0);
+    ).toBe(2);
     expect(
-      await prisma.contactAlert.count({
-        where: { clientId: { in: [free.clientId, hidden.clientId] } },
-      }),
+      await prisma.contactAlert.count({ where: { clientId: hidden.clientId } }),
+    ).toBe(1);
+  });
+
+  it('keeps a hidden first plan from letting a renewal restart the 90 days (FIX-021)', async () => {
+    const client = await createClientWithPlan(prisma, {
+      name: 'Renueva tras un plan oculto',
+      startsOn: new Date('2026-01-01T00:00:00.000Z'),
+      hiddenAt: new Date('2026-03-01T00:00:00.000Z'),
+    });
+    const renewal = await createPlan(prisma);
+    await prisma.subscription.create({
+      data: {
+        clientId: client.clientId,
+        planId: renewal.id,
+        planNameSnapshot: renewal.name,
+        durationDaysSnapshot: 30,
+        originalClassAllowance: 8,
+        remainingClassAllowance: 8,
+        startsOn,
+        endsOn: new Date('2026-10-30T00:00:00.000Z'),
+        activatedAt: startsOn,
+      },
+    });
+
+    await job().execute();
+    expect(
+      await prisma.contactAlert.count({ where: { clientId: client.clientId } }),
     ).toBe(0);
+    const milestones = await prisma.lifecycleMessage.findMany({
+      where: { clientId: client.clientId },
+      select: { milestone: true },
+    });
+    expect(milestones.map((row) => row.milestone).sort()).toEqual([
+      'DAY_2',
+      'DAY_30',
+      'DAY_90',
+      'WEEK_1',
+    ]);
   });
 
   it('opens the 7-day alert and leaves it when she has not booked', async () => {
