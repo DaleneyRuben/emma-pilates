@@ -90,4 +90,32 @@ describe('sendLifecycleMessages', () => {
       }),
     ).resolves.toEqual({ sent: 0 });
   });
+
+  it('records the other Clients when one fails, then reports the one that failed', async () => {
+    const record = jest.fn(({ clientId }: { clientId: string }) =>
+      clientId === 'broken'
+        ? Promise.reject(new Error('insert failed'))
+        : Promise.resolve(true),
+    );
+    const plan = (clientId: string) => ({
+      clientId,
+      accountId: `account-${clientId}`,
+      startsOn,
+      sentMilestones: ['day_2'],
+    });
+
+    await expect(
+      sendLifecycleMessages({
+        today,
+        occurredAt,
+        findFirstRealPlans: jest
+          .fn()
+          .mockResolvedValue([plan('broken'), plan('fine')]),
+        record,
+      }),
+    ).rejects.toThrow('first_90_days failed for 1 item: broken');
+    expect(record).toHaveBeenLastCalledWith(
+      expect.objectContaining({ clientId: 'fine', milestone: 'week_1' }),
+    );
+  });
 });
