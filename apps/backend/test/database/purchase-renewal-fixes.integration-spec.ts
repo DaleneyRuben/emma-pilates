@@ -307,7 +307,7 @@ describe('purchase and renewal fixes', () => {
     await currentPlan(queuedTester.clientId, {
       startsOn: '2026-08-24',
       endsOn: '2026-09-23',
-      remaining: 3,
+      remaining: 0,
     });
     await createPrismaCourtesyAccess(prisma, { now: () => now }).grant(
       {
