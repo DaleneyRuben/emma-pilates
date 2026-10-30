@@ -211,6 +211,27 @@ describe('first-90-days contact alerts', () => {
     ).toBe(1);
   });
 
+  it('counts the days in La Paz: a class at 23:30 on day 15 counts, one before the Plan does not', () => {
+    // 23:30 on 15 October in La Paz is already 16 October in UTC.
+    expect(
+      classesInsideFirstDays(startsOn, 15, [
+        new Date('2026-10-16T03:30:00.000Z'),
+      ]),
+    ).toBe(1);
+    // 00:30 on 16 October in La Paz is outside.
+    expect(
+      classesInsideFirstDays(startsOn, 15, [
+        new Date('2026-10-16T04:30:00.000Z'),
+      ]),
+    ).toBe(0);
+    // The day before the Plan started.
+    expect(
+      classesInsideFirstDays(startsOn, 15, [
+        new Date('2026-09-30T15:00:00.000Z'),
+      ]),
+    ).toBe(0);
+  });
+
   it('treats a Client as having booked since an alert when a live Booking is newer', () => {
     const openedAt = new Date('2026-10-08T12:00:00.000Z');
     expect(

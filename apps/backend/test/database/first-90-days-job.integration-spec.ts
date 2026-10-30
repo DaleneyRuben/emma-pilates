@@ -9,6 +9,7 @@ import {
 import {
   createBookedSession,
   createClientWithPlan,
+  createPlan,
   first90DaysNow,
 } from './first-90-days-test-support';
 
@@ -174,13 +175,19 @@ describe('first 90 days job (PostgreSQL)', () => {
       name: 'Clase tardía',
       startsOn,
     });
-    await createBookedSession(prisma, {
-      clientId: client.clientId,
-      subscriptionId: client.subscriptionId,
-      accountId: client.accountId,
-      createdAt: new Date('2026-10-02T15:00:00.000Z'),
-      startsAt: new Date('2026-10-20T15:00:00.000Z'),
-    });
+    // One class inside the first 15 days and one after: only one counts.
+    for (const startsAt of [
+      new Date('2026-10-05T15:00:00.000Z'),
+      new Date('2026-10-20T15:00:00.000Z'),
+    ]) {
+      await createBookedSession(prisma, {
+        clientId: client.clientId,
+        subscriptionId: client.subscriptionId,
+        accountId: client.accountId,
+        createdAt: new Date('2026-10-02T15:00:00.000Z'),
+        startsAt,
+      });
+    }
 
     await createFirst90DaysJob(
       prisma,
@@ -208,6 +215,32 @@ describe('first 90 days job (PostgreSQL)', () => {
         where: { clientId: client.clientId },
       }),
     ).toBe(4);
+    expect(
+      await prisma.contactAlert.count({ where: { clientId: client.clientId } }),
+    ).toBe(0);
+  });
+
+  it('keeps a renewal from restarting the first 90 days', async () => {
+    const client = await createClientWithPlan(prisma, {
+      name: 'Renueva tras meses',
+      startsOn: new Date('2026-01-01T00:00:00.000Z'),
+    });
+    const renewal = await createPlan(prisma);
+    await prisma.subscription.create({
+      data: {
+        clientId: client.clientId,
+        planId: renewal.id,
+        planNameSnapshot: renewal.name,
+        durationDaysSnapshot: 30,
+        originalClassAllowance: 8,
+        remainingClassAllowance: 8,
+        startsOn,
+        endsOn: new Date('2026-10-30T00:00:00.000Z'),
+        activatedAt: startsOn,
+      },
+    });
+
+    await job().execute();
     expect(
       await prisma.contactAlert.count({ where: { clientId: client.clientId } }),
     ).toBe(0);

@@ -2,6 +2,8 @@ import { sendLifecycleMessages } from './send-lifecycle-messages';
 
 const startsOn = new Date('2026-10-01T00:00:00.000Z');
 const today = new Date('2026-10-08T00:00:00.000Z');
+// 09:00 on the same day in La Paz, when date-triggered pushes go out.
+const occurredAt = new Date('2026-10-08T13:00:00.000Z');
 
 describe('sendLifecycleMessages', () => {
   it('records each due milestone once with destination none', async () => {
@@ -10,6 +12,7 @@ describe('sendLifecycleMessages', () => {
     await expect(
       sendLifecycleMessages({
         today,
+        occurredAt,
         findFirstRealPlans: jest.fn().mockResolvedValue([
           {
             clientId: 'client-1',
@@ -42,7 +45,7 @@ describe('sendLifecycleMessages', () => {
         message:
           '¿Cómo te sentiste en tus primeras clases? Si tienes alguna duda sobre los ejercicios o el nivel, cuéntale a tu instructora: estamos para acompañarte.',
         destination: null,
-        occurredAt: today,
+        occurredAt,
       },
     });
   });
@@ -53,6 +56,7 @@ describe('sendLifecycleMessages', () => {
     await expect(
       sendLifecycleMessages({
         today,
+        occurredAt,
         findFirstRealPlans: jest.fn().mockResolvedValue([
           {
             clientId: 'client-1',
@@ -73,6 +77,7 @@ describe('sendLifecycleMessages', () => {
     await expect(
       sendLifecycleMessages({
         today,
+        occurredAt,
         findFirstRealPlans: jest.fn().mockResolvedValue([
           {
             clientId: 'client-1',
