@@ -33,8 +33,6 @@ describe("Assistant plan card labels", () => {
         name: "Paquete de 8 clases, Bs 476, antes Bs 560",
       }),
     ).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Paquete de 12 clases, Bs 780" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Paquete de 12 clases, Bs 780" })).toBeOnTheScreen();
   });
 });
