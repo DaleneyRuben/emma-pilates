@@ -1,3 +1,4 @@
+import { sweepEach } from '../../jobs/sweep-each';
 import type { NewNotification } from '../../notifications/prisma-notification-store';
 import { lifecycleCopy } from './first-90-days-copy';
 import {
@@ -16,11 +17,13 @@ export type LifecycleSend = {
   clientId: string;
   accountId: string;
   milestone: LifecycleMilestone;
-  notification: NewNotification;
+  notification: NewNotification | null;
 };
 
 type SendLifecycleMessagesDependencies = {
   today: Date;
+  // The 09:00 morning the pushes go out, which stamps them.
+  occurredAt: Date;
   findFirstRealPlans(): Promise<FirstRealPlan[]>;
   record(send: LifecycleSend): Promise<boolean>;
 };
@@ -46,26 +49,27 @@ export const sendLifecycleMessages = async (
   const plans = await dependencies.findFirstRealPlans();
   let sent = 0;
 
-  for (const plan of plans) {
-    const alreadySent = new Set(plan.sentMilestones);
-    for (const milestone of dueMilestones(
-      plan.startsOn,
-      dependencies.today,
-      alreadySent,
-    )) {
-      const recorded = await dependencies.record({
-        clientId: plan.clientId,
-        accountId: plan.accountId,
-        milestone,
-        notification: lifecycleNotification(
-          plan,
+  await sweepEach(
+    'first_90_days',
+    plans,
+    (plan) => plan.clientId,
+    async (plan) => {
+      const alreadySent = new Set(plan.sentMilestones);
+      const due = dueMilestones(plan.startsOn, dependencies.today, alreadySent);
+      for (const milestone of due) {
+        const latest = milestone === due.at(-1);
+        const recorded = await dependencies.record({
+          clientId: plan.clientId,
+          accountId: plan.accountId,
           milestone,
-          dependencies.today,
-        ),
-      });
-      if (recorded) sent += 1;
-    }
-  }
+          notification: latest
+            ? lifecycleNotification(plan, milestone, dependencies.occurredAt)
+            : null,
+        });
+        if (recorded && latest) sent += 1;
+      }
+    },
+  );
 
   return { sent };
 };

@@ -1,3 +1,4 @@
+import { readPlanRenewals } from '../booking/payments/plan-renewals';
 import type { PrismaClient } from '../generated/prisma/client';
 import { monthKpis, type MonthKpiCounts } from './month-kpis';
 
@@ -44,7 +45,16 @@ export const readMonthKpis = async (
       AND plan_days > 0
       AND month < ${month}::date
   `;
+  const renewals = await readPlanRenewals(
+    prisma,
+    month,
+    new Date(Date.UTC(month.getUTCFullYear(), month.getUTCMonth() + 1, 1)),
+  );
   return monthKpis({
+    planRenewals: {
+      ending: renewals.length,
+      renewed: renewals.filter((plan) => plan.renewed).length,
+    },
     sessions: sessions.map((row) => ({
       capacity: Number(row.capacity),
       bookingsAtWindowClose: Number(row.bookings_at_window_close),

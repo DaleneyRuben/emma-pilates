@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class BudgetLineResultDto {
   @ApiProperty() name!: string;
@@ -24,8 +24,14 @@ export class MonthResultDto {
   lines!: BudgetLineResultDto[];
   @ApiProperty({ description: 'BOB centavos owed to the Nutritionist' })
   nutritionistCostCentavos!: number;
+  @ApiPropertyOptional({
+    description:
+      'The month’s Salary Payments, BOB centavos. The Coordinator’s and reception’s also show as the actual of their budget lines',
+  })
+  salariesCentavos?: number;
   @ApiProperty({
-    description: 'Cash income less tax, actual costs, and the Nutritionist',
+    description:
+      'Cash income less tax, actual costs, salaries, and the Nutritionist',
   })
   resultCentavos!: number;
   @ApiProperty({

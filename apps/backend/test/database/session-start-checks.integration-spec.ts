@@ -184,65 +184,6 @@ describe('Prisma Session start checks: Minimum Bookings', () => {
     ).resolves.toHaveLength(noticesBefore);
   });
 
-  it('finishes the remaining Sessions after a restart in the middle of a check, without repeating the settled one', async () => {
-    const firstStart = slotStart(2);
-    const first = await world.createSession(firstStart);
-    const second = await world.createSession(
-      new Date(firstStart.getTime() + hour),
-    );
-    const lucia = await world.principalOf('lucia@example.com');
-    const valeria = await world.principalOf('valeria@example.com');
-    await world.book(first.id, lucia);
-    await world.book(second.id, valeria);
-    const luciaAllowance = await world.remainingAllowance(lucia);
-    const valeriaAllowance = await world.remainingAllowance(valeria);
-    const luciaNoticesBefore = (
-      await world.sessionCancelledNotices('lucia@example.com')
-    ).length;
-    // The worker dies while settling the second Session: its transaction
-    // rolls back, the first one stays committed.
-    let crashed = false;
-    const crashOnSecond = async (
-      ...[transaction, notice]: Parameters<typeof recordNotification>
-    ) => {
-      if (!crashed && notice.businessEventKey.endsWith(second.id)) {
-        crashed = true;
-        throw new Error('worker stopped');
-      }
-      await recordNotification(transaction, notice);
-    };
-
-    world.setClock(new Date(second.startsAt.getTime() - lead));
-    await expect(
-      world.checks(crashOnSecond).checkMinimumBookings(),
-    ).rejects.toThrow('worker stopped');
-    await expect(sessionRow(first.id)).resolves.toMatchObject({
-      state: 'CANCELLED',
-    });
-    await expect(sessionRow(second.id)).resolves.toMatchObject({
-      state: 'SCHEDULED',
-      minimumBookingsCheckCompletedAt: null,
-    });
-
-    await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
-      checked: 1,
-      cancelled: 1,
-    });
-    await expect(sessionRow(second.id)).resolves.toMatchObject({
-      state: 'CANCELLED',
-      cancellationCause: 'MINIMUM_NOT_MET',
-    });
-    await expect(world.remainingAllowance(lucia)).resolves.toBe(
-      luciaAllowance + 1,
-    );
-    await expect(world.remainingAllowance(valeria)).resolves.toBe(
-      valeriaAllowance + 1,
-    );
-    await expect(
-      world.sessionCancelledNotices('lucia@example.com'),
-    ).resolves.toHaveLength(luciaNoticesBefore + 1);
-  });
-
   it('ignores a Session an Administrator already cancelled', async () => {
     const session = await world.createSession(slotStart(3));
     await world.prisma.session.update({

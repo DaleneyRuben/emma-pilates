@@ -1,5 +1,5 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
-import { boliviaMonth } from '../time/bolivia-time';
+import { readPlanRenewals } from '../booking/payments/plan-renewals';
 import {
   recomputeFacts,
   type FactBooking,
@@ -14,8 +14,10 @@ type SourceRow = {
   class_type_id: string;
   trainer_staff_member_id: string;
   starts_at: Date;
+  ends_at: Date;
   capacity: number;
   state: string;
+  bookings_at_window_close: number | null;
   client_id: string | null;
   booking_state: string | null;
   outcome: string | null;
@@ -24,14 +26,16 @@ type SourceRow = {
 type ClientRow = {
   client_id: string;
   plan_days: number;
-  renewed: boolean;
 };
 
 const monthEnd = (month: Date): Date =>
   new Date(Date.UTC(month.getUTCFullYear(), month.getUTCMonth() + 1, 1));
 
 // Booking exposes no studio query yet, so Studio Management reads the booking
-// schema by name (ADR-0011) and never imports Booking's internals.
+// schema by name (ADR-0011) and never imports Booking's internals. Plan days
+// come only from a Plan she bought and that stands: a guest pass and Courtesy
+// Access are courtesy Payments, and a voided sale is no sale (booking
+// ADR-0009, ADR-0012). A Subscription from before Payments has none and counts.
 const readSource = async (
   prisma: PrismaClient,
   month: Date,
@@ -39,7 +43,8 @@ const readSource = async (
   const until = monthEnd(month);
   const rows = await prisma.$queryRaw<SourceRow[]>`
     SELECT s.id AS session_id, s.branch_id, s.class_type_id, s.trainer_staff_member_id,
-           s.starts_at, s.capacity, s.state::text AS state,
+           s.starts_at, s.ends_at, s.capacity, s.state::text AS state,
+           s.bookings_at_window_close,
            b.client_id, b.state::text AS booking_state, a.outcome::text AS outcome
     FROM booking.sessions s
     LEFT JOIN booking.bookings b ON b.session_id = s.id
@@ -57,27 +62,25 @@ const readSource = async (
                  + 1
              )
              FROM booking.subscriptions s
+             LEFT JOIN booking.payments p ON p.id = s.payment_id
              WHERE s.client_id = c.id
                AND s.starts_on < ${until}::date
                AND s.ends_on >= ${month}::date
+               AND NOT s.ended_by_void
+               AND (s.payment_id IS NULL
+                 OR (p.state = 'confirmed' AND p.method <> 'courtesy'))
              ORDER BY s.starts_on DESC
              LIMIT 1
-           ), 0)::int AS plan_days,
-           EXISTS (
-             SELECT 1
-             FROM booking.subscriptions current_plan
-             JOIN booking.subscriptions next
-               ON next.client_id = current_plan.client_id
-              AND next.id <> current_plan.id
-              AND next.starts_on > current_plan.starts_on
-              AND next.starts_on <= current_plan.ends_on + 7
-             WHERE current_plan.client_id = c.id
-               AND current_plan.ends_on >= ${month}::date
-               AND current_plan.ends_on < ${until}::date
-           ) AS renewed
+           ), 0)::int AS plan_days
     FROM booking.clients c
     WHERE c.deleted_at IS NULL
   `;
+  // Owner decision 5: the KPIs read the same «renovó» as the bonus.
+  const renewedClients = new Set(
+    (await readPlanRenewals(prisma, month, until))
+      .filter((plan) => plan.renewed)
+      .map((plan) => plan.clientId),
+  );
   const sessions = new Map<string, FactSession>();
   for (const row of rows) {
     const session = sessions.get(row.session_id) ?? {
@@ -86,8 +89,13 @@ const readSource = async (
       classTypeId: row.class_type_id,
       trainerStaffMemberId: row.trainer_staff_member_id,
       startsAt: row.starts_at,
+      endsAt: row.ends_at,
       capacity: row.capacity,
       state: row.state === 'cancelled' ? 'cancelled' : 'scheduled',
+      bookingsAtWindowClose:
+        row.bookings_at_window_close === null
+          ? null
+          : Number(row.bookings_at_window_close),
       bookings: [],
     };
     if (row.client_id !== null && row.booking_state !== null) {
@@ -108,7 +116,7 @@ const readSource = async (
     clients: clients.map((row): FactClient => ({
       id: row.client_id,
       planDays: Number(row.plan_days),
-      renewed: row.renewed,
+      renewed: renewedClients.has(row.client_id),
       // REL-016 has not added the store-review flag. The seam takes it;
       // until the column exists every live Client is included.
       excludedFromAnalytics: false,
@@ -155,10 +163,10 @@ export const recomputeStudioFacts = async (
     Date.UTC(input.month.getUTCFullYear(), input.month.getUTCMonth(), 1),
   );
   const source = await readSource(prisma, month);
-  const facts = recomputeFacts(source, month);
   const now = input.now();
+  const facts = recomputeFacts(source, month, now);
   await prisma.$transaction(async (transaction) => {
-    await writeSessionFacts(transaction, facts.sessions, now);
+    await writeSessionFacts(transaction, facts.sessions, month, now);
     await writeClientMonthFacts(transaction, facts.clientMonths, month, now);
   });
   return {
@@ -170,20 +178,20 @@ export const recomputeStudioFacts = async (
 const writeSessionFacts = async (
   transaction: Prisma.TransactionClient,
   sessions: ReturnType<typeof recomputeFacts>['sessions'],
+  month: Date,
   now: Date,
 ): Promise<void> => {
+  // Every live fact of the month that is no longer a taught Session goes,
+  // also one written before a cancellation or before FIX-008.
   const live = await transaction.sessionFact.findMany({
-    where: { deletedAt: null },
+    where: {
+      deletedAt: null,
+      sessionDate: { gte: month, lt: monthEnd(month) },
+    },
   });
   const wanted = new Set(sessions.map((session) => session.sessionId));
-  const monthDates = new Set(
-    sessions.map((session) => session.sessionDate.getTime()),
-  );
   for (const existing of live) {
-    if (
-      monthDates.has(existing.sessionDate.getTime()) &&
-      !wanted.has(existing.sessionId)
-    ) {
+    if (!wanted.has(existing.sessionId)) {
       await transaction.sessionFact.update({
         where: { sessionId: existing.sessionId },
         data: { deletedAt: now },
@@ -238,5 +246,3 @@ const writeClientMonthFacts = async (
     });
   }
 };
-
-export const currentStudioMonth = (now: Date): Date => boliviaMonth(now);

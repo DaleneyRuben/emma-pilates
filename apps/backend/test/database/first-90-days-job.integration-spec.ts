@@ -9,6 +9,7 @@ import {
 import {
   createBookedSession,
   createClientWithPlan,
+  createPlan,
   first90DaysNow,
 } from './first-90-days-test-support';
 
@@ -37,7 +38,7 @@ describe('first 90 days job (PostgreSQL)', () => {
     });
 
     await expect(job().execute()).resolves.toEqual({
-      messages: 2,
+      messages: 1,
       alerts: 1,
     });
     await expect(job().execute()).resolves.toEqual({
@@ -54,10 +55,7 @@ describe('first 90 days job (PostgreSQL)', () => {
       where: { accountId: client.accountId },
       orderBy: { type: 'asc' },
     });
-    expect(inbox.map((row) => row.type)).toEqual([
-      'lifecycle_day_2',
-      'lifecycle_week_1',
-    ]);
+    expect(inbox.map((row) => row.type)).toEqual(['lifecycle_week_1']);
     expect(inbox.every((row) => row.destinationType === null)).toBe(true);
     const alerts = await prisma.contactAlert.findMany({
       where: { clientId: client.clientId },
@@ -169,5 +167,106 @@ describe('first 90 days job (PostgreSQL)', () => {
         },
       }),
     ).toBe(0);
+  });
+
+  it('ignores a class booked after day 15 when it opens the day-15 alert', async () => {
+    const day15 = new Date('2026-10-16T16:00:00.000Z');
+    const client = await createClientWithPlan(prisma, {
+      name: 'Clase tardía',
+      startsOn,
+    });
+    // One class inside the first 15 days and one after: only one counts.
+    for (const startsAt of [
+      new Date('2026-10-05T15:00:00.000Z'),
+      new Date('2026-10-20T15:00:00.000Z'),
+    ]) {
+      await createBookedSession(prisma, {
+        clientId: client.clientId,
+        subscriptionId: client.subscriptionId,
+        accountId: client.accountId,
+        createdAt: new Date('2026-10-02T15:00:00.000Z'),
+        startsAt,
+      });
+    }
+
+    await createFirst90DaysJob(
+      prisma,
+      () => day15,
+      recordNotification,
+    ).execute();
+    expect(
+      await prisma.contactAlert.findMany({
+        where: { clientId: client.clientId },
+      }),
+    ).toEqual([
+      expect.objectContaining({ reason: 'FEWER_THAN_2_CLASSES_BY_DAY_15' }),
+    ]);
+  });
+
+  it('does not alert a Client whose first plan started more than 90 days ago', async () => {
+    const client = await createClientWithPlan(prisma, {
+      name: 'Antigua',
+      startsOn: new Date('2026-01-01T00:00:00.000Z'),
+    });
+
+    await job().execute();
+    expect(
+      await prisma.lifecycleMessage.count({
+        where: { clientId: client.clientId },
+      }),
+    ).toBe(4);
+    expect(
+      await prisma.contactAlert.count({ where: { clientId: client.clientId } }),
+    ).toBe(0);
+  });
+
+  it('keeps a renewal from restarting the first 90 days', async () => {
+    const client = await createClientWithPlan(prisma, {
+      name: 'Renueva tras meses',
+      startsOn: new Date('2026-01-01T00:00:00.000Z'),
+    });
+    const renewal = await createPlan(prisma);
+    await prisma.subscription.create({
+      data: {
+        clientId: client.clientId,
+        planId: renewal.id,
+        planNameSnapshot: renewal.name,
+        durationDaysSnapshot: 30,
+        originalClassAllowance: 8,
+        remainingClassAllowance: 8,
+        startsOn,
+        endsOn: new Date('2026-10-30T00:00:00.000Z'),
+        activatedAt: startsOn,
+      },
+    });
+
+    await job().execute();
+    expect(
+      await prisma.contactAlert.count({ where: { clientId: client.clientId } }),
+    ).toBe(0);
+  });
+
+  it('still opens contact alerts when a lifecycle message cannot be recorded, then reports it', async () => {
+    const client = await createClientWithPlan(prisma, {
+      name: 'Mensaje roto',
+      startsOn,
+    });
+
+    await expect(
+      createFirst90DaysJob(
+        prisma,
+        () => first90DaysNow,
+        (transaction, notice) =>
+          notice.accountId === client.accountId
+            ? Promise.reject(new Error('notice broke'))
+            : recordNotification(transaction, notice),
+      ).execute(),
+    ).rejects.toThrow(`first_90_days failed for 1 item: ${client.clientId}`);
+    await expect(
+      prisma.contactAlert.findMany({
+        where: { clientId: client.clientId },
+        select: { reason: true },
+      }),
+    ).resolves.toEqual([{ reason: 'NO_BOOKING_7_DAYS' }]);
   });
 });

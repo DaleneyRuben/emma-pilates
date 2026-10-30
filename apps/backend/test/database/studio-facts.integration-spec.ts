@@ -93,6 +93,24 @@ describe('studio facts', () => {
        VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
       [accountId, `${accountId}@example.com`, trainerId],
     );
+    // A real cash sale, approved at `decidedAt` (owner decision 5 measures
+    // «renovó» by purchase).
+    const sale = async (clientId: string, decidedAt: string) => {
+      const paymentId = randomUUID();
+      await context.pool.query(
+        `INSERT INTO booking.payments
+           (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot,
+            class_allowance_snapshot, plan_price_centavos, credit_applied_centavos,
+            amount_due_centavos, starts_on, method, kind, state, collected_at_branch_id,
+            submitted_by_account_id, submitted_at, decided_by_account_id, decided_at,
+            created_at, updated_at)
+         VALUES ($1, $2, $3, 'Test Plan', 30, 8, 35000, 0, 35000, $4::date, 'cash', 'plan',
+            'confirmed', $5, $6, $4::timestamptz, $6, $4::timestamptz, $4::timestamptz,
+            CURRENT_TIMESTAMP)`,
+        [paymentId, clientId, planId, decidedAt, branchId, accountId],
+      );
+      return paymentId;
+    };
     for (const [index, clientId] of clients.entries()) {
       await context.pool.query(
         `INSERT INTO booking.clients (id, name, referral_code, updated_at)
@@ -101,10 +119,10 @@ describe('studio facts', () => {
       );
       await context.pool.query(
         `INSERT INTO booking.subscriptions
-           (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot,
+           (id, client_id, plan_id, payment_id, plan_name_snapshot, duration_days_snapshot,
             original_class_allowance, remaining_class_allowance, starts_on, ends_on,
             state, activated_at, expired_at, updated_at)
-         VALUES ($1, $2, $3, 'Test Plan', 30, 8, 6, $4, $5,
+         VALUES ($1, $2, $3, $9, 'Test Plan', 30, 8, 6, $4, $5,
             $6::"booking"."SubscriptionState", $7, $8, CURRENT_TIMESTAMP)`,
         [
           subscriptionIds[index],
@@ -115,17 +133,24 @@ describe('studio facts', () => {
           index === 2 ? 'expired' : 'active',
           '2026-10-01T04:00:00.000Z',
           index === 2 ? '2026-10-01T04:00:00.000Z' : null,
+          await sale(clientId, index === 2 ? '2026-09-01' : '2026-10-20'),
         ],
       );
       if (index !== 2) {
         await context.pool.query(
           `INSERT INTO booking.subscriptions
-             (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot,
+             (id, client_id, plan_id, payment_id, plan_name_snapshot, duration_days_snapshot,
               original_class_allowance, remaining_class_allowance, starts_on, ends_on,
               state, activated_at, expired_at, updated_at)
-           VALUES ($1, $2, $3, 'Next Plan', 30, 8, 8, '2026-11-01', '2026-11-30',
+           VALUES ($1, $2, $3, $5, 'Next Plan', 30, 8, 8, '2026-11-01', '2026-11-30',
               'expired', $4, $4, CURRENT_TIMESTAMP)`,
-          [randomUUID(), clientId, planId, '2026-11-01T04:00:00.000Z'],
+          [
+            randomUUID(),
+            clientId,
+            planId,
+            '2026-11-01T04:00:00.000Z',
+            await sale(clientId, '2026-10-28'),
+          ],
         );
       }
     }

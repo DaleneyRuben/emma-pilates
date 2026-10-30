@@ -225,6 +225,13 @@ describe('founder membership', () => {
         where: { businessEventKey: `founder-membership-lost:${lost.id}` },
       }),
     ).resolves.toBe(1);
+    await expect(
+      prisma.notification.findFirstOrThrow({
+        where: { businessEventKey: `founder-membership-lost:${lost.id}` },
+      }),
+    ).resolves.toMatchObject({
+      createdAt: new Date('2026-10-23T13:00:00.000Z'),
+    });
 
     await cash(lapsed.clientId, plan.id);
     await expect(
