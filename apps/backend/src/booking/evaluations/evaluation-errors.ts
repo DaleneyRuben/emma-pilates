@@ -5,6 +5,7 @@ export type EvaluationRuleCode =
   | 'evaluation_month_used'
   | 'evaluation_included_used'
   | 'evaluation_payment_required'
+  | 'evaluation_payment_pending'
   | 'no_eligible_subscription'
   | 'evaluation_not_found'
   | 'evaluation_not_booked'
@@ -25,6 +26,7 @@ const statuses: Record<EvaluationRuleCode, number> = {
   evaluation_month_used: 409,
   evaluation_included_used: 409,
   evaluation_payment_required: 409,
+  evaluation_payment_pending: 409,
   no_eligible_subscription: 409,
   evaluation_not_found: 404,
   evaluation_not_booked: 409,

@@ -20,6 +20,7 @@ import { recordNotification as defaultNotificationRecorder } from '../../notific
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { PaymentRuleError } from './payment-errors';
+import { createPendingPayment } from './pending-payment';
 import { summarizeCredit } from './credit-summary';
 import {
   allocateStartDate,
@@ -261,28 +262,25 @@ export const createFrontDeskTransfer = (
               deletionDueAt: null,
             },
           });
-          const payment = await transaction.payment.create({
-            data: {
-              clientId: command.clientId,
-              planId: plan!.id,
-              purchaseIntentId: intent.id,
-              planNameSnapshot: plan!.name,
-              durationDaysSnapshot: plan!.durationDays,
-              weeklyClassCapSnapshot: plan!.weeklyClassCap,
-              classAllowanceSnapshot: plan!.classAllowance,
-              planPriceCentavos: plan!.priceCentavos,
-              creditAppliedCentavos: reserved,
-              discountCentavos: priced.discountCentavos,
-              discountReason: priced.discountReason,
-              amountDueCentavos,
-              startsOn: allocated.startsOn,
-              method: PaymentMethod.TRANSFER,
-              state: PaymentState.PENDING,
-              submittedByAccountId: principal.accountId,
-              submittedAt: now,
-              createdAt: now,
-            },
-            select: { id: true },
+          const payment = await createPendingPayment(transaction, {
+            clientId: command.clientId,
+            planId: plan!.id,
+            purchaseIntentId: intent.id,
+            planNameSnapshot: plan!.name,
+            durationDaysSnapshot: plan!.durationDays,
+            weeklyClassCapSnapshot: plan!.weeklyClassCap,
+            classAllowanceSnapshot: plan!.classAllowance,
+            planPriceCentavos: plan!.priceCentavos,
+            creditAppliedCentavos: reserved,
+            discountCentavos: priced.discountCentavos,
+            discountReason: priced.discountReason,
+            amountDueCentavos,
+            startsOn: allocated.startsOn,
+            method: PaymentMethod.TRANSFER,
+            state: PaymentState.PENDING,
+            submittedByAccountId: principal.accountId,
+            submittedAt: now,
+            createdAt: now,
           });
           if (priced.discountReason === 'founder') {
             await repointFounderReservation(transaction, {
