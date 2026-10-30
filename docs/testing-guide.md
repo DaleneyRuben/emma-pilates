@@ -3276,7 +3276,9 @@ take about a minute:
    Mariana's panel shows «Monto a verificar», Bs 560,00, the receipt image
    (read from the API) and its enlargement; confirming asks first and says
    «Pago de Mariana Peña confirmado: su plan Paquete de 8 clases empieza
-   hoy.». Sofía's is rejected with a reason («Confirmar rechazo» stays
+   hoy.». A transfer bought for a later Start Date, or a renewal queued
+   after the current Plan, says that day instead, in the question and in
+   the notice («… empieza el sábado 31 de octubre.»). Sofía's is rejected with a reason («Confirmar rechazo» stays
    disabled until one is typed). Under `?status=all` both rows read
    Confirmado and Rechazado and no longer open.
 10. **Staff (AW23/AW24).** Valentina Soria is invited as a Nutritionist at
