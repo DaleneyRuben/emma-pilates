@@ -7,10 +7,11 @@ import workspacePackageJson from "../../../package.json";
 // ADR-0038/0039: manual EAS Build and Submit releases and controlled EAS
 // Updates, isolated per application (ADR-0085).
 describe("client release configuration", () => {
-  it("keeps its own store identity and ties updates to the app version", () => {
+  it("keeps its own store identity and ties updates to the native fingerprint", () => {
     expect(appConfig.expo.ios.bundleIdentifier).toBe("com.emmapilates.client");
     expect(appConfig.expo.android.package).toBe("com.emmapilates.client");
-    expect(appConfig.expo.runtimeVersion).toEqual({ policy: "appVersion" });
+    // FIX-011 / MOB-072: fingerprint so an OTA cannot land on a binary missing native modules.
+    expect(appConfig.expo.runtimeVersion).toEqual({ policy: "fingerprint" });
   });
 
   it("is linked to its own EAS project in the studio's Expo organization", () => {
@@ -55,7 +56,7 @@ describe("client release configuration", () => {
       autoIncrement: true,
     });
     expect(JSON.stringify(build.production)).not.toContain("localhost");
-    expect(easConfig.cli.appVersionSource).toBe("local");
+    expect(easConfig.cli.appVersionSource).toBe("remote");
   });
 
   it("installs development builds on the iOS Simulator with the development client", () => {
