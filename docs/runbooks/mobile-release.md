@@ -139,10 +139,13 @@ journeys against freshly applied fixtures (see the testing guide, Test 19).
 ## Native release (EAS Build and Submit)
 
 1. Confirm `expo.version` in the app's `app.json`. A native change (new
-   native module, permission, or SDK upgrade) needs a new version, because the
-   `appVersion` runtime policy ties OTA updates to it.
+   native module, permission, SDK upgrade, or a fingerprint-affecting config
+   change) needs a new store build, because the `fingerprint` runtime policy
+   (FIX-011) ties OTA updates to the native fingerprint rather than the
+   marketing version.
 2. `cd apps/<app> && eas build --profile production --platform all`
-   (`autoIncrement` raises the build number; `appVersionSource` is `local`).
+   (`autoIncrement` raises the build number on EAS; `appVersionSource` is
+   `remote`, so Android `versionCode` is stored on EAS rather than committed).
 3. Install the `staging` profile build (Test 55), or the production build through
    TestFlight/internal testing, and run the Maestro journeys with
    `APP_ID=com.emmapilates.<app>`.
@@ -172,9 +175,15 @@ secret. Until the owner creates it, dispatching a workflow fails at that
 check and publishes nothing.
 
 - **Publish OTA** (`mobile-publish-ota.yml`), from `main` only, after that
-  commit's CI run is green. Channel `preview` first. Channel `production`
-  is refused unless the preview dispatch of the same commit recorded a git
-  note `preview-ota:<app>:<sha>`. Rollout percentage applies to production.
+  commit's CI run is green. Choose channel `preview` first: the workflow
+  publishes that gate to the `staging` update channel with `--environment
+  preview` (testers use staging builds; there is no `preview` channel).
+  Channel `production` is refused unless the preview dispatch of the same
+  commit recorded a git note `preview-ota:<app>:<sha>` (notes are fetched
+  before the guard and appended so a second app does not overwrite the
+  first). Rollout percentage applies to production. The OTA message and
+  rollout are passed through `env:`, never interpolated into the script
+  from workflow inputs.
 - **Create native release** (`mobile-create-release.yml`) opens a pull
   request from `release/<app>-x.y.z` that bumps that app's `expo.version`.
   Merge it only after the store version is published. Merging earlier stops
