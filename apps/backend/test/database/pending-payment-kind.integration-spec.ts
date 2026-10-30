@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { PaymentKind, PaymentState } from '../../src/generated/prisma/client';
+import { createPrismaAdministratorPayments } from '../../src/booking/payments/prisma-administrator-payments';
 import {
   fixtures,
   now,
@@ -108,5 +109,25 @@ describe('a pending payment of another kind', () => {
     );
 
     expect(pending.state).toBe('pending');
+  });
+
+  it('names a pending evaluation in the administrator ledger', async () => {
+    const buyer = await world.newClient('Nombre de evaluación');
+    await pendingEvaluation(buyer.clientId, buyer.accountId);
+
+    const page = await createPrismaAdministratorPayments(world.prisma).list({
+      page: 1,
+      pageSize: 20,
+      status: 'pending',
+      invoice: 'all',
+      query: 'Nombre de evaluación',
+    });
+
+    expect(page.items).toEqual([
+      expect.objectContaining({
+        kind: 'evaluation',
+        planName: 'Evaluación nutricional',
+      }),
+    ]);
   });
 });

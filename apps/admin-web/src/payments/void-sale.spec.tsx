@@ -123,4 +123,25 @@ describe("AW28 Anular venta", () => {
       "Esta venta ya fue anulada.",
     );
   });
+
+  it("hides Anular venta on a confirmed evaluation", async () => {
+    const evaluation = paymentRow("05", "Lucía Fernández", {
+      state: "confirmed",
+      kind: "evaluation",
+      planName: "Evaluación nutricional",
+      decidedAt: "2026-09-20T15:00:00.000Z",
+    });
+    server.use(
+      http.get(apiUrl(paymentsPath), () =>
+        jsonResponse(paymentPage([evaluation], { pendingCount: 0 })),
+      ),
+    );
+    renderAdmin("/back-office/pagos?status=confirmed");
+    const row = (await screen.findByRole("cell", { name: /Lucía Fernández/ }))
+      .parentElement as HTMLElement;
+
+    expect(
+      within(row).queryByRole("button", { name: "Anular venta" }),
+    ).not.toBeInTheDocument();
+  });
 });
