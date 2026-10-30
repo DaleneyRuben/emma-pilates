@@ -1840,6 +1840,7 @@ The findings in [`docs/reviews/2026-10-28-launch-review.md`](../reviews/2026-10-
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | FIX-000 | P0 | Docs | Record the owner's six decisions of 2026-10-28 (founder discount from the first Plan, a cancelled guest-pass class may be rebooked, a void undoes everything from that sale, a voided cash sale stays in expected cash, «renovó» by purchase date, the Coordinator assigns a Trainer's Branches) | — | 0.5 d | done | `8f750d3d` |
 | FIX-015 | P0 | Backend | `DELETE /api/v1/bookings/{bookingId}` answers 200 while the contract and the Client app require 204, so every successful cancel shows «No pudimos cancelar la reserva. Inténtalo de nuevo.» on installed builds. | — | 0.5 d | done | `3b2a6265` red, `e10c9f3f` green. The other documented 204 routes already set the code. |
+| FIX-016 | P1 | Client app | Design follow-up 218 §3–4 in the app: «Elige otro turno» speaks of a paid move (no «gratuita» copy) and tapping a time asks «¿Mover tu evaluación?» (old and new turno, the payment stays) before `POST /evaluations/{id}/reschedule`; Mis evaluaciones then shows «Evaluación reprogramada» | FIX-014 | 0.5 d | done | `c460d18b` red, `44ae5075` green (`9c7006b2` spec fix). The used-month state moved to `evaluation-used-month.tsx` so the picker stays under 400 lines. Note: the backlog holds two different FIX-014 rows (the plan-card accessibility row and the paid-Evaluation reschedule row); one should be renumbered. |
 
 ## Deferred
 

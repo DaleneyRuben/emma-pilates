@@ -2,6 +2,7 @@ import {
   getListEvaluationsQueryKey,
   useGetCurrentClientSubscription,
   useListEvaluationSlots,
+  type ClientEvaluationDto,
   type EvaluationAvailabilityDto,
   type EvaluationSlotDto,
 } from "@pilates/api-contracts";
@@ -28,21 +29,16 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { moveEvaluation, rescheduleFailure } from "./reschedule-evaluation";
-import {
-  clockTime,
-  evaluationDate,
-  evaluationDayAndTime,
-  followingMonth,
-  monthName,
-  monthPhrase,
-} from "./evaluation-format";
+import { clockTime, evaluationDate } from "./evaluation-format";
+import { UsedMonth, usedMonthStyles } from "./evaluation-used-month";
+import { RescheduleConfirmSheet } from "./reschedule-confirm-sheet";
 
 type AvailabilityNavigation = {
   goBack: () => void;
   navigate: {
     (screen: "Plans"): void;
     (screen: "BookEvaluation", params: { slot: EvaluationSlotDto }): void;
-    (screen: "MyEvaluations"): void;
+    (screen: "MyEvaluations", params: { confirmed: ClientEvaluationDto; moved: true }): void;
   };
 };
 
@@ -56,19 +52,12 @@ const openDays = (availability: EvaluationAvailabilityDto, currentSlotId?: strin
     }))
     .filter((day) => day.slots.length > 0);
 
-const nextUnusedMonth = (months: EvaluationAvailabilityDto["months"]): string | null => {
-  const lastUsed = [...months].reverse().find((month) => month.status === "used");
-  if (lastUsed === undefined) return null;
-  const available = months.find(
-    (month) => month.status === "available" && month.month > lastUsed.month,
-  );
-  return available?.month ?? followingMonth(lastUsed.month);
-};
-
-function Intro() {
+function Intro({ rescheduling }: { rescheduling: boolean }) {
   return (
     <BodyText>
-      Reserva tu evaluación gratuita con la nutricionista. Tienes una evaluación disponible por mes.
+      {rescheduling
+        ? "Tu evaluación ya está pagada. Elige el nuevo horario: el pago se mantiene."
+        : "Reserva tu evaluación gratuita con la nutricionista. Tienes una evaluación disponible por mes."}
     </BodyText>
   );
 }
@@ -87,37 +76,10 @@ function NutritionistCard({ name }: { name: string }) {
   );
 }
 
-function UsedMonth({ availability }: { availability: EvaluationAvailabilityDto }) {
-  const next = nextUnusedMonth(availability.months);
-  const usedMonth = availability.months.find((month) => month.status === "used");
-  const last = [...availability.months]
-    .reverse()
-    .find((month) => month.evaluation !== null)?.evaluation;
-
-  return (
-    <View style={styles.used}>
-      <Text style={styles.usedTitle}>
-        {`Ya usaste tu evaluación de ${usedMonth === undefined ? "este mes" : monthPhrase(usedMonth.month)}.`}
-      </Text>
-      {next !== null ? (
-        <BodyText>
-          {`Podrás agendar la de ${monthName(next)} desde el 1 de ${monthName(next)}.`}
-        </BodyText>
-      ) : null}
-      {last ? (
-        <View style={styles.lastCard}>
-          <Text style={styles.label}>Tu última evaluación</Text>
-          <BodyText>{evaluationDayAndTime(last.startsAt)}</BodyText>
-        </View>
-      ) : null}
-    </View>
-  );
-}
-
 export function EvaluationAvailabilityScreen({
   route,
 }: {
-  route?: { params?: { evaluationId?: string; slotId?: string } };
+  route?: { params?: { evaluationId?: string; slotId?: string; startsAt?: string } };
 }) {
   const navigation = useNavigation<AvailabilityNavigation>();
   const evaluationId = route?.params?.evaluationId;
@@ -132,6 +94,7 @@ export function EvaluationAvailabilityScreen({
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [moving, setMoving] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  const [target, setTarget] = useState<EvaluationSlotDto | null>(null);
 
   const move = async (slot: EvaluationSlotDto) => {
     if (evaluationId === undefined || moving) return;
@@ -143,11 +106,14 @@ export function EvaluationAvailabilityScreen({
         await queryClient.invalidateQueries({
           queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
         });
-        navigation.navigate("MyEvaluations");
+        setTarget(null);
+        navigation.navigate("MyEvaluations", { confirmed: response.data, moved: true });
         return;
       }
+      setTarget(null);
       setFailure(rescheduleFailure(response.data));
     } catch {
+      setTarget(null);
       setFailure("No pudimos reprogramar la evaluación. Inténtalo de nuevo.");
     } finally {
       setMoving(false);
@@ -194,8 +160,8 @@ export function EvaluationAvailabilityScreen({
     return (
       <Screen style={styles.screen}>
         {header}
-        <View style={styles.used}>
-          <Text style={styles.usedTitle}>
+        <View style={usedMonthStyles.used}>
+          <Text style={usedMonthStyles.usedTitle}>
             Necesitas un plan activo para reservar tu evaluación.
           </Text>
           <BodyText>La evaluación es gratuita con cualquier plan.</BodyText>
@@ -214,9 +180,9 @@ export function EvaluationAvailabilityScreen({
           <UsedMonth availability={availability} />
         ) : (
           <>
-            <Intro />
-            <View style={styles.used}>
-              <Text style={styles.usedTitle}>No hay horarios disponibles por ahora.</Text>
+            <Intro rescheduling={rescheduling} />
+            <View style={usedMonthStyles.used}>
+              <Text style={usedMonthStyles.usedTitle}>No hay horarios disponibles por ahora.</Text>
               <BodyText>Vuelve a revisar en unos días.</BodyText>
             </View>
           </>
@@ -240,11 +206,11 @@ export function EvaluationAvailabilityScreen({
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
-        <Intro />
+        <Intro rescheduling={rescheduling} />
         {nutritionists.size === 1 ? (
           <NutritionistCard name={openSlots[0]?.nutritionistName ?? ""} />
         ) : null}
-        <Text style={styles.label}>Días disponibles</Text>
+        <Text style={usedMonthStyles.label}>Días disponibles</Text>
         <ScrollView
           contentContainerStyle={styles.days}
           horizontal
@@ -290,7 +256,7 @@ export function EvaluationAvailabilityScreen({
                   accessibilityRole="button"
                   key={slot.id}
                   onPress={() =>
-                    rescheduling ? void move(slot) : navigation.navigate("BookEvaluation", { slot })
+                    rescheduling ? setTarget(slot) : navigation.navigate("BookEvaluation", { slot })
                   }
                   style={styles.slot}
                 >
@@ -309,11 +275,22 @@ export function EvaluationAvailabilityScreen({
         {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
         <BodyText style={styles.muted}>
           {rescheduling
-            ? "Al elegir un horario movemos esta evaluación."
+            ? "Al elegir un horario te pediremos confirmar el cambio."
             : "Al elegir un horario confirmarás la cita en la siguiente pantalla."}
         </BodyText>
-        <BodyText style={styles.muted}>Puedes reservar hasta 3 horas antes.</BodyText>
+        <BodyText style={styles.muted}>
+          {rescheduling
+            ? "Puedes reprogramarla hasta 3 horas antes."
+            : "Puedes reservar hasta 3 horas antes."}
+        </BodyText>
       </ScrollView>
+      <RescheduleConfirmSheet
+        busy={moving}
+        currentStartsAt={route?.params?.startsAt}
+        onConfirm={() => (target === null ? undefined : void move(target))}
+        onDismiss={() => setTarget(null)}
+        target={target}
+      />
     </Screen>
   );
 }
@@ -353,18 +330,6 @@ const styles = StyleSheet.create({
   dayWeekday: { color: colors.textSecondary, fontSize: typography.label },
   days: { gap: spacing.sm },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  label: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-  },
-  lastCard: {
-    ...surfaces.flatCard,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
   muted: { color: colors.textMuted, fontSize: typography.note },
   nutritionist: {
     ...surfaces.flatCard,
@@ -388,11 +353,4 @@ const styles = StyleSheet.create({
   },
   slotCaption: { color: colors.textMuted, fontSize: typography.label },
   slotTime: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
-  used: {
-    backgroundColor: "rgba(201,154,78,0.10)",
-    borderRadius: radii.inset,
-    gap: spacing.sm,
-    padding: spacing.xl,
-  },
-  usedTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
 });

@@ -104,56 +104,6 @@ describe("Client Evaluations", () => {
     expect(screen.queryByRole("button", { name: "Cancelar" })).toBeNull();
   });
 
-  it("moves a paid evaluation to the chosen slot and does not book a new one", async () => {
-    const paid = upcomingEvaluation("evaluation-paid", boliviaInstant(firstDay, "09:45"), {
-      slotId: "slot-2",
-      included: false,
-      priceCentavos: 7_000,
-      paymentId: "payment-1",
-      cancellable: false,
-      reschedulable: true,
-    });
-    const moved = upcomingEvaluation("evaluation-paid", boliviaInstant(secondDay, "15:00"), {
-      included: false,
-      priceCentavos: 7_000,
-      paymentId: "payment-1",
-      slotId: "slot-3",
-      cancellable: false,
-      reschedulable: true,
-    });
-    let posted = false;
-    const fetcher = routeFetcher({
-      ...baseRoutes(),
-      "/api/v1/evaluations?scope=upcoming": () => jsonResponse(page(posted ? [moved] : [paid])),
-      "POST /api/v1/evaluations/evaluation-paid/reschedule": (init) => {
-        posted = true;
-        expect(JSON.parse(String(init?.body))).toEqual({ slotId: "slot-3" });
-        expect(new Headers(init?.headers).get("idempotency-key")).toEqual(
-          expect.stringMatching(/^[0-9a-f-]{36}$/),
-        );
-        return jsonResponse(moved);
-      },
-    });
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
-    await fireEvent.press(await screen.findByRole("button", { name: "Reprogramar" }));
-    expect(await screen.findByText("Elige otro turno")).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Turno 09:45" })).toBeNull();
-    await fireEvent.press(screen.getByRole("button", { name: dayName(secondDay) }));
-    await fireEvent.press(screen.getByRole("button", { name: "Turno 15:00" }));
-
-    await waitFor(() => {
-      expect(fetcher).toHaveBeenCalledWith(
-        "/api/v1/evaluations/evaluation-paid/reschedule",
-        expect.objectContaining({ method: "POST" }),
-      );
-    });
-    expect(fetcher).not.toHaveBeenCalledWith(
-      expect.stringMatching(/\/evaluation-slots\/.*\/evaluations/),
-      expect.anything(),
-    );
-    expect(screen.queryByText("Confirmar evaluación")).toBeNull();
-  });
-
   it("shows an 8-class Client the settings price and starts the QR payment", async () => {
     const paid = {
       included: false,
