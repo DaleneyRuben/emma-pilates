@@ -71,7 +71,9 @@ describe('evaluateCourtesyGrant', () => {
       startsOn: today,
       endsOn: new Date(today.getTime() + 5 * day),
       remainingClassAllowance: 3,
+      extraClasses: 0,
       futureBookedCount: 0,
+      courtesy: false,
     };
     expect(
       codeOf(() =>
@@ -108,7 +110,9 @@ describe('evaluateCourtesyGrant', () => {
           startsOn: today,
           endsOn: new Date(today.getTime() + 5 * day),
           remainingClassAllowance: 0,
+          extraClasses: 0,
           futureBookedCount: 0,
+          courtesy: false,
         },
       }),
     ).toEqual({ subscriptionIdToExpire: null });

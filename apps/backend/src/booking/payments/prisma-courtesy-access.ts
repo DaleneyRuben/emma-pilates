@@ -22,7 +22,11 @@ import {
   requireAdministrator,
 } from '../administration/administration-errors';
 import { deprecatedDurationMonths } from '../catalog/plan-validity';
-import { courtesyAccessPlan, evaluateCourtesyGrant } from './courtesy-access';
+import {
+  assertCourtesyTerm,
+  courtesyAccessPlan,
+  evaluateCourtesyGrant,
+} from './courtesy-access';
 import { PaymentRuleError } from './payment-errors';
 import type { PaymentView } from './prisma-payment-commands';
 import { grantGiftClass } from './allowance-adjustments';
@@ -147,6 +151,7 @@ export const createPrismaCourtesyAccess = (
       active,
       futureSubscriptionId,
     });
+    assertCourtesyTerm(allocated.startsOn, command.endsOn);
     if (eligibility.subscriptionIdToExpire !== null) {
       await expireSubscription(
         transaction,

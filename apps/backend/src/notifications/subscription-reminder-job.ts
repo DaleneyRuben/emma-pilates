@@ -15,20 +15,39 @@ export const createSubscriptionReminderJob = (
     remindExpiringSubscriptions({
       today: boliviaDate(now()),
       // Already reminded Subscriptions are excluded, so a day the job misses
-      // is recovered the next day instead of waiting for an exact date.
+      // is recovered the next day instead of waiting for an exact date. A
+      // Guest Pass or Courtesy Access is not renewed, and a Client whose next
+      // Plan is already queued has renewed: neither is reminded.
       findSubscriptionsEndingWithin: async (today) => {
         const subscriptions = await prisma.subscription.findMany({
           where: {
             state: 'ACTIVE',
             endsOn: { gte: today, lte: addCivilDays(today, 3) },
+            NOT: { payment: { is: { method: 'COURTESY' } } },
           },
           select: {
             id: true,
-            client: { select: { account: { select: { id: true } } } },
+            endsOn: true,
+            client: {
+              select: {
+                account: { select: { id: true } },
+                subscriptions: {
+                  where: {
+                    state: 'ACTIVE',
+                    startsOn: { gt: today },
+                    NOT: { payment: { is: { method: 'COURTESY' } } },
+                  },
+                  select: { startsOn: true },
+                },
+              },
+            },
           },
         });
         const candidates = subscriptions.flatMap((subscription) =>
-          subscription.client.account === null
+          subscription.client.account === null ||
+          subscription.client.subscriptions.some(
+            (next) => next.startsOn.getTime() > subscription.endsOn.getTime(),
+          )
             ? []
             : [
                 {

@@ -32,6 +32,8 @@ import { createFreezeReads } from './prisma-freeze-reads';
 import {
   allocateStartDate,
   endSubscriptionEarly,
+  recordStartDateMoved,
+  startsOnAtConfirmation,
   loadFutureSubscriptionId,
   parseRequestedStartDate,
   readStartDateRules,
@@ -1049,11 +1051,12 @@ export function createPrismaPaymentCommands(
         now,
       );
       const today = todayOf(now);
+      const startsOn = startsOnAtConfirmation(payment.startsOn, today);
       const allocated = await (async () => {
         try {
           return await committedStartDate(transaction, {
             clientId: payment.clientId,
-            requested: payment.startsOn,
+            requested: startsOn,
             today,
             active,
           });
@@ -1070,7 +1073,7 @@ export function createPrismaPaymentCommands(
           throw error;
         }
       })();
-      if (allocated.startsOn.getTime() !== payment.startsOn.getTime()) {
+      if (allocated.startsOn.getTime() !== startsOn.getTime()) {
         throw rule(
           'payment_confirmation_conflict',
           'The committed Start Date no longer matches the renewal',
@@ -1097,6 +1100,18 @@ export function createPrismaPaymentCommands(
         });
       }
 
+      if (startsOn.getTime() !== payment.startsOn.getTime()) {
+        await recordStartDateMoved(transaction, {
+          paymentId: payment.id,
+          clientId: payment.clientId,
+          soldStartsOn: payment.startsOn,
+          startsOn,
+          principal,
+          now,
+        });
+      }
+      // The gap is judged on the date she bought for: a late review is the
+      // studio's delay, never hers.
       await loseFounderForGap(transaction, {
         clientId: payment.clientId,
         nextStart: payment.startsOn,
@@ -1128,7 +1143,7 @@ export function createPrismaPaymentCommands(
       });
       const subscriptionId = await activateSubscription(
         transaction,
-        payment,
+        { ...payment, startsOn },
         principal,
         now,
         await readIsFounder(transaction, payment.clientId),

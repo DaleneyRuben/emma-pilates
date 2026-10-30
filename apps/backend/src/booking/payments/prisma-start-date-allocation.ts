@@ -8,6 +8,7 @@ import { decideRenewal } from './early-renewal';
 import { PaymentRuleError } from './payment-errors';
 import type { ActiveSubscriptionFacts } from './purchase-eligibility';
 import { resolveStartDate } from './start-date';
+import { loadActiveSubscription } from './subscription-allocation';
 import { computeSubscriptionTerm } from './subscription-term';
 
 type Transaction = Prisma.TransactionClient;
@@ -90,7 +91,9 @@ const rule = (code: PaymentRuleError['code'], message: string) =>
   new PaymentRuleError(code, message);
 
 // Ends the current Subscription the day before the renewal's Start Date, in
-// the same transaction, and audits who shortened it and why.
+// the same transaction, and audits who shortened it and why. A renewal that
+// starts the day the current one started leaves no day to keep: it expires
+// instead, since an end before the start is only a void's (ADR-0012).
 export const endSubscriptionEarly = async (
   transaction: Transaction,
   input: {
@@ -104,9 +107,17 @@ export const endSubscriptionEarly = async (
 ): Promise<void> => {
   const current = await transaction.subscription.findUniqueOrThrow({
     where: { id: input.subscriptionId },
-    select: { endsOn: true, clientId: true },
+    select: { startsOn: true, endsOn: true, clientId: true },
   });
-  if (input.endsOn.getTime() < current.endsOn.getTime()) {
+  const expired = input.endsOn.getTime() < current.startsOn.getTime();
+  // A Plan that already ended before the renewal's eve keeps its end.
+  if (!expired && input.endsOn.getTime() >= current.endsOn.getTime()) return;
+  if (expired) {
+    await transaction.subscription.update({
+      where: { id: input.subscriptionId },
+      data: { state: SubscriptionState.EXPIRED, expiredAt: input.now },
+    });
+  } else {
     await transaction.subscription.update({
       where: { id: input.subscriptionId },
       data: { endsOn: input.endsOn },
@@ -128,9 +139,52 @@ export const endSubscriptionEarly = async (
       metadata: {
         clientId: current.clientId,
         previousEndsOn: civil(current.endsOn),
-        endsOn: civil(input.endsOn),
+        endsOn: civil(expired ? current.endsOn : input.endsOn),
+        expired,
         renewalStartsOn: civil(input.startsOn),
         paymentId: input.paymentId,
+      },
+    },
+  });
+};
+
+// H6: a transfer reviewed after its Start Date has passed starts the day it
+// is confirmed. The Payment keeps the date it was sold with (its commercial
+// fields are immutable); the Subscription and this audit record carry the
+// move.
+export const startsOnAtConfirmation = (
+  soldStartsOn: Date,
+  today: Date,
+): Date => (soldStartsOn.getTime() < today.getTime() ? today : soldStartsOn);
+
+export const recordStartDateMoved = (
+  transaction: Transaction,
+  input: {
+    paymentId: string;
+    clientId: string;
+    soldStartsOn: Date;
+    startsOn: Date;
+    principal: AuthenticatedPrincipal;
+    now: Date;
+  },
+) => {
+  const actor = auditActorOf(input.principal);
+  return transaction.auditRecord.create({
+    data: {
+      actionCode: 'payment.start_date_moved',
+      outcome: AuditOutcome.SUCCEEDED,
+      actorKind: AuditActorKind.ACCOUNT,
+      actorAccountId: actor.accountId,
+      actorRole: actor.role,
+      impersonationId: actor.impersonationId,
+      targetType: 'payment',
+      targetId: input.paymentId,
+      correlationId: input.paymentId,
+      occurredAt: input.now,
+      metadata: {
+        clientId: input.clientId,
+        soldStartsOn: civil(input.soldStartsOn),
+        startsOn: civil(input.startsOn),
       },
     },
   });
@@ -154,3 +208,26 @@ export const parseRequestedStartDate = (
 };
 
 export const todayOf = (now: Date): Date => boliviaDate(now);
+
+// What the Client app shows instead of the Start Date chips: a Plan bought now
+// starts the day after the current one ends while it still holds classes
+// (booking ADR-0005). Null when she would choose the date, or cannot renew.
+export const readRenewalStartsOn = async (
+  transaction: Transaction,
+  clientId: string,
+  now: Date,
+): Promise<string | null> => {
+  const today = todayOf(now);
+  const active = await loadActiveSubscription(transaction, clientId, now);
+  if (active === null) return null;
+  if ((await loadFutureSubscriptionId(transaction, clientId, today)) !== null) {
+    return null;
+  }
+  const renewal = decideRenewal({
+    today,
+    current: active,
+    futureSubscriptionId: null,
+    requested: null,
+  });
+  return renewal.chosen ? null : civil(renewal.startsOn);
+};

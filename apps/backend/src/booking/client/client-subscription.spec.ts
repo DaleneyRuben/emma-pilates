@@ -148,6 +148,23 @@ describe('loadClientSubscription', () => {
     });
   });
 
+  it('says when a Plan bought now starts, while the current one still has classes', async () => {
+    const active = subscription(10);
+    const readRenewalStartsOn = jest.fn().mockResolvedValue('2026-10-02');
+
+    await expect(
+      loadClientSubscription({
+        principal,
+        today,
+        findActiveSubscription: jest.fn().mockResolvedValue(active),
+        findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn().mockResolvedValue(null),
+        readRenewalStartsOn,
+      }),
+    ).resolves.toMatchObject({ renewalStartsOn: '2026-10-02' });
+    expect(readRenewalStartsOn).toHaveBeenCalledWith('client-id');
+  });
+
   it('denies Staff principals', async () => {
     await expect(
       loadClientSubscription({

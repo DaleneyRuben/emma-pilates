@@ -1,6 +1,7 @@
 import { PaymentRuleError } from './payment-errors';
 import {
   evaluateAllocationEligibility,
+  isSubscriptionEffective,
   type PurchaseEligibility,
   type PurchaseEligibilityContext,
 } from './purchase-eligibility';
@@ -43,9 +44,7 @@ export const evaluateCourtesyGrant = (
   // purchase of a real Plan continues and shortens that Plan instead.
   if (
     context.activeSubscription !== null &&
-    context.activeSubscription.endsOn.getTime() >= context.today.getTime() &&
-    (context.activeSubscription.remainingClassAllowance > 0 ||
-      context.activeSubscription.futureBookedCount > 0)
+    isSubscriptionEffective(context.activeSubscription, context.today)
   ) {
     throw new PaymentRuleError(
       'subscription_not_expired',
@@ -53,4 +52,15 @@ export const evaluateCourtesyGrant = (
     );
   }
   return allocation;
+};
+
+// The start is only known once it is allocated (a later Start Date, or the
+// day after a Plan in force): an end before it is refused, not a 500.
+export const assertCourtesyTerm = (startsOn: Date, endsOn: Date): void => {
+  if (endsOn.getTime() < startsOn.getTime()) {
+    throw new PaymentRuleError(
+      'courtesy_end_date_invalid',
+      'Access must not end before it starts',
+    );
+  }
 };

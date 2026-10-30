@@ -23,6 +23,7 @@ import {
   boliviaMonth,
 } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import { netAllowanceClasses } from '../commands/net-allowance';
 import { isSubscriptionEffective } from '../payments/purchase-eligibility';
 import { rejectPaymentOfCancelledEvaluation } from './evaluation-payment-decision';
 import {
@@ -1154,6 +1155,10 @@ export const createPrismaEvaluationCommands = (
               id: true,
               endsOn: true,
               remainingClassAllowance: true,
+              allowanceAdjustments: {
+                where: { deletedAt: null },
+                select: { classes: true },
+              },
               _count: {
                 select: {
                   bookings: {
@@ -1171,6 +1176,9 @@ export const createPrismaEvaluationCommands = (
               {
                 endsOn: candidate.endsOn,
                 remainingClassAllowance: candidate.remainingClassAllowance,
+                extraClasses: netAllowanceClasses(
+                  candidate.allowanceAdjustments,
+                ),
                 futureBookedCount: candidate._count.bookings,
               },
               today,

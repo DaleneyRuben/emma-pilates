@@ -75,7 +75,9 @@ describe('evaluatePurchaseEligibility', () => {
       startsOn: new Date('2026-09-01T00:00:00.000Z'),
       endsOn: new Date('2026-10-01T00:00:00.000Z'),
       remainingClassAllowance: 0,
+      extraClasses: 0,
       futureBookedCount: 1,
+      courtesy: false,
     };
 
     expect(
@@ -101,7 +103,9 @@ describe('evaluatePurchaseEligibility', () => {
       startsOn: new Date('2026-08-22T00:00:00.000Z'),
       endsOn: new Date('2026-09-21T00:00:00.000Z'),
       remainingClassAllowance: 5,
+      extraClasses: 0,
       futureBookedCount: 0,
+      courtesy: false,
     };
     const exhausted = {
       ...byDate,

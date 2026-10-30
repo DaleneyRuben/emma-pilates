@@ -8,7 +8,9 @@ export type RenewalSubscription = {
   startsOn: Date;
   endsOn: Date;
   remainingClassAllowance: number;
+  extraClasses: number;
   futureBookedCount: number;
+  courtesy: boolean;
 };
 
 export type RenewalDecision = {
@@ -18,11 +20,13 @@ export type RenewalDecision = {
   endsOn?: Date;
 };
 
-// booking ADR-0005: with classes left (base allowance or a future booked
-// Session, the same facts isSubscriptionEffective uses), the next Plan starts
-// the day after the current one ends and no date is chosen. With none left,
-// it starts on the chosen Start Date and the current one ends the day before.
-// Only one future Subscription may exist.
+// booking ADR-0005: with classes left (base allowance, extra classes, or a
+// future booked Session, the same facts isSubscriptionEffective uses), the
+// next Plan starts the day after the current one ends and no date is chosen.
+// With none left, it starts on the chosen Start Date and the current one ends
+// the day before. A Guest Pass or Courtesy Access is never renewed: the paid
+// Plan starts on its chosen date and the courtesy one ends (H17). Only one
+// future Subscription may exist.
 export const decideRenewal = (context: {
   today: Date;
   current: RenewalSubscription;
@@ -36,7 +40,10 @@ export const decideRenewal = (context: {
     );
   }
 
-  if (isSubscriptionEffective(context.current, context.today)) {
+  if (
+    !context.current.courtesy &&
+    isSubscriptionEffective(context.current, context.today)
+  ) {
     return {
       startsOn: new Date(context.current.endsOn.getTime() + dayMilliseconds),
       chosen: false,
