@@ -1,5 +1,4 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
-import { boliviaMonth } from '../time/bolivia-time';
 import {
   recomputeFacts,
   type FactBooking,
@@ -253,5 +252,3 @@ const writeClientMonthFacts = async (
     });
   }
 };
-
-export const currentStudioMonth = (now: Date): Date => boliviaMonth(now);
