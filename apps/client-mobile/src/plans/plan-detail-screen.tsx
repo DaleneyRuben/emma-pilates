@@ -2,6 +2,7 @@ import {
   createPurchaseIntent,
   getCurrentPurchaseIntent,
   getGetCurrentPurchaseIntentQueryKey,
+  useGetCurrentClientSubscription,
   useGetPlan,
 } from "@pilates/api-contracts";
 import {
@@ -29,6 +30,7 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { formatCivilDate } from "../home/home-format";
 import { formatBolivianos } from "./plan-format";
 
 type PlanDetailNavigation = {
@@ -62,6 +64,12 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  // A renewal while the current Plan still has classes starts the day after
+  // it ends: the API names that date and no Start Date is chosen (FIX-002).
+  const subscription = useGetCurrentClientSubscription({
+    fetcher,
+    query: { refetchOnMount: "always" },
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const today = boliviaCivilDate(new Date());
@@ -87,6 +95,8 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
 
   const detail = plan.data.data;
   const price = formatBolivianos(detail.priceCentavos);
+  const renewalStartsOn =
+    subscription.data?.status === 200 ? subscription.data.data.renewalStartsOn : undefined;
 
   // A Purchase Intent freezes the amount to transfer: the Plan's full price,
   // since Credit is retired (PAY-005).
@@ -96,7 +106,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     const headers = { "idempotency-key": randomUUID() };
     try {
       const created = await createPurchaseIntent(
-        { planId: detail.id, startsOn },
+        renewalStartsOn === undefined ? { planId: detail.id, startsOn } : { planId: detail.id },
         { headers },
         fetcher,
       );
@@ -148,7 +158,14 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
             </BodyText>
           )}
           <BodyText>{validityCopy(detail.durationDays)}</BodyText>
-          {studioRules === undefined ? null : (
+          {renewalStartsOn === undefined ? null : (
+            <BodyText>
+              {`Tu nuevo plan empieza el ${formatCivilDate(renewalStartsOn)}, al terminar el actual.`}
+            </BodyText>
+          )}
+          {studioRules === undefined ||
+          subscription.isPending ||
+          renewalStartsOn !== undefined ? null : (
             <StartDateChooser
               openingDate={studioRules.openingDate}
               selected={startsOn}
