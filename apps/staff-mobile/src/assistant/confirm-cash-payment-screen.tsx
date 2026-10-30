@@ -257,7 +257,11 @@ export function ConfirmCashPaymentScreen({
           />
           <FrontDeskReceiptCard onPhotograph={() => void photograph()} receipt={receipt} />
           <BodyText style={styles.muted}>
-            Confirma solo cuando tengas el efectivo en mano. El plan se activa al instante.
+            {`Confirma solo cuando tengas el efectivo en mano. ${
+              renewalStartsOn === undefined
+                ? "El plan se activa al instante."
+                : "El plan queda programado para esa fecha."
+            }`}
           </BodyText>
           {failure !== null ? (
             <BodyText accessibilityRole="alert" style={styles.failure}>
