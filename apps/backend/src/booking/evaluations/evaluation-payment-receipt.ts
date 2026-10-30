@@ -9,6 +9,7 @@ import {
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { PaymentRuleError } from '../payments/payment-errors';
+import { netAllowanceClasses } from '../commands/net-allowance';
 import { isSubscriptionEffective } from '../payments/purchase-eligibility';
 
 type Transaction = Prisma.TransactionClient;
@@ -135,6 +136,10 @@ export const coveringSubscription = async (
       startsOn: true,
       endsOn: true,
       remainingClassAllowance: true,
+      allowanceAdjustments: {
+        where: { deletedAt: null },
+        select: { classes: true },
+      },
       evaluations: {
         where: {
           state: { in: [EvaluationState.BOOKED, EvaluationState.NO_SHOW] },
@@ -159,6 +164,7 @@ export const coveringSubscription = async (
         {
           endsOn: candidate.endsOn,
           remainingClassAllowance: candidate.remainingClassAllowance,
+          extraClasses: netAllowanceClasses(candidate.allowanceAdjustments),
           futureBookedCount: candidate._count.bookings,
         },
         input.today,

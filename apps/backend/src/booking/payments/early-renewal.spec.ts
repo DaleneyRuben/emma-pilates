@@ -10,7 +10,9 @@ const current = {
   startsOn: civil('2026-10-01'),
   endsOn: new Date(today.getTime() + 2 * day),
   remainingClassAllowance: 2,
+  extraClasses: 0,
   futureBookedCount: 0,
+  courtesy: false,
 };
 
 // booking ADR-0005: one future Subscription. Classes left queue it the day
@@ -45,6 +47,33 @@ describe('decideRenewal', () => {
         requested: today,
       }).startsOn,
     ).toEqual(civil('2026-10-26'));
+  });
+
+  it('counts extra classes left as classes still held (H14)', () => {
+    expect(
+      decideRenewal({
+        today,
+        current: { ...current, remainingClassAllowance: 0, extraClasses: 1 },
+        futureSubscriptionId: null,
+        requested: today,
+      }).startsOn,
+    ).toEqual(civil('2026-10-26'));
+  });
+
+  it('never queues behind a Guest Pass or Courtesy Access (H17)', () => {
+    expect(
+      decideRenewal({
+        today,
+        current: { ...current, courtesy: true, futureBookedCount: 1 },
+        futureSubscriptionId: null,
+        requested: today,
+      }),
+    ).toEqual({
+      startsOn: today,
+      chosen: true,
+      subscriptionIdToEndEarly: 'current',
+      endsOn: civil('2026-10-22'),
+    });
   });
 
   it('starts on the chosen date and ends the current Subscription the day before when nothing is left', () => {

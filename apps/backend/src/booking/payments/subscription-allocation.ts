@@ -1,7 +1,11 @@
 import type { Prisma } from '../../generated/prisma/client';
-import { SubscriptionState } from '../../generated/prisma/client';
+import {
+  PaymentMethod,
+  SubscriptionState,
+} from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { boliviaDate } from '../../time/bolivia-time';
+import { netAllowanceClasses } from '../commands/net-allowance';
 import type { ActiveSubscriptionFacts } from './purchase-eligibility';
 
 type Transaction = Prisma.TransactionClient;
@@ -28,6 +32,11 @@ export const loadActiveSubscription = async (
       startsOn: true,
       endsOn: true,
       remainingClassAllowance: true,
+      payment: { select: { method: true } },
+      allowanceAdjustments: {
+        where: { deletedAt: null },
+        select: { classes: true },
+      },
       _count: {
         select: {
           bookings: {
@@ -44,7 +53,9 @@ export const loadActiveSubscription = async (
         startsOn: active.startsOn,
         endsOn: active.endsOn,
         remainingClassAllowance: active.remainingClassAllowance,
+        extraClasses: netAllowanceClasses(active.allowanceAdjustments),
         futureBookedCount: active._count.bookings,
+        courtesy: active.payment?.method === PaymentMethod.COURTESY,
       };
 };
 

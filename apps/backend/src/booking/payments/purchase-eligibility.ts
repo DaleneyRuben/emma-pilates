@@ -11,7 +11,11 @@ export type ActiveSubscriptionFacts = {
   startsOn: Date;
   endsOn: Date;
   remainingClassAllowance: number;
+  /** The net sum of the live extra classes (campaign, gift, courtesy...). */
+  extraClasses: number;
   futureBookedCount: number;
+  /** A Guest Pass or Courtesy Access: never the base of a renewal (H17). */
+  courtesy: boolean;
 };
 
 export type PurchaseEligibilityContext = {
@@ -28,16 +32,18 @@ export type PurchaseEligibility = {
 };
 
 // A Subscription is effective while it is paid through today and still has
-// classes to use or future booked Sessions; otherwise the purchase expires it.
+// classes to use (base or extra, H14) or future booked Sessions; otherwise
+// the purchase expires it.
 export const isSubscriptionEffective = (
   subscription: Pick<
     ActiveSubscriptionFacts,
-    'endsOn' | 'remainingClassAllowance' | 'futureBookedCount'
+    'endsOn' | 'remainingClassAllowance' | 'extraClasses' | 'futureBookedCount'
   >,
   today: Date,
 ): boolean =>
   subscription.endsOn.getTime() >= today.getTime() &&
   (subscription.remainingClassAllowance > 0 ||
+    subscription.extraClasses > 0 ||
     subscription.futureBookedCount > 0);
 
 // What blocks any new Subscription for the Client, however it is granted: an

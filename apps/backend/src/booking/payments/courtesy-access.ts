@@ -1,6 +1,7 @@
 import { PaymentRuleError } from './payment-errors';
 import {
   evaluateAllocationEligibility,
+  isSubscriptionEffective,
   type PurchaseEligibility,
   type PurchaseEligibilityContext,
 } from './purchase-eligibility';
@@ -43,9 +44,7 @@ export const evaluateCourtesyGrant = (
   // purchase of a real Plan continues and shortens that Plan instead.
   if (
     context.activeSubscription !== null &&
-    context.activeSubscription.endsOn.getTime() >= context.today.getTime() &&
-    (context.activeSubscription.remainingClassAllowance > 0 ||
-      context.activeSubscription.futureBookedCount > 0)
+    isSubscriptionEffective(context.activeSubscription, context.today)
   ) {
     throw new PaymentRuleError(
       'subscription_not_expired',
@@ -54,3 +53,4 @@ export const evaluateCourtesyGrant = (
   }
   return allocation;
 };
+
