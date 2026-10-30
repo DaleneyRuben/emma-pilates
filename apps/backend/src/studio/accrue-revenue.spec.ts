@@ -23,18 +23,43 @@ describe('accrue revenue', () => {
     const october = accrueRevenue(
       [payment()],
       month('2026-10'),
-      day('2026-10-23'),
+      day('2026-12-01'),
     );
     const november = accrueRevenue(
       [payment()],
       month('2026-11'),
-      day('2026-10-23'),
+      day('2026-12-01'),
     );
 
     // Oct 20–31 is 12 of the 30 inclusive days: 300 * 12 / 30 = 120.
     expect(october.accruedCentavos).toBe(12_000);
     expect(november.accruedCentavos).toBe(18_000);
     expect(october.accruedCentavos + november.accruedCentavos).toBe(30_000);
+  });
+
+  it('accrues the running month only up to today, so it adds up with «Diferido» (FIX-022)', () => {
+    // On Oct 25, Oct 20–24 has passed: 5 of 30 days, Bs 50; Bs 250 is owed.
+    const october = accrueRevenue(
+      [payment()],
+      month('2026-10'),
+      day('2026-10-25'),
+    );
+
+    expect(october.accruedCentavos).toBe(5_000);
+    expect(october.deferredCentavos).toBe(25_000);
+    expect(october.accruedCentavos + october.deferredCentavos).toBe(
+      october.cashCentavos,
+    );
+  });
+
+  it('accrues nothing in a month that has not started (FIX-022)', () => {
+    const november = accrueRevenue(
+      [payment()],
+      month('2026-11'),
+      day('2026-10-25'),
+    );
+
+    expect(november.accruedCentavos).toBe(0);
   });
 
   it('defers what is not yet accrued, so the two never pass the amount by a centavo', () => {
@@ -65,7 +90,7 @@ describe('accrue revenue', () => {
     });
     const accrued = ['2026-09', '2026-10', '2026-11'].map(
       (value) =>
-        accrueRevenue([crossing], month(value), day('2026-10-23'))
+        accrueRevenue([crossing], month(value), day('2026-12-01'))
           .accruedCentavos,
     );
 
@@ -97,11 +122,14 @@ describe('accrue revenue', () => {
     );
     const after = accrueRevenue([oneDay], month('2026-10'), day('2026-10-21'));
 
+    // On its own day nothing has passed yet (FIX-022); the next day it is all
+    // accrued and nothing is owed.
     expect(october).toEqual({
-      accruedCentavos: 30_000,
+      accruedCentavos: 0,
       cashCentavos: 30_000,
       deferredCentavos: 30_000,
     });
+    expect(after.accruedCentavos).toBe(30_000);
     expect(after.deferredCentavos).toBe(0);
   });
 

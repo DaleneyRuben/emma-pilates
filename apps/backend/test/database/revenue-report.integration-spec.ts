@@ -26,7 +26,7 @@ describe('accrued revenue report', () => {
     await context?.stop();
   });
 
-  it('accrues a confirmed payment of Bs 300 across October and November and counts classes still owed', async () => {
+  it('accrues the running month of a Bs 300 payment up to today and counts classes still owed', async () => {
     const branchId = randomUUID();
     const planId = randomUUID();
     const clientId = randomUUID();
@@ -95,14 +95,15 @@ describe('accrued revenue report', () => {
       today,
     });
 
-    expect(october.accruedCentavos).toBe(12_000);
-    expect(november.accruedCentavos).toBe(18_000);
-    expect(october.accruedCentavos + november.accruedCentavos).toBe(30_000);
+    // Today is exclusive, like endsOn: 3 of 30 days have accrued, so Bs 270
+    // of the Payment is still deferred, and the running month adds up
+    // (FIX-022). November has not started, so it accrues nothing yet.
+    expect(october.accruedCentavos).toBe(3_000);
+    expect(november.accruedCentavos).toBe(0);
     expect(october.cashCentavos).toBe(30_000);
     expect(november.cashCentavos).toBe(0);
-    // Today is exclusive, like endsOn: 3 of 30 days have accrued, so Bs 270
-    // of the Payment is still deferred.
     expect(october.deferredCentavos).toBe(27_000);
+    expect(october.accruedCentavos + october.deferredCentavos).toBe(30_000);
     expect(october.classesStillOwed).toBe(5);
     expect(november.classesStillOwed).toBe(5);
   });
