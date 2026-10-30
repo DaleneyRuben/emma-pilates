@@ -1,4 +1,4 @@
-# Trigger mobile releases from GitHub Actions
+# ADR-0107. Trigger mobile releases from GitHub Actions
 
 Status: proposed
 

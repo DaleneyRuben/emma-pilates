@@ -14,6 +14,13 @@ const bookingRejections: Record<string, string> = {
   booking_during_freeze: "Tu plan está congelado en esa fecha.",
   guest_pass_last_place: "Un pase de invitada no puede tomar el último lugar.",
   guest_pass_already_used: "Tu pase de invitada ya se usó.",
+  // Session detail (04) raises these. Reprogramar raises booking_overlap too
+  // and used to show its generic line for it.
+  booking_overlap: "Ya tienes una reserva a esa hora.",
+  active_booking_exists: "Ya tienes una reserva en esta clase.",
+  active_waitlist_entry_exists: "Ya estás en la lista de espera.",
+  no_eligible_subscription: "No te quedan clases en tu plan.",
+  session_has_capacity: "La clase tiene cupos: puedes reservar directamente.",
 };
 
 export function bookingRejectionMessage(code: string | undefined): string | null {
