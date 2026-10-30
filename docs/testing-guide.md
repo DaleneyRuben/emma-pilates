@@ -7779,11 +7779,11 @@ H. **Detalle del plan (Client 09, design follow-up 219).** From Mi plan,
 
 The analytics findings of the 2026-10-28 review. Use `pilates_dev_sim` with the
 API and the admin web (`pnpm dev:admin`) signed in as Paola (Administrator).
-The reports read the studio facts: after changing data, run **Recalcular**
-(`POST /api/v1/administrator/reports/studio-facts/recompute?month=YYYY-MM`) for
-the month first.
+The reports read the studio facts: after changing data, recompute the month
+first (`POST /api/v1/administrator/studio-facts/recompute` with
+`{"month": "YYYY-MM"}`).
 
-A. **Accrued revenue (H12).** In Reporte → Indicadores for a month with a
+A. **Accrued revenue (H12).** In Indicadores (and Reporte) for a month with a
    30-day Plan of Bs 300 starting on the 20th: «Devengado» shows Bs 120 for
    the first month (12 of 30 days, the end date counts) and Bs 180 for the
    next. A Payment approved on the 1st counts in «Caja» of that month only.
