@@ -97,7 +97,11 @@ describe('exportPromotionContacts', () => {
       exportPromotionContacts(administrator, { store, now: () => now }),
     ).resolves.toEqual([valeria]);
     expect(store.recordExport).toHaveBeenCalledWith({
-      actor: { accountId: 'staff-account', staffMemberId: 'staff-id' },
+      actor: {
+        accountId: 'staff-account',
+        staffMemberId: 'staff-id',
+        impersonationId: null,
+      },
       contactCount: 1,
       occurredAt: now,
     });
@@ -122,7 +126,11 @@ describe('withdrawPromotionContact', () => {
     });
     expect(store.withdraw).toHaveBeenCalledWith({
       contactId: 'contact-id',
-      actor: { accountId: 'staff-account', staffMemberId: 'staff-id' },
+      actor: {
+        accountId: 'staff-account',
+        staffMemberId: 'staff-id',
+        impersonationId: null,
+      },
       occurredAt: now,
     });
   });

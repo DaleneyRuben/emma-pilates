@@ -109,9 +109,9 @@ describe("the Coordinator Role in Personal", () => {
     const { user } = renderAdmin("/back-office/personal");
 
     await user.click(
-      await screen.findByRole("button", { name: "Emma Vargas" }),
+      await screen.findByRole("button", { name: "Carolina Rivas" }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Emma Vargas" });
+    const panel = await screen.findByRole("dialog", { name: "Carolina Rivas" });
     expect(
       screen.queryByRole("button", { name: "Nuevo miembro" }),
     ).not.toBeInTheDocument();
