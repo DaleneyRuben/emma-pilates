@@ -140,6 +140,7 @@ export const readClientOverview = async (
       from: Date;
     }): Promise<UpcomingClientBooking[]>;
     findAttendedBookings(clientId: string): Promise<ClassHistoryEntry[]>;
+    readRenewalStartsOn?(clientId: string): Promise<string | null>;
   },
 ): Promise<ClientOverview> => {
   requireAssistant(dependencies.principal);

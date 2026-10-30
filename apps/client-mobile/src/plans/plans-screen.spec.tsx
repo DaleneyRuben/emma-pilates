@@ -67,7 +67,7 @@ describe("Client Plans", () => {
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 2.100")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Trimestral 36 clases" }));
+    await fireEvent.press(screen.getByRole("button", { name: /Trimestral 36 clases/ }));
 
     // The loading state shares the «Detalle del plan» heading, so wait for the Plan itself.
     await waitFor(() => {
@@ -115,7 +115,7 @@ describe("Client Plans", () => {
     expect(screen.getByText("Bs 80")).toBeOnTheScreen();
     expect(screen.getAllByText("Bs 560")).toHaveLength(1);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
+    await fireEvent.press(screen.getByRole("button", { name: /Paquete de 8 clases/ }));
     await waitFor(() => {
       expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
     });

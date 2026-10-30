@@ -1,4 +1,8 @@
-import { useQuoteAssistantClientPlans, type PlanQuoteDto } from "@pilates/api-contracts";
+import {
+  useGetAssistantClientOverview,
+  useQuoteAssistantClientPlans,
+  type PlanQuoteDto,
+} from "@pilates/api-contracts";
 import {
   BackLink,
   BodyText,
@@ -21,15 +25,28 @@ import { TabletGrid } from "./assistant-layout";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
 
+function planCardLabel(plan: PlanQuoteDto): string {
+  const price = formatBolivianos(plan.priceCentavos);
+  return plan.listPriceCentavos === undefined
+    ? `${plan.name}, ${price}`
+    : `${plan.name}, ${price}, antes ${formatBolivianos(plan.listPriceCentavos)}`;
+}
+
 type SelectPlanNavigation = {
   goBack: () => void;
-  navigate: (screen: "ConfirmCashPayment", params: ClientContext & { quote: PlanQuoteDto }) => void;
+  navigate: (
+    screen: "ConfirmCashPayment",
+    params: ClientContext & { quote: PlanQuoteDto; renewalStartsOn?: string },
+  ) => void;
 };
 
 export function SelectPlanScreen({ route }: { route: { params: ClientContext } }) {
   const { clientId, clientName } = route.params;
   const navigation = useNavigation<SelectPlanNavigation>();
   const fetcher = useStaffFetcher();
+  const overview = useGetAssistantClientOverview(clientId, { fetcher });
+  const renewalStartsOn =
+    overview.data?.status === 200 ? overview.data.data.subscription.renewalStartsOn : undefined;
   const quotes = useQuoteAssistantClientPlans(clientId, {
     fetcher,
     query: { refetchOnMount: "always" },
@@ -70,7 +87,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
         <TabletGrid testID="assistant-plan-grid">
           {plans.map((plan) => (
             <Pressable
-              accessibilityLabel={plan.name}
+              accessibilityLabel={planCardLabel(plan)}
               accessibilityRole="button"
               key={plan.id}
               onPress={() =>
@@ -78,6 +95,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
                   clientId,
                   clientName,
                   quote: plan,
+                  ...(renewalStartsOn === undefined ? {} : { renewalStartsOn }),
                 })
               }
               style={styles.card}

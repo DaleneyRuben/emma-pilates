@@ -4,6 +4,7 @@ import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { toSubscriptionSummary } from '../client/client-subscription';
 import type { PaymentCommands } from '../payments/prisma-payment-commands';
 import { priceFounderPlanList } from '../payments/prisma-founder-membership';
+import { readRenewalStartsOn } from '../payments/prisma-start-date-allocation';
 import {
   listAssistantClientBookings,
   listAssistantClientHistory,
@@ -56,6 +57,8 @@ export const createAssistantClientOperations = (input: {
         findUpcoming: (range) => catalog.findUpcomingClientBookings(range),
         findAttendedBookings: (clientId) =>
           catalog.findAttendedBookings(clientId),
+        readRenewalStartsOn: (clientId) =>
+          readRenewalStartsOn(input.prisma, clientId, input.now()),
       }),
     bookings: (command, principal) =>
       listAssistantClientBookings(command, {

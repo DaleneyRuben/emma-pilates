@@ -39,7 +39,7 @@ const renewFrom = async (view: object) => {
   );
   await fireEvent.press(screen.getByRole("button", { name: "Ver detalle" }));
   await fireEvent.press(await screen.findByRole("button", { name: "Renovar plan" }));
-  await fireEvent.press(await screen.findByRole("button", { name: "Paquete de 8 clases" }));
+  await fireEvent.press(await screen.findByRole("button", { name: /Paquete de 8 clases/ }));
   expect(await screen.findByText("Total a pagar")).toBeOnTheScreen();
   return { created, screen };
 };

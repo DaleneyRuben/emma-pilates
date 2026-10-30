@@ -36,7 +36,7 @@ import { BranchChips, useCashBranches } from "../ui/branch-chips";
 import { CenteredCard } from "./assistant-layout";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import { describeClasses, formatCivilDate } from "./assistant-format";
+import { describeClasses, formatCivilDate, formatCivilDayMonth } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
 import { FrontDeskReceiptCard, type FrontDeskReceipt } from "./front-desk-receipt-card";
@@ -80,9 +80,9 @@ function Line({
 export function ConfirmCashPaymentScreen({
   route,
 }: {
-  route: { params: ClientContext & { quote: PlanQuoteDto } };
+  route: { params: ClientContext & { quote: PlanQuoteDto; renewalStartsOn?: string } };
 }) {
-  const { clientId, clientName, quote } = route.params;
+  const { clientId, clientName, quote, renewalStartsOn } = route.params;
   const navigation = useNavigation<ConfirmNavigation>();
   const workspace = useAssistantWorkspace();
   const fetcher = useStaffFetcher();
@@ -123,7 +123,7 @@ export function ConfirmCashPaymentScreen({
         quote.id,
         branchId,
         photographed.imageAssetId,
-        startsOn,
+        renewalStartsOn === undefined ? startsOn : undefined,
       );
       setReceipt(photographed);
       setFailure("Comprobante enviado. Queda pendiente de revisión.");
@@ -147,7 +147,7 @@ export function ConfirmCashPaymentScreen({
         clientId,
         quote.id,
         branchId,
-        startsOn,
+        renewalStartsOn === undefined ? startsOn : undefined,
         invoiceData,
       );
       await queryClient.invalidateQueries({
@@ -228,7 +228,11 @@ export function ConfirmCashPaymentScreen({
               value={formatBolivianos(quote.priceCentavos)}
             />
           </View>
-          {studioRules === undefined ? null : (
+          {renewalStartsOn !== undefined ? (
+            <BodyText>
+              {`El nuevo plan empieza el ${formatCivilDayMonth(renewalStartsOn)}, al terminar el actual.`}
+            </BodyText>
+          ) : studioRules === undefined ? null : (
             <StartDateChooser
               openingDate={studioRules.openingDate}
               selected={startsOn}
