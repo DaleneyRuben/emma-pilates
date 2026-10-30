@@ -306,6 +306,13 @@ export class ClientEvaluationsController {
   @ApiOperation({ operationId: 'rescheduleEvaluation' })
   @ApiParam({ name: 'evaluationId', format: 'uuid' })
   @ApiHeader(idempotencyHeader)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['slotId'],
+      properties: { slotId: { type: 'string', format: 'uuid' } },
+    },
+  })
   @ApiOkResponse({ type: ClientEvaluationDto })
   @Header('Cache-Control', 'no-store')
   async reschedule(

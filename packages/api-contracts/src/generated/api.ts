@@ -220,6 +220,7 @@ import type {
   RequestEmailChangeDto,
   RequestFreezeDto,
   RequestPasswordRecoveryDto,
+  RescheduleEvaluationBody,
   RevenueReportDto,
   SalaryPaymentInputDto,
   SearchAssistantClientsParams,
@@ -25003,14 +25004,28 @@ export const getRescheduleEvaluationUrl = (evaluationId: string) => {
 
 export const rescheduleEvaluation = async (
   evaluationId: string,
+  rescheduleEvaluationBody: RescheduleEvaluationBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<rescheduleEvaluationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await (fetchFn ?? fetch)(
     getRescheduleEvaluationUrl(evaluationId),
     {
       ...options,
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(rescheduleEvaluationBody),
     },
   );
 
@@ -25061,9 +25076,9 @@ export const getRescheduleEvaluationMutationOptions = <
     Awaited<ReturnType<typeof rescheduleEvaluation>>,
     RescheduleEvaluationMutationVariables
   > = (props) => {
-    const { evaluationId } = props ?? {};
+    const { evaluationId, data } = props ?? {};
 
-    return rescheduleEvaluation(evaluationId, fetchOptions, fetcherFn);
+    return rescheduleEvaluation(evaluationId, data, fetchOptions, fetcherFn);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -25072,9 +25087,12 @@ export const getRescheduleEvaluationMutationOptions = <
 export type RescheduleEvaluationMutationResult = NonNullable<
   Awaited<ReturnType<typeof rescheduleEvaluation>>
 >;
-
+export type RescheduleEvaluationMutationBody = RescheduleEvaluationBody;
 export type RescheduleEvaluationMutationError = unknown;
-export type RescheduleEvaluationMutationVariables = { evaluationId: string };
+export type RescheduleEvaluationMutationVariables = {
+  evaluationId: string;
+  data: RescheduleEvaluationBody;
+};
 
 export const useRescheduleEvaluation = <TError = unknown, TContext = unknown>(
   options?: {

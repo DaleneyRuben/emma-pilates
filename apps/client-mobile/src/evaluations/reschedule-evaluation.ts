@@ -23,12 +23,7 @@ export const moveEvaluation = (
 ) =>
   rescheduleEvaluation(
     evaluationId,
-    {
-      body: JSON.stringify({ slotId: slot.id }),
-      headers: {
-        "Content-Type": "application/json",
-        "idempotency-key": idempotencyKey,
-      },
-    },
+    { slotId: slot.id },
+    { headers: { "idempotency-key": idempotencyKey } },
     fetcher,
   );
