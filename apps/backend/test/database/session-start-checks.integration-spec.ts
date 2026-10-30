@@ -1,3 +1,4 @@
+import { Prisma } from '../../src/generated/prisma/client';
 import { recordNotification } from '../../src/notifications/prisma-notification-store';
 import { boliviaDate } from '../../src/time/bolivia-time';
 import {
@@ -348,7 +349,7 @@ describe('Prisma Session start checks: Minimum Bookings', () => {
     }
   });
 
-  it('settles the later Sessions when one Session in the sweep throws', async () => {
+  it('settles the later Sessions when one throws, even a database error, then reports it', async () => {
     const first = await world.createSession(slotStart(8));
     const broken = await world.createSession(
       new Date(slotStart(8).getTime() + hour),
@@ -362,7 +363,10 @@ describe('Prisma Session start checks: Minimum Bookings', () => {
       ...[transaction, notice]: Parameters<typeof recordNotification>
     ) => {
       if (notice.businessEventKey.endsWith(broken.id)) {
-        throw new Error('session broke');
+        throw new Prisma.PrismaClientKnownRequestError('session broke', {
+          code: 'P2010',
+          clientVersion: 'test',
+        });
       }
       await recordNotification(transaction, notice);
     };
@@ -373,7 +377,7 @@ describe('Prisma Session start checks: Minimum Bookings', () => {
 
     await expect(
       world.checks(failTheMiddle).checkMinimumBookings(),
-    ).resolves.toEqual({ checked: 2, cancelled: 2 });
+    ).rejects.toThrow(`minimum_bookings_check failed for 1 item: ${broken.id}`);
     await expect(sessionRow(first.id)).resolves.toMatchObject({
       state: 'CANCELLED',
     });
