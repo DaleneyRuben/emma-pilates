@@ -154,6 +154,7 @@ run --device emulator-5554   # Android
 - iPad: never type through the Simulator control tool, because it drops characters. Log in with the Maestro `subflows/login.yaml`. Use `tapOn: "Hide keyboard"` to close the keyboard (`hideKeyboard` can tap the wrong thing).
 - Android:
   - The dev launcher can ignore the first open link while it starts. Send it again after 8 s, and accept an optional `tapOn: "http://.*:81.."`.
+  - `clearKeychain` does not sign out on Android. If a session is already open, run `adb shell pm clear <appId>` before the flow, or sign out from the profile screen first.
   - If `inputText` fails with «Maestro IME is not active», use `adb shell input text` (ASCII only).
   - If Maestro's driver will not start, run `adb kill-server && adb start-server` once.
   - Photo picker: tap «Photo taken on.*», then «Done».
