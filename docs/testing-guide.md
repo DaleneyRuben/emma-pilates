@@ -7724,3 +7724,9 @@ E. **Move a confirmed paid Evaluation (FIX-014, FIX-016, design follow-up
    **Sí, mover evaluación** sends `POST /api/v1/evaluations/{id}/reschedule`
    (`200`, the same Evaluation and Payment on the new slot) and lands on Mis
    evaluaciones with **Evaluación reprogramada**.
+   Back from there returns to Perfil, not to the picker. A refused move (the
+   slot was just taken) closes the sheet, says why, and refreshes the
+   slots; picking another time sends a new idempotency key. A Client whose
+   Plan ended can still move her paid Evaluation (no «Necesitas un plan
+   activo»), and with no other turno open the picker says «No hay horarios
+   disponibles por ahora.» instead of the used-month state.
