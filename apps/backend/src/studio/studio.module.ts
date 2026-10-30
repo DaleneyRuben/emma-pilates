@@ -168,8 +168,11 @@ export const createStudioOperations = (deps: {
 })
 export class StudioModule {}
 
-export const recomputeCurrentStudioMonth = (prisma: PrismaClient) =>
+export const recomputeCurrentStudioMonth = (
+  prisma: PrismaClient,
+  now: Date = new Date(),
+) =>
   recomputeStudioFacts(prisma, {
-    month: currentStudioMonth(new Date()),
-    now: () => new Date(),
+    month: currentStudioMonth(now),
+    now: () => now,
   });
