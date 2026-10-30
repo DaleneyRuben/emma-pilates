@@ -74,9 +74,9 @@ export const decideFreezeRequest = (
   ) {
     return refused('freeze_not_allowed');
   }
-  const startsToday =
-    facts.approving === true && facts.startsOn.getTime() === today.getTime();
-  if (facts.startsOn.getTime() < today.getTime() || startsToday) {
+  const startsOn = boliviaDate(facts.startsOn).getTime();
+  const startsToday = facts.approving === true && startsOn === today.getTime();
+  if (startsOn < today.getTime() || startsToday) {
     return refused('freeze_start_in_past');
   }
   const extensionReachesRenewal =
