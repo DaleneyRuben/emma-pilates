@@ -53,8 +53,9 @@ jobs:
         with:
           ref: main
 
+      # The first preview creates the notes ref; until then there is none.
       - name: Fetch git notes for the production guard
-        run: git fetch origin refs/notes/commits:refs/notes/commits
+        run: git fetch origin '+refs/notes/commits:refs/notes/commits' || echo "No git notes yet."
 
       - name: Require a green CI run of this commit
         env:
@@ -106,9 +107,11 @@ jobs:
               cd ../..
             else
               cd "apps/$app"
-              pnpm exec eas update --channel staging --environment preview --message "$OTA_MESSAGE" --non-interactive
+              # The staging builds are the staging variant (eas.json), which
+              # changes the fingerprint: publish for that runtime.
+              APP_VARIANT=staging pnpm exec eas update --channel staging --environment preview --message "$OTA_MESSAGE" --non-interactive
               cd ../..
-              git notes append -m "preview-ota:${app}:${OTA_SHA}" "$OTA_SHA"
+              git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" notes append -m "preview-ota:${app}:${OTA_SHA}" "$OTA_SHA"
               git push origin refs/notes/commits
             fi
           done

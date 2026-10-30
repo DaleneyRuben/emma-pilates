@@ -78,8 +78,9 @@ developer account «Daleney Labs» (`docs/architecture/infrastructure.md`).
 
 - **Build:** `eas build --profile production --platform android
   --non-interactive --no-wait` from each app folder spends one of the free
-  plan's monthly Android builds and bumps `expo.android.versionCode` in
-  `app.json`; commit that bump. `EXPO_PUBLIC_API_URL` comes from the EAS
+  plan's monthly Android builds. EAS keeps the `versionCode` itself
+  (`appVersionSource: remote`, FIX-011): `app.json`'s value is ignored and
+  nothing is committed. `EXPO_PUBLIC_API_URL` comes from the EAS
   `production` environment (the Northflank API).
 - **First upload by hand:** Google accepts an app's first bundle only through
   the console: Test and release → Testing → Internal testing → Create new

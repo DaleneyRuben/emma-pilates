@@ -40,7 +40,14 @@ test("the six integration shards cover every spec once, except the backup job", 
     .map((file) => file.split("/").pop())
     .filter((name) => name !== "s3-backup-store.integration-spec.ts" && !seen.has(name));
   assert.deepEqual(missing, []);
-  assert.equal(seen.has("s3-backup-store.integration-spec.ts"), false);
+  // The backup spec runs in its own job: no shard pattern may match it.
+  const backup = files.find((file) => file.endsWith("/s3-backup-store.integration-spec.ts"));
+  if (backup !== undefined) {
+    for (let shard = 1; shard <= 6; shard += 1) {
+      const regex = new RegExp(integrationShardPattern(files, shard));
+      assert.equal(regex.test(backup), false, `shard ${shard} runs the backup spec`);
+    }
+  }
 });
 
 test("a longer basename does not match another file's anchored shard pattern", () => {
