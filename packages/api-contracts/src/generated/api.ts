@@ -24986,6 +24986,120 @@ export const useCancelEvaluation = <TError = unknown, TContext = unknown>(
   return useMutation(getCancelEvaluationMutationOptions(options), queryClient);
 };
 
+export type rescheduleEvaluationResponse200 = {
+  data: ClientEvaluationDto;
+  status: 200;
+};
+
+export type rescheduleEvaluationResponseSuccess =
+  rescheduleEvaluationResponse200 & {
+    headers: Headers;
+  };
+export type rescheduleEvaluationResponse = rescheduleEvaluationResponseSuccess;
+
+export const getRescheduleEvaluationUrl = (evaluationId: string) => {
+  return `/api/v1/evaluations/${evaluationId}/reschedule`;
+};
+
+export const rescheduleEvaluation = async (
+  evaluationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<rescheduleEvaluationResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getRescheduleEvaluationUrl(evaluationId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: rescheduleEvaluationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as rescheduleEvaluationResponse;
+};
+
+export const getRescheduleEvaluationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof rescheduleEvaluation>>,
+    TError,
+    RescheduleEvaluationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof rescheduleEvaluation>>,
+  TError,
+  RescheduleEvaluationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["rescheduleEvaluation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof rescheduleEvaluation>>,
+    RescheduleEvaluationMutationVariables
+  > = (props) => {
+    const { evaluationId } = props ?? {};
+
+    return rescheduleEvaluation(evaluationId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RescheduleEvaluationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof rescheduleEvaluation>>
+>;
+
+export type RescheduleEvaluationMutationError = unknown;
+export type RescheduleEvaluationMutationVariables = { evaluationId: string };
+
+export const useRescheduleEvaluation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof rescheduleEvaluation>>,
+      TError,
+      RescheduleEvaluationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof rescheduleEvaluation>>,
+  TError,
+  RescheduleEvaluationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRescheduleEvaluationMutationOptions(options),
+    queryClient,
+  );
+};
+
 export type listNutritionistAgendaResponse200 = {
   data: NutritionistAgendaPageDto;
   status: 200;

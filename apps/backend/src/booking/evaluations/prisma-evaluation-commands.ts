@@ -36,6 +36,13 @@ import {
 import { readEvaluationKinds } from './evaluation-kinds';
 import { releaseSlot } from './evaluation-slot-release';
 import {
+  isConfirmedPaidEvaluation,
+  movePaidEvaluation,
+  occupyingEvaluation,
+  paidNotCancellable,
+  releaseConfirmedPaidEvaluation,
+} from './paid-evaluation-reschedule';
+import {
   evaluationBookedNotice,
   evaluationCancelledByStudioNotice,
   evaluationCancelledNotice,
@@ -138,6 +145,7 @@ export type ClientEvaluationView = {
   nutritionistName: string;
   cancellableUntil: Date;
   cancellable: boolean;
+  reschedulable: boolean;
 };
 
 export type NutritionistAgendaEntry = {
@@ -276,6 +284,7 @@ const evaluationSelect = {
   state: true,
   evaluationSlotId: true,
   paymentId: true,
+  slotReleasedAt: true,
   payment: {
     select: { amountDueCentavos: true, state: true, receiptImageAssetId: true },
   },
@@ -980,7 +989,7 @@ export const createPrismaEvaluationCommands = (
                 lt: boliviaInstant(addCivilDays(through, 1), 0),
                 gt: new Date(now.getTime() + 3 * hourMilliseconds),
               },
-              evaluations: { none: { state: EvaluationState.BOOKED } },
+              evaluations: { none: occupyingEvaluation },
               branch: { archivedAt: null },
               ...(query.branchId === undefined
                 ? {}
@@ -1036,7 +1045,7 @@ export const createPrismaEvaluationCommands = (
       select: {
         ...slotSelect,
         _count: {
-          select: { evaluations: { where: { state: EvaluationState.BOOKED } } },
+          select: { evaluations: { where: occupyingEvaluation } },
         },
       },
     });
@@ -1109,7 +1118,7 @@ export const createPrismaEvaluationCommands = (
               },
               _count: {
                 select: {
-                  evaluations: { where: { state: EvaluationState.BOOKED } },
+                  evaluations: { where: occupyingEvaluation },
                 },
               },
             },
@@ -1282,7 +1291,7 @@ export const createPrismaEvaluationCommands = (
               state: true,
               _count: {
                 select: {
-                  evaluations: { where: { state: EvaluationState.BOOKED } },
+                  evaluations: { where: occupyingEvaluation },
                 },
               },
             },
@@ -1477,6 +1486,7 @@ export const createPrismaEvaluationCommands = (
     client: {
       select: { name: true, account: { select: { id: true } } },
     },
+    payment: { select: { state: true } },
     slot: {
       select: {
         startsAt: true,
@@ -1520,6 +1530,7 @@ export const createPrismaEvaluationCommands = (
 
       const evaluation = await lockEvaluation(transaction, found);
       if (evaluation.state === EvaluationState.CANCELLED) return;
+      if (isConfirmedPaidEvaluation(evaluation)) throw paidNotCancellable();
       if (!isEvaluationBookable(evaluation.slot.startsAt, now)) {
         throw rule(
           'evaluation_cancellation_window_closed',
@@ -1592,6 +1603,15 @@ export const createPrismaEvaluationCommands = (
 
       const evaluation = await lockEvaluation(transaction, found);
       if (evaluation.state === EvaluationState.CANCELLED) return;
+      if (
+        await releaseConfirmedPaidEvaluation(transaction, recordNotification, {
+          evaluationId: evaluation.id,
+          now,
+          principal,
+        })
+      ) {
+        return;
+      }
       if (now >= evaluation.slot.startsAt) {
         throw rule('evaluation_started', 'The Evaluation has already started');
       }
@@ -1784,6 +1804,43 @@ export const createPrismaEvaluationCommands = (
     return { sent };
   };
 
+  const rescheduleClientEvaluation = async (
+    evaluationId: string,
+    slotId: string,
+    principal: AuthenticatedPrincipal,
+    idempotencyKey: string,
+  ) => {
+    const now = dependencies.now();
+    return transact(async (transaction) => {
+      await withIdempotency(
+        transaction,
+        {
+          accountId: principal.accountId,
+          command: 'reschedule_evaluation',
+          idempotencyKey,
+          request: { evaluationId, slotId },
+        },
+        async () => {
+          await movePaidEvaluation(transaction, recordNotification, {
+            evaluationId,
+            slotId,
+            principal,
+            now,
+            lockSlot,
+          });
+          return { evaluationId };
+        },
+      );
+      return toClientEvaluationView(
+        await transaction.evaluation.findUniqueOrThrow({
+          where: { id: evaluationId },
+          select: evaluationSelect,
+        }),
+        now,
+      );
+    });
+  };
+
   return {
     createAvailabilityBlock,
     replaceAvailabilityBlock,
@@ -1799,6 +1856,7 @@ export const createPrismaEvaluationCommands = (
     recordEvaluationNoShow,
     listClientEvaluations,
     cancelClientEvaluation,
+    rescheduleClientEvaluation,
     cancelEvaluationAsStaff,
     listNutritionistAgenda,
     sendDueEvaluationReminders,

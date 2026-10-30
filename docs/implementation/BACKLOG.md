@@ -499,6 +499,7 @@ wait for Google, Apple, and testers.
 | FIX-006 | P0 | Backend/admin web | Enforce the Freeze on the Waitlist and on Reschedule, and refuse a late approval | BKM-012 | 1 d | done |
 | FIX-003 | P0 | Backend/admin web/client app | Paid Evaluation payment lifecycle: reject and cancel settle the Payment, confirm audits and notifies, the receipt is visible, an exhausted Plan cannot buy one, cancelled Evaluations skip the Bs 50, AW28 names the sale and dates it by the decision, and a pending Evaluation Payment is not the current Plan Payment | NUT-003 | 1 d | done (`a2a07b11`/`cb375760` one pending Payment per kind, 409 instead of P2002; `5cb29021` evaluation sales read as «Evaluación nutricional» and Pagos hides «Anular venta». Device walk still open) |
 | FIX-005 | P0 | Backend | Allowance net, extra-class refund and reschedule, and guest-pass rebook and verification | BKM-008, BKM-014 | 1 d | done (second review on `8577ec10`: `c0a86505` the monthly refusal names the calendar month; the last-place check lives beside capacity; reschedule uses the shared guest-pass copy; a second cancel tap does not send another DELETE. Device walk still open) |
+| FIX-014 | P0 | Backend/client app | A confirmed Paid Evaluation is rescheduled, not cancelled (owner 2026-10-29). Distinct from the plan-card accessibility row on other branches | FIX-003 | 1 d | in progress |
 
 #### FIX-005 · Allowance net, extra-class refund, and guest-pass rebook
 

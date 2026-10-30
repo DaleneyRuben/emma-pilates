@@ -95,6 +95,13 @@ export const runEvaluationCommand = async <Result>(
   }
 };
 
+export const parseRescheduleSlot = (body: unknown): string | null => {
+  if (typeof body !== 'object' || body === null || !('slotId' in body)) {
+    return null;
+  }
+  return parseUuid(body.slotId);
+};
+
 export const requireIdempotencyKey = (value: string | undefined): string => {
   const parsed = parseUuid(value);
   if (parsed === null) throw invalidRequest('Idempotency-Key must be a UUID');
@@ -291,6 +298,36 @@ export class ClientEvaluationsController {
     );
     await runEvaluationCommand(() =>
       this.commands.cancelClientEvaluation(id, principal),
+    );
+  }
+
+  @Post(':evaluationId/reschedule')
+  @ApiOperation({ operationId: 'rescheduleEvaluation' })
+  @ApiParam({ name: 'evaluationId', format: 'uuid' })
+  @ApiHeader(idempotencyHeader)
+  @ApiOkResponse({ type: ClientEvaluationDto })
+  @Header('Cache-Control', 'no-store')
+  async reschedule(
+    @Param('evaluationId') evaluationId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Body() body: unknown,
+  ): Promise<ClientEvaluationDto> {
+    const id = requireId(evaluationId, 'Invalid Evaluation identifier');
+    const slotId = parseRescheduleSlot(body);
+    if (slotId === null) throw invalidRequest('Invalid reschedule request');
+    requireIdempotencyKey(idempotencyKey);
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    return runEvaluationCommand(() =>
+      this.commands.rescheduleClientEvaluation(
+        id,
+        slotId,
+        principal,
+        idempotencyKey!,
+      ),
     );
   }
 }

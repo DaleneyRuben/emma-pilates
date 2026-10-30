@@ -111,8 +111,13 @@ function UsedMonth({ availability }: { availability: EvaluationAvailabilityDto }
   );
 }
 
-export function EvaluationAvailabilityScreen() {
+export function EvaluationAvailabilityScreen({
+  route,
+}: {
+  route?: { params?: { evaluationId?: string } };
+}) {
   const navigation = useNavigation<AvailabilityNavigation>();
+  const rescheduling = route?.params?.evaluationId !== undefined;
   const fetcher = useClientFetcher();
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const subscription = useGetCurrentClientSubscription(queryOptions);
@@ -124,7 +129,11 @@ export function EvaluationAvailabilityScreen() {
 
   const header = (
     <>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Evaluación nutricional" />
+      <ScreenTopBar
+        fullBleed
+        onBack={() => navigation.goBack()}
+        title={rescheduling ? "Elige otro turno" : "Evaluación nutricional"}
+      />
     </>
   );
 

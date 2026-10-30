@@ -9,6 +9,8 @@ export type EvaluationRuleCode =
   | 'no_eligible_subscription'
   | 'evaluation_not_found'
   | 'evaluation_not_booked'
+  | 'evaluation_paid_not_cancellable'
+  | 'evaluation_reschedule_closed'
   | 'evaluation_cancellation_window_closed'
   | 'evaluation_started'
   | 'availability_block_not_found'
@@ -30,6 +32,8 @@ const statuses: Record<EvaluationRuleCode, number> = {
   no_eligible_subscription: 409,
   evaluation_not_found: 404,
   evaluation_not_booked: 409,
+  evaluation_paid_not_cancellable: 409,
+  evaluation_reschedule_closed: 409,
   evaluation_cancellation_window_closed: 409,
   evaluation_started: 409,
   availability_block_not_found: 404,

@@ -47,7 +47,10 @@ const noticeVisibleMs = 8_000;
 
 type EvaluationsNavigation = {
   goBack: () => void;
-  navigate: (screen: "EvaluationAvailability") => void;
+  navigate: (
+    screen: "EvaluationAvailability",
+    params?: { evaluationId: string },
+  ) => void;
   setParams: (params: { confirmed?: ClientEvaluationDto }) => void;
 };
 
@@ -66,18 +69,22 @@ function UpcomingCard({
   highlighted,
   uploading,
   onCancel,
+  onReschedule,
   onAttachReceipt,
 }: {
   evaluation: ClientEvaluationDto;
   highlighted: boolean;
   uploading: boolean;
   onCancel: () => void;
+  onReschedule: () => void;
   onAttachReceipt: () => void;
 }) {
   // The server's flag is a snapshot; the 3-hour limit is judged again when the card appears.
   const shownAt = useMountedAt();
-  const cancellable =
-    evaluation.cancellable && new Date(evaluation.cancellableUntil).getTime() > shownAt;
+  const open =
+    new Date(evaluation.cancellableUntil).getTime() > shownAt;
+  const cancellable = evaluation.cancellable && open;
+  const reschedulable = evaluation.reschedulable === true && open;
 
   return (
     <View style={[styles.card, highlighted && styles.cardHighlighted]}>
@@ -108,7 +115,20 @@ function UpcomingCard({
         {!evaluation.included && evaluation.receiptAttached === true ? (
           <BodyText style={styles.muted}>Comprobante listo.</BodyText>
         ) : null}
-        {cancellable ? (
+        {reschedulable ? (
+          <>
+            <BodyText style={styles.muted}>Puedes reprogramarla hasta 3 horas antes.</BodyText>
+            <Pressable
+              accessibilityLabel="Reprogramar"
+              accessibilityRole="button"
+              hitSlop={spacing.sm}
+              onPress={onReschedule}
+              style={styles.cancel}
+            >
+              <Text style={styles.cancelText}>Reprogramar</Text>
+            </Pressable>
+          </>
+        ) : cancellable ? (
           <>
             <BodyText style={styles.muted}>Puedes cancelar hasta 3 horas antes.</BodyText>
             <Pressable
@@ -276,6 +296,11 @@ export function MyEvaluationsScreen({
                 onAttachReceipt={() => void attachReceipt(evaluation)}
                 uploading={uploadingId === evaluation.id}
                 onCancel={() => setCancelling(evaluation)}
+                onReschedule={() =>
+                  navigation.navigate("EvaluationAvailability", {
+                    evaluationId: evaluation.id,
+                  })
+                }
               />
             ))}
           </>
@@ -364,15 +389,6 @@ const styles = StyleSheet.create({
   },
   noticeBody: { color: colors.successText, fontSize: typography.note },
   noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
-  pastRow: {
-    alignItems: "center",
-    borderBottomColor: colors.divider,
-    borderBottomWidth: 1,
-    flexDirection: "row",
-    gap: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  pastText: { flex: 1 },
   screen: { gap: spacing.lg },
   time: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
 });

@@ -97,6 +97,9 @@ model Evaluation {
   cancelledAt            DateTime?                    @map("cancelled_at") @db.Timestamptz(3)
   cancelledByAccountId   String?                      @map("cancelled_by_account_id") @db.Uuid
   cancellationCause      EvaluationCancellationCause? @map("cancellation_cause")
+  // Set when the studio frees the slot of a confirmed Paid Evaluation. The
+  // row stays booked so the client can pick another slot (owner, 2026-10-29).
+  slotReleasedAt         DateTime?                    @map("slot_released_at") @db.Timestamptz(3)
   dayReminderRecordedAt  DateTime?                    @map("day_reminder_recorded_at") @db.Timestamptz(3)
   hourReminderRecordedAt DateTime?                    @map("hour_reminder_recorded_at") @db.Timestamptz(3)
   createdAt              DateTime                     @default(now()) @map("created_at") @db.Timestamptz(3)

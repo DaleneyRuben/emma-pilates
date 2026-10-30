@@ -84,6 +84,26 @@ describe("Client Evaluations", () => {
     expect(screen.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
   });
 
+  it("offers Reprogramar on a confirmed paid evaluation", async () => {
+    const paid = upcomingEvaluation("evaluation-paid", boliviaInstant(firstDay, "09:45"), {
+      included: false,
+      priceCentavos: 7_000,
+      paymentId: "payment-1",
+      cancellable: false,
+      reschedulable: true,
+    });
+    const screen = await openProfileRow(
+      routeFetcher({
+        ...baseRoutes(),
+        "/api/v1/evaluations?scope=upcoming": () => jsonResponse(page([paid])),
+      }),
+      "Mis evaluaciones",
+    );
+
+    expect(await screen.findByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cancelar" })).toBeNull();
+  });
+
   it("shows an 8-class Client the settings price and starts the QR payment", async () => {
     const paid = {
       included: false,
