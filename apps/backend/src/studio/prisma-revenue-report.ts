@@ -11,15 +11,18 @@ export type RevenueMonth = {
 
 type PaymentRow = {
   id: string;
+  kind: string;
   amount_centavos: number;
   decided_on: Date;
-  starts_on: Date;
-  ends_on: Date;
+  starts_on: Date | null;
+  ends_on: Date | null;
   state: string;
 };
 
 // Booking exposes no studio query yet, so Studio Management reads the booking
 // schema by name (ADR-0011) and never imports Booking's command modules.
+// «Caja» counts what the income report counts: confirmed Plan and Evaluation
+// Payments, never Courtesy Access (booking ADR-0012).
 export const readRevenueMonth = async (
   prisma: PrismaClient,
   input: { month: Date; today: Date },
@@ -30,14 +33,17 @@ export const readRevenueMonth = async (
   const today = boliviaDate(input.today);
   const rows = await prisma.$queryRaw<PaymentRow[]>`
     SELECT p.id,
+           lower(p.kind::text) AS kind,
            p.amount_due_centavos AS amount_centavos,
            (p.decided_at AT TIME ZONE 'America/La_Paz')::date AS decided_on,
            s.starts_on,
            s.ends_on,
            lower(p.state::text) AS state
     FROM booking.payments p
-    JOIN booking.subscriptions s ON s.payment_id = p.id
+    LEFT JOIN booking.subscriptions s ON s.payment_id = p.id
     WHERE p.state = 'confirmed'
+      AND p.method <> 'courtesy'
+      AND (p.kind = 'evaluation' OR s.id IS NOT NULL)
   `;
   const owed = await prisma.$queryRaw<{ classes_still_owed: number }[]>`
     SELECT COALESCE(SUM(s.remaining_class_allowance), 0)::int AS classes_still_owed
@@ -48,6 +54,7 @@ export const readRevenueMonth = async (
   `;
   const payments: AccrualPayment[] = rows.map((row) => ({
     id: row.id,
+    kind: row.kind === 'evaluation' ? 'evaluation' : 'plan',
     amountCentavos: Number(row.amount_centavos),
     decidedOn: row.decided_on,
     startsOn: row.starts_on,
