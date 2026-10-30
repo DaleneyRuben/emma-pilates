@@ -502,6 +502,8 @@ wait for Google, Apple, and testers.
 | FIX-005 | P0 | Backend | Allowance net, extra-class refund and reschedule, and guest-pass rebook and verification | BKM-008, BKM-014 | 1 d | done (second review on `8577ec10`: `c0a86505` the monthly refusal names the calendar month; the last-place check lives beside capacity; reschedule uses the shared guest-pass copy; a second cancel tap does not send another DELETE. Device walk still open) |
 | FIX-014 | P0 | Backend/client app | A confirmed Paid Evaluation is rescheduled, not cancelled (owner 2026-10-29). Distinct from the plan-card accessibility row on other branches | FIX-003 | 1 d | in progress |
 
+Evidence still open. `evaluation.rescheduled` and `evaluation.slot_released` are listed in the audit catalog. Migration `20261029230000_evaluation_reminder_once` restores the reminder-once guard that `20261029220000_evaluation_slot_released` dropped. Needs owner approval. It ran only on a disposable database.
+
 #### FIX-005 · Allowance net, extra-class refund, and guest-pass rebook
 
 Review findings H13, the extra-class refund and reschedule mediums, the guest-pass verification medium, the invite-reward landing, and owner decision 2 of 2026-10-28. Branch `fix/fix-005-allowance-and-booking`. No migration.
