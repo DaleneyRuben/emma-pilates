@@ -4,8 +4,7 @@
 appId: ${APP_ID}
 env:
   EMAIL: paola.mendoza@example.com
-  PAYMENT_ID: c10aeb0a-d864-482e-aac1-e194769303d7
-  APP_LINK: emmapilates-staff://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8186
+  PAYMENT_ID: ${PAYMENT_ID}
 ---
 - launchApp:
     appId: ${APP_ID}

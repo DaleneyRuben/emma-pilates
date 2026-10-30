@@ -61,13 +61,14 @@ env:
     visible: "Elige tu plan"
     timeout: 20000
 - tapOn: "Paquete de 8 clases"
+# «Continuar al pago» ends the scroll, so swipe before waiting for it.
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
 - extendedWaitUntil:
     visible:
       id: "plan-continue-to-payment"
     timeout: 15000
-- swipe:
-    start: "50%,70%"
-    end: "50%,30%"
 - tapOn:
     id: "plan-continue-to-payment"
 - extendedWaitUntil:
