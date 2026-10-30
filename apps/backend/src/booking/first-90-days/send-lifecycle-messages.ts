@@ -21,6 +21,8 @@ export type LifecycleSend = {
 
 type SendLifecycleMessagesDependencies = {
   today: Date;
+  // The 09:00 morning the pushes go out, which stamps them.
+  occurredAt: Date;
   findFirstRealPlans(): Promise<FirstRealPlan[]>;
   record(send: LifecycleSend): Promise<boolean>;
 };
@@ -56,7 +58,7 @@ export const sendLifecycleMessages = async (
         accountId: plan.accountId,
         milestone,
         notification: latest
-          ? lifecycleNotification(plan, milestone, dependencies.today)
+          ? lifecycleNotification(plan, milestone, dependencies.occurredAt)
           : null,
       });
       if (recorded && latest) sent += 1;

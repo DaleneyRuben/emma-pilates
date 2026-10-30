@@ -168,19 +168,21 @@ const findClientAlertStates = async (
   prisma: PrismaClient,
   instant: Date,
 ): Promise<ClientAlertState[]> => {
-  const subscriptions = await prisma.subscription.findMany({
+  // The clock starts at each Client's first real Plan; a renewal within the
+  // window never restarts it.
+  const firsts = await prisma.subscription.groupBy({
+    by: ['clientId'],
     where: {
       plan: { priceCentavos: { gt: 0 }, hiddenAt: null },
       client: { deletedAt: null },
-      startsOn: withinNinetyDays(boliviaDate(instant)),
     },
-    orderBy: [{ startsOn: 'asc' }, { id: 'asc' }],
-    select: { clientId: true, startsOn: true },
+    _min: { startsOn: true },
+    having: { startsOn: { _min: withinNinetyDays(boliviaDate(instant)) } },
   });
   const firstStarts = new Map<string, Date>();
-  for (const row of subscriptions) {
-    if (!firstStarts.has(row.clientId))
-      firstStarts.set(row.clientId, row.startsOn);
+  for (const row of firsts) {
+    if (row._min.startsOn !== null)
+      firstStarts.set(row.clientId, row._min.startsOn);
   }
   const clientIds = [...firstStarts.keys()];
   if (clientIds.length === 0) return [];
@@ -272,6 +274,7 @@ export const createFirst90DaysJob = (
         ? { sent: 0 }
         : await sendLifecycleMessages({
             today,
+            occurredAt,
             findFirstRealPlans: () => findFirstRealPlans(prisma),
             record: (send) =>
               prisma.$transaction((transaction) =>
