@@ -61,6 +61,8 @@ describe('createStaffMember', () => {
     expect(transaction.recordAudit).toHaveBeenCalledWith({
       actionCode: 'staff_member.created',
       actorAccountId: 'admin-account',
+      actorRole: 'ADMINISTRATOR',
+      impersonationId: null,
       targetAccountId: 'id-1',
       correlationId: 'id-3',
       metadata: { role: 'trainer', branchIds: ['centro'] },
