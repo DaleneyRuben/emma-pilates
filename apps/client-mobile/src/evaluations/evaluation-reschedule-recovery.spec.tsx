@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse, routeFetcher } from "../test-support";
@@ -91,13 +91,59 @@ describe("Around a paid Evaluation move", () => {
     const screen = await openPicker(fetcher);
     await pick(screen, secondDay, "15:00");
     expect(await screen.findByText("Evaluación reprogramada")).toBeOnTheScreen();
+    // popTo removed the picker from the stack: nothing is left to go Back to.
+    expect(screen.queryByText("Elige otro turno")).toBeNull();
+  });
 
-    const topBar = screen.getAllByRole("button", { name: "Volver" })[0];
-    if (topBar === undefined) throw new Error("no back button");
-    await fireEvent.press(topBar);
-    await waitFor(() => {
-      expect(screen.queryByText("Elige otro turno")).toBeNull();
+  it("retries the same slot under the same key after a lost response", async () => {
+    const sent: Sent[] = [];
+    const fetcher = routeFetcher({
+      ...baseRoutes(),
+      "/api/v1/evaluations?scope=upcoming": () => jsonResponse(page([paid])),
+      "POST /api/v1/evaluations/evaluation-paid/reschedule": (init) => {
+        const body = JSON.parse(String(init?.body)) as { slotId: string };
+        sent.push({ slotId: body.slotId, key: new Headers(init?.headers).get("idempotency-key") });
+        if (sent.length === 1) throw new Error("network lost");
+        return jsonResponse(moved);
+      },
     });
+    const screen = await openPicker(fetcher);
+    await pick(screen, secondDay, "15:00");
+    expect(
+      await screen.findByText("No pudimos reprogramar la evaluación. Inténtalo de nuevo."),
+    ).toBeOnTheScreen();
+
+    await pick(screen, secondDay, "15:00");
+    expect(await screen.findByText("Evaluación reprogramada")).toBeOnTheScreen();
+    expect(sent).toHaveLength(2);
+    expect(sent[0]?.key).toEqual(sent[1]?.key);
+  });
+
+  it("keeps the refusal on screen when no other turno is left", async () => {
+    let refused = false;
+    const fetcher = routeFetcher({
+      ...baseRoutes(),
+      "/api/v1/evaluation-slots": () =>
+        jsonResponse(
+          refused
+            ? { days: [], months: availability.months }
+            : {
+                ...availability,
+                days: availability.days.filter((d) => d.date === secondDay),
+              },
+        ),
+      "/api/v1/evaluations?scope=upcoming": () => jsonResponse(page([paid])),
+      "POST /api/v1/evaluations/evaluation-paid/reschedule": () => {
+        refused = true;
+        return jsonResponse({ code: "evaluation_slot_unavailable" }, 409);
+      },
+    });
+    const screen = await openPicker(fetcher);
+    await fireEvent.press(screen.getByRole("button", { name: "Turno 15:00" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Sí, mover evaluación" }));
+
+    expect(await screen.findByText("No hay horarios disponibles por ahora.")).toBeOnTheScreen();
+    expect(screen.getByText("Ese horario ya no está disponible. Elige otro.")).toBeOnTheScreen();
   });
 
   it("lets a Client whose plan ended move her paid Evaluation", async () => {
