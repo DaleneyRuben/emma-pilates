@@ -129,6 +129,32 @@ describe("Paid Evaluation receipt", () => {
     expect(attached).toEqual([JSON.stringify({ imageAssetId: "asset-1" })]);
   });
 
+  it("names a second pending evaluation payment", async () => {
+    chooseReceipt();
+    const fetcher = routeFetcher(
+      baseRoutes({
+        "/api/v1/evaluation-slots": () => jsonResponse(paidAvailability()),
+        ...uploadRoutes(),
+        "POST /api/v1/evaluation-slots/slot-2/evaluation-payments": () =>
+          jsonResponse({ code: "evaluation_payment_pending", status: 409 }, 409),
+      }),
+    );
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
+    await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:45" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
+    );
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Confirmar" })).toBeEnabled();
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Ya tienes un pago de evaluación pendiente.")).toBeOnTheScreen();
+    });
+  });
+
   it("keeps the booked Evaluation when attaching the receipt fails", async () => {
     chooseReceipt();
     let listed = false;

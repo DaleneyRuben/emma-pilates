@@ -42,6 +42,7 @@ const bookingProblems: Record<string, string> = {
   evaluation_slot_unavailable: "Ese horario ya no está disponible. Elige otro.",
   evaluation_booking_closed: "Ese horario ya cerró: se puede reservar hasta 3 horas antes.",
   evaluation_slot_not_found: "Ese horario ya no está disponible. Elige otro.",
+  evaluation_payment_pending: "Ya tienes un pago de evaluación pendiente.",
   no_eligible_subscription: "Necesitas un plan activo para reservar tu evaluación.",
 };
 
