@@ -30,6 +30,14 @@ const hour = 60 * 60 * 1_000;
 const minute = 60 * 1_000;
 // Bookings take the database clock, so every Session starts well after it.
 const base = new Date(Math.ceil(Date.now() / hour) * hour + 30 * hour);
+// Noon in La Paz (16:00 UTC) on or after `from`: a class at a fixed hour, so
+// a reminder two hours before it never crosses midnight whenever CI runs.
+const laPazNoonFrom = (from: Date): Date => {
+  const noon = new Date(from);
+  noon.setUTCHours(16, 0, 0, 0);
+  if (noon < from) noon.setUTCDate(noon.getUTCDate() + 1);
+  return noon;
+};
 
 describe('class reminder worker', () => {
   let context: DatabaseTestContext;
@@ -149,7 +157,7 @@ describe('class reminder worker', () => {
 
   it('records the hour reminder once and leaves a cancelled Booking alone', async () => {
     const lucia = await principalOf('lucia@example.com');
-    const startsAt = new Date(base.getTime() + 50 * hour);
+    const startsAt = laPazNoonFrom(new Date(base.getTime() + 50 * hour));
     const session = await createSession(startsAt);
     const booked = await bookings.create({ sessionId: session.id }, lucia);
     const cancelled = await bookings.create(
@@ -192,7 +200,7 @@ describe('class reminder worker', () => {
 
   it('sends the hour reminder as Hoy when the class is later the same Bolivia day', async () => {
     const lucia = await principalOf('lucia@example.com');
-    const startsAt = new Date(base.getTime() + 120 * hour);
+    const startsAt = laPazNoonFrom(new Date(base.getTime() + 120 * hour));
     const session = await createSession(startsAt);
     const booking = await bookings.create({ sessionId: session.id }, lucia);
 
