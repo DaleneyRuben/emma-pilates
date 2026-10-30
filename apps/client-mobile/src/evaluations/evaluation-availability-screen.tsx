@@ -48,16 +48,14 @@ type AvailabilityNavigation = {
 
 type OpenDay = { date: string; slots: EvaluationSlotDto[] };
 
-const openDays = (availability: EvaluationAvailabilityDto): OpenDay[] =>
+const openDays = (availability: EvaluationAvailabilityDto, currentSlotId?: string): OpenDay[] =>
   availability.days
     .map((day) => ({
       date: day.date,
-      slots: day.slots.filter((slot) => slot.bookable),
+      slots: day.slots.filter((slot) => slot.bookable && slot.id !== currentSlotId),
     }))
     .filter((day) => day.slots.length > 0);
 
-// The month a Client can book next once the open picker is empty: the first
-// unused month in the horizon, else the month after the last used one.
 const nextUnusedMonth = (months: EvaluationAvailabilityDto["months"]): string | null => {
   const lastUsed = [...months].reverse().find((month) => month.status === "used");
   if (lastUsed === undefined) return null;
@@ -119,10 +117,11 @@ function UsedMonth({ availability }: { availability: EvaluationAvailabilityDto }
 export function EvaluationAvailabilityScreen({
   route,
 }: {
-  route?: { params?: { evaluationId?: string } };
+  route?: { params?: { evaluationId?: string; slotId?: string } };
 }) {
   const navigation = useNavigation<AvailabilityNavigation>();
   const evaluationId = route?.params?.evaluationId;
+  const currentSlotId = route?.params?.slotId;
   const rescheduling = evaluationId !== undefined;
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
@@ -156,7 +155,10 @@ export function EvaluationAvailabilityScreen({
   };
 
   const availability = slots.data?.status === 200 ? slots.data.data : null;
-  const days = useMemo(() => (availability === null ? [] : openDays(availability)), [availability]);
+  const days = useMemo(
+    () => (availability === null ? [] : openDays(availability, currentSlotId)),
+    [availability, currentSlotId],
+  );
 
   const header = (
     <ScreenTopBar

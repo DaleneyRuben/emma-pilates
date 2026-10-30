@@ -302,6 +302,7 @@ export class ClientEvaluationsController {
   }
 
   @Post(':evaluationId/reschedule')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ operationId: 'rescheduleEvaluation' })
   @ApiParam({ name: 'evaluationId', format: 'uuid' })
   @ApiHeader(idempotencyHeader)

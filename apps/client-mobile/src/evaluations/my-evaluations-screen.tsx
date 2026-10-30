@@ -47,7 +47,10 @@ const noticeVisibleMs = 8_000;
 
 type EvaluationsNavigation = {
   goBack: () => void;
-  navigate: (screen: "EvaluationAvailability", params?: { evaluationId: string }) => void;
+  navigate: (
+    screen: "EvaluationAvailability",
+    params?: { evaluationId: string; slotId: string },
+  ) => void;
   setParams: (params: { confirmed?: ClientEvaluationDto }) => void;
 };
 
@@ -295,6 +298,7 @@ export function MyEvaluationsScreen({
                 onReschedule={() =>
                   navigation.navigate("EvaluationAvailability", {
                     evaluationId: evaluation.id,
+                    slotId: evaluation.slotId,
                   })
                 }
               />

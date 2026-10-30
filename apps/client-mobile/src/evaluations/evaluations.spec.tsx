@@ -106,6 +106,7 @@ describe("Client Evaluations", () => {
 
   it("moves a paid evaluation to the chosen slot and does not book a new one", async () => {
     const paid = upcomingEvaluation("evaluation-paid", boliviaInstant(firstDay, "09:45"), {
+      slotId: "slot-2",
       included: false,
       priceCentavos: 7_000,
       paymentId: "payment-1",
@@ -136,6 +137,7 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Mis evaluaciones");
     await fireEvent.press(await screen.findByRole("button", { name: "Reprogramar" }));
     expect(await screen.findByText("Elige otro turno")).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Turno 09:45" })).toBeNull();
     await fireEvent.press(screen.getByRole("button", { name: dayName(secondDay) }));
     await fireEvent.press(screen.getByRole("button", { name: "Turno 15:00" }));
 
