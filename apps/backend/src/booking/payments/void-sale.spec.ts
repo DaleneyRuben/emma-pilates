@@ -63,7 +63,11 @@ describe('voidSale', () => {
     expect(deps.voidPayment).toHaveBeenCalledWith({
       paymentId: 'payment-id',
       reason: 'Registrada dos veces',
-      actorAccountId: 'administrator-account',
+      actor: {
+        accountId: 'administrator-account',
+        role: 'ADMINISTRATOR',
+        impersonationId: null,
+      },
       now: deps.now,
     });
   });

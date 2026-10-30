@@ -177,6 +177,7 @@ describe('what a void undoes', () => {
         subscriptionId: subscription.id,
         nutritionistCostCentavos: 5_000,
         createdByAccountId: buyer.accountId,
+        createdAt: now,
       },
     });
     const session = await prisma.session.findFirstOrThrow({
@@ -222,7 +223,10 @@ describe('what a void undoes', () => {
     await fillPlaces();
     const buyer = await world.newClient('Efectivo anulado');
     const camila = await world.staffPrincipal('camila.rojas@example.com');
-    const closes = createPrismaCashCloses(prisma, { now: () => now });
+    // The close counts sales recorded before its instant.
+    const closes = createPrismaCashCloses(prisma, {
+      now: () => new Date(now.getTime() + 60 * 1_000),
+    });
     const before = await closes.readToday({ branchId: centro().id }, camila);
     const sale = await cash(buyer.clientId);
 

@@ -9,6 +9,7 @@ import {
 import { createPrismaOversight } from '../../src/booking/administration/prisma-oversight';
 import { VoidSaleError } from '../../src/booking/payments/void-sale';
 import { createPrismaVoidPayment } from '../../src/booking/payments/prisma-void-payment';
+import { auditActorOf } from '../../src/system-identity/authentication/audit-actor';
 import {
   fixtures,
   now,
@@ -113,7 +114,7 @@ describe('voiding a sale', () => {
     const voided = await voids().voidPayment({
       paymentId: sale.payment.id,
       reason: 'Registrada dos veces',
-      actorAccountId: administrator.accountId,
+      actor: auditActorOf(administrator),
       now,
     });
 
@@ -171,7 +172,7 @@ describe('voiding a sale', () => {
     await voids().voidPayment({
       paymentId: sale.payment.id,
       reason: 'Registrada dos veces',
-      actorAccountId: administrator.accountId,
+      actor: auditActorOf(administrator),
       now,
     });
 
@@ -180,7 +181,7 @@ describe('voiding a sale', () => {
         voids().voidPayment({
           paymentId: sale.payment.id,
           reason: 'Otra vez',
-          actorAccountId: administrator.accountId,
+          actor: auditActorOf(administrator),
           now,
         }),
       ),
@@ -203,7 +204,7 @@ describe('voiding a sale', () => {
     await voids().voidPayment({
       paymentId: sale.payment.id,
       reason: 'Registrada dos veces',
-      actorAccountId: administrator.accountId,
+      actor: auditActorOf(administrator),
       now,
     });
 
