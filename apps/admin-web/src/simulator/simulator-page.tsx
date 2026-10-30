@@ -12,12 +12,16 @@ import { simulateMonth } from "./simulate-month";
 const cardClass =
   "flex flex-col gap-4 rounded-tarjeta border border-borde bg-blanco p-6 max-md:p-4";
 
-// The owner's opening month: 33 classes a week, 4 students, Bs 65 a class,
-// fixed costs Bs 21,175, tax 16 %.
+// The owner's opening month: 33 classes a week, 4 students paying about Bs 70
+// a class (diagnosis 3.4), Trainer pay of Bs 65 with up to 4 students and
+// Bs 8 from the fifth (decisions section 8), fixed costs Bs 21,175, tax 16 %.
 const opening = {
   classesPerWeek: "33",
   studentsPerClass: "4",
-  pricePerClass: "65",
+  clientPricePerClass: "70",
+  trainerClassPay: "65",
+  includedStudents: "4",
+  extraStudentPay: "8",
   fixedCosts: "21175",
   taxRate: "16",
 };
@@ -88,13 +92,19 @@ function Figure({
 function Calculator({ draft }: { draft: Draft }) {
   const classesPerWeek = whole(draft.classesPerWeek);
   const studentsPerClass = whole(draft.studentsPerClass);
-  const pricePerClassCentavos = amount(draft.pricePerClass);
+  const clientPricePerClassCentavos = amount(draft.clientPricePerClass);
+  const classCentavos = amount(draft.trainerClassPay);
+  const includedStudents = whole(draft.includedStudents);
+  const extraStudentCentavos = amount(draft.extraStudentPay);
   const fixedCostsCentavos = amount(draft.fixedCosts);
   const taxRatePercent = whole(draft.taxRate);
   const ready =
     classesPerWeek !== null &&
     studentsPerClass !== null &&
-    pricePerClassCentavos !== null &&
+    clientPricePerClassCentavos !== null &&
+    classCentavos !== null &&
+    includedStudents !== null &&
+    extraStudentCentavos !== null &&
     fixedCostsCentavos !== null &&
     taxRatePercent !== null &&
     taxRatePercent < 100;
@@ -105,13 +115,15 @@ function Calculator({ draft }: { draft: Draft }) {
       </p>
     );
   }
-  const month = simulateMonth({
+  const input = {
     classesPerWeek,
     studentsPerClass,
-    pricePerClassCentavos,
+    clientPricePerClassCentavos,
+    trainerPay: { classCentavos, includedStudents, extraStudentCentavos },
     fixedCostsCentavos,
     taxRatePercent,
-  });
+  };
+  const month = simulateMonth(input);
   return (
     <>
       <div className="grid gap-3 md:grid-cols-2">
@@ -129,15 +141,7 @@ function Calculator({ draft }: { draft: Draft }) {
         />
       </div>
       <p className="text-nota text-texto-tenue tabular">{month.derivation}</p>
-      <ProjectionSection
-        input={{
-          classesPerWeek,
-          studentsPerClass,
-          pricePerClassCentavos,
-          fixedCostsCentavos,
-          taxRatePercent,
-        }}
-      />
+      <ProjectionSection input={input} />
     </>
   );
 }
@@ -183,9 +187,24 @@ export function SimulatorPage() {
             onChange={change("studentsPerClass")}
           />
           <Field
-            label="Precio por clase (Bs)"
-            value={draft.pricePerClass}
-            onChange={change("pricePerClass")}
+            label="Precio por clase para la clienta (Bs)"
+            value={draft.clientPricePerClass}
+            onChange={change("clientPricePerClass")}
+          />
+          <Field
+            label="Pago por clase a la instructora (Bs)"
+            value={draft.trainerClassPay}
+            onChange={change("trainerClassPay")}
+          />
+          <Field
+            label="Alumnas incluidas en el pago"
+            value={draft.includedStudents}
+            onChange={change("includedStudents")}
+          />
+          <Field
+            label="Pago por alumna extra (Bs)"
+            value={draft.extraStudentPay}
+            onChange={change("extraStudentPay")}
           />
           <Field
             label="Costos fijos (Bs)"

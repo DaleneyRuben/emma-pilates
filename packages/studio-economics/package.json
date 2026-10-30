@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "exports": {
     ".": "./src/break-even.ts",
-    "./project-months": "./src/project-months.ts"
+    "./project-months": "./src/project-months.ts",
+    "./trainer-pay": "./src/trainer-pay.ts"
   },
   "scripts": {
     "test": "jest",
