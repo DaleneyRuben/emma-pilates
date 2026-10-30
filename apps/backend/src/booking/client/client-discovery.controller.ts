@@ -184,6 +184,9 @@ export class ClientProfileController {
       founderRenewalDeadline: view.founderRenewalDeadline ?? null,
       freeze: view.freeze ?? null,
       canRequestFreeze: view.canRequestFreeze ?? false,
+      ...(view.renewalStartsOn === undefined
+        ? {}
+        : { renewalStartsOn: view.renewalStartsOn }),
       subscription:
         view.subscription === null
           ? null
