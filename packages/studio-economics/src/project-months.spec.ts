@@ -4,13 +4,18 @@ import { projectMonths, weeksInAMonth } from './project-months';
 // STU-005. Three scenarios, no I/O. Base repeats the simulator month. Low is
 // 80 % of those students. High is 120 %, capped at the class capacity the
 // caller passes (default 12). A month is the weekly schedule times 4.33,
-// the same constant the Simulador page uses. Variable cost is trainer pay:
-// classes times the price per class, as simulateMonth already does.
+// the same constant the Simulador page uses. Income is what Clients pay per
+// class; variable cost is Trainer pay by the BKO-006 formula (FIX-008).
 
 const owner = {
   classesPerWeek: 33,
   studentsPerClass: 4,
-  pricePerClassCentavos: 6_500,
+  clientPricePerClassCentavos: 7_000,
+  trainerPay: {
+    classCentavos: 6_500,
+    includedStudents: 4,
+    extraStudentCentavos: 800,
+  },
   fixedCostsCentavos: 2_117_500,
   taxRatePercent: 16,
 };
@@ -33,9 +38,9 @@ describe('studio projections', () => {
     expect(one).toMatchObject({
       months: 1,
       scenario: 'base',
-      revenueCentavos: 143 * 4 * 6_500,
+      revenueCentavos: 143 * 4 * 7_000,
       costCentavos: 2_117_500 + 143 * 6_500,
-      taxCentavos: Math.round((143 * 4 * 6_500 * 16) / 100),
+      taxCentavos: Math.round((143 * 4 * 7_000 * 16) / 100),
       breakEvenCentavos: breakEven({
         fixedCostsCentavos: 2_117_500,
         variableCostsCentavos: 143 * 6_500,
@@ -66,19 +71,19 @@ describe('studio projections', () => {
     expect(low?.revenueCentavos).toBeLessThan(base?.revenueCentavos ?? 0);
     expect(base?.revenueCentavos).toBeLessThan(high?.revenueCentavos ?? 0);
     // 4 * 1.2 = 4.8, so the month's class-students round to 5.
-    expect(high?.revenueCentavos).toBe(143 * 5 * 6_500 * 3);
+    expect(high?.revenueCentavos).toBe(143 * 5 * 7_000 * 3);
 
     const crowded = projectMonths({ ...owner, studentsPerClass: 11 });
     const capped = horizon(crowded, 3, 'high');
     // 11 * 1.2 = 13.2, which the default capacity of 12 cuts to 12.
-    expect(capped?.revenueCentavos).toBe(143 * 12 * 6_500 * 3);
+    expect(capped?.revenueCentavos).toBe(143 * 12 * 7_000 * 3);
 
     const tighter = projectMonths(
       { ...owner, studentsPerClass: 8 },
       { classCapacity: 9 },
     );
     expect(horizon(tighter, 6, 'high')?.revenueCentavos).toBe(
-      143 * 9 * 6_500 * 6,
+      143 * 9 * 7_000 * 6,
     );
   });
 
@@ -105,5 +110,28 @@ describe('studio projections', () => {
     expect(twenty?.taxCentavos).toBeGreaterThan(sixteen?.taxCentavos ?? 0);
     expect(twenty?.resultCentavos).toBeLessThan(sixteen?.resultCentavos ?? 0);
     expect(twenty?.revenueCentavos).toBe(sixteen?.revenueCentavos);
+  });
+
+  // FIX-008 (review 2026-10-28): one price stood for both what a Client pays
+  // and what a Trainer earns, and the Bs 8 per extra student was ignored.
+  it('charges the Client price and pays the Trainer Bs 65 plus Bs 8 from the fifth student', () => {
+    const result = projectMonths(owner);
+    const base = horizon(result, 3, 'base');
+    const high = horizon(result, 3, 'high');
+    const low = horizon(result, 3, 'low');
+
+    expect(base?.revenueCentavos).toBe(143 * 4 * 7_000 * 3);
+    expect(base?.costCentavos).toBe((2_117_500 + 143 * 6_500) * 3);
+    // High has 5 students: Bs 65 + 1 extra × Bs 8 = Bs 73 a class.
+    expect(high?.costCentavos).toBe((2_117_500 + 143 * 7_300) * 3);
+    // Low has 3 students, still the Bs 65 class rate.
+    expect(low?.costCentavos).toBe((2_117_500 + 143 * 6_500) * 3);
+    expect(high?.breakEvenCentavos).toBe(
+      breakEven({
+        fixedCostsCentavos: 2_117_500,
+        variableCostsCentavos: 143 * 7_300,
+        taxRatePercent: 16,
+      }).breakEvenCentavos,
+    );
   });
 });
