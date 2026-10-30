@@ -9,6 +9,10 @@ import { lockFounderPlaces } from './prisma-founder-membership';
 
 const unreviewedHoldMilliseconds = 3 * 24 * 60 * 60 * 1_000;
 
+const unreviewedSince = (cutoff: Date) => ({
+  is: { state: PaymentState.PENDING, submittedAt: { lte: cutoff } },
+});
+
 // FIX-013 (owner 2026-10-30): a transfer nobody reviews holds its founder
 // place for 3 days, then the place is free for the next buyer. Nothing the
 // Client or the desk sees changes: a later confirmation still honours the
@@ -22,9 +26,7 @@ export const releaseUnreviewedFounderReservations = async (
     where: {
       status: FounderMembershipStatus.RESERVED,
       deletedAt: null,
-      payment: {
-        is: { state: PaymentState.PENDING, submittedAt: { lte: cutoff } },
-      },
+      payment: unreviewedSince(cutoff),
     },
     select: { id: true, clientId: true, number: true, paymentId: true },
   });
@@ -34,10 +36,13 @@ export const releaseUnreviewedFounderReservations = async (
       // The same lock a confirmation takes, so it never flips a freed place.
       await lockFounderPlaces(transaction);
       const changed = await transaction.founderMembership.updateMany({
+        // Checked again under the lock: a sale may have taken the
+        // reservation over since the read.
         where: {
           id: place.id,
           status: FounderMembershipStatus.RESERVED,
           deletedAt: null,
+          payment: unreviewedSince(cutoff),
         },
         data: { deletedAt: now },
       });
