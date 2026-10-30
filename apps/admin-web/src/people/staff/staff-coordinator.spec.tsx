@@ -100,6 +100,35 @@ describe("the Coordinator Role in Personal", () => {
     ]);
   });
 
+  it("saves a Trainer's Branches even when her stored contact would not pass the full form", async () => {
+    const lorena = member("07", "Lorena Paz", {
+      phone: `+591 ${"7".repeat(40)}`,
+    });
+    const saved: unknown[] = [];
+    server.use(
+      ...coordinatorHandlers(),
+      allBranchesHandler(),
+      http.get(apiUrl(staffMembersPath), () =>
+        jsonResponse(staffPage([lorena])),
+      ),
+      http.put(
+        apiUrl(`${staffMembersPath}/${lorena.id}/branches`),
+        async ({ request }) => {
+          saved.push(await request.json());
+          return jsonResponse({ ...lorena });
+        },
+      ),
+    );
+    const { user } = renderAdmin("/back-office/personal");
+
+    await user.click(await screen.findByRole("button", { name: "Lorena Paz" }));
+    const panel = await screen.findByRole("dialog", { name: "Lorena Paz" });
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+
+    await screen.findByText(/Guardamos las sucursales/);
+    expect(saved).toEqual([{ branchIds: lorena.branchIds }]);
+  });
+
   it("shows the Coordinator Personal read-only for anyone who is not a Trainer", async () => {
     server.use(
       ...coordinatorHandlers(),
