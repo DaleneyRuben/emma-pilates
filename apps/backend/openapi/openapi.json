@@ -16076,9 +16076,13 @@
             "type": "number",
             "description": "BOB centavos owed to the Nutritionist"
           },
+          "salariesCentavos": {
+            "type": "number",
+            "description": "The month’s Salary Payments, BOB centavos. The Coordinator’s and reception’s also show as the actual of their budget lines"
+          },
           "resultCentavos": {
             "type": "number",
-            "description": "Cash income less tax, actual costs, and the Nutritionist"
+            "description": "Cash income less tax, actual costs, salaries, and the Nutritionist"
           },
           "breakEvenCentavos": {
             "type": "number",

@@ -2,8 +2,9 @@
 // from zero. Averages stay in tenths (times 10) so the page formats the
 // decimal and this function never leaves integers. New means this month's
 // fact has plan days and the client has no earlier fact with plan days.
-// Renewal's denominator is active clients, not plans that expired: the
-// fact table cannot see those.
+// Renewal is booking's one «renovó» (owner decision 5): the share of the
+// real Plans that ended in the month and were renewed, as the Coordinator's
+// bonus counts it. Without those counts it falls back to the client facts.
 
 export type SessionFactInput = {
   capacity: number;
@@ -44,6 +45,7 @@ export const monthKpis = (input: {
   sessions: readonly SessionFactInput[];
   clientMonths: readonly ClientMonthInput[];
   earlierActiveClientIds: readonly string[];
+  planRenewals?: { ending: number; renewed: number };
 }): MonthKpiCounts => {
   const sessionsHeld = input.sessions.length;
   const bookings = sum(
@@ -54,7 +56,9 @@ export const monthKpis = (input: {
   const noShows = sum(input.sessions.map((session) => session.noShows));
   const active = input.clientMonths.filter((row) => row.planDays > 0);
   const earlier = new Set(input.earlierActiveClientIds);
-  const renewedClients = active.filter((row) => row.renewed).length;
+  const renewedClients =
+    input.planRenewals?.renewed ?? active.filter((row) => row.renewed).length;
+  const renewalBase = input.planRenewals?.ending ?? active.length;
 
   return {
     sessionsHeld,
@@ -65,6 +69,6 @@ export const monthKpis = (input: {
     activeClients: active.length,
     newClients: active.filter((row) => !earlier.has(row.clientId)).length,
     renewedClients,
-    renewalPercent: percent(renewedClients, active.length),
+    renewalPercent: percent(renewedClients, renewalBase),
   };
 };

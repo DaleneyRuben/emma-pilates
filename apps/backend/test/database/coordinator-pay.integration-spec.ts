@@ -35,9 +35,12 @@ const handCheckedTotalCentavos = 403_000;
 
 describe('coordinator pay statements', () => {
   let world: EvaluationTestWorld;
-  const statements = () =>
+  // December is paid once it is over, the Coordinator's renewal week
+  // included (FIX-007).
+  const afterDecember = new Date('2027-01-08T13:00:00.000Z');
+  const statements = (now: Date = fixtureNow) =>
     createPrismaPayStatements(world.prisma, {
-      now: () => fixtureNow,
+      now: () => now,
       factsOfMonth: () =>
         Promise.resolve({ rates: openingRates, trainers: [] }),
       coordinatorFactsOfMonth: (from, until) =>
@@ -196,18 +199,41 @@ describe('coordinator pay statements', () => {
           referralCode: `REF-${clientId.slice(0, 8)}`,
         },
       });
+      // Owner decision 5: «renovó» is measured by purchase, so each Plan is a
+      // real sale. The next one is bought the day it starts.
       const subscription = async (startsOn: Date, ends: Date) => {
-        await prisma.subscription.create({
+        await prisma.payment.create({
           data: {
             clientId,
             planId,
             planNameSnapshot: 'Mensual',
             durationDaysSnapshot: 30,
-            originalClassAllowance: 8,
-            remainingClassAllowance: 0,
+            classAllowanceSnapshot: 8,
+            planPriceCentavos: 78_000,
+            creditAppliedCentavos: 0,
+            amountDueCentavos: 78_000,
             startsOn,
-            endsOn: ends,
-            activatedAt: startsOn,
+            method: 'CASH',
+            collectedAtBranchId: branchId,
+            kind: 'PLAN',
+            state: 'CONFIRMED',
+            submittedByAccountId: admin.accountId,
+            submittedAt: startsOn,
+            decidedByAccountId: admin.accountId,
+            decidedAt: new Date(startsOn.getTime() + 15 * 60 * 60 * 1000),
+            subscription: {
+              create: {
+                clientId,
+                planId,
+                planNameSnapshot: 'Mensual',
+                durationDaysSnapshot: 30,
+                originalClassAllowance: 8,
+                remainingClassAllowance: 0,
+                startsOn,
+                endsOn: ends,
+                activatedAt: startsOn,
+              },
+            },
           },
         });
       };
@@ -245,13 +271,13 @@ describe('coordinator pay statements', () => {
       }),
     ]);
 
-    const approved = await statements().approveStatement(
+    const approved = await statements(afterDecember).approveStatement(
       { statementId: listed[0].id },
       admin,
     );
     expect(approved.state).toBe('approved');
     expect(approved.salaryPaymentId).not.toBeNull();
-    const again = await statements().approveStatement(
+    const again = await statements(afterDecember).approveStatement(
       { statementId: listed[0].id },
       admin,
     );

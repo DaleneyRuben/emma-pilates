@@ -7808,3 +7808,84 @@ F. **Account closure (H9).** A Client with a voided sale that carried
 G. **Audit actor.** `payment.voided` and every reversal name the
    Administrator who voided, her role, and the `impersonationId` while one
    is open.
+
+## Test 120: analytics review fixes (FIX-008)
+
+The analytics findings of the 2026-10-28 review. Use `pilates_dev_sim` with the
+API and the admin web (`pnpm dev:admin`) signed in as Paola (Administrator).
+The reports read the studio facts: after changing data, recompute the month
+first (`POST /api/v1/administrator/studio-facts/recompute` with
+`{"month": "YYYY-MM"}`).
+
+A. **Accrued revenue (H12).** In Indicadores (and Reporte) for a month with a
+   30-day Plan of Bs 300 starting on the 20th: «Devengado» shows Bs 120 for
+   the first month (12 of 30 days, the end date counts) and Bs 180 for the
+   next. A Payment approved on the 1st counts in «Caja» of that month only.
+   «Diferido» shrinks every day and reads Bs 0 the day after the Plan ends;
+   for a past month it is measured at that month's end. A paid Evaluation
+   shows in «Caja» and «Devengado» of the month it was approved, as in the
+   income report, and never in «Diferido». A one-day Plan never shows NaN.
+B. **Only Sessions taught.** A Session cancelled this month, or one later
+   today or later in the month, is not counted in «Clases dictadas»,
+   occupancy, the averages, the weak-schedule recommendations, or the
+   narrative («se dictaron N clases»). Students per class come from the
+   Bookings when the Cancellation Window closed (what Trainer pay counts),
+   not from today's Bookings. A Client with only a future Booking this month
+   is not listed as «no reservó este mes».
+C. **Who counts as a Client.** A friend with only a Guest Pass, a Client with
+   only Courtesy Access, and a Client whose only sale was voided are not
+   counted in «Clientas activas», «Nuevas», or the inactive-client
+   recommendations.
+D. **The previous month is finalized.** Through day 8 of a month (La Paz
+   time) the worker's daily studio-facts run recomputes the previous month as
+   well, so a late attendance or a void shows in it. From day 9 the previous
+   month no longer changes.
+E. **Simulador (AW37).** The form now has «Precio por clase para la clienta
+   (Bs)» (70), «Pago por clase a la instructora (Bs)» (65), «Alumnas
+   incluidas en el pago» (4), and «Pago por alumna extra (Bs)» (8) instead of
+   the single «Precio por clase (Bs)». With the opening values «Resultado»
+   reads «Bs 3.163,60» (ingreso Bs 40.040,00), «Punto de equilibrio»
+   «Bs 36.273,81», and the derivation «(21175 + 9295) / 0.84 = 36273.81».
+   With 6 students per class, Trainer pay is Bs 81 a class: the derivation
+   reads «(21175 + 11583) / 0.84 = 38997.62». The Proyección's «3 meses
+   Base» income is «Bs 120.120,00»; «Alto» pays the extra student.
+F. **No float noise.** A tax of 7 % shows the divisor as «0.93», never
+   «0.9299999999999999».
+
+## Test 121: payroll and finance (FIX-007)
+
+Run the API, the worker and the fixtures as in Tests 2 and 5. The
+integration spec
+`apps/backend/test/database/payroll-finance-fixes.integration-spec.ts` builds
+every state below.
+
+A. **Salaries in «Resultado» (H10).** Record Salary Payments for the
+   Coordinator, reception and a Trainer in one month. In Reporte ›
+   Finanzas, «Coordinadora» and «Recepción» show those payments as their
+   actual. «Sueldos pagados Bs N» shows the month's total. «Resultado»
+   subtracts it: «Ingresos en caja menos impuesto, gastos, sueldos y
+   nutricionista».
+B. **One Salary Payment per statement (H11).** Approving a statement twice
+   at once, or while the hourly re-draft runs, leaves one Salary Payment.
+   An approved statement is never re-drafted.
+C. **«Renovó» (H18, owner decision 5).** A real Plan ending in the month
+   renewed when another real Plan was bought (approval date, Bolivia) before
+   its end or up to 7 days after it, whatever its Start Date. A Guest Pass,
+   Courtesy Access, a single class and a voided sale are never counted. The
+   Coordinator's bonus and Indicadores use the same definition.
+D. **Months in Bolivia.** A sale approved at 23:30 on the last day of the
+   month (La Paz) counts in that month, in Finanzas and in pay.
+E. **Approval waits for the month.** Approving before the month is over
+   answers `409` `pay_statement_month_open`. The Coordinator's statement
+   waits 7 more days for the renewal week.
+F. **Commissions.** A Trainer's commission is paid on the first real Plan of
+   a Client she brought. A single class is not a Plan. After a voided first
+   Plan, a later Plan opens no commission.
+G. **Coordinators.** Every active Coordinator gets her statement. A
+   deactivated one gets none.
+H. **Re-draft and seed.** The hourly re-draft writes nothing when the lines
+   did not change. Two «Cargar presupuesto inicial» requests at once seed the
+   ten lines once.
+I. **Month and settings.** `?month=2026-13` answers `400`. A month reads the
+   tax and the renewal targets of the Studio Settings version in force
+   then, not a later one.

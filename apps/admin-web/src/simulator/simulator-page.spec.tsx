@@ -33,12 +33,17 @@ describe("Simulador on a desktop browser", () => {
 
     await fill(user, "Clases por semana", "33");
     await fill(user, "Alumnas por clase", "4");
-    await fill(user, "Precio por clase (Bs)", "65");
+    await fill(user, "Precio por clase para la clienta (Bs)", "70");
+    await fill(user, "Pago por clase a la instructora (Bs)", "65");
+    await fill(user, "Alumnas incluidas en el pago", "4");
+    await fill(user, "Pago por alumna extra (Bs)", "8");
     await fill(user, "Costos fijos (Bs)", "21175");
     await fill(user, "Impuestos (%)", "16");
 
+    // 143 classes × 4 × Bs 70 = Bs 40.040; tax Bs 6.406,40; Trainer pay
+    // 143 × Bs 65 = Bs 9.295.
     const result = screen.getByRole("region", { name: "Resultado" });
-    expect(within(result).getByText("Bs 761,20")).toBeVisible();
+    expect(within(result).getByText("Bs 3.163,60")).toBeVisible();
     expect(within(result).getByText(/143 clases/)).toBeVisible();
     expect(
       within(
@@ -50,8 +55,8 @@ describe("Simulador on a desktop browser", () => {
     const projection = screen.getByRole("region", { name: "Proyección" });
     expect(within(projection).getByRole("table")).toBeVisible();
     const base = within(projection).getByRole("row", { name: /3 meses Base/ });
-    expect(within(base).getByText("Bs 111.540,00")).toBeVisible();
-    expect(within(base).getByText("Bs 2.283,60")).toBeVisible();
+    expect(within(base).getByText("Bs 120.120,00")).toBeVisible();
+    expect(within(base).getByText("Bs 9.490,80")).toBeVisible();
     expect(
       within(projection).getByRole("row", { name: /12 meses Alto/ }),
     ).toBeVisible();
@@ -64,7 +69,7 @@ describe("Simulador on a desktop browser", () => {
     const { user } = renderAdmin("/simulador");
     await heading();
     await fill(user, "Clases por semana", "33");
-    await fill(user, "Precio por clase (Bs)", "65");
+    await fill(user, "Pago por clase a la instructora (Bs)", "65");
     await fill(user, "Costos fijos (Bs)", "21175");
 
     await fill(user, "Impuestos (%)", "20");
@@ -77,7 +82,24 @@ describe("Simulador on a desktop browser", () => {
     const base = within(
       screen.getByRole("region", { name: "Proyección" }),
     ).getByRole("row", { name: /3 meses Base/ });
-    expect(within(base).getByText("−Bs 2.178,00")).toBeVisible();
+    expect(within(base).getByText("Bs 4.686,00")).toBeVisible();
+  });
+
+  // FIX-008 (review 2026-10-28): the Client price and Trainer pay were one
+  // number, and the Bs 8 per student from the fifth was ignored.
+  it("pays the Trainer Bs 8 for each student from the fifth", async () => {
+    const { user } = renderAdmin("/simulador");
+    await heading();
+
+    await fill(user, "Alumnas por clase", "6");
+
+    // Trainer pay is 143 × (Bs 65 + 2 × Bs 8) = Bs 11.583.
+    expect(screen.getByText("(21175 + 11583) / 0.84 = 38997.62")).toBeVisible();
+    expect(
+      within(screen.getByRole("region", { name: "Resultado" })).getByText(
+        "Bs 17.692,40",
+      ),
+    ).toBeVisible();
   });
 
   it("hides the page from a role that is not the Administrator", async () => {

@@ -1,6 +1,7 @@
 import {
   recomputeFacts,
   type ClientMonthFact,
+  type FactSession,
   type FactSource,
   type SessionFact,
 } from './recompute-facts';
@@ -16,6 +17,7 @@ const excludedClient = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
 const branchId = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
 const classTypeId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
 const trainerId = '99999999-9999-4999-8999-999999999999';
+const now = new Date('2026-10-23T15:00:00.000Z');
 
 const source = (): FactSource => ({
   sessions: [
@@ -25,8 +27,12 @@ const source = (): FactSource => ({
       classTypeId,
       trainerStaffMemberId: trainerId,
       startsAt: new Date('2026-10-12T18:00:00.000Z'),
+      endsAt: new Date(
+        new Date('2026-10-12T18:00:00.000Z').getTime() + 50 * 60_000,
+      ),
       capacity: 8,
       state: 'scheduled',
+      bookingsAtWindowClose: null,
       bookings: [
         { clientId: clientA, state: 'booked', outcome: 'attended' },
         { clientId: clientB, state: 'booked', outcome: 'no_show' },
@@ -40,8 +46,12 @@ const source = (): FactSource => ({
       classTypeId,
       trainerStaffMemberId: trainerId,
       startsAt: new Date('2026-10-13T18:00:00.000Z'),
+      endsAt: new Date(
+        new Date('2026-10-13T18:00:00.000Z').getTime() + 50 * 60_000,
+      ),
       capacity: 6,
       state: 'scheduled',
+      bookingsAtWindowClose: null,
       bookings: [],
     },
     {
@@ -50,8 +60,12 @@ const source = (): FactSource => ({
       classTypeId,
       trainerStaffMemberId: trainerId,
       startsAt: new Date('2026-09-30T18:00:00.000Z'),
+      endsAt: new Date(
+        new Date('2026-09-30T18:00:00.000Z').getTime() + 50 * 60_000,
+      ),
       capacity: 8,
       state: 'scheduled',
+      bookingsAtWindowClose: null,
       bookings: [{ clientId: clientA, state: 'booked', outcome: 'attended' }],
     },
   ],
@@ -86,7 +100,7 @@ const source = (): FactSource => ({
 describe('recompute facts', () => {
   it('writes one session fact per session in the month, including one with no bookings', () => {
     const facts: { sessions: SessionFact[]; clientMonths: ClientMonthFact[] } =
-      recomputeFacts(source(), month);
+      recomputeFacts(source(), month, now);
 
     expect(facts.sessions).toEqual([
       {
@@ -116,7 +130,7 @@ describe('recompute facts', () => {
 
   it('writes one client month fact per included client and counts only that month', () => {
     const facts: { sessions: SessionFact[]; clientMonths: ClientMonthFact[] } =
-      recomputeFacts(source(), month);
+      recomputeFacts(source(), month, now);
 
     expect(facts.clientMonths).toEqual([
       {
@@ -148,7 +162,7 @@ describe('recompute facts', () => {
 
   it('excludes a store-review client and their bookings through the exclusion seam', () => {
     const facts: { sessions: SessionFact[]; clientMonths: ClientMonthFact[] } =
-      recomputeFacts(source(), month);
+      recomputeFacts(source(), month, now);
 
     expect(facts.sessions[0]?.bookingsAtWindowClose).toBe(2);
     expect(facts.clientMonths.map((row) => row.clientId)).not.toContain(
@@ -157,9 +171,72 @@ describe('recompute facts', () => {
   });
 
   it('returns the same rows when the same source is recomputed twice', () => {
-    const first = recomputeFacts(source(), month);
-    const second = recomputeFacts(source(), month);
+    const first = recomputeFacts(source(), month, now);
+    const second = recomputeFacts(source(), month, now);
 
     expect(second).toEqual(first);
+  });
+
+  describe('counts only the Sessions taught', () => {
+    const later = (overrides: Partial<FactSession>): FactSession => ({
+      id: '44444444-4444-4444-8444-444444444444',
+      branchId,
+      classTypeId,
+      trainerStaffMemberId: trainerId,
+      startsAt: new Date('2026-10-28T18:00:00.000Z'),
+      endsAt: new Date('2026-10-28T18:50:00.000Z'),
+      capacity: 8,
+      state: 'scheduled',
+      bookingsAtWindowClose: null,
+      bookings: [{ clientId: clientC, state: 'booked', outcome: null }],
+      ...overrides,
+    });
+
+    it('leaves a cancelled Session out of the facts and out of her bookings', () => {
+      const withCancelled = source();
+      withCancelled.sessions.push(
+        later({
+          startsAt: new Date('2026-10-14T18:00:00.000Z'),
+          endsAt: new Date('2026-10-14T18:50:00.000Z'),
+          state: 'cancelled',
+        }),
+      );
+
+      const facts = recomputeFacts(withCancelled, month, now);
+
+      expect(facts.sessions.map((row) => row.sessionId)).toEqual([
+        sessionId,
+        emptySessionId,
+      ]);
+      expect(
+        facts.clientMonths.find((row) => row.clientId === clientC)
+          ?.classesBooked,
+      ).toBe(0);
+    });
+
+    it('leaves a Session not yet taught out of the facts but keeps her booking', () => {
+      const withFuture = source();
+      withFuture.sessions.push(later({}));
+
+      const facts = recomputeFacts(withFuture, month, now);
+
+      expect(facts.sessions).toHaveLength(2);
+      expect(
+        facts.clientMonths.find((row) => row.clientId === clientC)
+          ?.classesBooked,
+      ).toBe(1);
+    });
+
+    it('takes the students from the window-close snapshot, not the live Bookings', () => {
+      const snapshotted = source();
+      snapshotted.sessions[0] = {
+        ...snapshotted.sessions[0],
+        bookingsAtWindowClose: 3,
+      };
+
+      const facts = recomputeFacts(snapshotted, month, now);
+
+      expect(facts.sessions[0]?.bookingsAtWindowClose).toBe(3);
+    });
   });
 });
