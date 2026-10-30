@@ -25,11 +25,11 @@ import { TabletGrid } from "./assistant-layout";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
 
-function planCardPrice(plan: PlanQuoteDto): string {
+function planCardLabel(plan: PlanQuoteDto): string {
   const price = formatBolivianos(plan.priceCentavos);
   return plan.listPriceCentavos === undefined
-    ? price
-    : `${price}, antes ${formatBolivianos(plan.listPriceCentavos)}`;
+    ? `${plan.name}, ${price}`
+    : `${plan.name}, ${price}, antes ${formatBolivianos(plan.listPriceCentavos)}`;
 }
 
 type SelectPlanNavigation = {
@@ -87,8 +87,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
         <TabletGrid testID="assistant-plan-grid">
           {plans.map((plan) => (
             <Pressable
-              accessibilityHint={planCardPrice(plan)}
-              accessibilityLabel={plan.name}
+              accessibilityLabel={planCardLabel(plan)}
               accessibilityRole="button"
               key={plan.id}
               onPress={() =>

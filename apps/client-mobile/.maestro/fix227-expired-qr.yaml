@@ -60,7 +60,8 @@ env:
 - extendedWaitUntil:
     visible: "Elige tu plan"
     timeout: 20000
-- tapOn: "Paquete de 8 clases"
+# The card label carries the price (FIX-017), so match the name as a prefix.
+- tapOn: "Paquete de 8 clases.*"
 # «Continuar al pago» ends the scroll, so swipe before waiting for it.
 - swipe:
     start: "50%,70%"

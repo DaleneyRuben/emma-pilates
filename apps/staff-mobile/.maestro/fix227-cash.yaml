@@ -86,12 +86,12 @@ env:
 - tapOn:
     id: "client-overview-cash-payment"
 - extendedWaitUntil:
-    visible: "Paquete de 8 clases"
+    visible: "Paquete de 8 clases.*"
     timeout: 20000
-# The price is drawn text, so VoiceOver and Maestro cannot read 476 or 560.
-# The screenshot is the proof: Bs 560 struck through, Bs 476 beside it.
+# The card's accessibility label carries the price (FIX-017): «Paquete de 8
+# clases, Bs 476, antes Bs 560». The screenshot shows Bs 560 struck through.
 - takeScreenshot: fix227-cash-founder-price
-- tapOn: "Paquete de 8 clases"
+- tapOn: "Paquete de 8 clases.*"
 - extendedWaitUntil:
     visible: "Confirmar pago en efectivo"
     timeout: 15000

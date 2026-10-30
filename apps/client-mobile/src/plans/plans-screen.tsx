@@ -22,18 +22,17 @@ type PlansNavigation = {
   navigate: (screen: "PlanDetail", params: { planId: string }) => void;
 };
 
-function planCardPrice(plan: PlanDto): string {
+function planCardLabel(plan: PlanDto): string {
   const price = formatBolivianos(plan.priceCentavos);
   return plan.listPriceCentavos === undefined
-    ? price
-    : `${price}, antes ${formatBolivianos(plan.listPriceCentavos)}`;
+    ? `${plan.name}, ${price}`
+    : `${plan.name}, ${price}, antes ${formatBolivianos(plan.listPriceCentavos)}`;
 }
 
 function PlanCard({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
   return (
     <Pressable
-      accessibilityHint={planCardPrice(plan)}
-      accessibilityLabel={plan.name}
+      accessibilityLabel={planCardLabel(plan)}
       accessibilityRole="button"
       onPress={onPress}
       style={styles.card}
