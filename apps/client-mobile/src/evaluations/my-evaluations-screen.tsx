@@ -47,10 +47,7 @@ const noticeVisibleMs = 8_000;
 
 type EvaluationsNavigation = {
   goBack: () => void;
-  navigate: (
-    screen: "EvaluationAvailability",
-    params?: { evaluationId: string },
-  ) => void;
+  navigate: (screen: "EvaluationAvailability", params?: { evaluationId: string }) => void;
   setParams: (params: { confirmed?: ClientEvaluationDto }) => void;
 };
 
@@ -81,8 +78,7 @@ function UpcomingCard({
 }) {
   // The server's flag is a snapshot; the 3-hour limit is judged again when the card appears.
   const shownAt = useMountedAt();
-  const open =
-    new Date(evaluation.cancellableUntil).getTime() > shownAt;
+  const open = new Date(evaluation.cancellableUntil).getTime() > shownAt;
   const cancellable = evaluation.cancellable && open;
   const reschedulable = evaluation.reschedulable === true && open;
 

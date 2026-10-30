@@ -304,9 +304,7 @@ export function EvaluationAvailabilityScreen({
             </View>
           </>
         ) : null}
-        {failure === null ? null : (
-          <BodyText accessibilityRole="alert" style={styles.failure}>{failure}</BodyText>
-        )}
+        {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
         <BodyText style={styles.muted}>
           {rescheduling
             ? "Al elegir un horario movemos esta evaluación."
@@ -351,7 +349,6 @@ const styles = StyleSheet.create({
   dayStrip: { flexGrow: 0 },
   dayTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   dayWeekday: { color: colors.textSecondary, fontSize: typography.label },
-  failure: { color: colors.errorText, fontSize: typography.note },
   days: { gap: spacing.sm },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   label: {
