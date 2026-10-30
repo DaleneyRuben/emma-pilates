@@ -29,11 +29,11 @@ import {
   readStartDateRules,
   todayOf,
 } from './prisma-start-date-allocation';
-import { loadActiveSubscription } from './subscription-allocation';
 import {
-  evaluatePurchaseEligibility,
-  isSubscriptionEffective,
-} from './purchase-eligibility';
+  expireSubscription,
+  loadActiveSubscription,
+} from './subscription-allocation';
+import { evaluatePurchaseEligibility } from './purchase-eligibility';
 import { priceTransferForGap } from './founder-gap';
 import { repointFounderReservation } from './founder-reservation';
 
@@ -141,41 +141,37 @@ export const createFrontDeskTransfer = (
               select: { id: true },
             }),
           ]);
+          // The same eligibility and Start Date as the Client's own
+          // transfer (H5): only a Plan whose term has passed expires now. One
+          // still in its term is shortened at confirmation, so a rejected
+          // receipt leaves her Plan and its extra classes as they were.
           const today = todayOf(now);
-          if (active !== null && !isSubscriptionEffective(active, today)) {
-            await transaction.subscription.update({
-              where: { id: active.id },
-              data: { state: 'EXPIRED', expiredAt: now },
-            });
-          }
-          evaluatePurchaseEligibility({
+          const futureSubscriptionId = await loadFutureSubscriptionId(
+            transaction,
+            command.clientId,
+            today,
+          );
+          const eligibility = evaluatePurchaseEligibility({
             today,
             plan,
-            activeSubscription:
-              active !== null && isSubscriptionEffective(active, today)
-                ? active
-                : null,
-            futureSubscriptionId: await loadFutureSubscriptionId(
-              transaction,
-              command.clientId,
-              today,
-            ),
+            activeSubscription: active,
+            futureSubscriptionId,
             openPurchaseIntentId: openIntent?.id ?? null,
             pendingPaymentId: pending?.id ?? null,
           });
+          if (eligibility.subscriptionIdToExpire !== null) {
+            await expireSubscription(
+              transaction,
+              eligibility.subscriptionIdToExpire,
+              now,
+            );
+          }
           const allocated = allocateStartDate({
             today,
             requested: parseRequestedStartDate(command.startsOn),
             rules: await readStartDateRules(transaction),
-            active:
-              active !== null && isSubscriptionEffective(active, today)
-                ? active
-                : null,
-            futureSubscriptionId: await loadFutureSubscriptionId(
-              transaction,
-              command.clientId,
-              today,
-            ),
+            active,
+            futureSubscriptionId,
           });
           const entries = await transaction.creditLedgerEntry.findMany({
             where: { clientId: command.clientId },
