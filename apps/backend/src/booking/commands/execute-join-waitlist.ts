@@ -3,11 +3,10 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
 import {
   findApprovedFreeze,
-  findCoveringSubscription,
   findNotYetStartedSubscription,
 } from './eligible-subscription';
 import { joinWaitlist } from './join-waitlist';
-import { readWeeklyCapPosition } from './weekly-cap-count';
+import { findSubscriptionForBooking } from './subscription-for-booking';
 import { loadSession } from './waitlist-promotion';
 
 export function executeJoinWaitlist(
@@ -55,19 +54,4 @@ export function executeJoinWaitlist(
     now,
     cancellationWindowMinutes: () => readCancellationWindowMinutes(transaction),
   });
-}
-
-async function findSubscriptionForBooking(
-  transaction: Prisma.TransactionClient,
-  input: { clientId: string; onDate: Date; needsAllowance: boolean },
-) {
-  const subscription = await findCoveringSubscription(transaction, input);
-  if (subscription === null) return null;
-  return {
-    id: subscription.id,
-    ...(await readWeeklyCapPosition(transaction, {
-      subscriptionId: subscription.id,
-      startsAt: input.onDate,
-    })),
-  };
 }

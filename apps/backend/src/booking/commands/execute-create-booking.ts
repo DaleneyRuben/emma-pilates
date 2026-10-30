@@ -4,11 +4,10 @@ import { decideGuestPassBooking } from '../payments/guest-pass';
 import { createBooking } from './create-booking';
 import {
   findApprovedFreeze,
-  findCoveringSubscription,
   findNotYetStartedSubscription,
 } from './eligible-subscription';
 import { fundBooking } from './weekly-cap-funding';
-import { readWeeklyCapPosition } from './weekly-cap-count';
+import { findSubscriptionForBooking } from './subscription-for-booking';
 import { loadSession } from './waitlist-promotion';
 
 export function executeCreate(
@@ -109,19 +108,4 @@ export function executeCreate(
     },
     now,
   });
-}
-
-async function findSubscriptionForBooking(
-  transaction: Prisma.TransactionClient,
-  input: { clientId: string; onDate: Date; needsAllowance: boolean },
-) {
-  const subscription = await findCoveringSubscription(transaction, input);
-  if (subscription === null) return null;
-  return {
-    id: subscription.id,
-    ...(await readWeeklyCapPosition(transaction, {
-      subscriptionId: subscription.id,
-      startsAt: input.onDate,
-    })),
-  };
 }
