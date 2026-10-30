@@ -28,4 +28,28 @@ describe('the studio simulator', () => {
 
     expect(higher.breakEvenCentavos).toBeGreaterThan(base.breakEvenCentavos);
   });
+
+  // FIX-008 (review 2026-10-28): the derivation printed float noise.
+  it('prints the divisor without float noise', () => {
+    const result = breakEven({
+      fixedCostsCentavos: 100_000,
+      variableCostsCentavos: 0,
+      taxRatePercent: 7,
+    });
+
+    expect(result.derivation).toBe('(1000 + 0) / 0.93 = 1075.27');
+    expect(result.breakEvenCentavos).toBe(107_527);
+  });
+
+  it('prints amounts with centavos to two places and the result it rounded', () => {
+    const result = breakEven({
+      fixedCostsCentavos: 2_117_550,
+      variableCostsCentavos: 929_005,
+      taxRatePercent: 3,
+    });
+
+    // (21175.50 + 9290.05) / 0.97 = 31407.78350…, rounded to the centavo.
+    expect(result.derivation).toBe('(21175.50 + 9290.05) / 0.97 = 31407.78');
+    expect(result.breakEvenCentavos).toBe(3_140_778);
+  });
 });
