@@ -43,7 +43,6 @@ export const readRevenueMonth = async (
     LEFT JOIN booking.subscriptions s ON s.payment_id = p.id
     WHERE p.state = 'confirmed'
       AND p.method <> 'courtesy'
-      AND (p.kind = 'evaluation' OR s.id IS NOT NULL)
   `;
   const owed = await prisma.$queryRaw<{ classes_still_owed: number }[]>`
     SELECT COALESCE(SUM(s.remaining_class_allowance), 0)::int AS classes_still_owed

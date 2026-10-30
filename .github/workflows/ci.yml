@@ -53,6 +53,7 @@ jobs:
               - *shared
               - apps/admin-web/**
               - packages/api-contracts/**
+              - packages/studio-economics/**
             mobile:
               - *shared
               - apps/client-mobile/**
@@ -315,6 +316,9 @@ jobs:
       # keeps React's scheduler off a Node MessagePort (WEB-016), and the
       # suite exits on its own
       - run: pnpm --filter @pilates/admin-web exec jest --ci
+      # FIX-008: the simulator's economics (break-even, projections, the
+      # BKO-006 Trainer pay) are tested in their own package
+      - run: pnpm --filter @pilates/studio-economics exec jest --ci
 
   # the ten Playwright journeys of Test 31 through the built backend and the
   # built admin web; the suite's global setup makes its own pilates_test_*

@@ -71,10 +71,9 @@ export const accrueRevenue = (
       accruedBefore(payment.amountCentavos, startsOn, span, until);
     accruedCentavos += share(monthEnd) - share(monthStart);
     if (payment.decidedOn <= today && payment.decidedOn < monthEnd) {
-      const daysLeft = span - clamp(dayCount(startsOn, asOf), 0, span);
-      deferredCentavos += Math.round(
-        (payment.amountCentavos * daysLeft) / span,
-      );
+      // What is not yet accrued, from the same rounding, so the two never
+      // pass the amount by a centavo.
+      deferredCentavos += payment.amountCentavos - share(asOf);
     }
   }
   return { accruedCentavos, cashCentavos, deferredCentavos };

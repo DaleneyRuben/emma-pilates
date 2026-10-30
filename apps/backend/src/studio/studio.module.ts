@@ -173,13 +173,21 @@ export const recomputeCurrentStudioMonth = async (
   now: Date = new Date(),
 ): Promise<{ sessions: number; clientMonths: number }> => {
   const total = { sessions: 0, clientMonths: 0 };
+  // One month failing leaves the other to run. The first failure is thrown
+  // afterwards so the worker reports it, and the next day retries.
+  let failure: Error | null = null;
   for (const month of studioMonthsToRecompute(now)) {
-    const result = await recomputeStudioFacts(prisma, {
-      month,
-      now: () => now,
-    });
-    total.sessions += result.sessions;
-    total.clientMonths += result.clientMonths;
+    try {
+      const result = await recomputeStudioFacts(prisma, {
+        month,
+        now: () => now,
+      });
+      total.sessions += result.sessions;
+      total.clientMonths += result.clientMonths;
+    } catch (error) {
+      failure ??= error instanceof Error ? error : new Error(String(error));
+    }
   }
+  if (failure !== null) throw failure;
   return total;
 };
