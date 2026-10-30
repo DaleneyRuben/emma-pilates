@@ -1,3 +1,4 @@
+import { sweepEach } from '../../jobs/sweep-each';
 import type { NewNotification } from '../../notifications/prisma-notification-store';
 import { lifecycleCopy } from './first-90-days-copy';
 import {
@@ -48,22 +49,27 @@ export const sendLifecycleMessages = async (
   const plans = await dependencies.findFirstRealPlans();
   let sent = 0;
 
-  for (const plan of plans) {
-    const alreadySent = new Set(plan.sentMilestones);
-    const due = dueMilestones(plan.startsOn, dependencies.today, alreadySent);
-    for (const milestone of due) {
-      const latest = milestone === due.at(-1);
-      const recorded = await dependencies.record({
-        clientId: plan.clientId,
-        accountId: plan.accountId,
-        milestone,
-        notification: latest
-          ? lifecycleNotification(plan, milestone, dependencies.occurredAt)
-          : null,
-      });
-      if (recorded && latest) sent += 1;
-    }
-  }
+  await sweepEach(
+    'first_90_days',
+    plans,
+    (plan) => plan.clientId,
+    async (plan) => {
+      const alreadySent = new Set(plan.sentMilestones);
+      const due = dueMilestones(plan.startsOn, dependencies.today, alreadySent);
+      for (const milestone of due) {
+        const latest = milestone === due.at(-1);
+        const recorded = await dependencies.record({
+          clientId: plan.clientId,
+          accountId: plan.accountId,
+          milestone,
+          notification: latest
+            ? lifecycleNotification(plan, milestone, dependencies.occurredAt)
+            : null,
+        });
+        if (recorded && latest) sent += 1;
+      }
+    },
+  );
 
   return { sent };
 };
