@@ -204,6 +204,7 @@ export function EvaluationAvailabilityScreen({
         ) : (
           <>
             <Intro rescheduling={rescheduling} />
+            {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
             <View style={usedMonthStyles.used}>
               <Text style={usedMonthStyles.usedTitle}>No hay horarios disponibles por ahora.</Text>
               <BodyText>Vuelve a revisar en unos días.</BodyText>
