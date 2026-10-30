@@ -148,12 +148,14 @@ export const createPrismaSessionStartChecks = (
       SET bookings_at_window_close = (
             SELECT count(*) FROM booking.bookings AS booking
             WHERE booking.session_id = session.id
-              AND booking.state = 'booked'
-          ) + (
-            SELECT count(*) FROM booking.bookings AS booking
-            WHERE booking.session_id = session.id
-              AND booking.state = 'cancelled'
-              AND booking.cancelled_at > session.starts_at - (${cancellationWindowMinutes} * interval '1 minute')
+              AND booking.created_at <= session.starts_at - (${cancellationWindowMinutes} * interval '1 minute')
+              AND (
+                booking.state = 'booked'
+                OR (
+                  booking.state = 'cancelled'
+                  AND booking.cancelled_at > session.starts_at - (${cancellationWindowMinutes} * interval '1 minute')
+                )
+              )
           ),
           updated_at = ${now}
       WHERE session.state = 'scheduled'
