@@ -58,7 +58,7 @@ describe('a refused freeze does not spend the plan', () => {
     return { client, subscription };
   };
 
-  it('accepts a new request from today after a late approval is refused', async () => {
+  it('accepts a later request after a late approval is refused', async () => {
     const { client, subscription } = await quarterlySale('Tardía');
     const late = createPrismaPaymentCommands(prisma, {
       now: () => new Date('2026-09-22T15:00:00.000Z'),
@@ -91,20 +91,20 @@ describe('a refused freeze does not spend the plan', () => {
       administrator,
     );
 
-    const today = createPrismaPaymentCommands(prisma, {
+    const tomorrow = createPrismaPaymentCommands(prisma, {
       now: () => new Date('2026-09-28T15:00:00.000Z'),
     });
-    const again = await today.requestFreeze(
+    const again = await tomorrow.requestFreeze(
       {
         subscriptionId: subscription.id,
-        startsOn: '2026-09-28',
-        endsOn: '2026-10-02',
-        reason: 'Desde hoy',
+        startsOn: '2026-09-29',
+        endsOn: '2026-10-03',
+        reason: 'Desde mañana',
       },
       client,
     );
     expect(again.state).toBe('requested');
-    await today.decideFreeze(
+    await tomorrow.decideFreeze(
       { freezeId: again.id, decision: 'approved' },
       administrator,
     );
