@@ -220,6 +220,7 @@ export const approveFreeze = async (
     durationDays: row.subscription.durationDaysSnapshot,
     endsOn: row.subscription.endsOn,
     today: input.decidedAt,
+    approving: true,
     startsOn: row.startsOn,
     endsOnRequest: row.endsOn,
     existingRequest: null,
