@@ -7027,7 +7027,11 @@ C. **The contract.** `GET /api/v1/plans` (as any Client) returns
    carry `durationDays` too.
 D. **Elige tu plan (08) and Detalle del plan (09).** As Sofía, **Comprar un
    plan**: each card reads «8 clases · válido por 30 días»; a capped Plan
-   adds « · hasta 3 por semana». Its detail shows «Válido por 60 días», «60
+   adds « · hasta 3 por semana». VoiceOver reads the Plan and its price as
+   one label («Paquete de 8 clases, Bs 560»; a founder hears «Paquete de 8
+   clases, Bs 476, antes Bs 560»). The Assistant's **Elige un plan** (S09)
+   reads the same labels. Its detail
+   shows «Válido por 60 días», «60
    días de vigencia desde que se confirma tu pago.», and «Hasta 3 clases por
    semana.». No Plan line says «mes» or «meses».
 E. **The end date.** As Camila register cash for a Client on the 60-day Plan
@@ -7801,6 +7805,18 @@ H. **Detalle del plan (Client 09, design follow-up 219).** From Mi plan,
    **Continuar al pago** sends no `startsOn`. With no classes left, the chips
    show and «Hoy» is selected. `GET /api/v1/clients/current/subscription`
    carries `renewalStartsOn` only in the first case.
+I. **Confirmar pago en efectivo (Staff S10, design follow-up 223).** As
+   Camila, open a Client whose Plan still has classes and tap **Registrar
+   pago en efectivo**, then a Plan. S10 shows «El nuevo plan empieza el
+   {date}, al terminar el actual.» and no «Fecha de inicio» chips, and the
+   footnote reads «Confirma solo cuando tengas el efectivo en mano. El plan
+   queda programado para esa fecha.»; confirming sends no `startsOn`. A
+   Client with nothing left still sees the chips and «… El plan se activa al
+   instante.». **Elige un plan** shows «Cargando planes» until the Client's
+   overview has loaded too, and «No pudimos cargar los planes.» with
+   **Reintentar** when it fails, so a renewal never falls back to the chips.
+   `GET /api/v1/assistant/clients/{clientId}` carries the same optional
+   `renewalStartsOn`. Older builds that ignore the field keep working.
 
 ## Test 119: what a void undoes, and account closure after a void (FIX-004)
 

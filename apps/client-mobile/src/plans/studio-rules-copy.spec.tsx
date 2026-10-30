@@ -104,9 +104,9 @@ describe("Client copy from the Studio Settings", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "8 clases" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^8 clases,/ })).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "8 clases" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^8 clases,/ }));
 
     await waitFor(() => {
       expect(

@@ -2,6 +2,7 @@ import { useListPlans, type PlanDto } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
+  describePlanCardLabel,
   describePlanTerms,
   LoadingState,
   QueryFailure,
@@ -25,7 +26,7 @@ type PlansNavigation = {
 function PlanCard({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
   return (
     <Pressable
-      accessibilityLabel={plan.name}
+      accessibilityLabel={describePlanCardLabel(plan)}
       accessibilityRole="button"
       onPress={onPress}
       style={styles.card}

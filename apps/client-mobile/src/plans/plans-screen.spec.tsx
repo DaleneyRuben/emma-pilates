@@ -67,7 +67,7 @@ describe("Client Plans", () => {
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 2.100")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Trimestral 36 clases" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Trimestral 36 clases,/ }));
 
     // The loading state shares the «Detalle del plan» heading, so wait for the Plan itself.
     await waitFor(() => {
@@ -115,12 +115,38 @@ describe("Client Plans", () => {
     expect(screen.getByText("Bs 80")).toBeOnTheScreen();
     expect(screen.getAllByText("Bs 560")).toHaveLength(1);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Paquete de 8 clases,/ }));
     await waitFor(() => {
       expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
     });
     expect(screen.getAllByText("Bs 476").length).toBeGreaterThan(0);
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
+  });
+
+  it("reads the price, and the list price when shown, in the plan card label", async () => {
+    const founderPlans = [
+      { ...plans[0], priceCentavos: 47_600, listPriceCentavos: 56_000 },
+      plans[1],
+    ];
+    const fetcher = routeFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse({ status: "none", subscription: null }),
+      "/api/v1/plans": () => jsonResponse(founderPlans),
+    });
+    const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
+
+    expect(
+      await screen.findByRole("button", { name: "Paquete de 8 clases, Bs 476, antes Bs 560" }),
+    ).not.toHaveProp("accessibilityHint");
+    expect(
+      screen.getByRole("button", { name: "Trimestral 36 clases, Bs 2.100" }),
+    ).toBeOnTheScreen();
   });
 
   it("shows an empty state when no Plan is visible", async () => {

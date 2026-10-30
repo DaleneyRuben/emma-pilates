@@ -5,6 +5,12 @@ const civilDateFormatter = new Intl.DateTimeFormat("es-BO", {
   year: "numeric",
 });
 
+const civilDayMonthFormatter = new Intl.DateTimeFormat("es-BO", {
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+});
+
 const instantDateFormatter = new Intl.DateTimeFormat("es-BO", {
   day: "numeric",
   month: "long",
@@ -15,6 +21,10 @@ const instantDateFormatter = new Intl.DateTimeFormat("es-BO", {
 // A civil date (YYYY-MM-DD) such as a Subscription's paid-through day.
 export function formatCivilDate(civilDate: string): string {
   return civilDateFormatter.format(new Date(`${civilDate}T12:00:00.000Z`));
+}
+
+export function formatCivilDayMonth(civilDate: string): string {
+  return civilDayMonthFormatter.format(new Date(`${civilDate}T12:00:00.000Z`));
 }
 
 // An instant rendered as the Bolivia calendar day it falls on.
