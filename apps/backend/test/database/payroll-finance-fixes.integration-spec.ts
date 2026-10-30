@@ -213,7 +213,8 @@ describe('payroll and finance fixes', () => {
       decidedAt: new Date('2027-03-03T15:00:00.000Z'),
       startsOn: civil('2027-03-03'),
     });
-    await voidSale(first.id, new Date('2027-03-04T15:00:00.000Z'));
+    // Voided after March was over, so its commission may have been paid.
+    await voidSale(first.id, new Date('2027-04-02T15:00:00.000Z'));
     await sell({
       clientId: voided,
       decidedAt: new Date('2027-04-03T15:00:00.000Z'),
