@@ -1,8 +1,8 @@
+import { InvoiceDataCard, invoiceChoiceFrom } from "@pilates/mobile-core";
 import { fireEvent, render } from "@testing-library/react-native";
 import { View } from "react-native";
 
 import { FrontDeskReceiptCard } from "./front-desk-receipt-card";
-import { InvoiceDataCard, invoiceChoiceFrom } from "./invoice-data-card";
 
 describe("front-desk receipt and invoice card", () => {
   it("lets the Assistant photograph a receipt and leave the sale without an invoice", async () => {
@@ -10,7 +10,12 @@ describe("front-desk receipt and invoice card", () => {
     const screen = await render(
       <View>
         <FrontDeskReceiptCard onPhotograph={onPhotograph} receipt={null} />
-        <InvoiceDataCard onChange={() => undefined} value={invoiceChoiceFrom()} />
+        <InvoiceDataCard
+          noInvoiceNote="Esta venta queda sin factura."
+          onChange={() => undefined}
+          prefilledNote="Datos de su última compra. Confírmalos con la clienta."
+          value={invoiceChoiceFrom(null)}
+        />
       </View>,
     );
 
