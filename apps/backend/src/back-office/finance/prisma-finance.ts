@@ -20,7 +20,8 @@ const monthStart = (month: Date) =>
 
 // H10: the month's Salary Payments are a cost of their own. The Coordinator's
 // and reception's pay are the actual of their budget lines; a Trainer's pay
-// has no budget line and counts in the total only.
+// has no budget line and counts in the total only. The Nutritionist's pay is
+// already her Bs 50 a consultation below, so it is never counted twice.
 const salaryLines: Record<string, string> = {
   COORDINATOR: 'Coordinadora',
   ASSISTANT: 'Recepción',
@@ -30,14 +31,17 @@ const salariesByLine = (
   payments: { amountCentavos: number; staffMember: { role: string } }[],
 ) => {
   const byLineCentavos: Record<string, number> = {};
-  for (const payment of payments) {
+  const paid = payments.filter(
+    (payment) => payment.staffMember.role !== 'NUTRITIONIST',
+  );
+  for (const payment of paid) {
     const line = salaryLines[payment.staffMember.role];
     if (line === undefined) continue;
     byLineCentavos[line] = (byLineCentavos[line] ?? 0) + payment.amountCentavos;
   }
   return {
     byLineCentavos,
-    totalCentavos: payments.reduce(
+    totalCentavos: paid.reduce(
       (total, payment) => total + payment.amountCentavos,
       0,
     ),
