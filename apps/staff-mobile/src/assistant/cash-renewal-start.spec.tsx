@@ -71,4 +71,39 @@ describe("Confirming cash for a renewal", () => {
     ).toBeOnTheScreen();
     expect(screen.queryByText(/El plan queda programado/)).toBeNull();
   });
+
+  it("waits for the Client overview before offering the Plans", async () => {
+    let overviewReads = 0;
+    let overviewFails = false;
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      "/api/v1/assistant/clients/client-lucia": () => {
+        overviewReads += 1;
+        return overviewFails
+          ? jsonResponse({ code: "service_unavailable" }, 503)
+          : jsonResponse(renewalOverview);
+      },
+      "/api/v1/studio-rules": () => jsonResponse(studioRules),
+    });
+    const readsOnOverview = overviewReads;
+    overviewFails = true;
+
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+
+    expect(await screen.findByText("No pudimos cargar los planes.")).toBeOnTheScreen();
+    expect(overviewReads).toBeGreaterThan(readsOnOverview);
+    expect(screen.queryByRole("button", { name: /^Paquete de 8 clases,/ })).toBeNull();
+
+    overviewFails = false;
+    await fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Confirmar pago en efectivo")).toBeOnTheScreen();
+    });
+    expect(screen.queryByTestId("start-date-chooser")).toBeNull();
+    expect(
+      screen.getByText("El nuevo plan empieza el 13 de octubre, al terminar el actual."),
+    ).toBeOnTheScreen();
+  });
 });
