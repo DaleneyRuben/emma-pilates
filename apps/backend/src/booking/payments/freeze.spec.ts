@@ -101,7 +101,7 @@ describe('decideFreezeRequest bounds', () => {
     ).toBe(true);
   });
 
-  it('refuses a start on the approval day so the morning class is not kept', () => {
+  it('approves a freeze that starts today so a morning class can stay', () => {
     expect(
       decideFreezeRequest({
         subscriptionId: 'subscription-1',
@@ -115,8 +115,8 @@ describe('decideFreezeRequest bounds', () => {
         subscriptionStartsOn: civil('2026-09-22'),
         renewalStartsOn: null,
         approving: true,
-      }),
-    ).toEqual({ allowed: false, code: 'freeze_start_in_past' });
+      }).allowed,
+    ).toBe(true);
   });
 
   it('approves a freeze that starts tomorrow', () => {
