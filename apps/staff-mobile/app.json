@@ -3,7 +3,7 @@
     "name": "Emma Pilates Staff",
     "slug": "emma-pilates-staff",
     "scheme": "emmapilates-staff",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "runtimeVersion": {
       "policy": "fingerprint"
     },
@@ -67,7 +67,7 @@
       [
         "expo-secure-store",
         {
-          "faceIDPermission": "Permite que Emma Pilates Staff use Face ID para proteger tu sesi\u00f3n."
+          "faceIDPermission": "Permite que Emma Pilates Staff use Face ID para proteger tu sesión."
         }
       ],
       [
