@@ -1,3 +1,4 @@
+import { SweepItemsFailed } from './jobs/sweep-each';
 import { startSweeps } from './worker-sweeps';
 
 describe('worker sweeps', () => {
@@ -141,5 +142,38 @@ describe('worker sweeps', () => {
       },
     ]);
     sweeps.stop();
+  });
+
+  it('counts a pass with failed items as finished and reports each item once a day', async () => {
+    jest.useFakeTimers();
+    const now = jest.fn(() => new Date(Date.now()));
+    const failing = () =>
+      Promise.reject(
+        new SweepItemsFailed('class_reminders', [
+          { id: 'booking-1', error: new Error('notice broke') },
+        ]),
+      );
+    const emit = jest.fn();
+    const reportError = jest.fn();
+
+    const { stop, progress } = await startSweeps(
+      [
+        {
+          intervalMs: 60_000,
+          steps: [{ job: 'class_reminders', execute: failing }],
+        },
+      ],
+      { serviceVersion: '1.2.3', emit, reportError, now },
+    );
+    await jest.advanceTimersByTimeAsync(10 * 60_000);
+
+    // The pass still ran, so the sweep is not stale.
+    expect(progress()[0].lastSuccessAt.getTime()).toBe(Date.now());
+    expect(emit).toHaveBeenCalledTimes(11);
+    expect(reportError).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(24 * 60 * 60_000);
+    expect(reportError).toHaveBeenCalledTimes(2);
+    stop();
   });
 });
