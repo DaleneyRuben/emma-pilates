@@ -170,4 +170,45 @@ describe('first 90 days job (PostgreSQL)', () => {
       }),
     ).toBe(0);
   });
+
+  it('ignores a class booked after day 15 when it opens the day-15 alert', async () => {
+    const day15 = new Date('2026-10-16T16:00:00.000Z');
+    const client = await createClientWithPlan(prisma, {
+      name: 'Clase tardía',
+      startsOn,
+    });
+    await createBookedSession(prisma, {
+      clientId: client.clientId,
+      subscriptionId: client.subscriptionId,
+      accountId: client.accountId,
+      createdAt: new Date('2026-10-02T15:00:00.000Z'),
+      startsAt: new Date('2026-10-20T15:00:00.000Z'),
+    });
+
+    await createFirst90DaysJob(prisma, () => day15, recordNotification).execute();
+    expect(
+      await prisma.contactAlert.findMany({
+        where: { clientId: client.clientId },
+      }),
+    ).toEqual([
+      expect.objectContaining({ reason: 'FEWER_THAN_2_CLASSES_BY_DAY_15' }),
+    ]);
+  });
+
+  it('does not read a Client whose first plan started more than 90 days ago', async () => {
+    const client = await createClientWithPlan(prisma, {
+      name: 'Antigua',
+      startsOn: new Date('2026-01-01T00:00:00.000Z'),
+    });
+
+    await job().execute();
+    expect(
+      await prisma.lifecycleMessage.count({
+        where: { clientId: client.clientId },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.contactAlert.count({ where: { clientId: client.clientId } }),
+    ).toBe(0);
+  });
 });

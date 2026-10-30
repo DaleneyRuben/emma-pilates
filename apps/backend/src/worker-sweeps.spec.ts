@@ -65,6 +65,40 @@ describe('worker sweeps', () => {
     stop();
   });
 
+  it('does not start a pass while the previous pass of that group is still running', async () => {
+    jest.useFakeTimers();
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const execute = jest
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockImplementation(() => gate);
+
+    const { stop } = await startSweeps(
+      [
+        {
+          intervalMs: 60_000,
+          steps: [{ job: 'class_reminders', execute }],
+        },
+      ],
+      { serviceVersion: '1.2.3', emit: jest.fn(), reportError: jest.fn() },
+    );
+    expect(execute).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(60_000);
+    await Promise.resolve();
+    expect(execute).toHaveBeenCalledTimes(2);
+
+    jest.advanceTimersByTime(60_000);
+    await Promise.resolve();
+    expect(execute).toHaveBeenCalledTimes(2);
+
+    release();
+    stop();
+  });
+
   it('records when each step last succeeded, from the worker start until then', async () => {
     jest.useFakeTimers({ now: new Date('2026-10-14T12:00:00.000Z') });
     const reminders = jest

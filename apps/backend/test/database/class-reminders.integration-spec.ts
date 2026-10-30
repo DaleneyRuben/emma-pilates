@@ -152,7 +152,7 @@ describe('class reminder worker', () => {
     ).resolves.toEqual([
       expect.objectContaining({
         type: 'class_reminder_hour',
-        message: `Tu clase de ${classType.name} empieza en 2 horas.`,
+        message: `Hoy tienes ${classType.name} a las ${boliviaClock(startsAt)}.`,
         destinationId: booked.id,
       }),
     ]);
@@ -164,6 +164,23 @@ describe('class reminder worker', () => {
         },
       }),
     ).resolves.toEqual([]);
+  });
+
+  it('sends the hour reminder as Hoy when the class is later the same Bolivia day', async () => {
+    const lucia = await principalOf('lucia@example.com');
+    const startsAt = new Date(base.getTime() + 120 * hour);
+    const session = await createSession(startsAt);
+    const booking = await bookings.create({ sessionId: session.id }, lucia);
+
+    clock = new Date(startsAt.getTime() - 90 * minute);
+    await expect(job().execute()).resolves.toEqual({ sent: 1 });
+    await expect(
+      prisma.notification.findFirstOrThrow({
+        where: { businessEventKey: `class-reminder-hour:${booking.id}` },
+      }),
+    ).resolves.toMatchObject({
+      message: `Hoy tienes ${classType.name} a las ${boliviaClock(startsAt)}.`,
+    });
   });
 
   it('does not send a day reminder for a Booking made inside the day window', async () => {

@@ -62,6 +62,12 @@ export const shouldReopenNoBooking7Days = (input: {
   );
 };
 
+export const classesInsideFirstDays = (
+  _startsOn: Date,
+  _days: number,
+  startsAt: readonly Date[],
+): number => startsAt.length;
+
 export const hasBookedSince = (
   openedAt: Date,
   bookedAt: readonly Date[],

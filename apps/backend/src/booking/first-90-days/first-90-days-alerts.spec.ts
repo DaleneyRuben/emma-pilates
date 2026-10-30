@@ -1,5 +1,6 @@
 import { boliviaDate } from '../../time/bolivia-time';
 import {
+  classesInsideFirstDays,
   hasBookedSince,
   isWithinFirstNinetyDays,
   shouldOpenFewerThan2ByDay15,
@@ -190,6 +191,32 @@ describe('first-90-days contact alerts', () => {
         lastBookedAt: new Date('2026-10-09T12:00:00.000Z'),
       }),
     ).toBe(true);
+  });
+
+  it('counts a class toward day 15 only when it starts inside the first 15 days', () => {
+    expect(
+      classesInsideFirstDays(
+        startsOn,
+        15,
+        [
+          new Date('2026-10-10T15:00:00.000Z'),
+          new Date('2026-10-20T15:00:00.000Z'),
+        ],
+      ),
+    ).toBe(1);
+  });
+
+  it('counts a class toward the first 30 days only when it starts inside them', () => {
+    expect(
+      classesInsideFirstDays(
+        startsOn,
+        30,
+        [
+          new Date('2026-10-20T15:00:00.000Z'),
+          new Date('2026-11-05T15:00:00.000Z'),
+        ],
+      ),
+    ).toBe(1);
   });
 
   it('treats a Client as having booked since an alert when a live Booking is newer', () => {

@@ -348,6 +348,47 @@ describe('Prisma Session start checks: Minimum Bookings', () => {
     }
   });
 
+  it('settles the next Session when one Session in the sweep throws', async () => {
+    const broken = await world.createSession(slotStart(8));
+    const next = await world.createSession(
+      new Date(slotStart(8).getTime() + hour),
+    );
+    const lucia = await world.principalOf('lucia@example.com');
+    const valeria = await world.principalOf('valeria@example.com');
+    await world.book(next.id, lucia, valeria);
+    const due = new Date(broken.startsAt.getTime() - lead);
+    world.setClock(due);
+    await world.prisma.$executeRaw`
+      CREATE OR REPLACE FUNCTION booking.fail_one_session()
+      RETURNS trigger LANGUAGE plpgsql AS $$
+      BEGIN
+        IF NEW.id = ${broken.id}::uuid THEN
+          RAISE EXCEPTION 'session broke';
+        END IF;
+        RETURN NEW;
+      END $$`;
+    await world.prisma.$executeRaw`
+      CREATE TRIGGER fail_one_session
+      BEFORE UPDATE ON booking.sessions
+      FOR EACH ROW EXECUTE FUNCTION booking.fail_one_session()`;
+
+    try {
+      await expect(world.checks().checkMinimumBookings()).resolves.toEqual({
+        checked: 1,
+        cancelled: 0,
+      });
+      await expect(sessionRow(next.id)).resolves.toMatchObject({
+        state: 'SCHEDULED',
+        minimumBookingsCheckCompletedAt: due,
+      });
+    } finally {
+      await world.prisma.$executeRaw`
+        DROP TRIGGER IF EXISTS fail_one_session ON booking.sessions`;
+      await world.prisma.$executeRaw`
+        DROP FUNCTION IF EXISTS booking.fail_one_session()`;
+    }
+  });
+
   it('closes open Waitlist Entries as session_started once the Session starts, without a notice, exactly once', async () => {
     const session = await world.createSession(slotStart(7), 1);
     const lucia = await world.principalOf('lucia@example.com');

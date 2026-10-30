@@ -225,6 +225,13 @@ describe('founder membership', () => {
         where: { businessEventKey: `founder-membership-lost:${lost.id}` },
       }),
     ).resolves.toBe(1);
+    await expect(
+      prisma.notification.findFirstOrThrow({
+        where: { businessEventKey: `founder-membership-lost:${lost.id}` },
+      }),
+    ).resolves.toMatchObject({
+      createdAt: new Date('2026-10-23T13:00:00.000Z'),
+    });
 
     await cash(lapsed.clientId, plan.id);
     await expect(
@@ -232,6 +239,50 @@ describe('founder membership', () => {
         where: { clientId: lapsed.clientId },
       }),
     ).resolves.toMatchObject({ status: 'LOST' });
+  });
+
+  it('keeps the place and writes no notice when the loss cannot be recorded', async () => {
+    await prisma.founderMembership.updateMany({
+      data: { deletedAt: now },
+    });
+    const lapsed = await world.newClient('Pérdida a medias');
+    await cash(lapsed.clientId, plan.id);
+    await prisma.subscription.updateMany({
+      where: { clientId: lapsed.clientId },
+      data: { endsOn: new Date('2026-10-14T00:00:00.000Z') },
+    });
+    await prisma.$executeRaw`
+      CREATE OR REPLACE FUNCTION booking.fail_founder_notice()
+      RETURNS trigger LANGUAGE plpgsql AS $$
+      BEGIN
+        IF NEW.business_event_key LIKE 'founder-membership-lost:%' THEN
+          RAISE EXCEPTION 'notice broke';
+        END IF;
+        RETURN NEW;
+      END $$`;
+    await prisma.$executeRaw`
+      CREATE TRIGGER fail_founder_notice
+      BEFORE INSERT ON system.notifications
+      FOR EACH ROW EXECUTE FUNCTION booking.fail_founder_notice()`;
+
+    try {
+      await expect(
+        createFounderMembershipJob(
+          prisma,
+          () => new Date('2026-10-23T15:00:00.000Z'),
+        ).execute(),
+      ).resolves.toEqual({ ended: 0 });
+      await expect(
+        prisma.founderMembership.findFirstOrThrow({
+          where: { clientId: lapsed.clientId },
+        }),
+      ).resolves.toMatchObject({ status: 'ACTIVE' });
+    } finally {
+      await prisma.$executeRaw`
+        DROP TRIGGER IF EXISTS fail_founder_notice ON system.notifications`;
+      await prisma.$executeRaw`
+        DROP FUNCTION IF EXISTS booking.fail_founder_notice()`;
+    }
   });
 
   it('keeps the place while a pending transfer covers the gap', async () => {
