@@ -1,6 +1,9 @@
 import { countedFreezeRequest, decideFreezeRequest } from './freeze';
 
-const civil = (date: string): Date => new Date(`${date}T00:00:00.000Z`);
+// A Bolivia calendar day, and 15:00 that afternoon in La Paz.
+const civil = (date: string): Date => new Date(`${date}T00:00:00.000-04:00`);
+const afternoon = (date: string): Date =>
+  new Date(`${date}T15:00:00.000-04:00`);
 
 const quarterly = {
   subscriptionId: 'subscription-1',
@@ -88,7 +91,7 @@ describe('decideFreezeRequest bounds', () => {
         clientId: 'client-1',
         durationDays: 90,
         endsOn: civil('2026-12-20'),
-        today: civil('2026-10-05'),
+        today: afternoon('2026-10-05'),
         startsOn: civil('2026-10-05'),
         endsOnRequest: civil('2026-10-10'),
         existingRequest: null,
@@ -105,7 +108,7 @@ describe('decideFreezeRequest bounds', () => {
         clientId: 'client-1',
         durationDays: 90,
         endsOn: civil('2026-12-20'),
-        today: civil('2026-10-05'),
+        today: afternoon('2026-10-05'),
         startsOn: civil('2026-10-05'),
         endsOnRequest: civil('2026-10-10'),
         existingRequest: null,
@@ -123,7 +126,7 @@ describe('decideFreezeRequest bounds', () => {
         clientId: 'client-1',
         durationDays: 90,
         endsOn: civil('2026-12-20'),
-        today: civil('2026-10-05'),
+        today: afternoon('2026-10-05'),
         startsOn: civil('2026-10-01'),
         endsOnRequest: civil('2026-10-10'),
         existingRequest: null,

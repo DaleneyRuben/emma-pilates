@@ -47,7 +47,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "test": "jest",
+    "test": "TZ=America/La_Paz jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

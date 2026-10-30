@@ -28,12 +28,12 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "pnpm lint --fix",
     "openapi:generate": "nest build && node dist/src/openapi/generate-openapi.js",
-    "test": "jest",
+    "test": "TZ=America/La_Paz jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "NODE_OPTIONS=\"--experimental-vm-modules ${NODE_OPTIONS:-}\" jest --config ./test/jest-e2e.json",
-    "test:integration": "NODE_OPTIONS=\"--experimental-vm-modules ${NODE_OPTIONS:-}\" jest --config ./test/jest-integration.json --runInBand",
+    "test:e2e": "TZ=America/La_Paz NODE_OPTIONS=\"--experimental-vm-modules ${NODE_OPTIONS:-}\" jest --config ./test/jest-e2e.json",
+    "test:integration": "TZ=America/La_Paz NODE_OPTIONS=\"--experimental-vm-modules ${NODE_OPTIONS:-}\" jest --config ./test/jest-integration.json --runInBand",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
