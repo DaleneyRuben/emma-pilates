@@ -1,4 +1,5 @@
 import {
+  getListEvaluationSlotsQueryKey,
   getListEvaluationsQueryKey,
   useGetCurrentClientSubscription,
   useListEvaluationSlots,
@@ -25,7 +26,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { AccessibilityInfo, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { moveEvaluation, rescheduleFailure } from "./reschedule-evaluation";
@@ -38,8 +39,10 @@ type AvailabilityNavigation = {
   navigate: {
     (screen: "Plans"): void;
     (screen: "BookEvaluation", params: { slot: EvaluationSlotDto }): void;
-    (screen: "MyEvaluations", params: { confirmed: ClientEvaluationDto; moved: true }): void;
   };
+  // Back to the Mis evaluaciones the picker was opened from, so Back cannot
+  // land on a picker whose Evaluation has already moved.
+  popTo: (screen: "MyEvaluations", params: { confirmed: ClientEvaluationDto; moved: true }) => void;
 };
 
 type OpenDay = { date: string; slots: EvaluationSlotDto[] };
@@ -87,7 +90,17 @@ export function EvaluationAvailabilityScreen({
   const rescheduling = evaluationId !== undefined;
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
-  const idempotencyKey = useRef(randomUUID());
+  // One key per target slot: a retry of the same slot replays, another slot
+  // after an unclear failure is a new command (the backend refuses a reused
+  // key with another body).
+  const keys = useRef(new Map<string, string>());
+  const keyFor = (slotId: string): string => {
+    const known = keys.current.get(slotId);
+    if (known !== undefined) return known;
+    const created = randomUUID();
+    keys.current.set(slotId, created);
+    return created;
+  };
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const subscription = useGetCurrentClientSubscription(queryOptions);
   const slots = useListEvaluationSlots(undefined, queryOptions);
@@ -96,25 +109,34 @@ export function EvaluationAvailabilityScreen({
   const [failure, setFailure] = useState<string | null>(null);
   const [target, setTarget] = useState<EvaluationSlotDto | null>(null);
 
+  const fail = (message: string) => {
+    setTarget(null);
+    setFailure(message);
+    AccessibilityInfo.announceForAccessibility(message);
+    // The move may have landed, or the slot may be gone: show what is true now.
+    void queryClient.invalidateQueries({ queryKey: getListEvaluationSlotsQueryKey() });
+    void queryClient.invalidateQueries({
+      queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
+    });
+  };
+
   const move = async (slot: EvaluationSlotDto) => {
     if (evaluationId === undefined || moving) return;
     setMoving(true);
     setFailure(null);
     try {
-      const response = await moveEvaluation(evaluationId, slot, idempotencyKey.current, fetcher);
+      const response = await moveEvaluation(evaluationId, slot, keyFor(slot.id), fetcher);
       if (response.status === 200) {
         await queryClient.invalidateQueries({
           queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
         });
         setTarget(null);
-        navigation.navigate("MyEvaluations", { confirmed: response.data, moved: true });
+        navigation.popTo("MyEvaluations", { confirmed: response.data, moved: true });
         return;
       }
-      setTarget(null);
-      setFailure(rescheduleFailure(response.data));
+      fail(rescheduleFailure(response.data));
     } catch {
-      setTarget(null);
-      setFailure("No pudimos reprogramar la evaluación. Inténtalo de nuevo.");
+      fail("No pudimos reprogramar la evaluación. Inténtalo de nuevo.");
     } finally {
       setMoving(false);
     }
@@ -156,7 +178,8 @@ export function EvaluationAvailabilityScreen({
   }
 
   const status = subscription.data?.status === 200 ? subscription.data.data.status : "none";
-  if (status !== "active" && status !== "expiring_soon") {
+  // A paid Evaluation moves without a plan: the payment is hers already.
+  if (!rescheduling && status !== "active" && status !== "expiring_soon") {
     return (
       <Screen style={styles.screen}>
         {header}
@@ -176,11 +199,12 @@ export function EvaluationAvailabilityScreen({
     return (
       <Screen style={styles.screen}>
         {header}
-        {anyUsed ? (
+        {anyUsed && !rescheduling ? (
           <UsedMonth availability={availability} />
         ) : (
           <>
             <Intro rescheduling={rescheduling} />
+            {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
             <View style={usedMonthStyles.used}>
               <Text style={usedMonthStyles.usedTitle}>No hay horarios disponibles por ahora.</Text>
               <BodyText>Vuelve a revisar en unos días.</BodyText>
