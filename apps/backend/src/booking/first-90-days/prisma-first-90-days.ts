@@ -84,7 +84,16 @@ const findFirstRealPlans = (prisma: PrismaClient): Promise<FirstRealPlan[]> =>
     .findMany({
       where: {
         plan: { priceCentavos: { gt: 0 }, hiddenAt: null },
-        client: { deletedAt: null },
+        // A Client sent the day-90 message has nothing left to receive.
+        client: {
+          deletedAt: null,
+          lifecycleMessages: {
+            none: {
+              milestone: PrismaLifecycleMilestone.DAY_90,
+              deletedAt: null,
+            },
+          },
+        },
       },
       orderBy: [{ startsOn: 'asc' }, { id: 'asc' }],
       select: {
