@@ -71,17 +71,39 @@ describe('class reminder copy', () => {
     });
   });
 
-  it('says the class starts in 2 hours', () => {
+  it('says the class starts in 2 hours when it is still tomorrow', () => {
     expect(
       classReminderNotice({
         ...booking,
         kind: 'hour',
+        // 16:00 Bolivia, class at 18:00 the same day.
         occurredAt: at('2026-09-22T20:00:00.000Z'),
       }),
     ).toMatchObject({
       type: 'class_reminder_hour',
       businessEventKey: 'class-reminder-hour:booking-1',
-      message: 'Tu clase de Mat Pilates empieza en 2 horas.',
+      message: 'Hoy tienes Mat Pilates a las 18:00.',
     });
+  });
+
+  it('says tomorrow when the 2 hour reminder falls the Bolivia day before the class', () => {
+    expect(
+      classReminderNotice({
+        ...booking,
+        startsAt: at('2026-09-22T12:00:00.000Z'),
+        kind: 'hour',
+        // 06:00 Bolivia on the 22nd, class at 08:00 the same morning.
+        occurredAt: at('2026-09-22T10:00:00.000Z'),
+      }).message,
+    ).toBe('Hoy tienes Mat Pilates a las 08:00.');
+    expect(
+      classReminderNotice({
+        ...booking,
+        startsAt: at('2026-09-22T12:00:00.000Z'),
+        kind: 'hour',
+        // 22:00 Bolivia on the 21st, class at 08:00 the next morning.
+        occurredAt: at('2026-09-22T02:00:00.000Z'),
+      }).message,
+    ).toBe('Mañana tienes Mat Pilates a las 08:00.');
   });
 });

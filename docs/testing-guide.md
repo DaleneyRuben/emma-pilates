@@ -2080,9 +2080,15 @@ Load the fixtures (Test 5A), start the backend, and start the worker with
   Session that started before the worker could check it is left alone.
 - **Sessions whose Cancellation Window has closed** (2.5 hours before the
   start, from Studio Settings). Each scheduled Session records its live
-  Bookings in `bookings_at_window_close` once; later cancellations,
-  Reschedules, or worker restarts never change it. Trainer pay (BKO-006)
-  counts this number. A cancelled Session gets none.
+  Bookings in `bookings_at_window_close` once, as they stood at the close:
+  a cancellation after the close still counts, and a Booking made after
+  it does not, however late the sweep runs. A cancellation before the
+  close, a Reschedule, and a worker restart do not change the number once
+  it is written. Trainer pay (BKO-006) counts this number. A cancelled
+  Session gets none. One Session whose settlement fails, for any reason,
+  does not stop the rest of that sweep; the worker logs
+  `minimum_bookings_check_failed` with its id and the next sweep retries
+  it.
 - **Sessions that have started.** Their remaining open Waitlist Entries close
   as `session_started`, without a notification.
 
@@ -6358,12 +6364,14 @@ build (Test 46).
    B). In the database, move that Session to 23 hours from now:
    `update booking.sessions set starts_at = now() + interval '23 hours', ends_at = now() + interval '23 hours 50 minutes' where id = '<session>'`.
    Within a minute her inbox (Perfil → Notificaciones, screen 19) shows
-   «Recordatorio» / «Mañana tienes {clase} a las {hora}.», with the Bolivia
-   time. Restart the worker: the inbox still has one entry.
+   «Recordatorio» / «Mañana tienes {clase} a las {hora}.» when the Session
+   is still the next Bolivia day, or «Hoy tienes {clase} a las {hora}.»
+   when it is already that day, with the Bolivia clock time. Restart the
+   worker: the inbox still has one entry.
 2. **2 hours before.** Move the same Session to 90 minutes from now. The
-   inbox gains «Tu clase de {clase} empieza en 2 horas.» A second restart
-   adds nothing. A Booking made inside the last 24 hours gets only this
-   one, never «Mañana».
+   inbox gains «Hoy tienes {clase} a las {hora}.» A second restart adds
+   nothing. A Booking made inside the last 24 hours gets only this one,
+   never «Mañana».
 3. **Nothing after a cancellation.** Cancel the Booking before the window
    (Mis reservas → Cancelar). Moving the Session into either window leaves
    her inbox without a new reminder.
@@ -7241,10 +7249,16 @@ With nobody to write to it reads «Nadie para contactar por ahora.».
 
 ### C. The Client app
 
-The messages arrive in **Notificaciones** (Perfil). The four titles are
-«Tu segunda clase», «Tu primera semana», «Tu primer mes», and «Tres meses
-con nosotras». The inbox card draws the message body and not the title
-(noted on the BKM-013 row; the title is what the push shows).
+The messages arrive in **Notificaciones** (Perfil) from 09:00 La Paz, never
+at midnight. The four titles are «Tu segunda clase», «Tu primera semana»,
+«Tu primer mes», and «Tres meses con nosotras». A catch-up records every
+missed milestone and pushes only the latest, so a Client does not get a
+burst of old messages. The 90 days run from her first real Plan: a
+renewal never restarts them. The day-15 and day-30 alerts count classes
+that start inside those days of her first Plan, on the La Paz calendar
+(a class at 23:30 on day 15 counts). The inbox card draws the
+message body and not the title (noted on the BKM-013 row; the title is
+what the push shows).
 
 ## Test 85: extra classes (BKM-008)
 

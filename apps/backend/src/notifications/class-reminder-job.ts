@@ -1,13 +1,17 @@
-import { BookingState, type PrismaClient } from '../generated/prisma/client';
+import type { PrismaClient } from '../generated/prisma/client';
 import { retrySerializable } from '../database/retry-serializable';
+import { sweepEach } from '../jobs/sweep-each';
 import type { NotificationRecorder } from './prisma-notification-store';
-import {
-  classReminderNotice,
-  dueClassReminder,
-  type ClassReminderKind,
-} from './class-reminders';
+import { classReminderNotice, type ClassReminderKind } from './class-reminders';
 
-const dayMilliseconds = 24 * 60 * 60 * 1_000;
+type DueReminder = {
+  bookingId: string;
+  accountId: string;
+  classTypeName: string;
+  startsAt: Date;
+  createdAt: Date;
+  kind: ClassReminderKind;
+};
 
 export const createClassReminderJob = (
   prisma: PrismaClient,
@@ -16,98 +20,79 @@ export const createClassReminderJob = (
 ) => ({
   execute: async (): Promise<{ sent: number }> => {
     const instant = now();
-    const candidates = await prisma.booking.findMany({
-      where: {
-        state: BookingState.BOOKED,
-        session: {
-          state: 'SCHEDULED',
-          startsAt: {
-            gt: instant,
-            lte: new Date(instant.getTime() + dayMilliseconds),
-          },
-        },
-      },
-      orderBy: { id: 'asc' },
-      select: { id: true },
-    });
+    // The windows of dueClassReminder, in SQL: the hour reminder covers
+    // [starts_at − 2 h, starts_at); the day one [starts_at − 24 h,
+    // starts_at − 2 h), for a Booking made before it. Only reminders not yet
+    // in the inbox come back, so a sweep with nothing due opens no
+    // transaction. A reminder counts as sent even once deleted, as the unique
+    // (account, business event key) index does.
+    const due = await prisma.$queryRaw<DueReminder[]>`
+      SELECT * FROM (
+        SELECT booking.id AS "bookingId",
+               account.id AS "accountId",
+               class_type.name AS "classTypeName",
+               session.starts_at AS "startsAt",
+               booking.created_at AS "createdAt",
+               CASE
+                 WHEN session.starts_at - interval '2 hours' <= ${instant} THEN 'hour'
+                 WHEN booking.created_at < session.starts_at - interval '24 hours' THEN 'day'
+               END AS kind
+        FROM booking.bookings AS booking
+        JOIN booking.sessions AS session ON session.id = booking.session_id
+        JOIN booking.class_types AS class_type ON class_type.id = session.class_type_id
+        JOIN system.accounts AS account ON account.client_id = booking.client_id
+        WHERE booking.state = 'booked'
+          AND session.state = 'scheduled'
+          AND session.starts_at > ${instant}
+          AND session.starts_at - interval '24 hours' <= ${instant}
+          AND account.deleted_at IS NULL
+      ) AS reminder
+      WHERE reminder.kind IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM system.notifications AS notification
+          WHERE notification.account_id = reminder."accountId"
+            AND notification.business_event_key =
+              'class-reminder-' || reminder.kind || ':' || reminder."bookingId"
+        )
+      ORDER BY reminder."bookingId"`;
     let sent = 0;
 
-    for (const { id } of candidates) {
-      sent += await retrySerializable(() =>
-        prisma.$transaction(
-          async (transaction) => {
-            await transaction.$queryRaw`
-              SELECT id FROM booking.bookings
-              WHERE id = ${id}::uuid FOR UPDATE`;
-            const booking = await transaction.booking.findUniqueOrThrow({
-              where: { id },
-              select: {
-                id: true,
-                state: true,
-                createdAt: true,
-                client: { select: { account: { select: { id: true } } } },
-                session: {
-                  select: {
-                    state: true,
-                    startsAt: true,
-                    classType: { select: { name: true } },
-                  },
+    await sweepEach(
+      'class_reminders',
+      due,
+      (row) => row.bookingId,
+      async (row) => {
+        sent += await retrySerializable(() =>
+          prisma.$transaction(
+            async (transaction) => {
+              // A Booking cancelled since the read hears nothing.
+              const live = await transaction.$queryRaw<unknown[]>`
+                SELECT booking.id FROM booking.bookings AS booking
+                JOIN booking.sessions AS session ON session.id = booking.session_id
+                WHERE booking.id = ${row.bookingId}::uuid
+                  AND booking.state = 'booked'
+                  AND session.state = 'scheduled'
+                FOR UPDATE OF booking`;
+              if (live.length === 0) return 0;
+              const count = await transaction.notification.count({
+                where: {
+                  accountId: row.accountId,
+                  businessEventKey: `class-reminder-${row.kind}:${row.bookingId}`,
                 },
-              },
-            });
-            const accountId = booking.client.account?.id;
-            if (
-              booking.state !== BookingState.BOOKED ||
-              booking.session.state !== 'SCHEDULED' ||
-              accountId === undefined
-            ) {
-              return 0;
-            }
-
-            const kind = dueClassReminder(
-              {
-                bookingId: booking.id,
-                accountId,
-                classTypeName: booking.session.classType.name,
-                startsAt: booking.session.startsAt,
-                createdAt: booking.createdAt,
-              },
-              instant,
-            );
-            if (kind === null) return 0;
-
-            const alreadySent = await transaction.notification.findFirst({
-              where: {
-                accountId,
-                businessEventKey: classReminderKey(booking.id, kind),
-                deletedAt: null,
-              },
-              select: { id: true },
-            });
-            if (alreadySent !== null) return 0;
-
-            await recordNotification(
-              transaction,
-              classReminderNotice({
-                bookingId: booking.id,
-                accountId,
-                classTypeName: booking.session.classType.name,
-                startsAt: booking.session.startsAt,
-                createdAt: booking.createdAt,
-                kind,
-                occurredAt: instant,
-              }),
-            );
-            return 1;
-          },
-          { isolationLevel: 'Serializable' },
-        ),
-      );
-    }
+              });
+              if (count > 0) return 0;
+              await recordNotification(
+                transaction,
+                classReminderNotice({ ...row, occurredAt: instant }),
+              );
+              return 1;
+            },
+            { isolationLevel: 'Serializable' },
+          ),
+        );
+      },
+    );
 
     return { sent };
   },
 });
-
-const classReminderKey = (bookingId: string, kind: ClassReminderKind): string =>
-  `class-reminder-${kind}:${bookingId}`;

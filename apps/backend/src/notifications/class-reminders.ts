@@ -1,4 +1,5 @@
 import type { NewNotification } from './prisma-notification-store';
+import { boliviaDate } from '../time/bolivia-time';
 
 export type ClassReminderKind = 'day' | 'hour';
 
@@ -34,6 +35,19 @@ export const dueClassReminder = (
     : null;
 };
 
+const dayMilliseconds = 24 * 60 * 60 * 1_000;
+
+const classReminderMessage = (
+  facts: ClassReminderBooking & { kind: ClassReminderKind; occurredAt: Date },
+): string => {
+  const when =
+    boliviaDate(facts.occurredAt).getTime() + dayMilliseconds ===
+    boliviaDate(facts.startsAt).getTime()
+      ? 'Mañana'
+      : 'Hoy';
+  return `${when} tienes ${facts.classTypeName} a las ${clockTime(facts.startsAt)}.`;
+};
+
 const clockTime = (instant: Date): string => {
   const parts = new Intl.DateTimeFormat('es-BO', {
     timeZone: 'America/La_Paz',
@@ -59,10 +73,7 @@ export const classReminderNotice = (
   type: facts.kind === 'day' ? 'class_reminder_day' : 'class_reminder_hour',
   businessEventKey: `class-reminder-${facts.kind}:${facts.bookingId}`,
   title: 'Recordatorio',
-  message:
-    facts.kind === 'day'
-      ? `Mañana tienes ${facts.classTypeName} a las ${clockTime(facts.startsAt)}.`
-      : `Tu clase de ${facts.classTypeName} empieza en 2 horas.`,
+  message: classReminderMessage(facts),
   destination: { type: 'booking', id: facts.bookingId },
   occurredAt: facts.occurredAt,
 });

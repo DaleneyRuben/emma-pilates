@@ -13,6 +13,7 @@ export type ClientAlertState = {
   lastBookedAt: Date | null;
   hasUpcomingBooking: boolean;
   bookedClassCount: number;
+  bookedClassCount30: number;
   openUncontacted: Partial<Record<ContactAlertReason, boolean>>;
   lastContactedAt: Partial<Record<ContactAlertReason, Date | null>>;
   everOpened: Partial<Record<ContactAlertReason, boolean>>;
@@ -52,7 +53,7 @@ export const reasonsToOpen = (
     shouldOpenFewerThan4InFirst30Days({
       startsOn: state.startsOn,
       today,
-      bookedClassCount: state.bookedClassCount,
+      bookedClassCount: state.bookedClassCount30,
     }) &&
     state.everOpened.fewer_than_4_classes_in_first_30_days !== true
   ) {
