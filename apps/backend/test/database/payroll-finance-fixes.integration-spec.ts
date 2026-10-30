@@ -6,14 +6,13 @@ import { coordinatorMonthFacts } from '../../src/back-office/payroll/coordinator
 import { createPrismaPayStatements } from '../../src/back-office/payroll/prisma-pay-statements';
 import { trainerMonthFacts } from '../../src/back-office/payroll/trainer-pay-facts';
 import { deterministicId } from '../../src/development-fixtures/deterministic-id';
+import { civil, payrollFixtures } from './payroll-finance-test-support';
 import {
   fixtureNow,
   startEvaluationTestWorld,
   type EvaluationTestWorld,
 } from './evaluation-test-support';
 
-const day = 24 * 60 * 60 * 1_000;
-const civil = (text: string) => new Date(`${text}T00:00:00.000Z`);
 const february = civil('2027-02-01');
 const march = civil('2027-03-01');
 const april = civil('2027-04-01');
@@ -36,7 +35,6 @@ describe('payroll and finance fixes', () => {
   const emmaId = deterministicId('staff-member:emma');
   const carolinaId = deterministicId('staff-member:carolina');
   const camilaId = deterministicId('staff-member:camila');
-  const branchId = deterministicId('branch:centro');
 
   const finance = () =>
     createPrismaFinance(world.prisma, {
@@ -60,122 +58,8 @@ describe('payroll and finance fixes', () => {
     await world?.stop();
   });
 
-  const newClient = async (name: string, broughtBy?: string) => {
-    const clientId = randomUUID();
-    await world.prisma.client.create({
-      data: { id: clientId, name, referralCode: `REF-${clientId.slice(0, 8)}` },
-    });
-    if (broughtBy !== undefined) {
-      await world.prisma.clientAcquisition.create({
-        data: {
-          clientId,
-          declaredChannel: 'TRAINER',
-          channel: 'TRAINER',
-          referralCode: `T-${clientId.slice(0, 6)}`,
-          referrerStaffMemberId: broughtBy,
-        },
-      });
-    }
-    return clientId;
-  };
-
-  // A Plan sale with its Subscription. `decidedAt` is the approval instant;
-  // the Subscription runs from `startsOn` for `durationDays`.
-  const sell = async (input: {
-    clientId: string;
-    decidedAt: Date;
-    startsOn: Date;
-    durationDays?: number;
-    classAllowance?: number;
-    method?: 'CASH' | 'COURTESY';
-    priceCentavos?: number;
-  }) => {
-    const durationDays = input.durationDays ?? 30;
-    const classAllowance = input.classAllowance ?? 8;
-    const price = input.priceCentavos ?? 59_000;
-    const admin = await administrator();
-    const planId = randomUUID();
-    await world.prisma.plan.create({
-      data: {
-        id: planId,
-        name: `Plan ${planId.slice(0, 6)}`,
-        durationDays,
-        classAllowance,
-        priceCentavos: price,
-        displayOrder: 95,
-        hiddenAt: civil('2027-01-01'),
-      },
-    });
-    const payment = await world.prisma.payment.create({
-      data: {
-        clientId: input.clientId,
-        planId,
-        planNameSnapshot: 'Plan',
-        durationDaysSnapshot: durationDays,
-        classAllowanceSnapshot: classAllowance,
-        planPriceCentavos: price,
-        creditAppliedCentavos: 0,
-        amountDueCentavos: price,
-        startsOn: input.startsOn,
-        method: input.method ?? 'CASH',
-        collectedAtBranchId: input.method === 'COURTESY' ? null : branchId,
-        kind: 'PLAN',
-        state: 'CONFIRMED',
-        submittedByAccountId: admin.accountId,
-        submittedAt: input.decidedAt,
-        decidedByAccountId: admin.accountId,
-        decidedAt: input.decidedAt,
-        createdAt: input.decidedAt,
-        subscription: {
-          create: {
-            clientId: input.clientId,
-            planId,
-            planNameSnapshot: 'Plan',
-            durationDaysSnapshot: durationDays,
-            originalClassAllowance: classAllowance,
-            remainingClassAllowance: classAllowance,
-            startsOn: input.startsOn,
-            endsOn: new Date(
-              input.startsOn.getTime() + (durationDays - 1) * day,
-            ),
-            activatedAt: input.decidedAt,
-          },
-        },
-      },
-      select: { id: true, amountDueCentavos: true },
-    });
-    return payment;
-  };
-
-  const voidSale = (paymentId: string, at: Date) =>
-    world.prisma.$transaction(async (transaction) => {
-      const admin = await administrator();
-      await transaction.payment.update({
-        where: { id: paymentId },
-        data: {
-          state: 'VOIDED',
-          voidedAt: at,
-          voidedByAccountId: admin.accountId,
-          voidReason: 'Error',
-        },
-      });
-      await transaction.subscription.updateMany({
-        where: { paymentId },
-        data: { endedByVoid: true },
-      });
-    });
-
-  const salary = async (staffMemberId: string, amountCentavos: number) => {
-    const admin = await administrator();
-    await world.prisma.salaryPayment.create({
-      data: {
-        staffMemberId,
-        amountCentavos,
-        paidOn: civil('2027-02-10'),
-        recordedByAccountId: admin.accountId,
-      },
-    });
-  };
+  const { newClient, sell, voidSale, salary, nextSettingsVersion } =
+    payrollFixtures(() => world, administrator);
 
   it('seeds the opening budget once, even when two seeds race', async () => {
     const admin = await administrator();
@@ -217,18 +101,9 @@ describe('payroll and finance fixes', () => {
       decidedAt: new Date('2027-03-01T03:30:00.000Z'),
       startsOn: civil('2027-02-28'),
     });
-    const current = await world.prisma.studioSettingsVersion.findFirstOrThrow({
-      orderBy: { version: 'desc' },
-    });
-    const { id: _id, version, createdAt: _createdAt, ...rest } = current;
-    await world.prisma.studioSettingsVersion.create({
-      data: {
-        ...rest,
-        version: version + 1,
-        taxRatePercent: 25,
-        createdByAccountId: (await administrator()).accountId,
-        createdAt: new Date('2027-03-05T12:00:00.000Z'),
-      },
+    const current = await nextSettingsVersion({
+      taxRatePercent: 25,
+      createdAt: new Date('2027-03-05T12:00:00.000Z'),
     });
 
     const result = await finance().monthResult(
