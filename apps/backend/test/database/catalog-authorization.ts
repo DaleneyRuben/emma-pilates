@@ -23,6 +23,11 @@ export const catalogAuthorizationRows = (): Record<string, MatrixRow> => ({
   'PUT /api/v1/administrator/class-types/{classTypeId}': administratorOnly(),
   'POST /api/v1/administrator/class-types/{classTypeId}/archive':
     administratorOnly(),
-  'PUT /api/v1/administrator/staff-members/{staffMemberId}/branches':
-    both('allow'),
+  // A real Trainer and no Branch: the Coordinator passes the Role check and
+  // meets invalid_branch_assignment, so nothing changes.
+  'PUT /api/v1/administrator/staff-members/{staffMemberId}/branches': {
+    ...both('allow'),
+    realIds: { staffMemberId: 'trainerStaffMemberId' },
+    body: { branchIds: [] },
+  },
 });

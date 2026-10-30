@@ -1,9 +1,25 @@
 import { hash } from 'argon2';
 import type { PrismaClient } from '../../src/generated/prisma/client';
 import { deterministicId } from '../../src/development-fixtures/deterministic-id';
-import type { RealIds } from './authorization-matrix';
 
 const day = 24 * 60 * 60 * 1_000;
+
+/** Rows the spec creates so a Booking command reaches its access check. */
+export type RealIds = {
+  sessionId: string;
+  otherSessionId: string;
+  bookingId: string;
+  /** A second Booking, so rescheduling never meets the cancelled one. */
+  rescheduleBookingId: string;
+  waitlistEntryId: string;
+  clientId: string;
+  /** A real Freeze, so the decision probe reaches the Role check. */
+  freezeId: string;
+  /** A real Evaluation slot, so the payment probe reaches the Role check. */
+  slotId: string;
+  /** A real Trainer, whose Branches the Coordinator may change (decision 6). */
+  trainerStaffMemberId: string;
+};
 
 // The fixtures are dated September 2026 and the API runs on the real clock,
 // so the Booking rows of the matrix get two future Sessions of their own, a
@@ -96,5 +112,6 @@ export const findRealIds = async (prisma: PrismaClient): Promise<RealIds> => {
     clientId: bea,
     freezeId: freeze.id,
     slotId: slot.id,
+    trainerStaffMemberId: deterministicId('staff-member:daniela'),
   };
 };
