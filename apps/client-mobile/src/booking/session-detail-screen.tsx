@@ -43,6 +43,7 @@ export type ConfirmedBooking = {
   classTypeName: string;
   startsAt: string;
   endsAt: string;
+  planName?: string;
 };
 
 type DetailNavigation = {
@@ -168,6 +169,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
               classTypeName: detail.classType.name,
               startsAt: detail.startsAt,
               endsAt: detail.endsAt,
+              planName: view?.subscription?.planName,
             },
           },
         });
