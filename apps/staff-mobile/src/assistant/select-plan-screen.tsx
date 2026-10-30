@@ -7,6 +7,7 @@ import {
   BackLink,
   BodyText,
   colors,
+  describePlanCardLabel,
   describePlanTerms,
   formatBolivianos,
   Heading,
@@ -24,13 +25,6 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { TabletGrid } from "./assistant-layout";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
-
-function planCardLabel(plan: PlanQuoteDto): string {
-  const price = formatBolivianos(plan.priceCentavos);
-  return plan.listPriceCentavos === undefined
-    ? `${plan.name}, ${price}`
-    : `${plan.name}, ${price}, antes ${formatBolivianos(plan.listPriceCentavos)}`;
-}
 
 type SelectPlanNavigation = {
   goBack: () => void;
@@ -87,7 +81,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
         <TabletGrid testID="assistant-plan-grid">
           {plans.map((plan) => (
             <Pressable
-              accessibilityLabel={planCardLabel(plan)}
+              accessibilityLabel={describePlanCardLabel(plan)}
               accessibilityRole="button"
               key={plan.id}
               onPress={() =>
