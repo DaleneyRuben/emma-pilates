@@ -20,6 +20,6 @@ export interface CashCloseHistoryEntryDto {
   note: string | null;
   closedAt: string;
   closedByName: string;
-  /** How the day’s cash sales moved after the close: a sale voided later (−) or recorded later (+) */
+  /** How the day’s cash sales moved after the close: a sale recorded later (+). A void returns no money, so it does not move them */
   adjustmentCentavos: number;
 }

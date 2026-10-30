@@ -1,3 +1,5 @@
+import { createPrismaVoidPayment } from '../../src/booking/payments/prisma-void-payment';
+import { auditActorOf } from '../../src/system-identity/authentication/audit-actor';
 import { randomUUID } from 'node:crypto';
 import { BackOfficeError } from '../../src/back-office/back-office-errors';
 import { createPrismaCashCloses } from '../../src/back-office/cash-close/prisma-cash-closes';
@@ -52,19 +54,13 @@ describe('Prisma Back Office cash closes', () => {
       );
   };
 
-  // PAY-006 will void a sale; until then a cash Payment is confirmed for good
-  // (a final decision, and payments_method_fields_check). This disposable
-  // database steps around both, as PAY-006's migration will for «voided».
-  const voidOutsideTheRules = (paymentId: string) =>
-    world.prisma.$transaction(async (transaction) => {
-      await transaction.$executeRaw`SET LOCAL session_replication_role = replica`;
-      await transaction.$executeRaw`
-        ALTER TABLE "booking"."payments"
-        DROP CONSTRAINT "payments_method_fields_check"`;
-      await transaction.$executeRaw`
-        UPDATE "booking"."payments"
-        SET "state" = 'rejected', "rejection_reason" = 'Venta anulada'
-        WHERE "id" = ${paymentId}::uuid`;
+  // PAY-006: an Administrator voids the sale after the close.
+  const voidAfterTheClose = (paymentId: string) =>
+    createPrismaVoidPayment(world.prisma).voidPayment({
+      paymentId,
+      reason: 'Venta anulada',
+      actor: auditActorOf(administrator),
+      now: new Date(evening.getTime() + hour),
     });
 
   beforeAll(async () => {
@@ -92,6 +88,7 @@ describe('Prisma Back Office cash closes', () => {
       businessDate: civil('2026-09-21'),
       expectedCentavos: before.expectedCentavos + 2 * first.amountDueCentavos,
       cashPaymentCount: before.cashPaymentCount + 2,
+      voidedCashCentavos: before.voidedCashCentavos,
       close: null,
     });
   });
@@ -237,7 +234,9 @@ describe('Prisma Back Office cash closes', () => {
 
   it('shows the history with differences, later adjustments, and days left unclosed', async () => {
     // Urubo: a sale yesterday never closed, today's close, then a sale voided
-    // after it (−) and a late sale (+), both adjustments of the closed day.
+    // after it and a late sale (+). The void returns no money, so the voided
+    // cash stays in the day's sales on its own line (owner decision 4); only
+    // the late sale adjusts the closed day.
     const today = await closes().readToday({ branchId: urubo }, administrator);
     const late = await cashSale(urubo, new Date(evening.getTime() + hour / 2));
     const firstOfToday = await world.prisma.payment.findFirstOrThrow({
@@ -258,7 +257,7 @@ describe('Prisma Back Office cash closes', () => {
       administrator,
       randomUUID(),
     );
-    await voidOutsideTheRules(firstOfToday.id);
+    await voidAfterTheClose(firstOfToday.id);
 
     const history = await closes(nextMorning).listCashCloses(
       { branchId: urubo, month: '2026-09' },
@@ -273,15 +272,12 @@ describe('Prisma Back Office cash closes', () => {
     expect(byDate.get(civil('2026-09-21').toISOString())).toEqual({
       businessDate: civil('2026-09-21'),
       status: 'closed',
-      cashSalesCentavos:
-        today.expectedCentavos -
-        firstOfToday.amountDueCentavos +
-        late.amountDueCentavos,
-      cashPaymentCount: today.cashPaymentCount,
+      cashSalesCentavos: today.expectedCentavos + late.amountDueCentavos,
+      cashPaymentCount: today.cashPaymentCount + 1,
+      voidedCashCentavos: firstOfToday.amountDueCentavos,
       close: {
         ...close,
-        adjustmentCentavos:
-          late.amountDueCentavos - firstOfToday.amountDueCentavos,
+        adjustmentCentavos: late.amountDueCentavos,
       },
     });
     expect(byDate.get(civil('2026-09-20').toISOString())).toMatchObject({

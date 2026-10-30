@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 import type {
   CashCloseHistory,
@@ -31,10 +31,16 @@ export class CashTodayDto {
   @ApiProperty({ format: 'date', description: 'Today in Bolivia' })
   businessDate!: string;
   @ApiProperty({
-    description: 'Confirmed cash Payments at the Branch today, so far',
+    description:
+      'Cash Payments at the Branch today, so far: confirmed, and voided ones too, since a void returns no money',
   })
   expectedCentavos!: number;
   @ApiProperty() cashPaymentCount!: number;
+  @ApiPropertyOptional({
+    description:
+      'The voided cash sales inside expectedCentavos, shown on their own line («Ventas anuladas (efectivo en caja)»)',
+  })
+  voidedCashCentavos?: number;
   @ApiProperty({ type: CashCloseDto, nullable: true })
   close!: CashCloseDto | null;
 }
@@ -55,7 +61,7 @@ export class CashCloseInputDto {
 export class CashCloseHistoryEntryDto extends CashCloseDto {
   @ApiProperty({
     description:
-      'How the day’s cash sales moved after the close: a sale voided later (−) or recorded later (+)',
+      'How the day’s cash sales moved after the close: a sale recorded later (+). A void returns no money, so it does not move them',
   })
   adjustmentCentavos!: number;
 }
@@ -67,9 +73,15 @@ export class CashDayDto {
     description: 'missing: a past day with cash sales and no close',
   })
   status!: (typeof cashDayStatuses)[number];
-  @ApiProperty({ description: 'The day’s confirmed cash Payments now' })
+  @ApiProperty({
+    description: 'The day’s cash Payments now, voided ones included',
+  })
   cashSalesCentavos!: number;
   @ApiProperty() cashPaymentCount!: number;
+  @ApiPropertyOptional({
+    description: 'The voided cash sales inside cashSalesCentavos',
+  })
+  voidedCashCentavos?: number;
   @ApiProperty({ type: CashCloseHistoryEntryDto, nullable: true })
   close!: CashCloseHistoryEntryDto | null;
 }
