@@ -1,4 +1,4 @@
-import { act, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { delay, http } from "msw";
@@ -71,10 +71,10 @@ describe("the first-load state while the app starts", () => {
     );
     renderAdmin("/back-office/gastos");
 
-    // The probe answers outside any Testing Library call, so the test holds
-    // the act scope while it waits.
-    await act(() => delay(150));
-    expect(startupState()).toBeInTheDocument();
+    // The probe answers outside any Testing Library call. Wait for the
+    // state the page keeps while that probe runs, instead of a fixed delay
+    // that can already be past when the suite is slow.
+    await waitFor(() => expect(startupState()).toBeInTheDocument());
 
     await heading("Gastos");
     await waitFor(() => expect(startupState()).not.toBeInTheDocument());

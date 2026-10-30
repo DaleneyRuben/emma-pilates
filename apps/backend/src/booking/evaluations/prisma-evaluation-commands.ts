@@ -24,6 +24,11 @@ import {
 } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { isSubscriptionEffective } from '../payments/purchase-eligibility';
+import { rejectPaymentOfCancelledEvaluation } from './evaluation-payment-decision';
+import {
+  attachEvaluationReceipt as attachPaidEvaluationReceipt,
+  coveringSubscription,
+} from './evaluation-payment-receipt';
 import {
   EvaluationRuleError,
   type EvaluationRuleCode,
@@ -36,15 +41,14 @@ import {
   evaluationCancelledNotice,
   evaluationReminderNotice,
 } from './evaluation-notifications';
+import { toClientEvaluationView } from './client-evaluation-view';
 import { evaluationOffer } from './evaluation-offer';
 import {
-  confirmEvaluationTransfer as confirmEvaluationPayment,
   releaseExpiredEvaluationHolds as releaseHolds,
   startEvaluationTransfer,
 } from './evaluation-payment';
 import {
   assertBlockValues,
-  cancellableUntil,
   dueReminders,
   evaluationSlotMinutes,
   isEvaluationBookable,
@@ -123,6 +127,8 @@ export type ClientEvaluationView = {
   included: boolean;
   priceCentavos: number;
   paymentId: string | null;
+  receiptAttached: boolean;
+  receiptUploadable: boolean;
   state: 'booked' | 'cancelled' | 'no_show';
   startsAt: Date;
   endsAt: Date;
@@ -270,11 +276,13 @@ const evaluationSelect = {
   state: true,
   evaluationSlotId: true,
   paymentId: true,
-  payment: { select: { amountDueCentavos: true, state: true } },
+  payment: {
+    select: { amountDueCentavos: true, state: true, receiptImageAssetId: true },
+  },
   slot: { select: slotSelect },
 } as const;
 
-type EvaluationRow = Prisma.EvaluationGetPayload<{
+export type ClientEvaluationRow = Prisma.EvaluationGetPayload<{
   select: typeof evaluationSelect;
 }>;
 
@@ -865,36 +873,6 @@ export const createPrismaEvaluationCommands = (
     priceCentavos: offer.priceCentavos,
   });
 
-  const toClientEvaluationView = (
-    row: EvaluationRow,
-    now: Date,
-  ): ClientEvaluationView => ({
-    id: row.id,
-    slotId: row.evaluationSlotId,
-    included: row.paymentId === null,
-    priceCentavos:
-      row.payment?.state === 'CONFIRMED' || row.payment?.state === 'PENDING'
-        ? row.payment.amountDueCentavos
-        : 0,
-    paymentId: row.paymentId,
-    state:
-      row.state === EvaluationState.BOOKED
-        ? 'booked'
-        : row.state === EvaluationState.NO_SHOW
-          ? 'no_show'
-          : 'cancelled',
-    startsAt: row.slot.startsAt,
-    endsAt: row.slot.endsAt,
-    durationMinutes: evaluationSlotMinutes,
-    branchId: row.slot.branchId,
-    branchName: row.slot.branch.name,
-    nutritionistName: row.slot.nutritionist.name,
-    cancellableUntil: cancellableUntil(row.slot.startsAt),
-    cancellable:
-      row.state === EvaluationState.BOOKED &&
-      isEvaluationBookable(row.slot.startsAt, now),
-  });
-
   const studioPrice = async (database: Database) => {
     const settings = await database.studioSettingsVersion.findFirstOrThrow({
       orderBy: { version: 'desc' },
@@ -914,29 +892,12 @@ export const createPrismaEvaluationCommands = (
     clientId: string,
     slotDate: Date,
   ) => {
-    const subscription = await database.subscription.findFirst({
-      where: {
-        clientId,
-        state: SubscriptionState.ACTIVE,
-        startsOn: { lte: slotDate },
-        endsOn: { gte: slotDate },
-      },
-      orderBy: [{ endsOn: 'desc' }, { id: 'asc' }],
-      select: {
-        id: true,
-        planId: true,
-        planNameSnapshot: true,
-        durationDaysSnapshot: true,
-        weeklyClassCapSnapshot: true,
-        originalClassAllowance: true,
-        startsOn: true,
-        evaluations: {
-          where: {
-            state: { in: [EvaluationState.BOOKED, EvaluationState.NO_SHOW] },
-          },
-          select: { id: true },
-        },
-      },
+    const now = dependencies.now();
+    const subscription = await coveringSubscription(database, {
+      clientId,
+      slotDate,
+      today: boliviaDate(now),
+      now,
     });
     if (subscription === null) return null;
     const settings = await studioPrice(database);
@@ -1383,17 +1344,21 @@ export const createPrismaEvaluationCommands = (
     });
   };
 
-  const confirmEvaluationTransfer = async (
-    paymentId: string,
+  const attachEvaluationReceipt = async (
+    command: {
+      paymentId?: string;
+      evaluationId?: string;
+      imageAssetId: string;
+    },
     principal: AuthenticatedPrincipal,
   ): Promise<void> => {
-    const settings = await studioPrice(prisma);
     await transact((transaction) =>
-      confirmEvaluationPayment(transaction, {
-        paymentId,
+      attachPaidEvaluationReceipt(transaction, {
+        paymentId: command.paymentId,
+        evaluationId: command.evaluationId,
+        imageAssetId: command.imageAssetId,
         principal,
         now: dependencies.now(),
-        feeCentavos: settings.nutritionistFeeCentavos,
       }),
     );
   };
@@ -1572,6 +1537,11 @@ export const createPrismaEvaluationCommands = (
         },
       });
       await releaseSlot(transaction, evaluation.evaluationSlotId, now);
+      await rejectPaymentOfCancelledEvaluation(transaction, {
+        evaluationId: evaluation.id,
+        now,
+        actor: auditActorOf(principal),
+      });
       if (evaluation.slot.nutritionist.account !== null) {
         await recordNotification(
           transaction,
@@ -1636,6 +1606,11 @@ export const createPrismaEvaluationCommands = (
         },
       });
       await releaseSlot(transaction, evaluation.evaluationSlotId, now);
+      await rejectPaymentOfCancelledEvaluation(transaction, {
+        evaluationId: evaluation.id,
+        now,
+        actor: auditActorOf(principal),
+      });
       if (evaluation.client.account !== null) {
         await recordNotification(
           transaction,
@@ -1819,7 +1794,7 @@ export const createPrismaEvaluationCommands = (
     readEvaluationSlot,
     bookEvaluation,
     bookPaidEvaluation,
-    confirmEvaluationTransfer,
+    attachEvaluationReceipt,
     releaseExpiredEvaluationHolds,
     recordEvaluationNoShow,
     listClientEvaluations,

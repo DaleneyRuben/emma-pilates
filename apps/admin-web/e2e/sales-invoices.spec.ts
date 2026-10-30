@@ -29,7 +29,7 @@ test("exports the unbilled sales and marks a cash sale's invoice issued", async 
     .split("\r\n")
     .filter((line) => line !== "");
   expect(lines).toHaveLength(2);
-  expect(lines[1]).toContain("Renata Soliz,Paquete de 8 clases,Efectivo,");
+  expect(lines[1]).toContain("Renata Soliz,Plan,Paquete de 8 clases,Efectivo,");
   expect(lines[1]).toMatch(/,Confirmado,4567891,Renata Soliz,No,,$/);
 
   await row

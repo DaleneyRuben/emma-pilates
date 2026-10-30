@@ -7,12 +7,14 @@ type Transaction = Prisma.TransactionClient;
 // confirmed. A retry finds it already confirmed and applies nothing.
 export const hasEarlierRealPayment = async (
   transaction: Transaction,
-  input: { clientId: string; paymentId: string },
+  input: { clientId: string; paymentId?: string },
 ): Promise<boolean> => {
   const earlier = await transaction.payment.findFirst({
     where: {
       clientId: input.clientId,
-      id: { not: input.paymentId },
+      ...(input.paymentId === undefined
+        ? {}
+        : { id: { not: input.paymentId } }),
       state: PaymentState.CONFIRMED,
       method: { not: PaymentMethod.COURTESY },
       planPriceCentavos: { gt: 0 },

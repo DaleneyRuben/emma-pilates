@@ -73,14 +73,31 @@ describe('founder membership', () => {
       ),
     ).toBe(false);
 
+    const granted = await prisma.founderMembership.findFirstOrThrow({
+      where: { clientId: buyers[0].clientId },
+    });
+    const grantedPayment = await prisma.payment.findFirstOrThrow({
+      where: { clientId: buyers[0].clientId, state: 'CONFIRMED' },
+    });
+    expect(granted.paymentId).toBe(grantedPayment.id);
+    expect(
+      await prisma.auditRecord.count({
+        where: {
+          actionCode: 'founder_membership.granted',
+          targetId: granted.id,
+          correlationId: grantedPayment.id,
+        },
+      }),
+    ).toBe(1);
+
     const first = await prisma.payment.findFirstOrThrow({
       where: { clientId: buyers[0].clientId, state: 'CONFIRMED' },
     });
     expect(first).toMatchObject({
       planPriceCentavos: plan.priceCentavos,
-      discountCentavos: 0,
-      discountReason: null,
-      amountDueCentavos: plan.priceCentavos,
+      discountCentavos: 8_400,
+      discountReason: 'founder',
+      amountDueCentavos: 47_600,
     });
   });
 
@@ -136,7 +153,12 @@ describe('founder membership', () => {
   });
 
   it('never hands the same number twice when two Payments confirm at once', async () => {
-    await prisma.founderMembership.deleteMany();
+    await prisma.founderMembership.updateMany({
+      data: { deletedAt: now },
+    });
+    const before = await prisma.founderMembership.aggregate({
+      _max: { number: true },
+    });
     const [left, right] = await Promise.all([
       world.newClient('Carrera izquierda'),
       world.newClient('Carrera derecha'),
@@ -148,21 +170,28 @@ describe('founder membership', () => {
     ]);
 
     const numbers = await prisma.founderMembership.findMany({
+      where: { clientId: { in: [left.clientId, right.clientId] } },
       orderBy: { number: 'asc' },
       select: { number: true },
     });
-    expect(numbers.map((membership) => membership.number)).toEqual([1, 2]);
+    const next = (before._max.number ?? 0) + 1;
+    expect(numbers.map((membership) => membership.number)).toEqual([
+      next,
+      next + 1,
+    ]);
   });
 
   it('ends a gap of 8 days, keeps a gap of 7, and does nothing the second night', async () => {
-    await prisma.founderMembership.deleteMany();
+    await prisma.founderMembership.updateMany({
+      data: { deletedAt: now },
+    });
     const lapsed = await world.newClient('Con hueco');
     const kept = await world.newClient('A tiempo');
     await cash(lapsed.clientId, plan.id);
     await cash(kept.clientId, plan.id);
     await prisma.subscription.updateMany({
       where: { clientId: lapsed.clientId },
-      data: { endsOn: new Date('2026-10-15T00:00:00.000Z') },
+      data: { endsOn: new Date('2026-10-14T00:00:00.000Z') },
     });
     await prisma.subscription.updateMany({
       where: { clientId: kept.clientId },
@@ -203,6 +232,51 @@ describe('founder membership', () => {
         where: { clientId: lapsed.clientId },
       }),
     ).resolves.toMatchObject({ status: 'LOST' });
+  });
+
+  it('keeps the place while a pending transfer covers the gap', async () => {
+    await prisma.founderMembership.updateMany({
+      data: { deletedAt: now },
+    });
+    const waiting = await world.newClient('Transferencia en revisión');
+    await cash(waiting.clientId, plan.id);
+    await prisma.subscription.updateMany({
+      where: { clientId: waiting.clientId },
+      data: {
+        endsOn: new Date('2026-10-20T00:00:00.000Z'),
+        state: 'EXPIRED',
+        expiredAt: now,
+      },
+    });
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+    const centro = fixtures.branches.find(
+      (branch) => branch.name === 'Centro',
+    )!;
+    await world
+      .commands(new Date('2026-10-22T15:00:00.000Z'))
+      .recordFrontDeskTransfer(
+        {
+          clientId: waiting.clientId,
+          planId: plan.id,
+          branchId: centro.id,
+          imageAssetId: receipt.id,
+          startsOn: '2026-10-22',
+        },
+        assistant,
+        randomUUID(),
+      );
+
+    const job = createFounderMembershipJob(
+      prisma,
+      () => new Date('2026-10-29T15:00:00.000Z'),
+    );
+    await expect(job.execute()).resolves.toEqual({ ended: 0 });
+    await expect(
+      prisma.founderMembership.findFirstOrThrow({
+        where: { clientId: waiting.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({ status: 'ACTIVE' });
   });
 
   it('shows the list price, the discount, and the amount paid', async () => {
@@ -246,7 +320,9 @@ describe('founder membership', () => {
     expect(page.places).toBe(40);
     expect(page.granted).toBe(page.items.length);
     expect(page.items.map((item) => item.number)).toEqual(
-      Array.from({ length: page.granted }, (_, index) => index + 1),
+      [...page.items.map((item) => item.number)].sort(
+        (left, right) => left - right,
+      ),
     );
 
     await expect(oversight.listFounders(assistant)).rejects.toBeInstanceOf(
@@ -266,5 +342,37 @@ describe('founder membership', () => {
     await expect(oversight.listFounders(coordinator)).rejects.toBeInstanceOf(
       AdministrationError,
     );
+  });
+
+  it('counts a reservation and leaves it off the founder list', async () => {
+    await prisma.founderMembership.updateMany({
+      data: { deletedAt: now },
+    });
+    const buyer = await world.newClient('Reserva sin pago');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+    const centro = fixtures.branches.find(
+      (branch) => branch.name === 'Centro',
+    )!;
+    await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro.id,
+        imageAssetId: receipt.id,
+      },
+      assistant,
+      randomUUID(),
+    );
+    const administrator = await world.staffPrincipal(
+      'paola.mendoza@example.com',
+    );
+
+    const page = await createPrismaOversight(prisma, {
+      now: () => now,
+    }).listFounders(administrator);
+
+    expect(page.granted).toBe(1);
+    expect(page.items).toEqual([]);
   });
 });

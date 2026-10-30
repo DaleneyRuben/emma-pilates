@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { createPrismaEvaluationCommands } from '../../src/booking/evaluations/prisma-evaluation-commands';
+import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
 import { createPrismaOversight } from '../../src/booking/administration/prisma-oversight';
 import { deterministicId } from '../../src/development-fixtures/deterministic-id';
 import {
@@ -195,8 +196,10 @@ describe('nutritionist evaluation rules', () => {
     if (again.paymentId === null) {
       throw new Error('A paid Evaluation books with its own Payment');
     }
-    await later.confirmEvaluationTransfer(
-      again.paymentId,
+    await createPrismaPaymentCommands(world.prisma, {
+      now: () => clock.now,
+    }).confirmTransfer(
+      { paymentId: again.paymentId },
       await world.principalOf('paola.mendoza@example.com'),
     );
     await expect(

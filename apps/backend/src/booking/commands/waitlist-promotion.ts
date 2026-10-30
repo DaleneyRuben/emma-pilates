@@ -2,7 +2,10 @@ import type { Prisma } from '../../generated/prisma/client';
 import { WaitlistClosureReason } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { promoteWaitlist } from './promote-waitlist';
-import { findCoveringSubscription } from './eligible-subscription';
+import {
+  findApprovedFreeze,
+  findCoveringSubscription,
+} from './eligible-subscription';
 import { fundBooking } from './weekly-cap-funding';
 import { readWeeklyCapPosition } from './weekly-cap-count';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
@@ -61,6 +64,8 @@ export const promoteWaitlistInTransaction = (
           },
           orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
         }),
+      findApprovedFreeze: ({ clientId, onDate }) =>
+        findApprovedFreeze(transaction, { clientId, onDate }),
       findEligibleSubscription: async ({ clientId, onDate }) => {
         const subscription = await findCoveringSubscription(transaction, {
           clientId,

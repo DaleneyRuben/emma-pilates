@@ -478,6 +478,9 @@ wait for Google, Apple, and testers.
 | BKM-009 | P0 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | done (919ef391, a6c21924, 938d0e56, 1db2fa8e; evidence below) |
 | PAY-005 | P0 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | done (4588fc6a purchases, 56d47a6e assistant and admin detail, 697cd121 closure, eb44650d admin endpoint, 99508a7f env var, 2ff8fa4d contract, 23a1e759 admin web, ead7ace2 client app, a8828bcb staff app; design follow-ups 135–139 exported 4657e3b7–2df9bc5a; verified on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator for both apps and in a browser at 1440 and 420 px; open: delete `REFERRAL_REWARD_CENTAVOS` from the Northflank services, now ignored) |
 | BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | done |
+| FIX-001 | P0 | Backend | Founder review: no gift or campaign for a founder, the 7-day gap counts uncovered days, a front-desk QR is priced, and the first Plan takes 15 % | BKM-010 | 1 d | done (second review on `4bed7dff`: `900e11c3`/`f0fcb958` an app rejection frees the place, `ca37f30d`/`f13049f4` a single class is not a Plan and a returning buyer sees the list price, `ded90b40`/`8d9ded77` a confirmation with no place left stays pending, `11963fa3` one grant audit, `86a0b960`/`cafa0e81` a gapped confirmation tells the Client, `e7dd4a5b`/`3a16a359` a release names the sale. Device walk still open) |
+| FIX-013 | P2 | Backend | An unreviewed transfer holds its founder place forever. Expire or release that reservation when the Payment stays pending past a decided limit, and say what the Client and the desk see. | FIX-001 | 0.5 d | todo |
+| FIX-014 | P2 | Client and Staff mobile | Elige tu plan: the plan card's accessibility label is only the plan name, so VoiceOver and Maestro never read the price. Include the price, and the founder price beside the list price when the card shows one, in the card's accessibility label (`apps/client-mobile/src/plans/plans-screen.tsx`, `apps/staff-mobile/src/assistant/select-plan-screen.tsx`). | FIX-001 | 0.5 d | todo |
 | BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | done (6f8f47df registration, de271070 Assistant flow, bc106c51 + bcee395d correction and Trainer codes, d8a6008a + 3a7f3b96 apps, cab4a4b0 admin web, 3a77ac3c design export; see the notes under «BKM-011») |
 | PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | done |
 
@@ -494,6 +497,50 @@ wait for Google, Apple, and testers.
 | BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | done |
 | BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | done |
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
+| FIX-006 | P0 | Backend/admin web | Enforce the Freeze on the Waitlist and on Reschedule, and refuse a late approval | BKM-012 | 1 d | done |
+| FIX-003 | P0 | Backend/admin web/client app | Paid Evaluation payment lifecycle: reject and cancel settle the Payment, confirm audits and notifies, the receipt is visible, an exhausted Plan cannot buy one, cancelled Evaluations skip the Bs 50, AW28 names the sale and dates it by the decision, and a pending Evaluation Payment is not the current Plan Payment | NUT-003 | 1 d | done (`a2a07b11`/`cb375760` one pending Payment per kind, 409 instead of P2002; `5cb29021` evaluation sales read as «Evaluación nutricional» and Pagos hides «Anular venta». Device walk still open) |
+| FIX-005 | P0 | Backend | Allowance net, extra-class refund and reschedule, and guest-pass rebook and verification | BKM-008, BKM-014 | 1 d | done (second review on `8577ec10`: `c0a86505` the monthly refusal names the calendar month; the last-place check lives beside capacity; reschedule uses the shared guest-pass copy; a second cancel tap does not send another DELETE. Device walk still open) |
+
+#### FIX-005 · Allowance net, extra-class refund, and guest-pass rebook
+
+Review findings H13, the extra-class refund and reschedule mediums, the guest-pass verification medium, the invite-reward landing, and owner decision 2 of 2026-10-28. Branch `fix/fix-005-allowance-and-booking`. No migration.
+
+Commits: `dcec6e9a` failing regressions, `982f6de2` the fix, `c49ca7fa` the cancelled-pass decision, `3cba3cfe` Test 86. `0afc89a8` merges `origin/main` (`fb08536e`, the seroval pin) into this branch.
+
+Findings:
+
+- H13. A queued Client whose extra classes are already spent no longer blocks the Session. Spendable extra is the signed sum of live allowance adjustments. Waitlist promotion skips a Client who cannot be funded.
+- A refund of an extra-funded class soft-deletes the linked consumption. A base-funded class still returns to `remainingClassAllowance`. Reschedule moves that consumption onto the replacement booking and does not count it as a new weekly-cap use.
+- Decision 2. A timely cancellation clears `guestPass.bookingId`. She can book another free class, and the last-place rule applies again. A late cancellation still spends the class.
+- The monthly invite opens at email verification, or at account activation for an invited friend. An unverified registration does not spend the month, and the monthly limit never fails registration. `openGuestPass` locks the host Client row. The host's +1 class lands on her current real Subscription or is owed until the next real one, never on her own Guest Pass.
+
+Decisions:
+
+- Net spendable extra is the signed sum of live allowance adjustments. A spent gift (+1 and −1) is not spendable.
+- A Client who cannot be funded is skipped during waitlist promotion. The catch stays for the race between the eligibility read and funding.
+- An extra-funded refund soft-deletes the linked `CONSUMPTION` row. A base-funded class increments remaining. The unique `bookingId` includes soft-deleted rows, so the same booking does not gain a second consumption row.
+- Reschedule moves the consumption row's `bookingId` to the replacement and does not treat that move as a new weekly-cap use.
+- A timely client cancellation clears `guestPass.bookingId`. Late cancellation still throws before the refund, so the class stays spent.
+- A spent Guest Pass still makes its courtesy Subscription eligible, so a second class answers `guest_pass_already_used`.
+- The monthly invite opens at email verification or account activation. Registration never throws `guest_pass_monthly_limit`. If the month is already used, verification succeeds and no pass is created. The host row is locked with `SELECT … FOR UPDATE`.
+- The invite reward refuses the host's own Guest Pass courtesy Subscription. If that is her only current Subscription, the class is owed until a real Subscription is activated. The courtesy link identifies it.
+- No HTTP contract change. No migration. The session-cancel refund uses the same restore helper. A dedicated session-cancel integration case was not added; `cancelBelowMinimum` covers the worker refund.
+- Freeze refund stays out of this item.
+
+Verified on PostgreSQL 18, port 5433, disposable `pilates_test_` databases:
+
+- Red, before the fix: unit `guest-pass.spec` expected the reward owed and received the host's Guest Pass id; unit `promote-waitlist.spec` rejected with `No eligible Subscription`. Integration: a client cancel left remaining at 1; `cancelBelowMinimum` did the same; the rescheduled booking had no consumption row; waitlist cancel threw `No eligible Subscription`; a timely guest-pass cancel left `bookingId` set; the invite reward wrote an adjustment on the courtesy Subscription; registration opened a pass; a second friend the same month threw `A host invites one friend a month`; concurrent verification threw that error at registration; assistant activation left `hostClientId` null.
+- Green, after the fix: unit 3 suites, 16 tests (`net-allowance`, `guest-pass`, `promote-waitlist`). Integration 14 suites, 60 tests (`guest-pass`, `booking-command`, `booking-command-waitlist`, `weekly-cap`, `allowance-consumption`, `guest-pass-verification`, `guest-pass-rebook`, `allowance-refund`, `session-start-checks`, `client-registration`, `client-invitations`, `client-acquisition-registration`, `session-cancellation`, `courtesy-access-bookings`).
+
+The Test 86 API journey was not run. Staging stayed paused. The Client app and the Staff app were not walked.
+
+Open:
+
+- The monthly-limit skip matches the error message `one friend a month`. A wording change would reopen the failure.
+- `collectOwedInviteReward` was not taught to skip a Guest Pass Subscription. The grant path is what the tests cover.
+- Waitlist promotion still does not know the last-place rule (BKM-014).
+- The courtesy adjustment's author being the friend herself stays an open question from BKM-014.
+- Freeze refund still increments the base remaining by the cancelled count.
 
 #### Closed-test enablement
 
@@ -931,6 +978,61 @@ semana» never appears; the push carries the title). The four titles need the
 owner's approval. A Client leaves the list as soon as she books, and a
 cancellation can put her back.
 
+#### FIX-003 · Paid Evaluation payment lifecycle
+
+Done on 2026-10-28, branch `fix/fix-003-paid-evaluations`. Red
+`2cf368e4`. Green `e834caac`. Migration
+`20261029120000_evaluation_payment_decision` (needs owner approval before a
+shared database): `payment_rejected`, a receipt on the Evaluation Payment,
+and an Administrator may reject that Payment. Renamed from
+`20261028120000` so it no longer shares a stamp with FIX-001.
+
+A Payment already pending on an Evaluation cancelled before this fix stays
+pending. There is no production data yet. Before the first shared database,
+reject each of those rows by hand: state `rejected`, `decided_at` at or after
+`submitted_at`, `decided_by_account_id` null, and reason
+`La evaluación fue cancelada`. Then schedule the receipt for deletion if one
+is attached.
+
+Verified: `paid-evaluation-lifecycle.integration-spec.ts` 8 failed before the
+fix and 8 passed after, on PostgreSQL 18 through
+`TEST_DATABASE_URL` on port 5433. `nutritionist-cost.spec.ts` failed, then
+passed. Admin CSV spec passed. ESLint clean on the staged backend, admin-web,
+and client files.
+
+Decisions: the Evaluation reject and confirm live in
+`evaluation-payment-decision.ts` so the oversized command files only call in.
+The receipt reuses `TRANSFER_RECEIPT` and lives on the Payment because an
+Evaluation transfer has no Purchase Intent. A pending Evaluation Payment does
+not block a Plan purchase and is not `GET /payments/current`. Cancelled
+Evaluations stay out of the Nutritionist cost. Follow-ups 216 and 217 stay
+pending; `design/` was not edited.
+
+Not verified: the admin web in a browser at 1440 and 420 px, and the Client
+receipt step on the iPhone, the iPad, and the Android emulator.
+
+2026-10-29, after the device walk. A pending Evaluation Payment and a pending
+Plan Payment are different sales. Migration
+`20261029210000_pending_payment_per_kind` (needs owner approval before a
+shared database) replaces `payments_one_pending_per_client_key` with
+`payments_one_pending_per_client_kind_key` on `(client_id, kind)` where
+`state = 'pending'`. Payment has no `deleted_at`, so the predicate does not
+name one. Prisma cannot model the predicate, and the migrate diff does not
+report the index, so `known-drift.sql` stays as it was.
+
+A race that still hits the index answers 409: `payment_pending_exists` on a
+Plan submit and on the front-desk QR, `evaluation_payment_pending` on a
+second paid Evaluation. Staff review and the admin Plan column name an
+Evaluation sale «Evaluación nutricional». Pagos hides «Anular venta» when
+`kind` is `evaluation`.
+
+Verified: `pending-payment-kind.integration-spec.ts` and
+`second-paid-evaluation.integration-spec.ts` failed on P2002 before the index
+and passed after (4 tests) on PostgreSQL 18, port 5433, database
+`pilates_test_pending_kind`. `saleLabel` unit 2 and admin `void-sale.spec.tsx`
+3 passed. `check-migrations.sh` on a disposable database passed. Device walk
+of this head is still open.
+
 #### NUT-003 · Nutritionist rules
 
 - Replaces «one Evaluation a month with an active Plan». A 90-day Plan (or a longer one) includes one free Evaluation, used within its validity. Every other Client pays Bs 70 (from the settings), by QR in the app (approved by the Administrator) or in cash at the front desk.
@@ -971,7 +1073,7 @@ Evidence (BKM-012, 2026-10-23, branch `feature/bkm-012-freeze`, stacked on `feat
 
 Decisions taken:
 
-- A Freeze is once per Subscription. A refused request still counts, so a second ask is `freeze_not_allowed`.
+- A Freeze is once per Subscription. Once counts a requested or an approved Freeze. A refusal does not spend it (owner decision 2026-10-29).
 - Inclusive days: the start and the end both count. Ten days is `2026-11-01` through `2026-11-10`.
 - A start in the past is compared as a Bolivia civil date, not as a UTC timestamp.
 - `freeze_not_allowed` answers `409` with «Este plan no se puede congelar.» `booking_during_freeze` answers `409` with «Tu plan está congelado hasta el {fecha}.» Clients branch on the code.
@@ -997,6 +1099,40 @@ Open:
 - IDN-009 makes Coordinator a real role for the decision.
 - The Client app and the Staff app were not walked on a device. PAY-006 may be walking the devices, and this item did not take the simulator lock.
 - Migration `20261023200000_freezes` needs the owner's approval before any shared database. It was applied only to disposable databases created for this item.
+
+#### FIX-006 · Freeze on the Waitlist, on Reschedule, and on a late approval
+
+Review findings H15 and H16, and the Freeze medium bullets, from
+`REVIEW-2026-10-28.md`.
+
+- Joining a Waitlist, being promoted from it, and rescheduling into an approved Freeze use the same check as booking. Approval closes Waitlist entries whose Session falls inside the window.
+- A Reschedule before the Start Date is refused the same way a Booking is.
+- An approval whose start is already a past Bolivia date is refused with `409` `freeze_start_in_past` and changes nothing. An approval on the start day keeps a class whose Session already started and cancels the ones that have not.
+- The window must lie inside the current term. A queued renewal caps it so the extension cannot reach that renewal's Start Date (`freeze_outside_term`).
+- A second approval finds the row no longer `REQUESTED` and answers `freeze_already_decided`. It does not extend the plan again.
+- The classes cancelled on approval are those whose Session falls on a Bolivia civil date inside the window, not a UTC midnight range.
+- A date that is not a calendar day answers `400` `invalid_civil_date`.
+
+Evidence (FIX-006, 2026-10-28, branch `fix/fix-006-freeze`, from `main` at `0623829c`, [PR #228](https://github.com/DaleneyRuben/emma-pilates/pull/228)). Red `e3b13159`, green `e824c1df`, docs `60654e7e`.
+
+Decisions taken:
+
+- A late approval, whose start is already a past Bolivia day, is refused, not trimmed to today. The code is `freeze_start_in_past`. The desk copy says to refuse it and ask again from tomorrow. Approving on the start day is allowed: a class already taught stays, and a class that has not started is cancelled. A refused Freeze does not spend the one Freeze (owner decision 2026-10-29).
+- A window that would overlap a queued renewal is `freeze_outside_term`, not `freeze_not_allowed`, so the Client can tell it from a Plan that cannot freeze.
+- A second approval is `freeze_already_decided`. The claim is an update where the state is still `REQUESTED`, inside a Serializable transaction.
+- Waitlist entries closed by a Freeze use `session_cancelled`. That closure names no Account, which is what the existing check allows. No new closure reason and no migration.
+- The shared rule is `decideFreezeRequest`. Request and approval both call it. Booking, joining, promotion, and reschedule share the approved-Freeze lookup already used by `createBooking`.
+
+Verified:
+
+- Unit: freeze rules, the invalid-date controller, join, promotion, and reschedule, 20 passed. The new cases failed before `e824c1df`.
+- Integration on PostgreSQL 18, port 5433, databases named `pilates_test_*`: 11 passed, including late approval, queued renewal, a double approval, Waitlist close, and Reschedule into the Freeze and before the Start Date.
+- Admin web copy for `freeze_start_in_past` and `freeze_already_decided` was not opened in a browser. The Client app and the Staff app were not walked. No migration.
+
+Open:
+
+- Promotion during a Freeze is covered by the unit test and by closing the entry on approval. An integration case that reopens the entry and frees a seat was not kept: writing the cancelled state by hand broke `bookings_state_fields_check`.
+- A freeze request that the plan cannot take answers `409` `freeze_not_allowed`, including a past start and a window outside the term (`82dae4c3`, `3259cc2d`). Approving a freeze that starts today keeps a class whose Session already started and cancels the ones that have not. Approving a start that is already a past Bolivia day is refused with `freeze_start_in_past` and changes nothing. A refused freeze does not use the one freeze (`d19426e4` red, `54e912e9` green, `cb914acf` counts only requested or approved). Migration `20261029200000_freeze_refused_does_not_count` replaces `freezes_subscription_id_key` with a partial unique index (`state <> 'refused' AND deleted_at IS NULL`). Needs owner approval before a shared database. The desk copy for a start already past is «El congelamiento ya empezó. Recházalo y pide uno desde mañana.»
 
 #### BKM-014 · Invita a una amiga
 
@@ -1037,8 +1173,8 @@ Open questions:
 - The courtesy adjustment's author is the friend's own new Account at self-registration, or the Assistant's Account at the front desk, with role null on the registration path. The reward's author is the Account that approved the friend's Payment, matching the gift. The pass's courtesy author being the friend herself is odd; it stays because the adjustment requires an Account and registration has no staff actor.
 - A second `openGuestPass` for the same friend is refused by the unique index (Prisma P2002) and is not translated into a named `GuestPassError`. A second registration of the same friend is already refused by the one-Referral rule, so the index is a backstop. The acceptance test covers the second class, not a second registration.
 - The Coordinator Role does not exist (IDN-009).
-- A cancelled guest-pass Booking does not clear `bookingId` or restore the courtesy class. Cancelling restores the base allowance, so a cancelled pass class still counts as used.
 - Waitlist promotion does not know the last-place rule. A guest pass could be promoted into the last place.
+- The 2026-10-23 notes that registration opens the pass, that a second registration answers `409` `guest_pass_monthly_limit`, and that a cancelled guest-pass Booking leaves `bookingId` set are superseded by FIX-005.
 - The confirmation still writes the Bs 60 credit ledger entry. PAY-005 (#157) removes it. This branch does not.
 
 #### BKM-013 · First 90 days

@@ -1,14 +1,22 @@
 import type { Prisma } from '../../generated/prisma/client';
 import {
+  EvaluationState,
   PaymentKind,
   PaymentMethod,
   PaymentState,
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { BookingAccessDeniedError } from '../commands/create-booking';
+import { EvaluationRuleError } from './evaluation-errors';
+import { rejectPaymentOfCancelledEvaluation } from './evaluation-payment-decision';
 import { evaluationHoldExpiresAt } from './evaluation-rules';
 
 type Transaction = Prisma.TransactionClient;
+
+const isUniqueViolation = (error: unknown): boolean =>
+  typeof error === 'object' &&
+  error !== null &&
+  'code' in error &&
+  error.code === 'P2002';
 
 export type PaidEvaluationQuote = {
   priceCentavos: number;
@@ -35,27 +43,50 @@ export const startEvaluationTransfer = async (
     now: Date;
   },
 ): Promise<{ paymentId: string; evaluationId: string }> => {
-  const payment = await transaction.payment.create({
-    data: {
+  const pending = await transaction.payment.findFirst({
+    where: {
       clientId: input.clientId,
-      planId: input.quote.planId,
-      planNameSnapshot: input.quote.planName,
-      durationDaysSnapshot: input.quote.durationDays,
-      weeklyClassCapSnapshot: input.quote.weeklyClassCap,
-      classAllowanceSnapshot: input.quote.classAllowance,
-      planPriceCentavos: input.quote.priceCentavos,
-      creditAppliedCentavos: 0,
-      amountDueCentavos: input.quote.priceCentavos,
-      startsOn: input.quote.startsOn,
-      method: PaymentMethod.TRANSFER,
       kind: PaymentKind.EVALUATION,
       state: PaymentState.PENDING,
-      submittedByAccountId: input.principal.accountId,
-      submittedAt: input.now,
-      createdAt: input.now,
     },
     select: { id: true },
   });
+  if (pending !== null) {
+    throw new EvaluationRuleError(
+      'evaluation_payment_pending',
+      'Ya tienes un pago de evaluación pendiente.',
+    );
+  }
+  let payment: { id: string };
+  try {
+    payment = await transaction.payment.create({
+      data: {
+        clientId: input.clientId,
+        planId: input.quote.planId,
+        planNameSnapshot: input.quote.planName,
+        durationDaysSnapshot: input.quote.durationDays,
+        weeklyClassCapSnapshot: input.quote.weeklyClassCap,
+        classAllowanceSnapshot: input.quote.classAllowance,
+        planPriceCentavos: input.quote.priceCentavos,
+        creditAppliedCentavos: 0,
+        amountDueCentavos: input.quote.priceCentavos,
+        startsOn: input.quote.startsOn,
+        method: PaymentMethod.TRANSFER,
+        kind: PaymentKind.EVALUATION,
+        state: PaymentState.PENDING,
+        submittedByAccountId: input.principal.accountId,
+        submittedAt: input.now,
+        createdAt: input.now,
+      },
+      select: { id: true },
+    });
+  } catch (error) {
+    if (!isUniqueViolation(error)) throw error;
+    throw new EvaluationRuleError(
+      'evaluation_payment_pending',
+      'Ya tienes un pago de evaluación pendiente.',
+    );
+  }
   const evaluation = await transaction.evaluation.create({
     data: {
       clientId: input.clientId,
@@ -73,90 +104,39 @@ export const startEvaluationTransfer = async (
 export const evaluationTransferHoldUntil = (submittedAt: Date): Date =>
   evaluationHoldExpiresAt(submittedAt);
 
-export const confirmEvaluationTransfer = async (
-  transaction: Transaction,
-  input: {
-    paymentId: string;
-    principal: AuthenticatedPrincipal;
-    now: Date;
-    feeCentavos: number;
-  },
-): Promise<void> => {
-  if (
-    input.principal.identity.kind !== 'staff' ||
-    input.principal.identity.role !== 'administrator'
-  ) {
-    throw new BookingAccessDeniedError();
-  }
-  const payment = await transaction.payment.findUnique({
-    where: { id: input.paymentId },
-    select: {
-      id: true,
-      kind: true,
-      state: true,
-      method: true,
-      evaluation: { select: { id: true, state: true } },
-    },
-  });
-  if (
-    payment === null ||
-    payment.kind !== PaymentKind.EVALUATION ||
-    payment.evaluation === null
-  ) {
-    throw new BookingAccessDeniedError();
-  }
-  if (payment.state === PaymentState.CONFIRMED) return;
-  if (payment.state !== PaymentState.PENDING) {
-    throw new BookingAccessDeniedError();
-  }
-  await transaction.payment.update({
-    where: { id: payment.id },
-    data: {
-      state: PaymentState.CONFIRMED,
-      decidedByAccountId: input.principal.accountId,
-      decidedAt: input.now,
-    },
-  });
-  await transaction.evaluation.update({
-    where: { id: payment.evaluation.id },
-    data: { nutritionistCostCentavos: input.feeCentavos },
-  });
-};
-
 export const releaseExpiredEvaluationHolds = async (
   transaction: Transaction,
   now: Date,
 ): Promise<number> => {
   const due = await transaction.evaluation.findMany({
     where: {
-      state: 'BOOKED',
+      state: EvaluationState.BOOKED,
+      slot: { startsAt: { gt: now } },
       payment: {
         kind: PaymentKind.EVALUATION,
         state: PaymentState.PENDING,
         submittedAt: { lte: new Date(now.getTime() - 24 * 60 * 60 * 1_000) },
       },
     },
-    select: { id: true, paymentId: true },
+    select: { id: true, paymentId: true, state: true },
   });
   for (const row of due) {
-    await transaction.evaluation.update({
-      where: { id: row.id },
-      data: {
-        state: 'CANCELLED',
-        cancelledAt: now,
-        cancellationCause: 'PAYMENT_EXPIRED',
-      },
-    });
-    if (row.paymentId !== null) {
-      await transaction.payment.update({
-        where: { id: row.paymentId },
+    if (row.state === EvaluationState.BOOKED) {
+      await transaction.evaluation.update({
+        where: { id: row.id },
         data: {
-          state: PaymentState.REJECTED,
-          decidedAt: now,
-          rejectionReason: evaluationPaymentReason,
+          state: 'CANCELLED',
+          cancelledAt: now,
+          cancellationCause: 'PAYMENT_EXPIRED',
         },
       });
     }
+    await rejectPaymentOfCancelledEvaluation(transaction, {
+      evaluationId: row.id,
+      now,
+      actor: null,
+      reason: evaluationPaymentReason,
+    });
   }
   return due.length;
 };

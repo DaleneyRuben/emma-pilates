@@ -2,7 +2,7 @@
 
 Status: accepted (2026-10-23)
 
-The owner opens with a founders' offer: 15 % off every Plan except the single class, for 40 Clients. The owner chose (2026-10-23) that the places go automatically to the first 40 distinct Clients whose first real Payment is confirmed, rather than being assigned by hand. Courtesy Access never takes a place.
+The owner opens with a founders' offer: 15 % off every Plan except the single class, for 40 Clients. The owner chose (2026-10-23) that the places go automatically to the first 40 distinct Clients, rather than being assigned by hand. The number is assigned when the sale is priced, in that order, and it becomes final when the Payment is confirmed. Courtesy Access, a hidden Plan, and a Bs 0 Plan never take a place.
 
 The owner clarified (2026-10-28) that the 15 % applies from the founder's first Plan, not from the second. The place is decided, under the existing lock, when the sale is priced (purchase intent, cash sale, or front-desk QR), while places remain, and it becomes final at confirmation. A founder never receives the Gift Class or Campaign classes. She can still invite a friend.
 

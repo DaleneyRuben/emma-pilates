@@ -8,6 +8,7 @@ import {
   scheduleReceiptDeletion,
   settleReservation,
 } from '../payments/purchase-intent-settlement';
+import { releaseFounderReservationOf } from '../payments/founder-reservation';
 import type { ClosureTransaction } from './close-client-account';
 import { closureScope } from './closure-scope';
 
@@ -51,6 +52,10 @@ export const createMembershipSteps = (
       occurredAt,
       false,
     );
+    await releaseFounderReservationOf(transaction, {
+      purchaseIntentId: intent.id,
+      now: occurredAt,
+    });
     return true;
   },
 

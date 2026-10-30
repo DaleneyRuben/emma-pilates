@@ -1,6 +1,7 @@
 import { actsForClientsAt } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
+import { bookingDuringFreezeMessage } from '../payments/freeze';
 import { bookingBeforeStartMessage } from './booking-before-start';
 import {
   BookingAccessDeniedError,
@@ -24,6 +25,10 @@ type JoinWaitlistDependencies = {
     clientId: string;
     onDate: Date;
   }): Promise<WeeklyCapSubscription | null>;
+  findApprovedFreeze?(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ endsOn: Date } | null>;
   findNotYetStartedSubscription?(input: {
     clientId: string;
     onDate: Date;
@@ -95,6 +100,15 @@ export const joinWaitlist = async (
   }
 
   const clientId = resolveClientId(command, session, dependencies.principal);
+  const freeze = dependencies.findApprovedFreeze
+    ? await dependencies.findApprovedFreeze({
+        clientId,
+        onDate: session.startsAt,
+      })
+    : null;
+  if (freeze !== null) {
+    throw new Error(bookingDuringFreezeMessage(freeze.endsOn));
+  }
 
   if ((await dependencies.countLiveBookings(session.id)) < session.capacity) {
     throw new Error('Session has capacity');

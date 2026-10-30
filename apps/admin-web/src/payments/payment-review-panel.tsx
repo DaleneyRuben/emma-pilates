@@ -61,6 +61,7 @@ function ReviewBody({
         <PaymentSummary review={review} />
         <ReceiptViewer
           receiptUrl={review.receiptUrl ?? null}
+          receiptMissing={review.receipt === null}
           mediaType={review.receipt?.mediaType}
           clientName={review.clientName}
           onRetry={onRetry}

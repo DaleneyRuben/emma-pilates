@@ -41,7 +41,7 @@ A discount of 15 % on every Plan except the single class, from the founder's fir
 _Avoid_: VIP, loyalty discount
 
 **Freeze**:
-A pause of a Subscription on a Plan of 90 days or more: once per Subscription, up to 15 days, never starting in the past. The client asks with dates and a reason; an Administrator approves or refuses it. During it the client cannot book and Bookings inside it are cancelled with their class returned the same way a cancellation returns it; the end date moves by exactly the frozen days ([ADR-0010](./docs/adr/0010-freeze-quarterly-subscriptions.md)).
+A pause of a Subscription on a Plan of 90 days or more: once per Subscription, counting a requested or an approved Freeze and not a refused one, up to 15 days, never starting in the past, and inside the current term so a queued renewal is not overlapped. The client asks with dates and a reason; an Administrator approves or refuses it. Approval on the start day, or after the start has passed, is refused and changes nothing. Approving on the start day would keep that morning's class and still extend the plan. During it the client cannot book, join a Waitlist, be promoted from one, or reschedule into it, and Bookings and Waitlist entries inside it are cancelled with their class returned the same way a cancellation returns it; the end date moves by exactly the frozen days ([ADR-0010](./docs/adr/0010-freeze-quarterly-subscriptions.md)).
 _Avoid_: Pause, hold, suspension
 
 **Courtesy Access**:
@@ -109,7 +109,7 @@ How a Client found the studio, asked at registration and at the front desk: Inst
 _Avoid_: Source, lead source
 
 **Guest Pass**:
-A friend's single free class, given once in her life, when she registers with a Client's Referral Code (in the app or at the front desk) and verifies her email. It is for a Session with a free place that is not the last one, and each host may invite one friend a month. Cancelling that class in time lets her book another one under the same rules (owner, 2026-10-28). If the friend buys a Plan, the host gets one extra class on her current real Subscription, or on her next one if she has none, never on the host's own Guest Pass. A Guest Pass is not a current Plan.
+A friend's single free class, given once in her life, when she registers with a Client's Referral Code (in the app or at the front desk) and verifies her email, or activates the account the Assistant invited. It is for a Session with a free place that is not the last one, and each host may invite one friend a month. An unverified registration does not spend that month. Cancelling that class in time lets her book another one under the same rules (owner, 2026-10-28). If the friend buys a Plan, the host gets one extra class on her current real Subscription, or on her next one if she has none, never on the host's own Guest Pass. A Guest Pass is not a current Plan.
 _Avoid_: Referral reward, free trial, invite (without the Guest Pass qualifier)
 
 **Purchase Intent**:

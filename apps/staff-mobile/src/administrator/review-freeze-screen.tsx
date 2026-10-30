@@ -15,16 +15,27 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { formatCivilDate } from "../assistant/assistant-format";
 import { useStaffFetcher } from "../staff-fetcher";
 
 type ReviewNavigation = { goBack: () => void };
+
+const decisionNotice = (body: unknown): string => {
+  const code = (body as { code?: unknown } | null)?.code;
+  if (code === "freeze_start_in_past") {
+    return "El congelamiento ya empezó. Recházalo y pide uno desde mañana.";
+  }
+  if (code === "freeze_already_decided") return "Este congelamiento ya fue decidido.";
+  if (code === "freeze_access_denied") return "No puedes decidir un congelamiento.";
+  return "No pudimos guardar la decisión.";
+};
 
 export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: string } } }) {
   const navigation = useNavigation<ReviewNavigation>();
   const fetcher = useStaffFetcher();
   const review = useGetFreezeReview(route.params.freezeId, { fetcher });
   const [pending, setPending] = useState<"approved" | "refused" | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ text: string; tone: "success" | "error" } | null>(null);
 
   const decide = async (decision: "approved" | "refused") => {
     setPending(decision);
@@ -32,11 +43,11 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
       const response = await decideFreeze(route.params.freezeId, { decision }, undefined, fetcher);
       setNotice(
         response.status === 200
-          ? "Listo. La clienta ya fue avisada."
-          : "No pudimos guardar la decisión.",
+          ? { text: "Listo. La clienta ya fue avisada.", tone: "success" }
+          : { text: decisionNotice(response.data), tone: "error" },
       );
     } catch {
-      setNotice("No pudimos guardar la decisión.");
+      setNotice({ text: "No pudimos guardar la decisión.", tone: "error" });
     } finally {
       setPending(null);
     }
@@ -71,11 +82,14 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
       {header}
       <Text style={styles.name}>{freeze.clientName}</Text>
       <BodyText>{freeze.planName}</BodyText>
-      <BodyText>{`${freeze.startsOn} – ${freeze.endsOn}`}</BodyText>
+      <BodyText>{`${formatCivilDate(freeze.startsOn)} – ${formatCivilDate(freeze.endsOn)}`}</BodyText>
       <BodyText>{freeze.reason}</BodyText>
       {notice === null ? null : (
-        <Text accessibilityRole="alert" style={styles.notice}>
-          {notice}
+        <Text
+          accessibilityRole="alert"
+          style={notice.tone === "success" ? styles.notice : styles.failure}
+        >
+          {notice.text}
         </Text>
       )}
       {freeze.state === "requested" ? (
@@ -101,6 +115,7 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
 const styles = StyleSheet.create({
   actions: { gap: spacing.md },
   name: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
+  failure: { color: colors.errorText, fontSize: typography.note },
   notice: { color: colors.successText, fontSize: typography.note },
   screen: { gap: spacing.lg },
 });

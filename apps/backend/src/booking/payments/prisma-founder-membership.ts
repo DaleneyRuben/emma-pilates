@@ -3,15 +3,17 @@ import {
   AuditActorKind,
   AuditOutcome,
   FounderMembershipStatus,
-  PaymentMethod,
 } from '../../generated/prisma/client';
 import {
   decideFounderPlace,
   founderDiscount,
   isFounder,
   priceFounderPlans,
+  showFounderPrice,
   type FounderRules,
 } from './founder-membership';
+import { hasEarlierPlanPayment } from './founder-plan-history';
+import { reclaimMissingFounderPlace } from './founder-grant-audit';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -36,28 +38,27 @@ const readRules = async (transaction: Transaction): Promise<FounderRules> => {
   return version;
 };
 
-// Active only. A lost membership answers false, which is the seam BKM-008
-// calls when the two branches meet.
+const founderStatusOf = (status: FounderMembershipStatus): 'active' | 'lost' =>
+  status === FounderMembershipStatus.ACTIVE ? 'active' : 'lost';
+
+// Active only. A lost or reserved membership answers false, which is the
+// seam BKM-008 calls when the two branches meet.
 export const readIsFounder = async (
   transaction: Transaction,
   clientId: string,
 ): Promise<boolean> => {
   const membership = await transaction.founderMembership.findFirst({
     where: { clientId, deletedAt: null },
-    select: { status: true },
+    select: { status: true, clientId: true },
   });
+
   return isFounder(
-    membership === null
-      ? null
-      : {
-          status:
-            membership.status === FounderMembershipStatus.ACTIVE
-              ? 'active'
-              : 'lost',
-        },
+    membership === null ? null : { status: founderStatusOf(membership.status) },
   );
 };
 
+// A Client who would take a place on her first real Plan sees the founder
+// price before she buys. The sale still claims the place under the lock.
 export const priceFounderPlanList = async <
   T extends {
     classAllowance: number;
@@ -68,10 +69,37 @@ export const priceFounderPlanList = async <
   clientId: string | null,
   plans: T[],
 ): Promise<Array<T & { listPriceCentavos?: number }>> => {
-  if (clientId === null || !(await readIsFounder(transaction, clientId))) {
+  if (clientId === null) return plans;
+  if (await hasEarlierPlanPayment(transaction, { clientId })) {
     return plans;
   }
   const rules = await readRules(transaction);
+  const held = await transaction.founderMembership.findFirst({
+    where: { clientId, deletedAt: null },
+    select: { status: true },
+  });
+  const heldStatus =
+    held === null
+      ? 'none'
+      : held.status === FounderMembershipStatus.LOST
+        ? 'lost'
+        : 'active';
+  const placesTaken = await transaction.founderMembership.count({
+    where: {
+      deletedAt: null,
+      status: {
+        in: [FounderMembershipStatus.ACTIVE, FounderMembershipStatus.RESERVED],
+      },
+    },
+  });
+  if (
+    !showFounderPrice({
+      held: heldStatus,
+      placesRemaining: placesTaken < rules.founderPlaces,
+    })
+  ) {
+    return plans;
+  }
   return priceFounderPlans(plans, {
     founder: true,
     percent: rules.founderDiscountPercent,
@@ -95,10 +123,28 @@ export const priceFounderSale = async (
     classAllowance: number;
     priceCentavos: number;
     creditAppliedCentavos: number;
+    now: Date;
+    courtesy: boolean;
+    hidden: boolean;
+    skipClaim?: boolean;
+    activate: boolean;
+    purchaseIntentId?: string;
+    paymentId?: string;
   },
 ): Promise<FounderSale> => {
-  const founder = await readIsFounder(transaction, input.clientId);
-  if (!founder) {
+  const founder = await claimFounderPlace(transaction, {
+    clientId: input.clientId,
+    now: input.now,
+    courtesy: input.courtesy,
+    hidden: input.hidden,
+    skipClaim: input.skipClaim === true,
+    priceCentavos: input.priceCentavos,
+    classAllowance: input.classAllowance,
+    purchaseIntentId: input.purchaseIntentId,
+    paymentId: input.paymentId,
+    activate: input.activate,
+  });
+  if (!founder.founder) {
     return {
       discountCentavos: 0,
       discountReason: null,
@@ -149,82 +195,179 @@ const auditGranted = (
     },
   });
 
-// The first real confirmed Payment of a Client who does not already hold
-// one. Courtesy Access never takes a place. The advisory lock serializes
-// the numbering; the unique number is the backstop.
+// Courtesy Access calls this and never takes a place. A real sale claims
+// through priceFounderSale instead.
 export const grantFounderPlace = async (
   transaction: Transaction,
   input: { clientId: string; paymentId: string; now: Date; courtesy: boolean },
 ): Promise<{ granted: boolean; number: number | null }> => {
   if (input.courtesy) return { granted: false, number: null };
-  await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${founderLockKey}, 0))`;
+  const claimed = await claimFounderPlace(transaction, {
+    clientId: input.clientId,
+    now: input.now,
+    courtesy: false,
+    hidden: false,
+    priceCentavos: 1,
+    classAllowance: 2,
+    paymentId: input.paymentId,
+    activate: true,
+  });
+  return { granted: claimed.founder, number: claimed.number };
+};
+
+const lockFounderPlaces = (transaction: Transaction) =>
+  transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${founderLockKey}, 0))`;
+
+const qualifiesForAPlace = (input: {
+  courtesy: boolean;
+  hidden: boolean;
+  priceCentavos: number;
+  classAllowance: number;
+}): boolean =>
+  !input.courtesy &&
+  !input.hidden &&
+  input.priceCentavos > 0 &&
+  input.classAllowance > singleClassAllowance();
+
+const singleClassAllowance = (): number => 1;
+
+type PlaceClaim = {
+  clientId: string;
+  now: Date;
+  courtesy: boolean;
+  hidden: boolean;
+  skipClaim?: boolean;
+  priceCentavos: number;
+  classAllowance: number;
+  purchaseIntentId?: string;
+  paymentId?: string;
+  activate: boolean;
+};
+
+// The advisory lock is taken before any read of founder places. A cash sale
+// activates in the same transaction; a transfer reserves until confirmation.
+export const claimFounderPlace = async (
+  transaction: Transaction,
+  input: PlaceClaim,
+): Promise<{ founder: boolean; number: number | null }> => {
+  if (!qualifiesForAPlace(input) || input.skipClaim === true) {
+    return { founder: false, number: null };
+  }
+  await lockFounderPlaces(transaction);
 
   const held = await transaction.founderMembership.findFirst({
     where: { clientId: input.clientId, deletedAt: null },
-    select: { id: true },
+    select: { id: true, status: true, number: true },
   });
+  if (held?.status === FounderMembershipStatus.ACTIVE) {
+    return { founder: true, number: held.number };
+  }
+  if (held?.status === FounderMembershipStatus.LOST) {
+    return { founder: false, number: null };
+  }
+  if (
+    await hasEarlierPlanPayment(transaction, {
+      clientId: input.clientId,
+      paymentId: input.paymentId,
+    })
+  ) {
+    return { founder: false, number: null };
+  }
+  if (held?.status === FounderMembershipStatus.RESERVED) {
+    if (input.activate) {
+      await transaction.founderMembership.update({
+        where: { id: held.id },
+        data: {
+          status: FounderMembershipStatus.ACTIVE,
+          paymentId: input.paymentId ?? null,
+          purchaseIntentId: null,
+        },
+      });
+    }
+    return { founder: true, number: held.number };
+  }
+
   const rules = await readRules(transaction);
-  const assigned = await transaction.founderMembership.count({
-    where: { deletedAt: null },
-  });
+  const [assigned, highest] = await Promise.all([
+    transaction.founderMembership.count({
+      where: {
+        deletedAt: null,
+        status: {
+          in: [
+            FounderMembershipStatus.ACTIVE,
+            FounderMembershipStatus.RESERVED,
+          ],
+        },
+      },
+    }),
+    transaction.founderMembership.aggregate({ _max: { number: true } }),
+  ]);
   const decision = decideFounderPlace({
     places: rules.founderPlaces,
     assigned,
-    alreadyHeld: held !== null,
+    nextNumber: (highest._max.number ?? 0) + 1,
+    alreadyHeld: false,
     courtesy: false,
   });
-  if (!decision.assign) return { granted: false, number: null };
+  if (!decision.assign) return { founder: false, number: null };
 
   const created = await transaction.founderMembership.create({
     data: {
       clientId: input.clientId,
       number: decision.number,
       since: input.now,
-      status: FounderMembershipStatus.ACTIVE,
+      status: input.activate
+        ? FounderMembershipStatus.ACTIVE
+        : FounderMembershipStatus.RESERVED,
+      purchaseIntentId: input.activate
+        ? null
+        : (input.purchaseIntentId ?? null),
+      paymentId: input.activate ? null : (input.paymentId ?? null),
     },
     select: { id: true, number: true },
   });
+  if (input.activate && input.paymentId !== undefined) {
+    await auditGranted(transaction, {
+      membershipId: created.id,
+      clientId: input.clientId,
+      number: created.number,
+      paymentId: input.paymentId,
+      now: input.now,
+    });
+  }
+  return { founder: true, number: created.number };
+};
+
+// Confirmation of a transfer locks again, then flips the reservation. A cash
+// sale already activated it while pricing.
+export const confirmFounderPlace = async (
+  transaction: Transaction,
+  input: { clientId: string; paymentId: string; now: Date },
+): Promise<void> => {
+  await lockFounderPlaces(transaction);
+  const held = await transaction.founderMembership.findFirst({
+    where: { clientId: input.clientId, deletedAt: null },
+    select: { id: true, status: true, number: true },
+  });
+  if (held === null) {
+    await reclaimMissingFounderPlace(transaction, input);
+    return;
+  }
+  if (held.status !== FounderMembershipStatus.RESERVED) return;
+  await transaction.founderMembership.update({
+    where: { id: held.id },
+    data: {
+      status: FounderMembershipStatus.ACTIVE,
+      since: input.now,
+      paymentId: input.paymentId,
+      purchaseIntentId: null,
+    },
+  });
   await auditGranted(transaction, {
-    membershipId: created.id,
+    membershipId: held.id,
     clientId: input.clientId,
-    number: created.number,
+    number: held.number,
     paymentId: input.paymentId,
     now: input.now,
   });
-  return { granted: true, number: created.number };
-};
-
-export const founderSaleOf = (input: {
-  method: PaymentMethod;
-  classAllowance: number;
-  priceCentavos: number;
-  creditAppliedCentavos: number;
-  discount: FounderSale;
-}): {
-  creditAppliedCentavos: number;
-  discountCentavos: number;
-  discountReason: string | null;
-  amountDueCentavos: number;
-  method: PaymentMethod;
-} => {
-  const creditAppliedCentavos = Math.min(
-    input.creditAppliedCentavos,
-    input.priceCentavos - input.discount.discountCentavos,
-  );
-  const amountDueCentavos =
-    input.priceCentavos -
-    input.discount.discountCentavos -
-    creditAppliedCentavos;
-  return {
-    creditAppliedCentavos,
-    discountCentavos: input.discount.discountCentavos,
-    discountReason: input.discount.discountReason,
-    amountDueCentavos,
-    method:
-      input.method === PaymentMethod.COURTESY
-        ? input.method
-        : amountDueCentavos === 0
-          ? PaymentMethod.CREDIT_ONLY
-          : input.method,
-  };
 };

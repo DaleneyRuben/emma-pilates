@@ -113,7 +113,8 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     expect(pending.find((entry) => entry.id === older.id)).toMatchObject({
       clientName: 'Primera Pendiente',
       planName: 'Paquete de 8 clases',
-      amountDueCentavos: 56_000,
+      // Her first real Plan reserves a founder place, so the review shows 15 %.
+      amountDueCentavos: 47_600,
       submittedAt: now,
       receiptAvailable: true,
     });
@@ -256,7 +257,8 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
       method: 'cash',
       state: 'confirmed',
       creditAppliedCentavos: 0,
-      amountDueCentavos: 56_000,
+      // Her first real Plan reserves a founder place, so cash confirms at 15 %.
+      amountDueCentavos: 47_600,
       decidedAt: now,
     });
     expect(payment.subscriptionId).toEqual(expect.any(String));

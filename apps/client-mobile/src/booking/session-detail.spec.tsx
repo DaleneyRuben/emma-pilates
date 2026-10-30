@@ -164,6 +164,32 @@ describe("Client Session detail", () => {
     expect(screen.getByText("Te quedan 4 clases en tu plan")).toBeOnTheScreen();
   });
 
+  it("does not count plan classes after a guest pass booking", async () => {
+    let spent = false;
+    const guest = () => ({
+      status: "active" as const,
+      subscription: {
+        id: "subscription-guest",
+        planName: "Pase de invitada",
+        originalClassAllowance: 1,
+        remainingClassAllowance: spent ? 0 : 1,
+        startsOn: "2026-09-11",
+        endsOn: "2026-10-11",
+      },
+    });
+    const { screen } = await openDetail({
+      "/api/v1/clients/current/subscription": () => jsonResponse(guest()),
+      "POST /api/v1/sessions/session-1/bookings": () => {
+        spent = true;
+        return jsonResponse({ id: "booking-guest" }, 201);
+      },
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await waitFor(() => expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen());
+    expect(screen.queryByText(/Te quedan \d+ clases en tu plan/)).toBeNull();
+    expect(screen.getByText("Tu pase de invitada ya se usó.")).toBeOnTheScreen();
+  });
+
   // MOB-070: joining inside the Cancellation Window is refused, so the
   // detail must not offer it. The window length comes from the studio rules.
   it("does not offer the Waitlist inside the Cancellation Window", async () => {
@@ -248,6 +274,27 @@ describe("Client Session detail", () => {
     });
   });
 
+  it("lets a guest pass book from the courtesy class", async () => {
+    const { screen } = await openDetail({
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse({
+          status: "active",
+          subscription: {
+            id: "pass-1",
+            planName: "Pase de invitada",
+            originalClassAllowance: 1,
+            remainingClassAllowance: 0,
+            startsOn: "2026-10-29",
+            endsOn: "2026-11-27",
+            extraClassesLine: "Clases extra: 1 · Cortesía",
+          },
+        }),
+    });
+
+    expect(screen.getByRole("button", { name: "Reservar" })).toBeEnabled();
+    expect(screen.queryByText("No te quedan clases en tu plan.")).toBeNull();
+  });
+
   it("disables booking without remaining classes and links to the Plans", async () => {
     const { screen } = await openDetail({}, 0, 3);
 
@@ -279,6 +326,22 @@ describe("Client Session detail", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Ya tienes una reserva a esa hora.")).toBeOnTheScreen();
+    });
+  });
+
+  it.each([
+    ["guest_pass_last_place", "Un pase de invitada no puede tomar el último lugar."],
+    ["guest_pass_already_used", "Tu pase de invitada ya se usó."],
+  ])("names a refused guest pass booking by %s", async (code, message) => {
+    const { screen } = await openDetail({
+      "POST /api/v1/sessions/session-1/bookings": () =>
+        jsonResponse({ code, status: 409, title: "Conflict" }, 409),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+
+    await waitFor(() => {
+      expect(screen.getByText(message)).toBeOnTheScreen();
     });
   });
 

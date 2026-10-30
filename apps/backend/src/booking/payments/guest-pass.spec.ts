@@ -2,6 +2,7 @@ import {
   decideGuestPassBooking,
   decideInvitation,
   decideInviteReward,
+  isMonthlyInviteSpent,
 } from './guest-pass';
 
 // BKM-014, decisions §5.3: a Guest Pass is one free class in a lifetime, and
@@ -43,7 +44,7 @@ describe('decideInvitation', () => {
       }),
     ).toEqual({
       code: 'guest_pass_monthly_limit',
-      detail: 'A host invites one friend a month',
+      detail: 'A host invites one friend each calendar month',
     });
   });
 
@@ -57,6 +58,15 @@ describe('decideInvitation', () => {
     ).toBeNull();
   });
 
+  it('treats a changed monthly-limit sentence as the same refusal', () => {
+    expect(
+      isMonthlyInviteSpent({
+        code: 'guest_pass_monthly_limit',
+        message: 'The studio changed how it explains the monthly invite',
+      }),
+    ).toBe(true);
+  });
+
   it('counts an invitation at 20:30 La Paz on the last day as this month', () => {
     expect(
       decideInvitation({
@@ -66,7 +76,7 @@ describe('decideInvitation', () => {
       }),
     ).toEqual({
       code: 'guest_pass_monthly_limit',
-      detail: 'A host invites one friend a month',
+      detail: 'A host invites one friend each calendar month',
     });
   });
 });
@@ -99,5 +109,15 @@ describe('decideInviteReward', () => {
         currentSubscriptionId: 'current',
       }),
     ).toBeNull();
+  });
+
+  it("owes the class when the host's only Subscription is her own Guest Pass", () => {
+    expect(
+      decideInviteReward({
+        alreadyRewarded: false,
+        currentSubscriptionId: 'host-guest-pass',
+        currentSubscriptionIsGuestPass: true,
+      }),
+    ).toEqual({ subscriptionId: null, owed: true });
   });
 });

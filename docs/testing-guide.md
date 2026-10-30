@@ -33,7 +33,7 @@ numbered tests.
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
-| Founder membership           | The first 40 Clients whose first real Payment is confirmed get 15 % off later Plans except the single class, a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; the first Payment itself is at list price |
+| Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
@@ -2956,9 +2956,10 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    (`?status=all`; the page reads
    `GET /api/v1/administrator/payments?status=…&q=…&page=…&pageSize=…`,
    while the Staff app's list is `…/payments/pending`, Test 7). Each row
-   shows the Client, the Plan, the amount she
+   shows the Client, **Tipo** (**Plan** or **Evaluación**), the Plan, the amount she
    transferred as `Bs 560,00` on the right (never a Credit line, even on a
-   Payment from before PAY-005), the date and time sent in Bolivia time
+   Payment from before PAY-005), the decision date in Bolivia time once the
+   sale is decided and the submission date while it is pending
    (`23/09/2026 · 22:51`), and **Pendiente**, **Confirmado**, or **Rechazado**.
    A **Método** column says **Transferencia** or **Efectivo**; Credit-only
    Payments never appear. **Buscar por cliente** finds a name without accents
@@ -2968,7 +2969,9 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
 4. **Revisar pago.** Click a pending Client: the side panel (the whole screen
    on a phone) shows the Client and Plan, **Monto a verificar**, the date,
    **Transferencia**,
-   and the receipt image read straight from the API (never cached). **Ver en
+   and the receipt image read straight from the API (never cached). A paid
+   Evaluation uses the same panel: its receipt lives on the Payment, and
+   confirming or rejecting it does not activate a Plan. **Ver en
    grande** (or a click on the image) opens it above everything; Esc, the ✕,
    or a click outside returns to the panel as it was.
 5. **Confirmar pago** asks first ("¿Confirmar el pago de Mariana Peña?"); after
@@ -7052,32 +7055,33 @@ existing ineligible-subscription refusal.
 
 ## Test 88: founder membership (BKM-010)
 
-The first 40 Clients whose first real Payment is confirmed hold a Founder
-Membership: 15 % off every Plan except the single class, lost for good after
-a gap of more than 7 days
+The first 40 Clients whose first real Plan is priced hold a Founder
+Membership: 15 % from that first Plan, except the single class, lost for good
+after more than 7 uncovered days
 ([booking ADR-0008](../booking/docs/adr/0008-founder-membership.md)).
 Run the API and the fixtures as in Tests 2 and 5. The Client app and the
 Staff app were not walked on a device for this item; the prices and the
 banner are covered by their unit tests. The admin list is the browser check.
 
-A. **The place.** Confirm a real Payment (cash or an approved transfer) for
-   a Client who has never paid. She receives the next number, from 1 to 40.
-   The 41st distinct Client receives none. A Courtesy Access (Bs 0) takes
-   no place. A second real Payment for a founder does not take a second
-   number.
+A. **The place.** Price a real Plan (cash, an in-app transfer, or a
+   front-desk QR) for a Client who has never paid, while a place remains.
+   She receives the next number. The 41st distinct Client receives none. A
+   Courtesy Access (Bs 0), a hidden Plan, and a Bs 0 Plan take no place. A
+   rejected or expired transfer releases the reservation. A second real
+   Payment for a founder does not take a second number.
 B. **The price (08, 09, S09).** As a founder, **Elige tu plan** shows the
    discounted price, with the list price struck through under it. The
    single class (1 class, Bs 80) shows only its list price. A Client who is
    not a founder sees only the list price. The Assistant's quote shows the
    same pair, and the cash to collect is the discounted price minus any
-   credit. The first real Payment itself is at list price; the discount
-   starts on the next purchase.
+   credit. The first real Plan is already discounted. A front-desk QR for a
+   founder is pending at the discounted amount.
 C. **The banner (12).** As a founder with a current Subscription, **Mi
-   plan** shows «Renueva antes del {fecha}.» The date is the current
-   Subscription's real end plus 7 days. No banner when she has no current
+   plan** shows «Renueva antes del {fecha}.» The date is the day after 7
+   uncovered days: the real end plus 8 days. No banner when she has no current
    Subscription, or when the membership is lost.
-D. **The gap.** A nightly job ends a membership when more than 7 days pass
-   after the stored end with no next Start Date. A gap of 7 days keeps it.
+D. **The gap.** A nightly job ends a membership when more than 7 days are
+   uncovered after the stored end. A gap of exactly 7 uncovered days keeps it.
    A lost membership does not return on a later Payment. Running the job
    twice ends nothing the second time. The Client receives a push and an
    inbox notification titled «Membresía fundadora».
@@ -7100,18 +7104,33 @@ device for this item. The admin approval is the browser check.
 
 A. **The request (12).** As a Client with **Trimestral 36 clases**, open
    **Mi plan**. The form asks for a start, an end, and a reason. A 10-day
-   request is accepted and the screen says it is in review. A 30-day or
-   60-day Plan, a second request, more than 15 days, or a start in the past
+   request inside the current term is accepted and the screen says it is in
+   review. A 30-day or 60-day Plan, a second request, or more than 15 days
    answers `409` `freeze_not_allowed` and «Este plan no se puede congelar.»
+   A start already in the past, a window outside the current term, and an
+   extension that would reach a queued renewal answer the same code and the
+   same sentence. A date that is not a calendar day, such as `2026-02-31`,
+   answers `400` `invalid_civil_date` and the same sentence.
 B. **The decision.** Paola opens **Back Office → Congelamientos**. The card
    names the Client, the Plan, the dates, and the reason, with **Aprobar**
-   and **Rechazar**. Approving moves the Subscription end by exactly the
-   frozen days and cancels Bookings already inside the window; the class
-   returns the same way a cancellation does. The Payment amount does not
-   change. The Client receives a push and an inbox notification.
+   and **Rechazar**. Approving on or before the start moves the Subscription
+   end by exactly the frozen days, cancels Bookings whose Session falls
+   inside the window in La Paz, and closes Waitlist entries for those
+   Sessions. The class returns the same way a cancellation does. The Payment
+   amount does not change. The Client receives a push and an inbox
+   notification. Approving on the start day keeps a class whose Session
+   already started and cancels the ones that have not. Approving after the
+   start has passed answers `409` `freeze_start_in_past` and changes nothing:
+   «El congelamiento ya empezó. Recházalo y pide uno desde mañana.» A refused
+   Freeze does not spend the one Freeze, so she can ask again with dates from
+   tomorrow, and that request can be approved. A second request while one is requested or approved still
+   answers `409` `freeze_not_allowed`. A second approval answers `409`
+   `freeze_already_decided` and does not move the end again.
 C. **The booking.** A Session inside an approved Freeze answers `409`
    `booking_during_freeze` and «Tu plan está congelado hasta el {fecha}.»
-   A Session outside it books as before.
+   Joining its Waitlist, being promoted from it, and rescheduling into it
+   answer the same code. A Reschedule before the Start Date answers `409`
+   `booking_before_start_date`. A Session outside the Freeze books as before.
 D. **The founder.** A founder whose Subscription was frozen is not ended by
    the nightly job: the stored end already includes the frozen days.
 E. **Who decides.** An Assistant, a Trainer, a Nutritionist, and a Client
@@ -7527,21 +7546,29 @@ Credit is retired (PAY-005); this screen never shows it. Use the fixtures (Test 
 ### B. The rules, through the API
 
 Register a friend with the host's code (Test 79 B, or the Assistant's S05).
-The answer is `202`, and `booking.guest_passes` gains one row. A second
-friend of the same host in the same calendar month answers `409`
-`guest_pass_monthly_limit`; the same invitation in the next month answers
-`202`. A second registration of the same friend is already refused by the
-one-Referral rule.
+The answer is `202`, and `booking.guest_passes` stays empty until she
+verifies the email (or, for the Assistant's invitation, until she activates
+the account). Then the pass opens. An unverified registration does not spend
+the host's month. A second friend of the same host in the same calendar
+month still answers `202`: she is registered, and no pass opens. The same
+invitation in the next month opens a pass. A second registration of the same
+friend is already refused by the one-Referral rule. The monthly limit never
+answers `409` on registration.
 
 The friend books a Session with exactly one place left: `409`
 `guest_pass_last_place`. A Client with a Plan takes that place as usual.
 Her second booking answers `409` `guest_pass_already_used`.
 
-When her first real Payment is approved, the host's current Subscription
-gains one `invite_converted` adjustment, and a second approval adds nothing.
-A host with no current Subscription gets it on the next one she buys. The
-friend's own first real Payment still gets the gift class: the free class
-never counted as a first Plan.
+If she cancels that free class in time, the pass is restored. She can book
+another Session, and the last-place rule applies again. A cancellation
+inside the window is still refused, and the class stays spent.
+
+When her first real Payment is approved, the host's current real
+Subscription gains one `invite_converted` adjustment, and a second approval
+adds nothing. A host whose only Subscription is her own guest pass, or who
+has none, gets it on the next real Plan she buys. The friend's own first
+real Payment still gets the gift class: the free class never counted as a
+first Plan.
 
 ## Test 90: campaign extra classes (BKM-015)
 
@@ -7650,3 +7677,37 @@ B. **Photographing a receipt still needs a new build.** As Camila, open a
    Client and start a front-desk transfer. Photographing the receipt loads
    the native modules only then, so on the old binary that one action fails.
    A binary built from this branch includes the modules and that action works.
+
+## Test 117: a paid Evaluation's payment (FIX-003)
+
+A paid Evaluation is its own transfer. It holds no Purchase Intent and it
+does not activate a Plan (booking ADR-0011). Run the API and the fixtures as
+in Tests 2 and 5. The Client needs an effective Plan: classes left, or a
+future class already booked, and an end date that still covers the slot.
+
+A. **The receipt.** On Confirmar evaluación for a paid slot, **Confirmar**
+   stays disabled until **Sube tu comprobante de transferencia** attaches
+   the same receipt a Plan transfer uses. An included Evaluation shows no
+   receipt control. `POST /api/v1/evaluations/{id}/receipt` stores it on the
+   Payment.
+B. **Review.** As Paola, Pagos shows **Tipo** **Evaluación**, the receipt,
+   and the submission date while the transfer is pending. Confirming writes
+   the audit `payment.transfer_confirmed` and tells the Client «Tu pago fue
+   confirmado. Tu evaluación quedó reservada.» It does not create a
+   Subscription. Rejecting cancels the Evaluation with cause
+   `payment_rejected` and writes `payment.transfer_rejected`. The CSV gains
+   **Tipo** and dates a decided sale by the decision date.
+C. **Cancel and confirm.** Cancelling the pending Evaluation rejects its
+   Payment with «La evaluación fue cancelada». Confirming after that answers
+   `409` `payment_confirmation_conflict` and leaves the Payment rejected, with
+   no Nutritionist cost. A cancelled Evaluation does not add the Bs 50. A
+   no-show, or a booked Evaluation whose slot has already started, keeps the
+   Payment pending so it can still be confirmed. Mis evaluaciones offers
+   **Sube tu comprobante** only while that Payment is still pending. Revisar
+   pago says **Todavía no hay comprobante.** when none was attached, and
+   **El comprobante ya no está disponible.** once it was dropped.
+D. **The Plan stays buyable.** `GET /api/v1/payments/current` does not return
+   the pending Evaluation Payment. Starting a Plan purchase while that
+   Payment is pending succeeds. A Client whose Plan has no classes left and
+   no future booking cannot book the paid Evaluation
+   (`no_eligible_subscription`).

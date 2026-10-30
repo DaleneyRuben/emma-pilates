@@ -130,7 +130,8 @@ describe('Prisma payment lifecycle', () => {
       planName: 'Paquete de 8 clases',
       planPriceCentavos: 56_000,
       creditAppliedCentavos: 0,
-      amountDueCentavos: 56_000,
+      discountCentavos: 8_400,
+      amountDueCentavos: 47_600,
       submittedAt: now,
       decidedAt: null,
       rejectionReason: null,
@@ -186,7 +187,8 @@ describe('Prisma payment lifecycle', () => {
     );
     expect(intent).toMatchObject({
       creditReservedCentavos: 0,
-      amountDueCentavos: 56_000,
+      discountCentavos: 8_400,
+      amountDueCentavos: 47_600,
     });
     const receipt = await readyReceipt(buyer.accountId);
     await commands().attachReceipt(
@@ -201,7 +203,8 @@ describe('Prisma payment lifecycle', () => {
     );
     expect(pending).toMatchObject({
       creditAppliedCentavos: 0,
-      amountDueCentavos: 56_000,
+      discountCentavos: 8_400,
+      amountDueCentavos: 47_600,
     });
 
     await expect(
@@ -373,7 +376,8 @@ describe('Prisma payment lifecycle', () => {
     ).resolves.toMatchObject({
       state: 'open',
       creditReservedCentavos: 0,
-      amountDueCentavos: 56_000,
+      discountCentavos: 8_400,
+      amountDueCentavos: 47_600,
     });
   });
 });

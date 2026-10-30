@@ -24,6 +24,10 @@ type PromoteWaitlistDependencies = {
     clientId: string;
     onDate: Date;
   }): Promise<WeeklyCapSubscription | null>;
+  findApprovedFreeze?(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ endsOn: Date } | null>;
   hasOverlappingBooking(input: {
     clientId: string;
     startsAt: Date;
@@ -82,6 +86,16 @@ export const promoteWaitlist = async (
       continue;
     }
 
+    const freeze = dependencies.findApprovedFreeze
+      ? await dependencies.findApprovedFreeze({
+          clientId: entry.clientId,
+          onDate: session.startsAt,
+        })
+      : null;
+    if (freeze !== null) {
+      continue;
+    }
+
     if (
       await dependencies.hasOverlappingBooking({
         clientId: entry.clientId,
@@ -92,12 +106,26 @@ export const promoteWaitlist = async (
       continue;
     }
 
-    const booking = await dependencies.createBooking({
-      sessionId: session.id,
-      clientId: entry.clientId,
-      subscriptionId: subscription.id,
-      createdByAccountId: entry.joinedByAccountId,
-    });
+    // Funding can still fail after the eligibility read, for instance when
+    // the extra class was spent between the two. Skip that entry so the
+    // next Client, and every other operation on the Session, proceeds.
+    let booking: { id: string };
+    try {
+      booking = await dependencies.createBooking({
+        sessionId: session.id,
+        clientId: entry.clientId,
+        subscriptionId: subscription.id,
+        createdByAccountId: entry.joinedByAccountId,
+      });
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === 'No eligible Subscription'
+      ) {
+        continue;
+      }
+      throw error;
+    }
     await dependencies.closeAsPromoted({
       entryId: entry.id,
       bookingId: booking.id,

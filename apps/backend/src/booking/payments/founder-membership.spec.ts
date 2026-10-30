@@ -5,6 +5,7 @@ import {
   founderRenewalDeadline,
   isFounder,
   priceFounderPlans,
+  showFounderPrice,
 } from './founder-membership';
 
 const day = 24 * 60 * 60 * 1_000;
@@ -32,6 +33,21 @@ describe('founder discount', () => {
         percent: 15,
       }),
     ).toEqual({ discountCentavos: 1_500, amountDueCentavos: 8_501 });
+  });
+
+  it('shows the founder price on a first Plan while a place remains', () => {
+    expect(showFounderPrice({ held: 'none', placesRemaining: true })).toBe(
+      true,
+    );
+    expect(showFounderPrice({ held: 'active', placesRemaining: false })).toBe(
+      true,
+    );
+    expect(showFounderPrice({ held: 'none', placesRemaining: false })).toBe(
+      false,
+    );
+    expect(showFounderPrice({ held: 'lost', placesRemaining: true })).toBe(
+      false,
+    );
   });
 
   it('shows a founder the discounted price and keeps the list price beside it', () => {
@@ -70,6 +86,7 @@ describe('founder places', () => {
       decideFounderPlace({
         places: 40,
         assigned: 39,
+        nextNumber: 40,
         alreadyHeld: false,
         courtesy: false,
       }),
@@ -78,6 +95,7 @@ describe('founder places', () => {
       decideFounderPlace({
         places: 40,
         assigned: 40,
+        nextNumber: 41,
         alreadyHeld: false,
         courtesy: false,
       }),
@@ -89,6 +107,7 @@ describe('founder places', () => {
       decideFounderPlace({
         places: 40,
         assigned: 3,
+        nextNumber: 4,
         alreadyHeld: false,
         courtesy: true,
       }),
@@ -97,18 +116,40 @@ describe('founder places', () => {
       decideFounderPlace({
         places: 40,
         assigned: 3,
+        nextNumber: 4,
         alreadyHeld: true,
         courtesy: false,
       }),
     ).toEqual({ assign: false });
+  });
+
+  it('numbers from the provided next number, not from the live count', () => {
+    expect(
+      decideFounderPlace({
+        places: 40,
+        assigned: 1,
+        nextNumber: 5,
+        alreadyHeld: false,
+        courtesy: false,
+      }),
+    ).toEqual({ assign: true, number: 5 });
   });
 });
 
 describe('founder gap', () => {
   const membership = { status: 'active' as const, lostAt: null };
 
-  it('ends it after more than 7 days and keeps it at 7', () => {
+  it('ends it after more than 7 uncovered days and keeps exactly 7', () => {
     const today = civil('2026-10-23');
+    expect(
+      decideFounderGap({
+        today,
+        rules,
+        membership,
+        latestRealEnd: new Date(today.getTime() - 9 * day),
+        nextStart: null,
+      }),
+    ).toEqual({ lose: true, reason: 'gap' });
     expect(
       decideFounderGap({
         today,
@@ -117,7 +158,7 @@ describe('founder gap', () => {
         latestRealEnd: new Date(today.getTime() - 8 * day),
         nextStart: null,
       }),
-    ).toEqual({ lose: true, reason: 'gap' });
+    ).toEqual({ lose: false });
     expect(
       decideFounderGap({
         today,
@@ -129,14 +170,14 @@ describe('founder gap', () => {
     ).toEqual({ lose: false });
   });
 
-  it('counts from the real end to the next Start Date, and a lost membership stays lost', () => {
+  it('counts uncovered days as next start minus end minus one, and a lost membership stays lost', () => {
     expect(
       decideFounderGap({
         today: civil('2026-11-01'),
         rules,
         membership,
         latestRealEnd: civil('2026-10-20'),
-        nextStart: civil('2026-10-27'),
+        nextStart: civil('2026-10-28'),
       }),
     ).toEqual({ lose: false });
     expect(
@@ -145,7 +186,7 @@ describe('founder gap', () => {
         rules,
         membership,
         latestRealEnd: civil('2026-10-20'),
-        nextStart: civil('2026-10-28'),
+        nextStart: civil('2026-10-29'),
       }),
     ).toEqual({ lose: true, reason: 'gap' });
     expect(
@@ -166,7 +207,7 @@ describe('founder gap', () => {
 describe('founder renewal deadline', () => {
   it('is the real end plus the allowed gap', () => {
     expect(founderRenewalDeadline(civil('2026-10-23'), rules)).toEqual(
-      civil('2026-10-30'),
+      civil('2026-10-31'),
     );
   });
 });

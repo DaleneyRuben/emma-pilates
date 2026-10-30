@@ -7,6 +7,7 @@ import {
   CreditLedgerEntryKind,
   ImageAssetPurpose,
   ImageAssetState,
+  PaymentKind,
   PaymentMethod,
   PaymentState,
   PurchaseIntentState,
@@ -19,6 +20,7 @@ import { recordNotification as defaultNotificationRecorder } from '../../notific
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { PaymentRuleError } from './payment-errors';
+import { createPendingPayment } from './pending-payment';
 import { summarizeCredit } from './credit-summary';
 import {
   allocateStartDate,
@@ -32,6 +34,8 @@ import {
   evaluatePurchaseEligibility,
   isSubscriptionEffective,
 } from './purchase-eligibility';
+import { priceTransferForGap } from './founder-gap';
+import { repointFounderReservation } from './founder-reservation';
 
 const hour = 60 * 60 * 1_000;
 const intentLifetime = 24 * hour;
@@ -132,6 +136,7 @@ export const createFrontDeskTransfer = (
               where: {
                 clientId: command.clientId,
                 state: PaymentState.PENDING,
+                kind: PaymentKind.PLAN,
               },
               select: { id: true },
             }),
@@ -182,10 +187,21 @@ export const createFrontDeskTransfer = (
               amountCentavos: entry.amountCentavos,
             })),
           );
+          const priced = await priceTransferForGap(transaction, {
+            clientId: command.clientId,
+            nextStart: allocated.startsOn,
+            today,
+            classAllowance: plan!.classAllowance,
+            priceCentavos: plan!.priceCentavos,
+            now,
+            hidden: plan!.hiddenAt !== null,
+          });
           const reserved = Math.min(
             credit.availableCentavos,
-            plan!.priceCentavos,
+            plan!.priceCentavos - priced.discountCentavos,
           );
+          const amountDueCentavos =
+            plan!.priceCentavos - priced.discountCentavos - reserved;
           const intent = await transaction.purchaseIntent.create({
             data: {
               clientId: command.clientId,
@@ -196,7 +212,9 @@ export const createFrontDeskTransfer = (
               classAllowanceSnapshot: plan!.classAllowance,
               planPriceCentavos: plan!.priceCentavos,
               creditReservedCentavos: reserved,
-              amountDueCentavos: plan!.priceCentavos - reserved,
+              discountCentavos: priced.discountCentavos,
+              discountReason: priced.discountReason,
+              amountDueCentavos,
               startsOn: allocated.startsOn,
               receiptImageAssetId: command.imageAssetId,
               state: PurchaseIntentState.SUBMITTED,
@@ -207,6 +225,12 @@ export const createFrontDeskTransfer = (
             },
             select: { id: true },
           });
+          if (priced.discountReason === 'founder') {
+            await repointFounderReservation(transaction, {
+              clientId: command.clientId,
+              purchaseIntentId: intent.id,
+            });
+          }
           if (reserved > 0) {
             const reservation = await transaction.creditReservation.create({
               data: {
@@ -238,27 +262,33 @@ export const createFrontDeskTransfer = (
               deletionDueAt: null,
             },
           });
-          const payment = await transaction.payment.create({
-            data: {
-              clientId: command.clientId,
-              planId: plan!.id,
-              purchaseIntentId: intent.id,
-              planNameSnapshot: plan!.name,
-              durationDaysSnapshot: plan!.durationDays,
-              weeklyClassCapSnapshot: plan!.weeklyClassCap,
-              classAllowanceSnapshot: plan!.classAllowance,
-              planPriceCentavos: plan!.priceCentavos,
-              creditAppliedCentavos: reserved,
-              amountDueCentavos: plan!.priceCentavos - reserved,
-              startsOn: allocated.startsOn,
-              method: PaymentMethod.TRANSFER,
-              state: PaymentState.PENDING,
-              submittedByAccountId: principal.accountId,
-              submittedAt: now,
-              createdAt: now,
-            },
-            select: { id: true },
+          const payment = await createPendingPayment(transaction, {
+            clientId: command.clientId,
+            planId: plan!.id,
+            purchaseIntentId: intent.id,
+            planNameSnapshot: plan!.name,
+            durationDaysSnapshot: plan!.durationDays,
+            weeklyClassCapSnapshot: plan!.weeklyClassCap,
+            classAllowanceSnapshot: plan!.classAllowance,
+            planPriceCentavos: plan!.priceCentavos,
+            creditAppliedCentavos: reserved,
+            discountCentavos: priced.discountCentavos,
+            discountReason: priced.discountReason,
+            amountDueCentavos,
+            startsOn: allocated.startsOn,
+            method: PaymentMethod.TRANSFER,
+            state: PaymentState.PENDING,
+            submittedByAccountId: principal.accountId,
+            submittedAt: now,
+            createdAt: now,
           });
+          if (priced.discountReason === 'founder') {
+            await repointFounderReservation(transaction, {
+              clientId: command.clientId,
+              purchaseIntentId: intent.id,
+              paymentId: payment.id,
+            });
+          }
           const administrators = await transaction.account.findMany({
             where: {
               activatedAt: { not: null },
@@ -297,7 +327,7 @@ export const createFrontDeskTransfer = (
               metadata: {
                 clientId: command.clientId,
                 method: 'transfer',
-                amountDueCentavos: plan!.priceCentavos - reserved,
+                amountDueCentavos,
               },
             },
           });

@@ -19,18 +19,34 @@ const withAccount = { deletedAt: null, account: { isNot: null } };
 
 // The same live Subscription as the Client directory: ACTIVE, and its date
 // range covers today in America/La_Paz. Subscription has no deleted_at.
+// A founder, Courtesy Access, a hidden Plan, and a Bs 0 Plan are not a
+// campaign (FIX-001). A guest pass is a hidden courtesy Subscription.
 const liveOn = (today: Date): Prisma.SubscriptionWhereInput => ({
   state: 'ACTIVE',
   startsOn: { lte: today },
   endsOn: { gte: today },
+  plan: { hiddenAt: null, priceCentavos: { gt: 0 } },
+  payment: {
+    method: { not: 'COURTESY' },
+    planPriceCentavos: { gt: 0 },
+    plan: { hiddenAt: null, priceCentavos: { gt: 0 } },
+  },
 });
 
 const findRecipients = async (
   transaction: Transaction,
   today: Date,
 ): Promise<LiveRecipient[]> => {
+  const founders = await transaction.founderMembership.findMany({
+    where: { deletedAt: null, status: 'ACTIVE' },
+    select: { clientId: true },
+  });
   const rows = await transaction.client.findMany({
-    where: { ...withAccount, subscriptions: { some: liveOn(today) } },
+    where: {
+      ...withAccount,
+      id: { notIn: founders.map((founder) => founder.clientId) },
+      subscriptions: { some: liveOn(today) },
+    },
     orderBy: [{ name: 'asc' }, { id: 'asc' }],
     select: {
       id: true,
@@ -56,8 +72,12 @@ const findSkipped = async (
   transaction: Transaction,
   today: Date,
 ): Promise<CampaignRecipient[]> => {
+  const recipients = await findRecipients(transaction, today);
   const rows = await transaction.client.findMany({
-    where: { ...withAccount, subscriptions: { none: liveOn(today) } },
+    where: {
+      ...withAccount,
+      id: { notIn: recipients.map((recipient) => recipient.clientId) },
+    },
     orderBy: [{ name: 'asc' }, { id: 'asc' }],
     select: { id: true, name: true },
   });
@@ -75,9 +95,20 @@ export const createPrismaCampaignGrant = (
     return previewCampaign({
       principal,
       countRecipients: () =>
-        prisma.client.count({
-          where: { ...withAccount, subscriptions: { some: liveOn(today) } },
-        }),
+        prisma.founderMembership
+          .findMany({
+            where: { deletedAt: null, status: 'ACTIVE' },
+            select: { clientId: true },
+          })
+          .then((founders) =>
+            prisma.client.count({
+              where: {
+                ...withAccount,
+                id: { notIn: founders.map((founder) => founder.clientId) },
+                subscriptions: { some: liveOn(today) },
+              },
+            }),
+          ),
       findSkipped: () => findSkipped(prisma, today),
     });
   },

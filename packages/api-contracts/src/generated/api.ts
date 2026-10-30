@@ -24744,6 +24744,141 @@ export function useListEvaluations<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export type attachEvaluationReceiptResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type attachEvaluationReceiptResponseSuccess =
+  attachEvaluationReceiptResponse204 & {
+    headers: Headers;
+  };
+export type attachEvaluationReceiptResponse =
+  attachEvaluationReceiptResponseSuccess;
+
+export const getAttachEvaluationReceiptUrl = (evaluationId: string) => {
+  return `/api/v1/evaluations/${evaluationId}/receipt`;
+};
+
+export const attachEvaluationReceipt = async (
+  evaluationId: string,
+  attachReceiptDto: AttachReceiptDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<attachEvaluationReceiptResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getAttachEvaluationReceiptUrl(evaluationId),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(attachReceiptDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: attachEvaluationReceiptResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as attachEvaluationReceiptResponse;
+};
+
+export const getAttachEvaluationReceiptMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof attachEvaluationReceipt>>,
+    TError,
+    AttachEvaluationReceiptMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof attachEvaluationReceipt>>,
+  TError,
+  AttachEvaluationReceiptMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["attachEvaluationReceipt"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof attachEvaluationReceipt>>,
+    AttachEvaluationReceiptMutationVariables
+  > = (props) => {
+    const { evaluationId, data } = props ?? {};
+
+    return attachEvaluationReceipt(evaluationId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AttachEvaluationReceiptMutationResult = NonNullable<
+  Awaited<ReturnType<typeof attachEvaluationReceipt>>
+>;
+export type AttachEvaluationReceiptMutationBody = AttachReceiptDto;
+export type AttachEvaluationReceiptMutationError = unknown;
+export type AttachEvaluationReceiptMutationVariables = {
+  evaluationId: string;
+  data: AttachReceiptDto;
+};
+
+export const useAttachEvaluationReceipt = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof attachEvaluationReceipt>>,
+      TError,
+      AttachEvaluationReceiptMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof attachEvaluationReceipt>>,
+  TError,
+  AttachEvaluationReceiptMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAttachEvaluationReceiptMutationOptions(options),
+    queryClient,
+  );
+};
+
 export type cancelEvaluationResponse204 = {
   data: void;
   status: 204;

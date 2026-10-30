@@ -1,4 +1,5 @@
 import {
+  attachEvaluationReceipt,
   bookEvaluation,
   bookPaidEvaluation,
   getListEvaluationSlotsQueryKey,
@@ -24,9 +25,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { pickReceipt, type AttachedReceipt } from "../payments/receipt-upload";
+import { idempotency, uploadImage } from "../uploads/image-upload";
 import { clockTime, evaluationDate } from "./evaluation-format";
 
 type BookNavigation = {
@@ -39,6 +42,7 @@ const bookingProblems: Record<string, string> = {
   evaluation_slot_unavailable: "Ese horario ya no está disponible. Elige otro.",
   evaluation_booking_closed: "Ese horario ya cerró: se puede reservar hasta 3 horas antes.",
   evaluation_slot_not_found: "Ese horario ya no está disponible. Elige otro.",
+  evaluation_payment_pending: "Ya tienes un pago de evaluación pendiente.",
   no_eligible_subscription: "Necesitas un plan activo para reservar tu evaluación.",
 };
 
@@ -62,13 +66,32 @@ export function BookEvaluationScreen({
   const { offerPermission: offerPushPermission } = usePushNotifications();
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [receipt, setReceipt] = useState<AttachedReceipt | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   // One key per confirmation screen, so a retried tap replays the same booking.
   const idempotencyKey = useRef(randomUUID());
 
+  const attach = async () => {
+    setMessage(null);
+    try {
+      const picked = await pickReceipt();
+      if (picked === null) return;
+      setUploading(true);
+      const imageAssetId = await uploadImage(picked, "transfer_receipt", fetcher);
+      setReceipt({ imageAssetId, localUri: picked.uri });
+    } catch {
+      setMessage("No pudimos subir el comprobante. Inténtalo de nuevo.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const confirm = async () => {
+    if (!slot.included && receipt === null) return;
     setSubmitting(true);
     setMessage(null);
+    let booked = false;
     try {
       const book = slot.included ? bookEvaluation : bookPaidEvaluation;
       const response = await book(
@@ -77,19 +100,38 @@ export function BookEvaluationScreen({
         fetcher,
       );
       if (response.status === 201) {
+        booked = true;
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: getListEvaluationSlotsQueryKey() }),
           queryClient.invalidateQueries({
             queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
           }),
         ]);
+      }
+      if (response.status === 201 && !slot.included && receipt !== null) {
+        const attached = await attachEvaluationReceipt(
+          response.data.id,
+          { imageAssetId: receipt.imageAssetId },
+          idempotency(),
+          fetcher,
+        );
+        if (attached.status !== 204) {
+          setMessage("Reservamos la evaluación, pero no pudimos adjuntar el comprobante.");
+          return;
+        }
+      }
+      if (response.status === 201) {
         offerPushPermission();
         navigation.navigate("MyEvaluations", { confirmed: response.data });
         return;
       }
       setMessage(problemMessage(response.data));
     } catch {
-      setMessage("No pudimos reservar la evaluación. Inténtalo de nuevo.");
+      setMessage(
+        booked
+          ? "Reservamos la evaluación, pero no pudimos adjuntar el comprobante."
+          : "No pudimos reservar la evaluación. Inténtalo de nuevo.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -119,9 +161,39 @@ export function BookEvaluationScreen({
           <Text style={styles.freeText}>
             {slot.included
               ? "Es gratuita — no usa clases de tu plan."
-              : `Cuesta ${formatBolivianos(slot.priceCentavos)}. La pagas por QR o en recepción.`}
+              : `Cuesta ${formatBolivianos(slot.priceCentavos)}. Transfiere el monto y sube tu comprobante.`}
           </Text>
         </View>
+        {slot.included ? null : (
+          <Pressable
+            accessibilityLabel={
+              receipt === null
+                ? "Sube tu comprobante de transferencia"
+                : "Comprobante adjunto. Toca para cambiarlo."
+            }
+            accessibilityRole="button"
+            accessibilityState={{ disabled: uploading }}
+            disabled={uploading}
+            onPress={() => void attach()}
+            style={styles.upload}
+            testID="evaluation-receipt"
+          >
+            {receipt === null ? (
+              <Text style={styles.uploadLabel}>
+                {uploading ? "Subiendo comprobante…" : "Sube tu comprobante de transferencia"}
+              </Text>
+            ) : (
+              <>
+                <Image
+                  accessibilityLabel="Comprobante adjunto"
+                  source={{ uri: receipt.localUri }}
+                  style={styles.thumbnail}
+                />
+                <Text style={styles.uploadLabel}>Comprobante listo. Toca para cambiarlo.</Text>
+              </>
+            )}
+          </Pressable>
+        )}
         <View style={styles.note}>
           <BodyText>Te avisaremos un día antes y una hora antes de tu cita.</BodyText>
         </View>
@@ -134,7 +206,12 @@ export function BookEvaluationScreen({
           </BodyText>
         ) : null}
       </ScrollView>
-      <PrimaryButton busy={submitting} label="Confirmar" onPress={() => void confirm()} />
+      <PrimaryButton
+        busy={submitting}
+        disabled={!slot.included && (receipt === null || uploading)}
+        label="Confirmar"
+        onPress={() => void confirm()}
+      />
     </Screen>
   );
 }
@@ -178,5 +255,16 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     padding: spacing.xl,
   },
+  thumbnail: { borderRadius: radii.control, height: 120, width: 90 },
   time: { color: colors.text, fontSize: typography.display, fontWeight: "400" },
+  upload: {
+    alignItems: "center",
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
+    borderStyle: "dashed",
+    borderWidth: 1,
+    gap: spacing.sm,
+    padding: spacing.lg,
+  },
+  uploadLabel: { color: colors.text, fontSize: typography.body, textAlign: "center" },
 });

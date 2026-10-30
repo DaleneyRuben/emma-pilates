@@ -28,7 +28,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -153,6 +153,8 @@ export function BookingsScreen({
     navigation.setParams({ confirmed: undefined }),
   );
   const [cancelling, setCancelling] = useState<UpcomingBookingDto | null>(null);
+  const [cancelInFlight, setCancelInFlight] = useState(false);
+  const cancelStarted = useRef(false);
   const [failure, setFailure] = useState<string | null>(null);
   const upcoming = useListUpcomingBookings({
     fetcher,
@@ -176,7 +178,16 @@ export function BookingsScreen({
     ]);
 
   const confirmCancel = async () => {
-    if (cancelling === null || cancelling.bookingId === undefined) return;
+    if (
+      cancelStarted.current ||
+      cancelInFlight ||
+      cancelling === null ||
+      cancelling.bookingId === undefined
+    ) {
+      return;
+    }
+    cancelStarted.current = true;
+    setCancelInFlight(true);
     setFailure(null);
     try {
       const response = await cancelBooking(cancelling.bookingId, undefined, fetcher);
@@ -189,6 +200,8 @@ export function BookingsScreen({
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
     } finally {
+      cancelStarted.current = false;
+      setCancelInFlight(false);
       setCancelling(null);
       await refresh();
     }
@@ -227,8 +240,10 @@ export function BookingsScreen({
           <BodyText style={styles.noticeBody}>
             {`${confirmed.classTypeName} · ${formatSessionDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`}
           </BodyText>
-          {remaining !== undefined ? (
+          {remaining !== undefined && confirmed.planName !== "Pase de invitada" ? (
             <BodyText style={styles.balance}>{`Te quedan ${remaining} clases en tu plan`}</BodyText>
+          ) : confirmed.planName === "Pase de invitada" ? (
+            <BodyText style={styles.balance}>Tu pase de invitada ya se usó.</BodyText>
           ) : null}
         </View>
       ) : null}
@@ -274,7 +289,10 @@ export function BookingsScreen({
         confirmLabel="Sí, cancelar reserva"
         confirmTestID="booking-cancel-confirm"
         note="La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para volver a reservarlo tendrá que seguir habiendo cupo."
-        onConfirm={() => void confirmCancel()}
+        onConfirm={() => {
+          if (cancelInFlight) return;
+          void confirmCancel();
+        }}
         onDismiss={() => setCancelling(null)}
         testID="booking-cancel-sheet"
         title="¿Cancelar esta reserva?"

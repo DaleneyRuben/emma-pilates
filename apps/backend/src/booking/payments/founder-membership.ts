@@ -4,6 +4,11 @@
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
 const singleClassAllowance = 1;
 
+// Uncovered days are the days after the real end and before the next start.
+// A gap of exactly the allowed days keeps the membership (FIX-001).
+export const uncoveredDays = (realEnd: Date, next: Date): number =>
+  (next.getTime() - realEnd.getTime()) / dayMilliseconds - 1;
+
 export type FounderRules = {
   founderPlaces: number;
   founderDiscountPercent: number;
@@ -36,16 +41,26 @@ export const founderDiscount = (input: {
   };
 };
 
+// The list shows the founder price to anyone who would take a place on her
+// first real Plan, and to a founder who still holds hers. A lost membership
+// and a full list of 40 see the list price.
+export const showFounderPrice = (input: {
+  held: 'active' | 'lost' | 'none';
+  placesRemaining: boolean;
+}): boolean =>
+  input.held === 'active' || (input.held === 'none' && input.placesRemaining);
+
 export const decideFounderPlace = (input: {
   places: number;
   assigned: number;
+  nextNumber: number;
   alreadyHeld: boolean;
   courtesy: boolean;
 }): { assign: false } | { assign: true; number: number } => {
   if (input.courtesy || input.alreadyHeld || input.assigned >= input.places) {
     return { assign: false };
   }
-  return { assign: true, number: input.assigned + 1 };
+  return { assign: true, number: input.nextNumber };
 };
 
 export const decideFounderGap = (input: {
@@ -59,9 +74,8 @@ export const decideFounderGap = (input: {
     return { lose: false };
   }
   const coveredUntil = input.nextStart === null ? input.today : input.nextStart;
-  const gapDays =
-    (coveredUntil.getTime() - input.latestRealEnd.getTime()) / dayMilliseconds;
-  return gapDays > input.rules.founderGapDays
+  return uncoveredDays(input.latestRealEnd, coveredUntil) >
+    input.rules.founderGapDays
     ? { lose: true, reason: 'gap' }
     : { lose: false };
 };
@@ -95,4 +109,5 @@ export const priceFounderPlans = <
 export const founderRenewalDeadline = (
   realEnd: Date,
   rules: Pick<FounderRules, 'founderGapDays'>,
-): Date => new Date(realEnd.getTime() + rules.founderGapDays * dayMilliseconds);
+): Date =>
+  new Date(realEnd.getTime() + (rules.founderGapDays + 1) * dayMilliseconds);

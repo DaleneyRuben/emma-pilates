@@ -1,6 +1,5 @@
 import type { PgBoss } from 'pg-boss';
 import { recordClientAcquisition } from '../../booking/acquisition/record-client-acquisition';
-import { openGuestPass } from '../../booking/payments/open-guest-pass';
 import { attributeReferral } from '../../booking/payments/referral-attribution';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
@@ -165,12 +164,9 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
         referredClientId: registration.clientId,
         referralCode: registration.referredByCode,
       });
-      await openGuestPass(this.transaction, {
-        hostClientId: holder.clientId,
-        friendClientId: registration.clientId,
-        authorAccountId: registration.accountId,
-        now: this.now(),
-      });
+      // The monthly invite is spent when she verifies, not here. An
+      // unverified registration must not burn the host's month, and the
+      // limit must not fail registration.
     }
   }
 

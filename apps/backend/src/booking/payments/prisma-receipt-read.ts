@@ -43,37 +43,36 @@ export const createPrismaReceiptRead = (prisma: PrismaClient) => ({
     ) {
       throw new BookingAccessDeniedError();
     }
+    const assetSelect = {
+      pendingObjectKey: true,
+      deletedAt: true,
+      declaredMediaType: true,
+      verifiedMediaType: true,
+      variants: {
+        where: {
+          kind: variantKinds[command.variant],
+          visibility: ImageVariantVisibility.PRIVATE,
+          deleteRequestedAt: null,
+          deletedAt: null,
+        },
+        select: { storageKey: true, mediaType: true },
+        take: 1,
+      },
+    } as const;
     const payment = await prisma.payment.findUnique({
       where: { id: command.paymentId },
       select: {
         purchaseIntent: {
-          select: {
-            receiptImageAsset: {
-              select: {
-                pendingObjectKey: true,
-                deletedAt: true,
-                declaredMediaType: true,
-                verifiedMediaType: true,
-                variants: {
-                  where: {
-                    kind: variantKinds[command.variant],
-                    visibility: ImageVariantVisibility.PRIVATE,
-                    deleteRequestedAt: null,
-                    deletedAt: null,
-                  },
-                  select: { storageKey: true, mediaType: true },
-                  take: 1,
-                },
-              },
-            },
-          },
+          select: { receiptImageAsset: { select: assetSelect } },
         },
+        receiptImageAsset: { select: assetSelect },
       },
     });
     if (payment === null) {
       throw new PaymentRuleError('payment_not_found', 'Payment not found');
     }
-    const receipt = payment.purchaseIntent?.receiptImageAsset;
+    const receipt =
+      payment.receiptImageAsset ?? payment.purchaseIntent?.receiptImageAsset;
     if (
       receipt === null ||
       receipt === undefined ||

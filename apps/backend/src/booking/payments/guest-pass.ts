@@ -26,6 +26,13 @@ export const decideGuestPassBooking = (input: {
   return null;
 };
 
+// Verification must keep succeeding when the sentence changes. The code is
+// the contract; the sentence is not.
+export const isMonthlyInviteSpent = (error: {
+  code?: string;
+  message?: string;
+}): boolean => error.code === 'guest_pass_monthly_limit';
+
 export type InvitationDecision = {
   code: 'guest_pass_monthly_limit';
   detail: string;
@@ -43,7 +50,7 @@ export const decideInvitation = (input: {
   if (invitationsThisMonth >= input.invitesPerMonth) {
     return {
       code: 'guest_pass_monthly_limit',
-      detail: 'A host invites one friend a month',
+      detail: 'A host invites one friend each calendar month',
     };
   }
   return null;
@@ -57,10 +64,17 @@ export type InviteRewardDecision = {
 export const decideInviteReward = (input: {
   alreadyRewarded: boolean;
   currentSubscriptionId: string | null;
+  // The host's own Guest Pass is never a real Subscription. The +1 waits
+  // for her current real Plan, or her next one (FIX-005).
+  currentSubscriptionIsGuestPass?: boolean;
 }): InviteRewardDecision | null => {
   if (input.alreadyRewarded) return null;
+  const realSubscriptionId =
+    input.currentSubscriptionIsGuestPass === true
+      ? null
+      : input.currentSubscriptionId;
   return {
-    subscriptionId: input.currentSubscriptionId,
-    owed: input.currentSubscriptionId === null,
+    subscriptionId: realSubscriptionId,
+    owed: realSubscriptionId === null,
   };
 };

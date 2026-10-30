@@ -51,9 +51,10 @@ Mismo precio para reformer, cadillac y mat.
 - **Solo en planes trimestrales** (y en planes más largos, si se agregan).
 - Una vez por plan, hasta 15 días.
 - La clienta lo solicita desde la app con fechas y motivo; **la administradora lo aprueba** (notificación push).
-- No puede empezar en el pasado.
-- La fecha de fin del plan se extiende exactamente los días congelados.
-- Durante el congelamiento no se puede reservar.
+- No puede empezar en el pasado. Si la administradora aprueba cuando el inicio ya pasó, la aprobación se rechaza y no cancela ni devuelve clases ya dictadas.
+- La ventana queda dentro del plan actual. Una renovación ya comprada limita el congelamiento para que la extensión no la pise.
+- La fecha de fin del plan se extiende exactamente los días congelados. Una segunda aprobación no extiende otra vez.
+- Durante el congelamiento no se puede reservar, ni entrar a la lista de espera, ni ser promovida desde ella, ni reprogramar hacia un día congelado.
 - Las fundadoras no pierden su beneficio por congelar.
 
 ### 2.5 Otras reglas
@@ -251,3 +252,7 @@ La dueña resolvió las preguntas abiertas de la revisión del lanzamiento. Esta
 4. **Cierre de caja y anulaciones.** Una venta en efectivo anulada sigue en el efectivo esperado del cierre de caja, porque no se devuelve dinero. Aparece en su propia línea: «Ventas anuladas (efectivo en caja): Bs N». Si alguna vez se devuelve dinero, la administradora lo registra como una salida.
 5. **«Renovó» para el bono.** Se mide por la fecha de compra, como ya dice la sección 9. Una renovación es otro plan real cuyo pago se aprobó (fecha de Bolivia) antes del fin del anterior, o hasta 7 días después, sea cual sea la fecha de inicio que ella eligió. El bono y los indicadores usan esta única definición.
 6. **Sucursales de una instructora.** La coordinadora puede asignar las sucursales de una instructora (`PUT /staff-members/{id}/branches` y el control de la web de administración). Cualquier otra escritura sobre el personal sigue siendo de la administradora.
+
+## 17. Addendum del 2026-10-29
+
+7. **Un rechazo no gasta el congelamiento (§2.4).** «Una vez por plan» cuenta solo los congelamientos solicitados o aprobados. Un congelamiento rechazado no gasta el único del plan. La clienta puede volver a pedirlo con fechas nuevas.

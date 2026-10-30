@@ -142,7 +142,7 @@ describe('loadClientSubscription', () => {
       status: 'active',
       subscription: active,
       nextSubscription: null,
-      founderRenewalDeadline: '2026-10-02',
+      founderRenewalDeadline: '2026-10-03',
       freeze: null,
       canRequestFreeze: false,
     });

@@ -40,6 +40,12 @@ export class AdminPaymentDto {
   @ApiProperty()
   planName!: string;
 
+  @ApiProperty({
+    enum: ['plan', 'evaluation'],
+    description: 'Plan sale or paid Evaluation',
+  })
+  kind!: 'plan' | 'evaluation';
+
   @ApiProperty({ minimum: 1, description: 'Money Amount in BOB centavos' })
   planPriceCentavos!: number;
 

@@ -150,11 +150,32 @@ describe("AW29 Revisar pago on a desktop browser", () => {
     ).toBeInTheDocument();
   });
 
-  it("says a receipt that is no longer kept cannot be shown", async () => {
+  it("says a receipt that was never attached is not here yet", async () => {
     server.use(
       ...handlers(() =>
         jsonResponse(
           reviewOf(sofiaPayment, { receipt: null, receiptUrl: null }),
+        ),
+      ),
+    );
+    const { panel } = await open("Sofía Guzmán");
+
+    expect(
+      await within(panel).findByText("Todavía no hay comprobante."),
+    ).toBeInTheDocument();
+  });
+
+  it("says a receipt that is no longer kept cannot be shown", async () => {
+    server.use(
+      ...handlers(() =>
+        jsonResponse(
+          reviewOf(sofiaPayment, {
+            receipt: {
+              imageAssetId: "11111111-1111-4111-8111-111111111111",
+              mediaType: "image/jpeg",
+            },
+            receiptUrl: null,
+          }),
         ),
       ),
     );

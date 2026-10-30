@@ -5,6 +5,7 @@ import {
   type Prisma,
 } from '../../generated/prisma/client';
 import { deprecatedDurationMonths } from '../catalog/plan-validity';
+import { saleLabel } from './payment-label';
 
 // The read models the payment commands return, and the selects and
 // mappers that build them from Payment and Purchase Intent rows.
@@ -182,7 +183,7 @@ export const toPaymentView = (row: PaymentRow): PaymentView => ({
   method: paymentMethods[row.method],
   state: paymentStates[row.state],
   planId: row.planId,
-  planName: row.planNameSnapshot,
+  planName: saleLabel(row),
   durationDays: row.durationDaysSnapshot,
   durationMonths: deprecatedDurationMonths(row.durationDaysSnapshot),
   classAllowance: row.classAllowanceSnapshot,

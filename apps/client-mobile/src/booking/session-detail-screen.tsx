@@ -1,3 +1,4 @@
+import { bookingRejectionMessage } from "./booking-rejection-copy";
 import {
   createBooking,
   getGetCurrentClientSubscriptionQueryKey,
@@ -42,6 +43,7 @@ export type ConfirmedBooking = {
   classTypeName: string;
   startsAt: string;
   endsAt: string;
+  planName?: string;
 };
 
 type DetailNavigation = {
@@ -76,7 +78,7 @@ function problemMessage(body: unknown): string | null {
     const date = /: (\d{4}-\d{2}-\d{2})$/.exec(detail)?.[1];
     if (date !== undefined) return `Podrás reservar a partir del ${formatCivilDate(date)}.`;
   }
-  return typeof code === "string" ? (bookingProblems[code] ?? null) : null;
+  return typeof code === "string" ? (bookingProblems[code] ?? bookingRejectionMessage(code)) : null;
 }
 
 export function SessionDetailScreen({ route }: { route: { params: { sessionId: string } } }) {
@@ -128,7 +130,8 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   const hasAllowance =
     view !== null &&
     (view.status === "active" || view.status === "expiring_soon") &&
-    (view.subscription?.remainingClassAllowance ?? 0) > 0;
+    ((view.subscription?.remainingClassAllowance ?? 0) > 0 ||
+      (view.subscription?.extraClassesLine ?? null) !== null);
   const full = forcedFull || detail.availableSeats === 0;
   // Joining inside the window is refused (the server answers 403), so the
   // offer stays hidden until the window length is known and still open.
@@ -166,6 +169,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
               classTypeName: detail.classType.name,
               startsAt: detail.startsAt,
               endsAt: detail.endsAt,
+              planName: view?.subscription?.planName,
             },
           },
         });

@@ -37,12 +37,42 @@ describe('campaign extra classes', () => {
 
   it('grants one campaign class to every live Subscription, skips a Client without one, and a retry writes nothing more', async () => {
     const live = await createFixture(prisma, { now: today });
-    await prisma.subscription.update({
-      where: { id: live.subscriptionId },
-      data: {
-        startsOn: new Date('2026-10-01'),
-        endsOn: new Date('2026-10-31'),
-      },
+    const planId = (
+      await prisma.subscription.findUniqueOrThrow({
+        where: { id: live.subscriptionId },
+        select: { planId: true },
+      })
+    ).planId;
+    await prisma.$transaction(async (transaction) => {
+      const payment = await transaction.payment.create({
+        data: {
+          clientId: live.clientId,
+          planId,
+          planNameSnapshot: 'Plan',
+          durationDaysSnapshot: 30,
+          classAllowanceSnapshot: 2,
+          planPriceCentavos: 10_000,
+          creditAppliedCentavos: 0,
+          amountDueCentavos: 10_000,
+          startsOn: new Date('2026-10-01'),
+          method: 'CASH',
+          state: 'CONFIRMED',
+          collectedAtBranchId: live.branchId,
+          submittedByAccountId: live.accountId,
+          submittedAt: today,
+          decidedByAccountId: live.accountId,
+          decidedAt: today,
+          createdAt: today,
+        },
+      });
+      await transaction.subscription.update({
+        where: { id: live.subscriptionId },
+        data: {
+          startsOn: new Date('2026-10-01'),
+          endsOn: new Date('2026-10-30'),
+          paymentId: payment.id,
+        },
+      });
     });
     await prisma.client.update({
       where: { id: live.clientId },

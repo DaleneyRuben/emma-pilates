@@ -12,6 +12,7 @@ import {
   boliviaDate,
   boliviaInstant,
 } from '../../time/bolivia-time';
+import { restoreBookedClass } from '../commands/restore-class';
 import {
   minimumNotMetClientNotice,
   minimumNotMetTrainerNotice,
@@ -129,9 +130,11 @@ export const cancelBelowMinimum = async (
         cancellationCause: BookingCancellationCause.SESSION_CANCELLED,
       },
     });
-    await transaction.subscription.update({
-      where: { id: booking.subscriptionId },
-      data: { remainingClassAllowance: { increment: 1 } },
+    await restoreBookedClass(transaction, {
+      bookingId: booking.id,
+      subscriptionId: booking.subscriptionId,
+      clientId: booking.clientId,
+      now,
     });
     if (booking.client.account === null) continue;
     const alternatives: AlternativeSession[] = others

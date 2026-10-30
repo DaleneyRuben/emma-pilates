@@ -37,9 +37,20 @@ export const grantInviteReward = async (
     orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
     select: { id: true },
   });
+  const guestPass =
+    current === null
+      ? null
+      : await transaction.guestPass.findFirst({
+          where: {
+            courtesySubscriptionId: current.id,
+            deletedAt: null,
+          },
+          select: { id: true },
+        });
   const decision = decideInviteReward({
     alreadyRewarded: pass.rewardedAt !== null,
     currentSubscriptionId: current?.id ?? null,
+    currentSubscriptionIsGuestPass: guestPass !== null,
   });
   if (decision === null) return;
   if (decision.subscriptionId === null) {
@@ -91,6 +102,13 @@ export const collectOwedInviteReward = async (
     select: { id: true },
   });
   if (owed === null) return;
+  // The class is owed to her next real Subscription. Collecting it onto her
+  // own Guest Pass would spend the reward on a class she cannot keep.
+  const landsOnGuestPass = await transaction.guestPass.findFirst({
+    where: { courtesySubscriptionId: input.subscriptionId, deletedAt: null },
+    select: { id: true },
+  });
+  if (landsOnGuestPass !== null) return;
   await recordAllowanceAdjustment(transaction, {
     subscriptionId: input.subscriptionId,
     clientId: input.hostClientId,

@@ -145,7 +145,9 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
               <BodyText>
                 {payment.receipt
                   ? "Cargando el comprobante…"
-                  : "El comprobante ya no está disponible."}
+                  : payment.receipt
+                    ? "El comprobante ya no está disponible."
+                    : "Todavía no hay comprobante."}
               </BodyText>
             )
           ) : (

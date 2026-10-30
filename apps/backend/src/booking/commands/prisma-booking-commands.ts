@@ -33,14 +33,17 @@ import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendanceCorrections } from './attendance-audit';
 import { recordAttendance } from './record-attendance';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
-import { boliviaDate } from '../../time/bolivia-time';
 import { fundBooking } from './weekly-cap-funding';
 import { readWeeklyCapPosition } from './weekly-cap-count';
+import { weeklyCapBlocksReschedule } from './reschedule-cap';
 import {
   findCoveringSubscription,
+  findApprovedFreeze,
   findNotYetStartedSubscription,
 } from './eligible-subscription';
 import { decideGuestPassBooking } from '../payments/guest-pass';
+import { refuseGuestPassLastPlace } from './guest-pass-reschedule';
+import { moveConsumptionToBooking, restoreBookedClass } from './restore-class';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -242,6 +245,7 @@ export class PrismaBookingCommands {
           where: { state: BookingState.BOOKED },
           select: {
             id: true,
+            clientId: true,
             subscriptionId: true,
             client: { select: { account: { select: { id: true } } } },
           },
@@ -291,9 +295,11 @@ export class PrismaBookingCommands {
           cancellationCause: BookingCancellationCause.SESSION_CANCELLED,
         },
       });
-      await transaction.subscription.update({
-        where: { id: booking.subscriptionId },
-        data: { remainingClassAllowance: { increment: 1 } },
+      await restoreBookedClass(transaction, {
+        bookingId: booking.id,
+        subscriptionId: booking.subscriptionId,
+        clientId: booking.clientId,
+        now,
       });
       if (booking.client.account !== null) {
         await notify(
@@ -491,17 +497,12 @@ export class PrismaBookingCommands {
                 throw new Error('Booking is not cancellable');
               }
 
-              const restored = await transaction.subscription.updateMany({
-                where: {
-                  id: input.subscriptionId,
-                  clientId: input.clientId,
-                },
-                data: { remainingClassAllowance: { increment: 1 } },
+              await restoreBookedClass(transaction, {
+                bookingId: input.bookingId,
+                subscriptionId: input.subscriptionId,
+                clientId: input.clientId,
+                now: this.now(),
               });
-
-              if (restored.count !== 1) {
-                throw new Error('Booking Subscription is unavailable');
-              }
 
               const cancelledBooking =
                 await transaction.booking.findUniqueOrThrow({
@@ -575,15 +576,12 @@ export class PrismaBookingCommands {
               transaction.booking.count({
                 where: { sessionId, state: BookingState.BOOKED },
               }),
-            weeklyCapBlocksDestination: async (input) => {
-              const position = await readWeeklyCapPosition(transaction, input);
-              return (
-                position.weeklyClassCap !== null &&
-                position.baseFundedBookingsThisWeek >=
-                  position.weeklyClassCap &&
-                position.extraClasses <= 0
-              );
-            },
+            findApprovedFreeze: ({ clientId, onDate }) =>
+              findApprovedFreeze(transaction, { clientId, onDate }),
+            findNotYetStartedSubscription: ({ clientId, onDate }) =>
+              findNotYetStartedSubscription(transaction, { clientId, onDate }),
+            weeklyCapBlocksDestination: (input) =>
+              weeklyCapBlocksReschedule(transaction, input),
             hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
               transaction.booking
                 .findFirst({
@@ -599,6 +597,7 @@ export class PrismaBookingCommands {
                 })
                 .then((booking) => booking !== null),
             reschedule: async (input) => {
+              await refuseGuestPassLastPlace(transaction, input);
               const replacement = await transaction.booking.create({
                 data: {
                   sessionId: input.targetSessionId,
@@ -622,6 +621,11 @@ export class PrismaBookingCommands {
               if (updated.count !== 1) {
                 throw new Error('Booking is not reschedulable');
               }
+
+              await moveConsumptionToBooking(transaction, {
+                fromBookingId: input.bookingId,
+                toBookingId: replacement.id,
+              });
 
               return replacement;
             },
@@ -788,6 +792,8 @@ export class PrismaBookingCommands {
           onDate,
           needsAllowance: false,
         }),
+      findApprovedFreeze: ({ clientId, onDate }) =>
+        findApprovedFreeze(transaction, { clientId, onDate }),
       findNotYetStartedSubscription: ({ clientId, onDate }) =>
         findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasLiveBooking: ({ sessionId, clientId }) =>
@@ -834,16 +840,7 @@ export class PrismaBookingCommands {
           needsAllowance: true,
         }),
       findApprovedFreeze: ({ clientId, onDate }) =>
-        transaction.freeze.findFirst({
-          where: {
-            clientId,
-            state: 'APPROVED',
-            deletedAt: null,
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-          },
-          select: { endsOn: true },
-        }),
+        findApprovedFreeze(transaction, { clientId, onDate }),
       findNotYetStartedSubscription: ({ clientId, onDate }) =>
         findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>

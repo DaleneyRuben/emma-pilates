@@ -25,7 +25,8 @@ import {
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
-import { confirmEvaluationTransfer as confirmEvaluationPayment } from '../evaluations/evaluation-payment';
+import { decideEvaluationTransfer } from '../evaluations/evaluation-payment-decision';
+import { evaluationReceiptOf } from '../evaluations/evaluation-payment-receipt';
 import { createFreezeCommands } from './prisma-freeze';
 import { createFreezeReads } from './prisma-freeze-reads';
 import {
@@ -39,6 +40,7 @@ import {
 } from './prisma-start-date-allocation';
 import type { CreditSummary } from './credit-summary';
 import { PaymentRuleError } from './payment-errors';
+import { createPendingPayment } from './pending-payment';
 import {
   intentSelect,
   paymentMethods,
@@ -82,11 +84,17 @@ import {
 
 import { grantGiftClass } from './allowance-adjustments';
 import { createFrontDeskTransfer } from './front-desk-transfer';
+import { loseFounderForGap, priceTransferForGap } from './founder-gap';
 import {
-  grantFounderPlace,
+  confirmFounderPlace,
   priceFounderSale,
   readIsFounder,
 } from './prisma-founder-membership';
+import { auditCashFounderGrant } from './founder-grant-audit';
+import {
+  releaseFounderReservationOf,
+  repointFounderReservation,
+} from './founder-reservation';
 import {
   collectOwedInviteReward,
   grantInviteReward,
@@ -275,6 +283,7 @@ export function createPrismaPaymentCommands(
         where: {
           clientId: input.clientId,
           state: PaymentState.PENDING,
+          kind: PaymentKind.PLAN,
           ...(input.ignorePaymentId
             ? { id: { not: input.ignorePaymentId } }
             : {}),
@@ -397,6 +406,7 @@ export function createPrismaPaymentCommands(
     payment: PaymentRow,
     principal: AuthenticatedPrincipal,
     now: Date,
+    founder: boolean,
   ): Promise<string> => {
     const term = subscriptionTermFor(
       payment.startsOn,
@@ -448,7 +458,7 @@ export function createPrismaPaymentCommands(
       method: paymentMethods[payment.method],
       hidden: payment.plan.hiddenAt !== null,
       priceCentavos: payment.planPriceCentavos,
-      founder: await readIsFounder(transaction, payment.clientId),
+      founder,
       earlierRealPayment: await hasEarlierRealPayment(transaction, {
         clientId: payment.clientId,
         paymentId: payment.id,
@@ -509,11 +519,21 @@ export function createPrismaPaymentCommands(
       today: eligible.today,
       active: eligible.active,
     });
+    await loseFounderForGap(transaction, {
+      clientId: input.clientId,
+      nextStart: allocated.startsOn,
+      today: eligible.today,
+      now,
+    });
     const priced = await priceFounderSale(transaction, {
       clientId: input.clientId,
       classAllowance: plan.classAllowance,
       priceCentavos: plan.priceCentavos,
       creditAppliedCentavos: 0,
+      now,
+      courtesy: false,
+      hidden: plan.hiddenAt !== null,
+      activate: true,
     });
 
     const payment = await transaction.payment.create({
@@ -542,6 +562,16 @@ export function createPrismaPaymentCommands(
       },
       select: paymentSelect,
     });
+    await confirmFounderPlace(transaction, {
+      clientId: input.clientId,
+      paymentId: payment.id,
+      now,
+    });
+    await auditCashFounderGrant(transaction, {
+      clientId: input.clientId,
+      paymentId: payment.id,
+      now,
+    });
 
     if (
       allocated.subscriptionIdToEndEarly !== null &&
@@ -561,13 +591,8 @@ export function createPrismaPaymentCommands(
       payment,
       input.principal,
       now,
+      await readIsFounder(transaction, input.clientId),
     );
-    await grantFounderPlace(transaction, {
-      clientId: input.clientId,
-      paymentId: payment.id,
-      now,
-      courtesy: false,
-    });
     await recordPaymentAudit(transaction, {
       actionCode: 'payment.cash_confirmed',
       principal: input.principal,
@@ -684,11 +709,14 @@ export function createPrismaPaymentCommands(
               active: eligible.active,
             });
             const now = dependencies.now();
-            const priced = await priceFounderSale(transaction, {
+            const priced = await priceTransferForGap(transaction, {
               clientId,
+              nextStart: allocated.startsOn,
+              today: eligible.today,
               classAllowance: plan.classAllowance,
               priceCentavos: plan.priceCentavos,
-              creditAppliedCentavos: 0,
+              now,
+              hidden: plan.hiddenAt !== null,
             });
 
             const intent = await transaction.purchaseIntent.create({
@@ -713,7 +741,12 @@ export function createPrismaPaymentCommands(
               },
               select: { id: true },
             });
-
+            if (priced.discountReason === 'founder') {
+              await repointFounderReservation(transaction, {
+                clientId,
+                purchaseIntentId: intent.id,
+              });
+            }
             return { id: intent.id };
           },
         ),
@@ -872,33 +905,35 @@ export function createPrismaPaymentCommands(
             ignorePurchaseIntentId: intent.id,
           });
 
-          const payment = await transaction.payment.create({
-            data: {
-              clientId,
-              planId: intent.planId,
-              purchaseIntentId: intent.id,
-              planNameSnapshot: intent.planNameSnapshot,
-              durationDaysSnapshot: intent.durationDaysSnapshot,
-              weeklyClassCapSnapshot: intent.weeklyClassCapSnapshot,
-              classAllowanceSnapshot: intent.classAllowanceSnapshot,
-              planPriceCentavos: intent.planPriceCentavos,
-              creditAppliedCentavos: intent.creditReservedCentavos,
-              discountCentavos: intent.discountCentavos,
-              discountReason: intent.discountReason,
-              amountDueCentavos: intent.amountDueCentavos,
-              startsOn: intent.startsOn,
-              method: PaymentMethod.TRANSFER,
-              state: PaymentState.PENDING,
-              submittedByAccountId: principal.accountId,
-              submittedAt: now,
-              createdAt: now,
-              ...invoiceColumns(command.invoiceData),
-            },
-            select: { id: true },
+          const payment = await createPendingPayment(transaction, {
+            clientId,
+            planId: intent.planId,
+            purchaseIntentId: intent.id,
+            planNameSnapshot: intent.planNameSnapshot,
+            durationDaysSnapshot: intent.durationDaysSnapshot,
+            weeklyClassCapSnapshot: intent.weeklyClassCapSnapshot,
+            classAllowanceSnapshot: intent.classAllowanceSnapshot,
+            planPriceCentavos: intent.planPriceCentavos,
+            creditAppliedCentavos: intent.creditReservedCentavos,
+            discountCentavos: intent.discountCentavos,
+            discountReason: intent.discountReason,
+            amountDueCentavos: intent.amountDueCentavos,
+            startsOn: intent.startsOn,
+            method: PaymentMethod.TRANSFER,
+            state: PaymentState.PENDING,
+            submittedByAccountId: principal.accountId,
+            submittedAt: now,
+            createdAt: now,
+            ...invoiceColumns(command.invoiceData),
           });
           await transaction.purchaseIntent.update({
             where: { id: intent.id },
             data: { state: PurchaseIntentState.SUBMITTED, submittedAt: now },
+          });
+          await repointFounderReservation(transaction, {
+            clientId,
+            purchaseIntentId: intent.id,
+            paymentId: payment.id,
           });
           await notifyAdministrators(transaction, payment.id, now);
 
@@ -938,6 +973,10 @@ export function createPrismaPaymentCommands(
           now,
           actor: { kind: CreditLedgerActorKind.WORKER, accountId: null },
           correlationId: id,
+        });
+        await releaseFounderReservationOf(transaction, {
+          purchaseIntentId: id,
+          now,
         });
         await scheduleReceiptDeletion(
           transaction,
@@ -984,11 +1023,12 @@ export function createPrismaPaymentCommands(
             orderBy: { version: 'desc' },
             select: { nutritionistFeeCentavos: true },
           });
-        await confirmEvaluationPayment(transaction, {
+        await decideEvaluationTransfer(transaction, recordNotification, {
           paymentId: payment.id,
           principal,
           now: dependencies.now(),
           feeCentavos: settings.nutritionistFeeCentavos,
+          decision: 'confirm',
         });
         return payment.id;
       }
@@ -1057,6 +1097,12 @@ export function createPrismaPaymentCommands(
         });
       }
 
+      await loseFounderForGap(transaction, {
+        clientId: payment.clientId,
+        nextStart: payment.startsOn,
+        today,
+        now,
+      });
       await transaction.payment.update({
         where: { id: payment.id },
         data: {
@@ -1075,18 +1121,18 @@ export function createPrismaPaymentCommands(
         },
         correlationId: payment.id,
       });
+      await confirmFounderPlace(transaction, {
+        clientId: payment.clientId,
+        paymentId: payment.id,
+        now,
+      });
       const subscriptionId = await activateSubscription(
         transaction,
         payment,
         principal,
         now,
+        await readIsFounder(transaction, payment.clientId),
       );
-      await grantFounderPlace(transaction, {
-        clientId: payment.clientId,
-        paymentId: payment.id,
-        now,
-        courtesy: false,
-      });
       await recordPaymentAudit(transaction, {
         actionCode: 'payment.transfer_confirmed',
         principal,
@@ -1127,6 +1173,17 @@ export function createPrismaPaymentCommands(
 
     const paymentId = await serializable(async (transaction) => {
       const payment = await loadTransferPayment(transaction, command.paymentId);
+      if (payment.kind === PaymentKind.EVALUATION) {
+        await decideEvaluationTransfer(transaction, recordNotification, {
+          paymentId: payment.id,
+          principal,
+          now: dependencies.now(),
+          feeCentavos: 0,
+          decision: 'reject',
+          reason,
+        });
+        return payment.id;
+      }
       if (payment.state === PaymentState.REJECTED) {
         if (payment.rejectionReason === reason) return payment.id;
         throw rule(
@@ -1161,6 +1218,10 @@ export function createPrismaPaymentCommands(
           accountId: principal.accountId,
         },
         correlationId: payment.id,
+      });
+      await releaseFounderReservationOf(transaction, {
+        paymentId: payment.id,
+        now,
       });
       await recordPaymentAudit(transaction, {
         actionCode: 'payment.transfer_rejected',
@@ -1224,7 +1285,7 @@ export function createPrismaPaymentCommands(
   ): Promise<PaymentView | null> => {
     const clientId = requireClient(principal);
     const payment = await prisma.payment.findFirst({
-      where: { clientId },
+      where: { clientId, kind: PaymentKind.PLAN },
       orderBy: [{ submittedAt: 'desc' }, { id: 'desc' }],
       select: paymentSelect,
     });
@@ -1361,6 +1422,7 @@ export function createPrismaPaymentCommands(
         purchaseIntent: {
           select: { receiptImageAsset: { select: receiptSelect } },
         },
+        receiptImageAsset: { select: receiptSelect },
       },
     });
     if (row === null) throw rule('payment_not_found', 'Payment not found');
@@ -1373,7 +1435,9 @@ export function createPrismaPaymentCommands(
   ): Promise<PaymentReview> => {
     requireAdministrator(principal);
     const row = await loadReview(command.paymentId);
-    const receipt = receiptOf(row.purchaseIntent?.receiptImageAsset);
+    const receipt = evaluationReceiptOf(
+      row.receiptImageAsset ?? row.purchaseIntent?.receiptImageAsset,
+    );
     return {
       ...toPaymentView(row),
       clientName: row.client.name,

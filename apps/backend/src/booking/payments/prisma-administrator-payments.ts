@@ -7,12 +7,14 @@ import type {
   AdministratorPaymentState,
   AdministratorPaymentStatusFilter,
 } from './administrator-payments';
+import { saleLabel } from './payment-label';
 
 type PaymentRow = {
   id: string;
   client_id: string;
   client_name: string;
   plan_name: string;
+  kind: 'plan' | 'evaluation';
   method: 'transfer' | 'cash';
   plan_price_centavos: number;
   credit_applied_centavos: number;
@@ -51,7 +53,11 @@ const toRow = (row: PaymentRow): AdministratorPaymentRow => ({
   id: row.id,
   clientId: row.client_id,
   clientName: row.client_name,
-  planName: row.plan_name,
+  planName: saleLabel({
+    kind: row.kind,
+    planNameSnapshot: row.plan_name,
+  }),
+  kind: row.kind,
   method: row.method,
   planPriceCentavos: row.plan_price_centavos,
   creditAppliedCentavos: row.credit_applied_centavos,
@@ -91,7 +97,8 @@ export const createPrismaAdministratorPayments = (
     const [rows, [counted], pendingCount] = await Promise.all([
       prisma.$queryRaw<PaymentRow[]>`
         SELECT p.id, p.client_id, c.name AS client_name,
-          p.plan_name_snapshot AS plan_name, p.method::text AS method,
+          p.plan_name_snapshot AS plan_name, p.kind::text AS kind,
+          p.method::text AS method,
           p.plan_price_centavos, p.credit_applied_centavos,
           p.amount_due_centavos, p.state::text AS state, p.submitted_at,
           p.decided_at, p.void_reason,
@@ -104,7 +111,9 @@ export const createPrismaAdministratorPayments = (
         LEFT JOIN booking.purchase_intents intent
           ON intent.id = p.purchase_intent_id
         LEFT JOIN system.image_assets receipt
-          ON receipt.id = intent.receipt_image_asset_id
+          ON receipt.id = COALESCE(
+            p.receipt_image_asset_id, intent.receipt_image_asset_id
+          )
         LEFT JOIN system.accounts issuer_account
           ON issuer_account.id = p.invoice_issued_by_account_id
         LEFT JOIN booking.staff_members issuer

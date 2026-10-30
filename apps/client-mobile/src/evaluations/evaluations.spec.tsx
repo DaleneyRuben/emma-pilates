@@ -112,15 +112,18 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
     await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:45" }));
     expect(
-      await screen.findByText("Cuesta Bs 70. La pagas por QR o en recepción."),
+      await screen.findByText("Cuesta Bs 70. Transfiere el monto y sube tu comprobante."),
     ).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
-    await waitFor(() => {
-      expect(fetcher).toHaveBeenCalledWith(
-        "/api/v1/evaluation-slots/slot-2/evaluation-payments",
-        expect.objectContaining({ method: "POST" }),
-      );
-    });
+    expect(
+      screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
+    ).toBeOnTheScreen();
+    // The photograph step needs the device camera. Until a receipt is
+    // attached the confirm stays disabled, so the payment is not started.
+    expect(screen.getByRole("button", { name: "Confirmar" })).toBeDisabled();
+    expect(fetcher).not.toHaveBeenCalledWith(
+      "/api/v1/evaluation-slots/slot-2/evaluation-payments",
+      expect.anything(),
+    );
   });
 
   it("offers notifications once the Evaluation is confirmed", async () => {

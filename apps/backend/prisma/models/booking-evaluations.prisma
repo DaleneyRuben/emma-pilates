@@ -21,6 +21,8 @@ enum EvaluationCancellationCause {
   PAYMENT_EXPIRED @map("payment_expired")
   // The Administrator voided the Evaluation Payment.
   PAYMENT_VOIDED  @map("payment_voided")
+  // The Administrator rejected the transfer (booking ADR-0011).
+  PAYMENT_REJECTED @map("payment_rejected")
 
   @@schema("booking")
 }
