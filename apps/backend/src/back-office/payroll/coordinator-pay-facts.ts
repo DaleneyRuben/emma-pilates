@@ -1,56 +1,42 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import {
-  monthOfOperation,
-  renewalRatePercent,
-  renewalTargetPercent,
-} from './coordinator-pay';
+  readPlanRenewals,
+  renewalRateOf,
+} from '../../booking/payments/plan-renewals';
+import { boliviaInstant } from '../../time/bolivia-time';
+import { settingsInForce } from '../settings-in-force';
+import { monthOfOperation, renewalTargetPercent } from './coordinator-pay';
+import { readFirstPlans } from './first-plans';
 import type { CoordinatorMonthFacts } from './prisma-pay-statements';
 
 // Booking owns Payments, Subscriptions, and Studio Settings. Back Office
 // asks for them here and never writes those tables (ADR-0103). A new Client
-// is her first confirmed Plan Payment of the month. A Plan renews when the
-// next one starts before its end or within 7 days after it.
+// is her first real Plan, approved in the month (Bolivia time). «Renovó» is
+// booking's one definition (owner decision 5). Every active Coordinator is
+// paid on the same facts.
 export const coordinatorMonthFacts = async (
   prisma: PrismaClient,
   from: Date,
   until: Date,
 ): Promise<CoordinatorMonthFacts> => {
-  const [coordinator, settings, payments, subscriptions, brought] =
-    await Promise.all([
-      prisma.staffMember.findFirst({
-        where: { role: 'COORDINATOR', deletedAt: null },
+  const window = {
+    from: boliviaInstant(from, 0),
+    until: boliviaInstant(until, 0),
+  };
+  const [coordinators, settings, firsts, renewals, brought] = await Promise.all(
+    [
+      prisma.staffMember.findMany({
+        where: {
+          role: 'COORDINATOR',
+          deletedAt: null,
+          account: { disabledAt: null },
+        },
         orderBy: { createdAt: 'asc' },
         select: { id: true },
       }),
-      prisma.studioSettingsVersion.findFirst({
-        orderBy: { version: 'desc' },
-        select: {
-          renewalTargetMonths1To6Percent: true,
-          renewalTargetMonths7To12Percent: true,
-          renewalTargetFromMonth13Percent: true,
-          openingDate: true,
-        },
-      }),
-      prisma.payment.findMany({
-        where: {
-          state: 'CONFIRMED',
-          kind: 'PLAN',
-          method: { in: ['TRANSFER', 'CASH'] },
-          decidedAt: { not: null },
-        },
-        select: {
-          clientId: true,
-          durationDaysSnapshot: true,
-          classAllowanceSnapshot: true,
-          decidedAt: true,
-        },
-        orderBy: { decidedAt: 'asc' },
-      }),
-      prisma.subscription.findMany({
-        where: { endedByVoid: false, durationDaysSnapshot: { gte: 30 } },
-        select: { clientId: true, startsOn: true, endsOn: true },
-        orderBy: { startsOn: 'asc' },
-      }),
+      settingsInForce(prisma, window.until),
+      readFirstPlans(prisma),
+      readPlanRenewals(prisma, from, until),
       prisma.clientAcquisition.findMany({
         where: {
           deletedAt: null,
@@ -59,55 +45,24 @@ export const coordinatorMonthFacts = async (
         },
         select: { clientId: true },
       }),
-    ]);
+    ],
+  );
 
   const broughtByTrainer = new Set(brought.map((row) => row.clientId));
-  const firstPaid = new Map<
-    string,
-    {
-      decidedAt: Date;
-      durationDays: number;
-      classAllowance: number;
-    }
-  >();
-  for (const payment of payments) {
-    if (firstPaid.has(payment.clientId)) continue;
-    firstPaid.set(payment.clientId, {
-      decidedAt: payment.decidedAt as Date,
-      durationDays: payment.durationDaysSnapshot,
-      classAllowance: payment.classAllowanceSnapshot,
-    });
-  }
-
-  const ending = subscriptions
-    .filter(
-      (subscription) =>
-        subscription.endsOn >= from && subscription.endsOn < until,
-    )
-    .map((subscription) => ({
-      endsOn: subscription.endsOn,
-      nextPlanStartsOn:
-        subscriptions
-          .filter(
-            (next) =>
-              next.clientId === subscription.clientId &&
-              next.startsOn > subscription.startsOn,
-          )
-          .map((next) => next.startsOn)
-          .sort((left, right) => left.getTime() - right.getTime())[0] ?? null,
-    }));
-
   const openingDate = settings?.openingDate ?? from;
   return {
-    staffMemberId: coordinator?.id ?? null,
-    newClients: [...firstPaid]
-      .filter(([, paid]) => paid.decidedAt >= from && paid.decidedAt < until)
-      .map(([clientId, paid]) => ({
-        durationDays: paid.durationDays,
-        classAllowance: paid.classAllowance,
-        broughtByTrainer: broughtByTrainer.has(clientId),
+    staffMemberIds: coordinators.map((coordinator) => coordinator.id),
+    newClients: [...firsts.values()]
+      .filter(
+        (first) =>
+          first.decidedAt >= window.from && first.decidedAt < window.until,
+      )
+      .map((first) => ({
+        durationDays: first.durationDays,
+        classAllowance: first.classAllowance,
+        broughtByTrainer: broughtByTrainer.has(first.clientId),
       })),
-    renewalRatePercent: renewalRatePercent(ending),
+    renewalRatePercent: renewalRateOf(renewals),
     renewalTargetPercent: renewalTargetPercent(
       {
         months1To6Percent: settings?.renewalTargetMonths1To6Percent ?? 80,

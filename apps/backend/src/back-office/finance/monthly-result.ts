@@ -21,7 +21,10 @@ export const monthlyResult = (input: {
   contingencyPercent: number;
   actualByLineCentavos: Record<string, number>;
   nutritionistCostCentavos: number;
+  /** The month's Salary Payments, by the budget line each one pays. */
+  salaries?: { byLineCentavos: Record<string, number>; totalCentavos: number };
 }) => {
+  const salaries = input.salaries ?? { byLineCentavos: {}, totalCentavos: 0 };
   const budgetSubtotalCentavos = input.budgetLines.reduce(
     (total, line) => total + line.monthlyCentavos,
     0,
@@ -51,12 +54,16 @@ export const monthlyResult = (input: {
     lines: input.budgetLines.map((line) => ({
       name: line.name,
       budgetCentavos: line.monthlyCentavos,
-      actualCentavos: input.actualByLineCentavos[line.name] ?? 0,
+      actualCentavos:
+        (input.actualByLineCentavos[line.name] ?? 0) +
+        (salaries.byLineCentavos[line.name] ?? 0),
     })),
+    salariesCentavos: salaries.totalCentavos,
     resultCentavos:
       input.cashIncomeCentavos -
       taxCentavos -
       actualCentavos -
+      salaries.totalCentavos -
       input.nutritionistCostCentavos,
   };
 };

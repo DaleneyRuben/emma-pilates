@@ -2080,9 +2080,15 @@ Load the fixtures (Test 5A), start the backend, and start the worker with
   Session that started before the worker could check it is left alone.
 - **Sessions whose Cancellation Window has closed** (2.5 hours before the
   start, from Studio Settings). Each scheduled Session records its live
-  Bookings in `bookings_at_window_close` once; later cancellations,
-  Reschedules, or worker restarts never change it. Trainer pay (BKO-006)
-  counts this number. A cancelled Session gets none.
+  Bookings in `bookings_at_window_close` once, as they stood at the close:
+  a cancellation after the close still counts, and a Booking made after
+  it does not, however late the sweep runs. A cancellation before the
+  close, a Reschedule, and a worker restart do not change the number once
+  it is written. Trainer pay (BKO-006) counts this number. A cancelled
+  Session gets none. One Session whose settlement fails, for any reason,
+  does not stop the rest of that sweep; the worker logs
+  `minimum_bookings_check_failed` with its id and the next sweep retries
+  it.
 - **Sessions that have started.** Their remaining open Waitlist Entries close
   as `session_started`, without a notification.
 
@@ -6358,12 +6364,14 @@ build (Test 46).
    B). In the database, move that Session to 23 hours from now:
    `update booking.sessions set starts_at = now() + interval '23 hours', ends_at = now() + interval '23 hours 50 minutes' where id = '<session>'`.
    Within a minute her inbox (Perfil → Notificaciones, screen 19) shows
-   «Recordatorio» / «Mañana tienes {clase} a las {hora}.», with the Bolivia
-   time. Restart the worker: the inbox still has one entry.
+   «Recordatorio» / «Mañana tienes {clase} a las {hora}.» when the Session
+   is still the next Bolivia day, or «Hoy tienes {clase} a las {hora}.»
+   when it is already that day, with the Bolivia clock time. Restart the
+   worker: the inbox still has one entry.
 2. **2 hours before.** Move the same Session to 90 minutes from now. The
-   inbox gains «Tu clase de {clase} empieza en 2 horas.» A second restart
-   adds nothing. A Booking made inside the last 24 hours gets only this
-   one, never «Mañana».
+   inbox gains «Hoy tienes {clase} a las {hora}.» A second restart adds
+   nothing. A Booking made inside the last 24 hours gets only this one,
+   never «Mañana».
 3. **Nothing after a cancellation.** Cancel the Booking before the window
    (Mis reservas → Cancelar). Moving the Session into either window leaves
    her inbox without a new reminder.
@@ -7244,10 +7252,16 @@ With nobody to write to it reads «Nadie para contactar por ahora.».
 
 ### C. The Client app
 
-The messages arrive in **Notificaciones** (Perfil). The four titles are
-«Tu segunda clase», «Tu primera semana», «Tu primer mes», and «Tres meses
-con nosotras». The inbox card draws the message body and not the title
-(noted on the BKM-013 row; the title is what the push shows).
+The messages arrive in **Notificaciones** (Perfil) from 09:00 La Paz, never
+at midnight. The four titles are «Tu segunda clase», «Tu primera semana»,
+«Tu primer mes», and «Tres meses con nosotras». A catch-up records every
+missed milestone and pushes only the latest, so a Client does not get a
+burst of old messages. The 90 days run from her first real Plan: a
+renewal never restarts them. The day-15 and day-30 alerts count classes
+that start inside those days of her first Plan, on the La Paz calendar
+(a class at 23:30 on day 15 counts). The inbox card draws the
+message body and not the title (noted on the BKM-013 row; the title is
+what the push shows).
 
 ## Test 85: extra classes (BKM-008)
 
@@ -7777,3 +7791,83 @@ H. **Detalle del plan (Client 09, design follow-up 219).** From Mi plan,
    **Continuar al pago** sends no `startsOn`. With no classes left, the chips
    show and «Hoy» is selected. `GET /api/v1/clients/current/subscription`
    carries `renewalStartsOn` only in the first case.
+
+## Test 120: analytics review fixes (FIX-008)
+
+The analytics findings of the 2026-10-28 review. Use `pilates_dev_sim` with the
+API and the admin web (`pnpm dev:admin`) signed in as Paola (Administrator).
+The reports read the studio facts: after changing data, recompute the month
+first (`POST /api/v1/administrator/studio-facts/recompute` with
+`{"month": "YYYY-MM"}`).
+
+A. **Accrued revenue (H12).** In Indicadores (and Reporte) for a month with a
+   30-day Plan of Bs 300 starting on the 20th: «Devengado» shows Bs 120 for
+   the first month (12 of 30 days, the end date counts) and Bs 180 for the
+   next. A Payment approved on the 1st counts in «Caja» of that month only.
+   «Diferido» shrinks every day and reads Bs 0 the day after the Plan ends;
+   for a past month it is measured at that month's end. A paid Evaluation
+   shows in «Caja» and «Devengado» of the month it was approved, as in the
+   income report, and never in «Diferido». A one-day Plan never shows NaN.
+B. **Only Sessions taught.** A Session cancelled this month, or one later
+   today or later in the month, is not counted in «Clases dictadas»,
+   occupancy, the averages, the weak-schedule recommendations, or the
+   narrative («se dictaron N clases»). Students per class come from the
+   Bookings when the Cancellation Window closed (what Trainer pay counts),
+   not from today's Bookings. A Client with only a future Booking this month
+   is not listed as «no reservó este mes».
+C. **Who counts as a Client.** A friend with only a Guest Pass, a Client with
+   only Courtesy Access, and a Client whose only sale was voided are not
+   counted in «Clientas activas», «Nuevas», or the inactive-client
+   recommendations.
+D. **The previous month is finalized.** Through day 8 of a month (La Paz
+   time) the worker's daily studio-facts run recomputes the previous month as
+   well, so a late attendance or a void shows in it. From day 9 the previous
+   month no longer changes.
+E. **Simulador (AW37).** The form now has «Precio por clase para la clienta
+   (Bs)» (70), «Pago por clase a la instructora (Bs)» (65), «Alumnas
+   incluidas en el pago» (4), and «Pago por alumna extra (Bs)» (8) instead of
+   the single «Precio por clase (Bs)». With the opening values «Resultado»
+   reads «Bs 3.163,60» (ingreso Bs 40.040,00), «Punto de equilibrio»
+   «Bs 36.273,81», and the derivation «(21175 + 9295) / 0.84 = 36273.81».
+   With 6 students per class, Trainer pay is Bs 81 a class: the derivation
+   reads «(21175 + 11583) / 0.84 = 38997.62». The Proyección's «3 meses
+   Base» income is «Bs 120.120,00»; «Alto» pays the extra student.
+F. **No float noise.** A tax of 7 % shows the divisor as «0.93», never
+   «0.9299999999999999».
+## Test 121: payroll and finance (FIX-007)
+
+Run the API, the worker and the fixtures as in Tests 2 and 5. The
+integration spec
+`apps/backend/test/database/payroll-finance-fixes.integration-spec.ts` builds
+every state below.
+
+A. **Salaries in «Resultado» (H10).** Record Salary Payments for the
+   Coordinator, reception and a Trainer in one month. In Reporte ›
+   Finanzas, «Coordinadora» and «Recepción» show those payments as their
+   actual. «Sueldos pagados Bs N» shows the month's total. «Resultado»
+   subtracts it: «Ingresos en caja menos impuesto, gastos, sueldos y
+   nutricionista».
+B. **One Salary Payment per statement (H11).** Approving a statement twice
+   at once, or while the hourly re-draft runs, leaves one Salary Payment.
+   An approved statement is never re-drafted.
+C. **«Renovó» (H18, owner decision 5).** A real Plan ending in the month
+   renewed when another real Plan was bought (approval date, Bolivia) before
+   its end or up to 7 days after it, whatever its Start Date. A Guest Pass,
+   Courtesy Access, a single class and a voided sale are never counted. The
+   Coordinator's bonus and Indicadores use the same definition.
+D. **Months in Bolivia.** A sale approved at 23:30 on the last day of the
+   month (La Paz) counts in that month, in Finanzas and in pay.
+E. **Approval waits for the month.** Approving before the month is over
+   answers `409` `pay_statement_month_open`. The Coordinator's statement
+   waits 7 more days for the renewal week.
+F. **Commissions.** A Trainer's commission is paid on the first real Plan of
+   a Client she brought. A single class is not a Plan. After a voided first
+   Plan, a later Plan opens no commission.
+G. **Coordinators.** Every active Coordinator gets her statement. A
+   deactivated one gets none.
+H. **Re-draft and seed.** The hourly re-draft writes nothing when the lines
+   did not change. Two «Cargar presupuesto inicial» requests at once seed the
+   ten lines once.
+I. **Month and settings.** `?month=2026-13` answers `400`. A month reads the
+   tax and the renewal targets of the Studio Settings version in force
+   then, not a later one.

@@ -26,7 +26,9 @@ export interface MonthResultDto {
   lines: BudgetLineResultDto[];
   /** BOB centavos owed to the Nutritionist */
   nutritionistCostCentavos: number;
-  /** Cash income less tax, actual costs, and the Nutritionist */
+  /** The month’s Salary Payments, BOB centavos. The Coordinator’s and reception’s also show as the actual of their budget lines */
+  salariesCentavos?: number;
+  /** Cash income less tax, actual costs, salaries, and the Nutritionist */
   resultCentavos: number;
   /** Cash income that covers the budget and the Nutritionist */
   breakEvenCentavos: number;

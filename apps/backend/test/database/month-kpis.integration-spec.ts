@@ -70,8 +70,10 @@ describe('month kpi reader', () => {
       noShowPercent: 15,
       activeClients: 2,
       newClients: 1,
-      renewedClients: 1,
-      renewalPercent: 50,
+      // «Renovó» is booking's one definition over real sales (owner
+      // decision 5); these fact rows carry no sale, so nothing ended.
+      renewedClients: 0,
+      renewalPercent: 0,
     });
   });
 });

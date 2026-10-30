@@ -1,3 +1,4 @@
+import { SweepItemsFailed } from './jobs/sweep-each';
 import { startSweeps } from './worker-sweeps';
 
 describe('worker sweeps', () => {
@@ -65,6 +66,40 @@ describe('worker sweeps', () => {
     stop();
   });
 
+  it('does not start a pass while the previous pass of that group is still running', async () => {
+    jest.useFakeTimers();
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const execute = jest
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockImplementation(() => gate);
+
+    const { stop } = await startSweeps(
+      [
+        {
+          intervalMs: 60_000,
+          steps: [{ job: 'class_reminders', execute }],
+        },
+      ],
+      { serviceVersion: '1.2.3', emit: jest.fn(), reportError: jest.fn() },
+    );
+    expect(execute).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(60_000);
+    await Promise.resolve();
+    expect(execute).toHaveBeenCalledTimes(2);
+
+    jest.advanceTimersByTime(60_000);
+    await Promise.resolve();
+    expect(execute).toHaveBeenCalledTimes(2);
+
+    release();
+    stop();
+  });
+
   it('records when each step last succeeded, from the worker start until then', async () => {
     jest.useFakeTimers({ now: new Date('2026-10-14T12:00:00.000Z') });
     const reminders = jest
@@ -107,5 +142,38 @@ describe('worker sweeps', () => {
       },
     ]);
     sweeps.stop();
+  });
+
+  it('counts a pass with failed items as finished and reports each item once a day', async () => {
+    jest.useFakeTimers();
+    const now = jest.fn(() => new Date(Date.now()));
+    const failing = () =>
+      Promise.reject(
+        new SweepItemsFailed('class_reminders', [
+          { id: 'booking-1', error: new Error('notice broke') },
+        ]),
+      );
+    const emit = jest.fn();
+    const reportError = jest.fn();
+
+    const { stop, progress } = await startSweeps(
+      [
+        {
+          intervalMs: 60_000,
+          steps: [{ job: 'class_reminders', execute: failing }],
+        },
+      ],
+      { serviceVersion: '1.2.3', emit, reportError, now },
+    );
+    await jest.advanceTimersByTimeAsync(10 * 60_000);
+
+    // The pass still ran, so the sweep is not stale.
+    expect(progress()[0].lastSuccessAt.getTime()).toBe(Date.now());
+    expect(emit).toHaveBeenCalledTimes(11);
+    expect(reportError).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(24 * 60 * 60_000);
+    expect(reportError).toHaveBeenCalledTimes(2);
+    stop();
   });
 });

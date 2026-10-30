@@ -3,10 +3,8 @@ import { PRISMA_CLIENT } from '../database/database.module';
 import { PrismaClient } from '../generated/prisma/client';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import { studioKpiRole, requireStudioAdministrator } from './studio-errors';
-import {
-  recomputeStudioFacts,
-  currentStudioMonth,
-} from './prisma-studio-facts';
+import { recomputeStudioFacts } from './prisma-studio-facts';
+import { studioMonthsToRecompute } from './recompute-months';
 import { readMonthKpis } from './prisma-month-kpis';
 import {
   dismissRecommendation,
@@ -168,8 +166,28 @@ export const createStudioOperations = (deps: {
 })
 export class StudioModule {}
 
-export const recomputeCurrentStudioMonth = (prisma: PrismaClient) =>
-  recomputeStudioFacts(prisma, {
-    month: currentStudioMonth(new Date()),
-    now: () => new Date(),
-  });
+// The worker's daily run: the current month, and the previous one until it
+// is final (recompute-months.ts).
+export const recomputeCurrentStudioMonth = async (
+  prisma: PrismaClient,
+  now: Date = new Date(),
+): Promise<{ sessions: number; clientMonths: number }> => {
+  const total = { sessions: 0, clientMonths: 0 };
+  // One month failing leaves the other to run. The first failure is thrown
+  // afterwards so the worker reports it, and the next day retries.
+  let failure: Error | null = null;
+  for (const month of studioMonthsToRecompute(now)) {
+    try {
+      const result = await recomputeStudioFacts(prisma, {
+        month,
+        now: () => now,
+      });
+      total.sessions += result.sessions;
+      total.clientMonths += result.clientMonths;
+    } catch (error) {
+      failure ??= error instanceof Error ? error : new Error(String(error));
+    }
+  }
+  if (failure !== null) throw failure;
+  return total;
+};
