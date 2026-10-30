@@ -34,8 +34,9 @@ export const dueMilestones = (
   startsOn: Date,
   today: Date,
   alreadySent: ReadonlySet<LifecycleMilestone>,
-): LifecycleMilestone[] =>
-  lifecycleMilestones.filter(
+): LifecycleMilestone[] => {
+  return lifecycleMilestones.filter(
     (milestone) =>
       isMilestoneDue(milestone, startsOn, today) && !alreadySent.has(milestone),
   );
+};

@@ -16,7 +16,7 @@ export type LifecycleSend = {
   clientId: string;
   accountId: string;
   milestone: LifecycleMilestone;
-  notification: NewNotification;
+  notification: NewNotification | null;
 };
 
 type SendLifecycleMessagesDependencies = {
@@ -48,22 +48,18 @@ export const sendLifecycleMessages = async (
 
   for (const plan of plans) {
     const alreadySent = new Set(plan.sentMilestones);
-    for (const milestone of dueMilestones(
-      plan.startsOn,
-      dependencies.today,
-      alreadySent,
-    )) {
+    const due = dueMilestones(plan.startsOn, dependencies.today, alreadySent);
+    for (const milestone of due) {
+      const latest = milestone === due.at(-1);
       const recorded = await dependencies.record({
         clientId: plan.clientId,
         accountId: plan.accountId,
         milestone,
-        notification: lifecycleNotification(
-          plan,
-          milestone,
-          dependencies.today,
-        ),
+        notification: latest
+          ? lifecycleNotification(plan, milestone, dependencies.today)
+          : null,
       });
-      if (recorded) sent += 1;
+      if (recorded && latest) sent += 1;
     }
   }
 

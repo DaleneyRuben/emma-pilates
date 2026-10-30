@@ -33,6 +33,7 @@ describe('endLapsedFounderMemberships', () => {
 
     expect(markLost).toHaveBeenCalledWith({
       id: 'membership-1',
+      accountId: 'account-1',
       reason: 'gap',
       occurredAt: today,
     });

@@ -251,7 +251,7 @@ describe('founder membership', () => {
       where: { clientId: lapsed.clientId },
       data: { endsOn: new Date('2026-10-14T00:00:00.000Z') },
     });
-    await prisma.$executeRaw`
+    await prisma.$executeRawUnsafe(`
       CREATE OR REPLACE FUNCTION booking.fail_founder_notice()
       RETURNS trigger LANGUAGE plpgsql AS $$
       BEGIN
@@ -259,7 +259,7 @@ describe('founder membership', () => {
           RAISE EXCEPTION 'notice broke';
         END IF;
         RETURN NEW;
-      END $$`;
+      END $$`);
     await prisma.$executeRaw`
       CREATE TRIGGER fail_founder_notice
       BEFORE INSERT ON system.notifications

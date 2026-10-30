@@ -53,11 +53,21 @@ export const startSweeps = async (
   };
 
   const timers: NodeJS.Timeout[] = [];
+  const running = new Set<SweepGroup>();
+  const guarded = async (group: SweepGroup) => {
+    if (running.has(group)) return;
+    running.add(group);
+    try {
+      await runGroup(group);
+    } finally {
+      running.delete(group);
+    }
+  };
   for (const group of groups) {
-    await runGroup(group);
+    await guarded(group);
     timers.push(
       setInterval(() => {
-        void runGroup(group);
+        void guarded(group);
       }, group.intervalMs),
     );
   }

@@ -7,6 +7,7 @@ import {
   PaymentState,
 } from '../../generated/prisma/client';
 import { boliviaDate } from '../../time/bolivia-time';
+import { dateTriggeredPushInstant } from '../../notifications/date-triggered-push';
 
 const civil = (date: Date): Date =>
   new Date(`${date.toISOString().slice(0, 10)}T00:00:00.000Z`);
@@ -64,7 +65,10 @@ export const createFounderMembershipJob = (
   recordNotification: NotificationRecorder = defaultNotificationRecorder,
 ) => ({
   execute: async (): Promise<{ ended: number }> => {
-    const today = boliviaDate(now());
+    const instant = now();
+    const occurredAt = dateTriggeredPushInstant(instant);
+    if (occurredAt === null) return { ended: 0 };
+    const today = boliviaDate(instant);
     const version = await prisma.studioSettingsVersion.findFirst({
       orderBy: { version: 'desc' },
       select: {
@@ -129,7 +133,7 @@ export const createFounderMembershipJob = (
             data: {
               status: FounderMembershipStatus.LOST,
               reason: input.reason,
-              lostAt: input.occurredAt,
+              lostAt: occurredAt,
             },
           });
           if (changed.count === 0) return;
@@ -141,15 +145,23 @@ export const createFounderMembershipJob = (
               targetType: 'founder_membership',
               targetId: input.id,
               correlationId: input.id,
-              occurredAt: input.occurredAt,
+              occurredAt,
               metadata: { reason: input.reason },
             },
           });
+          if (input.accountId === null) return;
+          await recordNotification(transaction, {
+            accountId: input.accountId,
+            category: 'reminder',
+            type: 'founder_membership_lost',
+            businessEventKey: `founder-membership-lost:${input.id}`,
+            title: 'Membresía fundadora',
+            message: `Pasaron más de ${version.founderGapDays} días sin plan, así que tu membresía fundadora se perdió.`,
+            destination: { type: 'subscription', id: null },
+            occurredAt,
+          });
         }),
-      record: (notification) =>
-        prisma.$transaction((transaction) =>
-          recordNotification(transaction, notification),
-        ),
+      record: () => Promise.resolve(),
     });
   },
 });

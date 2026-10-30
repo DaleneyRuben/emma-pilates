@@ -20,29 +20,31 @@ describe('sendLifecycleMessages', () => {
         ]),
         record,
       }),
-    ).resolves.toEqual({ sent: 2 });
+    ).resolves.toEqual({ sent: 1 });
 
     expect(record).toHaveBeenCalledTimes(2);
     expect(record).toHaveBeenCalledWith({
       clientId: 'client-1',
       accountId: 'account-1',
       milestone: 'day_2',
+      notification: null,
+    });
+    expect(record).toHaveBeenNthCalledWith(2, {
+      clientId: 'client-1',
+      accountId: 'account-1',
+      milestone: 'week_1',
       notification: {
         accountId: 'account-1',
         category: 'reminder',
-        type: 'lifecycle_day_2',
-        businessEventKey: 'lifecycle:day_2:client-1',
-        title: 'Tu segunda clase',
+        type: 'lifecycle_week_1',
+        businessEventKey: 'lifecycle:week_1:client-1',
+        title: 'Tu primera semana',
         message:
-          '¿Cómo te fue en tu primera clase? Tu segunda clase es el mejor momento para afianzar lo que aprendiste. Reserva cuando quieras: tu lugar te espera.',
+          '¿Cómo te sentiste en tus primeras clases? Si tienes alguna duda sobre los ejercicios o el nivel, cuéntale a tu instructora: estamos para acompañarte.',
         destination: null,
         occurredAt: today,
       },
     });
-    expect(record).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({ milestone: 'week_1' }),
-    );
   });
 
   it('skips milestones already sent so a rerun sends nothing twice', async () => {

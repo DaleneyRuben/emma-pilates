@@ -11,6 +11,7 @@ const state = (
   lastBookedAt: null,
   hasUpcomingBooking: false,
   bookedClassCount: 0,
+  bookedClassCount30: 0,
   openUncontacted: {},
   lastContactedAt: {},
   everOpened: {},
@@ -44,6 +45,7 @@ describe('reasonsToOpen', () => {
       reasonsToOpen(
         state({
           bookedClassCount: 3,
+          bookedClassCount30: 3,
           everOpened: { fewer_than_2_classes_by_day_15: true },
         }),
         new Date('2026-10-31T00:00:00.000Z'),

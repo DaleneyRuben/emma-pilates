@@ -1,4 +1,6 @@
 import { boliviaDate } from '../../time/bolivia-time';
+import { dateTriggeredPushInstant } from '../../notifications/date-triggered-push';
+import { classesInsideFirstDays } from './first-90-days-alerts';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import {
   BookingState,
@@ -72,6 +74,11 @@ const firstRealPlan = (
   return [...first.values()];
 };
 
+const withinNinetyDays = (today: Date) => ({
+  gte: new Date(today.getTime() - 90 * 24 * 60 * 60 * 1_000),
+  lte: today,
+});
+
 const findFirstRealPlans = (prisma: PrismaClient): Promise<FirstRealPlan[]> =>
   prisma.subscription
     .findMany({
@@ -141,7 +148,16 @@ const alertStateFrom = (
     hasUpcomingBooking: booked.some(
       (booking) => booking.session.startsAt > instant,
     ),
-    bookedClassCount: booked.length,
+    bookedClassCount: classesInsideFirstDays(
+      startsOn,
+      15,
+      booked.map((booking) => booking.session.startsAt),
+    ),
+    bookedClassCount30: classesInsideFirstDays(
+      startsOn,
+      30,
+      booked.map((booking) => booking.session.startsAt),
+    ),
     openUncontacted,
     lastContactedAt,
     everOpened,
@@ -156,6 +172,7 @@ const findClientAlertStates = async (
     where: {
       plan: { priceCentavos: { gt: 0 }, hiddenAt: null },
       client: { deletedAt: null },
+      startsOn: withinNinetyDays(boliviaDate(instant)),
     },
     orderBy: [{ startsOn: 'asc' }, { id: 'asc' }],
     select: { clientId: true, startsOn: true },
@@ -219,7 +236,9 @@ const recordLifecycle = async (
     skipDuplicates: true,
   });
   if (inserted.count === 0) return false;
-  await recordNotification(transaction, send.notification);
+  if (send.notification !== null) {
+    await recordNotification(transaction, send.notification);
+  }
   return true;
 };
 
@@ -247,14 +266,18 @@ export const createFirst90DaysJob = (
   execute: async () => {
     const instant = now();
     const today = boliviaDate(instant);
-    const messages = await sendLifecycleMessages({
-      today,
-      findFirstRealPlans: () => findFirstRealPlans(prisma),
-      record: (send) =>
-        prisma.$transaction((transaction) =>
-          recordLifecycle(transaction, recordNotification, send, instant),
-        ),
-    });
+    const occurredAt = dateTriggeredPushInstant(instant);
+    const messages =
+      occurredAt === null
+        ? { sent: 0 }
+        : await sendLifecycleMessages({
+            today,
+            findFirstRealPlans: () => findFirstRealPlans(prisma),
+            record: (send) =>
+              prisma.$transaction((transaction) =>
+                recordLifecycle(transaction, recordNotification, send, instant),
+              ),
+          });
     const alerts = await sweepContactAlerts({
       today,
       findClientStates: () => findClientAlertStates(prisma, instant),

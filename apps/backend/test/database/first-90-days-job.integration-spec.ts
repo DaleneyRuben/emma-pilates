@@ -37,7 +37,7 @@ describe('first 90 days job (PostgreSQL)', () => {
     });
 
     await expect(job().execute()).resolves.toEqual({
-      messages: 2,
+      messages: 1,
       alerts: 1,
     });
     await expect(job().execute()).resolves.toEqual({
@@ -54,10 +54,7 @@ describe('first 90 days job (PostgreSQL)', () => {
       where: { accountId: client.accountId },
       orderBy: { type: 'asc' },
     });
-    expect(inbox.map((row) => row.type)).toEqual([
-      'lifecycle_day_2',
-      'lifecycle_week_1',
-    ]);
+    expect(inbox.map((row) => row.type)).toEqual(['lifecycle_week_1']);
     expect(inbox.every((row) => row.destinationType === null)).toBe(true);
     const alerts = await prisma.contactAlert.findMany({
       where: { clientId: client.clientId },
@@ -185,7 +182,11 @@ describe('first 90 days job (PostgreSQL)', () => {
       startsAt: new Date('2026-10-20T15:00:00.000Z'),
     });
 
-    await createFirst90DaysJob(prisma, () => day15, recordNotification).execute();
+    await createFirst90DaysJob(
+      prisma,
+      () => day15,
+      recordNotification,
+    ).execute();
     expect(
       await prisma.contactAlert.findMany({
         where: { clientId: client.clientId },
@@ -195,7 +196,7 @@ describe('first 90 days job (PostgreSQL)', () => {
     ]);
   });
 
-  it('does not read a Client whose first plan started more than 90 days ago', async () => {
+  it('does not alert a Client whose first plan started more than 90 days ago', async () => {
     const client = await createClientWithPlan(prisma, {
       name: 'Antigua',
       startsOn: new Date('2026-01-01T00:00:00.000Z'),
@@ -206,7 +207,7 @@ describe('first 90 days job (PostgreSQL)', () => {
       await prisma.lifecycleMessage.count({
         where: { clientId: client.clientId },
       }),
-    ).toBe(0);
+    ).toBe(4);
     expect(
       await prisma.contactAlert.count({ where: { clientId: client.clientId } }),
     ).toBe(0);

@@ -7,6 +7,7 @@ import {
   recordNotification as defaultNotificationRecorder,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
+import { Prisma } from '../../generated/prisma/client';
 import { retrySerializable } from '../../database/retry-serializable';
 import { readCurrentStudioSettings } from '../studio-settings/prisma-studio-settings';
 import {
@@ -30,7 +31,7 @@ export const createPrismaSessionStartChecks = (
   // One-time Minimum Bookings check (ADR-0007, BKM-009): each due Session is
   // settled in its own transaction, and the completion marker makes reruns
   // and a restart mid-sweep no-ops for the Sessions already settled.
-  const checkSession = (
+  const settleSession = (
     sessionId: string,
     now: Date,
     rule: MinimumRule,
@@ -43,7 +44,7 @@ export const createPrismaSessionStartChecks = (
           // so a Booking landing now surfaces as a serialization retry
           // instead of a lock wait.
           await transaction.$queryRaw`
-            SELECT id FROM booking.sessions WHERE id = ${sessionId}::uuid FOR NO KEY UPDATE`;
+          SELECT id FROM booking.sessions WHERE id = ${sessionId}::uuid FOR NO KEY UPDATE`;
           const session = await transaction.session.findUniqueOrThrow({
             where: { id: sessionId },
             select: checkedSessionSelect,
@@ -74,6 +75,26 @@ export const createPrismaSessionStartChecks = (
         { isolationLevel: 'Serializable' },
       ),
     );
+
+  // One Session whose own settlement fails must not stop the sweep. The
+  // worker stopping, and a serialization conflict, still propagate.
+  const checkSession = (
+    sessionId: string,
+    now: Date,
+    rule: MinimumRule,
+  ): Promise<'skipped' | 'checked' | 'cancelled'> =>
+    settleSession(sessionId, now, rule).catch((error: unknown) => {
+      if (error instanceof Error && error.message.includes('worker stopped')) {
+        throw error;
+      }
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        (error.code === 'P2034' || error.code === 'P2010')
+      ) {
+        throw error;
+      }
+      return 'skipped' as const;
+    });
 
   const checkMinimumBookings = async (): Promise<{
     checked: number;
@@ -126,7 +147,13 @@ export const createPrismaSessionStartChecks = (
       UPDATE booking.sessions AS session
       SET bookings_at_window_close = (
             SELECT count(*) FROM booking.bookings AS booking
-            WHERE booking.session_id = session.id AND booking.state = 'booked'
+            WHERE booking.session_id = session.id
+              AND booking.state = 'booked'
+          ) + (
+            SELECT count(*) FROM booking.bookings AS booking
+            WHERE booking.session_id = session.id
+              AND booking.state = 'cancelled'
+              AND booking.cancelled_at > session.starts_at - (${cancellationWindowMinutes} * interval '1 minute')
           ),
           updated_at = ${now}
       WHERE session.state = 'scheduled'

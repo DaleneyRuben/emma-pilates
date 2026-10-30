@@ -62,11 +62,18 @@ export const shouldReopenNoBooking7Days = (input: {
   );
 };
 
+const dayMilliseconds = 24 * 60 * 60 * 1_000;
+
+// A class counts for a milestone only when it starts inside that many civil
+// days of the first Plan, not whenever in her life she booked it.
 export const classesInsideFirstDays = (
-  _startsOn: Date,
-  _days: number,
+  startsOn: Date,
+  days: number,
   startsAt: readonly Date[],
-): number => startsAt.length;
+): number => {
+  const until = startsOn.getTime() + days * dayMilliseconds;
+  return startsAt.filter((instant) => instant.getTime() < until).length;
+};
 
 export const hasBookedSince = (
   openedAt: Date,

@@ -16,6 +16,7 @@ type EndLapsedFounderMembershipsDependencies = {
   findActive(): Promise<ActiveFounderFacts[]>;
   markLost(input: {
     id: string;
+    accountId: string | null;
     reason: 'gap';
     occurredAt: Date;
   }): Promise<void>;
@@ -43,11 +44,16 @@ export const endLapsedFounderMemberships = async (
     });
     if (!decision.lose) continue;
 
-    await dependencies.markLost({
-      id: membership.id,
-      reason: decision.reason,
-      occurredAt: dependencies.today,
-    });
+    try {
+      await dependencies.markLost({
+        id: membership.id,
+        accountId: membership.accountId,
+        reason: decision.reason,
+        occurredAt: dependencies.today,
+      });
+    } catch {
+      continue;
+    }
     if (membership.accountId !== null) {
       await dependencies.record({
         accountId: membership.accountId,

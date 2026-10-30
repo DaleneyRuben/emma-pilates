@@ -1,4 +1,5 @@
 import { addCivilDays, boliviaDate } from '../time/bolivia-time';
+import { dateTriggeredPushInstant } from './date-triggered-push';
 import type { PrismaClient } from '../generated/prisma/client';
 import {
   recordNotification as defaultNotificationRecorder,
@@ -11,8 +12,10 @@ export const createSubscriptionReminderJob = (
   now: () => Date = () => new Date(),
   recordNotification: NotificationRecorder = defaultNotificationRecorder,
 ) => ({
-  execute: () =>
-    remindExpiringSubscriptions({
+  execute: () => {
+    const occurredAt = dateTriggeredPushInstant(now());
+    if (occurredAt === null) return Promise.resolve({ reminded: 0 });
+    return remindExpiringSubscriptions({
       today: boliviaDate(now()),
       // Already reminded Subscriptions are excluded, so a day the job misses
       // is recovered the next day instead of waiting for an exact date. A
@@ -81,7 +84,8 @@ export const createSubscriptionReminderJob = (
       // The push is queued in the same transaction as the inbox entry.
       record: (notification) =>
         prisma.$transaction((transaction) =>
-          recordNotification(transaction, notification),
+          recordNotification(transaction, { ...notification, occurredAt }),
         ),
-    }),
+    });
+  },
 });
