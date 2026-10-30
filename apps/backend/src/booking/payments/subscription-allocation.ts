@@ -44,6 +44,12 @@ export const loadActiveSubscription = async (
           },
         },
       },
+      bookings: {
+        where: { state: 'BOOKED', session: { startsAt: { gt: now } } },
+        orderBy: { session: { startsAt: 'desc' } },
+        take: 1,
+        select: { session: { select: { startsAt: true } } },
+      },
     },
   });
   return active === null
@@ -56,6 +62,10 @@ export const loadActiveSubscription = async (
         extraClasses: netAllowanceClasses(active.allowanceAdjustments),
         futureBookedCount: active._count.bookings,
         courtesy: active.payment?.method === PaymentMethod.COURTESY,
+        lastBookedOn:
+          active.bookings[0] === undefined
+            ? null
+            : boliviaDate(active.bookings[0].session.startsAt),
       };
 };
 

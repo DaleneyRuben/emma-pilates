@@ -238,7 +238,7 @@ describe('founder place release', () => {
     ).resolves.toBeNull();
   });
 
-  it('refuses a founder priced confirmation when the last place is gone', async () => {
+  it('confirms a late founder priced transfer over the cap when the last place is gone (FIX-013)', async () => {
     await releasePlaces();
     const buyer = await world.newClient('Sin lugar al confirmar');
     const assistant = await world.staffPrincipal('camila.rojas@example.com');
@@ -275,22 +275,26 @@ describe('founder place release', () => {
       );
     }
 
-    await expect(
-      world
-        .commands()
-        .confirmTransfer(
-          { paymentId: pending.id },
-          await world.staffPrincipal('paola.mendoza@example.com'),
-        ),
-    ).rejects.toMatchObject({ code: 'payment_confirmation_conflict' });
+    // Owner 2026-10-30: a late review is the desk's fault, not hers. She
+    // keeps the founder price she paid and becomes a founder over the cap.
+    await world
+      .commands()
+      .confirmTransfer(
+        { paymentId: pending.id },
+        await world.staffPrincipal('paola.mendoza@example.com'),
+      );
     await expect(
       prisma.payment.findUniqueOrThrow({ where: { id: pending.id } }),
-    ).resolves.toMatchObject({ state: 'PENDING' });
-    await expect(
-      prisma.allowanceAdjustment.count({
-        where: { clientId: buyer.clientId, reason: 'GIFT_NEW_CLIENT' },
-      }),
-    ).resolves.toBe(0);
+    ).resolves.toMatchObject({ state: 'CONFIRMED', discountReason: 'founder' });
+    const membership = await prisma.founderMembership.findFirstOrThrow({
+      where: { clientId: buyer.clientId, deletedAt: null },
+      select: { status: true, number: true, paymentId: true },
+    });
+    expect(membership).toMatchObject({
+      status: 'ACTIVE',
+      paymentId: pending.id,
+    });
+    expect(membership.number).toBeGreaterThan(40);
   });
 
   it('still grants a place on the first plan after a single class', async () => {

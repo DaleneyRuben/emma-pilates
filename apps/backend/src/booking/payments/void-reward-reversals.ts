@@ -23,7 +23,6 @@ export const otherRealSale = (transaction: Transaction, context: VoidContext) =>
       state: PaymentState.CONFIRMED,
       method: { not: PaymentMethod.COURTESY },
       planPriceCentavos: { gt: 0 },
-      plan: { hiddenAt: null },
     },
     orderBy: [{ decidedAt: 'asc' }, { id: 'asc' }],
     select: {

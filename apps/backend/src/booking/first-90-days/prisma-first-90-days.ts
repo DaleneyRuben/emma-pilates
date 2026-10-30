@@ -83,7 +83,7 @@ const findFirstRealPlans = (prisma: PrismaClient): Promise<FirstRealPlan[]> =>
   prisma.subscription
     .findMany({
       where: {
-        plan: { priceCentavos: { gt: 0 }, hiddenAt: null },
+        plan: { priceCentavos: { gt: 0 } },
         // A Client sent the day-90 message has nothing left to receive.
         client: {
           deletedAt: null,
@@ -182,7 +182,7 @@ const findClientAlertStates = async (
   const firsts = await prisma.subscription.groupBy({
     by: ['clientId'],
     where: {
-      plan: { priceCentavos: { gt: 0 }, hiddenAt: null },
+      plan: { priceCentavos: { gt: 0 } },
       client: { deletedAt: null },
     },
     _min: { startsOn: true },

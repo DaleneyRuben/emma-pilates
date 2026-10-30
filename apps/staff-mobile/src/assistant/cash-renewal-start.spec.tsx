@@ -106,4 +106,23 @@ describe("Confirming cash for a renewal", () => {
       screen.getByText("El nuevo plan empieza el 13 de octubre, al terminar el actual."),
     ).toBeOnTheScreen();
   });
+
+  it("explains a start before her booked guest class (FIX-019)", async () => {
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      "/api/v1/studio-rules": () => jsonResponse(studioRules),
+      "POST /api/v1/assistant/clients/client-lucia/cash-payments": () =>
+        jsonResponse({ code: "start_date_before_booked_class" }, 409),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Confirmar pago recibido" }));
+
+    expect(
+      await screen.findByText(
+        "La clienta tiene una clase reservada con su acceso actual. Elige un inicio después de esa clase.",
+      ),
+    ).toBeOnTheScreen();
+  });
 });

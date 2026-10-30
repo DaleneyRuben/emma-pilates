@@ -19,7 +19,6 @@ export const hasEarlierPlanPayment = async (
       method: { not: PaymentMethod.COURTESY },
       planPriceCentavos: { gt: 0 },
       classAllowanceSnapshot: { gt: 1 },
-      plan: { hiddenAt: null },
     },
     select: { id: true },
   });

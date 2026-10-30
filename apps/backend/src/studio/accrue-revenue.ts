@@ -1,6 +1,7 @@
 // STU-002 / decisions section 11. A Plan Payment accrues across the
 // Subscription's validity days, startsOn through endsOn inclusive. Each month
-// takes the rounded cumulative share at its end minus the share at its start,
+// takes the rounded cumulative share at its end (today while it runs) minus
+// the share at its start,
 // so the months always sum to the amount paid. An Evaluation is one service
 // on its decision date: «Caja» and «Devengado» in that month, never deferred,
 // as the income report counts it. Money is centavos; dates are civil dates.
@@ -46,8 +47,11 @@ export const accrueRevenue = (
   today: Date,
 ) => {
   const monthEnd = nextMonth(monthStart);
-  // «Diferido» is measured when the month closes, or today while it runs.
+  // Both are measured when the month closes, or today while it runs, so a
+  // running month's «Devengado» and «Diferido» add up (FIX-022). A month not
+  // yet started accrues nothing.
   const asOf = today < monthEnd ? today : monthEnd;
+  const accrualEnd = asOf < monthStart ? monthStart : asOf;
   let accruedCentavos = 0;
   let cashCentavos = 0;
   let deferredCentavos = 0;
@@ -69,7 +73,7 @@ export const accrueRevenue = (
     const span = Math.max(1, dayCount(startsOn, payment.endsOn) + 1);
     const share = (until: Date) =>
       accruedBefore(payment.amountCentavos, startsOn, span, until);
-    accruedCentavos += share(monthEnd) - share(monthStart);
+    accruedCentavos += share(accrualEnd) - share(monthStart);
     if (payment.decidedOn <= today && payment.decidedOn < monthEnd) {
       // What is not yet accrued, from the same rounding, so the two never
       // pass the amount by a centavo.

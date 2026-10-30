@@ -42,7 +42,7 @@ export const createPrismaContactAlerts = (
               phone: true,
               subscriptions: {
                 where: {
-                  plan: { priceCentavos: { gt: 0 }, hiddenAt: null },
+                  plan: { priceCentavos: { gt: 0 } },
                 },
                 orderBy: [{ startsOn: 'asc' }, { id: 'asc' }],
                 take: 1,

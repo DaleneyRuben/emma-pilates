@@ -58,6 +58,8 @@ const paymentProblems: Record<string, string> = {
   plan_not_purchasable: "Este plan ya no está disponible.",
   start_date_out_of_window: "Esa fecha de inicio no está disponible.",
   future_subscription_exists: "El cliente ya tiene un plan siguiente.",
+  start_date_before_booked_class:
+    "La clienta tiene una clase reservada con su acceso actual. Elige un inicio después de esa clase.",
 };
 
 function Line({

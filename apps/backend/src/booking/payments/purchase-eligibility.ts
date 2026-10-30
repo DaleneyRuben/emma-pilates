@@ -16,6 +16,8 @@ export type ActiveSubscriptionFacts = {
   futureBookedCount: number;
   /** A Guest Pass or Courtesy Access: never the base of a renewal (H17). */
   courtesy: boolean;
+  /** The civil date of its last future booked class, if any. */
+  lastBookedOn?: Date | null;
 };
 
 export type PurchaseEligibilityContext = {
