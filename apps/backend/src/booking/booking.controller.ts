@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Headers,
+  HttpCode,
+  HttpStatus,
   Inject,
   Param,
   Post,
@@ -190,6 +192,7 @@ export class BookingCancellationController {
   ) {}
 
   @Delete(':bookingId')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ operationId: 'cancelBooking' })
   @ApiParam({ name: 'bookingId', format: 'uuid' })
   @ApiNoContentResponse()
