@@ -20,12 +20,16 @@ Add one frame, «iOS · Renovación con clases», beside the existing confirmati
   empieza el 13 de octubre, al terminar el actual.» Same style as the
   validity line under the plan name. Third person: the Assistant speaks of
   the Client, not «tu».
+- The footnote above «Confirmar pago recibido» reads «Confirma solo cuando
+  tengas el efectivo en mano. El plan queda programado para esa fecha.»: the
+  Plan does not start at once, so «El plan se activa al instante.» would
+  contradict the line above.
 - Everything else as the existing frame: the price breakdown, the Branch
   chips, «Datos para la factura», the receipt photograph, and «Confirmar
   pago recibido».
 
-The existing frame (chips, «Hoy» selected) stays for a first purchase and
-for a renewal with nothing left.
+The existing frame (chips, «Hoy» selected, «El plan se activa al
+instante.») stays for a first purchase and for a renewal with nothing left.
 
 ## Leave untouched
 
