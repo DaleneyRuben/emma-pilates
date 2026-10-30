@@ -7953,15 +7953,22 @@ B. **A late confirmation over the cap (FIX-013).** Paola confirms that
    transfer after the 40 places are gone: the sale is confirmed at the
    founder price it charged and the Client becomes a founder with number 41
    or above. It no longer answers `409` `payment_confirmation_conflict`.
-   Spec: `founder-place-release.integration-spec.ts`.
+   Hiding the Plan in AW04 before the review changes nothing: she keeps the
+   place, and a buyer who is not a founder keeps her gift class. Specs:
+   `founder-place-release.integration-spec.ts`,
+   `founder-unreviewed-transfer.integration-spec.ts`.
 C. **A booked guest class comes first (FIX-019).** A friend whose Guest Pass
    class is booked for today buys a Plan with «Hoy»: the app shows «Tienes
-   una clase de invitada reservada. Elige un inicio después de esa clase.»
-   (Client 09) and Staff S10 shows «La clienta tiene una clase de invitada
-   reservada. Elige un inicio después de esa clase.» (`409`
-   `start_date_before_booked_class`). Starting the day after the class
-   works: the pass ends on the class day and the class stays booked. Spec:
-   `purchase-renewal-fixes.integration-spec.ts`.
+   una clase reservada con tu acceso actual. Elige un inicio después de esa
+   clase.» (Client 09) and Staff S10 shows «La clienta tiene una clase
+   reservada con su acceso actual. Elige un inicio después de esa clase.»
+   (`409` `start_date_before_booked_class`). The same applies to Courtesy
+   Access. Starting the day after the class works: the pass ends on the
+   class day and the class stays booked. If she books the class after
+   buying by transfer, Paola's confirmation (AW29) says «No se puede
+   confirmar: la clienta tiene una clase reservada con su acceso actual el
+   día de inicio o después. Cancela esa clase o espera a que pase, y vuelve
+   a confirmar.» Spec: `purchase-renewal-fixes.integration-spec.ts`.
 D. **No paid Evaluation on a courtesy plan (FIX-019).** A friend holding only
    a Guest Pass, or a Client holding only Courtesy Access, cannot book a
    nutrition Evaluation (`409` `no_eligible_subscription`, «Necesitas un plan
