@@ -1,5 +1,6 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
+import { releaseUnreviewedFounderReservations } from './founder-reservation-expiry';
 import { createPrismaPaymentCommands } from './prisma-payment-commands';
 
 export const createPurchaseIntentExpiryJob = (
@@ -13,8 +14,15 @@ export const createPurchaseIntentExpiryJob = (
   });
 
   return {
-    execute: async (): Promise<{ expired: number }> => ({
+    execute: async (): Promise<{
+      expired: number;
+      foundersReleased: number;
+    }> => ({
       expired: await commands.expirePurchaseIntents(),
+      foundersReleased: await releaseUnreviewedFounderReservations(
+        prisma,
+        now(),
+      ),
     }),
   };
 };

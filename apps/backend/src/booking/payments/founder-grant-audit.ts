@@ -71,6 +71,9 @@ export const reclaimMissingFounderPlace = async (
     classAllowance: payment.plan.classAllowance,
     paymentId: input.paymentId,
     activate: true,
+    // The Client paid the founder price; a late review is the desk's fault,
+    // so she keeps it and the place, over the cap (owner 2026-10-30).
+    overCap: true,
   });
   if (!claimed.founder) {
     throw new PaymentRuleError(

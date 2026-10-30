@@ -215,7 +215,7 @@ export const grantFounderPlace = async (
   return { granted: claimed.founder, number: claimed.number };
 };
 
-const lockFounderPlaces = (transaction: Transaction) =>
+export const lockFounderPlaces = (transaction: Transaction) =>
   transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${founderLockKey}, 0))`;
 
 const qualifiesForAPlace = (input: {
@@ -242,6 +242,8 @@ type PlaceClaim = {
   purchaseIntentId?: string;
   paymentId?: string;
   activate: boolean;
+  /** A late confirmation honours the founder price over the cap (FIX-013). */
+  overCap?: boolean;
 };
 
 // The advisory lock is taken before any read of founder places. A cash sale
@@ -303,7 +305,8 @@ export const claimFounderPlace = async (
     transaction.founderMembership.aggregate({ _max: { number: true } }),
   ]);
   const decision = decideFounderPlace({
-    places: rules.founderPlaces,
+    places:
+      input.overCap === true ? Number.MAX_SAFE_INTEGER : rules.founderPlaces,
     assigned,
     nextNumber: (highest._max.number ?? 0) + 1,
     alreadyHeld: false,
