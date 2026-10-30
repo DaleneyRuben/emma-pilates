@@ -28,4 +28,6 @@ export interface ClientEvaluationDto {
   /** Start minus 3 hours; the Client cannot cancel after it */
   cancellableUntil: string;
   cancellable: boolean;
+  /** A confirmed Paid Evaluation can move to another slot until 3 hours before the original start */
+  reschedulable: boolean;
 }

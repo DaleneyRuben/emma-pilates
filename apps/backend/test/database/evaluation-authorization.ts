@@ -29,6 +29,9 @@ export const evaluationAuthorizationRows = (): Record<string, MatrixRow> => ({
   // Roles are denied before the image is read.
   'POST /api/v1/evaluations/{evaluationId}/receipt': both('deny'),
   'DELETE /api/v1/evaluations/{evaluationId}': both('deny'),
+  // The Client moves her own confirmed Paid Evaluation. Staff is not that
+  // Client, so both Roles are denied.
+  'POST /api/v1/evaluations/{evaluationId}/reschedule': both('deny'),
   'GET /api/v1/nutritionist/evaluations': both('deny'),
   'DELETE /api/v1/nutritionist/evaluations/{evaluationId}': administratorOnly(),
   'POST /api/v1/nutritionist/evaluations/{evaluationId}/no-show':

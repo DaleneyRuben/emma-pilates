@@ -256,3 +256,4 @@ La dueña resolvió las preguntas abiertas de la revisión del lanzamiento. Esta
 ## 17. Addendum del 2026-10-29
 
 7. **Un rechazo no gasta el congelamiento (§2.4).** «Una vez por plan» cuenta solo los congelamientos solicitados o aprobados. Un congelamiento rechazado no gasta el único del plan. La clienta puede volver a pedirlo con fechas nuevas.
+8. **Una evaluación pagada y confirmada solo se reprograma (§6).** No se cancela y no hay devolución. La clienta elige otro turno disponible hasta 3 horas antes del turno original; el pago y el comprobante siguen con la evaluación. Si cancela el estudio o la nutricionista, tampoco hay devolución: la evaluación queda para que ella elija otro turno, y recibe un aviso. Una evaluación pagada con el pago pendiente se cancela y el pago queda rechazado, como hoy. La incluida se cancela como hoy. Si no se presenta, se da por usada.

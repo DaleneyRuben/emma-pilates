@@ -81,6 +81,8 @@ beyond what the table below names.
 | `session.updated` | Booking & Membership | An Administrator edits one Session (Trainer swap, new start, or capacity) | Administrator | `session` | Session Branch | previous and new `trainerStaffMemberId`, `startsAt`, `capacity` (only those changed) |
 | `attendance.corrected` | Booking & Membership | The assigned Trainer changes an Attendance outcome already saved for a Booking (the first complete roster save is not a correction) | Staff Account and Role | `booking` | Session Branch | `previousOutcome`, `outcome` (`attended` / `no_show`) |
 | `evaluation.cancelled_by_staff` | Booking & Membership | The Nutritionist or an Administrator cancels a booked Evaluation | Staff Account and Role | `evaluation` | Slot Branch | `cause`, `insideClientWindow` |
+| `evaluation.rescheduled` | Booking & Membership | A Client moves a confirmed Paid Evaluation to another published slot (FIX-014); the Payment stays and the old slot is freed in the same write | Client Account and Role | `evaluation` | New slot Branch | `previousSlotId`, `slotId`, `previousStartsAt`, `startsAt` |
+| `evaluation.slot_released` | Booking & Membership | The Nutritionist frees a confirmed Paid Evaluation's slot so the Client can pick another; the Payment stays (FIX-014) | Staff Account and Role | `evaluation` | — | `slotId`, `startsAt` |
 | `promotion.created` | Booking & Membership | An Administrator saves a new Promotion (a draft, with or without its image) | Administrator | `promotion` | — | `hasImage` |
 | `promotion.updated` | Booking & Membership | An Administrator edits a Promotion's copy, display window, or image (a changed image unpublishes it, follow-up 39) | Administrator | `promotion` | — | `imageChanged`, `unpublished` |
 | `promotion.published` | Booking & Membership | An Administrator publishes a Promotion, exposing its public image copies (ADR-0077) | Administrator | `promotion` | — | `displayStartsOn`, `displayEndsOn` |
@@ -127,7 +129,7 @@ window.
 | Trainer Attendance, first roster save | A reporting record with `recorded_by` and no money or access effect. A later correction of an outcome writes `attendance.corrected` above, because that outcome can decide instructor pay. |
 | Automatic empty-Session cancellation, Waitlist closure, Purchase Intent expiry | System sweeps with no human actor; the rows record cause and time (BOOK-001, BOOK-004, PAY-002). |
 | Drafting a Trainer Pay Statement | The worker replaces the draft; the approval is the decision, and it is audited. |
-| Client Evaluation booking and cancellation | Routine Client activity; the Evaluation row records creator, canceller, and cause. |
+| Client Evaluation booking and cancellation | Routine Client activity; the Evaluation row records creator, canceller, and cause. Moving a confirmed Paid Evaluation, and the studio freeing its slot, are audited above. |
 | Availability Block create, replace, end | The Nutritionist manages their own schedule; the block row records `created_by`/`ended_by`, and booked Evaluations are never changed by it. |
 | Transfer receipt upload and Purchase Intent creation | Client self-service with no decision; the Payment decision is audited instead. |
 | Credit ledger entries | The ledger itself is append-only and actor-stamped; the Payment audit references the purchase. |

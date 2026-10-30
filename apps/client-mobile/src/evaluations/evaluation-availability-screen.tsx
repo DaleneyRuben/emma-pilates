@@ -1,4 +1,5 @@
 import {
+  getListEvaluationsQueryKey,
   useGetCurrentClientSubscription,
   useListEvaluationSlots,
   type EvaluationAvailabilityDto,
@@ -20,10 +21,13 @@ import {
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { randomUUID } from "expo-crypto";
+import { useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { moveEvaluation, rescheduleFailure } from "./reschedule-evaluation";
 import {
   clockTime,
   evaluationDate,
@@ -38,21 +42,20 @@ type AvailabilityNavigation = {
   navigate: {
     (screen: "Plans"): void;
     (screen: "BookEvaluation", params: { slot: EvaluationSlotDto }): void;
+    (screen: "MyEvaluations"): void;
   };
 };
 
 type OpenDay = { date: string; slots: EvaluationSlotDto[] };
 
-const openDays = (availability: EvaluationAvailabilityDto): OpenDay[] =>
+const openDays = (availability: EvaluationAvailabilityDto, currentSlotId?: string): OpenDay[] =>
   availability.days
     .map((day) => ({
       date: day.date,
-      slots: day.slots.filter((slot) => slot.bookable),
+      slots: day.slots.filter((slot) => slot.bookable && slot.id !== currentSlotId),
     }))
     .filter((day) => day.slots.length > 0);
 
-// The month a Client can book next once the open picker is empty: the first
-// unused month in the horizon, else the month after the last used one.
 const nextUnusedMonth = (months: EvaluationAvailabilityDto["months"]): string | null => {
   const lastUsed = [...months].reverse().find((month) => month.status === "used");
   if (lastUsed === undefined) return null;
@@ -111,21 +114,58 @@ function UsedMonth({ availability }: { availability: EvaluationAvailabilityDto }
   );
 }
 
-export function EvaluationAvailabilityScreen() {
+export function EvaluationAvailabilityScreen({
+  route,
+}: {
+  route?: { params?: { evaluationId?: string; slotId?: string } };
+}) {
   const navigation = useNavigation<AvailabilityNavigation>();
+  const evaluationId = route?.params?.evaluationId;
+  const currentSlotId = route?.params?.slotId;
+  const rescheduling = evaluationId !== undefined;
   const fetcher = useClientFetcher();
+  const queryClient = useQueryClient();
+  const idempotencyKey = useRef(randomUUID());
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const subscription = useGetCurrentClientSubscription(queryOptions);
   const slots = useListEvaluationSlots(undefined, queryOptions);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [moving, setMoving] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+
+  const move = async (slot: EvaluationSlotDto) => {
+    if (evaluationId === undefined || moving) return;
+    setMoving(true);
+    setFailure(null);
+    try {
+      const response = await moveEvaluation(evaluationId, slot, idempotencyKey.current, fetcher);
+      if (response.status === 200) {
+        await queryClient.invalidateQueries({
+          queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
+        });
+        navigation.navigate("MyEvaluations");
+        return;
+      }
+      setFailure(rescheduleFailure(response.data));
+    } catch {
+      setFailure("No pudimos reprogramar la evaluación. Inténtalo de nuevo.");
+    } finally {
+      setMoving(false);
+    }
+  };
 
   const availability = slots.data?.status === 200 ? slots.data.data : null;
-  const days = useMemo(() => (availability === null ? [] : openDays(availability)), [availability]);
+  const days = useMemo(
+    () => (availability === null ? [] : openDays(availability, currentSlotId)),
+    [availability, currentSlotId],
+  );
 
   const header = (
-    <>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Evaluación nutricional" />
-    </>
+    <ScreenTopBar
+      fullBleed
+      onBack={() => navigation.goBack()}
+      title={rescheduling ? "Elige otro turno" : "Evaluación nutricional"}
+    />
   );
 
   if (subscription.isPending || slots.isPending) {
@@ -249,7 +289,9 @@ export function EvaluationAvailabilityScreen() {
                   accessibilityLabel={`Turno ${slotLabel(slot)}`}
                   accessibilityRole="button"
                   key={slot.id}
-                  onPress={() => navigation.navigate("BookEvaluation", { slot })}
+                  onPress={() =>
+                    rescheduling ? void move(slot) : navigation.navigate("BookEvaluation", { slot })
+                  }
                   style={styles.slot}
                 >
                   <Text style={styles.slotTime}>{clockTime(slot.startsAt)}</Text>
@@ -264,9 +306,11 @@ export function EvaluationAvailabilityScreen() {
             </View>
           </>
         ) : null}
+        {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
         <BodyText style={styles.muted}>
-          Los horarios ocupados no se muestran. Al elegir uno confirmarás la cita en la siguiente
-          pantalla.
+          {rescheduling
+            ? "Al elegir un horario movemos esta evaluación."
+            : "Al elegir un horario confirmarás la cita en la siguiente pantalla."}
         </BodyText>
         <BodyText style={styles.muted}>Puedes reservar hasta 3 horas antes.</BodyText>
       </ScrollView>

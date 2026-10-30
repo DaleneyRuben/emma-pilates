@@ -39,5 +39,11 @@ export const toClientEvaluationView = (
   cancellableUntil: cancellableUntil(row.slot.startsAt),
   cancellable:
     row.state === EvaluationState.BOOKED &&
+    row.payment?.state !== 'CONFIRMED' &&
+    isEvaluationBookable(row.slot.startsAt, now),
+  reschedulable:
+    row.state === EvaluationState.BOOKED &&
+    row.payment?.state === 'CONFIRMED' &&
+    row.slotReleasedAt === null &&
     isEvaluationBookable(row.slot.startsAt, now),
 });

@@ -356,6 +356,7 @@ export * from "./rejectPaymentDto";
 export * from "./requestEmailChangeDto";
 export * from "./requestFreezeDto";
 export * from "./requestPasswordRecoveryDto";
+export * from "./rescheduleEvaluationBody";
 export * from "./revenueReportDto";
 export * from "./salaryPaymentInputDto";
 export * from "./searchAssistantClientsParams";

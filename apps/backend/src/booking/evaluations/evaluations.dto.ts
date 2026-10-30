@@ -145,6 +145,12 @@ export class ClientEvaluationDto {
 
   @ApiProperty()
   cancellable!: boolean;
+
+  @ApiProperty({
+    description:
+      'A confirmed Paid Evaluation can move to another slot until 3 hours before the original start',
+  })
+  reschedulable!: boolean;
 }
 
 export class ClientEvaluationPageDto {

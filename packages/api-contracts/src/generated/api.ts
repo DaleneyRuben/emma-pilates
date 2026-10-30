@@ -220,6 +220,7 @@ import type {
   RequestEmailChangeDto,
   RequestFreezeDto,
   RequestPasswordRecoveryDto,
+  RescheduleEvaluationBody,
   RevenueReportDto,
   SalaryPaymentInputDto,
   SearchAssistantClientsParams,
@@ -24984,6 +24985,137 @@ export const useCancelEvaluation = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getCancelEvaluationMutationOptions(options), queryClient);
+};
+
+export type rescheduleEvaluationResponse200 = {
+  data: ClientEvaluationDto;
+  status: 200;
+};
+
+export type rescheduleEvaluationResponseSuccess =
+  rescheduleEvaluationResponse200 & {
+    headers: Headers;
+  };
+export type rescheduleEvaluationResponse = rescheduleEvaluationResponseSuccess;
+
+export const getRescheduleEvaluationUrl = (evaluationId: string) => {
+  return `/api/v1/evaluations/${evaluationId}/reschedule`;
+};
+
+export const rescheduleEvaluation = async (
+  evaluationId: string,
+  rescheduleEvaluationBody: RescheduleEvaluationBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<rescheduleEvaluationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getRescheduleEvaluationUrl(evaluationId),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(rescheduleEvaluationBody),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: rescheduleEvaluationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as rescheduleEvaluationResponse;
+};
+
+export const getRescheduleEvaluationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof rescheduleEvaluation>>,
+    TError,
+    RescheduleEvaluationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof rescheduleEvaluation>>,
+  TError,
+  RescheduleEvaluationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["rescheduleEvaluation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof rescheduleEvaluation>>,
+    RescheduleEvaluationMutationVariables
+  > = (props) => {
+    const { evaluationId, data } = props ?? {};
+
+    return rescheduleEvaluation(evaluationId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RescheduleEvaluationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof rescheduleEvaluation>>
+>;
+export type RescheduleEvaluationMutationBody = RescheduleEvaluationBody;
+export type RescheduleEvaluationMutationError = unknown;
+export type RescheduleEvaluationMutationVariables = {
+  evaluationId: string;
+  data: RescheduleEvaluationBody;
+};
+
+export const useRescheduleEvaluation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof rescheduleEvaluation>>,
+      TError,
+      RescheduleEvaluationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof rescheduleEvaluation>>,
+  TError,
+  RescheduleEvaluationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRescheduleEvaluationMutationOptions(options),
+    queryClient,
+  );
 };
 
 export type listNutritionistAgendaResponse200 = {

@@ -7,6 +7,8 @@ export type EvaluationNotificationType =
   | 'evaluation_booked'
   | 'evaluation_cancelled'
   | 'evaluation_cancelled_by_studio'
+  | 'evaluation_rescheduled'
+  | 'evaluation_reschedule_required'
   | 'evaluation_reminder_day'
   | 'evaluation_reminder_hour';
 
@@ -25,6 +27,16 @@ export const evaluationPushCatalog: Record<
     pushBody: 'Tienes una novedad en tu agenda.',
   },
   evaluation_cancelled_by_studio: {
+    sound: 'audible',
+    pushTitle: 'Tienes un aviso',
+    pushBody: 'Hay un cambio en una de tus citas.',
+  },
+  evaluation_rescheduled: {
+    sound: 'silent',
+    pushTitle: 'Tu agenda cambió',
+    pushBody: 'Tienes una novedad en tu agenda.',
+  },
+  evaluation_reschedule_required: {
     sound: 'audible',
     pushTitle: 'Tienes un aviso',
     pushBody: 'Hay un cambio en una de tus citas.',
@@ -119,6 +131,36 @@ export const evaluationCancelledByStudioNotice = (
   businessEventKey: `evaluation-cancelled:${facts.evaluationId}`,
   title: 'Evaluación cancelada',
   message: `El estudio canceló tu evaluación nutricional del ${formatEvaluationMoment(facts.startsAt)}. Ya puedes reservar otra ${freedMonth(facts.startsAt, facts.occurredAt)}.`,
+  destination: { type: 'evaluation', id: facts.evaluationId },
+  occurredAt: facts.occurredAt,
+});
+
+export const evaluationRescheduledNotice = (
+  facts: EvaluationFacts & {
+    accountId: string;
+    clientName: string;
+    previousStartsAt: Date;
+  },
+): NewNotification => ({
+  accountId: facts.accountId,
+  category: 'booking_schedule',
+  type: 'evaluation_rescheduled',
+  businessEventKey: `evaluation-rescheduled:${facts.evaluationId}:${facts.startsAt.toISOString()}`,
+  title: 'Evaluación reprogramada',
+  message: `${facts.clientName} reprogramó su evaluación del ${formatEvaluationMoment(facts.previousStartsAt)} al ${formatEvaluationMoment(facts.startsAt)}.`,
+  destination: { type: 'nutritionist_agenda', id: null },
+  occurredAt: facts.occurredAt,
+});
+
+export const evaluationRescheduleRequiredNotice = (
+  facts: EvaluationFacts & { accountId: string },
+): NewNotification => ({
+  accountId: facts.accountId,
+  category: 'booking_schedule',
+  type: 'evaluation_reschedule_required',
+  businessEventKey: `evaluation-reschedule-required:${facts.evaluationId}:${facts.startsAt.toISOString()}`,
+  title: 'Elige otro turno',
+  message: `El estudio canceló el turno de tu evaluación del ${formatEvaluationMoment(facts.startsAt)}. El pago sigue vigente. Elige otro turno.`,
   destination: { type: 'evaluation', id: facts.evaluationId },
   occurredAt: facts.occurredAt,
 });
