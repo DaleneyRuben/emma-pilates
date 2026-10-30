@@ -381,14 +381,16 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   muted: { color: colors.textMuted, fontSize: typography.note },
+  pastRow: { flexDirection: "row", gap: spacing.md, alignItems: "center" },
+  pastText: { color: colors.text, flex: 1 },
   notice: {
     backgroundColor: "rgba(124,148,115,0.14)",
     borderRadius: radii.inset,
     gap: spacing.xs,
     padding: spacing.lg,
   },
-  noticeBody: { color: colors.successText, fontSize: typography.note },
-  noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
+  noticeBody: { color: colors.successText },
+  noticeTitle: { color: colors.successText, fontWeight: "600" },
   screen: { gap: spacing.lg },
   time: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
 });
