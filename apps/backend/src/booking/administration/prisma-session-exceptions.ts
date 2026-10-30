@@ -4,7 +4,6 @@ import {
   AuditOutcome,
   BookingState,
   SessionState,
-  StaffRole,
 } from '../../generated/prisma/enums';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import {
@@ -17,7 +16,6 @@ import { promoteWaitlistInTransaction } from '../commands/waitlist-promotion';
 import { recordAdministratorAudit } from './administration-audit';
 import {
   AdministrationError,
-  auditRoleOf,
   requireOperations,
 } from './administration-errors';
 import {
@@ -113,8 +111,8 @@ export const createPrismaSessionExceptions = (
 
     // Solo esta sesión: a future scheduled Session changes its Trainer (the
     // swap), start, duration, or capacity and becomes an exception. A new
-    // start keeps the duration unless one is given and reopens the 2-hour
-    // empty check (BOOK-004).
+    // start keeps the duration unless one is given. The minimum-bookings
+    // check (BKM-009) is recorded once and is not reopened here.
     updateSession: async (
       input: {
         sessionId: string;
@@ -248,8 +246,9 @@ export const createPrismaSessionExceptions = (
             actionCode: 'session.updated',
             outcome: AuditOutcome.SUCCEEDED,
             actorKind: AuditActorKind.ACCOUNT,
-            actorAccountId: actor.accountId,
-            actorRole: StaffRole[auditRoleOf(actor)],
+            actorAccountId: actor.audit.accountId,
+            actorRole: actor.audit.role,
+            impersonationId: actor.audit.impersonationId,
             targetType: 'session',
             targetId: session.id,
             branchId: session.branchId,

@@ -7,6 +7,7 @@ import {
   plan,
   startPaymentWorld,
 } from './payment-lifecycle-test-support';
+import { impersonating, openImpersonation } from './impersonation-test-support';
 
 describe('a front-desk transfer receipt', () => {
   let world: PaymentWorld;
@@ -71,6 +72,53 @@ describe('a front-desk transfer receipt', () => {
         where: { paymentId: pending.id },
       }),
     ).resolves.not.toBeNull();
+  });
+
+  // FIX-010 / ADR-0100: the audit names the Administrator who sees the app as
+  // the Assistant, with her Role and the Impersonation.
+  it('audits a transfer taken while an Administrator sees the app as the Assistant', async () => {
+    const buyer = await world.newClient('Recepción suplantada');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const paola = await world.staffPrincipal('paola.mendoza@example.com');
+    const centro = fixtures.branches.find(
+      (branch) => branch.name === 'Centro',
+    )!;
+    const impersonation = await openImpersonation(world.prisma, {
+      administratorAccountId: paola.accountId,
+      staffMemberId: (assistant.identity as { staffMemberId: string })
+        .staffMemberId,
+      now,
+    });
+    const receipt = await world.readyReceipt(assistant.accountId);
+
+    const pending = await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro.id,
+        imageAssetId: receipt.id,
+      },
+      impersonating(assistant, impersonation),
+      randomUUID(),
+    );
+
+    await expect(
+      world.prisma.auditRecord.findFirstOrThrow({
+        where: {
+          actionCode: 'payment.front_desk_transfer_submitted',
+          targetId: pending.id,
+        },
+        select: {
+          actorAccountId: true,
+          actorRole: true,
+          impersonationId: true,
+        },
+      }),
+    ).resolves.toEqual({
+      actorAccountId: paola.accountId,
+      actorRole: 'ADMINISTRATOR',
+      impersonationId: impersonation.id,
+    });
   });
 
   it('still confirms cash on the spot, with no receipt', async () => {

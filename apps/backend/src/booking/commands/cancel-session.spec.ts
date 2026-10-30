@@ -47,6 +47,44 @@ describe('cancelSession', () => {
     expect(deps.cancel).toHaveBeenCalledWith({
       sessionId: 'session-1',
       cancelledByAccountId: 'admin-account',
+      audit: {
+        accountId: 'admin-account',
+        role: 'ADMINISTRATOR',
+        impersonationId: null,
+      },
+    });
+  });
+
+  it('names the Administrator in the audit, and keeps the Coordinator’s Account on the Session, while she sees the app as the Coordinator', async () => {
+    const deps = {
+      ...dependencies(),
+      principal: {
+        ...administrator,
+        accountId: 'coordinator-account',
+        identity: {
+          ...administrator.identity,
+          role: 'coordinator' as const,
+          staffMemberId: 'coordinator-staff',
+        },
+        impersonation: {
+          id: 'impersonation-id',
+          administratorAccountId: 'admin-account',
+          staffMemberName: 'Carolina Rivas',
+          expiresAt: new Date('2026-09-21T15:30:00.000Z'),
+        },
+      },
+    };
+
+    await cancelSession({ sessionId: 'session-1' }, deps);
+
+    expect(deps.cancel).toHaveBeenCalledWith({
+      sessionId: 'session-1',
+      cancelledByAccountId: 'coordinator-account',
+      audit: {
+        accountId: 'admin-account',
+        role: 'ADMINISTRATOR',
+        impersonationId: 'impersonation-id',
+      },
     });
   });
 

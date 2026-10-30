@@ -1,3 +1,7 @@
+import {
+  auditActorOf,
+  type AuditActor,
+} from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 
 export type AdministrationErrorCode =
@@ -62,7 +66,13 @@ export class AdministrationError extends Error {
   }
 }
 
-export type AdministratorActor = { accountId: string; staffMemberId: string };
+// `accountId` is the acting Staff Member's own Account, for unaudited actor
+// columns; `audit` is who the audit record names (ADR-0100).
+export type AdministratorActor = {
+  accountId: string;
+  staffMemberId: string;
+  audit: AuditActor;
+};
 
 export const requireAdministrator = (
   principal: AuthenticatedPrincipal,
@@ -76,6 +86,7 @@ export const requireAdministrator = (
   return {
     accountId: principal.accountId,
     staffMemberId: principal.identity.staffMemberId,
+    audit: auditActorOf(principal),
   };
 };
 
@@ -99,16 +110,9 @@ export const requireOperations = (
     accountId: principal.accountId,
     staffMemberId: principal.identity.staffMemberId,
     role: principal.identity.role,
+    audit: auditActorOf(principal),
   };
 };
-
-// The audit actor Role of a schedule or catalog change (ADR-0055, ADR-0102).
-export const auditRoleOf = (
-  actor: AdministratorActor | OperationsActor,
-): 'ADMINISTRATOR' | 'COORDINATOR' =>
-  'role' in actor && actor.role === 'coordinator'
-    ? 'COORDINATOR'
-    : 'ADMINISTRATOR';
 
 // Constraint names arrive only in the driver cause (see NUT-002 notes).
 export const databaseCause = (error: unknown): string => {

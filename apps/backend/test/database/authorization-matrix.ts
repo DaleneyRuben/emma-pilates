@@ -1,8 +1,10 @@
 import { campaignAuthorizationRows } from './campaign-authorization';
+import { catalogAuthorizationRows } from './catalog-authorization';
 import { evaluationAuthorizationRows } from './evaluation-authorization';
 import { payStatementAuthorizationRows } from './pay-statement-authorization';
 import { studioFactsAuthorizationRows } from './studio-facts-authorization';
 import { supplyMovementAuthorizationRows } from './supply-movement-authorization';
+import type { RealIds } from './authorization-matrix-support';
 
 // IDN-009 / ADR-0102: every endpoint the API serves, with an explicit
 // decision for the Administrator and the Coordinator. «allow» means the Role
@@ -16,16 +18,7 @@ import { supplyMovementAuthorizationRows } from './supply-movement-authorization
 
 export type Access = 'allow' | 'deny';
 
-/** Rows the spec creates so a Booking command reaches its access check. */
-export type RealIds = {
-  sessionId: string;
-  otherSessionId: string;
-  bookingId: string;
-  /** A second Booking, so rescheduling never meets the cancelled one. */
-  rescheduleBookingId: string;
-  waitlistEntryId: string;
-  clientId: string;
-};
+export type { RealIds } from './authorization-matrix-support';
 
 export type MatrixRow = {
   administrator: Access;
@@ -37,7 +30,7 @@ export type MatrixRow = {
   body?: Record<string, unknown> | ((ids: RealIds) => Record<string, unknown>);
   query?: string;
   /** Fill the path with the spec's real Session, Booking, and Waitlist rows. */
-  realIds?: true | Partial<Record<keyof RealIds, keyof RealIds>>;
+  realIds?: true | Partial<Record<string, keyof RealIds>>;
   /** Authorized by ownership, not by Role: both Roles must answer alike. */
   ownerScoped?: true;
   /** Sends image bytes instead of JSON. */
@@ -310,8 +303,6 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     administratorOnly(),
   'PUT /api/v1/administrator/staff-members/{staffMemberId}/role':
     administratorOnly(),
-  'PUT /api/v1/administrator/staff-members/{staffMemberId}/branches':
-    administratorOnly(),
   'POST /api/v1/administrator/staff-members/{staffMemberId}/deactivation':
     administratorOnly(),
 
@@ -328,17 +319,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'PATCH /api/v1/administrator/sessions/{sessionId}': both('allow'),
   'POST /api/v1/administrator/sessions/{sessionId}/cancel': both('allow'),
 
-  // The catalog: the schedule reads Branches and Class Types; changing the
-  // catalog, and the Plan list with its prices, stay the Administrator's.
-  'GET /api/v1/administrator/branches': both('allow'),
-  'POST /api/v1/administrator/branches': administratorOnly(),
-  'PUT /api/v1/administrator/branches/{branchId}': administratorOnly(),
-  'POST /api/v1/administrator/branches/{branchId}/archive': administratorOnly(),
-  'GET /api/v1/administrator/class-types': both('allow'),
-  'POST /api/v1/administrator/class-types': administratorOnly(),
-  'PUT /api/v1/administrator/class-types/{classTypeId}': administratorOnly(),
-  'POST /api/v1/administrator/class-types/{classTypeId}/archive':
-    administratorOnly(),
+  ...catalogAuthorizationRows(),
   'GET /api/v1/administrator/plans': administratorOnly(),
   // BKM-004: the Administrator edits the studio rules. The public rules
   // need no credential.
@@ -501,7 +482,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
 export const concretePath = (
   path: string,
   ids?: RealIds,
-  renames: Partial<Record<keyof RealIds, keyof RealIds>> = {},
+  renames: Partial<Record<string, keyof RealIds>> = {},
 ): string =>
   path
     .replace('{kind}', 'display')
@@ -509,6 +490,5 @@ export const concretePath = (
     .replace(
       /\{([A-Za-z]+)\}/g,
       (_match, name: string) =>
-        ids?.[renames[name as keyof RealIds] ?? (name as keyof RealIds)] ??
-        uuid,
+        ids?.[renames[name] ?? (name as keyof RealIds)] ?? uuid,
     );

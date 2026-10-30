@@ -15,6 +15,7 @@ import {
 } from '../../generated/prisma/client';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import { retrySerializable } from '../../database/retry-serializable';
+import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { recordNotification as defaultNotificationRecorder } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
@@ -78,6 +79,7 @@ export const createFrontDeskTransfer = (
     ) {
       throw rule('branch_not_assigned', 'Branch is not assigned');
     }
+    const audit = auditActorOf(principal);
 
     return retrySerializable(() =>
       prisma.$transaction(
@@ -310,11 +312,9 @@ export const createFrontDeskTransfer = (
               actionCode: 'payment.front_desk_transfer_submitted',
               outcome: AuditOutcome.SUCCEEDED,
               actorKind: AuditActorKind.ACCOUNT,
-              actorAccountId: principal.accountId,
-              actorRole:
-                principal.identity.kind === 'staff'
-                  ? (principal.identity.role.toUpperCase() as StaffRole)
-                  : null,
+              actorAccountId: audit.accountId,
+              actorRole: audit.role,
+              impersonationId: audit.impersonationId,
               targetType: 'payment',
               targetId: payment.id,
               branchId: command.branchId,

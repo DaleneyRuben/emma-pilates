@@ -1,3 +1,7 @@
+import {
+  auditActorOf,
+  type AuditActor,
+} from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 
 // Staff Accounts activate like invited Clients (ADR-0029): a 7-day Activation
@@ -65,6 +69,8 @@ export type StaffAudit = {
     | 'staff_member.invitation_cancelled'
     | 'staff_member.invitation_reopened';
   actorAccountId: string;
+  actorRole: AuditActor['role'];
+  impersonationId: string | null;
   targetAccountId: string;
   correlationId: string;
   metadata: Record<string, string | string[]> | null;
@@ -157,10 +163,19 @@ export type StaffManagementDependencies = {
   newId: () => string;
 };
 
-export type Actor = { accountId: string; staffMemberId: string };
+// `accountId` is the acting Staff Member's own Account, for unaudited actor
+// columns; `audit` is who the audit record names (ADR-0100).
+export type Actor = {
+  accountId: string;
+  staffMemberId: string;
+  audit: AuditActor;
+  /** Decision 6: the Coordinator changes the Branches of Trainers only. */
+  manages?: StaffRoleName;
+};
 
-// ADR-0102: the Coordinator reads Staff details for the schedule; inviting,
-// Role, Branch, and access changes stay with the Administrator.
+// ADR-0102: the Coordinator reads Staff details for the schedule. Inviting,
+// Role, and access changes stay with the Administrator. Decision 6 lets her
+// assign a Trainer's Branches.
 export const requireStaffReader = (principal: AuthenticatedPrincipal): void => {
   if (
     principal.identity.kind !== 'staff' ||
@@ -169,6 +184,29 @@ export const requireStaffReader = (principal: AuthenticatedPrincipal): void => {
   ) {
     throw new StaffManagementError('staff_access_denied');
   }
+};
+
+// Decision 6: assigning a Trainer's Branches is an operation, not a money
+// decision, so the Coordinator may; every other Role's stay with the
+// Administrator.
+export const requireBranchAssigner = (
+  principal: AuthenticatedPrincipal,
+): Actor => {
+  if (
+    principal.identity.kind !== 'staff' ||
+    (principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
+  ) {
+    throw new StaffManagementError('staff_access_denied');
+  }
+  return {
+    accountId: principal.accountId,
+    staffMemberId: principal.identity.staffMemberId,
+    audit: auditActorOf(principal),
+    ...(principal.identity.role === 'coordinator'
+      ? { manages: 'trainer' }
+      : {}),
+  };
 };
 
 export const requireAdministrator = (
@@ -183,6 +221,7 @@ export const requireAdministrator = (
   return {
     accountId: principal.accountId,
     staffMemberId: principal.identity.staffMemberId,
+    audit: auditActorOf(principal),
   };
 };
 
@@ -223,6 +262,9 @@ export const requireManageable = async (
 ): Promise<StaffMemberRecord> => {
   const member = await transaction.findStaffMember(staffMemberId);
   if (member === null) throw new StaffManagementError('staff_member_not_found');
+  if (actor.manages !== undefined && member.role !== actor.manages) {
+    throw new StaffManagementError('staff_access_denied');
+  }
   if (member.id === actor.staffMemberId) {
     throw new StaffManagementError('own_staff_member');
   }
@@ -267,7 +309,9 @@ export const audit = (
   },
 ): StaffAudit => ({
   actionCode: input.actionCode,
-  actorAccountId: actor.accountId,
+  actorAccountId: actor.audit.accountId,
+  actorRole: actor.audit.role,
+  impersonationId: actor.audit.impersonationId,
   targetAccountId: input.targetAccountId,
   correlationId: dependencies.newId(),
   metadata: input.metadata ?? null,

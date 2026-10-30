@@ -30,7 +30,11 @@ describe('markClientContacted', () => {
     expect(mark).toHaveBeenCalledWith({
       clientId: 'client-1',
       accountId: 'administrator-account',
-      actorRole: 'administrator',
+      audit: {
+        accountId: 'administrator-account',
+        role: 'ADMINISTRATOR',
+        impersonationId: null,
+      },
       occurredAt: now,
     });
 
@@ -41,7 +45,11 @@ describe('markClientContacted', () => {
     expect(mark).toHaveBeenLastCalledWith({
       clientId: 'client-1',
       accountId: 'coordinator-account',
-      actorRole: 'coordinator',
+      audit: {
+        accountId: 'coordinator-account',
+        role: 'COORDINATOR',
+        impersonationId: null,
+      },
       occurredAt: now,
     });
   });

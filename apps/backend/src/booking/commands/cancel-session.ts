@@ -1,3 +1,7 @@
+import {
+  auditActorOf,
+  type AuditActor,
+} from '../../system-identity/authentication/audit-actor';
 import { runsOperations } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from './create-booking';
@@ -18,6 +22,7 @@ type CancelSessionDependencies = {
   cancel(input: {
     sessionId: string;
     cancelledByAccountId: string;
+    audit: AuditActor;
   }): Promise<SessionCancellationResult>;
   now(): Date;
 };
@@ -45,8 +50,11 @@ export const cancelSession = async (
     throw new Error('Session has no Bookings');
   }
 
+  // ADR-0100: the Session and Bookings keep the acting Staff Member's Account;
+  // the audit record names who acted, with her Role.
   return dependencies.cancel({
     sessionId: session.id,
     cancelledByAccountId: dependencies.principal.accountId,
+    audit: auditActorOf(dependencies.principal),
   });
 };

@@ -30,6 +30,13 @@ export const staffFormSchema = z
     },
   );
 
+// Decision 6: the Coordinator's form shows a Trainer's Branches only, so it
+// validates nothing else; a stored contact never blocks «Guardar».
+export const trainerBranchesSchema = z.object({
+  branchIds: z.array(z.string()).min(1, "Elige al menos una sucursal."),
+});
+
+export type TrainerBranchesInput = z.input<typeof trainerBranchesSchema>;
 export type StaffFormInput = z.input<typeof staffFormSchema>;
 export type StaffFormOutput = z.output<typeof staffFormSchema>;
 

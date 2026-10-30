@@ -29,13 +29,15 @@ export const freezeAuthorizationRows = (): Record<string, MatrixRow> => ({
   'GET /api/v1/administrator/freezes': administratorOnly({ bearer: true }),
   'GET /api/v1/administrator/freezes/{freezeId}': administratorOnly({
     bearer: true,
+    realIds: { freezeId: 'freezeId' },
   }),
-  // A missing Freeze is denied before the Role is read, so both Roles
-  // answer 403 on a freeze id that does not exist.
+  // A real Freeze reaches the Role check. A missing id was 403 for both
+  // Roles before that check ran, so the probe never saw the decision.
   'POST /api/v1/administrator/freezes/{freezeId}/decision': {
-    administrator: 'deny',
+    administrator: 'allow',
     coordinator: 'deny',
     bearer: true,
+    realIds: { freezeId: 'freezeId' },
     body: { decision: 'refused' },
   },
 });

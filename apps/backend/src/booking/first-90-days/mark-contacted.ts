@@ -1,3 +1,4 @@
+import type { AuditActor } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import {
   AdministrationError,
@@ -8,8 +9,10 @@ import type { ContactAlertReason } from './first-90-days-alerts';
 export type MarkContactedStore = {
   mark(input: {
     clientId: string;
+    /** The acting Staff Member's own Account, kept on the alert. */
     accountId: string;
-    actorRole: 'administrator' | 'coordinator';
+    /** Who the audit record names (ADR-0100). */
+    audit: AuditActor;
     occurredAt: Date;
   }): Promise<ContactAlertReason[]>;
 };
@@ -23,7 +26,7 @@ export const markClientContacted = async (
   const reasons = await dependencies.store.mark({
     clientId: command.clientId,
     accountId: actor.accountId,
-    actorRole: actor.role,
+    audit: actor.audit,
     occurredAt: dependencies.now(),
   });
   if (reasons.length === 0) {

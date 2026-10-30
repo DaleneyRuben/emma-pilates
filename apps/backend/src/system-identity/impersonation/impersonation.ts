@@ -2,7 +2,8 @@ import type { AuthenticationSurface } from '../authentication/create-authenticat
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 
 // FUT-001 / ADR-0100: an Administrator sees the Staff app as one active
-// Trainer, Assistant, or Nutritionist for 30 minutes, on their own session.
+// Trainer, Assistant, Nutritionist, or Coordinator for 30 minutes, on her
+// own session.
 export const impersonationLifetimeMilliseconds = 30 * 60 * 1_000;
 
 export type ImpersonationErrorCode =

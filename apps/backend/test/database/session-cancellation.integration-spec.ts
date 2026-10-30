@@ -10,6 +10,7 @@ import {
   DatabaseTestContext,
   startDatabaseTestContext,
 } from './database-test-context';
+import { impersonating, openImpersonation } from './impersonation-test-support';
 
 // Bookings take the database clock as created_at, so the command clock must
 // not run behind it, and the fixtures follow that same clock.
@@ -176,5 +177,61 @@ describe('Administrator Session cancellation', () => {
     await expect(
       commands.cancelSession({ sessionId: session.id }, admin),
     ).rejects.toThrow('Session is not cancellable');
+  });
+
+  // FIX-010 / ADR-0100: the audit record names who acted, with her Role; the
+  // Session and Booking columns keep the acting Staff Member's Account.
+  it('audits the Coordinator’s cancellation as hers, and as the Administrator’s while she is impersonated', async () => {
+    const commands = new PrismaBookingCommands(prisma, () => new Date());
+    const lucia = await principalOf('lucia@example.com');
+    const carolina = await principalOf('carolina.rivas@example.com');
+    const paola = await principalOf('paola.mendoza@example.com');
+    const [own, impersonated] = fixtures.sessions
+      .filter((s) => s.startsAt.getTime() > now.getTime() + 3 * 60 * 60 * 1_000)
+      .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
+      .slice(1, 3);
+    const auditOf = (sessionId: string) =>
+      prisma.auditRecord.findFirstOrThrow({
+        where: { actionCode: 'session.cancelled', targetId: sessionId },
+        select: {
+          actorAccountId: true,
+          actorRole: true,
+          impersonationId: true,
+        },
+      });
+
+    await commands.create({ sessionId: own.id }, lucia);
+    await commands.cancelSession({ sessionId: own.id }, carolina);
+    await expect(auditOf(own.id)).resolves.toEqual({
+      actorAccountId: carolina.accountId,
+      actorRole: 'COORDINATOR',
+      impersonationId: null,
+    });
+
+    const booking = await commands.create(
+      { sessionId: impersonated.id },
+      lucia,
+    );
+    const impersonation = await openImpersonation(prisma, {
+      administratorAccountId: paola.accountId,
+      staffMemberId: (carolina.identity as { staffMemberId: string })
+        .staffMemberId,
+      now,
+    });
+    await commands.cancelSession(
+      { sessionId: impersonated.id },
+      impersonating(carolina, impersonation),
+    );
+    await expect(auditOf(impersonated.id)).resolves.toEqual({
+      actorAccountId: paola.accountId,
+      actorRole: 'ADMINISTRATOR',
+      impersonationId: impersonation.id,
+    });
+    await expect(
+      prisma.session.findUniqueOrThrow({ where: { id: impersonated.id } }),
+    ).resolves.toMatchObject({ cancelledByAccountId: carolina.accountId });
+    await expect(
+      prisma.booking.findUniqueOrThrow({ where: { id: booking.id } }),
+    ).resolves.toMatchObject({ cancelledByAccountId: carolina.accountId });
   });
 });

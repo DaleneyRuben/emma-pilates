@@ -3,7 +3,6 @@ import {
   AuditActorKind,
   AuditOutcome,
   Prisma,
-  StaffRole,
   type PrismaClient,
 } from '../../generated/prisma/client';
 import type { AdministratorActor } from '../administration/administration-errors';
@@ -79,8 +78,9 @@ const audit = (
   actionCode: input.actionCode,
   outcome: AuditOutcome.SUCCEEDED,
   actorKind: AuditActorKind.ACCOUNT,
-  actorAccountId: actor.accountId,
-  actorRole: StaffRole.ADMINISTRATOR,
+  actorAccountId: actor.audit.accountId,
+  actorRole: actor.audit.role,
+  impersonationId: actor.audit.impersonationId,
   targetType: input.targetType,
   targetId: input.targetId,
   correlationId: randomUUID(),

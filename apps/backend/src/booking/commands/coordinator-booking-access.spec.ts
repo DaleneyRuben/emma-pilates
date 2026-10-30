@@ -183,6 +183,11 @@ describe('the Coordinator on the schedule (ADR-0102)', () => {
     expect(cancel).toHaveBeenCalledWith({
       sessionId: session.id,
       cancelledByAccountId: 'coordinator-account-id',
+      audit: {
+        accountId: 'coordinator-account-id',
+        role: 'COORDINATOR',
+        impersonationId: null,
+      },
     });
   });
 });

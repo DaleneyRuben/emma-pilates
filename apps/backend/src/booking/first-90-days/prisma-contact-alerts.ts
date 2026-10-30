@@ -5,7 +5,6 @@ import {
   AuditOutcome,
   BookingState,
   ContactAlertReason as PrismaContactAlertReason,
-  StaffRole,
 } from '../../generated/prisma/enums';
 import type { ContactAlertReason } from './first-90-days-alerts';
 import type { OpenContactAlert } from './list-contact-alerts';
@@ -102,11 +101,9 @@ export const createPrismaContactAlerts = (
           actionCode: 'contact_alert.contacted',
           outcome: AuditOutcome.SUCCEEDED,
           actorKind: AuditActorKind.ACCOUNT,
-          actorAccountId: input.accountId,
-          actorRole:
-            input.actorRole === 'coordinator'
-              ? StaffRole.COORDINATOR
-              : StaffRole.ADMINISTRATOR,
+          actorAccountId: input.audit.accountId,
+          actorRole: input.audit.role,
+          impersonationId: input.audit.impersonationId,
           targetType: 'client',
           targetId: input.clientId,
           correlationId: randomUUID(),

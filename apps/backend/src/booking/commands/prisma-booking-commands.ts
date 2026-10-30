@@ -9,13 +9,13 @@ import {
   PrismaClient,
   SessionCancellationCause,
   SessionState,
-  StaffRole,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
 import {
   recordNotification as defaultNotificationRecorder,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
+import type { AuditActor } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
@@ -217,7 +217,7 @@ export class PrismaBookingCommands {
                   };
             },
             cancel: (input) =>
-              this.executeSessionCancellation(transaction, input, principal),
+              this.executeSessionCancellation(transaction, input),
             now: this.now,
           }),
         { isolationLevel: 'Serializable' },
@@ -230,8 +230,11 @@ export class PrismaBookingCommands {
   // and queued Clients plus the assigned Trainer.
   private async executeSessionCancellation(
     transaction: Prisma.TransactionClient,
-    input: { sessionId: string; cancelledByAccountId: string },
-    principal: AuthenticatedPrincipal,
+    input: {
+      sessionId: string;
+      cancelledByAccountId: string;
+      audit: AuditActor;
+    },
   ): Promise<SessionCancellationResult> {
     const now = this.now();
     const session = await transaction.session.findUniqueOrThrow({
@@ -336,11 +339,9 @@ export class PrismaBookingCommands {
         actionCode: 'session.cancelled',
         outcome: AuditOutcome.SUCCEEDED,
         actorKind: AuditActorKind.ACCOUNT,
-        actorAccountId: input.cancelledByAccountId,
-        actorRole:
-          principal.identity.kind === 'staff'
-            ? (principal.identity.role.toUpperCase() as StaffRole)
-            : null,
+        actorAccountId: input.audit.accountId,
+        actorRole: input.audit.role,
+        impersonationId: input.audit.impersonationId,
         targetType: 'session',
         targetId: session.id,
         branchId: session.branchId,

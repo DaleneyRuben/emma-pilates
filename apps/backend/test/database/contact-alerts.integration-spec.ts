@@ -16,6 +16,7 @@ import {
   createClientWithPlan,
   first90DaysNow,
 } from './first-90-days-test-support';
+import { impersonating, openImpersonation } from './impersonation-test-support';
 
 const startsOn = new Date('2026-10-01T00:00:00.000Z');
 
@@ -146,6 +147,80 @@ describe('Contact alerts (PostgreSQL)', () => {
     expect(after.items.some((item) => item.clientId === client.clientId)).toBe(
       false,
     );
+  });
+
+  // FIX-010 / ADR-0100: the audit names the Administrator; the alert keeps
+  // the Coordinator's Account.
+  it('audits the mark as the Administrator’s while she sees the app as the Coordinator', async () => {
+    const client = await createClientWithPlan(prisma, {
+      name: 'Patricia Áñez',
+      startsOn,
+    });
+    await createFirst90DaysJob(
+      prisma,
+      () => first90DaysNow,
+      recordNotification,
+    ).execute();
+    const [coordinator, administrator] = await Promise.all(
+      (['COORDINATOR', 'ADMINISTRATOR'] as const).map((role) =>
+        prisma.staffMember.create({
+          data: {
+            name: role,
+            role,
+            account: {
+              create: { email: `${role.toLowerCase()}@impersonation.test` },
+            },
+          },
+          include: { account: true },
+        }),
+      ),
+    );
+    const impersonation = await openImpersonation(prisma, {
+      administratorAccountId: administrator.account!.id,
+      staffMemberId: coordinator.id,
+      now: first90DaysNow,
+    });
+
+    await mark(
+      client.clientId,
+      impersonating(
+        {
+          ...staff('coordinator'),
+          accountId: coordinator.account!.id,
+          identity: {
+            kind: 'staff',
+            staffMemberId: coordinator.id,
+            role: 'coordinator',
+            branchIds: [],
+          },
+        },
+        impersonation,
+      ),
+    );
+
+    await expect(
+      prisma.contactAlert.findFirstOrThrow({
+        where: { clientId: client.clientId },
+        select: { contactedByAccountId: true },
+      }),
+    ).resolves.toEqual({ contactedByAccountId: coordinator.account!.id });
+    await expect(
+      prisma.auditRecord.findFirstOrThrow({
+        where: {
+          actionCode: 'contact_alert.contacted',
+          targetId: client.clientId,
+        },
+        select: {
+          actorAccountId: true,
+          actorRole: true,
+          impersonationId: true,
+        },
+      }),
+    ).resolves.toEqual({
+      actorAccountId: administrator.account!.id,
+      actorRole: 'ADMINISTRATOR',
+      impersonationId: impersonation.id,
+    });
   });
 
   it.each([['assistant'], ['trainer'], ['nutritionist']] as const)(
