@@ -19,11 +19,6 @@ export const milestoneOffsets = {
 export const elapsedCivilDays = (startsOn: Date, today: Date): number =>
   Math.floor((today.getTime() - startsOn.getTime()) / dayMilliseconds);
 
-export const isCourtesyPlan = (plan: {
-  priceCentavos: number;
-  hiddenAt: Date | null;
-}): boolean => plan.priceCentavos === 0 || plan.hiddenAt !== null;
-
 export const isMilestoneDue = (
   milestone: LifecycleMilestone,
   startsOn: Date,

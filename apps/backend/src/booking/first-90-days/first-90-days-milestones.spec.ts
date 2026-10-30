@@ -1,26 +1,9 @@
 import { boliviaDate } from '../../time/bolivia-time';
-import {
-  dueMilestones,
-  isCourtesyPlan,
-  isMilestoneDue,
-} from './first-90-days-milestones';
+import { dueMilestones, isMilestoneDue } from './first-90-days-milestones';
 
 const startsOn = new Date('2026-10-01T00:00:00.000Z');
 
 describe('first-90-days lifecycle milestones', () => {
-  it('treats a Plan as courtesy when it costs nothing or is hidden', () => {
-    expect(isCourtesyPlan({ priceCentavos: 0, hiddenAt: null })).toBe(true);
-    expect(
-      isCourtesyPlan({
-        priceCentavos: 56_000,
-        hiddenAt: new Date('2026-09-01T00:00:00.000Z'),
-      }),
-    ).toBe(true);
-    expect(isCourtesyPlan({ priceCentavos: 56_000, hiddenAt: null })).toBe(
-      false,
-    );
-  });
-
   it('becomes due on the Bolivia calendar day of each offset after the start', () => {
     expect(
       isMilestoneDue('day_2', startsOn, new Date('2026-10-03T00:00:00.000Z')),
