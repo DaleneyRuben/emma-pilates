@@ -47,11 +47,15 @@ describe('cancelSession', () => {
     expect(deps.cancel).toHaveBeenCalledWith({
       sessionId: 'session-1',
       cancelledByAccountId: 'admin-account',
-      impersonationId: null,
+      audit: {
+        accountId: 'admin-account',
+        role: 'ADMINISTRATOR',
+        impersonationId: null,
+      },
     });
   });
 
-  it('names the Administrator when she cancels while seeing the app as the Coordinator', async () => {
+  it('names the Administrator in the audit, and keeps the Coordinator’s Account on the Session, while she sees the app as the Coordinator', async () => {
     const deps = {
       ...dependencies(),
       principal: {
@@ -75,8 +79,12 @@ describe('cancelSession', () => {
 
     expect(deps.cancel).toHaveBeenCalledWith({
       sessionId: 'session-1',
-      cancelledByAccountId: 'admin-account',
-      impersonationId: 'impersonation-id',
+      cancelledByAccountId: 'coordinator-account',
+      audit: {
+        accountId: 'admin-account',
+        role: 'ADMINISTRATOR',
+        impersonationId: 'impersonation-id',
+      },
     });
   });
 

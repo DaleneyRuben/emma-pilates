@@ -9,13 +9,13 @@ import {
   PrismaClient,
   SessionCancellationCause,
   SessionState,
-  StaffRole,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
 import {
   recordNotification as defaultNotificationRecorder,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
+import type { AuditActor } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
@@ -233,7 +233,7 @@ export class PrismaBookingCommands {
     input: {
       sessionId: string;
       cancelledByAccountId: string;
-      impersonationId: string | null;
+      audit: AuditActor;
     },
   ): Promise<SessionCancellationResult> {
     const now = this.now();
@@ -339,9 +339,9 @@ export class PrismaBookingCommands {
         actionCode: 'session.cancelled',
         outcome: AuditOutcome.SUCCEEDED,
         actorKind: AuditActorKind.ACCOUNT,
-        actorAccountId: input.cancelledByAccountId,
-        actorRole: StaffRole.ADMINISTRATOR,
-        impersonationId: input.impersonationId,
+        actorAccountId: input.audit.accountId,
+        actorRole: input.audit.role,
+        impersonationId: input.audit.impersonationId,
         targetType: 'session',
         targetId: session.id,
         branchId: session.branchId,
