@@ -7,7 +7,7 @@ import {
   recordNotification as defaultNotificationRecorder,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
-import { Prisma } from '../../generated/prisma/client';
+import { sweepEach } from '../../jobs/sweep-each';
 import { retrySerializable } from '../../database/retry-serializable';
 import { readCurrentStudioSettings } from '../studio-settings/prisma-studio-settings';
 import {
@@ -76,26 +76,6 @@ export const createPrismaSessionStartChecks = (
       ),
     );
 
-  // One Session whose own settlement fails must not stop the sweep. The
-  // worker stopping, and a serialization conflict, still propagate.
-  const checkSession = (
-    sessionId: string,
-    now: Date,
-    rule: MinimumRule,
-  ): Promise<'skipped' | 'checked' | 'cancelled'> =>
-    settleSession(sessionId, now, rule).catch((error: unknown) => {
-      if (error instanceof Error && error.message.includes('worker stopped')) {
-        throw error;
-      }
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        (error.code === 'P2034' || error.code === 'P2010')
-      ) {
-        throw error;
-      }
-      return 'skipped' as const;
-    });
-
   const checkMinimumBookings = async (): Promise<{
     checked: number;
     cancelled: number;
@@ -123,12 +103,19 @@ export const createPrismaSessionStartChecks = (
     let checked = 0;
     let cancelled = 0;
 
-    for (const { id } of candidates) {
-      const outcome = await checkSession(id, now, rule);
-      if (outcome === 'skipped') continue;
-      checked += 1;
-      if (outcome === 'cancelled') cancelled += 1;
-    }
+    // One Session whose settlement fails must not stop the sweep; it is
+    // reported once the others are settled.
+    await sweepEach(
+      'minimum_bookings_check',
+      candidates,
+      ({ id }) => id,
+      async ({ id }) => {
+        const outcome = await settleSession(id, now, rule);
+        if (outcome === 'skipped') return;
+        checked += 1;
+        if (outcome === 'cancelled') cancelled += 1;
+      },
+    );
 
     return { checked, cancelled };
   };

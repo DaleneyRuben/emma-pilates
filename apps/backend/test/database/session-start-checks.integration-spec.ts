@@ -216,7 +216,7 @@ describe('Prisma Session start checks: Minimum Bookings', () => {
     world.setClock(new Date(second.startsAt.getTime() - lead));
     await expect(
       world.checks(crashOnSecond).checkMinimumBookings(),
-    ).rejects.toThrow('worker stopped');
+    ).rejects.toThrow(`minimum_bookings_check failed for 1 item: ${second.id}`);
     await expect(sessionRow(first.id)).resolves.toMatchObject({
       state: 'CANCELLED',
     });
