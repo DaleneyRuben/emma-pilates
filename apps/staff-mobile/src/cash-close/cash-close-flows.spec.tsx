@@ -177,6 +177,27 @@ describe("Cerrar caja (S25)", () => {
     });
   });
 
+  it("keeps the cash close usable when a profile refetch fails over cached data", async () => {
+    let profileDown = false;
+    const routes = assistantRoutes();
+    const profile = routes["/api/v1/staff-members/current"];
+    const screen = await openCashClose({
+      ...routes,
+      "/api/v1/staff-members/current": (init) => {
+        if (profileDown) throw new TypeError("Network request failed");
+        return profile(init);
+      },
+      [centroToday]: () => jsonResponse(today),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    profileDown = true;
+    await fireEvent.press(await screen.findByTestId("cash-close-entry"));
+
+    expect(await screen.findByText("EFECTIVO ESPERADO")).toBeOnTheScreen();
+    expect(screen.queryByText("No pudimos cargar la caja de hoy.")).toBeNull();
+  });
+
   it("shows the query failure when the Branch list cannot load, not an endless spinner", async () => {
     const screen = await render(
       <App
