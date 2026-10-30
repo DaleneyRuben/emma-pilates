@@ -160,7 +160,8 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
             {row.original.voidReason}
           </span>
         ) : null}
-        {row.original.state === "confirmed" ? (
+        {row.original.state === "confirmed" &&
+        row.original.kind !== "evaluation" ? (
           <VoidSaleAction
             paymentId={row.original.id}
             clientName={row.original.clientName}

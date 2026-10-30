@@ -7,6 +7,7 @@ import type {
   AdministratorPaymentState,
   AdministratorPaymentStatusFilter,
 } from './administrator-payments';
+import { saleLabel } from './payment-label';
 
 type PaymentRow = {
   id: string;
@@ -52,7 +53,10 @@ const toRow = (row: PaymentRow): AdministratorPaymentRow => ({
   id: row.id,
   clientId: row.client_id,
   clientName: row.client_name,
-  planName: row.plan_name,
+  planName: saleLabel({
+    kind: row.kind,
+    planNameSnapshot: row.plan_name,
+  }),
   kind: row.kind,
   method: row.method,
   planPriceCentavos: row.plan_price_centavos,

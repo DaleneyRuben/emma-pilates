@@ -40,6 +40,7 @@ import {
 } from './prisma-start-date-allocation';
 import type { CreditSummary } from './credit-summary';
 import { PaymentRuleError } from './payment-errors';
+import { createPendingPayment } from './pending-payment';
 import {
   intentSelect,
   paymentMethods,
@@ -904,29 +905,26 @@ export function createPrismaPaymentCommands(
             ignorePurchaseIntentId: intent.id,
           });
 
-          const payment = await transaction.payment.create({
-            data: {
-              clientId,
-              planId: intent.planId,
-              purchaseIntentId: intent.id,
-              planNameSnapshot: intent.planNameSnapshot,
-              durationDaysSnapshot: intent.durationDaysSnapshot,
-              weeklyClassCapSnapshot: intent.weeklyClassCapSnapshot,
-              classAllowanceSnapshot: intent.classAllowanceSnapshot,
-              planPriceCentavos: intent.planPriceCentavos,
-              creditAppliedCentavos: intent.creditReservedCentavos,
-              discountCentavos: intent.discountCentavos,
-              discountReason: intent.discountReason,
-              amountDueCentavos: intent.amountDueCentavos,
-              startsOn: intent.startsOn,
-              method: PaymentMethod.TRANSFER,
-              state: PaymentState.PENDING,
-              submittedByAccountId: principal.accountId,
-              submittedAt: now,
-              createdAt: now,
-              ...invoiceColumns(command.invoiceData),
-            },
-            select: { id: true },
+          const payment = await createPendingPayment(transaction, {
+            clientId,
+            planId: intent.planId,
+            purchaseIntentId: intent.id,
+            planNameSnapshot: intent.planNameSnapshot,
+            durationDaysSnapshot: intent.durationDaysSnapshot,
+            weeklyClassCapSnapshot: intent.weeklyClassCapSnapshot,
+            classAllowanceSnapshot: intent.classAllowanceSnapshot,
+            planPriceCentavos: intent.planPriceCentavos,
+            creditAppliedCentavos: intent.creditReservedCentavos,
+            discountCentavos: intent.discountCentavos,
+            discountReason: intent.discountReason,
+            amountDueCentavos: intent.amountDueCentavos,
+            startsOn: intent.startsOn,
+            method: PaymentMethod.TRANSFER,
+            state: PaymentState.PENDING,
+            submittedByAccountId: principal.accountId,
+            submittedAt: now,
+            createdAt: now,
+            ...invoiceColumns(command.invoiceData),
           });
           await transaction.purchaseIntent.update({
             where: { id: intent.id },
