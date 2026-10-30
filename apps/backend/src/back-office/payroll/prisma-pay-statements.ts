@@ -1,7 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
+import {
+  addCivilDays,
+  boliviaDate,
+  boliviaInstant,
+} from '../../time/bolivia-time';
 import {
   BackOfficeError,
   requireAdministrator,
@@ -12,7 +16,7 @@ import { coordinatorPay } from './coordinator-pay';
 import { trainerPay } from './trainer-pay';
 import type { TrainerMonthFacts } from './trainer-pay-facts';
 export type CoordinatorMonthFacts = {
-  staffMemberId: string | null;
+  staffMemberIds: string[];
   newClients: {
     durationDays: number;
     classAllowance: number;
@@ -52,7 +56,7 @@ const statementSelect = {
   state: true,
   totalCentavos: true,
   salaryPaymentId: true,
-  staffMember: { select: { name: true } },
+  staffMember: { select: { name: true, role: true } },
   lines: {
     where: { deletedAt: null },
     orderBy: { position: 'asc' as const },
@@ -78,6 +82,41 @@ const toView = (row: StatementRow) => ({
     amountCentavos: line.amountCentavos,
   })),
 });
+
+// The draft is unchanged when it holds the same lines in the same order and
+// the same total: the hourly re-draft then writes nothing.
+const sameLines = (
+  existing: {
+    totalCentavos: number;
+    lines: { kind: string; detail: string; amountCentavos: number }[];
+  },
+  input: {
+    totalCentavos: number;
+    lines: { kind: LineKind; detail: string; amountCentavos: number }[];
+  },
+): boolean =>
+  existing.totalCentavos === input.totalCentavos &&
+  existing.lines.length === input.lines.length &&
+  existing.lines.every(
+    (line, index) =>
+      line.kind === lineKinds[input.lines[index].kind] &&
+      line.detail === input.lines[index].detail &&
+      line.amountCentavos === input.lines[index].amountCentavos,
+  );
+
+// A month's pay is approved once it is over in Bolivia. The Coordinator's
+// renewal bonus counts purchases up to 7 days after the month's last Plans
+// end, so hers waits those 7 days too.
+const approvableFrom = (statement: {
+  month: Date;
+  staffMember: { role: string };
+}): Date => {
+  const end = monthEnd(statement.month);
+  return boliviaInstant(
+    statement.staffMember.role === 'COORDINATOR' ? addCivilDays(end, 7) : end,
+    0,
+  );
+};
 
 const requireTrainer = (principal: AuthenticatedPrincipal): string => {
   if (
@@ -125,12 +164,8 @@ export const createPrismaPayStatements = (
     const coordinatorFacts = dependencies.coordinatorFactsOfMonth
       ? await dependencies.coordinatorFactsOfMonth(from, monthEnd(from))
       : null;
-    if (
-      coordinatorFacts?.staffMemberId !== null &&
-      coordinatorFacts?.staffMemberId !== undefined
-    ) {
-      const pay = coordinatorPay(coordinatorFacts);
-      const staffMemberId = coordinatorFacts.staffMemberId;
+    for (const staffMemberId of coordinatorFacts?.staffMemberIds ?? []) {
+      const pay = coordinatorPay(coordinatorFacts!);
       await prisma.$transaction((transaction) =>
         replaceDraft(transaction, {
           staffMemberId,
@@ -159,16 +194,33 @@ export const createPrismaPayStatements = (
       now: Date;
     },
   ) => {
-    const existing = await transaction.payStatement.findFirst({
-      where: {
-        staffMemberId: input.staffMemberId,
-        month: input.month,
-        deletedAt: null,
-      },
-      select: { id: true, state: true },
-    });
+    // The row lock serializes a re-draft with an approval of the same
+    // statement (H11): whichever comes second sees the other's result.
+    const locked = await transaction.$queryRaw<{ id: string }[]>`
+      SELECT "id" FROM "back_office"."pay_statements"
+       WHERE "staff_member_id" = ${input.staffMemberId}::uuid
+         AND "month" = ${input.month.toISOString().slice(0, 10)}::date
+         AND "deleted_at" IS NULL
+       FOR UPDATE`;
+    const existing =
+      locked.length === 0
+        ? null
+        : await transaction.payStatement.findUniqueOrThrow({
+            where: { id: locked[0].id },
+            select: {
+              id: true,
+              state: true,
+              totalCentavos: true,
+              lines: {
+                where: { deletedAt: null },
+                orderBy: { position: 'asc' },
+                select: { kind: true, detail: true, amountCentavos: true },
+              },
+            },
+          });
     if (existing?.state === 'APPROVED') return existing.id;
-    if (existing !== null && existing !== undefined) {
+    if (existing !== null && sameLines(existing, input)) return existing.id;
+    if (existing !== null) {
       await transaction.payStatementLine.updateMany({
         where: { payStatementId: existing.id, deletedAt: null },
         data: { deletedAt: input.now },
@@ -245,6 +297,10 @@ export const createPrismaPayStatements = (
       const actor: BackOfficeActor = requireAdministrator(principal);
       const now = dependencies.now();
       return prisma.$transaction(async (transaction) => {
+        await transaction.$queryRaw`
+          SELECT "id" FROM "back_office"."pay_statements"
+           WHERE "id" = ${input.statementId}::uuid
+           FOR UPDATE`;
         const statement = await transaction.payStatement.findFirst({
           where: { id: input.statementId, deletedAt: null },
           select: statementSelect,
@@ -253,6 +309,9 @@ export const createPrismaPayStatements = (
           throw new BackOfficeError('pay_statement_not_found');
         }
         if (statement.state === 'APPROVED') return toView(statement);
+        if (now < approvableFrom(statement)) {
+          throw new BackOfficeError('pay_statement_month_open');
+        }
         const paidOn = boliviaDate(now);
         const payment = await transaction.salaryPayment.create({
           data: {
