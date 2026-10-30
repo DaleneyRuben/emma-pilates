@@ -87,6 +87,25 @@ describe("Cerrar caja (S25)", () => {
     expect(screen.getByText("Cerrada por Camila Rojas a las 19:05.")).toBeOnTheScreen();
   });
 
+  it("names the voided cash sales still in the drawer on their own line (FIX-004)", async () => {
+    const screen = await openCashClose({
+      ...assistantRoutes(),
+      [centroToday]: () => jsonResponse({ ...today, voidedCashCentavos: 29_000 }),
+    });
+
+    expect(screen.getByText("Bs 520")).toBeOnTheScreen();
+    expect(screen.getByText("Ventas anuladas (efectivo en caja): Bs 290")).toBeOnTheScreen();
+  });
+
+  it("shows no voided line when nothing was voided", async () => {
+    const screen = await openCashClose({
+      ...assistantRoutes(),
+      [centroToday]: () => jsonResponse({ ...today, voidedCashCentavos: 0 }),
+    });
+
+    expect(screen.queryByText(/Ventas anuladas/)).toBeNull();
+  });
+
   it("opens on the closed state when today is already closed", async () => {
     const screen = await openClientSearch({
       ...assistantRoutes(),
