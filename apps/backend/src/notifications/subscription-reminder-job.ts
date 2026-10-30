@@ -13,10 +13,11 @@ export const createSubscriptionReminderJob = (
   recordNotification: NotificationRecorder = defaultNotificationRecorder,
 ) => ({
   execute: () => {
-    const occurredAt = dateTriggeredPushInstant(now());
+    const instant = now();
+    const occurredAt = dateTriggeredPushInstant(instant);
     if (occurredAt === null) return Promise.resolve({ reminded: 0 });
     return remindExpiringSubscriptions({
-      today: boliviaDate(now()),
+      today: boliviaDate(instant),
       // Already reminded Subscriptions are excluded, so a day the job misses
       // is recovered the next day instead of waiting for an exact date. A
       // Guest Pass or Courtesy Access is not renewed, and a Client whose next
