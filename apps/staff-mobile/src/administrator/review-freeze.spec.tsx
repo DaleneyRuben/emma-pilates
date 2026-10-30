@@ -74,6 +74,7 @@ describe("freeze review", () => {
     );
     await fireEvent.press(screen.getByText("Lucía pidió un congelamiento."));
     await waitFor(() => expect(screen.getByText("Lucía Fernández")).toBeOnTheScreen());
+    expect(screen.getByText("27 de octubre de 2026 – 3 de noviembre de 2026")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Aprobar" }));
     await waitFor(() =>
       expect(

@@ -13,6 +13,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { formatCivilDate } from "../assistant/assistant-format";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 
@@ -65,7 +66,7 @@ export function FreezesScreen() {
             >
               <View style={styles.cardBody}>
                 <Text style={styles.name}>{freeze.clientName}</Text>
-                <BodyText>{`${freeze.startsOn} – ${freeze.endsOn}`}</BodyText>
+                <BodyText>{`${formatCivilDate(freeze.startsOn)} – ${formatCivilDate(freeze.endsOn)}`}</BodyText>
                 <BodyText>{freeze.reason}</BodyText>
               </View>
               <Chevron />

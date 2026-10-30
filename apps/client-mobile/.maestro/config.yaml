@@ -22,6 +22,7 @@ executionOrder:
     - promotions-consent
     - send-feedback
     - purchase-plan-transfer
+    - fix227-expired-qr
     - waitlist-join-and-leave
     - reschedule-booking
     - close-account

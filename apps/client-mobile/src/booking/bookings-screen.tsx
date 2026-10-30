@@ -240,8 +240,10 @@ export function BookingsScreen({
           <BodyText style={styles.noticeBody}>
             {`${confirmed.classTypeName} · ${formatSessionDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`}
           </BodyText>
-          {remaining !== undefined ? (
+          {remaining !== undefined && confirmed.planName !== "Pase de invitada" ? (
             <BodyText style={styles.balance}>{`Te quedan ${remaining} clases en tu plan`}</BodyText>
+          ) : confirmed.planName === "Pase de invitada" ? (
+            <BodyText style={styles.balance}>Tu pase de invitada ya se usó.</BodyText>
           ) : null}
         </View>
       ) : null}
