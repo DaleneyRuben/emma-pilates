@@ -150,7 +150,7 @@ describe("Assistant flows on a tablet", () => {
         flexWrap: "wrap",
       });
     });
-    await fireEvent.press(screen.getByRole("button", { name: /Paquete de 8 clases/ }));
+    await fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Confirmar pago en efectivo")).toBeOnTheScreen();
     });

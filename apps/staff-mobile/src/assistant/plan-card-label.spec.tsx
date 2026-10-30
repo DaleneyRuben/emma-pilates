@@ -28,11 +28,11 @@ describe("Assistant plan card labels", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
 
-    expect(
-      await screen.findByRole("button", {
-        name: "Paquete de 8 clases, Bs 476, antes Bs 560",
-      }),
-    ).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Paquete de 12 clases, Bs 780" })).toBeOnTheScreen();
+    const founder = await screen.findByRole("button", { name: "Paquete de 8 clases" });
+    expect(founder).toHaveProp("accessibilityHint", "Bs 476, antes Bs 560");
+    expect(screen.getByRole("button", { name: "Paquete de 12 clases" })).toHaveProp(
+      "accessibilityHint",
+      "Bs 780",
+    );
   });
 });

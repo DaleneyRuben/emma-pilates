@@ -42,9 +42,9 @@ async function openConfirmation(prefill: typeof company | null) {
   });
   await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: /Paquete de 8 clases/ })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Paquete de 8 clases" })).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: /Paquete de 8 clases/ }));
+  await fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
   await waitFor(() => {
     expect(screen.getByText("Datos para la factura")).toBeOnTheScreen();
   });

@@ -260,7 +260,7 @@ describe("Assistant Client flows", () => {
     expect(screen.getByText("8 clases · válido por 30 días")).toBeOnTheScreen();
     expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
 
-    await fireEvent.press(screen.getByRole("button", { name: /Paquete de 8 clases/ }));
+    await fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Confirmar pago en efectivo")).toBeOnTheScreen();
     });
