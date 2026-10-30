@@ -27,5 +27,8 @@ executionOrder:
     - administrator-cancel-session
     - assistant-create-client
     - assistant-cash-payment-and-booking
+    - fix227-cash
+    - fix227-reject
+    - fix227-expired-confirm
     - assistant-cash-close
     - trainer-attendance

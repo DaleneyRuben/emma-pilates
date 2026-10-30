@@ -1,0 +1,117 @@
+# Lucía submitted a transfer through the app. The Administrator rejects it.
+# The place is released: the API check after this flow shows no reservation.
+appId: ${APP_ID}
+env:
+  EMAIL: paola.mendoza@example.com
+  PAYMENT_ID: ${PAYMENT_ID}
+---
+- launchApp:
+    appId: ${APP_ID}
+    clearKeychain: true
+- openLink: ${APP_LINK}
+- repeat:
+    times: 6
+    while:
+      notVisible:
+        id: "login-email"
+    commands:
+      - tapOn:
+          text: "Open"
+          optional: true
+      - tapOn:
+          text: "Continue"
+          optional: true
+      - tapOn:
+          text: "Close"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "login-email"
+          timeout: 15000
+          optional: true
+- tapOn:
+    text: "Dismiss"
+    optional: true
+- tapOn:
+    id: "login-email"
+- waitForAnimationToEnd
+- inputText: ${EMAIL}
+- tapOn:
+    id: "login-password"
+- waitForAnimationToEnd
+- inputText: ${PASSWORD}
+- repeat:
+    times: 3
+    while:
+      visible:
+        id: "login-submit"
+    commands:
+      - tapOn:
+          id: "login-submit"
+      - extendedWaitUntil:
+          notVisible:
+            id: "login-submit"
+          timeout: 6000
+          optional: true
+- tapOn:
+    text: "Not Now"
+    optional: true
+- runFlow: subflows/dismiss-push-permission.yaml
+- runFlow: subflows/park-dev-gear.yaml
+- tapOn:
+    text: "Close"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "pending-payment-${PAYMENT_ID}"
+    timeout: 30000
+- takeScreenshot: fix227-reject-pending
+- tapOn:
+    id: "pending-payment-${PAYMENT_ID}"
+- extendedWaitUntil:
+    visible: "Comprobante"
+    timeout: 20000
+- takeScreenshot: fix227-reject-review
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- extendedWaitUntil:
+    visible:
+      id: "review-reject"
+    timeout: 10000
+- tapOn:
+    id: "review-reject"
+- extendedWaitUntil:
+    visible:
+      id: "review-reject-reason"
+    timeout: 10000
+- tapOn:
+    id: "review-reject-reason"
+- waitForAnimationToEnd
+- inputText: "El monto no coincide con la transferencia."
+# The iPad has a Hide keyboard key. The phone does not, and hideKeyboard
+# taps the receipt. Maestro also reports the confirm button as visible
+# while the keyboard covers it, so the scroll is unconditional.
+- tapOn:
+    text: "Hide keyboard"
+    optional: true
+- swipe:
+    start: "50%,42%"
+    end: "50%,16%"
+    duration: 700
+- swipe:
+    start: "50%,42%"
+    end: "50%,16%"
+    duration: 700
+- swipe:
+    start: "50%,42%"
+    end: "50%,16%"
+    duration: 700
+- takeScreenshot: fix227-reject-reason
+- tapOn:
+    id: "review-reject-confirm"
+- extendedWaitUntil:
+    notVisible:
+      id: "pending-payment-${PAYMENT_ID}"
+    timeout: 20000
+- takeScreenshot: fix227-reject-done

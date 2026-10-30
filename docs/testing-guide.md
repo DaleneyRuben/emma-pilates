@@ -7118,7 +7118,7 @@ B. **The decision.** Paola opens **Back Office → Congelamientos**. The card
    inside the window in La Paz, and closes Waitlist entries for those
    Sessions. The class returns the same way a cancellation does. The Payment
    amount does not change. The Client receives a push and an inbox
-   notification. Approving after the start has passed answers `409`
+   notification. Approving on the start day, or after the start has passed, answers `409`
    `freeze_start_in_past` and changes nothing: «El congelamiento ya empezó.
    Recházalo y pide uno desde hoy.» A refused Freeze does not spend the one
    Freeze, so she can ask again with dates from today, and that request can
