@@ -69,9 +69,9 @@ export const decideFreezeRequest = (
   ) {
     return refused('freeze_not_allowed');
   }
-  if (facts.startsOn.getTime() < today.getTime()) {
-    // The approval path keeps the finer code. An installed build still
-    // understands it, and the request path maps it before answering.
+  // A start of today still keeps that morning's class and still extends
+  // the plan, so approval treats today the same as a start already past.
+  if (boliviaDate(facts.startsOn).getTime() <= today.getTime()) {
     return refused('freeze_start_in_past');
   }
   const extensionReachesRenewal =
