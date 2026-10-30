@@ -7711,3 +7711,16 @@ D. **The Plan stays buyable.** `GET /api/v1/payments/current` does not return
    Payment is pending succeeds. A Client whose Plan has no classes left and
    no future booking cannot book the paid Evaluation
    (`no_eligible_subscription`).
+E. **Move a confirmed paid Evaluation (FIX-014, FIX-016, design follow-up
+   218).** Once its Payment is confirmed, the card in Mis evaluaciones reads
+   «Puedes reprogramarla hasta 3 horas antes.» and offers **Reprogramar**,
+   not **Cancelar**; `DELETE /api/v1/evaluations/{id}` answers `409`
+   `evaluation_paid_not_cancellable`. **Reprogramar** opens **Elige otro
+   turno**: «Tu evaluación ya está pagada. Elige el nuevo horario: el pago se
+   mantiene.», no «gratuita», no price or receipt, and her current turno is
+   not listed. Tapping a time opens **¿Mover tu evaluación?** with «Antes:»
+   and «Ahora:», «El pago se mantiene: no pagas de nuevo.» and «El horario
+   anterior queda libre para otras clientas.». **Volver** sends nothing;
+   **Sí, mover evaluación** sends `POST /api/v1/evaluations/{id}/reschedule`
+   (`200`, the same Evaluation and Payment on the new slot) and lands on Mis
+   evaluaciones with **Evaluación reprogramada**.
