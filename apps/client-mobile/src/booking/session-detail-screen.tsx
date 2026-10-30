@@ -57,15 +57,6 @@ type DetailNavigation = {
   };
 };
 
-const bookingProblems: Record<string, string> = {
-  booking_overlap: "Ya tienes una reserva a esa hora.",
-  active_booking_exists: "Ya tienes una reserva en esta clase.",
-  active_waitlist_entry_exists: "Ya estás en la lista de espera.",
-  no_eligible_subscription: "No te quedan clases en tu plan.",
-  session_has_capacity: "La clase tiene cupos: puedes reservar directamente.",
-  weekly_cap_reached: "Ya usaste tus clases de esta semana.",
-};
-
 function problemMessage(body: unknown): string | null {
   if (typeof body !== "object" || body === null) return null;
   const code = (body as { code?: unknown }).code;
@@ -78,7 +69,7 @@ function problemMessage(body: unknown): string | null {
     const date = /: (\d{4}-\d{2}-\d{2})$/.exec(detail)?.[1];
     if (date !== undefined) return `Podrás reservar a partir del ${formatCivilDate(date)}.`;
   }
-  return typeof code === "string" ? (bookingProblems[code] ?? bookingRejectionMessage(code)) : null;
+  return typeof code === "string" ? bookingRejectionMessage(code) : null;
 }
 
 export function SessionDetailScreen({ route }: { route: { params: { sessionId: string } } }) {
