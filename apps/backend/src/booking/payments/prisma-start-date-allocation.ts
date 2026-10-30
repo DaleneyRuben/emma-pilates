@@ -90,7 +90,9 @@ const rule = (code: PaymentRuleError['code'], message: string) =>
   new PaymentRuleError(code, message);
 
 // Ends the current Subscription the day before the renewal's Start Date, in
-// the same transaction, and audits who shortened it and why.
+// the same transaction, and audits who shortened it and why. A renewal that
+// starts the day the current one started leaves no day to keep: it expires
+// instead, since an end before the start is only a void's (ADR-0012).
 export const endSubscriptionEarly = async (
   transaction: Transaction,
   input: {
@@ -104,9 +106,15 @@ export const endSubscriptionEarly = async (
 ): Promise<void> => {
   const current = await transaction.subscription.findUniqueOrThrow({
     where: { id: input.subscriptionId },
-    select: { endsOn: true, clientId: true },
+    select: { startsOn: true, endsOn: true, clientId: true },
   });
-  if (input.endsOn.getTime() < current.endsOn.getTime()) {
+  const expired = input.endsOn.getTime() < current.startsOn.getTime();
+  if (expired) {
+    await transaction.subscription.update({
+      where: { id: input.subscriptionId },
+      data: { state: SubscriptionState.EXPIRED, expiredAt: input.now },
+    });
+  } else if (input.endsOn.getTime() < current.endsOn.getTime()) {
     await transaction.subscription.update({
       where: { id: input.subscriptionId },
       data: { endsOn: input.endsOn },
@@ -128,7 +136,8 @@ export const endSubscriptionEarly = async (
       metadata: {
         clientId: current.clientId,
         previousEndsOn: civil(current.endsOn),
-        endsOn: civil(input.endsOn),
+        endsOn: civil(expired ? current.endsOn : input.endsOn),
+        expired,
         renewalStartsOn: civil(input.startsOn),
         paymentId: input.paymentId,
       },
@@ -154,3 +163,4 @@ export const parseRequestedStartDate = (
 };
 
 export const todayOf = (now: Date): Date => boliviaDate(now);
+
