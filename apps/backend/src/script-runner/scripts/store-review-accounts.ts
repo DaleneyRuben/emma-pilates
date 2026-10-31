@@ -196,6 +196,7 @@ export const storeReviewAccounts: ScriptDefinition = {
   run: async (context) => {
     const clientEmail = emailParam(context.params.clientEmail);
     const trainerEmail = emailParam(context.params.trainerEmail);
+    if (clientEmail === trainerEmail) throw new Error('emails_equal');
     const endsOn = endsOnParam(context.params.endsOn, context.now());
     const client = await existingReviewer(
       context.prisma,
