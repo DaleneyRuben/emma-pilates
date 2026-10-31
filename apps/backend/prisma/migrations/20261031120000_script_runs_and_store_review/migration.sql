@@ -26,7 +26,7 @@ CREATE TABLE "system"."script_runs" (
 CREATE INDEX "script_runs_script_name_started_at_idx"
     ON "system"."script_runs"("script_name", "started_at");
 
--- The Accounts Apple's and Google's reviewers sign in with. They never count
--- toward income, KPIs, first-plan rules, or pay statements.
+-- The Accounts Apple's and Google's reviewers sign in with. The reports'
+-- store-review seam (real-plan-sale.ts) reads it in a later REL-016 step.
 ALTER TABLE "system"."accounts"
     ADD COLUMN "store_review" BOOLEAN NOT NULL DEFAULT false;

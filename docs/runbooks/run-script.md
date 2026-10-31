@@ -25,8 +25,17 @@ recorded in the database, and never run twice by accident.
   (`already_succeeded`) unless the run is forced; one still marked running
   for less than two hours is refused (`already_running`). Dry runs are
   recorded but never count.
-- The workflow shares the release's concurrency group, so a script never
-  runs beside a release of the same environment.
+- The dispatch refuses while the `migrate` job has a run that has not ended,
+  so a script never starts beside a release's migration. It has its own
+  concurrency group, since joining the release's would cancel a release
+  waiting there. Do not start a release while a script runs.
+- The workflow waits 30 minutes for the run. If it stops waiting (or is
+  cancelled), the run keeps going in Northflank: check it there before
+  releasing or running anything else.
+- Anyone with write access to the repository could dispatch an edited copy
+  of the workflow from a branch with the production token, since GitHub
+  environments with protection rules need a paid plan for a private
+  repository. Today the owner is the only one with write access.
 
 ## Running a script
 
@@ -65,7 +74,7 @@ Each run gives both Accounts new passwords and logs them once, in
 → Sign in details (and App Store Connect's review notes), never anywhere
 else. A rerun reuses the Accounts and keeps a tester Plan that is still
 active. The script refuses an email that belongs to any Account it did not
-mark (`email_taken`), so a real person's Account is never taken over. The
-`store_review_schedule` line counts upcoming Sessions: the reviewer can only
-book if the schedule has some, so load the test schedule on the admin web
-first when it says 0.
+mark (`email_taken`), so a real person's Account is never taken over, and
+one email for both (`emails_equal`). The `store_review_schedule` line counts
+upcoming Sessions: the reviewer can only book if the schedule has some, so
+load the test schedule on the admin web first when it says 0.
