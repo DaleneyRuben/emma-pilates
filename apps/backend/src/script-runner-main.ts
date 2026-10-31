@@ -4,7 +4,7 @@ import { runScript } from './script-runner/run-script';
 import {
   parseScriptCommand,
   ScriptCommandError,
-} from './script-runner/script-command';
+} from './deployment/script-command';
 import { createPrismaScriptRunStore } from './script-runner/prisma-script-run-store';
 import { scripts } from './script-runner/scripts';
 

@@ -1,7 +1,4 @@
-import {
-  scriptRunnerCommand,
-  type ScriptCommand,
-} from '../script-runner/script-command';
+import { scriptRunnerCommand, type ScriptCommand } from './script-command';
 import type { ReleaseClock } from './backend-release';
 import {
   NorthflankRequestError,

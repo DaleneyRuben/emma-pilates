@@ -5,7 +5,7 @@ import {
   type ScriptRunRecord,
   type ScriptRunStore,
 } from './run-script';
-import type { ScriptCommand } from './script-command';
+import type { ScriptCommand } from '../deployment/script-command';
 
 const now = new Date('2026-10-31T15:00:00.000Z');
 const hour = 60 * 60 * 1_000;

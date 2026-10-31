@@ -1,5 +1,5 @@
 import type { PrismaClient } from '../generated/prisma/client';
-import type { ScriptCommand } from './script-command';
+import type { ScriptCommand } from '../deployment/script-command';
 
 export type ScriptContext = {
   prisma: PrismaClient;
