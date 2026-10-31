@@ -20,7 +20,7 @@ is never published to production.
 | Phone | leave empty |
 | Privacy policy | `https://app.emmapilatesstudio.com/privacidad` (Policy → App content → Privacy policy) |
 | App icon (512 × 512) | `apps/client-mobile/assets/store-icon-512.png`, `apps/staff-mobile/assets/store-icon-512.png` |
-| Feature graphic (1024 × 500) | still to make (see below) |
+| Feature graphic (1024 × 500) | `graphics/client-feature-graphic.png`, `graphics/staff-feature-graphic.png` (see [Graphics](#graphics)) |
 
 ## Emma Pilates (`com.emmapilates.client`)
 
@@ -42,7 +42,7 @@ Reserva tus clases de Pilates, revisa tu plan y paga desde tu celular.
 Emma Pilates es la app de Emma Pilates Studio. Movimiento, equilibrio y bienestar, ahora en tu celular.
 
 Reserva tus clases
-• Mira el horario de la semana en cualquiera de nuestras sedes.
+• Mira el horario de la semana y cuántos lugares quedan en cada clase.
 • Reserva tu lugar en segundos y cancélalo si cambias de planes.
 • Si la clase está llena, únete a la lista de espera: cuando se libere un lugar, te reservamos automáticamente y te avisamos.
 • Dentro de las 2 horas y 30 minutos antes de la clase, puedes reprogramarla a otro horario del mismo día.
@@ -52,14 +52,11 @@ Tu plan, siempre a la vista
 • Compra o renueva tu plan pagando con transferencia por QR: sube la foto de tu comprobante y te avisamos cuando el estudio lo confirme.
 • Consulta tu historial de clases y de pagos.
 
-Evaluación nutricional
-• Agenda una evaluación con nuestra nutricionista. Una evaluación al mes está incluida con algunos planes; el estudio te dice el costo de las demás.
-
-Invita a tus amigas y amigos
-• Comparte tu código de referido. Pronto podrás invitar a una amiga a una clase.
+Invita a una amiga
+• Comparte tu código: tu amiga se registra y toma su primera clase gratis en una clase con cupo. Si después compra un plan, tú ganas una clase más.
 
 Notificaciones útiles
-• El estado de tus pagos, tu lugar confirmado desde la lista de espera, cambios del estudio en tus clases, recordatorios de tu evaluación y el aviso antes de que venza tu plan.
+• El estado de tus pagos, tu lugar confirmado desde la lista de espera, cambios del estudio en tus clases y el aviso antes de que venza tu plan.
 
 Para usar la app necesitas una cuenta de Emma Pilates Studio. Puedes crearla desde la app con tu correo o pedirla en recepción.
 
@@ -97,18 +94,17 @@ Si eres cliente del estudio, descarga la app Emma Pilates.
 ¿Dudas? Escríbenos a soporte@emmapilatesstudio.com.
 ```
 
-## Graphics still to make
+## Graphics
 
-- **Feature graphic**, 1024 × 500 PNG or JPEG, one per app: the app's icon
-  artwork on the blush background `#F3E9E7` with «Emma Pilates Studio» and
-  «Movimiento · Equilibrio · Bienestar». No price or ranking text (Play's
-  rules).
-- **Phone screenshots**, 2 to 8 per app, 16:9 or 9:16, each side 320–3,840
-  px. Client: Home, the week's classes, a class detail, Mi plan, the QR
-  payment, Evaluations. Staff: the Trainer agenda, the Assistant's Client
-  search, the Administrator's pending payments.
-- **Tablet screenshots** (7" and 10"): Staff only, since the Assistant works
-  on a tablet; the Client app can skip them.
+All in [`graphics/`](./graphics/), made 2026-10-31 from the fixtures data
+(fictional names, one branch, 8 places per class) and the 1.0.2 builds.
 
-Take screenshots on production-like data (the fixtures plan on staging),
-never with a real Client's name or photo.
+| Play field | Emma Pilates | Emma Pilates Staff |
+| --- | --- | --- |
+| Feature graphic (1024 × 500) | `graphics/client-feature-graphic.png` | `graphics/staff-feature-graphic.png` |
+| Phone screenshots (1080 × 1920, 9:16) | `graphics/client-1-inicio.png` … `client-5-mi-plan.png` | `graphics/staff-1-agenda.png` … `staff-3-clienta.png` |
+
+The screenshots crop the iOS status bar so they read the same on Android, and
+carry a caption above the screen. The plan prices are fixture values, so no
+screenshot shows a price; retake them when real prices or a new screen should
+appear. No tablet screenshots yet: the Staff closed test does not need them.
