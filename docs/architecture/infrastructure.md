@@ -435,8 +435,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
   secrets); an advisory whose fix is not published yet is ignored in
   `pnpm-workspace.yaml` (`auditConfig.ignoreGhsas`, one comment each) and
   reviewed when the next run or Dependabot names it. The ignored advisories
-  today are `GHSA-vfj7-8cjw-p6xm` (braces), `GHSA-86w9-cpqp-85rv`
-  (node-forge), `GHSA-2883-xcg3-v3hh` (js-yaml), and `GHSA-qr28-fpjm-wq7f`
+  today are `GHSA-vfj7-8cjw-p6xm` (braces), `GHSA-2883-xcg3-v3hh` (js-yaml), and `GHSA-qr28-fpjm-wq7f`
   (decode-uri-component 0.2.2, through `@react-navigation/core` and
   `query-string` 7: the fixed 0.5.1 is ESM-only, and `query-string` 7 loads it
   with `require`, so an override would break the apps' link parsing; it
@@ -446,7 +445,9 @@ Values never go in the repository or a chat. «Mac» means the user's own
   `@nestjs/platform-express` and Express 5.2.1 still resolve the vulnerable
   ranges. `seroval` is pinned to 1.6.8 because `@tanstack/router-core` still
   resolves 1.6.7 (`GHSA-97r2-qh9m-474h`, `GHSA-wp97-x4hv-qvhp`,
-  `GHSA-7rv5-mrxv-xcr9`). `secrets` runs gitleaks
+  `GHSA-7rv5-mrxv-xcr9`). `node-forge` is held at `^1.4.2` because Expo's
+  `^1.3.3` range left the lockfile on the vulnerable 1.4.0
+  (`GHSA-86w9-cpqp-85rv` and the advisories of 2026-10-31). `secrets` runs gitleaks
   over the pull request's commits (or the pushed ones) with the allowlists in
   `.gitleaks.toml` (the Firebase client keys in `google-services.json`, the
   CI and test database URLs, S3Mock's fixed credentials, generated design
