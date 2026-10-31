@@ -38,6 +38,7 @@ export type NorthflankClient = {
     override?: { customCommand: string },
   ): Promise<{ id: string; runName: string }>;
   getJobRun(jobId: string, runId: string): Promise<NorthflankRun>;
+  listJobRuns(jobId: string): Promise<NorthflankRun[]>;
   startServiceBuild(serviceId: string, sha: string): Promise<NorthflankBuild>;
   getServiceBuild(serviceId: string, buildId: string): Promise<NorthflankBuild>;
   getServiceDeployment(serviceId: string): Promise<NorthflankDeployment>;
@@ -168,6 +169,8 @@ export function createNorthflankClient(input: {
       );
       return { id: String(data.id), runName: String(data.runName) };
     },
+    listJobRuns: (jobId) =>
+      Promise.reject(new NorthflankRequestError(`not implemented ${jobId}`)),
     getJobRun: async (jobId, runId) =>
       toRun(await request('GET', `${project}/jobs/${jobId}/runs/${runId}`)),
     startServiceBuild: async (serviceId, sha) =>

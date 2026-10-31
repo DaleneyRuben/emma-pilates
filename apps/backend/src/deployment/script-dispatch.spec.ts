@@ -9,10 +9,14 @@ const run = (status: string, concluded: boolean): NorthflankRun => ({
   concluded,
 });
 
-const fakeNorthflank = (answers: (NorthflankRun | Error)[]) => {
+const fakeNorthflank = (
+  answers: (NorthflankRun | Error)[],
+  recent: NorthflankRun[] = [run('SUCCESS', true)],
+) => {
   const started: unknown[][] = [];
   let polls = 0;
   const northflank = {
+    listJobRuns: () => Promise.resolve(recent),
     startJobRun: (...args: unknown[]) => {
       started.push(args);
       return Promise.resolve({ id: 'run-9', runName: 'migrate-9' });
@@ -68,6 +72,20 @@ describe('dispatching a Run Script to Northflank (REL-016)', () => {
       ],
     ]);
     expect(fake.polls()).toBe(3);
+  });
+
+  // A release migrates through the same job, and a script must never run
+  // beside it (REL-016 review).
+  it('starts nothing while the migrate job is still running', async () => {
+    const fake = fakeNorthflank([], [run('RUNNING', false)]);
+
+    expect(await dispatch(fake.northflank)).toEqual({
+      outcome: 'failed',
+      runName: 'migrate-9',
+      detail:
+        'migrate-9 is still RUNNING; run the script again once it has ended',
+    });
+    expect(fake.started).toEqual([]);
   });
 
   it('reports a run that ended without success', async () => {

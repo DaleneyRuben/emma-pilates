@@ -144,6 +144,43 @@ describe('createNorthflankClient', () => {
     expect(run).toEqual({ id: 'run-2', runName: 'migrate-2' });
   });
 
+  it('lists the newest runs of a job', async () => {
+    const { calls, fetch } = fakeFetch(200, {
+      data: {
+        runs: [
+          {
+            id: 'run-3',
+            runName: 'migrate-3',
+            status: 'RUNNING',
+            concluded: false,
+          },
+          {
+            id: 'run-2',
+            runName: 'migrate-2',
+            status: 'SUCCESS',
+            concluded: true,
+          },
+        ],
+      },
+    });
+
+    const runs = await client(fetch).listJobRuns('migrate');
+
+    expect(calls[0]).toMatchObject({
+      url: 'https://api.northflank.com/v1/projects/default/jobs/migrate/runs?per_page=10',
+      method: 'GET',
+    });
+    expect(runs).toEqual([
+      {
+        id: 'run-3',
+        runName: 'migrate-3',
+        status: 'RUNNING',
+        concluded: false,
+      },
+      { id: 'run-2', runName: 'migrate-2', status: 'SUCCESS', concluded: true },
+    ]);
+  });
+
   it('reads a job run by id', async () => {
     const { calls, fetch } = fakeFetch(200, {
       data: {
