@@ -94,18 +94,17 @@ Si eres cliente del estudio, descarga la app Emma Pilates.
 ¿Dudas? Escríbenos a soporte@emmapilatesstudio.com.
 ```
 
-## Graphics still to make
+## Graphics
 
-- **Feature graphic**, 1024 × 500 PNG or JPEG, one per app: the app's icon
-  artwork on the blush background `#F3E9E7` with «Emma Pilates Studio» and
-  «Movimiento · Equilibrio · Bienestar». No price or ranking text (Play's
-  rules).
-- **Phone screenshots**, 2 to 8 per app, 16:9 or 9:16, each side 320–3,840
-  px. Client: Home, the week's classes, a class detail, Mi plan, the QR
-  payment, Evaluations. Staff: the Trainer agenda, the Assistant's Client
-  search, the Administrator's pending payments.
-- **Tablet screenshots** (7" and 10"): Staff only, since the Assistant works
-  on a tablet; the Client app can skip them.
+All in [`graphics/`](./graphics/), made 2026-10-31 from the fixtures data
+(fictional names, one branch, 8 places per class) and the 1.0.2 builds.
 
-Take screenshots on production-like data (the fixtures plan on staging),
-never with a real Client's name or photo.
+| Play field | Emma Pilates | Emma Pilates Staff |
+| --- | --- | --- |
+| Feature graphic (1024 × 500) | `graphics/client-feature-graphic.png` | `graphics/staff-feature-graphic.png` |
+| Phone screenshots (1080 × 1920, 9:16) | `graphics/client-1-inicio.png` … `client-5-mi-plan.png` | `graphics/staff-1-agenda.png` … `staff-3-clienta.png` |
+
+The screenshots crop the iOS status bar so they read the same on Android, and
+carry a caption above the screen. The plan prices are fixture values, so no
+screenshot shows a price; retake them when real prices or a new screen should
+appear. No tablet screenshots yet: the Staff closed test does not need them.
