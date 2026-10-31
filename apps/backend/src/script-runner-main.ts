@@ -1,4 +1,3 @@
-import { validateEnvironment } from './config/environment';
 import { createDatabasePrisma } from './database/database-clients';
 import { runScript } from './script-runner/run-script';
 import {
@@ -7,6 +6,7 @@ import {
 } from './deployment/script-command';
 import { createPrismaScriptRunStore } from './script-runner/prisma-script-run-store';
 import { scripts } from './script-runner/scripts';
+import { validateScriptEnvironment } from './script-runner/script-environment';
 
 // REL-016: runs one script from src/script-runner/scripts as a Northflank
 // job run, started by the Run Script workflow (docs/runbooks/run-script.md).
@@ -16,7 +16,7 @@ const log = (event: string, fields: Record<string, unknown> = {}): void =>
 
 async function main(): Promise<void> {
   const command = parseScriptCommand(process.argv.slice(2));
-  const environment = validateEnvironment(process.env);
+  const environment = validateScriptEnvironment(process.env);
   const prisma = createDatabasePrisma('script-runner', environment);
   try {
     log('script_started', {
