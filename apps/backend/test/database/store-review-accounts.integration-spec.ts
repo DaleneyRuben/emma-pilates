@@ -163,6 +163,15 @@ describe('the store-review Accounts script (REL-016)', () => {
     expect((await accountOf('lucia@example.com'))!.storeReview).toBe(false);
   });
 
+  it('refuses one email for both Accounts before writing anything', async () => {
+    const shared = 'revision-unica@emmapilatesstudio.com';
+
+    await expect(
+      run({ clientEmail: shared, trainerEmail: shared.toUpperCase() }),
+    ).rejects.toThrow('emails_equal');
+    expect(await accountOf(shared)).toBeNull();
+  });
+
   it('refuses an email that is not one', async () => {
     await expect(
       run({ clientEmail: 'not-an-email', trainerEmail }),
