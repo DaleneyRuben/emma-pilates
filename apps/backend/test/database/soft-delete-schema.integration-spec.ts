@@ -56,6 +56,7 @@ describe('soft delete schema', () => {
       'system.image_variants',
       'system.impersonation_sessions',
       'system.notifications',
+      'system.script_runs',
     ]);
   });
 
