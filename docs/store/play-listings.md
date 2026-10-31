@@ -42,7 +42,7 @@ Reserva tus clases de Pilates, revisa tu plan y paga desde tu celular.
 Emma Pilates es la app de Emma Pilates Studio. Movimiento, equilibrio y bienestar, ahora en tu celular.
 
 Reserva tus clases
-• Mira el horario de la semana en cualquiera de nuestras sedes.
+• Mira el horario de la semana y cuántos lugares quedan en cada clase.
 • Reserva tu lugar en segundos y cancélalo si cambias de planes.
 • Si la clase está llena, únete a la lista de espera: cuando se libere un lugar, te reservamos automáticamente y te avisamos.
 • Dentro de las 2 horas y 30 minutos antes de la clase, puedes reprogramarla a otro horario del mismo día.
@@ -52,14 +52,11 @@ Tu plan, siempre a la vista
 • Compra o renueva tu plan pagando con transferencia por QR: sube la foto de tu comprobante y te avisamos cuando el estudio lo confirme.
 • Consulta tu historial de clases y de pagos.
 
-Evaluación nutricional
-• Agenda una evaluación con nuestra nutricionista. Una evaluación al mes está incluida con algunos planes; el estudio te dice el costo de las demás.
-
-Invita a tus amigas y amigos
-• Comparte tu código de referido. Pronto podrás invitar a una amiga a una clase.
+Invita a una amiga
+• Comparte tu código: tu amiga se registra y toma su primera clase gratis. Si después compra un plan, tú ganas una clase más.
 
 Notificaciones útiles
-• El estado de tus pagos, tu lugar confirmado desde la lista de espera, cambios del estudio en tus clases, recordatorios de tu evaluación y el aviso antes de que venza tu plan.
+• El estado de tus pagos, tu lugar confirmado desde la lista de espera, cambios del estudio en tus clases y el aviso antes de que venza tu plan.
 
 Para usar la app necesitas una cuenta de Emma Pilates Studio. Puedes crearla desde la app con tu correo o pedirla en recepción.
 
