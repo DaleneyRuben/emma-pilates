@@ -73,7 +73,7 @@ export function fakeNorthflank(overrides: Partial<Answers> = {}) {
   const northflank: NorthflankClient = {
     startJobBuild: answer('startJobBuild'),
     getJobBuild: answer('getJobBuild'),
-    startJobRun: answer('startJobRun'),
+    startJobRun: (jobId) => answer('startJobRun')(jobId),
     getJobRun: answer('getJobRun'),
     startServiceBuild: answer('startServiceBuild'),
     getServiceBuild: answer('getServiceBuild'),

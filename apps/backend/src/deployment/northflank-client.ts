@@ -33,7 +33,10 @@ export type NorthflankDeployment = {
 export type NorthflankClient = {
   startJobBuild(jobId: string, sha: string): Promise<NorthflankBuild>;
   getJobBuild(jobId: string, buildId: string): Promise<NorthflankBuild>;
-  startJobRun(jobId: string): Promise<{ id: string; runName: string }>;
+  startJobRun(
+    jobId: string,
+    override?: { customCommand: string },
+  ): Promise<{ id: string; runName: string }>;
   getJobRun(jobId: string, runId: string): Promise<NorthflankRun>;
   startServiceBuild(serviceId: string, sha: string): Promise<NorthflankBuild>;
   getServiceBuild(serviceId: string, buildId: string): Promise<NorthflankBuild>;

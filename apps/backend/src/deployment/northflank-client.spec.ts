@@ -118,6 +118,32 @@ describe('createNorthflankClient', () => {
     expect(run).toEqual({ id: 'run-1', runName: 'migrate-1' });
   });
 
+  // REL-016: the Run Script workflow reuses the migrate job with its own
+  // command, since the free allowance has no job left.
+  it('starts a job run with another command for that run only', async () => {
+    const { calls, fetch } = fakeFetch(200, {
+      data: { id: 'run-2', runName: 'migrate-2' },
+    });
+
+    const run = await client(fetch).startJobRun('migrate', {
+      customCommand: 'node dist/src/script-runner-main.js demo',
+    });
+
+    expect(calls[0]).toMatchObject({
+      url: 'https://api.northflank.com/v1/projects/default/jobs/migrate/runs',
+      method: 'POST',
+      body: {
+        deployment: {
+          docker: {
+            configType: 'customCommand',
+            customCommand: 'node dist/src/script-runner-main.js demo',
+          },
+        },
+      },
+    });
+    expect(run).toEqual({ id: 'run-2', runName: 'migrate-2' });
+  });
+
   it('reads a job run by id', async () => {
     const { calls, fetch } = fakeFetch(200, {
       data: {
