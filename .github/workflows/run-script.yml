@@ -44,10 +44,11 @@ on:
 permissions:
   contents: read
 
-# The script borrows the migrate job, so it never runs beside a release of
-# the same environment.
+# Its own group: joining the release's would cancel a release waiting in
+# that group. Instead the dispatch refuses while the migrate job has a run
+# that has not ended.
 concurrency:
-  group: ${{ inputs.environment }}-release
+  group: ${{ inputs.environment }}-script
   cancel-in-progress: false
 
 env:
