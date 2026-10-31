@@ -33,8 +33,12 @@ export type NorthflankDeployment = {
 export type NorthflankClient = {
   startJobBuild(jobId: string, sha: string): Promise<NorthflankBuild>;
   getJobBuild(jobId: string, buildId: string): Promise<NorthflankBuild>;
-  startJobRun(jobId: string): Promise<{ id: string; runName: string }>;
+  startJobRun(
+    jobId: string,
+    override?: { customCommand: string },
+  ): Promise<{ id: string; runName: string }>;
   getJobRun(jobId: string, runId: string): Promise<NorthflankRun>;
+  listJobRuns(jobId: string): Promise<NorthflankRun[]>;
   startServiceBuild(serviceId: string, sha: string): Promise<NorthflankBuild>;
   getServiceBuild(serviceId: string, buildId: string): Promise<NorthflankBuild>;
   getServiceDeployment(serviceId: string): Promise<NorthflankDeployment>;
@@ -148,9 +152,31 @@ export function createNorthflankClient(input: {
       toBuild(
         await request('GET', `${project}/jobs/${jobId}/build/${buildId}`),
       ),
-    startJobRun: async (jobId) => {
-      const data = await request('POST', `${project}/jobs/${jobId}/runs`, {});
+    startJobRun: async (jobId, override) => {
+      const data = await request(
+        'POST',
+        `${project}/jobs/${jobId}/runs`,
+        override === undefined
+          ? {}
+          : {
+              deployment: {
+                docker: {
+                  configType: 'customCommand',
+                  customCommand: override.customCommand,
+                },
+              },
+            },
+      );
       return { id: String(data.id), runName: String(data.runName) };
+    },
+    listJobRuns: async (jobId) => {
+      const data = await request(
+        'GET',
+        `${project}/jobs/${jobId}/runs?per_page=10`,
+      );
+      return Array.isArray(data.runs)
+        ? (data.runs as Record<string, unknown>[]).map(toRun)
+        : [];
     },
     getJobRun: async (jobId, runId) =>
       toRun(await request('GET', `${project}/jobs/${jobId}/runs/${runId}`)),
