@@ -20,7 +20,7 @@ is never published to production.
 | Phone | leave empty |
 | Privacy policy | `https://app.emmapilatesstudio.com/privacidad` (Policy → App content → Privacy policy) |
 | App icon (512 × 512) | `apps/client-mobile/assets/store-icon-512.png`, `apps/staff-mobile/assets/store-icon-512.png` |
-| Feature graphic (1024 × 500) | still to make (see below) |
+| Feature graphic (1024 × 500) | `graphics/client-feature-graphic.png`, `graphics/staff-feature-graphic.png` (see [Graphics](#graphics)) |
 
 ## Emma Pilates (`com.emmapilates.client`)
 
@@ -53,7 +53,7 @@ Tu plan, siempre a la vista
 • Consulta tu historial de clases y de pagos.
 
 Invita a una amiga
-• Comparte tu código: tu amiga se registra y toma su primera clase gratis. Si después compra un plan, tú ganas una clase más.
+• Comparte tu código: tu amiga se registra y toma su primera clase gratis en una clase con cupo. Si después compra un plan, tú ganas una clase más.
 
 Notificaciones útiles
 • El estado de tus pagos, tu lugar confirmado desde la lista de espera, cambios del estudio en tus clases y el aviso antes de que venza tu plan.
