@@ -169,8 +169,15 @@ export function createNorthflankClient(input: {
       );
       return { id: String(data.id), runName: String(data.runName) };
     },
-    listJobRuns: (jobId) =>
-      Promise.reject(new NorthflankRequestError(`not implemented ${jobId}`)),
+    listJobRuns: async (jobId) => {
+      const data = await request(
+        'GET',
+        `${project}/jobs/${jobId}/runs?per_page=10`,
+      );
+      return Array.isArray(data.runs)
+        ? (data.runs as Record<string, unknown>[]).map(toRun)
+        : [];
+    },
     getJobRun: async (jobId, runId) =>
       toRun(await request('GET', `${project}/jobs/${jobId}/runs/${runId}`)),
     startServiceBuild: async (serviceId, sha) =>

@@ -27,6 +27,17 @@ export const dispatchScript = async (input: {
   log: (line: string) => void;
 }): Promise<DispatchResult> => {
   const { northflank, clock, jobId } = input;
+  // A release migrates through the same job; never run beside it.
+  const busy = (await northflank.listJobRuns(jobId)).find(
+    (run) => !run.concluded,
+  );
+  if (busy !== undefined) {
+    return {
+      outcome: 'failed',
+      runName: busy.runName,
+      detail: `${busy.runName} is still ${busy.status}; run the script again once it has ended`,
+    };
+  }
   const started = await northflank.startJobRun(jobId, {
     customCommand: scriptRunnerCommand(input.command),
   });
