@@ -1,0 +1,79 @@
+name: Run Script
+
+run-name: "[${{ inputs.environment }}] ${{ inputs.script_name }}${{ inputs.force_rerun && ' (rerun)' || '' }}${{ inputs.dry_run && ' (dry run)' || '' }}"
+
+# REL-016, after TurboTenant's Run Script: started by hand only. Runs one
+# one-off script from apps/backend/src/script-runner/scripts as a run of the
+# Northflank migrate job, so the script runs inside Northflank with the
+# environment's secret group and GitHub never holds a database credential.
+# The job runs the image of the last release, so a script must be released
+# before it can run. Every run is recorded in system.script_runs; a script
+# that succeeded runs again only with force_rerun. The script's output,
+# passwords included, is only in the job run's log in Northflank.
+# See docs/runbooks/run-script.md.
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      script_name:
+        description: Script name, with or without .ts (e.g. 20261031-store-review-accounts)
+        required: true
+        type: string
+      script_params:
+        description: JSON object of script parameters (e.g. {"clientEmail":"…"})
+        required: false
+        type: string
+        default: ""
+      dry_run:
+        description: Dry run (the script writes nothing and only reports)
+        required: false
+        type: boolean
+        default: false
+      force_rerun:
+        description: Force a rerun of a script that succeeded or is still marked running
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# The script borrows the migrate job, so it never runs beside a release of
+# the same environment.
+concurrency:
+  group: ${{ inputs.environment }}-release
+  cancel-in-progress: false
+
+env:
+  # prisma generate in the setup action reads it; nothing connects to it
+  DATABASE_URL: postgresql://nobody@127.0.0.1:1/pilates_ci_unreachable
+
+jobs:
+  run-script:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Refuse production from any branch but main
+        if: inputs.environment == 'production' && github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Production scripts run from main only; pick main in «Use workflow from»."
+          exit 1
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - name: Run the script in Northflank
+        env:
+          SCRIPT_ENVIRONMENT: ${{ inputs.environment }}
+          SCRIPT_NAME: ${{ inputs.script_name }}
+          SCRIPT_PARAMS: ${{ inputs.script_params }}
+          SCRIPT_DRY_RUN: ${{ inputs.dry_run }}
+          SCRIPT_FORCE_RERUN: ${{ inputs.force_rerun }}
+          NORTHFLANK_API_TOKEN: ${{ inputs.environment == 'production' && secrets.NORTHFLANK_API_TOKEN || secrets.NORTHFLANK_STAGING_API_TOKEN }}
+          NORTHFLANK_PROJECT_ID: default
+          NORTHFLANK_JOB_ID: migrate
+        run: pnpm --filter @pilates/backend script:dispatch
