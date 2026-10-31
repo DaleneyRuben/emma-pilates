@@ -151,8 +151,21 @@ export function createNorthflankClient(input: {
       toBuild(
         await request('GET', `${project}/jobs/${jobId}/build/${buildId}`),
       ),
-    startJobRun: async (jobId) => {
-      const data = await request('POST', `${project}/jobs/${jobId}/runs`, {});
+    startJobRun: async (jobId, override) => {
+      const data = await request(
+        'POST',
+        `${project}/jobs/${jobId}/runs`,
+        override === undefined
+          ? {}
+          : {
+              deployment: {
+                docker: {
+                  configType: 'customCommand',
+                  customCommand: override.customCommand,
+                },
+              },
+            },
+      );
       return { id: String(data.id), runName: String(data.runName) };
     },
     getJobRun: async (jobId, runId) =>
