@@ -686,14 +686,18 @@ aviso **con stock bajo**.
    el regalo y la invitada no generan esa comisión. Si la clienta llegó por
    una instructora, cobra la instructora y no la coordinadora.
 5. Menú **Nómina** lista los sueldos registrados. **Registrar pago** anota
-   un pago ya hecho, con persona, monto y fecha.
+   un pago ya hecho, con persona, monto y fecha. **Comprobante** es
+   opcional: sube la foto de la transferencia (JPG, PNG o WebP, hasta 10 MB).
+   Para agregarla a un pago ya anotado, ábrelo, sube la foto y **Guardar**.
+   La columna **Comprobante** muestra **Ver** cuando el pago tiene foto.
 6. En la app del equipo, Daniela abre **Tu cuenta** y luego **Mis pagos**.
    Ve una tarjeta por mes, la más nueva arriba, con **Borrador** o
    **Aprobado**, el total y la suma por concepto: clases dictadas,
    canceladas por mínimo y comisiones. **Ver cada clase** abre una línea por
    clase con sus alumnas y extras. Un borrador avisa que puede cambiar hasta
    que administración lo apruebe. Abajo, **Pagos recibidos** lista lo
-   que **Nómina** registró para ella, con fecha y monto. Solo ve lo suyo. La
+   que **Nómina** registró para ella, con fecha y monto. Un pago con foto
+   muestra **Ver** y la abre a pantalla completa. Solo ve lo suyo. La
    coordinadora, la recepcionista y la nutricionista no tienen esa fila.
 
 ### El mes
@@ -832,7 +836,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Personal | Invitar, cambiar rol y sede, desactivar | 3, 16 |
 | Pagos a instructoras | Calcular y aprobar el mes | 15 |
 | Pago a la coordinadora | Calcular y aprobar el mes | 15 |
-| Nómina | Registrar el sueldo pagado | 15 |
+| Nómina | Registrar el sueldo pagado y su comprobante | 15 |
 | Gastos | Gastos de la sede | 15 |
 | Categorías de gasto | Nombres del estudio | 15 |
 | Reporte | Ingreso y gasto del mes | 15 |

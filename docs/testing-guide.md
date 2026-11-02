@@ -3070,6 +3070,14 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    Clicking a row
    corrects it ("Guardamos la corrección del pago de …"); a payment is never
    deleted, and each record and correction writes an audit record.
+   **Comprobante** (BKO-008) is optional: **Subir foto del comprobante**
+   takes a JPG, PNG, or WebP of at most 10 MB («La imagen pesa más de 10
+   MB.» otherwise) and shows «Comprobante adjunto» with **Ver** and
+   **Cambiar**. To add one to a payment already recorded, open it and only
+   upload the photo; **Guardar** sends it. A replaced photo stays in the
+   audit record. The table's **Comprobante** column shows **Ver**, which
+   opens the photo enlarged, or «—»; at 420 px the column scrolls with the
+   table. The Staff Member it pays sees it in «Mis pagos» (Test 95).
 8. **Gastos.** Back Office → **Gastos** lists the selected Branch's Expenses
    with a **Categoría** filter. **+ Nuevo gasto** says which Branch it is
    recorded in ("Se registra en la sucursal Centro."), and **+ Nueva
@@ -3523,10 +3531,8 @@ The following are not ready for manual product testing:
   the Role arrives with IDN-009, so today only the Administrator can (Test 79);
 - accrued revenue by validity days: decisions §11 asks for it beside the
   cash view, and Test 94 shows only cash. STU-002 owns the accrued view;
-- a receipt on a Salary Payment: designed in follow-up 224 (AW11, AW12,
-  and S29's «Ver»), but BKO-008 waits for the owner to approve its
-  migration, so Nómina has no «Comprobante» field and «Mis pagos» shows no
-  receipt (Test 95);
+- a PDF receipt on a Salary Payment: Nómina takes a photo only (BKO-008,
+  Test 28 step 7);
 - the break-even in students per class, occupancy, and clients: Test 97
   shows it in bolivianos and Test 101 repeats the month. The diagnosis's
   section 3.4 asks for the other expressions, and neither page draws them;
@@ -7523,13 +7529,22 @@ and cannot list the statements. Log in as Test 24 describes.
    clase** lists each line («Clase», «6 alumnas, 2 extra», `Bs 81,00`);
    **Ocultar detalle** folds it. Under **Pagos recibidos** each Salary
    Payment of hers from Nómina shows its amount and date («1 de octubre de
-   2026»). With nothing calculated or paid the screen says «Todavía no
-   tienes pagos.» Pull down to reload. On the iPad the cards sit in one
-   centred column.
+   2026»). A payment with a receipt (Test 28 step 7) shows its thumbnail
+   and **Ver**; tapping it opens the photo full screen under «Pago del 1 de
+   noviembre de 2026», closed with the X. One without reads «Sin
+   comprobante» and does nothing. If the photo cannot load, the screen says
+   «No pudimos mostrar el comprobante.» With nothing calculated or paid the
+   screen says «Todavía no tienes pagos.» Pull down to reload. On the iPad
+   the cards sit in one centred column.
 7. **Her own payments only.** `GET /api/v1/trainer/salary-payments` as Emma
    returns only Emma's Salary Payments, newest first, as
-   `{ id, amountCentavos, paidOn }`. As Camila, Paola, or Carolina it
-   answers `403` `back_office_access_denied`.
+   `{ id, amountCentavos, paidOn, receiptUrl }`. As Camila, Paola, or
+   Carolina it answers `403` `back_office_access_denied`. Her
+   `…/trainer/salary-payments/{id}/receipt` serves her own photo
+   (`?variant=thumbnail` or `readable`); another Trainer's payment answers
+   `404` `salary_payment_not_found`, and a payment with no photo `404`
+   `salary_receipt_not_found`. Only Paola reads
+   `…/administrator/salary-payments/{id}/receipt`.
 
 The Coordinator sees no money (ADR-0102), so she cannot list or approve a
 statement, and she has no «Mis pagos». The migration `20261023230100_trainer_pay_statements` needs owner
