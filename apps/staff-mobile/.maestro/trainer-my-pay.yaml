@@ -1,0 +1,36 @@
+# Critical journey (MOB-073): the Trainer opens «Mis pagos» from Perfil and
+# reads her statements and payments. Fresh fixtures may hold no statement
+# yet, so the flow accepts the empty state; with one, it opens and folds a
+# month's classes.
+appId: ${APP_ID}
+env:
+  EMAIL: emma.vargas@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible: "Tu cuenta.*"
+    timeout: 30000
+- runFlow: subflows/park-dev-gear.yaml
+- tapOn:
+    id: "account-avatar"
+- extendedWaitUntil:
+    visible: "Mis pagos"
+    timeout: 15000
+- takeScreenshot: mob073-perfil
+- tapOn: "Mis pagos"
+- extendedWaitUntil:
+    visible:
+      text: "Liquidaciones|Pagos recibidos|Todavía no tienes pagos."
+    timeout: 15000
+- takeScreenshot: mob073-mis-pagos
+- runFlow:
+    when:
+      visible: "Ver cada clase"
+    commands:
+      - tapOn: "Ver cada clase"
+      - extendedWaitUntil:
+          visible: "Ocultar detalle"
+          timeout: 5000
+      - takeScreenshot: mob073-ver-cada-clase
+      - tapOn: "Ocultar detalle"
+      - assertVisible: "Ver cada clase"
