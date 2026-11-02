@@ -13,7 +13,7 @@ numbered tests.
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment with the invoice data, Mi plan, the referral code, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18); the Trainer credential, the tablet no-plan card, and the cancel-sheet sentence (Test 113) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
-| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); report an equipment fault from a Session as a Trainer (Test 82); the bare Branch on S13, the S14 commas, and the receipt's own ratio (Test 113) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
+| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); read her statements and payments in «Mis pagos» (Test 95); report an equipment fault from a Session as a Trainer (Test 82); the bare Branch on S13, the S14 commas, and the receipt's own ratio (Test 113) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
@@ -3523,9 +3523,10 @@ The following are not ready for manual product testing:
   the Role arrives with IDN-009, so today only the Administrator can (Test 79);
 - accrued revenue by validity days: decisions §11 asks for it beside the
   cash view, and Test 94 shows only cash. STU-002 owns the accrued view;
-- «Mis pagos» in the Staff app: the API answers a Trainer (Test 95), but
-  the screen waits on follow-up 209, which stays pending. The Coordinator
-  has no such screen: only the Administrator sees her statement (Test 96);
+- a receipt on a Salary Payment: designed in follow-up 224 (AW11, AW12,
+  and S29's «Ver»), but BKO-008 waits for the owner to approve its
+  migration, so Nómina has no «Comprobante» field and «Mis pagos» shows no
+  receipt (Test 95);
 - the break-even in students per class, occupancy, and clients: Test 97
   shows it in bolivianos and Test 101 repeats the month. The diagnosis's
   section 3.4 asks for the other expressions, and neither page draws them;
@@ -6219,7 +6220,9 @@ depends on the surface, and only on the surface. Credit is retired
    «Paquetes desde Bs 560». A paid Evaluation names its price the same way
    (`Bs 70`).
 2. **Staff app.** As Paola, **Pagos pendientes** reads `Bs 560` on a row
-   and the total with no decimals. As the Assistant, **Elegir plan** and
+   and the total with no decimals. The Cash Close and a Trainer's **Mis
+   pagos** (Test 95) are the exceptions: they keep centavos (`Bs 322,00`),
+   as the admin web does, because they are amounts to reconcile. As the Assistant, **Elegir plan** and
    **Confirmar pago en efectivo** use the full price (`Bs 560`), with no
    credit notice.
 3. **Admin web.** Planes shows `Bs 1.050,00` (Test 25). Pagos shows
@@ -7510,9 +7513,26 @@ and cannot list the statements. Log in as Test 24 describes.
    only Emma's statements. As Daniela it does not include Emma's. As Camila
    it answers `403` `back_office_access_denied`, and so does approval.
 
-The Staff app's «Mis pagos» row is not built: follow-up 209 stays pending.
+6. **«Mis pagos» in the Staff app (MOB-073).** Log in as Emma (Test 12) and
+   open **Tu cuenta**. Perfil shows **Mis pagos** above «Notificaciones»;
+   Camila, Paola, Gabriela, and Carolina do not have the row. It opens one
+   card per month, newest first: the month, «Aprobado» or «Borrador», the
+   total with centavos (`Bs 322,00`), and one row per concept: «Clases
+   dictadas · 3», «Canceladas por mínimo · 1», «Comisiones · 1». A draft
+   says «Puede cambiar hasta que administración lo apruebe.» **Ver cada
+   clase** lists each line («Clase», «6 alumnas, 2 extra», `Bs 81,00`);
+   **Ocultar detalle** folds it. Under **Pagos recibidos** each Salary
+   Payment of hers from Nómina shows its amount and date («1 de octubre de
+   2026»). With nothing calculated or paid the screen says «Todavía no
+   tienes pagos.» Pull down to reload. On the iPad the cards sit in one
+   centred column.
+7. **Her own payments only.** `GET /api/v1/trainer/salary-payments` as Emma
+   returns only Emma's Salary Payments, newest first, as
+   `{ id, amountCentavos, paidOn }`. As Camila, Paola, or Carolina it
+   answers `403` `back_office_access_denied`.
+
 The Coordinator sees no money (ADR-0102), so she cannot list or approve a
-statement. The migration `20261023230100_trainer_pay_statements` needs owner
+statement, and she has no «Mis pagos». The migration `20261023230100_trainer_pay_statements` needs owner
 approval before it runs on a shared database. Pull request:
 https://github.com/DaleneyRuben/emma-pilates/pull/186.
 

@@ -37,7 +37,8 @@ falta crearla para entender el resto.
 - Las fechas se escriben `dd/mm/aaaa` y las horas `HH:mm`, en 24 horas. El
   reloj del estudio es el de La Paz.
 - El dinero de la web muestra centavos (`Bs 560,00`). Las apps muestran
-  bolivianos enteros (`Bs 560`).
+  bolivianos enteros (`Bs 560`), salvo el cierre de caja y **Mis pagos**, que
+  muestran centavos.
 - Nada se borra de verdad. Archivar, anular, desactivar y cerrar una cuenta
   esconden el registro y dejan el rastro.
 
@@ -45,8 +46,6 @@ falta crearla para entender el resto.
 
 - No hay tarjeta de catering en **Mi plan**. El convenio todavía no está
   definido.
-- La instructora no tiene una pantalla **Mis pagos** en la app. Su liquidación
-  se lee y se aprueba en la web.
 - La factura se emite fuera del sistema. Aquí solo se anota el NIT o CI y se
   marca **Factura emitida**.
 - Un enlace de correo abre la app en un teléfono Android con la app
@@ -688,6 +687,14 @@ aviso **con stock bajo**.
    una instructora, cobra la instructora y no la coordinadora.
 5. Menú **Nómina** lista los sueldos registrados. **Registrar pago** anota
    un pago ya hecho, con persona, monto y fecha.
+6. En la app del equipo, Daniela abre **Tu cuenta** y luego **Mis pagos**.
+   Ve una tarjeta por mes, la más nueva arriba, con **Borrador** o
+   **Aprobado**, el total y la suma por concepto: clases dictadas,
+   canceladas por mínimo y comisiones. **Ver cada clase** abre una línea por
+   clase con sus alumnas y extras. Un borrador avisa que puede cambiar hasta
+   que administración lo apruebe. Abajo, **Pagos recibidos** lista lo
+   que **Nómina** registró para ella, con fecha y monto. Solo ve lo suyo. La
+   coordinadora, la recepcionista y la nutricionista no tienen esa fila.
 
 ### El mes
 
@@ -859,7 +866,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | --- | --- | --- | --- |
 | Administración | Pagos pendientes | Cancelar una clase, congelamientos, caja, ver como otra persona | 4, 7, 10, 16 |
 | Asistente | Buscar cliente | Alta, efectivo, comprobante de mostrador, reservas, caja | 9 |
-| Entrenadora | Mi agenda | Pasar lista, reportar una falla | 5, 8, 15 |
+| Entrenadora | Mi agenda | Pasar lista, reportar una falla, Mis pagos | 5, 8, 15 |
 | Nutricionista | Agenda | Mi disponibilidad, cancelar una consulta | 12 |
 | Coordinador | Buscar cliente | Para contactar, cancelar una clase, sin dinero y sin alta | 16 |
 | Todas | Perfil, desde Tu cuenta | Avisos, contraseña, comentarios, cerrar sesión | 4 |
