@@ -152,17 +152,17 @@ describe("Assistant flows on a tablet", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: /^Paquete de 8 clases,/ }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Confirmar pago en efectivo")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Registrar pago")).toBeOnTheScreen();
     });
     expect(screen.getByTestId("assistant-centered-card")).toHaveStyle({
       maxWidth: 520,
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago recibido" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
     await waitFor(() => {
       expect(screen.getByText("¡Pago registrado!")).toBeOnTheScreen();
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver al cliente" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a Clientes" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
     });

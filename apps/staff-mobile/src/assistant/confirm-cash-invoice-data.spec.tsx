@@ -46,7 +46,7 @@ async function openConfirmation(prefill: typeof company | null) {
   });
   await fireEvent.press(screen.getByRole("button", { name: /^Paquete de 8 clases,/ }));
   await waitFor(() => {
-    expect(screen.getByText("Datos para la factura")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^¿Necesita factura\?/ })).toBeOnTheScreen();
   });
   return { screen, paid };
 }
@@ -70,7 +70,7 @@ describe("Cash payment invoice data", () => {
       screen.getByText("Datos de su última compra. Confírmalos con la clienta."),
     ).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago recibido" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
 
     await waitFor(() => {
       expect(screen.getByText("¡Pago registrado!")).toBeOnTheScreen();
@@ -86,10 +86,11 @@ describe("Cash payment invoice data", () => {
   it("records «Sin factura» when the Client has no earlier invoice data", async () => {
     const { screen, paid } = await openConfirmation(null);
 
-    expect(screen.getByRole("button", { name: "Sin factura" })).toBeSelected();
-    expect(screen.getByText("La venta se registra sin datos de factura.")).toBeOnTheScreen();
+    // v2 S10: the invoice folds away, without one by default.
+    expect(screen.getByText("Por defecto, sin factura")).toBeOnTheScreen();
+    expect(screen.queryByText("Datos para la factura")).toBeNull();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago recibido" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
 
     await waitFor(() => {
       expect(paid).toHaveBeenCalledWith({
@@ -104,9 +105,10 @@ describe("Cash payment invoice data", () => {
   it("waits for the NIT or CI and the name once «Con factura» is chosen", async () => {
     const { screen, paid } = await openConfirmation(null);
 
+    await fireEvent.press(screen.getByRole("button", { name: /^¿Necesita factura\?/ }));
     await fireEvent.press(screen.getByRole("button", { name: "Con factura" }));
 
-    expect(screen.getByRole("button", { name: "Confirmar pago recibido" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Confirmar pago en efectivo" })).toBeDisabled();
     expect(paid).not.toHaveBeenCalled();
   });
 });

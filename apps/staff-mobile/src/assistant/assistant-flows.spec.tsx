@@ -260,16 +260,18 @@ describe("Assistant Client flows", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: /^Paquete de 8 clases,/ }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Confirmar pago en efectivo")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Registrar pago")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Precio del plan")).toBeOnTheScreen();
-    // Follow-up 178: S10's plan card carries the same terms line as S09.
-    expect(screen.getByText("8 clases · válido por 30 días")).toBeOnTheScreen();
+    // v2 S10: «¿Cómo paga?», then what to collect.
+    expect(screen.getByRole("tab", { name: "Efectivo" })).toHaveProp("accessibilityState", {
+      selected: true,
+    });
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.queryByText("Crédito aplicado")).toBeNull();
-    expect(screen.getByText("Monto a cobrar en efectivo")).toBeOnTheScreen();
+    expect(screen.getByText("Total en efectivo")).toBeOnTheScreen();
     expect(screen.getAllByText("Bs 560")).toHaveLength(2);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago recibido" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
     await waitFor(() => {
       expect(screen.getByText("¡Pago registrado!")).toBeOnTheScreen();
     });
@@ -282,16 +284,15 @@ describe("Assistant Client flows", () => {
       },
       idempotencyKey: expect.stringMatching(/^[0-9a-f-]{36}$/),
     });
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
-    expect(screen.getByText("8 clases")).toBeOnTheScreen();
-    expect(screen.getByText("Vence el 22 de octubre de 2026")).toBeOnTheScreen();
+    // v2: a centred state, «8 clases» once.
+    expect(
+      screen.getByText("El plan de Lucía ya está activo y el efectivo entró en la caja de hoy."),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByText("8 clases")).toHaveLength(1);
+    expect(screen.getByText("Cobrado en efectivo")).toBeOnTheScreen();
+    expect(screen.getByText("22 de octubre de 2026")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver al cliente" }));
-    await waitFor(() => {
-      expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
-    });
-
-    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a Clientes" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
     });
