@@ -74,9 +74,7 @@ describe("Client copy from the Studio Settings", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Paquetes desde Bs 80. Puedes pagar en el estudio o desde la app."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("Desde Bs 80")).toBeOnTheScreen();
     });
   });
 
@@ -86,8 +84,9 @@ describe("Client copy from the Studio Settings", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Puedes pagar en el estudio o desde la app.")).toBeOnTheScreen();
+      expect(screen.getByText("Elige tu plan y empieza a moverte")).toBeOnTheScreen();
     });
+    expect(screen.queryByText(/^Desde Bs/)).toBeNull();
   });
 
   it("writes the configured Cancellation Window in the Plan detail", async () => {
@@ -134,9 +133,9 @@ describe("Client copy from the Studio Settings", () => {
     await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
 
     await waitFor(() => {
-      expect(screen.getByText("No cancelable")).toBeOnTheScreen();
+      expect(screen.getByText(/ · faltan menos de 30 h$/)).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar" })).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cancelar reserva" })).not.toBeOnTheScreen();
   });
 });
