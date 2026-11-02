@@ -56,32 +56,12 @@ describe("Client unread badges", () => {
     ).not.toBeOnTheScreen();
   });
 
-  it("caps the Notificaciones row count at 9+ in Palo de rosa profundo", async () => {
+  it("says the unread count on the Notificaciones row", async () => {
     const screen = await openProfile(withUnread(12));
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("notifications-row-badge", {
-          includeHiddenElements: true,
-        }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Notificaciones, 12 sin leer" })).toBeOnTheScreen();
     });
-    expect(
-      screen.getByTestId("notifications-row-badge", {
-        includeHiddenElements: true,
-      }),
-    ).toHaveStyle({
-      backgroundColor: "#8A5D59",
-    });
-    expect(screen.getAllByText("9+", { includeHiddenElements: true }).length).toBeGreaterThan(0);
-    expect(
-      screen.getByRole("button", {
-        name: "Notificaciones, 12 notificaciones sin leer",
-      }),
-    ).toBeOnTheScreen();
-    expect(screen.getAllByText("9+", { includeHiddenElements: true })[0]?.parent).toHaveProp(
-      "importantForAccessibility",
-      "no-hide-descendants",
-    );
+    expect(screen.queryByTestId("notifications-row-badge", { includeHiddenElements: true })).toBeNull();
   });
 });
