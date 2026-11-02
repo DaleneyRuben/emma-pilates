@@ -56,7 +56,7 @@ describe("Client purchase flow", () => {
     expect(screen.getAllByText("Bs 560").length).toBeGreaterThan(0);
     expect(screen.queryByText(/crédito/)).toBeNull();
     expect(
-      screen.getByText("Escanea el código con tu app bancaria y transfiere el monto exacto."),
+      screen.getByText("Escanéalo con tu app bancaria y transfiere el monto exacto."),
     ).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByLabelText("Código QR del estudio")).toBeOnTheScreen();
