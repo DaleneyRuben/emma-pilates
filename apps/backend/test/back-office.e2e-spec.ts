@@ -1,3 +1,4 @@
+import { OBJECT_STORAGE } from '../src/uploads/object-storage.module';
 import { INestApplication } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -33,6 +34,7 @@ const salaryPayment = {
   staffMemberName: 'Emma Vargas',
   amountCentavos: 350_000,
   paidOn: new Date('2026-09-20T00:00:00.000Z'),
+  receiptImageAssetId: null,
 };
 const expense = {
   id,
@@ -170,6 +172,8 @@ describe('back office endpoints (e2e)', () => {
       controllers: backOfficeControllers,
       providers: [
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
+        // BKO-008: the receipt routes stream through the uploads store.
+        { provide: OBJECT_STORAGE, useValue: { get: jest.fn() } },
         {
           provide: backOfficeOperations,
           useValue: { supplies, salaryPayments, expenses, report, finance },
@@ -288,7 +292,14 @@ describe('back office endpoints (e2e)', () => {
       })
       .expect(201)
       .expect(({ body }) =>
-        expect(body).toEqual({ ...salaryPayment, paidOn: '2026-09-20' }),
+        expect(body).toEqual({
+          id: salaryPayment.id,
+          staffMemberId: salaryPayment.staffMemberId,
+          staffMemberName: salaryPayment.staffMemberName,
+          amountCentavos: salaryPayment.amountCentavos,
+          paidOn: '2026-09-20',
+          receiptUrl: null,
+        }),
       );
     expect(salaryPayments.recordSalaryPayment).toHaveBeenCalledWith(
       {
