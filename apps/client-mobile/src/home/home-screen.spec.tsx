@@ -64,7 +64,7 @@ describe("Client Home", () => {
     await clearPersistedAccountCache("account-1");
   });
 
-  it("greets the Client and shows an active Subscription", async () => {
+  it("greets the Client and shows an active Subscription on the hero card", async () => {
     const fetcher = createFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),
       "/api/v1/clients/current/subscription": () => jsonResponse(activeSubscription),
@@ -74,19 +74,41 @@ describe("Client Home", () => {
     await waitFor(() => {
       expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
-    expect(screen.getByText("5 de 8 clases")).toBeOnTheScreen();
+    // Follow-up 227: the hero is the screen's one Rosa profundo card.
+    expect(screen.getByTestId("home-plan-card")).toHaveStyle({
+      backgroundColor: "#93615D",
+      borderRadius: 20,
+    });
+    expect(screen.getByText("Tu plan · Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("5")).toHaveStyle({ color: "#FFFFFF", fontSize: 40 });
+    expect(screen.getByText("clases restantes")).toBeOnTheScreen();
     // Follow-up 177: the end is an expiry, «Vence el».
     expect(screen.getByText("Vence el 11 de octubre")).toBeOnTheScreen();
-    expect(screen.getByText("Activa")).toBeOnTheScreen();
+    expect(screen.getByText("Activo")).toBeOnTheScreen();
+    // The walkthrough removed the underlined «Ver detalle»: «Mi plan» is the white pill.
+    expect(screen.queryByText("Ver detalle")).toBeNull();
+    expect(screen.getByRole("button", { name: "Mi plan" })).toHaveStyle({
+      backgroundColor: "#FFFFFF",
+    });
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeEnabled();
-    // MOB-041: 02 ends its full-width «Reservar una clase» shortcut in a Palo
-    // de rosa chevron; its two tiles carry none.
-    const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
-    expect(chevrons).toHaveLength(1);
-    expect(chevrons[0]).toHaveProp("stroke", "#B78380");
-    expect(chevrons[0]).toHaveProp("width", 19);
     expect(screen.queryByTestId("shortcut-lock", { includeHiddenElements: true })).toBeNull();
+  });
+
+  it("opens Mi plan from the hero card", async () => {
+    const fetcher = createFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () => jsonResponse(activeSubscription),
+    });
+    const screen = await render(<App runtime={createRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Mi plan" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen();
+    });
   });
 
   it("warns when the Subscription is about to expire", async () => {
@@ -102,7 +124,52 @@ describe("Client Home", () => {
     });
   });
 
-  it("offers a Plan purchase and disables booking without an active Subscription", async () => {
+  it("shows the next booked class and opens Mis reservas from it", async () => {
+    const fetcher = createFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () => jsonResponse(activeSubscription),
+      "/api/v1/bookings": () =>
+        jsonResponse([
+          {
+            kind: "waitlist",
+            waitlistEntryId: "waitlist-1",
+            sessionId: "session-0",
+            branchId: "branch-1",
+            classTypeName: "Reformer",
+            trainerName: "Ana Rojas",
+            branchName: "Achumani",
+            startsAt: "2099-11-02T12:00:00.000Z",
+            endsAt: "2099-11-02T12:50:00.000Z",
+          },
+          {
+            kind: "booking",
+            bookingId: "booking-1",
+            sessionId: "session-1",
+            branchId: "branch-1",
+            classTypeName: "Mat Pilates",
+            trainerName: "Daniela Ortiz",
+            branchName: "Achumani",
+            startsAt: "2099-11-03T12:00:00.000Z",
+            endsAt: "2099-11-03T12:50:00.000Z",
+          },
+        ]),
+    });
+    const screen = await render(<App runtime={createRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Tu próxima clase")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("Mat Pilates")).toBeOnTheScreen();
+    expect(screen.getByText("08:00 · Daniela Ortiz · Achumani")).toBeOnTheScreen();
+    expect(screen.queryByText("Reformer")).toBeNull();
+
+    await fireEvent.press(screen.getByRole("button", { name: /^Tu próxima clase/ }));
+    await waitFor(() => {
+      expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
+    });
+  });
+
+  it("offers a Plan purchase and locks booking without an active Subscription", async () => {
     const fetcher = createFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),
       "/api/v1/clients/current/subscription": () =>
@@ -113,20 +180,19 @@ describe("Client Home", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
     });
-    expect(screen.getByText("Necesitas un plan activo para reservar")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeDisabled();
-    expect(screen.queryByText("Activa")).not.toBeOnTheScreen();
-    // UX-012 / C5: the no-plan card takes the carousel's 720 px tablet cap.
-    expect(screen.getByTestId("home-purchase-card")).toHaveStyle({
-      alignSelf: "center",
-      maxWidth: 720,
-      width: "100%",
+    // The walkthrough (n.º 5): the owner's title, the price as a pill, a white pill action.
+    expect(screen.getByText("Elige tu plan y empieza a moverte")).toBeOnTheScreen();
+    expect(screen.getByText("Desde Bs 560")).toBeOnTheScreen();
+    expect(screen.getByText("Mat y Reformer · paga por QR o en el estudio")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Comprar un plan" })).toHaveStyle({
+      backgroundColor: "#FFFFFF",
     });
-    // MOB-041: the disabled shortcut ends in the quiet lock instead of the chevron.
-    const lock = screen.getByTestId("shortcut-lock", { includeHiddenElements: true });
-    expect(lock).toHaveProp("stroke", "#C4BAB6");
-    expect(lock).toHaveProp("width", 19);
-    expect(screen.queryAllByTestId("chevron", { includeHiddenElements: true })).toHaveLength(0);
+    expect(screen.getByTestId("home-purchase-card")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByText("Necesitas un plan activo")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeDisabled();
+    expect(screen.queryByText("Activo")).not.toBeOnTheScreen();
+    expect(screen.getByTestId("shortcut-lock", { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getByText("Su primera clase es gratis")).toBeOnTheScreen();
   });
 
   it("recovers from a failed load with a retry", async () => {
@@ -148,7 +214,7 @@ describe("Client Home", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+      expect(screen.getByText("Tu plan · Paquete de 8 clases")).toBeOnTheScreen();
     });
   });
 
@@ -167,7 +233,7 @@ describe("Client Home", () => {
     await waitFor(() => {
       expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Tu plan · Paquete de 8 clases")).toBeOnTheScreen();
     expect(
       screen.getByText("Sin conexión. Mostrando tus datos de la última vez."),
     ).toBeOnTheScreen();
@@ -187,7 +253,7 @@ describe("Client Home", () => {
     await waitFor(() => {
       expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Tu plan · Paquete de 8 clases")).toBeOnTheScreen();
     expect(
       screen.getByText("Sin conexión. Mostrando tus datos de la última vez."),
     ).toBeOnTheScreen();
@@ -237,7 +303,7 @@ describe("Client Home", () => {
       onlineManager.setOnline(true);
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Tu plan · Paquete de 8 clases")).toBeOnTheScreen();
     expect(
       screen.queryByText("Sin conexión. Mostrando tus datos de la última vez."),
     ).not.toBeOnTheScreen();

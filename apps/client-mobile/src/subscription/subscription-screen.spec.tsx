@@ -37,11 +37,11 @@ async function openSubscription(view: unknown) {
   const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
 
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Ver detalle" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Mi plan" })).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Ver detalle" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
   await waitFor(() => {
-    expect(screen.getByText("Mi plan")).toBeOnTheScreen();
+    expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen();
   });
 
   return screen;

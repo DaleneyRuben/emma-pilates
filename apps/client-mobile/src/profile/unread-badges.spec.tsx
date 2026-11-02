@@ -22,27 +22,37 @@ describe("Client unread badges", () => {
     clearMobileQueryCache();
   });
 
-  it("shows the unread count on the Perfil tab and announces it", async () => {
+  it("shows the unread count on the Inicio bell and announces it", async () => {
     const screen = await render(<App runtime={withUnread(2)} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /^Perfil, 2 notificaciones sin leer/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Notificaciones, 2 sin leer" })).toBeOnTheScreen();
     });
-    expect(screen.getByTestId("profile-tab-badge", { includeHiddenElements: true })).toHaveStyle({
-      backgroundColor: "#8A5D59",
-    });
+    expect(
+      screen.getByTestId("home-bell-badge", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
   });
 
-  it("hides the tab badge at zero", async () => {
+  it("keeps the Perfil tab free of the count (owner, 2026-11-02)", async () => {
+    const screen = await render(<App runtime={withUnread(2)} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Notificaciones, 2 sin leer" })).toBeOnTheScreen();
+    });
+    expect(screen.getByRole("button", { name: /^Perfil, tab/ })).toBeOnTheScreen();
+    expect(
+      screen.queryByTestId("profile-tab-badge", { includeHiddenElements: true }),
+    ).not.toBeOnTheScreen();
+  });
+
+  it("names the bell without a count at zero", async () => {
     const screen = await render(<App runtime={withUnread(0)} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /^Perfil, tab/ })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
     });
     expect(
-      screen.queryByTestId("profile-tab-badge", { includeHiddenElements: true }),
+      screen.queryByTestId("home-bell-badge", { includeHiddenElements: true }),
     ).not.toBeOnTheScreen();
   });
 

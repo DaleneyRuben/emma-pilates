@@ -82,7 +82,7 @@ describe("Client push notifications (NOT-002)", () => {
 
     await act(async () => device.tap(subscriptionPush));
 
-    await waitFor(() => expect(screen.getByText("Mi plan")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
     expect(fetcher).toHaveBeenCalledWith(
       `/api/v1/notifications/${notificationId}/read`,
       expect.objectContaining({ method: "POST" }),
@@ -94,7 +94,7 @@ describe("Client push notifications (NOT-002)", () => {
       createMemoryPushPlatform("granted", { launchTap: subscriptionPush }),
     );
 
-    await waitFor(() => expect(screen.getByText("Mi plan")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
   });
 
   it("keeps the app badge on the unread count", async () => {

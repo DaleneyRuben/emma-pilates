@@ -45,88 +45,53 @@ async function openHome(subscription: unknown) {
   return screen;
 }
 
-// MOB-042: 02's shortcuts are a full-width «Reservar una clase» row with an
-// icon tile over two half-width tiles, as the frame draws them.
+// Follow-up 225 §10: «Accesos rápidos» as three Lino tiles, each with a 36 pt
+// Rosa tinte disc; without a Plan the booking row is locked at 60 % opacity.
 describe("Client Home shortcut tiles", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("draws the full-width row with its tile and the two half-width tiles", async () => {
+  it("draws three Lino tiles with an icon disc each", async () => {
     const screen = await openHome(active);
 
     expect(screen.getByText("Accesos rápidos")).toHaveStyle({
       color: "#6F6662",
-      fontSize: 11,
-      letterSpacing: 1.76,
+      fontSize: 12,
       textTransform: "uppercase",
     });
-    const title = screen.getByText("Reservar una clase");
-    expect(title).toHaveStyle({ color: "#4A4A4A", fontFamily: "Lora_500Medium", fontSize: 17 });
-    expect(screen.getByText("Horarios de esta semana")).toHaveStyle({
-      color: "#6F6662",
-      fontSize: 13,
+    for (const label of ["Reservar una clase", "Evaluación nutricional", "Invita a una amiga"]) {
+      expect(screen.getByRole("button", { name: label })).toHaveStyle({
+        backgroundColor: "#F5EFE9",
+        borderRadius: 16,
+      });
+      expect(screen.getByText(label)).toHaveStyle({ fontSize: 14 });
+    }
+    expect(screen.getAllByTestId("shortcut-disc")).toHaveLength(3);
+    expect(screen.getAllByTestId("shortcut-disc")[0]).toHaveStyle({
+      backgroundColor: "#F2E4E1",
+      height: 36,
+      width: 36,
     });
-    const tile = screen.getByTestId("shortcut-tile");
-    expect(tile).toHaveStyle({
-      backgroundColor: "rgba(216,189,184,0.28)",
-      borderRadius: 12,
-      height: 44,
-      width: 44,
-    });
-    const calendar = screen.getByTestId("glyph-calendar", hidden);
-    expect(calendar).toHaveProp("width", 22);
-    expect(calendar).toHaveProp("stroke", "#B78380");
-    expect(screen.getByRole("button", { name: /^Reservar una clase/ })).toHaveStyle({
-      alignItems: "center",
-      flexDirection: "row",
-      gap: 14,
-      padding: 18,
-    });
-
-    expect(screen.getByText("Evaluación nutricional")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 16,
-    });
-    expect(screen.getByText("Invita a una amiga")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 16,
-    });
-    expect(screen.getByText("Agenda tu cita del mes")).toHaveStyle({
-      color: "#6F6662",
-      fontSize: 12,
-    });
-    expect(screen.getByTestId("glyph-trend", hidden)).toHaveProp("width", 22);
-    expect(screen.getByTestId("glyph-person", hidden)).toHaveProp("width", 22);
+    expect(screen.getByTestId("glyph-calendar", hidden)).toHaveProp("stroke", "#B78380");
+    expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("width", 18);
+    expect(screen.getByTestId("glyph-personAdd", hidden)).toHaveProp("width", 18);
     expect(screen.getByTestId("shortcut-tiles")).toHaveStyle({ flexDirection: "row", gap: 12 });
-    expect(screen.getByRole("button", { name: /^Invita a una amiga/ })).toHaveStyle({
-      flex: 1,
-      gap: 10,
-      padding: 18,
-    });
   });
 
-  it("mutes the disabled row on Arena with the quiet lock", async () => {
+  it("locks the booking row at 60 % opacity without a Plan", async () => {
     const screen = await openHome({ status: "none", subscription: null });
 
     const row = screen.getByRole("button", { name: "Reservar una clase" });
-    expect(row).toHaveStyle({
-      backgroundColor: "#F2ECE5",
-      borderRadius: 16,
-    });
-    expect(screen.getByText("Reservar una clase")).toHaveStyle({ color: "#B3A9A5" });
-    expect(screen.getByTestId("shortcut-tile")).toHaveStyle({
-      backgroundColor: "rgba(74,74,74,0.05)",
-    });
-    expect(screen.getByTestId("glyph-calendar", hidden)).toHaveProp("stroke", "#B3A9A5");
-    expect(screen.getByText("Necesitas un plan activo para reservar")).toHaveStyle({
+    expect(row).toBeDisabled();
+    expect(row).toHaveStyle({ backgroundColor: "#F5EFE9", borderRadius: 16, opacity: 0.6 });
+    expect(screen.getByText("Necesitas un plan activo")).toHaveStyle({
       color: "#6F6662",
       fontSize: 13,
     });
-    const lock = screen.getByTestId("shortcut-lock", hidden);
-    expect(lock).toHaveProp("stroke", "#C4BAB6");
-    expect(lock).toHaveProp("width", 19);
-    expect(screen.queryByText("Horarios de esta semana")).toBeNull();
+    expect(screen.getByTestId("shortcut-lock", hidden)).toBeOnTheScreen();
+    expect(screen.getByText("Agenda tu cita")).toBeOnTheScreen();
+    expect(screen.getByText("Su primera clase es gratis")).toBeOnTheScreen();
   });
 });
