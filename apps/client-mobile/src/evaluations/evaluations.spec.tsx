@@ -57,15 +57,16 @@ describe("Client Evaluations", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Turno 09:45" }));
     await waitFor(() => {
-      expect(screen.getByText("Confirmar evaluación")).toBeOnTheScreen();
+      expect(screen.getByText("Confirma tu cita")).toBeOnTheScreen();
     });
-    expect(screen.getByText("45 minutos · Sucursal Centro")).toBeOnTheScreen();
-    expect(screen.getByText("Es gratuita — no usa clases de tu plan.")).toBeOnTheScreen();
-    expect(
-      screen.getByText("Te avisaremos un día antes y una hora antes de tu cita."),
-    ).toBeOnTheScreen();
+    // C14: the appointment on the hero card, its terms as icon rows.
+    expect(screen.getByTestId("evaluation-hero")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByText("45 minutos · Gabriela Rojas · Centro")).toBeOnTheScreen();
+    expect(screen.getByText("Es gratis: no usa clases de tu plan")).toBeOnTheScreen();
+    expect(screen.getByText("Te avisamos un día y una hora antes")).toBeOnTheScreen();
+    expect(screen.getByText("Cancela hasta 3 horas antes")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
 
     await waitFor(() => {
       expect(screen.getByText("Evaluación confirmada")).toBeOnTheScreen();
@@ -136,7 +137,7 @@ describe("Client Evaluations", () => {
     ).toBeOnTheScreen();
     // The photograph step needs the device camera. Until a receipt is
     // attached the confirm stays disabled, so the payment is not started.
-    expect(screen.getByRole("button", { name: "Confirmar" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeDisabled();
     expect(fetcher).not.toHaveBeenCalledWith(
       "/api/v1/evaluation-slots/slot-2/evaluation-payments",
       expect.anything(),
@@ -157,7 +158,7 @@ describe("Client Evaluations", () => {
     });
 
     await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:45" }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Confirmar evaluación" }));
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Activar notificaciones" })).toBeOnTheScreen();
@@ -262,10 +263,10 @@ describe("Client Evaluations", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: "Turno 09:00" }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Confirmar" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeOnTheScreen();
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
 
     await waitFor(() => {
       expect(

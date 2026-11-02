@@ -28,10 +28,10 @@ env:
 - extendedWaitUntil:
     visible: "Es gratuita — no usa clases de tu plan."
     timeout: 10000
-- assertVisible: "Te avisaremos un día antes y una hora antes de tu cita."
+- assertVisible: "Te avisamos un día y una hora antes"
 - assertVisible: "Si necesitas cambiarla, puedes cancelarla desde Mis evaluaciones hasta 3 horas antes."
 - takeScreenshot: client-evaluation-3-confirmar
-- tapOn: "Confirmar"
+- tapOn: "Confirmar evaluación"
 - runFlow: subflows/dismiss-push-permission.yaml
 # «Evaluación confirmada» lasts eight seconds and the notification sheet can
 # outlast it on a slow emulator; the booked card's cancellation line is the
