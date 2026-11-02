@@ -16,11 +16,13 @@ export function ReceiptRow({
   onAttach,
   onRemove,
   receipt,
+  testID = "payment-receipt",
   uploading,
 }: {
   onAttach: () => void;
   onRemove: () => void;
   receipt: AttachedReceipt | null;
+  testID?: string;
   uploading: boolean;
 }) {
   if (receipt === null) {
@@ -32,7 +34,7 @@ export function ReceiptRow({
         disabled={uploading}
         onPress={onAttach}
         style={styles.row}
-        testID="payment-receipt"
+        testID={testID}
       >
         <View style={styles.disc}>
           <Glyph name="upload" size={18} strokeWidth={1.5} />
@@ -54,7 +56,7 @@ export function ReceiptRow({
         accessibilityRole="button"
         onPress={onAttach}
         style={styles.attached}
-        testID="payment-receipt"
+        testID={testID}
       >
         <Image
           accessibilityLabel="Comprobante adjunto"
