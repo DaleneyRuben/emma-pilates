@@ -8395,6 +8395,36 @@
         ]
       }
     },
+    "/api/v1/trainer/salary-payments": {
+      "get": {
+        "operationId": "listOwnSalaryPayments",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OwnSalaryPaymentDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerSalaryPayments"
+        ]
+      }
+    },
     "/api/v1/cash-closes/today": {
       "get": {
         "operationId": "getTodayCashClose",
@@ -16204,6 +16234,28 @@
         },
         "required": [
           "drafted"
+        ]
+      },
+      "OwnSalaryPaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "paidOn": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "id",
+          "amountCentavos",
+          "paidOn"
         ]
       },
       "CashCloseDto": {

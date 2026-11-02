@@ -186,6 +186,7 @@ import type {
   NotificationPageDto,
   NutritionistAgendaPageDto,
   OpeningBudgetSeedDto,
+  OwnSalaryPaymentDto,
   PasswordRecoveryRequestResultDto,
   PasswordRecoveryResultDto,
   PayStatementDraftDto,
@@ -32063,6 +32064,189 @@ export function useListOwnPayStatements<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getListOwnPayStatementsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listOwnSalaryPaymentsResponse200 = {
+  data: OwnSalaryPaymentDto[];
+  status: 200;
+};
+
+export type listOwnSalaryPaymentsResponseSuccess =
+  listOwnSalaryPaymentsResponse200 & {
+    headers: Headers;
+  };
+export type listOwnSalaryPaymentsResponse =
+  listOwnSalaryPaymentsResponseSuccess;
+
+export const getListOwnSalaryPaymentsUrl = () => {
+  return `/api/v1/trainer/salary-payments`;
+};
+
+export const listOwnSalaryPayments = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listOwnSalaryPaymentsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListOwnSalaryPaymentsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listOwnSalaryPaymentsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listOwnSalaryPaymentsResponse;
+};
+
+export const getListOwnSalaryPaymentsQueryKey = () => {
+  return [`/api/v1/trainer/salary-payments`] as const;
+};
+
+export const getListOwnSalaryPaymentsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListOwnSalaryPaymentsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listOwnSalaryPayments>>
+  > = ({ signal }) =>
+    listOwnSalaryPayments({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListOwnSalaryPaymentsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listOwnSalaryPayments>>
+>;
+export type ListOwnSalaryPaymentsQueryError = unknown;
+
+export function useListOwnSalaryPayments<
+  TData = Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+          TError,
+          Awaited<ReturnType<typeof listOwnSalaryPayments>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListOwnSalaryPayments<
+  TData = Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+          TError,
+          Awaited<ReturnType<typeof listOwnSalaryPayments>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListOwnSalaryPayments<
+  TData = Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListOwnSalaryPayments<
+  TData = Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listOwnSalaryPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListOwnSalaryPaymentsQueryOptions(options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

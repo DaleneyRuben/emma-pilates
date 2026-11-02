@@ -282,6 +282,7 @@ export * from "./nutritionistAgendaEntryDto";
 export * from "./nutritionistAgendaEntryDtoKind";
 export * from "./nutritionistAgendaPageDto";
 export * from "./openingBudgetSeedDto";
+export * from "./ownSalaryPaymentDto";
 export * from "./passwordRecoveryRequestResultDto";
 export * from "./passwordRecoveryRequestResultDtoStatus";
 export * from "./passwordRecoveryResultDto";
