@@ -41,18 +41,12 @@ describe("Assistant Client Bookings empty state", () => {
     expect(action).toHaveStyle({ marginTop: 8, minWidth: 220 });
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
-    // The banner shows while the Branches load; the pill follows them.
+    // The banner shows while the Branches load; the Branch line follows them.
     await waitFor(() => {
-      expect(screen.getByText("Reservando para: Lucía Fernández")).toBeOnTheScreen();
-      expect(screen.getByTestId("branch-picker-chevron", hidden)).toBeOnTheScreen();
+      expect(screen.getByText("Reservando para Lucía Fernández")).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
     });
-    const picker = screen.getByTestId("branch-picker-chevron", hidden);
-    expect(picker).toHaveProp("stroke", "#6F6662");
-    expect(picker).toHaveProp("width", 16);
-    expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
-    expect(screen.queryByText("▾")).toBeNull();
-
     await fireEvent.press(screen.getByRole("button", { name: "Sucursal: Centro" }));
-    expect(screen.getByTestId("branch-picker-chevron-up", hidden)).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Urubó" })).toBeOnTheScreen();
   });
 });

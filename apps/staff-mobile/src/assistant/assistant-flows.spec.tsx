@@ -80,7 +80,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Viendo reservas de: Lucía Fernández")).toBeOnTheScreen();
+    expect(screen.getByText("Viendo reservas de Lucía Fernández")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByText("No cancelable")).toBeOnTheScreen();
     });
@@ -106,7 +106,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Historial de clases")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Viendo historial de: Lucía Fernández")).toBeOnTheScreen();
+    expect(screen.getByText("Viendo historial de Lucía Fernández")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByText("Septiembre 2026")).toBeOnTheScreen();
     });
@@ -128,7 +128,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Reservar una clase")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Reservando para: Lucía Fernández")).toBeOnTheScreen();
+    expect(screen.getByText("Reservando para Lucía Fernández")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
@@ -136,7 +136,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByText("6 de 12 cupos disponibles")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Reservando para: Lucía Fernández")).toBeOnTheScreen();
+    expect(screen.getByText("Reservando para Lucía Fernández")).toBeOnTheScreen();
     expect(screen.getByText("Se descontará 1 clase de su plan.")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
@@ -150,7 +150,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
     });
-    expect(screen.queryByText("Reservando para: Lucía Fernández")).toBeNull();
+    expect(screen.queryByText("Reservando para Lucía Fernández")).toBeNull();
   });
 
   it("reschedules a Booking inside the cancellation window and goes back to the overview from her Bookings", async () => {
@@ -247,7 +247,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Elige un plan")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Registrando pago para: Lucía Fernández")).toBeOnTheScreen();
+    expect(screen.getByText("Registrando pago para Lucía Fernández")).toBeOnTheScreen();
     // The quotes may still carry an older Credit figure; the screen ignores it.
     await waitFor(() => {
       expect(screen.getByText("Bs 560")).toBeOnTheScreen();
