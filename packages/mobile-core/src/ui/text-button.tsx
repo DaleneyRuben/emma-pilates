@@ -8,8 +8,9 @@ type TextButtonProps = {
   label: string;
   onPress: () => void;
   testID?: string;
-  /** «onTint» for a link on Palo de rosa tinte, such as a pending card's. */
-  tone?: "default" | "onTint";
+  /** «onTint» for a link on Palo de rosa tinte, such as a pending card's;
+   * «error» for a destructive card action (follow-up 226). */
+  tone?: "default" | "error" | "onTint";
 };
 
 export function TextButton({
