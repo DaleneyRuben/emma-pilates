@@ -80,6 +80,18 @@ export const requireAdministrator = (
   return { accountId: principal.accountId };
 };
 
+// A Trainer reads her own pay (BKO-006). Anyone else, a Coordinator included
+// (ADR-0102), is denied.
+export const requireTrainer = (principal: AuthenticatedPrincipal): string => {
+  if (
+    principal.identity.kind !== 'staff' ||
+    principal.identity.role !== 'trainer'
+  ) {
+    throw new BackOfficeError('back_office_access_denied');
+  }
+  return principal.identity.staffMemberId;
+};
+
 // Constraint names arrive only in the driver cause (see NUT-002 notes).
 export const databaseCause = (error: unknown): string => {
   const meta = (

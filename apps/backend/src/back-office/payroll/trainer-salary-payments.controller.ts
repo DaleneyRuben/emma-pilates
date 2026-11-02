@@ -5,10 +5,12 @@ import type { PrincipalResolver } from '../../system-identity/authentication/bea
 import {
   BackOfficeController,
   backOfficeOperations,
+  run,
   type BackOfficeOperations,
 } from '../back-office-http';
 import { OwnSalaryPaymentDto } from './pay-statements.dto';
 
+// «Mis pagos»: a Trainer reads the Salary Payments recorded for her in Nómina.
 @Controller({ path: 'trainer/salary-payments', version: '1' })
 @ApiBearerAuth()
 export class TrainerSalaryPaymentsController extends BackOfficeController {
@@ -23,9 +25,16 @@ export class TrainerSalaryPaymentsController extends BackOfficeController {
   @ApiOperation({ operationId: 'listOwnSalaryPayments' })
   @ApiOkResponse({ type: OwnSalaryPaymentDto, isArray: true })
   @Header('Cache-Control', 'no-store')
-  list(
+  async list(
     @Headers('authorization') authorization: string | undefined,
   ): Promise<OwnSalaryPaymentDto[]> {
-    return Promise.resolve(authorization === undefined ? [] : []);
+    const principal = await this.authenticate(authorization);
+    const payments = await run(() =>
+      this.operations.salaryPayments.listOwnSalaryPayments(principal),
+    );
+    return payments.map((payment) => ({
+      ...payment,
+      paidOn: payment.paidOn.toISOString().slice(0, 10),
+    }));
   }
 }

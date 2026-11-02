@@ -60,11 +60,7 @@ import {
 } from './back-office.dto';
 import { cashCloseControllers } from './cash-close/cash-close.controller';
 import { AdministratorFinanceController } from './finance/finance.controller';
-import {
-  AdministratorPayStatementsController,
-  CoordinatorPayStatementsController,
-  TrainerPayStatementsController,
-} from './payroll/pay-statements.controller';
+import { payrollControllers } from './payroll/pay-statements.controller';
 import { AdministratorSuppliesController } from './supplies/supplies.controller';
 
 export {
@@ -395,8 +391,6 @@ export const backOfficeControllers = [
   AdministratorExpensesController,
   AdministratorExpenseReportController,
   AdministratorFinanceController,
-  AdministratorPayStatementsController,
-  CoordinatorPayStatementsController,
-  TrainerPayStatementsController,
+  ...payrollControllers,
   ...cashCloseControllers,
 ];

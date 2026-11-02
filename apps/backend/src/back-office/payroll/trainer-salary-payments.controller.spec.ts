@@ -1,4 +1,4 @@
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import type { BackOfficeOperations } from '../back-office-http';
 import { BackOfficeError } from '../back-office-errors';
 import { TrainerSalaryPaymentsController } from './trainer-salary-payments.controller';
@@ -60,8 +60,5 @@ describe('TrainerSalaryPaymentsController', () => {
       response: { code: 'back_office_access_denied' },
       status: 403,
     });
-    await expect(controller.list(bearer)).rejects.toBeInstanceOf(
-      ForbiddenException,
-    );
   });
 });

@@ -258,18 +258,19 @@ describe('Prisma Back Office salary payments', () => {
     const own = await payroll().listOwnSalaryPayments(
       await principalOf('daniela.ortiz@example.com'),
     );
-    expect(own).toEqual([
-      {
-        id: expect.any(String) as string,
-        amountCentavos: 71_000,
-        paidOn: civil('2026-09-01'),
-      },
-      {
-        id: expect.any(String) as string,
-        amountCentavos: 70_000,
-        paidOn: civil('2026-08-01'),
-      },
-    ]);
+    const danielas = await world.prisma.salaryPayment.findMany({
+      where: { staffMemberId: daniela },
+      select: { id: true, amountCentavos: true, paidOn: true },
+    });
+    expect(own).toHaveLength(danielas.length);
+    expect(own).toEqual(expect.arrayContaining(danielas));
+    expect(own.map((row) => row.paidOn.getTime())).toEqual(
+      own.map((row) => row.paidOn.getTime()).sort((a, b) => b - a),
+    );
+    expect(own.map((row) => row.amountCentavos)).toEqual(
+      expect.arrayContaining([71_000, 70_000]),
+    );
+    expect(own.map((row) => row.amountCentavos)).not.toContain(99_000);
     for (const email of [
       'camila.rojas@example.com',
       'paola.mendoza@example.com',

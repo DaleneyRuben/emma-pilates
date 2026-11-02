@@ -9,6 +9,7 @@ import {
 import {
   BackOfficeError,
   requireAdministrator,
+  requireTrainer,
   type BackOfficeActor,
 } from '../back-office-errors';
 import { recordBackOfficeAudit } from '../prisma-audit';
@@ -116,16 +117,6 @@ const approvableFrom = (statement: {
     statement.staffMember.role === 'COORDINATOR' ? addCivilDays(end, 7) : end,
     0,
   );
-};
-
-const requireTrainer = (principal: AuthenticatedPrincipal): string => {
-  if (
-    principal.identity.kind !== 'staff' ||
-    principal.identity.role !== 'trainer'
-  ) {
-    throw new BackOfficeError('back_office_access_denied');
-  }
-  return principal.identity.staffMemberId;
 };
 
 // BKO-006: the worker drafts; the Administrator approves, which creates the
