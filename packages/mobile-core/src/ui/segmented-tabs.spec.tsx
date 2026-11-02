@@ -68,4 +68,22 @@ describe("SegmentedTabs", () => {
     await fireEvent.press(screen.getByRole("tab", { name: "Historial" }));
     expect(onSelect).toHaveBeenCalledWith("history");
   });
+
+  // S10 (FIX-028): once one way of paying is sent, the other cannot be chosen.
+  it("keeps a disabled segment from being chosen and says so", async () => {
+    const onSelect = jest.fn();
+    const screen = await render(
+      <SegmentedTabs
+        onSelect={onSelect}
+        options={[options[0], { ...options[1], disabled: true }]}
+        selected="upcoming"
+      />,
+    );
+
+    const off = screen.getByRole("tab", { name: "Historial" });
+    expect(off).toHaveProp("accessibilityState", { disabled: true, selected: false });
+    await fireEvent.press(off);
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(screen.getByText("Historial")).toHaveStyle({ color: "#B3A9A5" });
+  });
 });
