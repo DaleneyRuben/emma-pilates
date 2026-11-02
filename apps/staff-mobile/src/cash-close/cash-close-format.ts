@@ -1,15 +1,8 @@
 import { colors } from "@pilates/mobile-core";
 
-// Cash-close amounts keep two decimals (es-BO). Global formatBolivianos in
-// mobile-core still rounds to whole bolivianos (UX-010) for the rest of the app.
-const cashCloseBolivianos = new Intl.NumberFormat("es-BO", {
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 2,
-});
+import { formatExactBolivianos } from "../ui/exact-bolivianos";
 
-export function formatCashCloseBolivianos(centavos: number): string {
-  return `Bs ${cashCloseBolivianos.format(centavos / 100)}`;
-}
+export const formatCashCloseBolivianos = formatExactBolivianos;
 
 // «520», «520,5», «520,50», or «520.50» typed into «Efectivo contado», in
 // centavos; anything else (thousands separators included) is unreadable.
