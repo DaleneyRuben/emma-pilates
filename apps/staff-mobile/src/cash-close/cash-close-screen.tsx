@@ -5,20 +5,19 @@ import {
   type CashCloseDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
-  BodyText,
   colors,
+  EmphasisCard,
   fontFamilies,
   FormField,
   FormScrollView,
-  Heading,
+  Glyph,
   LoadingState,
+  NoticeRow,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
   spacing,
-  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -30,7 +29,10 @@ import { StyleSheet, Text, View } from "react-native";
 import { CenteredCard } from "../assistant/assistant-layout";
 import { civilDateLong } from "../nutritionist/nutritionist-format";
 import { useStaffFetcher } from "../staff-fetcher";
+import { BackBar } from "../ui/back-bar";
 import { BranchChips, useCashBranches } from "../ui/branch-chips";
+import { RootHeader } from "../ui/root-header";
+import { useIsStackRoot } from "../ui/use-is-stack-root";
 import {
   cashCloseFailure,
   cashCloseProblems,
@@ -98,34 +100,47 @@ function CashCloseForm({
     }
   };
 
+  const signed =
+    countedCentavos === null ? null : formatSignedBolivianos(countedCentavos - expectedCentavos);
+  const short = countedCentavos !== null && countedCentavos < expectedCentavos;
+
   return (
     <>
-      <View style={styles.card}>
-        <Text style={styles.eyebrow}>EFECTIVO ESPERADO</Text>
+      <EmphasisCard
+        eyebrow="Efectivo esperado"
+        note={describeCashSales(cashPaymentCount, branch.name)}
+      >
         <Text style={styles.expected}>{formatCashCloseBolivianos(expectedCentavos)}</Text>
-        <BodyText style={styles.muted}>{describeCashSales(cashPaymentCount, branch.name)}</BodyText>
         {voidedCashCentavos > 0 ? (
-          <BodyText style={styles.muted}>
+          <Text style={styles.onEmphasis}>
             {`Ventas anuladas (efectivo en caja): ${formatCashCloseBolivianos(voidedCashCentavos)}`}
-          </BodyText>
-        ) : null}
-      </View>
-      <View style={styles.field}>
-        <FormField
-          keyboardType="decimal-pad"
-          label="Efectivo contado"
-          onChangeText={setCounted}
-          placeholder="0,00"
-          testID="cash-close-counted"
-          value={counted}
-        />
-        <BodyText style={styles.muted}>Cuenta los billetes y monedas de la caja.</BodyText>
-      </View>
-      {difference === null || countedCentavos === null ? null : (
-        <View style={[styles.difference, { backgroundColor: difference.tint }]}>
-          <Text style={[styles.differenceText, { color: difference.text }]}>
-            {`Diferencia · ${formatSignedBolivianos(countedCentavos - expectedCentavos)} · ${difference.label}`}
           </Text>
+        ) : null}
+      </EmphasisCard>
+      <FormField
+        keyboardType="decimal-pad"
+        label="Efectivo contado"
+        onChangeText={setCounted}
+        placeholder="0,00"
+        testID="cash-close-counted"
+        value={counted}
+      />
+      {difference === null || signed === null ? null : (
+        <View
+          accessibilityLabel={`Diferencia · ${signed} · ${difference.label}`}
+          accessibilityRole="summary"
+          style={styles.difference}
+        >
+          <View style={[styles.disc, short && styles.errorDisc]}>
+            <Glyph
+              color={short ? colors.error : colors.primary}
+              name={short ? "alert" : "check"}
+              size={18}
+              strokeWidth={1.6}
+            />
+          </View>
+          <Text style={styles.differenceLabel}>{difference.label}</Text>
+          <Text style={[styles.differenceAmount, short && styles.short]}>{signed}</Text>
         </View>
       )}
       <View style={styles.field}>
@@ -140,15 +155,13 @@ function CashCloseForm({
           testID="cash-close-note"
           value={note}
         />
-        <Text style={styles.counter}>{`${note.length}/500`}</Text>
+        <Text style={styles.counter}>{`${note.length} / 500`}</Text>
       </View>
-      <BodyText style={styles.muted}>
-        Solo hay un cierre por día y no se puede corregir después.
-      </BodyText>
+      <Text style={styles.muted}>Hay un solo cierre por día y no se corrige después.</Text>
       {failure === null ? null : (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
+        <View accessibilityLabel={failure} accessibilityRole="alert">
+          <NoticeRow message={failure} />
+        </View>
       )}
       <PrimaryButton
         busy={submitting}
@@ -163,7 +176,9 @@ function CashCloseForm({
 
 // S25: the Assistant's (or the Administrator's) daily Cash Close (BKO-003).
 export function CashCloseScreen() {
-  const navigation = useNavigation<{ goBack: () => void }>();
+  const navigation = useNavigation<{ goBack: () => void; navigate: (tab: "ClientsTab") => void }>();
+  // The Assistant's Caja tab; the Administrator opens it from Pagos.
+  const root = useIsStackRoot();
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const branches = useCashBranches();
@@ -208,11 +223,15 @@ export function CashCloseScreen() {
     body = (
       <>
         {notice === null ? null : (
-          <BodyText accessibilityRole="alert" style={styles.failure}>
-            {notice}
-          </BodyText>
+          <View accessibilityLabel={notice} accessibilityRole="alert">
+            <NoticeRow message={notice} />
+          </View>
         )}
-        <CashCloseSummary close={day.close} onDone={() => navigation.goBack()} />
+        <CashCloseSummary
+          close={day.close}
+          doneLabel={root ? "Ir a Clientes" : "Volver"}
+          onDone={() => (root ? navigation.navigate("ClientsTab") : navigation.goBack())}
+        />
       </>
     );
   } else {
@@ -228,19 +247,26 @@ export function CashCloseScreen() {
     );
   }
 
+  const where =
+    day === undefined || branches.branch === null
+      ? undefined
+      : `${capitalized(civilDateLong(day.businessDate))} · ${branches.branch.name}`;
+  const title = day?.close ? "Caja" : "Cerrar caja";
+
   return (
     <Screen style={styles.screen}>
       <CenteredCard maxWidth={520}>
-        <BackLink onPress={() => navigation.goBack()} />
-        <View>
-          <Heading accessibilityLabel="Cerrar caja">Cerrar caja</Heading>
-          {day === undefined || branches.branch === null ? null : (
-            <BodyText style={styles.muted}>
-              {`${capitalized(civilDateLong(day.businessDate))} · ${branches.branch.name}`}
-            </BodyText>
-          )}
-        </View>
         <FormScrollView contentContainerStyle={styles.content}>
+          {root ? (
+            <RootHeader eyebrow={where} label="Cerrar caja" title={title} />
+          ) : (
+            <BackBar
+              back="Pagos"
+              onBack={() => navigation.goBack()}
+              subtitle={where}
+              title={title}
+            />
+          )}
           <BranchChips
             label="Sucursal"
             onSelect={(id) => {
@@ -259,26 +285,47 @@ export function CashCloseScreen() {
 }
 
 const styles = StyleSheet.create({
-  card: { ...surfaces.card, gap: spacing.xs, padding: spacing.lg },
-  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  counter: { alignSelf: "flex-end", color: colors.textSubtle, fontSize: typography.label },
-  difference: { borderRadius: radii.inset, padding: spacing.md },
-  differenceText: { fontSize: typography.body, fontVariant: ["tabular-nums"], fontWeight: "500" },
-  expected: {
+  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  counter: { alignSelf: "flex-end", color: colors.textMuted, fontSize: typography.label },
+  difference: {
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: radii.card,
+    flexDirection: "row",
+    gap: spacing.md,
+    padding: spacing.lg,
+  },
+  differenceAmount: {
     color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: 28,
+    fontFamily: fontFamilies.display,
+    fontSize: 20,
     fontVariant: ["tabular-nums"],
   },
-  eyebrow: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: 1.7,
+  differenceLabel: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: 16,
   },
-  failure: { color: colors.errorText },
+  disc: {
+    alignItems: "center",
+    backgroundColor: colors.primaryTint,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+  errorDisc: { backgroundColor: colors.errorSurface },
+  expected: {
+    color: colors.white,
+    fontFamily: fontFamilies.display,
+    fontSize: 32,
+    fontVariant: ["tabular-nums"],
+  },
   field: { gap: spacing.xs },
-  muted: { color: colors.textMuted, fontSize: typography.note },
+  muted: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   note: { minHeight: 88, paddingTop: spacing.md, textAlignVertical: "top" },
-  screen: { gap: spacing.md },
+  onEmphasis: { color: "rgba(255,255,255,0.85)", fontSize: typography.note },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
+  short: { color: colors.error },
 });
