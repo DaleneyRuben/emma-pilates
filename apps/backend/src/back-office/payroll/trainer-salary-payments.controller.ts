@@ -1,5 +1,14 @@
-import { Controller, Get, Header, Headers, Inject } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Header,
+  Headers,
+  Inject,
+  StreamableFile,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { OBJECT_STORAGE } from '../../uploads/object-storage.module';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
 import type { PrincipalResolver } from '../../system-identity/authentication/bearer-principal';
 import {
@@ -7,6 +16,7 @@ import {
   backOfficeOperations,
   run,
   type BackOfficeOperations,
+  type ReceiptStorage,
 } from '../back-office-http';
 import { OwnSalaryPaymentDto } from './pay-statements.dto';
 
@@ -17,8 +27,23 @@ export class TrainerSalaryPaymentsController extends BackOfficeController {
   constructor(
     @Inject(backOfficeOperations) operations: BackOfficeOperations,
     @Inject(authenticatedPrincipalResolver) resolver: PrincipalResolver,
+    @Inject(OBJECT_STORAGE) private readonly storage: ReceiptStorage,
   ) {
     super(operations, resolver);
+  }
+
+  receipt(
+    salaryPaymentId: string,
+    variant: string | undefined,
+    authorization: string | undefined,
+    response: { setHeader(name: string, value: string): void },
+  ): Promise<StreamableFile> {
+    return Promise.reject(
+      new BadRequestException(
+        [salaryPaymentId, variant, authorization, response, this.storage]
+          .length,
+      ),
+    );
   }
 
   @Get()

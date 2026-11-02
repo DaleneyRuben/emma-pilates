@@ -16,6 +16,8 @@ export type SalaryPaymentInput = {
   staffMemberId: string;
   amountCentavos: number;
   paidOn: Date;
+  // BKO-008: a ready photo she uploaded; left out, the receipt is unchanged.
+  receiptImageAssetId?: string;
 };
 
 const paymentSelect = {
@@ -23,6 +25,7 @@ const paymentSelect = {
   staffMemberId: true,
   amountCentavos: true,
   paidOn: true,
+  receiptImageAssetId: true,
   staffMember: { select: { name: true } },
 } satisfies Prisma.SalaryPaymentSelect;
 
@@ -93,7 +96,12 @@ export const createPrismaSalaryPayments = (
       return prisma.salaryPayment.findMany({
         where: { staffMemberId },
         orderBy: [{ paidOn: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
-        select: { id: true, amountCentavos: true, paidOn: true },
+        select: {
+          id: true,
+          amountCentavos: true,
+          paidOn: true,
+          receiptImageAssetId: true,
+        },
       });
     },
 

@@ -11,6 +11,7 @@ import type { SessionEquipment } from './equipment/prisma-session-equipment';
 import type { Expenses } from './expenses/prisma-expenses';
 import type { PayStatements } from './payroll/prisma-pay-statements';
 import type { SalaryPayments } from './payroll/prisma-salary-payments';
+import type { SalaryReceipts } from './payroll/prisma-salary-receipts';
 import type { ExpenseReport } from './reports/prisma-expense-report';
 import type { Finance } from './finance/prisma-finance';
 import type { Supplies } from './supplies/prisma-supplies';
@@ -22,6 +23,7 @@ export const backOfficeOperations = Symbol('backOfficeOperations');
 export type BackOfficeOperations = {
   supplies: Supplies;
   salaryPayments: SalaryPayments;
+  salaryReceipts: SalaryReceipts;
   payStatements: PayStatements;
   expenses: Expenses;
   report: ExpenseReport;
@@ -75,6 +77,9 @@ export const requireIdempotencyKey = (value: string | undefined): string => {
   if (key === null) throw invalidRequest('Idempotency-Key must be a UUID');
   return key;
 };
+
+// The uploads storage port, narrowed to streaming a receipt (BKO-008).
+export type ReceiptStorage = { get(key: string): Promise<Buffer> };
 
 export abstract class BackOfficeController {
   constructor(

@@ -12,6 +12,8 @@ export type BackOfficeErrorCode =
   | 'date_in_future'
   | 'staff_member_not_found'
   | 'salary_payment_not_found'
+  | 'salary_receipt_not_ready'
+  | 'salary_receipt_not_found'
   | 'pay_statement_not_found'
   | 'pay_statement_month_open'
   | 'expense_not_found'
@@ -39,6 +41,8 @@ const statuses: Record<BackOfficeErrorCode, number> = {
   date_in_future: 400,
   staff_member_not_found: 404,
   salary_payment_not_found: 404,
+  salary_receipt_not_ready: 409,
+  salary_receipt_not_found: 404,
   pay_statement_not_found: 404,
   pay_statement_month_open: 409,
   expense_not_found: 404,

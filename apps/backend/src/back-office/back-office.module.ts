@@ -16,6 +16,7 @@ import { monthFacts } from './finance/month-facts';
 import { coordinatorMonthFacts } from './payroll/coordinator-pay-facts';
 import { createPrismaPayStatements } from './payroll/prisma-pay-statements';
 import { createPrismaSalaryPayments } from './payroll/prisma-salary-payments';
+import { createPrismaSalaryReceipts } from './payroll/prisma-salary-receipts';
 import { trainerMonthFacts } from './payroll/trainer-pay-facts';
 import { createPrismaExpenseReport } from './reports/prisma-expense-report';
 import { createPrismaSupplies } from './supplies/prisma-supplies';
@@ -34,6 +35,7 @@ import { createPrismaSupplies } from './supplies/prisma-supplies';
         return {
           supplies: createPrismaSupplies(prisma, { now }),
           salaryPayments: createPrismaSalaryPayments(prisma, { now }),
+          salaryReceipts: createPrismaSalaryReceipts(prisma),
           payStatements: createPrismaPayStatements(prisma, {
             now,
             factsOfMonth: (from, until) =>

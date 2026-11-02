@@ -17,12 +17,16 @@ const principal = {
 describe('TrainerSalaryPaymentsController', () => {
   const resolvePrincipal = jest.fn();
   const listOwnSalaryPayments = jest.fn();
+  const readSalaryReceipt = jest.fn();
+  const get = jest.fn();
   const operations = {
     salaryPayments: { listOwnSalaryPayments },
+    salaryReceipts: { readSalaryReceipt },
   } as unknown as BackOfficeOperations;
   const controller = new TrainerSalaryPaymentsController(
     operations,
     resolvePrincipal,
+    { get },
   );
 
   beforeEach(() => {
@@ -36,11 +40,30 @@ describe('TrainerSalaryPaymentsController', () => {
         id: 'payment-id',
         amountCentavos: 32_200,
         paidOn: new Date('2026-10-01T00:00:00.000Z'),
+        receiptImageAssetId: 'photo-id',
+      },
+      {
+        id: 'bare-id',
+        amountCentavos: 15_050,
+        paidOn: new Date('2026-09-15T00:00:00.000Z'),
+        receiptImageAssetId: null,
       },
     ]);
 
+    // BKO-008: S29's «Ver» opens her own receipt route.
     await expect(controller.list(bearer)).resolves.toEqual([
-      { id: 'payment-id', amountCentavos: 32_200, paidOn: '2026-10-01' },
+      {
+        id: 'payment-id',
+        amountCentavos: 32_200,
+        paidOn: '2026-10-01',
+        receiptUrl: '/api/v1/trainer/salary-payments/payment-id/receipt',
+      },
+      {
+        id: 'bare-id',
+        amountCentavos: 15_050,
+        paidOn: '2026-09-15',
+        receiptUrl: null,
+      },
     ]);
     expect(listOwnSalaryPayments).toHaveBeenCalledWith(principal);
   });
@@ -60,5 +83,26 @@ describe('TrainerSalaryPaymentsController', () => {
       response: { code: 'back_office_access_denied' },
       status: 403,
     });
+  });
+
+  it('streams her own receipt', async () => {
+    const paymentId = '0b0f7a52-7d7c-4bbf-9d49-5d7bd4a1b2c3';
+    readSalaryReceipt.mockResolvedValue({
+      objectKey: 'private/receipt/thumbnail',
+      mediaType: 'image/webp',
+    });
+    get.mockResolvedValue(Buffer.from('webp'));
+    const response = { setHeader: jest.fn() };
+
+    await controller.receipt(paymentId, 'thumbnail', bearer, response);
+
+    expect(readSalaryReceipt).toHaveBeenCalledWith(
+      { salaryPaymentId: paymentId, variant: 'thumbnail' },
+      principal,
+    );
+    expect(response.setHeader).toHaveBeenCalledWith(
+      'Cache-Control',
+      'no-store',
+    );
   });
 });
