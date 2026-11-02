@@ -1,13 +1,15 @@
-# NOT-002: the notification permission sheet («¿Te avisamos?») follows a
-# booking, a Waitlist join, or a confirmed Evaluation in the Client app and a
-# Staff role's first home. The journeys do not test it (Test 46 does), so
-# they answer «Ahora no» whenever it shows and carry on.
+# NOT-002: the notification permission sheet («No te pierdas ninguna clase»)
+# follows a booking, a Waitlist join, or a confirmed Evaluation in the Client
+# app. The journeys do not test it (Test 46 does), so they answer «Ahora no»
+# whenever it shows and carry on. The sheet's copy is per app (walkthrough
+# n.º 16), so the subflow finds it by its test ids.
 appId: ${APP_ID}
 ---
 - extendedWaitUntil:
-    visible: "¿Te avisamos?"
+    visible:
+      id: "push-permission-sheet"
     timeout: 5000
     optional: true
 - tapOn:
-    text: "Ahora no"
+    id: "push-permission-decline"
     optional: true
