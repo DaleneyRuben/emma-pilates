@@ -53,7 +53,7 @@ describe("Assistant Client history (S22)", () => {
     expect(StyleSheet.flatten(rows[2].props.style)).not.toHaveProperty("borderBottomWidth");
   });
 
-  it("centres the empty state as the frame's bare Lora 21 title with the quiet clock", async () => {
+  it("centres the empty state as the v2 Lora 24 title with the Rosa profundo clock", async () => {
     const screen = await openHistory({
       ...assistantRoutes(),
       "/api/v1/assistant/clients/client-lucia/class-history": () => jsonResponse([]),
@@ -61,11 +61,11 @@ describe("Assistant Client history (S22)", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Esta clienta aún no tiene clases en su historial.")).toHaveStyle({
-        fontFamily: "Lora_500Medium",
-        fontSize: 21,
+        fontFamily: "Lora_400Regular",
+        fontSize: 24,
         textAlign: "center",
       });
     });
-    expect(screen.getByTestId("empty-state-icon-clock", hidden)).toHaveProp("stroke", "#C4BAB6");
+    expect(screen.getByTestId("empty-state-icon-clock", hidden)).toHaveProp("stroke", "#93615D");
   });
 });

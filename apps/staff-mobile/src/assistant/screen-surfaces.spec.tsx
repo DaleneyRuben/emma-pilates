@@ -22,12 +22,13 @@ describe("Assistant surfaces on Superficie", () => {
     jest.restoreAllMocks();
   });
 
-  it("draws S06's «Sin plan activo» as the frames' dashed neutral box", async () => {
+  // Follow-up 225 §6: the in-list state block stands on Lino, not the dashed box.
+  it("draws S06's «Sin plan activo» as the v2 state block on Lino", async () => {
     const screen = await openLucia(withoutPlan());
 
     expect(screen.getByText("Sin plan activo").parent).toHaveStyle({
-      backgroundColor: "rgba(216,201,187,0.14)",
-      borderStyle: "dashed",
+      backgroundColor: "#F5EFE9",
+      borderRadius: 16,
     });
   });
 
@@ -85,8 +86,8 @@ describe("Assistant cards and empty states (MOB-039)", () => {
 
     expect(screen.getByTestId("empty-state-icon-card", hidden)).toBeOnTheScreen();
     expect(screen.getByText("Sin plan activo")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 19,
+      fontFamily: "Lora_400Regular",
+      fontSize: 24,
       textAlign: "center",
     });
     expect(
@@ -99,17 +100,17 @@ describe("Assistant cards and empty states (MOB-039)", () => {
     ).not.toBeOnTheScreen();
   });
 
-  it("draws the tablet's empty panel with the person circle, a Lora 22 title, and its helper", async () => {
+  it("draws the tablet's empty panel with the person disc, a Lora 24 title, and its helper", async () => {
     jest
       .spyOn(Dimensions, "get")
       .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
     const screen = await openClientSearch(assistantRoutes());
 
-    expect(screen.getByTestId("empty-state-circle")).toHaveStyle({ height: 64, width: 64 });
+    expect(screen.getByTestId("empty-state-disc")).toHaveStyle({ height: 72, width: 72 });
     expect(screen.getByTestId("empty-state-icon-person", hidden)).toBeOnTheScreen();
     expect(screen.getByText("Selecciona un cliente para ver sus detalles")).toHaveStyle({
       fontFamily: "Lora_400Regular",
-      fontSize: 22,
+      fontSize: 24,
     });
     expect(
       screen.getByText(

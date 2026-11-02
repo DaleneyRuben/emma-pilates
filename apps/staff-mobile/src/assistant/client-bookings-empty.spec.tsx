@@ -17,7 +17,7 @@ describe("Assistant Client Bookings empty state", () => {
     clearMobileQueryCache();
   });
 
-  it("draws the bare calendar, title, note, and booking action", async () => {
+  it("draws the v2 calendar disc, title, note, and booking action", async () => {
     const screen = await openLucia({
       ...assistantRoutes(),
       "/api/v1/assistant/clients/client-lucia/bookings": () => jsonResponse([]),
@@ -28,17 +28,17 @@ describe("Assistant Client Bookings empty state", () => {
       expect(screen.getByText("Esta clienta no tiene reservas próximas.")).toBeOnTheScreen();
     });
     expect(screen.getByText("Esta clienta no tiene reservas próximas.")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 21,
+      fontFamily: "Lora_400Regular",
+      fontSize: 24,
     });
     const calendar = screen.getByTestId("empty-state-icon-calendar", hidden);
-    expect(calendar).toHaveProp("stroke", "#C4BAB6");
-    expect(calendar).toHaveProp("width", 34);
+    expect(calendar).toHaveProp("stroke", "#93615D");
+    expect(calendar).toHaveProp("width", 32);
     expect(
       screen.getByText("Puedes reservarle una clase desde el horario del estudio."),
-    ).toHaveStyle({ color: "#6F6662", fontSize: 14 });
+    ).toHaveStyle({ color: "#6F6662", fontSize: 15 });
     const action = screen.getByTestId("empty-state-action");
-    expect(action).toHaveStyle({ marginTop: 6, minWidth: 220 });
+    expect(action).toHaveStyle({ marginTop: 8, minWidth: 220 });
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
     // The banner shows while the Branches load; the pill follows them.

@@ -146,19 +146,20 @@ describe("Client Class History", () => {
     });
   });
 
-  // MOB-040: the 07 frame's empty state is the bare clock, Lora 21 title, and note.
-  it("centres the empty state with the quiet clock and the frame's note", async () => {
+  // Follow-up 225 §6: the empty history is the v2 state block, a Rosa
+  // profundo clock over a Lora 24 title and the frame's note.
+  it("centres the empty state with the clock and the frame's note", async () => {
     const screen = await openHistory([]);
 
     await waitFor(() => {
       expect(screen.getByText("Aún no tienes clases en tu historial.")).toHaveStyle({
-        fontFamily: "Lora_500Medium",
-        fontSize: 21,
+        fontFamily: "Lora_400Regular",
+        fontSize: 24,
       });
     });
     expect(
       screen.getByTestId("empty-state-icon-clock", { includeHiddenElements: true }),
-    ).toHaveProp("stroke", "#C4BAB6");
+    ).toHaveProp("stroke", "#93615D");
     expect(
       screen.getByText(
         "Aquí aparecerán tus clases una vez que registremos tu asistencia en el estudio.",
