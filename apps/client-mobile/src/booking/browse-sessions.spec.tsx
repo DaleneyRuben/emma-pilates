@@ -124,7 +124,7 @@ describe("Client Browse Sessions", () => {
         }),
       ).toBeOnTheScreen();
     });
-    expect(screen.getAllByText("Emma Vargas")).toHaveLength(2);
+    expect(screen.getAllByText("Emma Vargas · 50 min")).toHaveLength(2);
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
     expect(screen.getByText("Lleno")).toBeOnTheScreen();
     expect(screen.queryByText(/clases esta semana/)).not.toBeOnTheScreen();
