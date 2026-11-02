@@ -66,7 +66,7 @@ describe("Trainer agenda greeting and times", () => {
     expect(screen.getByText("50 min")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
     await waitFor(() => {
-      expect(screen.getByText("Sopocachi · 10:00 – 10:50")).toBeOnTheScreen();
+      expect(screen.getByText(/^Sopocachi · .* · 10:00 – 10:50$/)).toBeOnTheScreen();
     });
   });
 });

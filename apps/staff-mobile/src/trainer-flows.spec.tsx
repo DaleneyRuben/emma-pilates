@@ -67,9 +67,10 @@ describe("Trainer agenda and attendance", () => {
         { selected: true },
       ),
     );
-    // S03 (MOB-034): the chevron above the large title, not «← Volver».
-    expect(screen.queryByText("← Volver")).toBeNull();
-    expect(screen.getByTestId("back-chevron", { includeHiddenElements: true })).toBeOnTheScreen();
+    // v2 S03: back to «Mi agenda», how many are marked, and who is missing.
+    expect(screen.getByTestId("back-bar")).toHaveTextContent("Mi agenda");
+    expect(screen.getByText("1 de 2 marcadas")).toBeOnTheScreen();
+    expect(screen.getByText("Falta marcar a 1 clienta.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(
@@ -91,7 +92,7 @@ describe("Trainer agenda and attendance", () => {
           }),
         }),
       );
-      expect(screen.getByText("Asistencia guardada.")).toBeOnTheScreen();
+      expect(screen.getByText("Asistencia guardada")).toBeOnTheScreen();
     });
   });
 
