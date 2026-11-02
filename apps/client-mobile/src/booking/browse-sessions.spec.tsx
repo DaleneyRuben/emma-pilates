@@ -248,7 +248,7 @@ describe("Client Browse Sessions", () => {
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
 
     await waitFor(() => {
-      expect(screen.getByText("3 de 12 cupos disponibles")).toBeOnTheScreen();
+      expect(screen.getByText("de 12 cupos libres")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Reservar" })).toBeOnTheScreen();
   });

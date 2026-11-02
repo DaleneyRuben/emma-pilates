@@ -1,12 +1,10 @@
-import { colors, fontFamilies, radii, SeatPill, spacing, typography } from "@pilates/mobile-core";
+import { colors, fontFamilies, radii, spacing, typography } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
 /**
- * 04's capacity block (MOB-049, follow-up 88): no card and no label. The
- * count row, «N de M cupos disponibles» with the number in Lora 18 and
- * «N reservados» on the right or the «Lleno» seat pill when the class is
- * full, sits over the 7 pt bar: a Palo de rosa fill by the booked share on
- * Palo de rosa tinte, Icono tenue when full.
+ * 04's seats on the hero card (follow-up 227, C04): the free count in Lora 32
+ * white over «de M cupos libres», then a white bar by the booked share on
+ * white 25 %.
  */
 export function CapacityBlock({
   availableSeats,
@@ -24,17 +22,8 @@ export function CapacityBlock({
   return (
     <View style={styles.block} testID="capacity-block">
       <View style={styles.row}>
-        <Text style={styles.count}>
-          <Text style={styles.number}>{full ? 0 : availableSeats}</Text>
-          {` de ${capacity} cupos disponibles`}
-        </Text>
-        {full ? (
-          <SeatPill full>Lleno</SeatPill>
-        ) : (
-          <Text style={styles.booked}>
-            {bookedCount === 1 ? "1 reservado" : `${bookedCount} reservados`}
-          </Text>
-        )}
+        <Text style={styles.number}>{String(full ? 0 : availableSeats)}</Text>
+        <Text style={styles.label}>{`de ${capacity} cupos libres`}</Text>
       </View>
       <View
         accessibilityRole="progressbar"
@@ -42,10 +31,7 @@ export function CapacityBlock({
         accessible
         style={styles.track}
       >
-        <View
-          style={[styles.fill, { flex: fill }, full && styles.fillFull]}
-          testID="capacity-fill"
-        />
+        <View style={[styles.fill, { flex: fill }]} testID="capacity-fill" />
         <View style={{ flex: 1 - fill }} />
       </View>
     </View>
@@ -53,24 +39,25 @@ export function CapacityBlock({
 }
 
 const styles = StyleSheet.create({
-  block: { gap: spacing.smLg },
-  booked: { color: colors.textSubtle, fontSize: typography.label },
-  count: { color: colors.text, flexShrink: 1, fontSize: typography.body },
-  fill: { backgroundColor: colors.primary, borderRadius: radii.pill },
-  fillFull: { backgroundColor: colors.iconQuiet },
-  // The frame's Lora 18 count, a size the typography scale does not name.
-  number: { fontFamily: fontFamilies.heading, fontSize: 18 },
-  row: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    justifyContent: "space-between",
+  block: { gap: spacing.md, marginTop: spacing.xs },
+  fill: { backgroundColor: colors.white, borderRadius: radii.pill },
+  label: {
+    color: "rgba(255,255,255,0.85)",
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
   },
+  number: {
+    color: colors.white,
+    fontFamily: fontFamilies.display,
+    fontSize: 32,
+    fontVariant: ["tabular-nums"],
+  },
+  row: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
   track: {
-    backgroundColor: colors.primaryTint,
+    backgroundColor: "rgba(255,255,255,0.25)",
     borderRadius: radii.pill,
     flexDirection: "row",
-    height: 7,
+    height: 6,
     overflow: "hidden",
   },
 });
