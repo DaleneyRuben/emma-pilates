@@ -193,11 +193,12 @@ describe('AdministratorSessionsController', () => {
       status: 409,
       response: { code: 'session_not_cancellable' },
     });
+    // FIX-027: an empty Session is cancellable, so no rule maps to
+    // session_has_no_bookings any more; an unknown error is not a conflict.
     cancel.mockRejectedValue(new Error('Session has no Bookings'));
-    await expect(controller.cancel(sessionId, bearer)).rejects.toMatchObject({
-      status: 409,
-      response: { code: 'session_has_no_bookings' },
-    });
+    await expect(
+      controller.cancel(sessionId, bearer),
+    ).rejects.not.toMatchObject({ status: 409 });
     await expect(controller.cancel('nope', bearer)).rejects.toMatchObject({
       status: 400,
       response: { code: 'invalid_request' },
