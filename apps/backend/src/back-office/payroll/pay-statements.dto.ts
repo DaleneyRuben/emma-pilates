@@ -39,3 +39,9 @@ export class PayStatementDto {
 export class PayStatementDraftDto {
   @ApiProperty() drafted!: number;
 }
+
+export class OwnSalaryPaymentDto {
+  @ApiProperty({ format: 'uuid' }) id!: string;
+  @ApiProperty({ description: 'BOB centavos' }) amountCentavos!: number;
+  @ApiProperty({ format: 'date' }) paidOn!: string;
+}

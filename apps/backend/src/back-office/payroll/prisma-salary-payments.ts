@@ -85,6 +85,11 @@ export const createPrismaSalaryPayments = (
     });
 
   return {
+    listOwnSalaryPayments: (
+      principal: AuthenticatedPrincipal,
+    ): Promise<{ id: string; amountCentavos: number; paidOn: Date }[]> =>
+      Promise.resolve(principal.accountId === '' ? [] : []),
+
     listSalaryPayments: async (
       query: {
         staffMemberId?: string;

@@ -25,6 +25,7 @@ describe('Prisma Back Office salary payments', () => {
     createPrismaSalaryPayments(world.prisma, { now: () => fixtureNow });
   const administrator = () => world.principalOf('paola.mendoza@example.com');
   const assistant = () => world.principalOf('camila.rojas@example.com');
+  const principalOf = (email: string) => world.principalOf(email);
   const staffIdOf = async (email: string) =>
     (
       await world.prisma.account.findFirstOrThrow({
@@ -237,5 +238,47 @@ describe('Prisma Back Office salary payments', () => {
         ),
       ),
     ).resolves.toBe('back_office_access_denied');
+  });
+  it('lists only the signed-in Trainer’s own Salary Payments, newest first', async () => {
+    const daniela = await staffIdOf('daniela.ortiz@example.com');
+    const emma = await staffIdOf('emma.vargas@example.com');
+    const admin = await administrator();
+    for (const [staffMemberId, paidOn, amountCentavos] of [
+      [daniela, '2026-08-01', 70_000],
+      [daniela, '2026-09-01', 71_000],
+      [emma, '2026-09-02', 99_000],
+    ] as const) {
+      await payroll().recordSalaryPayment(
+        { staffMemberId, amountCentavos, paidOn: civil(paidOn) },
+        admin,
+        randomUUID(),
+      );
+    }
+
+    const own = await payroll().listOwnSalaryPayments(
+      await principalOf('daniela.ortiz@example.com'),
+    );
+    expect(own).toEqual([
+      {
+        id: expect.any(String) as string,
+        amountCentavos: 71_000,
+        paidOn: civil('2026-09-01'),
+      },
+      {
+        id: expect.any(String) as string,
+        amountCentavos: 70_000,
+        paidOn: civil('2026-08-01'),
+      },
+    ]);
+    for (const email of [
+      'camila.rojas@example.com',
+      'paola.mendoza@example.com',
+      'carolina.rivas@example.com',
+      'gabriela.flores@example.com',
+    ]) {
+      await expect(
+        codeOf(payroll().listOwnSalaryPayments(await principalOf(email))),
+      ).resolves.toBe('back_office_access_denied');
+    }
   });
 });
