@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from "react-native";
 
 import { fontFamilies } from "./fonts";
 import { colors, spacing, typography } from "./tokens";
@@ -7,6 +7,7 @@ type TextButtonProps = {
   disabled?: boolean;
   label: string;
   onPress: () => void;
+  style?: StyleProp<ViewStyle>;
   testID?: string;
   /** «onTint» for a link on Palo de rosa tinte, such as a pending card's;
    * «error» for a destructive card action (follow-up 226). */
@@ -17,6 +18,7 @@ export function TextButton({
   disabled = false,
   label,
   onPress,
+  style,
   testID,
   tone = "default",
 }: TextButtonProps) {
@@ -28,7 +30,7 @@ export function TextButton({
       disabled={disabled}
       hitSlop={spacing.sm}
       onPress={onPress}
-      style={styles.button}
+      style={[styles.button, style]}
       testID={testID}
     >
       <Text style={[styles.label, tone === "error" && styles.error, disabled && styles.disabled]}>

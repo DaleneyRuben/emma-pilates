@@ -50,6 +50,7 @@ export * from "./time/session-format";
 export * from "./ui/avatar-circle";
 export * from "./ui/back-link";
 export * from "./ui/branch-picker-pill";
+export * from "./ui/card-action-row";
 export * from "./ui/card-footer";
 export * from "./ui/body-text";
 export * from "./ui/button-label";
