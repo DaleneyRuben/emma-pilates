@@ -1,5 +1,5 @@
 import { cleanup, render, within } from "@testing-library/react-native";
-import { clearMobileQueryCache, MobileQueryProvider } from "@pilates/mobile-core";
+import { clearMobileQueryCache, MobileQueryProvider, spacing } from "@pilates/mobile-core";
 import type { ComponentType } from "react";
 
 import { CancelClassScreen } from "./administrator/cancel-class-screen";
@@ -9,7 +9,9 @@ import { AssistantRescheduleScreen } from "./assistant/assistant-reschedule-scre
 import { ClientBookingsScreen } from "./assistant/client-bookings-screen";
 import { ClientHistoryScreen } from "./assistant/client-history-screen";
 import { AvailabilityBlockFormScreen } from "./nutritionist/availability-block-form-screen";
+import { ContactListScreen } from "./coordinator/contact-list-screen";
 import { AvailabilityScreen } from "./nutritionist/availability-screen";
+import { StaffPayScreen } from "./profile/staff-pay-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { StaffFetcherContext } from "./staff-fetcher";
 
@@ -61,6 +63,8 @@ const screens: [string, ComponentType<never>, object, string][] = [
   ],
   ["S22", ClientHistoryScreen as ComponentType<never>, client, "Historial de clases"],
   ["S23", StaffProfileScreen as ComponentType<never>, {}, "Perfil"],
+  ["S28", ContactListScreen as ComponentType<never>, {}, "Para contactar"],
+  ["S29", StaffPayScreen as ComponentType<never>, {}, "Mis pagos"],
 ];
 
 const renderScreen = (Component: ComponentType<never>, params: object) => {
@@ -85,6 +89,8 @@ describe("The Staff screens' top bar", () => {
     const screen = await renderScreen(Component, params);
 
     const bar = screen.getByTestId("screen-top-bar");
+    // The bar spans the Screen's padding, so its rule meets both edges.
+    expect(bar).toHaveStyle({ marginHorizontal: -spacing.lg, marginTop: -spacing.lg });
     expect(within(bar).getByLabelText(title)).toHaveStyle({ fontSize: 19 });
     expect(screen.getAllByLabelText(title)).toHaveLength(1);
     expect(screen.queryByText("← Volver")).toBeNull();
