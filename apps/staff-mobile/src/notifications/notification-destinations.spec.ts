@@ -5,27 +5,34 @@ const clientId = "33333333-3333-4333-8333-333333333333";
 
 describe("staffNotificationDestination", () => {
   it("opens Mi agenda for the Trainer's and Nutritionist's schedule notices", () => {
-    expect(staffNotificationDestination("trainer", "trainer_schedule", null)).toEqual(["Agenda"]);
+    expect(staffNotificationDestination("trainer", "trainer_schedule", null)).toEqual([
+      "AgendaTab",
+      { screen: "Agenda" },
+    ]);
     expect(staffNotificationDestination("nutritionist", "nutritionist_agenda", null)).toEqual([
-      "Agenda",
+      "AgendaTab",
+      { screen: "Agenda" },
     ]);
   });
 
   it("opens the submitted payment for the Administrator", () => {
     expect(staffNotificationDestination("administrator", "payment", paymentId)).toEqual([
-      "ReviewPayment",
-      { paymentId },
+      "PaymentsTab",
+      { screen: "ReviewPayment", params: { paymentId } },
     ]);
   });
 
   it("opens the pending payments when the payment is not named", () => {
-    expect(staffNotificationDestination("administrator", "payment", null)).toEqual(["Payments"]);
+    expect(staffNotificationDestination("administrator", "payment", null)).toEqual([
+      "PaymentsTab",
+      { screen: "Payments" },
+    ]);
   });
 
   it("opens the named Client for the Assistant", () => {
     expect(staffNotificationDestination("assistant", "client", clientId)).toEqual([
-      "ClientOverview",
-      { clientId },
+      "ClientsTab",
+      { screen: "ClientOverview", params: { clientId } },
     ]);
   });
 
@@ -35,8 +42,8 @@ describe("staffNotificationDestination", () => {
 
   it("opens the Freeze review for the Administrator", () => {
     expect(staffNotificationDestination("administrator", "freeze", paymentId)).toEqual([
-      "ReviewFreeze",
-      { freezeId: paymentId },
+      "PaymentsTab",
+      { screen: "ReviewFreeze", params: { freezeId: paymentId } },
     ]);
   });
 
