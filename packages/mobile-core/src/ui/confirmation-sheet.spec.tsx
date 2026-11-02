@@ -86,6 +86,16 @@ describe("ConfirmationSheet", () => {
     expect(screen.getByText("Reformer · jueves 20")).toBeOnTheScreen();
   });
 
+  it("leaves the note out when the facts are rows (C05c)", async () => {
+    const screen = await renderSheet({
+      children: <Text>La clase vuelve a tu plan</Text>,
+      note: undefined,
+    });
+
+    expect(screen.getByText("La clase vuelve a tu plan")).toBeOnTheScreen();
+    expect(screen.queryAllByText("")).toHaveLength(0);
+  });
+
   it("falls back to «Volver» as the dismiss label", async () => {
     const screen = await renderSheet({ dismissLabel: undefined });
 
