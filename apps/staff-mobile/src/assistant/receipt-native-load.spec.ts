@@ -23,7 +23,10 @@ describe("staff receipt native modules", () => {
     expect(startup).not.toMatch(
       /front-desk-receipt-upload|expo-image-manipulator|expo-image-picker/,
     );
-    expect(source("./confirm-cash-payment-screen.tsx")).toMatch(
+    expect(source("./confirm-cash-payment-screen.tsx")).not.toMatch(
+      /from\s*["']\.\/front-desk-receipt-upload["']/,
+    );
+    expect(source("./load-receipt-upload.ts")).toMatch(
       /import\(\s*["']\.\/front-desk-receipt-upload["']\s*\)/,
     );
   });

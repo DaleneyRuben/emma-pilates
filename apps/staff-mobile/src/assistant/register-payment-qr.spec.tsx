@@ -6,8 +6,10 @@ import { assistantRoutes, expiredOverview, openLucia } from "./assistant-fixture
 
 jest.setTimeout(20_000);
 
-jest.mock("./front-desk-receipt-upload", () => ({
-  photographTransferReceipt: jest.fn().mockResolvedValue({ imageAssetId: "asset-1" }),
+jest.mock("./load-receipt-upload", () => ({
+  loadReceiptUpload: async () => ({
+    photographTransferReceipt: async () => ({ imageAssetId: "asset-1" }),
+  }),
 }));
 
 const png = () =>
@@ -78,10 +80,11 @@ describe("Registrar pago by QR (S10)", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
     expect(await screen.findByText("La clienta tiene un pago en revisión.")).toBeOnTheScreen();
-    // FIX-028: the other way is off once one is pending.
-    expect(screen.getByRole("tab", { name: "QR" })).toHaveProp("accessibilityState", {
+    // FIX-028: a receipt is pending, so the cash way is off.
+    expect(screen.getByRole("tab", { name: "Efectivo" })).toHaveProp("accessibilityState", {
       disabled: true,
-      selected: false,
+      selected: true,
     });
+    expect(screen.getByRole("button", { name: "Confirmar pago en efectivo" })).toBeDisabled();
   });
 });

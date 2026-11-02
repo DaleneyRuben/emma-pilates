@@ -5,24 +5,22 @@ import {
   type PlanQuoteDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
-  BodyText,
-  colors,
-  describePlanTerms,
   boliviaCivilDate,
+  colors,
+  fontFamilies,
   formatBolivianos,
   FormScrollView,
-  Heading,
-  InvoiceDataCard,
+  IconRowGroup,
   invoiceChoiceFrom,
   invoiceDataPayload,
   type InvoiceChoice,
+  NoticeRow,
   PrimaryButton,
-  radii,
   Screen,
+  SectionTitle,
+  SegmentedTabs,
   spacing,
   StartDateChooser,
-  surfaces,
   typography,
   useStudioRules,
 } from "@pilates/mobile-core";
@@ -32,23 +30,32 @@ import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { BackBar } from "../ui/back-bar";
 import { BranchChips, useCashBranches } from "../ui/branch-chips";
+import { ValueRow } from "../ui/value-row";
 import { CenteredCard } from "./assistant-layout";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { describeClasses, formatCivilDate, formatCivilDayMonth } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
-import { FrontDeskReceiptCard, type FrontDeskReceipt } from "./front-desk-receipt-card";
+import {
+  FrontDeskReceiptCard,
+  StudioQrCard,
+  type FrontDeskReceipt,
+} from "./front-desk-receipt-card";
+import { InvoiceDisclosure } from "./invoice-disclosure";
+import { loadReceiptUpload } from "./load-receipt-upload";
+import { PaymentDone } from "./payment-done";
 
 type ConfirmNavigation = {
   goBack: () => void;
-  // Back to the overview already in the stack, dropping plan and payment.
-  popTo: {
-    (screen: "ClientOverview", params: { clientId: string }): void;
-    (screen: "ClientSearch"): void;
-  };
+  // Back to the search, dropping plan and payment (S10 «Volver a Clientes»).
+  popTo: (screen: "ClientSearch") => void;
 };
+
+type Method = "cash" | "qr";
+type Sent = { kind: "cash"; result: AssistantCashPaymentDto } | { kind: "transfer" };
 
 const paymentProblems: Record<string, string> = {
   subscription_not_expired: "La clienta ya tiene un plan activo.",
@@ -62,23 +69,13 @@ const paymentProblems: Record<string, string> = {
     "La clienta tiene una clase reservada con su acceso actual. Elige un inicio después de esa clase.",
 };
 
-function Line({
-  label,
-  value,
-  strong = false,
-}: {
-  label: string;
-  value: string;
-  strong?: boolean;
-}) {
-  return (
-    <View style={styles.line}>
-      <BodyText style={strong ? styles.lineLabelStrong : styles.lineLabel}>{label}</BodyText>
-      <Text style={strong ? styles.lineValueStrong : styles.lineValue}>{value}</Text>
-    </View>
-  );
-}
+const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? name;
 
+/**
+ * S10 «Registrar pago» (walkthrough 21): «¿Cómo paga?» Efectivo or QR. Cash
+ * confirms at once; QR shows the studio QR, takes a photo, and sends it on
+ * its own button. Once one way is pending the other is off (FIX-028).
+ */
 export function ConfirmCashPaymentScreen({
   route,
 }: {
@@ -92,14 +89,17 @@ export function ConfirmCashPaymentScreen({
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
   const branches = useCashBranches();
   const branchId = branches.branch?.id ?? null;
+  const [method, setMethod] = useState<Method>("cash");
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
-  const [result, setResult] = useState<AssistantCashPaymentDto | null>(null);
+  // The path the API holds as pending, from this screen or before it.
+  const [lockedTo, setLockedTo] = useState<Method | null>(null);
+  const [sent, setSent] = useState<Sent | null>(null);
   const studioRules = useStudioRules(fetcher);
   const today = boliviaCivilDate(new Date());
   const [startsOn, setStartsOn] = useState(today);
   const [receipt, setReceipt] = useState<FrontDeskReceipt | null>(null);
-  const [receiptPending, setReceiptPending] = useState(false);
+  const [photographing, setPhotographing] = useState(false);
   // PAY-007: prefilled from the Client's last sale; a failed read leaves «Sin factura».
   const lastInvoice = useGetAssistantClientInvoiceData(clientId, { fetcher });
   const [invoiceEdit, setInvoiceEdit] = useState<InvoiceChoice | null>(null);
@@ -109,34 +109,43 @@ export function ConfirmCashPaymentScreen({
       lastInvoice.data?.status === 200 ? (lastInvoice.data.data.invoiceData ?? null) : null,
     );
   const invoiceData = invoiceDataPayload(invoice);
+  const start = renewalStartsOn === undefined ? startsOn : undefined;
+  const amount = formatBolivianos(quote.priceCentavos);
+
+  const refuse = (error: unknown, fallback: string, path: Method) => {
+    const code = error instanceof AssistantApiError ? error.code : null;
+    // The API already holds a pending payment: the other path is closed too.
+    if (code === "payment_pending_exists") setLockedTo(path === "cash" ? "qr" : "cash");
+    setFailure((code !== null ? paymentProblems[code] : undefined) ?? fallback);
+  };
 
   const photograph = async () => {
-    if (branchId === null || receiptPending) return;
-    setReceiptPending(true);
+    if (photographing) return;
+    setPhotographing(true);
     setFailure(null);
     try {
-      // Loaded only here: the receipt modules are native, and importing them
-      // from the navigation graph crashes every Staff role at startup.
-      const { photographTransferReceipt } = await import("./front-desk-receipt-upload");
+      const { photographTransferReceipt } = await loadReceiptUpload();
       const photographed = await photographTransferReceipt(fetcher);
-      if (photographed === null) return;
-      await api.recordFrontDeskTransfer(
-        clientId,
-        quote.id,
-        branchId,
-        photographed.imageAssetId,
-        renewalStartsOn === undefined ? startsOn : undefined,
-      );
-      setReceipt(photographed);
-      setFailure("Comprobante enviado. Queda pendiente de revisión.");
-    } catch (error) {
-      const code = error instanceof AssistantApiError ? error.code : null;
-      setFailure(
-        (code !== null ? paymentProblems[code] : undefined) ??
-          "No pudimos enviar el comprobante. Inténtalo de nuevo.",
-      );
+      if (photographed !== null) setReceipt(photographed);
+    } catch {
+      setFailure("No pudimos subir la foto. Inténtalo de nuevo.");
     } finally {
-      setReceiptPending(false);
+      setPhotographing(false);
+    }
+  };
+
+  const sendReceipt = async () => {
+    if (branchId === null || receipt === null) return;
+    setSubmitting(true);
+    setFailure(null);
+    try {
+      await api.recordFrontDeskTransfer(clientId, quote.id, branchId, receipt.imageAssetId, start);
+      setLockedTo("qr");
+      setSent({ kind: "transfer" });
+    } catch (error) {
+      refuse(error, "No pudimos enviar el comprobante. Inténtalo de nuevo.", "qr");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -149,91 +158,137 @@ export function ConfirmCashPaymentScreen({
         clientId,
         quote.id,
         branchId,
-        renewalStartsOn === undefined ? startsOn : undefined,
+        start,
         invoiceData,
       );
       await queryClient.invalidateQueries({
         queryKey: getGetAssistantClientOverviewQueryKey(clientId),
       });
-      setResult(recorded);
+      setLockedTo("cash");
+      setSent({ kind: "cash", result: recorded });
     } catch (error) {
-      const code = error instanceof AssistantApiError ? error.code : null;
-      setFailure(
-        (code !== null ? paymentProblems[code] : undefined) ??
-          "No pudimos registrar el pago. Inténtalo de nuevo.",
-      );
+      refuse(error, "No pudimos registrar el pago. Inténtalo de nuevo.", "cash");
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (result !== null) {
-    const activated = result.subscription;
+  if (sent !== null) {
+    const result = sent.kind === "cash" ? sent.result : null;
     return (
       <Screen style={styles.screen}>
         <CenteredCard maxWidth={520}>
-          <View style={styles.success}>
-            <View style={styles.successIcon}>
-              <Text style={styles.successGlyph}>✓</Text>
-            </View>
-            <Heading accessibilityLabel="¡Pago registrado!" style={styles.centered}>
-              ¡Pago registrado!
-            </Heading>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>{result.payment.planName}</Text>
-              <BodyText>{describeClasses(result.payment.classAllowance)}</BodyText>
-              {activated ? (
-                <BodyText style={styles.muted}>
-                  {`Vence el ${formatCivilDate(activated.endsOn)}`}
-                </BodyText>
-              ) : null}
-              <BodyText style={styles.muted}>
-                {`Cobrado en efectivo: ${formatBolivianos(result.payment.amountDueCentavos)}`}
-              </BodyText>
-            </View>
-            <PrimaryButton
-              label="Volver al cliente"
-              onPress={() => {
-                if (workspace.split) {
-                  workspace.show({ view: "overview", clientId });
-                  navigation.popTo("ClientSearch");
-                  return;
-                }
-                navigation.popTo("ClientOverview", { clientId });
-              }}
-              testID="cash-back-to-client"
-            />
-          </View>
+          <PaymentDone
+            amount={result === null ? amount : formatBolivianos(result.payment.amountDueCentavos)}
+            classes={describeClasses(result?.payment.classAllowance ?? quote.classAllowance)}
+            endsOn={result?.subscription ? formatCivilDate(result.subscription.endsOn) : undefined}
+            firstName={firstName(clientName)}
+            kind={sent.kind}
+            onBack={() => {
+              if (workspace.split) workspace.show({ view: "overview", clientId });
+              navigation.popTo("ClientSearch");
+            }}
+            scheduled={renewalStartsOn !== undefined}
+          />
         </CenteredCard>
       </Screen>
     );
   }
 
+  const discount =
+    quote.listPriceCentavos !== undefined && quote.listPriceCentavos > quote.priceCentavos
+      ? quote.listPriceCentavos - quote.priceCentavos
+      : 0;
+  const footer = (
+    <View style={styles.footer}>
+      {failure !== null ? (
+        <View accessibilityLabel={failure} accessibilityRole="alert">
+          <NoticeRow message={failure} />
+        </View>
+      ) : null}
+      <Text style={styles.note}>
+        {method === "cash"
+          ? `Confirma con el efectivo en mano: ${
+              renewalStartsOn === undefined
+                ? "el plan se activa al instante."
+                : "el plan queda programado para esa fecha."
+            }`
+          : "Queda pendiente hasta que administración lo apruebe. No entra en la caja."}
+      </Text>
+      {method === "cash" ? (
+        <PrimaryButton
+          busy={submitting}
+          disabled={branchId === null || invoiceData === "incomplete" || lockedTo === "qr"}
+          label="Confirmar pago en efectivo"
+          onPress={() => void confirm()}
+          testID="cash-confirm"
+        />
+      ) : (
+        <PrimaryButton
+          busy={submitting}
+          disabled={branchId === null || receipt === null || lockedTo === "cash"}
+          label="Enviar comprobante"
+          onPress={() => void sendReceipt()}
+          testID="front-desk-send"
+        />
+      )}
+    </View>
+  );
+
   return (
     <Screen style={styles.screen}>
       <CenteredCard maxWidth={520}>
-        <BackLink onPress={() => navigation.goBack()} />
-        <Heading accessibilityLabel="Confirmar pago en efectivo">
-          Confirmar pago en efectivo
-        </Heading>
-        <ClientBanner action="Registrando pago para" clientName={clientName} />
-        <FormScrollView contentContainerStyle={styles.content}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{quote.name}</Text>
-            <BodyText>{describePlanTerms(quote)}</BodyText>
-            <Line label="Precio del plan" value={formatBolivianos(quote.priceCentavos)} />
-            <View style={styles.divider} />
-            {/* Credit is retired (PAY-005): the cash collected is the full price. */}
-            <Line
-              label="Monto a cobrar en efectivo"
-              strong
-              value={formatBolivianos(quote.priceCentavos)}
+        <BackBar onBack={() => navigation.goBack()} title="Registrar pago" />
+        <FormScrollView contentContainerStyle={styles.content} footer={footer}>
+          <ClientBanner
+            action="Para"
+            clientName={clientName}
+            detail={`plan de ${describeClasses(quote.classAllowance)}`}
+          />
+          <View>
+            <SectionTitle>¿Cómo paga?</SectionTitle>
+            <SegmentedTabs
+              accessibilityLabel="¿Cómo paga?"
+              onSelect={(next) => {
+                setMethod(next);
+                setFailure(null);
+              }}
+              options={[
+                { key: "cash", label: "Efectivo", disabled: lockedTo === "qr" },
+                { key: "qr", label: "QR", disabled: lockedTo === "cash" },
+              ]}
+              selected={method}
             />
           </View>
+          {method === "cash" ? (
+            <View>
+              <SectionTitle>A cobrar</SectionTitle>
+              <IconRowGroup>
+                <ValueRow
+                  label={quote.name}
+                  value={formatBolivianos(quote.listPriceCentavos ?? quote.priceCentavos)}
+                />
+                {discount > 0 ? (
+                  <ValueRow
+                    label="Descuento"
+                    tone="emphasis"
+                    value={`−${formatBolivianos(discount)}`}
+                  />
+                ) : null}
+                {/* Credit is retired (PAY-005): the cash collected is the full price. */}
+                <ValueRow label="Total en efectivo" strong value={amount} />
+              </IconRowGroup>
+            </View>
+          ) : (
+            <>
+              <StudioQrCard amount={amount} />
+              <FrontDeskReceiptCard onPhotograph={() => void photograph()} receipt={receipt} />
+            </>
+          )}
           {renewalStartsOn !== undefined ? (
-            <BodyText>
+            <Text style={styles.line}>
               {`El nuevo plan empieza el ${formatCivilDayMonth(renewalStartsOn)}, al terminar el actual.`}
-            </BodyText>
+            </Text>
           ) : studioRules === undefined ? null : (
             <StartDateChooser
               openingDate={studioRules.openingDate}
@@ -244,39 +299,18 @@ export function ConfirmCashPaymentScreen({
             />
           )}
           <BranchChips
-            label="Sucursal donde recibes el efectivo"
+            label={
+              method === "cash" ? "Sucursal donde recibes el efectivo" : "Sucursal de la venta"
+            }
             onSelect={branches.select}
             options={branches.options}
             selectedId={branchId}
             testIDPrefix="cash-branch"
           />
-          <InvoiceDataCard
-            noInvoiceNote="La venta se registra sin datos de factura."
-            onChange={setInvoiceEdit}
-            prefilledNote="Datos de su última compra. Confírmalos con la clienta."
-            raised
-            value={invoice}
-          />
-          <FrontDeskReceiptCard onPhotograph={() => void photograph()} receipt={receipt} />
-          <BodyText style={styles.muted}>
-            {`Confirma solo cuando tengas el efectivo en mano. ${
-              renewalStartsOn === undefined
-                ? "El plan se activa al instante."
-                : "El plan queda programado para esa fecha."
-            }`}
-          </BodyText>
-          {failure !== null ? (
-            <BodyText accessibilityRole="alert" style={styles.failure}>
-              {failure}
-            </BodyText>
+          {/* The transfer API takes no invoice data, so the fold is for cash only. */}
+          {method === "cash" ? (
+            <InvoiceDisclosure onChange={setInvoiceEdit} value={invoice} />
           ) : null}
-          <PrimaryButton
-            busy={submitting}
-            disabled={branchId === null || invoiceData === "incomplete"}
-            label="Confirmar pago recibido"
-            onPress={() => void confirm()}
-            testID="cash-confirm"
-          />
         </FormScrollView>
       </CenteredCard>
     </Screen>
@@ -284,32 +318,14 @@ export function ConfirmCashPaymentScreen({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    ...surfaces.card,
-    gap: spacing.sm,
-    padding: spacing.lg,
+  content: { gap: spacing.xl, paddingBottom: spacing.xl },
+  footer: { gap: spacing.sm, paddingTop: spacing.md },
+  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  note: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    textAlign: "center",
   },
-  cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  centered: { textAlign: "center" },
-  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  divider: { backgroundColor: colors.border, height: 1 },
-  failure: { color: colors.errorText },
-  line: { flexDirection: "row", justifyContent: "space-between" },
-  lineLabel: { color: colors.textMuted },
-  lineLabelStrong: { color: colors.text, fontWeight: "600" },
-  lineValue: { color: colors.text, fontSize: typography.body },
-  lineValueStrong: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "600" },
-  muted: { color: colors.textMuted, fontSize: typography.note },
-  screen: { gap: spacing.md },
-  success: { alignItems: "stretch", flex: 1, gap: spacing.lg, justifyContent: "center" },
-  successGlyph: { color: colors.white, fontSize: typography.titleSecondary, fontWeight: "600" },
-  successIcon: {
-    alignItems: "center",
-    alignSelf: "center",
-    backgroundColor: colors.successText,
-    borderRadius: radii.pill,
-    height: 56,
-    justifyContent: "center",
-    width: 56,
-  },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
 });
