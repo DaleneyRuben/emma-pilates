@@ -4,17 +4,16 @@ import {
   useListAvailabilityBlocks,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   Chevron,
   colors,
+  fontFamilies,
+  IconRowGroup,
   LoadingState,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
-  ScreenTopBar,
   spacing,
-  surfaces,
+  StateScreen,
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -23,6 +22,8 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { RootHeader } from "../ui/root-header";
+import { SectionHeader } from "../ui/section-header";
 import {
   addCivilDays,
   boliviaToday,
@@ -70,21 +71,19 @@ export function AvailabilityScreen() {
   const refreshControl = usePullToRefresh(queryKeys);
 
   const header = (
-    <ScreenTopBar
-      action={
-        <Pressable
-          accessibilityLabel="Nuevo horario"
-          accessibilityRole="button"
-          onPress={() => navigation.navigate("AvailabilityBlockForm")}
-          style={styles.newButton}
-        >
-          <Text style={styles.newButtonText}>+ Nuevo horario</Text>
-        </Pressable>
-      }
-      fullBleed
-      onBack={() => navigation.goBack()}
+    <RootHeader
+      note="Las clientas eligen cupos de 45 min dentro de estos rangos."
       title="Mi disponibilidad"
     />
+  );
+  const newBlock = (
+    <View style={styles.footer}>
+      <PrimaryButton
+        label="Nuevo horario"
+        onPress={() => navigation.navigate("AvailabilityBlockForm")}
+        testID="availability-new-block"
+      />
+    </View>
   );
 
   if (blocks.isPending) {
@@ -117,101 +116,95 @@ export function AvailabilityScreen() {
   );
   const severalBranches = new Set(sorted.map((block) => block.branchId)).size > 1;
 
+  if (sorted.length === 0) {
+    return (
+      <Screen style={styles.screen}>
+        <RootHeader title="Mi disponibilidad" />
+        <StateScreen
+          icon="calendar"
+          note="Publica un rango y las clientas podrán reservar su evaluación."
+          primaryAction={{
+            label: "Nuevo horario",
+            onPress: () => navigation.navigate("AvailabilityBlockForm"),
+            testID: "availability-new-block",
+          }}
+          title="Aún no publicaste horarios"
+        />
+      </Screen>
+    );
+  }
+
   return (
     <Screen style={styles.screen}>
-      {header}
-      {sorted.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>Aún no publicaste horarios de disponibilidad.</Text>
-          <BodyText>Publica un rango y las clientas podrán reservar su evaluación.</BodyText>
-          <PrimaryButton
-            label="Nuevo horario"
-            onPress={() => navigation.navigate("AvailabilityBlockForm")}
+      <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
+        {header}
+        <View>
+          <SectionHeader
+            meta={countLabel(sorted.length, "horario", "horarios")}
+            title="Horarios semanales"
           />
+          <IconRowGroup>
+            {sorted.map((block) => {
+              const dates = dateLine(block, today);
+              return (
+                <Pressable
+                  accessibilityLabel={`Editar horario ${blockRange(block)}`}
+                  accessibilityRole="button"
+                  key={block.id}
+                  onPress={() => navigation.navigate("AvailabilityBlockForm", { block })}
+                  style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+                >
+                  <View style={styles.tag}>
+                    <Text style={styles.tagText}>{weekdayTag(block.weekday)}</Text>
+                  </View>
+                  <View style={styles.body}>
+                    <Text style={styles.range}>
+                      {`${displayTime(block.startsAtLocal)} – ${displayTime(block.endsAtLocal)}`}
+                    </Text>
+                    <Text style={styles.muted}>
+                      {[
+                        `${block.slotsPerWeek} cupos · ${bookedLabel(block.upcomingBookedCount)}`,
+                        ...(severalBranches ? [`Sucursal ${block.branchName}`] : []),
+                      ].join(" · ")}
+                    </Text>
+                    {dates === null ? null : <Text style={styles.dates}>{dates}</Text>}
+                  </View>
+                  <Chevron size={16} strokeWidth={1.5} tone="muted" />
+                </Pressable>
+              );
+            })}
+          </IconRowGroup>
         </View>
-      ) : (
-        <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.label}>Horarios semanales</Text>
-            <BodyText style={styles.muted}>
-              {countLabel(sorted.length, "horario", "horarios")}
-            </BodyText>
-          </View>
-          {sorted.map((block) => {
-            const dates = dateLine(block, today);
-            return (
-              <Pressable
-                accessibilityLabel={`Editar horario ${blockRange(block)}`}
-                accessibilityRole="button"
-                key={block.id}
-                onPress={() => navigation.navigate("AvailabilityBlockForm", { block })}
-                style={styles.card}
-              >
-                <View style={styles.tag}>
-                  <Text style={styles.tagText}>{weekdayTag(block.weekday)}</Text>
-                </View>
-                <View style={styles.cardBody}>
-                  <Text style={styles.range}>{blockRange(block)}</Text>
-                  <BodyText style={styles.muted}>
-                    {[
-                      `${block.slotsPerWeek} cupos de 45 min · ${bookedLabel(block.upcomingBookedCount)}`,
-                      ...(severalBranches ? [`Sucursal ${block.branchName}`] : []),
-                    ].join(" · ")}
-                  </BodyText>
-                  {dates === null ? null : <BodyText style={styles.dates}>{dates}</BodyText>}
-                </View>
-                <Chevron />
-              </Pressable>
-            );
-          })}
-          <BodyText style={styles.muted}>
-            Las clientas eligen cupos de 45 min dentro de estos rangos.
-          </BodyText>
-        </ScrollView>
-      )}
+      </ScrollView>
+      {newBlock}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    ...surfaces.card,
+  body: { flex: 1, gap: spacing.xxs },
+  dates: { color: colors.primaryOnTint, fontFamily: fontFamilies.body, fontSize: typography.note },
+  footer: { paddingBottom: spacing.lg, paddingTop: spacing.md },
+  list: { gap: spacing.xl, paddingBottom: spacing.xl },
+  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
+  pressed: { opacity: 0.7 },
+  range: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 16 },
+  row: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
-    padding: spacing.lg,
+    minHeight: 64,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
   },
-  cardBody: { flex: 1, gap: spacing.xxs },
-  dates: { color: colors.primaryDeep, fontSize: typography.note },
-  empty: { gap: spacing.lg, paddingTop: spacing.xl },
-  emptyTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  label: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-  },
-  list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  muted: { color: colors.textMuted, fontSize: typography.note },
-  newButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radii.control,
-    minHeight: 40,
-    justifyContent: "center",
-    paddingHorizontal: spacing.md,
-  },
-  newButtonText: { color: colors.white, fontSize: typography.note, fontWeight: "600" },
-  range: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  screen: { gap: spacing.lg },
-  sectionHeader: { flexDirection: "row", justifyContent: "space-between" },
+  screen: { paddingHorizontal: spacing.xlSm },
   tag: {
     alignItems: "center",
     backgroundColor: colors.primaryTint,
-    borderRadius: radii.control,
-    height: 44,
+    borderRadius: 18,
+    height: 36,
     justifyContent: "center",
-    width: 44,
+    width: 36,
   },
-  tagText: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "600" },
+  tagText: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong, fontSize: 12 },
 });

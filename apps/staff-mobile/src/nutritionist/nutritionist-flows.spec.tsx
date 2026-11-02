@@ -192,7 +192,7 @@ describe("Nutritionist agenda and availability", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Guardar" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Martes, 10:00 – 12:15")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Editar horario Martes, 10:00 – 12:15")).toBeOnTheScreen();
     });
     expect(fetcher).toHaveBeenCalledWith(
       "/api/v1/nutritionist/availability-blocks",
