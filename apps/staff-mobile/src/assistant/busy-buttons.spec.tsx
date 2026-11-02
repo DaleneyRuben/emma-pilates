@@ -19,7 +19,7 @@ describe("Staff busy buttons", () => {
         new Promise<Response>(() => undefined) as unknown as Response,
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+    await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => {
       expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
     });

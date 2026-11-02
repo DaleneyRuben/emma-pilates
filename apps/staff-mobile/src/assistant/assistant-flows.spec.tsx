@@ -31,8 +31,12 @@ describe("Assistant Client flows", () => {
       "zz",
     );
     await waitFor(() => {
-      expect(screen.getByText("No se encontró ningún cliente.")).toBeOnTheScreen();
+      expect(screen.getByText("No encontramos a nadie")).toBeOnTheScreen();
     });
+    // v2 S04: the empty search offers the new file directly.
+    expect(screen.getByText("Revisa cómo lo escribiste o crea una ficha nueva.")).toBeOnTheScreen();
+    expect(screen.getByTestId("client-search-empty-new-client")).toBeOnTheScreen();
+    expect(screen.getByText("Asistente · Centro")).toBeOnTheScreen();
 
     await fireEvent.changeText(
       screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
@@ -316,7 +320,7 @@ describe("Assistant Client flows", () => {
       "/api/v1/assistant/client-invitations/client-new": () => jsonResponse(invitation),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+    await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => {
       expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
     });
@@ -362,7 +366,7 @@ describe("Assistant Client flows", () => {
       },
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+    await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => {
       expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
     });

@@ -34,7 +34,7 @@ const invited = () =>
   jsonResponse({ status: "invited", clientId: "client-new", email: "ana@example.com" }, 201);
 
 async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearch>>) {
-  await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+  await fireEvent.press(screen.getByTestId("client-search-new-client"));
   await waitFor(() => {
     expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
   });

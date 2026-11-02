@@ -188,7 +188,7 @@ describe("Assistant flows on a tablet", () => {
         new Response(null, { status: 204 }),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+    await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => {
       expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
     });
@@ -239,7 +239,7 @@ describe("Assistant flows on a tablet", () => {
     });
 
     for (let round = 0; round < 2; round += 1) {
-      await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+      await fireEvent.press(screen.getByTestId("client-search-new-client"));
       await waitFor(() => {
         expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
       });
