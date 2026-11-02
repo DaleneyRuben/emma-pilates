@@ -21,6 +21,16 @@ describe("ScreenTopBar on an app screen", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
+  // The 22 pt chevron sits centred in a 44 pt target, so its tip starts about
+  // 18 pt in; pulled back 10 pt it lines up with the title's 8 pt inset, as
+  // BackLink already does above a large title.
+  it("lines the chevron's tip up with the title", async () => {
+    const screen = await render(<ScreenTopBar onBack={jest.fn()} title="Mis pagos" />);
+
+    expect(screen.getByRole("button", { name: "Volver" })).toHaveStyle({ marginLeft: -10 });
+    expect(screen.getByLabelText("Mis pagos")).toHaveStyle({ paddingHorizontal: spacing.sm });
+  });
+
   // MOB-038: the frames' header rule, which reads on Superficie.
   it("draws its bottom rule in the frames' header rule tone", async () => {
     const screen = await render(<ScreenTopBar onBack={jest.fn()} title="Mi crédito" />);
