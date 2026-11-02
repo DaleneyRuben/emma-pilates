@@ -1,19 +1,23 @@
 import { useGetPaymentReview } from "@pilates/api-contracts";
 import {
-  BodyText,
-  ButtonLabel,
+  CardActionRow,
+  cardWithActionRow,
   colors,
+  EmphasisCard,
+  fontFamilies,
   formatBolivianos,
   FormField,
   FormScrollView,
   FullScreenImage,
-  initials,
+  IconRow,
+  IconRowGroup,
   LoadingState,
+  NoticeRow,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
-  ScreenTopBar,
+  SectionTitle,
   spacing,
   surfaces,
   TextButton,
@@ -23,6 +27,9 @@ import { useNavigation } from "@react-navigation/native";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+
+import { BackBar } from "../ui/back-bar";
+import { PersonRow } from "../ui/person-row";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAdministratorApi } from "./administrator-api";
@@ -70,7 +77,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
 
-  const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Revisar pago" />;
+  const header = <BackBar onBack={() => navigation.goBack()} title="Revisar pago" />;
 
   if (review.isPending) {
     return (
@@ -105,73 +112,71 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
     }
   };
 
-  return (
-    <Screen style={styles.screen}>
-      {header}
-      <FormScrollView contentContainerStyle={styles.content}>
-        <View style={styles.client}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials(payment.clientName)}</Text>
-          </View>
-          <View style={styles.clientBody}>
-            <Text style={styles.name}>{payment.clientName}</Text>
-            <BodyText>{payment.planName}</BodyText>
-          </View>
-        </View>
-        <View style={styles.amountCard}>
-          <BodyText style={styles.amountLabel}>Monto a verificar</BodyText>
-          <Text style={styles.amount}>{formatBolivianos(payment.amountDueCentavos)}</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{stateLabels[payment.state]}</Text>
-          </View>
-          <BodyText style={styles.meta}>
-            {`Transferencia · enviado el ${formatSubmittedAt(payment.submittedAt)}`}
-          </BodyText>
-        </View>
-        <View style={styles.receiptSection}>
-          <View style={styles.receiptHeader}>
-            <Text style={styles.sectionTitle}>Comprobante</Text>
-            {receiptUri === null ? null : (
-              <TextButton label="Ampliar" onPress={() => setEnlarged(true)} />
-            )}
-          </View>
-          {receiptUri === null ? (
-            receipt.isError ? (
-              <QueryFailure
-                label="No pudimos mostrar el comprobante."
-                onRetry={() => void receipt.refetch()}
+  const receiptView =
+    receiptUri === null ? (
+      receipt.isError ? (
+        <QueryFailure
+          label="No pudimos mostrar el comprobante."
+          onRetry={() => void receipt.refetch()}
+        />
+      ) : (
+        <Text style={styles.helper}>
+          {payment.receipt ? "Cargando el comprobante…" : "Todavía no hay comprobante."}
+        </Text>
+      )
+    ) : (
+      <Pressable
+        accessibilityLabel="Ampliar comprobante"
+        accessibilityRole="imagebutton"
+        onPress={() => setEnlarged(true)}
+      >
+        <Image
+          accessibilityLabel="Comprobante de transferencia"
+          resizeMode="contain"
+          source={{ uri: receiptUri }}
+          style={[styles.receipt, { aspectRatio: receiptRatio }]}
+        />
+      </Pressable>
+    );
+  const failureRow =
+    failure === null ? null : (
+      <View accessibilityLabel={failure} accessibilityRole="alert">
+        <NoticeRow message={failure} />
+      </View>
+    );
+
+  // S12 «Rechazar»: who, the reason she will read, and what happens.
+  if (payment.state === "pending" && rejecting) {
+    return (
+      <Screen style={styles.screen}>
+        <FormScrollView
+          contentContainerStyle={styles.content}
+          footer={
+            <View style={styles.actions}>
+              {failureRow}
+              <PrimaryButton
+                busy={submitting}
+                disabled={trimmedReason === ""}
+                label="Confirmar rechazo"
+                onPress={() =>
+                  void decide(() => api.rejectPayment(payment.id, trimmedReason), "Pago rechazado")
+                }
+                testID="review-reject-confirm"
+                tone="error"
               />
-            ) : (
-              <BodyText>
-                {payment.receipt
-                  ? "Cargando el comprobante…"
-                  : payment.receipt
-                    ? "El comprobante ya no está disponible."
-                    : "Todavía no hay comprobante."}
-              </BodyText>
-            )
-          ) : (
-            <Pressable
-              accessibilityLabel="Ampliar comprobante"
-              accessibilityRole="imagebutton"
-              onPress={() => setEnlarged(true)}
-            >
-              <Image
-                accessibilityLabel="Comprobante de transferencia"
-                resizeMode="contain"
-                source={{ uri: receiptUri }}
-                style={[styles.receipt, { aspectRatio: receiptRatio }]}
-              />
-            </Pressable>
-          )}
-        </View>
-        {failure === null ? null : (
-          <BodyText accessibilityRole="alert" style={styles.failure}>
-            {failure}
-          </BodyText>
-        )}
-        {payment.state !== "pending" ? null : rejecting ? (
-          <View style={styles.rejectForm}>
+              <TextButton label="Volver" onPress={() => setRejecting(false)} />
+            </View>
+          }
+        >
+          {header}
+          <IconRowGroup>
+            <PersonRow
+              amount={formatBolivianos(payment.amountDueCentavos)}
+              detail={payment.planName}
+              name={payment.clientName}
+            />
+          </IconRowGroup>
+          <View style={styles.field}>
             <FormField
               label="Motivo del rechazo"
               multiline
@@ -181,55 +186,60 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
               testID="review-reject-reason"
               value={reason}
             />
-            <BodyText style={styles.helper}>
+            <Text style={styles.helper}>
               La clienta verá este mensaje para corregir y volver a enviar.
-            </BodyText>
-            <Pressable
-              accessibilityLabel="Confirmar rechazo"
-              accessibilityRole="button"
-              accessibilityState={{
-                busy: submitting,
-                disabled: trimmedReason === "" || submitting,
-              }}
-              disabled={trimmedReason === "" || submitting}
-              onPress={() =>
-                void decide(() => api.rejectPayment(payment.id, trimmedReason), "Pago rechazado")
-              }
-              style={[
-                styles.destructive,
-                trimmedReason === "" && !submitting && styles.destructiveDisabled,
-              ]}
-              testID="review-reject-confirm"
-            >
-              <ButtonLabel
+            </Text>
+          </View>
+          <NoticeRow message="El plan no se activa hasta que envíe un comprobante válido." />
+        </FormScrollView>
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen style={styles.screen}>
+      <FormScrollView
+        contentContainerStyle={styles.content}
+        footer={
+          payment.state !== "pending" ? undefined : (
+            <View style={styles.actions}>
+              {failureRow}
+              <PrimaryButton
                 busy={submitting}
-                label="Confirmar rechazo"
-                spinnerColor={colors.white}
-                style={styles.destructiveLabel}
+                disabled={receiptUri === null}
+                label="Confirmar pago"
+                onPress={() => void decide(() => api.confirmPayment(payment.id), "Pago confirmado")}
+                testID="review-confirm"
               />
-            </Pressable>
-            <TextButton label="Cancelar" onPress={() => setRejecting(false)} />
-          </View>
-        ) : (
-          <View style={styles.actions}>
-            <PrimaryButton
-              busy={submitting}
-              disabled={receiptUri === null}
-              label="Confirmar pago"
-              onPress={() => void decide(() => api.confirmPayment(payment.id), "Pago confirmado")}
-              testID="review-confirm"
-            />
-            <Pressable
-              accessibilityLabel="Rechazar"
-              accessibilityRole="button"
-              onPress={() => setRejecting(true)}
-              style={styles.reject}
-              testID="review-reject"
-            >
-              <Text style={styles.rejectLabel}>Rechazar</Text>
-            </Pressable>
-          </View>
-        )}
+              <TextButton
+                label="Rechazar"
+                onPress={() => setRejecting(true)}
+                testID="review-reject"
+                tone="error"
+              />
+            </View>
+          )
+        }
+      >
+        {header}
+        <EmphasisCard
+          eyebrow="Monto a verificar"
+          note={`${payment.clientName} · ${payment.planName}`}
+          pill={stateLabels[payment.state]}
+        >
+          <Text style={styles.amount}>{formatBolivianos(payment.amountDueCentavos)}</Text>
+        </EmphasisCard>
+        <IconRowGroup>
+          <IconRow icon="credit" label="Transferencia" />
+          <IconRow icon="clock" label={`Enviado el ${formatSubmittedAt(payment.submittedAt)}`} />
+        </IconRowGroup>
+        <View style={[styles.receiptCard, receiptUri === null ? null : cardWithActionRow]}>
+          <SectionTitle>Comprobante</SectionTitle>
+          {receiptView}
+          {receiptUri === null ? null : (
+            <CardActionRow label="Ampliar" onPress={() => setEnlarged(true)} />
+          )}
+        </View>
       </FormScrollView>
       <FullScreenImage
         aspectRatio={receiptRatio}
@@ -243,77 +253,18 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
 }
 
 const styles = StyleSheet.create({
-  actions: { gap: spacing.sm },
+  actions: { gap: spacing.xs, paddingTop: spacing.md },
   amount: {
-    color: colors.text,
-    fontFamily: "Lora_500Medium",
-    fontSize: typography.display,
+    color: colors.white,
+    fontFamily: fontFamilies.display,
+    fontSize: 32,
+    fontVariant: ["tabular-nums"],
   },
-  amountCard: {
-    ...surfaces.flatCard,
-    alignItems: "center",
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  amountLabel: {
-    color: colors.textMuted,
-    fontSize: typography.note,
-    letterSpacing: 1,
-    textTransform: "uppercase",
-  },
-  avatar: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 48,
-    justifyContent: "center",
-    width: 48,
-  },
-  avatarText: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "600" },
-  badge: {
-    backgroundColor: "rgba(201, 154, 78, 0.16)",
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xxs,
-  },
-  badgeText: { color: colors.warningText, fontSize: typography.note, fontWeight: "500" },
-  client: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  clientBody: { flex: 1, gap: spacing.xxs },
-  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  destructive: {
-    alignItems: "center",
-    backgroundColor: colors.error,
-    borderRadius: radii.control,
-    justifyContent: "center",
-    minHeight: 52,
-  },
-  destructiveDisabled: { backgroundColor: colors.disabledBackground },
-  destructiveLabel: { color: colors.white, fontSize: typography.body, fontWeight: "500" },
-  failure: { color: colors.errorText },
-  helper: { color: colors.textMuted, fontSize: typography.note },
-  meta: { color: colors.textMuted, fontSize: typography.note },
-  name: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  reasonInput: { minHeight: 96, paddingTop: spacing.md, textAlignVertical: "top" },
-  receipt: {
-    ...surfaces.flatCard,
-    width: "100%",
-  },
-  receiptHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  receiptSection: { gap: spacing.sm },
-  reject: {
-    alignItems: "center",
-    borderColor: colors.error,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 52,
-  },
-  rejectForm: { gap: spacing.md },
-  rejectLabel: { color: colors.errorText, fontSize: typography.body, fontWeight: "500" },
-  screen: { gap: spacing.md },
-  sectionTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
+  content: { gap: spacing.xl, paddingBottom: spacing.xl },
+  field: { gap: spacing.xs },
+  helper: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  reasonInput: { minHeight: 96, textAlignVertical: "top" },
+  receipt: { borderRadius: radii.inset, width: "100%" },
+  receiptCard: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

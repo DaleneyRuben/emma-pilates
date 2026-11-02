@@ -178,7 +178,7 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByText("Monto a verificar")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Carla Mendoza")).toBeOnTheScreen();
+    expect(screen.getByText("Carla Mendoza · Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Pendiente")).toBeOnTheScreen();
     // v2 S12: the amount on the hero, the transfer and its time as rows.
