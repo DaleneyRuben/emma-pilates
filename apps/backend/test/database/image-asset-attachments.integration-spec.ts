@@ -112,6 +112,37 @@ describe('image asset attachments (PostgreSQL)', () => {
     expect(reloaded.deletionDueAt).toBeNull();
   });
 
+  // BKO-008 review: two owners racing for one image. The second read sees
+  // READY while the first is uncommitted, then waits on the row lock.
+  it('lets only one of two concurrent attachments take a ready image', async () => {
+    const asset = await readyPromotionImage();
+    const pause = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+    const attach = (tx: Parameters<typeof attachImageAsset>[0]) =>
+      attachImageAsset(tx, {
+        imageAssetId: asset.id,
+        ownerAccountId,
+        purpose: 'promotion',
+        now,
+      });
+
+    const first = prisma.$transaction(async (tx) => {
+      await attach(tx);
+      await pause(400);
+    });
+    await pause(100);
+    const second = prisma.$transaction((tx) => attach(tx));
+    const outcomes = await Promise.allSettled([first, second]);
+
+    expect(outcomes.map((outcome) => outcome.status)).toEqual([
+      'fulfilled',
+      'rejected',
+    ]);
+    expect((outcomes[1] as PromiseRejectedResult).reason).toBeInstanceOf(
+      ImageAssetNotAttachableError,
+    );
+  });
+
   it('refuses an image that is not ready, has another purpose, or belongs to someone else', async () => {
     const attach = (imageAssetId: string, owner = ownerAccountId) =>
       prisma.$transaction((tx) =>
