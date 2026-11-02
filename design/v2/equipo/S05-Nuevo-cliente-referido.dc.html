@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Nuevo cliente · con código de referido</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="S04-Buscar-cliente.dc.html" aria-label="Volver a Buscar cliente" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-family: Lora, Georgia, serif; font-size: 24px">Nuevo cliente</span>
+  </div>
+  <div style="flex-grow: 1; padding: 12px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Datos</span>
+      <div style="background: #F5EFE9; border-radius: 16px; display: flex; flex-direction: column">
+        <div style="padding: 10px 16px 6px; display: flex; flex-direction: column; gap: 2px"><label for="s05r-nombre" style="font-size: 13px; color: #6F6662">Nombre</label><input id="s05r-nombre" value="Sofía Paredes" style="height: 32px; padding: 0; border: none; background: transparent; color: #4A4A4A; font-family: inherit; font-size: 16px"></div>
+        <div style="height: 1px; background: #E6DBD0; margin-left: 16px"></div>
+        <div style="padding: 10px 16px 6px; display: flex; flex-direction: column; gap: 2px"><label for="s05r-correo" style="font-size: 13px; color: #6F6662">Correo electrónico</label><input id="s05r-correo" type="email" value="sofia.paredes@correo.com" style="height: 32px; padding: 0; border: none; background: transparent; color: #4A4A4A; font-family: inherit; font-size: 16px"></div>
+        <div style="height: 1px; background: #E6DBD0; margin-left: 16px"></div>
+        <div style="padding: 10px 16px 6px; display: flex; flex-direction: column; gap: 2px"><label for="s05r-tel" style="font-size: 13px; color: #6F6662">Teléfono (opcional)</label><input id="s05r-tel" type="tel" value="+591 700 00002" style="height: 32px; padding: 0; border: none; background: transparent; color: #4A4A4A; font-family: inherit; font-size: 16px"></div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">¿Cómo nos conoció?</span>
+      <div role="radiogroup" aria-label="¿Cómo nos conoció?" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <button role="radio" aria-checked="false" style="min-height: 48px; padding: 8px 12px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><rect x="4" y="4" width="16" height="16" rx="4.5"></rect><circle cx="12" cy="12" r="3.5"></circle></svg>Instagram</button>
+        <button role="radio" aria-checked="false" style="min-height: 48px; padding: 8px 12px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M14 4v10.5a3.5 3.5 0 1 1-3.5-3.5"></path><path d="M14 4c.5 2.5 2.3 4 5 4"></path></svg>TikTok</button>
+        <button role="radio" aria-checked="false" style="min-height: 48px; padding: 8px 12px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><circle cx="12" cy="12" r="8.5"></circle><path d="M13.5 20.5V11h3M10 13.5h6M16.5 7h-1.5a2 2 0 0 0-2 2v2"></path></svg>Facebook</button>
+        <button role="radio" aria-checked="false" style="min-height: 48px; padding: 8px 12px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" style="flex: none"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>Google</button>
+        <button role="radio" aria-checked="false" style="min-height: 48px; padding: 8px 12px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><circle cx="9" cy="8" r="3.5"></circle><path d="M3 20c.8-3.5 3.2-5.5 6-5.5s5.2 2 6 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5c1.6.7 2.6 2.6 3 5.5"></path></svg>Recomendación de una amiga</button>
+        <button role="radio" aria-checked="true" style="min-height: 48px; padding: 8px 12px; border: none; border-radius: 12px; background: #F2E4E1; color: #7D4F4B; font-family: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; text-align: left"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M12 4l2.4 5 5.3.6-4 3.6 1.1 5.3L12 15.8 7.2 18.5l1.1-5.3-4-3.6 5.3-.6z"></path></svg>Una instructora</button>
+        <button role="radio" aria-checked="false" style="min-height: 48px; padding: 8px 12px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M4 20.5h16M5.5 20.5V9l6.5-4.5L18.5 9v11.5M10 20.5v-5h4v5"></path></svg>Pasé por el estudio</button>
+        <button role="radio" aria-checked="false" style="min-height: 48px; padding: 8px 12px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="2.4" stroke-linecap="round" style="flex: none"><path d="M6 12h.01M12 12h.01M18 12h.01"></path></svg>Otro</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <label for="s05r-codigo" style="font-size: 14px; font-weight: 500">Código de la instructora (opcional)</label>
+        <input id="s05r-codigo" value="DANIELA" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #E6DBD0; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 16px; letter-spacing: 0.08em">
+      </div>
+    </div>
+  </div>
+  <div style="padding: 12px 20px 30px; display: flex; flex-direction: column; gap: 8px">
+    <span style="font-size: 13px; color: #6F6662; text-align: center">Le enviaremos un enlace de activación al correo. Vence en 7 días.</span>
+    <a href="S06-Cuenta-pendiente.dc.html" style="height: 52px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Crear cuenta</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Buscar cliente · sin resultados</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 60px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Asistente · Achumani</span>
+        <span style="font-family: Lora, Georgia, serif; font-size: 30px">Buscar cliente</span>
+      </div>
+      <a href="S20-Notificaciones.dc.html" aria-label="Notificaciones" style="width: 44px; height: 44px; border-radius: 999px; background: #F5EFE9; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg></a>
+    </div>
+    <div style="position: relative">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.6" stroke-linecap="round" style="position: absolute; left: 16px; top: 17px"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>
+      <label for="s04s-buscar" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar por nombre, teléfono o correo</label>
+      <input id="s04s-buscar" type="search" value="Rojas Vega" style="width: 100%; height: 52px; box-sizing: border-box; padding: 0 52px 0 44px; border: 1px solid #E6DBD0; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 16px">
+      <a href="S04-Buscar-cliente.dc.html" aria-label="Borrar búsqueda" style="position: absolute; right: 4px; top: 4px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+    </div>
+  </div>
+  <div style="flex-grow: 1; padding: 0 32px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center">
+    <div style="width: 72px; height: 72px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4M8.5 11h5"></path></svg></div>
+    <span style="font-family: Lora, Georgia, serif; font-size: 24px">No encontramos a nadie</span>
+    <span style="font-size: 15px; line-height: 1.5; color: #6F6662">Revisa cómo lo escribiste o crea una ficha nueva.</span>
+    <a href="S05-Nuevo-cliente.dc.html" style="margin-top: 8px; height: 52px; padding: 0 24px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Nuevo cliente</a>
+  </div>
+  <nav aria-label="Principal" style="height: 82px; padding-bottom: 18px; box-sizing: border-box; background: #F5EFE9; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center">
+    <a href="S04-Buscar-cliente.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #93615D; font-size: 12px; font-weight: 600; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"></circle><path d="M3 20c.8-3.5 3.2-5.5 6-5.5s5.2 2 6 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5c1.6.7 2.6 2.6 3 5.5"></path></svg>Clientes</a>
+    <a href="HOR-Horario-asistente.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>Horario</a>
+    <a href="S25-Cerrar-caja.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16v9.5H4zM6.5 10V5.5h11V10M9 14.5h6"></path></svg>Caja</a>
+    <a href="S23-Perfil-asistente.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"></circle><path d="M5 20c1-3.6 3.8-5.5 7-5.5s6 1.9 7 5.5"></path></svg>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

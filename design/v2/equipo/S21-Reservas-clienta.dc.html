@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reservas de la clienta</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="S06-Resumen-cliente.dc.html" aria-label="Volver a la ficha de Lucía" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-size: 16px; font-weight: 500">Lucía Fernández</span>
+  </div>
+  <div style="flex-grow: 1; padding: 8px 20px 24px; display: flex; flex-direction: column; gap: 24px">
+    <span style="font-family: Lora, Georgia, serif; font-size: 30px">Reservas de Lucía</span>
+    <div role="tablist" aria-label="Reservas" style="background: #F5EFE9; border-radius: 14px; padding: 4px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px">
+      <span role="tab" aria-selected="true" style="height: 40px; border-radius: 10px; background: #F2E4E1; box-shadow: inset 0 0 0 1.5px #B78380; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">Próximas</span>
+      <a href="S22-Historial.dc.html" role="tab" aria-selected="false" style="height: 40px; border-radius: 10px; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Historial</a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: #F2E4E1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7D4F4B; flex: none"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">Hoy</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">2</span></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, Georgia, serif; font-size: 20px">Reformer Principiante</span><span style="font-size: 13px; color: #6F6662">18:00 – 19:00 · faltan menos de 2 h 30</span></div>
+        </div>
+        <div style="height: 1px; background: #E6DBD0"></div>
+        <div style="display: flex; justify-content: flex-end"><a href="S07-Reservar-clase.dc.html" style="height: 44px; padding: 0 12px; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; text-decoration: none">Reprogramar</a></div>
+      </div>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: #F2E4E1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7D4F4B; flex: none"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">Mar</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">3</span></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, Georgia, serif; font-size: 20px">Mat Pilates</span><span style="font-size: 13px; color: #6F6662">09:30 – 10:30 · Daniela Ortiz</span></div>
+        </div>
+        <div style="height: 1px; background: #E6DBD0"></div>
+        <div style="display: flex; justify-content: flex-end"><a href="S21-Cancelar-reserva.dc.html" style="height: 44px; padding: 0 12px; color: #A04E3E; font-size: 15px; font-weight: 600; display: flex; align-items: center; text-decoration: none">Cancelar reserva</a></div>
+      </div>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: #F2E4E1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7D4F4B; flex: none"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">Sáb</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">7</span></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px"><span style="font-family: Lora, Georgia, serif; font-size: 20px">Reformer Intermedio</span><span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6F6662">09:00 – 10:00 <span style="padding: 2px 8px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-size: 12px; font-weight: 600">2.ª en espera</span></span></div>
+        </div>
+        <div style="height: 1px; background: #E6DBD0"></div>
+        <div style="display: flex; justify-content: flex-end"><button style="height: 44px; padding: 0 12px; border: none; background: transparent; color: #A04E3E; font-family: inherit; font-size: 15px; font-weight: 600">Salir de la lista</button></div>
+      </div>
+    </div>
+  </div>
+  <div role="status" style="position: absolute; left: 20px; right: 20px; bottom: 34px; background: #93615D; border-radius: 14px; padding: 12px 8px 12px 16px; display: flex; align-items: center; gap: 12px; color: #FFFFFF; box-shadow: 0 8px 24px rgba(74,74,74,0.18)">
+    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">Reserva confirmada</span><span style="font-size: 13px; color: rgba(255,255,255,0.85)">Mat Pilates, martes 3 · 09:30. Le quedan 7 clases.</span></div>
+    <button aria-label="Cerrar aviso" style="width: 44px; height: 44px; border: none; background: transparent; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

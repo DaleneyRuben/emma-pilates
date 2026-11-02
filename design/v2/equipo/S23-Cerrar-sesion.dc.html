@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cerrar sesión</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative">
+  <div aria-hidden="true" style="padding: 60px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <span style="font-family: Lora, Georgia, serif; font-size: 30px">Perfil</span>
+    <div style="display: flex; align-items: center; gap: 16px">
+      <div style="width: 56px; height: 56px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-family: Lora, Georgia, serif; font-size: 20px; display: flex; align-items: center; justify-content: center">DO</div>
+      <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, Georgia, serif; font-size: 20px">Daniela Ortiz</span><span style="font-size: 14px; color: #6F6662">daniela.ortiz@emmapilates.bo</span></div>
+    </div>
+    <div style="height: 112px; background: #F5EFE9; border-radius: 16px"></div>
+    <div style="height: 280px; background: #F5EFE9; border-radius: 16px"></div>
+  </div>
+  <div style="position: absolute; inset: 0; background: rgba(74,74,74,0.45)"></div>
+  <div role="dialog" aria-modal="true" aria-labelledby="s23-hoja" style="position: absolute; left: 0; right: 0; bottom: 0; background: #FAF7F2; border-radius: 24px 24px 0 0; padding: 12px 20px 34px; display: flex; flex-direction: column; gap: 12px">
+    <div style="width: 36px; height: 4px; border-radius: 999px; background: #E6DBD0; align-self: center"></div>
+    <span id="s23-hoja" style="margin-top: 12px; font-family: Lora, Georgia, serif; font-size: 24px">¿Cerrar sesión?</span>
+    <span style="font-size: 15px; line-height: 1.5; color: #6F6662">Vuelves al inicio de sesión y tendrás que entrar de nuevo con tu correo y contraseña.</span>
+    <a href="S01-Iniciar-sesion.dc.html" style="margin-top: 12px; height: 52px; border-radius: 14px; background: #A04E3E; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Cerrar sesión</a>
+    <a href="S23-Perfil.dc.html" style="height: 44px; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Cancelar</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

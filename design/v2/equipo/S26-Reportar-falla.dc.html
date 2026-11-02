@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reportar una falla</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="S03-Lista-asistentes.dc.html" aria-label="Volver a la lista" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-size: 16px; font-weight: 500">Reformer Intermedio · 07:00</span>
+  </div>
+  <div style="flex-grow: 1; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: Lora, Georgia, serif; font-size: 30px">Reportar una falla</span>
+      <span style="font-size: 14px; color: #6F6662">Equipos de la sucursal Achumani</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">¿Qué equipo?</span>
+      <div role="tablist" aria-label="Tipo de equipo" style="background: #F5EFE9; border-radius: 14px; padding: 4px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
+        <button role="tab" aria-selected="true" style="height: 40px; border: none; border-radius: 10px; background: #F2E4E1; box-shadow: inset 0 0 0 1.5px #B78380; color: #7D4F4B; font-family: inherit; font-size: 15px; font-weight: 600">Reformers</button>
+        <button role="tab" aria-selected="false" style="height: 40px; border: none; border-radius: 10px; background: transparent; color: #7D4F4B; font-family: inherit; font-size: 15px; font-weight: 600">Cadillacs</button>
+        <button role="tab" aria-selected="false" style="height: 40px; border: none; border-radius: 10px; background: transparent; color: #7D4F4B; font-family: inherit; font-size: 15px; font-weight: 600">Mats</button>
+      </div>
+      <div role="radiogroup" aria-label="Reformers" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+        <button role="radio" aria-checked="false" style="height: 48px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 15px">1</button>
+        <button role="radio" aria-checked="false" style="height: 48px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 15px">2</button>
+        <button role="radio" aria-checked="true" style="height: 48px; border: none; border-radius: 12px; background: #B78380; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600">3</button>
+        <button role="radio" aria-checked="false" style="height: 48px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 15px">4</button>
+        <button role="radio" aria-checked="false" aria-label="Reformer 5, fuera de servicio" style="height: 48px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span>5</span><span style="font-size: 11px; color: #A04E3E">fuera de servicio</span></button>
+        <button role="radio" aria-checked="false" style="height: 48px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 15px">6</button>
+        <button role="radio" aria-checked="false" style="height: 48px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 15px">7</button>
+        <button role="radio" aria-checked="false" style="height: 48px; border: none; border-radius: 12px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 15px">8</button>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="s26-que" style="font-size: 14px; font-weight: 500">¿Qué pasó?</label>
+      <textarea id="s26-que" style="height: 96px; box-sizing: border-box; padding: 14px 16px; border: 1px solid #E6DBD0; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 16px; line-height: 1.5; resize: none">El resorte rojo se soltó y la plataforma no frena.</textarea>
+    </div>
+    <label style="background: #F5EFE9; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+      <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px">No se puede usar</span><span style="font-size: 13px; color: #6F6662">Nadie debería usarlo hasta que lo arreglen.</span></span>
+      <input type="checkbox" role="switch" checked style="width: 44px; height: 26px; accent-color: #B78380">
+    </label>
+  </div>
+  <div style="padding: 12px 20px 30px">
+    <a href="S26-Reporte-enviado.dc.html" style="height: 52px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Enviar reporte</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
