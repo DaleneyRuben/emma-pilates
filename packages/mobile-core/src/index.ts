@@ -56,6 +56,7 @@ export * from "./ui/button-label";
 export * from "./ui/chevron";
 export * from "./ui/confirmation-sheet";
 export * from "./ui/detail-line";
+export * from "./ui/emphasis-card";
 export * from "./ui/empty-state";
 export * from "./ui/fonts";
 export * from "./ui/form-field";
