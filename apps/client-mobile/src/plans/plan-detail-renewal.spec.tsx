@@ -38,7 +38,7 @@ const renewFrom = async (view: object) => {
     { timeout: 10_000 },
   );
   await fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
-  await fireEvent.press(await screen.findByRole("button", { name: "Renovar plan" }));
+  await fireEvent.press(await screen.findByRole("button", { name: "Renovar mi plan" }));
   await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
   expect(await screen.findByText("Desglose")).toBeOnTheScreen();
   return { created, screen };

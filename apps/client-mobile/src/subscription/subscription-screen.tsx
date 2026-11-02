@@ -206,7 +206,7 @@ export function SubscriptionScreen() {
           </View>
         ) : (
           <View style={styles.purchase}>
-            <PrimaryButton label="Renovar plan" onPress={() => navigation.navigate("Plans")} />
+            <PrimaryButton label="Renovar mi plan" onPress={() => navigation.navigate("Plans")} />
           </View>
         )}
       </ScrollView>
