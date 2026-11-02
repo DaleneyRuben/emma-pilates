@@ -213,6 +213,10 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.queryByText("Carla Mendoza")).not.toBeOnTheScreen();
     });
     expect(screen.getByText("Andrea Roca")).toBeOnTheScreen();
+    // Follow-up 225 §7: the toast stays until its × closes it.
+    expect(screen.getByText("Pago confirmado")).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar aviso" }));
+    await waitFor(() => expect(screen.queryByText("Pago confirmado")).toBeNull());
     expect(screen.getByText("Bs 780 en total")).toBeOnTheScreen();
   });
 

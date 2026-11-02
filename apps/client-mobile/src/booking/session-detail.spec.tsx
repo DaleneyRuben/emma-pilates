@@ -162,6 +162,9 @@ describe("Client Session detail", () => {
     });
     expect(booked).toHaveBeenCalledWith(expect.stringMatching(/^[0-9a-f-]{36}$/));
     expect(screen.getByText("Te quedan 4 clases en tu plan")).toBeOnTheScreen();
+    // Follow-up 225 §7: the toast stays until its × closes it.
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar aviso" }));
+    await waitFor(() => expect(screen.queryByText("Reserva confirmada")).toBeNull());
   });
 
   it("does not count plan classes after a guest pass booking", async () => {
