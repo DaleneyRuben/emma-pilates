@@ -66,7 +66,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S26](./staff/26-trainer-report-fault.md) | Reportar una falla (Entrenadora) | `S26` | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
 | [S27](./staff/27-send-feedback.md) | Enviar comentarios (todos los roles) | `S27` | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 | [S28](./staff/28-coordinator-contact-list.md) | Para contactar (Coordinación) | `S28` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
-| [S29](./staff/29-trainer-my-pay.md) | Mis pagos (Entrenadora) | `S29` | 🕓 pending |
+| [S29](./staff/29-trainer-my-pay.md) | Mis pagos (Entrenadora) | `S29` | ✅ applied (Claude Design canvas, 2026-11-02, `4c565207`) |
 
 ## Admin web (`admin-web/`)
 
@@ -253,7 +253,7 @@ Each of these was sent as the next message in the existing design session for th
 | [221](./followups/221-finanzas-salaries.md) | `AW16` Finanzas: «Resultado» subtracts salaries («…gastos, sueldos y nutricionista»), a «Sueldos pagados» line, and «Coordinadora» / «Recepción» filled from their Salary Payments (FIX-007, H10); Finanzas is not drawn yet, so this joins 208 when it is | 🕓 pending |
 | [222](./followups/222-simulator-split-prices.md) | The Simulador splits «Precio por clase para la clienta» from the Trainer's pay («Pago por clase a la instructora», «Alumnas incluidas en el pago», «Pago por alumna extra») (FIX-008); joins 202 and 205 when the page is first drawn | 🕓 pending |
 | [223](./followups/223-s10-renewal-fixed-start.md) | `S10` gains «iOS · Renovación con clases»: the same renewal shows «El nuevo plan empieza el {date}, al terminar el actual.» in place of the «Fecha de inicio» chips, and the footnote says «El plan queda programado para esa fecha.» (FIX-019 item 1) | 🕓 pending |
-| [224](./followups/224-mis-pagos-and-salary-receipts.md) | `S23`'s Trainer frames gain «Mis pagos» above «Notificaciones» (applies 202 §2's S23 half); `AW12` gains an optional «Comprobante» photo; `AW11` gains a «Comprobante» column | 🕓 pending |
+| [224](./followups/224-mis-pagos-and-salary-receipts.md) | `S23`'s Trainer frames gain «Mis pagos» above «Notificaciones» (applies 202 §2's S23 half); `AW12` gains an optional «Comprobante» photo; `AW11` gains a «Comprobante» column | ✅ applied (Claude Design canvas, 2026-11-02, `6d299fd4`; the AW11/AW12 receipt waits for the owner's migration approval) |
 
 | [130](./followups/130-aw33-studio-rules-entry.md) | `AW33`'s menu gains a first row «Reglas del estudio» that opens the new `AW36` (BKM-004, ADR-0101), above «Cambiar contraseña»; the README gains the `AW36` row and the `AW33 → AW36` navigation | ✅ applied (Claude Design canvas, 2026-10-23, `55bbe4cc`, with `AW36`; the admin web is built in BKM-004) |
 | [131](./followups/131-rules-copy-from-studio-settings.md) | README only: «Studio rules in copy» says the «2 h 30» of `05`/`09`/`S21`/`AW03` and `02`'s «Paquetes desde» price are Studio Settings values read from the API, with what each screen shows while they are unknown; no numbered screen changes (BKM-004, ADR-0101) | ✅ applied (README only, same canvas and commit `55bbe4cc`; the apps are built in BKM-004) |
@@ -306,7 +306,7 @@ Each of these was sent as the next message in the existing design session for th
 | [206](./followups/199-evaluation-price-and-history.md) | `13` and `14` name an included Evaluation or the settings price; `15` stops saying every past Evaluation is «Realizada» (NUT-003) | 🕓 pending |
 | [207](./followups/200-evaluation-income-apart.md) | `AW16` splits Plan income and Evaluation income under the method line (NUT-003) | 🕓 pending |
 | [208](./followups/201-aw16-finanzas-tab.md) | `AW16` gains Reporte and Finanzas tabs; Finanzas shows the month's cash income, tax, budget against actual, Nutritionist cost, result, and break-even (BKO-005) | 🕓 pending |
-| [209](./followups/202-trainer-pay-statements.md) | A new «Pagos a instructoras» page beside `AW11`, and «Mis pagos» on the Trainer frame of `S23` (BKO-006) | 🕓 pending |
+| [209](./followups/202-trainer-pay-statements.md) | A new «Pagos a instructoras» page beside `AW11`, and «Mis pagos» on the Trainer frame of `S23` (BKO-006) | ⚠️ superseded for `S23` by [224](./followups/224-mis-pagos-and-salary-receipts.md) and S29; the admin «Pagos a instructoras» page was built from the text and stays undrawn |
 | [210](./followups/202-sidebar-simulador.md) | The admin sidebar and the design-system sample gain **Simulador** after **Reporte** (STU-004; AW37 is Equipos, so the page is AW42) | 🕓 pending |
 | [211](./followups/204-sidebar-indicadores.md) | The sidebar gains **Indicadores** after **Reporte** (STU-003). AW39 is Para contactar, so the page is AW43. 110–114 and 190–210 are reserved by sibling branches | 🕓 pending |
 | [212](./followups/205-aw37-proyeccion.md) | Simulador (`AW42`; AW37 is Equipos) gains a **Proyección** table under the derivation: 3, 6, and 12 months, Bajo, Base, and Alto (STU-005) | 🕓 pending |
