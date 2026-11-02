@@ -74,10 +74,15 @@ function createFetcher(pages: unknown[]) {
   }) as unknown as jest.Mock & typeof globalThis.fetch;
 }
 
-async function renderScreen(fetcher: typeof globalThis.fetch, onOpen = jest.fn()) {
+async function renderScreen(
+  fetcher: typeof globalThis.fetch,
+  onOpen = jest.fn(),
+  emptyAction?: { label: string; onPress: () => void },
+) {
   const screen = await render(
     <MobileQueryProvider>
       <NotificationsScreen
+        emptyAction={emptyAction}
         emptySupport="Aquí te avisaremos sobre tus clases, pagos y evaluaciones."
         fetcher={fetcher}
         now={now}
@@ -173,6 +178,18 @@ describe("NotificationsScreen", () => {
       expect(screen.queryByRole("button", { name: "Marcar leídas" })).not.toBeOnTheScreen();
     });
     expect(screen.queryByText("Sin leer")).not.toBeOnTheScreen();
+  });
+
+  it("offers the app's own action from the empty state (C19b)", async () => {
+    const onPress = jest.fn();
+    const screen = await renderScreen(
+      createFetcher([{ items: [], hasMore: false, nextCursor: null }]),
+      jest.fn(),
+      { label: "Volver al inicio", onPress },
+    );
+
+    await fireEvent.press(await screen.findByRole("button", { name: "Volver al inicio" }));
+    expect(onPress).toHaveBeenCalled();
   });
 
   it("shows the empty state without the mark-all action", async () => {
