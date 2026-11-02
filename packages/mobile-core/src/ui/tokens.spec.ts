@@ -1,22 +1,37 @@
 import { colors, radii, shadows, surfaces, typography } from "./tokens";
 
-// Follow-up 70: the quiet text tones meet AA (4.5:1) on Blanco and Superficie
-// sutil, and text on Palo de rosa tinte has its own deeper tone.
-describe("colour tokens (follow-up 70)", () => {
-  it("darkens the two quiet text tones", () => {
-    expect(colors.textMuted).toBe("#766D69");
-    expect(colors.textSubtle).toBe("#7A716D");
+// Follow-up 225 (visual system v2): Lino replaces Blanco as the surface,
+// Rosa profundo is the one emphasis, and the quiet tones meet AA on Lino.
+describe("colour tokens (follow-up 225)", () => {
+  it("names Lino, Rosa tinte and Rosa profundo", () => {
+    expect(colors.card).toBe("#F5EFE9");
+    expect(colors.primaryTint).toBe("#F2E4E1");
+    expect(colors.emphasis).toBe("#93615D");
   });
 
-  it("names the text tone for Palo de rosa tinte", () => {
-    expect(colors.primaryTint).toBe("#EFE0DC");
-    expect(colors.primaryOnTint).toBe("#7A4F4B");
+  it("darkens the quiet text tones for Lino", () => {
+    expect(colors.textMuted).toBe("#6F6662");
+    expect(colors.textSecondary).toBe("#6F6662");
+  });
+
+  it("names Rosa enlace for text buttons and text on Rosa tinte", () => {
+    expect(colors.primaryOnTint).toBe("#7D4F4B");
+  });
+
+  it("deepens Error for destructive labels and names its tint", () => {
+    expect(colors.error).toBe("#A04E3E");
+    expect(colors.errorText).toBe("#A04E3E");
+    expect(colors.errorSurface).toBe("#F7E5E0");
+  });
+
+  it("names the Arena hairline", () => {
+    expect(colors.hairline).toBe("#E6DBD0");
   });
 });
 
-// MOB-039: the mobile frames draw every card on Blanco with a 1 px Borde
-// fuerte, radius 16, and a soft shadow; chips, notices, and insets keep 12.
-describe("card tokens (MOB-039)", () => {
+// Follow-up 225 replaces MOB-039's Blanco card: cards are Lino with no border
+// and no shadow; chips, notices, and insets keep 12.
+describe("card tokens (follow-up 225)", () => {
   it("rounds cards at 16 and insets at 12", () => {
     expect(radii.card).toBe(16);
     expect(radii.inset).toBe(12);
@@ -32,20 +47,13 @@ describe("card tokens (MOB-039)", () => {
     });
   });
 
-  it("shares one card surface, with and without the shadow", () => {
-    expect(surfaces.card).toEqual({
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
-      borderRadius: 16,
-      borderWidth: 1,
-      ...shadows.card,
-    });
-    expect(surfaces.flatCard).toEqual({
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
-      borderRadius: 16,
-      borderWidth: 1,
-    });
+  it("draws every card on Lino, without border or shadow", () => {
+    expect(surfaces.card).toEqual({ backgroundColor: "#F5EFE9", borderRadius: 16 });
+    expect(surfaces.flatCard).toEqual({ backgroundColor: "#F5EFE9", borderRadius: 16 });
+  });
+
+  it("rounds the emphasis card at 20 on Rosa profundo", () => {
+    expect(surfaces.emphasis).toEqual({ backgroundColor: "#93615D", borderRadius: 20 });
   });
 
   it("names the empty states' sizes and wash", () => {
