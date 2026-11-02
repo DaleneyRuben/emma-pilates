@@ -1,4 +1,4 @@
-import { cleanup, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -43,6 +43,28 @@ describe("Client unread badges", () => {
     expect(
       screen.queryByTestId("profile-tab-badge", { includeHiddenElements: true }),
     ).not.toBeOnTheScreen();
+  });
+
+  it("leads back to Inicio from the empty inbox (C19b)", async () => {
+    const screen = await render(
+      <App
+        runtime={createClientRuntime(
+          routeFetcher({
+            ...readRoutes,
+            "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
+            "/api/v1/notifications?limit=50": () =>
+              jsonResponse({ items: [], hasMore: false, nextCursor: null }),
+          }),
+        )}
+      />,
+    );
+
+    await fireEvent.press(await screen.findByRole("button", { name: "Notificaciones" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Volver al inicio" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
+    });
   });
 
   it("names the bell without a count at zero", async () => {
