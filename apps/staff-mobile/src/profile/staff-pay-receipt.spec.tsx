@@ -55,9 +55,7 @@ describe("Staff Mis pagos receipts", () => {
 
     await waitFor(() => expect(asked).toContain("readable"));
     expect(
-      await screen.findByText("Pago del 1 de noviembre de 2026", undefined, {
-        includeHiddenElements: true,
-      }),
+      await screen.findByText("Pago del 1 de noviembre de 2026", { includeHiddenElements: true }),
     ).toBeTruthy();
     expect(screen.getByTestId("full-screen-image")).toBeTruthy();
   });
