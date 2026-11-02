@@ -6,7 +6,6 @@ import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support"
 
 jest.setTimeout(20_000);
 
-
 const administrator = {
   id: "staff-2",
   name: "Paola Mendoza",
