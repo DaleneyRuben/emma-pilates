@@ -225,9 +225,9 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByText("Reprogramar clase")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByText("Puedes cambiar a otra clase disponible el mismo día."),
-    ).toBeOnTheScreen();
+    // C06: the current booking is marked as replaced, the others are «de hoy».
+    expect(screen.getByText("Se reemplaza")).toBeOnTheScreen();
+    expect(screen.getByText("Otras clases de hoy")).toBeOnTheScreen();
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
