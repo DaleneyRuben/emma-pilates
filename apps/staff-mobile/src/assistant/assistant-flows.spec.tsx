@@ -365,7 +365,7 @@ describe("Assistant Client flows", () => {
       expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText("Enviaremos un enlace de activación al correo. Vence en 7 días."),
+      screen.getByText("Le enviaremos un enlace de activación al correo. Vence en 7 días."),
     ).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Nombre"), " Ana Nueva ");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "Ana@Example.com");

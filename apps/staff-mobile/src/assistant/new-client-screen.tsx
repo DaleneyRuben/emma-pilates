@@ -1,16 +1,16 @@
 import {
-  AcquisitionChannelField,
   acquisitionChannelRequired,
   type AcquisitionChannelChoice,
-  BackLink,
-  BodyText,
   colors,
+  fontFamilies,
   formatCountdown,
   FormField,
   FormScrollView,
-  Heading,
+  IconRowGroup,
+  NoticeRow,
   PrimaryButton,
   Screen,
+  SectionTitle,
   spacing,
   typography,
   useCountdown,
@@ -18,9 +18,11 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { BackBar } from "../ui/back-bar";
+import { GroupedField } from "../ui/grouped-field";
 import { CenteredCard } from "./assistant-layout";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import {
@@ -29,6 +31,7 @@ import {
   limitedEmailMessage,
 } from "./assistant-format";
 import { useAssistantWorkspace } from "./assistant-workspace";
+import { ChannelGrid } from "./channel-grid";
 import { SelfRegisteredNotice } from "./self-registered-notice";
 
 type NewClientNavigation = {
@@ -39,6 +42,12 @@ type NewClientNavigation = {
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Walkthrough 20: only a trainer or a friend hands over a code.
+const referralLabels: Partial<Record<AcquisitionChannelChoice, string>> = {
+  friend: "Código de la amiga (opcional)",
+  trainer: "Código de la instructora (opcional)",
+};
 
 const problemOf = (error: unknown) => (error instanceof AssistantApiError ? error : null);
 
@@ -90,7 +99,7 @@ export function NewClientScreen() {
     setCodeUnknown(false);
     if (name.trim().length === 0 || !emailPattern.test(email.trim()) || channel === null) return;
     setSubmitting(true);
-    const code = referralCode.trim();
+    const code = referralLabels[channel] === undefined ? "" : referralCode.trim();
     try {
       const result = await api.inviteClient({
         name: name.trim(),
@@ -124,12 +133,43 @@ export function NewClientScreen() {
     }
   };
 
+  const referralLabel = channel === null ? undefined : referralLabels[channel];
+  const footer =
+    selfRegistered !== null ? undefined : (
+      <View style={styles.footer}>
+        {failure !== null ? (
+          failure === limitedEmailMessage ? (
+            <Text accessibilityRole="alert" style={styles.note}>
+              {failure}
+            </Text>
+          ) : (
+            <View accessibilityRole="alert">
+              <NoticeRow message={failure} />
+            </View>
+          )
+        ) : null}
+        {waitSeconds > 0 && !accountLimited ? (
+          <Text style={styles.note}>{`Podrás intentarlo en ${formatCountdown(waitSeconds)}.`}</Text>
+        ) : (
+          <Text style={styles.note}>
+            Le enviaremos un enlace de activación al correo. Vence en 7 días.
+          </Text>
+        )}
+        <PrimaryButton
+          busy={submitting}
+          disabled={waitSeconds > 0}
+          label="Crear cuenta"
+          onPress={() => void create()}
+          testID="new-client-submit"
+        />
+      </View>
+    );
+
   return (
     <Screen style={styles.screen}>
       <CenteredCard maxWidth={560}>
-        <BackLink onPress={() => navigation.goBack()} />
-        <Heading accessibilityLabel="Nuevo cliente">Nuevo cliente</Heading>
-        <FormScrollView contentContainerStyle={styles.form}>
+        <BackBar onBack={() => navigation.goBack()} title="Nuevo cliente" />
+        <FormScrollView contentContainerStyle={styles.form} footer={footer}>
           {selfRegistered !== null ? (
             <SelfRegisteredNotice
               clientId={selfRegistered.clientId}
@@ -145,76 +185,69 @@ export function NewClientScreen() {
                   waitLabel="Podrás intentarlo en"
                 />
               ) : null}
-              <FormField
-                autoCapitalize="words"
-                error={nameError}
-                label="Nombre"
-                onChangeText={setName}
-                placeholder="Nombre y apellido"
-                testID="new-client-name"
-                value={name}
-              />
-              <FormField
-                autoCapitalize="none"
-                autoCorrect={false}
-                error={emailError}
-                keyboardType="email-address"
-                label="Correo electrónico"
-                onChangeText={(value) => {
-                  setEmail(value);
-                  setEmailInUse(false);
-                }}
-                placeholder="correo@ejemplo.com"
-                testID="new-client-email"
-                value={email}
-              />
-              <FormField
-                keyboardType="phone-pad"
-                label="Teléfono (opcional)"
-                onChangeText={setPhone}
-                placeholder="+591 700 00000"
-                testID="new-client-phone"
-                value={phone}
-              />
-              <AcquisitionChannelField error={channelError} onChange={setChannel} value={channel} />
-              <FormField
-                autoCapitalize="characters"
-                autoCorrect={false}
-                error={
-                  codeUnknown ? "No encontramos ese código. Revísalo o déjalo vacío." : undefined
-                }
-                label="Código de referido (opcional)"
-                onChangeText={(value) => {
-                  setReferralCode(value);
-                  setCodeUnknown(false);
-                }}
-                placeholder="De una clienta o de una instructora"
-                testID="new-client-referral-code"
-                value={referralCode}
-              />
-              <BodyText style={styles.note}>
-                Enviaremos un enlace de activación al correo. Vence en 7 días.
-              </BodyText>
-              {failure !== null ? (
-                <BodyText
-                  accessibilityRole="alert"
-                  style={failure === limitedEmailMessage ? undefined : styles.failure}
-                >
-                  {failure}
-                </BodyText>
-              ) : null}
-              {waitSeconds > 0 && !accountLimited ? (
-                <BodyText style={styles.note}>
-                  {`Podrás intentarlo en ${formatCountdown(waitSeconds)}.`}
-                </BodyText>
-              ) : null}
-              <PrimaryButton
-                busy={submitting}
-                disabled={waitSeconds > 0}
-                label="Crear cuenta"
-                onPress={() => void create()}
-                testID="new-client-submit"
-              />
+              <View>
+                <SectionTitle>Datos</SectionTitle>
+                <IconRowGroup>
+                  <GroupedField
+                    autoCapitalize="words"
+                    error={nameError}
+                    label="Nombre"
+                    onChangeText={setName}
+                    placeholder="Nombre y apellido"
+                    testID="new-client-name"
+                    value={name}
+                  />
+                  <GroupedField
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    error={emailError}
+                    keyboardType="email-address"
+                    label="Correo electrónico"
+                    onChangeText={(value) => {
+                      setEmail(value);
+                      setEmailInUse(false);
+                    }}
+                    placeholder="correo@ejemplo.com"
+                    testID="new-client-email"
+                    value={email}
+                  />
+                  <GroupedField
+                    keyboardType="phone-pad"
+                    label="Teléfono (opcional)"
+                    onChangeText={setPhone}
+                    placeholder="+591 700 00000"
+                    testID="new-client-phone"
+                    value={phone}
+                  />
+                </IconRowGroup>
+              </View>
+              <View style={styles.channel}>
+                <SectionTitle>¿Cómo nos conoció?</SectionTitle>
+                <ChannelGrid
+                  error={channelError}
+                  label="¿Cómo nos conoció?"
+                  onChange={setChannel}
+                  value={channel}
+                />
+                {referralLabel === undefined ? null : (
+                  <FormField
+                    autoCapitalize="characters"
+                    autoCorrect={false}
+                    error={
+                      codeUnknown
+                        ? "No encontramos ese código. Revísalo o déjalo vacío."
+                        : undefined
+                    }
+                    label={referralLabel}
+                    onChangeText={(value) => {
+                      setReferralCode(value);
+                      setCodeUnknown(false);
+                    }}
+                    testID="new-client-referral-code"
+                    value={referralCode}
+                  />
+                )}
+              </View>
             </>
           )}
         </FormScrollView>
@@ -224,8 +257,14 @@ export function NewClientScreen() {
 }
 
 const styles = StyleSheet.create({
-  failure: { color: colors.errorText },
-  form: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  note: { color: colors.textMuted, fontSize: typography.note },
-  screen: { gap: spacing.md },
+  channel: { gap: spacing.md },
+  footer: { gap: spacing.sm, paddingTop: spacing.md },
+  form: { gap: spacing.xl, paddingBottom: spacing.xl },
+  note: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    textAlign: "center",
+  },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
 });
