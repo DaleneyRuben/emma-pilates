@@ -3076,8 +3076,8 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    **Cambiar**. To add one to a payment already recorded, open it and only
    upload the photo; **Guardar** sends it. A replaced photo stays in the
    audit record. The table's **Comprobante** column shows **Ver**, which
-   opens the photo enlarged, or «—»; at 420 px the column scrolls with the
-   table. The Staff Member it pays sees it in «Mis pagos» (Test 95).
+   opens the photo enlarged, or «—»; at 420 px each payment card gains a
+   **Comprobante** line with the same **Ver** or «—». The Staff Member it pays sees it in «Mis pagos» (Test 95).
 8. **Gastos.** Back Office → **Gastos** lists the selected Branch's Expenses
    with a **Categoría** filter. **+ Nuevo gasto** says which Branch it is
    recorded in ("Se registra en la sucursal Centro."), and **+ Nueva
