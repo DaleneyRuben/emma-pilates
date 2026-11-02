@@ -60,13 +60,18 @@ describe("Staff Mis pagos receipts", () => {
     expect(screen.getByTestId("full-screen-image")).toBeTruthy();
   });
 
-  it("says so when the receipt cannot be shown", async () => {
+  it("says so when the receipt cannot be shown, and tries again on a tap", async () => {
+    let readable = 0;
     const screen = await openMyPay({
       payments,
       extra: {
         [`${receiptUrl}?variant=thumbnail`]: () => png(),
-        [`${receiptUrl}?variant=readable`]: () =>
-          jsonResponse({ code: "salary_receipt_not_found", status: 404 }, 404),
+        [`${receiptUrl}?variant=readable`]: () => {
+          readable += 1;
+          return readable === 1
+            ? jsonResponse({ code: "internal_error", status: 500 }, 500)
+            : png();
+        },
       },
     });
 
@@ -78,5 +83,11 @@ describe("Staff Mis pagos receipts", () => {
     await fireEvent.press(row);
 
     expect(await screen.findByText("No pudimos mostrar el comprobante.")).toBeOnTheScreen();
+    await fireEvent.press(row);
+    await waitFor(() => expect(readable).toBe(2));
+    expect(
+      await screen.findByText("Pago del 1 de noviembre de 2026", { includeHiddenElements: true }),
+    ).toBeTruthy();
+    expect(screen.queryByText("No pudimos mostrar el comprobante.")).toBeNull();
   });
 });
