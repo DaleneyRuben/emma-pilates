@@ -34,3 +34,15 @@ env:
       - takeScreenshot: mob073-ver-cada-clase
       - tapOn: "Ocultar detalle"
       - assertVisible: "Ver cada clase"
+# BKO-008: a payment with a receipt opens it full screen.
+- runFlow:
+    when:
+      visible: "Ver el comprobante del pago.*"
+    commands:
+      - tapOn: "Ver el comprobante del pago.*"
+      - extendedWaitUntil:
+          visible: "Pago del .*"
+          timeout: 15000
+      - takeScreenshot: bko008-comprobante
+      - tapOn: "Cerrar"
+      - assertVisible: "Pagos recibidos"
