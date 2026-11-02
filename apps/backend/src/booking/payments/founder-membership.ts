@@ -23,7 +23,12 @@ export type FounderMembershipFlag = { status: FounderStatus } | null;
 export const isFounder = (membership: FounderMembershipFlag): boolean =>
   membership?.status === 'active';
 
-// Half up to the nearest centavo, computed once and stored on the Payment.
+const centavosPerBoliviano = 100;
+
+// The studio charges whole bolivianos (FIX-025, owner 2026-11-02): the
+// discounted price is rounded to the nearest boliviano, ,50 up, and the
+// discount is the rest of the list price. Computed once and stored on the
+// Payment, so the quote, the QR amount, and the cash close agree.
 export const founderDiscount = (input: {
   classAllowance: number;
   priceCentavos: number;
@@ -32,12 +37,14 @@ export const founderDiscount = (input: {
   if (input.classAllowance <= singleClassAllowance) {
     return { discountCentavos: 0, amountDueCentavos: input.priceCentavos };
   }
-  const discountCentavos = Math.round(
-    (input.priceCentavos * input.percent) / 100,
-  );
+  const amountDueCentavos =
+    Math.round(
+      (input.priceCentavos * (100 - input.percent)) /
+        (100 * centavosPerBoliviano),
+    ) * centavosPerBoliviano;
   return {
-    discountCentavos,
-    amountDueCentavos: input.priceCentavos - discountCentavos,
+    discountCentavos: input.priceCentavos - amountDueCentavos,
+    amountDueCentavos,
   };
 };
 
