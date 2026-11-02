@@ -23,29 +23,23 @@ describe("Assistant rows", () => {
     clearMobileQueryCache();
   });
 
-  it("draws the search result with the avatar and the chevron", async () => {
+  it("draws the search result as a v2 person row in a Lino group", async () => {
     const screen = await openClientSearch(assistantRoutes());
 
-    await fireEvent.changeText(
-      screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
-      "luc",
-    );
+    await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen();
     });
 
     const row = screen.getByRole("button", { name: "Ver cliente Lucía Fernández" });
-    expect(row).toHaveStyle({ alignItems: "center", flexDirection: "row", gap: 14 });
-    expect(screen.getByTestId("avatar-circle")).toHaveStyle({ height: 42, width: 42 });
-    expect(screen.getByText("L")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 16 });
+    expect(row).toHaveStyle({ alignItems: "center", flexDirection: "row", minHeight: 64 });
+    expect(screen.getByText("LF")).toHaveStyle({ fontFamily: "Lora_400Regular" });
     expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
     expect(screen.getByText("+591 70011001 · lucia@example.com")).toHaveStyle({
       color: "#6F6662",
       fontSize: 13,
     });
-    const chevron = screen.getByTestId("chevron", hidden);
-    expect(chevron).toHaveProp("stroke", "#B78380");
-    expect(chevron).toHaveProp("width", 19);
+    expect(screen.getByTestId("chevron", hidden)).toHaveProp("stroke", "#6F6662");
   });
 
   it("draws the picker pill and the Session card on the booking screen", async () => {

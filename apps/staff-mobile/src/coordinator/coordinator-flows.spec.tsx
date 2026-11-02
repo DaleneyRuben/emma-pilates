@@ -51,10 +51,7 @@ async function openClient(
   query: string,
   name: string,
 ) {
-  await fireEvent.changeText(
-    screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
-    query,
-  );
+  await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), query);
   await waitFor(() => {
     expect(screen.getByRole("button", { name: `Ver cliente ${name}` })).toBeOnTheScreen();
   });

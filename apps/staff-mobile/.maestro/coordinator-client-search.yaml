@@ -9,7 +9,8 @@ env:
     visible: "Tu cuenta.*"
     timeout: 30000
 - runFlow: subflows/park-dev-gear.yaml
-- assertNotVisible: "+ Nuevo cliente"
+- assertNotVisible:
+    id: "client-search-new-client"
 - assertVisible: "Cancelar una clase"
 - takeScreenshot: staff-coordinator-search
 - tapOn: "Cancelar una clase"
@@ -19,9 +20,11 @@ env:
 - takeScreenshot: staff-coordinator-cancel-class
 - tapOn: "Volver"
 - extendedWaitUntil:
-    visible: "Buscar por nombre, teléfono o correo"
+    visible:
+      id: "client-search-input"
     timeout: 15000
-- tapOn: "Buscar por nombre, teléfono o correo"
+- tapOn:
+    id: "client-search-input"
 - inputText: "Lucía"
 - extendedWaitUntil:
     visible:

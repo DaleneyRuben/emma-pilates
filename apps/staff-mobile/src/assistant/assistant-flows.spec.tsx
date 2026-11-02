@@ -26,10 +26,7 @@ describe("Assistant Client flows", () => {
   it("searches Clients and opens the overview with the Subscription, quick actions, and history preview", async () => {
     const screen = await openClientSearch(assistantRoutes());
 
-    await fireEvent.changeText(
-      screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
-      "zz",
-    );
+    await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "zz");
     await waitFor(() => {
       expect(screen.getByText("No encontramos a nadie")).toBeOnTheScreen();
     });
@@ -38,10 +35,7 @@ describe("Assistant Client flows", () => {
     expect(screen.getByTestId("client-search-empty-new-client")).toBeOnTheScreen();
     expect(screen.getByText("Asistente · Centro")).toBeOnTheScreen();
 
-    await fireEvent.changeText(
-      screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
-      "luc",
-    );
+    await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen();
     });

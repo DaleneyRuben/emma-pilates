@@ -237,10 +237,7 @@ export async function openClientSearch(routes: Parameters<typeof routeFetcher>[0
 
 export async function openLucia(routes: Parameters<typeof routeFetcher>[0]) {
   const screen = await openClientSearch(routes);
-  await fireEvent.changeText(
-    screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
-    "luc",
-  );
+  await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
   await waitFor(() => {
     expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen();
   });

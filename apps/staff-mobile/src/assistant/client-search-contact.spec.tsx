@@ -16,10 +16,7 @@ describe("Assistant search result contact", () => {
   it("keeps the contact line to one trimmed line", async () => {
     const screen = await openClientSearch(assistantRoutes());
 
-    await fireEvent.changeText(
-      screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
-      "luc",
-    );
+    await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
     await waitFor(() => {
       expect(screen.getByText("+591 70011001 · lucia@example.com")).toBeOnTheScreen();
     });

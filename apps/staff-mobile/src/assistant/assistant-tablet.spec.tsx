@@ -14,7 +14,7 @@ import {
 jest.setTimeout(20_000);
 
 const emptyPanel = "Selecciona un cliente para ver sus detalles";
-const searchField = "Buscar por nombre, teléfono o correo";
+const searchField = "Nombre, teléfono o correo";
 
 async function selectLucia(routes: Parameters<typeof openClientSearch>[0]) {
   const screen = await openClientSearch(routes);
