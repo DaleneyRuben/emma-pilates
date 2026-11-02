@@ -138,8 +138,10 @@ import type {
   GetMonthKpisParams,
   GetMonthResultParams,
   GetNarrativeReportParams,
+  GetOwnSalaryPaymentReceiptParams,
   GetPaymentReceiptParams,
   GetRevenueReportParams,
+  GetSalaryPaymentReceiptParams,
   GetTodayCashCloseParams,
   GrantCampaignDto,
   GrantCourtesyAccessDto,
@@ -29908,6 +29910,254 @@ export const useUpdateSalaryPayment = <TError = unknown, TContext = unknown>(
   );
 };
 
+export type getSalaryPaymentReceiptResponse200ImageJpeg = {
+  data: Blob;
+  status: 200;
+};
+
+export type getSalaryPaymentReceiptResponse200ImagePng = {
+  data: Blob;
+  status: 200;
+};
+
+export type getSalaryPaymentReceiptResponse200ImageWebp = {
+  data: Blob;
+  status: 200;
+};
+
+export type getSalaryPaymentReceiptResponseSuccess = (
+  | getSalaryPaymentReceiptResponse200ImageJpeg
+  | getSalaryPaymentReceiptResponse200ImagePng
+  | getSalaryPaymentReceiptResponse200ImageWebp
+) & {
+  headers: Headers;
+};
+export type getSalaryPaymentReceiptResponse =
+  getSalaryPaymentReceiptResponseSuccess;
+
+export const getGetSalaryPaymentReceiptUrl = (
+  salaryPaymentId: string,
+  params?: GetSalaryPaymentReceiptParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/salary-payments/${salaryPaymentId}/receipt?${stringifiedParams}`
+    : `/api/v1/administrator/salary-payments/${salaryPaymentId}/receipt`;
+};
+
+export const getSalaryPaymentReceipt = async (
+  salaryPaymentId: string,
+  params?: GetSalaryPaymentReceiptParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getSalaryPaymentReceiptResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetSalaryPaymentReceiptUrl(salaryPaymentId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getSalaryPaymentReceiptResponse["data"] =
+    body as getSalaryPaymentReceiptResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getSalaryPaymentReceiptResponse;
+};
+
+export const getGetSalaryPaymentReceiptQueryKey = (
+  salaryPaymentId: string,
+  params?: GetSalaryPaymentReceiptParams,
+) => {
+  return [
+    `/api/v1/administrator/salary-payments/${salaryPaymentId}/receipt`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetSalaryPaymentReceiptQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetSalaryPaymentReceiptQueryKey(salaryPaymentId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getSalaryPaymentReceipt>>
+  > = ({ signal }) =>
+    getSalaryPaymentReceipt(
+      salaryPaymentId,
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: salaryPaymentId !== null && salaryPaymentId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetSalaryPaymentReceiptQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSalaryPaymentReceipt>>
+>;
+export type GetSalaryPaymentReceiptQueryError = unknown;
+
+export function useGetSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params: undefined | GetSalaryPaymentReceiptParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof getSalaryPaymentReceipt>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof getSalaryPaymentReceipt>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetSalaryPaymentReceiptQueryOptions(
+    salaryPaymentId,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type listAdminExpenseCategoriesResponse200 = {
   data: AdminExpenseCategoryDto[];
   status: 200;
@@ -32247,6 +32497,254 @@ export function useListOwnSalaryPayments<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getListOwnSalaryPaymentsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getOwnSalaryPaymentReceiptResponse200ImageJpeg = {
+  data: Blob;
+  status: 200;
+};
+
+export type getOwnSalaryPaymentReceiptResponse200ImagePng = {
+  data: Blob;
+  status: 200;
+};
+
+export type getOwnSalaryPaymentReceiptResponse200ImageWebp = {
+  data: Blob;
+  status: 200;
+};
+
+export type getOwnSalaryPaymentReceiptResponseSuccess = (
+  | getOwnSalaryPaymentReceiptResponse200ImageJpeg
+  | getOwnSalaryPaymentReceiptResponse200ImagePng
+  | getOwnSalaryPaymentReceiptResponse200ImageWebp
+) & {
+  headers: Headers;
+};
+export type getOwnSalaryPaymentReceiptResponse =
+  getOwnSalaryPaymentReceiptResponseSuccess;
+
+export const getGetOwnSalaryPaymentReceiptUrl = (
+  salaryPaymentId: string,
+  params?: GetOwnSalaryPaymentReceiptParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/trainer/salary-payments/${salaryPaymentId}/receipt?${stringifiedParams}`
+    : `/api/v1/trainer/salary-payments/${salaryPaymentId}/receipt`;
+};
+
+export const getOwnSalaryPaymentReceipt = async (
+  salaryPaymentId: string,
+  params?: GetOwnSalaryPaymentReceiptParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getOwnSalaryPaymentReceiptResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetOwnSalaryPaymentReceiptUrl(salaryPaymentId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getOwnSalaryPaymentReceiptResponse["data"] =
+    body as getOwnSalaryPaymentReceiptResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getOwnSalaryPaymentReceiptResponse;
+};
+
+export const getGetOwnSalaryPaymentReceiptQueryKey = (
+  salaryPaymentId: string,
+  params?: GetOwnSalaryPaymentReceiptParams,
+) => {
+  return [
+    `/api/v1/trainer/salary-payments/${salaryPaymentId}/receipt`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetOwnSalaryPaymentReceiptQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetOwnSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetOwnSalaryPaymentReceiptQueryKey(salaryPaymentId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>
+  > = ({ signal }) =>
+    getOwnSalaryPaymentReceipt(
+      salaryPaymentId,
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: salaryPaymentId !== null && salaryPaymentId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetOwnSalaryPaymentReceiptQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>
+>;
+export type GetOwnSalaryPaymentReceiptQueryError = unknown;
+
+export function useGetOwnSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params: undefined | GetOwnSalaryPaymentReceiptParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOwnSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetOwnSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOwnSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetOwnSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetOwnSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetOwnSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetOwnSalaryPaymentReceiptQueryOptions(
+    salaryPaymentId,
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

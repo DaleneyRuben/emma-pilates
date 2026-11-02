@@ -10,4 +10,9 @@ export interface OwnSalaryPaymentDto {
   /** BOB centavos */
   amountCentavos: number;
   paidOn: string;
+  /**
+   * BKO-008
+   * @nullable
+   */
+  receiptUrl: string | null;
 }
