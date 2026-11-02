@@ -10,8 +10,9 @@ import { colors, radii, spacing, typography } from "./tokens";
 type ConfirmationSheetProps = PropsWithChildren<{
   visible: boolean;
   title: string;
-  /** The line under the title (and any children) that says what confirming does. */
-  note: string;
+  /** The line under the title (and any children) that says what confirming does;
+   * left out when the children already say it as rows (C05c). */
+  note?: string;
   confirmLabel: string;
   confirmTestID?: string;
   onConfirm: () => void;
@@ -59,7 +60,7 @@ export function ConfirmationSheet({
         <View style={styles.sheet} testID={testID}>
           <Text style={styles.title}>{title}</Text>
           {children}
-          <BodyText>{note}</BodyText>
+          {note === undefined ? null : <BodyText>{note}</BodyText>}
           <PrimaryButton
             busy={busy}
             label={confirmLabel}
