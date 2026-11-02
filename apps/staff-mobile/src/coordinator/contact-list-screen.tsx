@@ -114,7 +114,7 @@ export function ContactListScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar onBack={() => navigation.goBack()} title="Para contactar" />
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Para contactar" />
       {list.isPending ? (
         <LoadingState label="Cargando la lista" />
       ) : list.isError || list.data?.status !== 200 ? (

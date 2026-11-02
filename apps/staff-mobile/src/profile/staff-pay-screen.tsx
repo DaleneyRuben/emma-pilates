@@ -56,7 +56,7 @@ export function StaffPayScreen() {
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
 
-  const header = <ScreenTopBar onBack={() => navigation.goBack()} title="Mis pagos" />;
+  const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mis pagos" />;
   if (statements.isPending || payments.isPending) {
     return (
       <Screen style={styles.screen}>
