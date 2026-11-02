@@ -62,6 +62,8 @@ describe("Client unread badges", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Notificaciones, 12 sin leer" })).toBeOnTheScreen();
     });
-    expect(screen.queryByTestId("notifications-row-badge", { includeHiddenElements: true })).toBeNull();
+    expect(
+      screen.queryByTestId("notifications-row-badge", { includeHiddenElements: true }),
+    ).toBeNull();
   });
 });
