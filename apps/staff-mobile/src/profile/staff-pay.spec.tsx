@@ -81,7 +81,7 @@ describe("Staff Mis pagos", () => {
     clearMobileQueryCache();
   });
 
-  it("shows each month's statement with its lines and the payments received", async () => {
+  it("sums each month by concept and lists the payments received", async () => {
     const screen = await openMyPay();
 
     const october = within(
@@ -90,19 +90,39 @@ describe("Staff Mis pagos", () => {
     expect(october.getByText("Octubre 2026")).toBeOnTheScreen();
     expect(october.getByText("Aprobado")).toBeOnTheScreen();
     expect(october.getByText("Bs 322,00")).toBeOnTheScreen();
+    expect(october.getByText("Clases dictadas · 2")).toBeOnTheScreen();
+    expect(october.getByText("Bs 146,00")).toBeOnTheScreen();
+    expect(october.getByText("Canceladas por mínimo · 1")).toBeOnTheScreen();
+    expect(october.getByText("Bs 25,00")).toBeOnTheScreen();
+    expect(october.getByText("Comisiones · 1")).toBeOnTheScreen();
+    expect(october.getByText("Bs 78,50")).toBeOnTheScreen();
+    expect(october.queryByText("6 alumnas, 2 extra")).toBeNull();
+
+    const payments = within(screen.getByLabelText("Pagos recibidos"));
+    expect(payments.getByText("1 de noviembre de 2026")).toBeOnTheScreen();
+    expect(payments.getByText("Bs 322,00")).toBeOnTheScreen();
+  });
+
+  it("opens and folds each class of a month", async () => {
+    const screen = await openMyPay();
+
+    const october = within(
+      await waitFor(() => screen.getByLabelText("Liquidación de octubre 2026")),
+    );
+    await fireEvent.press(october.getByRole("button", { name: "Ver cada clase" }));
+
     expect(october.getAllByText("Clase")).toHaveLength(2);
     expect(october.getByText("3 alumnas")).toBeOnTheScreen();
     expect(october.getByText("6 alumnas, 2 extra")).toBeOnTheScreen();
     expect(october.getByText("Bs 81,00")).toBeOnTheScreen();
     expect(october.getByText("Clase cancelada por mínimo")).toBeOnTheScreen();
-    expect(october.getByText("Bs 25,00")).toBeOnTheScreen();
+    expect(october.getByText("Mínimo no alcanzado")).toBeOnTheScreen();
     expect(october.getByText("Comisión")).toBeOnTheScreen();
     expect(october.getByText("Primer plan")).toBeOnTheScreen();
-    expect(october.getByText("Bs 78,50")).toBeOnTheScreen();
 
-    const payments = within(screen.getByLabelText("Pagos recibidos"));
-    expect(payments.getByText("1 de noviembre de 2026")).toBeOnTheScreen();
-    expect(payments.getByText("Bs 322,00")).toBeOnTheScreen();
+    await fireEvent.press(october.getByRole("button", { name: "Ocultar detalle" }));
+    expect(october.queryByText("6 alumnas, 2 extra")).toBeNull();
+    expect(october.getByRole("button", { name: "Ver cada clase" })).toBeOnTheScreen();
   });
 
   it("lists the newest month first and marks a draft as still open", async () => {
