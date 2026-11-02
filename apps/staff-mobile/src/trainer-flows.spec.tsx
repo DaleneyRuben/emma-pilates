@@ -69,8 +69,7 @@ describe("Trainer agenda and attendance", () => {
     );
     // v2 S03: back to «Mi agenda», how many are marked, and who is missing.
     expect(screen.getByTestId("back-bar")).toHaveTextContent("Mi agenda");
-    expect(screen.getByText("1 de 2 marcadas")).toBeOnTheScreen();
-    expect(screen.getByText("Falta marcar a 1 clienta.")).toBeOnTheScreen();
+    expect(screen.getByText("2 de 2 marcadas")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(
@@ -130,6 +129,8 @@ describe("Trainer agenda and attendance", () => {
         { selected: true },
       ),
     );
+    expect(screen.getByText("1 de 2 marcadas")).toBeOnTheScreen();
+    expect(screen.getByText("Falta marcar a 1 clienta.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(

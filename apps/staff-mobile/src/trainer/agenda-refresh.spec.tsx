@@ -53,7 +53,7 @@ describe("Trainer agenda refresh (UX-004)", () => {
     );
     schedule = [session("session-1", "Reformer Pilates", 7)];
 
-    await fireEvent.press(screen.getByTestId("back-chevron", { includeHiddenElements: true }));
+    await fireEvent.press(screen.getByTestId("back-bar"));
 
     await waitFor(() => expect(screen.getByText("Centro · 7 de 8 reservados")).toBeOnTheScreen());
   });

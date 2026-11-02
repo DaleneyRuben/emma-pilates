@@ -4,20 +4,21 @@ import {
   type TrainerRosterBookingDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
-  BodyText,
+  BrandToast,
   colors,
   EmptyState,
   fontFamilies,
+  formatSessionDate,
   formatTimeRange,
-  Heading,
+  IconRow,
+  IconRowGroup,
   LoadingState,
+  NoticeRow,
   PrimaryButton,
   QueryFailure,
+  radii,
   Screen,
   spacing,
-  surfaces,
-  typography,
   useMountedAt,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -26,6 +27,10 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createTrainerApi } from "../trainer-api";
+import { BackBar } from "../ui/back-bar";
+import { PersonRow } from "../ui/person-row";
+import { SectionHeader } from "../ui/section-header";
+import { countLabel } from "../ui/session-time";
 import { requireOk } from "./require-ok";
 
 type AttendanceOutcome = "attended" | "no_show";
@@ -102,122 +107,150 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
     }
   };
 
+  const marked = session.bookings.filter(
+    (booking) => outcomes[booking.bookingId] !== undefined,
+  ).length;
+  const missing = session.bookings.length - marked;
+
   return (
     <Screen style={styles.screen}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel={session.classTypeName}>{session.classTypeName}</Heading>
-      <BodyText>{`${session.branchName} · ${formatTimeRange(session.startsAt, session.endsAt)}`}</BodyText>
-      {/* Follow-up 171: a fault can be found at any time, before or after the class. */}
-      <Pressable
-        accessibilityLabel="Reportar una falla"
-        accessibilityRole="button"
-        onPress={() => navigation.navigate("ReportFault", { sessionId: session.sessionId })}
-        style={styles.reportFault}
-        testID="roster-report-fault"
-      >
-        <Text style={styles.reportFaultText}>Reportar una falla</Text>
-      </Pressable>
-      {empty ? (
-        <EmptyState
-          icon="calendar"
-          message="No hay reservas para esta sesión."
-          title="Sin reservas"
-          variant="plain"
+      <ScrollView contentContainerStyle={styles.content}>
+        <BackBar
+          back="Mi agenda"
+          onBack={() => navigation.goBack()}
+          subtitle={`${session.branchName} · ${formatSessionDate(session.startsAt)} · ${formatTimeRange(session.startsAt, session.endsAt)}`}
+          title={session.classTypeName}
         />
-      ) : (
-        <ScrollView contentContainerStyle={styles.list}>
-          {session.bookings.map((booking) => (
-            <View key={booking.bookingId} style={styles.rosterRow}>
-              <Text style={styles.clientName}>{booking.clientName}</Text>
-              {isPostSession ? (
-                <View style={styles.segmented}>
-                  {(["attended", "no_show"] as const).map((outcome) => {
-                    const label = outcome === "attended" ? "Asistió" : "No asistió";
-                    const selected = outcomes[booking.bookingId] === outcome;
-                    return (
-                      <Pressable
-                        accessibilityLabel={`${booking.clientName}: ${label}`}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected }}
-                        key={outcome}
-                        testID={`roster-${outcome}-${booking.bookingId}`}
-                        onPress={() =>
-                          setEdits((current) => ({
-                            ...current,
-                            [booking.bookingId]: outcome,
-                          }))
-                        }
-                        style={[styles.segment, selected && styles.segmentSelected]}
-                      >
-                        <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>
-                          {label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              ) : null}
-            </View>
-          ))}
-        </ScrollView>
-      )}
-      {!isPostSession ? (
-        <BodyText>Podrás marcar asistencia cuando termine la clase.</BodyText>
-      ) : null}
-      {saveError ? (
-        <BodyText accessibilityRole="alert">No pudimos guardar la asistencia.</BodyText>
-      ) : null}
-      {saved ? <BodyText>Asistencia guardada.</BodyText> : null}
+        {/* Follow-up 171: a fault can be found at any time, before or after the class. */}
+        <IconRowGroup>
+          <IconRow
+            chevron
+            icon="alert"
+            label="Reportar una falla"
+            onPress={() => navigation.navigate("ReportFault", { sessionId: session.sessionId })}
+            testID="roster-report-fault"
+          />
+        </IconRowGroup>
+        {empty ? (
+          <EmptyState
+            icon="calendar"
+            message="No hay reservas para esta sesión."
+            title="Sin reservas"
+            variant="plain"
+          />
+        ) : (
+          <View>
+            <SectionHeader
+              meta={
+                isPostSession
+                  ? `${marked} de ${session.bookings.length} marcadas`
+                  : countLabel(session.bookings.length, "reserva", "reservas")
+              }
+              title={isPostSession ? "Asistencia" : "Reservas"}
+            />
+            <IconRowGroup>
+              {session.bookings.map((booking) =>
+                isPostSession ? (
+                  <View key={booking.bookingId} style={styles.attendanceRow}>
+                    <Text style={styles.clientName}>{booking.clientName}</Text>
+                    {(["attended", "no_show"] as const).map((outcome) => {
+                      const label = outcome === "attended" ? "Asistió" : "No asistió";
+                      const selected = outcomes[booking.bookingId] === outcome;
+                      return (
+                        <Pressable
+                          accessibilityLabel={`${booking.clientName}: ${label}`}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected }}
+                          key={outcome}
+                          onPress={() =>
+                            setEdits((current) => ({ ...current, [booking.bookingId]: outcome }))
+                          }
+                          style={[
+                            styles.choice,
+                            selected && (outcome === "attended" ? styles.attended : styles.noShow),
+                          ]}
+                          testID={`roster-${outcome}-${booking.bookingId}`}
+                        >
+                          <Text
+                            style={[
+                              styles.choiceLabel,
+                              selected &&
+                                (outcome === "attended"
+                                  ? styles.attendedLabel
+                                  : styles.noShowLabel),
+                            ]}
+                          >
+                            {label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                ) : (
+                  <PersonRow key={booking.bookingId} name={booking.clientName} />
+                ),
+              )}
+            </IconRowGroup>
+          </View>
+        )}
+        {!isPostSession ? (
+          <IconRowGroup>
+            <IconRow icon="clock" label="Podrás marcar asistencia cuando termine la clase." />
+          </IconRowGroup>
+        ) : null}
+        {saveError ? <NoticeRow message="No pudimos guardar la asistencia." /> : null}
+      </ScrollView>
       {isPostSession ? (
-        <PrimaryButton
-          disabled={empty || !complete}
-          label="Guardar asistencia"
-          onPress={() => void saveAttendance()}
-          testID="roster-save"
-        />
+        <View style={styles.footer}>
+          {missing > 0 && !empty ? (
+            <Text style={styles.missing}>
+              {`Falta marcar a ${countLabel(missing, "clienta", "clientas")}.`}
+            </Text>
+          ) : null}
+          <PrimaryButton
+            disabled={empty || !complete}
+            label="Guardar asistencia"
+            onPress={() => void saveAttendance()}
+            testID="roster-save"
+          />
+        </View>
       ) : null}
+      {saved ? <BrandToast onClose={() => setSaved(false)} title="Asistencia guardada" /> : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  reportFault: { alignSelf: "flex-start", justifyContent: "center", minHeight: 44 },
-  reportFaultText: {
-    color: colors.primary,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.body,
-    fontWeight: "500",
-  },
-  centered: {
+  attended: { backgroundColor: colors.primaryTint },
+  attendedLabel: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong },
+  attendanceRow: {
     alignItems: "center",
-    flex: 1,
-    gap: spacing.lg,
+    flexDirection: "row",
+    gap: spacing.sm,
+    minHeight: 60,
+    paddingLeft: spacing.lg,
+    paddingRight: spacing.md,
+  },
+  centered: { alignItems: "center", flex: 1, gap: spacing.lg, justifyContent: "center" },
+  choice: {
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderRadius: radii.pill,
+    height: 36,
     justifyContent: "center",
+    paddingHorizontal: spacing.md,
   },
-  clientName: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-  },
-  list: { gap: spacing.md, paddingBottom: spacing.lg },
-  rosterRow: {
-    ...surfaces.flatCard,
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  screen: { gap: spacing.md },
-  segment: {
-    borderColor: colors.borderStrong,
-    borderWidth: 1,
-    flex: 1,
-    padding: spacing.sm,
-  },
-  segmentSelected: { backgroundColor: colors.primary },
-  segmentText: {
-    color: colors.textSecondary,
-    fontSize: typography.note,
+  choiceLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 13 },
+  clientName: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 15 },
+  content: { gap: spacing.xl, paddingBottom: spacing.xl },
+  footer: { gap: spacing.sm, paddingBottom: spacing.lg, paddingTop: spacing.md },
+  missing: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: 13,
     textAlign: "center",
   },
-  segmentTextSelected: { color: colors.white },
-  segmented: { flexDirection: "row" },
+  noShow: { backgroundColor: colors.errorSurface },
+  noShowLabel: { color: colors.error, fontFamily: fontFamilies.bodyStrong },
+  screen: { paddingHorizontal: spacing.xlSm },
 });
