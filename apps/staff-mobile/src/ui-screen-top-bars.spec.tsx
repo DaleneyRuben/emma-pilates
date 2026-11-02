@@ -11,7 +11,6 @@ import { ClientHistoryScreen } from "./assistant/client-history-screen";
 import { AvailabilityBlockFormScreen } from "./nutritionist/availability-block-form-screen";
 import { ContactListScreen } from "./coordinator/contact-list-screen";
 import { AvailabilityScreen } from "./nutritionist/availability-screen";
-import { StaffPayScreen } from "./profile/staff-pay-screen";
 import { StaffFetcherContext } from "./staff-fetcher";
 
 jest.mock("@react-navigation/native", () => ({
@@ -56,7 +55,6 @@ const screens: [string, ComponentType<never>, object, string][] = [
   ],
   ["S22", ClientHistoryScreen as ComponentType<never>, client, "Historial de clases"],
   ["S28", ContactListScreen as ComponentType<never>, {}, "Para contactar"],
-  ["S29", StaffPayScreen as ComponentType<never>, {}, "Mis pagos"],
 ];
 
 const renderScreen = (Component: ComponentType<never>, params: object) => {

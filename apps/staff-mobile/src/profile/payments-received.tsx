@@ -5,7 +5,7 @@ import {
   fontFamilies,
   FullScreenImage,
   loadPrivateImageWithRatio,
-  radii,
+  SectionTitle,
   spacing,
   surfaces,
   typography,
@@ -44,10 +44,11 @@ function Thumbnail({ url }: { url: string }) {
 }
 
 function PaymentText({ payment }: { payment: OwnSalaryPaymentDto }) {
+  const receipt = (payment.receiptUrl ?? null) === null ? "sin comprobante" : "ver comprobante";
   return (
     <View style={styles.paymentBody}>
       <Text style={styles.amount}>{formatExactBolivianos(payment.amountCentavos)}</Text>
-      <Text style={styles.date}>{formatCivilDate(payment.paidOn)}</Text>
+      <Text style={styles.date}>{`${formatCivilDate(payment.paidOn)} · ${receipt}`}</Text>
     </View>
   );
 }
@@ -61,9 +62,7 @@ export function PaymentsReceived({ payments }: { payments: OwnSalaryPaymentDto[]
 
   return (
     <View accessibilityLabel="Pagos recibidos" style={styles.section}>
-      <Text accessibilityRole="header" style={styles.sectionTitle}>
-        Pagos recibidos
-      </Text>
+      <SectionTitle>Pagos recibidos</SectionTitle>
       <View style={styles.paymentGroup}>
         {payments.map((payment, index) => {
           const divider = index > 0 && styles.paymentDivider;
@@ -73,7 +72,6 @@ export function PaymentsReceived({ payments }: { payments: OwnSalaryPaymentDto[]
               <View key={payment.id} style={[styles.payment, divider]}>
                 <View style={[styles.thumbnail, styles.thumbnailEmpty]} />
                 <PaymentText payment={payment} />
-                <Text style={styles.none}>Sin comprobante</Text>
               </View>
             );
           }
@@ -91,8 +89,7 @@ export function PaymentsReceived({ payments }: { payments: OwnSalaryPaymentDto[]
             >
               <Thumbnail url={receiptUrl} />
               <PaymentText payment={payment} />
-              <Text style={styles.view}>Ver</Text>
-              <Chevron tone="quiet" />
+              <Chevron size={16} strokeWidth={1.5} tone="muted" />
             </Pressable>
           );
         })}
@@ -118,12 +115,11 @@ const styles = StyleSheet.create({
   amount: {
     color: colors.text,
     fontFamily: fontFamilies.body,
-    fontSize: typography.body,
+    fontSize: 16,
     fontVariant: ["tabular-nums"],
   },
   date: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   error: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.note },
-  none: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.note },
   payment: {
     alignItems: "center",
     flexDirection: "row",
@@ -133,23 +129,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   paymentBody: { flex: 1, gap: 2 },
-  paymentDivider: { borderTopColor: colors.border, borderTopWidth: 1 },
+  paymentDivider: { borderTopColor: colors.hairline, borderTopWidth: 1 },
   paymentGroup: { ...surfaces.flatCard, overflow: "hidden" },
   pressed: { backgroundColor: colors.background },
-  section: { gap: spacing.sm, marginTop: spacing.sm },
-  sectionTitle: {
-    color: colors.textSubtle,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.note,
-    letterSpacing: 1.7,
-    textTransform: "uppercase",
-  },
-  thumbnail: { borderRadius: radii.control, height: 40, width: 40 },
-  thumbnailEmpty: { borderColor: colors.border, borderStyle: "dashed", borderWidth: 1 },
+  section: {},
+  thumbnail: { borderRadius: 18, height: 36, width: 36 },
+  thumbnailEmpty: { backgroundColor: colors.primaryTint },
   thumbnailPending: { backgroundColor: colors.neutralTint },
-  view: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.note,
-  },
 });
