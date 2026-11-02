@@ -38,7 +38,6 @@ import { CloseAccountScreen } from "./profile/close-account-screen";
 import { EditProfileScreen } from "./profile/edit-profile-screen";
 import { ClientNotificationsScreen } from "./profile/notifications-screen";
 import { ProfileScreen } from "./profile/profile-screen";
-import { ProfileTabButton } from "./profile/profile-tab-button";
 import { SubscriptionScreen } from "./subscription/subscription-screen";
 
 const unavailableFetcher: typeof globalThis.fetch = async () => {
@@ -65,7 +64,13 @@ const shortcutScreens = {
 const HomeStack = createNativeStackNavigator({
   screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
-  screens: { Home: HomeScreen, ...planScreens, ...shortcutScreens },
+  // Walkthrough n.º 11: the Inicio bell opens Notificaciones over Inicio.
+  screens: {
+    Home: HomeScreen,
+    Notifications: ClientNotificationsScreen,
+    ...planScreens,
+    ...shortcutScreens,
+  },
 });
 
 const BookingsStack = createNativeStackNavigator({
@@ -112,8 +117,7 @@ const tabOptions = (title: string, icon: ClientTabIconName) => ({
 const ClientTabs = createBottomTabNavigator({
   // FIX-023: the tab bar covers the bottom safe area, so no screen adds it again.
   screenLayout: ({ children }) => <InsideTabBar>{children}</InsideTabBar>,
-  // Labels stay under the icons on a tablet too, so the Perfil count sits on
-  // its icon (follow-up 73) instead of over the label.
+  // Labels stay under the icons on a tablet too.
   screenOptions: {
     headerShown: false,
     tabBarActiveTintColor: colors.primary,
@@ -132,13 +136,8 @@ const ClientTabs = createBottomTabNavigator({
       screen: BookingsStack,
       options: tabOptions("Mis Reservas", "bookings"),
     },
-    ProfileTab: {
-      screen: ProfileStack,
-      options: {
-        ...tabOptions("Perfil", "profile"),
-        tabBarButton: (props) => <ProfileTabButton {...props} />,
-      },
-    },
+    // The owner removed the Perfil tab's unread pill (2026-11-02): it is on the Inicio bell.
+    ProfileTab: { screen: ProfileStack, options: tabOptions("Perfil", "profile") },
   },
 });
 

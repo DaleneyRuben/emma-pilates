@@ -4,26 +4,23 @@ import {
   getGetCurrentClientSubscriptionQueryKey,
   getListEvaluationsQueryKey,
   getListPromotionsQueryKey,
+  getListUpcomingBookingsQueryKey,
   useGetCurrentClientProfile,
   useGetCurrentClientReferrals,
   useGetCurrentClientSubscription,
   useListEvaluations,
   useListPromotions,
-  type ClientSubscriptionDto,
+  useListUpcomingBookings,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   colors,
-  formatBolivianos,
   Heading,
   LoadingState,
-  PrimaryButton,
   QueryFailure,
   useIsOnline,
   radii,
   Screen,
   spacing,
-  surfaces,
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -31,127 +28,36 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
-import {
-  describeAllowance,
-  evaluationShortcut,
-  firstName,
-  formatCivilDate,
-  referralShortcut,
-  subscriptionBadge,
-} from "./home-format";
-import { ShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
-import { promotionCardMaxWidth } from "./promotion-image";
+import { HomeHeader } from "./home-header";
+import { evaluationShortcut, referralShortcut } from "./home-format";
+import { ActivePlanCard, PurchasePlanCard } from "./home-plan-card";
+import { LockedShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
+import { NextClassCard, nextBookedClass } from "./next-class-card";
 import { PromotionsCarousel } from "./promotions-carousel";
 
 type HomeNavigation = {
   navigate: (
     screen:
       | "Booking"
+      | "Bookings"
       | "Plans"
       | "Subscription"
       | "EvaluationAvailability"
       | "MyEvaluations"
+      | "Notifications"
+      | "ProfileTab"
       | "Referrals",
   ) => void;
 };
 
 const offlineBannerCopy = "Sin conexión. Mostrando tus datos de la última vez.";
 
-const badgeStyles = {
-  active: { background: "rgba(124,148,115,0.14)", text: colors.successText },
-  expiring_soon: {
-    background: "rgba(201,154,78,0.16)",
-    text: colors.warningText,
-  },
-  expired: { background: "rgba(178,93,75,0.14)", text: colors.errorText },
-} as const;
-
-function SubscriptionCard({
-  status,
-  subscription,
-  onDetail,
-}: {
-  status: "active" | "expiring_soon";
-  subscription: NonNullable<ClientSubscriptionDto["subscription"]>;
-  onDetail: () => void;
-}) {
-  const badge = badgeStyles[status];
-  const progress =
-    subscription.originalClassAllowance === 0
-      ? 0
-      : subscription.remainingClassAllowance / subscription.originalClassAllowance;
-
-  return (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <BodyText style={styles.cardLabel}>Tu plan</BodyText>
-        <View style={[styles.badge, { backgroundColor: badge.background }]}>
-          <Text style={[styles.badgeText, { color: badge.text }]}>{subscriptionBadge(status)}</Text>
-        </View>
-      </View>
-      <Text style={styles.planName}>{subscription.planName}</Text>
-      <View
-        accessibilityRole="progressbar"
-        accessibilityValue={{
-          max: subscription.originalClassAllowance,
-          min: 0,
-          now: subscription.remainingClassAllowance,
-        }}
-        style={styles.progressTrack}
-      >
-        <View style={[styles.progressFill, { flex: progress }]} />
-        <View style={{ flex: 1 - progress }} />
-      </View>
-      <BodyText>
-        {describeAllowance(
-          subscription.remainingClassAllowance,
-          subscription.originalClassAllowance,
-        )}
-      </BodyText>
-      <BodyText>{`Vence el ${formatCivilDate(subscription.endsOn)}`}</BodyText>
-      <Pressable
-        accessibilityLabel="Ver detalle"
-        accessibilityRole="button"
-        onPress={onDetail}
-        style={styles.detailLink}
-      >
-        <Text style={styles.detailLinkText}>Ver detalle</Text>
-      </Pressable>
-    </View>
-  );
-}
-
 function OfflineHomeBanner() {
   return (
     <View accessibilityRole="alert" style={styles.offlineBanner}>
       <Text style={styles.offlineBannerText}>{offlineBannerCopy}</Text>
-    </View>
-  );
-}
-
-// «Paquetes desde» is the cheapest visible Plan (GET /studio-rules, BKM-004);
-// while it is unknown the card leaves the price out.
-function purchaseCopy(plansFromPriceCentavos: number | null | undefined): string {
-  const payment = "Puedes pagar en el estudio o desde la app.";
-  return plansFromPriceCentavos === null || plansFromPriceCentavos === undefined
-    ? payment
-    : `Paquetes desde ${formatBolivianos(plansFromPriceCentavos)}. ${payment}`;
-}
-
-function PurchaseCard({
-  onPurchase,
-  plansFromPriceCentavos,
-}: {
-  onPurchase: () => void;
-  plansFromPriceCentavos: number | null | undefined;
-}) {
-  return (
-    <View style={[styles.card, styles.purchaseCard]} testID="home-purchase-card">
-      <Text style={styles.purchaseTitle}>Elige tu plan y vuelve al mat</Text>
-      <BodyText style={styles.purchaseBody}>{purchaseCopy(plansFromPriceCentavos)}</BodyText>
-      <PrimaryButton label="Comprar un plan" onPress={onPurchase} testID="home-buy-plan" />
     </View>
   );
 }
@@ -166,6 +72,7 @@ export function HomeScreen() {
   const evaluations = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const referrals = useGetCurrentClientReferrals(queryOptions);
   const promotions = useListPromotions(queryOptions);
+  const bookings = useListUpcomingBookings(queryOptions);
   const studioRules = useStudioRules(fetcher);
   const queryKeys = [
     getGetCurrentClientProfileQueryKey(),
@@ -173,6 +80,7 @@ export function HomeScreen() {
     getListEvaluationsQueryKey({ scope: "upcoming" }),
     getGetCurrentClientReferralsQueryKey(),
     getListPromotionsQueryKey(),
+    getListUpcomingBookingsQueryKey(),
   ];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
@@ -230,6 +138,26 @@ export function HomeScreen() {
     view.subscription !== null &&
     view.subscription !== undefined;
 
+  const nextClass =
+    hasActivePlan && bookings.data?.status === 200
+      ? nextBookedClass(bookings.data.data)
+      : undefined;
+  const evaluationTile = {
+    hint: evaluationShortcut(nextEvaluation?.startsAt),
+    icon: "health",
+    label: "Evaluación nutricional",
+    onPress: () =>
+      navigation.navigate(
+        nextEvaluation === undefined ? "EvaluationAvailability" : "MyEvaluations",
+      ),
+  } as const;
+  const referralTile = {
+    hint: referralShortcut(referralCount),
+    icon: "personAdd",
+    label: "Invita a una amiga",
+    onPress: () => navigation.navigate("Referrals"),
+  } as const;
+
   return (
     <Screen style={styles.screen}>
       <ScrollView
@@ -238,50 +166,54 @@ export function HomeScreen() {
         testID="home-scroll"
       >
         {showingCachedHome ? <OfflineHomeBanner /> : null}
-        <Heading accessibilityLabel="Inicio">{`Hola, ${firstName(loadedProfile.data.name)}`}</Heading>
+        <HomeHeader
+          onNotifications={() => navigation.navigate("Notifications")}
+          onProfile={() => navigation.navigate("ProfileTab")}
+          profile={loadedProfile.data}
+        />
         <PromotionsCarousel
           loading={promotions.isPending}
           onImageMissing={() => void promotions.refetch()}
           promotions={promotions.data?.status === 200 ? promotions.data.data : []}
         />
         {hasActivePlan ? (
-          <SubscriptionCard
+          <ActivePlanCard
             onDetail={() => navigation.navigate("Subscription")}
             status={view.status as "active" | "expiring_soon"}
             subscription={view.subscription!}
           />
         ) : (
-          <PurchaseCard
+          <PurchasePlanCard
             onPurchase={() => navigation.navigate("Plans")}
             plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
           />
         )}
+        {nextClass === undefined ? null : (
+          <NextClassCard booking={nextClass} onPress={() => navigation.navigate("Bookings")} />
+        )}
         <ShortcutSection>
-          <ShortcutRow
-            disabled={!hasActivePlan}
-            disabledNote="Necesitas un plan activo para reservar"
-            label="Reservar una clase"
-            note="Horarios de esta semana"
-            onPress={() => navigation.navigate("Booking")}
-          />
-          <ShortcutTiles>
-            <ShortcutTile
-              icon="trend"
-              label="Evaluación nutricional"
-              onPress={() =>
-                navigation.navigate(
-                  nextEvaluation === undefined ? "EvaluationAvailability" : "MyEvaluations",
-                )
-              }
-              summary={evaluationShortcut(nextEvaluation?.startsAt)}
-            />
-            <ShortcutTile
-              icon="person"
-              label="Invita a una amiga"
-              onPress={() => navigation.navigate("Referrals")}
-              summary={referralShortcut(referralCount)}
-            />
-          </ShortcutTiles>
+          {hasActivePlan ? (
+            <ShortcutTiles>
+              <ShortcutTile
+                icon="calendar"
+                label="Reservar una clase"
+                onPress={() => navigation.navigate("Booking")}
+              />
+              <ShortcutTile {...evaluationTile} />
+              <ShortcutTile {...referralTile} />
+            </ShortcutTiles>
+          ) : (
+            <>
+              <LockedShortcutRow label="Reservar una clase" note="Necesitas un plan activo" />
+              <ShortcutTiles>
+                <ShortcutTile
+                  {...evaluationTile}
+                  note={nextEvaluation === undefined ? "Agenda tu cita" : evaluationTile.hint}
+                />
+                <ShortcutTile {...referralTile} note="Su primera clase es gratis" />
+              </ShortcutTiles>
+            </>
+          )}
         </ShortcutSection>
       </ScrollView>
     </Screen>
@@ -289,31 +221,8 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
-  badgeText: { fontSize: typography.label, fontWeight: "600" },
-  card: {
-    ...surfaces.card,
-    gap: spacing.sm,
-    padding: spacing.lg,
-  },
-  cardHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  cardLabel: { color: colors.textMuted, fontSize: typography.label },
   centered: { alignItems: "center", flex: 1, justifyContent: "center" },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  detailLink: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center" },
-  detailLinkText: {
-    color: colors.primaryDeep,
-    fontSize: typography.body,
-    textDecorationLine: "underline",
-  },
   offlineBanner: {
     backgroundColor: colors.warning,
     borderRadius: radii.inset,
@@ -321,35 +230,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   offlineBannerText: { color: colors.white, fontSize: typography.note, fontWeight: "500" },
-  planName: {
-    color: colors.text,
-    fontSize: typography.titleSecondary,
-    fontWeight: "500",
-  },
-  progressFill: {
-    backgroundColor: colors.primary,
-    borderRadius: radii.pill,
-  },
-  progressTrack: {
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    flexDirection: "row",
-    height: 8,
-    overflow: "hidden",
-  },
-  purchaseBody: { color: colors.white },
-  // UX-012: the tablet carousel stops at 720 px; the no-plan card takes the same cap.
-  purchaseCard: {
-    alignSelf: "center",
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-    maxWidth: promotionCardMaxWidth,
-    width: "100%",
-  },
-  purchaseTitle: {
-    color: colors.white,
-    fontSize: typography.titleSecondary,
-    fontWeight: "500",
-  },
   screen: { paddingBottom: 0 },
 });

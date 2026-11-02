@@ -51,7 +51,7 @@ describe("Dynamic Type on Client screens", () => {
 
   it("keeps a Home tile title's line box taller than its font", async () => {
     const screen = await render(
-      <ShortcutTile icon="calendar" label="Reservar" onPress={jest.fn()} summary="Hoy" />,
+      <ShortcutTile icon="calendar" label="Reservar" onPress={jest.fn()} note="Hoy" />,
     );
     const title = within(screen.getByRole("button")).getByText("Reservar");
     const style = StyleSheet.flatten(title.props.style);
