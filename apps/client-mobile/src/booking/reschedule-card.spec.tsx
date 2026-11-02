@@ -6,8 +6,6 @@ import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support
 
 jest.setTimeout(20_000);
 
-const hidden = { includeHiddenElements: true };
-
 const profile = {
   id: "client-1",
   name: "Lucía Fernández",

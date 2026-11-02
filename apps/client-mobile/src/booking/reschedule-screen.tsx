@@ -9,14 +9,17 @@ import {
 import {
   BodyText,
   colors,
+  fontFamilies,
+  formatStartTime,
   LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
   ScreenTopBar,
-  SeatPill,
-  SessionCard,
+  SectionTitle,
+  StateScreen,
+  surfaces,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -28,6 +31,8 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
+import { DayTile } from "./booking-card";
+import { RescheduleOption, RescheduleOptions } from "./reschedule-option";
 import type { ConfirmedBooking } from "./session-detail-screen";
 import {
   boliviaCivilDate,
@@ -139,76 +144,99 @@ export function RescheduleScreen({
   return (
     <Screen style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reprogramar clase" />
-      <View style={styles.current}>
-        <BodyText style={styles.currentLabel}>Reserva actual</BodyText>
-        <Text style={styles.currentTitle}>{booking.classTypeName}</Text>
-        <BodyText>
-          {`${booking.trainerName} · ${formatTimeRange(booking.startsAt, booking.endsAt)}`}
-        </BodyText>
-      </View>
-      <BodyText>Puedes cambiar a otra clase disponible el mismo día.</BodyText>
-      {loading ? (
-        <LoadingState label="Cargando alternativas" />
-      ) : failed ? (
-        <QueryFailure
-          label="No pudimos cargar las clases del día."
-          onRetry={() => void alternatives.refetch()}
-        />
-      ) : options.length === 0 ? (
-        <BodyText>No hay otras clases disponibles hoy.</BodyText>
-      ) : (
-        <ScrollView contentContainerStyle={styles.list}>
-          {options.map((session) => {
-            const selected = session.id === selectedId;
-            return (
-              <SessionCard
-                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
-                footerEnd={
-                  <SeatPill>
-                    {session.availableSeats === 1 ? "1 cupo" : `${session.availableSeats} cupos`}
-                  </SeatPill>
-                }
-                key={session.id}
-                onPress={() => setSelectedId(session.id)}
-                selected={selected}
-                testID={`reschedule-option-${session.id}`}
-                time={formatTimeRange(session.startsAt, session.endsAt)}
-                title={session.classTypeName}
-                trainerName={session.trainerName}
-              />
-            );
-          })}
-        </ScrollView>
-      )}
+      <ScrollView contentContainerStyle={styles.content}>
+        <View>
+          <SectionTitle>Tu reserva actual</SectionTitle>
+          <View style={styles.current}>
+            <DayTile startsAt={booking.startsAt} today={boliviaCivilDate(new Date())} />
+            <View style={styles.currentBody}>
+              <Text style={styles.currentTitle}>{booking.classTypeName}</Text>
+              <Text style={styles.currentDetails}>
+                {`${formatTimeRange(booking.startsAt, booking.endsAt)} · ${booking.trainerName}`}
+              </Text>
+            </View>
+            {options.length === 0 ? null : (
+              <View style={styles.replaced}>
+                <Text style={styles.replacedText}>Se reemplaza</Text>
+              </View>
+            )}
+          </View>
+        </View>
+        {loading ? (
+          <LoadingState label="Cargando alternativas" />
+        ) : failed ? (
+          <QueryFailure
+            label="No pudimos cargar las clases del día."
+            onRetry={() => void alternatives.refetch()}
+          />
+        ) : options.length === 0 ? (
+          <StateScreen
+            icon="calendar"
+            layout="inList"
+            note="Tu reserva sigue en pie. Si no puedes asistir, escríbenos al estudio."
+            primaryAction={{ label: "Volver a mis reservas", onPress: () => navigation.goBack() }}
+            title="No hay otras clases hoy"
+          />
+        ) : (
+          <View>
+            <SectionTitle>Otras clases de hoy</SectionTitle>
+            <RescheduleOptions>
+              {options.map((session) => (
+                <RescheduleOption
+                  key={session.id}
+                  onPress={() => setSelectedId(session.id)}
+                  selected={session.id === selectedId}
+                  session={session}
+                />
+              ))}
+            </RescheduleOptions>
+          </View>
+        )}
+      </ScrollView>
       {failure !== null ? (
         <BodyText accessibilityRole="alert" style={styles.failure}>
           {failure}
         </BodyText>
       ) : null}
       {!loading && !failed && options.length > 0 ? (
-        <PrimaryButton
-          busy={submitting}
-          disabled={selectedId === null}
-          label="Confirmar cambio"
-          onPress={() => void confirm()}
-          testID="reschedule-confirm"
-        />
+        <View style={styles.footer}>
+          <BodyText style={styles.note}>
+            {`Tu lugar de las ${formatStartTime(booking.startsAt)} se libera al confirmar`}
+          </BodyText>
+          <PrimaryButton
+            busy={submitting}
+            disabled={selectedId === null}
+            label="Confirmar cambio"
+            onPress={() => void confirm()}
+            testID="reschedule-confirm"
+          />
+        </View>
       ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  content: { gap: spacing.xl, paddingBottom: spacing.lg },
   current: {
-    backgroundColor: colors.divider,
-    borderRadius: radii.inset,
-    gap: spacing.xxs,
-    opacity: 0.85,
+    ...surfaces.card,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
     padding: spacing.lg,
   },
-  currentLabel: { color: colors.textMuted, fontSize: typography.label },
-  currentTitle: { color: colors.textSecondary, fontSize: typography.bodyLarge },
+  currentBody: { flex: 1, gap: spacing.xxs },
+  currentDetails: { color: colors.textMuted, fontSize: typography.note },
+  currentTitle: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
   failure: { color: colors.errorText },
-  list: { gap: spacing.md, paddingBottom: spacing.lg },
+  footer: { gap: spacing.sm, paddingBottom: spacing.sm },
+  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  replaced: {
+    backgroundColor: colors.hairline,
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.smLg,
+    paddingVertical: spacing.xs,
+  },
+  replacedText: { color: colors.text, fontSize: typography.label, fontWeight: "600" },
   screen: { gap: spacing.md },
 });

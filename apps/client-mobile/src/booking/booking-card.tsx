@@ -21,7 +21,7 @@ import {
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
-function DayTile({ startsAt, today }: { startsAt: string; today: string }) {
+export function DayTile({ startsAt, today }: { startsAt: string; today: string }) {
   const civil = boliviaCivilDate(new Date(startsAt));
   const day = dayChipLabel(civil);
   return (
