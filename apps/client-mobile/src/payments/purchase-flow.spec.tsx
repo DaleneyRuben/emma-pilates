@@ -44,7 +44,7 @@ describe("Client purchase flow", () => {
     expect(screen.queryByText(/crédito/)).toBeNull();
     expect(screen.getAllByText("Bs 560").length).toBeGreaterThan(0);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
 
     await waitFor(() => {
       expect(screen.getByText("Pago por transferencia")).toBeOnTheScreen();
@@ -128,7 +128,7 @@ describe("Client purchase flow", () => {
       "/api/v1/payments/current": () => jsonResponse(payment),
     });
     const screen = await openPlanDetail(fetcher);
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
@@ -191,7 +191,7 @@ describe("Client purchase flow", () => {
 
     expect(screen.queryByText("−Bs 560")).toBeNull();
     expect(screen.queryByText("Bs 0")).toBeNull();
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
 
     await waitFor(() => {
       expect(screen.getByText("Pago por transferencia")).toBeOnTheScreen();
@@ -207,7 +207,7 @@ describe("Client purchase flow", () => {
     });
     const screen = await openPlanDetail(fetcher);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
 
     expect(
       await screen.findByText(

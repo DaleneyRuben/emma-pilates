@@ -21,7 +21,7 @@ async function openPayment() {
       "POST /api/v1/purchase-intents": () => jsonResponse(intent, 201),
     }),
   );
-  await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+  await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
   await waitFor(() => {
     expect(screen.getByLabelText("Código QR del estudio")).toBeOnTheScreen();
   });

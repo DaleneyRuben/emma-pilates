@@ -46,7 +46,7 @@ async function openPaymentWithReceipt(prefill: typeof ana | null) {
       },
     }),
   );
-  await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+  await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
   await waitFor(() => {
     expect(screen.getByText("Datos para la factura")).toBeOnTheScreen();
   });

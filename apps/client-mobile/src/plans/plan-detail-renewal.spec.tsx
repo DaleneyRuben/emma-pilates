@@ -40,7 +40,7 @@ const renewFrom = async (view: object) => {
   await fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
   await fireEvent.press(await screen.findByRole("button", { name: "Renovar plan" }));
   await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
-  expect(await screen.findByText("Total a pagar")).toBeOnTheScreen();
+  expect(await screen.findByText("Desglose")).toBeOnTheScreen();
   return { created, screen };
 };
 
@@ -62,7 +62,7 @@ describe("Renewing from the Plan detail", () => {
       screen.getByText("Tu nuevo plan empieza el 25 de septiembre, al terminar el actual."),
     ).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
     await waitFor(() => {
       expect(created).toHaveBeenCalledWith({ planId: "plan-8" });
     });

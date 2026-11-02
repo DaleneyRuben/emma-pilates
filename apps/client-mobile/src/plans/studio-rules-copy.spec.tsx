@@ -108,9 +108,7 @@ describe("Client copy from the Studio Settings", () => {
     await fireEvent.press(screen.getByRole("button", { name: /^8 clases,/ }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Cancelación sin costo hasta 3 h antes de cada clase."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("Cancela sin costo hasta 3 h antes")).toBeOnTheScreen();
     });
   });
 
