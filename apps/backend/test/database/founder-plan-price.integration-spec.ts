@@ -93,4 +93,58 @@ describe('founder plan list price', () => {
     expect(priced).toMatchObject({ priceCentavos: 56_000 });
     expect(priced?.listPriceCentavos).toBeUndefined();
   });
+
+  // FIX-025: Bs 1050 − 15 % is Bs 892,50; the list, the stored sale, and so
+  // the cash close all say Bs 893.
+  it('rounds the founder price to a whole boliviano in the list and in the stored cash sale', async () => {
+    const monthly = fixtures.plans.find(
+      (item) => item.name === 'Mensual 16 clases',
+    )!;
+    // The first spec took every place; give them back.
+    const author = await world.prisma.account.findFirstOrThrow({
+      where: { email: 'paola.mendoza@example.com', deletedAt: null },
+      select: { id: true },
+    });
+    const current = await readCurrentStudioSettings(world.prisma);
+    await world.prisma.studioSettingsVersion.create({
+      data: {
+        ...current,
+        version: current.version + 1,
+        founderPlaces: 40,
+        createdByAccountId: author.id,
+      },
+    });
+    const buyer = await world.newClient('Paga en enteros');
+    const account = await world.prisma.account.findFirstOrThrow({
+      where: { clientId: buyer.clientId, deletedAt: null },
+      select: { clientId: true },
+    });
+    const plans = await createCatalogRepository(
+      world.prisma,
+    ).listVisiblePlans();
+    const listed = (
+      await priceFounderPlanList(world.prisma, account.clientId, plans)
+    ).find((item) => item.id === monthly.id);
+    expect(listed).toMatchObject({
+      priceCentavos: 89_300,
+      listPriceCentavos: 105_000,
+    });
+
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const centro = fixtures.branches.find(
+      (branch) => branch.name === 'Centro',
+    )!;
+    const sale = await world
+      .commands()
+      .recordCashPayment(
+        { clientId: buyer.clientId, planId: monthly.id, branchId: centro.id },
+        assistant,
+        randomUUID(),
+      );
+    expect(sale).toMatchObject({
+      planPriceCentavos: 105_000,
+      discountCentavos: 15_700,
+      amountDueCentavos: 89_300,
+    });
+  });
 });
