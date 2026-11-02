@@ -33,7 +33,7 @@ numbered tests.
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
-| Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
+| Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal where she assigns a Trainer's Branches and reads everyone else, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
@@ -1053,9 +1053,9 @@ authorize that credential:
 | `GET /api/v1/administrator/payments?invoice=unissued`  | Only confirmed sales with Invoice Data not marked yet; every row now carries `method`, `invoiceData`, and `invoiceIssued` |
 
 Repeating the same decision returns the same result; the opposite decision
-answers `409 payment_confirmation_conflict`. A Session without Bookings answers
-`409 session_has_no_bookings` (the worker's empty check handles those), and a
-started or cancelled one `409 session_not_cancellable`.
+answers `409 payment_confirmation_conflict`. A future Session without
+Bookings is cancelled too and answers `{ "affectedBookings": 0 }` (FIX-027,
+Test 123 C); a started or cancelled one answers `409 session_not_cancellable`.
 
 ### Acting for a Client as the Assistant (STAFF-003)
 
@@ -1832,9 +1832,9 @@ shows **Sesión cancelada** with "Se notificó a las N clientas afectadas." ("Se
 notificó a la clienta afectada." for one) and "Se reembolsó una clase a cada
 clienta."; **Volver** returns to the search.
 The fixtures ship no Bookings, so book a class from the Client app first
-(Test 7); cancelling a Session without Bookings answers
-`409 session_has_no_bookings` and the screen shows "No pudimos cancelar la
-sesión. Inténtalo de nuevo.".
+(Test 7). Since FIX-027 the API also cancels a future Session without
+Bookings (`{ "affectedBookings": 0 }`, Test 123 C); the Staff app's copy for
+that case belongs to the app side of FIX-027.
 
 ### E. No Credit for a referral
 
@@ -6627,7 +6627,8 @@ and the admin web as in Tests 2 and 24.
 A. **The public rules.** `curl -i http://127.0.0.1:3100/api/v1/studio-rules`
    answers without a credential, with `Cache-Control: public, max-age=60` and
    an `ETag`:
-   `{"cancellationWindowMinutes":150,"evaluationPriceCentavos":7000,"plansFromPriceCentavos":56000,"startDateLimitDays":14,"openingDate":null}`.
+   `{"cancellationWindowMinutes":150,"evaluationPriceCentavos":7000,"plansFromPriceCentavos":56000,"startDateLimitDays":14,"bookingWindowDays":7,"openingDate":null}`
+   (`bookingWindowDays` since FIX-026, Test 123 B).
    `plansFromPriceCentavos` is the cheapest visible Plan (hidden Plans do not
    count; `null` when none is visible). Sending the `ETag` back as
    `If-None-Match` answers `304`.
@@ -8029,3 +8030,57 @@ G. **A hidden first Plan still counts (FIX-021).** Hide, in AW04, the Plan a
    first Plan. Specs:
    `first-90-days-job.integration-spec.ts`,
    `hidden-first-plan.integration-spec.ts`.
+
+## Test 123: the owner's decisions of 2026-11-02, the API (FIX-025, FIX-026, FIX-027, FIX-028)
+
+The backend half of the [hand walkthrough of 2026-11-02](./reviews/2026-11-02-hand-walkthrough.md),
+notes 21 to 24 ([decisions §18](./decisiones-emma-pilates.md)). Run the API on a
+copy of `pilates_dev_sim` with the worker, as in Test 2, and migrate it first:
+migration `20261102180000_studio_settings_booking_window` adds the Booking
+Window. The app and web screens for these items are checked with their own
+part of each item; this test is the API.
+
+A. **The founder price is a whole boliviano (FIX-025, note 22).** As Camila
+   (Assistant), quote and record a cash sale of **Mensual 16 clases** (Bs 1050)
+   for a Client who has never paid while a founder place remains:
+   `GET /api/v1/assistant/clients/{clientId}/plan-quotes` shows
+   `priceCentavos: 89300` beside `listPriceCentavos: 105000` (Bs 1050 − 15 % = 892,50 → **Bs 893**), and the
+   sale answers `amountDueCentavos: 89300` and `discountCentavos: 15700`.
+   The 8-class plan of the walkthrough (Bs 590) is Bs 502, the 4-class one
+   (Bs 290) Bs 247; Bs 560 stays Bs 476 and Bs 820 stays Bs 697. The day's
+   **Cerrar caja** expects the same Bs 893, and a front-desk QR or an in-app
+   transfer for the same Plan is pending at Bs 893. Sales stored before
+   FIX-025 keep their centavos. Specs: `founder-membership.spec.ts`,
+   `founder-plan-price.integration-spec.ts`.
+B. **Días para reservar por adelantado (FIX-026, note 23).**
+   `GET /api/v1/studio-rules` and, as Paola,
+   `GET /api/v1/administrator/studio-settings` carry `"bookingWindowDays":7`.
+   With 7, a Session is bookable from today through the sixth day after it,
+   in La Paz dates. As Lucía, `POST /api/v1/sessions/{id}/bookings` for a
+   Session on the seventh day answers `409 booking_window_exceeded`; the same
+   for `POST /api/v1/sessions/{id}/waitlist-entries` on a full one and for
+   `POST /api/v1/bookings/{id}/reschedule` to a target past the window, and
+   the same when Camila acts for Lucía. Paola's
+   `PUT /api/v1/administrator/studio-settings` with `"bookingWindowDays":14`
+   (1 to 30; 0, 31, or 7.5 answer `400 invalid_studio_setting`) saves version
+   N + 1 with a `studio_settings.updated` audit row
+   (`previousBookingWindowDays: 7`, `bookingWindowDays: 14`), and the same
+   booking now goes through. A `PUT` without the field, as the admin web
+   sends it today, keeps the value in force. Cancelling a Session (C) is not
+   limited by the window. Specs: `booking-window.spec.ts`,
+   `booking-window.integration-spec.ts`, `studio-settings.spec.ts`,
+   `studio-settings.e2e-spec.ts`.
+C. **An empty Session can be cancelled (FIX-027, note 24).** As Paola or
+   Carolina (Coordinator), `POST /api/v1/administrator/sessions/{id}/cancel`
+   for a future Session nobody booked answers `200 {"affectedBookings":0}`,
+   the Session is `CANCELLED` with her Account, and one `session.cancelled`
+   audit row is written. `session_has_no_bookings` no longer exists. A started
+   or cancelled Session still answers `409 session_not_cancellable`. Specs:
+   `cancel-session.spec.ts`, `session-cancellation.integration-spec.ts`.
+D. **No cash sale over a pending front-desk QR (FIX-028, note 21).** As
+   Camila, send a front-desk QR receipt for a Client
+   (`POST /api/v1/assistant/clients/{clientId}/transfer-payments`), then try
+   `POST /api/v1/assistant/clients/{clientId}/cash-payments` for her, for the same Plan or another: `409
+   payment_pending_exists`, and no cash Payment is written. The backend
+   already refused this before FIX-028; the item adds the test. Spec:
+   `front-desk-receipt.integration-spec.ts`.

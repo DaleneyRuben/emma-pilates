@@ -28,6 +28,7 @@ const view: StudioSettingsView = {
   minimumBookings: 2,
   minimumBookingsCheckLeadMinutes: 180,
   startDateLimitDays: 14,
+  bookingWindowDays: 7,
   founderPlaces: 40,
   founderDiscountPercent: 15,
   founderGapDays: 7,
@@ -86,6 +87,7 @@ describe('studio settings (e2e)', () => {
       evaluationPriceCentavos: 7_000,
       plansFromPriceCentavos: 8_000,
       startDateLimitDays: 14,
+      bookingWindowDays: 7,
       openingDate: null,
     });
 
@@ -117,6 +119,7 @@ describe('studio settings (e2e)', () => {
         evaluationPriceCentavos: 7000,
         plansFromPriceCentavos: 8000,
         startDateLimitDays: 14,
+        bookingWindowDays: 7,
         openingDate: null,
       });
     expect(resolvePrincipal).not.toHaveBeenCalled();
@@ -149,8 +152,24 @@ describe('studio settings (e2e)', () => {
     );
   });
 
+  // FIX-026: the Booking Window travels in the same form; a form from before
+  // it leaves it out and the value stays as it was.
+  it('passes the Booking Window on when the form sends it', async () => {
+    await request(app.getHttpServer())
+      .put(adminPath)
+      .set('authorization', bearer)
+      .send({ ...body, bookingWindowDays: 14 })
+      .expect(200);
+    const { expectedVersion, ...values } = body;
+    expect(operations.update).toHaveBeenCalledWith(
+      { expectedVersion, values: { ...values, bookingWindowDays: 14 } },
+      administrator,
+    );
+  });
+
   it.each([
     {},
+    { ...body, bookingWindowDays: '7' },
     { ...body, minimumBookings: '3' },
     { ...body, openingDate: 'mañana' },
     { ...body, cancellationWindowMinutes: 240 },

@@ -40,6 +40,12 @@ export interface StudioSettingsDto {
   cancellationWindowMinutes: number;
   minimumBookingsCheckLeadMinutes: number;
   startDateLimitDays: number;
+  /**
+   * Días para reservar por adelantado: a Session is bookable from today through this many La Paz days, counting today (FIX-026)
+   * @minimum 1
+   * @maximum 30
+   */
+  bookingWindowDays: number;
   founderPlaces: number;
   founderDiscountPercent: number;
   founderGapDays: number;

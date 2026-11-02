@@ -1,3 +1,4 @@
+import { addCivilDays, boliviaDate } from '../../time/bolivia-time';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import {
   requireAdministrator,
@@ -11,6 +12,7 @@ export type StudioSettings = {
   minimumBookings: number;
   minimumBookingsCheckLeadMinutes: number;
   startDateLimitDays: number;
+  bookingWindowDays: number;
   founderPlaces: number;
   founderDiscountPercent: number;
   founderGapDays: number;
@@ -26,6 +28,8 @@ export type StudioSettings = {
   openingDate: string | null;
 };
 
+// The Booking Window is optional so a form from before FIX-026, which does
+// not send it, keeps the value in force.
 export type EditableStudioSettings = Pick<
   StudioSettings,
   | 'minimumBookings'
@@ -34,7 +38,8 @@ export type EditableStudioSettings = Pick<
   | 'renewalTargetMonths7To12Percent'
   | 'renewalTargetFromMonth13Percent'
   | 'openingDate'
->;
+> &
+  Partial<Pick<StudioSettings, 'bookingWindowDays'>>;
 
 export type StudioSettingsErrorCode =
   'studio_settings_version_conflict' | 'invalid_studio_setting';
@@ -65,6 +70,17 @@ export const isInsideCancellationWindow = (
 ): boolean =>
   startsAt.getTime() - now.getTime() <= cancellationWindowMinutes * 60_000;
 
+// FIX-026 (owner 2026-11-02): a Session is bookable from today through the
+// last day of the Booking Window, counting today, in La Paz civil dates. With
+// 7 that is the seven days the apps' day strip shows.
+export const isBeyondBookingWindow = (
+  startsAt: Date,
+  now: Date,
+  bookingWindowDays: number,
+): boolean =>
+  boliviaDate(startsAt).getTime() >=
+  addCivilDays(boliviaDate(now), bookingWindowDays).getTime();
+
 const editableFields = [
   'minimumBookings',
   'taxRatePercent',
@@ -72,6 +88,7 @@ const editableFields = [
   'renewalTargetMonths7To12Percent',
   'renewalTargetFromMonth13Percent',
   'openingDate',
+  'bookingWindowDays',
 ] as const satisfies readonly (keyof EditableStudioSettings)[];
 
 const percentFields = [
@@ -91,6 +108,8 @@ const isIntegerBetween = (value: number, low: number, high: number) =>
 const isValid = (values: EditableStudioSettings): boolean =>
   isIntegerBetween(values.minimumBookings, 1, 20) &&
   percentFields.every((field) => isIntegerBetween(values[field], 0, 100)) &&
+  (values.bookingWindowDays === undefined ||
+    isIntegerBetween(values.bookingWindowDays, 1, 30)) &&
   (values.openingDate === null || isCivilDate(values.openingDate));
 
 // Previous and new values of the fields that changed, for the audit record.
@@ -126,6 +145,8 @@ export const updateStudioSettings = async (
   const next: StudioSettings = {
     ...current,
     ...command.values,
+    bookingWindowDays:
+      command.values.bookingWindowDays ?? current.bookingWindowDays,
     version: current.version + 1,
   };
   const changed = changes(current, next);

@@ -25,6 +25,7 @@ describe('Reschedule problems', () => {
       'reschedule_target_ineligible',
     ],
     ['Booking is not reschedulable', 'booking_not_reschedulable'],
+    ['Session is beyond the Booking Window', 'booking_window_exceeded'],
   ])('answers 409 for «%s»', async (message, code) => {
     const controller = new BookingRescheduleController(
       jest.fn().mockRejectedValue(new Error(message)),

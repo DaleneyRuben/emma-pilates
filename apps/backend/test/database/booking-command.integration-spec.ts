@@ -330,7 +330,9 @@ describe('Booking commands', () => {
 
   it('writes the idempotency records from the injected clock even when it lies far in the past', async () => {
     const pastNow = new Date('2026-09-01T12:00:00.000Z');
-    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
+    // The Session follows the injected clock so it stays inside the Booking
+    // Window (FIX-026).
+    const fixture = await createFixture(prisma, { capacity: 1, now: pastNow });
     const commands = new PrismaBookingCommands(prisma, () => pastNow);
     const bookingKey = randomUUID();
     const waitlistKey = randomUUID();

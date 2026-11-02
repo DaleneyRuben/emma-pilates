@@ -201,8 +201,9 @@ describe('class reminder worker', () => {
   it('sends the hour reminder as Hoy when the class is later the same Bolivia day', async () => {
     const lucia = await principalOf('lucia@example.com');
     const startsAt = laPazNoonFrom(new Date(base.getTime() + 120 * hour));
-    const session = await createSession(startsAt);
-    const booking = await bookings.create({ sessionId: session.id }, lucia);
+    // Up to seven La Paz days ahead, past the Booking Window (FIX-026), so
+    // the Booking is written directly; the reminder is what is tested.
+    const booking = await bookDirectly(lucia, startsAt);
 
     clock = new Date(startsAt.getTime() - 90 * minute);
     await expect(job().execute()).resolves.toEqual({ sent: 1 });

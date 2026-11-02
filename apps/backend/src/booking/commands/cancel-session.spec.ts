@@ -21,7 +21,6 @@ const session: SessionForCancellation = {
   branchId: 'branch-1',
   startsAt: new Date('2026-09-22T11:00:00.000Z'),
   state: 'scheduled',
-  liveBookingCount: 2,
 };
 
 const dependencies = (overrides: Partial<typeof session> | null = {}) => ({
@@ -115,12 +114,14 @@ describe('cancelSession', () => {
     ).rejects.toThrow('Session is not cancellable');
   });
 
-  it('is a last resort for Sessions that still have Bookings', async () => {
+  // FIX-027: the owner cancels an empty class too (a holiday, a sick Trainer).
+  it('cancels a future Session that has no Bookings', async () => {
+    const deps = dependencies();
+    deps.cancel.mockResolvedValue({ affectedBookings: 0 });
+
     await expect(
-      cancelSession(
-        { sessionId: 'session-1' },
-        dependencies({ liveBookingCount: 0 }),
-      ),
-    ).rejects.toThrow('Session has no Bookings');
+      cancelSession({ sessionId: 'session-1' }, deps),
+    ).resolves.toEqual({ affectedBookings: 0 });
+    expect(deps.cancel).toHaveBeenCalled();
   });
 });

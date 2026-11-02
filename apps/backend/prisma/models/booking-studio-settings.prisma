@@ -7,6 +7,7 @@ model StudioSettingsVersion {
   minimumBookings                 Int       @map("minimum_bookings") @db.SmallInt
   minimumBookingsCheckLeadMinutes Int       @map("minimum_bookings_check_lead_minutes") @db.SmallInt
   startDateLimitDays              Int       @map("start_date_limit_days") @db.SmallInt
+  bookingWindowDays               Int       @default(7) @map("booking_window_days") @db.SmallInt
   founderPlaces                   Int       @map("founder_places") @db.SmallInt
   founderDiscountPercent          Int       @map("founder_discount_percent") @db.SmallInt
   founderGapDays                  Int       @map("founder_gap_days") @db.SmallInt

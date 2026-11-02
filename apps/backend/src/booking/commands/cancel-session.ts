@@ -11,7 +11,6 @@ export type SessionForCancellation = {
   branchId: string;
   startsAt: Date;
   state: 'scheduled' | 'cancelled';
-  liveBookingCount: number;
 };
 
 export type SessionCancellationResult = { affectedBookings: number };
@@ -27,9 +26,11 @@ type CancelSessionDependencies = {
   now(): Date;
 };
 
-// Last-resort cancellation when no substitute Trainer is available: only an
-// Administrator or the Coordinator (ADR-0102), only a future scheduled Session
-// that still has Bookings.
+// The owner's cancellation of a future scheduled Session, for when no
+// substitute Trainer is available, a holiday, or a sick Trainer: only an
+// Administrator or the Coordinator (ADR-0102). A Session with no Bookings is
+// cancellable too (FIX-027, owner 2026-11-02); the empty-Session check before
+// the start still cancels the ones nobody cancelled by hand.
 export const cancelSession = async (
   command: { sessionId: string },
   dependencies: CancelSessionDependencies,
@@ -45,9 +46,6 @@ export const cancelSession = async (
     session.startsAt.getTime() <= dependencies.now().getTime()
   ) {
     throw new Error('Session is not cancellable');
-  }
-  if (session.liveBookingCount === 0) {
-    throw new Error('Session has no Bookings');
   }
 
   // ADR-0100: the Session and Bookings keep the acting Staff Member's Account;

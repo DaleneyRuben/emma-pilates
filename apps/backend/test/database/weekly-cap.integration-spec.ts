@@ -14,6 +14,9 @@ import {
 
 // Monday 14 September, before every Session the cap cases book.
 const now = new Date('2026-09-14T14:00:00.000Z');
+// The next Monday is past the 7-day Booking Window from `now` (FIX-026), so
+// the cases book into the next week from Sunday 20.
+const sunday = new Date('2026-09-20T14:00:00.000Z');
 
 const cappedSubscription = {
   durationMonthsSnapshot: 3,
@@ -120,8 +123,16 @@ describe('weekly cap', () => {
     await expect(
       book(new Date('2026-09-19T15:00:00.000Z'), 'f'),
     ).rejects.toThrow('Weekly cap reached');
+    const nextWeek = await anotherSession(
+      fixture,
+      new Date('2026-09-21T15:00:00.000Z'),
+      'g',
+    );
     await expect(
-      book(new Date('2026-09-21T15:00:00.000Z'), 'g'),
+      new PrismaBookingCommands(prisma, () => sunday).create(
+        { sessionId: nextWeek.id },
+        principal,
+      ),
     ).resolves.toEqual({ id: expect.any(String) as string });
   });
 
@@ -250,7 +261,10 @@ describe('weekly cap', () => {
       'edge-d',
     );
     await expect(
-      commands.create({ sessionId: monday.id }, principalFor(fixture)),
+      new PrismaBookingCommands(prisma, () => sunday).create(
+        { sessionId: monday.id },
+        principalFor(fixture),
+      ),
     ).resolves.toEqual({ id: expect.any(String) as string });
   });
 

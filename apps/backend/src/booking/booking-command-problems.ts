@@ -67,6 +67,10 @@ export const commandProblem = (error: Error): HttpException | null => {
       'booking_not_reschedulable',
       'Booking is not reschedulable',
     ],
+    'Session is beyond the Booking Window': [
+      'booking_window_exceeded',
+      'Session is beyond the Booking Window',
+    ],
     'Attendance roster is incomplete': [
       'attendance_roster_incomplete',
       'Attendance roster is incomplete',
