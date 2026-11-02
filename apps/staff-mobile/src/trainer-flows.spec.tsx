@@ -57,7 +57,7 @@ describe("Trainer agenda and attendance", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
-      expect(screen.getByText("6 de 8 reservados")).toBeOnTheScreen();
+      expect(screen.getByText("Sopocachi · 6 de 8 reservados")).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
 

@@ -37,7 +37,6 @@ import {
   countLabel,
 } from "./nutritionist-format";
 
-
 const agendaPageSize = 50;
 
 const kindLabel: Record<NutritionistAgendaEntryDto["kind"], string> = {

@@ -75,7 +75,7 @@ describe("Staff notification destinations", () => {
   });
 
   it("opens Mi agenda from a trainer_schedule notice", async () => {
-    await openNoticeAndTap("trainer", "trainer_schedule", "No tienes clases este día.");
+    await openNoticeAndTap("trainer", "trainer_schedule", "Hoy no tienes clases");
   });
 
   it("opens the Nutritionist agenda from a nutritionist_agenda notice", async () => {
