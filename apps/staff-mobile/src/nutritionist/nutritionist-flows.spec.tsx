@@ -134,23 +134,28 @@ describe("Nutritionist agenda and availability", () => {
       "Editar horario Jueves, 15:00 – 18:00",
       "Editar horario Sábado, 9:00 – 12:00",
     ]);
-    expect(screen.getByText("5 cupos de 45 min · 2 reservados")).toBeOnTheScreen();
-    expect(screen.getByText("4 cupos de 45 min · 1 reservado")).toBeOnTheScreen();
-    expect(screen.getByText("4 cupos de 45 min · sin reservas")).toBeOnTheScreen();
+    expect(screen.getByText("5 cupos · 2 reservados")).toBeOnTheScreen();
+    expect(screen.getByText("4 cupos · 1 reservado")).toBeOnTheScreen();
+    expect(screen.getByText("4 cupos · sin reservas")).toBeOnTheScreen();
     expect(screen.getByText("Desde el jueves 1 de octubre")).toBeOnTheScreen();
-    // MOB-041: S16 ends each block row in the 19 pt Palo de rosa chevron.
-    const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
-    expect(chevrons).toHaveLength(3);
-    expect(chevrons[0]).toHaveProp("stroke", "#B78380");
-    expect(screen.queryByText("›")).toBeNull();
+    // v2 S16: a tab root with the fixed «Nuevo horario» under the rows.
+    expect(
+      screen.getByText("Las clientas eligen cupos de 45 min dentro de estos rangos."),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Lun")).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
+    expect(screen.getAllByRole("button", { name: "Nuevo horario" })).toHaveLength(1);
   });
 
   it("shows the empty availability state", async () => {
     const screen = await openAvailability(routeFetcher(routes()));
 
     await waitFor(() => {
-      expect(screen.getByText("Aún no publicaste horarios de disponibilidad.")).toBeOnTheScreen();
+      expect(screen.getByText("Aún no publicaste horarios")).toBeOnTheScreen();
     });
+    expect(
+      screen.getByText("Publica un rango y las clientas podrán reservar su evaluación."),
+    ).toBeOnTheScreen();
   });
 
   it("publishes a new block from today at the only Branch", async () => {

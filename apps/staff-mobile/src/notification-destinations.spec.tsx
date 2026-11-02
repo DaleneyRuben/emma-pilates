@@ -79,11 +79,7 @@ describe("Staff notification destinations", () => {
   });
 
   it("opens the Nutritionist agenda from a nutritionist_agenda notice", async () => {
-    await openNoticeAndTap(
-      "nutritionist",
-      "nutritionist_agenda",
-      "No tienes evaluaciones",
-    );
+    await openNoticeAndTap("nutritionist", "nutritionist_agenda", "No tienes evaluaciones");
   });
 
   it("opens the submitted payment from an Administrator's payment notice", async () => {
