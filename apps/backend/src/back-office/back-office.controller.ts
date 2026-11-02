@@ -41,8 +41,6 @@ import {
   AdminExpenseCategoryDto,
   AdminExpenseDto,
   AdminExpensePageDto,
-  AdminSalaryPaymentDto,
-  AdminSalaryPaymentPageDto,
   ExpenseCategoryInputDto,
   ExpenseChangeDto,
   ExpenseInputDto,
@@ -52,15 +50,13 @@ import {
   parseExpenseInput,
   parseExpenseQuery,
   parseExpenseReportQuery,
-  parseSalaryPaymentInput,
-  parseSalaryPaymentQuery,
   parseWithdrawalQuery,
-  SalaryPaymentInputDto,
   WithdrawalPageDto,
 } from './back-office.dto';
 import { cashCloseControllers } from './cash-close/cash-close.controller';
 import { AdministratorFinanceController } from './finance/finance.controller';
 import { payrollControllers } from './payroll/pay-statements.controller';
+import { AdministratorSalaryPaymentsController } from './payroll/salary-payments.controller';
 import { AdministratorSuppliesController } from './supplies/supplies.controller';
 
 export {
@@ -69,10 +65,6 @@ export {
 } from './back-office-http';
 
 const civil = (date: Date): string => date.toISOString().slice(0, 10);
-
-const toSalaryPaymentDto = <Payment extends { paidOn: Date }>(
-  payment: Payment,
-) => ({ ...payment, paidOn: civil(payment.paidOn) });
 
 const toExpenseDto = <Expense extends { incurredOn: Date }>(
   expense: Expense,
@@ -108,100 +100,6 @@ export class AdministratorWithdrawalsController extends BackOfficeController {
     const principal = await this.authenticate(authorization);
     return run(() =>
       this.operations.supplies.listWithdrawals(input, principal),
-    );
-  }
-}
-
-@Controller({ path: 'administrator/salary-payments', version: '1' })
-@ApiBearerAuth()
-export class AdministratorSalaryPaymentsController extends BackOfficeController {
-  constructor(
-    @Inject(backOfficeOperations) operations: BackOfficeOperations,
-    @Inject(authenticatedPrincipalResolver) resolver: PrincipalResolver,
-  ) {
-    super(operations, resolver);
-  }
-
-  @Get()
-  @ApiOperation({ operationId: 'listAdminSalaryPayments' })
-  @ApiQuery({
-    name: 'staffMemberId',
-    required: false,
-    schema: { format: 'uuid' },
-  })
-  @ApiQuery({ name: 'from', required: false, format: 'date' })
-  @ApiQuery({ name: 'to', required: false, format: 'date' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number })
-  @ApiOkResponse({ type: AdminSalaryPaymentPageDto })
-  @Header('Cache-Control', 'no-store')
-  async list(
-    @Headers('authorization') authorization: string | undefined,
-    @Query() query: unknown,
-  ): Promise<AdminSalaryPaymentPageDto> {
-    const input = parsed(
-      parseSalaryPaymentQuery(query),
-      'Invalid Salary Payment filters',
-    );
-    const principal = await this.authenticate(authorization);
-    const page = await run(() =>
-      this.operations.salaryPayments.listSalaryPayments(input, principal),
-    );
-    return { ...page, items: page.items.map(toSalaryPaymentDto) };
-  }
-
-  @Post()
-  @ApiOperation({ operationId: 'recordSalaryPayment' })
-  @ApiHeader(idempotencyHeader)
-  @ApiBody({ type: SalaryPaymentInputDto })
-  @ApiCreatedResponse({ type: AdminSalaryPaymentDto })
-  @Header('Cache-Control', 'no-store')
-  async record(
-    @Headers('authorization') authorization: string | undefined,
-    @Headers('idempotency-key') idempotencyKey: string | undefined,
-    @Body() body: unknown,
-  ): Promise<AdminSalaryPaymentDto> {
-    const input = parsed(
-      parseSalaryPaymentInput(body),
-      'Invalid Salary Payment',
-    );
-    const key = requireIdempotencyKey(idempotencyKey);
-    const principal = await this.authenticate(authorization);
-    return toSalaryPaymentDto(
-      await run(() =>
-        this.operations.salaryPayments.recordSalaryPayment(
-          input,
-          principal,
-          key,
-        ),
-      ),
-    );
-  }
-
-  @Put(':salaryPaymentId')
-  @ApiOperation({ operationId: 'updateSalaryPayment' })
-  @ApiParam({ name: 'salaryPaymentId', format: 'uuid' })
-  @ApiBody({ type: SalaryPaymentInputDto })
-  @ApiOkResponse({ type: AdminSalaryPaymentDto })
-  @Header('Cache-Control', 'no-store')
-  async update(
-    @Param('salaryPaymentId') salaryPaymentId: string,
-    @Headers('authorization') authorization: string | undefined,
-    @Body() body: unknown,
-  ): Promise<AdminSalaryPaymentDto> {
-    const id = requireId(salaryPaymentId, 'Invalid Salary Payment identifier');
-    const input = parsed(
-      parseSalaryPaymentInput(body),
-      'Invalid Salary Payment',
-    );
-    const principal = await this.authenticate(authorization);
-    return toSalaryPaymentDto(
-      await run(() =>
-        this.operations.salaryPayments.updateSalaryPayment(
-          { ...input, salaryPaymentId: id },
-          principal,
-        ),
-      ),
     );
   }
 }
