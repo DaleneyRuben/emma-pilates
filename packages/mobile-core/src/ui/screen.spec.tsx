@@ -2,6 +2,13 @@ import { render } from "@testing-library/react-native";
 
 import { InsideTabBar, Screen } from "./screen";
 
+// The safe-area view hands its host an edge → mode map; the edges in force are
+// the ones not switched off.
+const edgesOf = (element: { props: { edges?: Record<string, string> } }) =>
+  Object.entries(element.props.edges ?? {})
+    .filter(([, mode]) => mode !== "off")
+    .map(([edge]) => edge);
+
 // FIX-023: inside the tabs the tab bar already covers the bottom safe area, so a
 // screen that also kept the bottom edge and its padding ended about 40 pt above
 // the bar on both apps.
@@ -9,13 +16,8 @@ describe("Screen inside the tab bar (FIX-023)", () => {
   it("keeps every safe-area edge and the padding outside the tabs", async () => {
     const screen = await render(<Screen testID="app-screen" />);
 
-    expect(screen.getByTestId("app-screen")).toHaveProp("edges", [
-      "top",
-      "right",
-      "bottom",
-      "left",
-    ]);
-    expect(screen.getByTestId("app-screen")).toHaveStyle({ paddingBottom: 16 });
+    expect(edgesOf(screen.getByTestId("app-screen"))).toEqual(["top", "right", "bottom", "left"]);
+    expect(screen.getByTestId("app-screen")).toHaveStyle({ padding: 16 });
   });
 
   it("drops the bottom edge and the bottom padding inside the tabs", async () => {
@@ -25,7 +27,7 @@ describe("Screen inside the tab bar (FIX-023)", () => {
       </InsideTabBar>,
     );
 
-    expect(screen.getByTestId("app-screen")).toHaveProp("edges", ["top", "right", "left"]);
+    expect(edgesOf(screen.getByTestId("app-screen"))).toEqual(["top", "right", "left"]);
     expect(screen.getByTestId("app-screen")).toHaveStyle({ paddingBottom: 0 });
   });
 
@@ -36,6 +38,6 @@ describe("Screen inside the tab bar (FIX-023)", () => {
       </InsideTabBar>,
     );
 
-    expect(screen.getByTestId("app-screen")).toHaveProp("edges", ["top"]);
+    expect(edgesOf(screen.getByTestId("app-screen"))).toEqual(["top"]);
   });
 });

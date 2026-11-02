@@ -2,6 +2,7 @@ import {
   AuthenticationFlow,
   colors,
   EmailChangeLinkScreen,
+  InsideTabBar,
   MobileQueryProvider,
   type MobileNavigationProps,
   recoveryScreenLayout,
@@ -109,6 +110,8 @@ const tabOptions = (title: string, icon: ClientTabIconName) => ({
 });
 
 const ClientTabs = createBottomTabNavigator({
+  // FIX-023: the tab bar covers the bottom safe area, so no screen adds it again.
+  screenLayout: ({ children }) => <InsideTabBar>{children}</InsideTabBar>,
   // Labels stay under the icons on a tablet too, so the Perfil count sits on
   // its icon (follow-up 73) instead of over the label.
   screenOptions: {
