@@ -93,62 +93,41 @@ async function openDetail(availableSeats: number) {
   return { screen, block: within(screen.getByTestId("capacity-block")) };
 }
 
-// MOB-049 (follow-up 88): 04's capacity block is bare, no card and no label.
-// The count row sits above the 7 pt bar: «N de M cupos disponibles» with the
-// number in Lora 18 and «N reservados» on the right, or the «Lleno» seat pill
-// when the class is full; the bar's track is Palo de rosa tinte, its fill
-// Palo de rosa by the booked share, Icono tenue when full.
+// Follow-up 227 (C04): the seats sit on the hero card, the free count in
+// Lora 32 white over «de M cupos libres», a white bar by the booked share on
+// white 25 %, and the «Lleno» pill on the hero when the class is full.
 describe("Client Session detail capacity block", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("draws the count in Lora, the booked count, and the bar without a card", async () => {
+  it("draws the free seats in Lora 32 white and the white bar on the hero", async () => {
     const { screen, block } = await openDetail(3);
 
-    expect(screen.queryByText("Cupos disponibles")).not.toBeOnTheScreen();
-    expect(screen.getByTestId("capacity-block")).not.toHaveStyle({
-      backgroundColor: colors.white,
-    });
-
-    expect(block.getByText("3 de 12 cupos disponibles")).toHaveStyle({
-      color: colors.text,
-      fontSize: 15,
-    });
+    expect(screen.getByTestId("session-hero")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(block.getByText("3")).toHaveStyle({
-      fontFamily: fontFamilies.heading,
-      fontSize: 18,
+      color: colors.white,
+      fontFamily: fontFamilies.display,
+      fontSize: 32,
     });
-    expect(block.getByText("9 reservados")).toHaveStyle({
-      color: colors.textSubtle,
-      fontSize: 12,
-    });
-    expect(block.queryByTestId("seat-pill")).not.toBeOnTheScreen();
+    expect(block.getByText("de 12 cupos libres")).toBeOnTheScreen();
+    expect(block.queryByText("Lleno")).not.toBeOnTheScreen();
 
     const bar = block.getByRole("progressbar");
     expect(bar).toHaveProp("accessibilityValue", { max: 12, min: 0, now: 9 });
-    expect(bar).toHaveStyle({ backgroundColor: colors.primaryTint, height: 7 });
+    expect(bar).toHaveStyle({ backgroundColor: "rgba(255,255,255,0.25)", height: 6 });
     expect(block.getByTestId("capacity-fill")).toHaveStyle({
-      backgroundColor: colors.primary,
+      backgroundColor: colors.white,
       flex: 0.75,
     });
   });
 
-  it("keeps the count at zero beside the Lleno pill and greys the bar when full", async () => {
-    const { block } = await openDetail(0);
+  it("shows zero free seats and the Lleno pill when full", async () => {
+    const { screen, block } = await openDetail(0);
 
-    expect(block.getByText("0 de 12 cupos disponibles")).toBeOnTheScreen();
-    expect(block.queryByText("12 reservados")).not.toBeOnTheScreen();
-
-    const pill = block.getByTestId("seat-pill");
-    expect(within(pill).getByText("Lleno")).toHaveStyle({ color: colors.textSecondary });
-    expect(pill).toHaveStyle({ backgroundColor: colors.neutralPill });
-    expect(block.getAllByText("Lleno")).toHaveLength(1);
-
-    expect(block.getByTestId("capacity-fill")).toHaveStyle({
-      backgroundColor: colors.iconQuiet,
-      flex: 1,
-    });
+    expect(block.getByText("0")).toBeOnTheScreen();
+    expect(within(screen.getByTestId("session-hero")).getByText("Lleno")).toBeOnTheScreen();
+    expect(block.getByTestId("capacity-fill")).toHaveStyle({ flex: 1 });
   });
 });
