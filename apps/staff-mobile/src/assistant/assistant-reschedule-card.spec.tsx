@@ -31,7 +31,7 @@ describe("Assistant reschedule option card", () => {
       [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(dayFrom)}&until=${encodeURIComponent(dayUntil)}&limit=100`]:
         () => jsonResponse([alternative]),
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Ver reservas" }));
+    await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
     });

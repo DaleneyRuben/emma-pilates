@@ -155,11 +155,11 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
     await submitNewClient(screen);
     const title = await screen.findByText("Cuenta pendiente de activación");
 
+    // v2 S06: a Lino card, never the amber block.
     expect(screen.getByTestId("pending-card")).toHaveStyle({
+      backgroundColor: "#F5EFE9",
       borderRadius: 16,
-      gap: 12,
-      padding: 18,
     });
-    expect(title).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 19 });
+    expect(title).toHaveStyle({ fontSize: 16 });
   });
 });

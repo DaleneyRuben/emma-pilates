@@ -19,7 +19,7 @@ describe("Assistant Client Bookings and the Studio Settings", () => {
       ...assistantRoutes(),
       "/api/v1/studio-rules": rules,
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Ver reservas" }));
+    await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
       expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
     });

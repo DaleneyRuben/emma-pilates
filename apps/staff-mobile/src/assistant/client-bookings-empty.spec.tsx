@@ -23,7 +23,7 @@ describe("Assistant Client Bookings empty state", () => {
       "/api/v1/assistant/clients/client-lucia/bookings": () => jsonResponse([]),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Ver reservas" }));
+    await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
       expect(screen.getByText("Esta clienta no tiene reservas próximas.")).toBeOnTheScreen();
     });

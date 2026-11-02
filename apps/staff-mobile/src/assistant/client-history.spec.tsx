@@ -11,7 +11,7 @@ const hidden = { includeHiddenElements: true };
 
 async function openHistory(routes: ReturnType<typeof assistantRoutes>) {
   const screen = await openLucia(routes);
-  await fireEvent.press(screen.getByRole("button", { name: "Ver historial completo" }));
+  await fireEvent.press(screen.getByTestId("client-overview-history"));
   await waitFor(() => {
     expect(screen.getByLabelText("Historial de clases")).toBeOnTheScreen();
   });

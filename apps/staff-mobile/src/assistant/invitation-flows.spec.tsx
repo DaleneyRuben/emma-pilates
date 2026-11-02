@@ -233,7 +233,8 @@ describe("Assistant invitations (S05, S06)", () => {
         "La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.",
       ),
     ).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar invitación" })).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Más opciones de la invitación" }));
+    expect(screen.getByRole("button", { name: /^Cancelar invitación/ })).toBeDisabled();
   });
 
   it("words a failed email change apart from an invalid address", async () => {
@@ -247,7 +248,10 @@ describe("Assistant invitations (S05, S06)", () => {
     });
 
     await submitNewClient(screen);
-    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar correo" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Más opciones de la invitación" }),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: /^Cambiar correo/ }));
     await fireEvent.changeText(screen.getByLabelText("Nuevo correo"), "ana.nueva@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
 

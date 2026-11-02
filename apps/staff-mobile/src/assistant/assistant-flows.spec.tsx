@@ -45,15 +45,17 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
     });
+    // v2 S06: the Plan is the hero, with one primary «Reservar clase».
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
-    expect(screen.getByText("5 clases restantes")).toBeOnTheScreen();
+    expect(screen.getByText("5")).toHaveStyle({ fontSize: 32 });
+    expect(screen.getByText("clases restantes de 8")).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
     expect(screen.getByText("Vence el 12 de octubre de 2026")).toBeOnTheScreen();
-    expect(screen.getByText("Activa")).toBeOnTheScreen();
+    expect(screen.getByText("Activo")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Ver reservas" })).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Ver historial completo" })).toBeOnTheScreen();
+    expect(screen.getByTestId("client-overview-bookings")).toBeOnTheScreen();
+    expect(screen.getByTestId("client-overview-history")).toBeOnTheScreen();
     expect(screen.getAllByText("Emma Vargas · Centro")).toHaveLength(2);
     expect(screen.getByText("Mat Pilates")).toBeOnTheScreen();
   });
@@ -76,7 +78,7 @@ describe("Assistant Client flows", () => {
       },
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Ver reservas" }));
+    await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
       expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
     });
@@ -102,7 +104,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Ver historial completo" }));
+    await fireEvent.press(screen.getByTestId("client-overview-history"));
     await waitFor(() => {
       expect(screen.getByLabelText("Historial de clases")).toBeOnTheScreen();
     });
@@ -173,7 +175,7 @@ describe("Assistant Client flows", () => {
       },
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Ver reservas" }));
+    await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
     });
@@ -382,24 +384,23 @@ describe("Assistant Client flows", () => {
       email: "Ana@Example.com",
       phone: "+591 70000000",
     });
+    // v2 S06: one status line, «Reenviar enlace», and a menu for the rest.
     expect(screen.getByText("Sin plan activo")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar clase" })).toBeDisabled();
+    expect(
+      screen.getByText("Puede comprar su plan ahora, aunque todavía no haya activado su cuenta."),
+    ).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Reservar clase" })).toBeNull();
     await waitFor(() => {
       expect(screen.getByText("Cuenta pendiente de activación")).toBeOnTheScreen();
     });
-    expect(screen.getByText("ana@example.com")).toBeOnTheScreen();
-    expect(
-      screen.getByText("El enlace de activación vence el 29 de septiembre de 2026."),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByText(
-        "La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.",
-      ),
-    ).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Cambiar correo" })).toBeOnTheScreen();
+    expect(screen.getByText("El enlace vence el 29 de septiembre de 2026")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reenviar enlace" })).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cambiar correo" })).toBeNull();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar invitación" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Más opciones de la invitación" }));
+    expect(screen.getByText("Invitación de Ana")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^Cambiar correo/ })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: /^Cancelar invitación/ }));
     await waitFor(() => {
       expect(screen.getByText("¿Cancelar la invitación de Ana Nueva?")).toBeOnTheScreen();
     });
