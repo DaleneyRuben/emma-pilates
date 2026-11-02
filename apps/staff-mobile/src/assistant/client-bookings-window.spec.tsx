@@ -32,7 +32,7 @@ describe("Assistant Client Bookings and the Studio Settings", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByText(/faltan menos de 2 h 30$/)).toHaveLength(2);
+      expect(screen.getAllByText(/faltan menos de 30 h$/)).toHaveLength(2);
     });
     expect(screen.getAllByRole("button", { name: "Reprogramar" })).toHaveLength(2);
     expect(screen.queryByRole("button", { name: "Cancelar reserva" })).not.toBeOnTheScreen();
