@@ -17,7 +17,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { BookingsScreen } from "./booking/bookings-screen";
 import { BrowseSessionsScreen } from "./booking/browse-sessions-screen";
-import { ClassHistoryScreen } from "./booking/class-history-screen";
 import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientApiBaseUrlContext, ClientFetcherContext } from "./client-fetcher";
@@ -79,7 +78,6 @@ const BookingsStack = createNativeStackNavigator({
   screens: {
     MyBookings: BookingsScreen,
     Reschedule: RescheduleScreen,
-    History: ClassHistoryScreen,
   },
 });
 

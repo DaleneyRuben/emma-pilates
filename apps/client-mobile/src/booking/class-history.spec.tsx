@@ -112,7 +112,7 @@ describe("Client Class History", () => {
     expect(
       screen.getByLabelText("sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
     ).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar" })).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cancelar reserva" })).not.toBeOnTheScreen();
   });
 
   // MOB-040: the 07 frame draws rows between rules on Superficie, not cards.
