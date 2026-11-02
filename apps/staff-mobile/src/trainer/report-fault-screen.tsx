@@ -5,28 +5,30 @@ import {
   type EquipmentDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
-  BodyText,
   colors,
   EmptyState,
   FormField,
   FormScrollView,
   fontFamilies,
   formatTimeRange,
-  Heading,
   LoadingState,
+  NoticeRow,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  SectionTitle,
+  SegmentedTabs,
   spacing,
+  StateScreen,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { BackBar } from "../ui/back-bar";
 import { useIsTablet } from "../ui/use-is-tablet";
 
 type Kind = EquipmentDto["kind"];
@@ -42,7 +44,7 @@ function groupsOf(items: EquipmentDto[]): { kind: Kind; items: EquipmentDto[] }[
   return kinds.map((kind) => ({ kind, items: items.filter((piece) => piece.kind === kind) }));
 }
 
-function EquipmentChip({
+function EquipmentTile({
   piece,
   selected,
   onPress,
@@ -58,36 +60,12 @@ function EquipmentChip({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[styles.chip, selected && styles.chipSelected]}
+      style={[styles.tile, selected && styles.tileSelected]}
     >
-      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
-        {nameOf(piece)}
-        {out ? (
-          <Text style={[styles.chipOut, selected && styles.chipTextSelected]}>
-            {" · fuera de servicio"}
-          </Text>
-        ) : null}
-      </Text>
-    </Pressable>
-  );
-}
-
-function Checkbox({ checked, onPress }: { checked: boolean; onPress: () => void }) {
-  return (
-    <Pressable
-      accessibilityLabel="No se puede usar"
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked }}
-      onPress={onPress}
-      style={styles.checkRow}
-    >
-      <View style={[styles.box, checked && styles.boxChecked]}>
-        {checked ? <Text style={styles.tick}>✓</Text> : null}
-      </View>
-      <View style={styles.checkText}>
-        <Text style={styles.checkLabel}>No se puede usar</Text>
-        <Text style={styles.helper}>Márcalo si nadie debería usarlo hasta que lo arreglen.</Text>
-      </View>
+      <Text style={[styles.tileNumber, selected && styles.onSelected]}>{String(piece.number)}</Text>
+      {out ? (
+        <Text style={[styles.tileOut, selected && styles.onSelected]}>fuera de servicio</Text>
+      ) : null}
     </Pressable>
   );
 }
@@ -104,6 +82,7 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const [kind, setKind] = useState<Kind | null>(null);
   const [chosen, setChosen] = useState<EquipmentDto | null>(null);
   const [description, setDescription] = useState("");
   const [outOfService, setOutOfService] = useState(false);
@@ -112,29 +91,29 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
   const [sent, setSent] = useState<string | null>(null);
 
   const session = roster.data?.status === 200 ? roster.data.data : undefined;
+  const back =
+    session === undefined
+      ? "Volver"
+      : `${session.classTypeName} · ${formatTimeRange(session.startsAt, session.endsAt).split(" – ")[0]}`;
   const header = (
-    <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Reportar una falla">Reportar una falla</Heading>
-      {session === undefined ? null : (
-        <BodyText>{`${session.classTypeName} · Sucursal ${session.branchName} · ${formatTimeRange(session.startsAt, session.endsAt)}`}</BodyText>
-      )}
-    </>
+    <BackBar
+      back={back}
+      onBack={() => navigation.goBack()}
+      subtitle={session === undefined ? undefined : `Equipos de la sucursal ${session.branchName}`}
+      title="Reportar una falla"
+    />
   );
   const column = [styles.screen, tablet && styles.tablet];
 
   if (sent !== null)
     return (
       <Screen style={column}>
-        {header}
-        <View style={styles.sent}>
-          <Text style={styles.check}>✓</Text>
-          <Text style={styles.sentTitle}>Gracias por avisar</Text>
-          <BodyText
-            style={styles.sentLine}
-          >{`Administración ya puede ver la falla de ${sent}.`}</BodyText>
-        </View>
-        <PrimaryButton label="Volver a la lista" onPress={() => navigation.goBack()} />
+        <StateScreen
+          icon="check"
+          note={`Administración ya puede ver la falla del ${sent} y lo marcará cuando esté resuelto.`}
+          primaryAction={{ label: "Volver a la lista", onPress: () => navigation.goBack() }}
+          title="Gracias por avisar"
+        />
       </Screen>
     );
   if (equipment.isPending)
@@ -167,6 +146,9 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
       </Screen>
     );
 
+  const groups = groupsOf(items);
+  const shownKind = kind ?? groups[0]?.kind ?? "reformer";
+  const shown = groups.find((group) => group.kind === shownKind)?.items ?? [];
   const ready = chosen !== null && description.trim() !== "";
   const send = async () => {
     if (chosen === null) return;
@@ -190,15 +172,12 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
 
   return (
     <Screen style={column}>
-      {header}
       <FormScrollView
         contentContainerStyle={styles.form}
         footer={
           <View style={styles.footer}>
             {failed ? (
-              <BodyText accessibilityRole="alert">
-                No pudimos enviar el reporte. Inténtalo de nuevo.
-              </BodyText>
+              <NoticeRow message="No pudimos enviar el reporte. Inténtalo de nuevo." />
             ) : null}
             <PrimaryButton
               busy={busy}
@@ -210,22 +189,28 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
           </View>
         }
       >
-        <Text style={styles.eyebrow}>¿Qué equipo?</Text>
-        {groupsOf(items).map((group) => (
-          <View key={group.kind} style={styles.group}>
-            <Text style={styles.groupLabel}>{plural[group.kind]}</Text>
-            <View style={styles.chips}>
-              {group.items.map((piece) => (
-                <EquipmentChip
-                  key={piece.id}
-                  onPress={() => setChosen(piece)}
-                  piece={piece}
-                  selected={chosen?.id === piece.id}
-                />
-              ))}
-            </View>
+        {header}
+        <View style={styles.group}>
+          <SectionTitle>¿Qué equipo?</SectionTitle>
+          {groups.length > 1 ? (
+            <SegmentedTabs
+              accessibilityLabel="Tipo de equipo"
+              onSelect={setKind}
+              options={groups.map((group) => ({ key: group.kind, label: plural[group.kind] }))}
+              selected={shownKind}
+            />
+          ) : null}
+          <View accessibilityLabel={plural[shownKind]} style={styles.tiles}>
+            {shown.map((piece) => (
+              <EquipmentTile
+                key={piece.id}
+                onPress={() => setChosen(piece)}
+                piece={piece}
+                selected={chosen?.id === piece.id}
+              />
+            ))}
           </View>
-        ))}
+        </View>
         <FormField
           label="¿Qué pasó?"
           maxLength={500}
@@ -236,59 +221,61 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
           testID="report-fault-description"
           value={description}
         />
-        <Checkbox checked={outOfService} onPress={() => setOutOfService((value) => !value)} />
+        <Pressable
+          accessibilityLabel="No se puede usar"
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: outOfService }}
+          onPress={() => setOutOfService((value) => !value)}
+          style={styles.switchRow}
+        >
+          <View style={styles.switchText}>
+            <Text style={styles.switchLabel}>No se puede usar</Text>
+            <Text style={styles.helper}>Nadie debería usarlo hasta que lo arreglen.</Text>
+          </View>
+          <Switch
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            onValueChange={setOutOfService}
+            thumbColor={colors.white}
+            trackColor={{ false: colors.hairline, true: colors.primary }}
+            value={outOfService}
+          />
+        </Pressable>
       </FormScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  box: {
-    alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: 6,
-    borderWidth: 1,
-    height: 22,
-    justifyContent: "center",
-    width: 22,
-  },
-  boxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
   centered: { alignItems: "center", justifyContent: "center" },
-  check: { color: colors.success, fontSize: 40 },
-  checkLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
-  checkRow: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md, minHeight: 44 },
-  checkText: { flexShrink: 1, gap: spacing.xs },
-  chip: {
-    backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 40,
-    paddingHorizontal: spacing.lg,
-  },
-  chipOut: { color: colors.error, fontSize: typography.note },
-  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
-  chipTextSelected: { color: colors.white },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  eyebrow: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 12,
-    letterSpacing: 1.7,
-    textTransform: "uppercase",
-  },
   footer: { gap: spacing.sm, paddingTop: spacing.sm },
-  form: { gap: spacing.lg, paddingBottom: spacing.lg },
-  group: { gap: spacing.sm },
-  groupLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  helper: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.note },
-  screen: { gap: spacing.md },
-  sent: { alignItems: "center", flex: 1, gap: spacing.md, justifyContent: "center" },
-  sentLine: { textAlign: "center" },
-  sentTitle: { color: colors.text, fontFamily: fontFamilies.heading, fontSize: 21 },
+  form: { gap: spacing.xl, paddingBottom: spacing.lg },
+  group: { gap: spacing.md },
+  helper: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  onSelected: { color: colors.white },
+  screen: { paddingHorizontal: spacing.xlSm },
+  switchLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
+  switchRow: {
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: radii.card,
+    flexDirection: "row",
+    gap: spacing.md,
+    padding: spacing.lg,
+  },
+  switchText: { flex: 1, gap: spacing.xxs },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
   textArea: { minHeight: 104, textAlignVertical: "top" },
-  tick: { color: colors.white, fontSize: 14 },
+  tile: {
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    height: 60,
+    justifyContent: "center",
+    width: "23%",
+  },
+  tileNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  tileOut: { color: colors.error, fontFamily: fontFamilies.body, fontSize: 10 },
+  tileSelected: { backgroundColor: colors.primary },
+  tiles: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
 });
