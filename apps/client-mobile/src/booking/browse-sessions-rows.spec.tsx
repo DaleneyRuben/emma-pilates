@@ -49,8 +49,8 @@ const session = (id: string, startsAt: Date, availableSeats: number) => ({
   waitlistCount: 0,
 });
 
-// MOB-042: 03's «Sucursal:» picker is the shared pill and every Session card,
-// full ones included, ends in the chevron after the Trainer line.
+// Follow-up 227: with one Branch, 03 shows it fixed without a chevron
+// (walkthrough n.º 7); each Session is a Lino row with the start in Lora 20.
 describe("Client class list rows", () => {
   afterEach(async () => {
     await cleanup();
@@ -84,7 +84,7 @@ describe("Client class list rows", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
+      expect(screen.getByText("Centro")).toBeOnTheScreen();
     });
     await waitFor(() => {
       expect(screen.getAllByRole("button", { name: /^Reformer Pilates \d/ })).toHaveLength(2);
@@ -97,33 +97,34 @@ describe("Client class list rows", () => {
     return { cards, screen };
   }
 
-  it("draws the picker pill and the Session cards as the frame does", async () => {
+  it("shows the only Branch fixed and draws the v2 rows", async () => {
     const { cards, screen } = await openClassList();
 
-    const pill = screen.getByRole("button", { name: "Sucursal: Centro" });
-    expect(pill).toHaveStyle({ borderRadius: 999, minHeight: 44 });
-    expect(screen.getByTestId("glyph-pin", hidden)).toHaveProp("width", 17);
-    const picker = screen.getByTestId("branch-picker-chevron", hidden);
-    expect(picker).toHaveProp("stroke", "#6F6662");
-    expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Sucursal: Centro" })).toBeNull();
+    expect(screen.getByTestId("branch-fixed")).toBeOnTheScreen();
+    expect(screen.queryByTestId("branch-picker-chevron", hidden)).toBeNull();
 
-    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 19,
+    expect(screen.getAllByRole("button", { name: /^Reformer Pilates \d/ })[0]).toHaveStyle({
+      backgroundColor: "#F5EFE9",
+      borderRadius: 16,
+      minHeight: 72,
     });
-    expect(cards[0].getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
-    expect(cards[0].getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
-    expect(cards[1].getByText("Lleno")).toBeOnTheScreen();
+    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({ fontSize: 16 });
+    expect(cards[0].getByText("Emma Vargas · 50 min")).toHaveStyle({
+      color: "#6F6662",
+      fontSize: 13,
+    });
+    expect(cards[0].getByTestId("session-row-time")).toHaveStyle({
+      fontFamily: "Lora_400Regular",
+      fontSize: 20,
+    });
     for (const card of cards) {
-      const chevron = card.getByTestId("chevron", hidden);
-      expect(chevron).toHaveProp("stroke", "#B78380");
-      expect(chevron).toHaveProp("width", 19);
+      expect(card.getByTestId("chevron", hidden)).toHaveProp("stroke", "#6F6662");
     }
+    expect(screen.getByText("2 clases")).toBeOnTheScreen();
   });
 
-  // MOB-047: follow-up 84's seat pill — the seats on Palo de rosa tinte, a
-  // full class on the neutral pill, 12 pt weight 500, never red, no dot.
-  it("draws the seat pills as follow-up 84 settles them", async () => {
+  it("draws the seat pills on Rosa tinte, and a full class on Arena", async () => {
     const { cards } = await openClassList();
 
     expect(cards[0].getByTestId("seat-pill")).toHaveStyle({
@@ -133,11 +134,9 @@ describe("Client class list rows", () => {
     expect(cards[0].getByText("3 cupos")).toHaveStyle({
       color: "#7D4F4B",
       fontSize: 12,
-      fontWeight: "500",
+      fontWeight: "600",
     });
-    expect(cards[1].getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "rgba(216,201,187,0.34)",
-    });
-    expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#6F6662", fontSize: 12 });
+    expect(cards[1].getByTestId("seat-pill")).toHaveStyle({ backgroundColor: "#E6DBD0" });
+    expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#4A4A4A", fontSize: 12 });
   });
 });
