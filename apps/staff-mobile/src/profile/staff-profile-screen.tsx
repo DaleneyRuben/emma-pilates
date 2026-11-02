@@ -29,7 +29,7 @@ import { branchesLabel, roleLabel } from "./staff-labels";
 
 type ProfileNavigation = {
   goBack: () => void;
-  navigate: (screen: "Notifications" | "ChangePassword" | "Feedback" | "ViewAs") => void;
+  navigate: (screen: "Notifications" | "MyPay" | "ChangePassword" | "Feedback" | "ViewAs") => void;
 };
 
 function ValueRow({ label, value }: { label: string; value: string }) {
@@ -128,6 +128,9 @@ export function StaffProfileScreen() {
           <ValueRow label="Sucursales" value={branchesLabel(member)} />
         </View>
         <View style={styles.group}>
+          {identity.session?.role === "trainer" ? (
+            <MenuRow label="Mis pagos" onPress={() => navigation.navigate("MyPay")} />
+          ) : null}
           <MenuRow
             badge={unreadCount}
             label="Notificaciones"
