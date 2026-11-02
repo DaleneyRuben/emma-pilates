@@ -25,7 +25,7 @@ on:
         required: true
         type: string
       rollout_percentage:
-        description: Production rollout percentage (1-100). Preview ignores it.
+        description: Production rollout percentage (1-100; 100 reaches everyone). Preview ignores it.
         required: true
         default: "10"
         type: string
@@ -107,8 +107,13 @@ jobs:
           for app in "${apps[@]}"; do
             if [ "$OTA_CHANNEL" = "production" ]; then
               node scripts/mobile-ota-guard.mjs "$app" "$OTA_SHA"
+              # EAS takes 0-99 for a staged rollout; 100 means no rollout.
+              rollout=()
+              if [ "$OTA_ROLLOUT" != "100" ]; then
+                rollout=(--rollout-percentage "$OTA_ROLLOUT")
+              fi
               cd "apps/$app"
-              npx --yes eas-cli@"$EAS_CLI_VERSION" update --channel production --environment production --message "$OTA_MESSAGE" --rollout-percentage "$OTA_ROLLOUT" --non-interactive
+              npx --yes eas-cli@"$EAS_CLI_VERSION" update --channel production --environment production --message "$OTA_MESSAGE" "${rollout[@]}" --non-interactive
               cd ../..
             else
               cd "apps/$app"
