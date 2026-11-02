@@ -3,12 +3,7 @@ import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
-import {
-  approvedOctober,
-  openMyPay,
-  staffRoutes,
-  trainerProfile,
-} from "./staff-pay-test-support";
+import { approvedOctober, openMyPay, staffRoutes, trainerProfile } from "./staff-pay-test-support";
 
 jest.setTimeout(20_000);
 
