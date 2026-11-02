@@ -27,12 +27,23 @@ const concepts: { kind: LineKind; summary: string; line: string }[] = [
 
 const lineLabel = (kind: LineKind) => concepts.find((concept) => concept.kind === kind)?.line;
 
+const known = new Set<string>(concepts.map((concept) => concept.kind));
+
+// A kind a newer API adds still counts, under «Otros», so the rows add up to
+// the total.
 function summarize(lines: PayStatementLineDto[]) {
-  return concepts.flatMap(({ kind, summary }) => {
-    const matching = lines.filter((line) => line.kind === kind);
+  const groups = [
+    ...concepts.map(({ kind, summary }) => ({
+      key: kind,
+      summary,
+      lines: lines.filter((line) => line.kind === kind),
+    })),
+    { key: "other", summary: "Otros", lines: lines.filter((line) => !known.has(line.kind)) },
+  ];
+  return groups.flatMap(({ key, summary, lines: matching }) => {
     if (matching.length === 0) return [];
     const centavos = matching.reduce((total, line) => total + line.amountCentavos, 0);
-    return [{ kind, label: `${summary} · ${matching.length}`, centavos }];
+    return [{ key, label: `${summary} · ${matching.length}`, centavos }];
   });
 }
 
@@ -99,7 +110,7 @@ export function PayStatementCard({ statement }: { statement: PayStatementDto }) 
       )}
       <View style={styles.rows}>
         {summarize(statement.lines).map((concept) => (
-          <AmountRow centavos={concept.centavos} key={concept.kind} label={concept.label} />
+          <AmountRow centavos={concept.centavos} key={concept.key} label={concept.label} />
         ))}
       </View>
       {open ? (
