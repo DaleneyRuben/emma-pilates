@@ -44,4 +44,6 @@ export class OwnSalaryPaymentDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty({ description: 'BOB centavos' }) amountCentavos!: number;
   @ApiProperty({ format: 'date' }) paidOn!: string;
+  @ApiProperty({ nullable: true, type: String, description: 'BKO-008' })
+  receiptUrl!: string | null;
 }

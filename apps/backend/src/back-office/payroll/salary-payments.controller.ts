@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -10,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  Res,
   StreamableFile,
 } from '@nestjs/common';
 import {
@@ -20,9 +20,12 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiProduces,
   ApiQuery,
 } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { OBJECT_STORAGE } from '../../uploads/object-storage.module';
+import { receiptVariants } from '../../uploads/private-image-object';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
 import type { PrincipalResolver } from '../../system-identity/authentication/bearer-principal';
 import {
@@ -35,6 +38,7 @@ import {
   run,
   type BackOfficeOperations,
   type ReceiptStorage,
+  streamSalaryReceipt,
 } from '../back-office-http';
 import {
   AdminSalaryPaymentDto,
@@ -44,9 +48,24 @@ import {
   SalaryPaymentInputDto,
 } from '../back-office.dto';
 
-const toSalaryPaymentDto = <Payment extends { paidOn: Date }>(
-  payment: Payment,
-) => ({ ...payment, paidOn: payment.paidOn.toISOString().slice(0, 10) });
+// BKO-008: the page names a receipt by its route, never the asset.
+const toSalaryPaymentDto = <
+  Payment extends {
+    id: string;
+    paidOn: Date;
+    receiptImageAssetId: string | null;
+  },
+>({
+  receiptImageAssetId,
+  ...payment
+}: Payment) => ({
+  ...payment,
+  paidOn: payment.paidOn.toISOString().slice(0, 10),
+  receiptUrl:
+    receiptImageAssetId === null
+      ? null
+      : `/api/v1/administrator/salary-payments/${payment.id}/receipt`,
+});
 
 // AW11 and AW12: the studio-wide Salary Payments (BKO-002).
 @Controller({ path: 'administrator/salary-payments', version: '1' })
@@ -58,20 +77,6 @@ export class AdministratorSalaryPaymentsController extends BackOfficeController 
     @Inject(OBJECT_STORAGE) private readonly storage: ReceiptStorage,
   ) {
     super(operations, resolver);
-  }
-
-  receipt(
-    salaryPaymentId: string,
-    variant: string | undefined,
-    authorization: string | undefined,
-    response: { setHeader(name: string, value: string): void },
-  ): Promise<StreamableFile> {
-    return Promise.reject(
-      new BadRequestException(
-        [salaryPaymentId, variant, authorization, response, this.storage]
-          .length,
-      ),
-    );
   }
 
   @Get()
@@ -154,6 +159,29 @@ export class AdministratorSalaryPaymentsController extends BackOfficeController 
           principal,
         ),
       ),
+    );
+  }
+
+  // BKO-008: `readable` fits the enlarged viewer, `thumbnail` a list row.
+  @Get(':salaryPaymentId/receipt')
+  @ApiOperation({ operationId: 'getSalaryPaymentReceipt' })
+  @ApiParam({ name: 'salaryPaymentId', format: 'uuid' })
+  @ApiQuery({ name: 'variant', required: false, enum: receiptVariants })
+  @ApiProduces('image/jpeg', 'image/png', 'image/webp')
+  @ApiOkResponse({ schema: { type: 'string', format: 'binary' } })
+  async receipt(
+    @Param('salaryPaymentId') salaryPaymentId: string,
+    @Query('variant') variant: string | undefined,
+    @Headers('authorization') authorization: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<StreamableFile> {
+    const principal = await this.authenticate(authorization);
+    return streamSalaryReceipt(
+      (command) =>
+        this.operations.salaryReceipts.readAnySalaryReceipt(command, principal),
+      this.storage,
+      { salaryPaymentId, variant },
+      response,
     );
   }
 }

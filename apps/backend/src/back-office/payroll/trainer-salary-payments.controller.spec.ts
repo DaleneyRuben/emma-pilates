@@ -1,4 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common';
+import type { Response } from 'express';
 import type { BackOfficeOperations } from '../back-office-http';
 import { BackOfficeError } from '../back-office-errors';
 import { TrainerSalaryPaymentsController } from './trainer-salary-payments.controller';
@@ -17,11 +18,11 @@ const principal = {
 describe('TrainerSalaryPaymentsController', () => {
   const resolvePrincipal = jest.fn();
   const listOwnSalaryPayments = jest.fn();
-  const readSalaryReceipt = jest.fn();
+  const readOwnSalaryReceipt = jest.fn();
   const get = jest.fn();
   const operations = {
     salaryPayments: { listOwnSalaryPayments },
-    salaryReceipts: { readSalaryReceipt },
+    salaryReceipts: { readOwnSalaryReceipt },
   } as unknown as BackOfficeOperations;
   const controller = new TrainerSalaryPaymentsController(
     operations,
@@ -87,22 +88,20 @@ describe('TrainerSalaryPaymentsController', () => {
 
   it('streams her own receipt', async () => {
     const paymentId = '0b0f7a52-7d7c-4bbf-9d49-5d7bd4a1b2c3';
-    readSalaryReceipt.mockResolvedValue({
+    readOwnSalaryReceipt.mockResolvedValue({
       objectKey: 'private/receipt/thumbnail',
       mediaType: 'image/webp',
     });
     get.mockResolvedValue(Buffer.from('webp'));
-    const response = { setHeader: jest.fn() };
+    const setHeader = jest.fn();
+    const response = { setHeader } as unknown as Response;
 
     await controller.receipt(paymentId, 'thumbnail', bearer, response);
 
-    expect(readSalaryReceipt).toHaveBeenCalledWith(
+    expect(readOwnSalaryReceipt).toHaveBeenCalledWith(
       { salaryPaymentId: paymentId, variant: 'thumbnail' },
       principal,
     );
-    expect(response.setHeader).toHaveBeenCalledWith(
-      'Cache-Control',
-      'no-store',
-    );
+    expect(setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
   });
 });

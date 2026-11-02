@@ -7,6 +7,10 @@ import {
   requireTrainer,
   type BackOfficeActor,
 } from '../back-office-errors';
+import {
+  attachImageAsset,
+  ImageAssetNotAttachableError,
+} from '../../uploads/image-asset-attachments';
 import { civilText, recordBackOfficeAudit } from '../prisma-audit';
 import { runIdempotent } from '../prisma-idempotency';
 
@@ -67,6 +71,28 @@ export const createPrismaSalaryPayments = (
     });
     if (staffMember === null) {
       throw new BackOfficeError('staff_member_not_found');
+    }
+  };
+
+  // BKO-008: the photo must be hers and ready; attaching takes it out of the
+  // abandoned-upload sweep.
+  const attachReceipt = async (
+    transaction: Transaction,
+    actor: BackOfficeActor,
+    imageAssetId: string,
+  ) => {
+    try {
+      await attachImageAsset(transaction, {
+        imageAssetId,
+        ownerAccountId: actor.accountId,
+        purpose: 'transfer_receipt',
+        now: dependencies.now(),
+      });
+    } catch (error) {
+      if (error instanceof ImageAssetNotAttachableError) {
+        throw new BackOfficeError('salary_receipt_not_ready');
+      }
+      throw error;
     }
   };
 
@@ -161,12 +187,16 @@ export const createPrismaSalaryPayments = (
         },
         async (transaction) => {
           await requireStaffMember(transaction, input.staffMemberId);
+          if (input.receiptImageAssetId !== undefined) {
+            await attachReceipt(transaction, actor, input.receiptImageAssetId);
+          }
           const now = dependencies.now();
           const payment = await transaction.salaryPayment.create({
             data: {
               staffMemberId: input.staffMemberId,
               amountCentavos: input.amountCentavos,
               paidOn: input.paidOn,
+              receiptImageAssetId: input.receiptImageAssetId ?? null,
               recordedByAccountId: actor.accountId,
               createdAt: now,
               updatedAt: now,
@@ -179,6 +209,9 @@ export const createPrismaSalaryPayments = (
             metadata: {
               amountCentavos: payment.amountCentavos,
               paidOn: civilText(payment.paidOn),
+              ...(payment.receiptImageAssetId === null
+                ? {}
+                : { receiptImageAssetId: payment.receiptImageAssetId }),
             },
           });
           const view = toPaymentView(payment);
@@ -204,12 +237,23 @@ export const createPrismaSalaryPayments = (
           throw new BackOfficeError('salary_payment_not_found');
         }
         await requireStaffMember(transaction, input.staffMemberId);
+        // A replaced receipt stays attached and named in the audit: nothing
+        // is deleted (ADR-0086).
+        const newReceipt =
+          input.receiptImageAssetId !== undefined &&
+          input.receiptImageAssetId !== previous.receiptImageAssetId;
+        if (newReceipt) {
+          await attachReceipt(transaction, actor, input.receiptImageAssetId!);
+        }
         const updated = await transaction.salaryPayment.update({
           where: { id: previous.id },
           data: {
             staffMemberId: input.staffMemberId,
             amountCentavos: input.amountCentavos,
             paidOn: input.paidOn,
+            ...(newReceipt
+              ? { receiptImageAssetId: input.receiptImageAssetId }
+              : {}),
             updatedAt: dependencies.now(),
           },
           select: paymentSelect,
@@ -226,6 +270,12 @@ export const createPrismaSalaryPayments = (
         if (previous.paidOn.getTime() !== updated.paidOn.getTime()) {
           metadata.previousPaidOn = civilText(previous.paidOn);
           metadata.paidOn = civilText(updated.paidOn);
+        }
+        if (previous.receiptImageAssetId !== updated.receiptImageAssetId) {
+          if (previous.receiptImageAssetId !== null) {
+            metadata.previousReceiptImageAssetId = previous.receiptImageAssetId;
+          }
+          metadata.receiptImageAssetId = updated.receiptImageAssetId!;
         }
         if (Object.keys(metadata).length > 0) {
           await audit(transaction, actor, {

@@ -28,4 +28,8 @@ export const payStatementAuthorizationRows = (): Record<string, MatrixRow> => ({
   'GET /api/v1/coordinator/pay-statements': bothDenied(),
   // «Mis pagos»: a Trainer reads only the Salary Payments recorded for her.
   'GET /api/v1/trainer/salary-payments': bothDenied(),
+  // BKO-008: the receipt is the Administrator's, or the paid Trainer's own.
+  'GET /api/v1/administrator/salary-payments/{salaryPaymentId}/receipt':
+    administratorOnly(),
+  'GET /api/v1/trainer/salary-payments/{salaryPaymentId}/receipt': bothDenied(),
 });

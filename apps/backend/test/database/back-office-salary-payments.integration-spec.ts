@@ -260,7 +260,12 @@ describe('Prisma Back Office salary payments', () => {
     );
     const danielas = await world.prisma.salaryPayment.findMany({
       where: { staffMemberId: daniela },
-      select: { id: true, amountCentavos: true, paidOn: true },
+      select: {
+        id: true,
+        amountCentavos: true,
+        paidOn: true,
+        receiptImageAssetId: true,
+      },
     });
     expect(own).toHaveLength(danielas.length);
     expect(own).toEqual(expect.arrayContaining(danielas));

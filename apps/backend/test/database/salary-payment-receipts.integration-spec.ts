@@ -51,8 +51,15 @@ describe('Salary Payment receipts', () => {
         declaredMediaType: 'JPEG',
         declaredByteSize: 10,
         declaredChecksum: toPrismaBytes(Buffer.alloc(32, 3)),
+        verifiedMediaType: 'JPEG',
+        verifiedByteSize: 10,
+        verifiedChecksum: toPrismaBytes(Buffer.alloc(32, 3)),
+        verifiedWidth: 1200,
+        verifiedHeight: 1600,
         createdAt: created,
         expiresAt: new Date(created.getTime() + 15 * 60 * 1_000),
+        finalizedAt: new Date(created.getTime() + 5 * 60 * 1_000),
+        deletionDueAt: new Date(created.getTime() + 24 * 60 * 60 * 1_000),
         variants: {
           create: (['READABLE', 'THUMBNAIL'] as const).map((kind) => ({
             kind,
@@ -168,18 +175,33 @@ describe('Salary Payment receipts', () => {
     const payment = await record(photo.id);
     const readable = photo.variants.find((v) => v.kind === 'READABLE')!;
     const thumbnail = photo.variants.find((v) => v.kind === 'THUMBNAIL')!;
-    const read = async (email: string, variant = 'readable' as const) =>
-      receipts().readSalaryReceipt(
-        { salaryPaymentId: payment.id, variant },
-        await principalOf(email),
-      );
+    const command = {
+      salaryPaymentId: payment.id,
+      variant: 'readable' as const,
+    };
+    const any = async (email: string) =>
+      receipts().readAnySalaryReceipt(command, await principalOf(email));
+    const own = async (email: string) =>
+      receipts().readOwnSalaryReceipt(command, await principalOf(email));
 
-    await expect(read('paola.mendoza@example.com')).resolves.toEqual({
+    // Nómina: the Administrator only.
+    await expect(any('paola.mendoza@example.com')).resolves.toEqual({
       objectKey: readable.storageKey,
       mediaType: 'image/webp',
     });
+    for (const email of [
+      'emma.vargas@example.com',
+      'camila.rojas@example.com',
+      'carolina.rivas@example.com',
+    ]) {
+      await expect(codeOf(any(email))).resolves.toBe(
+        'back_office_access_denied',
+      );
+    }
+
+    // «Mis pagos»: the Trainer it pays; another Trainer finds nothing.
     await expect(
-      receipts().readSalaryReceipt(
+      receipts().readOwnSalaryReceipt(
         { salaryPaymentId: payment.id, variant: 'thumbnail' },
         await principalOf('emma.vargas@example.com'),
       ),
@@ -187,15 +209,16 @@ describe('Salary Payment receipts', () => {
       objectKey: thumbnail.storageKey,
       mediaType: 'image/webp',
     });
-    await expect(codeOf(read('daniela.ortiz@example.com'))).resolves.toBe(
+    await expect(codeOf(own('daniela.ortiz@example.com'))).resolves.toBe(
       'salary_payment_not_found',
     );
     for (const email of [
+      'paola.mendoza@example.com',
       'camila.rojas@example.com',
       'carolina.rivas@example.com',
       'lucia@example.com',
     ]) {
-      await expect(codeOf(read(email))).resolves.toBe(
+      await expect(codeOf(own(email))).resolves.toBe(
         'back_office_access_denied',
       );
     }
@@ -203,16 +226,16 @@ describe('Salary Payment receipts', () => {
     const bare = await record();
     await expect(
       codeOf(
-        receipts().readSalaryReceipt(
+        receipts().readAnySalaryReceipt(
           { salaryPaymentId: bare.id, variant: 'readable' },
           admin,
         ),
       ),
     ).resolves.toBe('salary_receipt_not_found');
-    const own = await payroll().listOwnSalaryPayments(
+    const ownPayments = await payroll().listOwnSalaryPayments(
       await principalOf('emma.vargas@example.com'),
     );
-    expect(own.find((row) => row.id === payment.id)).toMatchObject({
+    expect(ownPayments.find((row) => row.id === payment.id)).toMatchObject({
       receiptImageAssetId: photo.id,
     });
   });

@@ -146,6 +146,8 @@ export class AdminSalaryPaymentDto {
   @ApiProperty({ description: 'BOB centavos' }) amountCentavos!: number;
   @ApiProperty({ format: 'date', description: 'Bolivia civil date' })
   paidOn!: string;
+  @ApiProperty({ nullable: true, type: String, description: 'BKO-008' })
+  receiptUrl!: string | null;
 }
 
 export class AdminSalaryPaymentPageDto {
@@ -162,6 +164,12 @@ export class SalaryPaymentInputDto {
   amountCentavos!: number;
   @ApiProperty({ format: 'date', description: 'Today or earlier in Bolivia' })
   paidOn!: string;
+  @ApiProperty({
+    format: 'uuid',
+    required: false,
+    description: 'A ready transfer_receipt upload of hers (BKO-008)',
+  })
+  receiptImageAssetId?: string;
 }
 
 export const parseSalaryPaymentInput = (value: unknown) =>
@@ -170,6 +178,7 @@ export const parseSalaryPaymentInput = (value: unknown) =>
       staffMemberId: uuid,
       amountCentavos: centavos,
       paidOn: civilDate,
+      receiptImageAssetId: uuid.optional(),
     })
     .safeParse(value);
 

@@ -1,4 +1,5 @@
 import { BadRequestException, StreamableFile } from '@nestjs/common';
+import type { Response } from 'express';
 import type { BackOfficeOperations } from '../back-office-http';
 import { BackOfficeError } from '../back-office-errors';
 import { AdministratorSalaryPaymentsController } from './salary-payments.controller';
@@ -29,18 +30,19 @@ describe('AdministratorSalaryPaymentsController receipts', () => {
   const resolvePrincipal = jest.fn();
   const listSalaryPayments = jest.fn();
   const recordSalaryPayment = jest.fn();
-  const readSalaryReceipt = jest.fn();
+  const readAnySalaryReceipt = jest.fn();
   const get = jest.fn();
   const operations = {
     salaryPayments: { listSalaryPayments, recordSalaryPayment },
-    salaryReceipts: { readSalaryReceipt },
+    salaryReceipts: { readAnySalaryReceipt },
   } as unknown as BackOfficeOperations;
   const controller = new AdministratorSalaryPaymentsController(
     operations,
     resolvePrincipal,
     { get },
   );
-  const response = { setHeader: jest.fn() };
+  const setHeader = jest.fn();
+  const response = { setHeader } as unknown as Response;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -88,7 +90,7 @@ describe('AdministratorSalaryPaymentsController receipts', () => {
   });
 
   it('streams the receipt without caching', async () => {
-    readSalaryReceipt.mockResolvedValue({
+    readAnySalaryReceipt.mockResolvedValue({
       objectKey: 'private/receipt/readable',
       mediaType: 'image/webp',
     });
@@ -102,30 +104,24 @@ describe('AdministratorSalaryPaymentsController receipts', () => {
     );
 
     expect(file).toBeInstanceOf(StreamableFile);
-    expect(readSalaryReceipt).toHaveBeenCalledWith(
+    expect(readAnySalaryReceipt).toHaveBeenCalledWith(
       { salaryPaymentId: paymentId, variant: 'readable' },
       principal,
     );
     expect(get).toHaveBeenCalledWith('private/receipt/readable');
-    expect(response.setHeader).toHaveBeenCalledWith(
-      'Content-Type',
-      'image/webp',
-    );
-    expect(response.setHeader).toHaveBeenCalledWith(
-      'Cache-Control',
-      'no-store',
-    );
+    expect(setHeader).toHaveBeenCalledWith('Content-Type', 'image/webp');
+    expect(setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
   });
 
   it('refuses an unknown variant and maps a missing receipt to 404', async () => {
     await expect(
-      controller.receipt(paymentId, 'original', bearer, response as never),
+      controller.receipt(paymentId, 'original', bearer, response),
     ).rejects.toBeInstanceOf(BadRequestException);
-    readSalaryReceipt.mockRejectedValue(
+    readAnySalaryReceipt.mockRejectedValue(
       new BackOfficeError('salary_receipt_not_found'),
     );
     await expect(
-      controller.receipt(paymentId, 'thumbnail', bearer, response as never),
+      controller.receipt(paymentId, 'thumbnail', bearer, response),
     ).rejects.toMatchObject({
       response: { code: 'salary_receipt_not_found' },
       status: 404,
