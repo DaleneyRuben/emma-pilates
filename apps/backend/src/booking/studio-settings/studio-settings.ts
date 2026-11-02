@@ -65,6 +65,15 @@ export const isInsideCancellationWindow = (
 ): boolean =>
   startsAt.getTime() - now.getTime() <= cancellationWindowMinutes * 60_000;
 
+// FIX-026: a stub so the failing specs type-check; the rule comes next.
+export const isBeyondBookingWindow: (
+  startsAt: Date,
+  now: Date,
+  bookingWindowDays: number,
+) => boolean = () => {
+  throw new Error('Booking Window is not implemented');
+};
+
 const editableFields = [
   'minimumBookings',
   'taxRatePercent',
