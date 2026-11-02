@@ -256,6 +256,13 @@ describe("Client Session detail", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Activar notificaciones" })).toBeOnTheScreen();
     });
+    // Walkthrough n.º 16: the owner's global copy for the Client app.
+    expect(screen.getByText("No te pierdas ninguna clase")).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "Te avisamos antes de cada clase y cuando haya novedades sobre tus reservas, tu plan o tus pagos.",
+      ),
+    ).toBeOnTheScreen();
   });
 
   it("offers notifications once the Client joins the Waitlist", async () => {
