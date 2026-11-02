@@ -95,6 +95,8 @@ export const spacing = {
 // The frames round cards at 16 (MOB-039); chips, tinted notices, insets,
 // and sheets keep 12.
 export const radii = {
+  // Follow-up 225: primary and secondary buttons round at 14.
+  button: 14,
   control: 8,
   inset: 12,
   card: 16,

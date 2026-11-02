@@ -12,6 +12,8 @@ type PrimaryButtonProps = {
   /** «compact» for the 48 pt action inside a card. */
   size?: "compact" | "regular";
   testID?: string;
+  /** «error» is the solid destructive confirmation inside a sheet (follow-up 226). */
+  tone?: "error" | "primary";
 };
 
 export function PrimaryButton({
@@ -21,6 +23,7 @@ export function PrimaryButton({
   busy = false,
   size = "regular",
   testID,
+  tone = "primary",
 }: PrimaryButtonProps) {
   // Busy keeps the fill: grey would read as unavailable, not as working.
   const greyed = disabled && !busy;
@@ -31,7 +34,12 @@ export function PrimaryButton({
       accessibilityState={{ busy, disabled: disabled || busy }}
       disabled={disabled || busy}
       onPress={onPress}
-      style={[styles.button, size === "compact" && styles.compact, greyed && styles.disabledButton]}
+      style={[
+        styles.button,
+        size === "compact" && styles.compact,
+        tone === "error" && styles.errorButton,
+        greyed && styles.disabledButton,
+      ]}
       testID={testID}
     >
       <ButtonLabel
@@ -49,7 +57,7 @@ const styles = StyleSheet.create({
   button: {
     alignItems: "center",
     backgroundColor: colors.primary,
-    borderRadius: radii.control,
+    borderRadius: radii.button,
     justifyContent: "center",
     minHeight: 52,
     paddingHorizontal: spacing.lg,
@@ -57,13 +65,16 @@ const styles = StyleSheet.create({
   compact: {
     minHeight: 48,
   },
+  errorButton: {
+    backgroundColor: colors.error,
+  },
   disabledButton: {
     backgroundColor: colors.disabledBackground,
   },
   label: {
     color: colors.white,
     fontSize: typography.body,
-    fontWeight: "500",
+    fontWeight: "600",
   },
   disabledLabel: {
     color: colors.disabledText,
