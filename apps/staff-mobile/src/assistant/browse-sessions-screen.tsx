@@ -27,7 +27,7 @@ import { BranchField } from "../ui/branch-field";
 import { DayStrip } from "../ui/day-strip";
 import { FilterChips } from "../ui/filter-chips";
 import { SessionRow } from "../ui/session-row";
-import { countLabel, dayHeading, startTime } from "../ui/session-time";
+import { countLabel, dayHeading, noClassesOfType, startTime } from "../ui/session-time";
 import { TabletGrid } from "./assistant-layout";
 import { ClientBanner } from "./client-banner";
 import { useClientBookedSessionIds } from "./client-booked-sessions";
@@ -43,12 +43,6 @@ const allClassTypes = "all";
 function seatsTag(session: SessionAvailabilityDto): string {
   if (session.availableSeats === 0) return "Completa";
   return countLabel(session.availableSeats, "cupo", "cupos");
-}
-
-// «Hoy no hay Mat» or «El martes no hay Mat» (walkthrough 6, option A).
-function noneOfType(date: string, today: string, typeName: string): string {
-  if (date === today) return `Hoy no hay ${typeName}`;
-  return `El ${dayHeading(date).split(" ")[0]?.toLowerCase()} no hay ${typeName}`;
 }
 
 /** S07 Reservar una clase, for the Client named in the banner (v2). */
@@ -168,7 +162,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
               label: "Ver todas las clases",
               onPress: () => setClassTypeId(allClassTypes),
             }}
-            title={noneOfType(selectedDate, today, typeName)}
+            title={noClassesOfType(selectedDate, today, typeName)}
           />
         )
       ) : (

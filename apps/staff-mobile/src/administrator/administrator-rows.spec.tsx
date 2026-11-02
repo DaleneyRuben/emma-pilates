@@ -6,7 +6,6 @@ import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support"
 
 jest.setTimeout(20_000);
 
-const hidden = { includeHiddenElements: true };
 
 const administrator = {
   id: "staff-2",
@@ -104,50 +103,10 @@ describe("Administrator rows", () => {
     expect(screen.getByRole("button", { name: "Cerrar caja" })).toBeOnTheScreen();
   });
 
-  it("draws the cancel-class picker pill and the Session card", async () => {
-    const screen = await openPayments();
-
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
-    });
-    expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toHaveStyle({
-      borderRadius: 999,
-      minHeight: 44,
-    });
-    expect(screen.getAllByTestId("glyph-pin", hidden)[0]).toHaveProp("width", 17);
-
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
-    });
-    const card = within(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
-    expect(card.getByText("Reformer Pilates")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 20,
-    });
-    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#4A4A4A", fontSize: 14 });
-    expect(card.getByTestId("glyph-person", hidden)).toHaveProp("width", 16);
-    // UX-012 / S7: the pill already says «Sucursal: Centro», so the row is the bare name.
-    expect(card.getByText("Centro", { exact: true })).toHaveStyle({
-      color: "#6F6662",
-      fontSize: 13,
-    });
-    expect(card.queryByText(/^Sucursal /)).toBeNull();
-    expect(card.getByTestId("glyph-pin", hidden)).toHaveProp("width", 15);
-    expect(card.getByTestId("card-footer")).toHaveStyle({ paddingTop: 13 });
-    expect(card.getByText("6 reservas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
-    expect(card.getByText("6 cupos")).toBeOnTheScreen();
-    // S11's payment card stays mounted under S13, so the chevron is read inside the card.
-    const chevron = card.getByTestId("chevron", hidden);
-    expect(chevron).toHaveProp("stroke", "#B78380");
-    expect(chevron).toHaveProp("width", 19);
-  });
-
-  // MOB-047: follow-up 84's seat pill — the seats on Palo de rosa tinte, a
-  // full class on the neutral pill, 12 pt weight 500, never red, no dot.
-  it("draws the seat pills as follow-up 84 settles them", async () => {
-    const full = { ...session, id: "session-full", bookedCount: 12, availableSeats: 0 };
-    const screen = await openPayments([session, full]);
+  // v2 S13: the start in Lora 20, the class over its Trainer, the bookings pill.
+  it("draws each class to cancel as a v2 row with its bookings", async () => {
+    const empty = { ...session, id: "session-empty", bookedCount: 0, availableSeats: 12 };
+    const screen = await openPayments([session, empty]);
 
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
     await waitFor(() => {
@@ -156,18 +115,9 @@ describe("Administrator rows", () => {
     const cards = screen
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((card) => within(card));
-    expect(cards[0].getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#F2E4E1",
-      borderRadius: 999,
-    });
-    expect(cards[0].getByText("6 cupos")).toHaveStyle({
-      color: "#7D4F4B",
-      fontSize: 12,
-      fontWeight: "500",
-    });
-    expect(cards[1].getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "rgba(216,201,187,0.34)",
-    });
-    expect(cards[1].getByText("Llena")).toHaveStyle({ color: "#6F6662", fontSize: 12 });
+    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({ fontSize: 16 });
+    expect(cards[0].getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
+    expect(cards[0].getByText("6 reservas").parent).toHaveStyle({ backgroundColor: "#E6DBD0" });
+    expect(cards[1].getByText("Sin reservas")).toBeOnTheScreen();
   });
 });

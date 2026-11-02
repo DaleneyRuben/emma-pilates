@@ -56,7 +56,7 @@ describe("Cancelar una clase (S13)", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Elegir otra fecha, hasta 30 días" }));
     const days = screen.getAllByTestId(/^cancel-class-other-/);
-    expect(days).toHaveLength(23);
+    expect(days).toHaveLength(24);
     await fireEvent.press(days[days.length - 1]!);
     expect(screen.getByRole("button", { name: "Elegir otra fecha, hasta 30 días" })).toHaveProp(
       "accessibilityState",

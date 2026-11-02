@@ -1,35 +1,35 @@
 import {
+  useListAdministratorSessions,
   useListBranches,
   useListClassTypes,
-  useListAdministratorSessions,
   useListSessionAvailability,
   type SessionAvailabilityDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   boliviaCivilDate,
-  BranchPickerPill,
   civilDateRange,
-  colors,
-  dayChipLabel,
-  formatSessionDate,
+  formatTimeRange,
   hasStarted,
   LoadingState,
   QueryFailure,
-  radii,
   Screen,
-  ScreenTopBar,
+  SectionTitle,
   spacing,
-  typography,
+  StateScreen,
   upcomingCivilDates,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { describeCount } from "./administrator-format";
-import { CancelClassCard } from "./cancel-class-card";
+import { BackBar } from "../ui/back-bar";
+import { BranchField } from "../ui/branch-field";
+import { DayStrip, DayStripAction } from "../ui/day-strip";
+import { FilterChips } from "../ui/filter-chips";
+import { SessionRow } from "../ui/session-row";
+import { countLabel, dayHeading, noClassesOfType, startTime } from "../ui/session-time";
+import { OtherDateSheet } from "./other-date-sheet";
 
 export type CancellableSession = SessionAvailabilityDto & { branchName: string };
 
@@ -39,40 +39,28 @@ type CancelClassNavigation = {
 };
 
 const allClassTypes = "all";
+const everyBranch = "all";
+// Walkthrough 23: cancelling reaches the 30 days the schedule is published for.
+const horizonDays = 30;
+// Six days and «Otra» share the strip (S13).
+const stripDays = 6;
 
-function Chip({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={[styles.chip, selected && styles.chipSelected]}
-    >
-      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{label}</Text>
-    </Pressable>
-  );
+function bookings(session: SessionAvailabilityDto): string {
+  return session.bookedCount === 0
+    ? "Sin reservas"
+    : countLabel(session.bookedCount, "reserva", "reservas");
 }
 
-const everyBranch = "every-branch";
-
+/** S13 Cancelar una clase (v2), for the Administrator and the Coordinator. */
 export function CancelClassScreen() {
   const navigation = useNavigation<CancelClassNavigation>();
   const fetcher = useStaffFetcher();
   const today = boliviaCivilDate(new Date());
-  const dates = useMemo(() => upcomingCivilDates(today, 7), [today]);
+  const days = useMemo(() => upcomingCivilDates(today, horizonDays), [today]);
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
   const [classTypeId, setClassTypeId] = useState(allClassTypes);
-  const [choosingBranch, setChoosingBranch] = useState(false);
+  const [choosingDate, setChoosingDate] = useState(false);
 
   const branches = useListBranches({ fetcher });
   const classTypes = useListClassTypes({ fetcher });
@@ -84,10 +72,7 @@ export function CancelClassScreen() {
     { branchId: branch?.id ?? "", from, until, limit: 100 },
     {
       fetcher,
-      query: {
-        enabled: branch !== undefined && !allBranches,
-        refetchOnMount: "always",
-      },
+      query: { enabled: branch !== undefined && !allBranches, refetchOnMount: "always" },
     },
   );
   // API-002: an Administrator acts on every Branch, so one search spans them.
@@ -96,14 +81,8 @@ export function CancelClassScreen() {
     { fetcher, query: { enabled: allBranches, refetchOnMount: "always" } },
   );
   const sessions = allBranches ? everySession : branchSessions;
-  const branchLabel = allBranches ? "Todas las sucursales" : (branch?.name ?? "");
 
-  const header = (
-    <>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Cancelar una clase" />
-    </>
-  );
-
+  const header = <BackBar onBack={() => navigation.goBack()} title="Cancelar una clase" />;
   if (branches.isPending || classTypes.isPending) {
     return (
       <Screen style={styles.screen}>
@@ -125,97 +104,52 @@ export function CancelClassScreen() {
   }
 
   const classTypeList = classTypes.data?.status === 200 ? classTypes.data.data : [];
+  const typeName = classTypeList.find((classType) => classType.id === classTypeId)?.name;
   const now = new Date();
   const visible = (sessions.data?.status === 200 ? sessions.data.data : []).filter(
     (session) =>
       !hasStarted(session.startsAt, now) &&
       (classTypeId === allClassTypes || session.classTypeId === classTypeId),
   );
-  const dayTitle = formatSessionDate(`${selectedDate}T12:00:00.000Z`);
+  const strip = days.slice(0, stripDays);
+  const later = days.slice(stripDays);
+  const pickedLater = later.includes(selectedDate);
+  const isToday = selectedDate === today;
 
   return (
     <Screen style={styles.screen}>
       {header}
-      <BranchPickerPill
-        name={branchLabel}
-        onPress={() => setChoosingBranch((current) => !current)}
-        open={choosingBranch}
+      <BranchField
+        allLabel="Todas las sucursales"
+        onSelect={setSelectedBranchId}
+        options={branchList}
+        selectedId={allBranches ? everyBranch : branch.id}
+        selectedName={allBranches ? "Todas las sucursales" : branch.name}
       />
-      {choosingBranch ? (
-        <View style={styles.branchList}>
-          <BodyText>Elige una sucursal</BodyText>
-          <Chip
-            label="Todas las sucursales"
-            onPress={() => {
-              setSelectedBranchId(everyBranch);
-              setChoosingBranch(false);
-            }}
-            selected={allBranches}
+      <DayStrip
+        dates={strip}
+        onSelect={setSelectedDate}
+        selected={selectedDate}
+        testIDPrefix="cancel-class-day"
+        today={today}
+        trailing={
+          <DayStripAction
+            accessibilityLabel="Elegir otra fecha, hasta 30 días"
+            label={pickedLater ? (dayHeading(selectedDate).split(" ")[1] ?? "Otra") : "Otra"}
+            onPress={() => setChoosingDate(true)}
+            selected={pickedLater}
+            testID="cancel-class-other"
           />
-          {branchList.map((candidate) => (
-            <Chip
-              key={candidate.id}
-              label={candidate.name}
-              onPress={() => {
-                setSelectedBranchId(candidate.id);
-                setChoosingBranch(false);
-              }}
-              selected={!allBranches && candidate.id === branch.id}
-            />
-          ))}
-        </View>
-      ) : null}
-      <ScrollView
-        horizontal
-        contentContainerStyle={styles.chips}
-        showsHorizontalScrollIndicator={false}
-        style={styles.strip}
-      >
-        {dates.map((date) => {
-          const { weekday, day } = dayChipLabel(date);
-          const selected = date === selectedDate;
-          return (
-            <Pressable
-              accessibilityLabel={`${weekday} ${day}`}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              key={date}
-              onPress={() => setSelectedDate(date)}
-              style={[styles.dayChip, selected && styles.chipSelected]}
-              testID={`cancel-class-day-${date}`}
-            >
-              <Text style={[styles.dayWeekday, selected && styles.chipLabelSelected]}>
-                {weekday}
-              </Text>
-              <Text style={[styles.dayNumber, selected && styles.chipLabelSelected]}>{day}</Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-      <ScrollView
-        horizontal
-        contentContainerStyle={styles.chips}
-        showsHorizontalScrollIndicator={false}
-        style={styles.strip}
-      >
-        <Chip
-          label="Todas"
-          onPress={() => setClassTypeId(allClassTypes)}
-          selected={classTypeId === allClassTypes}
-        />
-        {classTypeList.map((classType) => (
-          <Chip
-            key={classType.id}
-            label={classType.name}
-            onPress={() => setClassTypeId(classType.id)}
-            selected={classTypeId === classType.id}
-          />
-        ))}
-      </ScrollView>
-      <View style={styles.dayHeader}>
-        <Text style={styles.dayTitle}>{dayTitle}</Text>
-        <BodyText>{describeCount(visible.length, "clase", "clases")}</BodyText>
-      </View>
+        }
+      />
+      <FilterChips
+        onSelect={setClassTypeId}
+        options={[
+          { id: allClassTypes, label: "Todas" },
+          ...classTypeList.map((classType) => ({ id: classType.id, label: classType.name })),
+        ]}
+        selected={classTypeId}
+      />
       {sessions.isPending ? (
         <LoadingState label="Cargando clases" />
       ) : sessions.isError ? (
@@ -224,80 +158,71 @@ export function CancelClassScreen() {
           onRetry={() => void sessions.refetch()}
         />
       ) : visible.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>No hay clases con estos filtros.</Text>
-          <BodyText style={styles.centered}>
-            Prueba otro día, otra sucursal u otro tipo de clase.
-          </BodyText>
-        </View>
+        typeName === undefined ? (
+          <StateScreen
+            icon="calendar"
+            layout="inList"
+            note="Elige otro día o una fecha más adelante."
+            textAction={{ label: "Elegir otra fecha", onPress: () => setChoosingDate(true) }}
+            title={isToday ? "Hoy no hay clases para cancelar" : "Este día no hay clases"}
+          />
+        ) : (
+          <StateScreen
+            icon="calendar"
+            layout="inList"
+            note="Prueba otro día o mira todas las clases de este día."
+            primaryAction={{
+              label: "Ver todas las clases",
+              onPress: () => setClassTypeId(allClassTypes),
+            }}
+            title={noClassesOfType(selectedDate, today, typeName)}
+          />
+        )
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
-          {visible.map((session) => {
-            const branchName = allBranches ? session.branchName : branch.name;
-            return (
-              <CancelClassCard
-                branchName={branchName}
-                key={session.id}
-                labelBranch={allBranches}
-                onPress={() =>
-                  navigation.navigate("CancelSession", {
-                    session: { ...session, branchName },
-                  })
-                }
-                session={session}
-              />
-            );
-          })}
+          <SectionTitle>
+            {`${dayHeading(selectedDate)} · ${countLabel(visible.length, "clase", "clases")}`}
+          </SectionTitle>
+          <View style={styles.rows}>
+            {visible.map((session) => {
+              const branchName = allBranches ? session.branchName : branch.name;
+              return (
+                <SessionRow
+                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}${allBranches ? ` · ${branchName}` : ""}`}
+                  key={session.id}
+                  onPress={() =>
+                    navigation.navigate("CancelSession", { session: { ...session, branchName } })
+                  }
+                  pill={bookings(session)}
+                  pillTone="neutral"
+                  subtitle={
+                    allBranches ? `${session.trainerName} · ${branchName}` : session.trainerName
+                  }
+                  testID={`cancel-class-card-${session.id}`}
+                  time={startTime(session.startsAt, session.endsAt)}
+                  title={session.classTypeName}
+                />
+              );
+            })}
+          </View>
         </ScrollView>
       )}
+      <OtherDateSheet
+        dates={later}
+        onClose={() => setChoosingDate(false)}
+        onSelect={(date) => {
+          setSelectedDate(date);
+          setChoosingDate(false);
+        }}
+        selected={selectedDate}
+        visible={choosingDate}
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  // Horizontal strips keep their natural height when the list below is long.
-  strip: { flexGrow: 0, flexShrink: 0 },
-  branchList: { gap: spacing.sm },
-  centered: { textAlign: "center" },
-  chip: {
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  chipLabel: { color: colors.textSecondary, fontSize: typography.note },
-  chipLabelSelected: { color: colors.white },
-  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chips: { gap: spacing.sm, paddingVertical: spacing.xs },
-  dayChip: {
-    alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: radii.inset,
-    borderWidth: 1,
-    minWidth: 52,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
-  },
-  dayHeader: {
-    alignItems: "baseline",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  dayNumber: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "600" },
-  dayTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  dayWeekday: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    textTransform: "uppercase",
-  },
-  empty: { alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xxl },
-  emptyTitle: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-    textAlign: "center",
-  },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  screen: { gap: spacing.md },
+  rows: { gap: spacing.md },
+  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
 });

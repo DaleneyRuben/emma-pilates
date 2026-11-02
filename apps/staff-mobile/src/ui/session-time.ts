@@ -21,3 +21,9 @@ export function dayHeading(civilDate: string): string {
 export function countLabel(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`;
 }
+
+// «Hoy no hay Mat» or «El martes no hay Mat» (walkthrough 6, option A).
+export function noClassesOfType(date: string, today: string, typeName: string): string {
+  if (date === today) return `Hoy no hay ${typeName}`;
+  return `El ${dayHeading(date).split(" ")[0]?.toLowerCase()} no hay ${typeName}`;
+}

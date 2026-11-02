@@ -14,6 +14,13 @@ export type AdministratorApi = {
   rejectPayment: (paymentId: string, reason: string) => Promise<PaymentReviewDto>;
 };
 
+/** A refused Administrator request, with the API's problem code when it sent one. */
+export class AdministratorApiError extends Error {
+  constructor(readonly code: string | null) {
+    super("The Administrator request could not be completed");
+  }
+}
+
 function requireSuccessfulResponse({ status }: { status: number }): void {
   if (status < 200 || status >= 300) {
     throw new Error("The Administrator request could not be completed");
@@ -24,7 +31,10 @@ export function createAdministratorApi(fetcher: typeof globalThis.fetch): Admini
   return {
     async cancelSession(sessionId) {
       const response = await cancelSession(sessionId, undefined, fetcher);
-      requireSuccessfulResponse(response);
+      if (response.status < 200 || response.status >= 300) {
+        const code = (response.data as { code?: unknown } | null)?.code;
+        throw new AdministratorApiError(typeof code === "string" ? code : null);
+      }
       return response.data as SessionCancellationDto;
     },
     async confirmPayment(paymentId) {
