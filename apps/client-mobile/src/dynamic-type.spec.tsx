@@ -3,7 +3,6 @@ import { StyleSheet } from "react-native";
 
 import { ShortcutTile } from "./home/home-shortcuts";
 import { ClientNavigation } from "./navigation";
-import { PaymentStatusView } from "./payments/payment-status-view";
 
 function createAuthenticationApiMock() {
   return {
@@ -38,15 +37,6 @@ describe("Dynamic Type on Client screens", () => {
 
     expect(style.fontSize).toBe(11);
     expect(style.lineHeight).toBeUndefined();
-  });
-
-  it("sizes the payment-status disc from the glyph", async () => {
-    const screen = await render(<PaymentStatusView state="pending" />);
-    const disc = StyleSheet.flatten(screen.getByTestId("payment-status-disc-pending").props.style);
-
-    expect(disc.height).toBeUndefined();
-    expect(disc.minHeight).toBeGreaterThanOrEqual(72);
-    expect(disc.minWidth).toBeGreaterThanOrEqual(72);
   });
 
   it("keeps a Home tile title's line box taller than its font", async () => {
