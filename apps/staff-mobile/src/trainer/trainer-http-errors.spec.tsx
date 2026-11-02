@@ -59,7 +59,7 @@ describe("Trainer screens on an HTTP error", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
 
     await waitFor(() => {
-      expect(screen.getByText("No tienes clases este día.")).toBeOnTheScreen();
+      expect(screen.getByText("Hoy no tienes clases")).toBeOnTheScreen();
     });
   });
 

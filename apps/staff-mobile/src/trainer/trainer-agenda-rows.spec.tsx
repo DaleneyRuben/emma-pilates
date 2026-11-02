@@ -18,8 +18,8 @@ const session = (sessionId: string, classTypeName: string, bookedCount: number) 
   startsAt: "2026-09-10T14:00:00.000Z",
 });
 
-// MOB-042: S02's agenda card ends in the chevron beside the time and title,
-// names the Branch after a pin, and closes with the booked count and a pill.
+// v2 S02: the start in Lora 20 with its length, the class over «Branch · booked»,
+// a pill, and a chevron.
 describe("Trainer agenda rows", () => {
   afterEach(async () => {
     await cleanup();
@@ -54,49 +54,29 @@ describe("Trainer agenda rows", () => {
     await waitFor(() => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Reformer Pilates")).toHaveStyle({
-      color: "#4A4A4A",
-      fontFamily: "Lora_500Medium",
+    expect(screen.getByText("Reformer Pilates")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
+    expect(screen.getAllByText("10:00")[0]).toHaveStyle({
+      fontFamily: "Lora_400Regular",
       fontSize: 20,
     });
-    expect(screen.getAllByText(/^10:00/)[0]).toHaveStyle({
+    expect(screen.getAllByText("60 min")[0]).toHaveStyle({ color: "#6F6662", fontSize: 13 });
+    expect(screen.getByText("Sopocachi · 6 de 8 reservados")).toHaveStyle({
       color: "#6F6662",
       fontSize: 13,
-      fontWeight: "500",
     });
-    expect(screen.getAllByText("Sopocachi")[0]).toHaveStyle({ color: "#6F6662", fontSize: 13 });
-    expect(screen.getAllByTestId("glyph-pin", hidden)[0]).toHaveProp("width", 15);
-    expect(screen.getByText("6 de 8 reservados")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
-    expect(screen.getAllByTestId("glyph-person", hidden)[0]).toHaveProp("width", 17);
-    expect(screen.getAllByTestId("card-footer")[0]).toHaveStyle({ paddingTop: 13 });
-    // MOB-047: follow-up 84's seat pill — «Con cupos» on Palo de rosa tinte,
-    // «Completa» on the neutral pill (never Éxito green), 12 pt weight 500.
+    expect(screen.getByText("Hoy · 2 clases")).toBeOnTheScreen();
     const open = within(
       screen.getByRole("button", {
         name: "Reformer Pilates, 10:00 – 11:00, Sopocachi, 6 de 8 reservados, Con cupos",
       }),
     );
-    expect(open.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#F2E4E1",
-      borderRadius: 999,
-    });
-    expect(open.getByText("Con cupos")).toHaveStyle({
-      color: "#7D4F4B",
-      fontSize: 12,
-      fontWeight: "500",
-    });
+    expect(open.getByText("Con cupos").parent).toHaveStyle({ backgroundColor: "#F2E4E1" });
     const full = within(
       screen.getByRole("button", {
         name: "Mat Pilates, 10:00 – 11:00, Sopocachi, 8 de 8 reservados, Completa",
       }),
     );
-    expect(full.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "rgba(216,201,187,0.34)",
-    });
-    expect(full.getByText("Completa")).toHaveStyle({ color: "#6F6662", fontSize: 12 });
-    const chevrons = screen.getAllByTestId("chevron", hidden);
-    expect(chevrons).toHaveLength(2);
-    expect(chevrons[0]).toHaveProp("stroke", "#B78380");
-    expect(chevrons[0]).toHaveProp("width", 19);
+    expect(full.getByText("Completa").parent).toHaveStyle({ backgroundColor: "#E6DBD0" });
+    expect(screen.getAllByTestId("chevron", hidden)).toHaveLength(2);
   });
 });
