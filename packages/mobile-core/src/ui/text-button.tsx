@@ -31,7 +31,7 @@ export function TextButton({
       style={styles.button}
       testID={testID}
     >
-      <Text style={[styles.label, tone === "onTint" && styles.onTint, disabled && styles.disabled]}>
+      <Text style={[styles.label, tone === "error" && styles.error, disabled && styles.disabled]}>
         {label}
       </Text>
     </Pressable>
@@ -48,13 +48,15 @@ const styles = StyleSheet.create({
   disabled: {
     color: colors.disabledText,
   },
-  onTint: {
-    color: colors.primaryOnTint,
+  error: {
+    color: colors.error,
   },
+  // Follow-up 225 §4: Rosa enlace, which already reads on Lino and Rosa tinte,
+  // so «onTint» draws the same; no underline.
   label: {
-    color: colors.primaryDeep,
-    fontFamily: fontFamilies.body,
+    color: colors.primaryOnTint,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
-    textDecorationLine: "underline",
+    fontWeight: "600",
   },
 });
