@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   },
   hint: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   input: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.control,
     borderWidth: 1,

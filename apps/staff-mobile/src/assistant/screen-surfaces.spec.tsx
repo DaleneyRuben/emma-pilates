@@ -27,9 +27,7 @@ describe("Assistant surfaces on Superficie", () => {
 
     expect(screen.getByText("Sin plan activo").parent).toHaveStyle({
       backgroundColor: "rgba(216,201,187,0.14)",
-      borderColor: "#D8C9BB",
       borderStyle: "dashed",
-      borderWidth: 1,
     });
   });
 
@@ -77,10 +75,8 @@ describe("Assistant cards and empty states (MOB-039)", () => {
     const screen = await openLucia(assistantRoutes());
 
     expect(screen.getByText("Historial").parent?.parent).toHaveStyle({
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
+      backgroundColor: "#F5EFE9",
       borderRadius: 16,
-      borderWidth: 1,
     });
   });
 

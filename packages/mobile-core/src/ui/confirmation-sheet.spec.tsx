@@ -34,7 +34,7 @@ describe("ConfirmationSheet", () => {
     ).toBeOnTheScreen();
     const confirm = sheet.getByTestId("logout-confirm");
     expect(confirm).toBe(sheet.getByRole("button", { name: "Cerrar sesión" }));
-    expect(confirm).toHaveStyle({ borderColor: "#B25D4B" });
+    expect(confirm).toHaveStyle({ borderColor: "#A04E3E" });
     expect(sheet.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
   });
 

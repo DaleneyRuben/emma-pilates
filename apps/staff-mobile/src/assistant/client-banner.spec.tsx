@@ -9,7 +9,7 @@ describe("ClientBanner", () => {
     );
 
     expect(screen.getByText("Reservando para: Lucía Fernández")).toHaveStyle({
-      color: "#7A4F4B",
+      color: "#7D4F4B",
     });
   });
 });

@@ -60,13 +60,13 @@ describe("Trainer agenda rows", () => {
       fontSize: 20,
     });
     expect(screen.getAllByText(/^10:00/)[0]).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 13,
       fontWeight: "500",
     });
-    expect(screen.getAllByText("Sopocachi")[0]).toHaveStyle({ color: "#766D69", fontSize: 13 });
+    expect(screen.getAllByText("Sopocachi")[0]).toHaveStyle({ color: "#6F6662", fontSize: 13 });
     expect(screen.getAllByTestId("glyph-pin", hidden)[0]).toHaveProp("width", 15);
-    expect(screen.getByText("6 de 8 reservados")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(screen.getByText("6 de 8 reservados")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
     expect(screen.getAllByTestId("glyph-person", hidden)[0]).toHaveProp("width", 17);
     expect(screen.getAllByTestId("card-footer")[0]).toHaveStyle({ paddingTop: 13 });
     // MOB-047: follow-up 84's seat pill — «Con cupos» on Palo de rosa tinte,
@@ -77,11 +77,11 @@ describe("Trainer agenda rows", () => {
       }),
     );
     expect(open.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#EFE0DC",
+      backgroundColor: "#F2E4E1",
       borderRadius: 999,
     });
     expect(open.getByText("Con cupos")).toHaveStyle({
-      color: "#7A4F4B",
+      color: "#7D4F4B",
       fontSize: 12,
       fontWeight: "500",
     });
@@ -93,7 +93,7 @@ describe("Trainer agenda rows", () => {
     expect(full.getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "rgba(216,201,187,0.34)",
     });
-    expect(full.getByText("Completa")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
+    expect(full.getByText("Completa")).toHaveStyle({ color: "#6F6662", fontSize: 12 });
     const chevrons = screen.getAllByTestId("chevron", hidden);
     expect(chevrons).toHaveLength(2);
     expect(chevrons[0]).toHaveProp("stroke", "#B78380");

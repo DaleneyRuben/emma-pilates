@@ -106,14 +106,12 @@ describe("Client reschedule option card", () => {
     const { button, card } = await openReschedule();
 
     expect(button).toHaveStyle({
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
+      backgroundColor: "#F5EFE9",
       borderRadius: 16,
-      borderWidth: 1,
       padding: 18,
     });
     expect(card.getByText(/^\d\d:\d\d – \d\d:\d\d$/)).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 12,
       fontWeight: "500",
       letterSpacing: 1.2,
@@ -127,13 +125,13 @@ describe("Client reschedule option card", () => {
       paddingTop: 12,
     });
     expect(card.getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
-    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
     expect(card.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#EFE0DC",
+      backgroundColor: "#F2E4E1",
       borderRadius: 999,
     });
     expect(card.getByText("8 cupos")).toHaveStyle({
-      color: "#7A4F4B",
+      color: "#7D4F4B",
       fontSize: 12,
       fontWeight: "500",
     });

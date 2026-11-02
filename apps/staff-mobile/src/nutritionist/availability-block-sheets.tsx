@@ -101,7 +101,7 @@ export function BlockChangeSheet({
 
 const styles = StyleSheet.create({
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderTopLeftRadius: radii.frame,
     borderTopRightRadius: radii.frame,
     gap: spacing.md,

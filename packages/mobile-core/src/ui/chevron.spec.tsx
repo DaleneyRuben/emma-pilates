@@ -34,7 +34,7 @@ describe("Chevron", () => {
     );
 
     const closed = screen.getByTestId("closed", hidden);
-    expect(closed).toHaveProp("stroke", "#766D69");
+    expect(closed).toHaveProp("stroke", "#6F6662");
     expect(closed).toHaveProp("width", 16);
     expect(screen.getByTestId("closed-down", hidden)).toHaveProp("d", "M6 9.5 12 15.5 18 9.5");
     expect(screen.getByTestId("open-up", hidden)).toHaveProp("d", "M6 14.5 12 8.5 18 14.5");

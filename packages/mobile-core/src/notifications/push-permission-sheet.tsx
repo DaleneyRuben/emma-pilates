@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderTopLeftRadius: radii.frame,
     borderTopRightRadius: radii.frame,
     gap: spacing.md,

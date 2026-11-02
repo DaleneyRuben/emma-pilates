@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   day: {
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.border,
     borderRadius: radii.inset,
     borderWidth: 1,
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
   screen: { gap: spacing.lg },
   slot: {
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.control,
     borderWidth: 1,

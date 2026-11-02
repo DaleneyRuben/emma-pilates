@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   removeText: { color: colors.errorText, fontSize: typography.body },
   screen: { gap: spacing.md },
   timeField: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.control,
     borderWidth: 1,

@@ -11,7 +11,7 @@ describe("PaymentStatusView", () => {
   it.each([
     ["pending", "Pago en revisión", "#C99A4E"],
     ["confirmed", "Pago confirmado", "#7C9473"],
-    ["rejected", "Comprobante rechazado", "#B25D4B"],
+    ["rejected", "Comprobante rechazado", "#A04E3E"],
   ] as const)(
     "draws the %s status as a line icon labelled for VoiceOver",
     async (state, label, disc) => {

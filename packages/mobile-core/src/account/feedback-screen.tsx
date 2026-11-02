@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   centered: { textAlign: "center" },
   chip: {
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,
     borderWidth: 1,

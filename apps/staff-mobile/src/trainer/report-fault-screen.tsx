@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   checkRow: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md, minHeight: 44 },
   checkText: { flexShrink: 1, gap: spacing.xs },
   chip: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,
     borderWidth: 1,

@@ -42,7 +42,7 @@ describe("Nutritionist agenda rows", () => {
       width: 1,
     });
     expect(screen.getByText("Valeria Áñez")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
-    expect(screen.getByText("Primera evaluación")).toHaveStyle({ color: "#766D69", fontSize: 13 });
+    expect(screen.getByText("Primera evaluación")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
     expect(screen.getByRole("button", { name: "09:00 Valeria Áñez" })).toHaveStyle({
       alignItems: "center",
       flexDirection: "row",

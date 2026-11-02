@@ -268,13 +268,13 @@ const styles = StyleSheet.create({
   },
   branchText: { flex: 1, gap: spacing.xxs },
   branchSheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderRadius: radii.frame,
     gap: spacing.xs,
     padding: spacing.lg,
   },
   chip: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,
     borderWidth: 1,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   strip: { flexGrow: 0, flexShrink: 0 },
   dayChip: {
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.inset,
     borderWidth: 1,

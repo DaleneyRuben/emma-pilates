@@ -46,7 +46,7 @@ async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearc
 
 const expectCardNotice = (screen: Awaited<ReturnType<typeof openClientSearch>>, wait: string) => {
   expect(screen.getByTestId("wait-notice")).toHaveStyle({
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
   });
   expect(
     screen.getByTestId("wait-notice-clock", { includeHiddenElements: true }),

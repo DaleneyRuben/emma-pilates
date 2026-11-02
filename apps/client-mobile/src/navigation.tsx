@@ -118,7 +118,7 @@ const ClientTabs = createBottomTabNavigator({
     tabBarLabelPosition: "below-icon",
     tabBarLabelStyle: { fontSize: typography.tabLabel },
     tabBarStyle: {
-      backgroundColor: colors.white,
+      backgroundColor: colors.card,
       borderTopColor: colors.borderStrong,
     },
   },

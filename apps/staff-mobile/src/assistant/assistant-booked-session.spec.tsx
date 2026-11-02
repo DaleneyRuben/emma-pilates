@@ -49,7 +49,7 @@ describe("Assistant booked Session", () => {
     expect(card.getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "rgba(216,201,187,0.34)",
     });
-    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
+    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#6F6662", fontSize: 12 });
   });
 
   it("keeps the seat count on a Session she only waits for", async () => {

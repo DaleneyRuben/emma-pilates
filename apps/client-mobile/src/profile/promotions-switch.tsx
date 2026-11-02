@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   error: { color: colors.error, fontSize: typography.note },
   helper: { color: colors.textMuted, fontSize: typography.note },
   knob: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderRadius: radii.pill,
     elevation: 2,
     height: 27,

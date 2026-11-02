@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   pill: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,
     borderWidth: 1,

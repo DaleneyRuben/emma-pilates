@@ -39,10 +39,8 @@ describe("Assistant Session detail capacity summary", () => {
 
     expect(box).toHaveStyle({
       alignItems: "center",
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
+      backgroundColor: "#F5EFE9",
       borderRadius: 16,
-      borderWidth: 1,
       flexDirection: "row",
       gap: 12,
       justifyContent: "space-between",
@@ -54,11 +52,11 @@ describe("Assistant Session detail capacity summary", () => {
       fontSize: 15,
     });
     expect(summary.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#EFE0DC",
+      backgroundColor: "#F2E4E1",
       borderRadius: 999,
     });
     expect(summary.getByText("Con cupos")).toHaveStyle({
-      color: "#7A4F4B",
+      color: "#7D4F4B",
       fontSize: 12,
       fontWeight: "500",
     });
@@ -77,7 +75,7 @@ describe("Assistant Session detail capacity summary", () => {
     expect(summary.getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "rgba(216,201,187,0.34)",
     });
-    expect(summary.getByText("Completa")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
+    expect(summary.getByText("Completa")).toHaveStyle({ color: "#6F6662", fontSize: 12 });
     expect(screen.queryByText("Lleno")).toBeNull();
     expect(screen.getByRole("button", { name: "Unirme a la lista de espera" })).toBeOnTheScreen();
   });

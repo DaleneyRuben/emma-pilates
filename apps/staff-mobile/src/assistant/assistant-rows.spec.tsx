@@ -40,7 +40,7 @@ describe("Assistant rows", () => {
     expect(screen.getByText("L")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 16 });
     expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
     expect(screen.getByText("+591 70011001 · lucia@example.com")).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 13,
     });
     const chevron = screen.getByTestId("chevron", hidden);
@@ -70,7 +70,7 @@ describe("Assistant rows", () => {
       fontFamily: "Lora_500Medium",
       fontSize: 19,
     });
-    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
     expect(card.getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
     expect(card.getByText("6 cupos")).toBeOnTheScreen();
     // S04's result row stays mounted under S07, so the chevron is read inside the card.
@@ -97,17 +97,17 @@ describe("Assistant rows", () => {
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((card) => within(card));
     expect(cards[0].getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#EFE0DC",
+      backgroundColor: "#F2E4E1",
       borderRadius: 999,
     });
     expect(cards[0].getByText("6 cupos")).toHaveStyle({
-      color: "#7A4F4B",
+      color: "#7D4F4B",
       fontSize: 12,
       fontWeight: "500",
     });
     expect(cards[1].getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "rgba(216,201,187,0.34)",
     });
-    expect(cards[1].getByText("Llena")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
+    expect(cards[1].getByText("Llena")).toHaveStyle({ color: "#6F6662", fontSize: 12 });
   });
 });

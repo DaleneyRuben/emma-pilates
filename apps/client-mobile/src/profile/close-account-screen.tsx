@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   content: { gap: spacing.mdLg, paddingBottom: spacing.lg },
   destructive: {
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.error,
     borderRadius: radii.control,
     borderWidth: 1,

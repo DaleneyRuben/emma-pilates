@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     color: colors.errorText,
   },
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderTopLeftRadius: radii.frame,
     borderTopRightRadius: radii.frame,
     gap: spacing.md,

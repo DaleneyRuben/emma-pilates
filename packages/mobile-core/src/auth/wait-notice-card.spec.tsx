@@ -30,7 +30,7 @@ describe("WaitNotice inside a pending card (S06 «Reenvío limitado», «Verific
     const screen = await notice("card");
 
     expect(screen.getByTestId("wait-notice")).toHaveStyle({
-      backgroundColor: colors.white,
+      backgroundColor: colors.card,
       borderColor: colors.borderStrong,
       gap: 10,
       paddingHorizontal: 14,

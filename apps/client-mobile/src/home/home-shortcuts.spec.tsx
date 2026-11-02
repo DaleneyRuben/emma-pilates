@@ -57,7 +57,7 @@ describe("Client Home shortcut tiles", () => {
     const screen = await openHome(active);
 
     expect(screen.getByText("Accesos rápidos")).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 11,
       letterSpacing: 1.76,
       textTransform: "uppercase",
@@ -65,7 +65,7 @@ describe("Client Home shortcut tiles", () => {
     const title = screen.getByText("Reservar una clase");
     expect(title).toHaveStyle({ color: "#4A4A4A", fontFamily: "Lora_500Medium", fontSize: 17 });
     expect(screen.getByText("Horarios de esta semana")).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 13,
     });
     const tile = screen.getByTestId("shortcut-tile");
@@ -94,7 +94,7 @@ describe("Client Home shortcut tiles", () => {
       fontSize: 16,
     });
     expect(screen.getByText("Agenda tu cita del mes")).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 12,
     });
     expect(screen.getByTestId("glyph-trend", hidden)).toHaveProp("width", 22);
@@ -113,9 +113,7 @@ describe("Client Home shortcut tiles", () => {
     const row = screen.getByRole("button", { name: "Reservar una clase" });
     expect(row).toHaveStyle({
       backgroundColor: "#F2ECE5",
-      borderColor: "#E7DCD8",
       borderRadius: 16,
-      borderWidth: 1,
     });
     expect(screen.getByText("Reservar una clase")).toHaveStyle({ color: "#B3A9A5" });
     expect(screen.getByTestId("shortcut-tile")).toHaveStyle({
@@ -123,7 +121,7 @@ describe("Client Home shortcut tiles", () => {
     });
     expect(screen.getByTestId("glyph-calendar", hidden)).toHaveProp("stroke", "#B3A9A5");
     expect(screen.getByText("Necesitas un plan activo para reservar")).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 13,
     });
     const lock = screen.getByTestId("shortcut-lock", hidden);

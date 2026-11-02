@@ -17,8 +17,8 @@ describe("OutlinedButton", () => {
 
     const button = screen.getByTestId("logout-confirm");
     expect(button).toBe(screen.getByRole("button", { name: "Cerrar sesión" }));
-    expect(button).toHaveStyle({ borderColor: "#B25D4B", backgroundColor: "transparent" });
-    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#94493A" });
+    expect(button).toHaveStyle({ borderColor: "#A04E3E", backgroundColor: "transparent" });
+    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#A04E3E" });
     await fireEvent.press(button);
     expect(onPress).toHaveBeenCalledTimes(1);
   });

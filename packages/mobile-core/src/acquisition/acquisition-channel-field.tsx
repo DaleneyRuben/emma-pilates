@@ -77,7 +77,7 @@ export function AcquisitionChannelField({
 
 const styles = StyleSheet.create({
   chip: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,
     borderWidth: 1,

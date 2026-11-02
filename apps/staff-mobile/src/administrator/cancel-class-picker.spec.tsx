@@ -48,7 +48,7 @@ describe("Cancel a class Branch picker", () => {
       expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
     });
     const picker = screen.getByTestId("branch-picker-chevron", hidden);
-    expect(picker).toHaveProp("stroke", "#766D69");
+    expect(picker).toHaveProp("stroke", "#6F6662");
     expect(picker).toHaveProp("width", 16);
     expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
     expect(screen.queryByText("▾")).toBeNull();

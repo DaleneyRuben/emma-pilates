@@ -43,7 +43,7 @@ describe("EmptyState", () => {
     });
     expect(screen.getByTestId("empty-state-icon-card", hidden)).toHaveProp("stroke", "#B78380");
     expect(screen.getByText("Esta clienta no tiene clases disponibles.")).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 13,
       textAlign: "center",
     });
@@ -101,7 +101,7 @@ describe("EmptyState plain variant", () => {
       screen.getByText(
         "Aquí aparecerán tus clases una vez que registremos tu asistencia en el estudio.",
       ),
-    ).toHaveStyle({ color: "#766D69", fontSize: 14, maxWidth: 260, textAlign: "center" });
+    ).toHaveStyle({ color: "#6F6662", fontSize: 14, maxWidth: 260, textAlign: "center" });
   });
 
   it("stands with the title alone, as S22's does", async () => {

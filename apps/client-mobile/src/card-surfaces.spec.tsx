@@ -43,11 +43,8 @@ describe("Client card surfaces (MOB-039)", () => {
       expect(screen.getByText("Tu plan")).toBeOnTheScreen();
     });
     expect(screen.getByText("Tu plan").parent?.parent).toHaveStyle({
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
+      backgroundColor: "#F5EFE9",
       borderRadius: 16,
-      borderWidth: 1,
-      shadowOpacity: 0.05,
     });
   });
 });

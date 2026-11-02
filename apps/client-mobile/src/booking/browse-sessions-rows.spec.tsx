@@ -104,14 +104,14 @@ describe("Client class list rows", () => {
     expect(pill).toHaveStyle({ borderRadius: 999, minHeight: 44 });
     expect(screen.getByTestId("glyph-pin", hidden)).toHaveProp("width", 17);
     const picker = screen.getByTestId("branch-picker-chevron", hidden);
-    expect(picker).toHaveProp("stroke", "#766D69");
+    expect(picker).toHaveProp("stroke", "#6F6662");
     expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
 
     expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({
       fontFamily: "Lora_500Medium",
       fontSize: 19,
     });
-    expect(cards[0].getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(cards[0].getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
     expect(cards[0].getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
     expect(cards[1].getByText("Lleno")).toBeOnTheScreen();
     for (const card of cards) {
@@ -127,17 +127,17 @@ describe("Client class list rows", () => {
     const { cards } = await openClassList();
 
     expect(cards[0].getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#EFE0DC",
+      backgroundColor: "#F2E4E1",
       borderRadius: 999,
     });
     expect(cards[0].getByText("3 cupos")).toHaveStyle({
-      color: "#7A4F4B",
+      color: "#7D4F4B",
       fontSize: 12,
       fontWeight: "500",
     });
     expect(cards[1].getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "rgba(216,201,187,0.34)",
     });
-    expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
+    expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#6F6662", fontSize: 12 });
   });
 });

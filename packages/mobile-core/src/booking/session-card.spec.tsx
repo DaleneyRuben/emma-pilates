@@ -24,15 +24,13 @@ describe("SessionCard", () => {
 
     const card = screen.getByRole("button", { name: "Reformer Pilates 07:00 – 07:50" });
     expect(card).toHaveStyle({
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
+      backgroundColor: "#F5EFE9",
       borderRadius: 16,
-      borderWidth: 1,
       gap: 12,
       padding: 18,
     });
     expect(screen.getByText("07:00 – 07:50")).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 12,
       fontVariant: ["tabular-nums"],
       fontWeight: "500",
@@ -44,7 +42,7 @@ describe("SessionCard", () => {
       fontSize: 19,
     });
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
-    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
     expect(screen.getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
     const footer = screen.getByTestId("card-footer");
     expect(footer).toHaveStyle({ borderTopColor: "#EFE7DE", paddingTop: 12 });
@@ -78,7 +76,7 @@ describe("SessionCard", () => {
     const footer = screen.getByTestId("card-footer");
     expect(footer).toHaveStyle({ borderTopColor: "#EFE7DE", paddingTop: 12 });
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
-    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
   });
 });
 

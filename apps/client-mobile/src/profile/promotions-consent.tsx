@@ -43,7 +43,7 @@ export function PromotionsConsent({
 const styles = StyleSheet.create({
   box: {
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: 6,
     borderWidth: 1.5,

@@ -36,7 +36,7 @@ describe("Assistant Client Bookings empty state", () => {
     expect(calendar).toHaveProp("width", 34);
     expect(
       screen.getByText("Puedes reservarle una clase desde el horario del estudio."),
-    ).toHaveStyle({ color: "#766D69", fontSize: 14 });
+    ).toHaveStyle({ color: "#6F6662", fontSize: 14 });
     const action = screen.getByTestId("empty-state-action");
     expect(action).toHaveStyle({ marginTop: 6, minWidth: 220 });
 
@@ -47,7 +47,7 @@ describe("Assistant Client Bookings empty state", () => {
       expect(screen.getByTestId("branch-picker-chevron", hidden)).toBeOnTheScreen();
     });
     const picker = screen.getByTestId("branch-picker-chevron", hidden);
-    expect(picker).toHaveProp("stroke", "#766D69");
+    expect(picker).toHaveProp("stroke", "#6F6662");
     expect(picker).toHaveProp("width", 16);
     expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
     expect(screen.queryByText("▾")).toBeNull();

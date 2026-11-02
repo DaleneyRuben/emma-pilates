@@ -58,7 +58,7 @@ describe("Trainer roster empty state (UX-009)", () => {
       });
     });
     expect(screen.getByText("No hay reservas para esta sesión.")).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 14,
     });
     expect(screen.getByTestId("empty-state-icon-calendar", hidden)).toHaveProp("stroke", "#C4BAB6");

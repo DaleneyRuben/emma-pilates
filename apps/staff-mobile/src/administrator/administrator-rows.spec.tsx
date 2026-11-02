@@ -93,7 +93,7 @@ describe("Administrator rows", () => {
       fontFamily: "Lora_500Medium",
       fontSize: 19,
     });
-    expect(screen.getByText("Paquete de 8 clases")).toHaveStyle({ color: "#766D69", fontSize: 13 });
+    expect(screen.getByText("Paquete de 8 clases")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
     expect(screen.getByTestId("card-footer")).toHaveStyle({ paddingTop: 13 });
     expect(screen.getByText("Bs 560")).toHaveStyle({
       fontFamily: "Lora_500Medium",
@@ -103,7 +103,7 @@ describe("Administrator rows", () => {
     const clock = screen.getByTestId("glyph-clock", hidden);
     expect(clock).toHaveProp("width", 15);
     expect(clock).toHaveProp("stroke", "#C99A4E");
-    expect(screen.getByText("Hace 20 minutos")).toHaveStyle({ color: "#766D69", fontSize: 13 });
+    expect(screen.getByText("Hace 20 minutos")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
     const chevron = screen.getByTestId("chevron", hidden);
     expect(chevron).toHaveProp("stroke", "#B78380");
     expect(chevron).toHaveProp("width", 19);
@@ -134,13 +134,13 @@ describe("Administrator rows", () => {
     expect(card.getByTestId("glyph-person", hidden)).toHaveProp("width", 16);
     // UX-012 / S7: the pill already says «Sucursal: Centro», so the row is the bare name.
     expect(card.getByText("Centro", { exact: true })).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 13,
     });
     expect(card.queryByText(/^Sucursal /)).toBeNull();
     expect(card.getByTestId("glyph-pin", hidden)).toHaveProp("width", 15);
     expect(card.getByTestId("card-footer")).toHaveStyle({ paddingTop: 13 });
-    expect(card.getByText("6 reservas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(card.getByText("6 reservas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
     expect(card.getByText("6 cupos")).toBeOnTheScreen();
     // S11's payment card stays mounted under S13, so the chevron is read inside the card.
     const chevron = card.getByTestId("chevron", hidden);
@@ -162,17 +162,17 @@ describe("Administrator rows", () => {
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((card) => within(card));
     expect(cards[0].getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#EFE0DC",
+      backgroundColor: "#F2E4E1",
       borderRadius: 999,
     });
     expect(cards[0].getByText("6 cupos")).toHaveStyle({
-      color: "#7A4F4B",
+      color: "#7D4F4B",
       fontSize: 12,
       fontWeight: "500",
     });
     expect(cards[1].getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "rgba(216,201,187,0.34)",
     });
-    expect(cards[1].getByText("Llena")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
+    expect(cards[1].getByText("Llena")).toHaveStyle({ color: "#6F6662", fontSize: 12 });
   });
 });

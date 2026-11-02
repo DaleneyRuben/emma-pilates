@@ -11,13 +11,13 @@ const hidden = { includeHiddenElements: true };
 describe("DetailLine", () => {
   it("puts a glyph before a short line of text, 8 pt apart", async () => {
     const screen = await render(
-      <DetailLine icon="person" iconSize={17} style={{ color: "#6E6663", fontSize: 14 }}>
+      <DetailLine icon="person" iconSize={17} style={{ color: "#6F6662", fontSize: 14 }}>
         Emma Vargas
       </DetailLine>,
     );
 
     const text = screen.getByText("Emma Vargas");
-    expect(text).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(text).toHaveStyle({ color: "#6F6662", fontSize: 14 });
     expect(text.parent).toHaveStyle({ alignItems: "center", flexDirection: "row", gap: 8 });
     const icon = screen.getByTestId("glyph-person", hidden);
     expect(icon).toHaveProp("width", 17);
