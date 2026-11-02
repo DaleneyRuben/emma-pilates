@@ -7,6 +7,13 @@ import { colors } from "./tokens";
 // The frames' small line icons on their 24-unit grid (follow-up 70, MOB-039,
 // MOB-041, MOB-042): one shape per name, drawn by `Glyph`.
 export const glyphShapes = {
+  // The v2 notice row's warning (follow-up 225 §7).
+  alert: (
+    <>
+      <Circle cx={12} cy={12} r={8.5} />
+      <Path d="M12 8v5M12 16.5v.5" />
+    </>
+  ),
   bell: (
     <>
       <Path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z" />

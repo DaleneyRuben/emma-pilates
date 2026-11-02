@@ -75,6 +75,7 @@ export * from "./ui/icon-row";
 export * from "./ui/launch-splash";
 export * from "./ui/line-icon";
 export * from "./ui/loading-state";
+export * from "./ui/notice-row";
 export * from "./ui/offline-banner";
 export * from "./ui/outlined-button";
 export * from "./ui/picker-check";
