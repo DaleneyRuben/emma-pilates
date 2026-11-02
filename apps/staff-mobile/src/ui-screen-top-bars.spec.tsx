@@ -1,5 +1,5 @@
-import { cleanup, render, within } from "@testing-library/react-native";
-import { clearMobileQueryCache, MobileQueryProvider, spacing } from "@pilates/mobile-core";
+import { cleanup, render } from "@testing-library/react-native";
+import { clearMobileQueryCache, MobileQueryProvider } from "@pilates/mobile-core";
 import type { ComponentType } from "react";
 
 import { CancelClassScreen } from "./administrator/cancel-class-screen";
@@ -7,8 +7,6 @@ import { CancelSessionScreen } from "./administrator/cancel-session-screen";
 import { ReviewPaymentScreen } from "./administrator/review-payment-screen";
 import { AssistantRescheduleScreen } from "./assistant/assistant-reschedule-screen";
 import { AvailabilityBlockFormScreen } from "./nutritionist/availability-block-form-screen";
-import { ContactListScreen } from "./coordinator/contact-list-screen";
-import { AvailabilityScreen } from "./nutritionist/availability-screen";
 import { StaffFetcherContext } from "./staff-fetcher";
 
 jest.mock("@react-navigation/native", () => ({
@@ -42,7 +40,6 @@ const screens: [string, ComponentType<never>, object, string][] = [
   ["S12", ReviewPaymentScreen as ComponentType<never>, { paymentId: "payment-1" }, "Revisar pago"],
   ["S13", CancelClassScreen as ComponentType<never>, {}, "Cancelar una clase"],
   ["S14", CancelSessionScreen as ComponentType<never>, { session }, "Cancelar sesión"],
-  ["S16", AvailabilityScreen as ComponentType<never>, {}, "Mi disponibilidad"],
   ["S17", AvailabilityBlockFormScreen as ComponentType<never>, {}, "Nuevo horario"],
   [
     "S21 reprogramar",
@@ -50,7 +47,6 @@ const screens: [string, ComponentType<never>, object, string][] = [
     { ...client, booking },
     "Reprogramar clase",
   ],
-  ["S28", ContactListScreen as ComponentType<never>, {}, "Para contactar"],
 ];
 
 const renderScreen = (Component: ComponentType<never>, params: object) => {
@@ -64,29 +60,21 @@ const renderScreen = (Component: ComponentType<never>, params: object) => {
   );
 };
 
-// MOB-034: the Staff screens draw the export's top bar, not «← Volver».
+// v2: a pushed Staff screen opens with the back chevron and its Lora title.
 describe("The Staff screens' top bar", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it.each(screens)("%s draws the bar with its title", async (_id, Component, params, title) => {
-    const screen = await renderScreen(Component, params);
+  it.each(screens)(
+    "%s draws the back bar with its title",
+    async (_id, Component, params, title) => {
+      const screen = await renderScreen(Component, params);
 
-    const bar = screen.getByTestId("screen-top-bar");
-    // The bar spans the Screen's padding, so its rule meets both edges.
-    expect(bar).toHaveStyle({ marginHorizontal: -spacing.lg, marginTop: -spacing.lg });
-    expect(within(bar).getByLabelText(title)).toHaveStyle({ fontSize: 19 });
-    expect(screen.getAllByLabelText(title)).toHaveLength(1);
-    expect(screen.queryByText("← Volver")).toBeNull();
-  });
-
-  it("puts S16's «Nuevo horario» in the bar", async () => {
-    const screen = await renderScreen(AvailabilityScreen as ComponentType<never>, {});
-
-    expect(
-      within(screen.getByTestId("screen-top-bar")).getByRole("button", { name: "Nuevo horario" }),
-    ).toBeOnTheScreen();
-  });
+      expect(screen.getByTestId("back-bar")).toHaveProp("accessibilityLabel", "Volver");
+      expect(screen.getAllByLabelText(title)).toHaveLength(1);
+      expect(screen.queryByTestId("screen-top-bar")).toBeNull();
+    },
+  );
 });
