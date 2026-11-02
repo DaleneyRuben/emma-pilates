@@ -27,7 +27,7 @@ describe("Assistant booking empty states (S07)", () => {
 
   it("offers every class when the chosen type has none today", async () => {
     const screen = await openBooking([session]);
-    await waitFor(() => expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByTestId("session-card-session-1")).toBeOnTheScreen());
 
     await fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
     expect(screen.getByText("Hoy no hay Mat Pilates")).toBeOnTheScreen();
@@ -36,7 +36,7 @@ describe("Assistant booking empty states (S07)", () => {
     ).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Ver todas las clases" }));
-    expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
+    expect(screen.getByTestId("session-card-session-1")).toBeOnTheScreen();
   });
 
   it("offers tomorrow when the day has no classes at all", async () => {
@@ -45,9 +45,6 @@ describe("Assistant booking empty states (S07)", () => {
     await waitFor(() => expect(screen.getByText("Este día no hay clases")).toBeOnTheScreen());
     expect(screen.getByText("Elige otro día de la semana para reservar.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Ver mañana" }));
-    expect(screen.getAllByRole("button", { selected: true })[0]).not.toHaveProp(
-      "accessibilityLabel",
-      expect.stringMatching(/^Hoy/),
-    );
+    expect(screen.getByLabelText(/^Hoy /)).toHaveProp("accessibilityState", { selected: false });
   });
 });

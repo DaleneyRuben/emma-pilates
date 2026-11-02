@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   day: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
   onSelected: { color: colors.white },
   selected: { backgroundColor: colors.primary, borderRadius: radii.button },
-  strip: { flexDirection: "row", flexShrink: 0, gap: spacing.smd },
+  strip: { flexDirection: "row", flexGrow: 0, flexShrink: 0, gap: spacing.smd },
   weekday: {
     color: colors.textMuted,
     fontFamily: fontFamilies.bodyMedium,
