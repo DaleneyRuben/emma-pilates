@@ -98,7 +98,10 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
     });
 
     await submitNewClient(screen);
-    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar correo" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Más opciones de la invitación" }),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: /^Cambiar correo/ }));
     await fireEvent.changeText(screen.getByLabelText("Nuevo correo"), "ana.n@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
 

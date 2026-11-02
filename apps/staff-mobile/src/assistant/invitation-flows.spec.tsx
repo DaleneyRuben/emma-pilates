@@ -228,12 +228,10 @@ describe("Assistant invitations (S05, S06)", () => {
 
     await submitNewClient(screen);
 
-    expect(
-      await screen.findByText(
-        "La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.",
-      ),
-    ).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Más opciones de la invitación" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Más opciones de la invitación" }),
+    );
+    expect(screen.getByText("Ya tiene pagos o reservas, así que se mantiene")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: /^Cancelar invitación/ })).toBeDisabled();
   });
 

@@ -56,8 +56,6 @@ describe("Assistant Client flows", () => {
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-bookings")).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-history")).toBeOnTheScreen();
-    expect(screen.getAllByText("Emma Vargas · Centro")).toHaveLength(2);
-    expect(screen.getByText("Mat Pilates")).toBeOnTheScreen();
   });
 
   it("shows the gift class with its origin on the Client summary", async () => {

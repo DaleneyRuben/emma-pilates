@@ -1,21 +1,19 @@
-import { useGetAssistantClientOverview, type ClientOverviewDto } from "@pilates/api-contracts";
+import { useGetAssistantClientOverview } from "@pilates/api-contracts";
 import {
-  BackLink,
-  BodyText,
+  boliviaCivilDate,
   colors,
-  EmptyState,
-  formatSessionDate,
+  dayChipLabel,
+  fontFamilies,
   formatTimeRange,
-  Heading,
+  IconRow,
+  IconRowGroup,
   LoadingState,
   OutlinedButton,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
+  SectionTitle,
   spacing,
-  surfaces,
-  TextButton,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -23,9 +21,12 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
+import { BackBar } from "../ui/back-bar";
+import { InitialsDisc } from "../ui/person-row";
 import { useInClientPanel } from "./assistant-workspace";
+import { PlanHero } from "./plan-hero";
+import { StateCard } from "./state-card";
 import { PendingInvitationCard } from "./pending-invitation-card";
-import { formatCivilDate } from "./assistant-format";
 
 export type ClientContext = { clientId: string; clientName: string };
 
@@ -40,49 +41,14 @@ type OverviewNavigation = {
   };
 };
 
-function SubscriptionCard({
-  view,
-  sells,
-}: {
-  view: ClientOverviewDto["subscription"];
-  sells: boolean;
-}) {
-  const subscription = view.subscription;
-  if (subscription === null || subscription === undefined) {
-    return (
-      <EmptyState
-        icon="card"
-        message={
-          sells
-            ? "Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar."
-            : "La clienta necesita un plan activo para reservar."
-        }
-        title="Sin plan activo"
-      />
-    );
-  }
-  const active = view.status === "active" || view.status === "expiring_soon";
-  return (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{subscription.planName}</Text>
-        <View style={[styles.badge, active ? styles.badgeActive : styles.badgeExpired]}>
-          <Text
-            style={[styles.badgeLabel, active ? styles.badgeLabelActive : styles.badgeLabelExpired]}
-          >
-            {active ? "Activa" : "Vencida"}
-          </Text>
-        </View>
-      </View>
-      <BodyText>{`${subscription.remainingClassAllowance} clases restantes`}</BodyText>
-      {subscription.extraClassesLine ? <BodyText>{subscription.extraClassesLine}</BodyText> : null}
-      <BodyText style={styles.muted}>
-        {`${active ? "Vence el" : "Venció el"} ${formatCivilDate(subscription.endsOn)}`}
-      </BodyText>
-    </View>
-  );
+// «Mar 3 · 09:30»: when her next Booking is, beside «Próximas reservas».
+function nextLabel(startsAt: string, endsAt: string): string {
+  const { weekday, day } = dayChipLabel(boliviaCivilDate(new Date(startsAt)));
+  const label = `${weekday} ${day} · ${formatTimeRange(startsAt, endsAt).split(" – ")[0]}`;
+  return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
+/** S06, the Client's file (v2, walkthrough 17). */
 export function ClientOverviewScreen({
   route,
 }: {
@@ -100,7 +66,7 @@ export function ClientOverviewScreen({
 
   // Beside the search on a tablet there is nowhere to go back to.
   const inPanel = useInClientPanel();
-  const back = inPanel ? null : <BackLink onPress={() => navigation.goBack()} />;
+  const back = inPanel ? null : <BackBar back="Clientes" onBack={() => navigation.goBack()} />;
 
   if (overview.isPending) {
     return (
@@ -125,24 +91,37 @@ export function ClientOverviewScreen({
   const data = overview.data.data;
   const { client } = data;
   const context: ClientContext = { clientId: client.id, clientName: client.name };
-  const canBook =
-    (data.subscription.status === "active" || data.subscription.status === "expiring_soon") &&
-    (data.subscription.subscription?.remainingClassAllowance ?? 0) > 0;
-  const hasActiveSubscription =
+  const active =
     data.subscription.status === "active" || data.subscription.status === "expiring_soon";
-  // The API's subscription_not_expired rule: a Plan paid through today blocks
-  // a new one while it still holds classes or a future Booking (UX-003).
+  const subscription = data.subscription.subscription ?? null;
+  const canBook = active && (subscription?.remainingClassAllowance ?? 0) > 0;
+  // The API's subscription_not_expired rule: a queued Plan blocks a new one
+  // (BKM-006), so the cash action is only offered when she can buy (UX-003).
   const futurePlan = data.subscription.nextSubscription ?? null;
+  const canBuy = sells && futurePlan === null;
+  const pending = client.accountStatus === "pending";
+  const cash = {
+    label: "Registrar pago en efectivo",
+    onPress: () => navigation.navigate("SelectPlan", context),
+    testID: "client-overview-cash-payment",
+  };
 
   return (
     <Screen style={styles.screen}>
       {back}
       <ScrollView contentContainerStyle={styles.content}>
-        <Heading accessibilityLabel={client.name}>{client.name}</Heading>
-        <BodyText style={styles.muted}>
-          {client.phone ? `${client.phone} · ${client.email}` : client.email}
-        </BodyText>
-        {client.accountStatus === "pending" && sells ? (
+        <View style={styles.identity}>
+          <InitialsDisc name={client.name} size={56} />
+          <View style={styles.identityBody}>
+            <Text accessibilityLabel={client.name} accessibilityRole="header" style={styles.name}>
+              {client.name}
+            </Text>
+            <Text style={styles.contact}>
+              {client.phone ? `${client.phone} · ${client.email}` : client.email}
+            </Text>
+          </View>
+        </View>
+        {pending && sells ? (
           <PendingInvitationCard
             clientEmail={client.email}
             clientId={client.id}
@@ -151,63 +130,61 @@ export function ClientOverviewScreen({
             reopened={reopened}
           />
         ) : null}
-        <SubscriptionCard sells={sells} view={data.subscription} />
-        {data.nextBooking ? (
-          <View style={styles.card}>
-            <BodyText style={styles.label}>Próxima reserva</BodyText>
-            <Text style={styles.cardTitle}>{data.nextBooking.classTypeName}</Text>
-            <BodyText>
-              {`${formatSessionDate(data.nextBooking.startsAt)} · ${formatTimeRange(data.nextBooking.startsAt, data.nextBooking.endsAt)}`}
-            </BodyText>
-          </View>
-        ) : null}
-        <View style={styles.actions}>
-          <PrimaryButton
-            disabled={!canBook}
-            label="Reservar clase"
-            onPress={() => navigation.navigate("BrowseSessions", context)}
-            testID="client-overview-book"
+        {subscription === null ? (
+          <StateCard
+            action={canBuy ? cash : undefined}
+            icon="card"
+            testID="client-no-plan"
+            note={
+              !sells
+                ? "La clienta necesita un plan activo para reservar."
+                : pending
+                  ? "Puede comprar su plan ahora, aunque todavía no haya activado su cuenta."
+                  : "Registra un pago para activar un plan y poder reservarle clases."
+            }
+            title="Sin plan activo"
           />
-          {sells ? (
-            <OutlinedButton
-              disabled={futurePlan !== null}
-              label="Registrar pago en efectivo"
-              onPress={() => navigation.navigate("SelectPlan", context)}
-              testID="client-overview-cash-payment"
-            />
-          ) : null}
-          {sells && futurePlan !== null ? (
-            <BodyText style={styles.note}>Ya tiene un plan siguiente.</BodyText>
-          ) : null}
-          {hasActiveSubscription ? (
-            <TextButton
-              label="Ver reservas"
+        ) : (
+          <>
+            <PlanHero active={active} subscription={subscription} />
+            <View style={styles.actions}>
+              {canBook ? (
+                <PrimaryButton
+                  label="Reservar clase"
+                  onPress={() => navigation.navigate("BrowseSessions", context)}
+                  testID="client-overview-book"
+                />
+              ) : null}
+              {canBuy ? canBook ? <OutlinedButton {...cash} /> : <PrimaryButton {...cash} /> : null}
+              {sells && futurePlan !== null ? (
+                <Text style={styles.note}>Ya tiene un plan siguiente.</Text>
+              ) : null}
+            </View>
+          </>
+        )}
+        <View>
+          <SectionTitle>Reservas</SectionTitle>
+          <IconRowGroup>
+            <IconRow
+              chevron
+              icon="calendar"
+              label="Próximas reservas"
               onPress={() => navigation.navigate("ClientBookings", context)}
               testID="client-overview-bookings"
+              value={
+                data.nextBooking
+                  ? nextLabel(data.nextBooking.startsAt, data.nextBooking.endsAt)
+                  : undefined
+              }
             />
-          ) : null}
-        </View>
-        <View style={styles.historyCard}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Historial</Text>
-            <TextButton
-              label="Ver historial completo"
+            <IconRow
+              chevron
+              icon="clock"
+              label="Historial de clases"
               onPress={() => navigation.navigate("ClientHistory", context)}
+              testID="client-overview-history"
             />
-          </View>
-          {data.recentHistory.length === 0 ? (
-            <BodyText style={styles.muted}>Aún no tiene clases en su historial.</BodyText>
-          ) : (
-            data.recentHistory.map((entry) => (
-              <View key={entry.bookingId} style={styles.historyRow}>
-                <Text style={styles.historyTitle}>{entry.classTypeName}</Text>
-                <BodyText style={styles.muted}>
-                  {`${entry.trainerName} · ${entry.branchName}`}
-                </BodyText>
-                <BodyText style={styles.muted}>{formatSessionDate(entry.startsAt)}</BodyText>
-              </View>
-            ))
-          )}
+          </IconRowGroup>
         </View>
       </ScrollView>
     </Screen>
@@ -216,31 +193,11 @@ export function ClientOverviewScreen({
 
 const styles = StyleSheet.create({
   actions: { gap: spacing.sm },
-  badge: { borderRadius: radii.pill, paddingHorizontal: spacing.smLg, paddingVertical: spacing.xs },
-  badgeActive: { backgroundColor: "rgba(124,148,115,0.16)" },
-  badgeExpired: { backgroundColor: colors.errorPill },
-  badgeLabel: { fontSize: typography.label, fontWeight: "600" },
-  badgeLabelActive: { color: colors.successText },
-  badgeLabelExpired: { color: colors.errorText },
-  card: {
-    ...surfaces.card,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  cardHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.sm,
-    justifyContent: "space-between",
-  },
-  cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  // The frames draw the history card without the shadow.
-  historyCard: { ...surfaces.flatCard, gap: spacing.xs, padding: spacing.lg },
-  historyRow: { gap: spacing.xxs, paddingTop: spacing.sm },
-  historyTitle: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
-  label: { color: colors.textMuted, fontSize: typography.label, textTransform: "uppercase" },
-  muted: { color: colors.textMuted, fontSize: typography.note },
+  contact: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  identity: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
+  identityBody: { flex: 1, gap: spacing.xxs },
+  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 24 },
   note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
-  screen: { gap: spacing.md },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
 });
