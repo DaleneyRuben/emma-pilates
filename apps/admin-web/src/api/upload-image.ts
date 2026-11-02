@@ -100,15 +100,30 @@ const messages: Record<UploadFailureCode, string> = {
     "La imagen está tardando en procesarse. Espera un momento e inténtalo de nuevo.",
 };
 
+// A receipt has no minimum size and a 10 MB ceiling (ADR-0072, BKO-008).
+const receiptMessages: Partial<Record<UploadFailureCode, string>> = {
+  image_too_large: "La imagen pesa más de 10 MB.",
+  upload_rejected:
+    "No pudimos procesar la imagen. Revisa que sea un JPG, PNG o WEBP que no esté animado.",
+};
+
 const isFailureCode = (code: string): code is UploadFailureCode =>
   code in messages;
 
-export function uploadFailureMessage(error: unknown): string {
-  if (error instanceof UploadFailure) return messages[error.code];
-  if (isApiError(error) && isFailureCode(error.code)) {
-    return messages[error.code];
-  }
-  return messages.upload_failed;
+export function uploadFailureMessage(
+  error: unknown,
+  purpose: ImagePurpose = "promotion",
+): string {
+  const code =
+    error instanceof UploadFailure
+      ? error.code
+      : isApiError(error) && isFailureCode(error.code)
+        ? error.code
+        : "upload_failed";
+  return (
+    (purpose === "transfer_receipt" ? receiptMessages[code] : undefined) ??
+    messages[code]
+  );
 }
 
 const base64 = (bytes: ArrayBuffer): string =>

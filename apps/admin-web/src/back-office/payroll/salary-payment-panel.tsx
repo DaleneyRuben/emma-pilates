@@ -29,6 +29,7 @@ import { Select } from "../../components/ui/select";
 import { formatBolivianos } from "../../lib/money";
 import { backOfficeProblem } from "../back-office-problems";
 import { staffOptionLabel } from "./payroll-format";
+import { SalaryReceiptField, type SalaryReceipt } from "./salary-receipt-field";
 import {
   payrollStaffQueryOptions,
   useSalaryPaymentChange,
@@ -58,6 +59,11 @@ export function SalaryPaymentPanelForm({
   const change = useSalaryPaymentChange();
   const keyFor = useIdempotencyKey();
   const [failure, setFailure] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<SalaryReceipt | null>(
+    payment?.receiptUrl == null
+      ? null
+      : { kind: "attached", url: payment.receiptUrl },
+  );
   const form = useForm<SalaryInput, unknown, SalaryOutput>({
     resolver: zodResolver(salarySchema),
     defaultValues: {
@@ -74,6 +80,9 @@ export function SalaryPaymentPanelForm({
       staffMemberId: values.staffMemberId,
       amountCentavos: values.amountCentavos,
       paidOn: values.date,
+      ...(receipt?.kind === "uploaded"
+        ? { receiptImageAssetId: receipt.imageAssetId }
+        : {}),
     };
     const name =
       staff.data?.find((member) => member.id === input.staffMemberId)?.name ??
@@ -94,7 +103,8 @@ export function SalaryPaymentPanelForm({
       if (
         input.staffMemberId === payment.staffMemberId &&
         input.amountCentavos === payment.amountCentavos &&
-        input.paidOn === payment.paidOn
+        input.paidOn === payment.paidOn &&
+        input.receiptImageAssetId === undefined
       ) {
         onDone();
         return;
@@ -175,6 +185,7 @@ export function SalaryPaymentPanelForm({
               </FormItem>
             )}
           />
+          <SalaryReceiptField value={receipt} onChange={setReceipt} />
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
               {failure}
