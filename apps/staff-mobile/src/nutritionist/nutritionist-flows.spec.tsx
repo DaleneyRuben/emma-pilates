@@ -16,6 +16,18 @@ import {
   urubo,
 } from "./nutritionist-test-support";
 
+const todayHeading = () => {
+  const label = new Intl.DateTimeFormat("es-BO", {
+    day: "numeric",
+    month: "long",
+    timeZone: "America/La_Paz",
+    weekday: "long",
+  })
+    .format(new Date())
+    .replace(",", "");
+  return label.charAt(0).toUpperCase() + label.slice(1);
+};
+
 jest.setTimeout(30_000);
 
 describe("Nutritionist agenda and availability", () => {
@@ -53,14 +65,12 @@ describe("Nutritionist agenda and availability", () => {
     expect(screen.getByText(/^Mañana · /)).toBeOnTheScreen();
     expect(screen.getByText("Primera evaluación")).toBeOnTheScreen();
     expect(screen.getByText("Seguimiento")).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
+    expect(screen.getByText("Nutricionista · " + todayHeading())).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "23:00 Valeria Áñez" }));
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar evaluación" }));
+    await fireEvent.press(screen.getByTestId("cancel-evaluation-evaluation-1"));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));
-    expect(
-      sheet.getByText("Le avisaremos a Valeria Áñez y el horario quedará libre."),
-    ).toBeOnTheScreen();
+    expect(sheet.getByText(/ · Valeria Áñez$/)).toBeOnTheScreen();
+    expect(sheet.getByText("Le avisamos y el horario queda libre")).toBeOnTheScreen();
     await fireEvent.press(sheet.getByRole("button", { name: "Sí, cancelar evaluación" }));
 
     await waitFor(() => {
@@ -77,11 +87,15 @@ describe("Nutritionist agenda and availability", () => {
     const screen = await openApp(routeFetcher(routes()));
 
     await waitFor(() => {
-      expect(screen.getByText("No tienes evaluaciones agendadas.")).toBeOnTheScreen();
+      expect(screen.getByText("No tienes evaluaciones")).toBeOnTheScreen();
     });
     expect(
       screen.getByText("Revisa tu disponibilidad para que las clientas puedan reservar."),
     ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Ver mi disponibilidad" }));
+    await waitFor(() =>
+      expect(screen.getAllByRole("button", { name: "Nuevo horario" })[0]).toBeOnTheScreen(),
+    );
   });
 
   it("lists blocks from Monday to Sunday with their turnos and future start dates", async () => {
