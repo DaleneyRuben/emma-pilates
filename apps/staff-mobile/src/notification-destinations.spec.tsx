@@ -82,7 +82,7 @@ describe("Staff notification destinations", () => {
     await openNoticeAndTap(
       "nutritionist",
       "nutritionist_agenda",
-      "No tienes evaluaciones agendadas.",
+      "No tienes evaluaciones",
     );
   });
 
