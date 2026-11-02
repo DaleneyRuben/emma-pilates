@@ -82,7 +82,11 @@ export function PaymentsReceived({ payments }: { payments: OwnSalaryPaymentDto[]
               accessibilityLabel={`Ver el comprobante del pago del ${formatCivilDate(payment.paidOn)}`}
               accessibilityRole="button"
               key={payment.id}
-              onPress={() => setOpen(payment)}
+              onPress={() => {
+                // A second tap on the receipt that failed asks for it again.
+                if (open?.id === payment.id && full.isError) void full.refetch();
+                setOpen(payment);
+              }}
               style={({ pressed }) => [styles.payment, divider, pressed && styles.pressed]}
             >
               <Thumbnail url={receiptUrl} />
