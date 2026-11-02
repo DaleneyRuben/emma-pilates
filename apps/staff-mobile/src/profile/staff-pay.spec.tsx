@@ -3,77 +3,14 @@ import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
+import {
+  approvedOctober,
+  openMyPay,
+  staffRoutes,
+  trainerProfile,
+} from "./staff-pay-test-support";
 
 jest.setTimeout(20_000);
-
-const trainerProfile = {
-  id: "staff-1",
-  name: "Emma Vargas",
-  email: "emma.vargas@example.com",
-  phone: null,
-  role: "trainer",
-  branches: [{ id: "branch-1", name: "Centro" }],
-};
-
-const approvedOctober = {
-  id: "statement-october",
-  staffMemberId: "staff-1",
-  staffMemberName: "Emma Vargas",
-  month: "2026-10-01",
-  state: "approved",
-  totalCentavos: 32_200,
-  salaryPaymentId: "payment-october",
-  lines: [
-    { kind: "class", detail: "3 alumnas", amountCentavos: 6_500 },
-    { kind: "class", detail: "6 alumnas, 2 extra", amountCentavos: 8_100 },
-    { kind: "minimum_not_met", detail: "Mínimo no alcanzado", amountCentavos: 2_500 },
-    { kind: "commission", detail: "Primer plan", amountCentavos: 7_850 },
-  ],
-};
-
-const draftNovember = {
-  ...approvedOctober,
-  id: "statement-november",
-  month: "2026-11-01",
-  state: "draft",
-  totalCentavos: 6_500,
-  salaryPaymentId: null,
-  lines: [{ kind: "class", detail: "4 alumnas", amountCentavos: 6_500 }],
-};
-
-type PayRoutes = { statements?: () => Response; payments?: () => Response };
-
-function staffRoutes(profile: unknown, pay: PayRoutes = {}) {
-  return {
-    "/api/v1/trainer/sessions": () => jsonResponse([]),
-    "/api/v1/staff-members/current": () => jsonResponse(profile),
-    "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
-    "/api/v1/trainer/pay-statements":
-      pay.statements ?? (() => jsonResponse([draftNovember, approvedOctober])),
-    "/api/v1/trainer/salary-payments":
-      pay.payments ??
-      (() =>
-        jsonResponse([{ id: "payment-october", amountCentavos: 32_200, paidOn: "2026-11-01" }])),
-  };
-}
-
-async function openMyPay(pay: PayRoutes = {}) {
-  const screen = await render(
-    <App runtime={createStaffRuntime(routeFetcher(staffRoutes(trainerProfile, pay)))} />,
-  );
-  await waitFor(
-    () => {
-      expect(screen.getByText("EV")).toBeOnTheScreen();
-    },
-    { timeout: 10_000 },
-  );
-  await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
-  await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Mis pagos" })).toBeOnTheScreen();
-  });
-  await fireEvent.press(screen.getByRole("button", { name: "Mis pagos" }));
-  return screen;
-}
 
 describe("Staff Mis pagos", () => {
   afterEach(async () => {
