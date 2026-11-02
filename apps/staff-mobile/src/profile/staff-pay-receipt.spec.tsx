@@ -47,8 +47,8 @@ describe("Staff Mis pagos receipts", () => {
         name: "Ver el comprobante del pago del 1 de noviembre de 2026",
       }),
     );
-    expect(within(row).getByText("Ver")).toBeOnTheScreen();
-    expect(received.getByText("Sin comprobante")).toBeOnTheScreen();
+    expect(within(row).getByText(/ · ver comprobante$/)).toBeOnTheScreen();
+    expect(received.getByText(/ · sin comprobante$/)).toBeOnTheScreen();
     await waitFor(() => expect(asked).toContain("thumbnail"));
 
     await fireEvent.press(row);
