@@ -318,12 +318,9 @@ describe("Administrator payments and Session cancellation", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
     await waitFor(() => {
-      expect(screen.getByText("No hay clases con estos filtros.")).toBeOnTheScreen();
+      expect(screen.getByText("Hoy no hay Mat Pilates")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByText("Prueba otro día, otra sucursal u otro tipo de clase."),
-    ).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Todas" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Ver todas las clases" }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
@@ -332,23 +329,21 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Cancelar sesión")).toBeOnTheScreen();
     });
-    expect(screen.getByText("6 clientas afectadas")).toBeOnTheScreen();
-    expect(screen.getByText("Esto no se puede deshacer")).toBeOnTheScreen();
+    // v2 S14: what happens as rows, and a warning row instead of the amber block.
+    expect(screen.getByText("Se cancelan las 6 reservas")).toBeOnTheScreen();
+    expect(screen.getByText("Esto no se puede deshacer.")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar sesión" }));
     await waitFor(() => {
       expect(cancelled).toHaveBeenCalled();
       expect(screen.getByText("Sesión cancelada")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Se notificó a las 6 clientas afectadas.")).toBeOnTheScreen();
-    expect(screen.getByText("Se reembolsó una clase a cada clienta.")).toBeOnTheScreen();
-
-    // S14's result has the bar's chevron and the «Volver» button under it (MOB-034).
-    const backs = screen.getAllByRole("button", { name: "Volver" });
-    expect(backs).toHaveLength(2);
-    await fireEvent.press(backs[1]);
+    expect(
+      screen.getByText("Avisamos a las 6 clientas y cada una recuperó su clase."),
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a las clases" }));
     await waitFor(() => {
-      expect(screen.getByText("No hay clases con estos filtros.")).toBeOnTheScreen();
+      expect(screen.getByText("Hoy no hay clases para cancelar")).toBeOnTheScreen();
     });
   });
 
