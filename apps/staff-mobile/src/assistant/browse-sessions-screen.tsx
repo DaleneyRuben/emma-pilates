@@ -292,5 +292,5 @@ const styles = StyleSheet.create({
   list: { paddingBottom: spacing.xxl },
   screen: { gap: spacing.md },
   // Horizontal strips would otherwise stretch into spare tablet height.
-  strip: { flexGrow: 0 },
+  strip: { flexGrow: 0, flexShrink: 0 },
 });
