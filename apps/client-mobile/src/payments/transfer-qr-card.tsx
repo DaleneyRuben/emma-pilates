@@ -123,7 +123,7 @@ export function TransferQrCard({ fetcher }: { fetcher: typeof globalThis.fetch }
         </>
       )}
       <BodyText style={styles.centered}>
-        Escanea el código con tu app bancaria y transfiere el monto exacto.
+        Escanéalo con tu app bancaria y transfiere el monto exacto.
       </BodyText>
       <FullScreenImage
         aspectRatio={ratio}
