@@ -181,7 +181,10 @@ describe("Administrator payments and Session cancellation", () => {
     expect(screen.getByText("Carla Mendoza")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Pendiente")).toBeOnTheScreen();
-    expect(screen.getByText(/^Transferencia · enviado el \d+ de \w+, 19:40$/)).toBeOnTheScreen();
+    // v2 S12: the amount on the hero, the transfer and its time as rows.
+    expect(screen.getByText("Bs 560")).toHaveStyle({ fontSize: 32 });
+    expect(screen.getByText("Transferencia")).toBeOnTheScreen();
+    expect(screen.getByText(/^Enviado el \d+ de \w+, 19:40$/)).toBeOnTheScreen();
     expect(screen.getByText("Comprobante")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByLabelText("Comprobante de transferencia")).toBeOnTheScreen();
@@ -249,6 +252,9 @@ describe("Administrator payments and Session cancellation", () => {
     expect(screen.queryByText("Motivo del rechazo")).not.toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Rechazar" }));
     expect(screen.getByText("Motivo del rechazo")).toBeOnTheScreen();
+    expect(
+      screen.getByText("El plan no se activa hasta que envíe un comprobante válido."),
+    ).toBeOnTheScreen();
     expect(
       screen.getByText("La clienta verá este mensaje para corregir y volver a enviar."),
     ).toBeOnTheScreen();
