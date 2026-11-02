@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Iniciar sesión</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="flex-grow: 1; padding: 0 20px; display: flex; flex-direction: column; justify-content: center; gap: 32px">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+      <span style="font-family: Lora, Georgia, serif; font-size: 36px; line-height: 1.1; text-align: center">Emma Pilates Studio</span>
+    </div>
+    <form style="display: flex; flex-direction: column; gap: 12px; margin: 0">
+      <label style="height: 56px; box-sizing: border-box; padding: 8px 16px; background: #F5EFE9; border: 1px solid #E6DBD0; border-radius: 14px; display: flex; flex-direction: column; justify-content: center; gap: 2px"><span style="font-size: 12px; color: #6F6662">Correo electrónico</span><input type="email" value="lucia.fernandez@correo.com" style="border: none; background: transparent; padding: 0; font-family: inherit; font-size: 16px; color: #4A4A4A; outline: none"></label>
+      <div style="height: 56px; box-sizing: border-box; padding: 0 4px 0 16px; background: #F5EFE9; border: 1px solid #E6DBD0; border-radius: 14px; display: flex; align-items: center; gap: 8px">
+        <label style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #6F6662">Contraseña</span><input type="password" value="emmapilates" style="border: none; background: transparent; padding: 0; font-family: inherit; font-size: 16px; color: #4A4A4A; outline: none"></label>
+        <button type="button" aria-label="Mostrar contraseña" style="width: 44px; height: 44px; border: none; background: transparent; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+      </div>
+      <div style="display: flex; justify-content: flex-end"><a href="C20-Recuperar-contrasena.dc.html" style="height: 44px; padding: 0 4px; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; text-decoration: none">¿Olvidaste tu contraseña?</a></div>
+      <a href="C02-Inicio-con-plan.dc.html" style="height: 52px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Iniciar sesión</a>
+      <a href="C02-Inicio-con-plan.dc.html" style="height: 52px; border-radius: 14px; background: #F2E4E1; color: #7D4F4B; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7D4F4B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9.5v1M15 9.5v1M12 9.5v3.5h-1M9.5 15.5c1.4 1 3.6 1 5 0"></path></svg>Iniciar sesión con Face ID</a>
+    </form>
+  </div>
+  <div style="padding: 12px 20px 30px; display: flex; align-items: center; justify-content: center; gap: 4px">
+    <span style="font-size: 15px; color: #6F6662">¿No tienes una cuenta?</span>
+    <a href="C01b-Registrate.dc.html" style="height: 44px; padding: 0 8px; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; text-decoration: none">Regístrate</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

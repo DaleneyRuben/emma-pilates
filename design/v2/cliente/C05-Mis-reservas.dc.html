@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mis reservas con aviso</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative">
+  <div style="flex-grow: 1; padding: 60px 20px 24px; display: flex; flex-direction: column; gap: 24px">
+    <span style="font-family: Lora, Georgia, serif; font-size: 30px">Mis reservas</span>
+    <div role="tablist" aria-label="Reservas" style="background: #F5EFE9; border-radius: 14px; padding: 4px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px">
+      <button role="tab" aria-selected="true" style="height: 40px; border: none; border-radius: 10px; background: #93615D; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600">Próximas</button>
+      <a href="C05d-Historial.dc.html" role="tab" aria-selected="false" style="height: 40px; border-radius: 10px; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Historial</a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: #F2E4E1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7D4F4B; flex: none"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">Mar</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">3</span></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, Georgia, serif; font-size: 20px">Mat Pilates</span><span style="font-size: 13px; color: #6F6662">08:00 – 09:00 · Daniela Ortiz · Achumani</span></div>
+        </div>
+        <div style="height: 1px; background: #E6DBD0"></div>
+        <div style="display: flex; justify-content: flex-end"><a href="C05c-Cancelar-reserva.dc.html" style="height: 44px; padding: 0 12px; color: #A04E3E; font-size: 15px; font-weight: 600; display: flex; align-items: center; text-decoration: none">Cancelar reserva</a></div>
+      </div>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: #F2E4E1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7D4F4B; flex: none"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">Mié</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">4</span></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, Georgia, serif; font-size: 20px">Reformer Pilates</span><span style="font-size: 13px; color: #6F6662">18:00 – 19:00 · Daniela Ortiz · Achumani</span></div>
+        </div>
+        <div style="height: 1px; background: #E6DBD0"></div>
+        <div style="display: flex; justify-content: flex-end"><a href="C05c-Cancelar-reserva.dc.html" style="height: 44px; padding: 0 12px; color: #A04E3E; font-size: 15px; font-weight: 600; display: flex; align-items: center; text-decoration: none">Cancelar reserva</a></div>
+      </div>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: #F2E4E1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7D4F4B; flex: none"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">Hoy</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">2</span></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, Georgia, serif; font-size: 20px">Reformer Pilates</span><span style="font-size: 13px; color: #6F6662">18:00 – 19:00 · faltan menos de 2 h 30</span></div>
+        </div>
+        <div style="height: 1px; background: #E6DBD0"></div>
+        <div style="display: flex; justify-content: flex-end"><a href="C06-Reprogramar.dc.html" style="height: 44px; padding: 0 12px; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; text-decoration: none">Reprogramar</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div role="status" style="position: absolute; left: 20px; right: 20px; bottom: 98px; background: #93615D; border-radius: 14px; padding: 12px 8px 12px 16px; display: flex; align-items: center; gap: 12px; color: #FFFFFF; box-shadow: 0 8px 24px rgba(74,74,74,0.18)">
+    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">Reserva confirmada</span><span style="font-size: 13px; color: rgba(255,255,255,0.85)">Te quedan 9 clases en tu plan</span></div>
+    <button aria-label="Cerrar aviso" style="width: 44px; height: 44px; border: none; background: transparent; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  </div>
+
+  <nav aria-label="Principal" style="height: 82px; padding-bottom: 18px; box-sizing: border-box; background: #F5EFE9; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center">
+    <a href="C02-Inicio-con-plan.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linejoin="round"><path d="M4 10.5L12 4l8 6.5V20H4z"></path></svg>Inicio</a>
+    <a href="C03-Reservar.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Reservar</a>
+    <span aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #93615D; font-size: 12px; font-weight: 600"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>Mis Reservas</span>
+    <a href="C18-Perfil.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"></circle><path d="M5 20c1-3.6 3.8-5.5 7-5.5s6 1.9 7 5.5"></path></svg>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

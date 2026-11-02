@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Crear contraseña</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="flex-grow: 1; padding: 72px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Emma Pilates Studio · Activar cuenta</span>
+      <span style="font-family: Lora, Georgia, serif; font-size: 30px">Crea tu contraseña</span>
+      <span style="font-size: 15px; line-height: 1.5; color: #6F6662">Tu contraseña activa tu cuenta y confirma tu correo. Luego inicias sesión con ella.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <label style="height: 56px; box-sizing: border-box; padding: 8px 16px; background: #F5EFE9; border: 1px solid #E6DBD0; border-radius: 14px; display: flex; flex-direction: column; justify-content: center; gap: 2px"><span style="font-size: 12px; color: #6F6662">Contraseña nueva</span><input type="password" value="emmapilates" style="border: none; background: transparent; padding: 0; font-family: inherit; font-size: 16px; color: #4A4A4A; outline: none"></label>
+      <label style="height: 56px; box-sizing: border-box; padding: 8px 16px; background: #F5EFE9; border: 1px solid #E6DBD0; border-radius: 14px; display: flex; flex-direction: column; justify-content: center; gap: 2px"><span style="font-size: 12px; color: #6F6662">Confirmar contraseña</span><input type="password" value="emmapilates" style="border: none; background: transparent; padding: 0; font-family: inherit; font-size: 16px; color: #4A4A4A; outline: none"></label>    </div>
+  </div>
+  <div style="padding: 12px 20px 30px">
+    <a href="C21b-Cuenta-activada.dc.html" style="height: 52px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Activar cuenta</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

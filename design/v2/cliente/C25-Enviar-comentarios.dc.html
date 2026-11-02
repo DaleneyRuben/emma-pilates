@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Enviar comentarios</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="C18b-Perfil-final.dc.html" aria-label="Volver" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-size: 16px; font-weight: 500">Perfil</span>
+  </div>
+  <div style="flex-grow: 1; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-family: Lora, Georgia, serif; font-size: 30px">Enviar comentarios</span>
+      <span style="font-size: 15px; line-height: 1.5; color: #6F6662">Cuéntanos qué falló o qué mejorarías. Lo lee el equipo de Emma Pilates Studio.</span>
+    </div>
+    <fieldset style="margin: 0; padding: 0; border: none">
+      <legend style="padding: 0; margin-bottom: 12px; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Tipo</legend>
+      <div role="radiogroup" style="background: #F5EFE9; border-radius: 14px; padding: 4px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
+        <button type="button" role="radio" aria-checked="true" style="height: 40px; border: none; border-radius: 10px; background: #93615D; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600">Problema</button>
+        <button type="button" role="radio" aria-checked="false" style="height: 40px; border: none; border-radius: 10px; background: transparent; color: #7D4F4B; font-family: inherit; font-size: 15px; font-weight: 600">Sugerencia</button>
+        <button type="button" role="radio" aria-checked="false" style="height: 40px; border: none; border-radius: 10px; background: transparent; color: #7D4F4B; font-family: inherit; font-size: 15px; font-weight: 600">Otro</button>
+      </div>
+    </fieldset>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <label style="box-sizing: border-box; padding: 12px 16px; background: #F5EFE9; border: 1px solid #E6DBD0; border-radius: 14px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #6F6662">Comentario</span><textarea rows="5" style="border: none; background: transparent; padding: 0; resize: none; font-family: inherit; font-size: 16px; line-height: 1.5; color: #4A4A4A; outline: none">No puedo ver mis reservas de mañana en la lista.</textarea></label>
+      <div style="padding: 0 4px; display: flex; justify-content: space-between; font-size: 13px; color: #6F6662"><span>Mínimo 10 caracteres</span><span>48 / 2000</span></div>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+      <div style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center; flex: none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="3" width="11" height="18" rx="2.5"></rect><path d="M11 17.5h2"></path></svg></div>
+      <span style="font-size: 14px; line-height: 1.4">Enviamos también la versión de la app (1.0.1), el sistema (iOS 18.2) y tu rol. Sin capturas.</span>
+    </div>
+  </div>
+  <div style="padding: 12px 20px 30px">
+    <a href="C25b-Comentario-enviado.dc.html" style="height: 52px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Enviar comentario</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
