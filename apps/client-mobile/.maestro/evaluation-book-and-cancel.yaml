@@ -19,7 +19,7 @@ env:
 - extendedWaitUntil:
     visible: "Días disponibles"
     timeout: 15000
-- assertVisible: "Nutricionista · sesiones de 45 min"
+- assertVisible: "Nutricionista · 45 min · .*"
 - assertVisible: "Puedes reservar hasta 3 horas antes."
 - takeScreenshot: client-evaluation-2-disponibilidad
 - tapOn:

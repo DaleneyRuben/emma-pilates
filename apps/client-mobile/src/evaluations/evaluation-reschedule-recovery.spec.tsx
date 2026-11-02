@@ -160,7 +160,7 @@ describe("Around a paid Evaluation move", () => {
         "Tu evaluación ya está pagada. Elige el nuevo horario: el pago se mantiene.",
       ),
     ).toBeOnTheScreen();
-    expect(screen.queryByText("Necesitas un plan activo para reservar tu evaluación.")).toBeNull();
+    expect(screen.queryByText("Necesitas un plan activo")).toBeNull();
     expect(screen.getByRole("button", { name: "Turno 09:00" })).toBeOnTheScreen();
   });
 

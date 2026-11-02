@@ -44,14 +44,11 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          "Reserva tu evaluación gratuita con la nutricionista. Tienes una evaluación disponible por mes.",
-        ),
-      ).toBeOnTheScreen();
+      // C13: one line of copy, then the Nutritionist with the Branch.
+      expect(screen.getByText("Una evaluación gratis por mes con tu plan.")).toBeOnTheScreen();
     });
     expect(screen.getByText("Gabriela Rojas")).toBeOnTheScreen();
-    expect(screen.getByText("Nutricionista · sesiones de 45 min")).toBeOnTheScreen();
+    expect(screen.getByText("Nutricionista · 45 min · Centro")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: dayName(firstDay) })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: dayName(secondDay) })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: dayName(fullDay) })).toBeNull();
@@ -244,10 +241,10 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Necesitas un plan activo para reservar tu evaluación."),
-      ).toBeOnTheScreen();
+      // C13b: the centred v2 state block.
+      expect(screen.getByRole("header", { name: "Necesitas un plan activo" })).toBeOnTheScreen();
     });
+    expect(screen.getByText("La evaluación es gratuita con cualquier plan.")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Ver planes" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: /^Turno/ })).toBeNull();
   });
