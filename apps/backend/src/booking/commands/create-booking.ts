@@ -3,6 +3,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { bookingDuringFreezeMessage } from '../payments/freeze';
 
 import { bookingBeforeStartMessage } from './booking-before-start';
+import { assertInsideBookingWindow } from './booking-window';
 import { assertWeeklyCapAllows } from './weekly-cap-decision';
 
 export class BookingAccessDeniedError extends Error {
@@ -54,6 +55,7 @@ type CreateBookingDependencies = {
     subscriptionId: string;
     createdByAccountId: string;
   }): Promise<{ id: string }>;
+  bookingWindowDays?(): Promise<number>;
   now(): Date;
 };
 
@@ -103,6 +105,11 @@ export const createBooking = async (
   }
 
   const clientId = resolveClientId(command, session, dependencies.principal);
+  await assertInsideBookingWindow(
+    session.startsAt,
+    dependencies.now(),
+    dependencies.bookingWindowDays?.bind(dependencies),
+  );
   const freeze = dependencies.findApprovedFreeze
     ? await dependencies.findApprovedFreeze({
         clientId,

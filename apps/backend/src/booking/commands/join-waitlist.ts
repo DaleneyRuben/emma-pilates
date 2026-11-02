@@ -3,6 +3,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
 import { bookingDuringFreezeMessage } from '../payments/freeze';
 import { bookingBeforeStartMessage } from './booking-before-start';
+import { assertInsideBookingWindow } from './booking-window';
 import {
   BookingAccessDeniedError,
   type WeeklyCapSubscription,
@@ -47,6 +48,7 @@ type JoinWaitlistDependencies = {
     joinedByAccountId: string;
   }): Promise<{ id: string }>;
   cancellationWindowMinutes(): Promise<number>;
+  bookingWindowDays?(): Promise<number>;
   now(): Date;
 };
 
@@ -100,6 +102,11 @@ export const joinWaitlist = async (
   }
 
   const clientId = resolveClientId(command, session, dependencies.principal);
+  await assertInsideBookingWindow(
+    session.startsAt,
+    dependencies.now(),
+    dependencies.bookingWindowDays?.bind(dependencies),
+  );
   const freeze = dependencies.findApprovedFreeze
     ? await dependencies.findApprovedFreeze({
         clientId,
