@@ -8,6 +8,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  BrandToast,
   colors,
   ConfirmationSheet,
   LoadingState,
@@ -22,7 +23,7 @@ import {
   useMountedAt,
   usePullToRefresh,
   useRefetchOnFocus,
-  useTransientNotice,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -42,8 +43,6 @@ import {
   monthName,
   monthPhrase,
 } from "./evaluation-format";
-
-const noticeVisibleMs = 8_000;
 
 type EvaluationsNavigation = {
   goBack: () => void;
@@ -156,9 +155,8 @@ export function MyEvaluationsScreen({
   const navigation = useNavigation<EvaluationsNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
-  const confirmed = useTransientNotice(route.params?.confirmed, noticeVisibleMs, () =>
-    navigation.setParams({ confirmed: undefined, moved: undefined }),
-  );
+  const dismissConfirmed = () => navigation.setParams({ confirmed: undefined, moved: undefined });
+  const confirmed = useStickyNotice(route.params?.confirmed, dismissConfirmed);
   const [cancelling, setCancelling] = useState<ClientEvaluationDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [receiptReady, setReceiptReady] = useState<Record<string, true>>({});
@@ -253,16 +251,6 @@ export function MyEvaluationsScreen({
   return (
     <Screen style={styles.screen}>
       {header}
-      {confirmed !== null ? (
-        <View style={styles.notice}>
-          <Text style={styles.noticeTitle}>
-            {route.params?.moved === true ? "Evaluación reprogramada" : "Evaluación confirmada"}
-          </Text>
-          <BodyText style={styles.noticeBody}>
-            {`${evaluationDate(confirmed.startsAt)}, ${clockTime(confirmed.startsAt)}`}
-          </BodyText>
-        </View>
-      ) : null}
       {failure !== null ? (
         <BodyText accessibilityRole="alert" style={styles.failure}>
           {failure}
@@ -343,6 +331,13 @@ export function MyEvaluationsScreen({
           </>
         ) : null}
       </ConfirmationSheet>
+      {confirmed !== null ? (
+        <BrandToast
+          note={`${evaluationDate(confirmed.startsAt)}, ${clockTime(confirmed.startsAt)}`}
+          onClose={dismissConfirmed}
+          title={route.params?.moved === true ? "Evaluación reprogramada" : "Evaluación confirmada"}
+        />
+      ) : null}
     </Screen>
   );
 }
@@ -386,14 +381,6 @@ const styles = StyleSheet.create({
   muted: { color: colors.textMuted, fontSize: typography.note },
   pastRow: { flexDirection: "row", gap: spacing.md, alignItems: "center" },
   pastText: { color: colors.text, flex: 1 },
-  notice: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  noticeBody: { color: colors.successText },
-  noticeTitle: { color: colors.successText, fontWeight: "600" },
   screen: { gap: spacing.lg },
   time: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
 });

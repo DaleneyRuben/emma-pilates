@@ -6,6 +6,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  BrandToast,
   colors,
   ConfirmationSheet,
   EmptyState,
@@ -22,7 +23,7 @@ import {
   surfaces,
   typography,
   useStudioRules,
-  useTransientNotice,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,8 +35,6 @@ import { createAssistantApi } from "./assistant-api";
 import type { ConfirmedBooking } from "./assistant-session-detail-screen";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
-
-const noticeVisibleMs = 8_000;
 
 type BookingsNavigation = {
   goBack: () => void;
@@ -142,9 +141,8 @@ export function ClientBookingsScreen({
   const queryClient = useQueryClient();
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
   const studioRules = useStudioRules(fetcher);
-  const notice = useTransientNotice(route.params.confirmed, noticeVisibleMs, () =>
-    navigation.setParams({ confirmed: undefined }),
-  );
+  const dismissNotice = () => navigation.setParams({ confirmed: undefined });
+  const notice = useStickyNotice(route.params.confirmed, dismissNotice);
   const [cancelling, setCancelling] = useState<AssistantClientBookingDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const upcoming = useListAssistantClientBookings(clientId, {
@@ -194,14 +192,6 @@ export function ClientBookingsScreen({
     <Screen style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reservas de la clienta" />
       <ClientBanner action="Viendo reservas de" clientName={clientName} />
-      {notice !== null ? (
-        <View style={styles.notice}>
-          <Text style={styles.noticeTitle}>Reserva confirmada</Text>
-          <BodyText style={styles.noticeBody}>
-            {`${notice.classTypeName} · ${formatSessionDate(notice.startsAt)} · ${formatTimeRange(notice.startsAt, notice.endsAt)}`}
-          </BodyText>
-        </View>
-      ) : null}
       {failure !== null ? (
         <BodyText accessibilityRole="alert" style={styles.failure}>
           {failure}
@@ -256,6 +246,13 @@ export function ClientBookingsScreen({
           </BodyText>
         ) : null}
       </ConfirmationSheet>
+      {notice !== null ? (
+        <BrandToast
+          note={`${notice.classTypeName} · ${formatSessionDate(notice.startsAt)} · ${formatTimeRange(notice.startsAt, notice.endsAt)}`}
+          onClose={dismissNotice}
+          title="Reserva confirmada"
+        />
+      ) : null}
     </Screen>
   );
 }
@@ -296,13 +293,5 @@ const styles = StyleSheet.create({
   failure: { color: colors.errorText },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
   lockedNote: { color: colors.textMuted, fontSize: typography.label, textAlign: "center" },
-  notice: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  noticeBody: { color: colors.successText, fontSize: typography.note },
-  noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
   screen: { gap: spacing.md },
 });

@@ -9,6 +9,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  BrandToast,
   colors,
   ConfirmationSheet,
   Heading,
@@ -24,7 +25,7 @@ import {
   usePullToRefresh,
   useRefetchOnFocus,
   useStudioRules,
-  useTransientNotice,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -39,8 +40,6 @@ import {
   formatTimeRange,
   isInsideCancellationWindow,
 } from "@pilates/mobile-core";
-
-const noticeVisibleMs = 8_000;
 
 type BookingsNavigation = {
   navigate: {
@@ -149,9 +148,8 @@ export function BookingsScreen({
   const navigation = useNavigation<BookingsNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
-  const confirmed = useTransientNotice(route.params?.confirmed, noticeVisibleMs, () =>
-    navigation.setParams({ confirmed: undefined }),
-  );
+  const dismissConfirmed = () => navigation.setParams({ confirmed: undefined });
+  const confirmed = useStickyNotice(route.params?.confirmed, dismissConfirmed);
   const [cancelling, setCancelling] = useState<UpcomingBookingDto | null>(null);
   const [cancelInFlight, setCancelInFlight] = useState(false);
   const cancelStarted = useRef(false);
@@ -234,19 +232,6 @@ export function BookingsScreen({
         <Heading accessibilityLabel="Mis reservas">Mis reservas</Heading>
         <TextButton label="Ver historial" onPress={() => navigation.navigate("History")} />
       </View>
-      {confirmed !== null ? (
-        <View style={styles.notice}>
-          <Text style={styles.noticeTitle}>Reserva confirmada</Text>
-          <BodyText style={styles.noticeBody}>
-            {`${confirmed.classTypeName} · ${formatSessionDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`}
-          </BodyText>
-          {remaining !== undefined && confirmed.planName !== "Pase de invitada" ? (
-            <BodyText style={styles.balance}>{`Te quedan ${remaining} clases en tu plan`}</BodyText>
-          ) : confirmed.planName === "Pase de invitada" ? (
-            <BodyText style={styles.balance}>Tu pase de invitada ya se usó.</BodyText>
-          ) : null}
-        </View>
-      ) : null}
       {failure !== null ? (
         <BodyText accessibilityRole="alert" style={styles.failure}>
           {failure}
@@ -304,6 +289,19 @@ export function BookingsScreen({
           </BodyText>
         ) : null}
       </ConfirmationSheet>
+      {confirmed !== null ? (
+        <BrandToast
+          note={
+            confirmed.planName === "Pase de invitada"
+              ? "Tu pase de invitada ya se usó."
+              : remaining !== undefined
+                ? `Te quedan ${remaining} clases en tu plan`
+                : `${confirmed.classTypeName} · ${formatSessionDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`
+          }
+          onClose={dismissConfirmed}
+          title="Reserva confirmada"
+        />
+      ) : null}
     </Screen>
   );
 }
@@ -328,7 +326,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   badgeText: { color: colors.warningText, fontSize: typography.label, fontWeight: "600" },
-  balance: { color: colors.textMuted, fontSize: typography.note },
   card: {
     ...surfaces.card,
     gap: spacing.xs,
@@ -345,13 +342,5 @@ const styles = StyleSheet.create({
   failure: { color: colors.errorText },
   header: { alignItems: "flex-start", gap: spacing.sm },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  notice: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  noticeBody: { color: colors.successText, fontSize: typography.note },
-  noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
   screen: { gap: spacing.lg },
 });

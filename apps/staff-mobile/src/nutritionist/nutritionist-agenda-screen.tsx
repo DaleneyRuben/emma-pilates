@@ -7,23 +7,24 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  BrandToast,
   Chevron,
   colors,
   ConfirmationSheet,
   fontFamilies,
   LoadingState,
   QueryFailure,
-  radii,
   Screen,
   spacing,
   surfaces,
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
@@ -41,7 +42,6 @@ import {
 type AgendaNavigation = { navigate: (screen: "Availability") => void };
 
 const agendaPageSize = 50;
-const noticeVisibleMs = 8_000;
 
 const kindLabel: Record<NutritionistAgendaEntryDto["kind"], string> = {
   first: "Primera evaluación",
@@ -71,15 +71,11 @@ export function NutritionistAgendaScreen() {
   const refreshControl = usePullToRefresh(queryKeys);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState<NutritionistAgendaEntryDto | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [cancelledNotice, setNotice] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
-
-  // The «Evaluación cancelada» strip fades like 15's confirmation.
-  useEffect(() => {
-    if (notice === null) return undefined;
-    const timer = setTimeout(() => setNotice(null), noticeVisibleMs);
-    return () => clearTimeout(timer);
-  }, [notice]);
+  // The «Evaluación cancelada» toast stays until closed or the screen changes.
+  const clearNotice = () => setNotice(null);
+  const notice = useStickyNotice(cancelledNotice ?? undefined, clearNotice);
 
   const firstName = profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
   const title = firstName === undefined ? "Hola" : `Hola, ${firstName}`;
@@ -148,12 +144,6 @@ export function NutritionistAgendaScreen() {
   return (
     <Screen style={styles.screen}>
       {header}
-      {notice !== null ? (
-        <View style={styles.notice}>
-          <Text style={styles.noticeTitle}>Evaluación cancelada</Text>
-          <BodyText style={styles.noticeBody}>{notice}</BodyText>
-        </View>
-      ) : null}
       {failure !== null ? (
         <BodyText accessibilityRole="alert" style={styles.failure}>
           {failure}
@@ -235,6 +225,9 @@ export function NutritionistAgendaScreen() {
           </BodyText>
         ) : null}
       </ConfirmationSheet>
+      {notice !== null ? (
+        <BrandToast note={notice} onClose={clearNotice} title="Evaluación cancelada" />
+      ) : null}
     </Screen>
   );
 }
@@ -270,14 +263,6 @@ const styles = StyleSheet.create({
   },
   list: { gap: spacing.xl, paddingBottom: spacing.xxl },
   muted: { color: colors.textMuted, fontSize: typography.note },
-  notice: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  noticeBody: { color: colors.successText, fontSize: typography.note },
-  noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
   screen: { gap: spacing.lg },
   time: {
     color: colors.text,

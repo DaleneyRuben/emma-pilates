@@ -2,6 +2,7 @@ import { getListPendingPaymentsQueryKey, useListPendingPayments } from "@pilates
 import {
   AvatarCircle,
   BodyText,
+  BrandToast,
   CardFooter,
   Chevron,
   colors,
@@ -19,7 +20,7 @@ import {
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
-  useTransientNotice,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -39,9 +40,6 @@ type PendingPaymentsNavigation = {
   setParams: (params: { notice?: PaymentsNotice }) => void;
 };
 
-const noticeMilliseconds = 2_000;
-const impersonationNoticeMilliseconds = 4_000;
-
 export function PendingPaymentsScreen({
   route,
 }: {
@@ -56,18 +54,24 @@ export function PendingPaymentsScreen({
   const queryKeys = [getListPendingPaymentsQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
-  // Confirming or rejecting returns here with a two-second notice.
-  const paymentsNotice = useTransientNotice(route.params?.notice, noticeMilliseconds, () =>
-    navigation.setParams({ notice: undefined }),
-  );
+  // Confirming or rejecting returns here with a toast that stays until closed
+  // or the screen changes (follow-up 225 §7).
+  const clearPaymentsNotice = () => navigation.setParams({ notice: undefined });
+  const paymentsNotice = useStickyNotice(route.params?.notice, clearPaymentsNotice);
   // FUT-001: «Salir» or the expiry of an Impersonation lands here with its line.
   const impersonation = useImpersonation();
-  const impersonationNotice = useTransientNotice(
+  const impersonationNotice = useStickyNotice(
     impersonation.notice ?? undefined,
-    impersonationNoticeMilliseconds,
     impersonation.clearNotice,
   );
   const notice = paymentsNotice ?? impersonationNotice;
+  const toast =
+    notice === null ? null : (
+      <BrandToast
+        onClose={paymentsNotice !== null ? clearPaymentsNotice : impersonation.clearNotice}
+        title={notice}
+      />
+    );
 
   const header = (
     <>
@@ -82,11 +86,6 @@ export function PendingPaymentsScreen({
         label="Pagos pendientes"
         title="Pagos pendientes"
       />
-      {notice === null ? null : (
-        <View accessibilityRole="alert" style={styles.notice}>
-          <Text style={styles.noticeText}>{notice}</Text>
-        </View>
-      )}
     </>
   );
 
@@ -95,6 +94,7 @@ export function PendingPaymentsScreen({
       <Screen style={styles.screen}>
         {header}
         <LoadingState label="Cargando pagos" />
+        {toast}
       </Screen>
     );
   }
@@ -106,6 +106,7 @@ export function PendingPaymentsScreen({
           label="No pudimos cargar los pagos pendientes."
           onRetry={() => void pending.refetch()}
         />
+        {toast}
       </Screen>
     );
   }
@@ -176,6 +177,7 @@ export function PendingPaymentsScreen({
           testID="pending-payments-cancel-class"
         />
       </ScrollView>
+      {toast}
     </Screen>
   );
 }
@@ -220,13 +222,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
   },
-  notice: {
-    alignItems: "center",
-    backgroundColor: colors.success,
-    borderRadius: radii.control,
-    paddingVertical: spacing.smLg,
-  },
-  noticeText: { color: colors.white, fontSize: typography.body, fontWeight: "500" },
   screen: { gap: spacing.md },
   summary: { gap: spacing.xxs, paddingVertical: spacing.sm },
   summaryLabel: {
