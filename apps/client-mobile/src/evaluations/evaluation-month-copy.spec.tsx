@@ -84,7 +84,7 @@ describe("Evaluation month copy (13, 14, 15)", () => {
     );
     const screen = await openProfileRow(fetcher, "Mis evaluaciones");
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cancelar evaluación" }));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));
 
     expect(

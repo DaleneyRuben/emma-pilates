@@ -79,7 +79,7 @@ describe("Client Evaluations", () => {
       }),
     );
     expect(screen.getByText("Mis evaluaciones")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cancelar evaluación" })).toBeOnTheScreen();
   });
 
   it("offers Reprogramar on a confirmed paid evaluation", async () => {
@@ -99,7 +99,7 @@ describe("Client Evaluations", () => {
     );
 
     expect(await screen.findByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
   });
 
   it("shows an 8-class Client the settings price and starts the QR payment", async () => {
@@ -300,13 +300,14 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Mis evaluaciones");
 
     await waitFor(() => {
-      expect(screen.getByText("Ya no se puede cancelar")).toBeOnTheScreen();
+      // C15: the limit is on each card's line, the action a text button.
+      expect(screen.getByText(/ · ya no se puede cancelar$/)).toBeOnTheScreen();
     });
-    expect(screen.getByText("Puedes cancelar hasta 3 horas antes.")).toBeOnTheScreen();
+    expect(screen.getByText(/ · cancela hasta 3 h antes$/)).toBeOnTheScreen();
     expect(await screen.findByText("Anteriores")).toBeOnTheScreen();
     expect(screen.getByText("Incluida")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar evaluación" }));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));
     expect(sheet.getByText("¿Cancelar esta evaluación?")).toBeOnTheScreen();
     expect(
@@ -316,7 +317,7 @@ describe("Client Evaluations", () => {
     await fireEvent.press(sheet.getByRole("button", { name: "Sí, cancelar evaluación" }));
 
     await waitFor(() => {
-      expect(screen.queryByRole("button", { name: "Cancelar" })).toBeNull();
+      expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
     });
     expect(fetcher).toHaveBeenCalledWith(
       "/api/v1/evaluations/evaluation-later",
@@ -329,8 +330,11 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Mis evaluaciones");
 
     await waitFor(() => {
-      expect(screen.getByText("No tienes evaluaciones próximas.")).toBeOnTheScreen();
+      expect(screen.getByText("No tienes evaluaciones próximas")).toBeOnTheScreen();
     });
+    expect(
+      screen.getByText("Tu evaluación de este mes sigue disponible y es gratis."),
+    ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Reservar evaluación" }));
 
     await waitFor(() => {
