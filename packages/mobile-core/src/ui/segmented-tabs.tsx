@@ -6,7 +6,8 @@ import { colors, spacing, typography } from "./tokens";
 export type SegmentedTabsProps<Key extends string> = {
   accessibilityLabel?: string;
   onSelect: (key: Key) => void;
-  options: readonly { key: Key; label: string; testID?: string }[];
+  /** `disabled` greys a segment that cannot be chosen now (S10 after a payment is sent). */
+  options: readonly { disabled?: boolean; key: Key; label: string; testID?: string }[];
   selected: Key;
   testID?: string;
 };
@@ -37,13 +38,21 @@ export function SegmentedTabs<Key extends string>({
           <Pressable
             accessibilityLabel={option.label}
             accessibilityRole="tab"
-            accessibilityState={{ selected: isSelected }}
+            accessibilityState={
+              option.disabled === true
+                ? { disabled: true, selected: isSelected }
+                : { selected: isSelected }
+            }
             key={option.key}
-            onPress={() => onSelect(option.key)}
+            onPress={() => {
+              if (option.disabled !== true) onSelect(option.key);
+            }}
             style={[styles.segment, isSelected && styles.selected]}
             testID={option.testID}
           >
-            <Text style={styles.label}>{option.label}</Text>
+            <Text style={[styles.label, option.disabled === true && styles.disabled]}>
+              {option.label}
+            </Text>
           </Pressable>
         );
       })}
@@ -52,6 +61,7 @@ export function SegmentedTabs<Key extends string>({
 }
 
 const styles = StyleSheet.create({
+  disabled: { color: colors.disabledText },
   label: {
     color: colors.primaryOnTint,
     fontFamily: fontFamilies.bodyStrong,
