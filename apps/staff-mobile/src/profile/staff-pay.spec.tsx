@@ -103,6 +103,28 @@ describe("Staff Mis pagos", () => {
     expect(payments.getByText("Bs 322,00")).toBeOnTheScreen();
   });
 
+  it("keeps a line kind the app does not know in the summary", async () => {
+    const screen = await openMyPay({
+      statements: () =>
+        jsonResponse([
+          {
+            ...approvedOctober,
+            totalCentavos: 16_500,
+            lines: [
+              { kind: "class", detail: "3 alumnas", amountCentavos: 6_500 },
+              { kind: "holiday_bonus", detail: "Feriado", amountCentavos: 10_000 },
+            ],
+          },
+        ]),
+    });
+
+    const october = within(
+      await waitFor(() => screen.getByLabelText("Liquidación de octubre 2026")),
+    );
+    expect(october.getByText("Otros · 1")).toBeOnTheScreen();
+    expect(october.getByText("Bs 100,00")).toBeOnTheScreen();
+  });
+
   it("opens and folds each class of a month", async () => {
     const screen = await openMyPay();
 

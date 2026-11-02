@@ -273,6 +273,7 @@ describe('Prisma Back Office salary payments', () => {
     expect(own.map((row) => row.amountCentavos)).not.toContain(99_000);
     for (const email of [
       'camila.rojas@example.com',
+      'lucia@example.com',
       'paola.mendoza@example.com',
       'carolina.rivas@example.com',
       'gabriela.flores@example.com',
