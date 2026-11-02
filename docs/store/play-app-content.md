@@ -28,19 +28,21 @@ instructions» once per app:
 | Field | Client app | Staff app |
 | --- | --- | --- |
 | Name | `Revisión Google Play` | `Revisión Google Play` |
-| Username | a Client Account made for Google on production | a Trainer Account made for Google on production |
-| Password | typed only into this form, never stored in the repository | same |
+| Username | `revision-play@emmapilatesstudio.com` | `revision-staff@emmapilatesstudio.com` |
+| Password | from the Run Script job log, typed only into this form, never stored in the repository | same |
 | Other information | «Inicia sesión con este correo y contraseña. La cuenta tiene un plan de prueba de 16 clases, otorgado por la administración, así que puedes reservar una clase, ver Mi plan y el perfil.» | «Inicia sesión con este correo y contraseña. La cuenta es de una instructora de prueba sin clases asignadas.» |
 | Login needed every time | No (the session stays signed in) | No |
 
-The reviewer Accounts are made for Google, never a real person's, under an
-address on our domain (for example `revision-play@emmapilatesstudio.com`
-through Email Routing). The Client Account gets the hidden tester Plan of 16
-classes (REL-011), granted by the Administrator, so the reviewer can book a
-class. That grant is a courtesy Payment of Bs 0 and counts toward no income
-report. REL-016 replaces both Accounts after the production reset, marked
-`store_review`, so they never count toward founders, the gift class, or pay
-statements. The Staff Account is a Trainer with **no Sessions**, since a real
+The reviewer Accounts are made for Google, never a real person's, by the
+Run Script workflow's `20261031-store-review-accounts` on production
+([runbook](../runbooks/run-script.md#store-review-accounts-20261031-store-review-accounts)):
+both are verified and active without an email, marked `store_review`, and
+their passwords appear once in the job run's log. The Client Account gets the
+hidden tester Plan of 16 classes (REL-011), granted in the Administrator's
+name, so the reviewer can book a class; that grant is a courtesy Payment of
+Bs 0 and counts toward no income report. After the production reset
+(REL-019) the script runs again with Force rerun and the new passwords go
+into this form. The Staff Account is a Trainer with **no Sessions**, since a real
 Session would be bookable by Clients; a Trainer rather than an Administrator
 keeps the reviewer away from payments and Account management.
 
@@ -51,6 +53,10 @@ keeps the reviewer away from payments and Account management.
   not a reference or news app).
 - Violence, fear, sexuality, nudity, language, controlled substances,
   gambling, crude humour: **No** to all.
+- **Online content** («content that isn't part of the initial app download»,
+  with product listings as an example): **Yes**, since the schedule and the
+  Plans come from the server; its follow-up questions (violence, sexuality,
+  language, controlled substances) are all **No** (owner, 2026-10-31).
 - **Does the app allow users to interact or exchange content?** The Client app
   sends a receipt photo and a profile photo that only studio staff see, and
   there is no chat, public profile, or content one Client can see from

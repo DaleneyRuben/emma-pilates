@@ -174,6 +174,8 @@ model Account {
   createdAt                 DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt                 DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
   deletedAt                 DateTime?               @map("deleted_at") @db.Timestamptz(3)
+  // REL-016: an Account Apple's or Google's reviewer signs in with.
+  storeReview               Boolean                 @default(false) @map("store_review")
   client                    Client?                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
   staffMember               StaffMember?            @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
   authenticationTokens      AuthenticationToken[]
@@ -580,5 +582,26 @@ model Feedback {
   @@index([accountId, createdAt])
   @@index([createdAt])
   @@map("feedback")
+  @@schema("system")
+}
+
+// REL-016: one row per run of a one-off script from the Run Script workflow.
+// `status` is running, success, or failure (a check constraint).
+model ScriptRun {
+  id           String    @id @default(uuid()) @db.Uuid
+  scriptName   String    @map("script_name")
+  status       String
+  params       Json      @default("{}")
+  dryRun       Boolean   @default(false) @map("dry_run")
+  runUrl       String?   @map("run_url")
+  startedAt    DateTime  @map("started_at") @db.Timestamptz(3)
+  finishedAt   DateTime? @map("finished_at") @db.Timestamptz(3)
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([scriptName, startedAt])
+  @@map("script_runs")
   @@schema("system")
 }

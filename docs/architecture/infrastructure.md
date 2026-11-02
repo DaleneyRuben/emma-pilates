@@ -163,7 +163,10 @@ Every account belongs to the project owner and is shared with no one else.
 - **Job `migrate`:** manual job, same repository, branch, and Dockerfile
   (Northflank cannot point a job at a combined service's image), nf-compute-20,
   command `node_modules/.bin/prisma migrate deploy`, retry limit 0, CI off,
-  CD on (a finished build becomes the image the next run uses).
+  CD on (a finished build becomes the image the next run uses). The Run
+  Script workflow (REL-016) also starts runs of it under the command
+  `node dist/src/script-runner-main.js …`, overriding the command for that
+  run only ([runbook](../runbooks/run-script.md)).
 - **Job `backup`:** cron job (EXT-009), same repository, branch `main`, and
   Dockerfile, built with the build argument `POSTGRESQL_CLIENT_MAJOR=18` so
   the image carries `pg_dump` 18 (the other images do not); schedule
@@ -475,6 +478,10 @@ Values never go in the repository or a chat. «Mac» means the user's own
   for its rollout (EXT-002), builds the `backup` job without running it
   (EXT-009), runs the smoke check (EXT-008), and deploys the production
   admin web with the Vercel CLI.
+- **`.github/workflows/run-script.yml`:** started by hand only (REL-016);
+  runs one script from `apps/backend/src/script-runner/scripts` as a run of
+  the environment's `migrate` job, with the release's concurrency group, and
+  records it in `system.script_runs` ([runbook](../runbooks/run-script.md)).
 - **Deployments:** only these two workflows deploy. Vercel's Git
   deployments are off in `vercel.json`, and Northflank's CI is off on every
   service and job.

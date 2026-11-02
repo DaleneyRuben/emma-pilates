@@ -82,7 +82,13 @@ const sharedKernel = [
   'time',
 ];
 // Composition roots wire everything together.
-const compositionRoots = ['architecture', 'development-fixtures'];
+// The Run Script runner and its scripts (REL-016) call commands of any
+// context, like the development fixtures.
+const compositionRoots = [
+  'architecture',
+  'development-fixtures',
+  'script-runner',
+];
 // Jest manual mocks of node modules the CommonJS unit suite cannot load
 // (pg-boss ships only ES modules); they import no context.
 const unitTestDoubles = ['__mocks__'];

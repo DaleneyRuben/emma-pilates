@@ -1,5 +1,9 @@
 export type DatabaseProcess =
-  'api' | 'worker' | 'administrator-bootstrap' | 'client-email-verification';
+  | 'api'
+  | 'worker'
+  | 'administrator-bootstrap'
+  | 'client-email-verification'
+  | 'script-runner';
 
 export type DatabasePool = 'prisma' | 'pgboss';
 

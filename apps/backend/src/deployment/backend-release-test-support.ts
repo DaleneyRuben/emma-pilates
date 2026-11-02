@@ -45,6 +45,7 @@ const healthyAnswers: Answers = {
   ],
   startJobRun: [{ id: 'run-1', runName: 'migrate-1' }],
   getJobRun: [run('RUNNING'), run('SUCCESS')],
+  listJobRuns: [[]],
   startServiceBuild: [build('api-build-1', 'PENDING')],
   getServiceBuild: [
     build('api-build-1', 'BUILDING'),
@@ -73,8 +74,9 @@ export function fakeNorthflank(overrides: Partial<Answers> = {}) {
   const northflank: NorthflankClient = {
     startJobBuild: answer('startJobBuild'),
     getJobBuild: answer('getJobBuild'),
-    startJobRun: answer('startJobRun'),
+    startJobRun: (jobId) => answer('startJobRun')(jobId),
     getJobRun: answer('getJobRun'),
+    listJobRuns: answer('listJobRuns'),
     startServiceBuild: answer('startServiceBuild'),
     getServiceBuild: answer('getServiceBuild'),
     getServiceDeployment: answer('getServiceDeployment'),

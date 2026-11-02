@@ -88,6 +88,7 @@ describe('foundation migration', () => {
       'system.impersonation_sessions',
       'system.notification_deliveries',
       'system.notifications',
+      'system.script_runs',
     ]);
   });
 
