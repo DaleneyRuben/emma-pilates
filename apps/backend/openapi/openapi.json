@@ -7842,6 +7842,68 @@
         ]
       }
     },
+    "/api/v1/administrator/salary-payments/{salaryPaymentId}/receipt": {
+      "get": {
+        "operationId": "getSalaryPaymentReceipt",
+        "parameters": [
+          {
+            "name": "salaryPaymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "readable",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSalaryPayments"
+        ]
+      }
+    },
     "/api/v1/administrator/expense-categories": {
       "get": {
         "operationId": "listAdminExpenseCategories",
@@ -8392,6 +8454,98 @@
         "summary": "",
         "tags": [
           "TrainerPayStatements"
+        ]
+      }
+    },
+    "/api/v1/trainer/salary-payments": {
+      "get": {
+        "operationId": "listOwnSalaryPayments",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OwnSalaryPaymentDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerSalaryPayments"
+        ]
+      }
+    },
+    "/api/v1/trainer/salary-payments/{salaryPaymentId}/receipt": {
+      "get": {
+        "operationId": "getOwnSalaryPaymentReceipt",
+        "parameters": [
+          {
+            "name": "salaryPaymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "readable",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerSalaryPayments"
         ]
       }
     },
@@ -15706,6 +15860,11 @@
             "type": "string",
             "format": "date",
             "description": "Bolivia civil date"
+          },
+          "receiptUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "BKO-008"
           }
         },
         "required": [
@@ -15713,7 +15872,8 @@
           "staffMemberId",
           "staffMemberName",
           "amountCentavos",
-          "paidOn"
+          "paidOn",
+          "receiptUrl"
         ]
       },
       "AdminSalaryPaymentPageDto": {
@@ -15758,6 +15918,11 @@
             "type": "string",
             "format": "date",
             "description": "Today or earlier in Bolivia"
+          },
+          "receiptImageAssetId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A ready transfer_receipt upload of hers (BKO-008)"
           }
         },
         "required": [
@@ -16204,6 +16369,34 @@
         },
         "required": [
           "drafted"
+        ]
+      },
+      "OwnSalaryPaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "paidOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "receiptUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "BKO-008"
+          }
+        },
+        "required": [
+          "id",
+          "amountCentavos",
+          "paidOn",
+          "receiptUrl"
         ]
       },
       "CashCloseDto": {

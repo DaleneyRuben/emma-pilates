@@ -55,11 +55,14 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     marginLeft: "auto",
   },
+  // The chevron's tip sits about 18 pt into the 44 pt target: pulled back so
+  // it lines up with the title's inset, as BackLink does.
   back: {
     alignItems: "center",
     borderRadius: radii.pill,
     height: 44,
     justifyContent: "center",
+    marginLeft: -10,
     width: 44,
   },
   backPressed: {

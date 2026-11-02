@@ -51,6 +51,7 @@ import { NutritionistAgendaScreen } from "./nutritionist/nutritionist-agenda-scr
 import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
 import { StaffFeedbackScreen } from "./profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
+import { StaffPayScreen } from "./profile/staff-pay-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { StaffFetcherContext, unavailableFetcher } from "./staff-fetcher";
 import { StaffRoleContext } from "./staff-role";
@@ -72,6 +73,7 @@ const TrainerStack = createNativeStackNavigator({
     Agenda: TrainerAgendaScreen,
     Roster: TrainerRosterScreen,
     ReportFault: ReportFaultScreen,
+    MyPay: StaffPayScreen,
     ...accountScreens,
   },
 });

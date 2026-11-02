@@ -15,8 +15,9 @@ const contexts = [
 ];
 const allowedContextEdges: Record<string, string[]> = {
   // Back Office reads Branches and Staff Members through its own read-only
-  // queries (ADR-0011) and imports no other context.
-  'back-office': [],
+  // queries (ADR-0011). It keeps a Salary Payment's receipt photo through the
+  // uploads slice and storage port, as Booking does (BKO-008).
+  'back-office': ['uploads'],
   // Studio Management reads Booking through its own queries and imports no
   // other context (ADR-0011).
   studio: [],

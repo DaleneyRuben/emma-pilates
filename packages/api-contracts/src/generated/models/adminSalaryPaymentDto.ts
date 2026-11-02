@@ -13,4 +13,9 @@ export interface AdminSalaryPaymentDto {
   amountCentavos: number;
   /** Bolivia civil date */
   paidOn: string;
+  /**
+   * BKO-008
+   * @nullable
+   */
+  receiptUrl: string | null;
 }

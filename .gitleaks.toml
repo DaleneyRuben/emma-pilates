@@ -28,9 +28,10 @@ regexes = [
 ]
 
 [[allowlists]]
-description = "fixture UUIDs in the backend specs and the schema proposal's prose about token digests"
+description = "fixture UUIDs and object keys in the backend specs and the schema proposal's prose about token digests"
 regexTarget = "line"
 regexes = [
   '''authenticationTokenId: '[0-9a-f-]{36}'\,''',
+  '''objectKey: 'private/[a-z]+/(thumbnail|readable)'\,''',
   '''one-way token digest, ''',
 ]

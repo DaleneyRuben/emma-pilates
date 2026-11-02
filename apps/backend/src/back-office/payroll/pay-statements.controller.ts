@@ -29,6 +29,7 @@ import {
   type BackOfficeOperations,
 } from '../back-office-http';
 import { PayStatementDraftDto, PayStatementDto } from './pay-statements.dto';
+import { TrainerSalaryPaymentsController } from './trainer-salary-payments.controller';
 
 const civil = (date: Date): string => date.toISOString().slice(0, 10);
 
@@ -172,3 +173,10 @@ export class TrainerPayStatementsController extends BackOfficeController {
     return statements.map(toDto);
   }
 }
+
+export const payrollControllers = [
+  AdministratorPayStatementsController,
+  CoordinatorPayStatementsController,
+  TrainerPayStatementsController,
+  TrainerSalaryPaymentsController,
+];

@@ -1,3 +1,4 @@
+import { OBJECT_STORAGE } from '../src/uploads/object-storage.module';
 import { INestApplication } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -58,6 +59,8 @@ describe('finance endpoints (e2e)', () => {
           provide: backOfficeOperations,
           useValue: { finance: { monthResult, seedOpeningBudget } },
         },
+        // BKO-008: the receipt routes stream through the uploads store.
+        { provide: OBJECT_STORAGE, useValue: { get: jest.fn() } },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();

@@ -1,11 +1,7 @@
-import { X, ZoomIn } from "lucide-react";
-import { Dialog } from "radix-ui";
+import { ZoomIn } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { BodyScrollLock } from "../components/ui/body-scroll-lock";
 import { Button } from "../components/ui/button";
-import { closeButtonClass } from "../components/ui/sheet";
-import { cn } from "../lib/cn";
-import { useIsNarrowViewport } from "../shell/use-media-query";
+import { ReceiptDialog } from "./receipt-dialog";
 
 const formats: Record<string, string> = {
   "image/jpeg": "JPG",
@@ -37,7 +33,6 @@ export function ReceiptViewer({
   clientName,
   onRetry,
 }: ReceiptViewerProps) {
-  const narrow = useIsNarrowViewport();
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [enlarged, setEnlarged] = useState(false);
@@ -106,60 +101,13 @@ export function ReceiptViewer({
         />
       </button>
       <p className="text-ayuda text-texto-muy-tenue">{caption}</p>
-      <Dialog.Root open={enlarged} onOpenChange={setEnlarged}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-scrim-fuerte" />
-          <Dialog.Content
-            aria-describedby={undefined}
-            data-presentation={narrow ? "full-screen" : "viewer"}
-            // WEB-036: Radix closes the viewer on Escape only once its layer
-            // is the highest, which happens in an effect after the viewer is
-            // painted and focused; until then the sheet below ignores the
-            // key (see SheetContent), so the viewer closes itself.
-            onKeyDown={(event) => {
-              if (event.key === "Escape") setEnlarged(false);
-            }}
-            className={cn(
-              "fixed z-50 flex flex-col gap-2 outline-none",
-              narrow
-                ? "inset-0 overflow-y-auto bg-blanco"
-                : "top-1/2 left-1/2 max-w-[min(900px,90vw)] -translate-x-1/2 -translate-y-1/2",
-            )}
-          >
-            <BodyScrollLock />
-            <Dialog.Title className="sr-only">
-              Comprobante ampliado
-            </Dialog.Title>
-            <div
-              className={cn(
-                "flex items-center justify-between gap-3",
-                narrow && "sticky top-0 bg-blanco px-4 py-3",
-              )}
-            >
-              <span
-                className={cn(
-                  "text-ayuda",
-                  narrow ? "text-texto-tenue" : "text-superficie",
-                )}
-              >
-                {caption}
-              </span>
-              <Dialog.Close aria-label="Cerrar" className={closeButtonClass}>
-                <X size={16} strokeWidth={1.6} aria-hidden="true" />
-              </Dialog.Close>
-            </div>
-            <img
-              src={receiptUrl}
-              alt={`${label}, ampliado`}
-              className={cn(
-                narrow
-                  ? "w-full object-contain"
-                  : "max-h-[90vh] max-w-full rounded-tarjeta border border-borde bg-blanco object-contain shadow-popover",
-              )}
-            />
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <ReceiptDialog
+        open={enlarged}
+        onOpenChange={setEnlarged}
+        src={receiptUrl}
+        alt={`${label}, ampliado`}
+        caption={caption}
+      />
     </ReceiptSection>
   );
 }

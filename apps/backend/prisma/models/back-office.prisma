@@ -134,10 +134,13 @@ model SalaryPayment {
   amountCentavos      Int         @map("amount_centavos")
   paidOn              DateTime    @map("paid_on") @db.Date
   recordedByAccountId String      @map("recorded_by_account_id") @db.Uuid
+  // BKO-008: the photo of the transfer, kept by the uploads context.
+  receiptImageAssetId String?     @unique @map("receipt_image_asset_id") @db.Uuid
   createdAt           DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
   staffMember         StaffMember @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
   recordedByAccount   Account     @relation("SalaryPaymentRecordedBy", fields: [recordedByAccountId], references: [id], onDelete: Restrict)
+  receiptImageAsset   ImageAsset? @relation("SalaryPaymentReceipt", fields: [receiptImageAssetId], references: [id], onDelete: Restrict)
   payStatement        PayStatement?
 
   @@index([paidOn])

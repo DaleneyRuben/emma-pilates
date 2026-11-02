@@ -19,6 +19,7 @@ executionOrder:
     - coordinator-client-search
     - nutritionist-availability
     - trainer-agenda-and-inbox
+    - trainer-my-pay
     - send-feedback
     - administrator-review-payments
     - fix006-late-freeze

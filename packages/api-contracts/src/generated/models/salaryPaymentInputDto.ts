@@ -14,4 +14,6 @@ export interface SalaryPaymentInputDto {
   amountCentavos: number;
   /** Today or earlier in Bolivia */
   paidOn: string;
+  /** A ready transfer_receipt upload of hers (BKO-008) */
+  receiptImageAssetId?: string;
 }

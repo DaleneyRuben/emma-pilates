@@ -26,6 +26,7 @@ export const salaryRow = (
   staffMemberName: staffMember.name,
   amountCentavos,
   paidOn,
+  receiptUrl: null,
 });
 
 export const salaryPage = (

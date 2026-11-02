@@ -1,4 +1,12 @@
-import { BadRequestException, HttpException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  StreamableFile,
+} from '@nestjs/common';
+import {
+  isReceiptVariant,
+  type ReceiptVariant,
+} from '../uploads/private-image-object';
 import {
   authenticateBearer,
   type PrincipalResolver,
@@ -11,6 +19,7 @@ import type { SessionEquipment } from './equipment/prisma-session-equipment';
 import type { Expenses } from './expenses/prisma-expenses';
 import type { PayStatements } from './payroll/prisma-pay-statements';
 import type { SalaryPayments } from './payroll/prisma-salary-payments';
+import type { SalaryReceipts } from './payroll/prisma-salary-receipts';
 import type { ExpenseReport } from './reports/prisma-expense-report';
 import type { Finance } from './finance/prisma-finance';
 import type { Supplies } from './supplies/prisma-supplies';
@@ -22,6 +31,7 @@ export const backOfficeOperations = Symbol('backOfficeOperations');
 export type BackOfficeOperations = {
   supplies: Supplies;
   salaryPayments: SalaryPayments;
+  salaryReceipts: SalaryReceipts;
   payStatements: PayStatements;
   expenses: Expenses;
   report: ExpenseReport;
@@ -74,6 +84,37 @@ export const requireIdempotencyKey = (value: string | undefined): string => {
   const key = parseUuidValue(value);
   if (key === null) throw invalidRequest('Idempotency-Key must be a UUID');
   return key;
+};
+
+// The uploads storage port, narrowed to streaming a receipt (BKO-008).
+export type ReceiptStorage = { get(key: string): Promise<Buffer> };
+
+type HeaderSink = { setHeader(name: string, value: string): unknown };
+
+// BKO-008: a Salary Payment's receipt, read for one caller and never cached,
+// as Booking serves a transfer's (ADR-0026, ADR-0063).
+export const streamSalaryReceipt = async (
+  readReceipt: (command: {
+    salaryPaymentId: string;
+    variant: ReceiptVariant;
+  }) => Promise<{ objectKey: string; mediaType: string }>,
+  storage: ReceiptStorage,
+  input: { salaryPaymentId: string; variant: string | undefined },
+  response: HeaderSink,
+): Promise<StreamableFile> => {
+  const salaryPaymentId = requireId(
+    input.salaryPaymentId,
+    'Invalid Salary Payment identifier',
+  );
+  const variant = input.variant ?? 'readable';
+  if (!isReceiptVariant(variant))
+    throw invalidRequest('Invalid receipt variant');
+  const receipt = await run(() => readReceipt({ salaryPaymentId, variant }));
+  const bytes = await storage.get(receipt.objectKey);
+  response.setHeader('Content-Type', receipt.mediaType);
+  response.setHeader('Cache-Control', 'no-store');
+  response.setHeader('X-Content-Type-Options', 'nosniff');
+  return new StreamableFile(bytes);
 };
 
 export abstract class BackOfficeController {

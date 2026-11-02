@@ -74,9 +74,10 @@ describe("Staff unread language", () => {
       "importantForAccessibility",
       "no-hide-descendants",
     );
-    // MOB-041: S23's three menu rows end in the 19 pt Icono tenue chevron.
+    // MOB-041: S23's menu rows end in the 19 pt Icono tenue chevron. A
+    // Trainer has four: «Mis pagos» (follow-up 202) above the three others.
     const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
-    expect(chevrons).toHaveLength(3);
+    expect(chevrons).toHaveLength(4);
     for (const chevron of chevrons) {
       expect(chevron).toHaveProp("stroke", "#C4BAB6");
     }
