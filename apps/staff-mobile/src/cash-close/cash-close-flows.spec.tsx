@@ -32,7 +32,7 @@ async function openCashClose(routes: Parameters<typeof routeFetcher>[0]) {
   const screen = await openClientSearch(routes);
   await fireEvent.press(screen.getByTestId("tab-cash"));
   await waitFor(() => {
-    expect(screen.getByText("EFECTIVO ESPERADO")).toBeOnTheScreen();
+    expect(screen.getByText("Efectivo esperado")).toBeOnTheScreen();
   });
   return screen;
 }
@@ -60,14 +60,20 @@ describe("Cerrar caja (S25)", () => {
     expect(screen.getByText("Bs 520,00")).toBeOnTheScreen();
     expect(screen.getByText("3 ventas en efectivo hoy en Centro")).toBeOnTheScreen();
     expect(screen.getByText("Viernes 23 de octubre · Centro")).toBeOnTheScreen();
+    // v2 S25: the Caja tab root, with the expected cash as the hero.
+    expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
+    expect(screen.getByText("Bs 520,00")).toHaveStyle({ fontSize: 32 });
+    expect(
+      screen.getByText("Hay un solo cierre por día y no se corrige después."),
+    ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cerrar caja" })).toBeDisabled();
 
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "520");
-    expect(screen.getByText("Diferencia · Bs 0,00 · Cuadra")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Diferencia · Bs 0,00 · Cuadra")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "525,50");
-    expect(screen.getByText("Diferencia · +Bs 5,50 · Sobra efectivo")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Diferencia · +Bs 5,50 · Sobra efectivo")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "510");
-    expect(screen.getByText("Diferencia · −Bs 10,00 · Falta efectivo")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Diferencia · −Bs 10,00 · Falta efectivo")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Nota (opcional)"), "Faltó cambio");
 
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar caja" }));
@@ -84,7 +90,7 @@ describe("Cerrar caja (S25)", () => {
     expect(screen.getByText("Bs 510,00")).toBeOnTheScreen();
     expect(screen.getByText("−Bs 10,00")).toBeOnTheScreen();
     expect(screen.getByText("Faltó cambio")).toBeOnTheScreen();
-    expect(screen.getByText("Cerrada por Camila Rojas a las 19:05.")).toBeOnTheScreen();
+    expect(screen.getByText("La cerró Camila Rojas a las 19:05.")).toBeOnTheScreen();
   });
 
   it("names the voided cash sales still in the drawer on their own line (FIX-004)", async () => {
@@ -150,7 +156,7 @@ describe("Cerrar caja (S25)", () => {
     expect(screen.getByText("Todavía no hay ventas en efectivo hoy.")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "12,345");
     expect(screen.getByRole("button", { name: "Cerrar caja" })).toBeDisabled();
-    expect(screen.queryByText(/^Diferencia/)).toBeNull();
+    expect(screen.queryByLabelText(/^Diferencia/)).toBeNull();
   });
 
   it("lets the Administrator close any Branch from Pagos pendientes", async () => {
@@ -213,7 +219,7 @@ describe("Cerrar caja (S25)", () => {
     profileDown = true;
     await fireEvent.press(await screen.findByTestId("tab-cash"));
 
-    expect(await screen.findByText("EFECTIVO ESPERADO")).toBeOnTheScreen();
+    expect(await screen.findByText("Efectivo esperado")).toBeOnTheScreen();
     expect(screen.queryByText("No pudimos cargar la caja de hoy.")).toBeNull();
   });
 
