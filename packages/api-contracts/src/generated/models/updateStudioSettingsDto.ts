@@ -38,4 +38,10 @@ export interface UpdateStudioSettingsDto {
   openingDate: string | null;
   /** The version the form was read from */
   expectedVersion: number;
+  /**
+   * Días para reservar por adelantado: a Session is bookable from today through this many La Paz days, counting today (FIX-026); left out, the value in force stays
+   * @minimum 1
+   * @maximum 30
+   */
+  bookingWindowDays?: number;
 }
