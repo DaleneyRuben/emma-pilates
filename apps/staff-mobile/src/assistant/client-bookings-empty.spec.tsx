@@ -25,9 +25,9 @@ describe("Assistant Client Bookings empty state", () => {
 
     await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
-      expect(screen.getByText("Esta clienta no tiene reservas próximas.")).toBeOnTheScreen();
+      expect(screen.getByText("No tiene reservas próximas")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Esta clienta no tiene reservas próximas.")).toHaveStyle({
+    expect(screen.getByText("No tiene reservas próximas")).toHaveStyle({
       fontFamily: "Lora_400Regular",
       fontSize: 24,
     });

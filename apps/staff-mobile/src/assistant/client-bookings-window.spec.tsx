@@ -21,7 +21,7 @@ describe("Assistant Client Bookings and the Studio Settings", () => {
     });
     await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
-      expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Reservas de Lucía")).toBeOnTheScreen();
     });
     return screen;
   };
@@ -32,10 +32,10 @@ describe("Assistant Client Bookings and the Studio Settings", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByText("No cancelable")).toHaveLength(2);
+      expect(screen.getAllByText(/faltan menos de 2 h 30$/)).toHaveLength(2);
     });
     expect(screen.getAllByRole("button", { name: "Reprogramar" })).toHaveLength(2);
-    expect(screen.queryByRole("button", { name: "Cancelar" })).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cancelar reserva" })).not.toBeOnTheScreen();
   });
 
   it("offers neither action while the window is unknown", async () => {
@@ -44,8 +44,8 @@ describe("Assistant Client Bookings and the Studio Settings", () => {
     await waitFor(() => {
       expect(screen.getByText("En lista de espera")).toBeOnTheScreen();
     });
-    expect(screen.queryByText("No cancelable")).not.toBeOnTheScreen();
+    expect(screen.queryByText(/faltan menos de/)).not.toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reprogramar" })).not.toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar" })).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cancelar reserva" })).not.toBeOnTheScreen();
   });
 });

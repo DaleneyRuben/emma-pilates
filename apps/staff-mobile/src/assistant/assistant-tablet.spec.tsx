@@ -83,7 +83,7 @@ describe("Assistant flows on a tablet", () => {
 
     await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
-      expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Reservas de Lucía")).toBeOnTheScreen();
     });
     expect(screen.getByPlaceholderText(searchField)).toBeOnTheScreen();
 
@@ -93,7 +93,9 @@ describe("Assistant flows on a tablet", () => {
     });
     await fireEvent.press(screen.getByTestId("client-overview-history"));
     await waitFor(() => {
-      expect(screen.getByLabelText("Historial de clases")).toBeOnTheScreen();
+      expect(screen.getByRole("tab", { name: "Historial" })).toHaveProp("accessibilityState", {
+        selected: true,
+      });
     });
     expect(screen.getByPlaceholderText(searchField)).toBeOnTheScreen();
   });

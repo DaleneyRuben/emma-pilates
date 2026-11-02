@@ -6,8 +6,6 @@ import { CancelClassScreen } from "./administrator/cancel-class-screen";
 import { CancelSessionScreen } from "./administrator/cancel-session-screen";
 import { ReviewPaymentScreen } from "./administrator/review-payment-screen";
 import { AssistantRescheduleScreen } from "./assistant/assistant-reschedule-screen";
-import { ClientBookingsScreen } from "./assistant/client-bookings-screen";
-import { ClientHistoryScreen } from "./assistant/client-history-screen";
 import { AvailabilityBlockFormScreen } from "./nutritionist/availability-block-form-screen";
 import { ContactListScreen } from "./coordinator/contact-list-screen";
 import { AvailabilityScreen } from "./nutritionist/availability-screen";
@@ -46,14 +44,12 @@ const screens: [string, ComponentType<never>, object, string][] = [
   ["S14", CancelSessionScreen as ComponentType<never>, { session }, "Cancelar sesión"],
   ["S16", AvailabilityScreen as ComponentType<never>, {}, "Mi disponibilidad"],
   ["S17", AvailabilityBlockFormScreen as ComponentType<never>, {}, "Nuevo horario"],
-  ["S21", ClientBookingsScreen as ComponentType<never>, client, "Reservas de la clienta"],
   [
     "S21 reprogramar",
     AssistantRescheduleScreen as ComponentType<never>,
     { ...client, booking },
     "Reprogramar clase",
   ],
-  ["S22", ClientHistoryScreen as ComponentType<never>, client, "Historial de clases"],
   ["S28", ContactListScreen as ComponentType<never>, {}, "Para contactar"],
 ];
 

@@ -78,35 +78,35 @@ describe("Assistant Client flows", () => {
 
     await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
-      expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Reservas de Lucía")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Viendo reservas de Lucía Fernández")).toBeOnTheScreen();
+    // v2 S21: Próximas | Historial under the title, card actions as text buttons.
+    expect(screen.getByRole("tab", { name: "Próximas" })).toHaveProp("accessibilityState", {
+      selected: true,
+    });
     await waitFor(() => {
-      expect(screen.getByText("No cancelable")).toBeOnTheScreen();
+      expect(screen.getByText(/faltan menos de 2 h 30$/)).toBeOnTheScreen();
     });
     expect(screen.getByText("En lista de espera")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Salir de la lista de espera" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Salir de la lista" })).toBeDisabled();
     expect(screen.getByText("Solo en tus sucursales")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar reserva" }));
     await waitFor(() => {
       expect(screen.getByText("¿Cancelar esta reserva de Lucía Fernández?")).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar reserva" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar la reserva" }));
     await waitFor(() => {
       expect(cancelled).toHaveBeenCalledTimes(1);
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await fireEvent.press(screen.getByRole("tab", { name: "Historial" }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
+      expect(screen.getByRole("tab", { name: "Historial" })).toHaveProp("accessibilityState", {
+        selected: true,
+      });
     });
-    await fireEvent.press(screen.getByTestId("client-overview-history"));
-    await waitFor(() => {
-      expect(screen.getByLabelText("Historial de clases")).toBeOnTheScreen();
-    });
-    expect(screen.getByText("Viendo historial de Lucía Fernández")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByText("Septiembre 2026")).toBeOnTheScreen();
     });
@@ -144,7 +144,7 @@ describe("Assistant Client flows", () => {
       expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
     });
     expect(booked).toHaveBeenCalledWith({ clientId: "client-lucia" });
-    expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Reservas de Lucía")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     await waitFor(() => {
@@ -190,7 +190,7 @@ describe("Assistant Client flows", () => {
       expect(rescheduled).toHaveBeenCalledWith({ targetSessionId: "session-alt" });
     });
     await waitFor(() => {
-      expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Reservas de Lucía")).toBeOnTheScreen();
     });
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
