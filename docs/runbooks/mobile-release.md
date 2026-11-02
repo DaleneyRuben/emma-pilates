@@ -182,7 +182,8 @@ check and publishes nothing.
   Channel `production` is refused unless the preview dispatch of the same
   commit recorded a git note `preview-ota:<app>:<sha>` (notes are fetched
   before the guard and appended so a second app does not overwrite the
-  first). Rollout percentage applies to production. The OTA message and
+  first). Rollout percentage applies to production; EAS takes 0–99 for a
+  staged rollout, so 100 publishes without one and reaches everyone. The OTA message and
   rollout are passed through `env:`, never interpolated into the script
   from workflow inputs.
 - **Create native release** (`mobile-create-release.yml`) opens a pull
