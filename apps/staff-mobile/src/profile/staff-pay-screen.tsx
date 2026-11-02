@@ -7,6 +7,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   colors,
+  fontFamilies,
   EmptyState,
   LoadingState,
   QueryFailure,
@@ -112,9 +113,14 @@ export function StaffPayScreen() {
 }
 
 const styles = StyleSheet.create({
-  amount: { color: colors.text, fontSize: typography.body, fontVariant: ["tabular-nums"] },
+  amount: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
+    fontVariant: ["tabular-nums"],
+  },
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  date: { color: colors.textMuted, fontSize: typography.note },
+  date: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   payment: {
     gap: 2,
     justifyContent: "center",
@@ -128,8 +134,8 @@ const styles = StyleSheet.create({
   section: { gap: spacing.sm, marginTop: spacing.sm },
   sectionTitle: {
     color: colors.textSubtle,
+    fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.note,
-    fontWeight: "500",
     letterSpacing: 1.7,
     textTransform: "uppercase",
   },

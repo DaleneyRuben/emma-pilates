@@ -1,6 +1,5 @@
 import type { PayStatementDto, PayStatementLineDto } from "@pilates/api-contracts";
 import {
-  BodyText,
   colors,
   fontFamilies,
   formatMonthHeading,
@@ -96,7 +95,7 @@ export function PayStatementCard({ statement }: { statement: PayStatementDto }) 
         <Text style={styles.total}>{formatExactBolivianos(statement.totalCentavos)}</Text>
       </View>
       {approved ? null : (
-        <BodyText style={styles.note}>Puede cambiar hasta que administración lo apruebe.</BodyText>
+        <Text style={styles.note}>Puede cambiar hasta que administración lo apruebe.</Text>
       )}
       <View style={styles.rows}>
         {summarize(statement.lines).map((concept) => (
@@ -126,13 +125,26 @@ export function PayStatementCard({ statement }: { statement: PayStatementDto }) 
 }
 
 const styles = StyleSheet.create({
-  amount: { color: colors.text, fontSize: typography.body, fontVariant: ["tabular-nums"] },
+  amount: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
+    fontVariant: ["tabular-nums"],
+  },
   approved: { backgroundColor: colors.successTint },
-  approvedText: { color: colors.successText, fontSize: typography.note, fontWeight: "500" },
+  approvedText: {
+    color: colors.successText,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.note,
+  },
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
-  detail: { color: colors.textMuted, fontSize: typography.note },
+  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   draft: { backgroundColor: colors.warningTint },
-  draftText: { color: colors.warningText, fontSize: typography.note, fontWeight: "500" },
+  draftText: {
+    color: colors.warningText,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.note,
+  },
   header: {
     alignItems: "center",
     flexDirection: "row",
@@ -141,7 +153,7 @@ const styles = StyleSheet.create({
   },
   lines: { borderTopColor: colors.border, borderTopWidth: 1, paddingTop: spacing.md },
   month: { color: colors.text, fontFamily: fontFamilies.heading, fontSize: typography.titleSmall },
-  note: { color: colors.textMuted, fontSize: typography.note },
+  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -149,7 +161,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   rowBody: { flexShrink: 1, gap: 2 },
-  rowLabel: { color: colors.text, fontSize: typography.body },
+  rowLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   rows: { gap: spacing.sm },
   state: {
     borderRadius: radii.pill,
@@ -157,7 +169,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xxs,
   },
   textButton: { alignSelf: "flex-start", paddingVertical: spacing.xxs },
-  textButtonLabel: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "500" },
+  textButtonLabel: {
+    color: colors.primaryOnTint,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.body,
+  },
   title: { alignItems: "flex-start", flexShrink: 1, gap: 6 },
   total: {
     color: colors.text,
