@@ -62,14 +62,17 @@ export const attachImageAsset = async (
   if (asset.state !== ImageAssetState.READY) {
     throw new ImageAssetNotAttachableError('not_ready');
   }
-  await tx.imageAsset.update({
-    where: { id: input.imageAssetId },
+  // Conditional on READY: a concurrent attachment read READY too, waited on
+  // this row's lock, and must find nothing left to take.
+  const taken = await tx.imageAsset.updateMany({
+    where: { id: input.imageAssetId, state: ImageAssetState.READY },
     data: {
       state: ImageAssetState.ATTACHED,
       attachedAt: input.now,
       deletionDueAt: null,
     },
   });
+  if (taken.count !== 1) throw new ImageAssetNotAttachableError('not_ready');
 };
 
 // The sweep deletes the objects and marks the rows; the asset keeps its
