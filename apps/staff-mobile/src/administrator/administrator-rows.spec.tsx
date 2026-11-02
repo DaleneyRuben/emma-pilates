@@ -83,30 +83,25 @@ describe("Administrator rows", () => {
     clearMobileQueryCache();
   });
 
-  it("draws the payment card with the avatar, the Lora name, and the chevron", async () => {
+  // v2 S11: a person row in a Lino group, the amount in Lora 18, and the
+  // Accesos that used to sit in the header.
+  it("draws the payment as a person row with its amount and the Accesos", async () => {
     const screen = await openPayments();
 
-    expect(screen.getByTestId("avatar-circle")).toHaveStyle({ height: 44, width: 44 });
-    expect(screen.getByText("C")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 17 });
-    expect(screen.getByText("Carla Mendoza")).toHaveStyle({
-      color: "#4A4A4A",
-      fontFamily: "Lora_500Medium",
-      fontSize: 19,
+    expect(screen.getByText("CM")).toHaveStyle({ fontFamily: "Lora_400Regular" });
+    expect(screen.getByText("Carla Mendoza")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
+    expect(screen.getByText("Paquete de 8 clases · hace 20 minutos")).toHaveStyle({
+      color: "#6F6662",
+      fontSize: 13,
     });
-    expect(screen.getByText("Paquete de 8 clases")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
-    expect(screen.getByTestId("card-footer")).toHaveStyle({ paddingTop: 13 });
     expect(screen.getByText("Bs 560")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 20,
+      fontFamily: "Lora_400Regular",
+      fontSize: 18,
       fontVariant: ["tabular-nums"],
     });
-    const clock = screen.getByTestId("glyph-clock", hidden);
-    expect(clock).toHaveProp("width", 15);
-    expect(clock).toHaveProp("stroke", "#C99A4E");
-    expect(screen.getByText("Hace 20 minutos")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
-    const chevron = screen.getByTestId("chevron", hidden);
-    expect(chevron).toHaveProp("stroke", "#B78380");
-    expect(chevron).toHaveProp("width", 19);
+    expect(screen.getByText("Accesos")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Congelamientos" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cerrar caja" })).toBeOnTheScreen();
   });
 
   it("draws the cancel-class picker pill and the Session card", async () => {

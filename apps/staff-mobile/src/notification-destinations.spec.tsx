@@ -52,11 +52,10 @@ async function openNoticeAndTap(
       jsonResponse({ items: [], hasMore: false, nextCursor: null }),
   });
   const screen = await render(<App runtime={createStaffRuntime(fetcher, role)} />);
-  await waitFor(
-    () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-    { timeout: 10_000 },
-  );
-  await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+  await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+    timeout: 10_000,
+  });
+  await fireEvent.press(screen.getByTestId("tab-profile"));
   await waitFor(() =>
     expect(screen.getByRole("button", { name: /Notificaciones/ })).toBeOnTheScreen(),
   );
@@ -129,11 +128,10 @@ describe("Staff notification destinations", () => {
         }),
     });
     const screen = await render(<App runtime={createStaffRuntime(fetcher, "assistant")} />);
-    await waitFor(
-      () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-      { timeout: 10_000 },
-    );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+      timeout: 10_000,
+    });
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: /Notificaciones/ })).toBeOnTheScreen(),
     );

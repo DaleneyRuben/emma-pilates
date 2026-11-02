@@ -2,10 +2,7 @@ import {
   AuthenticationFlow,
   type MobileNavigationProps,
   MobileQueryProvider,
-  recoveryScreenLayout,
 } from "@pilates/mobile-core";
-import { createStaticNavigation } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import {
@@ -14,25 +11,6 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 
-import { CancelClassScreen } from "./administrator/cancel-class-screen";
-import { CancelSessionScreen } from "./administrator/cancel-session-screen";
-import { FreezesScreen } from "./administrator/freezes-screen";
-import { PendingPaymentsScreen } from "./administrator/pending-payments-screen";
-import { ReviewFreezeScreen } from "./administrator/review-freeze-screen";
-import { ReviewPaymentScreen } from "./administrator/review-payment-screen";
-import { AssistantWorkspaceProvider } from "./assistant/assistant-workspace";
-import { createCoordinatorStack } from "./coordinator/coordinator-stack";
-import { AssistantRescheduleScreen } from "./assistant/assistant-reschedule-screen";
-import { AssistantSessionDetailScreen } from "./assistant/assistant-session-detail-screen";
-import { BrowseSessionsScreen } from "./assistant/browse-sessions-screen";
-import { ClientBookingsScreen } from "./assistant/client-bookings-screen";
-import { ClientHistoryScreen } from "./assistant/client-history-screen";
-import { ClientOverviewScreen } from "./assistant/client-overview-screen";
-import { ClientSearchScreen } from "./assistant/client-search-screen";
-import { ConfirmCashPaymentScreen } from "./assistant/confirm-cash-payment-screen";
-import { CashCloseScreen } from "./cash-close/cash-close-screen";
-import { NewClientScreen } from "./assistant/new-client-screen";
-import { SelectPlanScreen } from "./assistant/select-plan-screen";
 import {
   ImpersonationBanner,
   impersonationBannerHeight,
@@ -42,91 +20,11 @@ import {
   ImpersonationContext,
   type ImpersonationNotice,
 } from "./impersonation/impersonation-context";
-import { ViewAsScreen } from "./impersonation/view-as-screen";
-import { AvailabilityBlockFormScreen } from "./nutritionist/availability-block-form-screen";
-import { AvailabilityScreen } from "./nutritionist/availability-screen";
-import type { StaffRole } from "./notifications/notification-destinations";
+import { AssistantWorkspaceProvider } from "./assistant/assistant-workspace";
+import { roleNavigation } from "./navigation/role-tabs";
 import { StaffPushNotifications } from "./notifications/staff-push-notifications";
-import { NutritionistAgendaScreen } from "./nutritionist/nutritionist-agenda-screen";
-import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
-import { StaffFeedbackScreen } from "./profile/staff-feedback-screen";
-import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
-import { StaffPayScreen } from "./profile/staff-pay-screen";
-import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { StaffFetcherContext, unavailableFetcher } from "./staff-fetcher";
 import { StaffRoleContext } from "./staff-role";
-import { ReportFaultScreen } from "./trainer/report-fault-screen";
-import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
-import { TrainerRosterScreen } from "./trainer/trainer-roster-screen";
-
-const accountScreens = {
-  Profile: StaffProfileScreen,
-  Notifications: StaffNotificationsScreen,
-  ChangePassword: StaffChangePasswordScreen,
-  Feedback: StaffFeedbackScreen,
-};
-
-const TrainerStack = createNativeStackNavigator({
-  screenLayout: recoveryScreenLayout,
-  screenOptions: { headerShown: false },
-  screens: {
-    Agenda: TrainerAgendaScreen,
-    Roster: TrainerRosterScreen,
-    ReportFault: ReportFaultScreen,
-    MyPay: StaffPayScreen,
-    ...accountScreens,
-  },
-});
-const AssistantStack = createNativeStackNavigator({
-  screenLayout: recoveryScreenLayout,
-  screenOptions: { headerShown: false },
-  screens: {
-    ClientSearch: ClientSearchScreen,
-    NewClient: NewClientScreen,
-    ClientOverview: ClientOverviewScreen,
-    BrowseSessions: BrowseSessionsScreen,
-    SessionDetail: AssistantSessionDetailScreen,
-    SelectPlan: SelectPlanScreen,
-    ConfirmCashPayment: ConfirmCashPaymentScreen,
-    ClientBookings: ClientBookingsScreen,
-    Reschedule: AssistantRescheduleScreen,
-    ClientHistory: ClientHistoryScreen,
-    CashClose: CashCloseScreen,
-    ...accountScreens,
-  },
-});
-const AdministratorStack = createNativeStackNavigator({
-  screenLayout: recoveryScreenLayout,
-  screenOptions: { headerShown: false },
-  screens: {
-    Payments: PendingPaymentsScreen,
-    ReviewPayment: ReviewPaymentScreen,
-    Freezes: FreezesScreen,
-    ReviewFreeze: ReviewFreezeScreen,
-    CancelClass: CancelClassScreen,
-    CancelSession: CancelSessionScreen,
-    ViewAs: ViewAsScreen,
-    CashClose: CashCloseScreen,
-    ...accountScreens,
-  },
-});
-const NutritionistStack = createNativeStackNavigator({
-  screenLayout: recoveryScreenLayout,
-  screenOptions: { headerShown: false },
-  screens: {
-    Agenda: NutritionistAgendaScreen,
-    Availability: AvailabilityScreen,
-    AvailabilityBlockForm: AvailabilityBlockFormScreen,
-    ...accountScreens,
-  },
-});
-const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNavigation>> = {
-  administrator: createStaticNavigation(AdministratorStack),
-  assistant: createStaticNavigation(AssistantStack),
-  coordinator: createStaticNavigation(createCoordinatorStack(accountScreens)),
-  nutritionist: createStaticNavigation(NutritionistStack),
-  trainer: createStaticNavigation(TrainerStack),
-};
 
 // Jest has no native metrics; the device fills them in before the first frame.
 const windowMetrics = initialWindowMetrics ?? {

@@ -1,6 +1,5 @@
 import {
   getSearchAssistantClientsQueryKey,
-  useListContactAlerts,
   useSearchAssistantClients,
 } from "@pilates/api-contracts";
 import {
@@ -14,9 +13,7 @@ import {
   Screen,
   spacing,
   surfaces,
-  TextButton,
   typography,
-  UnreadCountPill,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
@@ -26,7 +23,6 @@ import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } fr
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
-import { HeaderAction } from "../ui/header-action";
 import { RootHeader } from "../ui/root-header";
 import { describeContact } from "./assistant-format";
 import { useAssistantWorkspace } from "./assistant-workspace";
@@ -65,11 +61,6 @@ export function ClientSearchScreen() {
   const coordinator = useStaffRole() === "coordinator";
   const [text, setText] = useState("");
   const [query, setQuery] = useState("");
-  const alerts = useListContactAlerts({
-    fetcher,
-    query: { enabled: coordinator },
-  });
-  const contactCount = alerts.data?.status === 200 ? alerts.data.data.totalItems : 0;
 
   useEffect(() => {
     const timer = setTimeout(() => setQuery(text.trim()), debounceMilliseconds);
@@ -100,17 +91,7 @@ export function ClientSearchScreen() {
 
   const search = (
     <>
-      <RootHeader
-        action={
-          <HeaderAction
-            label="Cerrar caja"
-            onPress={() => navigation.navigate("CashClose")}
-            testID="cash-close-entry"
-          />
-        }
-        label="Buscar cliente"
-        title="Buscar cliente"
-      />
+      <RootHeader bell label="Buscar cliente" title="Buscar cliente" />
       <TextInput
         accessibilityLabel={placeholder}
         autoCapitalize="none"
@@ -122,27 +103,7 @@ export function ClientSearchScreen() {
         testID="client-search-input"
         value={text}
       />
-      {coordinator ? (
-        <>
-          <TextButton
-            label="Cancelar una clase"
-            onPress={() => navigation.navigate("CancelClass")}
-            testID="client-search-cancel-class"
-          />
-          <Pressable
-            accessibilityLabel="Para contactar"
-            accessibilityRole="button"
-            onPress={() => navigation.navigate("ContactList")}
-            style={styles.contactListButton}
-            testID="client-search-contact-list"
-          >
-            <Text style={styles.contactListLabel}>Para contactar</Text>
-            <UnreadCountPill count={contactCount} testID="contact-list-count" />
-          </Pressable>
-        </>
-      ) : (
-        <NewClientButton onPress={() => navigation.navigate("NewClient")} />
-      )}
+      {coordinator ? null : <NewClientButton onPress={() => navigation.navigate("NewClient")} />}
       {!searching ? (
         <BodyText style={styles.hint}>Escribe al menos dos letras o números para buscar.</BodyText>
       ) : results.isPending ? (
@@ -204,18 +165,6 @@ export function ClientSearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  contactListButton: {
-    alignItems: "center",
-    borderColor: colors.primary,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: spacing.sm,
-    justifyContent: "center",
-    minHeight: 48,
-    paddingHorizontal: spacing.lg,
-  },
-  contactListLabel: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "500" },
   contact: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   empty: { alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xl },
   emptyTitle: {

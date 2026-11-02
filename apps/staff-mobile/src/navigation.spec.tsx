@@ -73,9 +73,10 @@ describe("StaffNavigation", () => {
   ] as const)("gives %s its own tab bar", async (role, tabs) => {
     const screen = await render(<StaffNavigation {...defaultProps} role={role} />);
 
-    expect(screen.getAllByRole("tab").map((tab) => tab.props.accessibilityLabel ?? "")).toEqual(
-      tabs.map((title) => expect.stringContaining(title)),
-    );
+    const labels = screen
+      .getAllByTestId(/^tab-/)
+      .map((tab) => String(tab.props.accessibilityLabel).split(",")[0]);
+    expect(labels).toEqual(tabs);
     expect(screen.queryByTestId("account-avatar")).not.toBeOnTheScreen();
   });
 

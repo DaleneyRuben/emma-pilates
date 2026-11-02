@@ -64,10 +64,8 @@ describe("freeze review", () => {
         ),
     });
     const screen = await render(<App runtime={createStaffRuntime(fetcher, "administrator")} />);
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-    );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await fireEvent.press(screen.getByRole("button", { name: /Notificaciones/ }));
     await waitFor(() =>
       expect(screen.getByText("Lucía pidió un congelamiento.")).toBeOnTheScreen(),

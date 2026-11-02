@@ -105,11 +105,10 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
       .mockResolvedValueOnce({ accountId: "account-1", role: "administrator" });
     const screen = await render(<App runtime={runtime} />);
 
-    await waitFor(
-      () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-      { timeout: 10_000 },
-    );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+      timeout: 10_000,
+    });
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Ver la app como…" })).toBeOnTheScreen(),
     );
@@ -191,11 +190,10 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     const runtime = createStaffRuntime(routeFetcher(routes(() => trainerProfile, [])), "trainer");
     const screen = await render(<App runtime={runtime} />);
 
-    await waitFor(
-      () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-      { timeout: 10_000 },
-    );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+      timeout: 10_000,
+    });
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => expect(screen.getByText("Camila Rojas")).toBeOnTheScreen());
     expect(screen.queryByRole("button", { name: "Ver la app como…" })).not.toBeOnTheScreen();
   });

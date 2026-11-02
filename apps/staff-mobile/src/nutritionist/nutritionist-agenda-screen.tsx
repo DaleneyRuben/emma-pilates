@@ -22,13 +22,11 @@ import {
   useRefetchOnFocus,
   useStickyNotice,
 } from "@pilates/mobile-core";
-import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { HeaderAction } from "../ui/header-action";
 import { RootHeader } from "../ui/root-header";
 import {
   agendaDayLabel,
@@ -39,7 +37,6 @@ import {
   countLabel,
 } from "./nutritionist-format";
 
-type AgendaNavigation = { navigate: (screen: "Availability") => void };
 
 const agendaPageSize = 50;
 
@@ -58,7 +55,6 @@ const groupByDay = (entries: NutritionistAgendaEntryDto[]) =>
   }, []);
 
 export function NutritionistAgendaScreen() {
-  const navigation = useNavigation<AgendaNavigation>();
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const profile = useGetCurrentStaffMemberProfile({ fetcher });
@@ -79,19 +75,7 @@ export function NutritionistAgendaScreen() {
 
   const firstName = profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
   const title = firstName === undefined ? "Hola" : `Hola, ${firstName}`;
-  const header = (
-    <RootHeader
-      action={
-        <HeaderAction
-          label="Mi disponibilidad"
-          onPress={() => navigation.navigate("Availability")}
-        />
-      }
-      eyebrow="Nutricionista"
-      label="Mi agenda"
-      title={title}
-    />
-  );
+  const header = <RootHeader bell eyebrow="Nutricionista" label="Mi agenda" title={title} />;
 
   const confirmCancel = async () => {
     if (cancelling === null) return;

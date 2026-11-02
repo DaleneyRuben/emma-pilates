@@ -3,73 +3,35 @@ import {
   useGetUnreadNotificationCount,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
-  Chevron,
   colors,
-  initials,
+  fontFamilies,
+  IconRow,
+  IconRowGroup,
   LoadingState,
   LogoutConfirmationSheet,
   QueryFailure,
-  radii,
   Screen,
-  ScreenTopBar,
+  SectionTitle,
   spacing,
-  surfaces,
   typography,
-  UnreadCountPill,
   useMobileIdentity,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import appConfig from "../../app.json";
 import { useStaffFetcher } from "../staff-fetcher";
+import { InitialsDisc } from "../ui/person-row";
+import { RootHeader } from "../ui/root-header";
+import { ProfileRow } from "./profile-row";
 import { branchesLabel, roleLabel } from "./staff-labels";
 
 type ProfileNavigation = {
-  goBack: () => void;
-  navigate: (screen: "Notifications" | "MyPay" | "ChangePassword" | "Feedback" | "ViewAs") => void;
+  navigate: (screen: "Notifications" | "PayTab" | "ChangePassword" | "Feedback" | "ViewAs") => void;
 };
 
-function ValueRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <BodyText style={styles.rowValue}>{value}</BodyText>
-    </View>
-  );
-}
-
-function MenuRow({
-  badge = 0,
-  label,
-  onPress,
-}: {
-  badge?: number;
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityLabel={
-        badge > 0
-          ? `${label}, ${badge} ${badge === 1 ? "notificación sin leer" : "notificaciones sin leer"}`
-          : label
-      }
-      accessibilityRole="button"
-      onPress={onPress}
-      style={styles.row}
-    >
-      <Text style={styles.rowLabel}>{label}</Text>
-      <View style={styles.rowTrailing}>
-        <UnreadCountPill count={badge} testID="notifications-row-badge" />
-        <Chevron tone="quiet" />
-      </View>
-    </Pressable>
-  );
-}
-
+/** S23 Perfil, the last tab of every role (follow-up 225 §8). */
 export function StaffProfileScreen() {
   const navigation = useNavigation<ProfileNavigation>();
   const identity = useMobileIdentity();
@@ -79,14 +41,12 @@ export function StaffProfileScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
-
   const unread = useGetUnreadNotificationCount({
     fetcher,
     query: { refetchOnMount: "always" },
   });
   const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : 0;
-
-  const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Perfil" />;
+  const header = <RootHeader title="Perfil" />;
 
   if (profile.isPending) {
     return (
@@ -96,7 +56,6 @@ export function StaffProfileScreen() {
       </Screen>
     );
   }
-
   if (profile.isError || profile.data.status !== 200) {
     return (
       <Screen style={styles.screen}>
@@ -107,59 +66,82 @@ export function StaffProfileScreen() {
   }
 
   const member = profile.data.data;
+  const administrator = identity.session?.role === "administrator";
+  const singleBranch = member.role !== "administrator" && member.role !== "coordinator";
 
   return (
     <Screen style={styles.screen}>
-      {header}
       <ScrollView contentContainerStyle={styles.content}>
+        {header}
         <View style={styles.summary}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials(member.name)}</Text>
-          </View>
+          <InitialsDisc name={member.name} size={56} />
           <View style={styles.summaryBody}>
             <Text style={styles.name}>{member.name}</Text>
-            <BodyText>{member.email}</BodyText>
-            {member.phone ? <BodyText>{member.phone}</BodyText> : null}
-            <BodyText style={styles.note}>Tus datos los actualiza administración.</BodyText>
+            <Text style={styles.detail}>{member.email}</Text>
+            {member.phone ? <Text style={styles.detail}>{member.phone}</Text> : null}
+            <Text style={styles.note}>
+              {administrator
+                ? "Tus datos se editan en la web de administración."
+                : "Tus datos los actualiza administración."}
+            </Text>
           </View>
         </View>
-        <View style={styles.group}>
-          <ValueRow label="Rol" value={roleLabel(member.role)} />
-          <ValueRow label="Sucursales" value={branchesLabel(member)} />
+        <View>
+          <SectionTitle>Tu cuenta</SectionTitle>
+          <IconRowGroup>
+            <IconRow icon="person" label="Rol" value={roleLabel(member.role)} />
+            <IconRow
+              icon="pin"
+              label={singleBranch && member.branches.length === 1 ? "Sucursal" : "Sucursales"}
+              value={branchesLabel(member)}
+            />
+          </IconRowGroup>
         </View>
-        <View style={styles.group}>
-          {identity.session?.role === "trainer" ? (
-            <MenuRow label="Mis pagos" onPress={() => navigation.navigate("MyPay")} />
-          ) : null}
-          <MenuRow
-            badge={unreadCount}
-            label="Notificaciones"
-            onPress={() => navigation.navigate("Notifications")}
-          />
-          <MenuRow
-            label="Cambiar contraseña"
-            onPress={() => navigation.navigate("ChangePassword")}
-          />
-          <MenuRow label="Enviar comentarios" onPress={() => navigation.navigate("Feedback")} />
-          {identity.session?.role === "administrator" ? (
-            <MenuRow label="Ver la app como…" onPress={() => navigation.navigate("ViewAs")} />
-          ) : null}
+        <View>
+          <SectionTitle>Ajustes</SectionTitle>
+          <IconRowGroup>
+            {administrator ? (
+              <ProfileRow
+                icon="eye"
+                label="Ver la app como…"
+                onPress={() => navigation.navigate("ViewAs")}
+              />
+            ) : null}
+            {identity.session?.role === "trainer" ? (
+              <ProfileRow
+                icon="credit"
+                label="Mis pagos"
+                onPress={() => navigation.navigate("PayTab")}
+              />
+            ) : null}
+            <ProfileRow
+              badge={unreadCount}
+              icon="bell"
+              label="Notificaciones"
+              onPress={() => navigation.navigate("Notifications")}
+            />
+            <ProfileRow
+              icon="lock"
+              label="Cambiar contraseña"
+              onPress={() => navigation.navigate("ChangePassword")}
+            />
+            <ProfileRow
+              icon="message"
+              label="Enviar comentarios"
+              onPress={() => navigation.navigate("Feedback")}
+            />
+            <ProfileRow
+              icon="cross"
+              label="Cerrar sesión"
+              onPress={() => setConfirmingLogout(true)}
+              testID="profile-logout"
+              tone="error"
+            />
+          </IconRowGroup>
+          <Text style={styles.footer}>
+            {`Emma Pilates Studio · versión ${appConfig.expo.version}`}
+          </Text>
         </View>
-        <Pressable
-          accessibilityLabel="Cerrar sesión"
-          accessibilityRole="button"
-          onPress={() => setConfirmingLogout(true)}
-          style={({ pressed }) => [styles.logout, pressed && styles.logoutPressed]}
-        >
-          {({ pressed }) => (
-            <Text style={[styles.logoutText, pressed && styles.logoutTextPressed]}>
-              Cerrar sesión
-            </Text>
-          )}
-        </Pressable>
-        <BodyText style={styles.footer}>
-          {`Emma Pilates Studio · versión ${appConfig.expo.version}`}
-        </BodyText>
       </ScrollView>
       <LogoutConfirmationSheet
         logout={identity.logout}
@@ -171,63 +153,18 @@ export function StaffProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  avatar: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 56,
-    justifyContent: "center",
-    width: 56,
-  },
-  avatarText: {
-    color: colors.primaryOnTint,
-    fontSize: typography.bodyLarge,
-    fontWeight: "600",
-  },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
   footer: {
-    color: colors.textSubtle,
-    fontSize: typography.note,
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.label,
+    marginTop: spacing.md,
     textAlign: "center",
   },
-  group: {
-    ...surfaces.flatCard,
-    overflow: "hidden",
-  },
-  logout: {
-    alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 52,
-  },
-  logoutPressed: { borderColor: colors.error },
-  logoutText: { color: colors.textSecondary, fontSize: typography.body },
-  logoutTextPressed: { color: colors.errorText },
-  name: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-  },
-  note: { color: colors.textMuted, fontSize: typography.note },
-  row: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    minHeight: 60,
-    paddingHorizontal: spacing.lg,
-  },
-  rowLabel: { color: colors.text, fontSize: typography.body },
-  rowTrailing: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  rowValue: { color: colors.textMuted },
-  screen: { gap: spacing.lg },
-  summary: {
-    ...surfaces.card,
-    alignItems: "flex-start",
-    flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
+  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  screen: { paddingHorizontal: spacing.xlSm },
+  summary: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
   summaryBody: { flex: 1, gap: spacing.xxs },
 });

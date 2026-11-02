@@ -118,6 +118,7 @@ export function TrainerAgendaScreen() {
   const firstName = profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
   const header = (
     <RootHeader
+      bell
       eyebrow="Entrenadora"
       label="Mi agenda"
       title={firstName === undefined ? "Hola" : `Hola, ${firstName}`}

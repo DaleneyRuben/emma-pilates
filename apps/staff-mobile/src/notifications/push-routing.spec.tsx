@@ -38,10 +38,9 @@ async function renderAdministrator(device = createMemoryPushPlatform()) {
       })}
     />,
   );
-  await waitFor(
-    () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-    { timeout: 10_000 },
-  );
+  await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+    timeout: 10_000,
+  });
   return { device, fetcher, screen };
 }
 

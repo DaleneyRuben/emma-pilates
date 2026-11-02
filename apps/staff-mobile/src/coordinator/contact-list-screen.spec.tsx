@@ -51,9 +51,9 @@ async function openContactList(routes = coordinatorRoutes()) {
   await waitFor(() => {
     expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Para contactar" }));
+  await fireEvent.press(screen.getByTestId("tab-contacts"));
   await waitFor(() => {
-    expect(screen.getByLabelText("Volver")).toBeOnTheScreen();
+    expect(screen.getByRole("header", { name: "Para contactar" })).toBeOnTheScreen();
   });
   return { screen, fetcher };
 }

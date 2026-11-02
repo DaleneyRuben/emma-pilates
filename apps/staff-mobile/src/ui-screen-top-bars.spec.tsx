@@ -12,18 +12,11 @@ import { AvailabilityBlockFormScreen } from "./nutritionist/availability-block-f
 import { ContactListScreen } from "./coordinator/contact-list-screen";
 import { AvailabilityScreen } from "./nutritionist/availability-screen";
 import { StaffPayScreen } from "./profile/staff-pay-screen";
-import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { StaffFetcherContext } from "./staff-fetcher";
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ goBack: jest.fn(), navigate: jest.fn(), popTo: jest.fn() }),
-}));
-
-// S23 reads the signed-in identity only to log out.
-jest.mock("@pilates/mobile-core", () => ({
-  ...jest.requireActual("@pilates/mobile-core"),
-  useMobileIdentity: () => ({ logout: jest.fn() }),
 }));
 
 // Every request stays pending, so each screen shows its loading state.
@@ -62,7 +55,6 @@ const screens: [string, ComponentType<never>, object, string][] = [
     "Reprogramar clase",
   ],
   ["S22", ClientHistoryScreen as ComponentType<never>, client, "Historial de clases"],
-  ["S23", StaffProfileScreen as ComponentType<never>, {}, "Perfil"],
   ["S28", ContactListScreen as ComponentType<never>, {}, "Para contactar"],
   ["S29", StaffPayScreen as ComponentType<never>, {}, "Mis pagos"],
 ];

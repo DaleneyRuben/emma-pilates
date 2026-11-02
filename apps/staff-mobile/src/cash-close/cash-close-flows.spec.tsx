@@ -30,7 +30,7 @@ const close = {
 
 async function openCashClose(routes: Parameters<typeof routeFetcher>[0]) {
   const screen = await openClientSearch(routes);
-  await fireEvent.press(screen.getByTestId("cash-close-entry"));
+  await fireEvent.press(screen.getByTestId("tab-cash"));
   await waitFor(() => {
     expect(screen.getByText("EFECTIVO ESPERADO")).toBeOnTheScreen();
   });
@@ -111,7 +111,7 @@ describe("Cerrar caja (S25)", () => {
       ...assistantRoutes(),
       [centroToday]: () => jsonResponse({ ...today, close }),
     });
-    await fireEvent.press(screen.getByTestId("cash-close-entry"));
+    await fireEvent.press(screen.getByTestId("tab-cash"));
 
     await waitFor(() => {
       expect(screen.getByLabelText("Caja cerrada")).toBeOnTheScreen();
@@ -209,9 +209,9 @@ describe("Cerrar caja (S25)", () => {
       [centroToday]: () => jsonResponse(today),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await fireEvent.press(screen.getByTestId("tab-clients"));
     profileDown = true;
-    await fireEvent.press(await screen.findByTestId("cash-close-entry"));
+    await fireEvent.press(await screen.findByTestId("tab-cash"));
 
     expect(await screen.findByText("EFECTIVO ESPERADO")).toBeOnTheScreen();
     expect(screen.queryByText("No pudimos cargar la caja de hoy.")).toBeNull();

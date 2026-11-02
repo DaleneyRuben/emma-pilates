@@ -141,11 +141,11 @@ describe("Staff Mis pagos", () => {
     );
     await waitFor(
       () => {
-        expect(screen.getByText("EV")).toBeOnTheScreen();
+        expect(screen.getByTestId("tab-profile")).toBeOnTheScreen();
       },
       { timeout: 10_000 },
     );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => {
       expect(screen.getByText("Administración")).toBeOnTheScreen();
     });

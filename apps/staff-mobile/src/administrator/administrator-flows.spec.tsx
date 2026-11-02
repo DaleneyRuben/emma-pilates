@@ -166,13 +166,12 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByText("Carla Mendoza")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Por confirmar")).toBeOnTheScreen();
+    expect(screen.getByText("Por confirmar · 2")).toBeOnTheScreen();
     expect(screen.getByText("Bs 1.340 en total")).toBeOnTheScreen();
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases · ayer, 19:40")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
-    expect(screen.getByText("Ayer, 19:40")).toBeOnTheScreen();
     expect(screen.getByText("Andrea Roca")).toBeOnTheScreen();
-    expect(screen.getByText("Hace 20 minutos")).toBeOnTheScreen();
+    expect(screen.getByText(/· hace 20 minutos$/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Revisar pago de Carla Mendoza" }));
 
@@ -269,10 +268,12 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.getByText("Pago rechazado")).toBeOnTheScreen();
     });
     await waitFor(() => {
-      expect(screen.getByText("No hay pagos pendientes.")).toBeOnTheScreen();
+      expect(screen.getByText("Todo al día")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText("Todo al día. Te avisaremos cuando llegue una transferencia nueva."),
+      screen.getByText(
+        "No hay pagos por confirmar. Te avisamos cuando llegue una transferencia nueva.",
+      ),
     ).toBeOnTheScreen();
   });
 

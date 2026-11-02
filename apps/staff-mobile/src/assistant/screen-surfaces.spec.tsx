@@ -42,7 +42,7 @@ describe("Assistant surfaces on Superficie", () => {
     expect(StyleSheet.flatten(panel?.props.style)).not.toHaveProperty("backgroundColor");
   });
 
-  it("rings the unread dot in the header's Superficie", async () => {
+  it("puts the unread count on the bell beside Buscar cliente", async () => {
     const screen = await render(
       <App
         runtime={createStaffRuntime(
@@ -56,7 +56,7 @@ describe("Assistant surfaces on Superficie", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("account-avatar-dot")).toHaveStyle({ borderColor: "#FAF7F2" });
+      expect(screen.getByRole("button", { name: "Notificaciones, 2 sin leer" })).toBeOnTheScreen();
     });
   });
 });
