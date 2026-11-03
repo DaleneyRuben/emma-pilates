@@ -12,7 +12,7 @@ import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStaticNavigation } from "@react-navigation/native";
+import { createStaticNavigation, getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { BookingsScreen } from "./booking/bookings-screen";
@@ -106,11 +106,21 @@ const ProfileStack = createNativeStackNavigator({
   },
 });
 
-const tabOptions = (title: string, icon: ClientTabIconName) => ({
-  tabBarButtonTestID: `tab-${icon}`,
-  tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
-  title,
-});
+const tabBarStyle = { backgroundColor: colors.card, borderTopColor: colors.borderStrong };
+
+// Follow-up 227: a pushed screen (with a back arrow) has no tab bar, so the
+// bar shows only while the tab's stack is on its root screen.
+const tabOptions =
+  (title: string, icon: ClientTabIconName, root: string) =>
+  ({ route }: { route: Parameters<typeof getFocusedRouteNameFromRoute>[0] }) => {
+    const focused = getFocusedRouteNameFromRoute(route) ?? root;
+    return {
+      tabBarButtonTestID: `tab-${icon}`,
+      tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
+      tabBarStyle: focused === root ? tabBarStyle : { display: "none" as const },
+      title,
+    };
+  };
 
 const ClientTabs = createBottomTabNavigator({
   // FIX-023: the tab bar covers the bottom safe area, so no screen adds it again.
@@ -122,20 +132,16 @@ const ClientTabs = createBottomTabNavigator({
     tabBarInactiveTintColor: colors.textSubtle,
     tabBarLabelPosition: "below-icon",
     tabBarLabelStyle: { fontSize: typography.tabLabel },
-    tabBarStyle: {
-      backgroundColor: colors.card,
-      borderTopColor: colors.borderStrong,
-    },
   },
   screens: {
-    HomeTab: { screen: HomeStack, options: tabOptions("Inicio", "home") },
-    Booking: { screen: BookingStack, options: tabOptions("Reservar", "booking") },
+    HomeTab: { screen: HomeStack, options: tabOptions("Inicio", "home", "Home") },
+    Booking: { screen: BookingStack, options: tabOptions("Reservar", "booking", "Browse") },
     Bookings: {
       screen: BookingsStack,
-      options: tabOptions("Mis Reservas", "bookings"),
+      options: tabOptions("Mis Reservas", "bookings", "MyBookings"),
     },
     // The owner removed the Perfil tab's unread pill (2026-11-02): it is on the Inicio bell.
-    ProfileTab: { screen: ProfileStack, options: tabOptions("Perfil", "profile") },
+    ProfileTab: { screen: ProfileStack, options: tabOptions("Perfil", "profile", "Profile") },
   },
 });
 
