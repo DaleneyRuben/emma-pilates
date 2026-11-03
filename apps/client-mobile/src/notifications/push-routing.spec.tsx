@@ -53,8 +53,10 @@ async function renderSignedIn(device = createMemoryPushPlatform()) {
       })}
     />,
   );
+  // A launch push may open a pushed screen at once, which hides the tab bar.
   await waitFor(
-    () => expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen(),
+    () =>
+      expect(screen.getByTestId("tab-booking", { includeHiddenElements: true })).toBeOnTheScreen(),
     { timeout: 10_000 },
   );
   return { device, fetcher, screen };
