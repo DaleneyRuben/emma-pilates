@@ -81,6 +81,7 @@ export * from "./ui/offline-banner";
 export * from "./ui/outlined-button";
 export * from "./ui/picker-check";
 export * from "./ui/screen";
+export * from "./ui/tab-stack-layout";
 export * from "./ui/screen-top-bar";
 export * from "./ui/section-title";
 export * from "./ui/segmented-tabs";
