@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { Prisma, type PrismaClient } from '../../generated/prisma/client';
+import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import {
   AuditActorKind,
   AuditOutcome,
@@ -15,6 +15,10 @@ import {
   fromPrismaChannel,
   resolveClientAttribution,
 } from './record-client-acquisition';
+import {
+  isReferralCodeBlocked,
+  isReferralCodeTaken,
+} from './referral-code-claim';
 import type { TrainerReferralCodeStore } from './trainer-referral-code';
 
 type Reader = Prisma.TransactionClient | PrismaClient;
@@ -134,13 +138,9 @@ export const createPrismaClientAcquisitionStore = (
     }),
 });
 
-const isUniqueViolation = (error: unknown): boolean =>
-  error instanceof Prisma.PrismaClientKnownRequestError &&
-  error.code === 'P2002';
-
-// BKM-011: a Trainer's personal code. Client codes are unique on their own
-// column; a live Trainer's through a partial index, and the check below
-// keeps the two apart.
+// BKM-011: a Trainer's personal code. Since BKM-017 the registry keeps every
+// code ever held unique across Clients and Trainers, and the owner's
+// blocklist applies to her too.
 export const createPrismaTrainerReferralCodeStore = (
   prisma: PrismaClient,
 ): TrainerReferralCodeStore => ({
@@ -161,22 +161,11 @@ export const createPrismaTrainerReferralCodeStore = (
   set: async (input) => {
     try {
       return await prisma.$transaction(async (transaction) => {
-        if (input.referralCode !== null) {
-          const [clients, trainers] = await Promise.all([
-            transaction.client.count({
-              where: { referralCode: input.referralCode },
-            }),
-            transaction.staffMember.count({
-              where: {
-                referralCode: input.referralCode,
-                deletedAt: null,
-                id: { not: input.staffMemberId },
-              },
-            }),
-          ]);
-          if (clients + trainers > 0) {
-            throw new AcquisitionError('referral_code_in_use');
-          }
+        if (
+          input.referralCode !== null &&
+          (await isReferralCodeBlocked(transaction, input.referralCode))
+        ) {
+          throw new AcquisitionError('referral_code_blocked');
         }
         await transaction.staffMember.update({
           where: { id: input.staffMemberId },
@@ -200,7 +189,7 @@ export const createPrismaTrainerReferralCodeStore = (
         };
       });
     } catch (error) {
-      if (isUniqueViolation(error)) {
+      if (isReferralCodeTaken(error)) {
         throw new AcquisitionError('referral_code_in_use');
       }
       throw error;
