@@ -27,7 +27,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createTrainerApi } from "../trainer-api";
-import { BackBar } from "../ui/back-bar";
+import { BackBar, backBarScroll } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
 import { SectionHeader } from "../ui/section-header";
 import { countLabel } from "../ui/session-time";
@@ -114,7 +114,10 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={[styles.content, backBarScroll.content]}
+        style={backBarScroll.scroll}
+      >
         <BackBar
           back="Mi agenda"
           onBack={() => navigation.goBack()}
