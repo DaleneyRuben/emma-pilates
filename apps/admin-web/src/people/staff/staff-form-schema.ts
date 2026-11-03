@@ -11,10 +11,14 @@ export const staffFormSchema = z
   .object({
     name: z.string().trim().min(1, "Escribe el nombre.").max(120),
     email: z.string().trim().pipe(z.email("Escribe un correo válido.")),
+    // FIX-030 with MOB-070: a Bolivian mobile, 8 digits starting with 7 after +591.
     phone: z
       .string()
       .trim()
-      .max(40, "Hasta 40 caracteres.")
+      .refine(
+        (phone) => phone === "" || /^\+591[\s-]*7(?:[\s-]?\d){7}$/.test(phone),
+        "Escribe un celular de Bolivia, por ejemplo +591 71234567.",
+      )
       .transform((phone) => (phone === "" ? null : phone)),
     role: z.enum(staffRoles, "Elige un rol."),
     branchIds: z.array(z.string()),

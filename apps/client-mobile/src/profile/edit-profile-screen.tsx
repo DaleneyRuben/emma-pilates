@@ -9,6 +9,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  bolivianMobileSchema,
   colors,
   FormField,
   FormScrollView,
@@ -27,7 +28,6 @@ import { Keyboard, StyleSheet, View } from "react-native";
 import { z } from "zod";
 
 import { useClientFetcher } from "../client-fetcher";
-import { bolivianMobileSchema } from "./bolivian-mobile";
 import { EmailChangeSection, normalizeEmail } from "./email-change-section";
 import { ProfilePhotoSection } from "./profile-photo-section";
 

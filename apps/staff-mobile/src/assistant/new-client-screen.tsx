@@ -6,6 +6,8 @@ import {
   formatCountdown,
   FormField,
   FormScrollView,
+  bolivianMobileMessage,
+  isBolivianMobileOrBlank,
   IconRowGroup,
   NoticeRow,
   PrimaryButton,
@@ -79,6 +81,8 @@ export function NewClientScreen() {
       ? "Escribe un correo válido."
       : undefined;
 
+  const phoneError =
+    submitted && !isBolivianMobileOrBlank(phone) ? bolivianMobileMessage : undefined;
   const channelError = submitted && channel === null ? acquisitionChannelRequired : undefined;
 
   const workspace = useAssistantWorkspace();
@@ -97,7 +101,14 @@ export function NewClientScreen() {
     setEmailInUse(false);
     setAccountLimited(false);
     setCodeUnknown(false);
-    if (name.trim().length === 0 || !emailPattern.test(email.trim()) || channel === null) return;
+    if (
+      name.trim().length === 0 ||
+      !emailPattern.test(email.trim()) ||
+      !isBolivianMobileOrBlank(phone) ||
+      channel === null
+    ) {
+      return;
+    }
     setSubmitting(true);
     const code = referralLabels[channel] === undefined ? "" : referralCode.trim();
     try {
@@ -212,6 +223,7 @@ export function NewClientScreen() {
                     value={email}
                   />
                   <GroupedField
+                    error={phoneError}
                     keyboardType="phone-pad"
                     label="Teléfono (opcional)"
                     onChangeText={setPhone}
