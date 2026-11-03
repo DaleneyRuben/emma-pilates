@@ -65,9 +65,7 @@ describe('recordAttendance', () => {
   it('refuses attendance before the Session starts', async () => {
     const deps = dependencies('2026-09-10T09:59:00Z');
 
-    await expect(record(deps)).rejects.toBeInstanceOf(
-      BookingAccessDeniedError,
-    );
+    await expect(record(deps)).rejects.toBeInstanceOf(BookingAccessDeniedError);
     expect(deps.save).not.toHaveBeenCalled();
   });
 });
