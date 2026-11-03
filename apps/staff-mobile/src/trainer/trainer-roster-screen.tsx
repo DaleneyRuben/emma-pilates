@@ -88,7 +88,8 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
 
   const session = roster.data.data;
   const outcomes = { ...savedOutcomes(session.bookings), ...edits };
-  const isPostSession = new Date(session.endsAt).getTime() <= openedAt;
+  // Owner, 2026-11-03: attendance opens when the class starts, with no closing time.
+  const attendanceOpen = new Date(session.startsAt).getTime() <= openedAt;
   const empty = session.bookings.length === 0;
   const complete = session.bookings.every((booking) => outcomes[booking.bookingId] !== undefined);
   const saveAttendance = async () => {
@@ -145,15 +146,15 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
           <View>
             <SectionHeader
               meta={
-                isPostSession
+                attendanceOpen
                   ? `${marked} de ${session.bookings.length} marcadas`
                   : countLabel(session.bookings.length, "reserva", "reservas")
               }
-              title={isPostSession ? "Asistencia" : "Reservas"}
+              title={attendanceOpen ? "Asistencia" : "Reservas"}
             />
             <IconRowGroup>
               {session.bookings.map((booking) =>
-                isPostSession ? (
+                attendanceOpen ? (
                   <View key={booking.bookingId} style={styles.attendanceRow}>
                     <Text style={styles.clientName}>{booking.clientName}</Text>
                     {(["attended", "no_show"] as const).map((outcome) => {
@@ -196,14 +197,14 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
             </IconRowGroup>
           </View>
         )}
-        {!isPostSession ? (
+        {!attendanceOpen ? (
           <IconRowGroup>
-            <IconRow icon="clock" label="Podrás marcar asistencia cuando termine la clase." />
+            <IconRow icon="clock" label="Podrás marcar asistencia cuando empiece la clase." />
           </IconRowGroup>
         ) : null}
         {saveError ? <NoticeRow message="No pudimos guardar la asistencia." /> : null}
       </ScrollView>
-      {isPostSession ? (
+      {attendanceOpen ? (
         <View style={styles.footer}>
           {missing > 0 && !empty ? (
             <Text style={styles.missing}>

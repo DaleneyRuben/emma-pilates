@@ -29,7 +29,7 @@ export function IconRow({ chevron = false, icon, label, onPress, testID, value }
       <View style={styles.disc} testID="icon-row-disc">
         <Glyph name={icon} size={18} strokeWidth={1.5} />
       </View>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, value === undefined && styles.labelAlone]}>{label}</Text>
       {value === undefined ? null : <Text style={styles.value}>{value}</Text>}
       {chevron ? <Chevron size={16} strokeWidth={1.5} tone="muted" /> : null}
     </>
@@ -97,6 +97,8 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.body,
     fontSize: typography.bodyMedium,
   },
+  // Without a value the label is the row's note: it wraps instead of running off.
+  labelAlone: { flexShrink: 1 },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",
