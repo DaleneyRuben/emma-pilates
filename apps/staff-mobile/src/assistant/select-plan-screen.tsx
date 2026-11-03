@@ -4,13 +4,14 @@ import {
   type PlanQuoteDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
+  Chevron,
   BodyText,
   colors,
   describePlanCardLabel,
   describePlanTerms,
   formatBolivianos,
-  Heading,
+  fontFamilies,
+  SectionTitle,
   LoadingState,
   QueryFailure,
   Screen,
@@ -22,6 +23,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { BackBar } from "../ui/back-bar";
 import { TabletGrid } from "./assistant-layout";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
@@ -48,8 +50,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Elige un plan">Elige un plan</Heading>
+      <BackBar onBack={() => navigation.goBack()} title="Elige un plan" />
       <ClientBanner action="Registrando pago para" clientName={clientName} />
     </>
   );
@@ -89,6 +90,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.list}>
+        <SectionTitle>Planes disponibles</SectionTitle>
         <TabletGrid testID="assistant-plan-grid">
           {plans.map((plan) => (
             <Pressable
@@ -118,6 +120,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
                 )}
                 <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
               </View>
+              <Chevron size={16} strokeWidth={1.5} tone="muted" />
             </Pressable>
           ))}
         </TabletGrid>
@@ -136,13 +139,13 @@ const styles = StyleSheet.create({
   },
   cardBody: { flex: 1, gap: spacing.xs },
   list: { paddingBottom: spacing.xxl },
-  planName: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
+  planName: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
   originalPrice: {
     color: colors.textSubtle,
     fontSize: typography.note,
     textDecorationLine: "line-through",
   },
-  price: { color: colors.text, fontFamily: "Lora_500Medium", fontSize: typography.titleSecondary },
+  price: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
   prices: { alignItems: "flex-end" },
-  screen: { gap: spacing.lg },
+  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
 });
