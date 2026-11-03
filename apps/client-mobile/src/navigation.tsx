@@ -2,10 +2,9 @@ import {
   AuthenticationFlow,
   colors,
   EmailChangeLinkScreen,
-  InsideTabBar,
   MobileQueryProvider,
   type MobileNavigationProps,
-  recoveryScreenLayout,
+  tabStackScreenLayout,
   typography,
 } from "@pilates/mobile-core";
 import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
@@ -61,7 +60,7 @@ const shortcutScreens = {
 };
 
 const HomeStack = createNativeStackNavigator({
-  screenLayout: recoveryScreenLayout,
+  screenLayout: tabStackScreenLayout,
   screenOptions: { headerShown: false },
   // Walkthrough n.º 11: the Inicio bell opens Notificaciones over Inicio.
   screens: {
@@ -73,7 +72,7 @@ const HomeStack = createNativeStackNavigator({
 });
 
 const BookingsStack = createNativeStackNavigator({
-  screenLayout: recoveryScreenLayout,
+  screenLayout: tabStackScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     MyBookings: BookingsScreen,
@@ -82,7 +81,7 @@ const BookingsStack = createNativeStackNavigator({
 });
 
 const BookingStack = createNativeStackNavigator({
-  screenLayout: recoveryScreenLayout,
+  screenLayout: tabStackScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     Browse: BrowseSessionsScreen,
@@ -92,7 +91,7 @@ const BookingStack = createNativeStackNavigator({
 });
 
 const ProfileStack = createNativeStackNavigator({
-  screenLayout: recoveryScreenLayout,
+  screenLayout: tabStackScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     Profile: ProfileScreen,
@@ -123,8 +122,6 @@ const tabOptions =
   };
 
 const ClientTabs = createBottomTabNavigator({
-  // FIX-023: the tab bar covers the bottom safe area, so no screen adds it again.
-  screenLayout: ({ children }) => <InsideTabBar>{children}</InsideTabBar>,
   // Labels stay under the icons on a tablet too.
   screenOptions: {
     headerShown: false,

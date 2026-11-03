@@ -9,7 +9,14 @@ type StackLayoutProps = {
   route: { key: string };
 };
 
-/** A React Navigation `screenLayout` for a stack inside a tab. */
-export function tabStackScreenLayout({ children }: StackLayoutProps) {
-  return <InsideTabBar>{recoveryScreenLayout({ children })}</InsideTabBar>;
+/**
+ * A React Navigation `screenLayout` for a stack inside a tab. Each screen
+ * recovers on its own; the stack's root sits over the tab bar, which covers the
+ * bottom safe area (FIX-023), while a pushed screen hides the bar (as the
+ * boards draw it), so it keeps the safe area itself.
+ */
+export function tabStackScreenLayout({ children, navigation, route }: StackLayoutProps) {
+  const content = recoveryScreenLayout({ children });
+  const root = navigation.getState().routes[0]?.key === route.key;
+  return root ? <InsideTabBar>{content}</InsideTabBar> : content;
 }

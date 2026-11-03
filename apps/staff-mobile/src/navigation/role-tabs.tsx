@@ -1,14 +1,12 @@
-import { colors, fontFamilies, InsideTabBar, recoveryScreenLayout } from "@pilates/mobile-core";
+import { colors, fontFamilies, tabStackScreenLayout } from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createStaticNavigation,
   getFocusedRouteNameFromRoute,
-  type NavigationState,
   type ParamListBase,
   type RouteProp,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import type { ReactNode } from "react";
 
 import { CancelClassScreen } from "../administrator/cancel-class-screen";
 import { CancelSessionScreen } from "../administrator/cancel-session-screen";
@@ -45,23 +43,10 @@ import { TrainerRosterScreen } from "../trainer/trainer-roster-screen";
 import { ContactsTabIcon } from "./contacts-tab-icon";
 import { StaffTabIcon, type StaffTabIconName } from "./staff-tab-icon";
 
-// A tab's root sits over the tab bar, which covers the bottom safe area
-// (FIX-023); a pushed screen hides the bar (as the boards draw it), so it
-// keeps the safe area itself.
+// FIX-023: a tab's root sits over the tab bar; a pushed screen keeps the
+// bottom safe area (tabStackScreenLayout).
 const stackConfig = {
-  screenLayout: ({
-    children,
-    navigation,
-    route,
-  }: {
-    children: ReactNode;
-    navigation: { getState: () => NavigationState };
-    route: { key: string };
-  }) => {
-    const root = navigation.getState().routes[0]?.key === route.key;
-    const content = recoveryScreenLayout({ children });
-    return root ? <InsideTabBar>{content}</InsideTabBar> : content;
-  },
+  screenLayout: tabStackScreenLayout,
   screenOptions: { headerShown: false },
 } as const;
 
