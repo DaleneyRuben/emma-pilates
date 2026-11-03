@@ -63,6 +63,8 @@ jest.mock("@react-native-community/netinfo", () => ({
   addEventListener: () => () => undefined,
 }));
 
+jest.mock("expo-clipboard", () => ({ setStringAsync: jest.fn(async () => true) }));
+
 jest.mock("expo-crypto", () => ({
   CryptoDigestAlgorithm: { SHA256: "SHA-256" },
   // The native module only accepts typed arrays; a bare ArrayBuffer fails on
