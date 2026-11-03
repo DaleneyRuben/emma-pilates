@@ -1,6 +1,12 @@
 import { colors, fontFamilies, InsideTabBar, recoveryScreenLayout } from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStaticNavigation } from "@react-navigation/native";
+import {
+  createStaticNavigation,
+  getFocusedRouteNameFromRoute,
+  type NavigationState,
+  type ParamListBase,
+  type RouteProp,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import type { ReactNode } from "react";
 
@@ -39,8 +45,23 @@ import { TrainerRosterScreen } from "../trainer/trainer-roster-screen";
 import { ContactsTabIcon } from "./contacts-tab-icon";
 import { StaffTabIcon, type StaffTabIconName } from "./staff-tab-icon";
 
+// A tab's root sits over the tab bar, which covers the bottom safe area
+// (FIX-023); a pushed screen hides the bar (as the boards draw it), so it
+// keeps the safe area itself.
 const stackConfig = {
-  screenLayout: recoveryScreenLayout,
+  screenLayout: ({
+    children,
+    navigation,
+    route,
+  }: {
+    children: ReactNode;
+    navigation: { getState: () => NavigationState };
+    route: { key: string };
+  }) => {
+    const root = navigation.getState().routes[0]?.key === route.key;
+    const content = recoveryScreenLayout({ children });
+    return root ? <InsideTabBar>{content}</InsideTabBar> : content;
+  },
   screenOptions: { headerShown: false },
 } as const;
 
@@ -71,33 +92,39 @@ const sellingScreens = {
 };
 const cancelClassScreens = { CancelClass: CancelClassScreen, CancelSession: CancelSessionScreen };
 
-const tabOptions = (title: string, icon: StaffTabIconName) => ({
-  tabBarButtonTestID: `tab-${icon}`,
-  tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) =>
-    icon === "contacts" ? (
-      <ContactsTabIcon color={color} focused={focused} />
-    ) : (
-      <StaffTabIcon color={color} focused={focused} name={icon} />
-    ),
-  title,
-});
+const tabBarStyle = { backgroundColor: colors.card, borderTopWidth: 0 };
+
+// The bar shows only while the tab's stack is on its root screen.
+const tabOptions =
+  (title: string, icon: StaffTabIconName, root: string) =>
+  ({ route }: { route: RouteProp<ParamListBase> }) => ({
+    tabBarButtonTestID: `tab-${icon}`,
+    tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) =>
+      icon === "contacts" ? (
+        <ContactsTabIcon color={color} focused={focused} />
+      ) : (
+        <StaffTabIcon color={color} focused={focused} name={icon} />
+      ),
+    tabBarStyle:
+      (getFocusedRouteNameFromRoute(route) ?? root) === root
+        ? tabBarStyle
+        : { display: "none" as const },
+    title,
+  });
 
 const profileTab = {
   screen: createNativeStackNavigator({ ...stackConfig, screens: profileScreens }),
-  options: tabOptions("Perfil", "profile"),
+  options: tabOptions("Perfil", "profile", "Profile"),
 };
 
 // Follow-up 225 §8: one tab bar per role, drawn like the client's, on Lino.
 const tabConfig = {
-  // FIX-023: the tab bar covers the bottom safe area, so no screen adds it again.
-  screenLayout: ({ children }: { children: ReactNode }) => <InsideTabBar>{children}</InsideTabBar>,
   screenOptions: {
     headerShown: false,
     tabBarActiveTintColor: colors.emphasis,
     tabBarInactiveTintColor: colors.textMuted,
     tabBarLabelPosition: "below-icon",
     tabBarLabelStyle: { fontFamily: fontFamilies.bodyMedium, fontSize: 12 },
-    tabBarStyle: { backgroundColor: colors.card, borderTopWidth: 0 },
   },
 } as const;
 
@@ -116,14 +143,14 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
               Notifications: StaffNotificationsScreen,
             },
           }),
-          options: tabOptions("Agenda", "agenda"),
+          options: tabOptions("Agenda", "agenda", "Agenda"),
         },
         PayTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
             screens: { MyPay: StaffPayScreen },
           }),
-          options: tabOptions("Mis pagos", "pay"),
+          options: tabOptions("Mis pagos", "pay", "MyPay"),
         },
         ProfileTab: profileTab,
       },
@@ -138,21 +165,21 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
             ...stackConfig,
             screens: { ...clientScreens, ...sellingScreens },
           }),
-          options: tabOptions("Clientes", "clients"),
+          options: tabOptions("Clientes", "clients", "ClientSearch"),
         },
         ScheduleTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
             screens: { Schedule: ScheduleScreen },
           }),
-          options: tabOptions("Horario", "schedule"),
+          options: tabOptions("Horario", "schedule", "Schedule"),
         },
         CashTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
             screens: { CashClose: CashCloseScreen },
           }),
-          options: tabOptions("Caja", "cash"),
+          options: tabOptions("Caja", "cash", "CashClose"),
         },
         ProfileTab: profileTab,
       },
@@ -167,7 +194,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
             ...stackConfig,
             screens: { Agenda: NutritionistAgendaScreen, Notifications: StaffNotificationsScreen },
           }),
-          options: tabOptions("Agenda", "agenda"),
+          options: tabOptions("Agenda", "agenda", "Agenda"),
         },
         AvailabilityTab: {
           screen: createNativeStackNavigator({
@@ -177,7 +204,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
               AvailabilityBlockForm: AvailabilityBlockFormScreen,
             },
           }),
-          options: tabOptions("Disponibilidad", "availability"),
+          options: tabOptions("Disponibilidad", "availability", "Availability"),
         },
         ProfileTab: profileTab,
       },
@@ -201,28 +228,28 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
               Notifications: StaffNotificationsScreen,
             },
           }),
-          options: tabOptions("Pagos", "payments"),
+          options: tabOptions("Pagos", "payments", "Payments"),
         },
         ClientsTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
             screens: { ...clientScreens, ...sellingScreens },
           }),
-          options: tabOptions("Clientes", "clients"),
+          options: tabOptions("Clientes", "clients", "ClientSearch"),
         },
         ScheduleTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
             screens: { Schedule: ScheduleScreen, ...cancelClassScreens },
           }),
-          options: tabOptions("Horario", "schedule"),
+          options: tabOptions("Horario", "schedule", "Schedule"),
         },
         ProfileTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
             screens: { ...profileScreens, ViewAs: ViewAsScreen },
           }),
-          options: tabOptions("Perfil", "profile"),
+          options: tabOptions("Perfil", "profile", "Profile"),
         },
       },
     }),
@@ -233,21 +260,21 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
       screens: {
         ClientsTab: {
           screen: createNativeStackNavigator({ ...stackConfig, screens: clientScreens }),
-          options: tabOptions("Clientes", "clients"),
+          options: tabOptions("Clientes", "clients", "ClientSearch"),
         },
         ContactsTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
             screens: { ContactList: ContactListScreen },
           }),
-          options: tabOptions("Para contactar", "contacts"),
+          options: tabOptions("Para contactar", "contacts", "ContactList"),
         },
         ScheduleTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
             screens: { Schedule: ScheduleScreen, ...cancelClassScreens },
           }),
-          options: tabOptions("Horario", "schedule"),
+          options: tabOptions("Horario", "schedule", "Schedule"),
         },
         ProfileTab: profileTab,
       },
