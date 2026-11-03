@@ -6,6 +6,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  bookingStripDays,
   boliviaCivilDate,
   civilDateRange,
   colors,
@@ -24,6 +25,7 @@ import {
   upcomingCivilDates,
   usePullToRefresh,
   useRefetchOnFocus,
+  useStudioRules,
   weeklyClassesLeftLine,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -49,7 +51,8 @@ export function BrowseSessionsScreen() {
   const navigation = useNavigation<BrowseNavigation>();
   const fetcher = useClientFetcher();
   const today = boliviaCivilDate(new Date());
-  const dates = useMemo(() => upcomingCivilDates(today, 7), [today]);
+  const stripDays = bookingStripDays(useStudioRules(fetcher));
+  const dates = useMemo(() => upcomingCivilDates(today, stripDays), [today, stripDays]);
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
   const [classTypeId, setClassTypeId] = useState(allClassTypes);
