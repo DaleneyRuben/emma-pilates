@@ -69,7 +69,7 @@ export class SetTrainerReferralCodeDto {
     nullable: true,
     example: 'CARLA',
     description:
-      '3 to 20 letters, digits, or hyphens, not starting with REF-; null removes the code',
+      '3 to 20 letters, digits, or hyphens, starting with a letter or digit; null removes the code',
   })
   referralCode!: string | null;
 }

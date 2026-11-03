@@ -94,8 +94,8 @@ describe('A Trainer’s personal Referral Code (BKM-011)', () => {
     ).resolves.toEqual({ staffMemberId: 'carla-id', referralCode: 'CARLA' });
   });
 
-  it('refuses a malformed code or one with the Client prefix', async () => {
-    for (const referralCode of ['C', 'REF-CARLA', 'CAR LA']) {
+  it('refuses a malformed code', async () => {
+    for (const referralCode of ['C', 'CAR LA', 'CARLÁ']) {
       const codes = store();
       await expect(
         setTrainerReferralCode(

@@ -9,6 +9,8 @@ const statuses = {
   staff_member_not_found: 404,
   staff_member_not_trainer: 409,
   referral_code_in_use: 409,
+  referral_code_blocked: 409,
+  referral_code_change_too_soon: 409,
 } as const;
 
 export type AcquisitionErrorCode = keyof typeof statuses;
@@ -17,13 +19,15 @@ const details: Record<AcquisitionErrorCode, string> = {
   referral_code_invalid: 'Unknown referral code',
   referral_self_reference: 'A Client cannot refer themselves',
   referral_code_malformed:
-    'A personal code has 3 to 20 letters, digits, or hyphens and cannot start with REF-',
+    'A code has 3 to 20 letters, digits, or hyphens and starts with a letter or digit',
   acquisition_access_denied:
     'Correcting how a Client found the studio is not allowed for this Role',
   client_not_found: 'Client not found',
   staff_member_not_found: 'Staff Member not found',
   staff_member_not_trainer: 'Only a Trainer holds a personal code',
-  referral_code_in_use: 'Another Client or Trainer already holds this code',
+  referral_code_in_use: 'Another Client or Trainer holds or held this code',
+  referral_code_blocked: 'This code uses a reserved or blocked word',
+  referral_code_change_too_soon: 'A code can change once every 30 days',
 };
 
 export class AcquisitionError extends Error {
