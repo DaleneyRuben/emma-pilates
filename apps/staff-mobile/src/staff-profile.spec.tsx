@@ -127,6 +127,9 @@ describe("Staff Perfil", () => {
     expect(
       screen.getByText("Te avisaremos aquí cuando haya algo que necesite tu atención."),
     ).toBeOnTheScreen();
+    // v2 S20: the empty inbox leads back to her agenda.
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a mi agenda" }));
+    await waitFor(() => expect(screen.getByLabelText("Mi agenda")).toBeOnTheScreen());
   });
 
   it("opens the change password step", async () => {
