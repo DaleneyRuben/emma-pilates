@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
 import { FeedbackScreen } from "./feedback-screen";
-import { describeFeedbackDevice, readFeedbackMetadata } from "./feedback-metadata";
+import { readFeedbackMetadata } from "./feedback-metadata";
 
 const metadata = {
   appVersion: "1.0.1",
@@ -52,14 +52,12 @@ describe("FeedbackScreen (REL-012)", () => {
     expect(sendButton(screen)).toBeEnabled();
   });
 
-  it("says what is attached and that no screenshot is sent", async () => {
+  // Owner, 2026-11-03: the app version and device are technical; they travel
+  // with the comment on their own and the screen never mentions them.
+  it("never shows the app version or the device", async () => {
     const screen = await renderScreen(jest.fn());
 
-    expect(
-      screen.getByText(
-        "Junto con tu comentario enviamos la versión de la app (1.0.1, compilación 3), el sistema (Android 14) y tu rol. No enviamos capturas de pantalla.",
-      ),
-    ).toBeOnTheScreen();
+    expect(screen.queryByText(/versión de la app|compilación|Android 14/)).toBeNull();
   });
 
   it("sends the type, text, and device details once, then thanks", async () => {
@@ -195,14 +193,5 @@ describe("feedback metadata", () => {
         runtimeVersion: null,
       }).appVersion,
     ).toBe("desconocida");
-  });
-
-  it("describes the device for the note under the form", () => {
-    expect(describeFeedbackDevice(metadata)).toBe(
-      "la versión de la app (1.0.1, compilación 3), el sistema (Android 14)",
-    );
-    expect(describeFeedbackDevice({ ...metadata, platform: "ios", osVersion: "18.2" })).toBe(
-      "la versión de la app (1.0.1, compilación 3), el sistema (iOS 18.2)",
-    );
   });
 });
