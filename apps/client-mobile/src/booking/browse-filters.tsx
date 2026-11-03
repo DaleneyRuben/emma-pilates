@@ -42,7 +42,11 @@ export function BranchLine({
   );
 }
 
-/** 03's day strip: 48 × 60 Lino chips, today as «Hoy», the chosen day in Palo de rosa. */
+/**
+ * 03's day strip: 60-high Lino chips, today as «Hoy», the chosen day in Palo de
+ * rosa. The seven days share the width: 48-wide chips clipped the last one on
+ * a 411-wide Android phone (MOB-074).
+ */
 export function DayStrip({
   dates,
   onSelect,
@@ -55,13 +59,7 @@ export function DayStrip({
   today: string;
 }) {
   return (
-    <ScrollView
-      contentContainerStyle={styles.chipRow}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.strip}
-      testID="browse-day-strip"
-    >
+    <View style={[styles.strip, styles.dayRow]} testID="browse-day-strip">
       {dates.map((date) => {
         const label = dayChipLabel(date);
         const isSelected = date === selected;
@@ -82,7 +80,7 @@ export function DayStrip({
           </Pressable>
         );
       })}
-    </ScrollView>
+    </View>
   );
 }
 
@@ -149,11 +147,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: radii.button,
     gap: spacing.xxs,
+    flex: 1,
     height: 60,
     justifyContent: "center",
-    width: 48,
+    minWidth: 0,
   },
   dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
+  dayRow: { flexDirection: "row", gap: spacing.sm },
   daySelected: { backgroundColor: colors.primary },
   dayWeekday: {
     color: colors.textMuted,
