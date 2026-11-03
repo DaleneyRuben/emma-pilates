@@ -1,4 +1,11 @@
-import { agendaDayChipLabel, colors, fontFamilies, radii, spacing, typography } from "@pilates/mobile-core";
+import {
+  agendaDayChipLabel,
+  colors,
+  fontFamilies,
+  radii,
+  spacing,
+  typography,
+} from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 const blockProblems: Record<string, string> = {

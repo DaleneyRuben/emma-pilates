@@ -83,10 +83,8 @@ import {
   type TransferInstructions,
 } from './payments/payments.controller';
 import { createPrismaPaymentCommands } from './payments/prisma-payment-commands';
-import {
-  priceFounderPlanList,
-  readFounderRenewal,
-} from './payments/prisma-founder-membership';
+import { readFounderRenewal } from './payments/prisma-founder-membership';
+import { priceFounderPlanList } from './payments/founder-plan-quote';
 import { readRenewalStartsOn } from './payments/prisma-start-date-allocation';
 import {
   ClientEvaluationsController,

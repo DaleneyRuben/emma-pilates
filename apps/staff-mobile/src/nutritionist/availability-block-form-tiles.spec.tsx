@@ -24,7 +24,9 @@ describe("Nuevo horario tiles", () => {
     const monday = screen.getByRole("button", { name: "Lunes" });
     expect(within(monday).getByText("Lun")).toBeOnTheScreen();
     expect(monday).toHaveStyle({ flex: 1, minWidth: 0 });
-    expect(within(screen.getByRole("button", { name: "Domingo" })).getByText("Dom")).toBeOnTheScreen();
+    expect(
+      within(screen.getByRole("button", { name: "Domingo" })).getByText("Dom"),
+    ).toBeOnTheScreen();
 
     const todayTile = screen.getByRole("button", { name: "Fecha Hoy" });
     expect(within(todayTile).getByText("Hoy")).toBeOnTheScreen();
