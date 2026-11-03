@@ -67,6 +67,23 @@ describe("Client unread badges", () => {
     });
   });
 
+  // Follow-up 227: pushed screens (with a back arrow) have no tab bar.
+  it("hides the tab bar on a pushed screen and brings it back on the root", async () => {
+    const screen = await render(<App runtime={withUnread(2)} />);
+
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Notificaciones, 2 sin leer" }),
+    );
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: /^Reservar, tab/ })).toBeNull();
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /^Reservar, tab/ })).toBeOnTheScreen();
+    });
+  });
+
   it("names the bell without a count at zero", async () => {
     const screen = await render(<App runtime={withUnread(0)} />);
 
