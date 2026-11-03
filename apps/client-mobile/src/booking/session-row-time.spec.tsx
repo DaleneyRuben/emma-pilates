@@ -6,6 +6,7 @@ import { SessionRow } from "./session-row";
 const session = {
   availableSeats: 14,
   branchId: "branch-centro",
+  branchName: "Centro",
   bookedCount: 0,
   capacity: 14,
   classTypeId: "class-mat",
