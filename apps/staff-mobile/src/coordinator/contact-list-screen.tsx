@@ -152,7 +152,8 @@ export function ContactListScreen() {
         <BrandToast
           note="Sale de la lista y queda registrado a tu nombre"
           onClose={() => setNotice(null)}
-          title={`${notice.name}, contactada`}
+          // S28: «Valeria, contactada», her first name only.
+          title={`${notice.name.trim().split(/\s+/)[0] ?? notice.name}, contactada`}
         />
       ) : null}
     </Screen>
