@@ -42,12 +42,23 @@ type ReferralCodeSheetProps = {
   onSave: () => void;
   /** The server refused the last save («Ya está en uso» meanwhile). */
   refusal: CodeStatus | null;
+  /** C16e / S23c inside the same sheet: iOS drops a second Modal presented
+   * while the first is still closing, so the confirmation never opens its own. */
+  confirmation: Confirmation | null;
   visible: boolean;
+};
+
+type Confirmation = {
+  busy: boolean;
+  current: string;
+  onBack: () => void;
+  onConfirm: () => void;
 };
 
 /** C16c / S23b: the bottom sheet that checks the new code while she types. */
 export function ReferralCodeSheet({
   code,
+  confirmation,
   fetcher,
   onChangeCode,
   onDismiss,
@@ -80,12 +91,32 @@ export function ReferralCodeSheet({
   }
 
   return (
-    <Modal animationType="slide" onRequestClose={onDismiss} transparent visible={visible}>
+    <Modal
+      animationType="slide"
+      onRequestClose={confirmation === null ? onDismiss : confirmation.onBack}
+      transparent
+      visible={visible}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.backdrop}
       >
-        <View style={styles.sheet}>
+        {confirmation === null ? null : (
+          <View style={styles.sheet}>
+            <Text style={styles.title}>{`¿Cambiar tu código a ${code}?`}</Text>
+            <Text style={styles.body}>
+              {`Tu código anterior ${confirmation.current} dejará de funcionar. Las amigas que ya se registraron con él siguen contando para ti.`}
+            </Text>
+            <PrimaryButton
+              busy={confirmation.busy}
+              label="Cambiar código"
+              onPress={confirmation.onConfirm}
+              size="compact"
+            />
+            <TextButton disabled={confirmation.busy} label="Volver" onPress={confirmation.onBack} />
+          </View>
+        )}
+        <View style={[styles.sheet, confirmation !== null && styles.hidden]}>
           <Text style={styles.title}>Editar tu código</Text>
           <View style={styles.field}>
             <FormField
@@ -132,7 +163,9 @@ function StatusLine({ status }: { status: CodeStatus }) {
 
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: colors.scrim, flex: 1, justifyContent: "flex-end" },
+  body: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   field: { gap: spacing.sm },
+  hidden: { display: "none" },
   input: { fontFamily: fontFamilies.display, fontSize: 22, letterSpacing: 2.6 },
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   ok: { color: colors.successText },

@@ -8,7 +8,6 @@ import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { ConfirmationSheet } from "../ui/confirmation-sheet";
 import { fontFamilies } from "../ui/fonts";
 import { useMountedAt } from "../time/mounted-at";
 import { Glyph } from "../ui/glyph";
@@ -121,6 +120,16 @@ export function EditReferralCode({ fetcher, onChanged }: EditReferralCodeProps) 
       <TextButton label="Editar código" onPress={open} style={styles.edit} />
       <ReferralCodeSheet
         code={code}
+        confirmation={
+          step === "confirming"
+            ? {
+                busy: change.isPending,
+                current,
+                onBack: () => setStep("editing"),
+                onConfirm: save,
+              }
+            : null
+        }
         fetcher={fetcher}
         onChangeCode={(next) => {
           setRefusal(null);
@@ -129,17 +138,7 @@ export function EditReferralCode({ fetcher, onChanged }: EditReferralCodeProps) 
         onDismiss={() => setStep("closed")}
         onSave={() => setStep("confirming")}
         refusal={refusal}
-        visible={step === "editing"}
-      />
-      <ConfirmationSheet
-        busy={change.isPending}
-        confirmLabel="Cambiar código"
-        note={`Tu código anterior ${current} dejará de funcionar. Las amigas que ya se registraron con él siguen contando para ti.`}
-        onConfirm={save}
-        onDismiss={() => setStep("editing")}
-        title={`¿Cambiar tu código a ${code}?`}
-        tone="primary"
-        visible={step === "confirming"}
+        visible={step !== "closed"}
       />
     </>
   );
