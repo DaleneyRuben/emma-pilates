@@ -32,8 +32,10 @@ export function BackBar({
           style={({ pressed }) => [styles.back, pressed && styles.pressed]}
           testID="back-bar"
         >
+          {/* The glyph starts at the box's edge: a scroll view clips anything
+              pulled past its padding, which cut the chevron on Android. */}
           <LineIcon color={colors.text} size={22} strokeWidth={1.5}>
-            <Polyline points="14.5,5 7.5,12 14.5,19" />
+            <Polyline points="8,5 1,12 8,19" />
           </LineIcon>
           {back === undefined ? null : <Text style={styles.backLabel}>{back}</Text>}
         </Pressable>
@@ -64,7 +66,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.xs,
-    marginLeft: -spacing.smLg,
     minHeight: 44,
     paddingRight: spacing.sm,
   },
