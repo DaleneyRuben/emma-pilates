@@ -43,7 +43,8 @@ export function ClientPushNotifications({
       fetcher={fetcher}
       installationId={installationIdentifier}
       onOpen={opener.deliver}
-      permissionReason="Activa las notificaciones para saber al momento si tu clase cambia, si se libera un cupo y antes de tu evaluación."
+      permissionReason="Te avisamos antes de cada clase y cuando haya novedades sobre tus reservas, tu plan o tus pagos."
+      permissionTitle="No te pierdas ninguna clase"
       platform={platform}
     >
       {children({ ref, onReady: opener.onReady })}

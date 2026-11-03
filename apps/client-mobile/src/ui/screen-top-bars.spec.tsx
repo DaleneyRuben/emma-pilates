@@ -2,7 +2,6 @@ import { cleanup, render, within } from "@testing-library/react-native";
 import { clearMobileQueryCache, MobileQueryProvider } from "@pilates/mobile-core";
 import type { ComponentType } from "react";
 
-import { ClassHistoryScreen } from "../booking/class-history-screen";
 import { RescheduleScreen } from "../booking/reschedule-screen";
 import { SessionDetailScreen } from "../booking/session-detail-screen";
 import { ClientFetcherContext } from "../client-fetcher";
@@ -59,13 +58,18 @@ const screens: [string, ComponentType<never>, object, string, ("title" | "contex
     "context",
   ],
   ["06", RescheduleScreen as ComponentType<never>, { booking }, "Reprogramar clase"],
-  ["07", ClassHistoryScreen as ComponentType<never>, {}, "Historial de clases"],
   ["08", PlansScreen as ComponentType<never>, {}, "Elige tu plan"],
   ["09", PlanDetailScreen as ComponentType<never>, { planId: "plan-1" }, "Detalle del plan"],
   ["10", PaymentScreen as ComponentType<never>, {}, "Pago por transferencia"],
   ["12", SubscriptionScreen as ComponentType<never>, {}, "Mi plan"],
   ["13", EvaluationAvailabilityScreen as ComponentType<never>, {}, "Evaluación nutricional"],
-  ["14", BookEvaluationScreen as ComponentType<never>, { slot }, "Confirmar evaluación"],
+  [
+    "14",
+    BookEvaluationScreen as ComponentType<never>,
+    { slot },
+    "Evaluación nutricional",
+    "context",
+  ],
   ["15", MyEvaluationsScreen as ComponentType<never>, {}, "Mis evaluaciones"],
   ["16", ReferralsScreen as ComponentType<never>, {}, "Invita a una amiga"],
   ["22", EditProfileScreen as ComponentType<never>, {}, "Editar perfil"],

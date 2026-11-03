@@ -39,9 +39,7 @@ describe("Perfil promotions switch", () => {
       expect(screen.getByRole("switch", { name: label, checked: false })).toBeOnTheScreen();
     });
     expect(
-      screen.getByText(
-        "Usamos tu nombre, correo y teléfono para enviarte ofertas y novedades del estudio. Puedes desactivarlo cuando quieras.",
-      ),
+      screen.getByText("Usamos tu nombre, correo y teléfono para enviarte ofertas del estudio."),
     ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("switch", { name: label }));
 

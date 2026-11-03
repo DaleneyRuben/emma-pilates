@@ -3,7 +3,12 @@ import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
-import { boliviaCivilDate, civilDateRange } from "@pilates/mobile-core";
+import {
+  boliviaCivilDate,
+  civilDateRange,
+  formatSessionDate,
+  upcomingCivilDates,
+} from "@pilates/mobile-core";
 
 jest.setTimeout(20_000);
 
@@ -44,6 +49,11 @@ const classTypes = [
 
 const today = boliviaCivilDate(new Date());
 const { from, until } = civilDateRange(today);
+const dates = upcomingCivilDates(today, 7);
+const sessionsUrl = (start: string, end: string) =>
+  `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(start)}&until=${encodeURIComponent(end)}&limit=100`;
+const dayUrl = (date: string) => sessionsUrl(civilDateRange(date).from, civilDateRange(date).until);
+const weekUrl = sessionsUrl(civilDateRange(dates[0]).from, civilDateRange(dates[6]).until);
 const inOneHour = new Date(Date.now() + 60 * 60 * 1_000);
 const inTwoHours = new Date(Date.now() + 2 * 60 * 60 * 1_000);
 const session = (id: string, classTypeId: string, startsAt: Date, availableSeats: number) => ({
@@ -114,7 +124,7 @@ describe("Client Browse Sessions", () => {
         }),
       ).toBeOnTheScreen();
     });
-    expect(screen.getAllByText("Emma Vargas")).toHaveLength(2);
+    expect(screen.getAllByText("Emma Vargas · 50 min")).toHaveLength(2);
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
     expect(screen.getByText("Lleno")).toBeOnTheScreen();
     expect(screen.queryByText(/clases esta semana/)).not.toBeOnTheScreen();
@@ -137,11 +147,10 @@ describe("Client Browse Sessions", () => {
     });
   });
 
-  it("filters the list by Class Type and shows an empty state", async () => {
+  it("filters the list by Class Type and offers every class when the filter is empty", async () => {
     const screen = await openBrowse({
       ...baseRoutes(),
-      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
-        () => jsonResponse([session("session-1", "class-reformer", inOneHour, 3)]),
+      [dayUrl(today)]: () => jsonResponse([session("session-1", "class-reformer", inOneHour, 3)]),
     });
 
     await waitFor(() => {
@@ -149,10 +158,68 @@ describe("Client Browse Sessions", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
 
+    // Walkthrough n.º 6 (A): a real empty state with an action.
     await waitFor(() => {
-      expect(screen.getByText("No hay clases con este filtro")).toBeOnTheScreen();
+      expect(screen.getByText("Hoy no hay Mat Pilates")).toBeOnTheScreen();
     });
+    expect(
+      screen.getByText("Prueba otro día o mira todas las clases de este día."),
+    ).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: /^Reformer Pilates \d/ })).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Ver todas las clases" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
+    });
+  });
+
+  it("offers the next day of the week that has the chosen Class Type", async () => {
+    const later = dates[3];
+    const laterStart = new Date(`${later}T12:00:00.000Z`);
+    const screen = await openBrowse({
+      ...baseRoutes(),
+      [dayUrl(today)]: () => jsonResponse([session("session-1", "class-reformer", inOneHour, 3)]),
+      [weekUrl]: () =>
+        jsonResponse([
+          session("session-1", "class-reformer", inOneHour, 3),
+          session("session-9", "class-mat", laterStart, 4),
+        ]),
+      [dayUrl(later)]: () => jsonResponse([session("session-9", "class-mat", laterStart, 4)]),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
+
+    const offer = `Ver el ${formatSessionDate(laterStart.toISOString()).split(" ").slice(0, 2).join(" ")}`;
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: offer })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: offer }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /^Mat Pilates \d/ })).toBeOnTheScreen();
+    });
+  });
+
+  it("offers tomorrow when today has no classes at all", async () => {
+    const tomorrowStart = new Date(`${dates[1]}T12:00:00.000Z`);
+    const screen = await openBrowse({
+      ...baseRoutes(),
+      [dayUrl(today)]: () => jsonResponse([]),
+      [dayUrl(dates[1])]: () =>
+        jsonResponse([session("session-2", "class-reformer", tomorrowStart, 5)]),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Este día no hay clases")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("Elige otro día de la semana para reservar.")).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Ver mañana" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
+    });
   });
 
   it("opens the Session detail from a card", async () => {
@@ -181,7 +248,7 @@ describe("Client Browse Sessions", () => {
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
 
     await waitFor(() => {
-      expect(screen.getByText("3 de 12 cupos disponibles")).toBeOnTheScreen();
+      expect(screen.getByText("de 12 cupos libres")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Reservar" })).toBeOnTheScreen();
   });

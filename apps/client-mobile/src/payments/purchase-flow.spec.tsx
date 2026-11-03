@@ -44,7 +44,7 @@ describe("Client purchase flow", () => {
     expect(screen.queryByText(/crédito/)).toBeNull();
     expect(screen.getAllByText("Bs 560").length).toBeGreaterThan(0);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
 
     await waitFor(() => {
       expect(screen.getByText("Pago por transferencia")).toBeOnTheScreen();
@@ -56,7 +56,7 @@ describe("Client purchase flow", () => {
     expect(screen.getAllByText("Bs 560").length).toBeGreaterThan(0);
     expect(screen.queryByText(/crédito/)).toBeNull();
     expect(
-      screen.getByText("Escanea el código con tu app bancaria y transfiere el monto exacto."),
+      screen.getByText("Escanéalo con tu app bancaria y transfiere el monto exacto."),
     ).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByLabelText("Código QR del estudio")).toBeOnTheScreen();
@@ -128,7 +128,7 @@ describe("Client purchase flow", () => {
       "/api/v1/payments/current": () => jsonResponse(payment),
     });
     const screen = await openPlanDetail(fetcher);
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
@@ -166,11 +166,17 @@ describe("Client purchase flow", () => {
       expect(screen.getByText("Tu pago está en revisión")).toBeOnTheScreen();
     });
     expect(calls.at(-1)).toBe("submit");
+    // Walkthrough n.º 15: the owner's copy, centred, with the facts and a real button.
     expect(
       screen.getByText(
-        "Un administrador va a confirmar tu comprobante pronto. Te avisaremos apenas esté listo.",
+        "Nuestro equipo está revisando tu comprobante. Suele tomar unos minutos en horario de atención. Te avisaremos apenas esté listo.",
       ),
     ).toBeOnTheScreen();
+    expect(screen.getByTestId("payment-status-facts")).toBeOnTheScreen();
+    expect(screen.getByText("Monto")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Volver al inicio" })).toHaveStyle({
+      backgroundColor: "#B78380",
+    });
     await fireEvent.press(screen.getByRole("button", { name: "Volver al inicio" }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
@@ -191,7 +197,7 @@ describe("Client purchase flow", () => {
 
     expect(screen.queryByText("−Bs 560")).toBeNull();
     expect(screen.queryByText("Bs 0")).toBeNull();
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
 
     await waitFor(() => {
       expect(screen.getByText("Pago por transferencia")).toBeOnTheScreen();
@@ -207,7 +213,7 @@ describe("Client purchase flow", () => {
     });
     const screen = await openPlanDetail(fetcher);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
 
     expect(
       await screen.findByText(
@@ -265,10 +271,16 @@ describe("Client purchase flow", () => {
     await fireEvent.press(screen.getByText(/Tu comprobante fue rechazado/));
 
     await waitFor(() => {
-      expect(screen.getByText("Tu comprobante fue rechazado")).toBeOnTheScreen();
+      expect(screen.getByText("No pudimos confirmar tu pago")).toBeOnTheScreen();
     });
-    expect(screen.getByText("El monto no coincide con el plan.")).toBeOnTheScreen();
+    expect(
+      screen.getByText("El monto no coincide con el plan. Sube uno nuevo para activar tu plan."),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Monto esperado")).toBeOnTheScreen();
     expect(screen.queryByText(/crédito/)).toBeNull();
-    expect(screen.getByRole("button", { name: "Subir un nuevo comprobante" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Subir otro comprobante" })).toBeOnTheScreen();
+    expect(
+      screen.getByTestId("state-screen-icon-alert", { includeHiddenElements: true }),
+    ).toHaveProp("stroke", "#A04E3E");
   });
 });

@@ -60,7 +60,7 @@ env:
 - tapOn:
     id: "payment-submit"
 - extendedWaitUntil:
-    visible: "Un administrador va a confirmar tu comprobante pronto.*"
+    visible: "Nuestro equipo está revisando tu comprobante.*"
     timeout: 20000
 - takeScreenshot: client-purchase-5-review
 - tapOn:

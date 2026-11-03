@@ -92,9 +92,9 @@ describe("Client booking rejection messages", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Cancelar reserva" })).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar reserva" }));
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar reserva" }));
 
     await waitFor(() => {
@@ -116,11 +116,11 @@ describe("Client booking rejection messages", () => {
         return new Response(null, { status: 204 });
       },
     });
-    await fireEvent.press(await screen.findByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cancelar reserva" }));
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar reserva" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Aún no tienes reservas próximas.")).toBeOnTheScreen();
+      expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen();
     });
     expect(
       screen.queryByText("No pudimos cancelar la reserva. Inténtalo de nuevo."),

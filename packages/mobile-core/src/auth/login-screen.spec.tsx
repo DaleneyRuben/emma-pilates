@@ -13,6 +13,14 @@ async function submitLogin(onSubmit: jest.Mock) {
 }
 
 describe("LoginScreen", () => {
+  // Follow-up 227: «Emma Pilates Studio» everywhere; the tagline is gone (owner, 2026-11-02).
+  it("names Emma Pilates Studio without the tagline", async () => {
+    const screen = await render(<LoginScreen onSubmit={jest.fn()} />);
+
+    expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({ fontSize: 36 });
+    expect(screen.queryByText("Movimiento · Equilibrio · Bienestar")).toBeNull();
+  });
+
   it("shows neutral feedback for rejected credentials", async () => {
     const screen = await submitLogin(jest.fn().mockResolvedValue({ status: "rejected" }));
 

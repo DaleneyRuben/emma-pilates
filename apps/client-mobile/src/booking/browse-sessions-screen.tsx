@@ -6,35 +6,34 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
-  BranchPickerPill,
+  boliviaCivilDate,
+  civilDateRange,
   colors,
+  fontFamilies,
+  formatSessionDate,
+  formatTimeRange,
+  hasStarted,
   Heading,
   LoadingState,
   PickerCheck,
   QueryFailure,
   radii,
   Screen,
-  SeatPill,
-  SessionCard,
   spacing,
-  weeklyClassesLeftLine,
   typography,
+  upcomingCivilDates,
   usePullToRefresh,
   useRefetchOnFocus,
+  weeklyClassesLeftLine,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import {
-  boliviaCivilDate,
-  civilDateRange,
-  dayChipLabel,
-  formatTimeRange,
-  hasStarted,
-  upcomingCivilDates,
-} from "@pilates/mobile-core";
+import { BrowseEmptyState } from "./browse-empty-state";
+import { BranchLine, ClassTypeStrip, DayStrip } from "./browse-filters";
+import { SessionRow, seatsTag } from "./session-row";
 
 type BrowseNavigation = {
   navigate: (screen: "SessionDetail", params: { sessionId: string }) => void;
@@ -42,31 +41,8 @@ type BrowseNavigation = {
 
 const allClassTypes = "all";
 
-function seatsTag(availableSeats: number): string {
-  if (availableSeats === 0) return "Lleno";
-  return availableSeats === 1 ? "1 cupo" : `${availableSeats} cupos`;
-}
-
-function Chip({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={[styles.chip, selected && styles.chipSelected]}
-    >
-      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{label}</Text>
-    </Pressable>
-  );
+function capitalized(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export function BrowseSessionsScreen() {
@@ -119,9 +95,10 @@ export function BrowseSessionsScreen() {
     <Screen style={styles.screen}>
       <Heading accessibilityLabel="Reservar">Reservar una clase</Heading>
       {selectedBranch ? (
-        <BranchPickerPill
+        <BranchLine
+          count={branchList.length}
           name={selectedBranch.name}
-          onPress={() => setChoosingBranch((open) => !open)}
+          onToggle={() => setChoosingBranch((open) => !open)}
           open={choosingBranch}
         />
       ) : null}
@@ -153,57 +130,15 @@ export function BrowseSessionsScreen() {
           ))}
         </View>
       ) : null}
-      <ScrollView
-        contentContainerStyle={styles.chipRow}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.strip}
-        testID="browse-day-strip"
-      >
-        {dates.map((date) => {
-          const label = dayChipLabel(date);
-          const selected = date === selectedDate;
-          return (
-            <Pressable
-              accessibilityLabel={`${label.weekday} ${label.day}`}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              key={date}
-              onPress={() => setSelectedDate(date)}
-              style={[styles.dayChip, selected && styles.chipSelected]}
-              testID={`browse-day-${date}`}
-            >
-              <Text style={[styles.dayWeekday, selected && styles.chipLabelSelected]}>
-                {label.weekday}
-              </Text>
-              <Text style={[styles.dayNumber, selected && styles.chipLabelSelected]}>
-                {label.day}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-      <ScrollView
-        contentContainerStyle={styles.chipRow}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.strip}
-        testID="browse-class-type-strip"
-      >
-        <Chip
-          label="Todas"
-          onPress={() => setClassTypeId(allClassTypes)}
-          selected={classTypeId === allClassTypes}
-        />
-        {classTypeList.map((classType) => (
-          <Chip
-            key={classType.id}
-            label={classType.name}
-            onPress={() => setClassTypeId(classType.id)}
-            selected={classTypeId === classType.id}
-          />
-        ))}
-      </ScrollView>
+      <DayStrip dates={dates} onSelect={setSelectedDate} selected={selectedDate} today={today} />
+      <ClassTypeStrip
+        onSelect={setClassTypeId}
+        options={[
+          { id: allClassTypes, label: "Todas" },
+          ...classTypeList.map((classType) => ({ id: classType.id, label: classType.name })),
+        ]}
+        selected={classTypeId}
+      />
       {loading ? (
         <LoadingState label="Cargando clases" />
       ) : failed ? (
@@ -216,11 +151,16 @@ export function BrowseSessionsScreen() {
         />
       ) : visibleSessions.length === 0 ? (
         <ScrollView contentContainerStyle={styles.empty} refreshControl={refreshControl}>
-          <BodyText>
-            {classTypeId === allClassTypes
-              ? "No hay clases este día."
-              : "No hay clases con este filtro"}
-          </BodyText>
+          <BrowseEmptyState
+            branchId={branchId}
+            classTypeId={classTypeId}
+            classTypeName={classTypeList.find((type) => type.id === classTypeId)?.name}
+            dates={dates}
+            onSelectDate={setSelectedDate}
+            onShowAll={() => setClassTypeId(allClassTypes)}
+            selectedDate={selectedDate}
+            today={today}
+          />
         </ScrollView>
       ) : (
         <ScrollView
@@ -228,24 +168,25 @@ export function BrowseSessionsScreen() {
           refreshControl={refreshControl}
           testID="browse-sessions-scroll"
         >
+          <View style={styles.dayHeader}>
+            <Text style={styles.dayTitle}>
+              {capitalized(formatSessionDate(civilDateRange(selectedDate).from))}
+            </Text>
+            <Text style={styles.dayCount}>
+              {visibleSessions.length === 1 ? "1 clase" : `${visibleSessions.length} clases`}
+            </Text>
+          </View>
           {visibleSessions.map((session) => {
             const left = weeklyClassesLeftLine(session.classesLeftThisWeek);
             return (
-              <View key={session.id}>
-                <SessionCard
+              <View key={session.id} style={styles.item}>
+                <SessionRow
                   accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.trainerName}, ${seatsTag(session.availableSeats)}`}
                   onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
-                  tag={
-                    <SeatPill full={session.availableSeats === 0}>
-                      {seatsTag(session.availableSeats)}
-                    </SeatPill>
-                  }
+                  session={session}
                   testID={`session-card-${session.id}`}
-                  time={formatTimeRange(session.startsAt, session.endsAt)}
-                  title={session.classTypeName}
-                  trainerName={session.trainerName}
                 />
-                {left === null ? null : <BodyText>{left}</BodyText>}
+                {left === null ? null : <BodyText style={styles.left}>{left}</BodyText>}
               </View>
             );
           })}
@@ -273,35 +214,25 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     padding: spacing.lg,
   },
-  chip: {
-    backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+  dayCount: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  dayHeader: {
+    alignItems: "baseline",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: spacing.xs,
   },
-  chipLabel: { color: colors.text, fontSize: typography.body },
-  chipLabelSelected: { color: colors.white },
-  chipRow: { gap: spacing.sm, paddingVertical: spacing.xs },
-  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  // Horizontal strips keep their natural height: spare tablet height would
-  // stretch them and an open Branch list would squash them.
-  strip: { flexGrow: 0, flexShrink: 0 },
-  dayChip: {
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.inset,
-    borderWidth: 1,
-    minWidth: 56,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.lg,
+  dayTitle: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.label,
+    fontWeight: "500",
+    letterSpacing: typography.label * 0.12,
+    textTransform: "uppercase",
   },
-  dayNumber: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  dayWeekday: { color: colors.textMuted, fontSize: typography.label },
-  empty: { paddingVertical: spacing.xl },
-  list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  screen: { gap: spacing.md },
+  empty: { flexGrow: 1 },
+  item: { gap: spacing.xs },
+  left: { color: colors.textMuted, fontSize: typography.note, paddingHorizontal: spacing.lg },
+  list: { gap: spacing.sm, paddingBottom: spacing.xxl, paddingTop: spacing.sm },
+  screen: { gap: spacing.lg },
   sheetTitle: { color: colors.textMuted, fontSize: typography.label },
 });

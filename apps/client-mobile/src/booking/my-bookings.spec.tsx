@@ -102,12 +102,16 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
     });
-    expect(screen.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
-    expect(screen.getByText("No cancelable")).toBeOnTheScreen();
+    // Follow-up 226: card actions are text buttons under a hairline.
+    expect(screen.getByRole("button", { name: "Cancelar reserva" })).toBeOnTheScreen();
+    expect(screen.getByText(/ · faltan menos de 2 h 30$/)).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
     expect(screen.getByText("En lista de espera")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Salir de la lista de espera" })).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Ver historial" })).toBeOnTheScreen();
+    // Walkthrough n.º 8: Próximas | Historial replaces «Ver historial».
+    expect(screen.queryByRole("button", { name: "Ver historial" })).toBeNull();
+    expect(screen.getByRole("tab", { name: "Próximas" })).toBeSelected();
+    expect(screen.getByRole("tab", { name: "Historial" })).toBeOnTheScreen();
     expect(screen.getByLabelText("Mis reservas")).toBeOnTheScreen();
   });
 
@@ -115,8 +119,9 @@ describe("Client My Bookings", () => {
     const screen = await openMyBookings(baseRoutes(() => []));
 
     await waitFor(() => {
-      expect(screen.getByText("Aún no tienes reservas próximas.")).toBeOnTheScreen();
+      expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen();
     });
+    expect(screen.getByText("Cuando reserves una clase, aparecerá aquí.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
 
     await waitFor(() => {
@@ -137,19 +142,15 @@ describe("Client My Bookings", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Cancelar reserva" })).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar reserva" }));
 
     await waitFor(() => {
       expect(screen.getByText("¿Cancelar esta reserva?")).toBeOnTheScreen();
     });
-    // UX-012 / C6: 05's sheet releases the spot in two sentences, not a semicolon.
-    expect(
-      screen.getByText(
-        "La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para volver a reservarlo tendrá que seguir habiendo cupo.",
-      ),
-    ).toBeOnTheScreen();
+    // C05c: the sheet's facts are icon rows.
+    expect(screen.getByText("La clase vuelve a tu plan")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar reserva" }));
 
     await waitFor(() => {
@@ -224,9 +225,9 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByText("Reprogramar clase")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByText("Puedes cambiar a otra clase disponible el mismo día."),
-    ).toBeOnTheScreen();
+    // C06: the current booking is marked as replaced, the others are «de hoy».
+    expect(screen.getByText("Se reemplaza")).toBeOnTheScreen();
+    expect(screen.getByText("Otras clases de hoy")).toBeOnTheScreen();
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();

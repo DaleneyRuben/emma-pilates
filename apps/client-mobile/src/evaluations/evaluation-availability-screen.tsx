@@ -13,7 +13,8 @@ import {
   dayChipLabel,
   initials,
   LoadingState,
-  PrimaryButton,
+  fontFamilies,
+  StateScreen,
   QueryFailure,
   radii,
   Screen,
@@ -60,12 +61,12 @@ function Intro({ rescheduling }: { rescheduling: boolean }) {
     <BodyText>
       {rescheduling
         ? "Tu evaluación ya está pagada. Elige el nuevo horario: el pago se mantiene."
-        : "Reserva tu evaluación gratuita con la nutricionista. Tienes una evaluación disponible por mes."}
+        : "Una evaluación gratis por mes con tu plan."}
     </BodyText>
   );
 }
 
-function NutritionistCard({ name }: { name: string }) {
+function NutritionistCard({ branchName, name }: { branchName: string; name: string }) {
   return (
     <View style={styles.nutritionist}>
       <View style={styles.avatar}>
@@ -73,7 +74,7 @@ function NutritionistCard({ name }: { name: string }) {
       </View>
       <View>
         <Text style={styles.nutritionistName}>{name}</Text>
-        <BodyText style={styles.muted}>Nutricionista · sesiones de 45 min</BodyText>
+        <BodyText style={styles.muted}>{`Nutricionista · 45 min · ${branchName}`}</BodyText>
       </View>
     </View>
   );
@@ -183,13 +184,12 @@ export function EvaluationAvailabilityScreen({
     return (
       <Screen style={styles.screen}>
         {header}
-        <View style={usedMonthStyles.used}>
-          <Text style={usedMonthStyles.usedTitle}>
-            Necesitas un plan activo para reservar tu evaluación.
-          </Text>
-          <BodyText>La evaluación es gratuita con cualquier plan.</BodyText>
-        </View>
-        <PrimaryButton label="Ver planes" onPress={() => navigation.navigate("Plans")} />
+        <StateScreen
+          icon="lock"
+          note="La evaluación es gratuita con cualquier plan."
+          primaryAction={{ label: "Ver planes", onPress: () => navigation.navigate("Plans") }}
+          title="Necesitas un plan activo"
+        />
       </Screen>
     );
   }
@@ -232,7 +232,10 @@ export function EvaluationAvailabilityScreen({
       <ScrollView contentContainerStyle={styles.content}>
         <Intro rescheduling={rescheduling} />
         {nutritionists.size === 1 ? (
-          <NutritionistCard name={openSlots[0]?.nutritionistName ?? ""} />
+          <NutritionistCard
+            branchName={openSlots[0]?.branchName ?? ""}
+            name={openSlots[0]?.nutritionistName ?? ""}
+          />
         ) : null}
         <Text style={usedMonthStyles.label}>Días disponibles</Text>
         <ScrollView
@@ -297,11 +300,11 @@ export function EvaluationAvailabilityScreen({
           </>
         ) : null}
         {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
-        <BodyText style={styles.muted}>
-          {rescheduling
-            ? "Al elegir un horario te pediremos confirmar el cambio."
-            : "Al elegir un horario confirmarás la cita en la siguiente pantalla."}
-        </BodyText>
+        {rescheduling ? (
+          <BodyText style={styles.muted}>
+            Al elegir un horario te pediremos confirmar el cambio.
+          </BodyText>
+        ) : null}
         <BodyText style={styles.muted}>
           {rescheduling
             ? "Puedes reprogramarla hasta 3 horas antes."
@@ -324,34 +327,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.primaryTint,
     borderRadius: radii.pill,
-    height: 48,
+    height: 44,
     justifyContent: "center",
-    width: 48,
+    width: 44,
   },
-  avatarText: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "600" },
+  avatarText: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 16 },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
+  // C13's day chips match Reservar's: 48 × 60 on Lino, the chosen one Palo de rosa.
   day: {
     alignItems: "center",
     backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: radii.inset,
-    borderWidth: 1,
+    borderRadius: radii.button,
     gap: spacing.xxs,
-    minWidth: 56,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    height: 60,
+    justifyContent: "center",
+    width: 48,
   },
   dayHeader: {
     alignItems: "baseline",
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  dayNumber: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "600" },
-  daySelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
+  daySelected: { backgroundColor: colors.primary },
   daySelectedText: { color: colors.white },
-  dayStrip: { flexGrow: 0 },
-  dayTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  dayWeekday: { color: colors.textSecondary, fontSize: typography.label },
+  dayStrip: { flexGrow: 0, flexShrink: 0 },
+  dayTitle: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.label,
+    fontWeight: "500",
+    letterSpacing: typography.label * 0.12,
+    textTransform: "uppercase",
+  },
+  dayWeekday: { color: colors.textMuted, fontSize: typography.tabLabel },
   days: { gap: spacing.sm },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   muted: { color: colors.textMuted, fontSize: typography.note },
@@ -367,14 +376,17 @@ const styles = StyleSheet.create({
   slot: {
     alignItems: "center",
     backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
+    borderRadius: radii.button,
     justifyContent: "center",
-    minHeight: 50,
+    minHeight: 52,
     paddingVertical: spacing.xs,
     width: "31%",
   },
   slotCaption: { color: colors.textMuted, fontSize: typography.label },
-  slotTime: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
+  slotTime: {
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: 18,
+    fontVariant: ["tabular-nums"],
+  },
 });

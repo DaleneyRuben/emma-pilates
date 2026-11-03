@@ -59,10 +59,11 @@ describe("Client Plans", () => {
       expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     });
     // BKM-005: validity in days, the Weekly Cap only on the Plans that have one.
-    expect(screen.getByText("8 clases · válido por 30 días")).toBeOnTheScreen();
-    expect(
-      screen.getByText("36 clases · válido por 90 días · hasta 4 por semana"),
-    ).toBeOnTheScreen();
+    // C08: each Plan is a row of one Lino group with its terms on one line.
+    expect(screen.getByText("Válido por 30 días")).toBeOnTheScreen();
+    // Without a discount there is no launch banner.
+    expect(screen.queryByText("Oferta por tiempo limitado · 15 % en tu plan")).toBeNull();
+    expect(screen.getByText("90 días · hasta 4 por semana")).toBeOnTheScreen();
     expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 2.100")).toBeOnTheScreen();
@@ -73,16 +74,22 @@ describe("Client Plans", () => {
     await waitFor(() => {
       expect(screen.getByText("Válido por 90 días")).toBeOnTheScreen();
     });
-    expect(screen.getByText("90 días de vigencia desde la fecha de inicio.")).toBeOnTheScreen();
-    expect(screen.getByText("Hasta 4 clases por semana.")).toBeOnTheScreen();
+    // C09: «Qué incluye» as icon rows.
+    expect(screen.getByText("90 días desde la fecha de inicio")).toBeOnTheScreen();
+    expect(screen.getByText("Hasta 4 clases por semana")).toBeOnTheScreen();
     expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
-    // 09's bar names the Plan once it loads (MOB-034).
+    // C09's bar names where it opened from; the hero names the Plan.
     expect(
-      within(screen.getByTestId("screen-top-bar")).getByLabelText("Trimestral 36 clases"),
+      within(screen.getByTestId("screen-top-bar")).getByLabelText("Elige tu plan"),
     ).toBeOnTheScreen();
-    expect(screen.getByText("36 clases en cualquier sucursal del estudio.")).toBeOnTheScreen();
-    expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Continuar al pago" })).toBeOnTheScreen();
+    expect(
+      within(screen.getByTestId("plan-hero")).getByText("Trimestral 36 clases"),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("36 clases en cualquier sucursal")).toBeOnTheScreen();
+    expect(screen.getByText("Total")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Pagar Bs 2.100" })).toBeOnTheScreen();
+    expect(screen.getByText("Pagas por QR y subes tu comprobante")).toBeOnTheScreen();
+    expect(screen.queryByText("Descuento 15 %")).toBeNull();
   });
 
   it("shows a founder the discounted price and the struck list price", async () => {
@@ -92,7 +99,7 @@ describe("Client Plans", () => {
         priceCentavos: 47_600,
         listPriceCentavos: 56_000,
       },
-      { ...plans[1], classAllowance: 1, priceCentavos: 8_000 },
+      { ...plans[1], classAllowance: 1, priceCentavos: 8_000, weeklyClassCap: null },
     ];
     const fetcher = routeFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),
@@ -114,13 +121,25 @@ describe("Client Plans", () => {
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 80")).toBeOnTheScreen();
     expect(screen.getAllByText("Bs 560")).toHaveLength(1);
+    // Walkthrough n.º 13: the launch banner, never «fundadora».
+    expect(screen.getByText("Oferta por tiempo limitado · 15 % en tu plan")).toBeOnTheScreen();
+    expect(screen.queryByText(/fundadora/i)).toBeNull();
+    expect(screen.getByText("Válida por 90 días")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: /^Paquete de 8 clases,/ }));
     await waitFor(() => {
-      expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
+      expect(screen.getByText("Desglose")).toBeOnTheScreen();
     });
+    // Walkthrough n.º 14: the breakdown shows the discount.
+    expect(
+      within(screen.getByTestId("plan-hero")).getByText("15 % de descuento"),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Precio del plan")).toBeOnTheScreen();
+    expect(screen.getByText("Descuento 15 %")).toBeOnTheScreen();
+    expect(screen.getByText("−Bs 84")).toHaveStyle({ color: "#7D4F4B" });
     expect(screen.getAllByText("Bs 476").length).toBeGreaterThan(0);
-    expect(screen.getByText("Bs 560")).toBeOnTheScreen();
+    expect(screen.getAllByText("Bs 560").length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "Pagar Bs 476" })).toBeOnTheScreen();
   });
 
   it("reads the price, and the list price when shown, in the plan card label", async () => {

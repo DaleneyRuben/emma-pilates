@@ -106,7 +106,6 @@ export function RegistrationScreen({
       footer={
         <FooterPrompt action="Inicia sesión" onPress={onBack} prompt="¿Ya tienes una cuenta?" />
       }
-      tagline
     >
       {error === null ? null : <FormAlert>{error}</FormAlert>}
       {waitSeconds > 0 ? (

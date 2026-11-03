@@ -125,7 +125,7 @@ describe("Client Home Promotions carousel", () => {
       expect(screen.queryByLabelText("Cargando promociones")).not.toBeOnTheScreen();
     });
     expect(screen.queryByText("Novedades del estudio")).not.toBeOnTheScreen();
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Tu plan · Paquete de 8 clases")).toBeOnTheScreen();
   });
 
   it("hides the section when the list fails and keeps the rest of Home", async () => {
@@ -141,7 +141,7 @@ describe("Client Home Promotions carousel", () => {
       expect(screen.queryByLabelText("Cargando promociones")).not.toBeOnTheScreen();
     });
     expect(screen.queryByText("Novedades del estudio")).not.toBeOnTheScreen();
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Tu plan · Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeOnTheScreen();
   });
 
@@ -198,6 +198,6 @@ describe("Client Home Promotions carousel", () => {
       expect(screen.queryByText("Novedades del estudio")).not.toBeOnTheScreen();
     });
     expect(reads).toBe(2);
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Tu plan · Paquete de 8 clases")).toBeOnTheScreen();
   });
 });

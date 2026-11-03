@@ -600,83 +600,86 @@ resettable. Never load them into production.
 
 Keep the backend and Client Expo server running. In the iOS Simulator, open the
 Client app, enter `lucia@example.com` and the fixture password, then tap
-**Iniciar sesión**. The app should open **Inicio** with "Hola, Lucía", the
-"Paquete de 8 clases" card marked **Activa** with 5 of 8 classes and its
-paid-through date, and an enabled **Reservar una clase** action. Log in as
-`mariana@example.com` to see the **Comprar un plan** card and the disabled
-booking action instead. Close and reopen the app; startup Session restoration
-should return to **Inicio** without asking for the password again.
+**Iniciar sesión**. The access screens name «Emma Pilates Studio» in Lora,
+with no tagline (follow-up 227). The app should open **Inicio** (MOB-074,
+board `C02`): today's date in small capitals over "Hola, Lucía", and on the
+right a Lino bell (with the unread count in a Rosa profundo pill; it opens
+**Notificaciones** with a back arrow) and her avatar (it opens **Perfil**).
+The plan is the Rosa profundo hero card: «Tu plan · Paquete de 8 clases» with
+an **Activo** pill (**Por vencer** near the end), «5 clases restantes» with
+the number in large Lora, a white bar, «Vence el …» and the white **Mi plan**
+pill (no underlined «Ver detalle»). With a booked class, «Tu próxima clase»
+shows its day tile, the class, and «08:00 · Trainer · Branch», and opens
+**Mis reservas**. «Accesos rápidos» are three Lino tiles (Reservar una clase,
+Evaluación nutricional, Invita a una amiga). Log in as `mariana@example.com`
+to see the no-plan hero instead: a «Desde Bs …» pill, «Elige tu plan y
+empieza a moverte», «Mat y Reformer · paga por QR o en el estudio», and the
+white **Comprar un plan** pill; the booking row is locked at 60 % with «Necesitas
+un plan activo», and the two tiles read «Agenda tu cita» and «Su primera clase
+es gratis». Close and reopen the app; startup Session restoration should
+return to **Inicio** without asking for the password again.
 
-The tab bar at the bottom is white with a thin sand line above it and four
-line icons (a house, a calendar, a clock, a person) over **Inicio**,
-**Reservar**, **Mis Reservas**, and **Perfil**. The current tab's icon and label
-are Palo de rosa; the others are a soft grey. On an iPad the labels stay under
-the icons.
+The tab bar at the bottom is Lino with four line icons over **Inicio**,
+**Reservar**, **Mis Reservas**, and **Perfil**. The **Perfil** tab carries no
+unread pill any more (owner, 2026-11-02): the count is on the Inicio bell.
+Every screen with a back arrow hides the tab bar; it returns on the tab's
+first screen. On an iPad the labels stay under the icons.
 
-From Home, **Ver detalle** opens **Mi plan** and **Comprar un plan** opens
-**Elige tu plan**; tapping a Plan shows its detail with the price breakdown
+**Comprar un plan** opens **Elige tu plan**; tapping a Plan shows its detail
 (Test 10 walks through the payment). The **Perfil** tab shows the Account
-summary, a **Mi plan** row, and **Cerrar sesión**; **Editar** lets you change
+summary and the sections described in Test 9 A; **Editar** lets you change
 the name and phone and saves through the API (changing the email is Test 34).
 
 The **Reservar** tab lists the fixture Sessions for the selected Branch, day,
-and Class Type (past Sessions of today are hidden; full ones show **Lleno**).
-A day without Sessions centres "No hay clases este día."; a Class Type chip
-that matches none of the day's Sessions reads "No hay clases con este
-filtro" instead (any Branch on a Sunday, which no fixture schedule covers;
-Prenatal at Centro).
-Each Session is a white card: the time in small spaced capitals over the Class
-Type in Lora, the seat pill on the right («N cupos» in Palo de rosa oscuro on
-Palo de rosa tinte; a full class reads **Lleno** in grey on a neutral sand
-pill, never red; MOB-047), and under a thin rule the Trainer after a small
-person icon with a Palo de rosa chevron on the right (full classes keep the
-chevron too; MOB-042). The **Sucursal:** pill (a pin, the
-Branch name in bold, and a small grey chevron pointing down, up while the
-list is open) opens «Elige una sucursal» with the current Branch's name in
-Palo de rosa profundo and a check on its right. The day and Class Type chip
-rows keep their height whether the Branch list is open or the day has no
-classes, on the iPhone and the iPad alike.
-Tapping a Session opens its detail. Under the title the Trainer is her
-initials in a circle, her name, and «Entrenadora certificada» on the line
-under the name (UX-012). Under the facts card the capacity is a
-bare block, not a card (MOB-049): «N de M cupos disponibles» with the number
-in Lora, «N reservados» in small grey text on the right, and a thin Palo de
-rosa bar under them on a Palo de rosa tinte track, filled by the booked
-share. A full Session keeps the count at «0 de M» beside the same grey
-**Lleno** pill as the list (never red) and greys the bar. **Reservar**
-creates a real Booking and lands on **Mis reservas** with a "Reserva
-confirmada" notice and the updated class balance. A full Session offers
-**Unirme a la lista de espera** while it is still outside the Cancellation
-Window. Inside it (a full class less than 2 h 30 away, or whatever window
-the studio rules currently hold) the button is gone and the note reads
-«Falta poco para la clase, así que la lista de espera ya cerró.» (Test 76).
-A Client without remaining classes sees
-the disabled button with a link to the Plans.
+and Class Type (past Sessions of today are hidden). With one Branch it shows
+«Sucursal **Centro**» fixed, without a chevron; from the second Branch the
+**Sucursal:** pill opens «Elige una sucursal» (walkthrough n.º 7). The day
+chips are 48 × 60 Lino tiles (today reads «Hoy»; the chosen day is Palo de
+rosa) and the Class Type chips are Lino pills (the chosen one Rosa profundo).
+The list starts with the day in small capitals and «N clases», then one Lino
+row per Session: the start in Lora 20, the Class Type over «Trainer · 50 min»,
+the seat pill («N cupos» on Rosa tinte; **Lleno** on Arena, never red) and a
+quiet chevron. Empty states have actions (walkthrough n.º 6): a Class Type
+with nothing that day reads «Hoy no hay {tipo}» (or «El martes no hay …»)
+with **Ver todas las clases** (clears the filter) and, when that type has a
+class later in the week, **Ver el jueves 5**; a day with no classes at all
+reads «Este día no hay clases» with **Ver mañana** (or **Ver el …** for
+another day). A Sunday at any Branch and Prenatal at Centro reach them.
+Tapping a Session opens its detail (`C04`): the Rosa profundo hero with the
+date, the Class Type, «08:00 – 08:50 · 50 minutos», the free seats in large
+Lora over «de 12 cupos libres» and a white bar (**Lleno** as the hero's pill
+when full); «La clase» as rows (the Trainer's initials, name and
+«Entrenadora», «Sucursal», and «Cancela sin costo hasta las HH:MM», or «Te
+avisamos si se libera un cupo» when full); «Sobre la clase»; and at the
+bottom «Se descuenta 1 clase de tu plan» over **Reservar** (or «La lista de
+espera no usa clases de tu plan» over **Unirme a la lista de espera**).
+**Reservar** creates a real Booking and lands on **Mis reservas** with the
+Rosa profundo toast «Reserva confirmada · Te quedan N clases en tu plan»,
+which stays until closed or the screen changes; the permission sheet (Test
+46) now reads «No te pierdas ninguna clase». Inside the Cancellation Window a
+full class drops the waitlist offer and reads «Falta poco para la clase, así
+que la lista de espera ya cerró.» (Test 76). A Client without remaining
+classes sees the disabled button with **Comprar un plan**.
 
-**Mis reservas** lists upcoming Bookings and Waitlist entries. A Booking more
-than 2 h 30 before its start offers **Cancelar** behind the shared
-confirmation sheet (UX-014: the same white sheet as «¿Cerrar sesión?», with a
-Lora title; the class returns to the balance, «el lugar queda libre para otra clienta.
-Para volver a reservarlo tendrá que seguir habiendo cupo.»); one inside that window shows **No
-cancelable** and **Reprogramar** to another Session of the same day; a
-Waitlist entry offers **Salir de la lista de espera**. **Reprogramar** opens
-**Reprogramar clase**: the current Booking in a muted box, then the day's
-other classes with seats as the same white cards as **Reservar** (the spaced
-time over the Lora Class Type, and under the thin rule the Trainer after the
-person icon with the «N cupos» pill in Palo de rosa oscuro on Palo de rosa
-tinte at the right, where the booking list's cards show a chevron). Tapping
-a card draws its border in Palo de rosa (2 px) and enables **Confirmar
-cambio** (MOB-048). With nothing upcoming,
-the screen offers **Reservar una clase**. **Ver historial** opens **Historial
-de clases**: «Has asistido a» over «N clases desde <mes>» in large Lora, then
-one group per month («Septiembre 2026» with its count, «4 clases», over a
-`#D8C9BB` rule) whose classes are rows drawn straight on the screen, not
-cards: a day column (the day of the month in Lora, the weekday in small
-capitals), the Class Type in Lora, and «Entrenadora · Sucursal» under it,
-separated by thin `#EFE7DE` rules. With no attendance yet the screen centres
-a quiet clock, «Aún no tienes clases en tu historial.», and «Aquí aparecerán
-tus clases una vez que registremos tu asistencia en el estudio.» (the
-fixtures reach this until a Trainer records attendance).
+**Mis reservas** (`C05`) has **Próximas | Historial** tabs under the title
+(the old **Historial de clases** screen is now the second tab; walkthrough
+n.º 8). Each upcoming Booking is a Lino card: a day tile, the Class Type in
+Lora 20, «HH:MM – HH:MM · Trainer · Branch», then, under a hairline, the text
+button **Cancelar reserva** in Error. Inside the 2 h 30 window the line ends
+«· faltan menos de 2 h 30» and the button is **Reprogramar** in Rosa enlace;
+a Waitlist entry shows «En lista de espera» and **Salir de la lista de
+espera**. **Cancelar reserva** opens the sheet «¿Cancelar esta reserva?» with
+the class and «La clase vuelve a tu plan» as rows and the solid Error
+**Sí, cancelar reserva**. With nothing upcoming the tab shows a calendar,
+«Aún no tienes reservas», «Cuando reserves una clase, aparecerá aquí.» and
+**Reservar una clase**. **Reprogramar** (`C06`) shows «Tu reserva actual»
+marked **Se reemplaza**, then «Otras clases de hoy» as rows of one Lino group
+(the start in Lora, the class over «Trainer · N cupos», a radio; the chosen
+row on Rosa tinte), «Tu lugar de las HH:MM se libera al confirmar» and
+**Confirmar cambio**; with no options it reads «No hay otras clases hoy» with
+**Volver a mis reservas**. The **Historial** tab keeps the monthly list
+(«Has asistido a» and the month groups); with no attendance it centres a
+clock and «Todavía no tomaste clases», without a button.
 
 Every list keeps itself current (UX-004). With **Mis reservas** open, switch
 to **Inicio**, book a class for Lucía from Swagger or the Staff app, and come
@@ -1581,18 +1584,20 @@ Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
 
 ### A. Client Perfil
 
-Log in as `sofia@example.com` and open the **Perfil** tab. Below the summary
-card you should see the rows **Mi plan**, **Evaluación nutricional**, **Mis
-evaluaciones**, **Mis referidos**, **Notificaciones**, and
-**Cambiar contraseña**, each with its line icon in Palo de rosa and a quiet
-19 pt chevron (Icono tenue, MOB-041) at its right end, an outlined
-**Cerrar sesión** button, and the footer "Emma Pilates Studio · versión 1.0.1"
-(the installed app version, Test 76).
-With unread notifications the Notificaciones row shows the count in a Palo de
-rosa profundo pill («9+» above nine), and so does the **Perfil** tab itself
-from every screen (VoiceOver reads "Perfil, 2 notificaciones sin leer"
-and skips the pill's digits, UX-020). The Notificaciones row says the same
-count, so a reader does not hear the digits twice.
+Log in as `sofia@example.com` and open the **Perfil** tab (`C18`). Below the
+summary card come three sections of v2 icon rows (a Rosa tinte disc, the
+label, a quiet chevron): «Tu plan y tus clases» (**Mi plan** with its state,
+**Evaluación nutricional**, **Mis evaluaciones**, **Invita a una amiga**),
+«Preferencias» (**Notificaciones** with «N sin leer» on the right, and the
+**Recibir promociones** switch, with «Usamos tu nombre, correo y teléfono
+para enviarte ofertas del estudio.» under the group), and «Cuenta»
+(**Cambiar contraseña**, **Enviar comentarios**, and **Cerrar sesión** as the
+last row, which opens the «¿Cerrar sesión?» sheet). Then the discreet
+**Cerrar mi cuenta** text button in Error and "Emma Pilates Studio · versión
+1.0.1" (the installed app version, Test 76). The **Perfil** tab no longer
+carries the unread pill; the count is on the Inicio bell (VoiceOver reads
+"Notificaciones, 2 sin leer"). From the bell, an empty inbox offers **Volver
+al inicio**.
 
 **Profile photo (MOB-020).** The summary card's circle shows two initials
 until a photo is attached. Put an image into the Simulator's library first
@@ -1709,16 +1714,19 @@ no Plan and no referrals. Since PAY-005 nobody earns, holds, or spends Credit
 
 ### A. The referral code from Perfil
 
-Log in as `sofia@example.com` and open **Perfil**. The menu reads **Mi
-plan**, **Evaluación nutricional**, **Mis evaluaciones**, **Mis referidos**,
-**Notificaciones**, and **Cambiar contraseña**; there is no **Mi crédito**.
+Log in as `sofia@example.com` and open **Perfil** (`C18`). Under «Tu plan y
+tus clases» the rows read **Mi plan**, **Evaluación nutricional**, **Mis
+evaluaciones**, and **Invita a una amiga**; there is no **Mi crédito**.
 
-Tap **Mis referidos**. The card shows the code `REF-SOFIA` with a
-**Compartir** button that opens the system share sheet with a message that
-contains the code. Below it, one line: "Comparte tu código. Tu amiga recibe una
-clase gratis, una sola vez. Cuando compre su primer plan, tú ganas una clase."
-Nothing else mentions Credit (PAY-005). Mariana sees the same screen with
-`REF-MARIANA`.
+Tap **Invita a una amiga** (`C16`). «Tu código» shows `REF-SOFIA` large and
+spaced (long-press it to copy; there is no **Copiar** button yet), then
+**Compartir**, which opens the system share sheet with a message that contains
+the code. «Cómo funciona» lists three numbered steps («Compartes tu código»,
+«Tu amiga toma una clase gratis», «Compra su primer plan y tú ganas una
+clase») over «Una amiga por mes. La clase gratis es una sola vez para ella.».
+«Tus invitadas» lists each friend with her initials and status; with none it
+reads «Aún no invitaste a nadie» with **Compartir tu código**. Nothing
+mentions Credit (PAY-005). Mariana sees the same screen with `REF-MARIANA`.
 
 ### B. Buy a Plan with a bank transfer
 
@@ -1730,42 +1738,47 @@ pnpm --filter @pilates/backend start:worker
 ```
 
 As Sofía, tap **Comprar un plan** on Home (her Plan is expired), pick
-**Paquete de 8 clases**, and check **Detalle del plan**: price `Bs 560` and
-**Total a pagar** `Bs 560`, with no Credit line. Tap **Continuar al pago**.
+**Paquete de 8 clases**, and check **Detalle del plan** (`C09`): the Rosa
+profundo hero with the price `Bs 560`, «Qué incluye» as rows, «Fecha de
+inicio», and «Desglose» with **Precio del plan** and **Total** `Bs 560` (a
+founder price adds the struck list price, a «15 % de descuento» pill, and a
+«Descuento 15 %» row with «−Bs …» in Rosa enlace), with no Credit line. Elige
+tu plan shows «Oferta por tiempo limitado · 15 % en tu plan» above the list
+while the discount applies. Tap **Pagar Bs 560**, fixed at the bottom under
+«Pagas por QR y subes tu comprobante».
 
-**Pago por transferencia** shows the amount, then a card with the studio QR
-(locally the placeholder image from `apps/backend/.data/transfer-qr.png`) and
-the line "Escanea el código con tu app bancaria y transfiere el monto exacto."
+**Pago por transferencia** (`C10`) shows the amount on the Rosa profundo hero
+(«Monto exacto a transferir», «Plan … · empieza hoy»), then «1 · Paga con el
+QR del estudio» with the studio QR (locally the placeholder image from
+`apps/backend/.data/transfer-qr.png`) and the line "Escanéalo con tu app
+bancaria y transfiere el monto exacto."
 and nothing else: since PAY-003 the QR is the only transfer instruction, with no
-beneficiary, bank, or account line (Test 41 checks the endpoint). Tap **Sube tu comprobante de
-transferencia**: the system photo picker opens with no permission prompt on
+beneficiary, bank, or account line (Test 41 checks the endpoint). Under «2 ·
+Sube tu comprobante», tap **Elegir comprobante**: the system photo picker opens with no permission prompt on
 either platform (MOB-065; the Simulator ships with sample photos). Picking one re-encodes it as
 a JPEG of at most 2048 px on its longest side (UPL-003, Test 53), uploads it
 through `/api/v1/uploads` (hash, PUT, finalize, wait until `READY`) and attaches
-it to the Purchase Intent; the thumbnail appears as **Comprobante adjunto** and
-**Enviar comprobante** becomes available.
+it to the Purchase Intent; the row shows the thumbnail, «Comprobante listo» and
+a × to remove it, and **Enviar comprobante** becomes available.
 
-Under the receipt, **Datos para la factura** (PAY-007, follow-up 145) offers
-**Con factura** and **Sin factura**. Walked on 2026-10-23 on the iPhone 16 Pro,
-the iPad Pro 11-inch (M4), and the Android emulator: the card renders with both
-choices and the walk stopped before **Enviar comprobante**, so no Payment was
-recorded. Sofía has never given invoice data, so
-**Sin factura** is chosen with "Tu compra se registra sin datos de factura."
-Tap **Con factura**: **NIT o CI** and **Nombre o razón social** appear and
+Under the receipt, **¿Necesitas factura?** (walkthrough n.º 14) is a closed
+row: closed, the purchase goes without an invoice. Tap it: **NIT o CI** and
+**Nombre o razón social** appear and
 **Enviar comprobante** waits until both are filled (a NIT or CI takes digits,
 letters, and hyphens; "45/67" shows "Usa solo números, letras y guiones.").
-Type `4567891` and `Sofía Guzmán` and tap **Enviar comprobante**. Her next
-purchase opens on **Con factura** with those values and "Usamos los datos de
-tu última compra. Puedes cambiarlos." (Test 27 shows them to the
+Type `4567891` and `Sofía Guzmán` and tap **Enviar comprobante**. On her next
+purchase the row starts closed again; opening it shows those values and
+"Usamos los datos de tu última compra. Puedes cambiarlos." (Test 27 shows them to the
 Administrator).
 
-**Estado del pago** reads "Tu pago está en revisión" with "Un administrador va
-a confirmar tu comprobante pronto. Te avisaremos apenas esté listo." and a
-**Volver al inicio** button. The status is a white line icon on a solid
-semantic disc — an hourglass on amber while it waits, a check on green once
-it is confirmed, a cross on red if it is rejected — never an emoji
-(UX-006). VoiceOver reads the disc as "Pago en revisión", "Pago confirmado",
-or "Comprobante rechazado". While the transfer is under review, **Comprar
+**Estado del pago** (`C11`) is centred: an hourglass in a Rosa tinte disc,
+"Tu pago está en revisión", the owner's copy "Nuestro equipo está revisando
+tu comprobante. Suele tomar unos minutos en horario de atención. Te
+avisaremos apenas esté listo.", the Plan and the amount as rows, and the
+**Volver al inicio** button (no link). A confirmed payment shows a check,
+"¡Pago confirmado!", «Tu plan ya está activo. Nos vemos pronto en el
+estudio.», the Plan and its end, **Reservar una clase** and **Ir al inicio**;
+never an emoji and never the system green. While the transfer is under review, **Comprar
 un plan** answers with the pending Payment instead of a new Intent. Coming back to **Continuar al pago** with an open Intent
 reopens the same Intent (the API answers `409 purchase_intent_open_exists`).
 
@@ -1802,9 +1815,10 @@ rechazado". The same endpoints remain available in Swagger (Test 7,
 Back in the Client app, after a confirmation Sofía's Home shows the new Plan
 and the inbox row "Tu pago fue confirmado…" opens **Estado del pago** with
 "¡Pago confirmado!" and **Ir al inicio**. After a rejection the same screen
-reads "Tu comprobante fue rechazado", shows the reason, explains "Sube un
-nuevo comprobante para activar tu plan.", and **Subir un nuevo comprobante** opens a fresh **Pago por transferencia**
-for the same Plan.
+shows an alert on the Error disc, "No pudimos confirmar tu pago", the reason
+followed by "Sube uno nuevo para activar tu plan.", the Plan and «Monto
+esperado», and **Subir otro comprobante** opens a fresh **Pago por
+transferencia** for the same Plan.
 
 ### D. Cancel a Session as the Administrator
 
@@ -2151,24 +2165,34 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
 
 **In the Client app** as `lucia@example.com`:
 
-1. Open **Perfil → Evaluación nutricional**. Only days with an open turno
-   appear; each turno is 45 minutes and disappears 3 hours before it starts.
-   With more than one Branch, each turno names its Branch.
-2. Tap a time, check the summary on **Confirmar evaluación** ("Es gratuita —
-   no usa clases de tu plan." and "…puedes cancelarla desde Mis evaluaciones
-   hasta 3 horas antes."), and tap **Confirmar**. You land on **Mis
-   evaluaciones** with "Evaluación confirmada".
-3. Tap **Cancelar** and confirm: the sheet says the turno is freed and "Podrás
+1. Open **Perfil → Evaluación nutricional** (`C13`): «Una evaluación gratis
+   por mes con tu plan.», the Nutritionist with «Nutricionista · 45 min ·
+   Branch», then the day chips (48 × 60 Lino tiles, as in Reservar). Only
+   days with an open turno appear; each turno is 45 minutes and disappears 3
+   hours before it starts. With more than one Branch, each turno names its
+   Branch.
+2. Tap a time and check **Confirma tu cita** (`C14`): the Rosa profundo hero
+   with the date, the time in large Lora, and «45 minutos · Nutricionista ·
+   Branch», then three rows («Es gratis: no usa clases de tu plan», «Te
+   avisamos un día y una hora antes», «Cancela hasta 3 horas antes»). Tap
+   **Confirmar evaluación**. You land on **Mis evaluaciones** (`C15`) with the
+   «Evaluación confirmada» toast.
+3. Each upcoming card shows a date tile, «HH:MM · Nutricionista» in Lora,
+   «45 min · cancela hasta 3 h antes», and the text button **Cancelar
+   evaluación** in Error («Anteriores» are rows with «Realizada» or
+   «Incluida»). Tap **Cancelar evaluación** and confirm: the sheet says the turno is freed and "Podrás
    reservar otra evaluación para este mes." (or "para noviembre" when the
    Evaluation is next month's). Inside 3 hours of the start the card shows
-   "Ya no se puede cancelar" instead. With nothing upcoming the list says this
-   month's Evaluation is still free, or, once it took place, "Ya usaste tu
+   "… · ya no se puede cancelar" instead. With nothing upcoming the list
+   shows «No tienes evaluaciones próximas» with «Tu evaluación de este mes
+   sigue disponible y es gratis.» and **Reservar evaluación**, or, once it took place, "Ya usaste tu
    evaluación de este mes. Puedes reservar la de noviembre, también gratuita."
 4. Book one again and open **Evaluación nutricional**: days in that month
    disappear. When no unused month has open turnos, the screen shows "Ya usaste
    tu evaluación de este mes." (naming the month when the used one is a later
-   month). A Client without an active plan sees "Necesitas un plan activo…"
-   with **Ver planes**. A studio cancellation reaches the inbox as "…Ya puedes
+   month). A Client without an active plan sees the centred «Necesitas un plan
+   activo» with «La evaluación es gratuita con cualquier plan.» and **Ver
+   planes**. A studio cancellation reaches the inbox as "…Ya puedes
    reservar otra este mes." (or "…otra para octubre.").
 
 **In the Staff app** as `gabriela.flores@example.com`:
@@ -2265,21 +2289,23 @@ In the Client app as `lucia@example.com`:
    admin web (Test 33, **Dejar de publicar**) and pull Inicio down to
    refresh: the section is gone. On an iPad the card stops at 720 pt and the
    next one peeks on the right.
-1. **Inicio** shows the shortcuts under an **Accesos rápidos** eyebrow
-   (MOB-042): a full-width **Reservar una clase** card with a calendar in a
-   tinted tile, the title in Lora, "Horarios de esta semana", and a Palo de
-   rosa chevron (without an active Plan the card turns Arena with a grey
-   calendar and title, "Necesitas un plan activo para reservar", and a quiet
-   lock instead of the chevron), over two half-width tiles with no chevron:
-   **Evaluación nutricional** (a trend icon; "Próxima: …" when one is booked,
-   otherwise "Agenda tu cita del mes"; it opens Mis evaluaciones or the
-   availability) and **Mis referidos** (a person icon; "N amigas invitadas" or
-   "Comparte tu código").
-2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with **Inicio** and
-   **Vence el** dates such as "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
-   termine."; while expiring, an amber banner; once expired, "Último plan",
-   "Venció el …", and **Comprar un plan**. As `isabel@example.com` (no
-   classes left) the classes line reads "Sin clases disponibles". Mi plan
+1. **Inicio** shows the shortcuts under «Accesos rápidos» (`C02`): three
+   Lino tiles with a Rosa tinte icon disc each, **Reservar una clase**,
+   **Evaluación nutricional** (it opens Mis evaluaciones when one is booked,
+   otherwise the availability; VoiceOver reads «Próxima: …» as its hint) and
+   **Invita a una amiga**. Without an active Plan the booking shortcut is a
+   full-width row at 60 % with «Necesitas un plan activo» and a lock, over
+   two tiles with «Agenda tu cita» and «Su primera clase es gratis».
+2. The hero's **Mi plan** pill opens **Mi plan** (`C12`): the Rosa profundo
+   hero («Tu plan · …», **Activo**, the classes left in large Lora «de N
+   clases restantes», «Vence el …»), «Detalles» as rows (Empezó, Vence,
+   Siguiente plan when there is one), «Renovación anticipada» with **Renovar
+   mi plan** (it opens Elige tu plan) and «El nuevo empieza el …, al día
+   siguiente de que venza este», and **Reservar una clase** at the bottom;
+   while expiring, a Rosa tinte notice; once expired, «Último plan · …»,
+   **Vencido**, «0 clases disponibles», «Venció el …», and «Elige tu próximo
+   plan» with **Comprar un plan**. As `isabel@example.com` (no classes left)
+   the hero reads «0 de N clases restantes». Mi plan
    refreshes when it regains focus and on pull (UX-004): confirm Lucía's
    pending transfer in the admin web while the screen is open elsewhere and
    it shows the new Plan on its next focus, without the loading logo.
@@ -2399,8 +2425,11 @@ the login fields and button (`login-email`, `login-password`,
 where it is the behaviour under test (a refusal message, a confirmation).
 
 Since NOT-002 a booking, an Evaluation, and a Staff role's first home can
-raise the notification sheet «¿Te avisamos?» while the system has not asked
-yet. The flows answer «Ahora no» through `subflows/dismiss-push-permission.yaml`
+raise the notification sheet while the system has not asked yet (the Client
+app titles it «No te pierdas ninguna clase»; the Staff app keeps «¿Te
+avisamos?»). The flows answer «Ahora no» through `subflows/dismiss-push-permission.yaml`,
+which finds the sheet by its `push-permission-sheet` and
+`push-permission-decline` test ids
 (an optional step, so a device that already answered runs as before), and they
 do it **before** asserting «Reserva confirmada» or «Evaluación confirmada»:
 the sheet hides the screen beneath it from Maestro, and those notices last
@@ -3524,6 +3553,15 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 The following are not ready for manual product testing:
 
+- parts of the client v2 boards (MOB-074) the API or the app cannot do yet:
+  «¡Quedan solo N lugares con 15 % de descuento!» on Elige tu plan (the API
+  does not expose the places left, BKM-019), the «Más elegido» pill (no Plan
+  field), **Copiar** on Invita a una amiga (no clipboard module in the
+  builds; long-press the code instead), readable codes such as «LUCIA»
+  (clients still get `REF-…`), «Tomó su clase» (the API only knows the class
+  was booked), «Pagado Bs … · QR» on Mi plan (the subscription carries no
+  payment), and the v2 restyle of the shared registration, recovery and
+  activation screens beyond the brand name;
 - the mobile apps were not walked for BKM-014: the invitation screen was
   verified by Jest and the registration rules by curl, not on a device
   (Test 86);
@@ -4470,8 +4508,10 @@ key (gate 9), so the Simulators are checked with `xcrun simctl push`.
 **A. The permission sheet (all three devices).**
 
 1. Client: sign in as `lucia@example.com`, open Reservar, book a class.
-   After «Reserva confirmada» the sheet «¿Te avisamos?» rises with the Client
-   text. It does **not** show at sign-in. It also follows a Waitlist join
+   After «Reserva confirmada» the sheet rises centred on Marfil with a bell
+   disc, «No te pierdas ninguna clase» and «Te avisamos antes de cada clase y
+   cuando haya novedades sobre tus reservas, tu plan o tus pagos.» (the Staff
+   app keeps «¿Te avisamos?» with its own text). It does **not** show at sign-in. It also follows a Waitlist join
    and «Evaluación confirmada».
 2. Tap «Activar notificaciones»: only now does the system prompt appear
    («Allow Emma Pilates to send you notifications?» on Android, «"Emma

@@ -80,13 +80,14 @@ async function openHistory(entries: unknown[]) {
   await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: "Ver historial" })).toBeOnTheScreen();
+      expect(screen.getByRole("tab", { name: "Historial" })).toBeOnTheScreen();
     },
     { timeout: 5_000 },
   );
-  await fireEvent.press(screen.getByRole("button", { name: "Ver historial" }));
+  // Walkthrough n.º 8: the history is the second tab of Mis reservas.
+  await fireEvent.press(screen.getByRole("tab", { name: "Historial" }));
   await waitFor(() => {
-    expect(screen.getByText("Historial de clases")).toBeOnTheScreen();
+    expect(screen.getByRole("tab", { name: "Historial" })).toBeSelected();
   });
 
   return screen;
@@ -111,7 +112,7 @@ describe("Client Class History", () => {
     expect(
       screen.getByLabelText("sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
     ).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar" })).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cancelar reserva" })).not.toBeOnTheScreen();
   });
 
   // MOB-040: the 07 frame draws rows between rules on Superficie, not cards.
@@ -138,21 +139,11 @@ describe("Client Class History", () => {
     });
   });
 
-  it("shows a calm empty state", async () => {
+  it("shows the empty history without a button", async () => {
     const screen = await openHistory([]);
 
     await waitFor(() => {
-      expect(screen.getByText("Aún no tienes clases en tu historial.")).toBeOnTheScreen();
-    });
-  });
-
-  // Follow-up 225 §6: the empty history is the v2 state block, a Rosa
-  // profundo clock over a Lora 24 title and the frame's note.
-  it("centres the empty state with the clock and the frame's note", async () => {
-    const screen = await openHistory([]);
-
-    await waitFor(() => {
-      expect(screen.getByText("Aún no tienes clases en tu historial.")).toHaveStyle({
+      expect(screen.getByText("Todavía no tomaste clases")).toHaveStyle({
         fontFamily: "Lora_400Regular",
         fontSize: 24,
       });
@@ -160,11 +151,6 @@ describe("Client Class History", () => {
     expect(
       screen.getByTestId("empty-state-icon-clock", { includeHiddenElements: true }),
     ).toHaveProp("stroke", "#93615D");
-    expect(
-      screen.getByText(
-        "Aquí aparecerán tus clases una vez que registremos tu asistencia en el estudio.",
-      ),
-    ).toBeOnTheScreen();
-    expect(screen.queryByText("Aquí verás las clases a las que asististe.")).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Reservar una clase" })).toBeNull();
   });
 });

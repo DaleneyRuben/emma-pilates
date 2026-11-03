@@ -115,21 +115,16 @@ describe("Client Home quick actions and notification destinations", () => {
     clearMobileQueryCache();
   });
 
-  it("shows the Evaluation and Referral quick actions with their summaries", async () => {
+  it("opens Mis evaluaciones from the Evaluation tile when one is booked", async () => {
     const screen = await openApp(routeFetcher(routes()));
 
+    // The tiles carry no note with a Plan (follow-up 227); the summary is the hint.
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Evaluación nutricional: Próxima: 2 de octubre" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByHintText("Próxima: 2 de octubre")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByRole("button", { name: "Invita a una amiga: 2 amigas invitadas" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByHintText("2 amigas invitadas")).toBeOnTheScreen();
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Evaluación nutricional: Próxima: 2 de octubre" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Evaluación nutricional" }));
     await waitFor(() => {
       expect(screen.getByText("Mis evaluaciones")).toBeOnTheScreen();
     });
@@ -147,35 +142,22 @@ describe("Client Home quick actions and notification destinations", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Evaluación nutricional: Agenda tu cita del mes" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByHintText("Agenda tu cita del mes")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByRole("button", {
-        name: "Invita a una amiga: Invita a una amiga a una clase gratis",
-      }),
-    ).toBeOnTheScreen();
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Evaluación nutricional: Agenda tu cita del mes" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Evaluación nutricional" }));
     await waitFor(() => {
       expect(screen.getByText("Evaluación nutricional")).toBeOnTheScreen();
     });
   });
 
-  it("opens Mis evaluaciones and Mis reservas from their notifications", async () => {
+  it("opens Notificaciones from the Inicio bell, then Mis evaluaciones and Mis reservas", async () => {
     const screen = await openApp(routeFetcher(routes()));
-    await fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
+    // The walkthrough (n.º 11): the bell carries the unread count, not the Perfil tab.
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Notificaciones, 2 notificaciones sin leer" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Notificaciones, 2 sin leer" })).toBeOnTheScreen();
     });
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Notificaciones, 2 notificaciones sin leer" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Notificaciones, 2 sin leer" }));
     await waitFor(() => {
       expect(screen.getByText("El estudio canceló tu evaluación nutricional.")).toBeOnTheScreen();
     });

@@ -9,7 +9,7 @@ import {
 
 type NotificationsNavigation = {
   goBack: () => void;
-  navigate: (...route: ClientNotificationRoute) => void;
+  navigate: (...route: ClientNotificationRoute | ["HomeTab", { screen: "Home" }]) => void;
 };
 
 export function ClientNotificationsScreen() {
@@ -18,6 +18,10 @@ export function ClientNotificationsScreen() {
 
   return (
     <NotificationsScreen
+      emptyAction={{
+        label: "Volver al inicio",
+        onPress: () => navigation.navigate("HomeTab", { screen: "Home" }),
+      }}
       emptySupport="Aquí te avisaremos sobre tus clases, pagos y evaluaciones."
       fetcher={fetcher}
       onBack={() => navigation.goBack()}

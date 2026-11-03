@@ -77,12 +77,7 @@ export function RecoveryRequestScreen({
   }
 
   return (
-    <AuthenticationScreen
-      brand={!limited}
-      tagline={!teamAccess}
-      teamAccess={teamAccess}
-      topBar={topBar}
-    >
+    <AuthenticationScreen brand={!limited} teamAccess={teamAccess} topBar={topBar}>
       <BodyText>Te enviaremos un enlace para restablecer tu contraseña.</BodyText>
       {limited ? (
         <WaitNotice

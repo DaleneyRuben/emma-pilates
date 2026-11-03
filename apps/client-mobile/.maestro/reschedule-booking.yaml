@@ -23,7 +23,7 @@ env:
     visible:
       id: "booking-reschedule-.*"
     timeout: 30000
-- assertVisible: "No cancelable"
+- assertVisible: ".* · faltan menos de .*"
 - takeScreenshot: client-reschedule-1-bookings
 - tapOn:
     id: "booking-reschedule-.*"
