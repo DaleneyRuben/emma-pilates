@@ -1,14 +1,6 @@
 import { useGetReferralCodeAvailability } from "@pilates/api-contracts";
 import { useEffect, useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
@@ -106,7 +98,8 @@ export function ReferralCodeSheet({
       visible={visible}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        // A Modal on Android does not resize with the keyboard: pad it there too.
+        behavior="padding"
         style={styles.backdrop}
       >
         {/* A tap on «Guardar código» acts while the keyboard is up. */}
