@@ -19,7 +19,6 @@ import {
   radii,
   Screen,
   spacing,
-  useMountedAt,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
@@ -28,6 +27,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { createTrainerApi } from "../trainer-api";
 import { BackBar, backBarScroll } from "../ui/back-bar";
+import { useHasStarted } from "../ui/use-has-started";
 import { PersonRow } from "../ui/person-row";
 import { SectionHeader } from "../ui/section-header";
 import { countLabel } from "../ui/session-time";
@@ -67,7 +67,11 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
   const [edits, setEdits] = useState<Record<string, AttendanceOutcome>>({});
   const [saveError, setSaveError] = useState(false);
   const [saved, setSaved] = useState(false);
-  const openedAt = useMountedAt();
+  // Owner, 2026-11-03: attendance opens when the class starts, with no closing
+  // time; a roster opened before the start opens it by itself at the start.
+  const attendanceOpen = useHasStarted(
+    roster.data?.status === 200 ? roster.data.data.startsAt : undefined,
+  );
   const trainerApi = useMemo(() => createTrainerApi(fetcher), [fetcher]);
 
   if (roster.isPending)
@@ -88,8 +92,6 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
 
   const session = roster.data.data;
   const outcomes = { ...savedOutcomes(session.bookings), ...edits };
-  // Owner, 2026-11-03: attendance opens when the class starts, with no closing time.
-  const attendanceOpen = new Date(session.startsAt).getTime() <= openedAt;
   const empty = session.bookings.length === 0;
   const complete = session.bookings.every((booking) => outcomes[booking.bookingId] !== undefined);
   const saveAttendance = async () => {
