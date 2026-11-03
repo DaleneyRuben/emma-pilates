@@ -154,6 +154,7 @@ describe('Readable Referral Codes (PostgreSQL)', () => {
       holder,
       referralCode: 'ISA-PILATES',
       previousReferralCode: 'ISABEL',
+      previousChangedAt: null,
       actorAccountId: account.id,
       occurredAt,
     });
@@ -181,6 +182,42 @@ describe('Readable Referral Codes (PostgreSQL)', () => {
       metadata: { previousReferralCode: 'ISABEL', referralCode: 'ISA-PILATES' },
       occurredAt,
     });
+  });
+
+  // Two devices saving at once: only one change counts inside the 30 days.
+  it('lets only one of two simultaneous changes through', async () => {
+    const rosa = await newClient('Rosa Paredes');
+    const account = await prisma.account.create({
+      data: {
+        email: `rosa-${randomUUID()}@example.com`,
+        clientId: rosa.id,
+        activatedAt: occurredAt,
+      },
+    });
+    const holder = { kind: 'client' as const, clientId: rosa.id };
+    const store = createPrismaOwnReferralCodeStore(prisma);
+    const change = (referralCode: string) =>
+      store.change({
+        holder,
+        referralCode,
+        previousReferralCode: 'ROSA',
+        previousChangedAt: null,
+        actorAccountId: account.id,
+        occurredAt,
+      });
+
+    const results = await Promise.allSettled([
+      change('ROSA-UNO'),
+      change('ROSA-DOS'),
+    ]);
+
+    expect(results.map(({ status }) => status).sort()).toEqual([
+      'fulfilled',
+      'rejected',
+    ]);
+    expect(
+      results.find(({ status }) => status === 'rejected'),
+    ).toMatchObject({ reason: { code: 'referral_code_change_too_soon' } });
   });
 
   it('refuses the owner a blocked or retired code for a Trainer', async () => {
