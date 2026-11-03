@@ -106,7 +106,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontVariant: ["tabular-nums"],
   },
-  // «07:00» in Lora 20 is wider than 56 pt on iOS: a fixed width wrapped it.
+  // «07:00» in Lora 20 runs wider than 56 pt on both platforms (more so on
+  // Android): a fixed width wrapped it, so 56 is only the floor.
   timeColumn: { flexShrink: 0, minWidth: 56 },
   title: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
 });

@@ -1,5 +1,6 @@
 import { IconRowGroup, StateScreen } from "@pilates/mobile-core";
-import { StyleSheet, View } from "react-native";
+import { useEffect, useEffectEvent } from "react";
+import { BackHandler, StyleSheet, View } from "react-native";
 
 import { StatusPill } from "../ui/session-row";
 import { ValueRow } from "../ui/value-row";
@@ -24,6 +25,16 @@ export function PaymentDone({
   scheduled: boolean;
 }) {
   const cash = kind === "cash";
+  // The only way on is «Volver a Clientes»: the Android back button takes it
+  // too instead of reopening the spent plan list (MOB-074).
+  const back = useEffectEvent(onBack);
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      back();
+      return true;
+    });
+    return () => subscription.remove();
+  }, []);
   return (
     <StateScreen
       icon="check"

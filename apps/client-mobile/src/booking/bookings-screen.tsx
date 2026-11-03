@@ -97,7 +97,8 @@ export function BookingsScreen({
     try {
       const response = await cancelBooking(cancelling.bookingId, undefined, fetcher);
       if (response.status === 204) {
-        // «Reserva confirmada» no longer holds once a Booking is cancelled.
+        // «Reserva confirmada · Te quedan N clases» no longer holds once a
+        // Booking is cancelled, often the one it confirmed (MOB-074).
         dismissConfirmed();
       } else {
         setFailure(

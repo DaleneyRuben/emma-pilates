@@ -155,6 +155,9 @@ export function ClientBookingsScreen({
     setFailure(null);
     try {
       await api.cancelBooking(cancelling.bookingId);
+      // «Reserva confirmada» no longer holds once a booking is cancelled,
+      // often the one it confirmed (MOB-074).
+      dismissNotice();
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
     } finally {
