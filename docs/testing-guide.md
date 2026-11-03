@@ -58,9 +58,9 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79, 115 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115 |
-| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115, 126 |
+| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93, 112 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
@@ -75,7 +75,7 @@ can be found by its design name.
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109, 110, 115 |
 | S26 Reportar una falla (Entrenadora) | 82 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112, 126 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112, 113 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20, 113 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93 |
@@ -8113,7 +8113,7 @@ B. **Días para reservar por adelantado (FIX-026, note 23).**
    sends it today, keeps the value in force. Cancelling a Session (C) is not
    limited by the window. Specs: `booking-window.spec.ts`,
    `booking-window.integration-spec.ts`, `studio-settings.spec.ts`,
-   `studio-settings.e2e-spec.ts`.
+   `studio-settings.e2e-spec.ts`. The apps' strips are Test 126.
 C. **An empty Session can be cancelled (FIX-027, note 24).** As Paola or
    Carolina (Coordinator), `POST /api/v1/administrator/sessions/{id}/cancel`
    for a future Session nobody booked answers `200 {"affectedBookings":0}`,
@@ -8337,3 +8337,43 @@ I. **The guide (FIX-029).** `docs/guia-de-recorrido.md` says to run
    `POST /api/v1/client-email-verifications` command for the iPhone
    Simulator, describes Steps 7 and 11 with the automatic founder and no
    gift, and Step 3 with the Trainer's automatic code.
+
+## Test 126: the booking window in the apps and the founder price on a device (FIX-026, FIX-025)
+
+The apps' half of the [hand walkthrough of 2026-11-02](./reviews/2026-11-02-hand-walkthrough.md)
+notes 22 and 23 ([decisions §18](./decisiones-emma-pilates.md) items 9 and 10);
+Test 123 is the API. Run the API and the worker on a copy of the fixtures
+(Test 3) and both apps on the development builds. Check on the iPhone 16 Pro
+and iPad Simulators and the Android emulator. To see the founder case of the
+walkthrough exactly, add a Plan of Bs 590 as Paola first (AW04, or
+`POST /api/v1/administrator/plans` with `priceCentavos: 59000`).
+
+A. **Días para reservar por adelantado in the strips (FIX-026).** As Lucía,
+   **Reservar** shows seven days, Hoy through the sixth day after it. As
+   Camila, open Lucía, **Reservar clase**: the same seven days. Set the
+   window to 3 with Paola's `PUT /api/v1/administrator/studio-settings`
+   (`"bookingWindowDays":3`, the current `expectedVersion` and the other
+   fields as they are; the admin web does not edit it yet), log in again, and
+   both strips show three days, wider chips sharing the same width. Set it
+   back to 7. With a window above 7 the strips still show seven days: the
+   chips share the width, and a wider window waits for S13's «Otra» on the
+   booking screens (FIX-031). A day chosen before the rules arrived that falls
+   past a shorter window goes back to Hoy. **Cancelar una clase** (S13) keeps
+   its 30 days, and Horario and Mi agenda keep their week: they do not book.
+B. **The refusal.** A booking, Waitlist join or reschedule the window refuses
+   (an app still holding an older, wider window) says «Esa clase todavía no
+   abre para reservar.» in the Client app (04, 06) and on S08 in the Staff
+   app, instead of the generic line.
+C. **The founder price is the same whole boliviano everywhere (FIX-025).** As
+   Mariana (never paid, founder places left), **Comprar un plan**: «Elige tu
+   plan» shows the Bs 590 Plan at **Bs 502** with Bs 590 struck through
+   (and Bs 560 → Bs 476, Bs 780 → Bs 663, Bs 1.050 → Bs 893, Bs 2.100 →
+   Bs 1.785). Its detail shows Bs 502 and **Pagar Bs 502**, and «Pago por
+   transferencia» asks for exactly **Bs 502**. As Camila, a Client with no
+   purchase in progress (Isabel), **Registrar pago** → the Bs 590 Plan: «A
+   cobrar» reads Bs 590, Descuento −Bs 88, Total en efectivo **Bs 502**;
+   confirming shows «Cobrado en efectivo Bs 502». **Caja** → «Cerrar caja»
+   expects **Bs 502,00**; counting 502 says «Cuadra Bs 0,00», and the closed
+   day shows esperado Bs 502,00, contado Bs 502,00, diferencia Bs 0,00.
+   Mariana herself cannot pay cash while her in-app purchase is open: S10
+   says «La clienta tiene una compra en curso desde la app.» (FIX-028).
