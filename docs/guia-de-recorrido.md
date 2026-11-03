@@ -361,8 +361,8 @@ Quédate en la app de clientas, como Lucía.
 1. **Inicio**, **Comprar un plan**. Los ocho planes aparecen en el orden que
    les diste, de menor a mayor. Arriba, la franja dice «Oferta por tiempo
    limitado · 15 % en tu plan». Mientras queden lugares de lanzamiento, toda
-   primera compra lleva el 15 %: el de 8 clases muestra su precio con el
-   15 % menos y, tachado, `Bs 590`. Con 10 lugares o menos, la franja dice «¡Quedan solo N lugares con
+   primera compra lleva el 15 %, redondeado al boliviano: el de 8 clases
+   muestra `Bs 502` y, tachado, `Bs 590`. Con 10 lugares o menos, la franja dice «¡Quedan solo N lugares con
    15 % de descuento!». La clienta nunca ve la palabra «fundadora» ni el total
    de lugares.
 2. Abre **8 clases**. La vigencia dice 30 días. Elige la fecha de inicio:
