@@ -3,7 +3,7 @@
     "name": "Emma Pilates Staff",
     "slug": "emma-pilates-staff",
     "scheme": "emmapilates-staff",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "runtimeVersion": {
       "policy": "fingerprint"
     },
