@@ -49,7 +49,7 @@ export function RescheduleOption({
       style={[styles.row, selected && styles.selected]}
       testID={`reschedule-option-${session.id}`}
     >
-      <Text style={styles.time}>{formatStartTime(session.startsAt)}</Text>
+      <Text numberOfLines={1} style={styles.time}>{formatStartTime(session.startsAt)}</Text>
       <View style={styles.body}>
         <Text style={styles.title}>{session.classTypeName}</Text>
         <Text style={styles.details}>
@@ -91,7 +91,8 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.display,
     fontSize: 20,
     fontVariant: ["tabular-nums"],
-    width: 52,
+    // Lora's digits run wider on Android: a fixed width wrapped «09:00».
+    minWidth: 52,
   },
   title: {
     color: colors.text,
