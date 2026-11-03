@@ -1,0 +1,54 @@
+# Critical journey: a Client copies her Referral Code and changes it once
+# (BKM-017, follow-up 228). A changed code locks for 30 days: run it once per
+# fixtures database, or copy it with another Account for a second device.
+appId: ${APP_ID}
+env:
+  EMAIL: valeria@example.com
+  NEW_CODE: VALE-PILATES
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    id: "tab-profile"
+- extendedWaitUntil:
+    visible: "Cambiar contraseña"
+    timeout: 15000
+- scrollUntilVisible:
+    element: "Invita a una amiga"
+    direction: DOWN
+- tapOn: "Invita a una amiga"
+- extendedWaitUntil:
+    visible: "Tu código"
+    timeout: 15000
+- tapOn: "Copiar"
+- extendedWaitUntil:
+    visible: "Código copiado"
+    timeout: 5000
+- takeScreenshot: bkm017-client-1-copiado
+- tapOn: "Editar código"
+- extendedWaitUntil:
+    visible: "Editar tu código"
+    timeout: 5000
+- tapOn: "Tu nuevo código"
+- eraseText: 20
+- inputText: "sofia"
+- extendedWaitUntil:
+    visible: "Ya está en uso"
+    timeout: 8000
+- takeScreenshot: bkm017-client-2-en-uso
+- eraseText: 20
+- inputText: ${NEW_CODE}
+- extendedWaitUntil:
+    visible: "Disponible"
+    timeout: 8000
+- takeScreenshot: bkm017-client-3-disponible
+- tapOn: "Guardar código"
+- extendedWaitUntil:
+    visible: ".*dejará de funcionar.*"
+    timeout: 5000
+- takeScreenshot: bkm017-client-4-confirmar
+- tapOn: "Cambiar código"
+- extendedWaitUntil:
+    visible: "Código actualizado"
+    timeout: 10000
+- assertVisible: "Podrás cambiarlo de nuevo el .*"
+- takeScreenshot: bkm017-client-5-actualizado

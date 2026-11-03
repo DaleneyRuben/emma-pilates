@@ -1,0 +1,55 @@
+# Critical journey: a Trainer opens her own Referral Code page from Perfil,
+# copies the code and changes it once (BKM-017, follow-up 229). A changed
+# code locks for 30 days: run it once per fixtures database.
+appId: ${APP_ID}
+env:
+  EMAIL: daniela.ortiz@example.com
+  NEW_CODE: DANI-PILATES
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-profile"
+    timeout: 30000
+- runFlow: subflows/park-dev-gear.yaml
+- tapOn:
+    id: "tab-profile"
+- extendedWaitUntil:
+    visible: "Tu código de referido.*"
+    timeout: 15000
+- takeScreenshot: bkm017-staff-1-perfil
+- tapOn: "Tu código de referido.*"
+- extendedWaitUntil:
+    visible: "Compartes tu código con tus alumnas"
+    timeout: 15000
+- tapOn: "Copiar"
+- extendedWaitUntil:
+    visible: "Código copiado"
+    timeout: 5000
+- takeScreenshot: bkm017-staff-2-copiado
+- tapOn: "Editar código"
+- extendedWaitUntil:
+    visible: "Editar tu código"
+    timeout: 5000
+- tapOn: "Tu nuevo código"
+- eraseText: 20
+- inputText: "sofia"
+- extendedWaitUntil:
+    visible: "Ya está en uso"
+    timeout: 8000
+- eraseText: 20
+- inputText: ${NEW_CODE}
+- extendedWaitUntil:
+    visible: "Disponible"
+    timeout: 8000
+- tapOn: "Guardar código"
+- extendedWaitUntil:
+    visible: ".*dejará de funcionar.*"
+    timeout: 5000
+- takeScreenshot: bkm017-staff-3-confirmar
+- tapOn: "Cambiar código"
+- extendedWaitUntil:
+    visible: "Código actualizado"
+    timeout: 10000
+- assertVisible: "Podrás cambiarlo de nuevo el .*"
+- takeScreenshot: bkm017-staff-4-actualizado
