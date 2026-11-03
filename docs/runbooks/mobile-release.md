@@ -188,6 +188,11 @@ check and publishes nothing.
   into the script from workflow inputs.
 - **Create native release** (`mobile-create-release.yml`) opens a pull
   request from `release/<app>-x.y.z` that bumps that app's `expo.version`.
+  Choose the bump: `patch` (the default) for fixes, `minor` for something
+  new people can use, `major` for a redesign or a forced update. The
+  workflow computes the version; the
+  [mobile-release skill](../../.agents/skills/mobile-release/SKILL.md) has
+  the standard.
   Merge it only after the store version is published. Merging earlier stops
   OTA updates from reaching installed builds of the previous version.
 - **Store deploy** (`mobile-store-deploy.yml`) runs from that release branch.
