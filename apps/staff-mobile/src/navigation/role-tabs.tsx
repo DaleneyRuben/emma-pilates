@@ -34,6 +34,7 @@ import { NutritionistAgendaScreen } from "../nutritionist/nutritionist-agenda-sc
 import { StaffChangePasswordScreen } from "../profile/staff-change-password-screen";
 import { StaffFeedbackScreen } from "../profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "../profile/staff-notifications-screen";
+import { StaffReferralCodeScreen } from "../profile/staff-referral-code-screen";
 import { StaffPayScreen } from "../profile/staff-pay-screen";
 import { StaffProfileScreen } from "../profile/staff-profile-screen";
 import { ScheduleScreen } from "../schedule/schedule-screen";
@@ -56,6 +57,7 @@ const profileScreens = {
   Notifications: StaffNotificationsScreen,
   ChangePassword: StaffChangePasswordScreen,
   Feedback: StaffFeedbackScreen,
+  ReferralCode: StaffReferralCodeScreen,
 };
 
 // A Client's file and everything reached from it (S06–S10, S21, S22). The
