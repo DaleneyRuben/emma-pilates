@@ -33,9 +33,16 @@ export const reopenStaffInvitation = async (
   transaction: StaffManagementTransaction,
   dependencies: StaffManagementDependencies,
   actor: Actor,
-  input: { staffMemberId: string; now: Date },
+  input: { staffMemberId: string; phone: string | null; now: Date },
 ): Promise<StaffMemberRecord> => {
   const member = await requirePending(transaction, actor, input.staffMemberId);
+  // FIX-030: the Role and Branches stay, but a phone typed again is kept.
+  if (input.phone !== null) {
+    await transaction.setPhone({
+      staffMemberId: member.id,
+      phone: input.phone,
+    });
+  }
   await requireActivationEmailRoom(transaction, {
     email: member.email,
     now: input.now,

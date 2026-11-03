@@ -228,6 +228,12 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
           activationExpiresAt: input.activationExpiresAt,
         });
       },
+      setPhone: async (input) => {
+        await transaction.staffMember.update({
+          where: { id: input.staffMemberId },
+          data: { phone: input.phone },
+        });
+      },
       reissueActivation: (input) => accounts.reissueActivation(input),
       setRole: async (input) => {
         const member = await transaction.staffMember.update({
