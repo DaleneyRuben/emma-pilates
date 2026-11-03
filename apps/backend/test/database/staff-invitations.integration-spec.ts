@@ -63,12 +63,12 @@ describe('Prisma staff invitations', () => {
     clock = new Date(clock.getTime() + 61_000);
   };
 
-  const invite = (email: string) =>
+  const invite = (email: string, phone: string | null = null) =>
     createStaffMember(
       {
         name: 'Lucía Vaca',
         email,
-        phone: null,
+        phone,
         role: 'trainer',
         branchIds: [centro()],
       },
@@ -152,6 +152,24 @@ describe('Prisma staff invitations', () => {
     await expect(promise).rejects.toBeInstanceOf(StaffManagementError);
     await expect(promise).rejects.toMatchObject({
       code: 'email_belongs_to_client',
+    });
+  });
+
+  // FIX-030: Camila's phone, typed when she was invited, stays on her row,
+  // and inviting her again with a phone fills the one she lacked.
+  it('keeps the phone of an invitation and of a reopened one', async () => {
+    await expect(
+      invite('camila.phone@example.com', '70000001'),
+    ).resolves.toMatchObject({ phone: '70000001' });
+
+    const first = await invite('camila.later@example.com');
+    later();
+    await expect(
+      invite('camila.later@example.com', '70000002'),
+    ).resolves.toMatchObject({
+      id: first.id,
+      invitationReopened: true,
+      phone: '70000002',
     });
   });
 
