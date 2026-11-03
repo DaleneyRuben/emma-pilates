@@ -8265,3 +8265,75 @@ G. **Coordinación.** Buscar cliente has no **Nuevo cliente**; Horario has a
    tu nombre»; empty, «Nadie para contactar» with **Buscar una clienta**.
 
 Specs: `apps/staff-mobile/src/**/*.spec.tsx`. Maestro: `apps/staff-mobile/.maestro`.
+
+## Test 125: readable referral codes, launch places, Copiar, and the walkthrough leftovers (BKM-017, BKM-019, FIX-029, FIX-030)
+
+The rest of the [hand walkthrough of 2026-11-02](./reviews/2026-11-02-hand-walkthrough.md)
+(notes 4, 13, 20 and the guide notes; [decisions §18](./decisiones-emma-pilates.md)
+items 13 and 14). Migrate a copy of `pilates_dev_sim` first: migration
+`20261103090000_readable_referral_codes` adds the `booking.referral_codes`
+registry and converts every `REF-…` code. Both apps need a new native build
+for **Copiar** (`expo-clipboard`).
+
+A. **The backfill.** Before migrating, note two Clients with `REF-…` codes and
+   a Trainer without one. After it: `select code, client_id, staff_member_id
+   from booking.referral_codes where retired_at is null` shows each of them
+   with a code from the name (Lucía Fernández → `LUCIA`, a second Lucía
+   Fernández → `FERNANDEZ`, a third → `LUCIA2`; «Emma de la Rosa» → `ROSA`,
+   because EMMA is reserved). No `REF-` code is left. Specs:
+   `readable-referral-codes.integration-spec.ts`.
+B. **New people.** Register a Client from the app, invite one from Nuevo
+   cliente, and invite a Trainer from the web: each gets a readable code at
+   once (`GET /api/v1/referral-codes/current` as each). Changing an
+   Assistant's role to Trainer gives her one. Spec:
+   `readable-referral-codes-creation.integration-spec.ts`.
+C. **Editing her own code, client app.** As Lucía, **Perfil** → **Invita a
+   una amiga**: the Rosa profundo card shows `LUCIA` with **Copiar**. Copiar
+   shows the toast «Código copiado» and the code pastes elsewhere. **Editar
+   código** opens the sheet; typing `sofia` turns `SOFIA` and, after a
+   moment, «Ya está en uso» (Sofía's code) with **Guardar código** off;
+   `emma` says «Ese código no está permitido»; `lu` says «Usa de 3 a 20
+   letras, números o guiones»; `lu-pilates` says «Disponible». **Guardar
+   código** → the confirmation «Tu código anterior LUCIA dejará de funcionar.
+   Las amigas que ya se registraron con él siguen contando para ti.» →
+   **Cambiar código** → the toast «Código actualizado», the card shows
+   `LU-PILATES`, and «Podrás cambiarlo de nuevo el …» (30 days later) replaces
+   **Editar código**. Registering a new Client with `LUCIA` now answers
+   `referral_code_unknown`; one with `LU-PILATES` is attributed to Lucía.
+   Lucía's earlier referred friends still list under «Tus invitadas».
+D. **The Trainer's page, staff app.** As Daniela, **Perfil** shows the row
+   «Tu código de referido · DANIELA»; other roles have no such row. It opens
+   S30 with the same card, **Copiar**, **Editar código**, «Cómo funciona» and
+   the 30-day note; the sheet and confirmation behave as in C and return to
+   S30. The web's **Personal** → Daniela → **Código personal** shows the new
+   code and still edits it; a blocked word there says «Ese código no está
+   permitido.», and the old «sin empezar con REF-» line is gone.
+E. **API.** `GET /api/v1/referral-codes/availability?code=SOFIA` answers
+   `in_use`, `EMMA` `blocked`, her own code `current`, a free one
+   `available`. `PUT /api/v1/referral-codes/current` a second time inside 30
+   days answers 409 `referral_code_change_too_soon`; the audit trail has
+   `client.referral_code_changed` / `staff_member.referral_code_changed` with
+   the previous and new codes. Specs: `own-referral-code.e2e-spec.ts`,
+   `own-referral-code.spec.ts`.
+F. **Launch places (BKM-019).** With 40 places and few founders, **Elige tu
+   plan** shows «Oferta por tiempo limitado · 15 % en tu plan» on Rosa tinte,
+   and `GET /api/v1/plans` has no `launchPlacesLeft`. Fill founder places
+   until 6 remain: the banner turns Rosa profundo with «¡Quedan solo 6
+   lugares con 15 % de descuento!» and the plans carry `launchPlacesLeft: 6`;
+   with one left, «¡Queda solo 1 lugar…!». No screen says «fundadora» or 40.
+   Specs: `launch-places-left.integration-spec.ts`, `plans-screen.spec.tsx`.
+G. **The tagline is gone.** The six authentication emails and the browser
+   page of a link end with «Emma Pilates Studio» alone; so do the web's
+   sign-in card and the public site.
+H. **Phones (FIX-030).** On the web, invite a staff member with `70000001`
+   and with `7000004`: both say «Escribe un celular de Bolivia, por ejemplo
+   +591 71234567.» and nothing is sent; `+591 70000001` is saved. Invite the
+   same pending address again with a phone: the reopened invitation keeps
+   the phone typed (the cause of Camila's missing phone). Nuevo cliente in
+   the staff app refuses the same two numbers. The client app's registration
+   has no phone field; **Editar perfil** already validates it (MOB-070).
+I. **The guide (FIX-029).** `docs/guia-de-recorrido.md` says to run
+   `prisma:generate` after a pull, gives the
+   `POST /api/v1/client-email-verifications` command for the iPhone
+   Simulator, describes Steps 7 and 11 with the automatic founder and no
+   gift, and Step 3 with the Trainer's automatic code.
