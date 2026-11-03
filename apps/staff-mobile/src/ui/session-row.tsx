@@ -41,7 +41,9 @@ export function SessionRow({
   const content = (
     <>
       <View style={styles.timeColumn}>
-        <Text style={styles.time}>{time}</Text>
+        <Text numberOfLines={1} style={styles.time}>
+          {time}
+        </Text>
         {duration === undefined ? null : <Text style={styles.quiet}>{duration}</Text>}
       </View>
       <View style={styles.body}>
@@ -104,6 +106,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontVariant: ["tabular-nums"],
   },
-  timeColumn: { flexShrink: 0, width: 56 },
+  // Lora's digits run wider on Android: a fixed width wrapped «07:00».
+  timeColumn: { flexShrink: 0, minWidth: 56 },
   title: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
 });
