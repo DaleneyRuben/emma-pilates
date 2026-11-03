@@ -17,7 +17,7 @@ env:
     id: "tab-booking"
 - extendedWaitUntil:
     visible:
-      text: "Sucursal: .*"
+      text: "Sucursal:? .*"
     timeout: 20000
 - runFlow:
     when:

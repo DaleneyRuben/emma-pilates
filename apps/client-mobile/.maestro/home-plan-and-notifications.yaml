@@ -28,30 +28,32 @@ env:
     end: "50%,25%"
 - extendedWaitUntil:
     visible:
-      text: "Evaluación nutricional: .*"
+      text: "Evaluación nutricional"
     timeout: 10000
 - assertVisible:
-    text: "Mis referidos: .*"
+    text: "Invita a una amiga"
 - takeScreenshot: client-home-1c-accesos
 - tapOn:
-    text: "Mis referidos: .*"
+    text: "Invita a una amiga"
 - extendedWaitUntil:
-    visible: "Pronto podrás invitar a una amiga a una clase gratis."
+    visible: "Cómo funciona"
     timeout: 15000
 - takeScreenshot: client-home-2-referidos
 - tapOn: "Volver"
 - extendedWaitUntil:
-    visible: "Ver detalle"
+    visible:
+      id: "home-plan-detail"
     timeout: 10000
-- tapOn: "Ver detalle"
+- tapOn:
+    id: "home-plan-detail"
 - extendedWaitUntil:
-    visible: "Suscripción actual"
+    visible: "Renovación anticipada"
     timeout: 10000
-- assertVisible: "Podrás comprar un plan nuevo cuando este termine."
+- assertVisible: "Renovar mi plan"
 - takeScreenshot: client-home-3-miplan
 - tapOn: "Volver"
 - tapOn:
-    text: "Evaluación nutricional: .*"
+    text: "Evaluación nutricional"
 - extendedWaitUntil:
     visible: "Días disponibles|Mis evaluaciones"
     timeout: 15000
@@ -83,6 +85,6 @@ env:
 - tapOn:
     text: ".*Tu clase de .* fue cancelada.*"
 - extendedWaitUntil:
-    visible: "Ver historial"
+    visible: "Próximas"
     timeout: 10000
 - takeScreenshot: client-home-7-mis-reservas
