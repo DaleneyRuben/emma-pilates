@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -72,6 +73,16 @@ describe("freeze review", () => {
     );
     await fireEvent.press(screen.getByText("Lucía pidió un congelamiento."));
     await waitFor(() => expect(screen.getByText("Lucía Fernández")).toBeOnTheScreen());
+    // iPad walk: the scroller holding the BackBar reaches the screen edge, so
+    // the chevron's negative margin is not clipped.
+    let scroller = screen.getByTestId("back-bar").parent;
+    while (scroller && scroller.props.contentContainerStyle === undefined) {
+      scroller = scroller.parent;
+    }
+    expect(StyleSheet.flatten(scroller?.props.style)).toMatchObject({ marginHorizontal: -20 });
+    expect(StyleSheet.flatten(scroller?.props.contentContainerStyle)).toMatchObject({
+      paddingHorizontal: 20,
+    });
     // v2 CON: the request as rows, the days counted.
     expect(screen.getByText("Del 27 de octubre al 3 de noviembre")).toBeOnTheScreen();
     expect(screen.getByText("8 días")).toBeOnTheScreen();
