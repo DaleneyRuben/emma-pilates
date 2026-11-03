@@ -87,7 +87,7 @@ const trainerCodePattern = /^[A-Z0-9][A-Z0-9-]{2,19}$/;
  * with a letter or digit, and never the Client prefix, so the two kinds of
  * code cannot collide.
  */
-export const parseTrainerReferralCode = (value: string): string | null => {
+export const parseReferralCode = (value: string): string | null => {
   const code = normalizeReferralCode(value);
   if (code === null || !trainerCodePattern.test(code)) return null;
   return code.startsWith(clientReferralCodePrefix) ? null : code;
