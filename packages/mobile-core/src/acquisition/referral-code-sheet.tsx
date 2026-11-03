@@ -96,6 +96,7 @@ export function ReferralCodeSheet({
               maxLength={20}
               onChangeText={(text) => onChangeCode(normalizeCode(text))}
               style={styles.input}
+              testID="referral-code-input"
               value={code}
             />
             {status === null ? null : <StatusLine status={status} />}

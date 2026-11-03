@@ -28,7 +28,8 @@ env:
 - extendedWaitUntil:
     visible: "Editar tu código"
     timeout: 5000
-- tapOn: "Tu nuevo código"
+- tapOn:
+    id: "referral-code-input"
 - eraseText: 20
 - inputText: "sofia"
 - extendedWaitUntil:
