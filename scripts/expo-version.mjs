@@ -6,23 +6,21 @@ const parts = (version) => {
   return match.slice(1).map(Number);
 };
 
-const later = (a, b) => {
-  for (let index = 0; index < 3; index += 1) {
-    if (a[index] !== b[index]) return a[index] > b[index];
-  }
-  return false;
-};
-
 /**
- * ADR-0107: the version a native release gets. Blank means the next patch of
- * the current one (1.0.2 → 1.0.3); a typed x.y.z must be later than it.
+ * ADR-0107 and the mobile-release skill: the version a native release gets.
+ * patch (the default) for fixes, minor for something new people can use,
+ * major for a redesign or a forced update.
  */
-export function releaseVersion(current, requested) {
-  const now = parts(current);
-  const typed = (requested ?? "").trim();
-  if (typed === "") return `${now[0]}.${now[1]}.${now[2] + 1}`;
-  if (!later(parts(typed), now)) {
-    throw new Error(`version must be later than ${current}, got «${typed}»`);
+export function releaseVersion(current, bump = "patch") {
+  const [major, minor, patch] = parts(current);
+  switch ((bump ?? "").trim() || "patch") {
+    case "patch":
+      return `${major}.${minor}.${patch + 1}`;
+    case "minor":
+      return `${major}.${minor + 1}.0`;
+    case "major":
+      return `${major + 1}.0.0`;
+    default:
+      throw new Error(`bump must be patch, minor or major, got «${bump}»`);
   }
-  return typed;
 }

@@ -12,11 +12,12 @@ on:
         required: true
         type: choice
         options: [client, staff]
-      version:
-        description: New expo.version, x.y.z. Leave blank for the next patch (1.0.2 → 1.0.3)
-        required: false
-        default: ""
-        type: string
+      bump:
+        description: "patch: fixes (1.0.2 → 1.0.3). minor: something new people can use (→ 1.1.0). major: a redesign or a forced update (→ 2.0.0)"
+        required: true
+        default: patch
+        type: choice
+        options: [patch, minor, major]
 
 permissions:
   contents: write
@@ -33,15 +34,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       # The inputs reach the script through env:, never interpolated into it.
-      # bump-expo-version.mjs refuses a malformed or earlier version.
+      # bump-expo-version.mjs computes the version from the current one.
       - name: Bump expo.version and open the pull request
         env:
           GH_TOKEN: ${{ github.token }}
           APP: ${{ inputs.app }}
-          REQUESTED_VERSION: ${{ inputs.version }}
+          BUMP: ${{ inputs.bump }}
         run: |
           folder="apps/${APP}-mobile"
-          version="$(node scripts/bump-expo-version.mjs "$folder/app.json" "$REQUESTED_VERSION")"
+          version="$(node scripts/bump-expo-version.mjs "$folder/app.json" "$BUMP")"
           branch="release/${APP}-${version}"
           git checkout -b "$branch"
           git add "$folder/app.json"
