@@ -13,11 +13,11 @@ import {
   Screen,
   spacing,
 } from "@pilates/mobile-core";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
-import { useState } from "react";
-import { StyleSheet } from "react-native";
+import { useCallback, useState } from "react";
+import { BackHandler, StyleSheet } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { PaymentStatusView } from "./payment-status-view";
@@ -43,6 +43,18 @@ export function PaymentStatusScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const goHome = () => navigation.navigate("HomeTab", { screen: "Home" });
+
+  // The result has no back arrow: the Android back button leads home like
+  // «Volver al inicio», never to the spent payment screen (MOB-074).
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+        navigation.navigate("HomeTab", { screen: "Home" });
+        return true;
+      });
+      return () => subscription.remove();
+    }, [navigation]),
+  );
 
   if (payment.isPending) {
     return (
