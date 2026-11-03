@@ -30,6 +30,8 @@ model Client {
   phone               String?
   profileImageAssetId String?         @unique @map("profile_image_asset_id") @db.Uuid
   referralCode        String          @unique @map("referral_code")
+  // BKM-017: when she last changed her own code (one change every 30 days).
+  referralCodeChangedAt DateTime?     @map("referral_code_changed_at") @db.Timestamptz(3)
   createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
   deletedAt           DateTime?       @map("deleted_at") @db.Timestamptz(3)
@@ -45,6 +47,7 @@ model Client {
   creditLedgerEntries CreditLedgerEntry[]
   referralsMade       Referral[]      @relation("ReferralReferrer")
   referralReceived    Referral?       @relation("ReferralReferred")
+  referralCodes       ReferralCode[]
   guestPassesHosted   GuestPass[]     @relation("GuestPassHost")
   guestPassesReceived GuestPass[]     @relation("GuestPassFriend")
   evaluations         Evaluation[]
@@ -123,6 +126,8 @@ model StaffMember {
   // BKM-011: a Trainer's personal Referral Code, set by the Administrator.
   // Unique among live rows: a partial index in the BKM-011 migration.
   referralCode        String?                 @map("referral_code")
+  // BKM-017: when she last changed her own code (one change every 30 days).
+  referralCodeChangedAt DateTime?             @map("referral_code_changed_at") @db.Timestamptz(3)
   profileImageAssetId String?                 @unique @map("profile_image_asset_id") @db.Uuid
   createdAt           DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -138,6 +143,7 @@ model StaffMember {
   payStatements       PayStatement[]
   impersonations      ImpersonationSession[]
   acquisitionsReferred ClientAcquisition[]
+  referralCodes       ReferralCode[]
 
   @@map("staff_members")
   @@schema("booking")
@@ -307,5 +313,25 @@ model ClientAcquisition {
   @@index([referrerClientId])
   @@index([referrerStaffMemberId])
   @@map("client_acquisitions")
+  @@schema("booking")
+}
+
+// BKM-017: every Referral Code ever held, by a Client or a Staff Member, so a
+// code is unique across both and stays reserved once retired. Triggers in the
+// migration keep it in step with the clients and staff_members columns; the
+// live row's holder decides attribution. One live code per holder (partial
+// unique indexes in the migration).
+model ReferralCode {
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code          String       @unique
+  clientId      String?      @map("client_id") @db.Uuid
+  staffMemberId String?      @map("staff_member_id") @db.Uuid
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  retiredAt     DateTime?    @map("retired_at") @db.Timestamptz(3)
+  client        Client?      @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  staffMember   StaffMember? @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
+
+  @@map("referral_codes")
   @@schema("booking")
 }
