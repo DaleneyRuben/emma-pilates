@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Dinero</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.app{width:100%;min-height:1000px;display:flex;flex-wrap:wrap;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;position:relative}
+.rail{flex:1 1 96px;max-width:100%;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;text-decoration:none;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{position:relative;width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rb{position:absolute;top:-4px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#93615D;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;border:2px solid #F5EFE9}
+.rl{font-size:12px;font-weight:500}
+.col{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:20px 40px}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+.search{flex:1 1 360px;max-width:560px;height:48px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;background:#F5EFE9}
+.search input,.find input{flex:1;min-width:0;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;outline:none;color:#4A4A4A}
+.kbd{font-size:12px;color:#6F6662;padding:2px 8px;border-radius:6px;background:#FAF7F2}
+.cb{height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border:0;border-radius:12px;background:#F5EFE9;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer}
+.me{height:44px;display:flex;align-items:center;gap:10px;padding:0 8px 0 4px;font-family:inherit;color:#4A4A4A}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}.av.s{width:36px;height:36px}
+main{padding:8px 40px 56px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h3{margin:0;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sub{color:#6F6662}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}.hl{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E6DBD0}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;cursor:pointer;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent;display:inline-flex;align-items:center}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.cnt{margin-left:6px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:999px;background:#93615D;color:#fff}
+.card{background:#F5EFE9;border-radius:16px}.pad{padding:20px}
+.hero{background:#93615D;color:#fff;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}.hero .eyebrow{color:rgba(255,255,255,.75)}
+.big{font-family:Lora,serif;font-size:30px;font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:#6F6662}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 16px;min-height:56px}.row+.row{border-top:1px solid #E6DBD0}
+.grow{flex:1;min-width:150px;display:flex;flex-direction:column;gap:2px}
+.strong{font-weight:600}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.p{background:#B78380;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}.d{background:#F7E5E0;color:#A04E3E}.td{background:transparent;color:#A04E3E;padding:0 10px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.wait{background:rgba(201,154,78,.16);color:#7C5D2A}.bad{background:#F7E5E0;color:#A04E3E}.none{background:rgba(216,201,187,.34);color:#6F6662}.rose{background:#F2E4E1;color:#7D4F4B}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.f{height:36px;padding:0 14px;border-radius:999px;background:#F5EFE9;font:400 14px 'Work Sans',sans-serif;border:0;color:#4A4A4A;cursor:pointer;display:inline-flex;align-items:center}.f.on{background:#F2E4E1;color:#7D4F4B;font-weight:600}
+.find{flex:0 1 320px;min-width:220px;height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;border-radius:12px;background:#F5EFE9}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:860px}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;white-space:nowrap}
+td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.22);display:flex;justify-content:flex-end;z-index:5}
+.panel{width:500px;max-width:100%;background:#FAF7F2;padding:28px;display:flex;flex-direction:column;gap:18px;overflow-y:auto}
+.ph{display:flex;align-items:flex-start;gap:12px}.ph h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:24px;flex:1}
+.x{width:40px;height:40px;border:0;border-radius:12px;background:#F5EFE9;color:#6F6662;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:12px 16px}.kv+.kv{border-top:1px solid #E6DBD0}
+.seg{display:flex;gap:2px;background:#F5EFE9;border-radius:12px;padding:3px}
+.seg button{height:38px;border:0;border-radius:10px;background:transparent;font:500 14px 'Work Sans',sans-serif;color:#6F6662;cursor:pointer;padding:0 14px}.seg button.on{background:#FAF7F2;color:#7D4F4B;font-weight:600}
+.notice{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;border-left:4px solid #B78380;font-size:14px}.notice.warn{border-left-color:#C99A4E}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.lora{font-family:Lora,serif}
+.receipt{aspect-ratio:3/4;max-height:320px;border-radius:12px;background:#F2E4E1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#B78380}
+.stmt{background:#F5EFE9;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.line{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:8px 0}.line+.line{border-top:1px solid #E6DBD0}
+.stepper{display:flex;align-items:center;gap:4px;background:#F5EFE9;border-radius:14px;padding:4px}
+</style>
+</helmet>
+<div class="app">
+  <nav class="rail" aria-label="Menú principal"><span class="mark" aria-label="Emma Pilates Studio">E</span>
+    <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><a class="{{r.cls}}" href="{{r.href}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span><sc-if value="{{r.badge}}" hint-placeholder-val="{{false}}"><span class="rb">{{r.badge}}</span></sc-if></span><span class="rl">{{r.label}}</span></a></sc-for>
+  </nav>
+  <div class="col">
+    <header class="top">
+      <span class="wm"><b>Emma</b><i>Pilates Studio</i></span>
+      <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
+      <span style="flex: 1"></span>
+      <button type="button" class="cb"><span class="ms" style="color: #B78380">{{branch.icon}}</span>{{branch.label}}<sc-if value="{{branch.pick}}" hint-placeholder-val="{{false}}"><span class="ms" style="color: #6F6662">expand_more</span></sc-if></button>
+      <span class="me"><span class="av">PM</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Paola Mendoza</span><span style="font-size: 12px; color: #6F6662">Administración</span></span></span>
+    </header>
+    <main>
+      <div class="head">
+        <div class="hl"><h1>Dinero</h1><span class="sub">{{explain}}</span></div>
+        <sc-if value="{{is.pagos}}" hint-placeholder-val="{{true}}"><button type="button" class="btn s"><span class="ms">download</span>Exportar CSV</button></sc-if>
+        <sc-if value="{{is.gastos}}" hint-placeholder-val="{{false}}"><button type="button" class="btn s" onClick="{{openCats}}">Editar categorías</button><button type="button" class="btn p"><span class="ms">add</span>Nuevo gasto</button></sc-if>
+        <sc-if value="{{is.sueldos}}" hint-placeholder-val="{{false}}"><button type="button" class="btn s"><span class="ms">add</span>Registrar un pago</button></sc-if>
+      </div>
+      <div class="tabs" role="tablist"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="4"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.go}}">{{t.label}}<sc-if value="{{t.count}}" hint-placeholder-val="{{false}}"><span class="cnt">{{t.count}}</span></sc-if></button></sc-for></div>
+
+      <sc-if value="{{is.pagos}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div class="filters">
+            <label class="find"><span class="ms" style="color: #B78380">search</span><input aria-label="Buscar clienta" placeholder="Buscar por clienta"></label>
+            <button type="button" class="f on">Por revisar · 1</button><button type="button" class="f">Confirmados</button><button type="button" class="f">Rechazados</button><button type="button" class="f">Anulados</button><button type="button" class="f">Sin factura emitida</button><button type="button" class="f">Todos</button>
+          </div>
+          <div class="tw"><table>
+            <thead><tr><th>Fecha</th><th>Clienta</th><th>Qué compró</th><th class="num">Monto</th><th>Cómo pagó</th><th>Estado</th><th>Factura</th><th></th></tr></thead>
+            <tbody>
+              <sc-for list="{{payments}}" as="p" hint-placeholder-count="4">
+                <tr><td>{{p.date}}</td><td class="strong">{{p.n}}</td><td>{{p.what}}</td><td class="num">{{p.amount}}</td><td>{{p.method}}</td><td><span class="{{p.pillCls}}">{{p.state}}</span></td><td>{{p.invoice}}</td><td style="text-align: right"><button type="button" class="{{p.btnCls}}" onClick="{{openReview}}">{{p.cta}}</button></td></tr>
+              </sc-for>
+            </tbody>
+          </table></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.caja}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div class="filters"><div class="stepper"><button type="button" class="btn sm t" aria-label="Mes anterior"><span class="ms">chevron_left</span></button><span class="lora" style="font-size: 17px; padding: 0 6px">noviembre de 2026</span><button type="button" class="btn sm t" aria-label="Mes siguiente"><span class="ms">chevron_right</span></button></div></div>
+          <div class="tw"><table>
+            <thead><tr><th>Día</th><th>Estado</th><th class="num">Debía haber</th><th class="num">Contó</th><th class="num">Diferencia</th><th>Cerró</th><th>Nota</th></tr></thead>
+            <tbody>
+              <tr><td>Martes 3</td><td><span class="pill wait">Abierta</span></td><td class="num">Bs 502,00</td><td class="num">—</td><td class="num">—</td><td>—</td><td>—</td></tr>
+              <tr><td>Lunes 2</td><td><span class="pill ok">Cerrada</span></td><td class="num">Bs 780,00</td><td class="num">Bs 778,00</td><td class="num" style="color: #A04E3E">−Bs 2,00</td><td>Camila Rojas</td><td>Faltaron monedas de cambio</td></tr>
+              <tr><td>Domingo 1</td><td><span class="pill none">Sin ventas</span></td><td class="num">Bs 0,00</td><td class="num">—</td><td class="num">—</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table></div>
+          <span class="note">La caja se cierra desde la app del equipo. Aquí solo se revisa.</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.sueldos}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div class="filters">
+            <div class="seg" role="tablist" aria-label="Período"><sc-for list="{{periods}}" as="q" hint-placeholder-count="4"><button type="button" class="{{q.cls}}" onClick="{{q.go}}">{{q.label}}</button></sc-for></div>
+            <div class="stepper"><button type="button" class="btn sm t" aria-label="Anterior"><span class="ms">chevron_left</span></button><span class="lora" style="font-size: 17px; padding: 0 6px">{{periodLabel}}</span><button type="button" class="btn sm t" aria-label="Siguiente"><span class="ms">chevron_right</span></button></div>
+            <span style="flex: 1"></span>
+            <div class="seg" role="tablist" aria-label="Vista"><sc-for list="{{views}}" as="w" hint-placeholder-count="2"><button type="button" class="{{w.cls}}" onClick="{{w.go}}">{{w.label}}</button></sc-for></div>
+          </div>
+          <sc-if value="{{sv.aprobar}}" hint-placeholder-val="{{true}}">
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <div class="notice"><span class="ms" style="color: #93615D">calculate</span><span style="flex: 1">Calculado con las tarifas vigentes para {{periodLabel}}. Una clase o una comisión ya pagada no se vuelve a contar.</span><button type="button" class="btn sm s">Volver a calcular</button></div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px">
+                <sc-for list="{{stmts}}" as="s" hint-placeholder-count="3">
+                  <div class="stmt">
+                    <div style="display: flex; align-items: center; gap: 12px"><span class="av s">{{s.ini}}</span><span class="grow"><span class="strong">{{s.n}}</span><span class="note">{{s.role}}</span></span><span class="big">{{s.total}}</span></div>
+                    <div><sc-for list="{{s.lines}}" as="l" hint-placeholder-count="3"><div class="line"><span>{{l.what}} <span class="note">{{l.detail}}</span></span><span style="font-variant-numeric: tabular-nums">{{l.amount}}</span></div></sc-for></div>
+                    <div class="actions"><button type="button" class="btn sm t">Ver cada clase</button><button type="button" class="btn sm p">Aprobar y marcar pagado</button></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{sv.pagados}}" hint-placeholder-val="{{false}}">
+            <div class="tw"><table>
+              <thead><tr><th>Fecha</th><th>Persona</th><th>Rol</th><th>Período</th><th class="num">Monto</th><th>Comprobante</th></tr></thead>
+              <tbody>
+                <tr><td>31 de octubre</td><td class="strong">Daniela Ortiz</td><td>Entrenadora</td><td>Octubre</td><td class="num">Bs 1.840</td><td><button type="button" class="btn sm t">Ver</button></td></tr>
+                <tr><td>31 de octubre</td><td class="strong">Carolina Rivas</td><td>Coordinadora</td><td>Octubre</td><td class="num">Bs 3.900</td><td><button type="button" class="btn sm t">Ver</button></td></tr>
+                <tr><td>30 de octubre</td><td class="strong">Camila Rojas</td><td>Recepción</td><td>Octubre</td><td class="num">Bs 2.500</td><td><button type="button" class="btn sm t">Ver</button></td></tr>
+                <tr><td>30 de octubre</td><td class="strong">Rosa Mamani</td><td>Limpieza</td><td>Octubre</td><td class="num">Bs 1.200</td><td><span class="note">Sin foto</span></td></tr>
+              </tbody>
+            </table></div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.gastos}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div class="filters"><div class="stepper"><button type="button" class="btn sm t" aria-label="Mes anterior"><span class="ms">chevron_left</span></button><span class="lora" style="font-size: 17px; padding: 0 6px">noviembre de 2026</span><button type="button" class="btn sm t" aria-label="Mes siguiente"><span class="ms">chevron_right</span></button></div><button type="button" class="f on">Todas las categorías</button><button type="button" class="f">Alquiler</button><button type="button" class="f">Limpieza</button><button type="button" class="f">Servicios</button></div>
+          <div class="tw"><table>
+            <thead><tr><th>Fecha</th><th>Categoría</th><th>Detalle</th><th class="num">Monto</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>1 de noviembre</td><td><span class="pill rose">Alquiler</span></td><td>Alquiler local Centro</td><td class="num">Bs 4.500</td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+              <tr><td>2 de noviembre</td><td><span class="pill rose">Servicios</span></td><td>Luz y agua</td><td class="num">Bs 380</td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+              <tr><td>3 de noviembre</td><td><span class="pill rose">Limpieza</span></td><td>Productos de limpieza</td><td class="num">Bs 145</td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+            </tbody>
+          </table></div>
+          <span class="note">Total de noviembre en Centro: Bs 5.025</span>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+
+  <sc-if value="{{review}}" hint-placeholder-val="{{false}}">
+    <div class="scrim"><div class="panel" role="dialog" aria-label="Revisar pago">
+      <div class="ph"><h2>Revisar pago</h2><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
+      <div class="card"><div class="kv"><span class="note">Clienta</span><span class="strong">Mariana Peña</span></div><div class="kv"><span class="note">Qué compró</span><span>Paquete de 8 clases</span></div><div class="kv"><span class="note">Monto a recibir</span><span class="lora" style="font-size: 20px">Bs 502</span></div><div class="kv"><span class="note">Cómo pagó</span><span>QR · hoy 08:40</span></div><div class="kv"><span class="note">Su plan empieza</span><span>Al confirmar</span></div></div>
+      <div class="receipt"><span class="ms" style="font-size: 40px">receipt_long</span><span class="note">Comprobante que subió la clienta</span><button type="button" class="btn sm s">Ver en grande</button></div>
+      <div class="notice warn"><span class="ms" style="color: #7C5D2A">info</span>Revisa que el monto y la fecha del comprobante coincidan con tu cuenta.</div>
+      <div class="actions"><button type="button" class="btn td">Rechazar</button><button type="button" class="btn p" onClick="{{close}}">Confirmar pago</button></div>
+    </div></div>
+  </sc-if>
+  <sc-if value="{{cats}}" hint-placeholder-val="{{false}}">
+    <div class="scrim"><div class="panel" role="dialog" aria-label="Categorías de gasto">
+      <div class="ph"><h2>Categorías de gasto</h2><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
+      <div class="card"><div class="row"><span class="grow">Alquiler</span><span class="pill none">En uso</span></div><div class="row"><span class="grow">Servicios</span><span class="pill none">En uso</span></div><div class="row"><span class="grow">Limpieza</span><span class="pill none">En uso</span></div><div class="row"><span class="grow">Mantenimiento de equipos</span><button type="button" class="btn sm td">Eliminar</button></div></div>
+      <div style="display: flex; gap: 8px"><span style="flex: 1; height: 44px; border: 1px solid #E6DBD0; border-radius: 12px; background: #F5EFE9; padding: 0 14px; display: flex; align-items: center; color: #6F6662">Nombre de la categoría</span><button type="button" class="btn p">Agregar</button></div>
+      <span class="note">Una categoría en uso no se puede eliminar.</span>
+    </div></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"vista":{"editor":"enum","options":["pagos","revisar","caja","sueldos","pagados","gastos"],"default":"pagos"},"$preview":{"width":1440,"height":1000}}'>
+var RAIL = [['ini','home','Inicio','P01-Inicio.dc.html','','b'],['hor','calendar_month','Horario','P02-Horario.dc.html','','b'],['cli','group','Clientas','P03-Clientas.dc.html','4','b'],['pro','campaign','Promociones','P04-Promociones.dc.html','','b'],['com','forum','Comentarios','P05-Comentarios.dc.html','2','b'],['din','payments','Dinero','P06-Dinero.dc.html','4','a'],['est','storefront','Estudio','P07-Estudio.dc.html','1','b'],['inf','bar_chart','Informes','P08-Informes.dc.html','','b'],['aj','settings','Ajustes','P09-Ajustes.dc.html','','b']];
+function rail(active) { return RAIL.map(function (r) { return { icon: r[1], label: r[2], href: r[3], badge: r[4], cls: 'ri' + (r[0] === active ? ' on' : '') }; }); }
+var EXPLAIN = { pagos: 'Pagos: cada plan o evaluación que compró una clienta, por QR o en efectivo', caja: 'Caja: el efectivo del mostrador de cada sede, día por día', sueldos: 'Sueldos: lo que corresponde pagar al equipo y lo ya pagado', gastos: 'Gastos: lo que gasta cada sede' };
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var v = this.props.vista ?? 'pagos';
+    var tab = st.tab || ({ revisar: 'pagos', pagados: 'sueldos' }[v] || v);
+    var per = st.per || 'mes';
+    var view = st.view || (v === 'pagados' ? 'pagados' : 'aprobar');
+    var review = st.review !== undefined ? st.review : v === 'revisar';
+    function set(o) { return function () { self.setState(o); }; }
+    var payments = [
+      ['Hoy', 'Mariana Peña', 'Paquete de 8 clases', 'Bs 502', 'QR', 'Por revisar', 'wait', '—', 'Revisar', true],
+      ['28/10', 'Lucía Fernández', 'Paquete de 8 clases', 'Bs 502', 'Efectivo', 'Confirmado', 'ok', 'Emitida', 'Anular', false],
+      ['27/10', 'Isabel Arce', 'Mensual 16 clases', 'Bs 780', 'Efectivo', 'Confirmado', 'ok', 'Marcar emitida', 'Anular', false],
+      ['02/10', 'Isabel Arce', 'Evaluación nutricional', 'Bs 120', 'QR', 'Confirmado', 'ok', 'Emitida', 'Anular', false]
+    ].map(function (p) { return { date: p[0], n: p[1], what: p[2], amount: p[3], method: p[4], state: p[5], pillCls: 'pill ' + p[6], invoice: p[7], cta: p[8], btnCls: p[9] ? 'btn sm p' : 'btn sm td' }; });
+    var labels = { dia: 'Martes 3 de noviembre', semana: 'Semana del 26 de octubre al 1 de noviembre', rango: '15 – 31 de octubre', mes: 'Octubre de 2026' };
+    var stmts = [
+      { n: 'Daniela Ortiz', ini: 'DO', role: 'Entrenadora · 24 clases', total: 'Bs 1.840', lines: [['Clases dictadas', '24 × Bs 65', 'Bs 1.560'], ['Alumnas extra', '20 × Bs 8', 'Bs 160'], ['Comisión clienta nueva', 'Camila Torres', 'Bs 120']] },
+      { n: 'Emma Vargas', ini: 'EV', role: 'Entrenadora · 12 clases', total: 'Bs 780', lines: [['Clases dictadas', '12 × Bs 65', 'Bs 780'], ['Clases canceladas por mínimo', '0', 'Bs 0']] },
+      { n: 'Carolina Rivas', ini: 'CR', role: 'Coordinadora · mensual', total: 'Bs 3.900', lines: [['Base', 'Octubre', 'Bs 3.500'], ['Clientas nuevas', '8 × Bs 50', 'Bs 400'], ['Bono de renovación', 'Meta no alcanzada', 'Bs 0']] }
+    ].map(function (s) { return Object.assign({}, s, { lines: s.lines.map(function (l) { return { what: l[0], detail: l[1], amount: l[2] }; }) }); });
+    var wide = tab === 'pagos' || tab === 'sueldos';
+    return { rail: rail('din'), payments: payments, stmts: stmts, explain: EXPLAIN[tab],
+      branch: wide ? { icon: 'apartment', label: 'Todo el estudio', pick: false } : { icon: 'location_on', label: 'Sucursal Centro', pick: true },
+      tabs: [['pagos', 'Pagos', '1'], ['caja', 'Caja', ''], ['sueldos', 'Sueldos', '3'], ['gastos', 'Gastos', '']].map(function (t) { return { label: t[1], count: t[2], cls: 'tab' + (t[0] === tab ? ' on' : ''), go: set({ tab: t[0], review: false, cats: false }) }; }),
+      is: { pagos: tab === 'pagos', caja: tab === 'caja', sueldos: tab === 'sueldos', gastos: tab === 'gastos' },
+      periods: [['dia', 'Día'], ['semana', 'Semana'], ['rango', 'Rango'], ['mes', 'Mes']].map(function (q) { return { label: q[1], cls: q[0] === per ? 'on' : '', go: set({ per: q[0] }) }; }),
+      periodLabel: labels[per],
+      views: [['aprobar', 'Por aprobar · 3'], ['pagados', 'Pagados']].map(function (w) { return { label: w[1], cls: w[0] === view ? 'on' : '', go: set({ view: w[0] }) }; }),
+      sv: { aprobar: view === 'aprobar', pagados: view === 'pagados' },
+      review: review, cats: !!st.cats, openReview: set({ review: true }), openCats: set({ cats: true }), close: set({ review: false, cats: false }) };
+  }
+}
+</script>
+</body>
+</html>

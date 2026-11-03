@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Dirección visual del admin web</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:'liga';font-feature-settings:'liga'}
+button{font-family:'Work Sans',sans-serif}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 1900px; box-sizing: border-box; background: #FAF7F2; font-family: 'Work Sans', sans-serif; color: #4A4A4A; font-size: 15px; padding: 56px 64px; display: flex; flex-direction: column; gap: 48px">
+  <div style="display: flex; flex-direction: column; gap: 8px; max-width: 880px">
+    <span style="font-family: 'Lora', serif; font-size: 18px; color: #93615D">Emma Pilates Studio</span>
+    <h1 style="margin: 0; font-family: 'Lora', serif; font-weight: 400; font-size: 44px">El sistema de las apps, en la computadora</h1>
+    <p style="margin: 0; color: #6F6662; font-size: 17px">Mismos colores, letras y botones que la app nueva. Superficies cálidas sin blanco, tarjetas sin borde ni sombra, un solo énfasis por página.</p>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Colores</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px">
+      <sc-for list="{{colors}}" as="c" hint-placeholder-count="8">
+        <div style="background: #F5EFE9; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column">
+          <span style="{{c.swatch}}"></span>
+          <span style="padding: 12px 16px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{c.name}}</span><span style="font-size: 13px; color: #6F6662">{{c.hex}} · {{c.use}}</span></span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 32px; align-items: start">
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Letras</h2>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 150px; font-size: 13px; color: #6F6662">Título de página · Lora 32</span><span style="font-family: 'Lora', serif; font-size: 32px">Clientas</span></div>
+        <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 150px; font-size: 13px; color: #6F6662">Título de tarjeta · Lora 20</span><span style="font-family: 'Lora', serif; font-size: 20px">Sin plan activo</span></div>
+        <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 150px; font-size: 13px; color: #6F6662">Cifra · Lora 32</span><span style="font-family: 'Lora', serif; font-size: 32px; font-variant-numeric: tabular-nums">Bs 1.282</span></div>
+        <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 150px; font-size: 13px; color: #6F6662">Texto · Work Sans 15</span><span>Paquete de 8 clases · vence el 28 de noviembre</span></div>
+        <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 150px; font-size: 13px; color: #6F6662">Sección · Work Sans 12</span><span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Por resolver</span></div>
+        <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 150px; font-size: 13px; color: #6F6662">Nota · Work Sans 13</span><span style="font-size: 13px; color: #6F6662">Transferencias por QR con comprobante</span></div>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Botones (44 de alto en la computadora)</h2>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+        <button type="button" style="height: 44px; padding: 0 18px; border: 0; border-radius: 14px; background: #B78380; color: #FFFFFF; font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px"><span class="ms" style="font-size: 20px">add</span>Nueva sesión</button>
+        <button type="button" style="height: 44px; padding: 0 18px; border: 0; border-radius: 14px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; font-size: 15px">Exportar CSV</button>
+        <button type="button" style="height: 44px; padding: 0 12px; border: 0; background: transparent; color: #7D4F4B; font-weight: 600; font-size: 15px">Ver horario</button>
+        <button type="button" style="height: 44px; padding: 0 18px; border: 0; border-radius: 14px; background: #F7E5E0; color: #A04E3E; font-weight: 600; font-size: 15px">Cancelar sesión</button>
+        <button type="button" style="height: 44px; padding: 0 18px; border: 0; border-radius: 14px; background: #A04E3E; color: #FFFFFF; font-weight: 600; font-size: 15px">Sí, cancelar</button>
+        <span style="background: #93615D; border-radius: 14px; padding: 8px"><button type="button" style="height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: #FFFFFF; color: #93615D; font-weight: 600; font-size: 14px">Revisar pagos</button></span>
+      </div>
+      <span style="font-size: 13px; color: #6F6662">Primario · Secundario · Texto · Destructivo · Confirmación destructiva · Sobre énfasis. Sin enlaces subrayados.</span>
+    </section>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 32px; align-items: start">
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Menú lateral</h2>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; max-width: 260px">
+        <div style="padding: 0 12px 6px; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Día a día</div>
+        <span style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 12px"><span class="ms" style="font-size: 20px; color: #B78380">calendar_month</span>Horario</span>
+        <span style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 12px; background: #F2E4E1; color: #7D4F4B; font-weight: 600"><span class="ms" style="font-size: 20px; color: #93615D">group</span><span style="flex: 1">Clientas</span><span style="min-width: 22px; height: 22px; padding: 0 7px; box-sizing: border-box; border-radius: 999px; background: #93615D; color: #FFFFFF; font-size: 12px; display: inline-flex; align-items: center; justify-content: center">4</span></span>
+        <span style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 12px"><span class="ms" style="font-size: 20px; color: #B78380">payments</span><span style="flex: 1">Pagos y caja</span><span style="min-width: 22px; height: 22px; padding: 0 7px; box-sizing: border-box; border-radius: 999px; background: #93615D; color: #FFFFFF; font-size: 12px; display: inline-flex; align-items: center; justify-content: center">2</span></span>
+      </div>
+      <span style="font-size: 13px; color: #6F6662">Lino de fondo, sin línea. La página activa en Rosa tinte. El número cuenta lo que espera una acción.</span>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Estados</h2>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-wrap: wrap; gap: 10px">
+        <span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(124,148,115,0.16); color: #4F6347">Activo</span>
+        <span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(201,154,78,0.16); color: #7C5D2A">Por revisar</span>
+        <span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F7E5E0; color: #A04E3E">Expirado</span>
+        <span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(216,201,187,0.34); color: #6F6662">Sin plan</span>
+        <span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #F2E4E1; color: #7D4F4B">Llena · 2 en espera</span>
+      </div>
+      <span style="font-size: 13px; color: #6F6662">Verde y ámbar solo en pastillas de estado.</span>
+    </section>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Listas y tablas</h2>
+    <div style="background: #F5EFE9; border-radius: 16px; overflow-x: auto">
+      <table style="width: 100%; min-width: 720px; border-collapse: collapse">
+        <thead><tr>
+          <th style="text-align: left; padding: 14px 20px; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Clienta</th>
+          <th style="text-align: left; padding: 14px 20px; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Plan</th>
+          <th style="text-align: right; padding: 14px 20px; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Monto</th>
+          <th style="text-align: left; padding: 14px 20px; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Estado</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-top: 1px solid #E6DBD0"><td style="padding: 14px 20px"><span style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center">MP</span><span style="font-weight: 600">Mariana Peña</span></span></td><td style="padding: 14px 20px">Paquete de 8 clases</td><td style="padding: 14px 20px; text-align: right; font-variant-numeric: tabular-nums">Bs 502</td><td style="padding: 14px 20px"><span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(201,154,78,0.16); color: #7C5D2A">Por revisar</span></td></tr>
+          <tr style="border-top: 1px solid #E6DBD0"><td style="padding: 14px 20px"><span style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center">LF</span><span style="font-weight: 600">Lucía Fernández</span></span></td><td style="padding: 14px 20px">Paquete de 8 clases</td><td style="padding: 14px 20px; text-align: right; font-variant-numeric: tabular-nums">Bs 502</td><td style="padding: 14px 20px"><span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(124,148,115,0.16); color: #4F6347">Confirmado</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <span style="font-size: 13px; color: #6F6662">La tabla es una tarjeta Lino; las filas se separan con una línea Arena. Cabecera en Sección, cifras alineadas a la derecha.</span>
+  </section>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 32px; align-items: start">
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Panel lateral (fichas y formularios)</h2>
+      <div style="background: rgba(74,58,48,0.22); border-radius: 16px; padding: 24px 0 24px 120px; display: flex; justify-content: flex-end">
+        <div style="width: 100%; max-width: 380px; background: #FAF7F2; border-radius: 16px 0 0 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+          <span style="font-family: 'Lora', serif; font-size: 24px">Nuevo insumo</span>
+          <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 500">Nombre</span><input value="Toallas" style="height: 44px; box-sizing: border-box; padding: 0 14px; border: 1px solid #E6DBD0; border-radius: 12px; background: #F5EFE9; font: 400 15px 'Work Sans', sans-serif; color: #4A4A4A"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 500">Avisar cuando queden</span><input value="5" style="height: 44px; box-sizing: border-box; padding: 0 14px; border: 1px solid #E6DBD0; border-radius: 12px; background: #F5EFE9; font: 400 15px 'Work Sans', sans-serif; color: #4A4A4A"></label>
+          <div style="display: flex; gap: 8px; justify-content: flex-end"><button type="button" style="height: 44px; padding: 0 12px; border: 0; background: transparent; color: #7D4F4B; font-weight: 600">Cancelar</button><button type="button" style="height: 44px; padding: 0 18px; border: 0; border-radius: 14px; background: #B78380; color: #FFFFFF; font-weight: 600">Guardar insumo</button></div>
+        </div>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Aviso, confirmación y vacío</h2>
+      <div style="display: flex; align-items: center; gap: 12px; background: #F5EFE9; border-radius: 12px; padding: 14px 16px; border-left: 4px solid #C99A4E"><span class="ms" style="font-size: 20px; color: #7C5D2A">warning</span><span>La clase tiene 9 reservas: se devuelven y se avisa a cada clienta.</span></div>
+      <div style="display: flex; align-items: center; gap: 12px; background: #93615D; color: #FFFFFF; border-radius: 14px; padding: 14px 16px"><span class="ms" style="font-size: 20px">check_circle</span><span style="flex: 1">Pago confirmado · el plan de Mariana ya está activo</span><span class="ms" style="font-size: 20px; color: rgba(255,255,255,0.8)">close</span></div>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+        <span style="width: 72px; height: 72px; border-radius: 999px; background: #F2E4E1; color: #93615D; display: flex; align-items: center; justify-content: center"><span class="ms" style="font-size: 32px">task_alt</span></span>
+        <span style="font-family: 'Lora', serif; font-size: 24px">Todo al día</span>
+        <span style="color: #6F6662; font-size: 14px">No hay pagos por revisar. Te avisamos cuando llegue uno.</span>
+      </div>
+    </section>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Medidas en la computadora</h2>
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; font-size: 14px">
+      <span>Menú lateral: 248 px; en el celular, menú que se abre con ☰</span>
+      <span>Margen de la página: 40 px; 20 px en el celular</span>
+      <span>Escala de espacios: 4 · 8 · 12 · 16 · 24 · 32 · 48</span>
+      <span>Esquinas: tarjetas 16, botones 14, énfasis 20</span>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+var C = [
+  ['Marfil', '#FAF7F2', 'fondo de página', true],
+  ['Lino', '#F5EFE9', 'menú, tarjetas, tablas, campos'],
+  ['Rosa tinte', '#F2E4E1', 'página activa, botón secundario'],
+  ['Palo de rosa', '#B78380', 'botón primario, íconos'],
+  ['Rosa profundo', '#93615D', 'el único énfasis de la página'],
+  ['Rosa enlace', '#7D4F4B', 'botones de texto'],
+  ['Plomo cálido', '#4A4A4A', 'texto'],
+  ['Texto tenue', '#6F6662', 'notas y etiquetas'],
+  ['Arena', '#E6DBD0', 'líneas entre filas'],
+  ['Error', '#A04E3E', 'acciones destructivas']
+];
+class Component extends DCLogic {
+  renderVals() {
+    return { colors: C.map(function (c) { return { name: c[0], hex: c[1], use: c[2], swatch: 'display: block; height: 72px; background: ' + c[1] + (c[3] ? '; box-shadow: inset 0 -1px 0 #E6DBD0' : '') }; }) };
+  }
+}
+</script>
+</body>
+</html>

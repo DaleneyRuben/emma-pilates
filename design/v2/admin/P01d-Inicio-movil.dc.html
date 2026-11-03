@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio · 420 px</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:'liga';font-feature-settings:'liga'}
+button{font-family:'Work Sans',sans-serif}
+</style>
+</helmet>
+<div style="position: relative; width: 420px; height: 1560px; overflow: hidden; background: #FAF7F2; font-family: 'Work Sans', sans-serif; color: #4A4A4A; font-size: 15px">
+  <header style="height: 64px; display: flex; align-items: center; gap: 8px; padding: 0 12px">
+    <button type="button" onClick="{{openMenu}}" aria-label="Abrir menú" style="width: 44px; height: 44px; border: 0; border-radius: 12px; background: #F5EFE9; color: #B78380; cursor: pointer; display: flex; align-items: center; justify-content: center"><span class="ms" style="font-size: 24px">menu</span></button>
+    <span style="flex: 1; display: flex; align-items: baseline; gap: 6px; padding-left: 4px"><span style="font-family: 'Lora', serif; font-size: 20px">Emma</span><span style="font-family: 'Lora', serif; font-size: 14px; color: #93615D">Pilates Studio</span></span>
+    <button type="button" aria-label="Buscar" style="width: 44px; height: 44px; border: 0; border-radius: 12px; background: #F5EFE9; color: #B78380; display: flex; align-items: center; justify-content: center"><span class="ms" style="font-size: 22px">search</span></button>
+    <span style="width: 40px; height: 40px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center">PM</span>
+  </header>
+  <main style="padding: 8px 20px 32px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <h1 style="margin: 0; font-family: 'Lora', serif; font-weight: 400; font-size: 30px">Buenos días, Paola</h1>
+      <button type="button" style="align-self: flex-start; height: 40px; display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; color: #6F6662; font-size: 15px"><span class="ms" style="font-size: 18px; color: #B78380">location_on</span>Martes 3 · Sucursal Centro<span class="ms" style="font-size: 18px">expand_more</span></button>
+    </div>
+    <div style="background: #93615D; color: #FFFFFF; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.75)">Por resolver</span>
+      <span style="font-family: 'Lora', serif; font-size: 32px">6 pendientes</span>
+      <span style="font-size: 14px; color: rgba(255,255,255,0.88); line-height: 1.5">1 pago por QR · 1 congelamiento · 3 clientas · 2 comentarios · stock bajo · 3 sueldos</span>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Hoy en Centro</span>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <span style="display: flex; flex-direction: column"><span style="font-family: 'Lora', serif; font-size: 26px">2</span><span style="font-size: 13px; color: #6F6662">clases</span></span>
+        <span style="display: flex; flex-direction: column"><span style="font-family: 'Lora', serif; font-size: 26px">23</span><span style="font-size: 13px; color: #6F6662">reservas</span></span>
+        <span style="display: flex; flex-direction: column"><span style="font-family: 'Lora', serif; font-size: 26px">88 %</span><span style="font-size: 13px; color: #6F6662">ocupación</span></span>
+      </div>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; justify-content: space-between"><span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Dinero</span><span style="display: flex; gap: 2px; background: #FAF7F2; border-radius: 999px; padding: 3px"><span style="height: 30px; padding: 0 12px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center">Hoy</span><span style="height: 30px; padding: 0 12px; border-radius: 999px; color: #6F6662; font-size: 13px; display: inline-flex; align-items: center">Mes</span></span></div>
+      <span style="font-family: 'Lora', serif; font-size: 30px">Bs 502</span>
+      <span style="font-size: 13px; color: #6F6662">Cobrado hoy · 1 venta · Bs 502 en QR por revisar</span>
+    </div>
+    <section style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Por resolver</h2>
+      <div style="background: #F5EFE9; border-radius: 16px">
+        <sc-for list="{{inbox}}" as="m" hint-placeholder-count="6">
+          <div style="{{m.rowStyle}}">
+            <span style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; color: #B78380; display: flex; align-items: center; justify-content: center; flex: none"><span class="ms" style="font-size: 20px">{{m.icon}}</span></span>
+            <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 500">{{m.title}}</span><span style="font-size: 13px; color: #6F6662">{{m.note}}</span></span>
+            <span class="ms" style="font-size: 20px; color: #C4BAB6">chevron_right</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Recomendaciones del mes</h2>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px; display: flex; gap: 12px"><span style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; color: #B78380; display: flex; align-items: center; justify-content: center; flex: none"><span class="ms" style="font-size: 20px">lightbulb</span></span><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 500">El Reformer del jueves 18:30 se llena poco</span><span style="font-size: 13px; color: #6F6662">3 de 12 lugares en promedio. Prueba moverlo a las 19:30.</span></span></div>
+    </section>
+  </main>
+
+  <sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; background: rgba(74,58,48,0.22); display: flex">
+      <nav aria-label="Menú principal" style="width: 300px; height: 100%; box-sizing: border-box; background: #F5EFE9; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px">
+        <div style="display: flex; align-items: center; gap: 8px; padding: 0 0 12px 12px">
+          <span style="flex: 1; display: flex; align-items: baseline; gap: 6px"><span style="font-family: 'Lora', serif; font-size: 22px">Emma</span><span style="font-family: 'Lora', serif; font-size: 14px; color: #93615D">Pilates Studio</span></span>
+          <button type="button" onClick="{{closeMenu}}" aria-label="Cerrar menú" style="width: 44px; height: 44px; border: 0; border-radius: 12px; background: #FAF7F2; color: #6F6662; cursor: pointer; display: flex; align-items: center; justify-content: center"><span class="ms" style="font-size: 22px">close</span></button>
+        </div>
+        <sc-for list="{{dest}}" as="d" hint-placeholder-count="9">
+          <button type="button" onClick="{{closeMenu}}" style="{{d.style}}"><span class="ms" style="{{d.iconStyle}}">{{d.icon}}</span><span style="flex: 1">{{d.label}}</span><sc-if value="{{d.badge}}" hint-placeholder-val="{{false}}"><span style="min-width: 22px; height: 22px; padding: 0 7px; box-sizing: border-box; border-radius: 999px; background: #93615D; color: #FFFFFF; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{d.badge}}</span></sc-if></button>
+        </sc-for>
+      </nav>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":420,"height":1560}}'>
+var DEST = [['home', 'Inicio', '', true], ['calendar_month', 'Horario', ''], ['group', 'Clientas', '4'], ['campaign', 'Promociones', ''], ['forum', 'Comentarios', '2'], ['payments', 'Dinero', '4'], ['storefront', 'Estudio', '1'], ['bar_chart', 'Informes', ''], ['settings', 'Ajustes', '']];
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var dest = DEST.map(function (d) {
+      var on = !!d[3];
+      return { icon: d[0], label: d[1], badge: d[2],
+        style: 'display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 12px; border: 0; border-radius: 12px; font-size: 16px; cursor: pointer; text-align: left;' + (on ? ' background: #93615D; color: #FFFFFF; font-weight: 600;' : ' background: transparent; color: #4A4A4A;'),
+        iconStyle: 'font-size: 22px; color: ' + (on ? '#FFFFFF' : '#B78380') };
+    });
+    var inbox = [['payments', 'Mariana Peña pagó Bs 502 por QR', 'Paquete de 8 clases'], ['ac_unit', 'Valeria pide congelar su plan', 'Del 10 al 24 de noviembre'], ['chat', '3 clientas para contactar', 'Primeros 90 días'], ['forum', '2 comentarios nuevos', 'App de clientas'], ['inventory_2', 'Toallas: quedan 4', 'Sucursal Centro'], ['account_balance_wallet', '3 sueldos por aprobar', 'Octubre de 2026']].map(function (m, i) {
+      return { icon: m[0], title: m[1], note: m[2], rowStyle: 'min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 8px 16px;' + (i ? ' border-top: 1px solid #E6DBD0;' : '') };
+    });
+    return { dest: dest, inbox: inbox, menuOpen: !!st.menu, openMenu: function () { self.setState({ menu: true }); }, closeMenu: function () { self.setState({ menu: false }); } };
+  }
+}
+</script>
+</body>
+</html>
