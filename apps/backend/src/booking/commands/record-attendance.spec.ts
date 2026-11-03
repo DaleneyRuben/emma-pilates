@@ -20,7 +20,6 @@ const dependencies = (now: string) => ({
     branchId: 'branch-id',
     trainerStaffMemberId: 'trainer-id',
     startsAt: new Date('2026-09-10T10:00:00Z'),
-    endsAt: new Date('2026-09-10T10:50:00Z'),
     state: 'scheduled',
   }),
   loadBookedIds: jest.fn().mockResolvedValue(['booking-id']),

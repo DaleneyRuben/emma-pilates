@@ -9,7 +9,7 @@ type RecordAttendanceDependencies = {
     id: string;
     branchId: string;
     trainerStaffMemberId: string;
-    endsAt: Date;
+    startsAt: Date;
     state: 'scheduled' | 'cancelled';
   } | null>;
   loadBookedIds(sessionId: string): Promise<string[]>;
@@ -33,7 +33,8 @@ export const recordAttendance = async (
   if (
     session === null ||
     session.state !== 'scheduled' ||
-    session.endsAt > dependencies.now() ||
+    // Owner, 2026-11-03: from the class start on, with no closing time.
+    session.startsAt > dependencies.now() ||
     dependencies.principal.identity.kind !== 'staff' ||
     dependencies.principal.identity.role !== 'trainer' ||
     dependencies.principal.identity.staffMemberId !==
