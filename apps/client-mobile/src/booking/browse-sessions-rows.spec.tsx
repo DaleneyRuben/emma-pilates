@@ -124,6 +124,17 @@ describe("Client class list rows", () => {
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
   });
 
+  // MOB-074 walk: a fixed 56 pt width broke «09:00» in Lora 20 into «09:0» and
+  // «0» on the iPhone 16 Pro.
+  it("keeps the start time on one line", async () => {
+    const { cards } = await openClassList();
+    const time = cards[0].getByTestId("session-row-time");
+
+    expect(time).toHaveProp("numberOfLines", 1);
+    expect(time).not.toHaveStyle({ width: 56 });
+    expect(time).toHaveStyle({ minWidth: 56 });
+  });
+
   it("draws the seat pills on Rosa tinte, and a full class on Arena", async () => {
     const { cards } = await openClassList();
 

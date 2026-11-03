@@ -75,6 +75,8 @@ describe("Renewing from the Plan detail", () => {
     });
 
     expect(screen.getByTestId("start-date-chooser")).toBeOnTheScreen();
+    // C09 titles the day tiles once.
+    expect(screen.getAllByText("Fecha de inicio")).toHaveLength(1);
     expect(screen.queryByText(/al terminar el actual/)).toBeNull();
   });
 });

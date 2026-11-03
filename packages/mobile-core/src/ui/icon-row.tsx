@@ -89,9 +89,11 @@ const styles = StyleSheet.create({
   group: { backgroundColor: colors.card, borderRadius: radii.card },
   // 16 side padding + 36 disc + 12 gap.
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
+  // The label keeps its width; a long value wraps under itself instead.
   label: {
     color: colors.text,
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 0,
     fontFamily: fontFamilies.body,
     fontSize: typography.bodyMedium,
   },
@@ -104,5 +106,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  value: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.body },
+  value: {
+    color: colors.textMuted,
+    flexShrink: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
+    textAlign: "right",
+  },
 });

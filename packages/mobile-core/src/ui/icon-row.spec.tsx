@@ -55,6 +55,23 @@ describe("IconRow", () => {
   });
 });
 
+// MOB-074 walk: a long value («Centro, Equipetrol, Urubó») squeezed the label
+// to «Sucursale / s» on the Staff Perfil; the label keeps its width and the
+// value wraps instead.
+describe("IconRow with a long value", () => {
+  it("keeps the label whole and lets the value wrap", async () => {
+    const screen = await render(
+      <IconRow icon="pin" label="Sucursales" value="Centro, Equipetrol, Urubó" />,
+    );
+
+    expect(screen.getByText("Sucursales")).toHaveStyle({ flexShrink: 0 });
+    expect(screen.getByText("Centro, Equipetrol, Urubó")).toHaveStyle({
+      flexShrink: 1,
+      textAlign: "right",
+    });
+  });
+});
+
 describe("IconRowGroup", () => {
   it("draws Lino at radius 16 with no border and a hairline inset 64 between rows", async () => {
     const screen = await render(

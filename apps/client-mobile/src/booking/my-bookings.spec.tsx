@@ -215,6 +215,10 @@ describe("Client My Bookings", () => {
         upcoming = [{ ...insideWindow, bookingId: "booking-new", ...facts(at(3 * hour)) }];
         return jsonResponse({ id: "booking-new" }, 201);
       },
+      "DELETE /api/v1/bookings/booking-new": () => {
+        upcoming = [];
+        return new Response(null, { status: 204 });
+      },
     });
 
     await waitFor(() => {
@@ -250,6 +254,18 @@ describe("Client My Bookings", () => {
       );
       expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
     });
+
+    // MOB-074 walk: once that Booking is cancelled, «Reserva confirmada» no
+    // longer holds, so the toast goes with it.
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar reserva" }));
+    await waitFor(() => {
+      expect(screen.getByText("¿Cancelar esta reserva?")).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar reserva" }));
+    await waitFor(() => {
+      expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen();
+    });
+    expect(screen.queryByText("Reserva confirmada")).toBeNull();
   });
 
   // MOB-070: a double tap must replay the same Reschedule, as Reservar and

@@ -11,7 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { BackBar } from "../ui/back-bar";
+import { BackBar, backBarScroll } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
 import { SectionHeader } from "../ui/section-header";
 import { freezeDays, freezeRange } from "./freeze-format";
@@ -61,7 +61,10 @@ export function FreezesScreen() {
   const freezes = requested.data.data;
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={[styles.content, backBarScroll.content]}
+        style={backBarScroll.scroll}
+      >
         {header}
         {freezes.length === 0 ? (
           <StateScreen

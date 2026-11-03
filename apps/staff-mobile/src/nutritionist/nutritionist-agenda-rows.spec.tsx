@@ -34,6 +34,8 @@ describe("Nutritionist agenda rows", () => {
       fontSize: 20,
       fontVariant: ["tabular-nums"],
     });
+    // MOB-074 walk: the time never wraps in its column.
+    expect(screen.getByText("09:00")).toHaveProp("numberOfLines", 1);
     expect(screen.getByText("45 min")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
     expect(screen.getByText("Valeria Áñez")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
     expect(screen.getByText("Primera evaluación")).toHaveStyle({ color: "#6F6662", fontSize: 13 });

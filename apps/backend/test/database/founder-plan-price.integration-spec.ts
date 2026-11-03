@@ -147,4 +147,79 @@ describe('founder plan list price', () => {
       amountDueCentavos: 89_300,
     });
   });
+
+  // The iPad showed Bs 560 for a renewing founder and charged Bs 476. The
+  // quote and the cash sale must agree for every founder state.
+  const buyEight = (clientId: string) =>
+    world.staffPrincipal('camila.rojas@example.com').then((assistant) =>
+      world.commands().recordCashPayment(
+        {
+          clientId,
+          planId: plan.id,
+          branchId: fixtures.branches.find(
+            (branch) => branch.name === 'Centro',
+          )!.id,
+        },
+        assistant,
+        randomUUID(),
+      ),
+    );
+
+  const quoteEight = async (clientId: string) =>
+    (
+      await priceFounderPlanList(
+        world.prisma,
+        clientId,
+        await createCatalogRepository(world.prisma).listVisiblePlans(),
+        now,
+      )
+    ).find((item) => item.id === plan.id);
+
+  it('quotes and charges the founder price on an active founder renewal', async () => {
+    const founder = await world.newClient('Renueva fundadora');
+    await buyEight(founder.clientId);
+
+    const quoted = await quoteEight(founder.clientId);
+    expect(quoted).toMatchObject({
+      priceCentavos: 47_600,
+      listPriceCentavos: 56_000,
+    });
+    const renewal = await buyEight(founder.clientId);
+    expect(renewal.amountDueCentavos).toBe(quoted?.priceCentavos);
+  });
+
+  it('quotes and charges the list price to a founder who lost the benefit', async () => {
+    const lost = await world.newClient('Perdió fundadora');
+    await buyEight(lost.clientId);
+    await world.prisma.founderMembership.updateMany({
+      where: { clientId: lost.clientId },
+      data: { status: 'LOST', reason: 'gap', lostAt: now },
+    });
+
+    const quoted = await quoteEight(lost.clientId);
+    expect(quoted).toMatchObject({ priceCentavos: 56_000 });
+    expect(quoted?.listPriceCentavos).toBeUndefined();
+    const sale = await buyEight(lost.clientId);
+    expect(sale.amountDueCentavos).toBe(quoted?.priceCentavos);
+  });
+
+  it('quotes the list price to a founder whose gap already passed 7 days, as the sale charges', async () => {
+    const lapsed = await world.newClient('Se pasó del plazo');
+    await buyEight(lapsed.clientId);
+    const tenDaysAgo = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1_000);
+    await world.prisma.subscription.updateMany({
+      where: { clientId: lapsed.clientId },
+      data: {
+        startsOn: new Date(tenDaysAgo.getTime() - 30 * 24 * 60 * 60 * 1_000),
+        endsOn: tenDaysAgo,
+        state: 'EXPIRED',
+        expiredAt: tenDaysAgo,
+      },
+    });
+
+    const quoted = await quoteEight(lapsed.clientId);
+    expect(quoted).toMatchObject({ priceCentavos: 56_000 });
+    const sale = await buyEight(lapsed.clientId);
+    expect(sale.amountDueCentavos).toBe(quoted?.priceCentavos);
+  });
 });

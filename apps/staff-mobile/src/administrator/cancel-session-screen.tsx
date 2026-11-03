@@ -22,7 +22,7 @@ import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { BackBar } from "../ui/back-bar";
+import { BackBar, backBarScroll } from "../ui/back-bar";
 import { dayHeading } from "../ui/session-time";
 import { ValueRow } from "../ui/value-row";
 import { AdministratorApiError, createAdministratorApi } from "./administrator-api";
@@ -114,7 +114,10 @@ export function CancelSessionScreen({
   const empty = session.bookedCount === 0;
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={[styles.content, backBarScroll.content]}
+        style={backBarScroll.scroll}
+      >
         {header}
         <View style={styles.card}>
           <Text style={styles.title}>{session.classTypeName}</Text>

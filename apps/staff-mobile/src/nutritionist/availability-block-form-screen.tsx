@@ -29,6 +29,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import {
+  DateTile,
   Pill,
   pillRow,
   problemMessage,
@@ -51,6 +52,7 @@ import {
   countLabel,
   turnosIn,
   weekdayNames,
+  weekdayTag,
 } from "./nutritionist-format";
 
 type FormNavigation = { goBack: () => void };
@@ -168,11 +170,13 @@ export function AvailabilityBlockFormScreen({
       />
       <ScrollView contentContainerStyle={styles.content}>
         <SectionLabel>Día</SectionLabel>
-        <View style={styles.pills}>
+        <View style={styles.weekdays}>
           {weekdayNames.map((name, index) => (
             <Pill
+              accessibilityLabel={name}
+              fill
               key={name}
-              label={name}
+              label={weekdayTag(index + 1)}
               onPress={() => setWeekday(index + 1)}
               selected={weekday === index + 1}
             />
@@ -206,21 +210,21 @@ export function AvailabilityBlockFormScreen({
         </View>
         <SectionLabel>{editing ? "Aplicar cambios desde" : "A partir del"}</SectionLabel>
         <ScrollView
-          contentContainerStyle={styles.pills}
+          contentContainerStyle={styles.weekdays}
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.dateStrip}
         >
           {Array.from({ length: effectiveDateChoices }, (_, offset) => {
             const date = addCivilDays(today, offset);
-            const chip = civilDateChip(date, today);
             return (
-              <Pill
-                accessibilityLabel={`Fecha ${chip}`}
+              <DateTile
+                accessibilityLabel={`Fecha ${civilDateChip(date, today)}`}
+                date={date}
                 key={date}
-                label={chip}
                 onPress={() => setEffectiveFrom(date)}
                 selected={effectiveFrom === date}
+                today={today}
               />
             );
           })}
@@ -302,4 +306,6 @@ const styles = StyleSheet.create({
   timePlaceholder: { color: colors.textSubtle },
   timeValue: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   times: { flexDirection: "row", gap: spacing.md },
+  // v2 S17: the seven day tiles share the width, 6 pt apart.
+  weekdays: { flexDirection: "row", gap: 6 },
 });
