@@ -667,7 +667,8 @@ export const buildDevelopmentFixtures = (input: {
     clients: clientDefinitions.map(({ key, ...client }) => ({
       id: clientId(key),
       ...client,
-      referralCode: `REF-${key.toUpperCase()}`,
+      // BKM-017: readable, as the backfill and registration make them.
+      referralCode: key.toUpperCase(),
     })),
     sessionSchedules,
     sessions,

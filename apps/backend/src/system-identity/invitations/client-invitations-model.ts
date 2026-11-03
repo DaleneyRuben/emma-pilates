@@ -114,7 +114,6 @@ export interface ClientInvitationTransaction {
     name: string;
     email: string;
     phone: string | null;
-    referralCode: string;
     /** BKM-011: how she found the studio, and the code that brought her. */
     acquisitionChannel: AcquisitionChannel;
     referredByCode: string | null;
@@ -156,7 +155,6 @@ export type ClientInvitationDependencies = {
   linkCipher: { encrypt: (secret: string) => EncryptedAuthenticationLink };
   now: () => Date;
   newId: () => string;
-  newReferralCode: () => string;
 };
 
 export type ClientInvitationView = {

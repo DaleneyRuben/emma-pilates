@@ -27,6 +27,8 @@ describe('renderLinkFallbackPage', () => {
     );
     expect(page).not.toContain('secret-1');
     expect(page).not.toContain('Continuar en el navegador');
+    expect(page).toContain('Emma Pilates Studio');
+    expect(page).not.toContain('Bienestar');
   });
 
   it.each([

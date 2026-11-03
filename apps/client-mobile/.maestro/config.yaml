@@ -21,6 +21,8 @@ executionOrder:
     - profile-photo
     - promotions-consent
     - send-feedback
+    - referral-code-edit
+    - launch-banner
     - purchase-plan-transfer
     - fix227-expired-qr
     - waitlist-join-and-leave

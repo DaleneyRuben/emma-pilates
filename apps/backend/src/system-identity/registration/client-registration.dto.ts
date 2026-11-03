@@ -33,7 +33,7 @@ export class StartClientRegistrationDto {
   password!: string;
 
   @ApiPropertyOptional({
-    example: 'REF-LUCIA',
+    example: 'LUCIA',
     description:
       'Referral Code of the Client or Trainer who brought this person; it decides the Acquisition Channel (BKM-011)',
   })

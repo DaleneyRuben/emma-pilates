@@ -1,0 +1,16 @@
+# Critical journey: a Client who never paid sees the launch banner on «Elige
+# tu plan» without the word «fundadora» (BKM-019, walkthrough n.º 13).
+appId: ${APP_ID}
+env:
+  EMAIL: mariana@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible: "Comprar un plan"
+    timeout: 15000
+- tapOn: "Comprar un plan"
+- extendedWaitUntil:
+    visible: "Oferta por tiempo limitado · 15 % en tu plan"
+    timeout: 15000
+- assertNotVisible: ".*[Ff]undadora.*"
+- takeScreenshot: bkm019-client-1-oferta

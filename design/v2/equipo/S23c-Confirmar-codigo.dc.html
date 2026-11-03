@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Confirmar el cambio de código</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; position: relative; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <span style="width: 44px; height: 44px"></span>
+    <span style="font-size: 16px; font-weight: 500">Tu código de referido</span>
+  </div>
+  <div style="position: absolute; inset: 0; background: rgba(74,74,74,0.45)"></div>
+  <div role="dialog" aria-labelledby="confirm-title" style="position: absolute; left: 20px; right: 20px; top: 260px; background: #FAF7F2; border-radius: 20px; padding: 24px 20px 16px; display: flex; flex-direction: column; gap: 14px">
+    <span id="confirm-title" style="font-family: Lora, Georgia, serif; font-size: 22px">¿Cambiar tu código a DANI-PILATES?</span>
+    <span style="font-size: 15px; line-height: 1.5">Tu código anterior DANIELA dejará de funcionar. Las clientas que ya se registraron con él siguen contigo.</span>
+    <span style="font-size: 14px; color: #6F6662">Podrás cambiarlo de nuevo en 30 días.</span>
+    <a href="S30-Mi-codigo.dc.html" style="height: 52px; border-radius: 14px; background: #93615D; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Cambiar código</a>
+    <a href="S23b-Editar-codigo.dc.html" style="height: 44px; color: #93615D; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Volver</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

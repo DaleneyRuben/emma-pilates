@@ -199,7 +199,6 @@ export const inviteClient = async (
         name: command.name.trim(),
         email,
         phone: command.phone,
-        referralCode: dependencies.newReferralCode(),
         acquisitionChannel: command.acquisitionChannel ?? 'unknown',
         referredByCode: normalizeReferralCode(command.referralCode),
         pendingExpiresAt: new Date(

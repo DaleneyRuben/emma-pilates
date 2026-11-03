@@ -20,6 +20,7 @@ executionOrder:
     - nutritionist-availability
     - trainer-agenda-and-inbox
     - trainer-my-pay
+    - trainer-referral-code
     - send-feedback
     - administrator-review-payments
     - fix006-late-freeze

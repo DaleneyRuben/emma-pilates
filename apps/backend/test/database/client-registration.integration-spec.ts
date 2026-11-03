@@ -56,7 +56,6 @@ describe('Client registration transaction', () => {
       ),
       now: () => now,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     });
 
     const result = await registerClient.execute({
@@ -151,7 +150,6 @@ describe('Client registration transaction', () => {
       linkCipher: cipher,
       now: () => registeredAt,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     });
     const originalEmail = `original-${randomUUID()}@example.com`;
     const registration = await registerClient.execute({
@@ -268,7 +266,6 @@ describe('Client registration transaction', () => {
       linkCipher: cipher,
       now: () => registeredAt,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     }).execute({
       name: 'Verified Client',
       email: `verified-${randomUUID()}@example.com`,

@@ -1,5 +1,5 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { parseTrainerReferralCode } from './acquisition';
+import { parseReferralCode } from './acquisition';
 import { AcquisitionError } from './acquisition-errors';
 
 export type TrainerReferralCodeView = {
@@ -67,7 +67,7 @@ export const setTrainerReferralCode = async (
   const referralCode =
     command.referralCode === null
       ? null
-      : parseTrainerReferralCode(command.referralCode);
+      : parseReferralCode(command.referralCode);
   if (command.referralCode !== null && referralCode === null) {
     throw new AcquisitionError('referral_code_malformed');
   }

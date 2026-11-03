@@ -43,6 +43,9 @@ const sharedContextSlices = [
   'booking/acquisition/acquisition',
   'booking/acquisition/acquisition-errors',
   'booking/acquisition/record-client-acquisition',
+  // A new Client gets her readable Referral Code in the same transaction
+  // (BKM-017).
+  'booking/acquisition/referral-code-claim',
   // Registration opens the friend's Guest Pass in the same transaction
   // (BKM-014). Verification and invitation activation call the same command
   // through the slice that finds the referrer.

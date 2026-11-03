@@ -49,6 +49,7 @@ export const createStaffMember = async (
     ) {
       return reopenStaffInvitation(transaction, dependencies, actor, {
         staffMemberId: existing.staffMemberId,
+        phone: command.phone,
         now,
       });
     }

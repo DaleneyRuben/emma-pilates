@@ -1,4 +1,5 @@
 import { randomBytes, randomUUID } from 'node:crypto';
+import { claimReadableReferralCode } from '../../booking/acquisition/referral-code-claim';
 import {
   SessionState,
   StaffRole,
@@ -124,7 +125,10 @@ const prepareAccount = async (
                 await transaction.client.create({
                   data: {
                     name: reviewerName,
-                    referralCode: `REF-${randomUUID()}`,
+                    referralCode: await claimReadableReferralCode(
+                      transaction,
+                      reviewerName,
+                    ),
                   },
                   select: { id: true },
                 })
@@ -133,7 +137,14 @@ const prepareAccount = async (
           : {
               staffMemberId: (
                 await transaction.staffMember.create({
-                  data: { name: reviewerName, role: StaffRole.TRAINER },
+                  data: {
+                    name: reviewerName,
+                    role: StaffRole.TRAINER,
+                    referralCode: await claimReadableReferralCode(
+                      transaction,
+                      reviewerName,
+                    ),
+                  },
                   select: { id: true },
                 })
               ).id,

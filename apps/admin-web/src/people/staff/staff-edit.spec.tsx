@@ -179,6 +179,37 @@ describe("AW24 Editar miembro", () => {
     );
   });
 
+  // FIX-030: the phone shows read-only here, so an older phone written
+  // without +591 never blocks a Role change.
+  it("changes the Role of a member whose stored phone predates the mobile rule", async () => {
+    const oldPhone = { ...emma, phone: "77712345" };
+    server.use(
+      http.get(apiUrl(staffMembersPath), () =>
+        jsonResponse(staffPage([oldPhone, paolaMember, valentina])),
+      ),
+      http.put(
+        apiUrl(`${memberPath(emma.id)}/role`),
+        record(() => jsonResponse({ ...oldPhone, role: "administrator" })),
+      ),
+    );
+    const { panel, user } = await openMember("Emma Vargas");
+
+    await user.click(
+      within(panel).getByRole("radio", { name: "Administración" }),
+    );
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+
+    await waitFor(() =>
+      expect(sent).toEqual([
+        {
+          method: "PUT",
+          path: `${memberPath(emma.id)}/role`,
+          body: { role: "administrator" },
+        },
+      ]),
+    );
+  });
+
   it("closes without a request when nothing changed", async () => {
     server.use(list());
     const { panel, user } = await openMember("Emma Vargas");

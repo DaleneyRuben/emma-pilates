@@ -8,9 +8,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       <div className="flex w-full max-w-[420px] flex-col gap-6 rounded-marco border border-borde bg-blanco px-5 py-8 sm:px-10 sm:py-10">
         <div className="flex flex-col items-center gap-1 text-center">
           <p className="font-serif text-display text-texto">Emma</p>
-          <p className="text-nota text-texto-tenue">
-            Movimiento · Equilibrio · Bienestar
-          </p>
+          <p className="text-nota text-texto-tenue">Pilates Studio</p>
         </div>
         {children}
       </div>

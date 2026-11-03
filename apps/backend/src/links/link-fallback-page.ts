@@ -92,7 +92,7 @@ export const renderLinkFallbackPage = (
     ) +
     browser +
     `</div>` +
-    `<p style="margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Emma Pilates Studio<br>Movimiento · Equilibrio · Bienestar</p>` +
+    `<p style="margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Emma Pilates Studio</p>` +
     `</main></body></html>`
   );
 };

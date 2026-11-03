@@ -73,6 +73,7 @@ import type {
   CashCloseInputDto,
   CashTodayDto,
   ChangeCurrentPasswordDto,
+  ChangeOwnReferralCodeDto,
   ChangeStaffBranchesDto,
   ChangeStaffRoleDto,
   ClassHistoryEntryDto,
@@ -140,6 +141,7 @@ import type {
   GetNarrativeReportParams,
   GetOwnSalaryPaymentReceiptParams,
   GetPaymentReceiptParams,
+  GetReferralCodeAvailabilityParams,
   GetRevenueReportParams,
   GetSalaryPaymentReceiptParams,
   GetTodayCashCloseParams,
@@ -188,6 +190,7 @@ import type {
   NotificationPageDto,
   NutritionistAgendaPageDto,
   OpeningBudgetSeedDto,
+  OwnReferralCodeDto,
   OwnSalaryPaymentDto,
   PasswordRecoveryRequestResultDto,
   PasswordRecoveryResultDto,
@@ -218,6 +221,7 @@ import type {
   RecordAllowanceAdjustmentDto,
   RecordCashPaymentDto,
   RecordFrontDeskTransferDto,
+  ReferralCodeAvailabilityDto,
   ReferralsDto,
   RejectPaymentDto,
   RequestEmailChangeDto,
@@ -22571,6 +22575,530 @@ export const useSetStaffMemberReferralCode = <
     queryClient,
   );
 };
+
+export type getOwnReferralCodeResponse200 = {
+  data: OwnReferralCodeDto;
+  status: 200;
+};
+
+export type getOwnReferralCodeResponseSuccess =
+  getOwnReferralCodeResponse200 & {
+    headers: Headers;
+  };
+export type getOwnReferralCodeResponse = getOwnReferralCodeResponseSuccess;
+
+export const getGetOwnReferralCodeUrl = () => {
+  return `/api/v1/referral-codes/current`;
+};
+
+export const getOwnReferralCode = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getOwnReferralCodeResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetOwnReferralCodeUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getOwnReferralCodeResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getOwnReferralCodeResponse;
+};
+
+export const getGetOwnReferralCodeQueryKey = () => {
+  return [`/api/v1/referral-codes/current`] as const;
+};
+
+export const getGetOwnReferralCodeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOwnReferralCode>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getOwnReferralCode>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetOwnReferralCodeQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getOwnReferralCode>>
+  > = ({ signal }) =>
+    getOwnReferralCode({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getOwnReferralCode>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetOwnReferralCodeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getOwnReferralCode>>
+>;
+export type GetOwnReferralCodeQueryError = unknown;
+
+export function useGetOwnReferralCode<
+  TData = Awaited<ReturnType<typeof getOwnReferralCode>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnReferralCode>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnReferralCode>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnReferralCode>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOwnReferralCode<
+  TData = Awaited<ReturnType<typeof getOwnReferralCode>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnReferralCode>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnReferralCode>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnReferralCode>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOwnReferralCode<
+  TData = Awaited<ReturnType<typeof getOwnReferralCode>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnReferralCode>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetOwnReferralCode<
+  TData = Awaited<ReturnType<typeof getOwnReferralCode>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnReferralCode>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetOwnReferralCodeQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type changeOwnReferralCodeResponse200 = {
+  data: OwnReferralCodeDto;
+  status: 200;
+};
+
+export type changeOwnReferralCodeResponseSuccess =
+  changeOwnReferralCodeResponse200 & {
+    headers: Headers;
+  };
+export type changeOwnReferralCodeResponse =
+  changeOwnReferralCodeResponseSuccess;
+
+export const getChangeOwnReferralCodeUrl = () => {
+  return `/api/v1/referral-codes/current`;
+};
+
+export const changeOwnReferralCode = async (
+  changeOwnReferralCodeDto: ChangeOwnReferralCodeDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<changeOwnReferralCodeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getChangeOwnReferralCodeUrl(), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(changeOwnReferralCodeDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: changeOwnReferralCodeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as changeOwnReferralCodeResponse;
+};
+
+export const getChangeOwnReferralCodeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof changeOwnReferralCode>>,
+    TError,
+    ChangeOwnReferralCodeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof changeOwnReferralCode>>,
+  TError,
+  ChangeOwnReferralCodeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["changeOwnReferralCode"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof changeOwnReferralCode>>,
+    ChangeOwnReferralCodeMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return changeOwnReferralCode(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ChangeOwnReferralCodeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof changeOwnReferralCode>>
+>;
+export type ChangeOwnReferralCodeMutationBody = ChangeOwnReferralCodeDto;
+export type ChangeOwnReferralCodeMutationError = unknown;
+export type ChangeOwnReferralCodeMutationVariables = {
+  data: ChangeOwnReferralCodeDto;
+};
+
+export const useChangeOwnReferralCode = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof changeOwnReferralCode>>,
+      TError,
+      ChangeOwnReferralCodeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof changeOwnReferralCode>>,
+  TError,
+  ChangeOwnReferralCodeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getChangeOwnReferralCodeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getReferralCodeAvailabilityResponse200 = {
+  data: ReferralCodeAvailabilityDto;
+  status: 200;
+};
+
+export type getReferralCodeAvailabilityResponseSuccess =
+  getReferralCodeAvailabilityResponse200 & {
+    headers: Headers;
+  };
+export type getReferralCodeAvailabilityResponse =
+  getReferralCodeAvailabilityResponseSuccess;
+
+export const getGetReferralCodeAvailabilityUrl = (
+  params: GetReferralCodeAvailabilityParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/referral-codes/availability?${stringifiedParams}`
+    : `/api/v1/referral-codes/availability`;
+};
+
+export const getReferralCodeAvailability = async (
+  params: GetReferralCodeAvailabilityParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getReferralCodeAvailabilityResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetReferralCodeAvailabilityUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getReferralCodeAvailabilityResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getReferralCodeAvailabilityResponse;
+};
+
+export const getGetReferralCodeAvailabilityQueryKey = (
+  params?: GetReferralCodeAvailabilityParams,
+) => {
+  return [
+    `/api/v1/referral-codes/availability`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetReferralCodeAvailabilityQueryOptions = <
+  TData = Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+  TError = unknown,
+>(
+  params: GetReferralCodeAvailabilityParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetReferralCodeAvailabilityQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getReferralCodeAvailability>>
+  > = ({ signal }) =>
+    getReferralCodeAvailability(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetReferralCodeAvailabilityQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getReferralCodeAvailability>>
+>;
+export type GetReferralCodeAvailabilityQueryError = unknown;
+
+export function useGetReferralCodeAvailability<
+  TData = Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+  TError = unknown,
+>(
+  params: GetReferralCodeAvailabilityParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+          TError,
+          Awaited<ReturnType<typeof getReferralCodeAvailability>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetReferralCodeAvailability<
+  TData = Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+  TError = unknown,
+>(
+  params: GetReferralCodeAvailabilityParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+          TError,
+          Awaited<ReturnType<typeof getReferralCodeAvailability>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetReferralCodeAvailability<
+  TData = Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+  TError = unknown,
+>(
+  params: GetReferralCodeAvailabilityParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetReferralCodeAvailability<
+  TData = Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+  TError = unknown,
+>(
+  params: GetReferralCodeAvailabilityParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getReferralCodeAvailability>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetReferralCodeAvailabilityQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
 
 export type setCurrentClientPhotoResponse200 = {
   data: ClientProfileDto;

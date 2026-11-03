@@ -50,6 +50,23 @@ describe('retrySerializable', () => {
     expect(execute).toHaveBeenCalledTimes(1);
   });
 
+  // BKM-017: a code claimed under a snapshot taken before another commit.
+  it('retries a failure the caller marks as retryable', async () => {
+    const execute = jest
+      .fn()
+      .mockRejectedValueOnce({ code: 'P2002' })
+      .mockResolvedValueOnce('staff-id');
+    const sleep = jest.fn().mockResolvedValue(undefined);
+
+    await expect(
+      retrySerializable(execute, {
+        sleep,
+        retryAlso: (error) => (error as { code?: string }).code === 'P2002',
+      }),
+    ).resolves.toBe('staff-id');
+    expect(execute).toHaveBeenCalledTimes(2);
+  });
+
   it('does not retry non-transaction failures', async () => {
     const failure = new Error('Session is full');
     const execute = jest.fn().mockRejectedValue(failure);

@@ -1,5 +1,6 @@
 import type { PgBoss } from 'pg-boss';
 import { recordClientAcquisition } from '../../booking/acquisition/record-client-acquisition';
+import { claimReadableReferralCode } from '../../booking/acquisition/referral-code-claim';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
   AuditActorKind,
@@ -158,7 +159,11 @@ const createInvitationTransaction = (
         id: invitation.clientId,
         name: invitation.name,
         phone: invitation.phone,
-        referralCode: invitation.referralCode,
+        // BKM-017: a readable code from her name, reserved in this transaction.
+        referralCode: await claimReadableReferralCode(
+          transaction,
+          invitation.name,
+        ),
         account: {
           create: {
             id: invitation.accountId,

@@ -29,7 +29,6 @@ const registerWith = async (command: RegisterClientCommand) => {
     },
     now: () => new Date('2026-10-23T15:00:00.000Z'),
     newId: () => `id-${(id += 1)}`,
-    newReferralCode: () => 'REF-NEW',
   }).execute(command);
   return createSelfRegistration.mock.calls[0]?.[0];
 };

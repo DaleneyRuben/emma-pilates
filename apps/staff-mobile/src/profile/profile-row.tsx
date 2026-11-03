@@ -21,6 +21,7 @@ export function ProfileRow({
   onPress,
   testID,
   tone = "default",
+  value,
 }: {
   badge?: number;
   icon: GlyphName;
@@ -28,6 +29,8 @@ export function ProfileRow({
   onPress: () => void;
   testID?: string;
   tone?: "default" | "error";
+  /** A short value before the chevron, such as the Trainer's code. */
+  value?: string;
 }) {
   const error = tone === "error";
   return (
@@ -35,7 +38,9 @@ export function ProfileRow({
       accessibilityLabel={
         badge > 0
           ? `${label}, ${badge} ${badge === 1 ? "notificación sin leer" : "notificaciones sin leer"}`
-          : label
+          : value === undefined
+            ? label
+            : `${label}, ${value}`
       }
       accessibilityRole="button"
       onPress={onPress}
@@ -56,6 +61,7 @@ export function ProfileRow({
           <Text style={styles.badgeLabel}>{badge > 9 ? "9+" : String(badge)}</Text>
         </View>
       ) : null}
+      {value === undefined ? null : <Text style={styles.value}>{value}</Text>}
       {error ? null : <Chevron size={16} strokeWidth={1.5} tone="muted" />}
     </Pressable>
   );
@@ -95,5 +101,11 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: 56,
     paddingHorizontal: spacing.lg,
+  },
+  value: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    letterSpacing: 1.1,
   },
 });

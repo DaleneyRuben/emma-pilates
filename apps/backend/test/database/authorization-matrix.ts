@@ -178,6 +178,10 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/clients/current/invoice-data': both('deny'),
   'GET /api/v1/clients/current/credit': both('deny'),
   'GET /api/v1/clients/current/referrals': both('deny'),
+  // BKM-017: a Client's or a Trainer's own code; no other Role holds one.
+  'GET /api/v1/referral-codes/current': both('deny'),
+  'PUT /api/v1/referral-codes/current': both('deny'),
+  'GET /api/v1/referral-codes/availability': both('deny'),
   // The studio's bank details for a transfer: shown to anyone signed in.
   'GET /api/v1/transfer-instructions': both('allow'),
   'GET /api/v1/transfer-instructions/qr': both('allow'),

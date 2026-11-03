@@ -112,6 +112,8 @@ describe('client discovery (e2e)', () => {
                   weeklyClassCap: 3,
                   classAllowance: 16,
                   priceCentavos: 56_000,
+                  listPriceCentavos: 65_900,
+                  launchPlacesLeft: 6,
                   displayOrder: 0,
                 },
               ]),
@@ -233,6 +235,9 @@ describe('client discovery (e2e)', () => {
           durationMonths: 2,
           classAllowance: 16,
           priceCentavos: 56_000,
+          listPriceCentavos: 65_900,
+          // BKM-019: only when 10 or fewer launch places are left.
+          launchPlacesLeft: 6,
         },
       ]);
     await request(app.getHttpServer())

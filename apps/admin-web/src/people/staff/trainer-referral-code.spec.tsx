@@ -100,8 +100,9 @@ describe("AW24 «Código personal» of a Trainer", () => {
     [
       "referral_code_malformed",
       400,
-      "Usa de 3 a 20 letras, números o guiones, sin empezar con REF-.",
+      "Usa de 3 a 20 letras, números o guiones.",
     ],
+    ["referral_code_blocked", 409, "Ese código no está permitido."],
   ])("explains a refused code (%s)", async (code, status, message) => {
     server.use(http.put(apiUrl(codePath), () => problemResponse(status, code)));
     const { panel, user } = await openMember("Emma Vargas");

@@ -125,6 +125,8 @@ export interface StaffManagementTransaction {
     pendingExpiresAt: Date;
     activationExpiresAt: Date;
   }) => Promise<void>;
+  /** FIX-030: a reopened invitation takes the phone typed again. */
+  setPhone: (input: { staffMemberId: string; phone: string }) => Promise<void>;
   reissueActivation: (input: {
     accountId: string;
     email: string;

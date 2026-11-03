@@ -77,18 +77,14 @@ export const normalizeReferralCode = (
   return normalized === '' ? null : normalized;
 };
 
-/** Every Client's code starts with it, and no Trainer's may. */
-export const clientReferralCodePrefix = 'REF-';
-
-const trainerCodePattern = /^[A-Z0-9][A-Z0-9-]{2,19}$/;
+const codePattern = /^[A-Z0-9][A-Z0-9-]{2,19}$/;
 
 /**
- * A Trainer's personal code: 3 to 20 letters, digits, or hyphens, starting
- * with a letter or digit, and never the Client prefix, so the two kinds of
- * code cannot collide.
+ * A code a holder picks (BKM-017): 3 to 20 letters, digits, or hyphens,
+ * starting with a letter or digit. Client and Trainer codes share one
+ * registry, so no prefix keeps them apart.
  */
-export const parseTrainerReferralCode = (value: string): string | null => {
+export const parseReferralCode = (value: string): string | null => {
   const code = normalizeReferralCode(value);
-  if (code === null || !trainerCodePattern.test(code)) return null;
-  return code.startsWith(clientReferralCodePrefix) ? null : code;
+  return code !== null && codePattern.test(code) ? code : null;
 };

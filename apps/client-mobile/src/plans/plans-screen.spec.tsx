@@ -168,6 +168,38 @@ describe("Client Plans", () => {
     ).toBeOnTheScreen();
   });
 
+  // BKM-019: with 10 or fewer launch places left, the strong line with the count.
+  it.each([
+    [6, "¡Quedan solo 6 lugares con 15 % de descuento!"],
+    [1, "¡Queda solo 1 lugar con 15 % de descuento!"],
+  ])("warns when %i launch places are left", async (placesLeft, line) => {
+    const founderPlans = [
+      {
+        ...plans[0],
+        priceCentavos: 47_600,
+        listPriceCentavos: 56_000,
+        launchPlacesLeft: placesLeft,
+      },
+      plans[1],
+    ];
+    const fetcher = routeFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse({ status: "none", subscription: null }),
+      "/api/v1/plans": () => jsonResponse(founderPlans),
+    });
+    const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
+
+    expect(await screen.findByText(line)).toBeOnTheScreen();
+    expect(screen.queryByText("Oferta por tiempo limitado · 15 % en tu plan")).toBeNull();
+    expect(screen.queryByText(/fundadora|40/i)).toBeNull();
+  });
+
   it("shows an empty state when no Plan is visible", async () => {
     const fetcher = routeFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),

@@ -11,22 +11,13 @@ export const referralProblem = (error: unknown): ReferralProblem | null =>
     : null;
 
 // Referral attribution happens once, inside the registration transaction, and
-// is immutable afterwards (PAY-001). The code belongs to the referring Client.
+// is immutable afterwards (PAY-001). It names the Client who holds the code
+// (BKM-017), found by the acquisition record, never the code's text.
 export const attributeReferral = async (
   transaction: Prisma.TransactionClient,
-  input: { referredClientId: string; referralCode: string },
+  input: { referredClientId: string; referrerClientId: string },
 ): Promise<void> => {
-  const referrer = await transaction.client.findFirst({
-    where: { referralCode: input.referralCode, deletedAt: null },
-    select: { id: true },
-  });
-  if (referrer === null) {
-    throw new PaymentRuleError(
-      'referral_code_invalid',
-      'Unknown referral code',
-    );
-  }
-  if (referrer.id === input.referredClientId) {
+  if (input.referrerClientId === input.referredClientId) {
     throw new PaymentRuleError(
       'referral_self_reference',
       'A Client cannot refer themselves',
@@ -35,7 +26,7 @@ export const attributeReferral = async (
 
   await transaction.referral.create({
     data: {
-      referrerClientId: referrer.id,
+      referrerClientId: input.referrerClientId,
       referredClientId: input.referredClientId,
     },
   });

@@ -7,7 +7,7 @@ import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/re
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
 import { AuthenticationLinkCipher } from '../../src/system-identity/security/authentication-link-cipher';
 import { authenticationTokens } from '../../src/system-identity/security/authentication-token-service';
-import { attributeReferral } from '../../src/booking/payments/referral-attribution';
+import { findReferralCodeHolder } from '../../src/booking/acquisition/record-client-acquisition';
 import {
   digestTestEmail,
   RegistrationWorld,
@@ -49,7 +49,6 @@ describe('Client registration cancellation, cleanup, and referral', () => {
       ),
       now: () => registeredAt,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     }).execute({
       name: 'Cancelled Client',
       email: `cancelled-${randomUUID()}@example.com`,
@@ -125,7 +124,6 @@ describe('Client registration cancellation, cleanup, and referral', () => {
       ),
       now: () => registeredAt,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     }).execute({
       name: 'Expired Client',
       email: `expired-${randomUUID()}@example.com`,
@@ -204,7 +202,6 @@ describe('Client registration cancellation, cleanup, and referral', () => {
       ),
       now: () => now,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     });
 
     const result = await registerClient.execute({
@@ -252,13 +249,11 @@ describe('Client registration cancellation, cleanup, and referral', () => {
       select: { referralCode: true },
     });
 
+    // BKM-017: a removed Client holds no live code, so nobody is attributed.
     await expect(
       prisma.$transaction((transaction) =>
-        attributeReferral(transaction, {
-          referredClientId: randomUUID(),
-          referralCode: removed.referralCode,
-        }),
+        findReferralCodeHolder(transaction, removed.referralCode),
       ),
-    ).rejects.toMatchObject({ code: 'referral_code_invalid' });
+    ).resolves.toBeNull();
   });
 });

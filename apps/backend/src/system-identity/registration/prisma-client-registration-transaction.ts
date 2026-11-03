@@ -1,5 +1,6 @@
 import type { PgBoss } from 'pg-boss';
 import { recordClientAcquisition } from '../../booking/acquisition/record-client-acquisition';
+import { claimReadableReferralCode } from '../../booking/acquisition/referral-code-claim';
 import { attributeReferral } from '../../booking/payments/referral-attribution';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
@@ -120,7 +121,11 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
       data: {
         id: registration.clientId,
         name: registration.name,
-        referralCode: registration.referralCode,
+        // BKM-017: a readable code from her name, reserved in this transaction.
+        referralCode: await claimReadableReferralCode(
+          this.transaction,
+          registration.name,
+        ),
         account: {
           create: {
             id: registration.accountId,
@@ -159,10 +164,10 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
       declaredChannel: registration.acquisitionChannel,
       referralCode: registration.referredByCode,
     });
-    if (registration.referredByCode !== null && holder?.kind === 'client') {
+    if (holder?.kind === 'client') {
       await attributeReferral(this.transaction, {
         referredClientId: registration.clientId,
-        referralCode: registration.referredByCode,
+        referrerClientId: holder.clientId,
       });
       // The monthly invite is spent when she verifies, not here. An
       // unverified registration must not burn the host's month, and the

@@ -14,6 +14,10 @@ import {
 } from '../../system-identity/staff-accounts/staff-accounts';
 import { boliviaDate } from '../../time/bolivia-time';
 import { endNutritionistAvailability } from '../evaluations/prisma-evaluation-commands';
+import {
+  claimReadableReferralCode,
+  isReferralCodeTaken,
+} from '../acquisition/referral-code-claim';
 import type {
   StaffDirectory,
   StaffManagementTransaction,
@@ -116,11 +120,15 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
     work: (transaction: StaffManagementTransaction) => Promise<Result>,
   ): Promise<Result> {
     const { prisma } = this.dependencies;
-    return retrySerializable(() =>
-      prisma.$transaction(
-        (transaction) => work(this.transactionFor(transaction)),
-        serializable,
-      ),
+    // BKM-017: a Trainer's claimed code can meet one a concurrent Client
+    // registration committed after this snapshot; a fresh attempt sees it.
+    return retrySerializable(
+      () =>
+        prisma.$transaction(
+          (transaction) => work(this.transactionFor(transaction)),
+          serializable,
+        ),
+      { retryAlso: isReferralCodeTaken },
     );
   }
 
@@ -209,6 +217,11 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
             name: input.name,
             phone: input.phone,
             role: roles[input.role],
+            // BKM-017: a Trainer gets her readable code when she is created.
+            referralCode:
+              input.role === 'trainer'
+                ? await claimReadableReferralCode(transaction, input.name)
+                : null,
             branchAssignments: {
               create: input.branchIds.map((branchId) => ({ branchId })),
             },
@@ -222,12 +235,31 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
           activationExpiresAt: input.activationExpiresAt,
         });
       },
-      reissueActivation: (input) => accounts.reissueActivation(input),
-      setRole: async (input) => {
+      setPhone: async (input) => {
         await transaction.staffMember.update({
           where: { id: input.staffMemberId },
-          data: { role: roles[input.role] },
+          data: { phone: input.phone },
         });
+      },
+      reissueActivation: (input) => accounts.reissueActivation(input),
+      setRole: async (input) => {
+        const member = await transaction.staffMember.update({
+          where: { id: input.staffMemberId },
+          data: { role: roles[input.role] },
+          select: { name: true, referralCode: true },
+        });
+        // BKM-017: becoming a Trainer gives her a code if she has none.
+        if (input.role === 'trainer' && member.referralCode === null) {
+          await transaction.staffMember.update({
+            where: { id: input.staffMemberId },
+            data: {
+              referralCode: await claimReadableReferralCode(
+                transaction,
+                member.name,
+              ),
+            },
+          });
+        }
       },
       replaceBranches: async (input) => {
         // ADR-0086: a removed assignment stays, marked removed; re-adding the

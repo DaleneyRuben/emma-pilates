@@ -1,7 +1,7 @@
 import {
   attributeClient,
   normalizeReferralCode,
-  parseTrainerReferralCode,
+  parseReferralCode,
 } from './acquisition';
 
 describe('Client attribution (BKM-011)', () => {
@@ -64,18 +64,19 @@ describe('Client attribution (BKM-011)', () => {
     ['carla', 'CARLA'],
     [' Emma-2026 ', 'EMMA-2026'],
     ['ABC', 'ABC'],
+    // BKM-017: the holder decides attribution, so REF- is an ordinary start.
+    ['ref-carla', 'REF-CARLA'],
   ])('accepts the personal code %p as %p', (typed, stored) => {
-    expect(parseTrainerReferralCode(typed)).toBe(stored);
+    expect(parseReferralCode(typed)).toBe(stored);
   });
 
   it.each([
     ['AB', 'too short'],
     ['A'.repeat(21), 'too long'],
-    ['REF-CARLA', 'the Client code prefix'],
     ['CAR LA', 'a space'],
     ['-CARLA', 'a leading hyphen'],
     ['CARLÁ', 'an accent'],
   ])('refuses the personal code %p (%s)', (typed) => {
-    expect(parseTrainerReferralCode(typed)).toBeNull();
+    expect(parseReferralCode(typed)).toBeNull();
   });
 });

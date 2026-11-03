@@ -202,6 +202,36 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     );
   });
 
+  // FIX-030 with MOB-070: a Bolivian mobile, 8 digits after +591.
+  it.each(["7000004", "70000001"])(
+    "refuses the phone %s before sending anything",
+    async (typed) => {
+      server.use(...staffHandlers(() => jsonResponse(valentina, 201)));
+      const { panel, user } = await openCreate();
+
+      await user.type(within(panel).getByLabelText("Nombre"), "Camila Rojas");
+      await user.type(
+        within(panel).getByLabelText("Correo electrónico"),
+        "camila@emmapilates.bo",
+      );
+      await user.type(
+        within(panel).getByLabelText("Teléfono (opcional)"),
+        typed,
+      );
+      await user.click(
+        within(panel).getByRole("radio", { name: "Administración" }),
+      );
+      await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+
+      expect(
+        await within(panel).findByText(
+          "Escribe un celular de Bolivia, por ejemplo +591 71234567.",
+        ),
+      ).toBeInTheDocument();
+      expect(created).toEqual([]);
+    },
+  );
+
   it("marks an email already in use on its field and keeps what was typed", async () => {
     server.use(...staffHandlers(() => problemResponse(409, "email_in_use")));
     const { panel, user } = await openCreate();

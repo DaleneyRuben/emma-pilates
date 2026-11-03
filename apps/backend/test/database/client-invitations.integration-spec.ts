@@ -55,7 +55,6 @@ describe('Client invitation unit of work', () => {
     ),
     now: () => at,
     newId: randomUUID,
-    newReferralCode: () => `REF-${randomUUID()}`,
   });
 
   const invite = (email = `nueva-${randomUUID()}@example.com`) =>

@@ -18,23 +18,28 @@ export const fromPrismaChannel = (
   channel: PrismaAcquisitionChannel,
 ): AcquisitionChannel => channel.toLowerCase() as AcquisitionChannel;
 
-// A live Client's code, or a live Trainer's personal code.
+// BKM-017: the live holder of a code in the registry, a live Client or a live
+// Trainer. A retired code holds nobody, whatever its text.
 export const findReferralCodeHolder = async (
   transaction: Prisma.TransactionClient,
   code: string,
 ): Promise<ReferralCodeHolder | null> => {
-  const client = await transaction.client.findFirst({
-    where: { referralCode: code, deletedAt: null },
-    select: { id: true },
+  const row = await transaction.referralCode.findFirst({
+    where: {
+      code,
+      retiredAt: null,
+      OR: [
+        { client: { deletedAt: null } },
+        { staffMember: { role: 'TRAINER', deletedAt: null } },
+      ],
+    },
+    select: { clientId: true, staffMemberId: true },
   });
-  if (client !== null) return { kind: 'client', clientId: client.id };
-  const trainer = await transaction.staffMember.findFirst({
-    where: { referralCode: code, role: 'TRAINER', deletedAt: null },
-    select: { id: true },
-  });
-  return trainer === null
-    ? null
-    : { kind: 'trainer', staffMemberId: trainer.id };
+  if (row?.clientId != null) return { kind: 'client', clientId: row.clientId };
+  if (row?.staffMemberId != null) {
+    return { kind: 'trainer', staffMemberId: row.staffMemberId };
+  }
+  return null;
 };
 
 // Resolves the typed code and works out the attribution; an unknown code or

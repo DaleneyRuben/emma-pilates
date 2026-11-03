@@ -48,7 +48,6 @@ describe('Client invitation unit of work with a pending self-registration', () =
     linkCipher,
     now: () => now,
     newId: randomUUID,
-    newReferralCode: () => `REF-${randomUUID()}`,
   });
 
   const registerHerself = async (): Promise<{
@@ -67,7 +66,6 @@ describe('Client invitation unit of work with a pending self-registration', () =
       // Two minutes earlier, so the recipient throttle has room again.
       now: () => new Date(now.getTime() - 2 * 60_000),
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     }).execute({
       name: 'Renata Áñez',
       email: `renata-${randomUUID()}@example.com`,

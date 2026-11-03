@@ -52,6 +52,17 @@ falta crearla para entender el resto.
   instalada. En el simulador de iPhone el enlace no abre la app: copia el
   enlace del correo, o del archivo del buzón local, y ábrelo en el navegador
   de la web o pégalo donde el paso lo diga.
+- El enlace «Confirma tu correo» de la clienta tampoco abre la app en el
+  simulador de iPhone con Expo Go: el navegador solo dice «Abre este enlace en
+  la app». Copia el `token=…` del enlace y confírmalo contra la API:
+
+  ```sh
+  curl -X POST http://localhost:3100/api/v1/client-email-verifications \
+    -H 'Content-Type: application/json' \
+    -d '{"verificationToken": "EL_TOKEN_DEL_ENLACE"}'
+  ```
+
+  Vuelve a la app: la pantalla **Revisa tu correo** pasa a **Inicio**.
 
 ## Paso 0. Dejar el estudio vacío y encendido
 
@@ -95,6 +106,10 @@ compartida.
    pnpm build
    node --env-file=.env dist/src/worker-main.js
    ```
+
+   Después de cada `git pull`, corre antes del build
+   `pnpm --filter @pilates/backend prisma:generate`. Sin eso el build del
+   backend falla con errores de tipos y el worker arranca el `dist/` viejo.
 
    `pnpm start:worker` no lee `apps/backend/.env`. Sin `--env-file` el
    worker se detiene al validar `DATABASE_URL` y no escribe los correos.
@@ -247,8 +262,11 @@ cuenta atrás.
 Cada persona abre su correo, entra al enlace y crea su contraseña. Ese
 enlace abre la web, no la app. Cuando termina, su fila pasa a **Activo**.
 
-Abre a Daniela. Una entrenadora tiene un código de referido. Anótalo: lo va
-a usar Lucía. Las otras roles no tienen ese campo.
+Abre a Daniela. Una entrenadora recibe su código de referido sola, al
+crearla: sale de su nombre, en mayúsculas y sin tildes (`DANIELA`; si ya
+existe, su apellido, y después `DANIELA2`). Anótalo: lo va a usar Lucía.
+Daniela puede cambiarlo en la app del equipo, desde **Perfil** → **Tu código
+de referido**, una vez cada 30 días. Los otros roles no tienen código.
 
 Una persona con rol **Administración** o **Coordinador** no elige sede: ve
 todas. Las demás solo ven las sedes que marques.
@@ -341,8 +359,12 @@ Si el correo tarda, el archivo del buzón local tiene el mismo enlace.
 Quédate en la app de clientas, como Lucía.
 
 1. **Inicio**, **Comprar un plan**. Los ocho planes aparecen en el orden que
-   les diste, de menor a mayor. El precio es `Bs 590` para el de 8 clases,
-   sin centavos.
+   les diste, de menor a mayor. Arriba, la franja dice «Oferta por tiempo
+   limitado · 15 % en tu plan». Mientras queden lugares de lanzamiento, toda
+   primera compra lleva el 15 %, redondeado al boliviano: el de 8 clases
+   muestra `Bs 502` y, tachado, `Bs 590`. Con 10 lugares o menos, la franja dice «¡Quedan solo N lugares con
+   15 % de descuento!». La clienta nunca ve la palabra «fundadora» ni el total
+   de lugares.
 2. Abre **8 clases**. La vigencia dice 30 días. Elige la fecha de inicio:
    hoy, o cualquier día de los próximos 14. Más lejos no se puede.
 3. Completa los datos de factura: **NIT o CI** y el nombre o la razón social.
@@ -367,9 +389,9 @@ Cuando el pago queda confirmado:
 
 - El plan de Lucía empieza en la fecha que eligió. Si es hoy, ya puede
   reservar.
-- Como es su primer plan, y no es fundadora, el sistema le suma 1 clase de
-  regalo. En **Mi plan** las clases son 9, no 8, y el origen de la extra dice
-  que es el regalo de bienvenida.
+- Como es su primer plan y quedan lugares, Lucía queda fundadora sola, con el
+  15 %. Una fundadora no recibe la clase de regalo: en **Mi plan** las clases
+  son 8, sin extra.
 - Daniela queda como quien trajo a Lucía, por el código. Esa comisión aparece
   en el paso 15.
 
@@ -485,22 +507,20 @@ Estos tres viven de un plan ya pagado. Hazlos en este orden.
 
 ### Fundadora
 
-En la web, menú **Fundadoras**. La lista está vacía y dice que hay 40
-lugares.
+En la web, menú **Fundadoras**. Lucía ya está en la lista, como la n.º 1: su
+primer pago confirmado la hizo fundadora sola en el paso 7. Nadie la marca a
+mano.
 
-1. Lucía ya pagó. Márcala como fundadora desde su ficha, o desde
-   **Fundadoras** si la pantalla ofrece agregarla. El descuento es 15 % en
-   cualquier plan menos la clase suelta, y queda en la persona, no en el
-   plan.
-2. La siguiente compra de Lucía, que no sea la clase suelta, muestra el
-   descuento en el pago. En **Pagos** la fila guarda el monto descontado.
-3. El lugar 41 se niega. Si Lucía deja pasar más de 7 días entre el fin de un
-   plan y el inicio del siguiente, el beneficio se pierde solo y no vuelve.
-   Congelar no lo quita.
+1. El descuento es 15 % en cualquier plan menos la clase suelta, y queda en
+   la persona, no en el plan. La siguiente compra de Lucía, que no sea la
+   clase suelta, lo muestra en el pago. En **Pagos** la fila guarda el monto
+   descontado.
+2. El lugar 41 se niega: la clienta número 41 paga el precio de lista y sí
+   recibe la clase de regalo. Si Lucía deja pasar más de 7 días entre el fin
+   de un plan y el inicio del siguiente, el beneficio se pierde solo y no
+   vuelve. Congelar no lo quita.
 
-El regalo de bienvenida no se suma a una fundadora. Lucía ya lo recibió en
-el paso 7, antes de ser fundadora. Una clienta marcada fundadora antes de su
-primer pago no recibe esa clase extra.
+Una fundadora nunca recibe la clase de regalo ni las clases de campaña.
 
 ### Congelamiento
 

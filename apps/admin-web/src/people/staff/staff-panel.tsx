@@ -27,7 +27,7 @@ import { StaffBranchForm } from "./staff-branch-form";
 import { StaffEditForm } from "./staff-edit-form";
 import {
   emptyStaffForm,
-  staffFormSchema,
+  staffCreateSchema,
   type StaffFormInput,
   type StaffFormOutput,
 } from "./staff-form-schema";
@@ -58,7 +58,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
   const [failure, setFailure] = useState<string | null>(null);
   const [accountWait, startAccountWait] = useCountdown();
   const form = useForm<StaffFormInput, unknown, StaffFormOutput>({
-    resolver: zodResolver(staffFormSchema),
+    resolver: zodResolver(staffCreateSchema),
     defaultValues: emptyStaffForm(),
   });
   const role = useWatch({ control: form.control, name: "role" });

@@ -1,5 +1,6 @@
 import {
   useGetCurrentStaffMemberProfile,
+  useGetOwnReferralCode,
   useGetUnreadNotificationCount,
 } from "@pilates/api-contracts";
 import {
@@ -28,7 +29,9 @@ import { ProfileRow } from "./profile-row";
 import { branchesLabel, roleLabel } from "./staff-labels";
 
 type ProfileNavigation = {
-  navigate: (screen: "Notifications" | "PayTab" | "ChangePassword" | "Feedback" | "ViewAs") => void;
+  navigate: (
+    screen: "Notifications" | "PayTab" | "ChangePassword" | "Feedback" | "ReferralCode" | "ViewAs",
+  ) => void;
 };
 
 /** S23 Perfil, the last tab of every role (follow-up 225 §8). */
@@ -45,6 +48,13 @@ export function StaffProfileScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const trainer = identity.session?.role === "trainer";
+  // BKM-017: only a Trainer has a code of her own (follow-up 229).
+  const ownCode = useGetOwnReferralCode({
+    fetcher,
+    query: { enabled: trainer, refetchOnMount: "always" },
+  });
+  const referralCode = ownCode.data?.status === 200 ? ownCode.data.data.referralCode : null;
   const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : 0;
   const header = <RootHeader title="Perfil" />;
 
@@ -107,11 +117,19 @@ export function StaffProfileScreen() {
                 onPress={() => navigation.navigate("ViewAs")}
               />
             ) : null}
-            {identity.session?.role === "trainer" ? (
+            {trainer ? (
               <ProfileRow
                 icon="credit"
                 label="Mis pagos"
                 onPress={() => navigation.navigate("PayTab")}
+              />
+            ) : null}
+            {trainer && referralCode !== null ? (
+              <ProfileRow
+                icon="tag"
+                label="Tu código de referido"
+                onPress={() => navigation.navigate("ReferralCode")}
+                value={referralCode}
               />
             ) : null}
             <ProfileRow

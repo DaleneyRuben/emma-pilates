@@ -72,6 +72,10 @@ describe('booking catalog concurrent writes', () => {
     if (prisma) {
       await prisma.sessionSchedule.deleteMany({ where: { id: scheduleId } });
       await prisma.plan.deleteMany({ where: { id: planId } });
+      // BKM-017: the registry keeps a holder's codes; a test removes them first.
+      await prisma.referralCode.deleteMany({
+        where: { OR: [{ clientId }, { staffMemberId: { in: trainers } }] },
+      });
       await prisma.client.deleteMany({ where: { id: clientId } });
       await prisma.classType.deleteMany({ where: { id: classTypeId } });
       await prisma.staffMember.deleteMany({ where: { id: { in: trainers } } });

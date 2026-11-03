@@ -79,7 +79,6 @@ const templates: Record<Purpose, Template> = {
 };
 
 const studio = 'Emma Pilates Studio';
-const footer = 'Movimiento · Equilibrio · Bienestar';
 
 const escapeHtml = (value: string): string =>
   value
@@ -110,7 +109,7 @@ export class SpanishAuthenticationEmailRenderer implements AuthenticationEmailRe
       '',
       ...(link === null ? [] : [link, '']),
       ...template.after.flatMap((line) => [line, '']),
-      `${studio} · ${footer}`,
+      studio,
     ];
 
     const button =
@@ -129,7 +128,7 @@ export class SpanishAuthenticationEmailRenderer implements AuthenticationEmailRe
       button +
       template.after.map(paragraph).join('') +
       `</div>` +
-      `<p style="margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">${escapeHtml(studio)}<br>${escapeHtml(footer)}</p>` +
+      `<p style="margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">${escapeHtml(studio)}</p>` +
       `</div></body></html>`;
 
     return {

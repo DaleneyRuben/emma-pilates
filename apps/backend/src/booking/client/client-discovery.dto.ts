@@ -205,6 +205,14 @@ export class PlanDto {
       'List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it.',
   })
   listPriceCentavos?: number;
+
+  @ApiPropertyOptional({
+    minimum: 1,
+    maximum: 10,
+    description:
+      'Launch-price places left, present only on a discounted Plan when 10 or fewer remain (BKM-019). Absent otherwise.',
+  })
+  launchPlacesLeft?: number;
 }
 
 export class BranchDto {

@@ -54,6 +54,7 @@ export const createTransaction = (
   setAccountEmail: jest.fn().mockResolvedValue(undefined),
   removePendingStaffMember: jest.fn().mockResolvedValue(undefined),
   createPendingStaffMember: jest.fn().mockResolvedValue(undefined),
+  setPhone: jest.fn().mockResolvedValue(undefined),
   reissueActivation: jest.fn().mockResolvedValue(undefined),
   setRole: jest.fn().mockResolvedValue(undefined),
   replaceBranches: jest.fn().mockResolvedValue(undefined),

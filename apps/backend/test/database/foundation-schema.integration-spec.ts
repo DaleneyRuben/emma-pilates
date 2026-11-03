@@ -62,6 +62,7 @@ describe('foundation migration', () => {
       'booking.promotion_contacts',
       'booking.promotions',
       'booking.purchase_intents',
+      'booking.referral_codes',
       'booking.referrals',
       'booking.session_schedules',
       'booking.sessions',

@@ -11,6 +11,17 @@ import {
   readClientAcquisition,
 } from './client-acquisition';
 import {
+  changeOwnReferralCode,
+  checkReferralCodeAvailability,
+  readOwnReferralCode,
+} from './own-referral-code';
+import {
+  OwnReferralCodeController,
+  ownReferralCodeOperations,
+  type OwnReferralCodeOperations,
+} from './own-referral-code.controller';
+import { createPrismaOwnReferralCodeStore } from './prisma-own-referral-code-store';
+import {
   createPrismaClientAcquisitionStore,
   createPrismaTrainerReferralCodeStore,
 } from './prisma-acquisition-stores';
@@ -25,6 +36,7 @@ export const acquisitionWiring = {
   controllers: [
     AdministratorClientAcquisitionController,
     AdministratorTrainerReferralCodeController,
+    OwnReferralCodeController,
   ],
   providers: (prismaToken: symbol): Provider[] => [
     {
@@ -49,6 +61,23 @@ export const acquisitionWiring = {
             readTrainerReferralCode(command, principal, trainers),
           setTrainerCode: (command, principal) =>
             setTrainerReferralCode(command, principal, trainers),
+        };
+      },
+    },
+    {
+      provide: ownReferralCodeOperations,
+      inject: [prismaToken],
+      useFactory: (prisma: PrismaClient): OwnReferralCodeOperations => {
+        const dependencies = {
+          store: createPrismaOwnReferralCodeStore(prisma),
+          now: () => new Date(),
+        };
+        return {
+          read: (principal) => readOwnReferralCode(principal, dependencies),
+          change: (command, principal) =>
+            changeOwnReferralCode(command, principal, dependencies),
+          checkAvailability: (command, principal) =>
+            checkReferralCodeAvailability(command, principal, dependencies),
         };
       },
     },

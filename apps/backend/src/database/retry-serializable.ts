@@ -1,5 +1,8 @@
 type RetryOptions = {
   sleep?: (milliseconds: number) => Promise<void>;
+  /** Another failure that a fresh snapshot can clear, such as a unique code
+   * claimed under a snapshot taken before a concurrent commit (BKM-017). */
+  retryAlso?: (error: unknown) => boolean;
 };
 
 const maxAttempts = 5;
@@ -27,13 +30,14 @@ const wait = (milliseconds: number): Promise<void> =>
 
 export const retrySerializable = async <Result>(
   execute: () => Promise<Result>,
-  { sleep = wait }: RetryOptions = {},
+  { sleep = wait, retryAlso = () => false }: RetryOptions = {},
 ): Promise<Result> => {
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     try {
       return await execute();
     } catch (error) {
-      if (!isWriteConflict(error) || attempt === maxAttempts - 1) throw error;
+      const retryable = isWriteConflict(error) || retryAlso(error);
+      if (!retryable || attempt === maxAttempts - 1) throw error;
       await sleep(10 * 2 ** attempt);
     }
   }
