@@ -96,6 +96,8 @@ describe("AW01 Login", () => {
     expect(
       screen.getByRole("textbox", { name: "Correo electrónico" }),
     ).toHaveValue("camila.rojas@example.com");
+    // Walkthrough of 2026-11-02: the brand without the tagline.
+    expect(screen.queryByText(/Bienestar/)).toBeNull();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Iniciar sesión",
     );
