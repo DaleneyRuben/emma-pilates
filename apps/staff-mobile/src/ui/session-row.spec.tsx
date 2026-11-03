@@ -7,7 +7,12 @@ import { SessionRow } from "./session-row";
 describe("Staff SessionRow", () => {
   it("keeps the start time on one line", async () => {
     const screen = await render(
-      <SessionRow duration="50 min" subtitle="Centro · sin reservas" time="07:00" title="Reformer" />,
+      <SessionRow
+        duration="50 min"
+        subtitle="Centro · sin reservas"
+        time="07:00"
+        title="Reformer"
+      />,
     );
 
     expect(screen.getByText("07:00")).toHaveProp("numberOfLines", 1);

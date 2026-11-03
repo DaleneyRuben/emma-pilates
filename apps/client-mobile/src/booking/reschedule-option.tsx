@@ -49,7 +49,9 @@ export function RescheduleOption({
       style={[styles.row, selected && styles.selected]}
       testID={`reschedule-option-${session.id}`}
     >
-      <Text numberOfLines={1} style={styles.time}>{formatStartTime(session.startsAt)}</Text>
+      <Text numberOfLines={1} style={styles.time}>
+        {formatStartTime(session.startsAt)}
+      </Text>
       <View style={styles.body}>
         <Text style={styles.title}>{session.classTypeName}</Text>
         <Text style={styles.details}>
