@@ -120,13 +120,16 @@ describe("own referral code (BKM-017)", () => {
     jest.useRealTimers();
   });
 
-  it("shows the server's answer when the code was taken meanwhile", async () => {
+  it.each([
+    ["referral_code_in_use", 409, "Ya está en uso"],
+    ["referral_code_change_too_soon", 409, "Solo puedes cambiarlo una vez cada 30 días"],
+    ["unexpected_error", 500, "No pudimos guardar tu código. Intenta de nuevo."],
+  ])("shows the server's answer %s on saving", async (code, status, line) => {
     const fetcher = fetcherFor({
       "GET /api/v1/referral-codes/current": () =>
         json({ referralCode: "LUCIA", editableFrom: null }),
       "GET /api/v1/referral-codes/availability": availability,
-      "PUT /api/v1/referral-codes/current": () =>
-        json({ code: "referral_code_in_use", status: 409 }, 409),
+      "PUT /api/v1/referral-codes/current": () => json({ code, status }, status),
     });
     const onChanged = jest.fn();
     const screen = await render(<EditReferralCode fetcher={fetcher} onChanged={onChanged} />, {
@@ -139,7 +142,7 @@ describe("own referral code (BKM-017)", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Guardar código" }));
     await fireEvent.press(screen.getByRole("button", { name: "Cambiar código" }));
 
-    expect(await screen.findByText("Ya está en uso")).toBeOnTheScreen();
+    expect(await screen.findByText(line)).toBeOnTheScreen();
     expect(onChanged).not.toHaveBeenCalled();
   });
 });
