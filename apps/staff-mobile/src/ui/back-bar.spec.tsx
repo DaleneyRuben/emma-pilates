@@ -1,5 +1,4 @@
 import { render } from "@testing-library/react-native";
-import { Polyline } from "react-native-svg";
 
 import { BackBar } from "./back-bar";
 
@@ -12,7 +11,7 @@ describe("BackBar", () => {
 
     const back = screen.getByTestId("back-bar");
     expect(back).not.toHaveStyle({ marginLeft: -10 });
-    const points = String(screen.UNSAFE_getByType(Polyline).props.points);
+    const points = /"points":"([^"]+)"/.exec(JSON.stringify(screen.toJSON()))?.[1] ?? "";
     const xs = points.split(" ").map((point) => Number(point.split(",")[0]));
     expect(Math.min(...xs)).toBeLessThanOrEqual(1.5);
   });
