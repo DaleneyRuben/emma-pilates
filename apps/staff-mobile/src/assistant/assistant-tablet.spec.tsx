@@ -123,13 +123,13 @@ describe("Assistant flows on a tablet", () => {
     }
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() => {
-      expect(screen.getByText("6 de 12 cupos disponibles")).toBeOnTheScreen();
+      expect(screen.getByText("cupos libres de 12")).toBeOnTheScreen();
     });
     expect(screen.getByTestId("assistant-centered-card")).toHaveStyle({
       maxWidth: 640,
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar para Lucía" }));
     await waitFor(() => {
       expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
     });

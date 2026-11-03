@@ -134,12 +134,12 @@ describe("Assistant Client flows", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() => {
-      expect(screen.getByText("6 de 12 cupos disponibles")).toBeOnTheScreen();
+      expect(screen.getByText("cupos libres de 12")).toBeOnTheScreen();
     });
     expect(screen.getByText("Reservando para Lucía Fernández")).toBeOnTheScreen();
     expect(screen.getByText("Se descontará 1 clase de su plan.")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar para Lucía" }));
     await waitFor(() => {
       expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
     });

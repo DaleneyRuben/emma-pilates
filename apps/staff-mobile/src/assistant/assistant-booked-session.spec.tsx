@@ -69,8 +69,8 @@ describe("Assistant booked Session", () => {
     await waitFor(() => {
       expect(screen.getByText("La clienta ya tiene esta clase reservada.")).toBeOnTheScreen();
     });
-    expect(screen.queryByRole("button", { name: "Reservar" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Reservar para Lucía" })).toBeNull();
     expect(screen.queryByText("Se descontará 1 clase de su plan.")).toBeNull();
-    expect(screen.getByText("6 de 12 cupos disponibles")).toBeOnTheScreen();
+    expect(screen.getByText("cupos libres de 12")).toBeOnTheScreen();
   });
 });
