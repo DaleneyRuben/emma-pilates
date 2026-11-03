@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react-native";
 
-import { Glyph } from "./glyph";
+import { Glyph, glyphShapes } from "./glyph";
 
 const hidden = { includeHiddenElements: true };
 
@@ -40,6 +40,39 @@ describe("Glyph", () => {
     );
 
     for (const name of ["pin", "person", "trend", "lock"]) {
+      expect(screen.getByTestId(`glyph-${name}`, hidden)).toBeOnTheScreen();
+    }
+  });
+
+  it("knows the shapes the client v2 boards add", async () => {
+    const names = [
+      "copy",
+      "document",
+      "flame",
+      "health",
+      "image",
+      "logout",
+      "mail",
+      "personAdd",
+      "phone",
+      "receipt",
+      "refresh",
+      "share",
+      "sun",
+      "tag",
+      "undo",
+      "upload",
+    ] as const;
+    const screen = await render(
+      <>
+        {names.map((name) => (
+          <Glyph key={name} name={name} size={18} />
+        ))}
+      </>,
+    );
+
+    for (const name of names) {
+      expect(glyphShapes).toHaveProperty(name);
       expect(screen.getByTestId(`glyph-${name}`, hidden)).toBeOnTheScreen();
     }
   });

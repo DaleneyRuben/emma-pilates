@@ -12,12 +12,11 @@ import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStaticNavigation } from "@react-navigation/native";
+import { createStaticNavigation, getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { BookingsScreen } from "./booking/bookings-screen";
 import { BrowseSessionsScreen } from "./booking/browse-sessions-screen";
-import { ClassHistoryScreen } from "./booking/class-history-screen";
 import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientApiBaseUrlContext, ClientFetcherContext } from "./client-fetcher";
@@ -38,7 +37,6 @@ import { CloseAccountScreen } from "./profile/close-account-screen";
 import { EditProfileScreen } from "./profile/edit-profile-screen";
 import { ClientNotificationsScreen } from "./profile/notifications-screen";
 import { ProfileScreen } from "./profile/profile-screen";
-import { ProfileTabButton } from "./profile/profile-tab-button";
 import { SubscriptionScreen } from "./subscription/subscription-screen";
 
 const unavailableFetcher: typeof globalThis.fetch = async () => {
@@ -65,7 +63,13 @@ const shortcutScreens = {
 const HomeStack = createNativeStackNavigator({
   screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
-  screens: { Home: HomeScreen, ...planScreens, ...shortcutScreens },
+  // Walkthrough n.º 11: the Inicio bell opens Notificaciones over Inicio.
+  screens: {
+    Home: HomeScreen,
+    Notifications: ClientNotificationsScreen,
+    ...planScreens,
+    ...shortcutScreens,
+  },
 });
 
 const BookingsStack = createNativeStackNavigator({
@@ -74,7 +78,6 @@ const BookingsStack = createNativeStackNavigator({
   screens: {
     MyBookings: BookingsScreen,
     Reschedule: RescheduleScreen,
-    History: ClassHistoryScreen,
   },
 });
 
@@ -103,42 +106,42 @@ const ProfileStack = createNativeStackNavigator({
   },
 });
 
-const tabOptions = (title: string, icon: ClientTabIconName) => ({
-  tabBarButtonTestID: `tab-${icon}`,
-  tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
-  title,
-});
+const tabBarStyle = { backgroundColor: colors.card, borderTopColor: colors.borderStrong };
+
+// Follow-up 227: a pushed screen (with a back arrow) has no tab bar, so the
+// bar shows only while the tab's stack is on its root screen.
+const tabOptions =
+  (title: string, icon: ClientTabIconName, root: string) =>
+  ({ route }: { route: Parameters<typeof getFocusedRouteNameFromRoute>[0] }) => {
+    const focused = getFocusedRouteNameFromRoute(route) ?? root;
+    return {
+      tabBarButtonTestID: `tab-${icon}`,
+      tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
+      tabBarStyle: focused === root ? tabBarStyle : { display: "none" as const },
+      title,
+    };
+  };
 
 const ClientTabs = createBottomTabNavigator({
   // FIX-023: the tab bar covers the bottom safe area, so no screen adds it again.
   screenLayout: ({ children }) => <InsideTabBar>{children}</InsideTabBar>,
-  // Labels stay under the icons on a tablet too, so the Perfil count sits on
-  // its icon (follow-up 73) instead of over the label.
+  // Labels stay under the icons on a tablet too.
   screenOptions: {
     headerShown: false,
     tabBarActiveTintColor: colors.primary,
     tabBarInactiveTintColor: colors.textSubtle,
     tabBarLabelPosition: "below-icon",
     tabBarLabelStyle: { fontSize: typography.tabLabel },
-    tabBarStyle: {
-      backgroundColor: colors.card,
-      borderTopColor: colors.borderStrong,
-    },
   },
   screens: {
-    HomeTab: { screen: HomeStack, options: tabOptions("Inicio", "home") },
-    Booking: { screen: BookingStack, options: tabOptions("Reservar", "booking") },
+    HomeTab: { screen: HomeStack, options: tabOptions("Inicio", "home", "Home") },
+    Booking: { screen: BookingStack, options: tabOptions("Reservar", "booking", "Browse") },
     Bookings: {
       screen: BookingsStack,
-      options: tabOptions("Mis Reservas", "bookings"),
+      options: tabOptions("Mis Reservas", "bookings", "MyBookings"),
     },
-    ProfileTab: {
-      screen: ProfileStack,
-      options: {
-        ...tabOptions("Perfil", "profile"),
-        tabBarButton: (props) => <ProfileTabButton {...props} />,
-      },
-    },
+    // The owner removed the Perfil tab's unread pill (2026-11-02): it is on the Inicio bell.
+    ProfileTab: { screen: ProfileStack, options: tabOptions("Perfil", "profile", "Profile") },
   },
 });
 

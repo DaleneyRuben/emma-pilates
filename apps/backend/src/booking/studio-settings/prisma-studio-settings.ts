@@ -20,6 +20,7 @@ export type StudioRules = {
   evaluationPriceCentavos: number;
   plansFromPriceCentavos: number | null;
   startDateLimitDays: number;
+  bookingWindowDays: number;
   openingDate: string | null;
 };
 
@@ -32,6 +33,7 @@ const versionSelect = {
   minimumBookings: true,
   minimumBookingsCheckLeadMinutes: true,
   startDateLimitDays: true,
+  bookingWindowDays: true,
   founderPlaces: true,
   founderDiscountPercent: true,
   founderGapDays: true,
@@ -61,6 +63,7 @@ const toSettings = (row: VersionRow): StudioSettings => ({
   minimumBookings: row.minimumBookings,
   minimumBookingsCheckLeadMinutes: row.minimumBookingsCheckLeadMinutes,
   startDateLimitDays: row.startDateLimitDays,
+  bookingWindowDays: row.bookingWindowDays,
   founderPlaces: row.founderPlaces,
   founderDiscountPercent: row.founderDiscountPercent,
   founderGapDays: row.founderGapDays,
@@ -96,6 +99,9 @@ const currentRow = async (client: Client): Promise<VersionRow> => {
 export const readCurrentStudioSettings = async (
   client: Client,
 ): Promise<StudioSettings> => toSettings(await currentRow(client));
+
+export const readBookingWindowDays = async (client: Client): Promise<number> =>
+  (await readCurrentStudioSettings(client)).bookingWindowDays;
 
 export const readCancellationWindowMinutes = async (
   client: Client,
@@ -164,6 +170,7 @@ export const createPrismaStudioSettings = (
       evaluationPriceCentavos: settings.evaluationPriceCentavos,
       plansFromPriceCentavos: cheapest._min.priceCentavos,
       startDateLimitDays: settings.startDateLimitDays,
+      bookingWindowDays: settings.bookingWindowDays,
       openingDate: settings.openingDate,
     };
   },

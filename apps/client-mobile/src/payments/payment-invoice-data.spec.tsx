@@ -46,9 +46,9 @@ async function openPaymentWithReceipt(prefill: typeof ana | null) {
       },
     }),
   );
-  await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+  await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
   await waitFor(() => {
-    expect(screen.getByText("Datos para la factura")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "¿Necesitas factura?" })).toBeOnTheScreen();
   });
   await fireEvent.press(
     screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
@@ -82,10 +82,28 @@ describe("Client payment invoice data", () => {
     jest.mocked(FileSystem.readAsStringAsync).mockReset();
   });
 
-  it("prefills her last sale's data and sends it with the transfer", async () => {
+  // Walkthrough n.º 14: the invoice is a collapsed «¿Necesitas factura?» row,
+  // so a purchase goes without one unless she opens it.
+  it("sends no invoice while «¿Necesitas factura?» stays closed", async () => {
     const { screen, submitted } = await openPaymentWithReceipt(ana);
 
-    expect(screen.getByRole("button", { name: "Con factura" })).toBeSelected();
+    expect(screen.getByRole("button", { name: "¿Necesitas factura?" })).toHaveProp(
+      "accessibilityState",
+      { expanded: false },
+    );
+    expect(screen.queryByLabelText("NIT o CI")).toBeNull();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
+
+    await waitFor(() => {
+      expect(submitted).toHaveBeenCalledWith({ invoiceData: null });
+    });
+  });
+
+  it("opens prefilled with her last sale's data and sends it", async () => {
+    const { screen, submitted } = await openPaymentWithReceipt(ana);
+
+    await fireEvent.press(screen.getByRole("button", { name: "¿Necesitas factura?" }));
     expect(screen.getByLabelText("NIT o CI")).toHaveProp("value", "4567891");
     expect(screen.getByLabelText("Nombre o razón social")).toHaveProp("value", "Ana Pérez");
     expect(
@@ -99,23 +117,10 @@ describe("Client payment invoice data", () => {
     });
   });
 
-  it("sends «Sin factura» when nothing was prefilled", async () => {
+  it("waits for both fields once the invoice is opened", async () => {
     const { screen, submitted } = await openPaymentWithReceipt(null);
 
-    expect(screen.getByRole("button", { name: "Sin factura" })).toBeSelected();
-    expect(screen.getByText("Tu compra se registra sin datos de factura.")).toBeOnTheScreen();
-
-    await fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
-
-    await waitFor(() => {
-      expect(submitted).toHaveBeenCalledWith({ invoiceData: null });
-    });
-  });
-
-  it("waits for both fields once «Con factura» is chosen", async () => {
-    const { screen, submitted } = await openPaymentWithReceipt(null);
-
-    await fireEvent.press(screen.getByRole("button", { name: "Con factura" }));
+    await fireEvent.press(screen.getByRole("button", { name: "¿Necesitas factura?" }));
     expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeDisabled();
 
     await fireEvent.changeText(screen.getByLabelText("NIT o CI"), "1020304050");
@@ -127,5 +132,15 @@ describe("Client payment invoice data", () => {
         invoiceData: { taxId: "1020304050", name: "Estudio Ana SRL" },
       });
     });
+  });
+
+  it("shows the amount on the hero and the two numbered steps", async () => {
+    const { screen } = await openPaymentWithReceipt(null);
+
+    expect(screen.getByTestId("payment-hero")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByText("Monto exacto a transferir")).toBeOnTheScreen();
+    expect(screen.getByText("1 · Paga con el QR del estudio")).toBeOnTheScreen();
+    expect(screen.getByText("2 · Sube tu comprobante")).toBeOnTheScreen();
+    expect(screen.getByText("El estudio revisa tu pago y te avisa por la app")).toBeOnTheScreen();
   });
 });

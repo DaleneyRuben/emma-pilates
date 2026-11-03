@@ -12,15 +12,12 @@ import {
   colors,
   ConfirmationSheet,
   LoadingState,
-  PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
+  SectionTitle,
   spacing,
-  surfaces,
-  typography,
-  useMountedAt,
+  StateScreen,
   usePullToRefresh,
   useRefetchOnFocus,
   useStickyNotice,
@@ -28,15 +25,15 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { pickReceipt } from "../payments/receipt-upload";
 import { idempotency, uploadImage } from "../uploads/image-upload";
+import { PastEvaluations, UpcomingEvaluationCard } from "./evaluation-card";
 import {
   boliviaMonth,
   clockTime,
-  evaluationBadge,
   evaluationDate,
   evaluationHistoryLabel,
   followingMonth,
@@ -52,100 +49,6 @@ type EvaluationsNavigation = {
   ) => void;
   setParams: (params: { confirmed?: ClientEvaluationDto; moved?: boolean }) => void;
 };
-
-function DateBadge({ instant }: { instant: string }) {
-  const badge = evaluationBadge(instant);
-  return (
-    <View style={styles.badge}>
-      <Text style={styles.badgeDay}>{badge.day}</Text>
-      <Text style={styles.badgeMonth}>{badge.month}</Text>
-    </View>
-  );
-}
-
-function UpcomingCard({
-  evaluation,
-  highlighted,
-  uploading,
-  onCancel,
-  onReschedule,
-  onAttachReceipt,
-}: {
-  evaluation: ClientEvaluationDto;
-  highlighted: boolean;
-  uploading: boolean;
-  onCancel: () => void;
-  onReschedule: () => void;
-  onAttachReceipt: () => void;
-}) {
-  // The server's flag is a snapshot; the 3-hour limit is judged again when the card appears.
-  const shownAt = useMountedAt();
-  const open = new Date(evaluation.cancellableUntil).getTime() > shownAt;
-  const cancellable = evaluation.cancellable && open;
-  const reschedulable = evaluation.reschedulable === true && open;
-
-  return (
-    <View style={[styles.card, highlighted && styles.cardHighlighted]}>
-      <DateBadge instant={evaluation.startsAt} />
-      <View style={styles.cardBody}>
-        <Text style={styles.time}>{clockTime(evaluation.startsAt)}</Text>
-        <BodyText>
-          {`${evaluationDate(evaluation.startsAt)} · ${evaluation.durationMinutes} min`}
-        </BodyText>
-        <BodyText style={styles.muted}>
-          {`${evaluation.nutritionistName} · Sucursal ${evaluation.branchName}`}
-        </BodyText>
-        {evaluation.receiptUploadable === true ? (
-          <Pressable
-            accessibilityLabel="Sube tu comprobante de transferencia"
-            accessibilityRole="button"
-            accessibilityState={{ disabled: uploading, busy: uploading }}
-            disabled={uploading}
-            hitSlop={spacing.sm}
-            onPress={onAttachReceipt}
-            style={styles.cancel}
-          >
-            <Text style={styles.attachText}>
-              {uploading ? "Subiendo comprobante…" : "Sube tu comprobante de transferencia"}
-            </Text>
-          </Pressable>
-        ) : null}
-        {!evaluation.included && evaluation.receiptAttached === true ? (
-          <BodyText style={styles.muted}>Comprobante listo.</BodyText>
-        ) : null}
-        {reschedulable ? (
-          <>
-            <BodyText style={styles.muted}>Puedes reprogramarla hasta 3 horas antes.</BodyText>
-            <Pressable
-              accessibilityLabel="Reprogramar"
-              accessibilityRole="button"
-              hitSlop={spacing.sm}
-              onPress={onReschedule}
-              style={styles.cancel}
-            >
-              <Text style={styles.cancelText}>Reprogramar</Text>
-            </Pressable>
-          </>
-        ) : cancellable ? (
-          <>
-            <BodyText style={styles.muted}>Puedes cancelar hasta 3 horas antes.</BodyText>
-            <Pressable
-              accessibilityLabel="Cancelar"
-              accessibilityRole="button"
-              hitSlop={spacing.sm}
-              onPress={onCancel}
-              style={styles.cancel}
-            >
-              <Text style={styles.cancelText}>Cancelar</Text>
-            </Pressable>
-          </>
-        ) : (
-          <BodyText style={styles.muted}>Ya no se puede cancelar</BodyText>
-        )}
-      </View>
-    </View>
-  );
-}
 
 export function MyEvaluationsScreen({
   route,
@@ -258,57 +161,52 @@ export function MyEvaluationsScreen({
       ) : null}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         {items.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>No tienes evaluaciones próximas.</Text>
-            <BodyText>
-              {pastItems.some((evaluation) => boliviaMonth(evaluation.startsAt) === boliviaMonth())
+          <StateScreen
+            icon="calendar"
+            layout="inList"
+            note={
+              pastItems.some((evaluation) => boliviaMonth(evaluation.startsAt) === boliviaMonth())
                 ? `Ya usaste tu evaluación de este mes. Puedes reservar la de ${monthName(followingMonth(boliviaMonth()))}, también gratuita.`
-                : "Tu evaluación de este mes sigue disponible y es gratuita."}
-            </BodyText>
-            <PrimaryButton
-              label="Reservar evaluación"
-              onPress={() => navigation.navigate("EvaluationAvailability")}
-            />
-          </View>
+                : "Tu evaluación de este mes sigue disponible y es gratis."
+            }
+            primaryAction={{
+              label: "Reservar evaluación",
+              onPress: () => navigation.navigate("EvaluationAvailability"),
+            }}
+            title="No tienes evaluaciones próximas"
+          />
         ) : (
-          <>
-            <Text style={styles.label}>{items.length === 1 ? "Próxima" : "Próximas"}</Text>
-            {items.map((evaluation) => (
-              <UpcomingCard
-                evaluation={{
-                  ...evaluation,
-                  receiptAttached:
-                    receiptReady[evaluation.id] === true || evaluation.receiptAttached === true,
-                }}
-                highlighted={confirmed?.id === evaluation.id}
-                key={evaluation.id}
-                onAttachReceipt={() => void attachReceipt(evaluation)}
-                uploading={uploadingId === evaluation.id}
-                onCancel={() => setCancelling(evaluation)}
-                onReschedule={() =>
-                  navigation.navigate("EvaluationAvailability", {
-                    evaluationId: evaluation.id,
-                    slotId: evaluation.slotId,
-                    startsAt: evaluation.startsAt,
-                  })
-                }
-              />
-            ))}
-          </>
+          <View>
+            <SectionTitle>{items.length === 1 ? "Próxima" : "Próximas"}</SectionTitle>
+            <View style={styles.cards}>
+              {items.map((evaluation) => (
+                <UpcomingEvaluationCard
+                  evaluation={{
+                    ...evaluation,
+                    receiptAttached:
+                      receiptReady[evaluation.id] === true || evaluation.receiptAttached === true,
+                  }}
+                  key={evaluation.id}
+                  onAttachReceipt={() => void attachReceipt(evaluation)}
+                  onCancel={() => setCancelling(evaluation)}
+                  onReschedule={() =>
+                    navigation.navigate("EvaluationAvailability", {
+                      evaluationId: evaluation.id,
+                      slotId: evaluation.slotId,
+                      startsAt: evaluation.startsAt,
+                    })
+                  }
+                  uploading={uploadingId === evaluation.id}
+                />
+              ))}
+            </View>
+          </View>
         )}
         {pastItems.length > 0 ? (
-          <>
-            <Text style={styles.label}>Anteriores</Text>
-            {pastItems.map((evaluation) => (
-              <View key={evaluation.id} style={styles.pastRow}>
-                <DateBadge instant={evaluation.startsAt} />
-                <BodyText style={styles.pastText}>
-                  {`${clockTime(evaluation.startsAt)} · ${evaluation.nutritionistName}`}
-                </BodyText>
-                <BodyText style={styles.muted}>{evaluationHistoryLabel(evaluation)}</BodyText>
-              </View>
-            ))}
-          </>
+          <View>
+            <SectionTitle>Anteriores</SectionTitle>
+            <PastEvaluations evaluations={pastItems} label={evaluationHistoryLabel} />
+          </View>
         ) : null}
       </ScrollView>
       <ConfirmationSheet
@@ -343,44 +241,8 @@ export function MyEvaluationsScreen({
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    alignItems: "center",
-    alignSelf: "flex-start",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.control,
-    justifyContent: "center",
-    minWidth: 48,
-    paddingVertical: spacing.sm,
-  },
-  badgeDay: { color: colors.primaryOnTint, fontSize: typography.bodyLarge, fontWeight: "600" },
-  badgeMonth: { color: colors.primaryOnTint, fontSize: typography.label },
-  attachText: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
-  cancel: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center" },
-  cancelText: { color: colors.errorText, fontSize: typography.body, fontWeight: "500" },
-  card: {
-    ...surfaces.card,
-    borderLeftColor: colors.white,
-    borderLeftWidth: 4,
-    flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  cardBody: { flex: 1, gap: spacing.xs },
-  cardHighlighted: { borderLeftColor: colors.success },
-  content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  empty: { gap: spacing.lg, paddingTop: spacing.xl },
-  emptyTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
+  cards: { gap: spacing.md },
+  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   failure: { color: colors.errorText },
-  label: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-  },
-  muted: { color: colors.textMuted, fontSize: typography.note },
-  pastRow: { flexDirection: "row", gap: spacing.md, alignItems: "center" },
-  pastText: { color: colors.text, flex: 1 },
   screen: { gap: spacing.lg },
-  time: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
 });

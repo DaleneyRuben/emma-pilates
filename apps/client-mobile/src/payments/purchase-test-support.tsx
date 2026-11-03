@@ -93,7 +93,7 @@ export async function openPlanDetail(fetcher: ReturnType<typeof routeFetcher>) {
   });
   await fireEvent.press(screen.getByRole("button", { name: /^Paquete de 8 clases,/ }));
   await waitFor(() => {
-    expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
+    expect(screen.getByText("Desglose")).toBeOnTheScreen();
   });
   return screen;
 }

@@ -53,8 +53,10 @@ async function renderSignedIn(device = createMemoryPushPlatform()) {
       })}
     />,
   );
+  // A launch push may open a pushed screen at once, which hides the tab bar.
   await waitFor(
-    () => expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen(),
+    () =>
+      expect(screen.getByTestId("tab-booking", { includeHiddenElements: true })).toBeOnTheScreen(),
     { timeout: 10_000 },
   );
   return { device, fetcher, screen };
@@ -82,7 +84,7 @@ describe("Client push notifications (NOT-002)", () => {
 
     await act(async () => device.tap(subscriptionPush));
 
-    await waitFor(() => expect(screen.getByText("Mi plan")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
     expect(fetcher).toHaveBeenCalledWith(
       `/api/v1/notifications/${notificationId}/read`,
       expect.objectContaining({ method: "POST" }),
@@ -94,7 +96,7 @@ describe("Client push notifications (NOT-002)", () => {
       createMemoryPushPlatform("granted", { launchTap: subscriptionPush }),
     );
 
-    await waitFor(() => expect(screen.getByText("Mi plan")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
   });
 
   it("keeps the app badge on the unread count", async () => {

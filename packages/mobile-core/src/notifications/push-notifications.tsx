@@ -54,6 +54,8 @@ type PushNotificationsProviderProps = PropsWithChildren<{
   /** Routes a tapped notification once its entry is marked read. */
   onOpen: (payload: PushPayload) => void;
   permissionReason: string;
+  /** The sheet's title; «¿Te avisamos?» unless the app gives its own (walkthrough n.º 16). */
+  permissionTitle?: string;
   platform?: PushPlatform;
   /**
    * FUT-001: false while an Administrator sees the app as a Staff Member, so
@@ -72,6 +74,7 @@ export function PushNotificationsProvider({
   now = Date.now,
   onOpen,
   permissionReason,
+  permissionTitle,
   platform,
   registrationEnabled = true,
 }: PushNotificationsProviderProps) {
@@ -199,6 +202,7 @@ export function PushNotificationsProvider({
         onAccept={() => void accept()}
         onDecline={() => void decline()}
         reason={permissionReason}
+        title={permissionTitle}
         visible={offering}
       />
     </PushNotificationsContext.Provider>

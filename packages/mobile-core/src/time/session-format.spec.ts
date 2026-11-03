@@ -5,6 +5,7 @@ import {
   dayChipLabel,
   formatMonthHeading,
   formatSessionDate,
+  formatStartTime,
   formatTimeRange,
   hasStarted,
   isInsideCancellationWindow,
@@ -78,5 +79,9 @@ describe("Session formatting", () => {
       "07:00 – 07:50",
     );
     expect(formatSessionDate("2026-09-21T11:00:00.000Z")).toBe("lunes 21 de septiembre");
+  });
+
+  it("writes a Session's start alone in La Paz time, as Inicio's next class does", () => {
+    expect(formatStartTime("2026-09-21T12:00:00.000Z")).toBe("08:00");
   });
 });

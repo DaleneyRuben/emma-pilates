@@ -44,14 +44,11 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          "Reserva tu evaluación gratuita con la nutricionista. Tienes una evaluación disponible por mes.",
-        ),
-      ).toBeOnTheScreen();
+      // C13: one line of copy, then the Nutritionist with the Branch.
+      expect(screen.getByText("Una evaluación gratis por mes con tu plan.")).toBeOnTheScreen();
     });
     expect(screen.getByText("Gabriela Rojas")).toBeOnTheScreen();
-    expect(screen.getByText("Nutricionista · sesiones de 45 min")).toBeOnTheScreen();
+    expect(screen.getByText("Nutricionista · 45 min · Centro")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: dayName(firstDay) })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: dayName(secondDay) })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: dayName(fullDay) })).toBeNull();
@@ -60,15 +57,16 @@ describe("Client Evaluations", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Turno 09:45" }));
     await waitFor(() => {
-      expect(screen.getByText("Confirmar evaluación")).toBeOnTheScreen();
+      expect(screen.getByText("Confirma tu cita")).toBeOnTheScreen();
     });
-    expect(screen.getByText("45 minutos · Sucursal Centro")).toBeOnTheScreen();
-    expect(screen.getByText("Es gratuita — no usa clases de tu plan.")).toBeOnTheScreen();
-    expect(
-      screen.getByText("Te avisaremos un día antes y una hora antes de tu cita."),
-    ).toBeOnTheScreen();
+    // C14: the appointment on the hero card, its terms as icon rows.
+    expect(screen.getByTestId("evaluation-hero")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByText("45 minutos · Gabriela Rojas · Centro")).toBeOnTheScreen();
+    expect(screen.getByText("Es gratis: no usa clases de tu plan")).toBeOnTheScreen();
+    expect(screen.getByText("Te avisamos un día y una hora antes")).toBeOnTheScreen();
+    expect(screen.getByText("Cancela hasta 3 horas antes")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
 
     await waitFor(() => {
       expect(screen.getByText("Evaluación confirmada")).toBeOnTheScreen();
@@ -81,7 +79,7 @@ describe("Client Evaluations", () => {
       }),
     );
     expect(screen.getByText("Mis evaluaciones")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cancelar evaluación" })).toBeOnTheScreen();
   });
 
   it("offers Reprogramar on a confirmed paid evaluation", async () => {
@@ -101,7 +99,7 @@ describe("Client Evaluations", () => {
     );
 
     expect(await screen.findByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
   });
 
   it("shows an 8-class Client the settings price and starts the QR payment", async () => {
@@ -132,14 +130,14 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
     await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:45" }));
     expect(
-      await screen.findByText("Cuesta Bs 70. Transfiere el monto y sube tu comprobante."),
+      await screen.findByText("Cuesta Bs 70: transfiere y sube tu comprobante"),
     ).toBeOnTheScreen();
     expect(
       screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
     ).toBeOnTheScreen();
     // The photograph step needs the device camera. Until a receipt is
     // attached the confirm stays disabled, so the payment is not started.
-    expect(screen.getByRole("button", { name: "Confirmar" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeDisabled();
     expect(fetcher).not.toHaveBeenCalledWith(
       "/api/v1/evaluation-slots/slot-2/evaluation-payments",
       expect.anything(),
@@ -160,7 +158,7 @@ describe("Client Evaluations", () => {
     });
 
     await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:45" }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Confirmar evaluación" }));
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Activar notificaciones" })).toBeOnTheScreen();
@@ -244,10 +242,10 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Necesitas un plan activo para reservar tu evaluación."),
-      ).toBeOnTheScreen();
+      // C13b: the centred v2 state block.
+      expect(screen.getByRole("header", { name: "Necesitas un plan activo" })).toBeOnTheScreen();
     });
+    expect(screen.getByText("La evaluación es gratuita con cualquier plan.")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Ver planes" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: /^Turno/ })).toBeNull();
   });
@@ -265,10 +263,10 @@ describe("Client Evaluations", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: "Turno 09:00" }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Confirmar" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeOnTheScreen();
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
 
     await waitFor(() => {
       expect(
@@ -302,13 +300,14 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Mis evaluaciones");
 
     await waitFor(() => {
-      expect(screen.getByText("Ya no se puede cancelar")).toBeOnTheScreen();
+      // C15: the limit is on each card's line, the action a text button.
+      expect(screen.getByText(/ · ya no se puede cancelar$/)).toBeOnTheScreen();
     });
-    expect(screen.getByText("Puedes cancelar hasta 3 horas antes.")).toBeOnTheScreen();
+    expect(screen.getByText(/ · cancela hasta 3 h antes$/)).toBeOnTheScreen();
     expect(await screen.findByText("Anteriores")).toBeOnTheScreen();
     expect(screen.getByText("Incluida")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar evaluación" }));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));
     expect(sheet.getByText("¿Cancelar esta evaluación?")).toBeOnTheScreen();
     expect(
@@ -318,7 +317,7 @@ describe("Client Evaluations", () => {
     await fireEvent.press(sheet.getByRole("button", { name: "Sí, cancelar evaluación" }));
 
     await waitFor(() => {
-      expect(screen.queryByRole("button", { name: "Cancelar" })).toBeNull();
+      expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
     });
     expect(fetcher).toHaveBeenCalledWith(
       "/api/v1/evaluations/evaluation-later",
@@ -331,8 +330,11 @@ describe("Client Evaluations", () => {
     const screen = await openProfileRow(fetcher, "Mis evaluaciones");
 
     await waitFor(() => {
-      expect(screen.getByText("No tienes evaluaciones próximas.")).toBeOnTheScreen();
+      expect(screen.getByText("No tienes evaluaciones próximas")).toBeOnTheScreen();
     });
+    expect(
+      screen.getByText("Tu evaluación de este mes sigue disponible y es gratis."),
+    ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Reservar evaluación" }));
 
     await waitFor(() => {

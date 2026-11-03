@@ -118,10 +118,10 @@ describe("Paid Evaluation receipt", () => {
       await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
     );
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Confirmar" })).toBeEnabled();
+      expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeEnabled();
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
 
     await waitFor(() => {
       expect(screen.getByText("Evaluación confirmada")).toBeOnTheScreen();
@@ -145,10 +145,10 @@ describe("Paid Evaluation receipt", () => {
       await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
     );
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Confirmar" })).toBeEnabled();
+      expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeEnabled();
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
 
     await waitFor(() => {
       expect(screen.getByText("Ya tienes un pago de evaluación pendiente.")).toBeOnTheScreen();
@@ -196,10 +196,10 @@ describe("Paid Evaluation receipt", () => {
       await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
     );
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Confirmar" })).toBeEnabled();
+      expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeEnabled();
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
 
     expect(
       await screen.findByText("Reservamos la evaluación, pero no pudimos adjuntar el comprobante."),
@@ -360,10 +360,10 @@ describe("Paid Evaluation receipt", () => {
       await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
     );
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Confirmar" })).toBeEnabled();
+      expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeEnabled();
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
 
     expect(
       await screen.findByText("Reservamos la evaluación, pero no pudimos adjuntar el comprobante."),

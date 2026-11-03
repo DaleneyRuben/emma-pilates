@@ -24,6 +24,7 @@ const current: StudioSettings = {
   minimumBookings: 2,
   minimumBookingsCheckLeadMinutes: 180,
   startDateLimitDays: 14,
+  bookingWindowDays: 7,
   founderPlaces: 40,
   founderDiscountPercent: 15,
   founderGapDays: 7,
@@ -118,6 +119,30 @@ describe('updateStudioSettings', () => {
     );
   });
 
+  // FIX-026: the Booking Window is editable, and a form from before it, which
+  // does not send it, keeps the current value.
+  it('saves a new Booking Window and keeps it when the form leaves it out', async () => {
+    const deps = dependencies();
+
+    const saved = await updateStudioSettings(
+      { expectedVersion: 1, values: { ...editable, bookingWindowDays: 14 } },
+      deps,
+    );
+    expect(saved).toEqual({ ...current, version: 2, bookingWindowDays: 14 });
+    expect(deps.saveVersion).toHaveBeenCalledWith(
+      saved,
+      { previousBookingWindowDays: 7, bookingWindowDays: 14 },
+      expect.anything(),
+    );
+
+    await expect(
+      updateStudioSettings(
+        { expectedVersion: 1, values: { ...editable, minimumBookings: 3 } },
+        deps,
+      ),
+    ).resolves.toMatchObject({ bookingWindowDays: 7, minimumBookings: 3 });
+  });
+
   it('writes no version when nothing changed', async () => {
     const deps = dependencies();
 
@@ -149,6 +174,9 @@ describe('updateStudioSettings', () => {
     ['renewalTargetFromMonth13Percent', 50.5],
     ['openingDate', '2026-02-30'],
     ['openingDate', '1/12/2026'],
+    ['bookingWindowDays', 0],
+    ['bookingWindowDays', 31],
+    ['bookingWindowDays', 7.5],
   ])('refuses %s = %p', async (field, value) => {
     const deps = dependencies();
 

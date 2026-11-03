@@ -9,6 +9,13 @@ const civilDate = {
   description: 'The studio Opening Date (La Paz), or null while unknown',
 } as const;
 
+const bookingWindow = {
+  minimum: 1,
+  maximum: 30,
+  description:
+    'Días para reservar por adelantado: a Session is bookable from today through this many La Paz days, counting today (FIX-026)',
+} as const;
+
 // GET /studio-rules: what the apps show Clients, read instead of hard-coded
 // copy (BKM-004, ADR-0101). Public and briefly cached.
 export class StudioRulesDto {
@@ -32,6 +39,9 @@ export class StudioRulesDto {
     description: 'Days after the purchase a Start Date may be chosen',
   })
   startDateLimitDays!: number;
+
+  @ApiProperty(bookingWindow)
+  bookingWindowDays!: number;
 
   @ApiProperty(civilDate)
   openingDate!: string | null;
@@ -61,6 +71,13 @@ export class StudioSettingsValuesDto {
 export class UpdateStudioSettingsDto extends StudioSettingsValuesDto {
   @ApiProperty({ description: 'The version the form was read from' })
   expectedVersion!: number;
+
+  @ApiProperty({
+    ...bookingWindow,
+    required: false,
+    description: `${bookingWindow.description}; left out, the value in force stays`,
+  })
+  bookingWindowDays?: number;
 }
 
 // Every Studio Setting, the read-only ones included, for «Reglas del estudio».
@@ -76,6 +93,9 @@ export class StudioSettingsDto extends StudioSettingsValuesDto {
 
   @ApiProperty()
   startDateLimitDays!: number;
+
+  @ApiProperty(bookingWindow)
+  bookingWindowDays!: number;
 
   @ApiProperty()
   founderPlaces!: number;
@@ -123,6 +143,7 @@ const updateSchema = z.strictObject({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .nullable(),
+  bookingWindowDays: z.number().optional(),
 });
 
 // Shapes only; the ranges are the domain's (studio-settings.ts).
@@ -131,6 +152,12 @@ export const parseUpdateStudioSettings = (
 ): { expectedVersion: number; values: EditableStudioSettings } | null => {
   const result = updateSchema.safeParse(value);
   if (!result.success) return null;
-  const { expectedVersion, ...values } = result.data;
-  return { expectedVersion, values };
+  const { expectedVersion, bookingWindowDays, ...values } = result.data;
+  return {
+    expectedVersion,
+    values:
+      bookingWindowDays === undefined
+        ? values
+        : { ...values, bookingWindowDays },
+  };
 };

@@ -85,12 +85,14 @@ async function renderProvider({
   fetcher = createFetcher(),
   onOpen = jest.fn(),
   now = () => 1_791_468_000_000,
+  permissionTitle,
   registrationEnabled,
 }: {
   platform?: ReturnType<typeof fakePlatform>;
   fetcher?: ReturnType<typeof createFetcher>;
   onOpen?: jest.Mock;
   now?: () => number;
+  permissionTitle?: string;
   registrationEnabled?: boolean;
 } = {}) {
   const screen = await render(
@@ -101,6 +103,7 @@ async function renderProvider({
         now={now}
         onOpen={onOpen}
         permissionReason="Te avisamos si tu clase cambia."
+        permissionTitle={permissionTitle}
         platform={platform}
         registrationEnabled={registrationEnabled}
       >
@@ -139,6 +142,19 @@ describe("PushNotificationsProvider", () => {
       fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
     });
     expect(screen.queryByText("Te avisamos si tu clase cambia.")).not.toBeOnTheScreen();
+  });
+
+  it("offers the permission under the app's own title", async () => {
+    const { screen } = await renderProvider({
+      platform: fakePlatform("undetermined"),
+      permissionTitle: "No te pierdas ninguna clase",
+    });
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    });
+    await waitFor(() => expect(screen.getByText("No te pierdas ninguna clase")).toBeOnTheScreen());
+    expect(screen.queryByText("¿Te avisamos?")).toBeNull();
   });
 
   it("marks a tapped entry read, then opens its destination", async () => {

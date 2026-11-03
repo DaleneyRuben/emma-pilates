@@ -1,6 +1,7 @@
 import type { Prisma } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { decideGuestPassBooking } from '../payments/guest-pass';
+import { readBookingWindowDays } from '../studio-settings/prisma-studio-settings';
 import { createBooking } from './create-booking';
 import {
   findApprovedFreeze,
@@ -106,6 +107,7 @@ export function executeCreate(
       }
       return booking;
     },
+    bookingWindowDays: () => readBookingWindowDays(transaction),
     now,
   });
 }

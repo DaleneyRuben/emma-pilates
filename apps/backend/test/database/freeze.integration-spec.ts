@@ -10,6 +10,7 @@ import {
   PaymentWorld,
   startPaymentWorld,
 } from './payment-lifecycle-test-support';
+import { widenBookingWindow } from './booking-window-test-support';
 
 const quarterly = fixtures.plans.find(
   (item) => item.name === 'Trimestral 36 clases',
@@ -22,6 +23,8 @@ describe('freeze', () => {
   beforeAll(async () => {
     world = await startPaymentWorld();
     ({ prisma } = world);
+    // The cases book October Sessions from a September clock.
+    await widenBookingWindow(prisma);
     await prisma.plan.create({
       data: {
         name: 'Bimestral 16 clases',

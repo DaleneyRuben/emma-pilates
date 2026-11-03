@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { PaymentState } from '../../src/generated/prisma/client';
 import {
+  codeOf,
   fixtures,
   now,
   PaymentWorld,
@@ -138,5 +139,47 @@ describe('a front-desk transfer receipt', () => {
 
     expect(payment).toMatchObject({ method: 'cash', state: 'confirmed' });
     expect(payment.decidedAt?.toISOString()).toBe(now.toISOString());
+  });
+
+  // FIX-028 (walkthrough note 21): after the receipt is sent, «Confirmar pago
+  // recibido» must not record the same sale again in cash, for that Plan or
+  // any other, until the Administrator decides the transfer.
+  it('refuses a cash sale while her front-desk transfer is pending', async () => {
+    const buyer = await world.newClient('Recepción doble cobro');
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const centro = fixtures.branches.find(
+      (branch) => branch.name === 'Centro',
+    )!;
+    const other = fixtures.plans.find((item) => item.id !== plan.id)!;
+    const receipt = await world.readyReceipt(assistant.accountId);
+    await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: buyer.clientId,
+        planId: plan.id,
+        branchId: centro.id,
+        imageAssetId: receipt.id,
+      },
+      assistant,
+      randomUUID(),
+    );
+
+    for (const planId of [plan.id, other.id]) {
+      await expect(
+        codeOf(
+          world
+            .commands()
+            .recordCashPayment(
+              { clientId: buyer.clientId, planId, branchId: centro.id },
+              assistant,
+              randomUUID(),
+            ),
+        ),
+      ).resolves.toBe('payment_pending_exists');
+    }
+    await expect(
+      world.prisma.payment.count({
+        where: { clientId: buyer.clientId, method: 'CASH' },
+      }),
+    ).resolves.toBe(0);
   });
 });

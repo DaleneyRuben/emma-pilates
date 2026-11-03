@@ -1,7 +1,10 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { BookingState } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
+import {
+  readBookingWindowDays,
+  readCancellationWindowMinutes,
+} from '../studio-settings/prisma-studio-settings';
 import {
   findApprovedFreeze,
   findNotYetStartedSubscription,
@@ -112,5 +115,6 @@ export function executeReschedule(
     },
     now,
     cancellationWindowMinutes: () => readCancellationWindowMinutes(transaction),
+    bookingWindowDays: () => readBookingWindowDays(transaction),
   });
 }

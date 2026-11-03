@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache, createMemoryPushPlatform } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -146,14 +146,17 @@ describe("Client Session detail", () => {
       },
     });
 
-    expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
-    // UX-012 / C4: 04 writes the credential under the Trainer's name.
-    expect(screen.getByText("Entrenadora certificada")).toBeOnTheScreen();
-    expect(screen.getByText("Centro")).toBeOnTheScreen();
-    expect(screen.getByText("75 minutos")).toBeOnTheScreen();
-    expect(screen.getByText("3 de 12 cupos disponibles")).toBeOnTheScreen();
+    // Follow-up 227 (C04): the hero carries the time and the seats; the
+    // Trainer, the Branch and the free-cancellation limit are icon rows.
+    const facts = within(screen.getByTestId("session-facts"));
+    expect(facts.getByText("Emma Vargas")).toBeOnTheScreen();
+    expect(facts.getByText("Entrenadora")).toBeOnTheScreen();
+    expect(facts.getByText("Centro")).toBeOnTheScreen();
+    expect(facts.getByText(/^Cancela sin costo hasta las \d{2}:\d{2}$/)).toBeOnTheScreen();
+    expect(screen.getByText(/ · 75 minutos$/)).toBeOnTheScreen();
+    expect(screen.getByText("de 12 cupos libres")).toBeOnTheScreen();
     expect(screen.getByText(classType.description)).toBeOnTheScreen();
-    expect(screen.getByText("Se descontará 1 clase de tu paquete.")).toBeOnTheScreen();
+    expect(screen.getByText("Se descuenta 1 clase de tu plan")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
 
@@ -228,7 +231,8 @@ describe("Client Session detail", () => {
       0,
     );
 
-    expect(screen.getByText("Clase llena. Te avisaremos si se libera un cupo.")).toBeOnTheScreen();
+    expect(screen.getByText("La lista de espera no usa clases de tu plan")).toBeOnTheScreen();
+    expect(screen.getByText("Te avisamos si se libera un cupo")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar" })).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Unirme a la lista de espera" }));
@@ -256,6 +260,13 @@ describe("Client Session detail", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Activar notificaciones" })).toBeOnTheScreen();
     });
+    // Walkthrough n.º 16: the owner's global copy for the Client app.
+    expect(screen.getByText("No te pierdas ninguna clase")).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "Te avisamos antes de cada clase y cuando haya novedades sobre tus reservas, tu plan o tus pagos.",
+      ),
+    ).toBeOnTheScreen();
   });
 
   it("offers notifications once the Client joins the Waitlist", async () => {

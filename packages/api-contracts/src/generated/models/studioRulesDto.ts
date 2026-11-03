@@ -18,6 +18,12 @@ export interface StudioRulesDto {
   /** Days after the purchase a Start Date may be chosen */
   startDateLimitDays: number;
   /**
+   * Días para reservar por adelantado: a Session is bookable from today through this many La Paz days, counting today (FIX-026)
+   * @minimum 1
+   * @maximum 30
+   */
+  bookingWindowDays: number;
+  /**
    * The studio Opening Date (La Paz), or null while unknown
    * @nullable
    */

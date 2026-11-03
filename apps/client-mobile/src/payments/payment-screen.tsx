@@ -7,18 +7,20 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  boliviaCivilDate,
   colors,
+  EmphasisCard,
+  fontFamilies,
   FormScrollView,
-  InvoiceDataCard,
   invoiceChoiceFrom,
   invoiceDataPayload,
   type InvoiceChoice,
   LoadingState,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
+  SectionTitle,
   spacing,
   surfaces,
   typography,
@@ -27,11 +29,14 @@ import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { formatCivilDate } from "../home/home-format";
 import { formatBolivianos } from "../plans/plan-format";
 import { pickReceipt, uploadReceipt, type AttachedReceipt } from "./receipt-upload";
+import { InvoiceDisclosure } from "./invoice-disclosure";
+import { ReceiptRow } from "./receipt-row";
 import { TransferQrCard } from "./transfer-qr-card";
 
 type PaymentNavigation = {
@@ -55,11 +60,14 @@ export function PaymentScreen() {
   // PAY-007: prefilled from her last sale; a failed read leaves «Sin factura».
   const lastInvoice = useGetCurrentClientInvoiceData({ fetcher });
   const [invoiceEdit, setInvoiceEdit] = useState<InvoiceChoice | null>(null);
-  const invoice =
-    invoiceEdit ??
-    invoiceChoiceFrom(
+  // Walkthrough n.º 14: closed by default, so the purchase goes without an
+  // invoice; opening it shows her last sale's data.
+  const invoice = invoiceEdit ?? {
+    ...invoiceChoiceFrom(
       lastInvoice.data?.status === 200 ? (lastInvoice.data.data.invoiceData ?? null) : null,
-    );
+    ),
+    wantsInvoice: false,
+  };
   const invoiceData = invoiceDataPayload(invoice);
   const [receipt, setReceipt] = useState<AttachedReceipt | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -134,57 +142,53 @@ export function PaymentScreen() {
     }
   };
 
+  const startsLine =
+    current.startsOn === undefined
+      ? ""
+      : current.startsOn === boliviaCivilDate(new Date())
+        ? " · empieza hoy"
+        : ` · empieza el ${formatCivilDate(current.startsOn)}`;
+
   return (
     <Screen style={styles.screen}>
       {header}
       <FormScrollView contentContainerStyle={styles.content}>
-        <View style={styles.amountCard}>
-          <BodyText>Monto exacto a transferir</BodyText>
-          <Text style={styles.amount}>{formatBolivianos(current.amountDueCentavos)}</Text>
-        </View>
-        <TransferQrCard fetcher={fetcher} />
-        <Pressable
-          accessibilityLabel={
-            receipt === null
-              ? "Sube tu comprobante de transferencia"
-              : "Comprobante adjunto. Toca para cambiarlo."
-          }
-          accessibilityRole="button"
-          accessibilityState={{ disabled: uploading }}
-          disabled={uploading}
-          onPress={() => void attach()}
-          style={styles.upload}
-          testID="payment-receipt"
+        <EmphasisCard
+          eyebrow="Monto exacto a transferir"
+          note={`Plan ${current.planName}${startsLine}`}
+          testID="payment-hero"
         >
-          {receipt === null ? (
-            <>
-              <Text style={styles.uploadIcon}>⇪</Text>
-              <Text style={styles.uploadLabel}>
-                {uploading ? "Subiendo comprobante…" : "Sube tu comprobante de transferencia"}
-              </Text>
-            </>
-          ) : (
-            <>
-              <Image
-                accessibilityLabel="Comprobante adjunto"
-                source={{ uri: receipt.localUri }}
-                style={styles.thumbnail}
-              />
-              <Text style={styles.uploadLabel}>Comprobante listo. Toca para cambiarlo.</Text>
-            </>
-          )}
-        </Pressable>
-        <InvoiceDataCard
-          noInvoiceNote="Tu compra se registra sin datos de factura."
-          onChange={setInvoiceEdit}
-          prefilledNote="Usamos los datos de tu última compra. Puedes cambiarlos."
-          value={invoice}
-        />
+          <Text style={styles.amount}>{formatBolivianos(current.amountDueCentavos)}</Text>
+        </EmphasisCard>
+        <View>
+          <SectionTitle>1 · Paga con el QR del estudio</SectionTitle>
+          <TransferQrCard fetcher={fetcher} />
+        </View>
+        <View>
+          <SectionTitle>2 · Sube tu comprobante</SectionTitle>
+          <View style={styles.group}>
+            <ReceiptRow
+              onAttach={() => void attach()}
+              onRemove={() => setReceipt(null)}
+              receipt={receipt}
+              uploading={uploading}
+            />
+            <View style={styles.hairline} />
+            <InvoiceDisclosure onChange={setInvoiceEdit} value={invoice} />
+          </View>
+        </View>
         {error === null ? null : (
           <BodyText accessibilityRole="alert" style={styles.error}>
             {error}
           </BodyText>
         )}
+      </FormScrollView>
+      <View style={styles.footer}>
+        <BodyText style={styles.note}>
+          {receipt === null
+            ? "Adjunta tu comprobante para continuar"
+            : "El estudio revisa tu pago y te avisa por la app"}
+        </BodyText>
         <PrimaryButton
           busy={submitting}
           disabled={receipt === null || uploading || invoiceData === "incomplete"}
@@ -192,38 +196,23 @@ export function PaymentScreen() {
           onPress={() => void submit()}
           testID="payment-submit"
         />
-      </FormScrollView>
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   amount: {
-    color: colors.text,
-    fontFamily: "Lora_500Medium",
-    fontSize: typography.display,
+    color: colors.white,
+    fontFamily: fontFamilies.display,
+    fontSize: 32,
+    fontVariant: ["tabular-nums"],
   },
-  amountCard: {
-    ...surfaces.flatCard,
-    alignItems: "center",
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
+  content: { gap: spacing.xl, paddingBottom: spacing.lg },
   error: { color: colors.errorText },
+  footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
+  group: { ...surfaces.card },
+  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
+  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   screen: { gap: spacing.lg },
-  thumbnail: { borderRadius: radii.control, height: 120, width: 90 },
-  upload: {
-    alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: radii.inset,
-    borderStyle: "dashed",
-    borderWidth: 1.5,
-    gap: spacing.sm,
-    minHeight: 120,
-    justifyContent: "center",
-    padding: spacing.lg,
-  },
-  uploadIcon: { color: colors.primaryDeep, fontSize: typography.titleSecondary },
-  uploadLabel: { color: colors.primaryDeep, fontSize: typography.body, textAlign: "center" },
 });

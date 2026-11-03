@@ -1,21 +1,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useState } from "react";
 import { z } from "zod";
 
-import { TeamAccessBadge } from "./auth-layout";
+import { BrandHeader } from "./auth-layout";
 import { emailPlaceholder, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
 import { FormScrollView } from "../ui/form-scroll-view";
 import { BodyText } from "../ui/body-text";
-import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
 import { TextButton } from "../ui/text-button";
-import { colors, spacing, typography } from "../ui/tokens";
+import { colors, spacing } from "../ui/tokens";
 
 const loginSchema = z.object({
   email: z.email("Escribe un correo electrónico válido."),
@@ -79,12 +78,7 @@ export function LoginScreen({
             <BodyText style={styles.noticeText}>{notice}</BodyText>
           </View>
         )}
-        <View style={styles.brand}>
-          <Text style={styles.wordmark}>Emma</Text>
-          <View style={styles.brandRule} />
-          <BodyText style={styles.tagline}>Movimiento · Equilibrio · Bienestar</BodyText>
-          {teamAccess ? <TeamAccessBadge /> : null}
-        </View>
+        <BrandHeader teamAccess={teamAccess} />
 
         <View style={styles.form}>
           {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
@@ -166,15 +160,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   noticeText: { color: colors.successText },
-  brand: {
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  brandRule: {
-    backgroundColor: colors.borderStrong,
-    height: 1,
-    width: 36,
-  },
   // A phone-width column, centred on a tablet instead of stretched.
   content: {
     alignSelf: "center",
@@ -192,18 +177,5 @@ const styles = StyleSheet.create({
   screen: {
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.xlLg,
-  },
-  tagline: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    letterSpacing: 2,
-    textAlign: "center",
-    textTransform: "uppercase",
-  },
-  wordmark: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 52,
-    lineHeight: 56,
   },
 });

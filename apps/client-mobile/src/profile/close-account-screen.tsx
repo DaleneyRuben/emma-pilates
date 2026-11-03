@@ -11,21 +11,23 @@ import {
   colors,
   FormField,
   FormScrollView,
+  type GlyphName,
+  IconRow,
+  IconRowGroup,
   LoadingState,
-  PrimaryButton,
   QueryFailure,
   radii,
   Screen,
   ScreenTopBar,
   spacing,
-  surfaces,
+  StateScreen,
   TextButton,
   typography,
   useMobileIdentity,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { describeAccountClosure } from "./close-account-consequences";
@@ -72,6 +74,15 @@ function DestructiveButton({
 
 // Prompt 24 (BE-007 G2–G6): the Client closes their own Account after seeing
 // what it does, confirming with the password.
+// C24: each consequence as an icon row, its glyph by what it is about.
+function consequenceIcon(line: string): GlyphName {
+  if (line.startsWith("Cancelamos") || line.startsWith("Sales")) return "calendar";
+  if (line.startsWith("Tu plan")) return "card";
+  if (line.startsWith("Cerramos")) return "logout";
+  if (line.startsWith("Tu correo")) return "mail";
+  return "alert";
+}
+
 export function CloseAccountScreen() {
   const navigation = useNavigation<{ goBack: () => void }>();
   const identity = useMobileIdentity();
@@ -133,15 +144,12 @@ export function CloseAccountScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <View style={styles.pending}>
-          <Text style={styles.pendingTitle}>Pago en revisión</Text>
-          <BodyText style={styles.pendingText}>
-            Tienes un pago por transferencia en revisión. Podrás cerrar tu cuenta cuando el estudio
-            lo confirme o lo rechace.
-          </BodyText>
-        </View>
-        <View style={styles.spacer} />
-        <PrimaryButton label="Volver al perfil" onPress={() => navigation.goBack()} />
+        <StateScreen
+          icon="hourglass"
+          note="Podrás cerrar tu cuenta cuando el estudio confirme o rechace tu transferencia."
+          primaryAction={{ label: "Volver al perfil", onPress: () => navigation.goBack() }}
+          title="Tienes un pago en revisión"
+        />
       </Screen>
     );
   }
@@ -204,19 +212,13 @@ export function CloseAccountScreen() {
         keyboardVerticalOffset={spacing.xxl}
       >
         <BodyText style={styles.lead}>
-          Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo que va a pasar:
+          Esto pasa al cerrar tu cuenta en Emma Pilates Studio:
         </BodyText>
-        <View style={styles.card}>
-          {closure.lines.map((line, index) => (
-            <View
-              key={line}
-              style={[styles.line, index < closure.lines.length - 1 && styles.lineDivider]}
-            >
-              <View style={styles.bullet} />
-              <BodyText style={styles.lineText}>{line}</BodyText>
-            </View>
+        <IconRowGroup testID="close-account-lines">
+          {closure.lines.map((line) => (
+            <IconRow icon={consequenceIcon(line)} key={line} label={line} />
           ))}
-        </View>
+        </IconRowGroup>
         <BodyText style={styles.note}>
           Borramos tu nombre, correo, teléfono y foto. El estudio conserva tus pagos y tus clases
           sin tus datos, para su contabilidad.
@@ -226,7 +228,7 @@ export function CloseAccountScreen() {
           <FormField
             autoCapitalize="none"
             error={passwordError}
-            label="Contraseña"
+            label="Tu contraseña, para confirmar"
             onChangeText={(value) => {
               setPasswordError(undefined);
               setPassword(value);
@@ -235,7 +237,6 @@ export function CloseAccountScreen() {
             secureTextEntry
             value={password}
           />
-          <BodyText style={styles.note}>Escribe tu contraseña para confirmar que eres tú.</BodyText>
         </View>
       </FormScrollView>
     </Screen>
@@ -243,17 +244,6 @@ export function CloseAccountScreen() {
 }
 
 const styles = StyleSheet.create({
-  bullet: {
-    backgroundColor: colors.primary,
-    borderRadius: radii.pill,
-    height: 6,
-    marginTop: 7,
-    width: 6,
-  },
-  card: {
-    ...surfaces.card,
-    overflow: "hidden",
-  },
   content: { gap: spacing.mdLg, paddingBottom: spacing.lg },
   destructive: {
     alignItems: "center",
@@ -281,29 +271,6 @@ const styles = StyleSheet.create({
   field: { gap: spacing.sm },
   footer: { gap: spacing.xs, paddingTop: spacing.md },
   lead: { color: colors.text },
-  line: {
-    flexDirection: "row",
-    gap: spacing.smLg,
-    paddingHorizontal: spacing.mdLg,
-    paddingVertical: spacing.smLg,
-  },
-  lineDivider: { borderBottomColor: colors.divider, borderBottomWidth: 1 },
-  lineText: { color: colors.text, flex: 1, fontSize: typography.note + 1 },
   note: { color: colors.textMuted, fontSize: typography.note },
-  pending: {
-    backgroundColor: colors.warningTint,
-    borderColor: "rgba(201,154,78,0.35)",
-    borderRadius: radii.frame,
-    borderWidth: 1,
-    gap: spacing.smLg,
-    padding: spacing.lgXl,
-  },
-  pendingText: { color: colors.warningBody },
-  pendingTitle: {
-    color: colors.warningTitle,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-  },
   screen: { gap: spacing.lg },
-  spacer: { flex: 1 },
 });

@@ -51,11 +51,8 @@ describe("Evaluation month copy (13, 14, 15)", () => {
     const screen = await openProfileRow(routeFetcher(baseRoutes()), "Evaluación nutricional");
     await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:00" }));
 
-    expect(
-      await screen.findByText(
-        "Si necesitas cambiarla, puedes cancelarla desde Mis evaluaciones hasta 3 horas antes.",
-      ),
-    ).toBeOnTheScreen();
+    // C14: the cancellation limit is one of the terms rows.
+    expect(await screen.findByText("Cancela hasta 3 horas antes")).toBeOnTheScreen();
   });
 
   it("does not call this month's Evaluation available on 15 once it took place", async () => {
@@ -87,7 +84,7 @@ describe("Evaluation month copy (13, 14, 15)", () => {
     );
     const screen = await openProfileRow(fetcher, "Mis evaluaciones");
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cancelar evaluación" }));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));
 
     expect(
