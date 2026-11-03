@@ -42,6 +42,8 @@ env:
     visible: "Disponible"
     timeout: 8000
 - takeScreenshot: bkm017-client-3-disponible
+# iOS: XCUITest cannot tap through the open keyboard.
+- hideKeyboard
 - tapOn: "Guardar código"
 - extendedWaitUntil:
     visible: ".*dejará de funcionar.*"

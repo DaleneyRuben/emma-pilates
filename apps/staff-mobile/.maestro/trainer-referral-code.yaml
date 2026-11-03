@@ -43,6 +43,8 @@ env:
 - extendedWaitUntil:
     visible: "Disponible"
     timeout: 8000
+# iOS: XCUITest cannot tap through the open keyboard.
+- hideKeyboard
 - tapOn: "Guardar código"
 - extendedWaitUntil:
     visible: ".*dejará de funcionar.*"
