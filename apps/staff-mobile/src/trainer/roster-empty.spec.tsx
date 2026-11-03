@@ -25,11 +25,15 @@ const staff = {
   branches: [],
 };
 
-async function openRoster(bookings: unknown[], endsAt = session.endsAt) {
+async function openRoster(
+  bookings: unknown[],
+  endsAt = session.endsAt,
+  startsAt = session.startsAt,
+) {
   const fetcher = routeFetcher({
-    "/api/v1/trainer/sessions": () => jsonResponse([{ ...session, endsAt }]),
+    "/api/v1/trainer/sessions": () => jsonResponse([{ ...session, startsAt, endsAt }]),
     "/api/v1/trainer/sessions/session-1/roster": () =>
-      jsonResponse({ ...session, endsAt, bookings }),
+      jsonResponse({ ...session, startsAt, endsAt, bookings }),
     "/api/v1/staff-members/current": () => jsonResponse(staff),
     "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
   });
@@ -93,13 +97,28 @@ describe("Trainer roster empty state (UX-009)", () => {
     const { screen } = await openRoster(
       [{ bookingId: "booking-1", clientName: "Ana Pérez" }],
       "2099-09-10T11:00:00.000Z",
+      "2099-09-10T10:00:00.000Z",
     );
 
     await waitFor(() => {
       expect(screen.getByText("Ana Pérez")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Podrás marcar asistencia cuando termine la clase.")).toBeOnTheScreen();
+    expect(screen.getByText("Podrás marcar asistencia cuando empiece la clase.")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Guardar asistencia" })).toBeNull();
     expect(screen.queryByText("Sin reservas")).toBeNull();
+  });
+
+  // Owner, 2026-11-03: attendance opens when the class starts.
+  it("lets the Trainer mark attendance while the class is on", async () => {
+    const startsAt = new Date(Date.now() - 10 * 60_000).toISOString();
+    const endsAt = new Date(Date.now() + 40 * 60_000).toISOString();
+    const { screen } = await openRoster(
+      [{ bookingId: "booking-1", clientName: "Ana Pérez" }],
+      endsAt,
+      startsAt,
+    );
+
+    expect(await screen.findByRole("button", { name: "Guardar asistencia" })).toBeOnTheScreen();
+    expect(screen.queryByText(/Podrás marcar asistencia/)).toBeNull();
   });
 });
