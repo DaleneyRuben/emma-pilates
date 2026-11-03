@@ -3,7 +3,9 @@ import { BackHandler } from "react-native";
 
 import { PaymentDone } from "./payment-done";
 
-type BackListener = () => boolean | null | undefined;
+type BackListener = Parameters<typeof BackHandler.addEventListener>[1];
+// The listeners ignore the event; any value of its type will do.
+const backPress = {} as Parameters<BackListener>[0];
 
 // Seen on the emulator (MOB-074): back from «¡Pago registrado!» reopened
 // «Elige un plan» for a Client whose plan was already active. The result's
@@ -31,7 +33,7 @@ describe("PaymentDone and the Android back button", () => {
 
     let handled = false;
     await act(async () => {
-      handled = [...listeners].reverse().some((listener) => listener() === true);
+      handled = [...listeners].reverse().some((listener) => listener(backPress) === true);
     });
 
     expect(handled).toBe(true);

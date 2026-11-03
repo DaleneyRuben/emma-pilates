@@ -7,7 +7,9 @@ import { baseRoutes, openPlanDetail, payment } from "./purchase-test-support";
 
 jest.setTimeout(30_000);
 
-type BackListener = () => boolean | null | undefined;
+type BackListener = Parameters<typeof BackHandler.addEventListener>[1];
+// The listeners ignore the event; any value of its type will do.
+const backPress = {} as Parameters<BackListener>[0];
 
 // The Android back button: the newest listener runs first, as in BackHandler.
 function trackBackListeners() {
@@ -20,7 +22,7 @@ function trackBackListeners() {
       },
     };
   });
-  return { press: () => [...listeners].reverse().some((listener) => listener() === true) };
+  return { press: () => [...listeners].reverse().some((listener) => listener(backPress) === true) };
 }
 
 // Seen on the emulator (MOB-074): back from «Tu pago está en revisión»

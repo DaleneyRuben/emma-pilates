@@ -8,6 +8,7 @@ function createApiMock(): AuthenticationApi {
   return {
     activateAccount: jest.fn(),
     cancelRegistration: jest.fn(),
+    completeEmailChange: jest.fn(),
     completePasswordRecovery: jest.fn(),
     correctRegistrationEmail: jest.fn(),
     inspectLink: jest.fn(),
@@ -18,7 +19,9 @@ function createApiMock(): AuthenticationApi {
   } as AuthenticationApi;
 }
 
-type BackListener = () => boolean | null | undefined;
+type BackListener = Parameters<typeof BackHandler.addEventListener>[1];
+// The listeners ignore the event; any value of its type will do.
+const backPress = {} as Parameters<BackListener>[0];
 
 // The Android back button: the newest listener runs first, as in BackHandler.
 function trackBackListeners() {
@@ -32,7 +35,7 @@ function trackBackListeners() {
     };
   });
   return {
-    press: () => [...listeners].reverse().some((listener) => listener() === true),
+    press: () => [...listeners].reverse().some((listener) => listener(backPress) === true),
   };
 }
 
