@@ -71,7 +71,7 @@ export function SessionRow({
       ]}
       testID={testID}
     >
-      <Text style={styles.time} testID="session-row-time">
+      <Text numberOfLines={1} style={styles.time} testID="session-row-time">
         {formatStartTime(session.startsAt)}
       </Text>
       <View style={styles.body}>
@@ -123,7 +123,8 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.display,
     fontSize: 20,
     fontVariant: ["tabular-nums"],
-    width: 56,
+    // «09:00» in Lora 20 is wider than 56 pt on iOS: a fixed width wrapped it.
+    minWidth: 56,
   },
   title: {
     color: colors.text,
