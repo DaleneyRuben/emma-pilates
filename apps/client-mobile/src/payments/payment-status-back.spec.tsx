@@ -37,8 +37,7 @@ describe("the Android back button on the payment result", () => {
     const back = trackBackListeners();
     const fetcher = routeFetcher({
       ...baseRoutes(0),
-      "POST /api/v1/purchase-intents": () =>
-        jsonResponse({ code: "payment_pending_exists" }, 409),
+      "POST /api/v1/purchase-intents": () => jsonResponse({ code: "payment_pending_exists" }, 409),
       "/api/v1/payments/current": () => jsonResponse(payment),
     });
     const screen = await openPlanDetail(fetcher);
