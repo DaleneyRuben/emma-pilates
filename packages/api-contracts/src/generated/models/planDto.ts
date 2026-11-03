@@ -34,4 +34,10 @@ export interface PlanDto {
    * @minimum 0
    */
   listPriceCentavos?: number;
+  /**
+   * Launch-price places left, present only on a discounted Plan when 10 or fewer remain (BKM-019). Absent otherwise.
+   * @minimum 1
+   * @maximum 10
+   */
+  launchPlacesLeft?: number;
 }

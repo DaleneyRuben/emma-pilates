@@ -7,7 +7,7 @@
 
 export interface SetTrainerReferralCodeDto {
   /**
-   * 3 to 20 letters, digits, or hyphens, not starting with REF-; null removes the code
+   * 3 to 20 letters, digits, or hyphens, starting with a letter or digit; null removes the code
    * @nullable
    */
   referralCode: string | null;

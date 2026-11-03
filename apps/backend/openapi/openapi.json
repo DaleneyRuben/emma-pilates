@@ -5781,6 +5781,104 @@
         ]
       }
     },
+    "/api/v1/referral-codes/current": {
+      "get": {
+        "operationId": "getOwnReferralCode",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnReferralCodeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnReferralCode"
+        ]
+      },
+      "put": {
+        "operationId": "changeOwnReferralCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeOwnReferralCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnReferralCodeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnReferralCode"
+        ]
+      }
+    },
+    "/api/v1/referral-codes/availability": {
+      "get": {
+        "operationId": "getReferralCodeAvailability",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferralCodeAvailabilityDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnReferralCode"
+        ]
+      }
+    },
     "/api/v1/clients/current/photo": {
       "put": {
         "operationId": "setCurrentClientPhoto",
@@ -10621,6 +10719,12 @@
             "type": "number",
             "minimum": 0,
             "description": "List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it."
+          },
+          "launchPlacesLeft": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10,
+            "description": "Launch-price places left, present only on a discounted Plan when 10 or fewer remain (BKM-019). Absent otherwise."
           }
         },
         "required": [
@@ -13190,6 +13294,12 @@
             "minimum": 0,
             "description": "List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it."
           },
+          "launchPlacesLeft": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10,
+            "description": "Launch-price places left, present only on a discounted Plan when 10 or fewer remain (BKM-019). Absent otherwise."
+          },
           "creditAppliedCentavos": {
             "type": "number",
             "minimum": 0,
@@ -14595,11 +14705,69 @@
             "type": "string",
             "nullable": true,
             "example": "CARLA",
-            "description": "3 to 20 letters, digits, or hyphens, not starting with REF-; null removes the code"
+            "description": "3 to 20 letters, digits, or hyphens, starting with a letter or digit; null removes the code"
           }
         },
         "required": [
           "referralCode"
+        ]
+      },
+      "OwnReferralCodeDto": {
+        "type": "object",
+        "properties": {
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "LUCIA"
+          },
+          "editableFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When she may change her code again (one change every 30 days); null means now"
+          }
+        },
+        "required": [
+          "referralCode",
+          "editableFrom"
+        ]
+      },
+      "ChangeOwnReferralCodeDto": {
+        "type": "object",
+        "properties": {
+          "referralCode": {
+            "type": "string",
+            "example": "LU-PILATES",
+            "description": "3 to 20 letters, digits, or hyphens, starting with a letter or digit"
+          }
+        },
+        "required": [
+          "referralCode"
+        ]
+      },
+      "ReferralCodeAvailabilityDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "LUNA",
+            "description": "The code as it would be stored"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "in_use",
+              "blocked",
+              "malformed",
+              "current"
+            ],
+            "description": "`in_use`: another Client or Trainer holds or held it; `blocked`: a reserved or blocked word; `current`: already hers"
+          }
+        },
+        "required": [
+          "code",
+          "status"
         ]
       },
       "SetClientPhotoDto": {
