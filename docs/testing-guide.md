@@ -8090,7 +8090,11 @@ A. **The founder price is a whole boliviano (FIX-025, note 22).** As Camila
    (Bs 290) Bs 247; Bs 560 stays Bs 476 and Bs 820 stays Bs 697. The day's
    **Cerrar caja** expects the same Bs 893, and a front-desk QR or an in-app
    transfer for the same Plan is pending at Bs 893. Sales stored before
-   FIX-025 keep their centavos. Specs: `founder-membership.spec.ts`,
+   FIX-025 keep their centavos. The quote and the sale read one rule
+   (`founder-plan-quote.ts`, `readFounderPrice`): an active founder's second
+   plan-quotes call shows Bs 476 for the Bs 560 plan and the renewal records
+   Bs 476; a founder who lost the place, or whose last Plan ended more than 7
+   days ago, is quoted and charged Bs 560. Specs: `founder-membership.spec.ts`,
    `founder-plan-price.integration-spec.ts`.
 B. **Días para reservar por adelantado (FIX-026, note 23).**
    `GET /api/v1/studio-rules` and, as Paola,
