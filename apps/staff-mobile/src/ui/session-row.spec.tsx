@@ -11,6 +11,10 @@ describe("Staff SessionRow", () => {
     );
 
     expect(screen.getByText("07:00")).toHaveProp("numberOfLines", 1);
-    expect(screen.getByText("07:00").parent?.parent).toHaveStyle({ minWidth: 56 });
+    // The column under the time grows with it instead of holding 56 pt.
+    let column = screen.getByText("07:00").parent;
+    while (column !== null && column.type !== "View") column = column.parent;
+    expect(column).toHaveStyle({ minWidth: 56 });
+    expect(column).not.toHaveStyle({ width: 56 });
   });
 });
