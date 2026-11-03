@@ -44,9 +44,18 @@ ALTER TABLE "booking"."referral_codes" ADD CONSTRAINT "referral_codes_client_id_
 -- AddForeignKey
 ALTER TABLE "booking"."referral_codes" ADD CONSTRAINT "referral_codes_staff_member_id_fkey" FOREIGN KEY ("staff_member_id") REFERENCES "booking"."staff_members"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- Every code held today, as it is.
+-- Every code held today, as it is. The old index on staff_members only kept
+-- live codes unique, so a removed Staff Member could share a live Trainer's
+-- code: a removed one keeps none. A live code that a Client already holds
+-- (the old rule checked it in the application only) is dropped too; the
+-- backfill below gives that Trainer a fresh one.
+UPDATE "booking"."staff_members" SET "referral_code" = NULL
+WHERE "deleted_at" IS NOT NULL AND "referral_code" IS NOT NULL;
 INSERT INTO "booking"."referral_codes" ("code", "client_id", "created_at")
 SELECT "referral_code", "id", "created_at" FROM "booking"."clients";
+UPDATE "booking"."staff_members" AS s SET "referral_code" = NULL
+WHERE s."referral_code" IS NOT NULL
+  AND EXISTS (SELECT 1 FROM "booking"."referral_codes" r WHERE r."code" = s."referral_code");
 INSERT INTO "booking"."referral_codes" ("code", "staff_member_id", "created_at")
 SELECT "referral_code", "id", "created_at" FROM "booking"."staff_members"
 WHERE "referral_code" IS NOT NULL;
