@@ -16,6 +16,18 @@ import {
   urubo,
 } from "./nutritionist-test-support";
 
+const todayHeading = () => {
+  const label = new Intl.DateTimeFormat("es-BO", {
+    day: "numeric",
+    month: "long",
+    timeZone: "America/La_Paz",
+    weekday: "long",
+  })
+    .format(new Date())
+    .replace(",", "");
+  return label.charAt(0).toUpperCase() + label.slice(1);
+};
+
 jest.setTimeout(30_000);
 
 describe("Nutritionist agenda and availability", () => {
@@ -53,14 +65,12 @@ describe("Nutritionist agenda and availability", () => {
     expect(screen.getByText(/^Mañana · /)).toBeOnTheScreen();
     expect(screen.getByText("Primera evaluación")).toBeOnTheScreen();
     expect(screen.getByText("Seguimiento")).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
+    expect(screen.getByText("Nutricionista · " + todayHeading())).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "23:00 Valeria Áñez" }));
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar evaluación" }));
+    await fireEvent.press(screen.getByTestId("cancel-evaluation-evaluation-1"));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));
-    expect(
-      sheet.getByText("Le avisaremos a Valeria Áñez y el horario quedará libre."),
-    ).toBeOnTheScreen();
+    expect(sheet.getByText(/ · Valeria Áñez$/)).toBeOnTheScreen();
+    expect(sheet.getByText("Le avisamos y el horario queda libre")).toBeOnTheScreen();
     await fireEvent.press(sheet.getByRole("button", { name: "Sí, cancelar evaluación" }));
 
     await waitFor(() => {
@@ -77,11 +87,15 @@ describe("Nutritionist agenda and availability", () => {
     const screen = await openApp(routeFetcher(routes()));
 
     await waitFor(() => {
-      expect(screen.getByText("No tienes evaluaciones agendadas.")).toBeOnTheScreen();
+      expect(screen.getByText("No tienes evaluaciones")).toBeOnTheScreen();
     });
     expect(
       screen.getByText("Revisa tu disponibilidad para que las clientas puedan reservar."),
     ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Ver mi disponibilidad" }));
+    await waitFor(() =>
+      expect(screen.getAllByRole("button", { name: "Nuevo horario" })[0]).toBeOnTheScreen(),
+    );
   });
 
   it("lists blocks from Monday to Sunday with their turnos and future start dates", async () => {
@@ -120,23 +134,28 @@ describe("Nutritionist agenda and availability", () => {
       "Editar horario Jueves, 15:00 – 18:00",
       "Editar horario Sábado, 9:00 – 12:00",
     ]);
-    expect(screen.getByText("5 cupos de 45 min · 2 reservados")).toBeOnTheScreen();
-    expect(screen.getByText("4 cupos de 45 min · 1 reservado")).toBeOnTheScreen();
-    expect(screen.getByText("4 cupos de 45 min · sin reservas")).toBeOnTheScreen();
+    expect(screen.getByText("5 cupos · 2 reservados")).toBeOnTheScreen();
+    expect(screen.getByText("4 cupos · 1 reservado")).toBeOnTheScreen();
+    expect(screen.getByText("4 cupos · sin reservas")).toBeOnTheScreen();
     expect(screen.getByText("Desde el jueves 1 de octubre")).toBeOnTheScreen();
-    // MOB-041: S16 ends each block row in the 19 pt Palo de rosa chevron.
-    const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
-    expect(chevrons).toHaveLength(3);
-    expect(chevrons[0]).toHaveProp("stroke", "#B78380");
-    expect(screen.queryByText("›")).toBeNull();
+    // v2 S16: a tab root with the fixed «Nuevo horario» under the rows.
+    expect(
+      screen.getByText("Las clientas eligen cupos de 45 min dentro de estos rangos."),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Lun")).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
+    expect(screen.getAllByRole("button", { name: "Nuevo horario" })).toHaveLength(1);
   });
 
   it("shows the empty availability state", async () => {
     const screen = await openAvailability(routeFetcher(routes()));
 
     await waitFor(() => {
-      expect(screen.getByText("Aún no publicaste horarios de disponibilidad.")).toBeOnTheScreen();
+      expect(screen.getByText("Aún no publicaste horarios")).toBeOnTheScreen();
     });
+    expect(
+      screen.getByText("Publica un rango y las clientas podrán reservar su evaluación."),
+    ).toBeOnTheScreen();
   });
 
   it("publishes a new block from today at the only Branch", async () => {
@@ -173,7 +192,7 @@ describe("Nutritionist agenda and availability", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Guardar" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Martes, 10:00 – 12:15")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Editar horario Martes, 10:00 – 12:15")).toBeOnTheScreen();
     });
     expect(fetcher).toHaveBeenCalledWith(
       "/api/v1/nutritionist/availability-blocks",

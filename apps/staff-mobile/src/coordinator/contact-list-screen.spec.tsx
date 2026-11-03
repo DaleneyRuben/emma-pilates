@@ -51,9 +51,9 @@ async function openContactList(routes = coordinatorRoutes()) {
   await waitFor(() => {
     expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Para contactar" }));
+  await fireEvent.press(screen.getByTestId("tab-contacts"));
   await waitFor(() => {
-    expect(screen.getByLabelText("Volver")).toBeOnTheScreen();
+    expect(screen.getByRole("header", { name: "Para contactar" })).toBeOnTheScreen();
   });
   return { screen, fetcher };
 }
@@ -68,13 +68,12 @@ describe("S28 Para contactar", () => {
     const { screen } = await openContactList();
 
     expect(screen.getByText("Valeria Quiroga")).toBeOnTheScreen();
-    expect(screen.getByText("+591 70011005")).toBeOnTheScreen();
+    expect(screen.getByText("+591 70011005 · empezó el 2 de octubre")).toBeOnTheScreen();
     expect(screen.getAllByText("7 días sin reservar").length).toBeGreaterThan(0);
-    expect(screen.getByText("Empezó el 2 de octubre")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Abrir WhatsApp" })).toBeOnTheScreen();
 
     expect(screen.getByText("Daniela Rojas")).toBeOnTheScreen();
-    expect(screen.getByText("Sin teléfono")).toBeOnTheScreen();
+    expect(screen.getByText(/^Sin teléfono · empezó el /)).toBeOnTheScreen();
     expect(screen.getByText("Menos de 2 clases a los 15 días")).toBeOnTheScreen();
     expect(screen.getAllByRole("button", { name: "Abrir WhatsApp" })).toHaveLength(1);
     expect(screen.queryByText(/Bs/)).toBeNull();
@@ -98,10 +97,12 @@ describe("S28 Para contactar", () => {
       }),
     );
 
-    await fireEvent.press(screen.getAllByRole("button", { name: "Contactada" })[0]!);
+    await fireEvent.press(screen.getAllByRole("button", { name: "Marcar contactada" })[0]!);
+    // v2 S28: the brand toast that stays until closed.
     await waitFor(() => {
-      expect(screen.getByText("Marcaste a Valeria Quiroga como contactada.")).toBeOnTheScreen();
+      expect(screen.getByText("Valeria Quiroga, contactada")).toBeOnTheScreen();
     });
+    expect(screen.getByText("Sale de la lista y queda registrado a tu nombre")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.queryByText("Valeria Quiroga")).toBeNull();
     });
@@ -114,7 +115,8 @@ describe("S28 Para contactar", () => {
       }),
     );
 
-    expect(screen.getByText("Nadie para contactar por ahora.")).toBeOnTheScreen();
+    expect(screen.getByText("Nadie para contactar")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Buscar una clienta" })).toBeOnTheScreen();
     expect(
       screen.getByText(
         "Aquí aparecen las clientas nuevas que dejan de reservar o toman pocas clases.",

@@ -105,24 +105,23 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
       .mockResolvedValueOnce({ accountId: "account-1", role: "administrator" });
     const screen = await render(<App runtime={runtime} />);
 
-    await waitFor(
-      () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-      { timeout: 10_000 },
-    );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+      timeout: 10_000,
+    });
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Ver la app como…" })).toBeOnTheScreen(),
     );
     await fireEvent.press(screen.getByRole("button", { name: "Ver la app como…" }));
     await waitFor(() => expect(screen.getByText("Camila Rojas")).toBeOnTheScreen());
-    expect(screen.getByText("Entrenadoras")).toBeOnTheScreen();
-    expect(screen.getByText("Asistentes")).toBeOnTheScreen();
-    expect(screen.getByText("Nutricionistas")).toBeOnTheScreen();
-    expect(screen.getByText("Equipetrol, Centro")).toBeOnTheScreen();
+    // v2 S24: one list of the team, each with her role and Branches.
+    expect(screen.getByText("El equipo")).toBeOnTheScreen();
+    expect(screen.getByText(/ · Equipetrol, Centro$/)).toBeOnTheScreen();
+    expect(screen.getByText("Nunca aparece otra persona de administración.")).toBeOnTheScreen();
     expect(screen.queryByText("Paola Mendoza")).not.toBeOnTheScreen();
     expect(
       screen.getByText(
-        "Verás la app tal como la ve esa persona, con sus clases y sus sucursales, durante 30 minutos. Puedes salir cuando quieras desde la franja de arriba.",
+        "Verás sus clases y su agenda durante 30 minutos. Sales cuando quieras desde la franja de arriba.",
       ),
     ).toBeOnTheScreen();
 
@@ -130,11 +129,8 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     // UX-002: the design's sheet (S24), not a native alert.
     const sheet = within(screen.getByTestId("view-as-sheet"));
     expect(sheet.getByText("¿Ver la app como Camila Rojas?")).toBeOnTheScreen();
-    expect(
-      sheet.getByText(
-        "Durante 30 minutos verás sus clases y sus sucursales y podrás actuar como ella. Todo lo que hagas quedará registrado a tu nombre.",
-      ),
-    ).toBeOnTheScreen();
+    expect(sheet.getByText("Durante 30 minutos verás sus clases")).toBeOnTheScreen();
+    expect(sheet.getByText("Lo que hagas queda registrado a tu nombre")).toBeOnTheScreen();
     await fireEvent.press(sheet.getByRole("button", { name: "Cancelar" }));
     expect(screen.queryByTestId("view-as-sheet")).toBeNull();
     expect(calls).toEqual([]);
@@ -191,11 +187,10 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     const runtime = createStaffRuntime(routeFetcher(routes(() => trainerProfile, [])), "trainer");
     const screen = await render(<App runtime={runtime} />);
 
-    await waitFor(
-      () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-      { timeout: 10_000 },
-    );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+      timeout: 10_000,
+    });
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => expect(screen.getByText("Camila Rojas")).toBeOnTheScreen());
     expect(screen.queryByRole("button", { name: "Ver la app como…" })).not.toBeOnTheScreen();
   });

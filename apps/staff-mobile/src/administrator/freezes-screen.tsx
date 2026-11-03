@@ -1,31 +1,42 @@
 import { useListRequestedFreezes } from "@pilates/api-contracts";
 import {
-  BodyText,
-  Chevron,
-  colors,
+  IconRowGroup,
   LoadingState,
   QueryFailure,
   Screen,
   spacing,
-  surfaces,
-  typography,
+  StateScreen,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
-import { formatCivilDate } from "../assistant/assistant-format";
 import { useStaffFetcher } from "../staff-fetcher";
-import { RootHeader } from "../ui/root-header";
+import { BackBar } from "../ui/back-bar";
+import { PersonRow } from "../ui/person-row";
+import { SectionHeader } from "../ui/section-header";
+import { freezeDays, freezeRange } from "./freeze-format";
 
 type FreezesNavigation = {
+  goBack: () => void;
   navigate: (screen: "ReviewFreeze", params: { freezeId: string }) => void;
 };
 
+/**
+ * CON Congelamientos, opened from Pagos (owner, 2026-11-02). The API lists
+ * only the requests still to decide, so the board's «Revisados» is not drawn.
+ */
 export function FreezesScreen() {
   const navigation = useNavigation<FreezesNavigation>();
   const fetcher = useStaffFetcher();
-  const requested = useListRequestedFreezes({ fetcher });
-  const header = <RootHeader label="Congelamientos" title="Congelamientos" />;
+  const requested = useListRequestedFreezes({ fetcher, query: { refetchOnMount: "always" } });
+  const header = (
+    <BackBar
+      back="Pagos"
+      onBack={() => navigation.goBack()}
+      subtitle="Pausan el plan de la clienta. Los días congelados se suman a su vencimiento."
+      title="Congelamientos"
+    />
+  );
 
   if (requested.isPending) {
     return (
@@ -48,30 +59,32 @@ export function FreezesScreen() {
   }
 
   const freezes = requested.data.data;
-
   return (
     <Screen style={styles.screen}>
-      {header}
       <ScrollView contentContainerStyle={styles.content}>
+        {header}
         {freezes.length === 0 ? (
-          <BodyText>No hay solicitudes pendientes.</BodyText>
+          <StateScreen
+            icon="hourglass"
+            layout="inList"
+            note="Te avisamos cuando una clienta pida pausar su plan."
+            title="No hay solicitudes por revisar"
+          />
         ) : (
-          freezes.map((freeze) => (
-            <Pressable
-              accessibilityLabel={`Revisar congelamiento de ${freeze.clientName}`}
-              accessibilityRole="button"
-              key={freeze.id}
-              onPress={() => navigation.navigate("ReviewFreeze", { freezeId: freeze.id })}
-              style={styles.card}
-            >
-              <View style={styles.cardBody}>
-                <Text style={styles.name}>{freeze.clientName}</Text>
-                <BodyText>{`${formatCivilDate(freeze.startsOn)} – ${formatCivilDate(freeze.endsOn)}`}</BodyText>
-                <BodyText>{freeze.reason}</BodyText>
-              </View>
-              <Chevron />
-            </Pressable>
-          ))
+          <View>
+            <SectionHeader title={`Por revisar · ${freezes.length}`} />
+            <IconRowGroup>
+              {freezes.map((freeze) => (
+                <PersonRow
+                  accessibilityLabel={`Revisar congelamiento de ${freeze.clientName}`}
+                  detail={`${freezeRange(freeze.startsOn, freeze.endsOn)} · ${freezeDays(freeze.startsOn, freeze.endsOn)} · ${freeze.reason}`}
+                  key={freeze.id}
+                  name={freeze.clientName}
+                  onPress={() => navigation.navigate("ReviewFreeze", { freezeId: freeze.id })}
+                />
+              ))}
+            </IconRowGroup>
+          </View>
         )}
       </ScrollView>
     </Screen>
@@ -79,16 +92,6 @@ export function FreezesScreen() {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    ...surfaces.card,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    justifyContent: "space-between",
-    padding: spacing.lg,
-  },
-  cardBody: { flexShrink: 1, gap: spacing.xs },
-  content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  name: { color: colors.text, fontSize: typography.titleSmall, fontWeight: "500" },
-  screen: { gap: spacing.md },
+  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

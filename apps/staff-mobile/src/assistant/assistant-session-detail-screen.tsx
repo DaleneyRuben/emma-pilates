@@ -5,30 +5,30 @@ import {
   useGetSession,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
-  ButtonLabel,
+  boliviaCivilDate,
   colors,
-  formatSessionDate,
   formatSessionMinutes,
   formatTimeRange,
-  Heading,
+  IconRow,
+  IconRowGroup,
   LoadingState,
+  NoticeRow,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   spacing,
-  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { BackBar } from "../ui/back-bar";
+import { dayHeading } from "../ui/session-time";
 import { CenteredCard } from "./assistant-layout";
 import { CapacitySummary } from "./capacity-summary";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
@@ -83,10 +83,21 @@ export function AssistantSessionDetailScreen({
   const [forcedFull, setForcedFull] = useState(false);
   const [waitlisted, setWaitlisted] = useState(false);
 
+  const firstName = clientName.trim().split(/\s+/)[0] ?? clientName;
+  const left =
+    overview.data?.status === 200
+      ? overview.data.data.subscription.subscription?.remainingClassAllowance
+      : undefined;
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <ClientBanner action="Reservando para" clientName={clientName} />
+      <BackBar back="Reservar una clase" onBack={() => navigation.goBack()} />
+      <ClientBanner
+        action="Reservando para"
+        clientName={clientName}
+        detail={
+          left === undefined ? undefined : `${left} ${left === 1 ? "clase" : "clases"} en su plan`
+        }
+      />
     </>
   );
 
@@ -194,41 +205,29 @@ export function AssistantSessionDetailScreen({
       <CenteredCard maxWidth={640}>
         {header}
         <ScrollView contentContainerStyle={styles.content}>
-          <Heading accessibilityLabel={detail.classType.name}>{detail.classType.name}</Heading>
-          <Text style={styles.trainerName}>{detail.trainerName}</Text>
-          <View style={styles.facts}>
-            <View style={styles.factRow}>
-              <BodyText style={styles.factLabel}>Sucursal</BodyText>
-              <Text style={styles.factValue}>{detail.branch.name}</Text>
-            </View>
-            <View style={styles.factRow}>
-              <BodyText style={styles.factLabel}>Fecha</BodyText>
-              <Text style={styles.factValue}>{formatSessionDate(detail.startsAt)}</Text>
-            </View>
-            <View style={styles.factRow}>
-              <BodyText style={styles.factLabel}>Horario</BodyText>
-              <Text style={styles.factValue}>
-                {formatTimeRange(detail.startsAt, detail.endsAt)}
-              </Text>
-            </View>
-            <View style={styles.factRow}>
-              <BodyText style={styles.factLabel}>Duración</BodyText>
-              <Text style={styles.factValue}>
-                {formatSessionMinutes(detail.startsAt, detail.endsAt)}
-              </Text>
-            </View>
-          </View>
           <CapacitySummary
             availableSeats={detail.availableSeats}
             capacity={detail.capacity}
             full={full}
+            title={detail.classType.name}
+            waitlistCount={detail.waitlistCount}
+            when={`${dayHeading(boliviaCivilDate(new Date(detail.startsAt)))} · ${formatTimeRange(detail.startsAt, detail.endsAt).split(" – ")[0]}`}
           />
+          <IconRowGroup>
+            <IconRow icon="person" label={detail.trainerName} value="Entrenadora" />
+            <IconRow icon="pin" label={`Sucursal ${detail.branch.name}`} />
+            <IconRow
+              icon="clock"
+              label={formatTimeRange(detail.startsAt, detail.endsAt)}
+              value={formatSessionMinutes(detail.startsAt, detail.endsAt)}
+            />
+          </IconRowGroup>
         </ScrollView>
         <View style={styles.actions}>
           {message !== null ? (
-            <BodyText accessibilityRole="alert" style={styles.message}>
-              {message}
-            </BodyText>
+            <View accessibilityLabel={message} accessibilityRole="alert">
+              <NoticeRow message={message} />
+            </View>
           ) : null}
           {booked ? (
             <BodyText style={styles.note}>La clienta ya tiene esta clase reservada.</BodyText>
@@ -237,40 +236,32 @@ export function AssistantSessionDetailScreen({
               <BodyText style={styles.note}>La clienta ya está en la lista de espera.</BodyText>
             ) : (
               <>
-                <Pressable
-                  accessibilityLabel="Unirme a la lista de espera"
-                  accessibilityRole="button"
-                  accessibilityState={{ busy: submitting, disabled: submitting }}
-                  disabled={submitting}
-                  onPress={() => void joinWaitlist()}
-                  style={styles.outlinedButton}
-                  testID="session-join-waitlist"
-                >
-                  <ButtonLabel
-                    busy={submitting}
-                    label="Unirme a la lista de espera"
-                    spinnerColor={colors.primaryDeep}
-                    style={styles.outlinedLabel}
-                  />
-                </Pressable>
                 <BodyText style={styles.note}>
-                  Clase llena. Se avisará a la clienta si se libera un cupo.
+                  {`Si se libera un cupo, le avisamos a ${firstName}.`}
                 </BodyText>
+                <PrimaryButton
+                  busy={submitting}
+                  label="Anotarla en la lista de espera"
+                  onPress={() => void joinWaitlist()}
+                  testID="session-join-waitlist"
+                />
               </>
             )
           ) : hasAllowance ? (
             <>
+              <BodyText style={styles.note}>
+                Se descuenta 1 clase de su plan. Le avisamos por notificación.
+              </BodyText>
               <PrimaryButton
                 busy={submitting}
-                label="Reservar"
+                label={`Reservar para ${firstName}`}
                 onPress={() => void book()}
                 testID="session-book"
               />
-              <BodyText style={styles.note}>Se descontará 1 clase de su plan.</BodyText>
             </>
           ) : (
             <>
-              <PrimaryButton disabled label="Reservar" />
+              <PrimaryButton disabled label={`Reservar para ${firstName}`} />
               <BodyText style={styles.note}>
                 La clienta no tiene clases disponibles en su plan.
               </BodyText>
@@ -287,32 +278,8 @@ export function AssistantSessionDetailScreen({
 }
 
 const styles = StyleSheet.create({
-  actions: {
-    borderTopColor: colors.border,
-    borderTopWidth: 1,
-    gap: spacing.sm,
-    paddingTop: spacing.md,
-  },
+  actions: { gap: spacing.sm, paddingBottom: spacing.lg, paddingTop: spacing.md },
   content: { gap: spacing.lg, paddingBottom: spacing.lg },
-  factLabel: { color: colors.textMuted, fontSize: typography.note },
-  factRow: { flexDirection: "row", justifyContent: "space-between" },
-  factValue: { color: colors.text, fontSize: typography.body },
-  facts: {
-    ...surfaces.card,
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  message: { color: colors.errorText },
   note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
-  outlinedButton: {
-    alignItems: "center",
-    borderColor: colors.primary,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 52,
-  },
-  outlinedLabel: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "500" },
-  screen: { gap: spacing.md },
-  trainerName: { color: colors.text, fontSize: typography.bodyLarge },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
 });

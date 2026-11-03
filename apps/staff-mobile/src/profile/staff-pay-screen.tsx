@@ -5,28 +5,26 @@ import {
   useListOwnSalaryPayments,
 } from "@pilates/api-contracts";
 import {
-  colors,
-  fontFamilies,
-  EmptyState,
   LoadingState,
   QueryFailure,
   Screen,
-  ScreenTopBar,
+  SectionTitle,
   spacing,
-  typography,
+  StateScreen,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { PayStatementCard } from "./pay-statement-card";
+import { RootHeader } from "../ui/root-header";
+import { DraftStatementCard, PayStatementCard } from "./pay-statement-card";
 import { PaymentsReceived } from "./payments-received";
 import { useIsTablet } from "../ui/use-is-tablet";
 
 export function StaffPayScreen() {
-  const navigation = useNavigation<{ goBack: () => void }>();
+  const navigation = useNavigation<{ navigate: (screen: "AgendaTab") => void }>();
   const fetcher = useStaffFetcher();
   const tablet = useIsTablet();
   const statements = useListOwnPayStatements({ fetcher, query: { refetchOnMount: "always" } });
@@ -35,7 +33,7 @@ export function StaffPayScreen() {
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
 
-  const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mis pagos" />;
+  const header = <RootHeader title="Mis pagos" />;
   if (statements.isPending || payments.isPending) {
     return (
       <Screen style={styles.screen}>
@@ -61,45 +59,54 @@ export function StaffPayScreen() {
 
   const monthly = statements.data.data;
   const received = payments.data.data;
+  if (monthly.length === 0 && received.length === 0) {
+    return (
+      <Screen style={styles.screen}>
+        {header}
+        <StateScreen
+          icon="card"
+          note="Aquí verás cada mes lo que te corresponde por tus clases y lo que se te pagó."
+          primaryAction={{
+            label: "Ver mi agenda",
+            onPress: () => navigation.navigate("AgendaTab"),
+          }}
+          title="Todavía no tienes pagos"
+        />
+      </Screen>
+    );
+  }
+  // v2 S29: the open month is the hero; the approved ones follow.
+  const draft = monthly[0]?.state === "draft" ? monthly[0] : undefined;
+  const earlier = draft === undefined ? monthly : monthly.slice(1);
   return (
     <Screen style={styles.screen}>
-      {header}
-      {monthly.length === 0 && received.length === 0 ? (
-        <EmptyState
-          icon="card"
-          message="Aquí verás cada mes lo que te corresponde y lo que se te pagó."
-          title="Todavía no tienes pagos."
-          variant="plain"
-        />
-      ) : (
-        <ScrollView
-          contentContainerStyle={[styles.content, tablet && styles.tablet]}
-          refreshControl={refreshControl}
-        >
-          {monthly.length === 0 ? null : (
-            <Text accessibilityRole="header" style={styles.sectionTitle}>
-              Liquidaciones
-            </Text>
-          )}
-          {monthly.map((statement) => (
-            <PayStatementCard key={statement.id} statement={statement} />
-          ))}
-          {received.length === 0 ? null : <PaymentsReceived payments={received} />}
-        </ScrollView>
-      )}
+      <ScrollView
+        contentContainerStyle={[styles.content, tablet && styles.tablet]}
+        refreshControl={refreshControl}
+      >
+        {header}
+        {draft === undefined ? null : <DraftStatementCard statement={draft} />}
+        {earlier.length === 0 ? null : (
+          <View>
+            <SectionTitle>
+              {draft === undefined ? "Liquidaciones" : "Liquidaciones anteriores"}
+            </SectionTitle>
+            <View style={styles.cards}>
+              {earlier.map((statement) => (
+                <PayStatementCard key={statement.id} statement={statement} />
+              ))}
+            </View>
+          </View>
+        )}
+        {received.length === 0 ? null : <PaymentsReceived payments={received} />}
+      </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  screen: { gap: spacing.md },
-  sectionTitle: {
-    color: colors.textSubtle,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.note,
-    letterSpacing: 1.7,
-    textTransform: "uppercase",
-  },
+  cards: { gap: spacing.md },
+  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  screen: { paddingHorizontal: spacing.xlSm },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

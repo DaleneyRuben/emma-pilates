@@ -11,10 +11,11 @@ env:
 - runFlow: subflows/park-dev-gear.yaml
 - extendedWaitUntil:
     visible:
-      text: "Por confirmar|No hay pagos pendientes."
+      text: "Por confirmar.*|Todo al día"
     timeout: 20000
 - takeScreenshot: staff-admin-payments
-- tapOn: "Cancelar una clase"
+- tapOn:
+    id: "pending-payments-cancel-class"
 - extendedWaitUntil:
     visible:
       text: "Sucursal: .*"
@@ -28,6 +29,6 @@ env:
     timeout: 10000
 - extendedWaitUntil:
     visible:
-      text: ".* · (Centro|Equipetrol|Urubó)|No hay clases con estos filtros."
+      text: ".*(Centro|Equipetrol|Urubó).*|.*no hay clases.*|Este día no hay clases"
     timeout: 15000
 - takeScreenshot: staff-admin-every-branch

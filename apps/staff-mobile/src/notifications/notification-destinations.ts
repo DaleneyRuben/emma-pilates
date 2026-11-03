@@ -2,17 +2,19 @@ import type { AppRole } from "@pilates/mobile-core";
 
 export type StaffRole = Exclude<AppRole, "client">;
 
+// Each role has a tab bar (follow-up 225 §8), so a destination names the tab
+// and the screen inside its stack.
 export type StaffNotificationRoute =
-  | readonly ["Agenda"]
-  | readonly ["ClientOverview", { clientId: string }]
-  | readonly ["Payments"]
-  | readonly ["ReviewPayment", { paymentId: string }]
-  | readonly ["Freezes"]
-  | readonly ["ReviewFreeze", { freezeId: string }];
+  | readonly ["AgendaTab", { screen: "Agenda" }]
+  | readonly ["ClientsTab", { screen: "ClientOverview"; params: { clientId: string } }]
+  | readonly ["PaymentsTab", { screen: "Payments" }]
+  | readonly ["PaymentsTab", { screen: "ReviewPayment"; params: { paymentId: string } }]
+  | readonly ["PaymentsTab", { screen: "Freezes" }]
+  | readonly ["PaymentsTab", { screen: "ReviewFreeze"; params: { freezeId: string } }];
 
 // The one map from a notification's destination to a Staff screen, shared by
-// the inbox and push taps (NOT-002). Mi agenda is the root of the Trainer and
-// Nutritionist stacks; the Administrator reviews a submitted payment; the
+// the inbox and push taps (NOT-002). Mi agenda is the first tab of the Trainer
+// and the Nutritionist; the Administrator reviews a submitted payment; the
 // Assistant opens the named Client.
 export function staffNotificationDestination(
   role: StaffRole,
@@ -23,16 +25,20 @@ export function staffNotificationDestination(
     (role === "trainer" && destinationType === "trainer_schedule") ||
     (role === "nutritionist" && destinationType === "nutritionist_agenda")
   ) {
-    return ["Agenda"];
+    return ["AgendaTab", { screen: "Agenda" }];
   }
   if (role === "administrator" && destinationType === "payment") {
-    return destinationId === null ? ["Payments"] : ["ReviewPayment", { paymentId: destinationId }];
+    return destinationId === null
+      ? ["PaymentsTab", { screen: "Payments" }]
+      : ["PaymentsTab", { screen: "ReviewPayment", params: { paymentId: destinationId } }];
   }
   if (role === "assistant" && destinationType === "client" && destinationId !== null) {
-    return ["ClientOverview", { clientId: destinationId }];
+    return ["ClientsTab", { screen: "ClientOverview", params: { clientId: destinationId } }];
   }
   if (role === "administrator" && destinationType === "freeze") {
-    return destinationId === null ? ["Freezes"] : ["ReviewFreeze", { freezeId: destinationId }];
+    return destinationId === null
+      ? ["PaymentsTab", { screen: "Freezes" }]
+      : ["PaymentsTab", { screen: "ReviewFreeze", params: { freezeId: destinationId } }];
   }
   return null;
 }

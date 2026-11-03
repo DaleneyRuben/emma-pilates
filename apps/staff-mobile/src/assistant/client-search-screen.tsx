@@ -1,40 +1,41 @@
 import {
   getSearchAssistantClientsQueryKey,
-  useListContactAlerts,
   useSearchAssistantClients,
 } from "@pilates/api-contracts";
 import {
-  AvatarCircle,
-  BodyText,
-  Chevron,
   colors,
   fontFamilies,
+  Glyph,
+  IconRowGroup,
+  LineIcon,
   QueryFailure,
   radii,
   Screen,
   spacing,
-  surfaces,
-  TextButton,
+  StateScreen,
   typography,
-  UnreadCountPill,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
+import { useGetCurrentStaffMemberProfile } from "@pilates/api-contracts";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
+import { Circle, Path } from "react-native-svg";
 import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
+import { roleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
-import { HeaderAction } from "../ui/header-action";
+import { PersonRow } from "../ui/person-row";
 import { RootHeader } from "../ui/root-header";
+import { StatusPill } from "../ui/session-row";
 import { describeContact } from "./assistant-format";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { ClientDetailPanel } from "./client-panel";
 
 export type ClientSearchNavigation = {
   navigate: {
-    (screen: "NewClient" | "CancelClass" | "ContactList" | "CashClose"): void;
+    (screen: "NewClient"): void;
     (screen: "ClientOverview", params: { clientId: string }): void;
   };
 };
@@ -43,16 +44,18 @@ const minimumQueryLength = 2;
 const debounceMilliseconds = 250;
 const placeholder = "Buscar por nombre, teléfono o correo";
 
+// v2 S04: the secondary «Nuevo cliente» under the search field.
 function NewClientButton({ onPress }: { onPress: () => void }) {
   return (
     <Pressable
-      accessibilityLabel="+ Nuevo cliente"
+      accessibilityLabel="Nuevo cliente"
       accessibilityRole="button"
       onPress={onPress}
-      style={styles.newClient}
+      style={({ pressed }) => [styles.newClient, pressed && styles.pressed]}
       testID="client-search-new-client"
     >
-      <Text style={styles.newClientLabel}>+ Nuevo cliente</Text>
+      <Glyph color={colors.primaryOnTint} name="person" size={18} strokeWidth={1.6} />
+      <Text style={styles.newClientLabel}>Nuevo cliente</Text>
     </Pressable>
   );
 }
@@ -65,11 +68,6 @@ export function ClientSearchScreen() {
   const coordinator = useStaffRole() === "coordinator";
   const [text, setText] = useState("");
   const [query, setQuery] = useState("");
-  const alerts = useListContactAlerts({
-    fetcher,
-    query: { enabled: coordinator },
-  });
-  const contactCount = alerts.data?.status === 200 ? alerts.data.data.totalItems : 0;
 
   useEffect(() => {
     const timer = setTimeout(() => setQuery(text.trim()), debounceMilliseconds);
@@ -98,93 +96,94 @@ export function ClientSearchScreen() {
     workspace.show({ view: "overview", clientId });
   };
 
+  const profile = useGetCurrentStaffMemberProfile({ fetcher });
+  const member = profile.data?.status === 200 ? profile.data.data : undefined;
+  const role = useStaffRole();
+  const eyebrow =
+    member?.branches.length === 1
+      ? `${roleLabel(role)} · ${member.branches[0]?.name}`
+      : roleLabel(role);
+
   const search = (
     <>
-      <RootHeader
-        action={
-          <HeaderAction
-            label="Cerrar caja"
-            onPress={() => navigation.navigate("CashClose")}
-            testID="cash-close-entry"
-          />
-        }
-        label="Buscar cliente"
-        title="Buscar cliente"
-      />
-      <TextInput
-        accessibilityLabel={placeholder}
-        autoCapitalize="none"
-        autoCorrect={false}
-        onChangeText={setText}
-        placeholder={placeholder}
-        placeholderTextColor={colors.textSubtle}
-        style={styles.input}
-        testID="client-search-input"
-        value={text}
-      />
-      {coordinator ? (
-        <>
-          <TextButton
-            label="Cancelar una clase"
-            onPress={() => navigation.navigate("CancelClass")}
-            testID="client-search-cancel-class"
-          />
+      <RootHeader bell eyebrow={eyebrow} label="Buscar cliente" title="Buscar cliente" />
+      <View style={styles.field}>
+        <LineIcon color={colors.textMuted} size={18} strokeWidth={1.5}>
+          <Circle cx={11} cy={11} r={6.5} />
+          <Path d="M16 16l4 4" />
+        </LineIcon>
+        <TextInput
+          accessibilityLabel={placeholder}
+          autoCapitalize="none"
+          autoCorrect={false}
+          onChangeText={setText}
+          placeholder="Nombre, teléfono o correo"
+          placeholderTextColor={colors.textMuted}
+          style={styles.input}
+          testID="client-search-input"
+          value={text}
+        />
+        {text === "" ? null : (
           <Pressable
-            accessibilityLabel="Para contactar"
+            accessibilityLabel="Borrar búsqueda"
             accessibilityRole="button"
-            onPress={() => navigation.navigate("ContactList")}
-            style={styles.contactListButton}
-            testID="client-search-contact-list"
+            hitSlop={spacing.sm}
+            onPress={() => setText("")}
+            style={styles.clear}
           >
-            <Text style={styles.contactListLabel}>Para contactar</Text>
-            <UnreadCountPill count={contactCount} testID="contact-list-count" />
+            <Glyph color={colors.textMuted} name="cross" size={16} strokeWidth={1.6} />
           </Pressable>
-        </>
-      ) : (
+        )}
+      </View>
+      {coordinator || (searching && clients.length === 0 && results.data?.status === 200) ? null : (
         <NewClientButton onPress={() => navigation.navigate("NewClient")} />
       )}
       {!searching ? (
-        <BodyText style={styles.hint}>Escribe al menos dos letras o números para buscar.</BodyText>
+        <Text style={styles.hint}>Escribe al menos dos letras o números para buscar.</Text>
       ) : results.isPending ? (
-        <BodyText accessibilityLabel="Buscando clientes">Buscando…</BodyText>
+        <Text accessibilityLabel="Buscando clientes" style={styles.hint}>
+          Buscando…
+        </Text>
       ) : results.isError || results.data.status !== 200 ? (
         <QueryFailure label="No pudimos buscar clientes." onRetry={() => void results.refetch()} />
       ) : clients.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>No se encontró ningún cliente.</Text>
-          <BodyText style={styles.hint}>Revisa el nombre o crea la cuenta de la clienta.</BodyText>
-        </View>
+        <StateScreen
+          icon="person"
+          layout="inList"
+          note="Revisa cómo lo escribiste o crea una ficha nueva."
+          primaryAction={
+            coordinator
+              ? undefined
+              : {
+                  label: "Nuevo cliente",
+                  onPress: () => navigation.navigate("NewClient"),
+                  testID: "client-search-empty-new-client",
+                }
+          }
+          title="No encontramos a nadie"
+        />
       ) : (
         <ScrollView
           contentContainerStyle={styles.list}
           keyboardShouldPersistTaps="handled"
           refreshControl={refreshControl}
         >
-          {clients.map((client) => (
-            <Pressable
-              accessibilityLabel={`Ver cliente ${client.name}`}
-              accessibilityRole="button"
-              accessibilityState={{ selected: client.id === selectedId }}
-              key={client.id}
-              onPress={() => open(client.id)}
-              style={[styles.row, client.id === selectedId && styles.rowSelected]}
-              testID={`client-result-${client.id}`}
-            >
-              <AvatarCircle fontSize={16} name={client.name} size={42} />
-              <View style={styles.rowBody}>
-                <Text style={styles.name}>{client.name}</Text>
-                <Text ellipsizeMode="tail" numberOfLines={1} style={styles.contact}>
-                  {describeContact(client.phone, client.email)}
-                </Text>
-              </View>
-              {client.accountStatus === "pending" ? (
-                <View style={styles.pendingTag}>
-                  <Text style={styles.pendingLabel}>Pendiente</Text>
-                </View>
-              ) : null}
-              <Chevron />
-            </Pressable>
-          ))}
+          <IconRowGroup>
+            {clients.map((client) => (
+              <PersonRow
+                accessibilityLabel={`Ver cliente ${client.name}`}
+                detail={describeContact(client.phone, client.email)}
+                key={client.id}
+                name={client.name}
+                onPress={() => open(client.id)}
+                selected={client.id === selectedId}
+                testID={`client-result-${client.id}`}
+                trailing={
+                  client.accountStatus === "pending" ? <StatusPill label="Pendiente" /> : undefined
+                }
+              />
+            ))}
+          </IconRowGroup>
         </ScrollView>
       )}
     </>
@@ -204,75 +203,43 @@ export function ClientSearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  contactListButton: {
+  clear: { alignItems: "center", height: 32, justifyContent: "center", width: 32 },
+  detailPanel: { borderLeftColor: colors.hairline, borderLeftWidth: 1, flex: 1 },
+  field: {
     alignItems: "center",
-    borderColor: colors.primary,
-    borderRadius: radii.control,
-    borderWidth: 1,
+    backgroundColor: colors.card,
+    borderRadius: radii.button,
     flexDirection: "row",
     gap: spacing.sm,
-    justifyContent: "center",
-    minHeight: 48,
-    paddingHorizontal: spacing.lg,
-  },
-  contactListLabel: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "500" },
-  contact: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  empty: { alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xl },
-  emptyTitle: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  hint: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
-  input: {
-    backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    color: colors.text,
-    fontSize: 16,
     minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
-  list: { gap: spacing.sm, paddingBottom: spacing.xxl },
-  name: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
+  hint: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  input: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: 16,
+    minHeight: 52,
+  },
+  list: { paddingBottom: spacing.xxl },
   newClient: {
     alignItems: "center",
-    borderColor: colors.primary,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 48,
-  },
-  newClientLabel: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "500" },
-  pendingLabel: { color: colors.warningText, fontSize: typography.label, fontWeight: "600" },
-  pendingTag: {
-    backgroundColor: "rgba(201,154,78,0.16)",
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
-  // S04's result row (MOB-042): the avatar, the name over the contact, the chevron.
-  // The split view's column (MOB-046) gives the row the frame's 344 pt: the
-  // 360 pt panel minus the screen's 16 pt gutter, as the frame's 392 px panel
-  // minus its 24 px padding on each side.
-  row: {
-    ...surfaces.card,
-    alignItems: "center",
+    backgroundColor: colors.primaryTint,
+    borderRadius: radii.button,
     flexDirection: "row",
-    gap: spacing.mdLg,
-    paddingHorizontal: spacing.lgXl,
-    paddingVertical: spacing.lg,
+    gap: spacing.sm,
+    justifyContent: "center",
+    minHeight: 52,
   },
-  rowBody: { flex: 1, gap: 3 },
-  rowSelected: { borderColor: colors.primary, borderWidth: 2 },
-  screen: { gap: spacing.md },
-  detailPanel: {
-    borderLeftColor: colors.divider,
-    borderLeftWidth: 1,
-    flex: 1,
+  newClientLabel: {
+    color: colors.primaryOnTint,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
   },
+  pressed: { opacity: 0.7 },
+  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
   searchPanel: { gap: spacing.md, paddingRight: spacing.lg, width: 360 },
   split: { flexDirection: "row", paddingRight: 0 },
 });

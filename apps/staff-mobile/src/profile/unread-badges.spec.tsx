@@ -25,62 +25,41 @@ const runtime = (unread: number) =>
     }),
   );
 
-// Follow-up 73: a dot without number on the avatar, the count on S23's row.
+// v2: the bell on the root carries the count; S23's row repeats it as a pill.
 describe("Staff unread language", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("marks the avatar with a Palo de rosa profundo dot and says so", async () => {
+  it("puts the unread count on the bell of Mi agenda and says so", async () => {
     const screen = await render(<App runtime={runtime(3)} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Tu cuenta, notificaciones sin leer" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Notificaciones, 3 sin leer" })).toBeOnTheScreen();
     });
-    expect(screen.getByTestId("account-avatar-dot")).toHaveStyle({
-      backgroundColor: "#8A5D59",
+    expect(screen.getByTestId("notification-bell-count")).toHaveStyle({
+      backgroundColor: "#93615D",
     });
   });
 
   it("shows the unread count on S23's Notificaciones row", async () => {
     const screen = await render(<App runtime={runtime(12)} />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Tu cuenta, notificaciones sin leer" }),
-      ).toBeOnTheScreen();
-    });
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Tu cuenta, notificaciones sin leer" }),
-    );
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByTestId("tab-profile"));
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("notifications-row-badge", {
-          includeHiddenElements: true,
-        }),
-      ).toBeOnTheScreen();
+      expect(screen.getByTestId("notifications-row-badge")).toBeOnTheScreen();
     });
-    expect(screen.getByText("9+", { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getByTestId("notifications-row-badge")).toHaveStyle({
+      backgroundColor: "#F2E4E1",
+    });
+    expect(screen.getAllByText("9+").length).toBeGreaterThan(0);
     expect(
       screen.getByRole("button", {
         name: "Notificaciones, 12 notificaciones sin leer",
       }),
     ).toBeOnTheScreen();
-    expect(screen.getAllByText("9+", { includeHiddenElements: true })[0]?.parent).toHaveProp(
-      "importantForAccessibility",
-      "no-hide-descendants",
-    );
-    // MOB-041: S23's menu rows end in the 19 pt Icono tenue chevron. A
-    // Trainer has four: «Mis pagos» (follow-up 202) above the three others.
-    const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
-    expect(chevrons).toHaveLength(4);
-    for (const chevron of chevrons) {
-      expect(chevron).toHaveProp("stroke", "#C4BAB6");
-    }
-    expect(screen.queryByText("›")).toBeNull();
   });
 });

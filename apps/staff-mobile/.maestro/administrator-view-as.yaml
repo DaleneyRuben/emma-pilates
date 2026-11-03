@@ -10,13 +10,13 @@ env:
     timeout: 30000
 - runFlow: subflows/park-dev-gear.yaml
 - tapOn:
-    id: "account-avatar"
+    id: "tab-profile"
 - extendedWaitUntil:
     visible: "Ver la app como…"
     timeout: 15000
 - tapOn: "Ver la app como…"
 - extendedWaitUntil:
-    visible: "Entrenadoras"
+    visible: "El equipo"
     timeout: 20000
 - takeScreenshot: staff-admin-view-as
 - tapOn: "Emma Vargas"

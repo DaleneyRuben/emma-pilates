@@ -31,7 +31,7 @@ describe("Staff Mis pagos", () => {
     expect(october.queryByText("6 alumnas, 2 extra")).toBeNull();
 
     const payments = within(screen.getByLabelText("Pagos recibidos"));
-    expect(payments.getByText("1 de noviembre de 2026")).toBeOnTheScreen();
+    expect(payments.getByText("1 de noviembre de 2026 · sin comprobante")).toBeOnTheScreen();
     expect(payments.getByText("Bs 322,00")).toBeOnTheScreen();
   });
 
@@ -79,21 +79,21 @@ describe("Staff Mis pagos", () => {
     expect(october.getByRole("button", { name: "Ver cada clase" })).toBeOnTheScreen();
   });
 
-  it("lists the newest month first and marks a draft as still open", async () => {
+  // v2 S29: the open month is the screen's one Rosa profundo card.
+  it("puts the draft month on the hero card and the rest under «Liquidaciones anteriores»", async () => {
     const screen = await openMyPay();
 
     await waitFor(() => {
       expect(screen.getByText("Noviembre 2026")).toBeOnTheScreen();
     });
-    const months = screen
-      .getAllByText(/^(Noviembre|Octubre) 2026$/)
-      .map((node) => node.props.children);
-    expect(months).toEqual(["Noviembre 2026", "Octubre 2026"]);
     const november = within(screen.getByLabelText("Liquidación de noviembre 2026"));
     expect(november.getByText("Borrador")).toBeOnTheScreen();
+    expect(november.getByText("Bs 65,00")).toHaveStyle({ fontSize: 32 });
     expect(
-      november.getByText("Puede cambiar hasta que administración lo apruebe."),
+      november.getByText("1 clase dictada · puede cambiar hasta que administración lo apruebe."),
     ).toBeOnTheScreen();
+    expect(screen.getByText("Liquidaciones anteriores")).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
   });
 
   it("says so when nothing was calculated or paid yet", async () => {
@@ -103,11 +103,15 @@ describe("Staff Mis pagos", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Todavía no tienes pagos.")).toBeOnTheScreen();
+      expect(screen.getByText("Todavía no tienes pagos")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText("Aquí verás cada mes lo que te corresponde y lo que se te pagó."),
+      screen.getByText(
+        "Aquí verás cada mes lo que te corresponde por tus clases y lo que se te pagó.",
+      ),
     ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Ver mi agenda" }));
+    await waitFor(() => expect(screen.getByLabelText("Mi agenda")).toBeOnTheScreen());
   });
 
   it("offers a retry when the pay cannot load", async () => {
@@ -141,11 +145,11 @@ describe("Staff Mis pagos", () => {
     );
     await waitFor(
       () => {
-        expect(screen.getByText("EV")).toBeOnTheScreen();
+        expect(screen.getByTestId("tab-profile")).toBeOnTheScreen();
       },
       { timeout: 10_000 },
     );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => {
       expect(screen.getByText("Administración")).toBeOnTheScreen();
     });

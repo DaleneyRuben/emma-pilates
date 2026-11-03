@@ -38,7 +38,7 @@ describe("Confirming cash for a renewal", () => {
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Confirmar pago en efectivo")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Registrar pago")).toBeOnTheScreen();
     });
     expect(screen.queryByTestId("start-date-chooser")).toBeNull();
     expect(
@@ -46,10 +46,10 @@ describe("Confirming cash for a renewal", () => {
     ).toBeOnTheScreen();
     expect(
       screen.getByText(
-        "Confirma solo cuando tengas el efectivo en mano. El plan queda programado para esa fecha.",
+        "Confirma con el efectivo en mano: el plan queda programado para esa fecha.",
       ),
     ).toBeOnTheScreen();
-    expect(screen.queryByText(/El plan se activa al instante/)).toBeNull();
+    expect(screen.queryByText(/el plan se activa al instante/)).toBeNull();
   });
 
   it("keeps the dates and the instant activation when nothing is left to renew", async () => {
@@ -65,9 +65,7 @@ describe("Confirming cash for a renewal", () => {
       expect(screen.getByTestId("start-date-chooser")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText(
-        "Confirma solo cuando tengas el efectivo en mano. El plan se activa al instante.",
-      ),
+      screen.getByText("Confirma con el efectivo en mano: el plan se activa al instante."),
     ).toBeOnTheScreen();
     expect(screen.queryByText(/El plan queda programado/)).toBeNull();
   });
@@ -99,7 +97,7 @@ describe("Confirming cash for a renewal", () => {
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Confirmar pago en efectivo")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Registrar pago")).toBeOnTheScreen();
     });
     expect(screen.queryByTestId("start-date-chooser")).toBeNull();
     expect(
@@ -117,7 +115,9 @@ describe("Confirming cash for a renewal", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Confirmar pago recibido" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Confirmar pago en efectivo" }),
+    );
 
     expect(
       await screen.findByText(

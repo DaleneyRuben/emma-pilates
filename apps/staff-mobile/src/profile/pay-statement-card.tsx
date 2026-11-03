@@ -1,6 +1,9 @@
 import type { PayStatementDto, PayStatementLineDto } from "@pilates/api-contracts";
 import {
+  CardActionRow,
+  cardWithActionRow,
   colors,
+  EmphasisCard,
   fontFamilies,
   formatMonthHeading,
   radii,
@@ -9,7 +12,7 @@ import {
   typography,
 } from "@pilates/mobile-core";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { formatExactBolivianos } from "../ui/exact-bolivianos";
 
@@ -72,17 +75,21 @@ function AmountRow({
   );
 }
 
-function TextButton({ label, onPress }: { label: string; onPress: () => void }) {
+/** S29's hero: the month still open, on Rosa profundo (follow-up 225 §5). */
+export function DraftStatementCard({ statement }: { statement: PayStatementDto }) {
+  const heading = monthHeading(statement.month);
+  const classes = statement.lines.filter((line) => line.kind === "class").length;
   return (
-    <Pressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      hitSlop={8}
-      onPress={onPress}
-      style={styles.textButton}
-    >
-      <Text style={styles.textButtonLabel}>{label}</Text>
-    </Pressable>
+    <View accessibilityLabel={`Liquidación de ${heading.toLowerCase()}`}>
+      <EmphasisCard
+        eyebrow={heading}
+        note={`${classes} ${classes === 1 ? "clase dictada" : "clases dictadas"} · puede cambiar hasta que administración lo apruebe.`}
+        pill="Borrador"
+        testID="pay-draft-card"
+      >
+        <Text style={styles.heroTotal}>{formatExactBolivianos(statement.totalCentavos)}</Text>
+      </EmphasisCard>
+    </View>
   );
 }
 
@@ -93,17 +100,14 @@ export function PayStatementCard({ statement }: { statement: PayStatementDto }) 
   return (
     <View accessibilityLabel={`Liquidación de ${heading.toLowerCase()}`} style={styles.card}>
       <View style={styles.header}>
-        <View style={styles.title}>
-          <Text numberOfLines={1} style={styles.month}>
-            {heading}
+        <Text numberOfLines={1} style={styles.month}>
+          {heading}
+        </Text>
+        <View style={[styles.state, approved ? styles.approved : styles.draft]}>
+          <Text style={approved ? styles.approvedText : styles.draftText}>
+            {approved ? "Aprobado" : "Borrador"}
           </Text>
-          <View style={[styles.state, approved ? styles.approved : styles.draft]}>
-            <Text style={approved ? styles.approvedText : styles.draftText}>
-              {approved ? "Aprobado" : "Borrador"}
-            </Text>
-          </View>
         </View>
-        <Text style={styles.total}>{formatExactBolivianos(statement.totalCentavos)}</Text>
       </View>
       {approved ? null : (
         <Text style={styles.note}>Puede cambiar hasta que administración lo apruebe.</Text>
@@ -112,25 +116,28 @@ export function PayStatementCard({ statement }: { statement: PayStatementDto }) 
         {summarize(statement.lines).map((concept) => (
           <AmountRow centavos={concept.centavos} key={concept.key} label={concept.label} />
         ))}
+        <View style={[styles.row, styles.totalRow]}>
+          <Text style={styles.totalLabel}>Total</Text>
+          <Text style={styles.total}>{formatExactBolivianos(statement.totalCentavos)}</Text>
+        </View>
       </View>
       {open ? (
-        <>
-          <View style={[styles.rows, styles.lines]}>
-            {statement.lines.map((line, index) => (
-              // Lines have no identity of their own; their order is the statement's.
-              <AmountRow
-                centavos={line.amountCentavos}
-                detail={line.detail}
-                key={index}
-                label={lineLabel(line.kind) ?? line.kind}
-              />
-            ))}
-          </View>
-          <TextButton label="Ocultar detalle" onPress={() => setOpen(false)} />
-        </>
-      ) : (
-        <TextButton label="Ver cada clase" onPress={() => setOpen(true)} />
-      )}
+        <View style={[styles.rows, styles.lines]}>
+          {statement.lines.map((line, index) => (
+            // Lines have no identity of their own; their order is the statement's.
+            <AmountRow
+              centavos={line.amountCentavos}
+              detail={line.detail}
+              key={index}
+              label={lineLabel(line.kind) ?? line.kind}
+            />
+          ))}
+        </View>
+      ) : null}
+      <CardActionRow
+        label={open ? "Ocultar detalle" : "Ver cada clase"}
+        onPress={() => setOpen((current) => !current)}
+      />
     </View>
   );
 }
@@ -148,7 +155,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.note,
   },
-  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
+  card: { ...surfaces.card, ...cardWithActionRow, gap: spacing.md, padding: spacing.lg },
   detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   draft: { backgroundColor: colors.warningTint },
   draftText: {
@@ -162,8 +169,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     justifyContent: "space-between",
   },
-  lines: { borderTopColor: colors.border, borderTopWidth: 1, paddingTop: spacing.md },
-  month: { color: colors.text, fontFamily: fontFamilies.heading, fontSize: typography.titleSmall },
+  lines: { borderTopColor: colors.hairline, borderTopWidth: 1, paddingTop: spacing.md },
+  month: { color: colors.text, flexShrink: 1, fontFamily: fontFamilies.display, fontSize: 20 },
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: {
     alignItems: "center",
@@ -179,17 +186,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xxs,
   },
-  textButton: { alignSelf: "flex-start", paddingVertical: spacing.xxs },
-  textButtonLabel: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.body,
+  heroTotal: {
+    color: colors.white,
+    fontFamily: fontFamilies.display,
+    fontSize: 32,
+    fontVariant: ["tabular-nums"],
   },
-  title: { alignItems: "flex-start", flexShrink: 1, gap: 6 },
+  totalLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
+  totalRow: { borderTopColor: colors.hairline, borderTopWidth: 1, paddingTop: spacing.sm },
   total: {
     color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleSecondary,
+    fontFamily: fontFamilies.display,
+    fontSize: 20,
     fontVariant: ["tabular-nums"],
   },
 });

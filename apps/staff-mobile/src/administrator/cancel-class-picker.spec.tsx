@@ -6,8 +6,6 @@ import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support"
 
 jest.setTimeout(20_000);
 
-const hidden = { includeHiddenElements: true };
-
 const administrator = {
   id: "staff-2",
   name: "Paola Mendoza",
@@ -27,33 +25,43 @@ const routes = {
   "/api/v1/administrator/sessions": () => jsonResponse([]),
 };
 
-// MOB-041: S13's «Sucursal:» row ends in the 16 pt Texto tenue chevron that
-// points down while the picker is closed and up while it is open.
-describe("Cancel a class Branch picker", () => {
+const openCancelClass = async () => {
+  const screen = await render(
+    <App runtime={createStaffRuntime(routeFetcher(routes), "administrator")} />,
+  );
+  await waitFor(() =>
+    expect(screen.getByRole("button", { name: "Cancelar una clase" })).toBeOnTheScreen(),
+  );
+  await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
+  await waitFor(() => expect(screen.getByTestId("cancel-class-day-strip")).toBeOnTheScreen());
+  return screen;
+};
+
+// v2 S13 (walkthrough 7 and 23): one Branch is fixed, and the dates reach 30 days.
+describe("Cancelar una clase (S13)", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("turns the picker chevron with the picker", async () => {
-    const screen = await render(
-      <App runtime={createStaffRuntime(routeFetcher(routes), "administrator")} />,
+  it("shows the only Branch fixed, with nothing to open", async () => {
+    const screen = await openCancelClass();
+
+    expect(screen.getByTestId("branch-field-fixed")).toHaveTextContent("Sucursal Centro");
+    expect(screen.queryByRole("button", { name: /^Sucursal/ })).toBeNull();
+  });
+
+  it("reaches a class 30 days ahead from «Otra»", async () => {
+    const screen = await openCancelClass();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Elegir otra fecha, hasta 30 días" }));
+    const days = screen.getAllByTestId(/^cancel-class-other-/);
+    expect(days).toHaveLength(24);
+    await fireEvent.press(days[days.length - 1]!);
+    expect(screen.getByRole("button", { name: "Elegir otra fecha, hasta 30 días" })).toHaveProp(
+      "accessibilityState",
+      { selected: true },
     );
-
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Cancelar una clase" })).toBeOnTheScreen();
-    });
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
-    });
-    const picker = screen.getByTestId("branch-picker-chevron", hidden);
-    expect(picker).toHaveProp("stroke", "#6F6662");
-    expect(picker).toHaveProp("width", 16);
-    expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
-    expect(screen.queryByText("▾")).toBeNull();
-
-    await fireEvent.press(screen.getByRole("button", { name: "Sucursal: Centro" }));
-    expect(screen.getByTestId("branch-picker-chevron-up", hidden)).toBeOnTheScreen();
+    expect(screen.getByText("Este día no hay clases")).toBeOnTheScreen();
   });
 });

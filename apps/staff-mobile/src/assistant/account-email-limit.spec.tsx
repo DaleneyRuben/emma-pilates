@@ -34,7 +34,7 @@ const invited = () =>
   jsonResponse({ status: "invited", clientId: "client-new", email: "ana@example.com" }, 201);
 
 async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearch>>) {
-  await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+  await fireEvent.press(screen.getByTestId("client-search-new-client"));
   await waitFor(() => {
     expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
   });
@@ -98,7 +98,10 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
     });
 
     await submitNewClient(screen);
-    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar correo" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Más opciones de la invitación" }),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: /^Cambiar correo/ }));
     await fireEvent.changeText(screen.getByLabelText("Nuevo correo"), "ana.n@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
 

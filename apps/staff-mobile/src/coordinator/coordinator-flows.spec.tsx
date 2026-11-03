@@ -51,10 +51,7 @@ async function openClient(
   query: string,
   name: string,
 ) {
-  await fireEvent.changeText(
-    screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
-    query,
-  );
+  await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), query);
   await waitFor(() => {
     expect(screen.getByRole("button", { name: `Ver cliente ${name}` })).toBeOnTheScreen();
   });
@@ -70,15 +67,14 @@ describe("the Coordinator's Staff app", () => {
     clearMobileQueryCache();
   });
 
-  it("lands on Buscar cliente without «Nuevo cliente» and with «Cancelar una clase»", async () => {
+  // v2: Para contactar and Horario (with «Cancelar una clase») are her tabs now.
+  it("lands on Buscar cliente without «Nuevo cliente», beside her own tabs", async () => {
     const { screen } = await openAsCoordinator();
 
-    expect(screen.queryByRole("button", { name: "+ Nuevo cliente" })).toBeNull();
-    expect(screen.getByRole("button", { name: "Para contactar" })).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
-    await waitFor(() => {
-      expect(screen.getByText("Cancelar una clase")).toBeOnTheScreen();
-    });
+    expect(screen.queryByRole("button", { name: /Nuevo cliente/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Cancelar una clase" })).toBeNull();
+    expect(screen.getByTestId("tab-contacts")).toBeOnTheScreen();
+    expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen();
   });
 
   it("books for a Client but never sells her a Plan", async () => {
@@ -87,7 +83,7 @@ describe("the Coordinator's Staff app", () => {
 
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Registrar pago en efectivo" })).toBeNull();
-    expect(screen.getByRole("button", { name: "Ver reservas" })).toBeOnTheScreen();
+    expect(screen.getByTestId("client-overview-bookings")).toBeOnTheScreen();
     const reads = fetcher.mock.calls.map(([input]) => String(input));
     expect(reads.some((path) => path.includes("plan-quotes"))).toBe(false);
   });
@@ -105,7 +101,7 @@ describe("the Coordinator's Staff app", () => {
   it("names her Role «Coordinación» and every Branch on Perfil", async () => {
     const { screen } = await openAsCoordinator();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Tu cuenta" }));
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => {
       expect(screen.getByText("Coordinación")).toBeOnTheScreen();
     });

@@ -244,8 +244,8 @@ pnpm --filter @pilates/staff-mobile ios
 
 Expo Go displays one project at a time, so the Simulator switches from the
 Client project to the Staff project. Both development servers may remain
-running. You should see the same approved Login styling with an **Acceso del
-equipo** pill under the tagline, the email placeholder "tu@emmapilates.bo"
+running. You should see the same approved Login styling («Emma Pilates
+Studio» in Lora, no tagline) with an **Acceso del equipo** pill, the email placeholder "tu@emmapilates.bo"
 (the Client app shows "tu@correo.com"; recovery follows the same rule),
 **Iniciar sesión**, and **¿Olvidaste tu contraseña?**, but you must not see
 **Regístrate**. Staff Accounts
@@ -8124,3 +8124,140 @@ D. **No cash sale over a pending front-desk QR (FIX-028, note 21).** As
    payment_pending_exists`, and no cash Payment is written. The backend
    already refused this before FIX-028; the item adds the test. Spec:
    `front-desk-receipt.integration-spec.ts`.
+
+## Test 124: the v2 Staff app (MOB-074)
+
+The staff app follows the approved boards in `design/v2/equipo` (follow-ups
+225 and 226). Use the development fixtures (Test 3) and log in as each Staff
+Member in turn. Check on the iPhone 16 Pro and iPad Simulators and the Android
+emulator.
+
+A. **One tab bar per role.** The bar is Lino; the current tab is Rosa
+   profundo, the others Texto tenue, each with a line icon over its label.
+   No root shows the round avatar any more: Perfil is always the last tab.
+   - Entrenadora (`emma.vargas@example.com`): **Agenda · Mis pagos · Perfil**.
+   - Asistente (`camila.rojas@example.com`): **Clientes · Horario · Caja · Perfil**.
+   - Nutricionista: **Agenda · Disponibilidad · Perfil**.
+   - Administración (`paola.mendoza@example.com`): **Pagos · Clientes · Horario · Perfil**.
+   - Coordinación (`carolina.rivas@example.com`): **Clientes · Para contactar ·
+     Horario · Perfil**; **Para contactar** carries the count of Clients waiting.
+   Every screen with a back arrow hides the tab bar; it returns on the tab's
+   first screen. Mi agenda, Buscar cliente, Pagos pendientes and the
+   Nutritionist's agenda carry a Lino bell with the unread count; it opens
+   **Notificaciones**. An empty inbox offers **Volver a mi agenda** (Trainer
+   and Nutritionist) or **Volver**. The first home asks for notifications with
+   «Entérate al momento» and «Te avisamos apenas cambie una clase, llegue una
+   reserva o haya un pago por revisar.» **Ver la app como…** (Paola, from
+   Perfil) still opens the strip and the person's own tabs.
+B. **Perfil (S23).** Initials, name, email and «Tus datos los actualiza
+   administración.» («…se editan en la web de administración.» for Paola);
+   «Tu cuenta» rows **Rol** and **Sucursal(es)**; «Ajustes» rows (**Ver la app
+   como…** for Paola, **Mis pagos** for the Trainer, **Notificaciones** with a
+   Rosa tinte count, **Cambiar contraseña**, **Enviar comentarios**) and
+   **Cerrar sesión** as the last row in Error, which opens «¿Cerrar sesión?».
+   The footer reads «Emma Pilates Studio · versión …».
+C. **Entrenadora.** Mi agenda (S02) opens on today, with «Entrenadora · Lunes
+   2 de noviembre» over the greeting. «Esta semana» shows today («Hoy») and the
+   next six days, never a past day, and a **Hoy** button. Each class is a Lino
+   row: the start in Lora with «60 min» under it, the class over «Branch · N de
+   M reservados», a **Con cupos** or **Completa** pill and a chevron. A day
+   without classes reads «El sábado 7 no tienes clases» with **Ver mis clases
+   de hoy**. The attendance list (S03) has **Reportar una falla** as a row,
+   «Reservas» before the class with «Podrás marcar asistencia cuando termine la
+   clase.», and after it «Asistencia · N de M marcadas» with **Asistió** (Rosa
+   tinte) and **No asistió** (Error tint) per Client, «Falta marcar a N
+   clienta(s).» and a toast «Asistencia guardada». **Reportar una falla** (S26)
+   shows one tab per kind (Reformers, Cadillacs, Mats), numbered tiles, «¿Qué
+   pasó?» and a «No se puede usar» switch; sending shows «Gracias por avisar».
+   **Mis pagos** (S29) puts the open month on the Rosa profundo card (Borrador,
+   the total in large Lora), «Liquidaciones anteriores» with **Ver cada clase**
+   as a text action, and «Pagos recibidos»; empty, «Todavía no tienes pagos»
+   with **Ver mi agenda**.
+D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search field
+   with a clear ×, the Rosa tinte **Nuevo cliente** button, results as person
+   rows (a **Pendiente** pill for a pending Account). No result reads «No
+   encontramos a nadie» with **Nuevo cliente**. Nuevo cliente (S05): «Datos»
+   as one Lino group, «¿Cómo nos conoció?» as a two-column grid, the referral
+   field only for «Una instructora» («Código de la instructora») or
+   «Recomendación de una amiga» («Código de la amiga»), and **Crear cuenta**
+   fixed at the bottom under «Le enviaremos un enlace de activación al correo.
+   Vence en 7 días.» The Client file (S06): initials, name, contact; the Plan
+   as the Rosa profundo card (classes left in large Lora, a white bar, «Vence
+   el …», **Activo**/**Vencido**); one primary **Reservar clase**;
+   **Registrar pago en efectivo** only when she can buy (never with a Plan
+   already queued, which shows «Ya tiene un plan siguiente.»); «Reservas» rows
+   **Próximas reservas** and **Historial de clases**. Without a Plan, a Lino
+   card «Sin plan activo» with **Registrar pago en efectivo** and no
+   **Reservar clase**. A pending Account (Sofía) shows one Lino line «Cuenta
+   pendiente de activación · El enlace vence el …», a ⋯ menu («Invitación de
+   Sofía»: **Cambiar correo**, **Cancelar invitación**, **Cerrar**) and
+   **Reenviar enlace**. Reservar una clase (S07): the banner «Reservando para
+   **Lucía Fernández**», the Branch as a fixed line with one Branch (a chevron
+   and chips from two), seven day tiles that share the width and never clip,
+   type chips, Lino rows with «N cupos», **Completa** or **Ya reservada**. A
+   type with no class reads «Hoy no hay Mat Pilates» with **Ver todas las
+   clases**; an empty day «Este día no hay clases» with **Ver mañana**. The
+   detail (S08) is a Rosa profundo card with the free seats in large Lora,
+   then Entrenadora, Sucursal and time rows, «Se descuenta 1 clase de su plan.
+   Le avisamos por notificación.» and **Reservar para Lucía** (full:
+   **Anotarla en la lista de espera**). Elige un plan (S09) lists «Planes
+   disponibles». **Registrar pago** (S10): «¿Cómo paga?» **Efectivo** | **QR**.
+   Efectivo shows «A cobrar» (plan, discount, «Total en efectivo»), the start
+   dates, a folded «¿Necesita factura? · Por defecto, sin factura» and
+   **Confirmar pago en efectivo**; the result is the centred «¡Pago
+   registrado!» with Plan («8 clases» once), Cobrado en efectivo, Vence and
+   **Volver a Clientes**. QR shows «Monto exacto a transferir» and the studio
+   QR, **Fotografiar comprobante** (then «Comprobante fotografiado · Todavía no
+   se envió» and **Fotografiar otra vez**), and a separate **Enviar
+   comprobante**; the result is «Comprobante enviado» with an **En revisión**
+   pill. When a QR receipt is already pending, the cash way is off and the
+   app says «La clienta tiene un pago en revisión.» Reservas de Lucía
+   (S21/S22): **Próximas | Historial** under the title; booking cards with a
+   day tile and the action as a right-aligned text button under a hairline
+   (**Cancelar reserva** in Error, **Reprogramar** inside the window, **Salir
+   de la lista**); the sheet asks «¿Cancelar esta reserva de …?» with **Sí,
+   cancelar la reserva** and **No, volver**. Horario (HOR): the week for her
+   Branch, read-only rows «Trainer · N de M reservados» with «N cupos», and
+   **Reservar para una clienta** (opens Clientes). Caja (S25): «Cerrar caja»
+   with the expected cash on the Rosa profundo card, «Efectivo contado», the
+   live difference row («Falta efectivo −Bs 2»), the note with its counter,
+   «Hay un solo cierre por día y no se corrige después.»; once closed, «Caja
+   cerrada · La cerró … a las …» with the four rows and **Ir a Clientes**.
+E. **Administración.** Pagos pendientes (S11): «Por confirmar · N» with the
+   total, person rows with the amount in Lora, and «Accesos»: **Cancelar una
+   clase**, **Congelamientos** («N por revisar») and **Cerrar caja**. With no
+   payments, «Todo al día» and **Ver el horario**. Revisar pago (S12): the
+   amount on the Rosa profundo card, Transferencia and «Enviado el …» rows,
+   the receipt with **Ampliar**, **Confirmar pago** and **Rechazar** in Error;
+   rejecting shows the person row, «Motivo del rechazo», the warning row «El
+   plan no se activa hasta que envíe un comprobante válido.» and the solid
+   Error **Confirmar rechazo**. Congelamientos (CON): «Por revisar · N» with
+   «9 al 22 de noviembre · 14 días · viaje»; the review shows the request as
+   rows and **Aprobar congelamiento** / **Rechazar**. Cancelar una clase
+   (S13): a fixed Branch line with one Branch (from two, **Todas las
+   sucursales** too), six day tiles and **Otra**, which opens the following
+   days up to 30 ahead; rows show «N reservas» or «Sin reservas». Cancelar
+   sesión (S14): «Qué va a pasar» rows and the warning row «Esto no se puede
+   deshacer.» (no amber block); a class without bookings shows only «Esto no
+   se puede deshacer. La clase no tiene reservas.» and can be cancelled. A
+   refusal names its reason («Esta clase ya empezó o ya está cancelada.»,
+   «Tu cuenta no puede cancelar clases.», …) instead of «Inténtalo de nuevo».
+   The result reads «Sesión cancelada» with **Volver a las clases**. Ver la
+   app como (S24): one «El equipo» list (role and Branches per person), «Nunca
+   aparece otra persona de administración.», and the sheet's two rows.
+F. **Nutricionista.** Mi agenda (S15): «Nutricionista · …», days as section
+   titles with their count, Lino cards with **Cancelar evaluación** as the
+   text action (none once it started); empty, «No tienes evaluaciones» with
+   **Ver mi disponibilidad**. Mi disponibilidad (S16) is a tab: weekday discs,
+   «N cupos · M reservados», and **Nuevo horario** fixed at the bottom; empty,
+   «Aún no publicaste horarios». Nuevo/Editar horario (S17): a fixed Branch
+   with one Branch, the turnos as a row, **Guardar** fixed with **Eliminar
+   horario** as an Error text button.
+G. **Coordinación.** Buscar cliente has no **Nuevo cliente**; Horario has a
+   **Cancelar una clase** row and «Solo lectura. Para reservar, abre la ficha
+   de una clienta.»; Para contactar (S28) shows each Client with her reasons
+   as pills and **Abrir WhatsApp** / **Marcar contactada** as text actions,
+   then the toast «Valeria, contactada · Sale de la lista y queda registrado a
+   tu nombre»; empty, «Nadie para contactar» with **Buscar una clienta**.
+
+Specs: `apps/staff-mobile/src/**/*.spec.tsx`. Maestro: `apps/staff-mobile/.maestro`.

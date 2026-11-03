@@ -58,10 +58,7 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
       ),
     );
 
-    await fireEvent.press(
-      await screen.findByRole("button", { name: `${started.time} Valeria Áñez` }),
-    );
-
+    expect(await screen.findByLabelText(`${started.time} Valeria Áñez`)).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).not.toBeOnTheScreen();
   });
 
@@ -80,8 +77,7 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
       ),
     );
 
-    await fireEvent.press(await screen.findByRole("button", { name: "09:45 Lucía Justiniano" }));
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar evaluación" }));
+    await fireEvent.press(await screen.findByTestId("cancel-evaluation-evaluation-1"));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));
     await fireEvent.press(sheet.getByRole("button", { name: "Sí, cancelar evaluación" }));
     expect(await screen.findByText("Evaluación cancelada")).toBeOnTheScreen();

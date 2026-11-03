@@ -55,23 +55,25 @@ export function SectionLabel({ children }: { children: string }) {
 export const pillRow = { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm } as const;
 
 const styles = StyleSheet.create({
+  // v2 S17: the 12 pt section title and Lino chips, the chosen one Palo de rosa.
   label: {
     color: colors.textMuted,
     fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: 0.6,
-    marginTop: spacing.sm,
+    fontWeight: "500",
+    letterSpacing: typography.label * 0.12,
+    marginTop: spacing.md,
     textTransform: "uppercase",
   },
   pill: {
+    alignItems: "center",
     backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
+    borderRadius: radii.button,
+    justifyContent: "center",
+    minHeight: 44,
+    minWidth: 48,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
   },
-  pillSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  pillText: { color: colors.text, fontSize: typography.note },
+  pillSelected: { backgroundColor: colors.primary },
+  pillText: { color: colors.text, fontSize: 14 },
   pillTextSelected: { color: colors.white },
 });

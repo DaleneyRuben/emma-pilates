@@ -4,10 +4,11 @@ import {
   useGetClientInvitation,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   colors,
   ConfirmationSheet,
+  fontFamilies,
   FormField,
+  NoticeRow,
   OutlinedButton,
   PrimaryButton,
   radii,
@@ -19,12 +20,14 @@ import {
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { accountEmailLimitCode, formatInstantDate, resendLimitNotice } from "./assistant-format";
+import { InvitationMenu } from "./invitation-menu";
 import { SelfRegisteredNotice } from "./self-registered-notice";
+import { StateCard } from "./state-card";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -61,6 +64,7 @@ export function PendingInvitationCard({
   const [editingEmail, setEditingEmail] = useState(false);
   const [email, setEmail] = useState("");
   const [confirmingCancel, setConfirmingCancel] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [showReopened, setShowReopened] = useState(reopened);
   const [notice, setNotice] = useState<string | null>(null);
@@ -146,76 +150,92 @@ export function PendingInvitationCard({
       onCancelled();
     }, "No pudimos cancelar la invitación. Inténtalo de nuevo.");
 
+  const more = (
+    <Pressable
+      accessibilityLabel="Más opciones de la invitación"
+      accessibilityRole="button"
+      hitSlop={spacing.sm}
+      onPress={() => setMenuOpen(true)}
+      style={styles.more}
+      testID="pending-card-more"
+    >
+      <Text style={styles.moreDots}>⋯</Text>
+    </Pressable>
+  );
+
   return (
-    <View style={styles.pendingCard} testID="pending-card">
-      {showReopened ? (
-        <BodyText style={styles.success}>
-          {`${firstName(clientName)} ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.`}
-        </BodyText>
-      ) : null}
-      <Text style={styles.cardTitle}>Cuenta pendiente de activación</Text>
-      <View style={styles.emailLine}>
-        <BodyText style={styles.email}>{pending.email}</BodyText>
-        {editingEmail ? null : (
-          <TextButton label="Cambiar correo" onPress={() => setEditingEmail(true)} />
-        )}
-      </View>
-      {pending.activationExpiresAt ? (
-        <BodyText style={styles.muted}>
-          {`El enlace de activación vence el ${formatInstantDate(pending.activationExpiresAt)}.`}
-        </BodyText>
-      ) : null}
-      <BodyText style={[styles.muted, styles.ruled]}>
-        La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.
-      </BodyText>
-      {notice !== null ? <BodyText style={styles.success}>{notice}</BodyText> : null}
-      {failure !== null ? (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
-      ) : null}
-      {waitSeconds > 0 ? (
-        <WaitNotice
-          {...resendLimitNotice(accountLimited)}
-          remainingSeconds={waitSeconds}
-          surface="card"
+    <View style={styles.block}>
+      <StateCard
+        icon="clock"
+        note={
+          pending.activationExpiresAt
+            ? `El enlace vence el ${formatInstantDate(pending.activationExpiresAt)}`
+            : undefined
+        }
+        testID="pending-card"
+        title="Cuenta pendiente de activación"
+        trailing={more}
+      >
+        {showReopened ? (
+          <Text style={styles.line}>
+            {`${firstName(clientName)} ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.`}
+          </Text>
+        ) : null}
+        {notice !== null ? <Text style={styles.line}>{notice}</Text> : null}
+        {failure !== null ? (
+          <View accessibilityLabel={failure} accessibilityRole="alert">
+            <NoticeRow message={failure} />
+          </View>
+        ) : null}
+        {waitSeconds > 0 ? (
+          <WaitNotice
+            {...resendLimitNotice(accountLimited)}
+            remainingSeconds={waitSeconds}
+            surface="card"
+          />
+        ) : null}
+        {editingEmail ? (
+          <>
+            <FormField
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              label="Nuevo correo"
+              onChangeText={setEmail}
+              value={email}
+            />
+            <PrimaryButton
+              busy={busy}
+              disabled={accountWaiting}
+              label="Guardar correo"
+              onPress={() => void changeEmail()}
+            />
+            <TextButton label="Cancelar" onPress={() => setEditingEmail(false)} />
+          </>
+        ) : null}
+      </StateCard>
+      {editingEmail ? null : (
+        <OutlinedButton
+          busy={busy && !confirmingCancel}
+          disabled={busy || waitSeconds > 0}
+          label="Reenviar enlace"
+          onPress={() => void resend()}
         />
-      ) : null}
-      {editingEmail ? (
-        <>
-          <FormField
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            label="Nuevo correo"
-            onChangeText={setEmail}
-            value={email}
-          />
-          <PrimaryButton
-            busy={busy}
-            disabled={accountWaiting}
-            label="Guardar correo"
-            onPress={() => void changeEmail()}
-          />
-          <TextButton label="Cancelar" onPress={() => setEditingEmail(false)} />
-        </>
-      ) : (
-        <View style={styles.pendingActions}>
-          <OutlinedButton
-            busy={busy && !confirmingCancel}
-            disabled={busy || waitSeconds > 0}
-            label="Reenviar enlace"
-            onPress={() => void resend()}
-          />
-          {pending.cancellable ? (
-            <TextButton label="Cancelar invitación" onPress={() => setConfirmingCancel(true)} />
-          ) : (
-            <BodyText style={styles.muted}>
-              La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.
-            </BodyText>
-          )}
-        </View>
       )}
+      <InvitationMenu
+        cancellable={pending.cancellable}
+        firstName={firstName(clientName)}
+        onCancel={() => {
+          setMenuOpen(false);
+          setConfirmingCancel(true);
+        }}
+        onChangeEmail={() => {
+          setMenuOpen(false);
+          setEditingEmail(true);
+        }}
+        onClose={() => setMenuOpen(false)}
+        visible={menuOpen}
+      />
       <ConfirmationSheet
         busy={busy}
         confirmLabel="Sí, cancelar invitación"
@@ -231,22 +251,9 @@ export function PendingInvitationCard({
 }
 
 const styles = StyleSheet.create({
-  cardTitle: { color: colors.text, fontFamily: "Lora_500Medium", fontSize: 19 },
-  email: { color: colors.text, flexShrink: 1 },
-  emailLine: { alignItems: "flex-start" },
-  failure: { color: colors.errorText },
-  muted: { color: colors.textMuted, fontSize: typography.note },
-  pendingActions: { gap: spacing.smd, paddingTop: spacing.xs },
-  pendingCard: {
-    backgroundColor: colors.warningTint,
-    borderRadius: radii.frame,
-    gap: spacing.md,
-    padding: 18,
-  },
-  ruled: {
-    borderTopColor: colors.warningRule,
-    borderTopWidth: 1,
-    paddingTop: 10,
-  },
-  success: { color: colors.successText, fontSize: typography.note },
+  block: { gap: spacing.md },
+  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  more: { alignItems: "center", height: 36, justifyContent: "center", width: 36 },
+  moreDots: { color: colors.textMuted, fontSize: 22, lineHeight: 24 },
+  pendingCard: { backgroundColor: colors.card, borderRadius: radii.card, padding: spacing.lg },
 });

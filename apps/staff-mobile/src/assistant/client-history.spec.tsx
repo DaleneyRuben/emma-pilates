@@ -11,9 +11,11 @@ const hidden = { includeHiddenElements: true };
 
 async function openHistory(routes: ReturnType<typeof assistantRoutes>) {
   const screen = await openLucia(routes);
-  await fireEvent.press(screen.getByRole("button", { name: "Ver historial completo" }));
+  await fireEvent.press(screen.getByTestId("client-overview-history"));
   await waitFor(() => {
-    expect(screen.getByLabelText("Historial de clases")).toBeOnTheScreen();
+    expect(screen.getByRole("tab", { name: "Historial" })).toHaveProp("accessibilityState", {
+      selected: true,
+    });
   });
   return screen;
 }
@@ -30,7 +32,7 @@ describe("Assistant Client history (S22)", () => {
     const screen = await openHistory(assistantRoutes());
 
     await waitFor(() => {
-      expect(screen.getByText("Ha asistido a")).toBeOnTheScreen();
+      expect(screen.getByText("Asistió a")).toBeOnTheScreen();
     });
     expect(screen.getByText("3 clases desde agosto")).toHaveStyle({ fontSize: 26 });
     expect(screen.getByText("Septiembre 2026").parent).toHaveStyle({
@@ -60,7 +62,7 @@ describe("Assistant Client history (S22)", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Esta clienta aún no tiene clases en su historial.")).toHaveStyle({
+      expect(screen.getByText("Todavía no tomó clases")).toHaveStyle({
         fontFamily: "Lora_400Regular",
         fontSize: 24,
         textAlign: "center",

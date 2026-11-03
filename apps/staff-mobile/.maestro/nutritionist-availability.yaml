@@ -5,11 +5,13 @@ env:
 ---
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
-    visible: "Mi disponibilidad"
+    visible:
+      id: "tab-availability"
     timeout: 30000
 - runFlow: subflows/park-dev-gear.yaml
 - takeScreenshot: staff-nutritionist-agenda
-- tapOn: "Mi disponibilidad"
+- tapOn:
+    id: "tab-availability"
 - extendedWaitUntil:
     visible: "Nuevo horario"
     timeout: 15000

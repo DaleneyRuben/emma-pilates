@@ -33,9 +33,9 @@ describe("Staff «Enviar comentarios»", () => {
     const screen = await render(<App runtime={createStaffRuntime(fetcher)} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Tu cuenta/ })).toBeOnTheScreen();
+      expect(screen.getByTestId("tab-profile")).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: /Tu cuenta/ }));
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Enviar comentarios" })).toBeOnTheScreen();
     });

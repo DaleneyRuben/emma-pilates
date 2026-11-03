@@ -64,22 +64,54 @@ describe("freeze review", () => {
         ),
     });
     const screen = await render(<App runtime={createStaffRuntime(fetcher, "administrator")} />);
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-    );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByTestId("tab-profile"));
     await fireEvent.press(screen.getByRole("button", { name: /Notificaciones/ }));
     await waitFor(() =>
       expect(screen.getByText("Lucía pidió un congelamiento.")).toBeOnTheScreen(),
     );
     await fireEvent.press(screen.getByText("Lucía pidió un congelamiento."));
     await waitFor(() => expect(screen.getByText("Lucía Fernández")).toBeOnTheScreen());
-    expect(screen.getByText("27 de octubre de 2026 – 3 de noviembre de 2026")).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Aprobar" }));
+    // v2 CON: the request as rows, the days counted.
+    expect(screen.getByText("Del 27 de octubre al 3 de noviembre")).toBeOnTheScreen();
+    expect(screen.getByText("8 días")).toBeOnTheScreen();
+    expect(screen.getByText("Viaje de trabajo")).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Aprobar congelamiento" }));
     await waitFor(() =>
       expect(
         screen.getByText("El congelamiento ya empezó. Recházalo y pide uno desde mañana."),
       ).toBeOnTheScreen(),
     );
+  });
+
+  it("lists the requests from Pagos with their dates and reason", async () => {
+    const fetcher = routeFetcher({
+      "/api/v1/staff-members/current": () => jsonResponse(profile),
+      "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
+      "/api/v1/administrator/payments/pending": () => jsonResponse([]),
+      "/api/v1/administrator/freezes": () => jsonResponse([freeze]),
+      [`/api/v1/administrator/freezes/${freeze.id}`]: () => jsonResponse(freeze),
+    });
+    const screen = await render(<App runtime={createStaffRuntime(fetcher, "administrator")} />);
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Congelamientos, 1 por revisar" }),
+      ).toBeOnTheScreen(),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: "Congelamientos, 1 por revisar" }));
+    await waitFor(() => expect(screen.getByText("Por revisar · 1")).toBeOnTheScreen());
+    expect(
+      screen.getByText(
+        "Pausan el plan de la clienta. Los días congelados se suman a su vencimiento.",
+      ),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByText("27 de octubre al 3 de noviembre · 8 días · Viaje de trabajo"),
+    ).toBeOnTheScreen();
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Revisar congelamiento de Lucía Fernández" }),
+    );
+    await waitFor(() => expect(screen.getByLabelText("Revisar congelamiento")).toBeOnTheScreen());
   });
 });

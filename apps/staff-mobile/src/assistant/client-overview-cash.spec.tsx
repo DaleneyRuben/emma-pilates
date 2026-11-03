@@ -54,7 +54,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("0 clases restantes")).toBeOnTheScreen();
+      expect(screen.getByText("clases restantes de 8")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
@@ -75,13 +75,14 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("0 clases restantes")).toBeOnTheScreen();
+      expect(screen.getByText("clases restantes de 8")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
   });
 
-  it("disables it when a future Plan is already queued", async () => {
+  // v2 S06: offered only when she can buy, never shown to fail.
+  it("hides it when a future Plan is already queued", async () => {
     const screen = await openLucia({
       ...assistantRoutes(),
       "/api/v1/assistant/clients/client-lucia": () =>
@@ -95,8 +96,8 @@ describe("Client overview cash action", () => {
         }),
     });
 
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeDisabled();
-    expect(screen.getByText(note)).toBeOnTheScreen();
+    await waitFor(() => expect(screen.getByText(note)).toBeOnTheScreen());
+    expect(screen.queryByRole("button", { name: "Registrar pago en efectivo" })).toBeNull();
   });
 
   it("keeps it enabled without the note once the Plan has expired", async () => {
@@ -113,7 +114,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Vencida")).toBeOnTheScreen();
+      expect(screen.getByText("Vencido")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();

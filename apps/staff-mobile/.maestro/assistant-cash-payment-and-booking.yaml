@@ -50,7 +50,7 @@ env:
 - tapOn:
     id: "cash-confirm"
 - extendedWaitUntil:
-    visible: "Cobrado en efectivo: .*"
+    visible: "Cobrado en efectivo"
     timeout: 15000
 - takeScreenshot: staff-cash-3-recorded
 - tapOn:
@@ -83,7 +83,7 @@ env:
 # «Reserva confirmada» lasts eight seconds and the notification sheet can
 # outlast it, so the proof is the booking on her list at the class's time.
 - extendedWaitUntil:
-    visible: "Viendo reservas de: .*"
+    visible: "Reservas de .*"
     timeout: 15000
 - assertVisible: ".*${output.time} – .*"
 - takeScreenshot: staff-cash-4-booked
