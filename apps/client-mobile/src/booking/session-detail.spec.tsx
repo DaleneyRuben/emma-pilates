@@ -346,7 +346,8 @@ describe("Client Session detail", () => {
   it.each([
     ["guest_pass_last_place", "Un pase de invitada no puede tomar el último lugar."],
     ["guest_pass_already_used", "Tu pase de invitada ya se usó."],
-  ])("names a refused guest pass booking by %s", async (code, message) => {
+    ["booking_window_exceeded", "Esa clase todavía no abre para reservar."],
+  ])("names a refused booking by %s", async (code, message) => {
     const { screen } = await openDetail({
       "POST /api/v1/sessions/session-1/bookings": () =>
         jsonResponse({ code, status: 409, title: "Conflict" }, 409),
