@@ -68,6 +68,7 @@ export const priceFounderPlanList = async <
   transaction: Transaction,
   clientId: string | null,
   plans: T[],
+  _now: Date = new Date(),
 ): Promise<Array<T & { listPriceCentavos?: number }>> => {
   if (clientId === null) return plans;
   if (await hasEarlierPlanPayment(transaction, { clientId })) {
