@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { dayChipLabel } from "../time/session-format";
+import { SectionTitle } from "../ui/section-title";
 import { colors, radii, spacing, typography } from "../ui/tokens";
 import { startDateOptions, type StartDateOption } from "./start-date-options";
 
@@ -20,8 +21,8 @@ export function StartDateChooser({
   const options = startDateOptions({ today, startDateLimitDays, openingDate });
 
   return (
-    <View style={styles.block}>
-      <Text style={styles.label}>Fecha de inicio</Text>
+    <View>
+      <SectionTitle>Fecha de inicio</SectionTitle>
       <ScrollView
         contentContainerStyle={styles.row}
         horizontal
@@ -70,8 +71,6 @@ function StartDateChip({
 }
 
 const styles = StyleSheet.create({
-  block: { gap: spacing.sm },
-  label: { color: colors.textMuted, fontSize: typography.label },
   row: { gap: spacing.sm, paddingVertical: spacing.xs },
   chip: {
     alignItems: "center",
