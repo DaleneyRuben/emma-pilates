@@ -93,7 +93,7 @@ env:
 - takeScreenshot: fix227-cash-founder-price
 - tapOn: "Paquete de 8 clases.*"
 - extendedWaitUntil:
-    visible: "Confirmar pago en efectivo"
+    visible: "Registrar pago"
     timeout: 15000
 - swipe:
     start: "50%,70%"
@@ -109,6 +109,6 @@ env:
 - tapOn:
     id: "cash-confirm"
 - extendedWaitUntil:
-    visible: "Cobrado en efectivo: .*"
+    visible: "Cobrado en efectivo"
     timeout: 20000
 - takeScreenshot: fix227-cash-recorded

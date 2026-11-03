@@ -1,14 +1,13 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { BodyText } from "../ui/body-text";
 import { FormScrollView } from "../ui/form-scroll-view";
 import { fontFamilies } from "../ui/fonts";
 import { Heading } from "../ui/heading";
 import { OutcomeBadge, type OutcomeBadgeProps } from "../ui/outcome-badge";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
-import { colors, radii, spacing, typography } from "../ui/tokens";
+import { colors, radii, spacing } from "../ui/tokens";
 
 /** The pill under the Staff wordmark (S01, S18): this is the team's entrance. */
 export function TeamAccessBadge() {
@@ -19,21 +18,11 @@ export function TeamAccessBadge() {
   );
 }
 
-/** The Emma wordmark over its rule, with the tagline on the form screens. */
-export function BrandHeader({
-  tagline = false,
-  teamAccess = false,
-}: {
-  tagline?: boolean;
-  teamAccess?: boolean;
-}) {
+/** «Emma Pilates Studio» in Lora 36 (follow-up 227: the tagline is gone). */
+export function BrandHeader({ teamAccess = false }: { teamAccess?: boolean }) {
   return (
     <View style={styles.brand}>
-      <Text style={styles.wordmark}>Emma</Text>
-      <View style={styles.brandRule} />
-      {tagline ? (
-        <BodyText style={styles.tagline}>Movimiento · Equilibrio · Bienestar</BodyText>
-      ) : null}
+      <Text style={styles.wordmark}>Emma Pilates Studio</Text>
       {teamAccess ? <TeamAccessBadge /> : null}
     </View>
   );
@@ -46,7 +35,6 @@ export function AuthenticationScreen({
   children,
   eyebrow,
   footer,
-  tagline = false,
   teamAccess = false,
   title,
   topBar,
@@ -58,7 +46,6 @@ export function AuthenticationScreen({
   /** A small uppercase line over the title, such as «Activar cuenta». */
   eyebrow?: string;
   footer?: ReactNode;
-  tagline?: boolean;
   teamAccess?: boolean;
   title?: string;
   /** The full-width bar of 20, S18, and «Cambiar correo», with the way back. */
@@ -71,7 +58,7 @@ export function AuthenticationScreen({
         contentContainerStyle={styles.content}
         style={topBar === undefined ? undefined : styles.inset}
       >
-        {brand ? <BrandHeader tagline={tagline} teamAccess={teamAccess} /> : null}
+        {brand ? <BrandHeader teamAccess={teamAccess} /> : null}
         <View style={styles.panel}>
           {eyebrow === undefined ? null : <Text style={styles.eyebrow}>{eyebrow}</Text>}
           {badge === undefined ? null : <OutcomeBadge {...badge} />}
@@ -103,11 +90,6 @@ const styles = StyleSheet.create({
   brand: {
     alignItems: "center",
     gap: spacing.md,
-  },
-  brandRule: {
-    backgroundColor: colors.borderStrong,
-    height: 1,
-    width: 36,
   },
   // A phone-width column, centred on a tablet instead of stretched.
   content: {
@@ -141,13 +123,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: 0,
   },
-  tagline: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    letterSpacing: 2,
-    textAlign: "center",
-    textTransform: "uppercase",
-  },
   teamBadge: {
     backgroundColor: colors.secondaryTint,
     borderColor: colors.borderStrong,
@@ -166,7 +141,8 @@ const styles = StyleSheet.create({
   wordmark: {
     color: colors.text,
     fontFamily: fontFamilies.display,
-    fontSize: 44,
-    lineHeight: 50,
+    fontSize: 36,
+    lineHeight: 40,
+    textAlign: "center",
   },
 });

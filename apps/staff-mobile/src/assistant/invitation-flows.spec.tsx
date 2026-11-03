@@ -28,7 +28,7 @@ const overviewRoutes = (pending = invitation) => ({
 });
 
 async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearch>>) {
-  await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+  await fireEvent.press(screen.getByTestId("client-search-new-client"));
   await waitFor(() => {
     expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
   });
@@ -228,12 +228,11 @@ describe("Assistant invitations (S05, S06)", () => {
 
     await submitNewClient(screen);
 
-    expect(
-      await screen.findByText(
-        "La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.",
-      ),
-    ).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Cancelar invitación" })).not.toBeOnTheScreen();
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Más opciones de la invitación" }),
+    );
+    expect(screen.getByText("Ya tiene pagos o reservas, así que se mantiene")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^Cancelar invitación/ })).toBeDisabled();
   });
 
   it("words a failed email change apart from an invalid address", async () => {
@@ -247,7 +246,10 @@ describe("Assistant invitations (S05, S06)", () => {
     });
 
     await submitNewClient(screen);
-    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar correo" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Más opciones de la invitación" }),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: /^Cambiar correo/ }));
     await fireEvent.changeText(screen.getByLabelText("Nuevo correo"), "ana.nueva@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
 

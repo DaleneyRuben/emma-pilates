@@ -1,29 +1,57 @@
 import {
-  BodyText,
-  ButtonLabel,
+  boliviaCivilDate,
   colors,
-  formatSessionDate,
+  fontFamilies,
   formatTimeRange,
-  radii,
+  IconRow,
+  IconRowGroup,
+  NoticeRow,
+  PrimaryButton,
   Screen,
-  ScreenTopBar,
+  SectionTitle,
   spacing,
+  StateScreen,
   surfaces,
   TextButton,
   typography,
+  useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { createAdministratorApi } from "./administrator-api";
-import { describeCount, describeSessionCancellation } from "./administrator-format";
+import { BackBar, backBarScroll } from "../ui/back-bar";
+import { dayHeading } from "../ui/session-time";
+import { ValueRow } from "../ui/value-row";
+import { AdministratorApiError, createAdministratorApi } from "./administrator-api";
 import type { CancellableSession } from "./cancel-class-screen";
 
 type CancelSessionNavigation = { goBack: () => void };
 
+// Walkthrough 24: the app says the real reason for each refusal.
+const cancelProblems: Record<string, string> = {
+  booking_access_denied: "Tu cuenta no puede cancelar clases.",
+  session_has_no_bookings: "El servidor todavía no deja cancelar una clase sin reservas.",
+  session_not_cancellable: "Esta clase ya empezó o ya está cancelada.",
+};
+
+function refusal(error: unknown): string {
+  if (error instanceof AdministratorApiError) {
+    return (
+      (error.code === null ? undefined : cancelProblems[error.code]) ??
+      "El servidor no aceptó la cancelación. Inténtalo de nuevo en un momento."
+    );
+  }
+  return "No hay conexión con el estudio. Revisa tu internet e inténtalo de nuevo.";
+}
+
+// «2 h 30» for the Studio Setting's minutes (BKM-004).
+const windowLabel = (minutes: number) =>
+  minutes % 60 === 0 ? `${minutes / 60} h` : `${Math.floor(minutes / 60)} h ${minutes % 60}`;
+
+/** S14 Cancelar sesión (v2), with a short confirmation for an empty class. */
 export function CancelSessionScreen({
   route,
 }: {
@@ -33,6 +61,7 @@ export function CancelSessionScreen({
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const api = useMemo(() => createAdministratorApi(fetcher), [fetcher]);
+  const rules = useStudioRules(fetcher);
   const { session } = route.params;
   const [submitting, setSubmitting] = useState(false);
   const [affected, setAffected] = useState<number | null>(null);
@@ -45,121 +74,114 @@ export function CancelSessionScreen({
       const result = await api.cancelSession(session.id);
       await queryClient.invalidateQueries();
       setAffected(result.affectedBookings);
-    } catch {
-      setFailure("No pudimos cancelar la sesión. Inténtalo de nuevo.");
+    } catch (error) {
+      setFailure(refusal(error));
     } finally {
       setSubmitting(false);
     }
   };
 
-  const when = `${formatSessionDate(session.startsAt)} · ${formatTimeRange(session.startsAt, session.endsAt)}`;
+  const day = dayHeading(boliviaCivilDate(new Date(session.startsAt)));
+  const time = formatTimeRange(session.startsAt, session.endsAt);
+  const header = <BackBar onBack={() => navigation.goBack()} title="Cancelar sesión" />;
 
   if (affected !== null) {
     return (
       <Screen style={styles.screen}>
-        <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Sesión cancelada" />
-        <View style={styles.summary}>
-          <BodyText>{when}</BodyText>
-          <Text style={styles.title}>{session.classTypeName}</Text>
-          <BodyText>{`${session.trainerName} · ${session.branchName}`}</BodyText>
-        </View>
-        <View style={styles.receipt}>
-          <BodyText>
-            {affected === 1
-              ? "Se notificó a la clienta afectada."
-              : `Se notificó a las ${affected} clientas afectadas.`}
-          </BodyText>
-          <BodyText>Se reembolsó una clase a cada clienta.</BodyText>
-        </View>
-        <TextButton label="Volver" onPress={() => navigation.goBack()} />
+        <StateScreen
+          icon="check"
+          note={
+            affected === 0
+              ? "La clase no tenía reservas."
+              : affected === 1
+                ? "Avisamos a la clienta y recuperó su clase."
+                : `Avisamos a las ${affected} clientas y cada una recuperó su clase.`
+          }
+          primaryAction={{ label: "Volver a las clases", onPress: () => navigation.goBack() }}
+          title="Sesión cancelada"
+        >
+          <View style={styles.summary}>
+            <IconRowGroup>
+              <ValueRow label="Clase" value={session.classTypeName} />
+              <ValueRow label="Fecha" value={`${day} · ${time.split(" – ")[0]}`} />
+            </IconRowGroup>
+          </View>
+        </StateScreen>
       </Screen>
     );
   }
 
+  const empty = session.bookedCount === 0;
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Cancelar sesión" />
-      <View style={styles.summary}>
-        <BodyText>{when}</BodyText>
-        <Text style={styles.title}>{session.classTypeName}</Text>
-        <BodyText>{session.trainerName}</BodyText>
-        <BodyText>{session.branchName}</BodyText>
-        <Text style={styles.affected}>
-          {describeCount(session.bookedCount, "clienta afectada", "clientas afectadas")}
-        </Text>
-      </View>
-      <View style={styles.warning}>
-        <Text style={styles.warningTitle}>Esto no se puede deshacer</Text>
-        <BodyText style={styles.warningText}>{describeSessionCancellation(session)}</BodyText>
-      </View>
-      {failure === null ? null : (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
-      )}
-      <Pressable
-        accessibilityLabel="Sí, cancelar sesión"
-        accessibilityRole="button"
-        accessibilityState={{ busy: submitting, disabled: submitting }}
-        disabled={submitting}
-        onPress={() => void cancel()}
-        style={styles.destructive}
-        testID="cancel-session-confirm"
+      <ScrollView
+        contentContainerStyle={[styles.content, backBarScroll.content]}
+        style={backBarScroll.scroll}
       >
-        <ButtonLabel
+        {header}
+        <View style={styles.card}>
+          <Text style={styles.title}>{session.classTypeName}</Text>
+          <Text style={styles.muted}>{`${day} · ${time}`}</Text>
+          <Text style={styles.muted}>{`${session.trainerName} · ${session.branchName}`}</Text>
+        </View>
+        {empty ? null : (
+          <View>
+            <SectionTitle>Qué va a pasar</SectionTitle>
+            <IconRowGroup>
+              <IconRow
+                icon="cross"
+                label={
+                  session.bookedCount === 1
+                    ? "Se cancela la reserva"
+                    : `Se cancelan las ${session.bookedCount} reservas`
+                }
+              />
+              <IconRow
+                icon="check"
+                label={
+                  rules === undefined
+                    ? "Cada clienta recupera su clase, aun dentro del plazo de cancelación"
+                    : `Cada clienta recupera su clase, aun fuera del plazo de ${windowLabel(rules.cancellationWindowMinutes)}`
+                }
+              />
+              <IconRow icon="bell" label="Avisamos a cada clienta por notificación" />
+            </IconRowGroup>
+          </View>
+        )}
+        <NoticeRow
+          message={
+            empty
+              ? "Esto no se puede deshacer. La clase no tiene reservas."
+              : "Esto no se puede deshacer."
+          }
+        />
+        {failure === null ? null : (
+          <View accessibilityLabel={failure} accessibilityRole="alert">
+            <Text style={styles.failure}>{failure}</Text>
+          </View>
+        )}
+      </ScrollView>
+      <View style={styles.actions}>
+        <PrimaryButton
           busy={submitting}
           label="Sí, cancelar sesión"
-          spinnerColor={colors.white}
-          style={styles.destructiveLabel}
+          onPress={() => void cancel()}
+          testID="cancel-session-confirm"
+          tone="error"
         />
-      </Pressable>
-      <TextButton label="Cancelar" onPress={() => navigation.goBack()} />
+        <TextButton label="Volver" onPress={() => navigation.goBack()} />
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  affected: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "600",
-    marginTop: spacing.sm,
-  },
-  destructive: {
-    alignItems: "center",
-    backgroundColor: colors.error,
-    borderRadius: radii.control,
-    justifyContent: "center",
-    minHeight: 52,
-  },
-  destructiveLabel: { color: colors.white, fontSize: typography.body, fontWeight: "500" },
-  failure: { color: colors.errorText },
-  receipt: {
-    ...surfaces.card,
-    gap: spacing.sm,
-    padding: spacing.lg,
-  },
-  screen: { gap: spacing.lg },
-  summary: {
-    ...surfaces.card,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  title: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
-  // S14 draws the consequences as a warning, not an error; the destructive
-  // button alone carries the error colour.
-  warning: {
-    backgroundColor: colors.warningTint,
-    borderColor: colors.warning,
-    borderRadius: radii.frame,
-    borderWidth: 1,
-    gap: spacing.smLg,
-    padding: spacing.xlSm,
-  },
-  warningText: { color: colors.text, fontSize: 14, lineHeight: 23 },
-  warningTitle: {
-    color: colors.warningText,
-    fontFamily: "Lora_500Medium",
-    fontSize: typography.bodyLarge,
-  },
+  actions: { gap: spacing.xs, paddingBottom: spacing.lg, paddingTop: spacing.md },
+  card: { ...surfaces.card, gap: spacing.xs, padding: spacing.lg },
+  content: { gap: spacing.xl, paddingBottom: spacing.xl },
+  failure: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.body },
+  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  screen: { paddingHorizontal: spacing.xlSm },
+  summary: { alignSelf: "stretch", marginTop: spacing.sm },
+  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
 });

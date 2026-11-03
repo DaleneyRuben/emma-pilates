@@ -9,6 +9,7 @@ import {
   PaymentWorld,
   startPaymentWorld,
 } from './payment-lifecycle-test-support';
+import { widenBookingWindow } from './booking-window-test-support';
 
 const quarterly = fixtures.plans.find(
   (item) => item.name === 'Trimestral 36 clases',
@@ -31,6 +32,8 @@ describe('freeze approval bounds', () => {
   beforeAll(async () => {
     world = await startPaymentWorld();
     ({ prisma } = world);
+    // The cases book October Sessions from a September clock (FIX-026).
+    await widenBookingWindow(prisma);
   });
 
   afterAll(async () => {

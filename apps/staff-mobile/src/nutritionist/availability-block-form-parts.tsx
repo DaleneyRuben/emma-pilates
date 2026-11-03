@@ -1,4 +1,11 @@
-import { colors, radii, spacing, typography } from "@pilates/mobile-core";
+import {
+  agendaDayChipLabel,
+  colors,
+  fontFamilies,
+  radii,
+  spacing,
+  typography,
+} from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 const blockProblems: Record<string, string> = {
@@ -29,11 +36,14 @@ export function Pill({
   onPress,
   selected,
   accessibilityLabel = label,
+  fill = false,
 }: {
   label: string;
   onPress: () => void;
   selected: boolean;
   accessibilityLabel?: string;
+  /** S17's «Día» grid: the tiles share the row instead of wrapping. */
+  fill?: boolean;
 }) {
   return (
     <Pressable
@@ -41,9 +51,40 @@ export function Pill({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[styles.pill, selected && styles.pillSelected]}
+      style={[styles.pill, fill && styles.fill, selected && styles.pillSelected]}
     >
       <Text style={[styles.pillText, selected && styles.pillTextSelected]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+/** S17's «A partir del» tile: the weekday (or «Hoy») over the Lora day number. */
+export function DateTile({
+  accessibilityLabel,
+  date,
+  onPress,
+  selected,
+  today,
+}: {
+  accessibilityLabel: string;
+  date: string;
+  onPress: () => void;
+  selected: boolean;
+  today: string;
+}) {
+  const { weekday, day } = agendaDayChipLabel(date);
+  return (
+    <Pressable
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={[styles.tile, selected && styles.pillSelected]}
+    >
+      <Text style={[styles.tileWeekday, selected && styles.pillTextSelected]}>
+        {date === today ? "Hoy" : weekday.toLowerCase()}
+      </Text>
+      <Text style={[styles.tileDay, selected && styles.pillTextSelected]}>{day}</Text>
     </Pressable>
   );
 }
@@ -55,23 +96,37 @@ export function SectionLabel({ children }: { children: string }) {
 export const pillRow = { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm } as const;
 
 const styles = StyleSheet.create({
+  // v2 S17: the 12 pt section title and Lino chips, the chosen one Palo de rosa.
   label: {
     color: colors.textMuted,
     fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: 0.6,
-    marginTop: spacing.sm,
+    fontWeight: "500",
+    letterSpacing: typography.label * 0.12,
+    marginTop: spacing.md,
     textTransform: "uppercase",
   },
   pill: {
-    backgroundColor: colors.white,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: radii.button,
+    justifyContent: "center",
+    minHeight: 44,
+    minWidth: 48,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
   },
-  pillSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  pillText: { color: colors.text, fontSize: typography.note },
+  fill: { flex: 1, minWidth: 0, paddingHorizontal: 0 },
+  pillSelected: { backgroundColor: colors.primary },
+  pillText: { color: colors.text, fontSize: 14 },
   pillTextSelected: { color: colors.white },
+  tile: {
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    gap: spacing.xxs,
+    height: 60,
+    justifyContent: "center",
+    width: 52,
+  },
+  tileDay: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
+  tileWeekday: { color: colors.textMuted, fontFamily: fontFamilies.bodyMedium, fontSize: 11 },
 });

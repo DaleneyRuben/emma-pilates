@@ -3,7 +3,6 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "./body-text";
 import { fontFamilies } from "./fonts";
-import { OutlinedButton } from "./outlined-button";
 import { PrimaryButton } from "./primary-button";
 import { TextButton } from "./text-button";
 import { colors, radii, spacing, typography } from "./tokens";
@@ -11,8 +10,9 @@ import { colors, radii, spacing, typography } from "./tokens";
 type ConfirmationSheetProps = PropsWithChildren<{
   visible: boolean;
   title: string;
-  /** The line under the title (and any children) that says what confirming does. */
-  note: string;
+  /** The line under the title (and any children) that says what confirming does;
+   * left out when the children already say it as rows (C05c). */
+  note?: string;
   confirmLabel: string;
   confirmTestID?: string;
   onConfirm: () => void;
@@ -21,7 +21,7 @@ type ConfirmationSheetProps = PropsWithChildren<{
   onDismiss: () => void;
   /** The confirming request is in flight: the button spins, nothing else reacts. */
   busy?: boolean;
-  /** «destructive» outlines the action in Error; «primary» fills it (S24). */
+  /** «destructive» fills the action in Error (follow-up 226); «primary» in Palo de rosa (S24). */
   tone?: "destructive" | "primary";
   testID?: string;
 }>;
@@ -60,24 +60,15 @@ export function ConfirmationSheet({
         <View style={styles.sheet} testID={testID}>
           <Text style={styles.title}>{title}</Text>
           {children}
-          <BodyText>{note}</BodyText>
-          {tone === "primary" ? (
-            <PrimaryButton
-              busy={busy}
-              label={confirmLabel}
-              onPress={onConfirm}
-              size="compact"
-              testID={confirmTestID}
-            />
-          ) : (
-            <OutlinedButton
-              busy={busy}
-              label={confirmLabel}
-              onPress={onConfirm}
-              testID={confirmTestID}
-              tone="error"
-            />
-          )}
+          {note === undefined ? null : <BodyText>{note}</BodyText>}
+          <PrimaryButton
+            busy={busy}
+            label={confirmLabel}
+            onPress={onConfirm}
+            size="compact"
+            testID={confirmTestID}
+            tone={tone === "primary" ? "primary" : "error"}
+          />
           <TextButton disabled={busy} label={dismissLabel} onPress={dismiss} />
         </View>
       </View>
@@ -92,7 +83,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderTopLeftRadius: radii.frame,
     borderTopRightRadius: radii.frame,
     gap: spacing.md,

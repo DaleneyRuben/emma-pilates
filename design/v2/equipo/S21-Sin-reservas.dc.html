@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reservas · vacío</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="S06-Sin-plan.dc.html" aria-label="Volver a la ficha de Valeria" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-size: 16px; font-weight: 500">Valeria</span>
+  </div>
+  <div style="padding: 8px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <span style="font-family: Lora, Georgia, serif; font-size: 30px">Reservas de Valeria</span>
+    <div role="tablist" aria-label="Reservas" style="background: #F5EFE9; border-radius: 14px; padding: 4px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px">
+      <span role="tab" aria-selected="true" style="height: 40px; border-radius: 10px; background: #F2E4E1; box-shadow: inset 0 0 0 1.5px #B78380; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">Próximas</span>
+      <a href="S22-Historial-vacio.dc.html" role="tab" aria-selected="false" style="height: 40px; border-radius: 10px; color: #7D4F4B; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Historial</a>
+    </div>
+  </div>
+  <div style="flex-grow: 1; padding: 0 32px 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center">
+    <div style="width: 72px; height: 72px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg></div>
+    <span style="font-family: Lora, Georgia, serif; font-size: 24px">No tiene reservas próximas</span>
+    <span style="font-size: 15px; line-height: 1.5; color: #6F6662">Puedes reservarle una clase desde el horario del estudio.</span>
+    <a href="S07-Reservar-clase.dc.html" style="margin-top: 8px; height: 52px; padding: 0 24px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Reservar una clase</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

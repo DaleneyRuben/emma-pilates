@@ -1,53 +1,131 @@
-import { BodyText, colors, radii, spacing, surfaces, typography } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { getGetTransferQrImageUrl } from "@pilates/api-contracts";
+import {
+  colors,
+  fontFamilies,
+  Glyph,
+  loadPrivateImageWithRatio,
+  OutlinedButton,
+  radii,
+  spacing,
+  TextButton,
+} from "@pilates/mobile-core";
+import { useQuery } from "@tanstack/react-query";
+import { Image, StyleSheet, Text, View } from "react-native";
+
+import { useStaffFetcher } from "../staff-fetcher";
 
 export type FrontDeskReceipt = { imageAssetId: string };
 
+/** S10 QR: the studio QR to show the Client, with the exact amount above it. */
+export function StudioQrCard({ amount }: { amount: string }) {
+  const fetcher = useStaffFetcher();
+  const qr = useQuery({
+    queryKey: ["studio-transfer-qr"],
+    queryFn: () => loadPrivateImageWithRatio(fetcher, getGetTransferQrImageUrl()),
+    retry: false,
+  });
+  return (
+    <View style={styles.card}>
+      <View style={styles.amountRow}>
+        <Text style={styles.muted}>Monto exacto a transferir</Text>
+        <Text style={styles.amount}>{amount}</Text>
+      </View>
+      <View
+        accessibilityLabel="QR del estudio para transferir"
+        accessibilityRole="image"
+        style={styles.qrBox}
+      >
+        {qr.data ? (
+          <Image
+            source={{ uri: qr.data.uri }}
+            style={[styles.qr, { aspectRatio: qr.data.aspectRatio }]}
+          />
+        ) : null}
+      </View>
+      <Text style={[styles.muted, styles.centred]}>QR del estudio · muéstraselo a la clienta</Text>
+    </View>
+  );
+}
+
 /**
- * The Assistant photographs the Client's transfer receipt. The Payment stays
- * pending for the existing review (decisions §4.2). Cash is a separate button.
+ * S10 QR: the photographed receipt waits here until «Enviar comprobante»
+ * (walkthrough 21, FIX-028); the photo alone sends nothing.
  */
 export function FrontDeskReceiptCard({
   onPhotograph,
   receipt,
 }: {
-  /** Opens the camera or the library and returns the READY receipt, or null. */
-  onPhotograph: () => Promise<FrontDeskReceipt | null> | void;
+  /** Opens the camera or the library. */
+  onPhotograph: () => void;
   receipt: FrontDeskReceipt | null;
 }) {
-  return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Comprobante de transferencia</Text>
-      <BodyText style={styles.note}>
-        {receipt === null
-          ? "Fotografía el comprobante. El pago queda pendiente hasta que la administración lo apruebe."
-          : "Comprobante listo. El pago queda pendiente de revisión."}
-      </BodyText>
-      <Pressable
-        accessibilityLabel="Fotografiar comprobante"
-        accessibilityRole="button"
+  if (receipt === null) {
+    return (
+      <OutlinedButton
+        label="Fotografiar comprobante"
         onPress={onPhotograph}
-        style={styles.button}
         testID="front-desk-photograph"
-      >
-        <Text style={styles.buttonLabel}>Fotografiar comprobante</Text>
-      </Pressable>
+      />
+    );
+  }
+  return (
+    <View style={styles.receipt} testID="front-desk-receipt">
+      <View style={styles.disc}>
+        <Glyph color={colors.primary} name="check" size={18} strokeWidth={1.6} />
+      </View>
+      <View style={styles.body}>
+        <Text style={styles.title}>Comprobante fotografiado</Text>
+        <Text style={styles.muted}>Todavía no se envió</Text>
+      </View>
+      <TextButton
+        label="Fotografiar otra vez"
+        onPress={onPhotograph}
+        testID="front-desk-photograph"
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  button: {
+  amount: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 28 },
+  amountRow: { alignItems: "center", gap: spacing.xxs },
+  body: { flex: 1, gap: spacing.xxs },
+  card: {
     alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    minHeight: 44,
-    justifyContent: "center",
-    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.card,
+    borderRadius: radii.card,
+    gap: spacing.md,
+    padding: spacing.xlSm,
   },
-  buttonLabel: { color: colors.text, fontSize: typography.body },
-  card: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
-  note: { color: colors.textMuted, fontSize: typography.note },
-  title: { color: colors.text, fontSize: 16, fontWeight: "500" },
+  centred: { textAlign: "center" },
+  disc: {
+    alignItems: "center",
+    backgroundColor: colors.primaryTint,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
+  qr: { height: undefined, width: "100%" },
+  qrBox: {
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderRadius: radii.inset,
+    height: 180,
+    justifyContent: "center",
+    padding: spacing.md,
+    width: 180,
+  },
+  receipt: {
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: radii.card,
+    flexDirection: "row",
+    gap: spacing.md,
+    paddingLeft: spacing.lg,
+    paddingRight: spacing.sm,
+    paddingVertical: spacing.md,
+  },
+  title: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 15 },
 });

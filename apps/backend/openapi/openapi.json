@@ -14297,6 +14297,12 @@
           "startDateLimitDays": {
             "type": "number"
           },
+          "bookingWindowDays": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 30,
+            "description": "Días para reservar por adelantado: a Session is bookable from today through this many La Paz days, counting today (FIX-026)"
+          },
           "founderPlaces": {
             "type": "number"
           },
@@ -14344,6 +14350,7 @@
           "cancellationWindowMinutes",
           "minimumBookingsCheckLeadMinutes",
           "startDateLimitDays",
+          "bookingWindowDays",
           "founderPlaces",
           "founderDiscountPercent",
           "founderGapDays",
@@ -14393,6 +14400,12 @@
           "expectedVersion": {
             "type": "number",
             "description": "The version the form was read from"
+          },
+          "bookingWindowDays": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 30,
+            "description": "Días para reservar por adelantado: a Session is bookable from today through this many La Paz days, counting today (FIX-026); left out, the value in force stays"
           }
         },
         "required": [
@@ -14425,6 +14438,12 @@
             "type": "number",
             "description": "Days after the purchase a Start Date may be chosen"
           },
+          "bookingWindowDays": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 30,
+            "description": "Días para reservar por adelantado: a Session is bookable from today through this many La Paz days, counting today (FIX-026)"
+          },
           "openingDate": {
             "type": "string",
             "format": "date",
@@ -14437,6 +14456,7 @@
           "evaluationPriceCentavos",
           "plansFromPriceCentavos",
           "startDateLimitDays",
+          "bookingWindowDays",
           "openingDate"
         ]
       },

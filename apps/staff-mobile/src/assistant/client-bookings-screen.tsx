@@ -5,37 +5,41 @@ import {
   type AssistantClientBookingDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
+  boliviaCivilDate,
+  BrandToast,
+  CardActionRow,
+  cardWithActionRow,
   colors,
   ConfirmationSheet,
+  dayChipLabel,
   EmptyState,
+  fontFamilies,
   formatSessionDate,
   formatTimeRange,
+  IconRow,
+  IconRowGroup,
   isInsideCancellationWindow,
   LoadingState,
+  NoticeRow,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
-  ScreenTopBar,
   spacing,
   surfaces,
-  typography,
+  useStickyNotice,
   useStudioRules,
-  useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { StatusPill } from "../ui/session-row";
 import { createAssistantApi } from "./assistant-api";
 import type { ConfirmedBooking } from "./assistant-session-detail-screen";
-import { ClientBanner } from "./client-banner";
+import { ClientRecordsHeader } from "./client-records-header";
 import type { ClientContext } from "./client-overview-screen";
-
-const noticeVisibleMs = 8_000;
 
 type BookingsNavigation = {
   goBack: () => void;
@@ -46,40 +50,25 @@ type BookingsNavigation = {
   };
 };
 
-function Badge({ label }: { label: string }) {
-  return (
-    <View style={styles.badge}>
-      <Text style={styles.badgeText}>{label}</Text>
-    </View>
-  );
+// «2 h 30» for the Studio Setting's 150 minutes (BKM-004).
+function windowLabel(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest === 0 ? `${hours} h` : `${hours} h ${rest}`;
 }
 
-function OutlinedAction({
-  disabled = false,
-  label,
-  onPress,
-  tone = "neutral",
-}: {
-  disabled?: boolean;
-  label: string;
-  onPress: () => void;
-  tone?: "neutral" | "error";
-}) {
+/** The date disc on the left of a v2 booking card (S21). */
+function DateDisc({ startsAt }: { startsAt: string }) {
+  const civil = boliviaCivilDate(new Date(startsAt));
+  const { weekday, day } = dayChipLabel(civil);
+  const today = civil === boliviaCivilDate(new Date());
   return (
-    <Pressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      style={[
-        styles.action,
-        tone === "error" && styles.actionError,
-        disabled && styles.actionDisabled,
-      ]}
-    >
-      <Text style={[styles.actionLabel, tone === "error" && styles.actionLabelError]}>{label}</Text>
-    </Pressable>
+    <View style={styles.disc}>
+      <Text style={styles.discWeekday}>
+        {today ? "Hoy" : weekday.charAt(0).toUpperCase() + weekday.slice(1)}
+      </Text>
+      <Text style={styles.discDay}>{day}</Text>
+    </View>
   );
 }
 
@@ -104,29 +93,29 @@ function BookingCard({
     windowKnown &&
     isInsideCancellationWindow(item.startsAt, new Date(), cancellationWindowMinutes);
   const locked = !item.actionable;
+  const time = formatTimeRange(item.startsAt, item.endsAt);
+  const line = insideWindow
+    ? `${time} · faltan menos de ${windowLabel(cancellationWindowMinutes)}`
+    : `${time} · ${item.trainerName} · ${item.branchName}`;
 
   return (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{item.classTypeName}</Text>
-        {item.kind === "waitlist" ? (
-          <Badge label="En lista de espera" />
-        ) : insideWindow ? (
-          <Badge label="No cancelable" />
-        ) : null}
+    <View style={[styles.card, windowKnown || item.kind === "waitlist" ? styles.withAction : null]}>
+      <View style={styles.cardBody}>
+        <DateDisc startsAt={item.startsAt} />
+        <View style={styles.cardText}>
+          <Text style={styles.cardTitle}>{item.classTypeName}</Text>
+          <Text style={styles.line}>{line}</Text>
+          {item.kind === "waitlist" ? <StatusPill label="En lista de espera" /> : null}
+          {locked ? <Text style={styles.line}>Solo en tus sucursales</Text> : null}
+        </View>
       </View>
-      <BodyText>{`${item.trainerName} · ${item.branchName}`}</BodyText>
-      <BodyText>
-        {`${formatSessionDate(item.startsAt)} · ${formatTimeRange(item.startsAt, item.endsAt)}`}
-      </BodyText>
       {item.kind === "waitlist" ? (
-        <OutlinedAction disabled={locked} label="Salir de la lista de espera" onPress={onLeave} />
+        <CardActionRow disabled={locked} label="Salir de la lista" onPress={onLeave} />
       ) : !windowKnown ? null : insideWindow ? (
-        <OutlinedAction disabled={locked} label="Reprogramar" onPress={onReschedule} />
+        <CardActionRow disabled={locked} label="Reprogramar" onPress={onReschedule} />
       ) : (
-        <OutlinedAction disabled={locked} label="Cancelar" onPress={onCancel} />
+        <CardActionRow disabled={locked} label="Cancelar reserva" onPress={onCancel} tone="error" />
       )}
-      {locked ? <BodyText style={styles.lockedNote}>Solo en tus sucursales</BodyText> : null}
     </View>
   );
 }
@@ -142,9 +131,8 @@ export function ClientBookingsScreen({
   const queryClient = useQueryClient();
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
   const studioRules = useStudioRules(fetcher);
-  const notice = useTransientNotice(route.params.confirmed, noticeVisibleMs, () =>
-    navigation.setParams({ confirmed: undefined }),
-  );
+  const dismissNotice = () => navigation.setParams({ confirmed: undefined });
+  const notice = useStickyNotice(route.params.confirmed, dismissNotice);
   const [cancelling, setCancelling] = useState<AssistantClientBookingDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const upcoming = useListAssistantClientBookings(clientId, {
@@ -167,6 +155,9 @@ export function ClientBookingsScreen({
     setFailure(null);
     try {
       await api.cancelBooking(cancelling.bookingId);
+      // «Reserva confirmada» no longer holds once a booking is cancelled,
+      // often the one it confirmed (MOB-074).
+      dismissNotice();
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
     } finally {
@@ -192,20 +183,11 @@ export function ClientBookingsScreen({
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reservas de la clienta" />
-      <ClientBanner action="Viendo reservas de" clientName={clientName} />
-      {notice !== null ? (
-        <View style={styles.notice}>
-          <Text style={styles.noticeTitle}>Reserva confirmada</Text>
-          <BodyText style={styles.noticeBody}>
-            {`${notice.classTypeName} · ${formatSessionDate(notice.startsAt)} · ${formatTimeRange(notice.startsAt, notice.endsAt)}`}
-          </BodyText>
-        </View>
-      ) : null}
+      <ClientRecordsHeader context={context} selected="upcoming" />
       {failure !== null ? (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
+        <View accessibilityLabel={failure} accessibilityRole="alert">
+          <NoticeRow message={failure} />
+        </View>
       ) : null}
       {upcoming.isPending ? (
         <LoadingState label="Cargando reservas" />
@@ -224,7 +206,7 @@ export function ClientBookingsScreen({
           }
           icon="calendar"
           message="Puedes reservarle una clase desde el horario del estudio."
-          title="Esta clienta no tiene reservas próximas."
+          title="No tiene reservas próximas"
           variant="plain"
         />
       ) : (
@@ -242,8 +224,9 @@ export function ClientBookingsScreen({
         </ScrollView>
       )}
       <ConfirmationSheet
-        confirmLabel="Sí, cancelar reserva"
-        note="La clase vuelve al saldo del plan y el cupo se libera."
+        confirmLabel="Sí, cancelar la reserva"
+        dismissLabel="No, volver"
+        note="La clase vuelve a su plan y le avisamos."
         onConfirm={() => void confirmCancel()}
         onDismiss={() => setCancelling(null)}
         testID="assistant-cancel-booking-sheet"
@@ -251,58 +234,42 @@ export function ClientBookingsScreen({
         visible={cancelling !== null}
       >
         {cancelling !== null ? (
-          <BodyText>
-            {`${cancelling.classTypeName} · ${formatSessionDate(cancelling.startsAt)} · ${formatTimeRange(cancelling.startsAt, cancelling.endsAt)}`}
-          </BodyText>
+          <IconRowGroup>
+            <IconRow
+              icon="calendar"
+              label={`${cancelling.classTypeName} · ${formatSessionDate(cancelling.startsAt)}, ${formatTimeRange(cancelling.startsAt, cancelling.endsAt).split(" – ")[0]}`}
+            />
+          </IconRowGroup>
         ) : null}
       </ConfirmationSheet>
+      {notice !== null ? (
+        <BrandToast
+          note={`${notice.classTypeName} · ${formatSessionDate(notice.startsAt)} · ${formatTimeRange(notice.startsAt, notice.endsAt)}`}
+          onClose={dismissNotice}
+          title="Reserva confirmada"
+        />
+      ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  action: {
+  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
+  cardBody: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
+  cardText: { alignItems: "flex-start", flex: 1, gap: spacing.xs },
+  cardTitle: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  disc: {
     alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
+    backgroundColor: colors.primaryTint,
+    borderRadius: 14,
+    height: 52,
     justifyContent: "center",
-    marginTop: spacing.xs,
-    minHeight: 44,
+    width: 48,
   },
-  actionDisabled: { opacity: 0.45 },
-  actionError: { borderColor: colors.error },
-  actionLabel: { color: colors.text, fontSize: typography.body },
-  actionLabelError: { color: colors.errorText },
-  badge: {
-    backgroundColor: "rgba(201,154,78,0.16)",
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
-  badgeText: { color: colors.warningText, fontSize: typography.label, fontWeight: "600" },
-  card: {
-    ...surfaces.card,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  cardHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.sm,
-    justifyContent: "space-between",
-  },
-  cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  failure: { color: colors.errorText },
+  discDay: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 18 },
+  discWeekday: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyMedium, fontSize: 11 },
+  line: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  lockedNote: { color: colors.textMuted, fontSize: typography.label, textAlign: "center" },
-  notice: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  noticeBody: { color: colors.successText, fontSize: typography.note },
-  noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
-  screen: { gap: spacing.md },
+  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
+  withAction: cardWithActionRow,
 });

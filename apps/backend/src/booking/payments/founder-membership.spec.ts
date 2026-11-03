@@ -5,7 +5,7 @@ import {
   founderRenewalDeadline,
   isFounder,
   priceFounderPlans,
-  showFounderPrice,
+  founderPriceFrom,
 } from './founder-membership';
 
 const day = 24 * 60 * 60 * 1_000;
@@ -18,7 +18,7 @@ const rules = {
 };
 
 describe('founder discount', () => {
-  it('takes 15 percent off any Plan except the single class, rounded half up', () => {
+  it('takes 15 percent off any Plan except the single class', () => {
     expect(
       founderDiscount({
         classAllowance: 8,
@@ -32,27 +32,47 @@ describe('founder discount', () => {
         priceCentavos: 10_001,
         percent: 15,
       }),
-    ).toEqual({ discountCentavos: 1_500, amountDueCentavos: 8_501 });
+    ).toEqual({ discountCentavos: 1_501, amountDueCentavos: 8_500 });
   });
 
-  it('shows the founder price on a first Plan while a place remains', () => {
-    expect(showFounderPrice({ held: 'none', placesRemaining: true })).toBe(
-      true,
-    );
-    expect(showFounderPrice({ held: 'active', placesRemaining: false })).toBe(
-      true,
-    );
-    expect(showFounderPrice({ held: 'none', placesRemaining: false })).toBe(
-      false,
-    );
-    expect(showFounderPrice({ held: 'lost', placesRemaining: true })).toBe(
-      false,
-    );
-  });
+  // FIX-025 (owner 2026-11-02): the studio charges whole bolivianos, so the
+  // discounted price is rounded to the nearest boliviano, ,50 up, and the
+  // discount is what is left of the list price.
+  it.each([
+    [59_000, 50_200, 8_800],
+    [29_000, 24_700, 4_300],
+    [82_000, 69_700, 12_300],
+    [105_000, 89_300, 15_700],
+    [10_040, 8_500, 1_540],
+  ])(
+    'rounds the discounted price of %i centavos to %i, a whole boliviano',
+    (priceCentavos, amountDueCentavos, discountCentavos) => {
+      expect(
+        founderDiscount({ classAllowance: 8, priceCentavos, percent: 15 }),
+      ).toEqual({ discountCentavos, amountDueCentavos });
+    },
+  );
+
+  it.each([
+    ['active', false, 'founder'],
+    ['active', true, 'founder'],
+    ['reserved', false, 'founder'],
+    ['reserved', true, 'list'],
+    ['lost', false, 'list'],
+    ['lost', true, 'list'],
+    ['none', false, 'needs-place'],
+    ['none', true, 'list'],
+  ] as const)(
+    'prices a %s place with earlier plan payment %s as %s',
+    (held, earlierPlanPayment, price) => {
+      expect(founderPriceFrom({ held, earlierPlanPayment })).toBe(price);
+    },
+  );
 
   it('shows a founder the discounted price and keeps the list price beside it', () => {
     const plans = [
       { classAllowance: 8, priceCentavos: 56_000 },
+      { classAllowance: 16, priceCentavos: 105_000 },
       { classAllowance: 1, priceCentavos: 8_000 },
     ];
 
@@ -61,6 +81,11 @@ describe('founder discount', () => {
         classAllowance: 8,
         priceCentavos: 47_600,
         listPriceCentavos: 56_000,
+      },
+      {
+        classAllowance: 16,
+        priceCentavos: 89_300,
+        listPriceCentavos: 105_000,
       },
       { classAllowance: 1, priceCentavos: 8_000 },
     ]);

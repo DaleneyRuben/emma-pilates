@@ -2,9 +2,23 @@ import { fireEvent, render } from "@testing-library/react-native";
 
 import { OutlinedButton } from "./outlined-button";
 
-// UX-002: the outlined action every confirmation sheet draws, shared by both apps.
+// UX-002: the secondary action every confirmation sheet draws, shared by both
+// apps. Follow-up 225 fills it instead of outlining it: Rosa tinte with a Rosa
+// enlace label, or the Error tint with an Error label.
 describe("OutlinedButton", () => {
-  it("draws the Error outline and label for the destructive tone", async () => {
+  it("fills the secondary action on Rosa tinte with a Rosa enlace label, radius 14", async () => {
+    const screen = await render(<OutlinedButton label="Ver historial" onPress={jest.fn()} />);
+
+    expect(screen.getByRole("button", { name: "Ver historial" })).toHaveStyle({
+      backgroundColor: "#F2E4E1",
+      borderRadius: 14,
+      borderWidth: 0,
+      minHeight: 52,
+    });
+    expect(screen.getByText("Ver historial")).toHaveStyle({ color: "#7D4F4B", fontWeight: "600" });
+  });
+
+  it("fills the destructive tone on the Error tint with an Error label", async () => {
     const onPress = jest.fn();
     const screen = await render(
       <OutlinedButton
@@ -17,8 +31,8 @@ describe("OutlinedButton", () => {
 
     const button = screen.getByTestId("logout-confirm");
     expect(button).toBe(screen.getByRole("button", { name: "Cerrar sesión" }));
-    expect(button).toHaveStyle({ borderColor: "#B25D4B", backgroundColor: "transparent" });
-    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#94493A" });
+    expect(button).toHaveStyle({ backgroundColor: "#F7E5E0", borderWidth: 0 });
+    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#A04E3E" });
     await fireEvent.press(button);
     expect(onPress).toHaveBeenCalledTimes(1);
   });

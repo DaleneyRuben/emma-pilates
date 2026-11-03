@@ -33,14 +33,14 @@ const renewFrom = async (view: object) => {
   const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: "Ver detalle" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Mi plan" })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
-  await fireEvent.press(screen.getByRole("button", { name: "Ver detalle" }));
-  await fireEvent.press(await screen.findByRole("button", { name: "Renovar plan" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
+  await fireEvent.press(await screen.findByRole("button", { name: "Renovar mi plan" }));
   await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
-  expect(await screen.findByText("Total a pagar")).toBeOnTheScreen();
+  expect(await screen.findByText("Desglose")).toBeOnTheScreen();
   return { created, screen };
 };
 
@@ -62,7 +62,7 @@ describe("Renewing from the Plan detail", () => {
       screen.getByText("Tu nuevo plan empieza el 25 de septiembre, al terminar el actual."),
     ).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
     await waitFor(() => {
       expect(created).toHaveBeenCalledWith({ planId: "plan-8" });
     });
@@ -75,6 +75,8 @@ describe("Renewing from the Plan detail", () => {
     });
 
     expect(screen.getByTestId("start-date-chooser")).toBeOnTheScreen();
+    // C09 titles the day tiles once.
+    expect(screen.getAllByText("Fecha de inicio")).toHaveLength(1);
     expect(screen.queryByText(/al terminar el actual/)).toBeNull();
   });
 });

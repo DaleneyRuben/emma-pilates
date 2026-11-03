@@ -15,10 +15,8 @@ describe("BranchPickerPill", () => {
     expect(pill).toHaveStyle({
       alignItems: "center",
       alignSelf: "flex-start",
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
+      backgroundColor: "#F5EFE9",
       borderRadius: 999,
-      borderWidth: 1,
       flexDirection: "row",
       gap: 10,
       minHeight: 44,
@@ -34,7 +32,7 @@ describe("BranchPickerPill", () => {
     expect(pin).toHaveProp("width", 17);
     expect(pin).toHaveProp("stroke", "#B78380");
     const chevron = screen.getByTestId("branch-picker-chevron", hidden);
-    expect(chevron).toHaveProp("stroke", "#766D69");
+    expect(chevron).toHaveProp("stroke", "#6F6662");
     expect(chevron).toHaveProp("width", 16);
     expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
 

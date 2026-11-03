@@ -10,24 +10,27 @@ import {
 import {
   BodyText,
   colors,
+  EmphasisCard,
+  fontFamilies,
   formatBolivianos,
-  initials,
+  Heading,
+  IconRow,
+  IconRowGroup,
   PrimaryButton,
-  radii,
   Screen,
   ScreenTopBar,
   spacing,
   surfaces,
-  typography,
   usePushNotifications,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { ReceiptRow } from "../payments/receipt-row";
 import { pickReceipt, type AttachedReceipt } from "../payments/receipt-upload";
 import { idempotency, uploadImage } from "../uploads/image-upload";
 import { clockTime, evaluationDate } from "./evaluation-format";
@@ -139,132 +142,76 @@ export function BookEvaluationScreen({
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Confirmar evaluación" />
+      <ScreenTopBar
+        fullBleed
+        onBack={() => navigation.goBack()}
+        title="Evaluación nutricional"
+        tone="context"
+      />
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.summary}>
-          <BodyText>{evaluationDate(slot.startsAt)}</BodyText>
+        <Heading accessibilityRole="header">Confirma tu cita</Heading>
+        <EmphasisCard
+          eyebrow={capitalized(evaluationDate(slot.startsAt))}
+          note={`${slot.durationMinutes} minutos · ${slot.nutritionistName} · ${slot.branchName}`}
+          testID="evaluation-hero"
+        >
           <Text style={styles.time}>{clockTime(slot.startsAt)}</Text>
-          <BodyText style={styles.muted}>
-            {`${slot.durationMinutes} minutos · Sucursal ${slot.branchName}`}
-          </BodyText>
-          <View style={styles.nutritionist}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{initials(slot.nutritionistName)}</Text>
-            </View>
-            <View>
-              <Text style={styles.name}>{slot.nutritionistName}</Text>
-              <BodyText style={styles.muted}>Nutricionista</BodyText>
-            </View>
-          </View>
-        </View>
-        <View style={styles.free}>
-          <Text style={styles.freeText}>
-            {slot.included
-              ? "Es gratuita — no usa clases de tu plan."
-              : `Cuesta ${formatBolivianos(slot.priceCentavos)}. Transfiere el monto y sube tu comprobante.`}
-          </Text>
-        </View>
-        {slot.included ? null : (
-          <Pressable
-            accessibilityLabel={
-              receipt === null
-                ? "Sube tu comprobante de transferencia"
-                : "Comprobante adjunto. Toca para cambiarlo."
+        </EmphasisCard>
+        <IconRowGroup>
+          <IconRow
+            icon={slot.included ? "check" : "card"}
+            label={
+              slot.included
+                ? "Es gratis: no usa clases de tu plan"
+                : `Cuesta ${formatBolivianos(slot.priceCentavos)}: transfiere y sube tu comprobante`
             }
-            accessibilityRole="button"
-            accessibilityState={{ disabled: uploading }}
-            disabled={uploading}
-            onPress={() => void attach()}
-            style={styles.upload}
-            testID="evaluation-receipt"
-          >
-            {receipt === null ? (
-              <Text style={styles.uploadLabel}>
-                {uploading ? "Subiendo comprobante…" : "Sube tu comprobante de transferencia"}
-              </Text>
-            ) : (
-              <>
-                <Image
-                  accessibilityLabel="Comprobante adjunto"
-                  source={{ uri: receipt.localUri }}
-                  style={styles.thumbnail}
-                />
-                <Text style={styles.uploadLabel}>Comprobante listo. Toca para cambiarlo.</Text>
-              </>
-            )}
-          </Pressable>
+          />
+          <IconRow icon="bell" label="Te avisamos un día y una hora antes" />
+          <IconRow icon="undo" label="Cancela hasta 3 horas antes" />
+        </IconRowGroup>
+        {slot.included ? null : (
+          <View style={styles.group}>
+            <ReceiptRow
+              onAttach={() => void attach()}
+              onRemove={() => setReceipt(null)}
+              receipt={receipt}
+              testID="evaluation-receipt"
+              uploading={uploading}
+            />
+          </View>
         )}
-        <View style={styles.note}>
-          <BodyText>Te avisaremos un día antes y una hora antes de tu cita.</BodyText>
-        </View>
-        <BodyText style={styles.muted}>
-          Si necesitas cambiarla, puedes cancelarla desde Mis evaluaciones hasta 3 horas antes.
-        </BodyText>
         {message !== null ? (
           <BodyText accessibilityRole="alert" style={styles.failure}>
             {message}
           </BodyText>
         ) : null}
       </ScrollView>
-      <PrimaryButton
-        busy={submitting}
-        disabled={!slot.included && (receipt === null || uploading)}
-        label="Confirmar"
-        onPress={() => void confirm()}
-      />
+      <View style={styles.footer}>
+        <PrimaryButton
+          busy={submitting}
+          disabled={!slot.included && (receipt === null || uploading)}
+          label="Confirmar evaluación"
+          onPress={() => void confirm()}
+        />
+      </View>
     </Screen>
   );
 }
 
+function capitalized(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 const styles = StyleSheet.create({
-  avatar: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 40,
-    justifyContent: "center",
-    width: 40,
-  },
-  avatarText: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "600" },
-  content: { gap: spacing.md, paddingBottom: spacing.xl },
+  content: { gap: spacing.xl, paddingBottom: spacing.lg },
   failure: { color: colors.errorText },
-  free: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    padding: spacing.lg,
-  },
-  freeText: { color: colors.successText, fontSize: typography.body, fontWeight: "500" },
-  muted: { color: colors.textMuted, fontSize: typography.note },
-  name: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
-  note: {
-    ...surfaces.flatCard,
-    padding: spacing.lg,
-  },
-  nutritionist: {
-    alignItems: "center",
-    borderTopColor: colors.divider,
-    borderTopWidth: 1,
-    flexDirection: "row",
-    gap: spacing.md,
-    marginTop: spacing.sm,
-    paddingTop: spacing.md,
-  },
+  footer: { paddingBottom: spacing.sm, paddingTop: spacing.sm },
+  group: { ...surfaces.card },
   screen: { gap: spacing.lg },
-  summary: {
-    ...surfaces.card,
-    gap: spacing.xs,
-    padding: spacing.xl,
+  time: {
+    color: colors.white,
+    fontFamily: fontFamilies.display,
+    fontSize: 40,
+    fontVariant: ["tabular-nums"],
   },
-  thumbnail: { borderRadius: radii.control, height: 120, width: 90 },
-  time: { color: colors.text, fontSize: typography.display, fontWeight: "400" },
-  upload: {
-    alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: radii.inset,
-    borderStyle: "dashed",
-    borderWidth: 1,
-    gap: spacing.sm,
-    padding: spacing.lg,
-  },
-  uploadLabel: { color: colors.text, fontSize: typography.body, textAlign: "center" },
 });

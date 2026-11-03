@@ -39,7 +39,7 @@ export function OutlinedButton({
       <ButtonLabel
         busy={busy}
         label={label}
-        spinnerColor={tone === "error" ? colors.errorText : colors.primaryDeep}
+        spinnerColor={tone === "error" ? colors.errorText : colors.primaryOnTint}
         style={[
           styles.outlinedLabel,
           tone === "error" && styles.outlinedLabelError,
@@ -52,17 +52,17 @@ export function OutlinedButton({
 
 const styles = StyleSheet.create({
   disabledLabel: { color: colors.disabledText },
+  // Follow-up 225: the secondary action is filled, never outlined.
   outlined: {
     alignItems: "center",
-    backgroundColor: "transparent",
-    borderColor: colors.primary,
-    borderRadius: radii.control,
-    borderWidth: 1,
+    backgroundColor: colors.primaryTint,
+    borderRadius: radii.button,
+    borderWidth: 0,
     justifyContent: "center",
-    minHeight: 48,
+    minHeight: 52,
   },
-  outlinedDisabled: { borderColor: colors.border },
-  outlinedError: { borderColor: colors.error },
-  outlinedLabel: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "500" },
+  outlinedDisabled: { backgroundColor: colors.disabledBackground },
+  outlinedError: { backgroundColor: colors.errorSurface },
+  outlinedLabel: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "600" },
   outlinedLabelError: { color: colors.errorText },
 });

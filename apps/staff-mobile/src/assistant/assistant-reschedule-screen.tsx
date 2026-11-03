@@ -15,7 +15,6 @@ import {
   QueryFailure,
   radii,
   Screen,
-  ScreenTopBar,
   SeatPill,
   SessionCard,
   spacing,
@@ -28,6 +27,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
+import { BackBar } from "../ui/back-bar";
 import { ClientBanner } from "./client-banner";
 import { useShowClientBookings } from "./show-client-bookings";
 import type { ClientContext } from "./client-overview-screen";
@@ -111,7 +111,7 @@ export function AssistantRescheduleScreen({
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reprogramar clase" />
+      <BackBar onBack={() => navigation.goBack()} title="Reprogramar clase" />
       <ClientBanner action="Viendo reservas de" clientName={clientName} />
       <View style={styles.current}>
         <BodyText style={styles.currentLabel}>Reserva actual</BodyText>

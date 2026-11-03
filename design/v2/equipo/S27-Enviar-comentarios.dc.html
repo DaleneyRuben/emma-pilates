@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Enviar comentarios</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="S23-Perfil.dc.html" aria-label="Volver a Perfil" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-size: 16px; font-weight: 500">Perfil</span>
+  </div>
+  <div style="flex-grow: 1; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-family: Lora, Georgia, serif; font-size: 30px">Enviar comentarios</span>
+      <span style="font-size: 15px; line-height: 1.5; color: #6F6662">Cuéntanos qué falló o qué mejorarías. Lo lee el equipo de Emma Pilates Studio.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Tipo</span>
+      <div role="radiogroup" aria-label="Tipo" style="background: #F5EFE9; border-radius: 14px; padding: 4px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
+        <button role="radio" aria-checked="false" style="height: 40px; border: none; border-radius: 10px; background: transparent; color: #7D4F4B; font-family: inherit; font-size: 15px; font-weight: 600">Problema</button>
+        <button role="radio" aria-checked="true" style="height: 40px; border: none; border-radius: 10px; background: #F2E4E1; box-shadow: inset 0 0 0 1.5px #B78380; color: #7D4F4B; font-family: inherit; font-size: 15px; font-weight: 600">Sugerencia</button>
+        <button role="radio" aria-checked="false" style="height: 40px; border: none; border-radius: 10px; background: transparent; color: #7D4F4B; font-family: inherit; font-size: 15px; font-weight: 600">Otro</button>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="s27-texto" style="font-size: 14px; font-weight: 500">Comentario</label>
+      <textarea id="s27-texto" style="height: 140px; box-sizing: border-box; padding: 14px 16px; border: 1px solid #E6DBD0; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 16px; line-height: 1.5; resize: none">Sería útil ver la lista de la clase siguiente.</textarea>
+      <div style="display: flex; justify-content: space-between; font-size: 13px; color: #6F6662"><span>Mínimo 10 caracteres.</span><span>46 / 2000</span></div>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+      <div style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center; flex: none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.5"></path></svg></div>
+      <span style="font-size: 14px; line-height: 1.4">Enviamos también la versión de la app (1.0.1), el sistema (iOS 18.2) y tu rol. Nunca capturas.</span>
+    </div>
+  </div>
+  <div style="padding: 12px 20px 30px">
+    <a href="S27-Gracias.dc.html" style="height: 52px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Enviar comentario</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
 import type { Prisma } from '../../generated/prisma/client';
 import {
-  BookingState,
   PrismaClient,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
@@ -186,11 +185,6 @@ export class PrismaBookingCommands {
                   branchId: true,
                   startsAt: true,
                   state: true,
-                  _count: {
-                    select: {
-                      bookings: { where: { state: BookingState.BOOKED } },
-                    },
-                  },
                 },
               });
               return session === null
@@ -201,7 +195,6 @@ export class PrismaBookingCommands {
                     startsAt: session.startsAt,
                     state: session.state.toLowerCase() as
                       'scheduled' | 'cancelled',
-                    liveBookingCount: session._count.bookings,
                   };
             },
             cancel: (input) =>

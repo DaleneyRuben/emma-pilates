@@ -166,23 +166,25 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByText("Carla Mendoza")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Por confirmar")).toBeOnTheScreen();
+    expect(screen.getByText("Por confirmar · 2")).toBeOnTheScreen();
     expect(screen.getByText("Bs 1.340 en total")).toBeOnTheScreen();
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases · ayer, 19:40")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
-    expect(screen.getByText("Ayer, 19:40")).toBeOnTheScreen();
     expect(screen.getByText("Andrea Roca")).toBeOnTheScreen();
-    expect(screen.getByText("Hace 20 minutos")).toBeOnTheScreen();
+    expect(screen.getByText(/· hace 20 minutos$/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Revisar pago de Carla Mendoza" }));
 
     await waitFor(() => {
       expect(screen.getByText("Monto a verificar")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Carla Mendoza")).toBeOnTheScreen();
+    expect(screen.getByText("Carla Mendoza · Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Pendiente")).toBeOnTheScreen();
-    expect(screen.getByText(/^Transferencia · enviado el \d+ de \w+, 19:40$/)).toBeOnTheScreen();
+    // v2 S12: the amount on the hero, the transfer and its time as rows.
+    expect(screen.getByText("Bs 560")).toHaveStyle({ fontSize: 32 });
+    expect(screen.getByText("Transferencia")).toBeOnTheScreen();
+    expect(screen.getByText(/^Enviado el \d+ de \w+, 19:40$/)).toBeOnTheScreen();
     expect(screen.getByText("Comprobante")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByLabelText("Comprobante de transferencia")).toBeOnTheScreen();
@@ -213,6 +215,10 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.queryByText("Carla Mendoza")).not.toBeOnTheScreen();
     });
     expect(screen.getByText("Andrea Roca")).toBeOnTheScreen();
+    // Follow-up 225 §7: the toast stays until its × closes it.
+    expect(screen.getByText("Pago confirmado")).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar aviso" }));
+    await waitFor(() => expect(screen.queryByText("Pago confirmado")).toBeNull());
     expect(screen.getByText("Bs 780 en total")).toBeOnTheScreen();
   });
 
@@ -247,6 +253,9 @@ describe("Administrator payments and Session cancellation", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Rechazar" }));
     expect(screen.getByText("Motivo del rechazo")).toBeOnTheScreen();
     expect(
+      screen.getByText("El plan no se activa hasta que envíe un comprobante válido."),
+    ).toBeOnTheScreen();
+    expect(
       screen.getByText("La clienta verá este mensaje para corregir y volver a enviar."),
     ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Confirmar rechazo" })).toBeDisabled();
@@ -265,10 +274,12 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.getByText("Pago rechazado")).toBeOnTheScreen();
     });
     await waitFor(() => {
-      expect(screen.getByText("No hay pagos pendientes.")).toBeOnTheScreen();
+      expect(screen.getByText("Todo al día")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText("Todo al día. Te avisaremos cuando llegue una transferencia nueva."),
+      screen.getByText(
+        "No hay pagos por confirmar. Te avisamos cuando llegue una transferencia nueva.",
+      ),
     ).toBeOnTheScreen();
   });
 
@@ -302,17 +313,13 @@ describe("Administrator payments and Session cancellation", () => {
     });
     expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
     expect(screen.getByText("6 reservas")).toBeOnTheScreen();
-    expect(screen.getByText("6 cupos")).toBeOnTheScreen();
-    expect(screen.getByText("1 clase")).toBeOnTheScreen();
+    expect(screen.getByText(/ · 1 clase$/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
     await waitFor(() => {
-      expect(screen.getByText("No hay clases con estos filtros.")).toBeOnTheScreen();
+      expect(screen.getByText("Hoy no hay Mat Pilates")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByText("Prueba otro día, otra sucursal u otro tipo de clase."),
-    ).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Todas" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Ver todas las clases" }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
@@ -321,23 +328,21 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Cancelar sesión")).toBeOnTheScreen();
     });
-    expect(screen.getByText("6 clientas afectadas")).toBeOnTheScreen();
-    expect(screen.getByText("Esto no se puede deshacer")).toBeOnTheScreen();
+    // v2 S14: what happens as rows, and a warning row instead of the amber block.
+    expect(screen.getByText("Se cancelan las 6 reservas")).toBeOnTheScreen();
+    expect(screen.getByText("Esto no se puede deshacer.")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar sesión" }));
     await waitFor(() => {
       expect(cancelled).toHaveBeenCalled();
       expect(screen.getByText("Sesión cancelada")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Se notificó a las 6 clientas afectadas.")).toBeOnTheScreen();
-    expect(screen.getByText("Se reembolsó una clase a cada clienta.")).toBeOnTheScreen();
-
-    // S14's result has the bar's chevron and the «Volver» button under it (MOB-034).
-    const backs = screen.getAllByRole("button", { name: "Volver" });
-    expect(backs).toHaveLength(2);
-    await fireEvent.press(backs[1]);
+    expect(
+      screen.getByText("Avisamos a las 6 clientas y cada una recuperó su clase."),
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a las clases" }));
     await waitFor(() => {
-      expect(screen.getByText("No hay clases con estos filtros.")).toBeOnTheScreen();
+      expect(screen.getByText("Hoy no hay clases para cancelar")).toBeOnTheScreen();
     });
   });
 
@@ -375,7 +380,7 @@ describe("Administrator payments and Session cancellation", () => {
     expect(
       screen.getByRole("button", { name: "Sucursal: Todas las sucursales" }),
     ).toBeOnTheScreen();
-    expect(screen.getByText("2 clases")).toBeOnTheScreen();
+    expect(screen.getByText(/ · 2 clases$/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: /^Mat Pilates \d.* · Urubó$/ }));
     await waitFor(() => {

@@ -8,7 +8,8 @@ describe("PrimaryButton while busy", () => {
     const screen = await render(<PrimaryButton busy label="Iniciar sesión" />);
 
     const button = screen.getByRole("button", { name: "Iniciar sesión" });
-    expect(button).toHaveStyle({ backgroundColor: "#B78380", minHeight: 52 });
+    // Follow-up 225: radius 14 and a 600 label.
+    expect(button).toHaveStyle({ backgroundColor: "#B78380", borderRadius: 14, minHeight: 52 });
     expect(screen.getByTestId("primary-button-spinner")).toBeOnTheScreen();
     expect(screen.getByText("Iniciar sesión")).toHaveStyle({ opacity: 0 });
   });

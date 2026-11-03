@@ -4,10 +4,10 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
-import { Glyph } from "../ui/glyph";
 import { FormField } from "../ui/form-field";
 import { FormScrollView } from "../ui/form-scroll-view";
 import { PrimaryButton } from "../ui/primary-button";
+import { StateScreen } from "../ui/state-screen";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
 import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
@@ -61,18 +61,12 @@ function TypeChips({
 
 function Thanks({ onBack }: { onBack: () => void }) {
   return (
-    <View style={styles.thanks}>
-      <View style={styles.thanksIcon}>
-        <Glyph name="message" size={30} />
-      </View>
-      <Text accessibilityRole="header" style={styles.thanksTitle}>
-        ¡Gracias por tu comentario!
-      </Text>
-      <BodyText style={styles.centered}>
-        Lo recibió el equipo de Emma Pilates y lo vamos a revisar.
-      </BodyText>
-      <PrimaryButton label="Volver al perfil" onPress={onBack} />
-    </View>
+    <StateScreen
+      icon="check"
+      note="Lo recibió el equipo de Emma Pilates Studio y lo vamos a revisar."
+      primaryAction={{ label: "Volver al perfil", onPress: onBack }}
+      title="¡Gracias por tu comentario!"
+    />
   );
 }
 
@@ -114,7 +108,7 @@ export function FeedbackScreen({
           keyboardVerticalOffset={spacing.xxl}
         >
           <BodyText>
-            Cuéntanos qué falló o qué mejorarías. Lo lee el equipo de Emma Pilates.
+            Cuéntanos qué falló o qué mejorarías. Lo lee el equipo de Emma Pilates Studio.
           </BodyText>
           <TypeChips value={type} onChange={setType} />
           <View style={styles.field}>
@@ -159,10 +153,9 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   attachedText: { color: colors.textSecondary, fontSize: typography.note, lineHeight: 19 },
-  centered: { textAlign: "center" },
   chip: {
     alignItems: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,
     borderWidth: 1,
@@ -190,20 +183,4 @@ const styles = StyleSheet.create({
   },
   screen: { gap: spacing.lg },
   textArea: { minHeight: 160, paddingBottom: spacing.md, paddingTop: spacing.md },
-  thanks: { ...column, alignItems: "stretch", gap: spacing.lg, paddingTop: spacing.xxl },
-  thanksIcon: {
-    alignItems: "center",
-    alignSelf: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 64,
-    justifyContent: "center",
-    width: 64,
-  },
-  thanksTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleSecondary,
-    textAlign: "center",
-  },
 });

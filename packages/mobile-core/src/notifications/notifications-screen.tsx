@@ -12,6 +12,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
 import { EmptyState } from "../ui/empty-state";
+import { PrimaryButton } from "../ui/primary-button";
 import { QueryFailure } from "../ui/query-failure";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
@@ -26,6 +27,8 @@ import { useRefetchOnFocus } from "../query/refetch-on-focus";
 const pageSize = 50;
 
 type NotificationsScreenProps = {
+  /** The empty state's button, such as the client's «Volver al inicio» (C19b). */
+  emptyAction?: { label: string; onPress: () => void };
   emptySupport: string;
   fetcher: typeof globalThis.fetch;
   now?: () => Date;
@@ -82,6 +85,7 @@ function NotificationRow({
 }
 
 export function NotificationsScreen({
+  emptyAction,
   emptySupport,
   fetcher,
   now = () => new Date(),
@@ -158,6 +162,11 @@ export function NotificationsScreen({
         {header()}
         <DeniedNotice />
         <EmptyState
+          action={
+            emptyAction === undefined ? undefined : (
+              <PrimaryButton label={emptyAction.label} onPress={emptyAction.onPress} />
+            )
+          }
           icon="bell"
           message={emptySupport}
           title="No tienes notificaciones."

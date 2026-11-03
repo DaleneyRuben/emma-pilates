@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent, useState } from "react";
+import { BackHandler } from "react-native";
 
 import type { AuthenticationLinkIntent } from "../ingress/verified-link";
 import { BodyText } from "../ui/body-text";
@@ -52,6 +53,12 @@ function routeForIntent(intent: AuthenticationLinkIntent | null | undefined): Au
     default:
       return "login";
   }
+}
+
+/** Where the Android back button leads; null leaves it to the system. */
+function previousRoute(route: AuthenticationRoute): AuthenticationRoute | null {
+  if (route === "login") return null;
+  return route === "correct-email" ? "check-email" : "login";
 }
 
 function VerifyEmailScreen({
@@ -139,6 +146,18 @@ export function AuthenticationFlow({
   function showLogin() {
     setRoute("login");
   }
+
+  // The flow switches screens without a navigator, so the Android back button
+  // would close the app from every screen past the login (MOB-074).
+  useEffect(() => {
+    const target = previousRoute(route);
+    if (target === null) return;
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      setRoute(target);
+      return true;
+    });
+    return () => subscription.remove();
+  }, [route]);
 
   // A signed-in Client no longer has a registration to continue.
   const login = async (values: LoginValues) => {

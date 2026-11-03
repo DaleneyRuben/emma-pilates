@@ -253,13 +253,13 @@ describe('administrator payments and sessions (e2e)', () => {
       .expect(200)
       .expect({ affectedBookings: 6 });
 
-    cancelSession.mockRejectedValue(new Error('Session has no Bookings'));
+    cancelSession.mockRejectedValue(new Error('Session is not cancellable'));
     await request(app.getHttpServer())
       .post(`/api/v1/administrator/sessions/${sessionId}/cancel`)
       .set('authorization', bearer)
       .expect(409)
       .expect(({ body }) =>
-        expect(body).toMatchObject({ code: 'session_has_no_bookings' }),
+        expect(body).toMatchObject({ code: 'session_not_cancellable' }),
       );
 
     cancelSession.mockRejectedValue(new BookingAccessDeniedError());

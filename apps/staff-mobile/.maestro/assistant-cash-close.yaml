@@ -10,16 +10,16 @@ env:
 - runFlow: subflows/park-dev-gear.yaml
 - extendedWaitUntil:
     visible:
-      id: "cash-close-entry"
+      id: "tab-cash"
     timeout: 30000
 - tapOn:
-    id: "cash-close-entry"
+    id: "tab-cash"
 - extendedWaitUntil:
-    visible: "EFECTIVO ESPERADO|Caja cerrada"
+    visible: "Efectivo esperado|Caja cerrada"
     timeout: 15000
 - runFlow:
     when:
-      visible: "EFECTIVO ESPERADO"
+      visible: "Efectivo esperado"
     commands:
       - takeScreenshot: staff-cash-close-1-form
       - tapOn:

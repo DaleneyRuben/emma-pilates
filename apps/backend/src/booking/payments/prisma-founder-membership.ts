@@ -7,10 +7,10 @@ import {
 import {
   decideFounderPlace,
   founderDiscount,
+  founderPriceFrom,
   isFounder,
-  priceFounderPlans,
-  showFounderPrice,
   type FounderRules,
+  type HeldFounderPlace,
 } from './founder-membership';
 import { hasEarlierPlanPayment } from './founder-plan-history';
 import { reclaimMissingFounderPlace } from './founder-grant-audit';
@@ -25,7 +25,9 @@ export type FounderSale = {
   amountDueCentavos: number;
 };
 
-const readRules = async (transaction: Transaction): Promise<FounderRules> => {
+export const readFounderRules = async (
+  transaction: Transaction,
+): Promise<FounderRules> => {
   const version = await transaction.studioSettingsVersion.findFirst({
     orderBy: { version: 'desc' },
     select: {
@@ -57,53 +59,34 @@ export const readIsFounder = async (
   );
 };
 
-// A Client who would take a place on her first real Plan sees the founder
-// price before she buys. The sale still claims the place under the lock.
-export const priceFounderPlanList = async <
-  T extends {
-    classAllowance: number;
-    priceCentavos: number;
-  },
->(
+export const heldFounderPlace = (
+  held: { status: FounderMembershipStatus } | null,
+): HeldFounderPlace => {
+  if (held === null) return 'none';
+  if (held.status === FounderMembershipStatus.ACTIVE) return 'active';
+  if (held.status === FounderMembershipStatus.RESERVED) return 'reserved';
+  return 'lost';
+};
+
+// The quote and the sale both read the founder price here. A free place is
+// still needed for 'needs-place': the sale claims it under the lock.
+export const readFounderPrice = async (
   transaction: Transaction,
-  clientId: string | null,
-  plans: T[],
-): Promise<Array<T & { listPriceCentavos?: number }>> => {
-  if (clientId === null) return plans;
-  if (await hasEarlierPlanPayment(transaction, { clientId })) {
-    return plans;
-  }
-  const rules = await readRules(transaction);
+  input: { clientId: string; paymentId?: string },
+) => {
   const held = await transaction.founderMembership.findFirst({
-    where: { clientId, deletedAt: null },
-    select: { status: true },
+    where: { clientId: input.clientId, deletedAt: null },
+    select: { id: true, status: true, number: true },
   });
-  const heldStatus =
-    held === null
-      ? 'none'
-      : held.status === FounderMembershipStatus.LOST
-        ? 'lost'
-        : 'active';
-  const placesTaken = await transaction.founderMembership.count({
-    where: {
-      deletedAt: null,
-      status: {
-        in: [FounderMembershipStatus.ACTIVE, FounderMembershipStatus.RESERVED],
-      },
-    },
+  const place = heldFounderPlace(held);
+  const price = founderPriceFrom({
+    held: place,
+    earlierPlanPayment:
+      place === 'none' || place === 'reserved'
+        ? await hasEarlierPlanPayment(transaction, input)
+        : false,
   });
-  if (
-    !showFounderPrice({
-      held: heldStatus,
-      placesRemaining: placesTaken < rules.founderPlaces,
-    })
-  ) {
-    return plans;
-  }
-  return priceFounderPlans(plans, {
-    founder: true,
-    percent: rules.founderDiscountPercent,
-  });
+  return { held, price };
 };
 
 export const readFounderRenewal = async (
@@ -111,7 +94,7 @@ export const readFounderRenewal = async (
   clientId: string,
 ): Promise<{ gapDays: number } | null> => {
   if (!(await readIsFounder(transaction, clientId))) return null;
-  const rules = await readRules(transaction);
+  const rules = await readFounderRules(transaction);
   return { gapDays: rules.founderGapDays };
 };
 
@@ -151,7 +134,7 @@ export const priceFounderSale = async (
       amountDueCentavos: input.priceCentavos - input.creditAppliedCentavos,
     };
   }
-  const rules = await readRules(transaction);
+  const rules = await readFounderRules(transaction);
   const priced = founderDiscount({
     classAllowance: input.classAllowance,
     priceCentavos: input.priceCentavos,
@@ -257,26 +240,10 @@ export const claimFounderPlace = async (
   }
   await lockFounderPlaces(transaction);
 
-  const held = await transaction.founderMembership.findFirst({
-    where: { clientId: input.clientId, deletedAt: null },
-    select: { id: true, status: true, number: true },
-  });
-  if (held?.status === FounderMembershipStatus.ACTIVE) {
-    return { founder: true, number: held.number };
-  }
-  if (held?.status === FounderMembershipStatus.LOST) {
-    return { founder: false, number: null };
-  }
-  if (
-    await hasEarlierPlanPayment(transaction, {
-      clientId: input.clientId,
-      paymentId: input.paymentId,
-    })
-  ) {
-    return { founder: false, number: null };
-  }
-  if (held?.status === FounderMembershipStatus.RESERVED) {
-    if (input.activate) {
+  const { held, price } = await readFounderPrice(transaction, input);
+  if (price === 'list') return { founder: false, number: null };
+  if (held !== null && price === 'founder') {
+    if (held.status === FounderMembershipStatus.RESERVED && input.activate) {
       await transaction.founderMembership.update({
         where: { id: held.id },
         data: {
@@ -289,7 +256,7 @@ export const claimFounderPlace = async (
     return { founder: true, number: held.number };
   }
 
-  const rules = await readRules(transaction);
+  const rules = await readFounderRules(transaction);
   const [assigned, highest] = await Promise.all([
     transaction.founderMembership.count({
       where: {

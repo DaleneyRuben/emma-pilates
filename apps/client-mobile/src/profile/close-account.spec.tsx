@@ -79,9 +79,7 @@ async function openClosure(routes = closureRoutes()) {
   await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
   await waitFor(() => {
     expect(
-      screen.getByText(
-        "Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo que va a pasar:",
-      ),
+      screen.getByText("Esto pasa al cerrar tu cuenta en Emma Pilates Studio:"),
     ).toBeOnTheScreen();
   });
 
@@ -97,6 +95,8 @@ describe("Cerrar mi cuenta", () => {
   it("lists what closing does and waits for the password", async () => {
     const { screen } = await openClosure();
 
+    // C24: each consequence is an icon row.
+    expect(screen.getByTestId("close-account-lines")).toHaveStyle({ backgroundColor: "#F5EFE9" });
     for (const line of [
       "Cancelamos tus 2 reservas futuras y tu evaluación nutricional pendiente. No se descuenta nada.",
       "Sales de 1 lista de espera.",
@@ -109,7 +109,7 @@ describe("Cerrar mi cuenta", () => {
     expect(screen.queryByText(/crédito/)).toBeNull();
     expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toBeDisabled();
 
-    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.changeText(screen.getByLabelText("Tu contraseña, para confirmar"), "secret");
 
     expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toBeEnabled();
   });
@@ -128,7 +128,7 @@ describe("Cerrar mi cuenta", () => {
       closureRoutes({ "POST /api/v1/accounts/current/closure": closure }),
     );
 
-    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.changeText(screen.getByLabelText("Tu contraseña, para confirmar"), "secret");
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
@@ -179,7 +179,7 @@ describe("Cerrar mi cuenta", () => {
 
     await fireEvent.press(box);
     expect(box).toBeChecked();
-    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.changeText(screen.getByLabelText("Tu contraseña, para confirmar"), "secret");
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
@@ -198,7 +198,7 @@ describe("Cerrar mi cuenta", () => {
       }),
     );
 
-    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.changeText(screen.getByLabelText("Tu contraseña, para confirmar"), "secret");
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
@@ -214,7 +214,7 @@ describe("Cerrar mi cuenta", () => {
       }),
     );
 
-    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "wrong");
+    await fireEvent.changeText(screen.getByLabelText("Tu contraseña, para confirmar"), "wrong");
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
@@ -231,7 +231,7 @@ describe("Cerrar mi cuenta", () => {
       }),
     );
 
-    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.changeText(screen.getByLabelText("Tu contraseña, para confirmar"), "secret");
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
@@ -239,7 +239,7 @@ describe("Cerrar mi cuenta", () => {
         screen.getByText("No pudimos cerrar tu cuenta. Inténtalo de nuevo."),
       ).toBeOnTheScreen();
     });
-    expect(screen.getByLabelText("Contraseña").props.value).toBe("secret");
+    expect(screen.getByLabelText("Tu contraseña, para confirmar").props.value).toBe("secret");
   });
 
   it("does not offer closure while a transfer awaits review", async () => {
@@ -257,11 +257,13 @@ describe("Cerrar mi cuenta", () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          "Tienes un pago por transferencia en revisión. Podrás cerrar tu cuenta cuando el estudio lo confirme o lo rechace.",
+          "Podrás cerrar tu cuenta cuando el estudio confirme o rechace tu transferencia.",
         ),
       ).toBeOnTheScreen();
     });
-    expect(screen.queryByLabelText("Contraseña")).toBeNull();
+    // C24b: the centred v2 state block.
+    expect(screen.getByRole("header", { name: "Tienes un pago en revisión" })).toBeOnTheScreen();
+    expect(screen.queryByLabelText("Tu contraseña, para confirmar")).toBeNull();
     await fireEvent.press(screen.getByRole("button", { name: "Volver al perfil" }));
     await waitFor(() => {
       expect(screen.getByText("Sofía Guzmán")).toBeOnTheScreen();

@@ -52,16 +52,16 @@ describe("Trainer roster empty state (UX-009)", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Sin reservas")).toHaveStyle({
-        fontFamily: "Lora_500Medium",
-        fontSize: 21,
+        fontFamily: "Lora_400Regular",
+        fontSize: 24,
         textAlign: "center",
       });
     });
     expect(screen.getByText("No hay reservas para esta sesión.")).toHaveStyle({
-      color: "#766D69",
-      fontSize: 14,
+      color: "#6F6662",
+      fontSize: 15,
     });
-    expect(screen.getByTestId("empty-state-icon-calendar", hidden)).toHaveProp("stroke", "#C4BAB6");
+    expect(screen.getByTestId("empty-state-icon-calendar", hidden)).toHaveProp("stroke", "#93615D");
     expect(screen.getByRole("button", { name: "Guardar asistencia" })).toHaveProp(
       "accessibilityState",
       { busy: false, disabled: true },

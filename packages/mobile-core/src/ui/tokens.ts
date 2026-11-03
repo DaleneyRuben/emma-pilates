@@ -2,22 +2,31 @@ export const colors = {
   background: "#F2ECE5",
   surface: "#FAF7F2",
   white: "#FFFFFF",
+  // Lino: every card, list group and input fill; replaces Blanco as a surface
+  // (follow-up 225).
+  card: "#F5EFE9",
+  // Rosa profundo: the one emphasis surface per screen (hero card, selected
+  // segment, toast); white text on it is 5.1:1 (follow-up 225).
+  emphasis: "#93615D",
+  // Arena hairline between rows of a group and around inputs (follow-up 225).
+  hairline: "#E6DBD0",
   surfaceSubtle: "#FDFAF6",
   rowHover: "#FDF7F2",
   primary: "#B78380",
   primaryHover: "#A87370",
   primaryPressed: "#9C6764",
-  primaryTint: "#EFE0DC",
+  // Rosa tinte: icon discs, secondary buttons, selected chips (follow-up 225).
+  primaryTint: "#F2E4E1",
   // The outcome badge's circle on a link that did not work (MOB-035).
   primaryWash: "rgba(183,131,128,0.14)",
   // Text on Palo de rosa tinte: badges, initials, and pending cards (follow-up 70).
-  primaryOnTint: "#7A4F4B",
+  primaryOnTint: "#7D4F4B",
   primaryDeep: "#8A5D59",
   secondaryAccent: "#D8BDB8",
   secondaryTint: "#F6EDEB",
   text: "#4A4A4A",
-  textSecondary: "#6E6663",
-  textMuted: "#766D69",
+  textSecondary: "#6F6662",
+  textMuted: "#6F6662",
   textSubtle: "#7A716D",
   borderStrong: "#D8C9BB",
   border: "#E4D8CC",
@@ -28,8 +37,10 @@ export const colors = {
   successText: "#5F7457",
   warning: "#C99A4E",
   warningText: "#9A7434",
-  error: "#B25D4B",
-  errorText: "#94493A",
+  error: "#A04E3E",
+  errorText: "#A04E3E",
+  // The disc and fill behind a destructive or error state (follow-up 225).
+  errorSurface: "#F7E5E0",
   // 24's destructive button while it cannot be pressed (MOB-066).
   errorDisabledBorder: "#E7CFC8",
   errorDisabledText: "#D4A99F",
@@ -84,6 +95,8 @@ export const spacing = {
 // The frames round cards at 16 (MOB-039); chips, tinted notices, insets,
 // and sheets keep 12.
 export const radii = {
+  // Follow-up 225: primary and secondary buttons round at 14.
+  button: 14,
   control: 8,
   inset: 12,
   card: 16,
@@ -127,16 +140,14 @@ export const shadows = {
 } as const;
 
 const cardBox = {
-  backgroundColor: colors.white,
-  borderColor: colors.borderStrong,
+  backgroundColor: colors.card,
   borderRadius: radii.card,
-  borderWidth: 1,
 } as const;
 
-/** The mobile frames' card: Blanco, 1 px Borde fuerte, radius 16 (MOB-039). */
+/** Follow-up 225: cards are Lino with no border and no shadow; the screen's one
+ * emphasis card is Rosa profundo, radius 20. */
 export const surfaces = {
-  card: { ...cardBox, ...shadows.card },
-  // Cards the frames draw without the shadow: 12's dates, 17's origin, S03's
-  // roster, S06's history, S12's receipt, S23's groups.
+  card: cardBox,
   flatCard: cardBox,
+  emphasis: { backgroundColor: colors.emphasis, borderRadius: 20 },
 } as const;

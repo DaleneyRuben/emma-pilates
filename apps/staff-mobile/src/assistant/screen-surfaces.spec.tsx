@@ -22,14 +22,13 @@ describe("Assistant surfaces on Superficie", () => {
     jest.restoreAllMocks();
   });
 
-  it("draws S06's «Sin plan activo» as the frames' dashed neutral box", async () => {
+  // Follow-up 225 §6: the in-list state block stands on Lino, not the dashed box.
+  it("draws S06's «Sin plan activo» as the v2 state block on Lino", async () => {
     const screen = await openLucia(withoutPlan());
 
-    expect(screen.getByText("Sin plan activo").parent).toHaveStyle({
-      backgroundColor: "rgba(216,201,187,0.14)",
-      borderColor: "#D8C9BB",
-      borderStyle: "dashed",
-      borderWidth: 1,
+    expect(screen.getByTestId("client-no-plan")).toHaveStyle({
+      backgroundColor: "#F5EFE9",
+      borderRadius: 16,
     });
   });
 
@@ -43,7 +42,7 @@ describe("Assistant surfaces on Superficie", () => {
     expect(StyleSheet.flatten(panel?.props.style)).not.toHaveProperty("backgroundColor");
   });
 
-  it("rings the unread dot in the header's Superficie", async () => {
+  it("puts the unread count on the bell beside Buscar cliente", async () => {
     const screen = await render(
       <App
         runtime={createStaffRuntime(
@@ -57,7 +56,7 @@ describe("Assistant surfaces on Superficie", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("account-avatar-dot")).toHaveStyle({ borderColor: "#FAF7F2" });
+      expect(screen.getByRole("button", { name: "Notificaciones, 2 sin leer" })).toBeOnTheScreen();
     });
   });
 });
@@ -73,47 +72,37 @@ describe("Assistant cards and empty states (MOB-039)", () => {
     jest.restoreAllMocks();
   });
 
-  it("draws S06's cards on Blanco with a 1 pt Borde fuerte and radius 16", async () => {
+  it("groups S06's Bookings and history as rows on Lino", async () => {
     const screen = await openLucia(assistantRoutes());
 
-    expect(screen.getByText("Historial").parent?.parent).toHaveStyle({
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
+    expect(screen.getByText("Historial de clases")).toBeOnTheScreen();
+    expect(screen.getByTestId("client-overview-history").parent).toHaveStyle({
+      backgroundColor: "#F5EFE9",
       borderRadius: 16,
-      borderWidth: 1,
     });
   });
 
-  it("centres S06's «Sin plan activo» with the card icon and the frame's copy", async () => {
+  it("offers S06's cash sale from «Sin plan activo» with the board's copy", async () => {
     const screen = await openLucia(withoutPlan());
 
-    expect(screen.getByTestId("empty-state-icon-card", hidden)).toBeOnTheScreen();
-    expect(screen.getByText("Sin plan activo")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 19,
-      textAlign: "center",
-    });
     expect(
-      screen.getByText(
-        "Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.",
-      ),
+      screen.getByText("Registra un pago para activar un plan y poder reservarle clases."),
     ).toBeOnTheScreen();
-    expect(
-      screen.queryByText("Registra un pago en efectivo para activar un plan."),
-    ).not.toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Reservar clase" })).toBeNull();
   });
 
-  it("draws the tablet's empty panel with the person circle, a Lora 22 title, and its helper", async () => {
+  it("draws the tablet's empty panel with the person disc, a Lora 24 title, and its helper", async () => {
     jest
       .spyOn(Dimensions, "get")
       .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
     const screen = await openClientSearch(assistantRoutes());
 
-    expect(screen.getByTestId("empty-state-circle")).toHaveStyle({ height: 64, width: 64 });
+    expect(screen.getByTestId("empty-state-disc")).toHaveStyle({ height: 72, width: 72 });
     expect(screen.getByTestId("empty-state-icon-person", hidden)).toBeOnTheScreen();
     expect(screen.getByText("Selecciona un cliente para ver sus detalles")).toHaveStyle({
       fontFamily: "Lora_400Regular",
-      fontSize: 22,
+      fontSize: 24,
     });
     expect(
       screen.getByText(

@@ -72,6 +72,10 @@ export function civilDateRange(civilDate: string): {
   return { from: from.toISOString(), until: until.toISOString() };
 }
 
+export function formatStartTime(startsAt: string): string {
+  return timeFormatter.format(new Date(startsAt));
+}
+
 export function formatTimeRange(startsAt: string, endsAt: string): string {
   return `${timeFormatter.format(new Date(startsAt))} – ${timeFormatter.format(new Date(endsAt))}`;
 }

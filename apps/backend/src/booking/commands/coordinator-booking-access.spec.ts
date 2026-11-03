@@ -172,9 +172,7 @@ describe('the Coordinator on the schedule (ADR-0102)', () => {
         { sessionId: session.id },
         {
           principal: coordinator,
-          loadSession: jest
-            .fn()
-            .mockResolvedValue({ ...session, liveBookingCount: 3 }),
+          loadSession: jest.fn().mockResolvedValue(session),
           cancel,
           now,
         },

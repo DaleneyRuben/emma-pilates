@@ -13,6 +13,35 @@ async function submitLogin(onSubmit: jest.Mock) {
 }
 
 describe("LoginScreen", () => {
+  // Follow-up 227: «Emma Pilates Studio» everywhere; the tagline is gone (owner, 2026-11-02).
+  it("names Emma Pilates Studio without the tagline", async () => {
+    const screen = await render(<LoginScreen onSubmit={jest.fn()} />);
+
+    expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({ fontSize: 36 });
+    expect(screen.queryByText("Movimiento · Equilibrio · Bienestar")).toBeNull();
+  });
+
+  it("centres the brand and the form together, the team login too (v2 C01, S01)", async () => {
+    for (const teamAccess of [false, true]) {
+      const screen = await render(
+        <LoginScreen
+          onRegister={teamAccess ? undefined : jest.fn()}
+          onSubmit={jest.fn()}
+          teamAccess={teamAccess}
+        />,
+      );
+      const main = screen.getByTestId("login-main");
+      expect(main).toHaveStyle({
+        flexGrow: 1,
+        gap: teamAccess ? 24 : 32,
+        justifyContent: "center",
+      });
+      expect(main).toContainElement(screen.getByText("Emma Pilates Studio"));
+      expect(main).toContainElement(screen.getByTestId("login-submit"));
+      await screen.unmount();
+    }
+  });
+
   it("shows neutral feedback for rejected credentials", async () => {
     const screen = await submitLogin(jest.fn().mockResolvedValue({ status: "rejected" }));
 

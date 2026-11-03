@@ -58,14 +58,12 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
       ),
     );
 
-    await fireEvent.press(
-      await screen.findByRole("button", { name: `${started.time} Valeria Áñez` }),
-    );
-
+    expect(await screen.findByLabelText(`${started.time} Valeria Áñez`)).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).not.toBeOnTheScreen();
   });
 
-  it("lets the «Evaluación cancelada» strip fade after 8 seconds", async () => {
+  // Follow-up 225 §7: the toast never fades on its own; its × closes it.
+  it("keeps the «Evaluación cancelada» toast until its × closes it", async () => {
     const screen = await openApp(
       routeFetcher(
         routes({
@@ -79,15 +77,13 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
       ),
     );
 
-    await fireEvent.press(await screen.findByRole("button", { name: "09:45 Lucía Justiniano" }));
-    await fireEvent.press(screen.getByRole("button", { name: "Cancelar evaluación" }));
+    await fireEvent.press(await screen.findByTestId("cancel-evaluation-evaluation-1"));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));
     await fireEvent.press(sheet.getByRole("button", { name: "Sí, cancelar evaluación" }));
     expect(await screen.findByText("Evaluación cancelada")).toBeOnTheScreen();
 
-    await waitFor(() => expect(screen.queryByText("Evaluación cancelada")).not.toBeOnTheScreen(), {
-      timeout: 10_000,
-    });
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar aviso" }));
+    await waitFor(() => expect(screen.queryByText("Evaluación cancelada")).not.toBeOnTheScreen());
   });
 
   it("marks the field's current time in the S17 time sheet (follow-up 74)", async () => {

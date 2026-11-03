@@ -102,6 +102,6 @@ describe("The outcome badge (MOB-035)", () => {
 
     await screen.findByText(title);
     expectBadge(screen, tone, icon, title);
-    expect(screen.getByText("Emma")).toBeOnTheScreen();
+    expect(screen.getByText("Emma Pilates Studio")).toBeOnTheScreen();
   });
 });

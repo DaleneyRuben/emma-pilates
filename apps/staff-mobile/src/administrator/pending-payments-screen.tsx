@@ -1,46 +1,43 @@
-import { getListPendingPaymentsQueryKey, useListPendingPayments } from "@pilates/api-contracts";
 import {
-  AvatarCircle,
-  BodyText,
-  CardFooter,
-  Chevron,
-  colors,
-  DetailLine,
-  fontFamilies,
+  getListPendingPaymentsQueryKey,
+  useListPendingPayments,
+  useListRequestedFreezes,
+} from "@pilates/api-contracts";
+import {
+  BrandToast,
   formatBolivianos,
   formatNotificationTime,
+  IconRow,
+  IconRowGroup,
   LoadingState,
   QueryFailure,
-  radii,
   Screen,
+  SectionTitle,
   spacing,
-  surfaces,
-  TextButton,
-  typography,
+  StateScreen,
   usePullToRefresh,
   useRefetchOnFocus,
-  useTransientNotice,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { useStaffFetcher } from "../staff-fetcher";
-import { HeaderAction } from "../ui/header-action";
+import { PersonRow } from "../ui/person-row";
 import { RootHeader } from "../ui/root-header";
+import { SectionHeader } from "../ui/section-header";
 
 export type PaymentsNotice = "Pago confirmado" | "Pago rechazado";
 
 type PendingPaymentsNavigation = {
-  navigate: (
-    screen: "ReviewPayment" | "CancelClass" | "CashClose",
-    params?: { paymentId: string },
-  ) => void;
+  navigate: {
+    (screen: "ReviewPayment", params: { paymentId: string }): void;
+    (screen: "CancelClass" | "CashClose" | "Freezes"): void;
+    (screen: "ScheduleTab"): void;
+  };
   setParams: (params: { notice?: PaymentsNotice }) => void;
 };
-
-const noticeMilliseconds = 2_000;
-const impersonationNoticeMilliseconds = 4_000;
 
 export function PendingPaymentsScreen({
   route,
@@ -53,41 +50,62 @@ export function PendingPaymentsScreen({
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const freezes = useListRequestedFreezes({ fetcher });
+  const freezeCount = freezes.data?.status === 200 ? freezes.data.data.length : 0;
   const queryKeys = [getListPendingPaymentsQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
-  // Confirming or rejecting returns here with a two-second notice.
-  const paymentsNotice = useTransientNotice(route.params?.notice, noticeMilliseconds, () =>
-    navigation.setParams({ notice: undefined }),
-  );
+  // Confirming or rejecting returns here with a toast that stays until closed
+  // or the screen changes (follow-up 225 §7).
+  const clearPaymentsNotice = () => navigation.setParams({ notice: undefined });
+  const paymentsNotice = useStickyNotice(route.params?.notice, clearPaymentsNotice);
   // FUT-001: «Salir» or the expiry of an Impersonation lands here with its line.
   const impersonation = useImpersonation();
-  const impersonationNotice = useTransientNotice(
+  const impersonationNotice = useStickyNotice(
     impersonation.notice ?? undefined,
-    impersonationNoticeMilliseconds,
     impersonation.clearNotice,
   );
   const notice = paymentsNotice ?? impersonationNotice;
+  const toast =
+    notice === null ? null : (
+      <BrandToast
+        onClose={paymentsNotice !== null ? clearPaymentsNotice : impersonation.clearNotice}
+        title={notice}
+      />
+    );
 
   const header = (
-    <>
-      <RootHeader
-        action={
-          <HeaderAction
-            label="Cerrar caja"
-            onPress={() => navigation.navigate("CashClose")}
-            testID="cash-close-entry"
-          />
-        }
-        label="Pagos pendientes"
-        title="Pagos pendientes"
-      />
-      {notice === null ? null : (
-        <View accessibilityRole="alert" style={styles.notice}>
-          <Text style={styles.noticeText}>{notice}</Text>
-        </View>
-      )}
-    </>
+    <RootHeader bell eyebrow="Administración" label="Pagos pendientes" title="Pagos pendientes" />
+  );
+  // Owner, 2026-11-02: what used to sit in the header opens from Pagos.
+  const shortcuts = (
+    <View>
+      <SectionTitle>Accesos</SectionTitle>
+      <IconRowGroup>
+        <IconRow
+          chevron
+          icon="calendar"
+          label="Cancelar una clase"
+          onPress={() => navigation.navigate("CancelClass")}
+          testID="pending-payments-cancel-class"
+        />
+        <IconRow
+          chevron
+          icon="hourglass"
+          label="Congelamientos"
+          onPress={() => navigation.navigate("Freezes")}
+          testID="pending-payments-freezes"
+          value={freezeCount > 0 ? `${freezeCount} por revisar` : undefined}
+        />
+        <IconRow
+          chevron
+          icon="credit"
+          label="Cerrar caja"
+          onPress={() => navigation.navigate("CashClose")}
+          testID="cash-close-entry"
+        />
+      </IconRowGroup>
+    </View>
   );
 
   if (pending.isPending) {
@@ -95,6 +113,7 @@ export function PendingPaymentsScreen({
       <Screen style={styles.screen}>
         {header}
         <LoadingState label="Cargando pagos" />
+        {toast}
       </Screen>
     );
   }
@@ -106,6 +125,7 @@ export function PendingPaymentsScreen({
           label="No pudimos cargar los pagos pendientes."
           onRetry={() => void pending.refetch()}
         />
+        {toast}
       </Screen>
     );
   }
@@ -116,123 +136,48 @@ export function PendingPaymentsScreen({
 
   return (
     <Screen style={styles.screen}>
-      {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
+        {header}
         {payments.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>No hay pagos pendientes.</Text>
-            <BodyText style={styles.centered}>
-              Todo al día. Te avisaremos cuando llegue una transferencia nueva.
-            </BodyText>
-          </View>
+          <StateScreen
+            icon="check"
+            layout="inList"
+            note="No hay pagos por confirmar. Te avisamos cuando llegue una transferencia nueva."
+            textAction={{
+              label: "Ver el horario",
+              onPress: () => navigation.navigate("ScheduleTab"),
+            }}
+            title="Todo al día"
+          />
         ) : (
-          <>
-            <View style={styles.summary}>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Por confirmar</Text>
-                <View style={styles.countBadge}>
-                  <Text style={styles.countText}>{String(payments.length)}</Text>
-                </View>
-              </View>
-              <BodyText>{`${formatBolivianos(total)} en total`}</BodyText>
-            </View>
-            {payments.map((payment) => (
-              <Pressable
-                accessibilityLabel={`Revisar pago de ${payment.clientName}`}
-                accessibilityRole="button"
-                key={payment.id}
-                onPress={() => navigation.navigate("ReviewPayment", { paymentId: payment.id })}
-                style={styles.card}
-                testID={`pending-payment-${payment.id}`}
-              >
-                <View style={styles.cardHeader}>
-                  <View style={styles.identity}>
-                    <AvatarCircle fontSize={17} name={payment.clientName} size={44} />
-                    <View style={styles.cardBody}>
-                      <Text style={styles.name}>{payment.clientName}</Text>
-                      <Text style={styles.plan}>{payment.planName}</Text>
-                    </View>
-                  </View>
-                  <Chevron />
-                </View>
-                <CardFooter paddingTop={13}>
-                  <Text style={styles.amount}>{formatBolivianos(payment.amountDueCentavos)}</Text>
-                  <DetailLine
-                    icon="clock"
-                    iconColor={colors.warning}
-                    iconSize={15}
-                    style={styles.ago}
-                  >
-                    {formatNotificationTime(payment.submittedAt, now)}
-                  </DetailLine>
-                </CardFooter>
-              </Pressable>
-            ))}
-          </>
+          <View>
+            <SectionHeader
+              meta={`${formatBolivianos(total)} en total`}
+              title={`Por confirmar · ${payments.length}`}
+            />
+            <IconRowGroup>
+              {payments.map((payment) => (
+                <PersonRow
+                  accessibilityLabel={`Revisar pago de ${payment.clientName}`}
+                  amount={formatBolivianos(payment.amountDueCentavos)}
+                  detail={`${payment.planName} · ${formatNotificationTime(payment.submittedAt, now).toLowerCase()}`}
+                  key={payment.id}
+                  name={payment.clientName}
+                  onPress={() => navigation.navigate("ReviewPayment", { paymentId: payment.id })}
+                  testID={`pending-payment-${payment.id}`}
+                />
+              ))}
+            </IconRowGroup>
+          </View>
         )}
-        <TextButton
-          label="Cancelar una clase"
-          onPress={() => navigation.navigate("CancelClass")}
-          testID="pending-payments-cancel-class"
-        />
+        {shortcuts}
       </ScrollView>
+      {toast}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  ago: { color: colors.textMuted, fontSize: typography.note },
-  amount: {
-    color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleCard,
-    fontVariant: ["tabular-nums"],
-  },
-  // S11's payment card (MOB-042): the avatar and the Lora name beside the
-  // chevron, then the amount and the amber clock under a rule.
-  card: { ...surfaces.card, gap: spacing.mdLg, padding: spacing.lgXl },
-  cardBody: { flexShrink: 1, gap: spacing.xs },
-  cardHeader: {
-    alignItems: "flex-start",
-    flexDirection: "row",
-    gap: spacing.md,
-    justifyContent: "space-between",
-  },
-  identity: { alignItems: "center", flexDirection: "row", flexShrink: 1, gap: 13 },
-  name: { color: colors.text, fontFamily: fontFamilies.heading, fontSize: typography.titleSmall },
-  plan: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  centered: { textAlign: "center" },
-  content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  countBadge: {
-    alignItems: "center",
-    backgroundColor: colors.primary,
-    borderRadius: radii.pill,
-    justifyContent: "center",
-    minWidth: 24,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
-  },
-  countText: { color: colors.white, fontSize: typography.note, fontWeight: "600" },
-  empty: { alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xxxl },
-  emptyTitle: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  notice: {
-    alignItems: "center",
-    backgroundColor: colors.success,
-    borderRadius: radii.control,
-    paddingVertical: spacing.smLg,
-  },
-  noticeText: { color: colors.white, fontSize: typography.body, fontWeight: "500" },
-  screen: { gap: spacing.md },
-  summary: { gap: spacing.xxs, paddingVertical: spacing.sm },
-  summaryLabel: {
-    color: colors.text,
-    fontSize: typography.titleSecondary,
-    fontFamily: "Lora_500Medium",
-  },
-  summaryRow: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
+  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

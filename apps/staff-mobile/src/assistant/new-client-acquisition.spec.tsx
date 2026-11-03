@@ -19,7 +19,7 @@ const overviewRoutes = {
 };
 
 async function openForm(screen: Awaited<ReturnType<typeof openClientSearch>>) {
-  await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+  await fireEvent.press(screen.getByTestId("client-search-new-client"));
   await waitFor(() => {
     expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
   });
@@ -50,7 +50,10 @@ describe("Assistant new Client acquisition (S05)", () => {
 
     await openForm(screen);
     await fireEvent.press(screen.getByRole("radio", { name: "Una instructora" }));
-    await fireEvent.changeText(screen.getByLabelText("Código de referido (opcional)"), " carla ");
+    await fireEvent.changeText(
+      screen.getByLabelText("Código de la instructora (opcional)"),
+      " carla ",
+    );
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
     await waitFor(() => {
@@ -63,6 +66,34 @@ describe("Assistant new Client acquisition (S05)", () => {
       acquisitionChannel: "trainer",
       referralCode: "carla",
     });
+  });
+
+  // v2 S05 (walkthrough 20): the code only for a trainer or a friend.
+  it("asks for a code only when a trainer or a friend sent her, and drops it otherwise", async () => {
+    const invited = jest.fn();
+    const screen = await openClientSearch({
+      ...assistantRoutes(),
+      ...overviewRoutes,
+      "POST /api/v1/assistant/client-invitations": (init) => {
+        invited(JSON.parse(String(init?.body)));
+        return jsonResponse(
+          { status: "invited", clientId: "client-new", email: "ana@example.com" },
+          201,
+        );
+      },
+    });
+
+    await openForm(screen);
+    expect(screen.getByText("¿Cómo nos conoció?")).toBeOnTheScreen();
+    expect(screen.queryByLabelText(/^Código de/)).toBeNull();
+    await fireEvent.press(screen.getByRole("radio", { name: "Una instructora" }));
+    await fireEvent.changeText(screen.getByLabelText("Código de la instructora (opcional)"), "X");
+    await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
+    expect(screen.queryByLabelText(/^Código de/)).toBeNull();
+    await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+
+    await waitFor(() => expect(invited).toHaveBeenCalled());
+    expect(invited.mock.calls[0]?.[0]).not.toHaveProperty("referralCode");
   });
 
   it("asks how she found the studio before creating anything", async () => {
@@ -95,8 +126,8 @@ describe("Assistant new Client acquisition (S05)", () => {
     });
 
     await openForm(screen);
-    await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
-    await fireEvent.changeText(screen.getByLabelText("Código de referido (opcional)"), "NADIE");
+    await fireEvent.press(screen.getByRole("radio", { name: "Recomendación de una amiga" }));
+    await fireEvent.changeText(screen.getByLabelText("Código de la amiga (opcional)"), "NADIE");
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
     expect(

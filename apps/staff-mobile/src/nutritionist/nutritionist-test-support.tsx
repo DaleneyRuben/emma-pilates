@@ -72,7 +72,7 @@ export async function openApp(fetcher: typeof globalThis.fetch) {
   const screen = await render(<App runtime={createStaffRuntime(fetcher, "nutritionist")} />);
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: "Mi disponibilidad" })).toBeOnTheScreen();
+      expect(screen.getByTestId("tab-availability")).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
@@ -81,7 +81,7 @@ export async function openApp(fetcher: typeof globalThis.fetch) {
 
 export async function openAvailability(fetcher: typeof globalThis.fetch) {
   const screen = await openApp(fetcher);
-  await fireEvent.press(screen.getByRole("button", { name: "Mi disponibilidad" }));
+  await fireEvent.press(screen.getByTestId("tab-availability"));
   await waitFor(() => {
     expect(screen.getAllByRole("button", { name: "Nuevo horario" })[0]).toBeOnTheScreen();
   });

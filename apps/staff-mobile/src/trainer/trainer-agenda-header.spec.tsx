@@ -31,8 +31,8 @@ const renderTrainer = () =>
     />,
   );
 
-// UX-007: S02 draws «Entrenadora» over the greeting and names each chip
-// «Mié 21», so Saturday and Sunday are not bare numbers.
+// v2 S02 (owner, 2026-11-02): the agenda opens on today, shows no past
+// days because attendance is never corrected, and keeps a «Hoy» button.
 describe("Trainer agenda header", () => {
   beforeEach(() => {
     jest.useFakeTimers({ doNotFake: ["nextTick", "queueMicrotask", "setImmediate"] });
@@ -45,43 +45,44 @@ describe("Trainer agenda header", () => {
     clearMobileQueryCache();
   });
 
-  it("puts the Entrenadora eyebrow over the greeting", async () => {
+  it("puts the role and today's date over the greeting", async () => {
     const screen = await renderTrainer();
 
     await waitFor(() => {
       expect(screen.getByLabelText("Mi agenda")).toHaveTextContent("Hola, Emma");
     });
-    expect(screen.getByText("Entrenadora")).toBeOnTheScreen();
+    expect(screen.getByText("Entrenadora · Miércoles 21 de octubre")).toBeOnTheScreen();
   });
 
-  it("names each day chip with its weekday and day number", async () => {
+  it("starts the week strip today and never shows a past day", async () => {
     const screen = await renderTrainer();
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Mié 21")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Hoy 21")).toBeOnTheScreen();
     });
-    expect(screen.getByLabelText("Lun 19")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Hoy 21")).toHaveProp("accessibilityState", { selected: true });
     expect(screen.getByLabelText("Sáb 24")).toBeOnTheScreen();
-    expect(screen.getByLabelText("Dom 25")).toBeOnTheScreen();
-    expect(screen.queryByLabelText("2026-10-21")).toBeNull();
+    expect(screen.getByLabelText("Mar 27")).toBeOnTheScreen();
+    expect(screen.queryByLabelText("Lun 19")).toBeNull();
+    expect(screen.queryByLabelText("Mar 20")).toBeNull();
+  });
+
+  it("offers today again from an empty day and from the «Hoy» button", async () => {
+    const screen = await renderTrainer();
+    await waitFor(() => expect(screen.getByLabelText("Sáb 24")).toBeOnTheScreen());
 
     await fireEvent.press(screen.getByLabelText("Sáb 24"));
-    expect(screen.getByLabelText("Sáb 24")).toHaveProp("accessibilityState", { selected: true });
-    expect(screen.queryByLabelText("2026-10-24")).toBeNull();
-    expect(screen.queryByLabelText("2026-10-25")).toBeNull();
-  });
-
-  // UX-015: the day number sits under the weekday. A fixed line box clips it
-  // on Android, so neither line fixes its height.
-  it("lets the day number grow under the weekday", async () => {
-    const screen = await renderTrainer();
-
     await waitFor(() => {
-      expect(screen.getByText("21")).toBeOnTheScreen();
+      expect(screen.getByText("El sábado 24 no tienes clases")).toBeOnTheScreen();
     });
-    expect(screen.getByText("21")).not.toHaveStyle({ lineHeight: 18 });
-    expect(screen.getByText("Mié").parent).not.toHaveStyle({
-      paddingVertical: 12,
-    });
+    expect(
+      screen.getByText("Elige otro día de la semana o vuelve a tus clases de hoy."),
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Ver mis clases de hoy" }));
+    expect(screen.getByLabelText("Hoy 21")).toHaveProp("accessibilityState", { selected: true });
+
+    await fireEvent.press(screen.getByLabelText("Sáb 24"));
+    await fireEvent.press(screen.getByRole("button", { name: "Hoy" }));
+    expect(screen.getByLabelText("Hoy 21")).toHaveProp("accessibilityState", { selected: true });
   });
 });

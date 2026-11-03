@@ -5,48 +5,32 @@ import {
 import {
   BodyText,
   colors,
+  formatBolivianos,
   LoadingState,
+  OutlinedButton,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
+  SectionTitle,
   spacing,
-  surfaces,
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
+  useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { FreezeRequest } from "./freeze-request";
-import {
-  describeAllowance,
-  formatCivilDate,
-  formatCivilDateWithYear,
-  subscriptionBadge,
-} from "../home/home-format";
+import { formatCivilDate, formatCivilDateWithYear } from "../home/home-format";
+import { DetailRows, SubscriptionHero } from "./subscription-parts";
 
 type SubscriptionNavigation = {
   goBack: () => void;
-  navigate: (screen: "Plans") => void;
+  navigate: (screen: "Booking" | "Plans", params?: { screen: "Browse" }) => void;
 };
-
-const badgeColors = {
-  active: { background: "rgba(124,148,115,0.14)", text: colors.successText },
-  expiring_soon: {
-    background: "rgba(201,154,78,0.16)",
-    text: colors.warningText,
-  },
-  expired: { background: "rgba(178,93,75,0.14)", text: colors.errorText },
-} as const;
-
-function allowanceMessage(remaining: number, expired: boolean): string {
-  if (expired || remaining === 0) return "Sin clases disponibles";
-  return remaining === 1 ? "Te queda 1 clase por usar" : `Te quedan ${remaining} clases por usar`;
-}
 
 export function SubscriptionScreen() {
   const navigation = useNavigation<SubscriptionNavigation>();
@@ -58,6 +42,7 @@ export function SubscriptionScreen() {
   const queryKeys = [getGetCurrentClientSubscriptionQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
+  const studioRules = useStudioRules(fetcher);
 
   const header = (
     <>
@@ -103,95 +88,33 @@ export function SubscriptionScreen() {
   }
 
   const expired = status === "expired";
-  const badge = badgeColors[status];
-  const progress = expired
-    ? 0
-    : subscription.remainingClassAllowance / subscription.originalClassAllowance;
+  const renewalStartsOn = view.data.data.renewalStartsOn ?? dayAfter(subscription.endsOn);
+  const details: [string, string][] = [
+    ["Empezó", formatCivilDate(subscription.startsOn)],
+    [expired ? "Venció" : "Vence", formatCivilDate(subscription.endsOn)],
+  ];
+  if (nextSubscription)
+    details.push(["Siguiente plan", formatCivilDate(nextSubscription.startsOn)]);
 
   return (
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         {founderRenewalDeadline == null ? null : (
-          <View style={styles.founderBanner}>
-            <Text style={styles.founderBannerText}>
-              {`Renueva antes del ${formatCivilDateWithYear(founderRenewalDeadline)}.`}
-            </Text>
-          </View>
+          <Notice>{`Renueva antes del ${formatCivilDateWithYear(founderRenewalDeadline)}.`}</Notice>
         )}
         {status === "expiring_soon" ? (
-          <View style={styles.warning}>
-            <Text style={styles.warningText}>
-              {`Tu plan vence el ${formatCivilDate(subscription.endsOn)}.`}
-            </Text>
-            <BodyText style={styles.warningNote}>
-              Renueva cuando quieras y elige tu fecha de inicio.
-            </BodyText>
-          </View>
+          <Notice note="Renueva cuando quieras y elige tu fecha de inicio.">
+            {`Tu plan vence el ${formatCivilDate(subscription.endsOn)}.`}
+          </Notice>
         ) : null}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <BodyText style={styles.cardLabel}>
-              {expired ? "Último plan" : "Suscripción actual"}
-            </BodyText>
-            <View style={[styles.badge, { backgroundColor: badge.background }]}>
-              <Text style={[styles.badgeText, { color: badge.text }]}>
-                {subscriptionBadge(status)}
-              </Text>
-            </View>
-          </View>
-          <Text style={styles.planName}>{subscription.planName}</Text>
-          <View
-            accessibilityRole="progressbar"
-            accessibilityValue={{
-              max: subscription.originalClassAllowance,
-              min: 0,
-              now: expired ? 0 : subscription.remainingClassAllowance,
-            }}
-            style={styles.progressTrack}
-          >
-            <View
-              style={[styles.progressFill, { flex: progress }, expired && styles.progressExpired]}
-            />
-            <View style={{ flex: 1 - progress }} />
-          </View>
-          <BodyText>
-            {describeAllowance(
-              expired ? 0 : subscription.remainingClassAllowance,
-              subscription.originalClassAllowance,
-            )}
-          </BodyText>
-          <BodyText>{allowanceMessage(subscription.remainingClassAllowance, expired)}</BodyText>
-          {subscription.extraClassesLine ? (
-            <BodyText>{subscription.extraClassesLine}</BodyText>
-          ) : null}
-        </View>
-        <View style={styles.dates}>
-          <View style={styles.dateRow}>
-            <BodyText style={styles.dateLabel}>Inicio</BodyText>
-            <Text style={styles.dateValue}>{formatCivilDateWithYear(subscription.startsOn)}</Text>
-          </View>
-          <View style={styles.dateRow}>
-            <BodyText style={styles.dateLabel}>{expired ? "Venció el" : "Vence el"}</BodyText>
-            <Text style={[styles.dateValue, expired && styles.expiredDate]}>
-              {formatCivilDateWithYear(subscription.endsOn)}
-            </Text>
-          </View>
-          {nextSubscription ? (
-            <View style={styles.dateRow}>
-              <BodyText style={styles.dateLabel}>Siguiente plan</BodyText>
-              <Text style={styles.dateValue}>
-                {`Siguiente plan desde ${formatCivilDateWithYear(nextSubscription.startsOn)}`}
-              </Text>
-            </View>
-          ) : null}
-        </View>
+        <SubscriptionHero status={status} subscription={subscription} />
+        <DetailRows rows={details} title="Detalles" />
+        {subscription.extraClassesLine ? (
+          <BodyText style={styles.note}>{subscription.extraClassesLine}</BodyText>
+        ) : null}
         {freeze?.state === "approved" ? (
-          <View style={styles.founderBanner}>
-            <Text style={styles.founderBannerText}>
-              {`Tu plan está congelado hasta el ${formatCivilDateWithYear(freeze.endsOn)}.`}
-            </Text>
-          </View>
+          <Notice>{`Tu plan está congelado hasta el ${formatCivilDateWithYear(freeze.endsOn)}.`}</Notice>
         ) : null}
         {freeze?.state === "requested" ? (
           <BodyText>Tu solicitud de congelamiento está en revisión.</BodyText>
@@ -200,82 +123,69 @@ export function SubscriptionScreen() {
           <FreezeRequest onRequested={() => void view.refetch()} subscriptionId={subscription.id} />
         ) : null}
         {expired ? (
-          <View style={styles.purchase}>
+          <View style={styles.section}>
+            <SectionTitle>Elige tu próximo plan</SectionTitle>
+            <BodyText style={styles.note}>
+              {purchaseNote(studioRules?.plansFromPriceCentavos)}
+            </BodyText>
             <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
-            <BodyText style={styles.note}>Elige el paquete que mejor te acomode.</BodyText>
           </View>
-        ) : (
-          <View style={styles.purchase}>
-            <PrimaryButton label="Renovar plan" onPress={() => navigation.navigate("Plans")} />
+        ) : nextSubscription ? null : (
+          <View style={styles.section}>
+            <SectionTitle>Renovación anticipada</SectionTitle>
+            <OutlinedButton label="Renovar mi plan" onPress={() => navigation.navigate("Plans")} />
+            <BodyText style={styles.note}>
+              {`El nuevo empieza el ${formatCivilDate(renewalStartsOn)}, al día siguiente de que venza este`}
+            </BodyText>
           </View>
         )}
       </ScrollView>
+      {expired ? null : (
+        <View style={styles.footer}>
+          <PrimaryButton
+            label="Reservar una clase"
+            onPress={() => navigation.navigate("Booking", { screen: "Browse" })}
+          />
+        </View>
+      )}
     </Screen>
   );
 }
 
+function dayAfter(civilDate: string): string {
+  const date = new Date(`${civilDate}T12:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + 1);
+  return date.toISOString().slice(0, 10);
+}
+
+function purchaseNote(fromCentavos: number | null | undefined): string {
+  const pay = "Puedes pagar en el estudio o desde la app.";
+  return fromCentavos === null || fromCentavos === undefined
+    ? pay
+    : `Paquetes desde ${formatBolivianos(fromCentavos)}. ${pay}`;
+}
+
+function Notice({ children, note }: { children: string; note?: string }) {
+  return (
+    <View style={styles.notice}>
+      <Text style={styles.noticeText}>{children}</Text>
+      {note === undefined ? null : <BodyText style={styles.noticeNote}>{note}</BodyText>}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  badge: {
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
-  badgeText: { fontSize: typography.label, fontWeight: "600" },
-  card: {
-    ...surfaces.card,
-    gap: spacing.sm,
-    padding: spacing.lg,
-  },
-  cardHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  cardLabel: { color: colors.textMuted, fontSize: typography.label },
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  dateLabel: { color: colors.textMuted },
-  dateRow: { flexDirection: "row", gap: spacing.md, justifyContent: "space-between" },
-  dateValue: {
-    color: colors.text,
-    flexShrink: 1,
-    fontSize: typography.body,
-    textAlign: "right",
-  },
-  founderBanner: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    padding: spacing.md,
-  },
-  founderBannerText: { color: colors.successText, fontSize: typography.note, fontWeight: "600" },
-  expiredDate: { color: colors.errorText },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
-  purchase: { gap: spacing.sm },
-  warningNote: { color: colors.warningText, fontSize: typography.note },
-  dates: {
-    ...surfaces.flatCard,
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  planName: {
-    color: colors.text,
-    fontSize: typography.titleSecondary,
-    fontWeight: "500",
-  },
-  progressExpired: { backgroundColor: colors.disabledBackground },
-  progressFill: { backgroundColor: colors.primary, borderRadius: radii.pill },
-  progressTrack: {
+  content: { gap: spacing.xl, paddingBottom: spacing.lg },
+  footer: { paddingBottom: spacing.sm, paddingTop: spacing.sm },
+  note: { color: colors.textMuted, fontSize: typography.note },
+  notice: {
     backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    flexDirection: "row",
-    height: 8,
-    overflow: "hidden",
-  },
-  screen: { gap: spacing.lg },
-  warning: {
-    backgroundColor: "rgba(201,154,78,0.16)",
-    borderRadius: radii.inset,
-    gap: spacing.xs,
+    borderRadius: 14,
+    gap: spacing.xxs,
     padding: spacing.lg,
   },
-  warningText: { color: colors.warningText, fontSize: typography.body },
+  noticeNote: { color: colors.primaryOnTint, fontSize: typography.note },
+  noticeText: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "600" },
+  screen: { gap: spacing.lg },
+  section: { gap: spacing.sm },
 });

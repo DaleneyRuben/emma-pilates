@@ -1,40 +1,37 @@
 import { useListBranches, useListStaffMembers, type StaffMemberDto } from "@pilates/api-contracts";
 import {
-  BodyText,
-  Chevron,
-  colors,
   ConfirmationSheet,
   EmptyState,
-  initials,
+  fontFamilies,
+  colors,
+  IconRow,
+  IconRowGroup,
   LoadingState,
+  NoticeRow,
   QueryFailure,
-  radii,
   Screen,
-  ScreenTopBar,
+  SectionTitle,
   spacing,
-  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { roleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
+import { BackBar, backBarScroll } from "../ui/back-bar";
+import { PersonRow } from "../ui/person-row";
 import { createImpersonationApi } from "./impersonation-api";
 import { useImpersonation } from "./impersonation-context";
 
 type ImpersonableRole = "trainer" | "assistant" | "nutritionist" | "coordinator";
-const groups: { role: ImpersonableRole; label: string }[] = [
-  { role: "trainer", label: "Entrenadoras" },
-  { role: "assistant", label: "Asistentes" },
-  { role: "nutritionist", label: "Nutricionistas" },
-  { role: "coordinator", label: "Coordinación" },
-];
+const roleOrder: ImpersonableRole[] = ["trainer", "assistant", "nutritionist", "coordinator"];
 const isImpersonable = (
   member: StaffMemberDto,
 ): member is StaffMemberDto & { role: ImpersonableRole } => member.role !== "administrator";
 
-// S24 (FUT-001): the active Trainers, Assistants, and Nutritionists by Role.
+// S24 (FUT-001, v2): the active team, never another Administrator.
 export function ViewAsScreen() {
   const navigation = useNavigation<{ goBack: () => void }>();
   const fetcher = useStaffFetcher();
@@ -55,7 +52,12 @@ export function ViewAsScreen() {
     ]),
   );
   const header = (
-    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Ver la app como…" />
+    <BackBar
+      back="Perfil"
+      onBack={() => navigation.goBack()}
+      subtitle="Verás sus clases y su agenda durante 30 minutos. Sales cuando quieras desde la franja de arriba."
+      title="Ver la app como…"
+    />
   );
 
   if (members.isPending) {
@@ -78,7 +80,9 @@ export function ViewAsScreen() {
     );
   }
 
-  const people = members.data.data.items.filter(isImpersonable);
+  const people = members.data.data.items
+    .filter(isImpersonable)
+    .sort((a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role));
   const firstName = confirming === null ? "" : (confirming.name.split(" ")[0] ?? confirming.name);
   const start = async () => {
     if (confirming === null) return;
@@ -95,18 +99,25 @@ export function ViewAsScreen() {
     }
   };
 
+  const branchesOf = (member: StaffMemberDto) =>
+    member.branchIds.length === 0
+      ? "Todas las sucursales"
+      : member.branchIds
+          .map((id) => branchNames.get(id) ?? "")
+          .filter(Boolean)
+          .join(", ");
+
   return (
     <Screen style={styles.screen}>
-      {header}
-      <ScrollView contentContainerStyle={styles.content}>
-        <BodyText style={styles.intro}>
-          Verás la app tal como la ve esa persona, con sus clases y sus sucursales, durante 30
-          minutos. Puedes salir cuando quieras desde la franja de arriba.
-        </BodyText>
+      <ScrollView
+        contentContainerStyle={[styles.content, backBarScroll.content]}
+        style={backBarScroll.scroll}
+      >
+        {header}
         {failure === null ? null : (
-          <BodyText accessibilityRole="alert" style={styles.failure}>
-            {failure}
-          </BodyText>
+          <View accessibilityLabel={failure} accessibilityRole="alert">
+            <NoticeRow message={failure} />
+          </View>
         )}
         {people.length === 0 ? (
           <EmptyState
@@ -114,44 +125,24 @@ export function ViewAsScreen() {
             title="Nadie a quien ver todavía"
             variant="plain"
           />
-        ) : null}
-        {groups.map(({ role, label }) => {
-          const rows = people.filter((member) => member.role === role);
-          if (rows.length === 0) return null;
-          return (
-            <View key={role} style={styles.group}>
-              <Text style={styles.eyebrow}>{label}</Text>
-              <View style={styles.card}>
-                {rows.map((member, index) => (
-                  <Pressable
-                    accessibilityLabel={member.name}
-                    accessibilityRole="button"
-                    key={member.id}
-                    onPress={() => setConfirming(member)}
-                    style={[styles.row, index < rows.length - 1 && styles.rowRule]}
-                    testID={`view-as-${member.id}`}
-                  >
-                    <View style={styles.avatar}>
-                      <Text style={styles.avatarText}>{initials(member.name)}</Text>
-                    </View>
-                    <View style={styles.rowBody}>
-                      <Text style={styles.name}>{member.name}</Text>
-                      <Text numberOfLines={1} style={styles.branches}>
-                        {member.branchIds.length === 0
-                          ? "Todas las sucursales"
-                          : member.branchIds
-                              .map((id) => branchNames.get(id) ?? "")
-                              .filter(Boolean)
-                              .join(", ")}
-                      </Text>
-                    </View>
-                    <Chevron />
-                  </Pressable>
-                ))}
-              </View>
-            </View>
-          );
-        })}
+        ) : (
+          <View>
+            <SectionTitle>El equipo</SectionTitle>
+            <IconRowGroup>
+              {people.map((member) => (
+                <PersonRow
+                  accessibilityLabel={member.name}
+                  detail={`${roleLabel(member.role)} · ${branchesOf(member)}`}
+                  key={member.id}
+                  name={member.name}
+                  onPress={() => setConfirming(member)}
+                  testID={`view-as-${member.id}`}
+                />
+              ))}
+            </IconRowGroup>
+            <Text style={styles.footnote}>Nunca aparece otra persona de administración.</Text>
+          </View>
+        )}
       </ScrollView>
       {/* S24's sheet (UX-002): the solid action, since starting is not destructive. */}
       <ConfirmationSheet
@@ -159,57 +150,39 @@ export function ViewAsScreen() {
         confirmLabel={`Ver como ${firstName}`}
         confirmTestID="view-as-confirm"
         dismissLabel="Cancelar"
-        note="Durante 30 minutos verás sus clases y sus sucursales y podrás actuar como ella. Todo lo que hagas quedará registrado a tu nombre."
+        note="Sales cuando quieras desde la franja de arriba."
         onConfirm={() => void start()}
         onDismiss={() => setConfirming(null)}
         testID="view-as-sheet"
         title={`¿Ver la app como ${confirming?.name ?? ""}?`}
         tone="primary"
         visible={confirming !== null}
-      />
+      >
+        <IconRowGroup>
+          <IconRow icon="clock" label="Durante 30 minutos verás sus clases" />
+          <IconRow icon="person" label="Lo que hagas queda registrado a tu nombre" />
+        </IconRowGroup>
+      </ConfirmationSheet>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  avatar: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 40,
-    justifyContent: "center",
-    width: 40,
-  },
-  avatarText: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "500" },
-  branches: { color: colors.textMuted, fontSize: typography.note },
-  card: { ...surfaces.flatCard, overflow: "hidden" },
   // S24: a 560 pt column on the tablet, the full width on a phone.
   content: {
     alignSelf: "center",
     gap: spacing.xl,
-    maxWidth: 560,
+    // 560 pt of text inside the scroller's own padding.
+    maxWidth: 600,
     paddingBottom: spacing.xxl,
     width: "100%",
   },
-  eyebrow: {
+  footnote: {
     color: colors.textMuted,
-    fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    marginTop: spacing.md,
+    textAlign: "center",
   },
-  failure: { color: colors.errorText },
-  group: { gap: spacing.sm },
-  intro: { color: colors.textMuted, fontSize: typography.note },
-  name: { color: colors.text, fontSize: typography.body },
-  row: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    minHeight: 64,
-    paddingHorizontal: spacing.lg,
-  },
-  rowBody: { flex: 1, gap: 3 },
-  rowRule: { borderBottomColor: colors.border, borderBottomWidth: 1 },
-  screen: { gap: spacing.md },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

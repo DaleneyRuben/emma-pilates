@@ -126,39 +126,33 @@ describe("Client Profile", () => {
     expect(screen.queryByText("No pudimos cargar tu perfil.")).not.toBeOnTheScreen();
   });
 
-  it("draws 18's line icon on every Perfil row (follow-up 70)", async () => {
+  // Follow-up 227 (C18): the rows are v2 icon rows in three sections, and
+  // «Cerrar sesión» is the last row of «Cuenta» (walkthrough n.º 19).
+  it("groups the rows under Tu plan y tus clases, Preferencias and Cuenta", async () => {
     const screen = await openProfile();
 
-    for (const row of [
-      "plan",
-      "evaluation",
-      "evaluations",
-      "referrals",
-      "notifications",
-      "password",
-      "feedback",
-    ]) {
-      expect(
-        screen.getByTestId(`profile-row-icon-${row}`, { includeHiddenElements: true }),
-      ).toBeOnTheScreen();
+    for (const title of ["Tu plan y tus clases", "Preferencias", "Cuenta"]) {
+      expect(screen.getByRole("header", { name: title })).toBeOnTheScreen();
     }
+    for (const row of [
+      "Evaluación nutricional",
+      "Mis evaluaciones",
+      "Invita a una amiga",
+      "Notificaciones",
+      "Cambiar contraseña",
+      "Enviar comentarios",
+      "Cerrar sesión",
+    ]) {
+      expect(screen.getByRole("button", { name: row })).toBeOnTheScreen();
+    }
+    expect(screen.getAllByTestId("icon-row-disc").length).toBeGreaterThanOrEqual(8);
+    expect(
+      screen.getByText("Usamos tu nombre, correo y teléfono para enviarte ofertas del estudio."),
+    ).toBeOnTheScreen();
+    // «Cerrar mi cuenta» stays discreet: a text button in Error, then the version.
+    expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toBeOnTheScreen();
     // PAY-005 retired Credit: Perfil has no «Mi crédito» row.
     expect(screen.queryByRole("button", { name: /Mi crédito/ })).toBeNull();
-  });
-
-  // MOB-041: 18 ends every menu row in the 19 pt Icono tenue chevron.
-  it("ends every Perfil row in the quiet chevron", async () => {
-    const screen = await openProfile();
-
-    // The Inicio tab is mounted too, so count the quiet ones only.
-    const chevrons = screen
-      .getAllByTestId("chevron", { includeHiddenElements: true })
-      .filter((chevron) => chevron.props.stroke === "#C4BAB6");
-    expect(chevrons).toHaveLength(7);
-    for (const chevron of chevrons) {
-      expect(chevron).toHaveProp("width", 19);
-    }
-    expect(screen.queryByText("›")).toBeNull();
   });
 
   it("shows the account summary and the Plan status row", async () => {
@@ -166,20 +160,20 @@ describe("Client Profile", () => {
 
     expect(screen.getByText("sofia@example.com")).toBeOnTheScreen();
     expect(screen.getByText("+591 70011004")).toBeOnTheScreen();
-    expect(screen.getByText("Vencida")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Mi plan: Vencida" })).toBeOnTheScreen();
+    expect(screen.getByText("Vencido")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Mi plan, Vencido" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeOnTheScreen();
   });
 
   it("opens the expired Plan detail with a purchase action", async () => {
     const screen = await openProfile();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Mi plan: Vencida" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Mi plan, Vencido" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Último plan")).toBeOnTheScreen();
+      expect(screen.getByText(/^Último plan · /)).toBeOnTheScreen();
     });
-    expect(screen.getByText("Vencida")).toBeOnTheScreen();
+    expect(screen.getByText("Vencido")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
   });
 
@@ -209,20 +203,16 @@ describe("Client Profile", () => {
       createClientRuntime(routeFetcher({ ...readRoutes, ...notificationRoutes })),
     );
 
-    // The row and the Perfil tab both carry the count (follow-up 73).
+    // C18: the row says the count as its value; the pill is on the Inicio bell.
     await waitFor(() => {
-      expect(
-        screen.getByTestId("notifications-row-badge", {
-          includeHiddenElements: true,
-        }),
-      ).toHaveTextContent("2");
+      expect(screen.getByText("2 sin leer")).toBeOnTheScreen();
     });
     // MOB-070: the footer reads the installed app version, not a hard-coded 1.0.
     expect(screen.getByText("Emma Pilates Studio · versión 1.0.1")).toBeOnTheScreen();
 
     await fireEvent.press(
       screen.getByRole("button", {
-        name: "Notificaciones, 2 notificaciones sin leer",
+        name: "Notificaciones, 2 sin leer",
       }),
     );
 

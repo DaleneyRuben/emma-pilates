@@ -6,42 +6,43 @@ import {
   type NutritionistAgendaEntryDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
-  Chevron,
+  BrandToast,
+  CardActionRow,
+  cardWithActionRow,
   colors,
   ConfirmationSheet,
   fontFamilies,
+  IconRow,
+  IconRowGroup,
   LoadingState,
+  NoticeRow,
   QueryFailure,
-  radii,
   Screen,
   spacing,
+  StateScreen,
   surfaces,
-  typography,
   usePullToRefresh,
   useRefetchOnFocus,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { HeaderAction } from "../ui/header-action";
 import { RootHeader } from "../ui/root-header";
+import { SectionHeader } from "../ui/section-header";
+import { dayHeading } from "../ui/session-time";
 import {
   agendaDayLabel,
   boliviaToday,
   civilDateOf,
-  civilDateLong,
   clockTime,
   countLabel,
 } from "./nutritionist-format";
 
-type AgendaNavigation = { navigate: (screen: "Availability") => void };
-
 const agendaPageSize = 50;
-const noticeVisibleMs = 8_000;
 
 const kindLabel: Record<NutritionistAgendaEntryDto["kind"], string> = {
   first: "Primera evaluación",
@@ -58,7 +59,7 @@ const groupByDay = (entries: NutritionistAgendaEntryDto[]) =>
   }, []);
 
 export function NutritionistAgendaScreen() {
-  const navigation = useNavigation<AgendaNavigation>();
+  const navigation = useNavigation<{ navigate: (tab: "AvailabilityTab") => void }>();
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const profile = useGetCurrentStaffMemberProfile({ fetcher });
@@ -69,29 +70,19 @@ export function NutritionistAgendaScreen() {
   const queryKeys = [getListNutritionistAgendaQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState<NutritionistAgendaEntryDto | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [cancelledNotice, setNotice] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
-
-  // The «Evaluación cancelada» strip fades like 15's confirmation.
-  useEffect(() => {
-    if (notice === null) return undefined;
-    const timer = setTimeout(() => setNotice(null), noticeVisibleMs);
-    return () => clearTimeout(timer);
-  }, [notice]);
+  // The «Evaluación cancelada» toast stays until closed or the screen changes.
+  const clearNotice = () => setNotice(null);
+  const notice = useStickyNotice(cancelledNotice ?? undefined, clearNotice);
 
   const firstName = profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
   const title = firstName === undefined ? "Hola" : `Hola, ${firstName}`;
   const header = (
     <RootHeader
-      action={
-        <HeaderAction
-          label="Mi disponibilidad"
-          onPress={() => navigation.navigate("Availability")}
-        />
-      }
-      eyebrow="Nutricionista"
+      bell
+      eyebrow={`Nutricionista · ${dayHeading(boliviaToday())}`}
       label="Mi agenda"
       title={title}
     />
@@ -120,7 +111,6 @@ export function NutritionistAgendaScreen() {
     // Announce the cancellation only once the refreshed agenda no longer lists it.
     if (cancelled) {
       setNotice(`${target.clientName} · ${clockTime(target.startsAt)}`);
-      setSelectedId(null);
     }
   };
 
@@ -147,82 +137,75 @@ export function NutritionistAgendaScreen() {
 
   return (
     <Screen style={styles.screen}>
-      {header}
-      {notice !== null ? (
-        <View style={styles.notice}>
-          <Text style={styles.noticeTitle}>Evaluación cancelada</Text>
-          <BodyText style={styles.noticeBody}>{notice}</BodyText>
-        </View>
-      ) : null}
-      {failure !== null ? (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
-      ) : null}
-      {groups.length === 0 ? (
-        <ScrollView contentContainerStyle={styles.empty} refreshControl={refreshControl}>
-          <Text style={styles.emptyTitle}>No tienes evaluaciones agendadas.</Text>
-          <BodyText>Revisa tu disponibilidad para que las clientas puedan reservar.</BodyText>
-        </ScrollView>
-      ) : (
-        <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
-          {groups.map((group) => (
-            <View key={group.date} style={styles.group}>
-              <View style={styles.groupHeader}>
-                <Text style={styles.groupLabel}>{agendaDayLabel(group.date, today)}</Text>
-                <BodyText style={styles.muted}>
-                  {countLabel(group.entries.length, "evaluación", "evaluaciones")}
-                </BodyText>
-              </View>
-              {group.entries.map((entry) => {
-                const selected = entry.evaluationId === selectedId;
-                // A started Evaluation can no longer be cancelled (evaluation_started).
-                const cancellable = new Date(entry.startsAt).getTime() > Date.now();
-                return (
-                  <View key={entry.evaluationId}>
-                    <Pressable
-                      accessibilityLabel={`${clockTime(entry.startsAt)} ${entry.clientName}`}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected }}
-                      onPress={() => setSelectedId(selected ? null : entry.evaluationId)}
-                      style={[styles.card, selected && styles.cardSelected]}
+      <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
+        {header}
+        {failure !== null ? (
+          <View accessibilityLabel={failure} accessibilityRole="alert">
+            <NoticeRow message={failure} />
+          </View>
+        ) : null}
+        {groups.length === 0 ? (
+          <StateScreen
+            icon="calendar"
+            layout="inList"
+            note="Revisa tu disponibilidad para que las clientas puedan reservar."
+            primaryAction={{
+              label: "Ver mi disponibilidad",
+              onPress: () => navigation.navigate("AvailabilityTab"),
+            }}
+            title="No tienes evaluaciones"
+          />
+        ) : (
+          groups.map((group) => (
+            <View key={group.date}>
+              <SectionHeader
+                meta={countLabel(group.entries.length, "evaluación", "evaluaciones")}
+                title={agendaDayLabel(group.date, today)}
+              />
+              <View style={styles.cards}>
+                {group.entries.map((entry) => {
+                  // A started Evaluation can no longer be cancelled (evaluation_started).
+                  const cancellable = new Date(entry.startsAt).getTime() > Date.now();
+                  return (
+                    <View
+                      key={entry.evaluationId}
+                      style={[styles.card, cancellable && cardWithActionRow]}
                     >
-                      <View style={styles.timeColumn}>
-                        <Text style={styles.time}>{clockTime(entry.startsAt)}</Text>
-                        <Text style={styles.duration}>{`${entry.durationMinutes} min`}</Text>
-                      </View>
-                      <View style={styles.divider} testID="agenda-row-divider" />
-                      <View style={styles.cardBody}>
-                        <Text style={styles.client}>{entry.clientName}</Text>
-                        <Text style={styles.kind}>{kindLabel[entry.kind]}</Text>
-                      </View>
-                      <Chevron />
-                    </Pressable>
-                    {selected && cancellable ? (
-                      <Pressable
-                        accessibilityLabel="Cancelar evaluación"
-                        accessibilityRole="button"
-                        hitSlop={spacing.sm}
-                        onPress={() => setCancelling(entry)}
-                        style={styles.cancel}
+                      <View
+                        accessibilityLabel={`${clockTime(entry.startsAt)} ${entry.clientName}`}
+                        accessible
+                        style={styles.cardBody}
                       >
-                        <Text style={styles.cancelText}>Cancelar evaluación</Text>
-                      </Pressable>
-                    ) : null}
-                  </View>
-                );
-              })}
+                        <View style={styles.timeColumn}>
+                          <Text numberOfLines={1} style={styles.time}>
+                            {clockTime(entry.startsAt)}
+                          </Text>
+                          <Text style={styles.quiet}>{`${entry.durationMinutes} min`}</Text>
+                        </View>
+                        <View style={styles.who}>
+                          <Text style={styles.client}>{entry.clientName}</Text>
+                          <Text style={styles.quiet}>{kindLabel[entry.kind]}</Text>
+                        </View>
+                      </View>
+                      {cancellable ? (
+                        <CardActionRow
+                          label="Cancelar evaluación"
+                          onPress={() => setCancelling(entry)}
+                          testID={`cancel-evaluation-${entry.evaluationId}`}
+                          tone="error"
+                        />
+                      ) : null}
+                    </View>
+                  );
+                })}
+              </View>
             </View>
-          ))}
-        </ScrollView>
-      )}
+          ))
+        )}
+      </ScrollView>
       <ConfirmationSheet
         confirmLabel="Sí, cancelar evaluación"
-        note={
-          cancelling === null
-            ? ""
-            : `Le avisaremos a ${cancelling.clientName} y el horario quedará libre.`
-        }
+        note="Esto no se puede deshacer."
         onConfirm={() => void confirmCancel()}
         onDismiss={() => setCancelling(null)}
         testID="cancel-evaluation-sheet"
@@ -230,60 +213,38 @@ export function NutritionistAgendaScreen() {
         visible={cancelling !== null}
       >
         {cancelling !== null ? (
-          <BodyText>
-            {`${civilDateLong(civilDateOf(cancelling.startsAt))}, ${clockTime(cancelling.startsAt)} · ${cancelling.clientName}`}
-          </BodyText>
+          <IconRowGroup>
+            <IconRow
+              icon="calendar"
+              label={`${agendaDayLabel(civilDateOf(cancelling.startsAt), today).split(" · ")[0]}, ${clockTime(cancelling.startsAt)} · ${cancelling.clientName}`}
+            />
+            <IconRow icon="bell" label="Le avisamos y el horario queda libre" />
+          </IconRowGroup>
         ) : null}
       </ConfirmationSheet>
+      {notice !== null ? (
+        <BrandToast note={notice} onClose={clearNotice} title="Evaluación cancelada" />
+      ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  cancel: { alignSelf: "flex-end", minHeight: 44, justifyContent: "center" },
-  cancelText: { color: colors.errorText, fontSize: typography.body, fontWeight: "500" },
-  // S15's row (MOB-042): a Lora time column, a thin divider, the Client over the kind, the chevron.
-  card: {
-    ...surfaces.card,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.lg,
-    padding: spacing.lgXl,
-  },
-  cardBody: { flex: 1, gap: 3 },
-  cardSelected: { borderColor: colors.primary },
-  client: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
-  divider: { backgroundColor: colors.rule, height: 38, width: 1 },
-  duration: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.label },
-  kind: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  empty: { gap: spacing.sm, paddingTop: spacing.xl },
-  emptyTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  failure: { color: colors.errorText },
-  group: { gap: spacing.sm },
-  groupHeader: { flexDirection: "row", justifyContent: "space-between" },
-  groupLabel: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-  },
+  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
+  cardBody: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  cards: { gap: spacing.md },
+  client: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 16 },
   list: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  muted: { color: colors.textMuted, fontSize: typography.note },
-  notice: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  noticeBody: { color: colors.successText, fontSize: typography.note },
-  noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
-  screen: { gap: spacing.lg },
+  quiet: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
+  screen: { paddingHorizontal: spacing.xlSm },
   time: {
     color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleSmall,
+    fontFamily: fontFamilies.display,
+    fontSize: 20,
     fontVariant: ["tabular-nums"],
   },
-  timeColumn: { gap: spacing.xxs, minWidth: 62 },
+  // «07:00» in Lora 20 runs wider than 56 pt on both platforms (more so on
+  // Android): a fixed width wrapped it, so 56 is only the floor.
+  timeColumn: { flexShrink: 0, minWidth: 56 },
+  who: { flex: 1, gap: spacing.xxs },
 });

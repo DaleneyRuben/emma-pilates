@@ -5,31 +5,23 @@ import {
   LoadingState,
   QueryFailure,
   Screen,
-  ScreenTopBar,
   spacing,
 } from "@pilates/mobile-core";
-import { useNavigation } from "@react-navigation/native";
 import { StyleSheet } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { ClientBanner } from "./client-banner";
+import { ClientRecordsHeader } from "./client-records-header";
 import type { ClientContext } from "./client-overview-screen";
 
 export function ClientHistoryScreen({ route }: { route: { params: ClientContext } }) {
   const { clientId, clientName } = route.params;
-  const navigation = useNavigation<{ goBack: () => void }>();
   const fetcher = useStaffFetcher();
   const history = useListAssistantClientHistory(clientId, {
     fetcher,
     query: { refetchOnMount: "always" },
   });
 
-  const header = (
-    <>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Historial de clases" />
-      <ClientBanner action="Viendo historial de" clientName={clientName} />
-    </>
-  );
+  const header = <ClientRecordsHeader context={{ clientId, clientName }} selected="history" />;
 
   if (history.isPending) {
     return (
@@ -59,16 +51,17 @@ export function ClientHistoryScreen({ route }: { route: { params: ClientContext 
       {entries.length === 0 ? (
         <EmptyState
           icon="clock"
-          title="Esta clienta aún no tiene clases en su historial."
+          message="Aquí verás las clases a las que asistió."
+          title="Todavía no tomó clases"
           variant="plain"
         />
       ) : (
-        <ClassHistoryList entries={entries} lead="Ha asistido a" />
+        <ClassHistoryList entries={entries} lead="Asistió a" />
       )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { gap: spacing.md },
+  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
 });

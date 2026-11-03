@@ -34,51 +34,33 @@ describe("Assistant Session detail capacity summary", () => {
     return { box, screen, summary: within(box) };
   }
 
-  it("draws the seats beside a «Con cupos» pill in a flat Blanco box, with no bar", async () => {
+  // v2 S08: the class is the screen's hero, the free seats in Lora 32 over a bar.
+  it("puts the free seats on the Rosa profundo hero with its progress bar", async () => {
     const { box, screen, summary } = await openDetail(sessionDetail);
 
-    expect(box).toHaveStyle({
-      alignItems: "center",
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
-      borderRadius: 16,
-      borderWidth: 1,
-      flexDirection: "row",
-      gap: 12,
-      justifyContent: "space-between",
-      paddingHorizontal: 18,
-      paddingVertical: 16,
-    });
-    expect(summary.getByText("6 de 12 cupos disponibles")).toHaveStyle({
-      color: "#4A4A4A",
-      fontSize: 15,
-    });
-    expect(summary.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#EFE0DC",
-      borderRadius: 999,
-    });
-    expect(summary.getByText("Con cupos")).toHaveStyle({
-      color: "#7A4F4B",
-      fontSize: 12,
-      fontWeight: "500",
-    });
-    expect(screen.queryByRole("progressbar")).toBeNull();
-    expect(screen.queryByText("Cupos disponibles")).toBeNull();
+    expect(box).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 20 });
+    expect(summary.getByText("6")).toHaveStyle({ fontSize: 32 });
+    expect(summary.getByText("cupos libres de 12")).toBeOnTheScreen();
+    expect(summary.getByTestId("capacity-bar")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Se descuenta 1 clase de su plan. Le avisamos por notificación."),
+    ).toBeOnTheScreen();
   });
 
-  it("reads «0 de M cupos disponibles» beside a neutral «Completa» pill when full", async () => {
+  it("marks a full class «Completa» and offers the waiting list", async () => {
     const { screen, summary } = await openDetail({
       ...sessionDetail,
       bookedCount: 12,
       availableSeats: 0,
+      waitlistCount: 2,
     });
 
-    expect(summary.getByText("0 de 12 cupos disponibles")).toBeOnTheScreen();
-    expect(summary.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "rgba(216,201,187,0.34)",
-    });
-    expect(summary.getByText("Completa")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
-    expect(screen.queryByText("Lleno")).toBeNull();
-    expect(screen.getByRole("button", { name: "Unirme a la lista de espera" })).toBeOnTheScreen();
+    expect(summary.getByText("0")).toBeOnTheScreen();
+    expect(summary.getByText("cupos libres de 12 · 2 en espera")).toBeOnTheScreen();
+    expect(summary.getByText("Completa")).toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", { name: "Anotarla en la lista de espera" }),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Si se libera un cupo, le avisamos a Lucía.")).toBeOnTheScreen();
   });
 });

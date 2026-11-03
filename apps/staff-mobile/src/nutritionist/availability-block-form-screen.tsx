@@ -9,13 +9,15 @@ import {
   type AvailabilityBlockInputDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   colors,
+  IconRow,
+  IconRowGroup,
+  NoticeRow,
   PrimaryButton,
   radii,
   Screen,
-  ScreenTopBar,
   spacing,
+  TextButton,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -25,7 +27,9 @@ import { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { BackBar } from "../ui/back-bar";
 import {
+  DateTile,
   Pill,
   pillRow,
   problemMessage,
@@ -48,6 +52,7 @@ import {
   countLabel,
   turnosIn,
   weekdayNames,
+  weekdayTag,
 } from "./nutritionist-format";
 
 type FormNavigation = { goBack: () => void };
@@ -159,18 +164,19 @@ export function AvailabilityBlockFormScreen({
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar
-        fullBleed
+      <BackBar
         onBack={() => navigation.goBack()}
         title={editing ? "Editar horario" : "Nuevo horario"}
       />
       <ScrollView contentContainerStyle={styles.content}>
         <SectionLabel>Día</SectionLabel>
-        <View style={styles.pills}>
+        <View style={styles.weekdays}>
           {weekdayNames.map((name, index) => (
             <Pill
+              accessibilityLabel={name}
+              fill
               key={name}
-              label={name}
+              label={weekdayTag(index + 1)}
               onPress={() => setWeekday(index + 1)}
               selected={weekday === index + 1}
             />
@@ -191,7 +197,12 @@ export function AvailabilityBlockFormScreen({
               ))}
             </View>
           </>
-        ) : null}
+        ) : branches[0] === undefined ? null : (
+          <>
+            <SectionLabel>Sucursal</SectionLabel>
+            <Text style={styles.fixedBranch}>{branches[0].name}</Text>
+          </>
+        )}
         <SectionLabel>Horario</SectionLabel>
         <View style={styles.times}>
           {timeField("start", startsAtLocal)}
@@ -199,53 +210,57 @@ export function AvailabilityBlockFormScreen({
         </View>
         <SectionLabel>{editing ? "Aplicar cambios desde" : "A partir del"}</SectionLabel>
         <ScrollView
-          contentContainerStyle={styles.pills}
+          contentContainerStyle={styles.weekdays}
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.dateStrip}
         >
           {Array.from({ length: effectiveDateChoices }, (_, offset) => {
             const date = addCivilDays(today, offset);
-            const chip = civilDateChip(date, today);
             return (
-              <Pill
-                accessibilityLabel={`Fecha ${chip}`}
+              <DateTile
+                accessibilityLabel={`Fecha ${civilDateChip(date, today)}`}
+                date={date}
                 key={date}
-                label={chip}
                 onPress={() => setEffectiveFrom(date)}
                 selected={effectiveFrom === date}
+                today={today}
               />
             );
           })}
         </ScrollView>
-        <BodyText style={styles.muted}>
-          El sistema generará turnos de evaluación individuales dentro de este horario.
-        </BodyText>
         {turnos > 0 ? (
-          <Text style={styles.preview}>
-            {[
-              `${countLabel(turnos, "turno", "turnos")} de 45 min`,
-              ...(booked > 0 ? [countLabel(booked, "ya reservado", "ya reservados")] : []),
-            ].join(" · ")}
+          <IconRowGroup>
+            <IconRow
+              icon="clock"
+              label={[
+                `${countLabel(turnos, "turno", "turnos")} de 45 min`,
+                ...(booked > 0 ? [countLabel(booked, "ya reservado", "ya reservados")] : []),
+              ].join(" · ")}
+            />
+          </IconRowGroup>
+        ) : (
+          <Text style={styles.muted}>
+            El sistema generará turnos de evaluación individuales dentro de este horario.
+          </Text>
+        )}
+        {booked > 0 && editing ? (
+          <Text style={styles.muted}>
+            {`${countLabel(booked, "evaluación reservada se mantiene", "evaluaciones reservadas se mantienen")}.`}
           </Text>
         ) : null}
         {message !== null ? (
-          <BodyText accessibilityRole="alert" style={styles.failure}>
-            {message}
-          </BodyText>
-        ) : null}
-        <PrimaryButton busy={submitting} disabled={!valid} label="Guardar" onPress={save} />
-        {editing ? (
-          <Pressable
-            accessibilityLabel="Eliminar horario"
-            accessibilityRole="button"
-            onPress={() => setConfirming("end")}
-            style={styles.remove}
-          >
-            <Text style={styles.removeText}>Eliminar horario</Text>
-          </Pressable>
+          <View accessibilityLabel={message} accessibilityRole="alert">
+            <NoticeRow message={message} />
+          </View>
         ) : null}
       </ScrollView>
+      <View style={styles.footer}>
+        <PrimaryButton busy={submitting} disabled={!valid} label="Guardar" onPress={save} />
+        {editing ? (
+          <TextButton label="Eliminar horario" onPress={() => setConfirming("end")} tone="error" />
+        ) : null}
+      </View>
       <TimePickerSheet
         onClose={() => setPicking(null)}
         onPick={(time) => {
@@ -275,12 +290,11 @@ const styles = StyleSheet.create({
   failure: { color: colors.errorText },
   muted: { color: colors.textMuted, fontSize: typography.note },
   pills: pillRow,
-  preview: { color: colors.primaryDeep, fontSize: typography.note, fontWeight: "600" },
-  remove: { alignItems: "center", minHeight: 44, justifyContent: "center" },
-  removeText: { color: colors.errorText, fontSize: typography.body },
-  screen: { gap: spacing.md },
+  fixedBranch: { color: colors.text, fontSize: typography.bodyMedium },
+  footer: { gap: spacing.xs, paddingBottom: spacing.lg, paddingTop: spacing.md },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
   timeField: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.control,
     borderWidth: 1,
@@ -292,4 +306,6 @@ const styles = StyleSheet.create({
   timePlaceholder: { color: colors.textSubtle },
   timeValue: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   times: { flexDirection: "row", gap: spacing.md },
+  // v2 S17: the seven day tiles share the width, 6 pt apart.
+  weekdays: { flexDirection: "row", gap: 6 },
 });

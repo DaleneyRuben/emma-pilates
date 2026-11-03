@@ -6,8 +6,6 @@ import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support
 
 jest.setTimeout(20_000);
 
-const hidden = { includeHiddenElements: true };
-
 const profile = {
   id: "client-1",
   name: "Lucía Fernández",
@@ -102,45 +100,29 @@ describe("Client reschedule option card", () => {
     return { button, card: within(button), screen };
   }
 
-  it("draws the option as the frame's card with the seat pill in the footer", async () => {
-    const { button, card } = await openReschedule();
+  // C06: the options are rows of one Lino group, the start in Lora 20 and
+  // «Trainer · N cupos» under the class, with a radio at the end.
+  it("draws the option as a row of the Lino group with its radio", async () => {
+    const { button, card, screen } = await openReschedule();
 
-    expect(button).toHaveStyle({
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
+    expect(screen.getByTestId("reschedule-options")).toHaveStyle({
+      backgroundColor: "#F5EFE9",
       borderRadius: 16,
-      borderWidth: 1,
-      padding: 18,
     });
-    expect(card.getByText(/^\d\d:\d\d – \d\d:\d\d$/)).toHaveStyle({
-      color: "#766D69",
-      fontSize: 12,
-      fontWeight: "500",
-      letterSpacing: 1.2,
+    expect(button).toHaveStyle({ minHeight: 64 });
+    expect(card.getByText(/^\d\d:\d\d$/)).toHaveStyle({
+      fontFamily: "Lora_400Regular",
+      fontSize: 20,
     });
-    expect(card.getByText("Reformer Pilates")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 19,
+    expect(card.getByText("Reformer Pilates")).toHaveStyle({ fontSize: 15 });
+    expect(card.getByText("Emma Vargas · 8 cupos")).toHaveStyle({
+      color: "#6F6662",
+      fontSize: 13,
     });
-    expect(card.getByTestId("card-footer")).toHaveStyle({
-      borderTopColor: "#EFE7DE",
-      paddingTop: 12,
-    });
-    expect(card.getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
-    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
-    expect(card.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#EFE0DC",
-      borderRadius: 999,
-    });
-    expect(card.getByText("8 cupos")).toHaveStyle({
-      color: "#7A4F4B",
-      fontSize: 12,
-      fontWeight: "500",
-    });
-    expect(card.queryByTestId("chevron", hidden)).toBeNull();
+    expect(card.getByTestId("reschedule-radio")).toBeOnTheScreen();
   });
 
-  it("marks the selected option by its 2px Palo de rosa border", async () => {
+  it("marks the selected option on Rosa tinte with a filled radio", async () => {
     const { button, screen } = await openReschedule();
 
     await fireEvent.press(button);
@@ -151,8 +133,11 @@ describe("Client reschedule option card", () => {
       );
     });
     expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toHaveStyle({
-      borderColor: "#B78380",
-      borderWidth: 2,
+      backgroundColor: "#F2E4E1",
     });
+    expect(screen.getByTestId("reschedule-radio")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(
+      screen.getByText(/^Tu lugar de las \d\d:\d\d se libera al confirmar$/),
+    ).toBeOnTheScreen();
   });
 });

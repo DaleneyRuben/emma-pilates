@@ -5,19 +5,17 @@ import {
   type ContactAlertItemDto,
 } from "@pilates/api-contracts";
 import {
-  AvatarCircle,
-  BodyText,
+  BrandToast,
   colors,
-  EmptyState,
+  fontFamilies,
   LoadingState,
-  OutlinedButton,
-  PrimaryButton,
+  NoticeRow,
   QueryFailure,
   Screen,
-  ScreenTopBar,
   spacing,
+  StateScreen,
   surfaces,
-  typography,
+  TextButton,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
@@ -26,19 +24,13 @@ import { useState } from "react";
 import { Linking, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { InitialsDisc } from "../ui/person-row";
+import { RootHeader } from "../ui/root-header";
+import { StatusPill } from "../ui/session-row";
 import { useIsTablet } from "../ui/use-is-tablet";
 import { contactAlertReasons, startedOnLabel, whatsAppHref } from "./contact-list-copy";
 
 type Notice = { kind: "success" | "error"; name: string };
-
-function ReasonLine({ reason }: { reason: ContactAlertItemDto["reasons"][number] }) {
-  return (
-    <View style={styles.reason}>
-      <View style={styles.dot} />
-      <Text style={styles.reasonText}>{contactAlertReasons[reason]}</Text>
-    </View>
-  );
-}
 
 function ContactCard({
   item,
@@ -50,53 +42,45 @@ function ContactCard({
   onContacted: (item: ContactAlertItemDto) => void;
 }) {
   const href = item.phone === null ? null : whatsAppHref(item.phone);
+  const started = startedOnLabel(item.startedOn);
   return (
     <View style={styles.card}>
       <View style={styles.identity}>
-        <AvatarCircle fontSize={16} name={item.name} size={42} />
+        <InitialsDisc name={item.name} />
         <View style={styles.identityBody}>
           <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.phone}>{item.phone ?? "Sin teléfono"}</Text>
+          <Text style={styles.quiet}>
+            {`${item.phone ?? "Sin teléfono"} · ${started.charAt(0).toLowerCase()}${started.slice(1)}`}
+          </Text>
         </View>
       </View>
-      {item.reasons.map((reason) => (
-        <ReasonLine key={reason} reason={reason} />
-      ))}
-      <Text style={styles.started}>{startedOnLabel(item.startedOn)}</Text>
+      <View style={styles.reasons}>
+        {item.reasons.map((reason) => (
+          <StatusPill key={reason} label={contactAlertReasons[reason]} />
+        ))}
+      </View>
       <View style={styles.actions}>
         {href === null ? null : (
-          <View style={styles.action}>
-            <OutlinedButton label="Abrir WhatsApp" onPress={() => void Linking.openURL(href)} />
-          </View>
+          <TextButton label="Abrir WhatsApp" onPress={() => void Linking.openURL(href)} />
         )}
-        <View style={styles.action}>
-          <PrimaryButton
-            busy={busy}
-            label="Contactada"
-            onPress={() => onContacted(item)}
-            size="compact"
-          />
-        </View>
+        <TextButton disabled={busy} label="Marcar contactada" onPress={() => onContacted(item)} />
       </View>
     </View>
   );
 }
 
+/** S28 Para contactar, the Coordinator's second tab (BKM-013, v2). */
 export function ContactListScreen() {
-  const navigation = useNavigation<{ goBack: () => void }>();
+  const navigation = useNavigation<{ navigate: (tab: "ClientsTab") => void }>();
   const fetcher = useStaffFetcher();
   const tablet = useIsTablet();
-  const list = useListContactAlerts({
-    fetcher,
-    query: { refetchOnMount: "always" },
-  });
+  const list = useListContactAlerts({ fetcher, query: { refetchOnMount: "always" } });
   const mark = useMarkClientContacted({ fetcher });
   const queryKeys = [getListContactAlertsQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
   const [notice, setNotice] = useState<Notice | null>(null);
-  const page = list.data?.status === 200 ? list.data.data : undefined;
-  const items = page?.items ?? [];
+  const items = list.data?.status === 200 ? list.data.data.items : [];
   const markingId = mark.isPending ? mark.variables?.clientId : undefined;
 
   const onContacted = (item: ContactAlertItemDto) => {
@@ -111,40 +95,49 @@ export function ContactListScreen() {
       },
     );
   };
+  const header = (
+    <RootHeader
+      note="Clientas nuevas que conviene escribir por WhatsApp. Salen solas de la lista cuando reservan."
+      title="Para contactar"
+    />
+  );
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Para contactar" />
       {list.isPending ? (
-        <LoadingState label="Cargando la lista" />
+        <>
+          {header}
+          <LoadingState label="Cargando la lista" />
+        </>
       ) : list.isError || list.data?.status !== 200 ? (
-        <QueryFailure label="No pudimos cargar la lista." onRetry={() => void list.refetch()} />
+        <>
+          {header}
+          <QueryFailure label="No pudimos cargar la lista." onRetry={() => void list.refetch()} />
+        </>
       ) : items.length === 0 ? (
-        <EmptyState
-          icon="person"
-          message="Aquí aparecen las clientas nuevas que dejan de reservar o toman pocas clases."
-          title="Nadie para contactar por ahora."
-          variant="plain"
-        />
+        <>
+          <RootHeader title="Para contactar" />
+          <StateScreen
+            icon="person"
+            note="Aquí aparecen las clientas nuevas que dejan de reservar o toman pocas clases."
+            textAction={{
+              label: "Buscar una clienta",
+              onPress: () => navigation.navigate("ClientsTab"),
+            }}
+            title="Nadie para contactar"
+          />
+        </>
       ) : (
         <ScrollView
           contentContainerStyle={[styles.list, tablet && styles.tablet]}
           refreshControl={refreshControl}
         >
-          <BodyText style={styles.intro}>
-            Clientas nuevas que conviene escribir por WhatsApp. Salen solas de la lista cuando
-            reservan una clase.
-          </BodyText>
-          {notice === null ? null : (
-            <Text
-              accessibilityRole={notice.kind === "error" ? "alert" : undefined}
-              style={notice.kind === "error" ? styles.error : styles.success}
-            >
-              {notice.kind === "success"
-                ? `Marcaste a ${notice.name} como contactada.`
-                : `No pudimos marcar a ${notice.name}. Inténtalo de nuevo.`}
-            </Text>
-          )}
+          {header}
+          {notice?.kind === "error" ? (
+            <View accessibilityRole="alert">
+              <NoticeRow message={`No pudimos marcar a ${notice.name}. Inténtalo de nuevo.`} />
+            </View>
+          ) : null}
           {items.map((item) => (
             <ContactCard
               busy={markingId === item.clientId}
@@ -155,35 +148,32 @@ export function ContactListScreen() {
           ))}
         </ScrollView>
       )}
+      {notice?.kind === "success" ? (
+        <BrandToast
+          note="Sale de la lista y queda registrado a tu nombre"
+          onClose={() => setNotice(null)}
+          // S28: «Valeria, contactada», her first name only.
+          title={`${notice.name.trim().split(/\s+/)[0] ?? notice.name}, contactada`}
+        />
+      ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  action: { flex: 1 },
-  actions: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.sm },
-  card: {
-    ...surfaces.card,
-    gap: spacing.sm,
-    padding: spacing.lg,
+  actions: {
+    borderTopColor: colors.hairline,
+    borderTopWidth: 1,
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
-  dot: {
-    backgroundColor: colors.primary,
-    borderRadius: 3,
-    height: 6,
-    width: 6,
-  },
-  error: { color: colors.errorText, fontSize: typography.body },
-  identity: { alignItems: "center", flexDirection: "row", gap: spacing.mdLg },
-  identityBody: { flex: 1, gap: 3 },
-  intro: { color: colors.textSubtle, fontSize: typography.note },
-  list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  name: { color: colors.text, fontSize: typography.bodyMedium },
-  phone: { color: colors.textMuted, fontSize: typography.note },
-  reason: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  reasonText: { color: colors.text, fontSize: 14 },
-  screen: { gap: spacing.md },
-  started: { color: colors.textMuted, fontSize: typography.note },
-  success: { color: colors.successText, fontSize: typography.body },
+  card: { ...surfaces.card, gap: spacing.md, paddingBottom: spacing.xs, padding: spacing.lg },
+  identity: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  identityBody: { flex: 1, gap: spacing.xxs },
+  list: { gap: spacing.lg, paddingBottom: spacing.xxl },
+  name: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 16 },
+  quiet: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
+  reasons: { alignItems: "flex-start", flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

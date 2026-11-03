@@ -79,20 +79,22 @@ describe("Invita a una amiga (BKM-014)", () => {
       expect(screen.getByText("REF-LUCIA")).toBeOnTheScreen();
     });
     expect(screen.getByText("Invita a una amiga")).toBeOnTheScreen();
+    // Walkthrough n.º 10: the code readable, «Cómo funciona» in three steps.
+    expect(screen.getByText("REF-LUCIA")).toHaveProp("selectable", true);
+    expect(screen.getByText("Cómo funciona")).toBeOnTheScreen();
+    expect(screen.getByText("Compartes tu código")).toBeOnTheScreen();
+    expect(screen.getByText("Tu amiga toma una clase gratis")).toBeOnTheScreen();
+    expect(screen.getByText("Compra su primer plan y tú ganas una clase")).toBeOnTheScreen();
     expect(
-      screen.getByText(
-        "Comparte tu código. Tu amiga recibe una clase gratis, una sola vez. Cuando compre su primer plan, tú ganas una clase.",
-      ),
+      screen.getByText("Una amiga por mes. La clase gratis es una sola vez para ella."),
     ).toBeOnTheScreen();
     expect(screen.queryByText("Tu crédito")).toBeNull();
     expect(screen.queryByText(/crédito/i)).toBeNull();
     expect(screen.queryByText(/Bs/)).toBeNull();
-    expect(screen.getByText("Tus invitaciones")).toBeOnTheScreen();
+    expect(screen.getByText("Tus invitadas")).toBeOnTheScreen();
     expect(screen.getByText("Sofía G.")).toBeOnTheScreen();
-    expect(screen.getByText("Primer pago el 12 de septiembre")).toBeOnTheScreen();
     expect(screen.getByText("Compró su plan")).toBeOnTheScreen();
     expect(screen.getByText("Mariana P.")).toBeOnTheScreen();
-    expect(screen.getByText("Se registró el 18 de septiembre")).toBeOnTheScreen();
     expect(screen.getByText("Registrada")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Compartir" }));
@@ -108,7 +110,9 @@ describe("Invita a una amiga (BKM-014)", () => {
     await waitFor(() => {
       expect(screen.getByText("REF-LUCIA")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Aún no has invitado a nadie. ¡Comparte tu código!")).toBeOnTheScreen();
-    expect(screen.queryByText("Tus invitaciones")).toBeNull();
+    expect(screen.getByText("Aún no invitaste a nadie")).toBeOnTheScreen();
+    expect(screen.getByText("Cuando una amiga use tu código, la verás aquí.")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Compartir tu código" })).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Compartir" })).toBeNull();
   });
 });

@@ -62,7 +62,8 @@ export function StaffPushNotifications({
       fetcher={fetcher}
       installationId={installationIdentifier}
       onOpen={opener.deliver}
-      permissionReason="Activa las notificaciones para enterarte al momento de cambios en tu agenda y de lo que necesite tu atención."
+      permissionReason="Te avisamos apenas cambie una clase, llegue una reserva o haya un pago por revisar."
+      permissionTitle="Entérate al momento"
       platform={platform}
       registrationEnabled={registrationEnabled}
     >

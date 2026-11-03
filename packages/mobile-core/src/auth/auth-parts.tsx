@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   noticeOnCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     gap: 10,
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,

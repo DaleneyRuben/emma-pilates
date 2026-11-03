@@ -9,149 +9,54 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  BrandToast,
   colors,
   ConfirmationSheet,
   Heading,
   LoadingState,
-  PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
+  SegmentedTabs,
+  StateScreen,
   spacing,
-  surfaces,
-  TextButton,
-  typography,
   usePullToRefresh,
   useRefetchOnFocus,
   useStudioRules,
-  useTransientNotice,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
+import { BookingCard, CancelBookingFacts } from "./booking-card";
+import { ClassHistoryTab } from "./class-history-tab";
 import type { ConfirmedBooking } from "./session-detail-screen";
-import {
-  formatSessionDate,
-  formatTimeRange,
-  isInsideCancellationWindow,
-} from "@pilates/mobile-core";
+import { formatSessionDate, formatTimeRange } from "@pilates/mobile-core";
 
-const noticeVisibleMs = 8_000;
+type BookingsTab = "history" | "upcoming";
 
 type BookingsNavigation = {
   navigate: {
     (screen: "Booking"): void;
-    (screen: "History"): void;
     (screen: "Reschedule", params: { booking: UpcomingBookingDto }): void;
   };
-  setParams: (params: { confirmed?: ConfirmedBooking }) => void;
+  setParams: (params: { confirmed?: ConfirmedBooking; tab?: BookingsTab }) => void;
 };
-
-function Badge({ label }: { label: string }) {
-  return (
-    <View style={styles.badge}>
-      <Text style={styles.badgeText}>{label}</Text>
-    </View>
-  );
-}
-
-function OutlinedAction({
-  label,
-  onPress,
-  testID,
-  tone = "neutral",
-}: {
-  label: string;
-  onPress: () => void;
-  testID: string;
-  tone?: "neutral" | "error";
-}) {
-  return (
-    <Pressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={[styles.action, tone === "error" && styles.actionError]}
-      testID={testID}
-    >
-      <Text style={[styles.actionLabel, tone === "error" && styles.actionLabelError]}>{label}</Text>
-    </Pressable>
-  );
-}
-
-function BookingCard({
-  cancellationWindowMinutes,
-  item,
-  onCancel,
-  onLeave,
-  onReschedule,
-}: {
-  cancellationWindowMinutes: number | undefined;
-  item: UpcomingBookingDto;
-  onCancel: () => void;
-  onLeave: () => void;
-  onReschedule: () => void;
-}) {
-  // The window is a Studio Setting (BKM-004): until it is known, a booking
-  // offers neither Cancelar nor Reprogramar rather than guess.
-  const windowKnown = cancellationWindowMinutes !== undefined;
-  const insideWindow =
-    item.kind === "booking" &&
-    windowKnown &&
-    isInsideCancellationWindow(item.startsAt, new Date(), cancellationWindowMinutes);
-
-  return (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{item.classTypeName}</Text>
-        {item.kind === "waitlist" ? (
-          <Badge label="En lista de espera" />
-        ) : insideWindow ? (
-          <Badge label="No cancelable" />
-        ) : null}
-      </View>
-      <BodyText>{`${item.trainerName} · ${item.branchName}`}</BodyText>
-      <BodyText>
-        {`${formatSessionDate(item.startsAt)} · ${formatTimeRange(item.startsAt, item.endsAt)}`}
-      </BodyText>
-      {item.kind === "waitlist" ? (
-        <OutlinedAction
-          label="Salir de la lista de espera"
-          onPress={onLeave}
-          testID={`booking-leave-waitlist-${item.waitlistEntryId}`}
-        />
-      ) : !windowKnown ? null : insideWindow ? (
-        <OutlinedAction
-          label="Reprogramar"
-          onPress={onReschedule}
-          testID={`booking-reschedule-${item.bookingId}`}
-        />
-      ) : (
-        <OutlinedAction
-          label="Cancelar"
-          onPress={onCancel}
-          testID={`booking-cancel-${item.bookingId}`}
-        />
-      )}
-    </View>
-  );
-}
 
 export function BookingsScreen({
   route,
 }: {
-  route: { params?: { confirmed?: ConfirmedBooking } };
+  route: { params?: { confirmed?: ConfirmedBooking; tab?: BookingsTab } };
 }) {
   const navigation = useNavigation<BookingsNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
-  const confirmed = useTransientNotice(route.params?.confirmed, noticeVisibleMs, () =>
-    navigation.setParams({ confirmed: undefined }),
-  );
+  const dismissConfirmed = () => navigation.setParams({ confirmed: undefined });
+  const confirmed = useStickyNotice(route.params?.confirmed, dismissConfirmed);
+  const tab = route.params?.tab ?? "upcoming";
   const [cancelling, setCancelling] = useState<UpcomingBookingDto | null>(null);
   const [cancelInFlight, setCancelInFlight] = useState(false);
   const cancelStarted = useRef(false);
@@ -191,7 +96,11 @@ export function BookingsScreen({
     setFailure(null);
     try {
       const response = await cancelBooking(cancelling.bookingId, undefined, fetcher);
-      if (response.status !== 204) {
+      if (response.status === 204) {
+        // «Reserva confirmada · Te quedan N clases» no longer holds once a
+        // Booking is cancelled, often the one it confirmed (MOB-074).
+        dismissConfirmed();
+      } else {
         setFailure(
           bookingRejectionMessage(problemCode(response.data)) ??
             "No pudimos cancelar la reserva. Inténtalo de nuevo.",
@@ -230,29 +139,26 @@ export function BookingsScreen({
 
   return (
     <Screen style={styles.screen}>
-      <View style={styles.header}>
-        <Heading accessibilityLabel="Mis reservas">Mis reservas</Heading>
-        <TextButton label="Ver historial" onPress={() => navigation.navigate("History")} />
-      </View>
-      {confirmed !== null ? (
-        <View style={styles.notice}>
-          <Text style={styles.noticeTitle}>Reserva confirmada</Text>
-          <BodyText style={styles.noticeBody}>
-            {`${confirmed.classTypeName} · ${formatSessionDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`}
-          </BodyText>
-          {remaining !== undefined && confirmed.planName !== "Pase de invitada" ? (
-            <BodyText style={styles.balance}>{`Te quedan ${remaining} clases en tu plan`}</BodyText>
-          ) : confirmed.planName === "Pase de invitada" ? (
-            <BodyText style={styles.balance}>Tu pase de invitada ya se usó.</BodyText>
-          ) : null}
-        </View>
-      ) : null}
+      <Heading accessibilityLabel="Mis reservas" accessibilityRole="header">
+        Mis reservas
+      </Heading>
+      <SegmentedTabs
+        accessibilityLabel="Reservas"
+        onSelect={(key) => navigation.setParams({ tab: key })}
+        options={[
+          { key: "upcoming", label: "Próximas", testID: "bookings-tab-upcoming" },
+          { key: "history", label: "Historial", testID: "bookings-tab-history" },
+        ]}
+        selected={tab}
+      />
       {failure !== null ? (
         <BodyText accessibilityRole="alert" style={styles.failure}>
           {failure}
         </BodyText>
       ) : null}
-      {upcoming.isPending ? (
+      {tab === "history" ? (
+        <ClassHistoryTab />
+      ) : upcoming.isPending ? (
         <LoadingState label="Cargando reservas" />
       ) : upcoming.isError || upcoming.data.status !== 200 ? (
         <QueryFailure
@@ -261,10 +167,14 @@ export function BookingsScreen({
         />
       ) : items.length === 0 ? (
         <ScrollView contentContainerStyle={styles.empty} refreshControl={refreshControl}>
-          <BodyText>Aún no tienes reservas próximas.</BodyText>
-          <PrimaryButton
-            label="Reservar una clase"
-            onPress={() => navigation.navigate("Booking")}
+          <StateScreen
+            icon="calendar"
+            note="Cuando reserves una clase, aparecerá aquí."
+            primaryAction={{
+              label: "Reservar una clase",
+              onPress: () => navigation.navigate("Booking"),
+            }}
+            title="Aún no tienes reservas"
           />
         </ScrollView>
       ) : (
@@ -288,7 +198,6 @@ export function BookingsScreen({
       <ConfirmationSheet
         confirmLabel="Sí, cancelar reserva"
         confirmTestID="booking-cancel-confirm"
-        note="La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para volver a reservarlo tendrá que seguir habiendo cupo."
         onConfirm={() => {
           if (cancelInFlight) return;
           void confirmCancel();
@@ -298,60 +207,28 @@ export function BookingsScreen({
         title="¿Cancelar esta reserva?"
         visible={cancelling !== null}
       >
-        {cancelling !== null ? (
-          <BodyText>
-            {`${cancelling.classTypeName} · ${formatSessionDate(cancelling.startsAt)} · ${formatTimeRange(cancelling.startsAt, cancelling.endsAt)} · ${cancelling.trainerName} · ${cancelling.branchName}`}
-          </BodyText>
-        ) : null}
+        {cancelling !== null ? <CancelBookingFacts booking={cancelling} /> : null}
       </ConfirmationSheet>
+      {confirmed !== null ? (
+        <BrandToast
+          note={
+            confirmed.planName === "Pase de invitada"
+              ? "Tu pase de invitada ya se usó."
+              : remaining !== undefined
+                ? `Te quedan ${remaining} clases en tu plan`
+                : `${confirmed.classTypeName} · ${formatSessionDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`
+          }
+          onClose={dismissConfirmed}
+          title="Reserva confirmada"
+        />
+      ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  action: {
-    alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    justifyContent: "center",
-    marginTop: spacing.xs,
-    minHeight: 44,
-  },
-  actionError: { borderColor: colors.error },
-  actionLabel: { color: colors.text, fontSize: typography.body },
-  actionLabelError: { color: colors.errorText },
-  badge: {
-    backgroundColor: "rgba(201,154,78,0.16)",
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
-  badgeText: { color: colors.warningText, fontSize: typography.label, fontWeight: "600" },
-  balance: { color: colors.textMuted, fontSize: typography.note },
-  card: {
-    ...surfaces.card,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  cardHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.sm,
-    justifyContent: "space-between",
-  },
-  cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  empty: { gap: spacing.lg, paddingTop: spacing.xl },
+  empty: { flexGrow: 1 },
   failure: { color: colors.errorText },
-  header: { alignItems: "flex-start", gap: spacing.sm },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  notice: {
-    backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.inset,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  noticeBody: { color: colors.successText, fontSize: typography.note },
-  noticeTitle: { color: colors.successText, fontSize: typography.bodyLarge, fontWeight: "600" },
   screen: { gap: spacing.lg },
 });

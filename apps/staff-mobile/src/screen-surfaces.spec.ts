@@ -21,9 +21,18 @@ function sourceFiles(directory: string): string[] {
 // filled with it would vanish into the screen; the frames draw cards on Blanco.
 describe("screen surfaces", () => {
   it("never fills a card or panel with the screen's own Superficie", () => {
+    // v2 draws Marfil only where it sits on something else: a bottom sheet
+    // over the scrim, and a chip or the QR box inside a Lino card.
+    const onOtherSurfaces = [
+      "administrator/other-date-sheet.tsx",
+      "assistant/front-desk-receipt-card.tsx",
+      "assistant/invitation-menu.tsx",
+      "trainer/trainer-roster-screen.tsx",
+    ];
     const offenders = sourceFiles(__dirname)
       .filter((path) => /backgroundColor: colors\.surface\b/.test(readFileSync(path, "utf8")))
-      .map((path) => path.slice(__dirname.length + 1));
+      .map((path) => path.slice(__dirname.length + 1))
+      .filter((path) => !onOtherSurfaces.includes(path));
 
     expect(offenders).toEqual([]);
   });

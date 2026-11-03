@@ -22,16 +22,19 @@ const tones = {
 export function Chevron({
   direction = "right",
   size = 19,
+  strokeWidth = 1.3,
   testID = "chevron",
   tone = "primary",
 }: {
   direction?: keyof typeof points;
   size?: number;
+  /** v2's icon rows draw it at 1.5 (follow-up 225). */
+  strokeWidth?: number;
   testID?: string;
   tone?: keyof typeof tones;
 }) {
   return (
-    <LineIcon color={tones[tone]} size={size} strokeWidth={1.3} testID={testID}>
+    <LineIcon color={tones[tone]} size={size} strokeWidth={strokeWidth} testID={testID}>
       <Polyline points={points[direction]} testID={`${testID}-${direction}`} />
     </LineIcon>
   );

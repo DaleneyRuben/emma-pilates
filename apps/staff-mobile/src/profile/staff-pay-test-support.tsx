@@ -66,16 +66,10 @@ export async function openMyPay(pay: PayRoutes = {}) {
   const screen = await render(
     <App runtime={createStaffRuntime(routeFetcher(staffRoutes(trainerProfile, pay)))} />,
   );
-  await waitFor(
-    () => {
-      expect(screen.getByText("EV")).toBeOnTheScreen();
-    },
-    { timeout: 10_000 },
-  );
-  await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
-  await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Mis pagos" })).toBeOnTheScreen();
+  // v2: Mis pagos is the Trainer's second tab (follow-up 225 §8).
+  await waitFor(() => expect(screen.getByTestId("tab-pay")).toBeOnTheScreen(), {
+    timeout: 10_000,
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Mis pagos" }));
+  await fireEvent.press(screen.getByTestId("tab-pay"));
   return screen;
 }

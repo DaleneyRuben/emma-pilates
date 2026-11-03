@@ -219,7 +219,6 @@ export class AdministratorPaymentsController {
 
 const sessionProblems: Record<string, string> = {
   'Session is not cancellable': 'session_not_cancellable',
-  'Session has no Bookings': 'session_has_no_bookings',
 };
 
 @Controller({ path: 'administrator/sessions', version: '1' })

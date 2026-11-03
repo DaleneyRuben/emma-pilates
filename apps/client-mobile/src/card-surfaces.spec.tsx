@@ -32,7 +32,8 @@ describe("Client card surfaces (MOB-039)", () => {
     clearMobileQueryCache();
   });
 
-  it("draws Inicio's plan card with the frames' border and radius", async () => {
+  // Follow-up 225 §5: Inicio's plan card is the screen's one emphasis surface.
+  it("draws Inicio's plan card on Rosa profundo at radius 20", async () => {
     const fetcher = routeFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),
       "/api/v1/clients/current/subscription": () => jsonResponse(activeSubscription),
@@ -40,14 +41,11 @@ describe("Client card surfaces (MOB-039)", () => {
     const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
 
     await waitFor(() => {
-      expect(screen.getByText("Tu plan")).toBeOnTheScreen();
+      expect(screen.getByTestId("home-plan-card")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Tu plan").parent?.parent).toHaveStyle({
-      backgroundColor: "#FFFFFF",
-      borderColor: "#D8C9BB",
-      borderRadius: 16,
-      borderWidth: 1,
-      shadowOpacity: 0.05,
+    expect(screen.getByTestId("home-plan-card")).toHaveStyle({
+      backgroundColor: "#93615D",
+      borderRadius: 20,
     });
   });
 });

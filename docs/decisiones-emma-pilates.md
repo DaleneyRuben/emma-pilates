@@ -172,7 +172,7 @@ La coordinadora **no puede ver nada relacionado con dinero**. Sí puede gestiona
 | --- | --- | --- |
 | Crear, modificar y cancelar clases y horarios | ✓ | ✓ |
 | Asignar instructoras y reemplazos | ✓ | ✓ |
-| Cancelar una clase con reservas | ✓ | ✓ |
+| Cancelar una clase futura, con o sin reservas (§18) | ✓ | ✓ |
 | Ver y editar perfiles de clientas y sus reservas | ✓ | ✓ |
 | Ver clases restantes y vencimientos de clientas | ✓ | ✓ |
 | Ver asistencia, ocupación, clientas nuevas y renovación (en cantidades) | ✓ | ✓ |
@@ -257,3 +257,12 @@ La dueña resolvió las preguntas abiertas de la revisión del lanzamiento. Esta
 
 7. **Un rechazo no gasta el congelamiento (§2.4).** «Una vez por plan» cuenta solo los congelamientos solicitados o aprobados. Un congelamiento rechazado no gasta el único del plan. La clienta puede volver a pedirlo con fechas nuevas.
 8. **Una evaluación pagada y confirmada solo se reprograma (§6).** No se cancela y no hay devolución. La clienta elige otro turno disponible hasta 3 horas antes del turno original; el pago y el comprobante siguen con la evaluación. Si cancela el estudio o la nutricionista, tampoco hay devolución: la evaluación queda para que ella elija otro turno, y recibe un aviso. Una evaluación pagada con el pago pendiente se cancela y el pago queda rechazado, como hoy. La incluida se cancela como hoy. Si no se presenta, se da por usada.
+
+## 18. Addendum del 2026-11-02
+
+Decisiones de la dueña en el [recorrido a mano del 2026-11-02](reviews/2026-11-02-hand-walkthrough.md).
+
+9. **El precio con descuento se redondea al boliviano entero (§5.1, nota 22).** El estudio cobra en bolivianos enteros. El precio de fundadora se redondea al boliviano más cercano al calcularlo, y ,50 sube: Bs 590 − 15 % = 501,50 → **Bs 502**; 290 → **247**; 1050 → **893**. El descuento es lo que falta para el precio de lista. El monto guardado en la venta, el que ve la clienta, el que cobra la recepcionista, el del QR y el efectivo esperado del cierre de caja son el mismo. Las ventas ya hechas no se reescriben.
+10. **Días para reservar por adelantado (§3, nota 23).** Es una regla de **Reglas del estudio**, **7 días** por defecto, editable de 1 a 30 desde la web. Cuenta días de Bolivia desde hoy, hoy incluido: con 7, la clienta reserva de hoy al sexto día siguiente, los siete días que muestra la tira de las apps. El backend la hace cumplir al reservar, al sumarse a la lista de espera y al reprogramar, por la clienta y por el equipo en su nombre (código `booking_window_exceeded`). Cancelar una clase (dueña o coordinadora) no tiene ese límite.
+11. **Una clase futura sin reservas se puede cancelar a mano (§3.2, nota 24).** Feriado, instructora enferma: la dueña o la coordinadora la cancelan aunque nadie haya reservado. Ya no existe el código `session_has_no_bookings`. La revisión automática del mínimo sigue cancelando las que nadie canceló.
+12. **No hay venta en efectivo encima de un QR en recepción pendiente (§4.2, nota 21).** Mientras el comprobante que subió la recepcionista espera la aprobación de la dueña, el backend rechaza una venta en efectivo para esa clienta, de ese plan o de otro (`payment_pending_exists`), como ya rechaza cualquier compra con un pago pendiente.

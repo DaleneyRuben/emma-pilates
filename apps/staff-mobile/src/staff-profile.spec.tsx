@@ -44,14 +44,11 @@ async function openProfile(
 
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen();
+      expect(screen.getByTestId("tab-profile")).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
-  await waitFor(() => {
-    expect(screen.getByText("EV")).toBeOnTheScreen();
-  });
-  await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+  await fireEvent.press(screen.getByTestId("tab-profile"));
   await waitFor(() => {
     expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
   });
@@ -65,7 +62,7 @@ describe("Staff Perfil", () => {
     clearMobileQueryCache();
   });
 
-  it("opens a read-only profile from the account avatar", async () => {
+  it("opens a read-only profile from the Perfil tab", async () => {
     const screen = await openProfile();
 
     expect(screen.getByText("emma.vargas@example.com")).toBeOnTheScreen();
@@ -85,7 +82,9 @@ describe("Staff Perfil", () => {
     ).toBeOnTheScreen();
     expect(screen.queryByText("Emma Pilates Studio · versión 1.0")).toBeNull();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    // Perfil is a tab root: no back, the tab bar leads back to Agenda.
+    expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
+    await fireEvent.press(screen.getByTestId("tab-agenda"));
     await waitFor(() => {
       expect(screen.getByLabelText("Mi agenda")).toBeOnTheScreen();
     });
@@ -103,11 +102,11 @@ describe("Staff Perfil", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByText("MF")).toBeOnTheScreen();
+        expect(screen.getByTestId("tab-profile")).toBeOnTheScreen();
       },
       { timeout: 10_000 },
     );
-    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await fireEvent.press(screen.getByTestId("tab-profile"));
 
     await waitFor(() => {
       expect(screen.getByText("Administración")).toBeOnTheScreen();
@@ -128,6 +127,9 @@ describe("Staff Perfil", () => {
     expect(
       screen.getByText("Te avisaremos aquí cuando haya algo que necesite tu atención."),
     ).toBeOnTheScreen();
+    // v2 S20: the empty inbox leads back to her agenda.
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a mi agenda" }));
+    await waitFor(() => expect(screen.getByLabelText("Mi agenda")).toBeOnTheScreen());
   });
 
   it("opens the change password step", async () => {

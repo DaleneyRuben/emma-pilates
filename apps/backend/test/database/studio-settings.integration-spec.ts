@@ -20,6 +20,7 @@ const seeded = {
   minimumBookings: 2,
   minimumBookingsCheckLeadMinutes: 180,
   startDateLimitDays: 14,
+  bookingWindowDays: 7,
   founderPlaces: 40,
   founderDiscountPercent: 15,
   founderGapDays: 7,
@@ -123,6 +124,7 @@ describe('Studio Settings on PostgreSQL', () => {
       evaluationPriceCentavos: 7_000,
       plansFromPriceCentavos: 8_000,
       startDateLimitDays: 14,
+      bookingWindowDays: 7,
       openingDate: null,
     });
   });

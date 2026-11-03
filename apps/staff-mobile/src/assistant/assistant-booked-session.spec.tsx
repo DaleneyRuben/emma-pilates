@@ -46,10 +46,8 @@ describe("Assistant booked Session", () => {
       expect(card.getByText("Ya reservada")).toBeOnTheScreen();
     });
     expect(card.queryByText("6 cupos")).toBeNull();
-    expect(card.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "rgba(216,201,187,0.34)",
-    });
-    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
+    expect(card.getByText("Ya reservada").parent).toHaveStyle({ backgroundColor: "#E6DBD0" });
+    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#4A4A4A", fontSize: 12 });
   });
 
   it("keeps the seat count on a Session she only waits for", async () => {
@@ -71,8 +69,10 @@ describe("Assistant booked Session", () => {
     await waitFor(() => {
       expect(screen.getByText("La clienta ya tiene esta clase reservada.")).toBeOnTheScreen();
     });
-    expect(screen.queryByRole("button", { name: "Reservar" })).toBeNull();
-    expect(screen.queryByText("Se descontará 1 clase de su plan.")).toBeNull();
-    expect(screen.getByText("6 de 12 cupos disponibles")).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Reservar para Lucía" })).toBeNull();
+    expect(
+      screen.queryByText("Se descuenta 1 clase de su plan. Le avisamos por notificación."),
+    ).toBeNull();
+    expect(screen.getByText("cupos libres de 12")).toBeOnTheScreen();
   });
 });

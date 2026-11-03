@@ -74,6 +74,11 @@ describe("FeedbackScreen (REL-012)", () => {
     await waitFor(() => {
       expect(screen.getByText("¡Gracias por tu comentario!")).toBeOnTheScreen();
     });
+    // Follow-up 227: the brand is «Emma Pilates Studio»; the sent state is the v2 block.
+    expect(
+      screen.getByText("Lo recibió el equipo de Emma Pilates Studio y lo vamos a revisar."),
+    ).toBeOnTheScreen();
+    expect(screen.getByTestId("state-screen-disc")).toBeOnTheScreen();
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(fetcher).toHaveBeenCalledWith(
       "/api/v1/feedback",

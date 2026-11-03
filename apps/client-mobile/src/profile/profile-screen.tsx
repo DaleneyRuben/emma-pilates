@@ -8,32 +8,31 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
-  Chevron,
   colors,
+  fontFamilies,
   Heading,
+  IconRow,
+  IconRowGroup,
   LoadingState,
   LogoutConfirmationSheet,
   QueryFailure,
-  radii,
   Screen,
+  SectionTitle,
   spacing,
   surfaces,
   TextButton,
   typography,
-  UnreadCountPill,
   useMobileIdentity,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { appVersionLabel } from "./app-version";
-import { ProfileRowIcon, type ProfileRowIconName } from "./profile-row-icons";
-import { subscriptionBadge } from "../home/home-format";
 import { ClientAvatar } from "./client-avatar";
-import { PromotionsSwitch } from "./promotions-switch";
+import { PromotionsSwitch, promotionsLegalLine } from "./promotions-switch";
 import { useClientPhoto } from "./use-client-photo";
 
 type ProfileNavigation = {
@@ -50,43 +49,6 @@ type ProfileNavigation = {
       | "MyEvaluations",
   ) => void;
 };
-
-function MenuRow({
-  badge,
-  icon,
-  label,
-  onPress,
-  value,
-}: {
-  badge?: number;
-  icon: ProfileRowIconName;
-  label: string;
-  onPress: () => void;
-  value?: string;
-}) {
-  return (
-    <Pressable
-      accessibilityLabel={
-        badge !== undefined && badge > 0
-          ? `${label}, ${badge} ${badge === 1 ? "notificación sin leer" : "notificaciones sin leer"}`
-          : value === undefined
-            ? label
-            : `${label}: ${value}`
-      }
-      accessibilityRole="button"
-      onPress={onPress}
-      style={styles.row}
-    >
-      <ProfileRowIcon name={icon} />
-      <Text style={styles.rowLabel}>{label}</Text>
-      <View style={styles.rowTrailing}>
-        {value === undefined ? null : <BodyText style={styles.rowValue}>{value}</BodyText>}
-        <UnreadCountPill count={badge ?? 0} testID="notifications-row-badge" />
-        <Chevron tone="quiet" />
-      </View>
-    </Pressable>
-  );
-}
 
 export function ProfileScreen() {
   const navigation = useNavigation<ProfileNavigation>();
@@ -143,70 +105,86 @@ export function ProfileScreen() {
           </View>
           <TextButton label="Editar" onPress={() => navigation.navigate("EditProfile")} />
         </View>
-        <View style={styles.menu}>
-          <MenuRow
-            icon="plan"
-            label="Mi plan"
-            onPress={() => navigation.navigate("Subscription")}
-            value={status === null || status === "none" ? undefined : subscriptionBadge(status)}
-          />
-          <MenuRow
-            icon="evaluation"
-            label="Evaluación nutricional"
-            onPress={() => navigation.navigate("EvaluationAvailability")}
-          />
-          <MenuRow
-            icon="evaluations"
-            label="Mis evaluaciones"
-            onPress={() => navigation.navigate("MyEvaluations")}
-          />
-          <MenuRow
-            icon="referrals"
-            label="Invita a una amiga"
-            onPress={() => navigation.navigate("Referrals")}
-          />
-          <MenuRow
-            badge={unreadCount}
-            icon="notifications"
-            label="Notificaciones"
-            onPress={() => navigation.navigate("Notifications")}
-          />
-          <MenuRow
-            icon="password"
-            label="Cambiar contraseña"
-            onPress={() => navigation.navigate("ChangePassword")}
-          />
-          <MenuRow
-            icon="feedback"
-            label="Enviar comentarios"
-            onPress={() => navigation.navigate("Feedback")}
-          />
+        <View>
+          <SectionTitle>Tu plan y tus clases</SectionTitle>
+          <IconRowGroup>
+            <IconRow
+              chevron
+              icon="card"
+              label="Mi plan"
+              onPress={() => navigation.navigate("Subscription")}
+              value={status === null || status === "none" ? undefined : planPill[status]}
+            />
+            <IconRow
+              chevron
+              icon="health"
+              label="Evaluación nutricional"
+              onPress={() => navigation.navigate("EvaluationAvailability")}
+            />
+            <IconRow
+              chevron
+              icon="document"
+              label="Mis evaluaciones"
+              onPress={() => navigation.navigate("MyEvaluations")}
+            />
+            <IconRow
+              chevron
+              icon="personAdd"
+              label="Invita a una amiga"
+              onPress={() => navigation.navigate("Referrals")}
+            />
+          </IconRowGroup>
         </View>
-        <PromotionsSwitch />
-        <Pressable
-          accessibilityLabel="Cerrar sesión"
-          accessibilityRole="button"
-          onPress={() => setConfirmingLogout(true)}
-          style={({ pressed }) => [styles.logout, pressed && styles.logoutPressed]}
-        >
-          {({ pressed }) => (
-            <Text style={[styles.logoutText, pressed && styles.logoutTextPressed]}>
-              Cerrar sesión
-            </Text>
-          )}
-        </Pressable>
-        <Pressable
-          accessibilityLabel="Cerrar mi cuenta"
-          accessibilityRole="button"
-          hitSlop={spacing.sm}
-          onPress={() => navigation.navigate("CloseAccount")}
-          style={styles.closeAccount}
-        >
-          <Text style={styles.closeAccountText}>Cerrar mi cuenta</Text>
-        </Pressable>
-        <BodyText
-          style={styles.footer}
-        >{`Emma Pilates Studio · versión ${appVersionLabel()}`}</BodyText>
+        <View>
+          <SectionTitle>Preferencias</SectionTitle>
+          <View style={styles.group}>
+            <IconRow
+              chevron
+              icon="bell"
+              label="Notificaciones"
+              onPress={() => navigation.navigate("Notifications")}
+              value={
+                unreadCount === undefined || unreadCount === 0
+                  ? undefined
+                  : `${unreadCount} sin leer`
+              }
+            />
+            <PromotionsSwitch />
+          </View>
+          <BodyText style={styles.legal}>{promotionsLegalLine}</BodyText>
+        </View>
+        <View>
+          <SectionTitle>Cuenta</SectionTitle>
+          <IconRowGroup>
+            <IconRow
+              chevron
+              icon="password"
+              label="Cambiar contraseña"
+              onPress={() => navigation.navigate("ChangePassword")}
+            />
+            <IconRow
+              chevron
+              icon="message"
+              label="Enviar comentarios"
+              onPress={() => navigation.navigate("Feedback")}
+            />
+            <IconRow
+              icon="logout"
+              label="Cerrar sesión"
+              onPress={() => setConfirmingLogout(true)}
+            />
+          </IconRowGroup>
+        </View>
+        <View style={styles.end}>
+          <TextButton
+            label="Cerrar mi cuenta"
+            onPress={() => navigation.navigate("CloseAccount")}
+            tone="error"
+          />
+          <BodyText style={styles.footer}>
+            {`Emma Pilates Studio · versión ${appVersionLabel()}`}
+          </BodyText>
+        </View>
       </ScrollView>
       <LogoutConfirmationSheet
         logout={identity.logout}
@@ -217,54 +195,16 @@ export function ProfileScreen() {
   );
 }
 
+// C18: the Plan's state as Mi plan names it.
+const planPill = { active: "Activo", expiring_soon: "Por vencer", expired: "Vencido" } as const;
+
 const styles = StyleSheet.create({
-  closeAccount: {
-    alignSelf: "center",
-    justifyContent: "center",
-    minHeight: 44,
-    paddingHorizontal: spacing.md,
-  },
-  closeAccountText: {
-    color: colors.error,
-    fontSize: typography.note,
-    fontWeight: "500",
-  },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  footer: {
-    color: colors.textSubtle,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
-  logout: {
-    alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    minHeight: 52,
-    justifyContent: "center",
-  },
-  logoutPressed: { borderColor: colors.error },
-  logoutText: { color: colors.textSecondary, fontSize: typography.body },
-  logoutTextPressed: { color: colors.errorText },
-  menu: {
-    ...surfaces.card,
-    overflow: "hidden",
-  },
-  name: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-  },
-  row: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.mdLg,
-    minHeight: 60,
-    paddingHorizontal: spacing.lg,
-  },
-  rowLabel: { color: colors.text, flex: 1, fontSize: 16 },
-  rowTrailing: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  rowValue: { color: colors.textMuted },
+  end: { alignItems: "center", gap: spacing.xs },
+  footer: { color: colors.textMuted, fontSize: typography.label, textAlign: "center" },
+  group: { ...surfaces.card },
+  legal: { color: colors.textMuted, fontSize: typography.note, marginTop: spacing.sm },
+  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.titleCard },
   screen: { gap: spacing.lg },
   summary: {
     ...surfaces.card,

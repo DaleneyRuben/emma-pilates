@@ -11,13 +11,13 @@ describe("SeatPill", () => {
     const screen = await render(<SeatPill>3 cupos</SeatPill>);
 
     expect(screen.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#EFE0DC",
+      backgroundColor: "#F2E4E1",
       borderRadius: 999,
       paddingHorizontal: 12,
       paddingVertical: 6,
     });
     expect(screen.getByText("3 cupos")).toHaveStyle({
-      color: "#7A4F4B",
+      color: "#7D4F4B",
       fontFamily: "WorkSans_500Medium",
       fontSize: 12,
       fontWeight: "500",
@@ -32,7 +32,7 @@ describe("SeatPill", () => {
       borderRadius: 999,
     });
     expect(screen.getByText("Completa")).toHaveStyle({
-      color: "#6E6663",
+      color: "#6F6662",
       fontSize: 12,
       fontWeight: "500",
     });

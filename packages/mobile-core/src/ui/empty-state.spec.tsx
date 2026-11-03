@@ -15,10 +15,11 @@ function svgShapes(instance: Instance): Record<string, unknown>[] {
   );
 }
 
-// MOB-039: S06's «Sin plan activo» and the tablet's empty panel, as the
-// frames draw them.
+// Follow-up 225 §6: every empty state draws the v2 block of `StateScreen`: a
+// 72 pt Rosa tinte disc with a 32 pt Rosa profundo glyph, a Lora 24 title, and
+// a Texto tenue 15 note. The variants keep where it stands.
 describe("EmptyState", () => {
-  it("frames a centred card icon, Lora title, and note in the dashed box", async () => {
+  it("draws the framed variant as the in-list block on Lino", async () => {
     const screen = await render(
       <EmptyState
         icon="card"
@@ -28,28 +29,28 @@ describe("EmptyState", () => {
     );
 
     const title = screen.getByText("Sin plan activo");
-    expect(title).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 19,
-      textAlign: "center",
+    expect(title).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 24, textAlign: "center" });
+    const block = title.parent;
+    expect(block).toHaveStyle({ backgroundColor: "#F5EFE9", borderRadius: 16 });
+    const flat = StyleSheet.flatten(block?.props.style);
+    expect(flat).not.toHaveProperty("borderWidth");
+    expect(flat).not.toHaveProperty("flex");
+    expect(screen.getByTestId("empty-state-disc")).toHaveStyle({
+      backgroundColor: "#F2E4E1",
+      height: 72,
+      width: 72,
     });
-    expect(title.parent).toHaveStyle({
-      alignItems: "center",
-      backgroundColor: "rgba(216,201,187,0.14)",
-      borderColor: "#D8C9BB",
-      borderRadius: 16,
-      borderStyle: "dashed",
-      borderWidth: 1,
-    });
-    expect(screen.getByTestId("empty-state-icon-card", hidden)).toHaveProp("stroke", "#B78380");
+    const icon = screen.getByTestId("empty-state-icon-card", hidden);
+    expect(icon).toHaveProp("stroke", "#93615D");
+    expect(icon).toHaveProp("width", 32);
     expect(screen.getByText("Esta clienta no tiene clases disponibles.")).toHaveStyle({
-      color: "#766D69",
-      fontSize: 13,
+      color: "#6F6662",
+      fontSize: 15,
       textAlign: "center",
     });
   });
 
-  it("draws the panel variant bare, with the icon in a 64 pt circle", async () => {
+  it("draws the panel variant bare and uncentred", async () => {
     const screen = await render(
       <EmptyState
         icon="person"
@@ -59,28 +60,18 @@ describe("EmptyState", () => {
       />,
     );
 
-    const title = screen.getByText("Selecciona un cliente para ver sus detalles");
-    expect(title).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 22 });
-    expect(StyleSheet.flatten(title.parent?.props.style)).not.toHaveProperty("backgroundColor");
-    expect(screen.getByTestId("empty-state-circle")).toHaveStyle({
-      backgroundColor: "rgba(216,201,187,0.18)",
-      borderColor: "#D8C9BB",
-      borderRadius: 32,
-      borderWidth: 1,
-      height: 64,
-      width: 64,
-    });
-    expect(screen.getByTestId("empty-state-icon-person", hidden)).toHaveProp("stroke", "#B78380");
-    expect(
-      screen.getByText("Busca por nombre, teléfono o correo en el panel izquierdo."),
-    ).toHaveStyle({ fontSize: 14, maxWidth: 340 });
+    const flat = StyleSheet.flatten(
+      screen.getByText("Selecciona un cliente para ver sus detalles").parent?.props.style,
+    );
+    expect(flat).not.toHaveProperty("backgroundColor");
+    expect(flat).not.toHaveProperty("flex");
+    expect(screen.getByTestId("empty-state-disc")).toHaveStyle({ height: 72, width: 72 });
+    expect(screen.getByTestId("empty-state-icon-person", hidden)).toHaveProp("stroke", "#93615D");
   });
 });
 
-// MOB-040: 07 and S22 (like 19, S20, and S21) centre a bare empty state on
-// the screen: a quiet 34 pt clock, a Lora 21 title, and an optional note.
 describe("EmptyState plain variant", () => {
-  it("draws the bare clock, Lora 21 title, and 14 pt note on the screen", async () => {
+  it("centres the block on the screen", async () => {
     const screen = await render(
       <EmptyState
         icon="clock"
@@ -91,17 +82,12 @@ describe("EmptyState plain variant", () => {
     );
 
     const title = screen.getByText("Aún no tienes clases en tu historial.");
-    expect(title).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 21, textAlign: "center" });
+    expect(title).toHaveStyle({ fontSize: 24 });
+    expect(title.parent).toHaveStyle({ alignItems: "center", flex: 1, justifyContent: "center" });
     expect(StyleSheet.flatten(title.parent?.props.style)).not.toHaveProperty("backgroundColor");
-    expect(StyleSheet.flatten(title.parent?.props.style)).not.toHaveProperty("borderWidth");
     const icon = screen.getByTestId("empty-state-icon-clock", hidden);
-    expect(icon).toHaveProp("stroke", "#C4BAB6");
-    expect(icon).toHaveProp("width", 34);
-    expect(
-      screen.getByText(
-        "Aquí aparecerán tus clases una vez que registremos tu asistencia en el estudio.",
-      ),
-    ).toHaveStyle({ color: "#766D69", fontSize: 14, maxWidth: 260, textAlign: "center" });
+    expect(icon).toHaveProp("stroke", "#93615D");
+    expect(icon).toHaveProp("width", 32);
   });
 
   it("stands with the title alone, as S22's does", async () => {
@@ -110,13 +96,12 @@ describe("EmptyState plain variant", () => {
     );
 
     expect(screen.getByText("Esta clienta aún no tiene clases en su historial.")).toHaveStyle({
-      fontSize: 21,
+      fontSize: 24,
     });
-    expect(screen.queryByTestId("empty-state-icon-clock", hidden)).toBeNull();
+    expect(screen.queryByTestId("empty-state-disc")).toBeNull();
   });
 
-  // MOB-041: 19 and S20 draw the bell, S21 the calendar, all in the quiet tone.
-  it("draws the bell and the calendar in the same quiet tone", async () => {
+  it("keeps the bell and the calendar shapes", async () => {
     const screen = await render(
       <>
         <EmptyState icon="bell" title="No tienes notificaciones." variant="plain" />
@@ -128,12 +113,6 @@ describe("EmptyState plain variant", () => {
       </>,
     );
 
-    for (const name of ["bell", "calendar"]) {
-      const icon = screen.getByTestId(`empty-state-icon-${name}`, hidden);
-      expect(icon).toHaveProp("stroke", "#C4BAB6");
-      expect(icon).toHaveProp("strokeWidth", 1.1);
-      expect(icon).toHaveProp("width", 34);
-    }
     expect(svgShapes(screen.getByTestId("empty-state-icon-bell", hidden))).toContainEqual(
       expect.objectContaining({ d: "M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z" }),
     );
@@ -142,11 +121,10 @@ describe("EmptyState plain variant", () => {
     );
   });
 
-  // MOB-041: S21 puts «Reservar una clase» 6 pt under the note, 220 pt wide.
-  it("places the action under the note", async () => {
+  it("places the action last, 8 under the note", async () => {
     const screen = await render(
       <EmptyState
-        action={<PrimaryButton label="Reservar una clase" onPress={jest.fn()} />}
+        action={<PrimaryButton label="Reservar una clase" onPress={() => undefined} />}
         icon="calendar"
         message="Puedes reservarle una clase desde el horario del estudio."
         title="Esta clienta no tiene reservas próximas."
@@ -155,7 +133,7 @@ describe("EmptyState plain variant", () => {
     );
 
     const action = screen.getByTestId("empty-state-action");
-    expect(action).toHaveStyle({ marginTop: 6, minWidth: 220 });
+    expect(action).toHaveStyle({ marginTop: 8, minWidth: 220 });
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeOnTheScreen();
     const block = screen.getByText("Esta clienta no tiene reservas próximas.").parent;
     expect(block?.children.indexOf(action)).toBe(block!.children.length - 1);

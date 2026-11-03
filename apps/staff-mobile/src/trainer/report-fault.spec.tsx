@@ -71,7 +71,12 @@ describe("Trainer fault report", () => {
       expect(screen.getByRole("button", { name: "Reformer 3" })).toBeOnTheScreen(),
     );
     expect(screen.getByRole("button", { name: "Reformer 5, fuera de servicio" })).toBeOnTheScreen();
-    expect(screen.getByText("Mats")).toBeOnTheScreen();
+    // v2 S26: one tab per kind, the pieces as numbered tiles.
+    expect(screen.getByText("Equipos de la sucursal Equipetrol")).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Mat 1" })).toBeNull();
+    await fireEvent.press(screen.getByRole("tab", { name: "Mats" }));
+    expect(screen.getByRole("button", { name: "Mat 1" })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("tab", { name: "Reformers" }));
     const send = screen.getByRole("button", { name: "Enviar reporte" });
     expect(send).toBeDisabled();
 
@@ -82,7 +87,9 @@ describe("Trainer fault report", () => {
 
     await waitFor(() => expect(screen.getByText("Gracias por avisar")).toBeOnTheScreen());
     expect(
-      screen.getByText("Administración ya puede ver la falla de Reformer 3."),
+      screen.getByText(
+        "Administración ya puede ver la falla del Reformer 3 y lo marcará cuando esté resuelto.",
+      ),
     ).toBeOnTheScreen();
     expect(fetcher).toHaveBeenCalledWith(
       "/api/v1/trainer/sessions/session-1/equipment-issues",

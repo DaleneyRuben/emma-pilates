@@ -3,6 +3,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
 import { bookingDuringFreezeMessage } from '../payments/freeze';
 import { bookingBeforeStartMessage } from './booking-before-start';
+import { assertInsideBookingWindow } from './booking-window';
 import { BookingAccessDeniedError } from './create-booking';
 import { boliviaWeek } from './weekly-cap';
 
@@ -59,6 +60,7 @@ type RescheduleBookingDependencies = {
     rescheduledByAccountId: string;
   }): Promise<{ id: string }>;
   cancellationWindowMinutes(): Promise<number>;
+  bookingWindowDays?(): Promise<number>;
   now(): Date;
 };
 
@@ -128,6 +130,12 @@ export const rescheduleBooking = async (
   ) {
     throw new Error('Target Session is not eligible for Reschedule');
   }
+
+  await assertInsideBookingWindow(
+    target.startsAt,
+    now,
+    dependencies.bookingWindowDays?.bind(dependencies),
+  );
 
   const freeze = dependencies.findApprovedFreeze
     ? await dependencies.findApprovedFreeze({

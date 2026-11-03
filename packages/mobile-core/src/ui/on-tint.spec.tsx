@@ -10,12 +10,12 @@ describe("text on a tint", () => {
       <TextButton label="Reenviar correo" onPress={jest.fn()} tone="onTint" />,
     );
 
-    expect(screen.getByText("Reenviar correo")).toHaveStyle({ color: "#7A4F4B" });
+    expect(screen.getByText("Reenviar correo")).toHaveStyle({ color: "#7D4F4B" });
   });
 
   it("draws the team access pill in the on-tint tone", async () => {
     const screen = await render(<TeamAccessBadge />);
 
-    expect(screen.getByText("Acceso del equipo")).toHaveStyle({ color: "#7A4F4B" });
+    expect(screen.getByText("Acceso del equipo")).toHaveStyle({ color: "#7D4F4B" });
   });
 });

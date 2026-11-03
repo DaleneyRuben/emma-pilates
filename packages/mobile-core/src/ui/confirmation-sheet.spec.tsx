@@ -22,7 +22,8 @@ describe("ConfirmationSheet", () => {
       />,
     );
 
-  it("draws the Lora title, the note, the outlined Error action and the quiet dismiss link", async () => {
+  // Follow-up 226: inside the sheet the destructive confirmation is solid Error.
+  it("draws the Lora title, the note, the solid Error action and the quiet dismiss link", async () => {
     const screen = await renderSheet();
 
     const sheet = within(screen.getByTestId("logout-sheet"));
@@ -34,7 +35,8 @@ describe("ConfirmationSheet", () => {
     ).toBeOnTheScreen();
     const confirm = sheet.getByTestId("logout-confirm");
     expect(confirm).toBe(sheet.getByRole("button", { name: "Cerrar sesión" }));
-    expect(confirm).toHaveStyle({ borderColor: "#B25D4B" });
+    expect(confirm).toHaveStyle({ backgroundColor: "#A04E3E" });
+    expect(sheet.getByText("Cerrar sesión")).toHaveStyle({ color: "#FFFFFF" });
     expect(sheet.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
   });
 
@@ -82,6 +84,16 @@ describe("ConfirmationSheet", () => {
 
     const screen = await renderSheet({ children: <Text>Reformer · jueves 20</Text> });
     expect(screen.getByText("Reformer · jueves 20")).toBeOnTheScreen();
+  });
+
+  it("leaves the note out when the facts are rows (C05c)", async () => {
+    const screen = await renderSheet({
+      children: <Text>La clase vuelve a tu plan</Text>,
+      note: undefined,
+    });
+
+    expect(screen.getByText("La clase vuelve a tu plan")).toBeOnTheScreen();
+    expect(screen.queryAllByText("")).toHaveLength(0);
   });
 
   it("falls back to «Volver» as the dismiss label", async () => {

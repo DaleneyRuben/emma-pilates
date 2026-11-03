@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Revisar pago</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="S11-Pagos-pendientes.dc.html" aria-label="Volver a Pagos pendientes" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-family: Lora, Georgia, serif; font-size: 24px">Revisar pago</span>
+  </div>
+  <div style="flex-grow: 1; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="background: #93615D; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 8px; color: #FFFFFF">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.75)">Monto a verificar</span>
+        <span style="padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.18); font-size: 12px; font-weight: 600">Pendiente</span>
+      </div>
+      <span style="font-family: Lora, Georgia, serif; font-size: 32px; font-variant-numeric: tabular-nums">Bs 697</span>
+      <span style="font-size: 14px; color: rgba(255,255,255,0.85)">Valeria · plan de 12 clases con 15 %</span>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 16px; display: flex; flex-direction: column">
+      <div style="min-height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 12px">
+        <div style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center; flex: none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20.5h16M5.5 20.5V9l6.5-4.5L18.5 9v11.5M10 20.5v-5h4v5"></path></svg></div>
+        <span style="flex-grow: 1; font-size: 16px">Transferencia</span><span style="font-size: 15px; color: #6F6662">Banco Ganadero</span>
+      </div>
+      <div style="height: 1px; background: #E6DBD0; margin-left: 64px"></div>
+      <div style="min-height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 12px">
+        <div style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center; flex: none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></div>
+        <span style="flex-grow: 1; font-size: 16px">Enviado hace 20 min</span><span style="font-size: 15px; color: #6F6662">2 nov, 09:12</span>
+      </div>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Comprobante</span>
+      <div role="img" aria-label="Captura del comprobante de Valeria" style="height: 168px; border-radius: 12px; background: #E6DBD0; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4v13H7z"></path><path d="M14 3.5v4h4M10 12h5M10 15.5h5"></path></svg></div>
+      <div style="height: 1px; background: #E6DBD0"></div>
+      <div style="display: flex; justify-content: flex-end"><button style="height: 44px; padding: 0 12px; border: none; background: transparent; color: #7D4F4B; font-family: inherit; font-size: 15px; font-weight: 600">Ampliar</button></div>
+    </div>
+  </div>
+  <div style="padding: 12px 20px 30px; display: flex; flex-direction: column; gap: 4px">
+    <a href="S11-Pagos-pendientes.dc.html" style="height: 52px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Confirmar pago</a>
+    <a href="S12-Rechazar-pago.dc.html" style="height: 44px; color: #A04E3E; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Rechazar</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

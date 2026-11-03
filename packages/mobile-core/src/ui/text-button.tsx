@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from "react-native";
 
 import { fontFamilies } from "./fonts";
 import { colors, spacing, typography } from "./tokens";
@@ -7,15 +7,18 @@ type TextButtonProps = {
   disabled?: boolean;
   label: string;
   onPress: () => void;
+  style?: StyleProp<ViewStyle>;
   testID?: string;
-  /** «onTint» for a link on Palo de rosa tinte, such as a pending card's. */
-  tone?: "default" | "onTint";
+  /** «onTint» for a link on Palo de rosa tinte, such as a pending card's;
+   * «error» for a destructive card action (follow-up 226). */
+  tone?: "default" | "error" | "onTint";
 };
 
 export function TextButton({
   disabled = false,
   label,
   onPress,
+  style,
   testID,
   tone = "default",
 }: TextButtonProps) {
@@ -27,10 +30,10 @@ export function TextButton({
       disabled={disabled}
       hitSlop={spacing.sm}
       onPress={onPress}
-      style={styles.button}
+      style={[styles.button, style]}
       testID={testID}
     >
-      <Text style={[styles.label, tone === "onTint" && styles.onTint, disabled && styles.disabled]}>
+      <Text style={[styles.label, tone === "error" && styles.error, disabled && styles.disabled]}>
         {label}
       </Text>
     </Pressable>
@@ -47,13 +50,15 @@ const styles = StyleSheet.create({
   disabled: {
     color: colors.disabledText,
   },
-  onTint: {
-    color: colors.primaryOnTint,
+  error: {
+    color: colors.error,
   },
+  // Follow-up 225 §4: Rosa enlace, which already reads on Lino and Rosa tinte,
+  // so «onTint» draws the same; no underline.
   label: {
-    color: colors.primaryDeep,
-    fontFamily: fontFamilies.body,
+    color: colors.primaryOnTint,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
-    textDecorationLine: "underline",
+    fontWeight: "600",
   },
 });

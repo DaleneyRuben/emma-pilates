@@ -234,4 +234,35 @@ describe('Administrator Session cancellation', () => {
       prisma.booking.findUniqueOrThrow({ where: { id: booking.id } }),
     ).resolves.toMatchObject({ cancelledByAccountId: carolina.accountId });
   });
+
+  // FIX-027: the owner cancels a future class nobody booked (a holiday, a sick
+  // Trainer); no Booking is refunded and the Session is still audited.
+  it('cancels a future Session that has no Bookings', async () => {
+    const commands = new PrismaBookingCommands(prisma, () => new Date());
+    const admin = await principalOf('paola.mendoza@example.com');
+    const future = fixtures.sessions
+      .filter((s) => s.startsAt.getTime() > now.getTime() + 3 * 60 * 60 * 1_000)
+      .sort((a, b) => b.startsAt.getTime() - a.startsAt.getTime());
+    const counts = await Promise.all(
+      future.map((s) =>
+        prisma.booking.count({ where: { sessionId: s.id, state: 'BOOKED' } }),
+      ),
+    );
+    const empty = future[counts.indexOf(0)];
+
+    await expect(
+      commands.cancelSession({ sessionId: empty.id }, admin),
+    ).resolves.toEqual({ affectedBookings: 0 });
+    await expect(
+      prisma.session.findUniqueOrThrow({ where: { id: empty.id } }),
+    ).resolves.toMatchObject({
+      state: 'CANCELLED',
+      cancelledByAccountId: admin.accountId,
+    });
+    await expect(
+      prisma.auditRecord.count({
+        where: { actionCode: 'session.cancelled', targetId: empty.id },
+      }),
+    ).resolves.toBe(1);
+  });
 });

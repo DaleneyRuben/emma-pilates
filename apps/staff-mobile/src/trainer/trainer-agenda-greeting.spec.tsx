@@ -57,15 +57,16 @@ describe("Trainer agenda greeting and times", () => {
     });
   });
 
-  it("writes the agenda and roster times as «10:00 – 10:50»", async () => {
+  it("writes the agenda start with its length and the roster time as «10:00 – 10:50»", async () => {
     const screen = await renderTrainer();
 
     await waitFor(() => {
-      expect(screen.getByText("10:00 – 10:50")).toBeOnTheScreen();
+      expect(screen.getByText("10:00")).toBeOnTheScreen();
     });
+    expect(screen.getByText("50 min")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
     await waitFor(() => {
-      expect(screen.getByText("Sopocachi · 10:00 – 10:50")).toBeOnTheScreen();
+      expect(screen.getByText(/^Sopocachi · .* · 10:00 – 10:50$/)).toBeOnTheScreen();
     });
   });
 });

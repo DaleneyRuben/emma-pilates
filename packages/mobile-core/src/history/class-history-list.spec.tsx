@@ -34,7 +34,7 @@ describe("ClassHistoryList", () => {
   it("opens with the lead and the count since the oldest month", async () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
-    expect(screen.getByText("Has asistido a")).toHaveStyle({ color: "#766D69", fontSize: 13 });
+    expect(screen.getByText("Has asistido a")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
     expect(screen.getByText("3 clases desde agosto")).toHaveStyle({
       fontFamily: "Lora_500Medium",
       fontSize: 26,
@@ -76,7 +76,7 @@ describe("ClassHistoryList", () => {
       fontSize: 17,
     });
     expect(screen.getByText("Daniela Ortiz · Urubó")).toHaveStyle({
-      color: "#766D69",
+      color: "#6F6662",
       fontSize: 13,
     });
   });

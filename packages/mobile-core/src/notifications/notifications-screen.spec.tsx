@@ -74,10 +74,15 @@ function createFetcher(pages: unknown[]) {
   }) as unknown as jest.Mock & typeof globalThis.fetch;
 }
 
-async function renderScreen(fetcher: typeof globalThis.fetch, onOpen = jest.fn()) {
+async function renderScreen(
+  fetcher: typeof globalThis.fetch,
+  onOpen = jest.fn(),
+  emptyAction?: { label: string; onPress: () => void },
+) {
   const screen = await render(
     <MobileQueryProvider>
       <NotificationsScreen
+        emptyAction={emptyAction}
         emptySupport="Aquí te avisaremos sobre tus clases, pagos y evaluaciones."
         fetcher={fetcher}
         now={now}
@@ -175,6 +180,18 @@ describe("NotificationsScreen", () => {
     expect(screen.queryByText("Sin leer")).not.toBeOnTheScreen();
   });
 
+  it("offers the app's own action from the empty state (C19b)", async () => {
+    const onPress = jest.fn();
+    const screen = await renderScreen(
+      createFetcher([{ items: [], hasMore: false, nextCursor: null }]),
+      jest.fn(),
+      { label: "Volver al inicio", onPress },
+    );
+
+    await fireEvent.press(await screen.findByRole("button", { name: "Volver al inicio" }));
+    expect(onPress).toHaveBeenCalled();
+  });
+
   it("shows the empty state without the mark-all action", async () => {
     const screen = await renderScreen(
       createFetcher([{ items: [], hasMore: false, nextCursor: null }]),
@@ -183,19 +200,19 @@ describe("NotificationsScreen", () => {
     await waitFor(() => {
       expect(screen.getByText("No tienes notificaciones.")).toBeOnTheScreen();
     });
-    // MOB-041: 19's and S20's bare empty state, a quiet bell over Lora 21.
+    // Follow-up 225 §6: the v2 state block, a Rosa profundo bell over Lora 24.
     expect(screen.getByText("No tienes notificaciones.")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 21,
+      fontFamily: "Lora_400Regular",
+      fontSize: 24,
     });
     const bell = screen.getByTestId("empty-state-icon-bell", {
       includeHiddenElements: true,
     });
-    expect(bell).toHaveProp("stroke", "#C4BAB6");
-    expect(bell).toHaveProp("width", 34);
+    expect(bell).toHaveProp("stroke", "#93615D");
+    expect(bell).toHaveProp("width", 32);
     expect(
       screen.getByText("Aquí te avisaremos sobre tus clases, pagos y evaluaciones."),
-    ).toHaveStyle({ color: "#766D69", fontSize: 14 });
+    ).toHaveStyle({ color: "#6F6662", fontSize: 15 });
     expect(screen.queryByRole("button", { name: "Marcar leídas" })).not.toBeOnTheScreen();
   });
 

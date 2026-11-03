@@ -55,11 +55,29 @@ describe("StaffNavigation", () => {
     ["assistant", "Buscar cliente"],
     ["administrator", "Pagos pendientes"],
     ["nutritionist", "Mi agenda"],
+    ["coordinator", "Buscar cliente"],
   ] as const)("routes %s to its Staff destination", async (role, label) => {
     const screen = await render(<StaffNavigation {...defaultProps} role={role} />);
 
     expect(screen.getByLabelText(label)).toBeOnTheScreen();
     expect(screen.queryByLabelText("Iniciar sesión")).not.toBeOnTheScreen();
+  });
+
+  // Follow-up 225 §8: Perfil replaces the avatar on every root (owner, 2026-11-02).
+  it.each([
+    ["trainer", ["Agenda", "Mis pagos", "Perfil"]],
+    ["assistant", ["Clientes", "Horario", "Caja", "Perfil"]],
+    ["nutritionist", ["Agenda", "Disponibilidad", "Perfil"]],
+    ["administrator", ["Pagos", "Clientes", "Horario", "Perfil"]],
+    ["coordinator", ["Clientes", "Para contactar", "Horario", "Perfil"]],
+  ] as const)("gives %s its own tab bar", async (role, tabs) => {
+    const screen = await render(<StaffNavigation {...defaultProps} role={role} />);
+
+    const labels = screen
+      .getAllByTestId(/^tab-/)
+      .map((tab) => String(tab.props.accessibilityLabel).split(",")[0]);
+    expect(labels).toEqual(tabs);
+    expect(screen.queryByTestId("account-avatar")).not.toBeOnTheScreen();
   });
 
   it("does not render Client navigation for a Client identity", async () => {

@@ -36,7 +36,8 @@ env:
             notVisible:
               id: "roster-attended-.*"
           commands:
-            - tapOn: "Volver"
+            - tapOn:
+                id: "back-bar"
             # Nothing has this id: a 30-second pause before reopening.
             - extendedWaitUntil:
                 visible:
@@ -49,6 +50,6 @@ env:
 - tapOn:
     id: "roster-save"
 - extendedWaitUntil:
-    visible: "Asistencia guardada."
+    visible: "Asistencia guardada"
     timeout: 15000
 - takeScreenshot: staff-attendance-3-saved

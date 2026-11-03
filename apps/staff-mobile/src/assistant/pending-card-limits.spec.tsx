@@ -34,7 +34,7 @@ const createdAs = (status: "invited" | "verification_pending") => () =>
   jsonResponse({ status, clientId: "client-new", email: "ana@example.com" }, 201);
 
 async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearch>>) {
-  await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+  await fireEvent.press(screen.getByTestId("client-search-new-client"));
   await waitFor(() => {
     expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
   });
@@ -46,7 +46,7 @@ async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearc
 
 const expectCardNotice = (screen: Awaited<ReturnType<typeof openClientSearch>>, wait: string) => {
   expect(screen.getByTestId("wait-notice")).toHaveStyle({
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
   });
   expect(
     screen.getByTestId("wait-notice-clock", { includeHiddenElements: true }),
@@ -76,7 +76,7 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
     expectCardNotice(screen, "Podrás reenviarlo en 0:40.");
     const resend = screen.getByRole("button", { name: "Reenviar enlace" });
     expect(resend).toBeDisabled();
-    expect(resend).toHaveStyle({ borderColor: colors.border });
+    expect(resend).toHaveStyle({ backgroundColor: colors.disabledBackground });
   });
 
   it("draws «Verificación limitada» on S06 as the card's clock notice with a 48 pt button", async () => {
@@ -155,11 +155,11 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
     await submitNewClient(screen);
     const title = await screen.findByText("Cuenta pendiente de activación");
 
+    // v2 S06: a Lino card, never the amber block.
     expect(screen.getByTestId("pending-card")).toHaveStyle({
+      backgroundColor: "#F5EFE9",
       borderRadius: 16,
-      gap: 12,
-      padding: 18,
     });
-    expect(title).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 19 });
+    expect(title).toHaveStyle({ fontSize: 16 });
   });
 });

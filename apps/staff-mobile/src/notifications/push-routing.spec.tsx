@@ -38,10 +38,9 @@ async function renderAdministrator(device = createMemoryPushPlatform()) {
       })}
     />,
   );
-  await waitFor(
-    () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
-    { timeout: 10_000 },
-  );
+  await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+    timeout: 10_000,
+  });
   return { device, fetcher, screen };
 }
 
@@ -92,5 +91,18 @@ describe("Staff push notifications (NOT-002)", () => {
 
     await act(async () => undefined);
     expect(screen.queryByRole("button", { name: "Activar notificaciones" })).toBeNull();
+  });
+
+  // P01 (v2): the staff sheet speaks to the team, not to a Client.
+  it("asks for notifications with the team's own title and text", async () => {
+    const { screen } = await renderAdministrator(createMemoryPushPlatform("undetermined"));
+
+    await waitFor(() => expect(screen.getByTestId("push-permission-sheet")).toBeOnTheScreen());
+    expect(screen.getByText("Entérate al momento")).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "Te avisamos apenas cambie una clase, llegue una reserva o haya un pago por revisar.",
+      ),
+    ).toBeOnTheScreen();
   });
 });

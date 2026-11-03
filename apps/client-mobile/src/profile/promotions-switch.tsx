@@ -3,7 +3,15 @@ import {
   setCurrentClientPromotionsConsent,
   useGetCurrentClientPromotionsConsent,
 } from "@pilates/api-contracts";
-import { BodyText, colors, radii, spacing, surfaces, typography } from "@pilates/mobile-core";
+import {
+  BodyText,
+  colors,
+  fontFamilies,
+  Glyph,
+  radii,
+  spacing,
+  typography,
+} from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -47,8 +55,10 @@ export function PromotionsSwitch() {
     }
   };
 
+  // C18b: one row of the Preferencias group, the legal line under the group.
   return (
-    <View style={styles.card}>
+    <>
+      <View style={styles.hairline} />
       <Pressable
         accessibilityLabel={label}
         accessibilityRole="switch"
@@ -58,26 +68,35 @@ export function PromotionsSwitch() {
         style={[styles.row, saving !== null && styles.saving]}
         testID="profile-promotions-switch"
       >
+        <View style={styles.disc}>
+          <Glyph name="tag" size={18} strokeWidth={1.5} />
+        </View>
         <View style={styles.text}>
-          <Text style={styles.label}>{label}</Text>
-          <BodyText style={styles.helper}>
-            Usamos tu nombre, correo y teléfono para enviarte ofertas y novedades del estudio.
-            Puedes desactivarlo cuando quieras.
-          </BodyText>
+          <Text style={styles.label}>Recibir promociones</Text>
           {failed ? <BodyText style={styles.error}>{saveFailed}</BodyText> : null}
         </View>
         <View style={[styles.track, checked && styles.trackOn]}>
           <View style={styles.knob} />
         </View>
       </Pressable>
-    </View>
+    </>
   );
 }
 
+export const promotionsLegalLine =
+  "Usamos tu nombre, correo y teléfono para enviarte ofertas del estudio.";
+
 const styles = StyleSheet.create({
-  card: { ...surfaces.card, overflow: "hidden" },
+  disc: {
+    alignItems: "center",
+    backgroundColor: colors.primaryTint,
+    borderRadius: radii.pill,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
   error: { color: colors.error, fontSize: typography.note },
-  helper: { color: colors.textMuted, fontSize: typography.note },
+  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
   knob: {
     backgroundColor: colors.white,
     borderRadius: radii.pill,
@@ -89,19 +108,20 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     width: 27,
   },
-  label: { color: colors.text, fontSize: 16 },
+  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
   row: {
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.mdLg,
+    gap: spacing.md,
+    minHeight: 56,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+    paddingVertical: spacing.sm,
   },
   saving: { opacity: 0.6 },
   text: { flex: 1, gap: spacing.xs },
   track: {
     alignItems: "flex-start",
-    backgroundColor: colors.borderStrong,
+    backgroundColor: colors.hairline,
     borderRadius: radii.pill,
     height: 31,
     justifyContent: "center",

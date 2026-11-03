@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   pill: {
     alignItems: "center",
     alignSelf: "flex-start",
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,
     borderWidth: 1,
