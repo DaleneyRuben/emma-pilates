@@ -25,6 +25,7 @@ const editableFromFormatter = new Intl.DateTimeFormat("es-BO", {
 // The API's refusals of a save (BKM-017), shown on the sheet's status line.
 const refusals: Record<string, CodeStatus> = {
   referral_code_blocked: "blocked",
+  referral_code_change_too_soon: "too_soon",
   referral_code_in_use: "in_use",
   referral_code_malformed: "malformed",
 };
@@ -107,7 +108,8 @@ export function EditReferralCode({ fetcher, onChanged }: EditReferralCodeProps) 
             return;
           }
           const problem = (response?.data ?? {}) as { code?: string };
-          setRefusal(refusals[problem.code ?? ""] ?? "in_use");
+          // A network failure or an unexpected answer can be tried again.
+          setRefusal(refusals[problem.code ?? ""] ?? "failed");
           setStep("editing");
         },
       },

@@ -13,14 +13,17 @@ import { colors, radii, spacing, typography } from "../ui/tokens";
 const codePattern = /^[A-Z0-9][A-Z0-9-]{2,19}$/;
 const debounceMilliseconds = 300;
 
-export type CodeStatus = "available" | "blocked" | "current" | "in_use" | "malformed";
+export type CodeStatus =
+  "available" | "blocked" | "current" | "failed" | "in_use" | "malformed" | "too_soon";
 
 export const codeStatusText: Record<CodeStatus, string> = {
   available: "Disponible",
   blocked: "Ese código no está permitido",
   current: "Es tu código actual",
+  failed: "No pudimos guardar tu código. Intenta de nuevo.",
   in_use: "Ya está en uso",
   malformed: "Usa de 3 a 20 letras, números o guiones",
+  too_soon: "Solo puedes cambiarlo una vez cada 30 días",
 };
 
 /** Upper case, no accents, no spaces or symbols: what the code would be stored as. */
@@ -61,7 +64,8 @@ export function ReferralCodeSheet({
   const wellFormed = codePattern.test(checked);
   const availability = useGetReferralCodeAvailability(
     { code: checked },
-    { fetcher, query: { enabled: visible && wellFormed, staleTime: 0 } },
+    // No cached «Disponible»: only a fresh answer enables «Guardar código».
+    { fetcher, query: { enabled: visible && wellFormed, gcTime: 0, staleTime: 0 } },
   );
   const answer =
     availability.data?.status === 200 && availability.data.data.code === checked
@@ -100,7 +104,7 @@ export function ReferralCodeSheet({
             Usa de 3 a 20 letras, números o guiones. Puedes cambiarlo una vez cada 30 días.
           </Text>
           <PrimaryButton
-            disabled={status !== "available"}
+            disabled={status !== "available" && status !== "failed"}
             label="Guardar código"
             onPress={onSave}
             size="compact"
