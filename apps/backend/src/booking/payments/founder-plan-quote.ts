@@ -29,31 +29,45 @@ export const priceFounderPlanList = async <
 > => {
   if (clientId === null) return plans;
   const rules = await readFounderRules(transaction);
-  if (!(await quotesFounderPrice(transaction, clientId, rules, now))) {
-    return plans;
-  }
-  return priceFounderPlans(plans, {
+  const quote = await quotesFounderPrice(transaction, clientId, rules, now);
+  if (quote === null) return plans;
+  const priced = priceFounderPlans(plans, {
     founder: true,
     percent: rules.founderDiscountPercent,
   });
+  // BKM-019: the places left reach the Client only when 10 or fewer remain,
+  // so the internal total of founder places never leaves the backend.
+  const placesLeft = quote.placesLeft;
+  if (placesLeft === null || placesLeft > launchPlacesShownFrom) return priced;
+  return priced.map((plan) =>
+    plan.listPriceCentavos === undefined
+      ? plan
+      : { ...plan, launchPlacesLeft: placesLeft },
+  );
 };
+
+const launchPlacesShownFrom = 10;
 
 const quotesFounderPrice = async (
   transaction: Transaction,
   clientId: string,
   rules: { founderPlaces: number },
   now: Date,
-): Promise<boolean> => {
+): Promise<{ placesLeft: number | null } | null> => {
   const { held, price } = await readFounderPrice(transaction, { clientId });
-  if (price === 'list') return false;
+  if (price === 'list') return null;
+  // A founder's renewal keeps 15 % whatever the places, so no count shows.
+  const renewal = { placesLeft: null };
   if (price === 'founder') {
-    if (held?.status !== FounderMembershipStatus.ACTIVE) return true;
+    if (held?.status !== FounderMembershipStatus.ACTIVE) return renewal;
     const today = todayOf(now);
-    return !(await founderGapWouldLose(transaction, {
+    return (await founderGapWouldLose(transaction, {
       clientId,
       nextStart: today,
       today,
-    }));
+    }))
+      ? null
+      : renewal;
   }
   const placesTaken = await transaction.founderMembership.count({
     where: {
@@ -63,5 +77,7 @@ const quotesFounderPrice = async (
       },
     },
   });
-  return placesTaken < rules.founderPlaces;
+  return placesTaken < rules.founderPlaces
+    ? { placesLeft: rules.founderPlaces - placesTaken }
+    : null;
 };

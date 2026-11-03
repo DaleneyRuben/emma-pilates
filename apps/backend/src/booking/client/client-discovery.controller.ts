@@ -95,6 +95,9 @@ const toPlanDto = (plan: PlanSummary): PlanDto => ({
   ...(plan.listPriceCentavos === undefined
     ? {}
     : { listPriceCentavos: plan.listPriceCentavos }),
+  ...(plan.launchPlacesLeft === undefined
+    ? {}
+    : { launchPlacesLeft: plan.launchPlacesLeft }),
 });
 
 @Controller({ path: 'clients/current', version: '1' })

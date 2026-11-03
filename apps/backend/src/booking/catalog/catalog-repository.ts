@@ -7,6 +7,8 @@ export type PlanSummary = {
   priceCentavos: number;
   // Present only for a founder, and only when the Plan is discounted.
   listPriceCentavos?: number;
+  // BKM-019: launch places left, only when 10 or fewer remain.
+  launchPlacesLeft?: number;
   displayOrder: number;
 };
 
