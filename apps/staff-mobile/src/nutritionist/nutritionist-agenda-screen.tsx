@@ -177,7 +177,9 @@ export function NutritionistAgendaScreen() {
                         style={styles.cardBody}
                       >
                         <View style={styles.timeColumn}>
-                          <Text style={styles.time}>{clockTime(entry.startsAt)}</Text>
+                          <Text numberOfLines={1} style={styles.time}>
+                            {clockTime(entry.startsAt)}
+                          </Text>
                           <Text style={styles.quiet}>{`${entry.durationMinutes} min`}</Text>
                         </View>
                         <View style={styles.who}>
@@ -241,6 +243,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontVariant: ["tabular-nums"],
   },
-  timeColumn: { width: 56 },
+  timeColumn: { flexShrink: 0, minWidth: 56 },
   who: { flex: 1, gap: spacing.xxs },
 });
