@@ -166,6 +166,20 @@ Only JavaScript, copy, style, and asset fixes that need no native change:
    with `eas update:republish` of the previous group. Never promote only
    because time passed.
 
+## How often to make a store build (owner, 2026-11-03)
+
+- After every native change: a native module, a config plugin, a permission,
+  an SDK upgrade, the icon, the splash, or anything else in `app.json` that
+  changes the fingerprint.
+- Monthly, on the first Monday, with `patch`, when OTAs went out since the
+  last store build, so a new install starts from the latest code.
+- At least once a year for Google Play's target API level (deadline at the
+  end of August) and an Expo SDK upgrade.
+
+Everything else ships as an OTA. The
+[mobile-release skill](../../.agents/skills/mobile-release/SKILL.md) holds
+the same standard.
+
 ## From GitHub Actions (REL-008, [ADR-0107](../adr/0107-trigger-mobile-releases-from-github-actions.md))
 
 Three workflows replace the workstation commands above. Each is

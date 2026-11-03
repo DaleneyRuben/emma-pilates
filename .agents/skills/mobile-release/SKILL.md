@@ -13,6 +13,14 @@ The step-by-step reference is the [mobile release runbook](../../../docs/runbook
 - **Store build**: anything native. That means a new native module (for example `expo-clipboard`), a config plugin, a permission, an SDK upgrade, or any other change to the fingerprint. Installed apps never receive it as an OTA, so each app that changed needs its own build.
 - When the JavaScript calls a new API, the backend has to reach production before testers can use that screen. Until then the screen must degrade gracefully.
 
+### When to make a store build (owner, 2026-11-03)
+
+1. **Always** after a native change (above). Without it the change reaches nobody.
+2. **Monthly**, on the first Monday, with `patch`, when OTAs went out since the last store build. A new install then starts from the latest code instead of waiting for an OTA on first launch. A month without changes needs no build.
+3. **By the calendar:** Google Play requires the new Android target API level every year (deadline at the end of August), and Expo ships two or three SDKs a year; upgrade at least once a year. Both always need a store build.
+
+Everything else ships by OTA. The free plan's 15 builds per platform a month cover this easily.
+
 ## 2. The version standard (owner, 2026-11-03)
 
 Store builds follow semver. Nobody types the version: **Create native release** asks for the bump and computes the number (`scripts/expo-version.mjs`).
