@@ -121,4 +121,23 @@ describe("Trainer roster empty state (UX-009)", () => {
     expect(await screen.findByRole("button", { name: "Guardar asistencia" })).toBeOnTheScreen();
     expect(screen.queryByText(/Podrás marcar asistencia/)).toBeNull();
   });
+
+  // A Trainer who opens the roster just before the class keeps it open: the
+  // attendance controls appear at the start without leaving the screen.
+  it("opens attendance at the start while the roster stays open", async () => {
+    const startsAt = new Date(Date.now() + 1500).toISOString();
+    const endsAt = new Date(Date.now() + 50 * 60_000).toISOString();
+    const { screen } = await openRoster(
+      [{ bookingId: "booking-1", clientName: "Ana Pérez" }],
+      endsAt,
+      startsAt,
+    );
+
+    expect(
+      await screen.findByText("Podrás marcar asistencia cuando empiece la clase."),
+    ).toBeOnTheScreen();
+    expect(
+      await screen.findByRole("button", { name: "Guardar asistencia" }, { timeout: 5000 }),
+    ).toBeOnTheScreen();
+  });
 });
