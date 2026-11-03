@@ -5,7 +5,7 @@ import {
   founderRenewalDeadline,
   isFounder,
   priceFounderPlans,
-  showFounderPrice,
+  founderPriceFrom,
 } from './founder-membership';
 
 const day = 24 * 60 * 60 * 1_000;
@@ -53,20 +53,21 @@ describe('founder discount', () => {
     },
   );
 
-  it('shows the founder price on a first Plan while a place remains', () => {
-    expect(showFounderPrice({ held: 'none', placesRemaining: true })).toBe(
-      true,
-    );
-    expect(showFounderPrice({ held: 'active', placesRemaining: false })).toBe(
-      true,
-    );
-    expect(showFounderPrice({ held: 'none', placesRemaining: false })).toBe(
-      false,
-    );
-    expect(showFounderPrice({ held: 'lost', placesRemaining: true })).toBe(
-      false,
-    );
-  });
+  it.each([
+    ['active', false, 'founder'],
+    ['active', true, 'founder'],
+    ['reserved', false, 'founder'],
+    ['reserved', true, 'list'],
+    ['lost', false, 'list'],
+    ['lost', true, 'list'],
+    ['none', false, 'needs-place'],
+    ['none', true, 'list'],
+  ] as const)(
+    'prices a %s place with earlier plan payment %s as %s',
+    (held, earlierPlanPayment, price) => {
+      expect(founderPriceFrom({ held, earlierPlanPayment })).toBe(price);
+    },
+  );
 
   it('shows a founder the discounted price and keeps the list price beside it', () => {
     const plans = [

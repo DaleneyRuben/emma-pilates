@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { createCatalogRepository } from '../../src/booking/catalog/prisma-catalog-repository';
-import { priceFounderPlanList } from '../../src/booking/payments/prisma-founder-membership';
+import { priceFounderPlanList } from '../../src/booking/payments/founder-plan-quote';
 import { readCurrentStudioSettings } from '../../src/booking/studio-settings/prisma-studio-settings';
 import {
   fixtures,

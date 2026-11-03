@@ -48,14 +48,21 @@ export const founderDiscount = (input: {
   };
 };
 
-// The list shows the founder price to anyone who would take a place on her
-// first real Plan, and to a founder who still holds hers. A lost membership
-// and a full list of 40 see the list price.
-export const showFounderPrice = (input: {
-  held: 'active' | 'lost' | 'none';
-  placesRemaining: boolean;
-}): boolean =>
-  input.held === 'active' || (input.held === 'none' && input.placesRemaining);
+export type HeldFounderPlace = 'active' | 'reserved' | 'lost' | 'none';
+
+// One answer for the quote and the sale, so what a Client sees is what she
+// pays. A held place keeps the price on every Plan, from the first one on; a
+// lost one never comes back; a Client who already bought a real Plan without
+// a place cannot take one later. Only a first Plan needs a free place.
+export const founderPriceFrom = (input: {
+  held: HeldFounderPlace;
+  earlierPlanPayment: boolean;
+}): 'founder' | 'list' | 'needs-place' => {
+  if (input.held === 'active') return 'founder';
+  if (input.held === 'lost') return 'list';
+  if (input.earlierPlanPayment) return 'list';
+  return input.held === 'reserved' ? 'founder' : 'needs-place';
+};
 
 export const decideFounderPlace = (input: {
   places: number;
