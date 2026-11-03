@@ -36,16 +36,41 @@ export function planRowTerms(
   return `${plan.classAllowance === 1 ? "Válida" : "Válido"} por ${plan.durationDays} días`;
 }
 
+/** The places left the API sends (BKM-019) only while 10 or fewer remain. */
+function launchPlacesLeft(plans: readonly PlanDto[]): number | null {
+  const counts = plans.flatMap((plan) =>
+    plan.launchPlacesLeft === undefined ? [] : [plan.launchPlacesLeft],
+  );
+  return counts.length === 0 ? null : Math.min(...counts);
+}
+
+const scarcityLine = (placesLeft: number) =>
+  placesLeft === 1
+    ? "¡Queda solo 1 lugar con 15 % de descuento!"
+    : `¡Quedan solo ${placesLeft} lugares con 15 % de descuento!`;
+
 /**
  * Walkthrough n.º 13: the launch banner while the 15 % applies to this
- * Client. «¡Quedan solo N lugares…!» needs the places left, which the API
- * does not expose yet (BKM-019), so only the general line shows.
+ * Client, in the strong tone with the count when few places are left (C08b).
+ * It never says «Fundadora» nor how many places there were.
  */
-function LaunchBanner() {
+function LaunchBanner({ placesLeft }: { placesLeft: number | null }) {
+  const strong = placesLeft !== null;
   return (
-    <View accessibilityRole="text" style={styles.banner} testID="plans-launch-banner">
-      <Glyph color={colors.primaryOnTint} name="tag" size={20} strokeWidth={1.6} />
-      <Text style={styles.bannerText}>Oferta por tiempo limitado · 15 % en tu plan</Text>
+    <View
+      accessibilityRole="text"
+      style={[styles.banner, strong && styles.bannerStrong]}
+      testID="plans-launch-banner"
+    >
+      <Glyph
+        color={strong ? colors.white : colors.primaryOnTint}
+        name={strong ? "flame" : "tag"}
+        size={20}
+        strokeWidth={1.6}
+      />
+      <Text style={[styles.bannerText, strong && styles.bannerTextStrong]}>
+        {strong ? scarcityLine(placesLeft) : "Oferta por tiempo limitado · 15 % en tu plan"}
+      </Text>
     </View>
   );
 }
@@ -94,7 +119,7 @@ export function PlansScreen() {
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
           {plans.data.data.some((plan) => plan.listPriceCentavos !== undefined) ? (
-            <LaunchBanner />
+            <LaunchBanner placesLeft={launchPlacesLeft(plans.data.data)} />
           ) : null}
           <View style={styles.group}>
             {plans.data.data.map((plan, index) => (
@@ -123,6 +148,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
+  bannerStrong: { backgroundColor: colors.emphasis },
   bannerText: {
     color: colors.primaryOnTint,
     flex: 1,
@@ -130,6 +156,7 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     fontWeight: "600",
   },
+  bannerTextStrong: { color: colors.white },
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
   list: { gap: spacing.xl, paddingBottom: spacing.xxl },
