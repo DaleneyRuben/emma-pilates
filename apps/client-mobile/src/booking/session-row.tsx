@@ -71,7 +71,7 @@ export function SessionRow({
       ]}
       testID={testID}
     >
-      <Text style={styles.time} testID="session-row-time">
+      <Text numberOfLines={1} style={styles.time} testID="session-row-time">
         {formatStartTime(session.startsAt)}
       </Text>
       <View style={styles.body}>
@@ -123,7 +123,8 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.display,
     fontSize: 20,
     fontVariant: ["tabular-nums"],
-    width: 56,
+    // Lora's digits run wider on Android: a fixed width wrapped «09:00».
+    minWidth: 56,
   },
   title: {
     color: colors.text,
