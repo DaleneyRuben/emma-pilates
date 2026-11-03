@@ -108,7 +108,9 @@ for (let step = 0; session === null && step < 12; step += 1) {
 }
 if (session === null) throw new Error("no free slot for Daniela's class");
 for (const email of ["lucia@example.com", "valeria@example.com"]) {
-  const booked = await request("POST", `/sessions/${session.id}/bookings`, await login(email), {});
-  console.log(`${email} → Daniela's class: ${booked.status}`);
+  // A failed booking leaves the class under the 2-booking minimum, and the
+  // worker would cancel it before the photo: stop instead.
+  await must("POST", `/sessions/${session.id}/bookings`, await login(email), {});
+  console.log(`${email} booked Daniela's class`);
 }
 console.log(`Daniela's class starts at ${session.startsAt}`);

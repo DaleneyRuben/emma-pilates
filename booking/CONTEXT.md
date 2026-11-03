@@ -73,7 +73,7 @@ The ordered queue of clients waiting for a spot in a Session that is at capacity
 _Avoid_: Queue, standby, wait list
 
 **Attendance**:
-A record, set by the assigned Trainer after a Session happens, of whether a Booking's client actually showed up (attended / no-show). The Trainer completes the whole roster in one save and may later correct it; no arbitrary correction deadline applies in the first release. Only exists once the Session has occurred. A client's class history is their Bookings with Attendance = attended. Purely a reporting record — it has no effect on the Subscription or its allowance, since the class was already consumed when the Booking was created.
+A record, set by the assigned Trainer once a Session starts (during it or after it; owner, 2026-11-03), of whether a Booking's client actually showed up (attended / no-show). The Trainer completes the whole roster in one save and may later correct it; no arbitrary correction deadline applies in the first release. Only exists once the Session has started. A client's class history is their Bookings with Attendance = attended. Purely a reporting record — it has no effect on the Subscription or its allowance, since the class was already consumed when the Booking was created.
 _Avoid_: Check-in
 
 **Cancellation Window**:
