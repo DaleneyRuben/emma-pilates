@@ -45,6 +45,9 @@ describe('SpanishAuthenticationEmailRenderer', () => {
       expect(message.html).toContain(`href="${link}"`);
       expect(message.html).toContain(`>${link}<`);
       expect(message.text).not.toMatch(/token=(?!secret-1)/);
+      // Walkthrough of 2026-11-02: the brand is «Emma Pilates Studio» alone.
+      expect(message.text).not.toContain('Bienestar');
+      expect(message.html).not.toContain('Bienestar');
       expect({
         subject: message.subject,
         text: message.text,
