@@ -53,7 +53,9 @@ export function BrowseSessionsScreen() {
   const today = boliviaCivilDate(new Date());
   const stripDays = bookingStripDays(useStudioRules(fetcher));
   const dates = useMemo(() => upcomingCivilDates(today, stripDays), [today, stripDays]);
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [chosenDate, setSelectedDate] = useState(today);
+  // A day chosen before the rules arrived may lie past a shorter window.
+  const selectedDate = dates.includes(chosenDate) ? chosenDate : today;
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
   const [classTypeId, setClassTypeId] = useState(allClassTypes);
   const [choosingBranch, setChoosingBranch] = useState(false);

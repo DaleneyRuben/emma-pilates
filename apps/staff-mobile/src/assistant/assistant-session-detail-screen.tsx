@@ -57,6 +57,7 @@ const bookingProblems: Record<string, string> = {
   no_eligible_subscription: "La clienta no tiene clases disponibles en su plan.",
   booking_access_denied: "Solo puedes reservar en tus sucursales.",
   weekly_cap_reached: "Ya usaste tus clases de esta semana.",
+  booking_window_exceeded: "Esa clase todavía no abre para reservar.",
 };
 
 const fallback = "No pudimos completar la reserva. Inténtalo de nuevo.";
