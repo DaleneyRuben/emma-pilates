@@ -20,7 +20,7 @@ is never published to production.
 | Phone | leave empty |
 | Privacy policy | `https://app.emmapilatesstudio.com/privacidad` (Policy → App content → Privacy policy) |
 | App icon (512 × 512) | `apps/client-mobile/assets/store-icon-512.png`, `apps/staff-mobile/assets/store-icon-512.png` |
-| Feature graphic (1024 × 500) | `graphics/client-feature-graphic.png`, `graphics/staff-feature-graphic.png` (see [Graphics](#graphics)) |
+| Feature graphic (1024 × 500) | `graphics/play/client/feature-graphic.png`, `graphics/play/staff/feature-graphic.png` (see [Graphics](#graphics)) |
 
 ## Emma Pilates (`com.emmapilates.client`)
 
@@ -39,7 +39,7 @@ Reserva tus clases de Pilates, revisa tu plan y paga desde tu celular.
 **Full description**
 
 ```text
-Emma Pilates es la app de Emma Pilates Studio. Movimiento, equilibrio y bienestar, ahora en tu celular.
+Emma Pilates es la app de Emma Pilates Studio. Tus clases, tu plan y tus reservas, ahora en tu celular.
 
 Reserva tus clases
 • Mira el horario de la semana y cuántos lugares quedan en cada clase.
@@ -96,15 +96,30 @@ Si eres cliente del estudio, descarga la app Emma Pilates.
 
 ## Graphics
 
-All in [`graphics/`](./graphics/), made 2026-10-31 from the fixtures data
-(fictional names, one branch, 8 places per class) and the 1.0.2 builds.
+Made 2026-11-03 in style A «Editorial», chosen by the owner on a Claude
+Design canvas: a Lino ground, a small uppercase label, a Lora title on the
+left, and the real v2 screen in a dark frame that runs off the bottom. **No
+image shows a price or the launch discount**, because the offer is temporary
+(owner, 2026-11-03).
 
 | Play field | Emma Pilates | Emma Pilates Staff |
 | --- | --- | --- |
-| Feature graphic (1024 × 500) | `graphics/client-feature-graphic.png` | `graphics/staff-feature-graphic.png` |
-| Phone screenshots (1080 × 1920, 9:16) | `graphics/client-1-inicio.png` … `client-5-mi-plan.png` | `graphics/staff-1-agenda.png` … `staff-3-clienta.png` |
+| Feature graphic (1024 × 500) | `graphics/play/client/feature-graphic.png` | `graphics/play/staff/feature-graphic.png` |
+| Phone screenshots (1080 × 1920) | `graphics/play/phone/client/1-reservar.png` … `5-invita.png` | `graphics/play/phone/staff/1-agenda.png` … `5-codigo.png` |
+| 7- and 10-inch tablet screenshots (1440 × 2560) | `graphics/play/tablet/client/` | `graphics/play/tablet/staff/` |
 
-The screenshots crop the iOS status bar so they read the same on Android, and
-carry a caption above the screen. The plan prices are fixture values, so no
-screenshot shows a price; retake them when real prices or a new screen should
-appear. No tablet screenshots yet: the Staff closed test does not need them.
+The App Store sizes come from the same captures: `graphics/apple/iphone-6.9/`
+(1320 × 2868) and `graphics/apple/ipad-13/` (2064 × 2752), one folder per app
+([app-store.md](./app-store.md)).
+
+**To make them again** after a screen changes:
+
+1. Capture the raw screens from Release builds of both apps on the iPhone
+   16 Pro and the iPad Pro 11 Simulators, with the fixtures data and the
+   status bar at 9:41 (`xcrun simctl status_bar <udid> override --time 9:41`;
+   the iPad ignores it, so the render crops its status bar). They go to
+   `graphics/raw/<app>/<phone|tablet>/`, with the file names
+   `scripts/store-graphics/copy.mjs` lists.
+2. Run `node scripts/store-graphics/render.mjs` (or `… client`, `… staff`).
+   It writes every Play and App Store size. The copy for each image is in
+   `copy.mjs`; the layout is in `templates.mjs`.

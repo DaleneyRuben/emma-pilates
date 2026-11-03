@@ -22,7 +22,7 @@ export async function executeRecordAttendance(
           id: true,
           branchId: true,
           trainerStaffMemberId: true,
-          endsAt: true,
+          startsAt: true,
           state: true,
         },
       });

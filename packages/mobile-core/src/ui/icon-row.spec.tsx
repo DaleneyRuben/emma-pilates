@@ -73,6 +73,17 @@ describe("IconRow with a long value", () => {
 });
 
 describe("IconRowGroup", () => {
+  // A long label alone (a note row) wraps instead of running off the row.
+  it("wraps a long label that has no value", async () => {
+    const screen = await render(
+      <IconRow icon="clock" label="Podrás marcar asistencia cuando empiece la clase." />,
+    );
+
+    expect(screen.getByText("Podrás marcar asistencia cuando empiece la clase.")).toHaveStyle({
+      flexShrink: 1,
+    });
+  });
+
   it("draws Lino at radius 16 with no border and a hairline inset 64 between rows", async () => {
     const screen = await render(
       <IconRowGroup testID="group">

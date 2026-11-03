@@ -207,7 +207,7 @@ describe('Booking commands', () => {
     ).resolves.toEqual({ remainingClassAllowance: 1 });
   });
 
-  it('records a complete Attendance roster after a Session ends', async () => {
+  it('records a complete Attendance roster once a Session has started', async () => {
     const fixture = await createFixture(prisma, { now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const booking = await commands.create(

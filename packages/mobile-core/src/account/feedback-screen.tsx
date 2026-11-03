@@ -10,8 +10,8 @@ import { PrimaryButton } from "../ui/primary-button";
 import { StateScreen } from "../ui/state-screen";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
-import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
-import { describeFeedbackDevice, type FeedbackMetadata } from "./feedback-metadata";
+import { colors, radii, spacing, typography } from "../ui/tokens";
+import type { FeedbackMetadata } from "./feedback-metadata";
 import { useSendFeedback, type FeedbackType } from "./use-send-feedback";
 
 const types: readonly (readonly [FeedbackType, string])[] = [
@@ -128,11 +128,6 @@ export function FeedbackScreen({
               <Text style={styles.hint}>{`${text.length} / ${textLength.max}`}</Text>
             </View>
           </View>
-          <View style={styles.attached}>
-            <BodyText style={styles.attachedText}>
-              {`Junto con tu comentario enviamos ${describeFeedbackDevice(metadata)} y tu rol. No enviamos capturas de pantalla.`}
-            </BodyText>
-          </View>
           {feedback.failure === null ? null : (
             <BodyText accessibilityRole="alert" style={styles.failure}>
               {feedback.failure}
@@ -148,11 +143,6 @@ export function FeedbackScreen({
 const column = { alignSelf: "center", maxWidth: 560, width: "100%" } as const;
 
 const styles = StyleSheet.create({
-  attached: {
-    ...surfaces.flatCard,
-    padding: spacing.md,
-  },
-  attachedText: { color: colors.textSecondary, fontSize: typography.note, lineHeight: 19 },
   chip: {
     alignItems: "center",
     backgroundColor: colors.card,

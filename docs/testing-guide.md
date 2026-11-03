@@ -2032,7 +2032,7 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    **Entrenadora** eyebrow (UX-007). The day strip names each day ("Mié 21",
    "Sáb 24", "Dom 25") instead of a bare number, and today is the filled
    chip. It lists today's Sessions you lead, the ones that already started
-   included (attendance is recorded after the class ends, MOB-044). Each card
+   included (attendance opens when the class starts, MOB-044 and decisions §18.16). Each card
    ends in a Palo de rosa chevron beside the 24-hour time ("07:00 – 07:50",
    as the Client's list writes it) and the Class Type in Lora,
    names the Branch after a small pin, and closes with "N de M reservados"
@@ -2047,7 +2047,7 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    empty state (quiet calendar, **Sin reservas**, "No hay reservas para esta
    sesión.") and leaves **Guardar asistencia** disabled, because there is
    nothing to save (UX-009, Test 110). A Session that has not ended yet shows
-   the names and "Podrás marcar asistencia cuando termine la clase." instead
+   the names and "Podrás marcar asistencia cuando empiece la clase." instead
    of the choices (the API answers `403` before the end, Test 61).
 3. Mark every Client and tap **Guardar asistencia** (enabled only once every
    Client has an outcome, and never while the roster is empty): "Asistencia
@@ -6300,7 +6300,7 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    the roster as Test 12 describes (enabled only once every Client has an
    outcome).
 4. Open a Session that has not ended and has bookings: the names stay
-   read-only, "Podrás marcar asistencia cuando termine la clase." is under
+   read-only, "Podrás marcar asistencia cuando empiece la clase." is under
    the list, and there is no **Guardar asistencia** button.
 
 The empty frame is design follow-up 112, still pending, so the exported
@@ -8167,7 +8167,7 @@ C. **Entrenadora.** Mi agenda (S02) opens on today, with «Entrenadora · Lunes
    M reservados», a **Con cupos** or **Completa** pill and a chevron. A day
    without classes reads «El sábado 7 no tienes clases» with **Ver mis clases
    de hoy**. The attendance list (S03) has **Reportar una falla** as a row,
-   «Reservas» before the class with «Podrás marcar asistencia cuando termine la
+   «Reservas» before the class with «Podrás marcar asistencia cuando empiece la
    clase.», and after it «Asistencia · N de M marcadas» with **Asistió** (Rosa
    tinte) and **No asistió** (Error tint) per Client, «Falta marcar a N
    clienta(s).» and a toast «Asistencia guardada». **Reportar una falla** (S26)

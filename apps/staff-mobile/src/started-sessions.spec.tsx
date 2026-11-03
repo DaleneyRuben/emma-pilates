@@ -32,7 +32,7 @@ const staffMember = (role: string, name: string) => ({
 });
 
 // MOB-044: today's Sessions that already started stay on the Trainer's agenda
-// (attendance is marked after the class) and leave the Assistant's booking
+// (attendance opens when the class starts) and leave the Assistant's booking
 // list and the Administrator's cancel list, like the Client's 03.
 describe("started Sessions on the Staff lists", () => {
   afterEach(async () => {
