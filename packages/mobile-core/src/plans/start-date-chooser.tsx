@@ -1,9 +1,15 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { dayChipLabel } from "../time/session-format";
-import { colors, radii, spacing, typography } from "../ui/tokens";
+import { fontFamilies } from "../ui/fonts";
+import { SectionTitle } from "../ui/section-title";
+import { colors, radii, spacing } from "../ui/tokens";
 import { startDateOptions, type StartDateOption } from "./start-date-options";
 
+/**
+ * C09 and S10 on v2: «Fecha de inicio» as the section title, then 60-high Lino
+ * tiles with the day in Lora 18 and the chosen one in Palo de rosa.
+ */
 export function StartDateChooser({
   today,
   startDateLimitDays,
@@ -20,8 +26,8 @@ export function StartDateChooser({
   const options = startDateOptions({ today, startDateLimitDays, openingDate });
 
   return (
-    <View style={styles.block}>
-      <Text style={styles.label}>Fecha de inicio</Text>
+    <View>
+      <SectionTitle>Fecha de inicio</SectionTitle>
       <ScrollView
         contentContainerStyle={styles.row}
         horizontal
@@ -63,28 +69,31 @@ function StartDateChip({
       style={[styles.chip, selected && styles.chipSelected]}
       testID={`start-date-${option.date}`}
     >
-      <Text style={[styles.weekday, selected && styles.selectedText]}>{weekday}</Text>
+      <Text style={[styles.weekday, selected && [styles.selectedText, styles.selectedWeekday]]}>
+        {weekday}
+      </Text>
       {day === "" ? null : <Text style={[styles.day, selected && styles.selectedText]}>{day}</Text>}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  block: { gap: spacing.sm },
-  label: { color: colors.textMuted, fontSize: typography.label },
-  row: { gap: spacing.sm, paddingVertical: spacing.xs },
   chip: {
     alignItems: "center",
     backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.inset,
-    borderWidth: 1,
-    minWidth: 56,
+    borderRadius: radii.button,
+    borderWidth: 0,
+    gap: spacing.xxs,
+    height: 60,
+    justifyContent: "center",
+    // «Día de apertura» is wider than a day.
+    minWidth: 52,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
   },
-  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  weekday: { color: colors.textMuted, fontSize: typography.label },
-  day: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
+  chipSelected: { backgroundColor: colors.primary },
+  day: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
+  row: { gap: spacing.sm },
   selectedText: { color: colors.white },
+  selectedWeekday: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  weekday: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 11 },
 });

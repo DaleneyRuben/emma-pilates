@@ -14,7 +14,6 @@ import {
   QueryFailure,
   Screen,
   ScreenTopBar,
-  SectionTitle,
   spacing,
   StartDateChooser,
   typography,
@@ -147,16 +146,13 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
         {studioRules === undefined ||
         subscription.isPending ||
         renewalStartsOn !== undefined ? null : (
-          <View>
-            <SectionTitle>Fecha de inicio</SectionTitle>
-            <StartDateChooser
-              openingDate={studioRules.openingDate}
-              selected={startsOn}
-              startDateLimitDays={studioRules.startDateLimitDays}
-              today={today}
-              onSelect={setStartsOn}
-            />
-          </View>
+          <StartDateChooser
+            openingDate={studioRules.openingDate}
+            selected={startsOn}
+            startDateLimitDays={studioRules.startDateLimitDays}
+            today={today}
+            onSelect={setStartsOn}
+          />
         )}
         <PlanBreakdown plan={detail} />
         {error === null ? null : (
