@@ -31,6 +31,9 @@ export interface OwnReferralCodeStore {
     holder: ReferralCodeHolder;
     referralCode: string;
     previousReferralCode: string | null;
+    /** The change she read before saving: a save that finds another one
+     * since then is refused as too soon (two devices at once). */
+    previousChangedAt: Date | null;
     actorAccountId: string;
     occurredAt: Date;
   }) => Promise<void>;
@@ -112,6 +115,7 @@ export const changeOwnReferralCode = async (
     holder,
     referralCode,
     previousReferralCode: current.referralCode,
+    previousChangedAt: current.changedAt,
     actorAccountId: principal.accountId,
     occurredAt,
   });

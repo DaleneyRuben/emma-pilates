@@ -215,9 +215,9 @@ describe('Readable Referral Codes (PostgreSQL)', () => {
       'fulfilled',
       'rejected',
     ]);
-    expect(
-      results.find(({ status }) => status === 'rejected'),
-    ).toMatchObject({ reason: { code: 'referral_code_change_too_soon' } });
+    expect(results.find(({ status }) => status === 'rejected')).toMatchObject({
+      reason: { code: 'referral_code_change_too_soon' },
+    });
   });
 
   it('refuses the owner a blocked or retired code for a Trainer', async () => {

@@ -61,14 +61,33 @@ export const createPrismaOwnReferralCodeStore = (
     };
     try {
       await prisma.$transaction(async (transaction) => {
+        // Only if nobody changed it since she read it (30-day rule).
+        const unchanged = { referralCodeChangedAt: input.previousChangedAt };
         const target =
           input.holder.kind === 'client'
-            ? await transaction.client
-                .update({ where: { id: input.holder.clientId }, data })
-                .then(({ id }) => ({ type: 'client', id }))
-            : await transaction.staffMember
-                .update({ where: { id: input.holder.staffMemberId }, data })
-                .then(({ id }) => ({ type: 'staff_member', id }));
+            ? {
+                type: 'client',
+                id: input.holder.clientId,
+                count: (
+                  await transaction.client.updateMany({
+                    where: { id: input.holder.clientId, ...unchanged },
+                    data,
+                  })
+                ).count,
+              }
+            : {
+                type: 'staff_member',
+                id: input.holder.staffMemberId,
+                count: (
+                  await transaction.staffMember.updateMany({
+                    where: { id: input.holder.staffMemberId, ...unchanged },
+                    data,
+                  })
+                ).count,
+              };
+        if (target.count === 0) {
+          throw new AcquisitionError('referral_code_change_too_soon');
+        }
         await transaction.auditRecord.create({
           data: {
             actionCode:

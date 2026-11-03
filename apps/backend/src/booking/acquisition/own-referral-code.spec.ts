@@ -104,6 +104,7 @@ describe('Her own Referral Code', () => {
       holder: { kind: 'client', clientId: 'lucia-id' },
       referralCode: 'LU-PILATES',
       previousReferralCode: 'LUCIA',
+      previousChangedAt: null,
       actorAccountId: 'lucia-account',
       occurredAt: now,
     });
