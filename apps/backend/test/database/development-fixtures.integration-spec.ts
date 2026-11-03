@@ -122,7 +122,7 @@ describe('development fixtures', () => {
       reservedCentavos: 0,
     });
     await expect(commands.readReferrals(sofia)).resolves.toMatchObject({
-      referralCode: 'REF-SOFIA',
+      referralCode: 'SOFIA',
       referrals: [
         { referredName: 'Mariana P.', state: 'pending' },
         { referredName: 'Valeria Q.', state: 'pending', awardCentavos: null },
