@@ -39,7 +39,7 @@ Reserva tus clases de Pilates, revisa tu plan y paga desde tu celular.
 **Full description**
 
 ```text
-Emma Pilates es la app de Emma Pilates Studio. Movimiento, equilibrio y bienestar, ahora en tu celular.
+Emma Pilates es la app de Emma Pilates Studio. Tus clases, tu plan y tus reservas, ahora en tu celular.
 
 Reserva tus clases
 • Mira el horario de la semana y cuántos lugares quedan en cada clase.
