@@ -10179,7 +10179,7 @@
           },
           "referralCode": {
             "type": "string",
-            "example": "REF-LUCIA",
+            "example": "LUCIA",
             "description": "Referral Code of the Client or Trainer who brought this person; it decides the Acquisition Channel (BKM-011)"
           },
           "acquisitionChannel": {
