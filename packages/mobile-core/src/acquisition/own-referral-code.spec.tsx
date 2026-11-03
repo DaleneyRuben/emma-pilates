@@ -104,6 +104,7 @@ describe("own referral code (BKM-017)", () => {
   });
 
   it("says when she can change it again inside the 30 days", async () => {
+    jest.useFakeTimers({ now: new Date("2026-11-03T12:00:00.000Z") });
     const fetcher = fetcherFor({
       "GET /api/v1/referral-codes/current": () =>
         json({ referralCode: "LUCIA", editableFrom: "2026-12-03T12:00:00.000Z" }),
@@ -116,6 +117,7 @@ describe("own referral code (BKM-017)", () => {
       await screen.findByText("Podrás cambiarlo de nuevo el 3 de diciembre"),
     ).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Editar código" })).toBeNull();
+    jest.useRealTimers();
   });
 
   it("shows the server's answer when the code was taken meanwhile", async () => {
