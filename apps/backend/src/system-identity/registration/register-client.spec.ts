@@ -52,7 +52,6 @@ describe('RegisterClient', () => {
         .mockReturnValueOnce('client-id')
         .mockReturnValueOnce('verification-token-id')
         .mockReturnValueOnce('continuation-token-id'),
-      newReferralCode: () => 'ANA-REFERRAL',
     });
 
     await expect(
@@ -72,7 +71,6 @@ describe('RegisterClient', () => {
       name: 'Ana Pérez',
       email: 'ana@example.com',
       passwordHash: 'argon2id-password-hash',
-      referralCode: 'ANA-REFERRAL',
       referredByCode: 'REF-LUCIA',
       acquisitionChannel: 'unknown',
       pendingExpiresAt: new Date('2026-09-06T18:00:00.000Z'),
@@ -153,7 +151,6 @@ describe('RegisterClient', () => {
       },
       now: () => now,
       newId: () => 'new-verification-token-id',
-      newReferralCode: () => 'UNUSED-REFERRAL',
     });
 
     await expect(
@@ -237,7 +234,6 @@ describe('RegisterClient', () => {
       },
       now: () => now,
       newId: () => 'new-activation-token-id',
-      newReferralCode: () => 'UNUSED-REFERRAL',
     });
 
     await expect(
@@ -318,7 +314,6 @@ describe('RegisterClient', () => {
       },
       now: () => new Date('2026-08-30T18:00:00.000Z'),
       newId: () => 'unused-id',
-      newReferralCode: () => 'UNUSED-REFERRAL',
     });
 
     await expect(

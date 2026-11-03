@@ -66,7 +66,6 @@ describe('guest pass opens at email verification', () => {
       ),
       now: () => now,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     }).execute({
       name: 'Amiga nueva',
       email,

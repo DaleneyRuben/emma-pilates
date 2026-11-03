@@ -23,7 +23,6 @@ type NewSelfRegistration = {
   name: string;
   email: string;
   passwordHash: string;
-  referralCode: string;
   referredByCode: string | null;
   acquisitionChannel: AcquisitionChannel;
   pendingExpiresAt: Date;
@@ -78,7 +77,6 @@ type RegisterClientDependencies = {
   linkCipher: { encrypt(secret: string): EncryptedAuthenticationLink };
   now(): Date;
   newId(): string;
-  newReferralCode(): string;
 };
 
 export type RegisterClientCommand = {
@@ -223,7 +221,6 @@ export class RegisterClient {
           name: command.name.trim(),
           email,
           passwordHash,
-          referralCode: this.dependencies.newReferralCode(),
           referredByCode: command.referralCode?.trim().toUpperCase() || null,
           acquisitionChannel: command.acquisitionChannel ?? 'unknown',
           pendingExpiresAt,

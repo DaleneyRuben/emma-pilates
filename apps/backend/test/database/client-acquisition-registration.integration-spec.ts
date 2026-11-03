@@ -50,7 +50,6 @@ describe('Client acquisition at self-registration (PostgreSQL)', () => {
       ),
       now: () => new Date(Date.now() + 60_000),
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     }).execute({ ...command, password: 'correct horse battery staple' });
     const account = await prisma.account.findFirstOrThrow({
       where: { email: result.email, deletedAt: null },
@@ -198,7 +197,6 @@ describe('Client acquisition at self-registration (PostgreSQL)', () => {
         ),
         now: () => new Date(Date.now() + 60_000),
         newId: randomUUID,
-        newReferralCode: () => `REF-${randomUUID()}`,
       },
     );
 

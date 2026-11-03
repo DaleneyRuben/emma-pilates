@@ -264,7 +264,6 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
           linkCipher,
           now: () => new Date(),
           newId: randomUUID,
-          newReferralCode: () => `REF-${randomUUID()}`,
         };
         return {
           invite: (command, principal) =>
@@ -296,7 +295,6 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
           linkCipher,
           now: () => new Date(),
           newId: randomUUID,
-          newReferralCode: () => `REF-${randomUUID()}`,
         }),
     },
     {

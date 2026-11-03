@@ -113,7 +113,6 @@ describe('Readable Referral Codes at creation (PostgreSQL)', () => {
       linkCipher: linkCipher(),
       now: () => now,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     }).execute({
       name: 'Renata Salinas',
       email: `renata-${randomUUID()}@example.com`,
@@ -139,7 +138,6 @@ describe('Readable Referral Codes at creation (PostgreSQL)', () => {
         linkCipher: linkCipher(),
         now: () => now,
         newId: randomUUID,
-        newReferralCode: () => `REF-${randomUUID()}`,
       },
     );
     await expect(codeOf(invited.email)).resolves.toBe('SALINAS');

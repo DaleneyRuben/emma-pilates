@@ -1,5 +1,6 @@
 import type { PgBoss } from 'pg-boss';
 import { recordClientAcquisition } from '../../booking/acquisition/record-client-acquisition';
+import { claimReadableReferralCode } from '../../booking/acquisition/referral-code-claim';
 import { attributeReferral } from '../../booking/payments/referral-attribution';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
@@ -120,7 +121,11 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
       data: {
         id: registration.clientId,
         name: registration.name,
-        referralCode: registration.referralCode,
+        // BKM-017: a readable code from her name, reserved in this transaction.
+        referralCode: await claimReadableReferralCode(
+          this.transaction,
+          registration.name,
+        ),
         account: {
           create: {
             id: registration.accountId,

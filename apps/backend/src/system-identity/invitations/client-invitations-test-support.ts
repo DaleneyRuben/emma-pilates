@@ -67,5 +67,4 @@ export const dependencies = (transaction: ClientInvitationTransaction) => ({
   },
   now: () => now,
   newId: () => `id-${(ids += 1)}`,
-  newReferralCode: () => 'REF-NEW',
 });

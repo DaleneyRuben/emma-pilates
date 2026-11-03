@@ -49,7 +49,6 @@ describe('Client registration cancellation, cleanup, and referral', () => {
       ),
       now: () => registeredAt,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     }).execute({
       name: 'Cancelled Client',
       email: `cancelled-${randomUUID()}@example.com`,
@@ -125,7 +124,6 @@ describe('Client registration cancellation, cleanup, and referral', () => {
       ),
       now: () => registeredAt,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     }).execute({
       name: 'Expired Client',
       email: `expired-${randomUUID()}@example.com`,
@@ -204,7 +202,6 @@ describe('Client registration cancellation, cleanup, and referral', () => {
       ),
       now: () => now,
       newId: randomUUID,
-      newReferralCode: () => `REF-${randomUUID()}`,
     });
 
     const result = await registerClient.execute({
