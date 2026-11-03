@@ -1,6 +1,14 @@
 import { useGetReferralCodeAvailability } from "@pilates/api-contracts";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
@@ -101,48 +109,59 @@ export function ReferralCodeSheet({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.backdrop}
       >
-        {confirmation === null ? null : (
-          <View style={styles.sheet}>
-            <Text style={styles.title}>{`¿Cambiar tu código a ${code}?`}</Text>
-            <Text style={styles.body}>
-              {`Tu código anterior ${confirmation.current} dejará de funcionar. Las amigas que ya se registraron con él siguen contando para ti.`}
+        {/* A tap on «Guardar código» acts while the keyboard is up. */}
+        <ScrollView
+          bounces={false}
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+        >
+          {confirmation === null ? null : (
+            <View style={styles.sheet}>
+              <Text style={styles.title}>{`¿Cambiar tu código a ${code}?`}</Text>
+              <Text style={styles.body}>
+                {`Tu código anterior ${confirmation.current} dejará de funcionar. Las amigas que ya se registraron con él siguen contando para ti.`}
+              </Text>
+              <PrimaryButton
+                busy={confirmation.busy}
+                label="Cambiar código"
+                onPress={confirmation.onConfirm}
+                size="compact"
+              />
+              <TextButton
+                disabled={confirmation.busy}
+                label="Volver"
+                onPress={confirmation.onBack}
+              />
+            </View>
+          )}
+          <View style={[styles.sheet, confirmation !== null && styles.hidden]}>
+            <Text style={styles.title}>Editar tu código</Text>
+            <View style={styles.field}>
+              <FormField
+                autoCapitalize="characters"
+                autoComplete="off"
+                autoCorrect={false}
+                label="Tu nuevo código"
+                maxLength={20}
+                onChangeText={(text) => onChangeCode(normalizeCode(text))}
+                style={styles.input}
+                testID="referral-code-input"
+                value={code}
+              />
+              {status === null ? null : <StatusLine status={status} />}
+            </View>
+            <Text style={styles.note}>
+              Usa de 3 a 20 letras, números o guiones. Puedes cambiarlo una vez cada 30 días.
             </Text>
             <PrimaryButton
-              busy={confirmation.busy}
-              label="Cambiar código"
-              onPress={confirmation.onConfirm}
+              disabled={status !== "available" && status !== "failed"}
+              label="Guardar código"
+              onPress={onSave}
               size="compact"
             />
-            <TextButton disabled={confirmation.busy} label="Volver" onPress={confirmation.onBack} />
+            <TextButton label="Cancelar" onPress={onDismiss} />
           </View>
-        )}
-        <View style={[styles.sheet, confirmation !== null && styles.hidden]}>
-          <Text style={styles.title}>Editar tu código</Text>
-          <View style={styles.field}>
-            <FormField
-              autoCapitalize="characters"
-              autoComplete="off"
-              autoCorrect={false}
-              label="Tu nuevo código"
-              maxLength={20}
-              onChangeText={(text) => onChangeCode(normalizeCode(text))}
-              style={styles.input}
-              testID="referral-code-input"
-              value={code}
-            />
-            {status === null ? null : <StatusLine status={status} />}
-          </View>
-          <Text style={styles.note}>
-            Usa de 3 a 20 letras, números o guiones. Puedes cambiarlo una vez cada 30 días.
-          </Text>
-          <PrimaryButton
-            disabled={status !== "available" && status !== "failed"}
-            label="Guardar código"
-            onPress={onSave}
-            size="compact"
-          />
-          <TextButton label="Cancelar" onPress={onDismiss} />
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -170,6 +189,7 @@ const styles = StyleSheet.create({
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   ok: { color: colors.successText },
   quiet: { color: colors.textMuted },
+  scroll: { flexGrow: 1, justifyContent: "flex-end" },
   sheet: {
     backgroundColor: colors.card,
     borderTopLeftRadius: radii.frame,

@@ -41,7 +41,14 @@ export function ReferralCodeCard({ code, onCopied }: ReferralCodeCardProps) {
     <View style={styles.card}>
       <View style={styles.codeColumn}>
         <Text style={styles.eyebrow}>Tu código</Text>
-        <Text selectable style={styles.code}>
+        {/* Up to 20 characters: one line, the type shrinks to fit. */}
+        <Text
+          adjustsFontSizeToFit
+          minimumFontScale={0.5}
+          numberOfLines={1}
+          selectable
+          style={styles.code}
+        >
           {code}
         </Text>
       </View>
