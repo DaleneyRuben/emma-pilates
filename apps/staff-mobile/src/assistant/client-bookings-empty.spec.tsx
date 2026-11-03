@@ -43,7 +43,7 @@ describe("Assistant Client Bookings empty state", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
     // The banner shows while the Branches load; the Branch line follows them.
     await waitFor(() => {
-      expect(screen.getByText("Reservando para Lucía Fernández")).toBeOnTheScreen();
+      expect(screen.getByText(/^Reservando para Lucía Fernández/)).toBeOnTheScreen();
       expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Sucursal: Centro" }));

@@ -49,7 +49,7 @@ describe("Assistant rows", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
     });
-    expect(screen.getByText("Reservando para Lucía Fernández")).toBeOnTheScreen();
+    expect(screen.getByText(/^Reservando para Lucía Fernández/)).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });

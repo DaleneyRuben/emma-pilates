@@ -128,7 +128,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Reservar una clase")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Reservando para Lucía Fernández")).toBeOnTheScreen();
+    expect(screen.getByText(/^Reservando para Lucía Fernández/)).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
@@ -136,8 +136,10 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByText("cupos libres de 12")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Reservando para Lucía Fernández")).toBeOnTheScreen();
-    expect(screen.getByText("Se descontará 1 clase de su plan.")).toBeOnTheScreen();
+    expect(screen.getByText(/^Reservando para Lucía Fernández/)).toBeOnTheScreen();
+    expect(
+      screen.getByText("Se descuenta 1 clase de su plan. Le avisamos por notificación."),
+    ).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar para Lucía" }));
     await waitFor(() => {
@@ -150,7 +152,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
     });
-    expect(screen.queryByText("Reservando para Lucía Fernández")).toBeNull();
+    expect(screen.queryByText(/^Reservando para Lucía Fernández/)).toBeNull();
   });
 
   it("reschedules a Booking inside the cancellation window and goes back to the overview from her Bookings", async () => {
