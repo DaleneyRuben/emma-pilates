@@ -13,8 +13,9 @@ on:
         type: choice
         options: [client, staff]
       version:
-        description: New expo.version, x.y.z
-        required: true
+        description: New expo.version, x.y.z. Leave blank for the next patch (1.0.2 → 1.0.3)
+        required: false
+        default: ""
         type: string
 
 permissions:
@@ -26,29 +27,25 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - name: Refuse a version that is not x.y.z
-        run: |
-          echo "${{ inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || {
-            echo "version must be x.y.z"
-            exit 1
-          }
-
       - uses: actions/checkout@v4
         with:
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # The inputs reach the script through env:, never interpolated into it.
+      # bump-expo-version.mjs refuses a malformed or earlier version.
       - name: Bump expo.version and open the pull request
         env:
           GH_TOKEN: ${{ github.token }}
+          APP: ${{ inputs.app }}
+          REQUESTED_VERSION: ${{ inputs.version }}
         run: |
-          app="${{ inputs.app }}"
-          version="${{ inputs.version }}"
-          folder="apps/${app}-mobile"
-          branch="release/${app}-${version}"
+          folder="apps/${APP}-mobile"
+          version="$(node scripts/bump-expo-version.mjs "$folder/app.json" "$REQUESTED_VERSION")"
+          branch="release/${APP}-${version}"
           git checkout -b "$branch"
-          node scripts/bump-expo-version.mjs "$folder/app.json" "$version"
           git add "$folder/app.json"
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "bump the ${app} app to ${version}"
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "bump the ${APP} app to ${version}"
           git push --set-upstream origin "$branch"
-          gh pr create --base main --head "$branch" --title "release ${app} ${version}" --body "Bumps ${folder} expo.version to ${version}. Merge only after this version is published in the stores. The appVersion runtime policy stops OTA updates from reaching installed builds of the previous version once this merges (ADR-0039, ADR-0101)."
+          gh pr create --base main --head "$branch" --title "release ${APP} ${version}" --body "Bumps ${folder} expo.version to ${version}. Merge only after this version is published in the stores. The appVersion runtime policy stops OTA updates from reaching installed builds of the previous version once this merges (ADR-0039, ADR-0101)."
+          echo "Release branch ${branch} opened for ${APP} ${version}." >> "$GITHUB_STEP_SUMMARY"
