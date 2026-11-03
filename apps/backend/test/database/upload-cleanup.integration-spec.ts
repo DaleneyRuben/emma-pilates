@@ -47,6 +47,10 @@ describe('Upload cleanup gateway', () => {
     await prisma.account.deleteMany({
       where: { id: { in: createdAccountIds } },
     });
+    // BKM-017: the registry keeps a holder's codes; a test removes them first.
+    await prisma.referralCode.deleteMany({
+      where: { clientId: { in: createdClientIds } },
+    });
     await prisma.client.deleteMany({
       where: { id: { in: createdClientIds } },
     });

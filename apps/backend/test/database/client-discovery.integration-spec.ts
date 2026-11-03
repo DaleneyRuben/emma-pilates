@@ -50,7 +50,7 @@ describe('Client discovery reads', () => {
       name: 'Lucía Fernández',
       email: 'lucia@example.com',
       phone: '+591 70011001',
-      referralCode: 'REF-LUCIA',
+      referralCode: 'LUCIA',
       photo: null,
     });
   });
@@ -69,7 +69,7 @@ describe('Client discovery reads', () => {
       name: 'Isabel Arce Rojas',
       email: 'isabel@example.com',
       phone: null,
-      referralCode: 'REF-ISABEL',
+      referralCode: 'ISABEL',
       photo: null,
     });
     await expect(
