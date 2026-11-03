@@ -2,7 +2,7 @@ import { render, waitFor } from "@testing-library/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Text } from "react-native";
 
-import { formatCancellationWindow, useStudioRules } from "./studio-rules";
+import { bookingStripDays, formatCancellationWindow, useStudioRules } from "./studio-rules";
 
 const rules = {
   cancellationWindowMinutes: 150,
@@ -10,6 +10,7 @@ const rules = {
   plansFromPriceCentavos: 8_000,
   startDateLimitDays: 14,
   openingDate: null,
+  bookingWindowDays: 7,
 };
 
 function Probe({ fetcher }: { fetcher: typeof globalThis.fetch }) {
@@ -59,5 +60,20 @@ describe("useStudioRules", () => {
 
     await waitFor(() => expect(fetcher).toHaveBeenCalled());
     expect(screen.getByText("loading")).toBeOnTheScreen();
+  });
+});
+
+describe("bookingStripDays", () => {
+  it("follows the booking window, counting today", () => {
+    expect(bookingStripDays({ ...rules, bookingWindowDays: 3 })).toBe(3);
+    expect(bookingStripDays({ ...rules, bookingWindowDays: 1 })).toBe(1);
+  });
+
+  it("holds at most the seven chips the strip shares its width with", () => {
+    expect(bookingStripDays({ ...rules, bookingWindowDays: 14 })).toBe(7);
+  });
+
+  it("assumes the default seven days until the rules are read", () => {
+    expect(bookingStripDays(undefined)).toBe(7);
   });
 });
