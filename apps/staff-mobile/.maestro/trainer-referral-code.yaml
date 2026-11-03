@@ -11,7 +11,6 @@ env:
     visible:
       id: "tab-profile"
     timeout: 30000
-- runFlow: subflows/park-dev-gear.yaml
 - tapOn:
     id: "tab-profile"
 - extendedWaitUntil:
