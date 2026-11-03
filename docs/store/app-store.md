@@ -87,9 +87,7 @@ pilates,clases,reservas,horario,estudio,bienestar,reformer,entrenamiento,salud
 | Privacy | `https://app.emmapilatesstudio.com/privacidad` |
 | Marketing | `https://app.emmapilatesstudio.com` |
 
-**Screenshots still to make:** 6.9" iPhone and 13" iPad, from production-like
-data, never with a real Client's name or photo. Home, the week's classes, a
-class detail, Mi plan, the QR payment.
+**Screenshots:** ready in `graphics/apple/iphone-6.9/<app>/` (1320 × 2868) and `graphics/apple/ipad-13/<app>/` (2064 × 2752), five per app, made with the Play set ([play-listings.md](./play-listings.md#graphics)).
 
 ### Review notes, to paste
 
