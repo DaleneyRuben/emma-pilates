@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ajustes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.app{width:100%;min-height:1000px;display:flex;flex-wrap:wrap;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;position:relative}
+.rail{flex:1 1 96px;max-width:100%;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;text-decoration:none;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{position:relative;width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rb{position:absolute;top:-4px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#93615D;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;border:2px solid #F5EFE9}
+.rl{font-size:12px;font-weight:500}
+.col{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:20px 40px}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+.search{flex:1 1 360px;max-width:560px;height:48px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;background:#F5EFE9}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;outline:none}
+.kbd{font-size:12px;color:#6F6662;padding:2px 8px;border-radius:6px;background:#FAF7F2}
+.cb{height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:12px;background:#F5EFE9}
+.me{height:44px;display:flex;align-items:center;gap:10px;padding:0 8px 0 4px}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+main{padding:8px 40px 56px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h3{margin:0;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sub{color:#6F6662}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}.hl{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E6DBD0}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;cursor:pointer;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.card{background:#F5EFE9;border-radius:16px}.pad{padding:20px}
+.note{font-size:13px;color:#6F6662}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 16px;min-height:56px}.row+.row{border-top:1px solid #E6DBD0}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#B78380;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:150px;display:flex;flex-direction:column;gap:2px}
+.strong{font-weight:600}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.p{background:#B78380;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}.td{background:transparent;color:#A04E3E;padding:0 10px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.none{background:rgba(216,201,187,.34);color:#6F6662}.rose{background:#F2E4E1;color:#7D4F4B}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;white-space:nowrap}
+td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+.field{display:flex;flex-direction:column;gap:6px}.field>span{font-size:13px;font-weight:500}
+.input{height:44px;padding:0 14px;border:1px solid #E6DBD0;border-radius:12px;background:#FAF7F2;display:flex;align-items:center;justify-content:space-between}
+.input.ro{background:transparent;border-style:dashed}
+.lora{font-family:Lora,serif}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:24px;align-items:start}
+.qr{width:220px;height:220px;border-radius:16px;background:#FAF7F2;display:flex;align-items:center;justify-content:center;color:#4A4A4A}
+.notice{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;border-left:4px solid #B78380;font-size:14px}
+</style>
+</helmet>
+<div class="app">
+  <nav class="rail" aria-label="Menú principal"><span class="mark" aria-label="Emma Pilates Studio">E</span>
+    <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><a class="{{r.cls}}" href="{{r.href}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span><sc-if value="{{r.badge}}" hint-placeholder-val="{{false}}"><span class="rb">{{r.badge}}</span></sc-if></span><span class="rl">{{r.label}}</span></a></sc-for>
+  </nav>
+  <div class="col">
+    <header class="top">
+      <span class="wm"><b>Emma</b><i>Pilates Studio</i></span>
+      <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
+      <span style="flex: 1"></span>
+      <span class="cb"><span class="ms" style="color: #B78380">apartment</span>Todo el estudio</span>
+      <span class="me"><span class="av">{{who.ini}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span></span>
+    </header>
+    <main>
+      <div class="head">
+        <div class="hl"><h1>Ajustes</h1><span class="sub">Lo que se configura al empezar y casi no cambia</span></div>
+        <sc-if value="{{action}}" hint-placeholder-val="{{true}}"><button type="button" class="btn p"><span class="ms">add</span>{{action}}</button></sc-if>
+      </div>
+      <div class="tabs" role="tablist"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="5"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.go}}">{{t.label}}</button></sc-for></div>
+
+      <sc-if value="{{is.tipos}}" hint-placeholder-val="{{true}}">
+        <div class="tw"><table>
+          <thead><tr><th>Tipo de clase</th><th class="num">Capacidad</th><th class="num">Duración</th><th>Equipo que necesita</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="strong">Reformer Pilates</td><td class="num">12</td><td class="num">50 min</td><td>Reformer</td><td><span class="pill ok">Activo</span></td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+            <tr><td class="strong">Mat Pilates</td><td class="num">14</td><td class="num">50 min</td><td>Mat</td><td><span class="pill ok">Activo</span></td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+            <tr><td class="strong">Pilates Prenatal</td><td class="num">8</td><td class="num">50 min</td><td>Mat</td><td><span class="pill ok">Activo</span></td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+          </tbody>
+        </table></div>
+      </sc-if>
+
+      <sc-if value="{{is.planes}}" hint-placeholder-val="{{false}}">
+        <div class="tw"><table>
+          <thead><tr><th>Plan</th><th class="num">Precio</th><th class="num">Clases</th><th class="num">Vigencia</th><th>Tope semanal</th><th>En la app</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="strong">Clase suelta</td><td class="num">Bs 80</td><td class="num">1</td><td class="num">30 días</td><td>Sin tope</td><td><span class="pill ok">Se ve</span></td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+            <tr><td class="strong">Paquete de 4 clases</td><td class="num">Bs 290</td><td class="num">4</td><td class="num">30 días</td><td>Sin tope</td><td><span class="pill ok">Se ve</span></td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+            <tr><td class="strong">Paquete de 8 clases</td><td class="num">Bs 590</td><td class="num">8</td><td class="num">30 días</td><td>3 por semana</td><td><span class="pill ok">Se ve</span></td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+            <tr><td class="strong">Mensual 16 clases</td><td class="num">Bs 780</td><td class="num">16</td><td class="num">30 días</td><td>5 por semana</td><td><span class="pill none">Oculto</span></td><td style="text-align: right"><button type="button" class="btn sm t">Editar</button></td></tr>
+          </tbody>
+        </table></div>
+      </sc-if>
+
+      <sc-if value="{{is.sedes}}" hint-placeholder-val="{{false}}">
+        <div class="grid2">
+          <div class="card pad" style="display: flex; flex-direction: column; gap: 8px"><span class="lora" style="font-size: 20px">Centro</span><span class="note">Av. Monseñor Rivero 245, Santa Cruz</span><span><span class="pill ok">Activa</span></span><button type="button" class="btn sm s" style="align-self: flex-start">Editar</button></div>
+          <div class="card pad" style="display: flex; flex-direction: column; gap: 8px"><span class="lora" style="font-size: 20px">Equipetrol</span><span class="note">Calle 9 Este 12, Santa Cruz</span><span><span class="pill ok">Activa</span></span><button type="button" class="btn sm s" style="align-self: flex-start">Editar</button></div>
+          <div class="card pad" style="display: flex; flex-direction: column; gap: 8px"><span class="lora" style="font-size: 20px">Urubó</span><span class="note">Condominio Las Palmas, Urubó</span><span><span class="pill ok">Activa</span></span><button type="button" class="btn sm s" style="align-self: flex-start">Editar</button></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.reglas}}" hint-placeholder-val="{{false}}">
+        <div class="grid2">
+          <section style="display: flex; flex-direction: column; gap: 12px"><h3>{{rulesTitle}}</h3>
+            <div class="card pad" style="display: flex; flex-direction: column; gap: 14px">
+              <label class="field"><span>Fecha de apertura</span><span class="{{inputCls}}">1 de diciembre de 2026</span></label>
+              <label class="field"><span>Impuestos sobre las ventas</span><span class="{{inputCls}}">16 %</span></label>
+              <label class="field"><span>Mínimo de reservas para que una clase se dé</span><span class="{{inputCls}}">2 reservas</span></label>
+              <label class="field"><span>Días adelante que una clienta puede reservar</span><span class="{{inputCls}}">7 días</span></label>
+              <label class="field"><span>Meta de renovación de la coordinadora</span><span class="{{inputCls}}">80 % · 85 % · 90 %</span></label>
+              <sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><button type="button" class="btn p" style="align-self: flex-end">Guardar cambios</button></sc-if>
+            </div>
+          </section>
+          <section style="display: flex; flex-direction: column; gap: 12px"><h3>Reglas fijas</h3>
+            <div class="card">
+              <div class="row"><span class="disc"><span class="ms">schedule</span></span><span class="grow"><span>Ventana de cancelación</span><span class="note">Hasta 2 h 30 antes, sin perder la clase</span></span></div>
+              <div class="row"><span class="disc"><span class="ms">event_busy</span></span><span class="grow"><span>Revisión del mínimo</span><span class="note">3 h antes; si no llega al mínimo, se cancela sola</span></span></div>
+              <div class="row"><span class="disc"><span class="ms">play_circle</span></span><span class="grow"><span>Inicio de un plan</span><span class="note">El día que la clienta elige al comprar</span></span></div>
+              <div class="row"><span class="disc"><span class="ms">workspace_premium</span></span><span class="grow"><span>Membresía fundadora</span><span class="note">Precio de lanzamiento con 15 % para las primeras clientas</span></span></div>
+              <div class="row"><span class="disc"><span class="ms">share</span></span><span class="grow"><span>Invita a una amiga</span><span class="note">Comisión del 10 % para la entrenadora que la trajo</span></span></div>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.qr}}" hint-placeholder-val="{{false}}">
+        <div class="grid2" style="max-width: 1000px">
+          <div class="card pad" style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap">
+            <div class="qr"><span class="ms" style="font-size: 160px; font-weight: 200">qr_code_2</span></div>
+            <div style="display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 200px"><span class="lora" style="font-size: 20px">QR de transferencia</span><span class="note">Es el que ven las clientas al pagar desde la app. Cuenta: Emma Pilates Studio · Banco Ganadero.</span><button type="button" class="btn p" style="align-self: flex-start"><span class="ms">upload</span>Subir un QR nuevo</button><span class="note">Actualizado el 15 de octubre</span></div>
+          </div>
+          <div class="notice"><span class="ms" style="color: #93615D">info</span>Cuando el banco te dé un QR nuevo, súbelo aquí y la app lo usa al instante.</div>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"rol":{"editor":"enum","options":["Administración","Coordinación"],"default":"Administración"},"$preview":{"width":1440,"height":1000}}'>
+var RAIL = [['ini','home','Inicio','P01-Inicio.dc.html','','b'],['hor','calendar_month','Horario','P02-Horario.dc.html','','b'],['cli','group','Clientas','P03-Clientas.dc.html','4','b'],['pro','campaign','Promociones','P04-Promociones.dc.html','','b'],['com','forum','Comentarios','P05-Comentarios.dc.html','2','b'],['din','payments','Dinero','P06-Dinero.dc.html','4','a'],['est','storefront','Estudio','P07-Estudio.dc.html','1','b'],['inf','bar_chart','Informes','P08-Informes.dc.html','','b'],['aj','settings','Ajustes','P09-Ajustes.dc.html','','b']];
+function rail(active, admin) { return RAIL.filter(function (r) { return admin || r[5] === 'b'; }).map(function (r) { return { icon: r[1], label: r[2], href: r[3], badge: r[4], cls: 'ri' + (r[0] === active ? ' on' : '') }; }); }
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var admin = (this.props.rol ?? 'Administración') === 'Administración';
+    var all = [['tipos', 'Tipos de clase', 'a', 'Nuevo tipo de clase'], ['planes', 'Planes', 'a', 'Nuevo plan'], ['sedes', 'Sucursales', 'a', 'Nueva sucursal'], ['reglas', 'Reglas del estudio', 'b', ''], ['qr', 'QR del estudio', 'a', '']].filter(function (t) { return admin || t[2] === 'b'; });
+    var cur = all.filter(function (t) { return t[0] === st.tab; })[0] || all[0];
+    var tab = cur[0];
+    function set(o) { return function () { self.setState(o); }; }
+    return { rail: rail('aj', admin), admin: admin, action: admin ? cur[3] : '',
+      tabs: all.map(function (t) { return { label: t[1], cls: 'tab' + (t[0] === tab ? ' on' : ''), go: set({ tab: t[0] }) }; }),
+      is: { tipos: tab === 'tipos', planes: tab === 'planes', sedes: tab === 'sedes', reglas: tab === 'reglas', qr: tab === 'qr' },
+      rulesTitle: admin ? 'Puedes cambiar' : 'Reglas que se pueden cambiar (solo lectura)', inputCls: admin ? 'input' : 'input ro',
+      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación' } };
+  }
+}
+</script>
+</body>
+</html>

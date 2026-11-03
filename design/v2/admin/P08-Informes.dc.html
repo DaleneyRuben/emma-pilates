@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Informes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.app{width:100%;min-height:1000px;display:flex;flex-wrap:wrap;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;position:relative}
+.rail{flex:1 1 96px;max-width:100%;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;text-decoration:none;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{position:relative;width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rb{position:absolute;top:-4px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#93615D;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;border:2px solid #F5EFE9}
+.rl{font-size:12px;font-weight:500}
+.col{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:20px 40px}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+.search{flex:1 1 360px;max-width:560px;height:48px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;background:#F5EFE9}
+.search input,.ask input{flex:1;min-width:0;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;outline:none;color:#4A4A4A}
+.kbd{font-size:12px;color:#6F6662;padding:2px 8px;border-radius:6px;background:#FAF7F2}
+.cb{height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border:0;border-radius:12px;background:#F5EFE9;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer}
+.me{height:44px;display:flex;align-items:center;gap:10px;padding:0 8px 0 4px}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+main{padding:8px 40px 56px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h3{margin:0;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sub{color:#6F6662}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}.hl{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E6DBD0}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;cursor:pointer;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.card{background:#F5EFE9;border-radius:16px}.pad{padding:20px}
+.hero{background:#93615D;color:#fff;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}.hero .eyebrow{color:rgba(255,255,255,.75)}
+.big{font-family:Lora,serif;font-size:32px;font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:#6F6662}.hero .note{color:rgba(255,255,255,.85)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 16px}.row+.row{border-top:1px solid #E6DBD0}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#B78380;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:150px;display:flex;flex-direction:column;gap:2px}
+.strong{font-weight:600}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.p{background:#B78380;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.rose{background:#F2E4E1;color:#7D4F4B}.none{background:rgba(216,201,187,.34);color:#6F6662}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:24px;align-items:start}
+.stepper{display:flex;align-items:center;gap:4px;background:#F5EFE9;border-radius:14px;padding:4px}
+.lora{font-family:Lora,serif}
+.chart{height:200px;display:flex;align-items:flex-end;gap:16px;padding:8px 4px 0;border-bottom:1px solid #E6DBD0}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.pair{display:flex;align-items:flex-end;gap:4px;height:100%;width:100%;justify-content:center}
+.bar{width:28px;border-radius:6px 6px 0 0;background:#93615D}.bar.b{background:#D8BDB8}
+.xl{display:flex;gap:16px;padding:6px 4px 0}.xl span{flex:1;text-align:center;font-size:12px;color:#6F6662}
+.legend{display:flex;gap:16px;font-size:13px;color:#6F6662}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.ask{height:48px;display:flex;align-items:center;gap:10px;padding:0 6px 0 16px;border-radius:14px;background:#FAF7F2}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+td{padding:12px 20px;border-top:1px solid #E6DBD0}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+.meter{height:8px;border-radius:999px;background:#E6DBD0;overflow:hidden}.meter span{display:block;height:100%;background:#B78380;border-radius:999px}
+.field{display:flex;flex-direction:column;gap:6px}.field>span{font-size:13px;font-weight:500}
+.input{height:44px;padding:0 14px;border:1px solid #E6DBD0;border-radius:12px;background:#FAF7F2;display:flex;align-items:center;justify-content:space-between}
+.seg{display:flex;gap:2px;background:#F5EFE9;border-radius:12px;padding:3px}
+.seg button{height:38px;border:0;border-radius:10px;background:transparent;font:500 14px 'Work Sans',sans-serif;color:#6F6662;cursor:pointer;padding:0 14px}.seg button.on{background:#FAF7F2;color:#7D4F4B;font-weight:600}
+</style>
+</helmet>
+<div class="app">
+  <nav class="rail" aria-label="Menú principal"><span class="mark" aria-label="Emma Pilates Studio">E</span>
+    <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><a class="{{r.cls}}" href="{{r.href}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span><sc-if value="{{r.badge}}" hint-placeholder-val="{{false}}"><span class="rb">{{r.badge}}</span></sc-if></span><span class="rl">{{r.label}}</span></a></sc-for>
+  </nav>
+  <div class="col">
+    <header class="top">
+      <span class="wm"><b>Emma</b><i>Pilates Studio</i></span>
+      <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
+      <span style="flex: 1"></span>
+      <button type="button" class="cb"><span class="ms" style="color: #B78380">apartment</span>{{branchLabel}}<span class="ms" style="color: #6F6662">expand_more</span></button>
+      <span class="me"><span class="av">{{who.ini}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span></span>
+    </header>
+    <main>
+      <div class="head">
+        <div class="hl"><h1>Informes</h1><span class="sub">Para mirar con calma, cada semana o cada mes</span></div>
+        <sc-if value="{{showMonth}}" hint-placeholder-val="{{true}}"><div class="stepper"><button type="button" class="btn sm t" aria-label="Mes anterior"><span class="ms">chevron_left</span></button><span class="lora" style="font-size: 17px; padding: 0 6px">noviembre de 2026</span><button type="button" class="btn sm t" aria-label="Mes siguiente"><span class="ms">chevron_right</span></button></div></sc-if>
+        <sc-if value="{{is.dinero}}" hint-placeholder-val="{{false}}"><div class="stepper"><span class="lora" style="font-size: 17px; padding: 0 10px">1 de junio – 3 de noviembre</span><button type="button" class="btn sm s">Cambiar</button></div></sc-if>
+      </div>
+      <div class="tabs" role="tablist"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.go}}">{{t.label}}</button></sc-for></div>
+
+      <sc-if value="{{is.mes}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 24px">
+          <div class="grid4">
+            <div class="hero"><span class="eyebrow">Ocupación</span><span class="big">68 %</span><span class="note">70 de 104 lugares · +6 puntos vs octubre</span></div>
+            <div class="card pad"><span class="eyebrow">Alumnas por clase</span><div class="big">8,4</div><span class="note">promedio del mes</span></div>
+            <div class="card pad"><span class="eyebrow">Clientas activas</span><div class="big">3</div><span class="note">con plan vigente</span></div>
+            <div class="card pad"><span class="eyebrow">Renovación</span><div class="big">50 %</div><span class="note">meta de la coordinadora: 80 %</span></div>
+          </div>
+          <sc-if value="{{admin}}" hint-placeholder-val="{{true}}">
+            <div class="grid4">
+              <div class="card pad"><span class="eyebrow">Cobrado</span><div class="big" style="font-size: 26px">Bs 1.282</div><span class="note">entró a caja y por QR</span></div>
+              <div class="card pad"><span class="eyebrow">Ganado</span><div class="big" style="font-size: 26px">Bs 925</div><span class="note">clases ya dictadas («devengado»)</span></div>
+              <div class="card pad"><span class="eyebrow">Por dar</span><div class="big" style="font-size: 26px">Bs 357</div><span class="note">clases pagadas aún no dictadas</span></div>
+            </div>
+          </sc-if>
+          <div class="grid2">
+            <section class="card pad" style="display: flex; flex-direction: column; gap: 12px">
+              <div style="display: flex; justify-content: space-between; align-items: center"><span class="lora" style="font-size: 20px">Clases dictadas por semana</span><span class="note">Centro, Equipetrol y Urubó</span></div>
+              <div class="chart"><sc-for list="{{weeks}}" as="w" hint-placeholder-count="5"><div class="bcol"><div class="pair"><div class="bar" style="{{w.h}}"></div></div></div></sc-for></div>
+              <div class="xl"><sc-for list="{{weeks}}" as="w" hint-placeholder-count="5"><span>{{w.l}}</span></sc-for></div>
+            </section>
+            <section class="card pad" style="display: flex; flex-direction: column; gap: 14px">
+              <span class="lora" style="font-size: 20px">Informe del mes</span>
+              <p style="margin: 0; line-height: 1.6">Noviembre empezó mejor que octubre: la ocupación subió a 68 %, empujada por el Mat de los martes, que se llena. Los Reformer de la tarde siguen flojos el jueves y el viernes. Dos clientas nuevas todavía no reservaron.</p>
+              <label class="ask"><span class="ms" style="color: #B78380">auto_awesome</span><input aria-label="Pregunta sobre el mes" placeholder="Pregunta sobre el mes, por ejemplo: ¿qué clase conviene mover?"><button type="button" class="btn sm p">Preguntar</button></label>
+            </section>
+          </div>
+          <section style="display: flex; flex-direction: column; gap: 12px"><h3>Recomendaciones del mes</h3>
+            <div class="card">
+              <sc-for list="{{recs}}" as="r" hint-placeholder-count="3">
+                <div class="row"><span class="disc"><span class="ms">lightbulb</span></span><span class="grow"><span class="strong">{{r.t}}</span><span class="note">{{r.n}}</span></span><span class="{{r.pillCls}}">{{r.state}}</span><sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm t">Descartar</button></sc-if></div>
+              </sc-for>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.dinero}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 24px">
+          <div class="grid4">
+            <div class="card pad"><span class="eyebrow">Ingresos</span><div class="big">Bs 2.704</div><span class="note">ventas confirmadas</span></div>
+            <div class="card pad"><span class="eyebrow">Gastos</span><div class="big">Bs 14.465</div><span class="note">gastos de sedes y sueldos pagados</span></div>
+            <div class="hero"><span class="eyebrow">Neto</span><span class="big">−Bs 11.761</span><span class="note">ingresos menos gastos · antes de abrir</span></div>
+          </div>
+          <section class="card pad" style="display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px"><span class="lora" style="font-size: 20px">Mes por mes</span><span class="legend"><span><i style="background: #93615D"></i>Ingresos</span><span><i style="background: #D8BDB8"></i>Gastos</span></span></div>
+            <div class="chart"><sc-for list="{{months}}" as="m" hint-placeholder-count="6"><div class="bcol"><div class="pair"><div class="bar" style="{{m.i}}"></div><div class="bar b" style="{{m.g}}"></div></div></div></sc-for></div>
+            <div class="xl"><sc-for list="{{months}}" as="m" hint-placeholder-count="6"><span>{{m.l}}</span></sc-for></div>
+          </section>
+          <div class="grid2">
+            <section style="display: flex; flex-direction: column; gap: 12px"><h3>Finanzas de noviembre</h3>
+              <div class="card">
+                <div class="row"><span class="grow">Cobrado</span><span class="lora" style="font-size: 18px">Bs 1.282</span></div>
+                <div class="row"><span class="grow">Impuestos (16 %)</span><span>−Bs 205</span></div>
+                <div class="row"><span class="grow">Gastos y sueldos</span><span>−Bs 12.965</span></div>
+                <div class="row"><span class="grow strong">Resultado</span><span class="lora" style="font-size: 20px; color: #A04E3E">−Bs 11.888</span></div>
+                <div class="row"><span class="grow"><span>Punto de equilibrio</span><span class="note">lo que hay que cobrar en el mes para no perder</span></span><span class="lora" style="font-size: 18px">Bs 15.430</span></div>
+              </div>
+            </section>
+            <section style="display: flex; flex-direction: column; gap: 12px"><div style="display: flex; justify-content: space-between; align-items: center"><h3>Presupuesto frente a lo gastado</h3><button type="button" class="btn sm s">Cargar presupuesto</button></div>
+              <div class="card pad" style="display: flex; flex-direction: column; gap: 16px">
+                <div style="display: flex; flex-direction: column; gap: 6px"><span style="display: flex; justify-content: space-between"><span>Alquiler</span><span class="note">Bs 4.500 de Bs 4.500</span></span><span class="meter"><span style="width: 100%"></span></span></div>
+                <div style="display: flex; flex-direction: column; gap: 6px"><span style="display: flex; justify-content: space-between"><span>Sueldos</span><span class="note">Bs 9.440 de Bs 12.000</span></span><span class="meter"><span style="width: 79%"></span></span></div>
+                <div style="display: flex; flex-direction: column; gap: 6px"><span style="display: flex; justify-content: space-between"><span>Servicios y limpieza</span><span class="note">Bs 525 de Bs 900</span></span><span class="meter"><span style="width: 58%"></span></span></div>
+              </div>
+            </section>
+          </div>
+          <div class="tw"><table>
+            <thead><tr><th>Mes</th><th class="num">Ingresos</th><th class="num">Gastos</th><th class="num">Sueldos</th><th class="num">Neto</th></tr></thead>
+            <tbody>
+              <tr><td>Septiembre</td><td class="num">Bs 0</td><td class="num">Bs 0</td><td class="num">Bs 0</td><td class="num">Bs 0</td></tr>
+              <tr><td>Octubre</td><td class="num">Bs 1.422</td><td class="num">Bs 0</td><td class="num">Bs 9.440</td><td class="num">−Bs 8.018</td></tr>
+              <tr><td>Noviembre</td><td class="num">Bs 1.282</td><td class="num">Bs 5.025</td><td class="num">Bs 0</td><td class="num">−Bs 3.743</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.sim}}" hint-placeholder-val="{{false}}">
+        <div class="grid2">
+          <section class="card pad" style="display: flex; flex-direction: column; gap: 14px">
+            <span class="lora" style="font-size: 20px">Tus supuestos</span>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+              <label class="field"><span>Precio por clase para la clienta</span><span class="input">Bs 74</span></label>
+              <label class="field"><span>Alumnas por clase</span><span class="input">8</span></label>
+              <label class="field"><span>Clases por semana</span><span class="input">30</span></label>
+              <label class="field"><span>Pago por clase a la instructora</span><span class="input">Bs 65</span></label>
+              <label class="field"><span>Alumnas incluidas en el pago</span><span class="input">4</span></label>
+              <label class="field"><span>Pago por alumna extra</span><span class="input">Bs 8</span></label>
+              <label class="field"><span>Costos fijos del mes</span><span class="input">Bs 9.000</span></label>
+              <label class="field"><span>Impuestos</span><span class="input">16 %</span></label>
+            </div>
+            <span class="note">No se guarda nada. Cambia un número y mira el resultado.</span>
+          </section>
+          <section style="display: flex; flex-direction: column; gap: 16px">
+            <div class="hero"><span class="eyebrow">Resultado del mes</span><span class="big">Bs 41.300</span><span class="note">Punto de equilibrio: 4 alumnas por clase</span></div>
+            <div class="tw"><table>
+              <thead><tr><th>Proyección</th><th class="num">Bajo</th><th class="num">Base</th><th class="num">Alto</th></tr></thead>
+              <tbody>
+                <tr><td>3 meses</td><td class="num">Bs 62.000</td><td class="num">Bs 123.900</td><td class="num">Bs 160.000</td></tr>
+                <tr><td>6 meses</td><td class="num">Bs 124.000</td><td class="num">Bs 247.800</td><td class="num">Bs 320.000</td></tr>
+                <tr><td>12 meses</td><td class="num">Bs 248.000</td><td class="num">Bs 495.600</td><td class="num">Bs 640.000</td></tr>
+              </tbody>
+            </table></div>
+          </section>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"rol":{"editor":"enum","options":["Administración","Coordinación"],"default":"Administración"},"$preview":{"width":1440,"height":1000}}'>
+var RAIL = [['ini','home','Inicio','P01-Inicio.dc.html','','b'],['hor','calendar_month','Horario','P02-Horario.dc.html','','b'],['cli','group','Clientas','P03-Clientas.dc.html','4','b'],['pro','campaign','Promociones','P04-Promociones.dc.html','','b'],['com','forum','Comentarios','P05-Comentarios.dc.html','2','b'],['din','payments','Dinero','P06-Dinero.dc.html','4','a'],['est','storefront','Estudio','P07-Estudio.dc.html','1','b'],['inf','bar_chart','Informes','P08-Informes.dc.html','','b'],['aj','settings','Ajustes','P09-Ajustes.dc.html','','b']];
+function rail(active, admin) { return RAIL.filter(function (r) { return admin || r[5] === 'b'; }).map(function (r) { return { icon: r[1], label: r[2], href: r[3], badge: r[4], cls: 'ri' + (r[0] === active ? ' on' : '') }; }); }
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var admin = (this.props.rol ?? 'Administración') === 'Administración';
+    var all = [['mes', 'El mes', 'b'], ['dinero', 'Dinero', 'a'], ['sim', 'Simulador', 'a']].filter(function (t) { return admin || t[2] === 'b'; });
+    var tab = all.some(function (t) { return t[0] === st.tab; }) ? st.tab : 'mes';
+    function set(o) { return function () { self.setState(o); }; }
+    var weeks = [['6–12 oct', 12], ['13–19 oct', 16], ['20–26 oct', 18], ['27 oct–2 nov', 20], ['3–8 nov', 10]].map(function (w) { return { l: w[0], h: 'height: ' + Math.round(w[1] / 22 * 100) + '%' }; });
+    var months = [['Jun', 0, 0], ['Jul', 0, 0], ['Ago', 0, 0], ['Sep', 0, 0], ['Oct', 1422, 9440], ['Nov', 1282, 5025]].map(function (m) { return { l: m[0], i: 'height: ' + Math.max(1, Math.round(m[1] / 10000 * 100)) + '%', g: 'height: ' + Math.max(1, Math.round(m[2] / 10000 * 100)) + '%' }; });
+    var recs = [['El Reformer del jueves 18:30 se llena poco', '3 de 12 lugares en promedio las últimas 3 semanas. Prueba moverlo a las 19:30.', 'Nueva', 'rose'], ['2 clientas nuevas no reservaron en 7 días', 'Escríbeles desde «Para contactar».', 'Nueva', 'rose'], ['El Mat del martes tiene lista de espera', 'Considera abrir otro Mat el martes a las 10:00.', 'Vista', 'none']].map(function (r) { return { t: r[0], n: r[1], state: r[2], pillCls: 'pill ' + r[3] }; });
+    return { rail: rail('inf', admin), admin: admin, weeks: weeks, months: months, recs: recs,
+      tabs: all.map(function (t) { return { label: t[1], cls: 'tab' + (t[0] === tab ? ' on' : ''), go: set({ tab: t[0] }) }; }),
+      is: { mes: tab === 'mes', dinero: tab === 'dinero', sim: tab === 'sim' }, showMonth: tab === 'mes',
+      branchLabel: 'Todas las sucursales',
+      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación' } };
+  }
+}
+</script>
+</body>
+</html>

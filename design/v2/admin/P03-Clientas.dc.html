@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Clientas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.app{width:100%;min-height:1000px;display:flex;flex-wrap:wrap;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;position:relative}
+.rail{flex:1 1 96px;max-width:100%;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;text-decoration:none;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{position:relative;width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rb{position:absolute;top:-4px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#93615D;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;border:2px solid #F5EFE9}
+.rl{font-size:12px;font-weight:500}
+.col{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:20px 40px;position:relative}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+.search{flex:1 1 360px;max-width:560px;height:48px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;background:#F5EFE9}
+.search input,.find input{flex:1;min-width:0;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;outline:none;color:#4A4A4A}
+.kbd{font-size:12px;color:#6F6662;padding:2px 8px;border-radius:6px;background:#FAF7F2}
+.cb{height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border:0;border-radius:12px;background:#F5EFE9;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer}
+.me{height:44px;display:flex;align-items:center;gap:10px;padding:0 8px 0 4px;border:0;background:transparent;cursor:pointer;font-family:inherit;color:#4A4A4A;text-align:left}
+.menu{position:absolute;right:40px;top:72px;width:240px;background:#FAF7F2;border-radius:16px;box-shadow:0 8px 24px rgba(74,58,48,.16);padding:8px;z-index:9;display:flex;flex-direction:column}
+.menu a{height:44px;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:10px;text-decoration:none;color:#4A4A4A}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}.av.s{width:36px;height:36px}.av.l{width:56px;height:56px;font-size:17px}
+main{padding:8px 40px 56px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h3{margin:0;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sub{color:#6F6662}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}.hl{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E6DBD0}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;cursor:pointer;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent;display:inline-flex;align-items:center}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.cnt{margin-left:6px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:999px;background:#93615D;color:#fff}
+.card{background:#F5EFE9;border-radius:16px}.pad{padding:20px}
+.hero{background:#93615D;color:#fff;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}.hero .eyebrow{color:rgba(255,255,255,.75)}
+.big{font-family:Lora,serif;font-size:32px;font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:#6F6662}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 16px;min-height:60px}.row+.row{border-top:1px solid #E6DBD0}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#B78380;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:150px;display:flex;flex-direction:column;gap:2px}
+.strong{font-weight:600}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.p{background:#B78380;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}.d{background:#F7E5E0;color:#A04E3E}.dd{background:#A04E3E;color:#fff}.td{background:transparent;color:#A04E3E;padding:0 10px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.wait{background:rgba(201,154,78,.16);color:#7C5D2A}.bad{background:#F7E5E0;color:#A04E3E}.none{background:rgba(216,201,187,.34);color:#6F6662}.rose{background:#F2E4E1;color:#7D4F4B}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.f{height:36px;padding:0 14px;border-radius:999px;background:#F5EFE9;font:400 14px 'Work Sans',sans-serif;display:inline-flex;align-items:center;border:0;color:#4A4A4A;cursor:pointer}.f.on{background:#F2E4E1;color:#7D4F4B;font-weight:600}
+.find{flex:0 1 360px;min-width:220px;height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;border-radius:12px;background:#F5EFE9}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:860px}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;white-space:nowrap}
+td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
+tr.click{cursor:pointer}tr.click:hover td{background:#FDF7F2}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.22);display:flex;justify-content:flex-end;z-index:5}
+.panel{width:520px;max-width:100%;background:#FAF7F2;padding:28px;display:flex;flex-direction:column;gap:20px;overflow-y:auto}
+.ph{display:flex;align-items:flex-start;gap:12px}.ph h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:24px}
+.x{width:40px;height:40px;border:0;border-radius:12px;background:#F5EFE9;color:#6F6662;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.notice{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;border-left:4px solid #C99A4E;font-size:14px}.notice.err{border-left-color:#A04E3E}.notice.info{border-left-color:#B78380}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.lora{font-family:Lora,serif}
+.empty{padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}.empty .disc{width:72px;height:72px}
+.bar{height:6px;border-radius:999px;background:rgba(255,255,255,.25);overflow:hidden}.bar span{display:block;height:100%;background:#fff;border-radius:999px}
+</style>
+</helmet>
+<div class="app">
+  <nav class="rail" aria-label="Menú principal"><span class="mark" aria-label="Emma Pilates Studio">E</span>
+    <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><a class="{{r.cls}}" href="{{r.href}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span><sc-if value="{{r.badge}}" hint-placeholder-val="{{false}}"><span class="rb">{{r.badge}}</span></sc-if></span><span class="rl">{{r.label}}</span></a></sc-for>
+  </nav>
+  <div class="col">
+    <header class="top">
+      <span class="wm"><b>Emma</b><i>Pilates Studio</i></span>
+      <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
+      <span style="flex: 1"></span>
+      <span class="cb" style="cursor: default"><span class="ms" style="color: #B78380">apartment</span>Todo el estudio</span>
+      <button type="button" class="me" onClick="{{toggleMenu}}"><span class="av">{{who.ini}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span><span class="ms" style="color: #6F6662">expand_more</span></button>
+      <sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}"><div class="menu"><a href="#"><span class="ms" style="color: #B78380">key</span>Cambiar contraseña</a><a href="P10-Acceso.dc.html"><span class="ms" style="color: #B78380">logout</span>Cerrar sesión</a></div></sc-if>
+    </header>
+    <main>
+      <div class="head"><div class="hl"><h1>Clientas</h1><span class="sub">5 clientas · 3 con plan activo · 2 fundadoras</span></div></div>
+      <div class="tabs" role="tablist"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.go}}">{{t.label}}<sc-if value="{{t.count}}" hint-placeholder-val="{{false}}"><span class="cnt">{{t.count}}</span></sc-if></button></sc-for></div>
+
+      <sc-if value="{{is.todas}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div class="filters">
+            <label class="find"><span class="ms" style="color: #B78380">search</span><input aria-label="Buscar clienta" placeholder="Nombre, correo o teléfono"></label>
+            <sc-for list="{{filters}}" as="f" hint-placeholder-count="5"><button type="button" class="{{f.cls}}" onClick="{{f.go}}">{{f.label}}</button></sc-for>
+          </div>
+          <div class="tw">
+            <table>
+              <thead><tr><th>Clienta</th><th>Contacto</th><th>Plan</th><th>Le quedan</th><th>Vence</th><th>Invitada por</th><th>Estado</th></tr></thead>
+              <tbody>
+                <sc-for list="{{clients}}" as="c" hint-placeholder-count="5">
+                  <tr class="click" onClick="{{c.open}}">
+                    <td><span style="display: flex; align-items: center; gap: 12px"><span class="av s">{{c.ini}}</span><span style="display: flex; flex-direction: column; gap: 2px"><span class="strong">{{c.n}}</span><sc-if value="{{c.founder}}" hint-placeholder-val="{{false}}"><span class="note">Fundadora n.º {{c.founder}}</span></sc-if></span></span></td>
+                    <td><span style="display: flex; flex-direction: column; gap: 2px"><span>{{c.mail}}</span><span class="note">{{c.tel}}</span></span></td>
+                    <td>{{c.plan}}</td>
+                    <td class="num">{{c.left}}</td>
+                    <td>{{c.ends}}</td>
+                    <td>{{c.by}}</td>
+                    <td><span class="{{c.pillCls}}">{{c.estado}}</span></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+          <span class="note">Mostrando {{shown}} de 5 clientas · toca una fila para abrir su ficha</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.contactar}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <span class="sub" style="font-size: 14px">Clientas en sus primeros 90 días que conviene escribir. Marca «Contactada» cuando les hayas escrito.</span>
+          <div class="card">
+            <sc-for list="{{contact}}" as="c" hint-placeholder-count="3">
+              <div class="row" style="padding: 12px 20px"><span class="av s">{{c.ini}}</span><span class="grow"><span class="strong">{{c.n}}</span><span class="note">{{c.why}} · empezó el {{c.since}}</span></span><span class="note">{{c.tel}}</span><a href="#" class="btn sm s"><span class="ms" style="font-size: 18px">chat</span>Abrir WhatsApp</a><button type="button" class="btn sm t">Contactada</button></div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.cong}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <span class="sub" style="font-size: 14px">Pedidos para pausar un plan. Al aprobar, el vencimiento del plan se corre los días congelados.</span>
+          <div class="card">
+            <div class="row" style="padding: 16px 20px"><span class="av s">VQ</span><span class="grow"><span class="strong">Valeria Quiroga</span><span class="note">Paquete de 8 clases · del 10 al 24 de noviembre (15 días) · «Viaje de trabajo»</span><span class="note">Su plan pasaría a vencer el 21 de noviembre</span></span><button type="button" class="btn sm td">Rechazar</button><button type="button" class="btn sm p">Aprobar</button></div>
+          </div>
+          <h3 style="margin-top: 12px">Decididos</h3>
+          <div class="card">
+            <div class="row" style="padding: 12px 20px"><span class="av s">LF</span><span class="grow"><span class="strong">Lucía Fernández</span><span class="note">Del 14 al 20 de octubre · aprobado por Carolina Rivas</span></span><span class="pill ok">Aprobado</span></div>
+          </div>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+
+  <sc-if value="{{panelOpen}}" hint-placeholder-val="{{false}}">
+    <div class="scrim">
+      <div class="panel" role="dialog" aria-label="Ficha de la clienta">
+        <div class="ph"><span class="av l">{{sel.ini}}</span><div style="flex: 1; display: flex; flex-direction: column; gap: 6px"><h2>{{sel.n}}</h2><span class="filters"><span class="{{sel.pillCls}}">{{sel.estado}}</span><sc-if value="{{sel.founder}}" hint-placeholder-val="{{false}}"><span class="pill rose">Fundadora n.º {{sel.founder}}</span></sc-if></span></div><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
+        <div class="tabs" role="tablist"><sc-for list="{{ftabs}}" as="t" hint-placeholder-count="4"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.go}}">{{t.label}}</button></sc-for></div>
+
+        <sc-if value="{{fv.resumen}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; flex-direction: column; gap: 20px">
+            <sc-if value="{{sel.active}}" hint-placeholder-val="{{true}}">
+              <div class="hero"><span class="eyebrow">{{sel.plan}}</span><span class="big">{{sel.left}} clases</span><span class="bar"><span style="{{sel.barStyle}}"></span></span><span style="font-size: 14px; color: rgba(255,255,255,.88)">Vence el {{sel.ends}}</span></div>
+            </sc-if>
+            <sc-if value="{{sel.inactive}}" hint-placeholder-val="{{false}}">
+              <div class="card pad" style="display: flex; flex-direction: column; gap: 8px"><span class="lora" style="font-size: 20px">Sin plan activo</span><span class="note">{{sel.planNote}}</span><sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm s" style="align-self: flex-start">Dar acceso de prueba</button></sc-if></div>
+            </sc-if>
+            <section style="display: flex; flex-direction: column; gap: 12px"><h3>Contacto</h3>
+              <div class="card"><div class="row"><span class="disc"><span class="ms">mail</span></span><span class="grow">{{sel.mail}}</span></div><div class="row"><span class="disc"><span class="ms">call</span></span><span class="grow">{{sel.tel}}</span><a href="#" class="btn sm s">WhatsApp</a></div></div>
+            </section>
+            <section style="display: flex; flex-direction: column; gap: 12px"><h3>Referidos</h3>
+              <div class="card"><div class="row"><span class="disc"><span class="ms">sell</span></span><span class="grow"><span>Su código</span></span><span class="strong">{{sel.code}}</span></div><div class="row"><span class="disc"><span class="ms">share</span></span><span class="grow"><span>Invitada por</span></span><span>{{sel.by}}</span></div><div class="row"><span class="disc"><span class="ms">group_add</span></span><span class="grow"><span>Amigas que invitó</span></span><span>{{sel.invited}}</span></div></div>
+            </section>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <button type="button" class="btn s">Editar perfil</button>
+              <sc-if value="{{showCourtesy}}" hint-placeholder-val="{{true}}"><div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><button type="button" class="btn s">Clase de cortesía</button><button type="button" class="btn s">Devolver una clase</button></div></sc-if>
+              <sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><button type="button" class="btn d">Cerrar cuenta</button></sc-if>
+              <sc-if value="{{coord}}" hint-placeholder-val="{{false}}"><span class="note">Las clases de cortesía y las devoluciones las hace Administración.</span></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{fv.reservas}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <h3>Próximas</h3>
+            <div class="card">
+              <div class="row"><span class="disc"><span class="ms">event</span></span><span class="grow"><span class="strong">Mat Pilates</span><span class="note">Martes 3 · 09:00 · Daniela Ortiz · Centro</span></span><button type="button" class="btn sm td">Cancelar</button></div>
+              <div class="row"><span class="disc"><span class="ms">event</span></span><span class="grow"><span class="strong">Reformer Pilates</span><span class="note">Jueves 5 · 18:30 · Daniela Ortiz · Centro</span></span><button type="button" class="btn sm td">Cancelar</button></div>
+            </div>
+            <a href="P02-Horario.dc.html" class="btn s"><span class="ms">add</span>Reservar una clase</a>
+            <h3>Historial</h3>
+            <div class="card">
+              <div class="row"><span class="grow"><span>Reformer Pilates</span><span class="note">Jueves 29 de octubre · 18:30</span></span><span class="pill ok">Asistió</span></div>
+              <div class="row"><span class="grow"><span>Mat Pilates</span><span class="note">Martes 27 de octubre · 09:00</span></span><span class="pill bad">No asistió</span></div>
+              <div class="row"><span class="grow"><span>Reformer Pilates</span><span class="note">Lunes 26 de octubre · 07:00</span></span><span class="pill none">Cancelada a tiempo</span></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{fv.pagos}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <div class="card">
+              <div class="row"><span class="grow"><span class="strong">Paquete de 8 clases</span><span class="note">28 de octubre · Efectivo · Centro</span></span><span class="num">Bs 502</span><span class="pill ok">Confirmado</span></div>
+              <div class="row"><span class="grow"><span class="strong">Evaluación nutricional</span><span class="note">2 de octubre · QR</span></span><span class="num">Bs 120</span><span class="pill ok">Confirmado</span></div>
+            </div>
+            <a href="P06-Dinero.dc.html" class="btn t" style="align-self: flex-start">Ver en Dinero</a>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{fv.eval}}" hint-placeholder-val="{{false}}">
+          <div class="card">
+            <div class="row"><span class="disc"><span class="ms">nutrition</span></span><span class="grow"><span class="strong">Primera evaluación</span><span class="note">Miércoles 4 de noviembre · 10:00 · Gabriela Flores</span></span><span class="pill rose">Próxima</span></div>
+            <div class="row"><span class="disc"><span class="ms">nutrition</span></span><span class="grow"><span class="strong">Seguimiento</span><span class="note">2 de octubre · Gabriela Flores</span></span><span class="pill ok">Hecha</span></div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"rol":{"editor":"enum","options":["Administración","Coordinación"],"default":"Administración"},"vista":{"editor":"enum","options":["todas","ficha","contactar","congelamientos"],"default":"todas"},"$preview":{"width":1440,"height":1000}}'>
+var RAIL = [['ini','home','Inicio','P01-Inicio.dc.html','','b'],['hor','calendar_month','Horario','P02-Horario.dc.html','','b'],['cli','group','Clientas','P03-Clientas.dc.html','4','b'],['pro','campaign','Promociones','P04-Promociones.dc.html','','b'],['com','forum','Comentarios','P05-Comentarios.dc.html','2','b'],['din','payments','Dinero','P06-Dinero.dc.html','4','a'],['est','storefront','Estudio','P07-Estudio.dc.html','1','b'],['inf','bar_chart','Informes','P08-Informes.dc.html','','b'],['aj','settings','Ajustes','P09-Ajustes.dc.html','','b']];
+function rail(active, admin) { return RAIL.filter(function (r) { return admin || r[5] === 'b'; }).map(function (r) { return { icon: r[1], label: r[2], href: r[3], badge: r[4], cls: 'ri' + (r[0] === active ? ' on' : '') }; }); }
+var CLIENTS = [
+  { n: 'Isabel Arce', ini: 'IA', mail: 'isabel@example.com', tel: '+591 70011003', plan: 'Mensual 16 clases', left: 9, total: 16, ends: '26 de noviembre', by: '—', k: 'ok', estado: 'Activo', founder: '2', code: 'ISABEL', invited: '0', f: 'con' },
+  { n: 'Lucía Fernández', ini: 'LF', mail: 'lucia@example.com', tel: '+591 70011001', plan: 'Paquete de 8 clases', left: 5, total: 8, ends: '28 de noviembre', by: '—', k: 'ok', estado: 'Activo', founder: '1', code: 'LUCIA', invited: '0', f: 'con' },
+  { n: 'Mariana Peña', ini: 'MP', mail: 'mariana@example.com', tel: '+591 70011005', plan: 'Sin plan', left: null, ends: '—', by: 'Sofía Guzmán', k: 'none', estado: 'Sin plan', founder: '', code: 'MARIANA', invited: '0', f: 'sin', planNote: 'Nunca compró un plan. Tiene un pago por QR esperando revisión.' },
+  { n: 'Sofía Guzmán', ini: 'SG', mail: 'sofia@example.com', tel: '+591 70011004', plan: 'Paquete de 8 clases', left: null, ends: 'Venció el 30 de octubre', by: '—', k: 'bad', estado: 'Expirado', founder: '', code: 'SOFIA', invited: '2', f: 'exp', planNote: 'Su Paquete de 8 clases venció el 30 de octubre.' },
+  { n: 'Valeria Quiroga', ini: 'VQ', mail: 'valeria@example.com', tel: '+591 70011002', plan: 'Paquete de 8 clases', left: 2, total: 8, ends: '6 de noviembre', by: 'Sofía Guzmán', k: 'ok', estado: 'Activo', founder: '', code: 'VALERIA', invited: '0', f: 'con' }
+];
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var admin = (this.props.rol ?? 'Administración') === 'Administración';
+    var v = this.props.vista ?? 'todas';
+    var tab = st.tab || ({ contactar: 'contactar', congelamientos: 'cong' }[v] || 'todas');
+    var panel = st.panel !== undefined ? st.panel : (v === 'ficha' ? 2 : null);
+    var ftab = st.ftab || 'resumen';
+    var flt = st.flt || 'todas';
+    function set(o) { return function () { self.setState(o); }; }
+    var tabs = [['todas', 'Todas', ''], ['contactar', 'Para contactar', '3'], ['cong', 'Congelamientos', '1']].map(function (t) { return { label: t[1], count: t[2], cls: 'tab' + (t[0] === tab ? ' on' : ''), go: set({ tab: t[0], panel: null }) }; });
+    var filters = [['todas', 'Todas'], ['con', 'Con plan'], ['sin', 'Sin plan'], ['exp', 'Expirado'], ['fun', 'Fundadora']].map(function (f) { return { label: f[1], cls: 'f' + (f[0] === flt ? ' on' : ''), go: set({ flt: f[0] }) }; });
+    var list = CLIENTS.map(function (c, i) { return Object.assign({}, c, { idx: i + 1 }); }).filter(function (c) { return flt === 'todas' || (flt === 'fun' ? !!c.founder : c.f === flt); });
+    var clients = list.map(function (c) { return Object.assign({}, c, { left: c.left === null ? '—' : c.left + ' de ' + c.total, pillCls: 'pill ' + c.k, open: set({ panel: c.idx, ftab: 'resumen' }) }); });
+    var contact = [['MP', 'Mariana Peña', '7 días sin reservar', '20 de octubre', '+591 70011005'], ['VQ', 'Valeria Quiroga', 'Menos de 2 clases a los 15 días', '15 de octubre', '+591 70011002'], ['CT', 'Camila Torres', 'Menos de 4 clases en su primer mes', '2 de octubre', '+591 70011012']].map(function (c) { return { ini: c[0], n: c[1], why: c[2], since: c[3], tel: c[4] }; });
+    var c = panel ? CLIENTS[panel - 1] : CLIENTS[0];
+    var sel = Object.assign({}, c, { pillCls: 'pill ' + c.k, active: c.left !== null, inactive: c.left === null, barStyle: 'width: ' + (c.left !== null ? Math.round(100 * c.left / c.total) : 0) + '%' });
+    var ftabsAll = [['resumen', 'Resumen', 'b'], ['reservas', 'Reservas', 'b'], ['pagos', 'Pagos', 'a'], ['eval', 'Evaluaciones', 'b']];
+    var ftabs = ftabsAll.filter(function (t) { return admin || t[2] === 'b'; }).map(function (t) { return { label: t[1], cls: 'tab' + (t[0] === ftab ? ' on' : ''), go: set({ ftab: t[0] }) }; });
+    if (!admin && ftab === 'pagos') ftab = 'resumen';
+    return { rail: rail('cli', admin), tabs: tabs, filters: filters, clients: clients, shown: clients.length, contact: contact,
+      is: { todas: tab === 'todas', contactar: tab === 'contactar', cong: tab === 'cong' },
+      panelOpen: !!panel, sel: sel, ftabs: ftabs, fv: { resumen: ftab === 'resumen', reservas: ftab === 'reservas', pagos: ftab === 'pagos', eval: ftab === 'eval' },
+      admin: admin, coord: !admin, showCourtesy: admin && c.left !== null, close: set({ panel: null }),
+      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación' },
+      menuOpen: !!st.menu, toggleMenu: set({ menu: !st.menu }) };
+  }
+}
+</script>
+</body>
+</html>

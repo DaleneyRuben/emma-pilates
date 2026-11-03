@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Clientas · 420 px</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.ph{position:relative;width:420px;height:1100px;overflow:hidden;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px}
+.top{height:64px;display:flex;align-items:center;gap:8px;padding:0 12px}
+.ib{width:44px;height:44px;border:0;border-radius:12px;background:#F5EFE9;color:#B78380;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.wm{flex:1;display:flex;align-items:baseline;gap:6px;padding-left:4px}.wm b{font-family:Lora,serif;font-weight:400;font-size:20px}.wm i{font-family:Lora,serif;font-style:normal;font-size:14px;color:#93615D}
+main{padding:8px 20px 24px;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:30px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #E6DBD0;overflow-x:auto}
+.tab{height:44px;padding:0 12px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;color:#6F6662;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:inline-flex;align-items:center}.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.cnt{margin-left:6px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:999px;background:#93615D;color:#fff}
+.find{height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;border-radius:12px;background:#F5EFE9;color:#6F6662}
+.filters{display:flex;gap:8px;overflow-x:auto}
+.f{height:36px;padding:0 14px;border-radius:999px;background:#F5EFE9;font-size:14px;display:inline-flex;align-items:center;white-space:nowrap}.f.on{background:#F2E4E1;color:#7D4F4B;font-weight:600}
+.card{background:#F5EFE9;border-radius:16px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:68px;border:0;background:transparent;width:100%;text-align:left;font-family:inherit;color:inherit;cursor:pointer}.row+.row{border-top:1px solid #E6DBD0}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.note{font-size:13px;color:#6F6662}
+.pill{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.bad{background:#F7E5E0;color:#A04E3E}.none{background:rgba(216,201,187,.34);color:#6F6662}
+.sheet{position:absolute;inset:0;background:#FAF7F2;display:flex;flex-direction:column}
+.hero{background:#93615D;color:#fff;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.btn{height:52px;display:flex;align-items:center;justify-content:center;border:0;border-radius:14px;font:600 16px 'Work Sans',sans-serif;cursor:pointer}
+.s{background:#F2E4E1;color:#7D4F4B}
+</style>
+</helmet>
+<div class="ph">
+  <header class="top"><button type="button" class="ib" aria-label="Abrir menú"><span class="ms" style="font-size: 24px">menu</span></button><span class="wm"><b>Emma</b><i>Pilates Studio</i></span><button type="button" class="ib" aria-label="Buscar"><span class="ms" style="font-size: 22px">search</span></button></header>
+  <main>
+    <h1>Clientas</h1>
+    <div class="tabs"><span class="tab on">Todas</span><span class="tab">Para contactar<span class="cnt">3</span></span><span class="tab">Congelamientos<span class="cnt">1</span></span></div>
+    <div class="find"><span class="ms" style="color: #B78380">search</span>Nombre, correo o teléfono</div>
+    <div class="filters"><span class="f on">Todas</span><span class="f">Con plan</span><span class="f">Sin plan</span><span class="f">Expirado</span><span class="f">Fundadora</span></div>
+    <div class="card">
+      <sc-for list="{{clients}}" as="c" hint-placeholder-count="5">
+        <button type="button" class="row" onClick="{{c.open}}"><span class="av">{{c.ini}}</span><span class="grow"><span style="font-weight: 600">{{c.n}}</span><span class="note">{{c.plan}}</span></span><span class="{{c.pillCls}}">{{c.estado}}</span></button>
+      </sc-for>
+    </div>
+  </main>
+  <sc-if value="{{open}}" hint-placeholder-val="{{false}}">
+    <div class="sheet" role="dialog" aria-label="Ficha de la clienta">
+      <header class="top"><button type="button" class="ib" aria-label="Volver" onClick="{{close}}"><span class="ms">arrow_back</span></button><span class="wm"><b style="font-size: 18px">Ficha</b></span></header>
+      <main>
+        <div style="display: flex; align-items: center; gap: 12px"><span class="av" style="width: 56px; height: 56px; font-size: 17px">LF</span><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: Lora, serif; font-size: 24px">Lucía Fernández</span><span><span class="pill ok">Activo</span> <span class="note">Fundadora n.º 1</span></span></span></div>
+        <div class="tabs"><span class="tab on">Resumen</span><span class="tab">Reservas</span><span class="tab">Pagos</span><span class="tab">Evaluaciones</span></div>
+        <div class="hero"><span style="font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.75)">Paquete de 8 clases</span><span style="font-family: Lora, serif; font-size: 30px">5 clases</span><span style="font-size: 14px; color: rgba(255,255,255,.88)">Vence el 28 de noviembre</span></div>
+        <div class="card"><div class="row" style="cursor: default"><span class="grow"><span>lucia@example.com</span><span class="note">+591 70011001</span></span></div></div>
+        <button type="button" class="btn s">Clase de cortesía</button>
+        <button type="button" class="btn s">Devolver una clase</button>
+      </main>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":420,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var clients = [['IA', 'Isabel Arce', 'Mensual 16 clases · le quedan 9', 'Activo', 'ok'], ['LF', 'Lucía Fernández', 'Paquete de 8 clases · le quedan 5', 'Activo', 'ok'], ['MP', 'Mariana Peña', 'Sin plan', 'Sin plan', 'none'], ['SG', 'Sofía Guzmán', 'Venció el 30 de octubre', 'Expirado', 'bad'], ['VQ', 'Valeria Quiroga', 'Paquete de 8 clases · le quedan 2', 'Activo', 'ok']].map(function (c) {
+      return { ini: c[0], n: c[1], plan: c[2], estado: c[3], pillCls: 'pill ' + c[4], open: function () { self.setState({ open: true }); } };
+    });
+    return { clients: clients, open: !!st.open, close: function () { self.setState({ open: false }); } };
+  }
+}
+</script>
+</body>
+</html>

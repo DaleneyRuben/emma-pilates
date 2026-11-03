@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio · Administración</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:'liga';font-feature-settings:'liga'}
+button{font-family:'Work Sans',sans-serif}
+input::placeholder{color:#6F6662}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 1000px; display: flex; flex-wrap: wrap; background: #FAF7F2; font-family: 'Work Sans', sans-serif; color: #4A4A4A; font-size: 15px">
+  <nav aria-label="Menú principal" style="flex: 1 1 96px; max-width: 100%; background: #F5EFE9; padding: 20px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+    <span style="font-family: 'Lora', serif; font-size: 24px; color: #93615D; text-align: center; padding-bottom: 12px" aria-label="Emma Pilates Studio">E</span>
+    <sc-for list="{{dest}}" as="d" hint-placeholder-count="9">
+      <a href="{{d.href}}" style="{{d.style}}">
+        <span style="{{d.pillStyle}}"><span class="ms" style="font-size: 22px">{{d.icon}}</span><sc-if value="{{d.badge}}" hint-placeholder-val="{{false}}"><span style="position: absolute; top: -4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 999px; background: #93615D; color: #FFFFFF; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; border: 2px solid #F5EFE9">{{d.badge}}</span></sc-if></span>
+        <span style="font-size: 12px; font-weight: 500">{{d.label}}</span>
+      </a>
+    </sc-for>
+  </nav>
+
+  <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
+    <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 20px 40px">
+      <span style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: 'Lora', serif; font-size: 22px">Emma</span><span style="font-family: 'Lora', serif; font-size: 15px; color: #93615D">Pilates Studio</span></span>
+      <label style="flex: 1 1 360px; max-width: 560px; height: 48px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-radius: 14px; background: #F5EFE9">
+        <span class="ms" style="font-size: 22px; color: #B78380">search</span>
+        <input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página" style="flex: 1; min-width: 0; border: 0; background: transparent; font: 400 15px 'Work Sans', sans-serif; outline: none">
+        <span style="font-size: 12px; color: #6F6662; padding: 2px 8px; border-radius: 6px; background: #FAF7F2">Ctrl K</span>
+      </label>
+      <span style="flex: 1"></span>
+      <button type="button" style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border: 0; border-radius: 12px; background: #F5EFE9; font-size: 15px; cursor: pointer"><span class="ms" style="font-size: 20px; color: #B78380">location_on</span>Sucursal Centro<span class="ms" style="font-size: 20px; color: #6F6662">expand_more</span></button>
+      <button type="button" style="height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 4px; border: 0; border-radius: 12px; background: transparent; cursor: pointer"><span style="width: 40px; height: 40px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center">{{who.ini}}</span><span style="display: flex; flex-direction: column; align-items: flex-start"><span style="font-size: 14px; font-weight: 600; color: #4A4A4A">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span><span class="ms" style="font-size: 20px; color: #6F6662">expand_more</span></button>
+    </header>
+
+    <main style="padding: 8px 40px 56px; display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h1 style="margin: 0; font-family: 'Lora', serif; font-weight: 400; font-size: 32px">Buenos días, {{who.first}}</h1>
+        <span style="color: #6F6662">Martes 3 de noviembre · Sucursal Centro</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px">
+        <sc-if value="{{busy}}" hint-placeholder-val="{{true}}">
+          <div style="background: #93615D; color: #FFFFFF; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+            <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.75)">Por resolver</span>
+            <span style="font-family: 'Lora', serif; font-size: 36px">{{sum.count}}</span>
+            <span style="font-size: 14px; color: rgba(255,255,255,0.88); line-height: 1.5">{{sum.detail}}</span>
+            <a href="#pendientes" style="margin-top: auto; align-self: flex-start; height: 40px; padding: 0 16px; border-radius: 999px; background: #FFFFFF; color: #93615D; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center">Ver la lista</a>
+          </div>
+        </sc-if>
+        <sc-if value="{{calm}}" hint-placeholder-val="{{false}}">
+          <div style="background: #93615D; color: #FFFFFF; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+            <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.75)">Por resolver</span>
+            <span style="font-family: 'Lora', serif; font-size: 36px">Todo al día</span>
+            <span style="font-size: 14px; color: rgba(255,255,255,0.88); line-height: 1.5">No hay pagos, pedidos ni comentarios esperando. Te avisamos aquí cuando llegue algo.</span>
+          </div>
+        </sc-if>
+
+        <div style="background: #F5EFE9; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; justify-content: space-between"><span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Hoy en Centro</span><a href="#" style="font-size: 14px; font-weight: 600; color: #7D4F4B; text-decoration: none">Ver horario</a></div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Lora', serif; font-size: 30px">2</span><span style="font-size: 13px; color: #6F6662">clases</span></span>
+            <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Lora', serif; font-size: 30px">23</span><span style="font-size: 13px; color: #6F6662">reservas</span></span>
+            <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Lora', serif; font-size: 30px">88 %</span><span style="font-size: 13px; color: #6F6662">ocupación</span></span>
+          </div>
+          <div style="border-top: 1px solid #E6DBD0; padding-top: 4px; display: flex; flex-direction: column">
+            <sc-for list="{{today}}" as="c" hint-placeholder-count="2">
+              <div style="min-height: 48px; display: flex; align-items: center; gap: 12px; font-size: 14px">
+                <span style="width: 44px; font-family: 'Lora', serif; font-size: 16px; font-variant-numeric: tabular-nums">{{c.time}}</span>
+                <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 500">{{c.cls}}</span><span style="font-size: 12px; color: #6F6662">{{c.who}}</span></span>
+                <span style="{{c.seatStyle}}">{{c.seats}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{admin}}" hint-placeholder-val="{{true}}">
+          <div style="background: #F5EFE9; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+              <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Dinero · todo el estudio</span>
+              <span role="tablist" aria-label="Período" style="display: flex; gap: 2px; background: #FAF7F2; border-radius: 999px; padding: 3px">
+                <sc-for list="{{moneyTabs}}" as="m" hint-placeholder-count="2"><button type="button" role="tab" onClick="{{m.go}}" style="{{m.style}}">{{m.label}}</button></sc-for>
+              </span>
+            </div>
+            <span style="font-family: 'Lora', serif; font-size: 36px; font-variant-numeric: tabular-nums">{{money.total}}</span>
+            <span style="font-size: 13px; color: #6F6662">{{money.note}}</span>
+            <div style="border-top: 1px solid #E6DBD0; padding-top: 10px; display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+              <span style="display: flex; justify-content: space-between"><span>Efectivo</span><span style="font-variant-numeric: tabular-nums">{{money.cash}}</span></span>
+              <span style="display: flex; justify-content: space-between"><span>QR confirmados</span><span style="font-variant-numeric: tabular-nums">{{money.qr}}</span></span>
+              <span style="display: flex; justify-content: space-between; color: #7C5D2A"><span>QR por revisar (aún no cuenta)</span><span style="font-variant-numeric: tabular-nums">{{money.pending}}</span></span>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{coord}}" hint-placeholder-val="{{false}}">
+          <div style="background: #F5EFE9; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; align-items: center; justify-content: space-between"><span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Clientas · todo el estudio</span><a href="#" style="font-size: 14px; font-weight: 600; color: #7D4F4B; text-decoration: none">Ver clientas</a></div>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+              <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Lora', serif; font-size: 30px">3</span><span style="font-size: 13px; color: #6F6662">con plan</span></span>
+              <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Lora', serif; font-size: 30px">1</span><span style="font-size: 13px; color: #6F6662">nueva esta semana</span></span>
+              <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Lora', serif; font-size: 30px">1</span><span style="font-size: 13px; color: #6F6662">vence pronto</span></span>
+            </div>
+            <div style="border-top: 1px solid #E6DBD0; padding-top: 10px; font-size: 14px; display: flex; justify-content: space-between"><span>Valeria Quiroga · vence el 6 de noviembre</span><span style="color: #6F6662">2 clases</span></div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; align-items: start">
+        <section aria-labelledby="pendientes" style="display: flex; flex-direction: column; gap: 12px">
+          <h2 id="pendientes" style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Por resolver</h2>
+          <sc-if value="{{busy}}" hint-placeholder-val="{{true}}">
+            <div style="background: #F5EFE9; border-radius: 16px">
+              <sc-for list="{{inbox}}" as="m" hint-placeholder-count="5">
+                <div style="{{m.rowStyle}}">
+                  <span style="width: 40px; height: 40px; border-radius: 999px; background: #F2E4E1; color: #B78380; display: flex; align-items: center; justify-content: center; flex: none"><span class="ms" style="font-size: 22px">{{m.icon}}</span></span>
+                  <span style="flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 500">{{m.title}}</span><span style="font-size: 13px; color: #6F6662">{{m.note}}</span></span>
+                  <sc-if value="{{m.second}}" hint-placeholder-val="{{false}}"><button type="button" style="{{m.secondStyle}}">{{m.second}}</button></sc-if>
+                  <button type="button" style="height: 40px; padding: 0 16px; border: 0; border-radius: 14px; background: #B78380; color: #FFFFFF; font-weight: 600; font-size: 14px; cursor: pointer">{{m.cta}}</button>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{calm}}" hint-placeholder-val="{{false}}">
+            <div style="background: #F5EFE9; border-radius: 16px; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+              <span style="width: 72px; height: 72px; border-radius: 999px; background: #F2E4E1; color: #93615D; display: flex; align-items: center; justify-content: center"><span class="ms" style="font-size: 32px">task_alt</span></span>
+              <span style="font-family: 'Lora', serif; font-size: 24px">Nada por resolver</span>
+              <span style="font-size: 14px; color: #6F6662; max-width: 340px">Los pagos por QR, los congelamientos y los comentarios nuevos aparecen aquí.</span>
+            </div>
+          </sc-if>
+        </section>
+        <section aria-labelledby="recomendaciones" style="display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; justify-content: space-between"><h2 id="recomendaciones" style="margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Recomendaciones del mes</h2><a href="#" style="font-size: 14px; font-weight: 600; color: #7D4F4B; text-decoration: none">Ver todas</a></div>
+          <div style="background: #F5EFE9; border-radius: 16px">
+            <sc-for list="{{recs}}" as="r" hint-placeholder-count="2">
+              <div style="{{r.rowStyle}}">
+                <span style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; color: #B78380; display: flex; align-items: center; justify-content: center; flex: none"><span class="ms" style="font-size: 20px">lightbulb</span></span>
+                <span style="flex: 1; display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 500">{{r.title}}</span><span style="font-size: 13px; color: #6F6662; line-height: 1.5">{{r.note}}</span></span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"rol":{"editor":"enum","options":["Administración","Coordinación"],"default":"Administración"},"estado":{"editor":"enum","options":["Con pendientes","Todo al día"],"default":"Con pendientes"},"$preview":{"width":1440,"height":1000}}'>
+var DEST = [['home', 'Inicio', '', '', true, 'b'], ['calendar_month', 'Horario', '', '', false, 'b'], ['group', 'Clientas', '4', '4', false, 'b'], ['campaign', 'Promociones', '', '', false, 'b'], ['forum', 'Comentarios', '2', '2', false, 'b'], ['payments', 'Dinero', '4', '', false, 'a'], ['storefront', 'Estudio', '1', '1', false, 'b'], ['bar_chart', 'Informes', '', '', false, 'b'], ['settings', 'Ajustes', '', '', false, 'b']];
+var SECOND = 'height: 40px; padding: 0 10px; border: 0; background: transparent; font-weight: 600; font-size: 14px; cursor: pointer;';
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var admin = (this.props.rol ?? 'Administración') === 'Administración';
+    var calm = (this.props.estado ?? 'Con pendientes') === 'Todo al día';
+    var dest = DEST.filter(function (d) { return admin || d[5] === 'b'; }).map(function (d) {
+      var on = d[4];
+      var HREF = { Inicio: 'P01-Inicio.dc.html', Horario: 'P02-Horario.dc.html', Clientas: 'P03-Clientas.dc.html', Promociones: 'P04-Promociones.dc.html', Comentarios: 'P05-Comentarios.dc.html', Dinero: 'P06-Dinero.dc.html', Estudio: 'P07-Estudio.dc.html', Informes: 'P08-Informes.dc.html', Ajustes: 'P09-Ajustes.dc.html' };
+      return { icon: d[0], label: d[1], href: HREF[d[1]], badge: calm ? '' : (admin ? d[2] : d[3]),
+        style: 'display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; text-decoration: none; color: ' + (on ? '#7D4F4B' : '#4A4A4A'),
+        pillStyle: 'position: relative; width: 56px; height: 32px; border-radius: 999px; display: flex; align-items: center; justify-content: center;' + (on ? ' background: #93615D; color: #FFFFFF;' : ' background: transparent; color: #B78380;') };
+    });
+    var mk = st.m || 'dia';
+    var moneyTabs = [['dia', 'Hoy'], ['mes', 'Mes']].map(function (m) {
+      var on = m[0] === mk;
+      return { label: m[1], go: function () { self.setState({ m: m[0] }); },
+        style: 'height: 30px; padding: 0 12px; border: 0; border-radius: 999px; font-size: 13px; cursor: pointer;' + (on ? ' background: #F2E4E1; color: #7D4F4B; font-weight: 600;' : ' background: transparent; color: #6F6662;') };
+    });
+    var money = mk === 'dia'
+      ? { total: 'Bs 502', note: 'Cobrado hoy · 1 venta', cash: 'Bs 502', qr: 'Bs 0', pending: calm ? 'Bs 0' : 'Bs 502' }
+      : { total: 'Bs 1.282', note: 'Cobrado en noviembre · 3 ventas', cash: 'Bs 1.282', qr: 'Bs 0', pending: calm ? 'Bs 0' : 'Bs 502' };
+    var all = [
+      ['payments', 'Mariana Peña pagó Bs 502 por QR', 'Paquete de 8 clases · hace 20 minutos', 'Ver comprobante', 'Confirmar', 'a', false],
+      ['ac_unit', 'Valeria Quiroga pide congelar su plan', 'Del 10 al 24 de noviembre · «Viaje de trabajo»', 'Rechazar', 'Aprobar', 'b', true],
+      ['chat', '3 clientas para contactar', 'Primeros 90 días · Mariana lleva 7 días sin reservar', '', 'Ver lista', 'b', false],
+      ['forum', '2 comentarios nuevos', 'Desde la app de clientas', '', 'Leer', 'b', false],
+      ['inventory_2', 'Toallas: quedan 4', 'Sucursal Centro · el aviso es en 5', '', 'Reponer', 'b', false],
+      ['account_balance_wallet', '3 sueldos por aprobar', 'Entrenadoras · octubre de 2026', '', 'Revisar', 'a', false]
+    ];
+    var inbox = all.filter(function (m) { return admin || m[5] === 'b'; }).map(function (m, i) {
+      return { icon: m[0], title: m[1], note: m[2], second: m[3], cta: m[4],
+        secondStyle: SECOND + ' color: ' + (m[6] ? '#A04E3E' : '#7D4F4B'),
+        rowStyle: 'display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 16px;' + (i ? ' border-top: 1px solid #E6DBD0;' : '') };
+    });
+    var recs = [['El Reformer del jueves 18:30 se llena poco', '3 de 12 lugares en promedio las últimas 3 semanas. Prueba moverlo a las 19:30.'], ['2 clientas nuevas no reservaron en 7 días', 'Escríbeles desde «Para contactar» antes de que se enfríen.']].map(function (r, i) {
+      return { title: r[0], note: r[1], rowStyle: 'display: flex; gap: 12px; padding: 16px;' + (i ? ' border-top: 1px solid #E6DBD0;' : '') };
+    });
+    var today = [['09:00', 'Mat Pilates', 'Daniela Ortiz', 'Llena', true], ['18:30', 'Reformer Pilates', 'Daniela Ortiz', '9 de 12', false]].map(function (c) {
+      return { time: c[0], cls: c[1], who: c[2], seats: c[3], seatStyle: c[4] ? 'height: 24px; padding: 0 10px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center' : 'color: #6F6662; font-variant-numeric: tabular-nums' };
+    });
+    var sum = admin
+      ? { count: '6 pendientes', detail: '1 pago por QR · 1 congelamiento · 3 clientas para contactar · 2 comentarios · stock bajo · 3 sueldos' }
+      : { count: '4 pendientes', detail: '1 congelamiento · 3 clientas para contactar · 2 comentarios · stock bajo' };
+    var who = admin ? { name: 'Paola Mendoza', first: 'Paola', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', first: 'Carolina', ini: 'CR', role: 'Coordinación' };
+    return { dest: dest, admin: admin, coord: !admin, busy: !calm, calm: calm, moneyTabs: moneyTabs, money: money, inbox: inbox, recs: recs, today: today, sum: sum, who: who };
+  }
+}
+</script>
+</body>
+</html>

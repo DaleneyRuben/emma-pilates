@@ -1,0 +1,164 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-03T22:30:00Z"
+ },
+ "title": "Emma v2 · Admin web",
+ "launch": {
+  "view": "focused",
+  "file": "P01-Inicio.dc.html"
+ },
+ "pages": [],
+ "boards": {
+  "Direccion-visual.dc.html": {
+   "x": 0,
+   "y": -2020,
+   "w": 1440,
+   "h": 1900,
+   "title": "Dirección visual · v2 en escritorio",
+   "expand": "fill"
+  },
+  "P01-Inicio.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1000,
+   "title": "1 · Inicio · Administración (el riel lleva a cada página)",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "P01d-Inicio-movil.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 420,
+   "h": 1560,
+   "title": "1 · Inicio · 420 px (toca ☰)",
+   "is_interactive": true
+  },
+  "P01b-Inicio-coordinacion.dc.html": {
+   "x": 0,
+   "y": 1120,
+   "w": 1440,
+   "h": 1000,
+   "title": "1 · Inicio · Coordinación",
+   "expand": "fill"
+  },
+  "P01c-Inicio-al-dia.dc.html": {
+   "x": 0,
+   "y": 2240,
+   "w": 1440,
+   "h": 1000,
+   "title": "1 · Inicio · Todo al día",
+   "expand": "fill"
+  },
+  "P02-Horario.dc.html": {
+   "x": 0,
+   "y": 3360,
+   "w": 1440,
+   "h": 1000,
+   "title": "2 · Horario (toca una clase · Tweaks: vista)",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "P03-Clientas.dc.html": {
+   "x": 0,
+   "y": 4480,
+   "w": 1440,
+   "h": 1000,
+   "title": "3 · Clientas (toca una fila · Tweaks: rol)",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "P11-Clientas-movil.dc.html": {
+   "x": 1520,
+   "y": 4480,
+   "w": 420,
+   "h": 1100,
+   "title": "3 · Clientas · 420 px",
+   "is_interactive": true
+  },
+  "P04-Promociones.dc.html": {
+   "x": 0,
+   "y": 5700,
+   "w": 1440,
+   "h": 1000,
+   "title": "4 · Promociones",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "P05-Comentarios.dc.html": {
+   "x": 0,
+   "y": 6820,
+   "w": 1440,
+   "h": 1000,
+   "title": "5 · Comentarios",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "P06-Dinero.dc.html": {
+   "x": 0,
+   "y": 7940,
+   "w": 1440,
+   "h": 1000,
+   "title": "6 · Dinero (solo Administración)",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "P07-Estudio.dc.html": {
+   "x": 0,
+   "y": 9060,
+   "w": 1440,
+   "h": 1000,
+   "title": "7 · Estudio",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "P08-Informes.dc.html": {
+   "x": 0,
+   "y": 10180,
+   "w": 1440,
+   "h": 1000,
+   "title": "8 · Informes",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "P09-Ajustes.dc.html": {
+   "x": 0,
+   "y": 11300,
+   "w": 1440,
+   "h": 1000,
+   "title": "9 · Ajustes",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "P10-Acceso.dc.html": {
+   "x": 0,
+   "y": 12420,
+   "w": 1440,
+   "h": 900,
+   "title": "10 · Acceso (iniciar sesión, recuperar, crear contraseña)",
+   "expand": "fill",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Direccion-visual.dc.html",
+  "P01-Inicio.dc.html",
+  "P01d-Inicio-movil.dc.html",
+  "P01b-Inicio-coordinacion.dc.html",
+  "P01c-Inicio-al-dia.dc.html",
+  "P02-Horario.dc.html",
+  "P03-Clientas.dc.html",
+  "P11-Clientas-movil.dc.html",
+  "P04-Promociones.dc.html",
+  "P05-Comentarios.dc.html",
+  "P06-Dinero.dc.html",
+  "P07-Estudio.dc.html",
+  "P08-Informes.dc.html",
+  "P09-Ajustes.dc.html",
+  "P10-Acceso.dc.html"
+ ],
+ "notes": {},
+ "designSystems": []
+}

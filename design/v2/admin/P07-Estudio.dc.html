@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Estudio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.app{width:100%;min-height:1000px;display:flex;flex-wrap:wrap;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;position:relative}
+.rail{flex:1 1 96px;max-width:100%;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;text-decoration:none;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{position:relative;width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rb{position:absolute;top:-4px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#93615D;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;border:2px solid #F5EFE9}
+.rl{font-size:12px;font-weight:500}
+.col{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:20px 40px}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+.search{flex:1 1 360px;max-width:560px;height:48px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;background:#F5EFE9}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;outline:none}
+.kbd{font-size:12px;color:#6F6662;padding:2px 8px;border-radius:6px;background:#FAF7F2}
+.cb{height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border:0;border-radius:12px;background:#F5EFE9;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer}
+.me{height:44px;display:flex;align-items:center;gap:10px;padding:0 8px 0 4px;color:#4A4A4A}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}.av.s{width:36px;height:36px}
+main{padding:8px 40px 56px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h3{margin:0;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sub{color:#6F6662}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}.hl{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E6DBD0}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;cursor:pointer;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent;display:inline-flex;align-items:center}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.cnt{margin-left:6px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:999px;background:#93615D;color:#fff}
+.card{background:#F5EFE9;border-radius:16px}
+.note{font-size:13px;color:#6F6662}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 16px;min-height:56px}.row+.row{border-top:1px solid #E6DBD0}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#B78380;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:150px;display:flex;flex-direction:column;gap:2px}
+.strong{font-weight:600}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.p{background:#B78380;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}.d{background:#F7E5E0;color:#A04E3E}.td{background:transparent;color:#A04E3E;padding:0 10px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.wait{background:rgba(201,154,78,.16);color:#7C5D2A}.bad{background:#F7E5E0;color:#A04E3E}.none{background:rgba(216,201,187,.34);color:#6F6662}.rose{background:#F2E4E1;color:#7D4F4B}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.f{height:36px;padding:0 14px;border-radius:999px;background:#F5EFE9;font:400 14px 'Work Sans',sans-serif;border:0;color:#4A4A4A;cursor:pointer;display:inline-flex;align-items:center}.f.on{background:#F2E4E1;color:#7D4F4B;font-weight:600}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;white-space:nowrap}
+td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.22);display:flex;justify-content:flex-end;z-index:5}
+.panel{width:480px;max-width:100%;background:#FAF7F2;padding:28px;display:flex;flex-direction:column;gap:18px;overflow-y:auto}
+.ph{display:flex;align-items:flex-start;gap:12px}.ph h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:24px;flex:1}
+.x{width:40px;height:40px;border:0;border-radius:12px;background:#F5EFE9;color:#6F6662;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.field{display:flex;flex-direction:column;gap:6px}.field>span{font-size:13px;font-weight:500}
+.input{min-height:44px;padding:10px 14px;border:1px solid #E6DBD0;border-radius:12px;background:#F5EFE9;color:#4A4A4A;display:flex;align-items:center;justify-content:space-between;width:100%}
+.check{display:flex;align-items:center;gap:10px;min-height:44px}.box{width:22px;height:22px;border-radius:6px;border:1.5px solid #B78380;display:flex;align-items:center;justify-content:center;color:#fff}.box.on{background:#B78380}
+.notice{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;border-left:4px solid #B78380;font-size:14px}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.lora{font-family:Lora,serif}
+.seg{display:flex;gap:2px;background:#F5EFE9;border-radius:12px;padding:3px}
+.seg button{height:38px;border:0;border-radius:10px;background:transparent;font:500 14px 'Work Sans',sans-serif;color:#6F6662;cursor:pointer;padding:0 14px}.seg button.on{background:#FAF7F2;color:#7D4F4B;font-weight:600}
+.stock{width:120px;height:6px;border-radius:999px;background:#E6DBD0;overflow:hidden}.stock span{display:block;height:100%;background:#B78380;border-radius:999px}.stock.low span{background:#C99A4E}
+</style>
+</helmet>
+<div class="app">
+  <nav class="rail" aria-label="Menú principal"><span class="mark" aria-label="Emma Pilates Studio">E</span>
+    <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><a class="{{r.cls}}" href="{{r.href}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span><sc-if value="{{r.badge}}" hint-placeholder-val="{{false}}"><span class="rb">{{r.badge}}</span></sc-if></span><span class="rl">{{r.label}}</span></a></sc-for>
+  </nav>
+  <div class="col">
+    <header class="top">
+      <span class="wm"><b>Emma</b><i>Pilates Studio</i></span>
+      <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
+      <span style="flex: 1"></span>
+      <button type="button" class="cb"><span class="ms" style="color: #B78380">{{branch.icon}}</span>{{branch.label}}<sc-if value="{{branch.pick}}" hint-placeholder-val="{{true}}"><span class="ms" style="color: #6F6662">expand_more</span></sc-if></button>
+      <span class="me"><span class="av">{{who.ini}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span></span>
+    </header>
+    <main>
+      <div class="head">
+        <div class="hl"><h1>Estudio</h1><span class="sub">{{subtitle}}</span></div>
+        <sc-if value="{{showInvite}}" hint-placeholder-val="{{true}}"><button type="button" class="btn p" onClick="{{openMember}}"><span class="ms">person_add</span>Invitar a alguien</button></sc-if>
+        <sc-if value="{{is.insumos}}" hint-placeholder-val="{{false}}"><button type="button" class="btn p"><span class="ms">add</span>Nuevo insumo</button></sc-if>
+        <sc-if value="{{is.equipos}}" hint-placeholder-val="{{false}}"><button type="button" class="btn p"><span class="ms">add</span>Nuevo equipo</button></sc-if>
+      </div>
+      <div class="tabs" role="tablist"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.go}}">{{t.label}}<sc-if value="{{t.count}}" hint-placeholder-val="{{false}}"><span class="cnt">{{t.count}}</span></sc-if></button></sc-for></div>
+
+      <sc-if value="{{is.personal}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div class="filters"><button type="button" class="f on">Todo el equipo · 8</button><button type="button" class="f">Entrenadoras</button><button type="button" class="f">Recepción</button><button type="button" class="f">Nutrición</button><button type="button" class="f">Coordinación</button><button type="button" class="f">Invitaciones pendientes · 1</button></div>
+          <div class="tw"><table>
+            <thead><tr><th>Persona</th><th>Contacto</th><th>Rol</th><th>Sedes</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+              <sc-for list="{{staff}}" as="m" hint-placeholder-count="6">
+                <tr><td><span style="display: flex; align-items: center; gap: 12px"><span class="av s">{{m.ini}}</span><span class="strong">{{m.n}}</span></span></td><td><span style="display: flex; flex-direction: column"><span>{{m.mail}}</span><span class="note">{{m.tel}}</span></span></td><td>{{m.role}}</td><td>{{m.branches}}</td><td><span class="{{m.pillCls}}">{{m.state}}</span></td><td style="text-align: right"><button type="button" class="btn sm t" onClick="{{openMember}}">Abrir</button></td></tr>
+              </sc-for>
+            </tbody>
+          </table></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.insumos}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div class="filters"><div class="seg"><sc-for list="{{supViews}}" as="w" hint-placeholder-count="2"><button type="button" class="{{w.cls}}" onClick="{{w.go}}">{{w.label}}</button></sc-for></div></div>
+          <sc-if value="{{sup.stock}}" hint-placeholder-val="{{true}}">
+            <div class="tw"><table>
+              <thead><tr><th>Insumo</th><th class="num">En stock</th><th></th><th class="num">Aviso en</th><th>Estado</th><th></th></tr></thead>
+              <tbody>
+                <tr><td class="strong">Toallas</td><td class="num">4</td><td><span class="stock low"><span style="width: 20%"></span></span></td><td class="num">5</td><td><span class="pill wait">Stock bajo</span></td><td style="text-align: right; white-space: nowrap"><button type="button" class="btn sm s">Retiro</button> <button type="button" class="btn sm p">Reposición</button></td></tr>
+                <tr><td class="strong">Calcetines antideslizantes</td><td class="num">32</td><td><span class="stock"><span style="width: 80%"></span></span></td><td class="num">10</td><td><span class="pill ok">Bien</span></td><td style="text-align: right; white-space: nowrap"><button type="button" class="btn sm s">Retiro</button> <button type="button" class="btn sm s">Reposición</button></td></tr>
+                <tr><td class="strong">Alcohol en gel</td><td class="num">6</td><td><span class="stock"><span style="width: 60%"></span></span></td><td class="num">2</td><td><span class="pill ok">Bien</span></td><td style="text-align: right; white-space: nowrap"><button type="button" class="btn sm s">Retiro</button> <button type="button" class="btn sm s">Reposición</button></td></tr>
+              </tbody>
+            </table></div>
+          </sc-if>
+          <sc-if value="{{sup.retiros}}" hint-placeholder-val="{{false}}">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; align-items: start">
+              <section style="display: flex; flex-direction: column; gap: 12px"><h3>Retiros de noviembre</h3>
+                <div class="card"><div class="row"><span class="grow"><span class="strong">Toallas</span><span class="note">3 de noviembre · Camila Rojas</span></span><span>−6</span></div><div class="row"><span class="grow"><span class="strong">Calcetines antideslizantes</span><span class="note">2 de noviembre · Camila Rojas</span></span><span>−8</span></div></div>
+              </section>
+              <section style="display: flex; flex-direction: column; gap: 12px"><h3>Consumo del mes</h3>
+                <div class="card"><div class="row"><span class="grow">Toallas</span><span>6</span></div><div class="row"><span class="grow">Calcetines antideslizantes</span><span>8</span></div></div>
+              </section>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{is.equipos}}" hint-placeholder-val="{{false}}">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; align-items: start">
+          <section style="display: flex; flex-direction: column; gap: 12px"><h3>Equipos de Centro</h3>
+            <div class="card">
+              <div class="row"><span class="disc"><span class="ms">fitness_center</span></span><span class="grow"><span class="strong">Reformer 1</span></span><span class="pill ok">Se puede usar</span><button type="button" class="btn sm t">Registrar falla</button></div>
+              <div class="row"><span class="disc"><span class="ms">fitness_center</span></span><span class="grow"><span class="strong">Reformer 2</span></span><span class="pill ok">Se puede usar</span><button type="button" class="btn sm t">Registrar falla</button></div>
+              <div class="row"><span class="disc"><span class="ms">fitness_center</span></span><span class="grow"><span class="strong">Reformer 3</span><span class="note">El resorte izquierdo no engancha</span></span><span class="pill bad">Fuera de servicio</span><button type="button" class="btn sm t">Registrar falla</button></div>
+              <div class="row"><span class="disc"><span class="ms">sports_gymnastics</span></span><span class="grow"><span class="strong">Mat 1 a 14</span></span><span class="pill ok">Se pueden usar</span><button type="button" class="btn sm t">Registrar falla</button></div>
+            </div>
+          </section>
+          <section style="display: flex; flex-direction: column; gap: 12px"><div style="display: flex; align-items: center; justify-content: space-between"><h3>Fallas</h3><div class="seg"><button type="button" class="on">Abiertas · 1</button><button type="button">Resueltas</button></div></div>
+            <div class="card">
+              <div class="row"><span class="disc"><span class="ms">build</span></span><span class="grow"><span class="strong">Reformer 3</span><span class="note">«El resorte izquierdo no engancha» · 1 de noviembre · Daniela Ortiz</span><span class="note">El jueves 18:30 queda con un reformer menos</span></span><button type="button" class="btn sm s">Marcar resuelta</button></div>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+
+  <sc-if value="{{member}}" hint-placeholder-val="{{false}}">
+    <div class="scrim"><div class="panel" role="dialog" aria-label="Persona del equipo">
+      <div class="ph"><span class="av">DO</span><div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><h2>Daniela Ortiz</h2><span class="note">daniela.ortiz@example.com · +591 70022002</span></div><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
+      <sc-if value="{{coord}}" hint-placeholder-val="{{false}}"><div class="notice"><span class="ms" style="color: #93615D">info</span>Puedes cambiar sus sedes. Invitar y cambiar roles lo hace Administración.</div></sc-if>
+      <label class="field"><span>Rol</span><span class="input">Entrenadora<sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><span class="ms" style="color: #6F6662">expand_more</span></sc-if></span></label>
+      <div class="field"><span>Sedes</span><div class="card" style="padding: 4px 16px"><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Centro</label><label class="check"><span class="box"></span>Equipetrol</label><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Urubó</label></div></div>
+      <sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><label class="field"><span>Código de referido</span><span class="input">DANIELA<span class="note">Ella también puede cambiarlo</span></span></label></sc-if>
+      <div class="actions" style="justify-content: space-between"><sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><button type="button" class="btn td">Desactivar cuenta</button></sc-if><span style="display: flex; gap: 8px; margin-left: auto"><button type="button" class="btn t" onClick="{{close}}">Cancelar</button><button type="button" class="btn p" onClick="{{close}}">Guardar</button></span></div>
+    </div></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"rol":{"editor":"enum","options":["Administración","Coordinación"],"default":"Administración"},"$preview":{"width":1440,"height":1000}}'>
+var RAIL = [['ini','home','Inicio','P01-Inicio.dc.html','','b'],['hor','calendar_month','Horario','P02-Horario.dc.html','','b'],['cli','group','Clientas','P03-Clientas.dc.html','4','b'],['pro','campaign','Promociones','P04-Promociones.dc.html','','b'],['com','forum','Comentarios','P05-Comentarios.dc.html','2','b'],['din','payments','Dinero','P06-Dinero.dc.html','4','a'],['est','storefront','Estudio','P07-Estudio.dc.html','1','b'],['inf','bar_chart','Informes','P08-Informes.dc.html','','b'],['aj','settings','Ajustes','P09-Ajustes.dc.html','','b']];
+function rail(active, admin) { return RAIL.filter(function (r) { return admin || r[5] === 'b'; }).map(function (r) { return { icon: r[1], label: r[2], href: r[3], badge: r[4], cls: 'ri' + (r[0] === active ? ' on' : '') }; }); }
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var admin = (this.props.rol ?? 'Administración') === 'Administración';
+    var tab = st.tab || 'personal';
+    var sv = st.sv || 'stock';
+    function set(o) { return function () { self.setState(o); }; }
+    var staff = [['EV', 'Emma Vargas', 'emma.vargas@example.com', '+591 70022001', 'Entrenadora', 'Centro, Equipetrol, Urubó', 'Activa', 'ok'], ['DO', 'Daniela Ortiz', 'daniela.ortiz@example.com', '+591 70022002', 'Entrenadora', 'Centro, Urubó', 'Activa', 'ok'], ['AS', 'Andrea Suárez', 'andrea.suarez@example.com', '+591 70022003', 'Entrenadora', 'Equipetrol', 'Activa', 'ok'], ['CR', 'Camila Rojas', 'camila.rojas@example.com', '+591 70022004', 'Recepción', 'Centro', 'Activa', 'ok'], ['GF', 'Gabriela Flores', 'gabriela.flores@example.com', '+591 70022005', 'Nutricionista', 'Centro', 'Activa', 'ok'], ['CR', 'Carolina Rivas', 'carolina.rivas@example.com', '+591 70022006', 'Coordinadora', 'Todas', 'Activa', 'ok'], ['LM', 'Luciana Montaño', 'luciana@example.com', '+591 70022007', 'Entrenadora', 'Centro', 'Invitación enviada', 'wait']].map(function (m) {
+      return { ini: m[0], n: m[1], mail: m[2], tel: m[3], role: m[4], branches: m[5], state: m[6], pillCls: 'pill ' + m[7] };
+    });
+    var subs = { personal: 'El equipo es del estudio, no de una sede', insumos: 'Sucursal Centro · 1 con stock bajo', equipos: 'Sucursal Centro · 1 falla abierta' };
+    return { rail: rail('est', admin), staff: staff, subtitle: subs[tab], admin: admin, coord: !admin, showInvite: admin && tab === 'personal',
+      branch: tab === 'personal' ? { icon: 'apartment', label: 'Todo el estudio', pick: false } : { icon: 'location_on', label: 'Sucursal Centro', pick: true },
+      tabs: [['personal', 'Personal', ''], ['insumos', 'Insumos', '1'], ['equipos', 'Equipos', '1']].map(function (t) { return { label: t[1], count: t[2], cls: 'tab' + (t[0] === tab ? ' on' : ''), go: set({ tab: t[0], member: false }) }; }),
+      is: { personal: tab === 'personal', insumos: tab === 'insumos', equipos: tab === 'equipos' },
+      supViews: [['stock', 'Stock'], ['retiros', 'Retiros del mes']].map(function (w) { return { label: w[1], cls: w[0] === sv ? 'on' : '', go: set({ sv: w[0] }) }; }),
+      sup: { stock: sv === 'stock', retiros: sv === 'retiros' },
+      member: !!st.member, openMember: set({ member: true }), close: set({ member: false }),
+      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación' } };
+  }
+}
+</script>
+</body>
+</html>
