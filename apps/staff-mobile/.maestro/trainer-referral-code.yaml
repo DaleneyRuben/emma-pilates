@@ -42,8 +42,13 @@ env:
 - extendedWaitUntil:
     visible: "Disponible"
     timeout: 8000
-# iOS: XCUITest cannot tap through the open keyboard.
-- hideKeyboard
+# iOS: XCUITest cannot tap through the open keyboard. On Android
+# hideKeyboard presses Back, which closes the sheet.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - hideKeyboard
 - tapOn: "Guardar código"
 - extendedWaitUntil:
     visible: ".*dejará de funcionar.*"
