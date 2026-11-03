@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
+import { claimReadableReferralCode } from '../booking/acquisition/referral-code-claim';
 import {
   PaymentMethod,
   PaymentState,
@@ -124,9 +125,21 @@ export const applyDevelopmentFixtures = async (
 
       for (const member of fixtures.staffMembers) {
         const data = { name: member.name, role: staffRoles[member.role] };
+        // BKM-017: a Trainer is created with her readable code.
+        const created = await transaction.staffMember.findUnique({
+          where: { id: member.id },
+          select: { id: true },
+        });
         await transaction.staffMember.upsert({
           where: { id: member.id },
-          create: { id: member.id, ...data },
+          create: {
+            id: member.id,
+            ...data,
+            referralCode:
+              created === null && member.role === 'trainer'
+                ? await claimReadableReferralCode(transaction, member.name)
+                : null,
+          },
           update: data,
         });
 
