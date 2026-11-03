@@ -159,10 +159,10 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
       declaredChannel: registration.acquisitionChannel,
       referralCode: registration.referredByCode,
     });
-    if (registration.referredByCode !== null && holder?.kind === 'client') {
+    if (holder?.kind === 'client') {
       await attributeReferral(this.transaction, {
         referredClientId: registration.clientId,
-        referralCode: registration.referredByCode,
+        referrerClientId: holder.clientId,
       });
       // The monthly invite is spent when she verifies, not here. An
       // unverified registration must not burn the host's month, and the

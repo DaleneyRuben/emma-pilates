@@ -7,7 +7,7 @@ import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/re
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
 import { AuthenticationLinkCipher } from '../../src/system-identity/security/authentication-link-cipher';
 import { authenticationTokens } from '../../src/system-identity/security/authentication-token-service';
-import { attributeReferral } from '../../src/booking/payments/referral-attribution';
+import { findReferralCodeHolder } from '../../src/booking/acquisition/record-client-acquisition';
 import {
   digestTestEmail,
   RegistrationWorld,
@@ -252,13 +252,11 @@ describe('Client registration cancellation, cleanup, and referral', () => {
       select: { referralCode: true },
     });
 
+    // BKM-017: a removed Client holds no live code, so nobody is attributed.
     await expect(
       prisma.$transaction((transaction) =>
-        attributeReferral(transaction, {
-          referredClientId: randomUUID(),
-          referralCode: removed.referralCode,
-        }),
+        findReferralCodeHolder(transaction, removed.referralCode),
       ),
-    ).rejects.toMatchObject({ code: 'referral_code_invalid' });
+    ).resolves.toBeNull();
   });
 });
