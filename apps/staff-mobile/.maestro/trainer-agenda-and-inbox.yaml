@@ -5,16 +5,17 @@ env:
 ---
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
-    visible: "Tu cuenta.*"
+    visible:
+      id: "tab-profile"
     timeout: 30000
 - runFlow: subflows/park-dev-gear.yaml
 - extendedWaitUntil:
     visible:
-      text: "No tienes clases este día.|.*Pilates"
+      text: "Hoy no tienes clases|.* no tienes clases|.*Pilates"
     timeout: 15000
 - takeScreenshot: staff-trainer-agenda
 - tapOn:
-    id: "account-avatar"
+    id: "tab-profile"
 - extendedWaitUntil:
     visible:
       text: "Notificaciones.*"
@@ -23,5 +24,5 @@ env:
     text: "Notificaciones.*"
 - extendedWaitUntil:
     visible:
-      text: "Sin leer|Anteriores|No tienes notificaciones."
+      text: "Sin leer|Anteriores|No tienes notificaciones.*"
     timeout: 15000

@@ -8,19 +8,15 @@ env:
 ---
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
-    visible: "Tu cuenta.*"
+    visible:
+      id: "tab-profile"
     timeout: 30000
 - runFlow: subflows/park-dev-gear.yaml
 - tapOn:
-    id: "account-avatar"
-- extendedWaitUntil:
-    visible: "Mis pagos"
-    timeout: 15000
-- takeScreenshot: mob073-perfil
-- tapOn: "Mis pagos"
+    id: "tab-pay"
 - extendedWaitUntil:
     visible:
-      text: "Liquidaciones|Pagos recibidos|Todavía no tienes pagos."
+      text: "Liquidaciones.*|Pagos recibidos|Todavía no tienes pagos"
     timeout: 15000
 - takeScreenshot: mob073-mis-pagos
 - runFlow:

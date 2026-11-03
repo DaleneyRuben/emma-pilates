@@ -63,7 +63,7 @@ env:
     text: "Close"
     optional: true
 - tapOn:
-    id: "account-avatar"
+    id: "tab-profile"
 - extendedWaitUntil:
     visible: "Notificaciones.*"
     timeout: 15000

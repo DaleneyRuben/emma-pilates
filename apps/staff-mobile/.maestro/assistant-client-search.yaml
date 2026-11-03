@@ -5,7 +5,8 @@ env:
 ---
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
-    visible: "Tu cuenta.*"
+    visible:
+      id: "tab-profile"
     timeout: 30000
 - runFlow: subflows/park-dev-gear.yaml
 - tapOn:
