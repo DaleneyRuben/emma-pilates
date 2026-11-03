@@ -14,7 +14,10 @@ import {
 } from '../../system-identity/staff-accounts/staff-accounts';
 import { boliviaDate } from '../../time/bolivia-time';
 import { endNutritionistAvailability } from '../evaluations/prisma-evaluation-commands';
-import { claimReadableReferralCode } from '../acquisition/referral-code-claim';
+import {
+  claimReadableReferralCode,
+  isReferralCodeTaken,
+} from '../acquisition/referral-code-claim';
 import type {
   StaffDirectory,
   StaffManagementTransaction,
@@ -117,11 +120,15 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
     work: (transaction: StaffManagementTransaction) => Promise<Result>,
   ): Promise<Result> {
     const { prisma } = this.dependencies;
-    return retrySerializable(() =>
-      prisma.$transaction(
-        (transaction) => work(this.transactionFor(transaction)),
-        serializable,
-      ),
+    // BKM-017: a Trainer's claimed code can meet one a concurrent Client
+    // registration committed after this snapshot; a fresh attempt sees it.
+    return retrySerializable(
+      () =>
+        prisma.$transaction(
+          (transaction) => work(this.transactionFor(transaction)),
+          serializable,
+        ),
+      { retryAlso: isReferralCodeTaken },
     );
   }
 
