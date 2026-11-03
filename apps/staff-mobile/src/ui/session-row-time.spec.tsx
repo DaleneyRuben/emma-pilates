@@ -18,7 +18,7 @@ describe("the start time of a staff class row", () => {
 
     const time = screen.getByText("07:00", { includeHiddenElements: true });
     expect(time.props.numberOfLines).toBe(1);
-    expect(time.parent?.parent).toHaveStyle({ minWidth: 56 });
-    expect(time.parent?.parent).not.toHaveStyle({ width: 56 });
+    expect(time.parent).toHaveStyle({ minWidth: 56 });
+    expect(time.parent).not.toHaveStyle({ width: 56 });
   });
 });
