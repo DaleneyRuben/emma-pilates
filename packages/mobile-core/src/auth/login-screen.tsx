@@ -78,69 +78,73 @@ export function LoginScreen({
             <BodyText style={styles.noticeText}>{notice}</BodyText>
           </View>
         )}
-        <BrandHeader teamAccess={teamAccess} />
+        {/* v2 C01/S01: the brand and the form sit together, centred in the
+            spare height; only the register prompt stays at the bottom. */}
+        <View style={[styles.main, teamAccess ? styles.mainTeam : null]} testID="login-main">
+          <BrandHeader teamAccess={teamAccess} />
 
-        <View style={styles.form}>
-          {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
-          {retryAfterSeconds > 0 ? (
-            <WaitNotice
-              message="Demasiados intentos. Intenta de nuevo en un momento."
-              remainingSeconds={retryAfterSeconds}
-              waitLabel="Podrás intentarlo en"
+          <View style={styles.form}>
+            {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
+            {retryAfterSeconds > 0 ? (
+              <WaitNotice
+                message="Demasiados intentos. Intenta de nuevo en un momento."
+                remainingSeconds={retryAfterSeconds}
+                waitLabel="Podrás intentarlo en"
+              />
+            ) : null}
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onBlur, onChange, value } }) => (
+                <FormField
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  error={errors.email?.message}
+                  keyboardType="email-address"
+                  label="Correo electrónico"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  placeholder={emailPlaceholder(teamAccess)}
+                  testID="login-email"
+                  value={value}
+                />
+              )}
             />
-          ) : null}
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onBlur, onChange, value } }) => (
-              <FormField
-                autoCapitalize="none"
-                autoComplete="email"
-                error={errors.email?.message}
-                keyboardType="email-address"
-                label="Correo electrónico"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                placeholder={emailPlaceholder(teamAccess)}
-                testID="login-email"
-                value={value}
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onBlur, onChange, value } }) => (
+                <FormField
+                  autoComplete="current-password"
+                  error={errors.password?.message}
+                  label="Contraseña"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  placeholder="••••••••"
+                  secureTextEntry
+                  testID="login-password"
+                  value={value}
+                />
+              )}
+            />
+            <PrimaryButton
+              busy={isSubmitting}
+              disabled={retryAfterSeconds > 0}
+              label="Iniciar sesión"
+              onPress={submitLogin}
+              testID="login-submit"
+            />
+            {onBiometricUnlock === undefined ? null : (
+              <BiometricLoginButton onPress={onBiometricUnlock} />
+            )}
+            {onForgotPassword === undefined ? null : (
+              <TextButton
+                label="¿Olvidaste tu contraseña?"
+                onPress={onForgotPassword}
+                testID="login-forgot-password"
               />
             )}
-          />
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onBlur, onChange, value } }) => (
-              <FormField
-                autoComplete="current-password"
-                error={errors.password?.message}
-                label="Contraseña"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                placeholder="••••••••"
-                secureTextEntry
-                testID="login-password"
-                value={value}
-              />
-            )}
-          />
-          <PrimaryButton
-            busy={isSubmitting}
-            disabled={retryAfterSeconds > 0}
-            label="Iniciar sesión"
-            onPress={submitLogin}
-            testID="login-submit"
-          />
-          {onBiometricUnlock === undefined ? null : (
-            <BiometricLoginButton onPress={onBiometricUnlock} />
-          )}
-          {onForgotPassword === undefined ? null : (
-            <TextButton
-              label="¿Olvidaste tu contraseña?"
-              onPress={onForgotPassword}
-              testID="login-forgot-password"
-            />
-          )}
+          </View>
         </View>
         {onRegister === undefined ? null : (
           <FooterPrompt action="Regístrate" onPress={onRegister} prompt="¿No tienes una cuenta?" />
@@ -167,13 +171,14 @@ const styles = StyleSheet.create({
     gap: spacing.xxxl,
     maxWidth: 480,
     width: "100%",
-    justifyContent: "space-between",
     paddingBottom: spacing.xl,
     paddingTop: spacing.xxxl,
   },
   form: {
     gap: spacing.lgXl,
   },
+  main: { flexGrow: 1, gap: spacing.xxl, justifyContent: "center" },
+  mainTeam: { gap: spacing.xl },
   screen: {
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.xlLg,
