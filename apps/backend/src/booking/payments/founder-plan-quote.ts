@@ -24,7 +24,9 @@ export const priceFounderPlanList = async <
   clientId: string | null,
   plans: T[],
   now: Date = new Date(),
-): Promise<Array<T & { listPriceCentavos?: number }>> => {
+): Promise<
+  Array<T & { listPriceCentavos?: number; launchPlacesLeft?: number }>
+> => {
   if (clientId === null) return plans;
   const rules = await readFounderRules(transaction);
   if (!(await quotesFounderPrice(transaction, clientId, rules, now))) {
