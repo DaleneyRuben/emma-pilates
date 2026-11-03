@@ -25,18 +25,6 @@ const steps = [
   "Compra su primer plan y tú ganas una clase",
 ] as const;
 
-/** C16's code: readable and spaced, selectable so a long press copies it. */
-export function ReferralCodeCard({ code }: { code: string }) {
-  return (
-    <View style={styles.codeCard}>
-      <Text style={styles.codeLabel}>Tu código</Text>
-      <Text selectable style={styles.code}>
-        {code}
-      </Text>
-    </View>
-  );
-}
-
 /** C16's «Cómo funciona»: three numbered rows and the limits line. */
 export function HowItWorks() {
   return (
@@ -83,21 +71,6 @@ export function ReferredList({ referred }: { referred: readonly ReferredClientDt
 }
 
 const styles = StyleSheet.create({
-  code: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 30,
-    letterSpacing: 4,
-  },
-  codeCard: { ...surfaces.card, alignItems: "center", gap: spacing.xs, padding: spacing.xlSm },
-  codeLabel: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
-  },
   disc: {
     alignItems: "center",
     backgroundColor: colors.primaryTint,
