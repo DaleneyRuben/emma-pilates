@@ -58,9 +58,3 @@ export function deviceFeedbackMetadata(): FeedbackMetadata {
     runtimeVersion,
   });
 }
-
-const systemNames = { android: "Android", ios: "iOS" } as const;
-
-export function describeFeedbackDevice(metadata: FeedbackMetadata): string {
-  return `la versión de la app (${metadata.appVersion}, compilación ${metadata.appBuild}), el sistema (${systemNames[metadata.platform]} ${metadata.osVersion})`;
-}
