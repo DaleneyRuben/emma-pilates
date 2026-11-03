@@ -96,7 +96,10 @@ export function BookingsScreen({
     setFailure(null);
     try {
       const response = await cancelBooking(cancelling.bookingId, undefined, fetcher);
-      if (response.status !== 204) {
+      if (response.status === 204) {
+        // «Reserva confirmada» no longer holds once a Booking is cancelled.
+        dismissConfirmed();
+      } else {
         setFailure(
           bookingRejectionMessage(problemCode(response.data)) ??
             "No pudimos cancelar la reserva. Inténtalo de nuevo.",
