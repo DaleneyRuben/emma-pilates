@@ -59,6 +59,16 @@ export function BackBar({
   );
 }
 
+/**
+ * For a BackBar inside a ScrollView on a screen padded by `xlSm`: the scroller
+ * reaches the screen edge and pads its content instead, so the chevron's
+ * negative margin is not clipped by the scroller's bounds (iPad walk).
+ */
+export const backBarScroll = StyleSheet.create({
+  content: { paddingHorizontal: spacing.xlSm },
+  scroll: { marginHorizontal: -spacing.xlSm },
+});
+
 const styles = StyleSheet.create({
   back: {
     alignItems: "center",

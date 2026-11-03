@@ -20,7 +20,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { roleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
-import { BackBar } from "../ui/back-bar";
+import { BackBar, backBarScroll } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
 import { createImpersonationApi } from "./impersonation-api";
 import { useImpersonation } from "./impersonation-context";
@@ -109,7 +109,10 @@ export function ViewAsScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={[styles.content, backBarScroll.content]}
+        style={backBarScroll.scroll}
+      >
         {header}
         {failure === null ? null : (
           <View accessibilityLabel={failure} accessibilityRole="alert">
@@ -169,7 +172,8 @@ const styles = StyleSheet.create({
   content: {
     alignSelf: "center",
     gap: spacing.xl,
-    maxWidth: 560,
+    // 560 pt of text inside the scroller's own padding.
+    maxWidth: 600,
     paddingBottom: spacing.xxl,
     width: "100%",
   },

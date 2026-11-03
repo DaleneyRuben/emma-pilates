@@ -21,7 +21,7 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { BackBar } from "../ui/back-bar";
+import { BackBar, backBarScroll } from "../ui/back-bar";
 import { InitialsDisc } from "../ui/person-row";
 import { freezeDays, freezeRange } from "./freeze-format";
 
@@ -87,7 +87,10 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
   const requested = freeze.state === "requested";
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={[styles.content, backBarScroll.content]}
+        style={backBarScroll.scroll}
+      >
         {header}
         <View style={styles.identity}>
           <InitialsDisc name={freeze.clientName} size={56} />
