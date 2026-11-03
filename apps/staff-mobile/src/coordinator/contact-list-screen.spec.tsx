@@ -98,9 +98,9 @@ describe("S28 Para contactar", () => {
     );
 
     await fireEvent.press(screen.getAllByRole("button", { name: "Marcar contactada" })[0]!);
-    // v2 S28: the brand toast that stays until closed.
+    // v2 S28: the brand toast that stays until closed, with her first name.
     await waitFor(() => {
-      expect(screen.getByText("Valeria Quiroga, contactada")).toBeOnTheScreen();
+      expect(screen.getByText("Valeria, contactada")).toBeOnTheScreen();
     });
     expect(screen.getByText("Sale de la lista y queda registrado a tu nombre")).toBeOnTheScreen();
     await waitFor(() => {
