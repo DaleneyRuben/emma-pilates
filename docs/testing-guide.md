@@ -8299,7 +8299,7 @@ C. **Editing her own code, client app.** As Lucía, **Perfil** → **Invita a
    **Cambiar código** → the toast «Código actualizado», the card shows
    `LU-PILATES`, and «Podrás cambiarlo de nuevo el …» (30 days later) replaces
    **Editar código**. Registering a new Client with `LUCIA` now answers
-   `referral_code_unknown`; one with `LU-PILATES` is attributed to Lucía.
+   `referral_code_invalid`; one with `LU-PILATES` is attributed to Lucía.
    Lucía's earlier referred friends still list under «Tus invitadas».
 D. **The Trainer's page, staff app.** As Daniela, **Perfil** shows the row
    «Tu código de referido · DANIELA»; other roles have no such row. It opens
