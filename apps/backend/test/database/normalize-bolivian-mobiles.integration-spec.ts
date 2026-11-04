@@ -50,10 +50,20 @@ describe('normalize Bolivian mobiles migration', () => {
     await context?.stop();
   });
 
-  it('stores every Bolivian mobile of Clients and Staff as the backend does and leaves the rest as typed', async () => {
+  it('stores every Bolivian mobile of Clients, Staff and promotion contacts as the backend does and leaves the rest as typed', async () => {
     const clientIds: string[] = [];
     const staffIds: string[] = [];
+    const contactIds: string[] = [];
     for (const [index, phone] of stored.entries()) {
+      const contact = await prisma.promotionContact.create({
+        data: {
+          name: `Contact ${index}`,
+          email: `contact${index}@example.com`,
+          phone,
+          consentedAt: new Date(),
+        },
+      });
+      contactIds.push(contact.id);
       const client = await prisma.client.create({
         data: {
           id: randomUUID(),
@@ -69,8 +79,9 @@ describe('normalize Bolivian mobiles migration', () => {
       staffIds.push(staff.id);
     }
 
-    await prisma.$executeRawUnsafe(migration.split(';')[0]);
-    await prisma.$executeRawUnsafe(migration.split(';')[1]);
+    for (const statement of migration.split(';')) {
+      if (statement.trim() !== '') await prisma.$executeRawUnsafe(statement);
+    }
 
     const expected = stored.map((phone) => {
       const normalized = normalizeContactPhone(phone)!;
@@ -87,6 +98,12 @@ describe('normalize Bolivian mobiles migration', () => {
     ).toEqual(expected);
     expect(
       staffIds.map((id) => staff.find((row) => row.id === id)!.phone),
+    ).toEqual(expected);
+    const contacts = await prisma.promotionContact.findMany({
+      where: { id: { in: contactIds } },
+    });
+    expect(
+      contactIds.map((id) => contacts.find((row) => row.id === id)!.phone),
     ).toEqual(expected);
     expect(expected.slice(0, 7)).toEqual([
       '+591 70000002',
