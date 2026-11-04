@@ -11671,6 +11671,12 @@
             "type": "string",
             "format": "date",
             "description": "Vigente desde, today or later"
+          },
+          "effectiveUntil": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Exclusive end, after effectiveFrom (BKM-018); null for no end. Left out, a new series has no end and a replacement keeps the old end"
           }
         },
         "required": [
@@ -11816,6 +11822,12 @@
             "type": "string",
             "format": "date",
             "description": "Vigente desde, today or later"
+          },
+          "effectiveUntil": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Exclusive end shared by every row, after effectiveFrom (BKM-018); left out or null for no end"
           },
           "rows": {
             "minItems": 1,

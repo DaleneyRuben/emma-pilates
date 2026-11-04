@@ -24,4 +24,9 @@ export interface SessionScheduleInputDto {
   capacity: number;
   /** Vigente desde, today or later */
   effectiveFrom: string;
+  /**
+   * Exclusive end, after effectiveFrom (BKM-018); null for no end. Left out, a new series has no end and a replacement keeps the old end
+   * @nullable
+   */
+  effectiveUntil?: string | null;
 }

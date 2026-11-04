@@ -15,6 +15,11 @@ export interface SessionScheduleBatchInputDto {
   /** Vigente desde, today or later */
   effectiveFrom: string;
   /**
+   * Exclusive end shared by every row, after effectiveFrom (BKM-018); left out or null for no end
+   * @nullable
+   */
+  effectiveUntil?: string | null;
+  /**
    * One weekly schedule per row, each lasting its own minutes, all created together or none; rows may not repeat or overlap each other
    * @minItems 1
    * @maxItems 7
