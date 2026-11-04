@@ -36,7 +36,7 @@ numbered tests.
 | Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
-| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal where she assigns a Trainer's Branches and reads everyone else, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
+| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation, class, and Plan reminders (Tests 7 and 105), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
@@ -576,7 +576,7 @@ Evaluation slots, and these active Accounts. Every fixture Account uses the pass
 | `andrea.suarez@example.com`  | Trainer       | Leads Pilates Prenatal in Equipetrol          |
 | `camila.rojas@example.com`   | Assistant     | Assigned to Centro                            |
 | `paola.mendoza@example.com`  | Administrator | Covers every Branch                           |
-| `carolina.rivas@example.com` | Coordinator   | Every Branch; operations without money (ADR-0102) |
+| `carolina.rivas@example.com` | Coordinator   | Every Branch; operations without money (ADR-0102, ADR-0108) |
 | `gabriela.flores@example.com`| Nutritionist  | Assigned to Centro                            |
 
 The 30-day window starts on the day you run the command. With the worker
@@ -2651,8 +2651,8 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    to decide, clients to contact, new comments, low stock, salaries to
    approve), each with **Revisar** opening its tab, or «Nada por resolver.»;
    then **Recomendaciones del mes**. Carolina sees **Clientas** (active,
-   new this month, renewal) instead of Dinero and only the Para contactar
-   row. At 420 px the cards stack in one column. On the left, a narrow
+   new this month, renewal) instead of Dinero and the freezes, contacts,
+   comments and low-stock rows, never transfers or salaries (ADR-0108). At 420 px the cards stack in one column. On the left, a narrow
    Lino rail carries the brand mark «E» and nine destinations, each an icon
    over its name: **Inicio, Horario, Clientas, Promociones, Comentarios,
    Dinero, Estudio, Informes, Ajustes** (follow-up 232). The current one is
@@ -6848,25 +6848,29 @@ Branch, up to the moment of the close.
 ## Test 77: work as the Coordinator (IDN-009)
 
 The Coordinator runs the studio's operation without seeing money
-([ADR-0102](./adr/0102-coordinator-role-without-money.md)). The fixtures
+([ADR-0102](./adr/0102-coordinator-role-without-money.md), widened by
+[ADR-0108](./adr/0108-widen-the-coordinator-role.md)). The fixtures
 (Test 5 A) include her: `carolina.rivas@example.com`, with the fixture
 password, holding every Branch.
 
 ### A. The admin web
 
 1. Start the API and the admin web (Test 24) and sign in as
-   `carolina.rivas@example.com`. The rail shows only **Inicio**,
-   **Horario**, **Clientas** (Todas · Para contactar), **Estudio**
-   (Personal) and **Informes** (El mes · Recomendaciones); the top bar and
-   the account menu name her Role «Coordinación». A money page opened by
-   address returns her to Horario with «Esa sección es solo para
-   administración.» (BKO-010 widens her pages).
+   `carolina.rivas@example.com`. The rail shows **Inicio**, **Horario**
+   (Clases · Nutrición), **Clientas** (Todas · Para contactar ·
+   Congelamientos), **Promociones** (Carrusel · Referidos · Contactos),
+   **Comentarios**, **Estudio** (Personal · Insumos · Equipos), **Informes**
+   (El mes) and **Ajustes** (Reglas del estudio), never Dinero; Estudio
+   carries the selected Branch's low-stock count. The top bar and the
+   account menu name her Role «Coordinación». A money page opened by address
+   returns her to Horario with «Esa sección es solo para administración.».
 2. In **Horario**, create a one-off Session, move one to another Trainer,
    and cancel one that has Bookings (Test 25): everything works as for the
    Administrator, at every Branch.
 3. Type `/back-office/pagos` (or `/reporte`, `/back-office/nomina`,
-   `/promociones`) in the address bar: you land on Horario with «Esa
-   sección es solo para administración.».
+   `/promociones/clases-de-campana`, `/clientas/fundadoras`,
+   `/informes/simulador`, `/ajustes/planes`) in the address bar: you land
+   on Horario with «Esa sección es solo para administración.».
 4. In **Clientes**, there is no **Dar clases de campaña**. Open a Client:
    no «Crédito» row, no «Cerrar cuenta», no **Agregar clase de cortesía**,
    no **Devolver una clase**, no **¿Cómo nos conociste?**, and no «Bs»
@@ -6880,7 +6884,21 @@ password, holding every Branch.
    Role: «Solo administración invita y cambia roles. Puedes asignar las
    sucursales de una entrenadora.». Opening anyone else stays read-only
    with «Solo administración invita y cambia roles.».
-6. Sign in as `paola.mendoza@example.com`: **Editar perfil** works the same
+6. The pages ADR-0108 opens to her (BKO-010): in **Clientas ›
+   Congelamientos** she approves or rejects a requested Freeze as Test 92
+   describes. In **Promociones › Carrusel** she creates, edits, orders,
+   publishes, unpublishes and deletes a Promotion (Test 33); **Referidos**
+   and **Contactos** work as for the Administrator, the export and
+   «Quitar contacto» included. In **Comentarios** she filters, exports and
+   triages. In **Estudio › Insumos** there is no «Nuevo insumo» and a row's
+   name does not open it, but **Registrar retiro** and **Registrar
+   reposición** work and «Retiros del mes» lists the month; **Equipos**
+   works as for the Administrator. **Horario › Nutrición** lists the
+   Evaluations. **Ajustes › Reglas del estudio** shows «Reglas
+   configurables» as text with «Solo administración las cambia.», no
+   field and no **Guardar cambios**, and «Reglas fijas» without the paid
+   Evaluation row: no «Bs» anywhere.
+7. Sign in as `paola.mendoza@example.com`: **Editar perfil** works the same
    for the Administrator, and **Personal → Nuevo miembro** offers the Role
    **Coordinador**, which replaces the Branch chips with «Todas las
    sucursales (implícito por el rol)».
@@ -6909,6 +6927,12 @@ a disposable database and checks each one (Test 8, integration tests). By
 hand, with her bearer token from Swagger (Test 3): `GET
 /api/v1/administrator/payments`, `GET /api/v1/administrator/reports/income`,
 and `GET /api/v1/assistant/clients/{id}/plan-quotes` answer `403`;
+`GET /api/v1/administrator/studio-settings` answers with
+`evaluationPriceCentavos` and `nutritionistFeeCentavos` at `null`, and
+`POST /api/v1/administrator/supplies` answers `403`;
+with the Administrator's token, `POST /api/v1/sessions/{id}/bookings` with
+`{"clientId": "…"}` books that Client at any Branch, and `DELETE
+/api/v1/bookings/{id}` cancels it (ADR-0108: the owner books from Horario);
 `PATCH /api/v1/administrator/clients/{id}` with `{"name": "…", "phone":
 null}` answers the refreshed detail with `creditAvailableCentavos` at 0
 (Credit is retired, PAY-005), and `system.audit_records` gains
@@ -7264,9 +7288,9 @@ C. **The booking.** A Session inside an approved Freeze answers `409`
    `booking_before_start_date`. A Session outside the Freeze books as before.
 D. **The founder.** A founder whose Subscription was frozen is not ended by
    the nightly job: the stored end already includes the frozen days.
-E. **Who decides.** An Assistant, a Trainer, a Nutritionist, and a Client
-   get `403` on the decision. A Coordinator principal is rejected too;
-   IDN-009 makes that role real.
+E. **Who decides.** The Administrator and the Coordinator decide
+   (ADR-0108). An Assistant, a Trainer, a Nutritionist, and a Client get
+   `403` on the decision.
 
 ## Test 82: equipment, its faults, and the capacity flags (BKO-004)
 
