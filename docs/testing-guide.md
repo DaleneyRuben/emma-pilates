@@ -2096,10 +2096,10 @@ Load the fixtures (Test 5A), start the backend, and start the worker with
   stays scheduled. Either way the check is recorded in
   `empty_booking_check_completed_at` (the column kept its BOOK-004 name) and
   never runs again for that Session, even if its Bookings later drop. A
-  check missed while the worker was down runs when it comes back, even after
-  the class started or ended (FIX-033, Test 130 B): below the minimum it is
-  cancelled the same way, unless a Booking has «Asistió», which proves the
-  class was taught.
+  check missed while the worker was down runs when it comes back (FIX-033,
+  Test 130 B). Before the start it cancels as above. Once the class has
+  started, a class with nobody booked is cancelled as `minimum_not_met`
+  without a notice, and a class with someone booked is left to be taught.
 - **Sessions whose Cancellation Window has closed** (2.5 hours before the
   start, from Studio Settings). Each scheduled Session records its live
   Bookings in `bookings_at_window_close` once, as they stood at the close:
@@ -8705,15 +8705,16 @@ A. **The rail (FIX-032).** At 1440 px and in a wide window (1900 px), every
    sits whole inside the 96 px rail at 12 px. The status pills and the table
    headers, which share that size, draw at 12 px too. Spec:
    `e2e/icon-rail.spec.ts`, `cn.spec.tsx`.
-B. **A missed Minimum Bookings check (FIX-033).** Stop the worker, let a
-   class with fewer than 2 Bookings start (or create one with `POST
-   /api/v1/administrator/sessions` a few minutes ahead), then start the worker
-   again. Within a minute the class is `cancelled` with `minimum_not_met`, the
-   booked Clients have their class back and a notice, and the Trainer gets
-   «… se canceló: no llegó al mínimo de 2 reservas.». Inicio no longer shows it
-   as today's class. A class whose Trainer marked «Asistió» for someone stays
-   scheduled. On the walkthrough's backup the five past classes of 3 and 4
-   November go this way. Specs:
+B. **A missed Minimum Bookings check (FIX-033).** Stop the worker and let
+   two classes start: one with nobody booked and one with a single Booking
+   (create them with `POST /api/v1/administrator/sessions` a few minutes
+   ahead, and book the second for Lucía). Start the worker again. Within a
+   minute the empty class is `cancelled` with `minimum_not_met` and nobody
+   gets a notice; the booked one stays scheduled, Lucía keeps her Booking,
+   and its check is recorded. Inicio no longer shows the empty class as
+   today's class. A class that has not started yet is cancelled with the
+   usual notices. On the walkthrough's backup the five past empty classes of
+   3 and 4 November go this way. Specs:
    `session-start-checks-overdue.integration-spec.ts`,
    `session-start-checks.spec.ts`.
 C. **No pay for an unchecked class (FIX-033).** In **Dinero › Sueldos**, the
@@ -8729,7 +8730,8 @@ D. **Reglas del estudio (FIX-034, FIX-035).** «Días adelante que una
 E. **Phones (FIX-036).** Test 125 H for the forms. After the migration,
    **Estudio › Personal** shows Daniela and Gabriela as `+591 70000002` and
    `+591 70000003`, like Paula; a stored phone that is not a Bolivian mobile
-   (Sofía's `7000004`) stays as it was. `PATCH /api/v1/clients/current` with
+   (Sofía's `7000004`) stays as it was; promotion contacts get the same
+   treatment. `PATCH /api/v1/clients/current` with
    `"phone":"71234567"` answers `"phone":"+591 71234567"`; a foreign number is
    saved as typed, so an older app keeps working. Specs:
    `bolivian-mobile.spec.ts` (backend and `mobile-core`),
