@@ -45,6 +45,16 @@
   --color-deshabilitado: #e7dcd8;
   --color-deshabilitado-texto: #b3a9a5;
 
+  /* Follow-up 225 (visual system v2), the admin web's new shell first:
+     Lino surfaces without border or shadow, Rosa profundo as the one
+     emphasis, Rosa enlace for text buttons, and the hairline Arena. */
+  --color-lino: #f5efe9;
+  --color-rosa-tinte: #f2e4e1;
+  --color-rosa-profundo: #93615d;
+  --color-rosa-enlace: #7d4f4b;
+  --color-tenue: #6f6662;
+  --color-arena-linea: #e6dbd0;
+
   --color-scrim: rgba(74, 58, 48, 0.22);
   /* Follow-up 21: the enlarged receipt, the one overlay above another. */
   --color-scrim-fuerte: rgba(74, 58, 48, 0.55);
@@ -90,6 +100,10 @@
   --text-ayuda--line-height: 1.4;
   --text-fila-menu: 13.5px;
   --text-fila-menu--line-height: 1.4;
+  /* Follow-up 225: the rail's labels, counts and the Role line, 12 px with
+     no tracking (Etiqueta is the tracked uppercase label). */
+  --text-pie: 12px;
+  --text-pie--line-height: 1.3;
 
   --radius-control: 8px;
   --radius-tarjeta: 12px;
