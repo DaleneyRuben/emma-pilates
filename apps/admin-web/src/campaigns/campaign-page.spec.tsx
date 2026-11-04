@@ -47,11 +47,12 @@ describe("AW21 Campaña", () => {
     );
   });
 
-  it("opens from Clientes and shows how many Clients will receive the campaign", async () => {
-    const { user } = renderAdmin("/back-office/clientes");
+  it("opens from the Promociones tabs and shows how many Clients will receive the campaign", async () => {
+    const { user } = renderAdmin("/promociones");
 
+    // Follow-up 232: the campaign moved from Clientes to Promociones.
     await user.click(
-      await screen.findByRole("link", { name: "Dar clases de campaña" }),
+      await screen.findByRole("link", { name: "Clases de campaña" }),
     );
 
     expect(
@@ -62,7 +63,7 @@ describe("AW21 Campaña", () => {
   });
 
   it("submits the campaign and shows the granted and skipped counts", async () => {
-    const { user } = renderAdmin("/back-office/clientes/campana");
+    const { user } = renderAdmin("/promociones/clases-de-campana");
 
     await user.type(
       await screen.findByLabelText("Nombre de la campaña"),

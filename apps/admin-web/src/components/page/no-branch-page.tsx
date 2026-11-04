@@ -20,7 +20,7 @@ export function NoBranchPage({
       {pending ? (
         <LoadingNotice>{loadingMessage}</LoadingNotice>
       ) : (
-        <p className="rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center text-cuerpo text-texto-secundario">
+        <p className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
           {emptyMessage}
         </p>
       )}

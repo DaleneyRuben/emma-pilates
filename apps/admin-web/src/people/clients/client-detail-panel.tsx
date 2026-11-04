@@ -4,7 +4,7 @@ import {
   type AdminClientDetailDto,
 } from "@pilates/api-contracts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { isApiError } from "../../api/problem";
 import {
@@ -23,6 +23,10 @@ import { formatCivilDate } from "../../lib/bolivia-time";
 import { useAdminRole, type AdminRole } from "../../session/admin-role";
 import { AllowanceAdjustmentAction } from "./allowance-adjustment-action";
 import { ClientAcquisitionBlock } from "./client-acquisition-block";
+import { ClientBookingsTab } from "./client-bookings-tab";
+import { ClientEvaluationsTab } from "./client-evaluations-tab";
+import { ClientFileTabs, type ClientFileTab } from "./client-file-tabs";
+import { ClientPaymentsTab } from "./client-payments-tab";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
 import { CourtesyAccessAction } from "./courtesy-access-action";
@@ -142,7 +146,7 @@ function ClientSummary({
             : client.referredClientCount}
         </SummaryRow>
         <SummaryRow label="Código">
-          <span className="rounded-control border border-borde bg-blanco px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto-secundario">
+          <span className="rounded-control bg-lino px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto-secundario">
             {client.referralCode}
           </span>
         </SummaryRow>
@@ -171,7 +175,10 @@ function ContactBlock({ client }: { client: AdminClientDetailDto }) {
 
 // AW22: a support summary of one Client. «Editar perfil» corrects the name
 // and phone (IDN-009, follow-up 156); closing the Account (follow-up 66) is
-// the Administrator's alone (ADR-0102).
+// the Administrator's alone (ADR-0102). Follow-up 232 (WEB-040) makes it a
+// file with tabs: Resumen (this summary and its actions), Reservas, Pagos
+// (the Administrator's alone), and Evaluaciones; each other tab reads its
+// list only when opened.
 export function ClientDetailPanel({
   clientId,
   onClosed,
@@ -184,52 +191,77 @@ export function ClientDetailPanel({
   const role = useAdminRole();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [tab, setTab] = useState<ClientFileTab>("resumen");
+  const panelBase = useId();
 
   return (
     <>
+      <ClientFileTabs
+        role={role}
+        value={tab}
+        onChange={setTab}
+        panelBase={panelBase}
+      />
       <SidePanelBody>
-        {query.isPending ? (
-          <LoadingNotice>Cargando la ficha…</LoadingNotice>
-        ) : query.isError ? (
-          isApiError(query.error) && query.error.code === "client_not_found" ? (
-            <p role="alert" className="text-cuerpo text-texto-secundario">
-              Esta clienta ya no existe.
-            </p>
+        <div
+          role="tabpanel"
+          id={`${panelBase}-${tab}`}
+          className="flex flex-col gap-5"
+        >
+          {tab === "reservas" ? (
+            <ClientBookingsTab clientId={clientId} />
+          ) : tab === "pagos" ? (
+            <ClientPaymentsTab
+              clientId={clientId}
+              clientName={query.data?.name ?? ""}
+            />
+          ) : tab === "evaluaciones" ? (
+            <ClientEvaluationsTab clientId={clientId} />
+          ) : query.isPending ? (
+            <LoadingNotice>Cargando la ficha…</LoadingNotice>
+          ) : query.isError ? (
+            isApiError(query.error) &&
+            query.error.code === "client_not_found" ? (
+              <p role="alert" className="text-cuerpo text-texto-secundario">
+                Esta clienta ya no existe.
+              </p>
+            ) : (
+              <QueryFailure
+                error={query.error}
+                what="la ficha de la clienta"
+                onRetry={() => void query.refetch()}
+              />
+            )
           ) : (
-            <QueryFailure
-              error={query.error}
-              what="la ficha de la clienta"
-              onRetry={() => void query.refetch()}
-            />
-          )
-        ) : (
-          <>
-            {saved ? (
-              <PageNotice>Guardamos los cambios del perfil.</PageNotice>
-            ) : null}
-            <ClientSummary
-              client={query.data}
-              role={role}
-              contact={
-                editing ? (
-                  <ClientProfileForm
-                    client={query.data}
-                    onCancel={() => setEditing(false)}
-                    onSaved={() => {
-                      setEditing(false);
-                      setSaved(true);
-                    }}
-                  />
-                ) : (
-                  <ContactBlock client={query.data} />
-                )
-              }
-            />
-          </>
-        )}
+            <>
+              {saved ? (
+                <PageNotice>Guardamos los cambios del perfil.</PageNotice>
+              ) : null}
+              <ClientSummary
+                client={query.data}
+                role={role}
+                contact={
+                  editing ? (
+                    <ClientProfileForm
+                      client={query.data}
+                      onCancel={() => setEditing(false)}
+                      onSaved={() => {
+                        setEditing(false);
+                        setSaved(true);
+                      }}
+                    />
+                  ) : (
+                    <ContactBlock client={query.data} />
+                  )
+                }
+              />
+            </>
+          )}
+        </div>
       </SidePanelBody>
       {/* AW22: a deactivated account has nothing left to edit or close. */}
-      {query.data === undefined ||
+      {tab !== "resumen" ||
+      query.data === undefined ||
       query.data.accountStatus === "disabled" ? null : (
         <SidePanelFooter>
           {granted === null ? null : (

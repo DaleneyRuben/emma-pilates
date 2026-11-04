@@ -54,7 +54,7 @@ describe("AW02 Horario on a desktop browser", () => {
 
   it("draws the selected Branch's week in Bolivia time with occupancy and the waitlist", async () => {
     server.use(sessionReads((params) => jsonResponse(weekOf(params))));
-    renderAdmin(`/?week=${nextMonday}`);
+    renderAdmin(`/horario?week=${nextMonday}`);
     await heading();
 
     expect(
@@ -102,7 +102,7 @@ describe("AW02 Horario on a desktop browser", () => {
 
   it("moves between weeks through the address", async () => {
     server.use(sessionReads((params) => jsonResponse(weekOf(params))));
-    const { router, user } = renderAdmin(`/?week=${nextMonday}`);
+    const { router, user } = renderAdmin(`/horario?week=${nextMonday}`);
     await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
 
     await user.click(screen.getByRole("button", { name: "Semana siguiente" }));
@@ -123,7 +123,7 @@ describe("AW02 Horario on a desktop browser", () => {
 
   it("reloads the grid for the Branch chosen in the top bar", async () => {
     server.use(sessionReads((params) => jsonResponse(weekOf(params))));
-    const { user } = renderAdmin(`/?week=${nextMonday}`);
+    const { user } = renderAdmin(`/horario?week=${nextMonday}`);
     await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
 
     await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
@@ -158,7 +158,7 @@ describe("AW02 Horario on a desktop browser", () => {
       }),
       sessionReads((params) => jsonResponse(weekOf(params))),
     );
-    const { user } = renderAdmin(`/?week=${nextMonday}`);
+    const { user } = renderAdmin(`/horario?week=${nextMonday}`);
     await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
 
     await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
@@ -182,7 +182,7 @@ describe("AW02 Horario on a desktop browser", () => {
     server.use(
       sessionReads(() => problemResponse(403, "booking_access_denied")),
     );
-    renderAdmin(`/?week=${nextMonday}`);
+    renderAdmin(`/horario?week=${nextMonday}`);
 
     expect(await screen.findByText("Cargando el horario…")).toBeInTheDocument();
     expect(
@@ -195,7 +195,7 @@ describe("AW02 Horario on a desktop browser", () => {
 
   it("offers a retry when the week cannot load", async () => {
     server.use(sessionReads(() => problemResponse(400, "invalid_request")));
-    renderAdmin(`/?week=${nextMonday}`);
+    renderAdmin(`/horario?week=${nextMonday}`);
     expect(
       await screen.findByText("No pudimos cargar el horario."),
     ).toBeInTheDocument();
@@ -203,7 +203,7 @@ describe("AW02 Horario on a desktop browser", () => {
 
   it("asks for a Branch first when none is active", async () => {
     server.use(activeBranchesHandler([]));
-    renderAdmin(`/?week=${nextMonday}`);
+    renderAdmin(`/horario?week=${nextMonday}`);
     await heading();
 
     expect(
@@ -222,7 +222,7 @@ describe("AW02 Horario on a desktop browser", () => {
       id: `1e000000-0000-5000-8000-0000000${String(index).padStart(5, "0")}`,
     }));
     server.use(sessionReads(() => jsonResponse(crowded)));
-    renderAdmin(`/?week=${nextMonday}`);
+    renderAdmin(`/horario?week=${nextMonday}`);
 
     expect(
       await screen.findByText(
@@ -238,7 +238,7 @@ describe("AW02 Horario on a desktop browser", () => {
 
   it("starts on the current Bolivia week when the address names none", async () => {
     server.use(sessionReads(() => jsonResponse([])));
-    const { router } = renderAdmin("/");
+    const { router } = renderAdmin("/horario");
     await heading();
     await waitFor(() => expect(reads.length).toBeGreaterThan(0));
     expect(reads[0]?.get("from")).toBe(
@@ -258,7 +258,7 @@ describe("AW02 Horario on a narrow browser", () => {
 
   it("shows one day at a time behind day tabs", async () => {
     server.use(sessionReads((params) => jsonResponse(weekOf(params))));
-    const { user } = renderAdmin(`/?week=${nextMonday}`);
+    const { user } = renderAdmin(`/horario?week=${nextMonday}`);
     await heading();
 
     const tabs = await screen.findByRole("tablist", {

@@ -19,7 +19,7 @@ export function QueryFailure({
     return (
       <p
         role="alert"
-        className="rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center text-cuerpo text-texto-secundario"
+        className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario"
       >
         No tienes permiso para ver esta sección.
       </p>
@@ -29,7 +29,7 @@ export function QueryFailure({
   return (
     <div
       role="alert"
-      className="flex flex-col items-center gap-3 rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center"
+      className="flex flex-col items-center gap-3 rounded-marco bg-lino px-6 py-10 text-center"
     >
       <p className="text-cuerpo text-texto-secundario">
         No pudimos cargar {what}.
@@ -45,7 +45,7 @@ export function LoadingNotice({ children }: { children: string }) {
   return (
     <p
       role="status"
-      className="rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center text-cuerpo text-texto-tenue"
+      className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-tenue"
     >
       {children}
     </p>

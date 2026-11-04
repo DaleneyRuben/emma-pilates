@@ -2,19 +2,20 @@ import { expect, test } from "@playwright/test";
 import { sidebar, signIn } from "./support/session";
 
 // The 420 px variant every admin screen has (design system → Admin Desktop
-// Web Responsiveness): drawer, bottom sheet, and one card per row.
+// Web Responsiveness, P01d): the menu of nine destinations, bottom sheet,
+// and one card per row.
 test.use({ viewport: { width: 420, height: 860 } });
 
 test("a narrow browser gets the drawer, the bottom-sheet selector, and card rows", async ({
   page,
 }) => {
-  await signIn(page, "/back-office/personal");
+  await signIn(page, "/estudio/personal");
   await expect(sidebar(page)).toHaveCount(0);
 
   await page.getByRole("button", { name: "Abrir menú" }).click();
   await page
     .getByRole("dialog", { name: "Menú" })
-    .getByRole("link", { name: "Clientes" })
+    .getByRole("link", { name: /^Clientas/ })
     .click();
   // Isabel stays. The clients journey closes Lucía, and the suite shares
   // one database, so this walk cannot depend on her still being there.
@@ -30,7 +31,11 @@ test("a narrow browser gets the drawer, the bottom-sheet selector, and card rows
   await page.getByRole("button", { name: "Abrir menú" }).click();
   const drawer = page.getByRole("dialog", { name: "Menú" });
   await expect(drawer.getByRole("link", { name: "Horario" })).toBeVisible();
-  await drawer.getByRole("link", { name: "Gastos" }).click();
+  await drawer.getByRole("link", { name: /^Dinero/ }).click();
+  await page
+    .getByRole("navigation", { name: "Páginas de Dinero" })
+    .getByRole("link", { name: "Gastos" })
+    .click();
   await expect(
     page.getByRole("heading", { level: 1, name: "Gastos" }),
   ).toBeVisible();
@@ -47,7 +52,7 @@ test("a narrow browser gets the drawer, the bottom-sheet selector, and card rows
   await page.getByRole("button", { name: "Abrir menú" }).click();
   await page
     .getByRole("dialog", { name: "Menú" })
-    .getByRole("link", { name: "Personal" })
+    .getByRole("link", { name: /^Estudio/ })
     .click();
   await expect(page.getByText("Mostrando 1–7 de 7 miembros")).toBeVisible();
   // The header row is hidden and each cell carries its column name.

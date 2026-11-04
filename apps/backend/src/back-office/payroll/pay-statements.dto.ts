@@ -26,7 +26,18 @@ export class PayStatementDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty({ format: 'uuid' }) staffMemberId!: string;
   @ApiProperty() staffMemberName!: string;
-  @ApiProperty({ format: 'date' }) month!: string;
+  @ApiProperty({
+    format: 'date',
+    description: 'First day of the month the period starts in',
+  })
+  month!: string;
+  @ApiProperty({ format: 'date', description: 'BKO-009: first day paid' })
+  periodStart!: string;
+  @ApiProperty({
+    format: 'date',
+    description: 'BKO-009: the day after the last day paid (exclusive)',
+  })
+  periodEnd!: string;
   @ApiProperty({ enum: ['draft', 'approved'] })
   state!: 'draft' | 'approved';
   @ApiProperty({ description: 'BOB centavos' }) totalCentavos!: number;

@@ -29,14 +29,14 @@ numbered tests.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111); tell an expired Plan from a Client who never bought one on Clientes (Test 113); read Horario and the report at 1024 px (Test 114) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the nine-destination rail and its tabs, the old addresses that still work, the global search, the Branch cell, and the narrow-browser menu (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation, who booked a class and its waitlist, booking a Client into it) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients with the plan and Fundadora chips, «Le quedan», «Vence» and «Invitada por», open the Client file's Resumen, Reservas, Pagos, and Evaluaciones tabs, and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111); tell an expired Plan from a Client who never bought one on Clientes (Test 113); read Horario and the report at 1024 px (Test 114) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
 | Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
-| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal where she assigns a Trainer's Branches and reads everyone else, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
+| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation, class, and Plan reminders (Tests 7 and 105), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
@@ -47,6 +47,7 @@ numbered tests.
 | Weekly cap                   | Book up to the cap snapshotted on a Plan, see `classesLeftThisWeek` count down, and get `409 weekly_cap_reached` on the next Booking or Waitlist join unless an extra class remains (Test 91) | The «Te quedan N clases esta semana» line on Reservar is follow-up 203 and is still pending; the mobile screens were not walked on a device |
 | Money format                 | Whole bolivianos in both apps («Bs 560») and centavos on the admin web («Bs 560,00») (Test 112) | A leftover fraction of a boliviano is not in the fixtures; the unit tests cover the rounding. Credit is retired (PAY-005), so no screen shows a credit line |
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 83) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
+| Trainer pay periods          | Calculate and approve a Trainer's pay by Día, Semana, Rango or Mes in Sueldos › Por aprobar, see an approved day keep the month from paying it again, and read the period in «Mis pagos» (Test 127) | The Coordinator stays monthly; the worker drafts whole months only, so a Trainer already paid by day or week that month is drafted by hand |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -99,7 +100,7 @@ can be found by its design name.
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115 |
 | AW39 Para contactar | 84 |
-| AW40 Fundadoras | 88 |
+| AW40 Fundadoras (the Fundadora chip on Clientas since WEB-040) | 26, 88 |
 | AW41 Congelamientos | 92 |
 | AW23–AW24 Personal | 26, 31, 72, 79 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72, 93 |
@@ -576,7 +577,7 @@ Evaluation slots, and these active Accounts. Every fixture Account uses the pass
 | `andrea.suarez@example.com`  | Trainer       | Leads Pilates Prenatal in Equipetrol          |
 | `camila.rojas@example.com`   | Assistant     | Assigned to Centro                            |
 | `paola.mendoza@example.com`  | Administrator | Covers every Branch                           |
-| `carolina.rivas@example.com` | Coordinator   | Every Branch; operations without money (ADR-0102) |
+| `carolina.rivas@example.com` | Coordinator   | Every Branch; operations without money (ADR-0102, ADR-0108) |
 | `gabriela.flores@example.com`| Nutritionist  | Assigned to Centro                            |
 
 The 30-day window starts on the day you run the command. With the worker
@@ -2637,44 +2638,93 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_dev_sim" ADMIN_WEB_TRUST
 
 The built app is split by page: the shell, the Login pages, and the session
 check load first, and each page's code arrives the first time you open it
-(or as soon as you point at its sidebar entry). In the browser's developer
+(or as soon as you point at its rail destination or tab). In the browser's developer
 tools (Network) you can see one small `*-route-*.js` file per page.
 
-1. **Sidebar.** On a desktop-width window the "Emma" wordmark sits once, at
-   the top of the sidebar, and the content area is the warm Superficie tone,
-   a shade lighter than the sand behind the Login card. The left sidebar shows **Horario**,
-   then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
-   (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
-   Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
-   Referidos). There is no "Descuentos" and, since PAY-005, no "Créditos"
-   (`/promociones/creditos` shows «Página no encontrada»). Every entry is a real page
-   (Tests 25 to 30 and 33); the entry you choose is highlighted in the
-   sidebar and the address changes (`/promociones`, for example).
-2. **Branch selector.** The top bar shows **Sucursal Centro**. Click it: a
-   popover lists Centro, Equipetrol, and Urubó with their addresses, marks the
-   current one with a check, and ends with **Gestionar sucursales** (opens
-   Sucursales). Choosing Urubó closes the popover, the cell reads **Sucursal
-   Urubó**, and you stay on the same page. Esc or a click outside closes it.
-   It works from the keyboard too: open it with Enter, the current Branch
-   has focus, the arrow keys (and Home/End) move between Branches, and Enter
-   chooses. Press Tab on a fresh page and the first thing focused is a
-   **Saltar al contenido** link that jumps past the sidebar; after any
-   sidebar navigation focus lands on the new page's content.
-   On **Reporte** the cell is replaced by "El reporte usa su propio filtro de
-   sucursal" (the report has its own selector, Test 30). On **Pagos**,
-   **Clientes**, **Nómina**, **Categorías de gasto**, or **Referidos** the
-   popover first says "Esta página no se filtra por sucursal — …" and still
-   lets you switch for the next page. The Branches are the active ones the
-   API returns (Test 25); archived Branches never appear here.
-3. **Narrow browser.** Make the window narrower than 1024 px (or open the
-   address on a phone). The sidebar disappears behind the **Abrir menú**
-   button, which opens a drawer with the same sections that closes after you
-   pick one, and the Branch selector opens as a sheet from the bottom.
-4. **Unknown address.** Open `http://localhost:5173/no-existe`: "Página no
-   encontrada" with **Volver al horario**. A list address with a bad page,
-   such as `/promociones?page=abc&pageSize=500`, is accepted and treated as
-   page 1 of 20.
+1. **The rail.** On a desktop-width window the session opens on **Inicio**
+   («Buenos días, Paola», the day and the Branch). Inicio (WEB-043) shows
+   three cards side by side: **Por resolver** in Rosa profundo («N
+   pendientes» with what they are, or «Todo al día»), **Hoy en Centro**
+   (classes, bookings and occupancy, the next classes with «Llena» or «N de
+   M», **Ver horario**) and **Dinero** for the whole studio with **Hoy ·
+   Mes** (collected, Efectivo, QR confirmados, QR por revisar). Below them,
+   **Pendientes**: one row per waiting thing (transfers to review, freezes
+   to decide, clients to contact, new comments, low stock, salaries to
+   approve), each with **Revisar** opening its tab, or «Nada por resolver.»;
+   then **Recomendaciones del mes**. Carolina sees **Clientas** (active,
+   new this month, renewal) instead of Dinero and the freezes, contacts,
+   comments and low-stock rows, never transfers or salaries (ADR-0108). At 420 px the cards stack in one column. On the left, a narrow
+   Lino rail carries the brand mark «E» and nine destinations, each an icon
+   over its name: **Inicio, Horario, Clientas, Promociones, Comentarios,
+   Dinero, Estudio, Informes, Ajustes** (follow-up 232). The current one is
+   a Rosa profundo pill. A destination with something waiting shows a count
+   on its icon: Clientas the people to contact, Dinero the transfers to
+   review, Estudio the selected Branch's low-stock Supplies. There is no
+   "Descuentos" and no "Créditos" (`/promociones/creditos` shows «Página no
+   encontrada»).
+2. **Tabs.** Click **Dinero**: the address becomes `/dinero/pagos` and the
+   page has its title (Lora) with its actions on the right, then the tabs
+   **Pagos · Caja · Sueldos · Gastos**, the current one underlined.
+   **Sueldos** has a second row of views (**Por aprobar · Pagados**: every
+   statement of the month, the Coordinator's included, then the payments
+   made), Gastos has **Editar categorías** opening the categories in a
+   panel, and Estudio › **Insumos** has **Stock · Retiros del mes**.
+   The other destinations: Horario (Clases · Nutrición), Clientas (Todas ·
+   Para contactar · Congelamientos), Promociones (Carrusel ·
+   Clases de campaña · Referidos · Contactos), Estudio (Personal · Insumos
+   · Equipos), Informes (El mes · Dinero · Simulador; El mes ends with
+   «Recomendaciones del mes») and Ajustes (Tipos de clase · Planes ·
+   Sucursales · Reglas del estudio). Fundadoras is no longer a tab: it is
+   the **Fundadora** chip on Clientas › Todas (WEB-040, Test 26).
+   Every page is on v2 (follow-up 233): Lino cards and tables with no
+   border or shadow on Marfil, Rosa tinte secondary buttons, text buttons
+   without underline, and notices as a Lino line with a Palo de rosa bar.
+3. **Old addresses.** Every address of the old sidebar still works and
+   lands on its new page with its filters: `/back-office/gastos?page=2`
+   opens `/dinero/gastos?page=2…`, `/ajustes/planes` opens
+   `/ajustes/planes`, `/reporte` opens `/informes/dinero`,
+   `/clientas/fundadoras` and `/back-office/fundadoras` open
+   `/clientas?filter=founder` with the **Fundadora** chip on, and
+   `/reglas-del-estudio` opens `/ajustes/reglas-del-estudio` (no longer in
+   the account menu).
+4. **Top bar and search.** The top bar shows «Emma Pilates Studio», the
+   search field «Buscar una clienta, una clase, un pago o una página»
+   (Ctrl K focuses it), the Branch cell and Paola with «Administración».
+   Type `caja`: the list offers **Dinero · Caja** and **Buscar «caja» en
+   Clientas**; the arrow keys move between them and Enter opens the
+   highlighted one. Type a name such as `Lucía` and press Enter: Clientas ›
+   Todas opens with that search. Esc closes the list.
+5. **Branch cell.** On a Branch page (Inicio, Horario, Caja, Gastos,
+   Insumos, Equipos) the top bar shows **Sucursal Centro**. Click it: a
+   popover lists Centro, Equipetrol, and Urubó with their addresses, marks
+   the current one with a check, and ends with **Gestionar sucursales**
+   (opens Ajustes › Sucursales). Choosing Urubó closes the popover, the cell
+   reads **Sucursal Urubó**, and you stay on the same page. Esc or a click
+   outside closes it. It works from the keyboard too: open it with Enter,
+   the current Branch has focus, the arrow keys (and Home/End) move between
+   Branches, and Enter chooses. On a studio-wide page (Clientas,
+   Promociones, Comentarios, Pagos, Sueldos, Personal, Informes except
+   Dinero, and Ajustes) the cell reads **Todo el estudio** instead and
+   cannot be opened; the Branch you chose is still there on the next Branch
+   page. On Informes › **Dinero** the cell is replaced by "El reporte usa su
+   propio filtro de sucursal" (Test 30). Press Tab on a fresh page and the
+   first thing focused is a **Saltar al contenido** link that jumps past
+   the rail; after any navigation focus lands on the new page's content.
+6. **Narrow browser.** Make the window narrower than 1024 px (or open the
+   address on a phone). The rail disappears behind the **Abrir menú** button
+   in the top bar (with «Emma Pilates Studio», a search button and the
+   avatar). It opens a Lino drawer with the nine destinations and their
+   counts, which closes after you pick one or with **Cerrar menú**. The
+   Branch cell sits above the tabs and opens as a sheet from the bottom.
+7. **The account menu.** Click Paola: the menu has only **Cambiar
+   contraseña** and **Cerrar sesión** (Test 24).
+8. **Unknown address.** Open `http://localhost:5173/no-existe`: "Página no
+   encontrada" with **Volver al inicio**. A list address with a bad page,
+   such as `/promociones/referidos?page=abc&pageSize=500`, is accepted and
+   treated as page 1 of 20.
 
+Later tests written before follow-up 232 say «sidebar»: read it as the rail
+and the destination's tabs; their old addresses redirect to the new ones.
 The account cell on the right shows the signed-in Administrator; Test 24
 walks through its menu. Press `Ctrl+C` in the Terminal to stop the server.
 
@@ -2695,10 +2745,10 @@ pnpm dev:admin
 ```
 
 1. **Signed out.** Open
-   [http://localhost:5173/catalogo/planes](http://localhost:5173/catalogo/planes).
+   [http://localhost:5173/ajustes/planes](http://localhost:5173/ajustes/planes).
    You land on the Login card (Emma, the tagline, **Correo electrónico**,
    **Contraseña**, **Iniciar sesión**, **¿Olvidaste tu contraseña?**) with no
-   sidebar, and the address remembers `redirect=/catalogo/planes…`.
+   sidebar, and the address remembers `redirect=/ajustes/planes…`.
 2. **Neutral rejection.** Log in as `camila.rojas@example.com` with the fixture
    password `emma-local-2026`. She is an Assistant, so the card says "El correo
    o la contraseña no son correctos.", exactly as for a wrong password or an
@@ -2842,6 +2892,25 @@ Bolivia time, whatever time zone your computer uses.
    **Esta y las futuras** (change the weekly schedule from a **Vigente desde**
    date, with the series' own Duración: unbooked Sessions move, booked ones
    stay, and the page says how many of each). **Terminar la serie** stops the schedule from a date after asking.
+   **Who booked (WEB-039).** Above the form the panel lists **Reservaron
+   (N)** with each Client's name ("Nadie reservó todavía." when empty; a
+   recorded Attendance adds "Asistió" or "No vino") and, when someone waits,
+   **Lista de espera (N)** numbered in queue order with "Entra sola si se
+   libera un lugar". Names only: no plan and no amount. **Reservar a una
+   clienta** (or **Agregar a la lista de espera** on a full class) turns the
+   panel into the booking view: type two letters of a name, email, or phone
+   in **Buscar clienta**; a Client with no active plan shows "Sin plan
+   activo" and cannot be picked. **Elegir**, then **Confirmar la reserva**
+   (or **Agregar a la lista**, after "La clase está llena: la clienta entra
+   a la lista de espera en el puesto N.") books her as Paola, and the panel
+   returns to the class saying "Mariana Peña quedó reservada." (or "… quedó
+   en la lista de espera.") with her name in the list. A refusal stays on
+   the confirmation with the reason by its code: for example "… ya usó sus
+   clases de esta semana.", "… no tiene un plan activo con clases para esta
+   fecha.", or "… ya está reservada en esta clase.". **Volver a la clase**
+   goes back without booking. A class that has started shows "Clase pasada:
+   solo lectura." with its list and no booking button or form. Signed in as
+   `carolina.rivas@example.com`, the Coordinator sees and books the same way.
 4. **Cancelar sesión.** Only a Session with Bookings offers it (an empty one
    says it cancels itself 2 hours before). The confirmation says every
    Booking is refunded even inside the 2 h 30 window and that the waitlist is
@@ -2885,15 +2954,30 @@ Start the backend on `pilates_dev_sim` after loading the fixtures and start
 the admin web, exactly as Test 24 describes, and log in as
 `paola.mendoza@example.com` / `emma-local-2026`.
 
-1. **Clientes.** Back Office → **Clientes** lists every Client of the studio,
+1. **Clientes.** **Clientas › Todas** lists every Client of the studio,
    read-only: no **+ Nuevo** button, because accounts are born in the Staff app
    or by registration. The subtitle counts them in the feminine ("6 clientas ·
-   5 con plan activo") and the footer says "Mostrando 6 de 6 clientas". Each
-   row shows the name, the email and phone, the current Plan (or **Vencido**
-   when the last Plan expired, or **Sin plan** when she never bought one),
-   and **Activo**, **Expirado** (had a Plan before), or **Sin plan**
-   (never bought one). The Branch selector says this page is not filtered by
-   Branch.
+   5 con plan activo · 2 fundadoras") and the footer says "Mostrando 6 de 6
+   clientas". The columns are **Clienta** (with «Fundadora n.º N» under a
+   founder's name), **Contacto**, **Plan** (or **Vencido** when the last
+   Plan expired, or **Sin plan** when she never bought one), **Le quedan**
+   ("9 de 16", «—» without an active Plan), **Vence** (the Plan's last day
+   as `dd/mm/aaaa`, «Venció el dd/mm/aaaa» for an expired one, «—» if she
+   never bought one), **Invitada por** (the Client or Trainer whose code she
+   used, «—» otherwise) and **Estado**: **Activo**, **Expirado** (had a Plan
+   before), or **Sin plan** (never bought one). The top bar says «Todo el
+   estudio».
+
+   **Chips (WEB-040).** Under the search, the chips **Todas · Con plan ·
+   Sin plan · Expirado · Fundadora**, one at a time, **Todas** on at first.
+   Each chip narrows the table, goes back to page 1, and stays in the
+   address (`?filter=active`, `none`, `expired`, `founder`; **Todas**
+   removes it); it combines with the search. Under **Fundadora**, Paola also
+   reads «n de 40 lugares de fundadora otorgados» (the old Fundadoras
+   page's count, reserved places included); a lost place no longer counts
+   as a Fundadora. The list is
+   `GET /api/v1/administrator/clients?filter=founder&q=…`; an unknown chip
+   answers `400 invalid_request`.
 2. **Search.** Type in **Buscar por nombre, correo o teléfono**: after a
    moment the address gains `?q=…` and the table shows the matches. Accents
    and capitals do not matter ("guzman" finds Sofía Guzmán). A search that
@@ -2913,6 +2997,30 @@ the admin web, exactly as Test 24 describes, and log in as
    `GET /api/v1/administrator/clients?q=…&page=…&pageSize=…` and the panel
    `GET …/clients/{clientId}` (`404 client_not_found` for a closed or
    unknown one).
+
+   **The Client file's tabs (WEB-040).** Under her name the file has the
+   tabs **Resumen · Reservas · Pagos · Evaluaciones**, on **Resumen** (the
+   summary above, with its footer actions) at every opening. Each other tab
+   loads its list only when opened, with its own loading line and empty
+   line:
+   - **Reservas**: «Próximas», her booked classes as «dd/mm/aaaa · hh:mm ·
+     Entrenadora · Sucursal» with **En espera** on a waitlist entry («No
+     tiene clases reservadas.» when none), then «Historial», the classes she
+     took («Todavía no tomó ninguna clase.»). Booking her into a class is
+     done from Horario (Test 25).
+   - **Pagos** (Paola only): her latest sales with the date, **Efectivo** or
+     **Transferencia**, the amount («Bs 502,00») and **Pendiente**,
+     **Confirmado**, **Rechazado** or **Anulado**, then **Ver en Dinero**,
+     which opens Dinero › Pagos searching her name. The list is
+     `GET /api/v1/administrator/payments?clientId=…` (still `403` for the
+     Coordinator).
+   - **Evaluaciones**: «Primera evaluación» or «Seguimiento» with the
+     date, the Nutritionist and the Branch, **Próxima** or **Hecha**, newest
+     first. The list is `GET /api/v1/administrator/evaluations?clientId=…`
+     with no `from`/`until`; without `clientId`, both stay required
+     (`400 invalid_request`).
+   At 420 px the file fills the screen with the same tabs, which scroll
+   sideways if they do not fit.
 4. **Personal.** Back Office → **Personal** lists every Staff Member with the
    Role as a plain label (Entrenadora, Asistente, Administración, Nutricionista;
 the same four names as the Staff app and the user menu, UX-005),
@@ -2979,8 +3087,9 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
 7, "Buying a Plan through Swagger"). Then log in to the admin web as
 `paola.mendoza@example.com` / `emma-local-2026`.
 
-1. **The badge.** The sidebar shows the number of transfers waiting next to
-   **Pagos** on every page; with nothing waiting it shows no number.
+1. **The badge.** The rail shows the number of transfers waiting on
+   **Dinero** on every page, and the Dinero tabs show it on **Pagos**; with
+   nothing waiting there is no number.
 2. **Pagos.** Back Office → **Pagos** lists the studio's transfers and, since
    PAY-007, its cash sales,
    not only one Branch's (the Branch selector says this page is not filtered
@@ -3056,7 +3165,7 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    Supplies with **Cantidad en stock** on the right and an amber **Stock
    bajo** pill when the stock is at or below the Supply's alert threshold.
    The subtitle counts them ("Sucursal Centro · 1 con stock bajo") and the
-   sidebar shows the same count beside **Insumos** in amber, on every page;
+   rail shows the same count on **Estudio** (and the Insumos tab), on every page;
    choosing another Branch in the top bar changes both. The header has
    **+ Nuevo insumo**, **Registrar retiro**, **Registrar reposición**, and the
    **Ver historial de retiros** link, in that order.
@@ -3226,19 +3335,19 @@ laptop is 1024 px wide, and that width used to cut every Session block to
 web as Test 24 describes, log in as `paola.mendoza@example.com`, and set the
 browser window to 1024 × 900.
 
-1. **Horario.** The sidebar stays (168 px, narrower than the 236 px one at
-   1440; it still collapses only below 1024 px, behind "Abrir menú"). Each
+1. **Horario.** The 96 px icon rail stays (it collapses only below 1024 px,
+   behind "Abrir menú"). Each
    Session block is three
    lines: the Class Type in full ("Reformer Pilates", not "Refo…"), then the
    time ("07:00 – 07:50") with the Trainer, then the seats ("0/12", or
    "Llena · 3 en espera"). Neither the type nor the time wraps.
-2. **Reporte.** Open **Reporte**. In **Totales por mes**, "mayo de 2026" and
+2. **Reporte.** Open Informes › **Dinero**. In **Totales por mes**, "mayo de 2026" and
    "Bs 780,00" each stay on one line. The three tiles stay in one row, and
    their captions ("Ingresos", "Gastos", "Neto") stay on one line; only the
    sentence under a figure may wrap.
-3. **The drawn widths.** At 1440 px the sidebar is the wide one again and the
+3. **The drawn widths.** At 1440 px the rail is the same 96 px and the
    same block still names the Class Type and the time on their own lines. At
-   420 px the sidebar is gone behind "Abrir menú", the week is day tabs, and
+   420 px the rail is gone behind "Abrir menú", the week is day tabs, and
    the report's month names and amounts still do not wrap inside their cards.
 
 Playwright covers the same three widths (`e2e/laptop.spec.ts`, inside Test
@@ -3278,7 +3387,7 @@ take about a minute:
    `__Host-emma-admin-session` cookie is HttpOnly, Secure, SameSite Lax, and
    host-only, and page scripts cannot read it. She logs out from the user
    menu and the old address asks her to sign in again. A signed-out visit to
-   `/catalogo/planes?page=2` returns there after Login. When the session is
+   `/ajustes/planes?page=2` returns there after Login. When the session is
    ended behind the browser's back, the next click returns to Login with
    "Tu sesión terminó" and signing in again lands on the page she was on.
 2. **Branch scope.** In Horario, next week shows Centro's Mat Pilates; after
@@ -3565,6 +3674,10 @@ The following are not ready for manual product testing:
 - the mobile apps were not walked for BKM-014: the invitation screen was
   verified by Jest and the registration rules by curl, not on a device
   (Test 86);
+- from the Client file's **Reservas** tab (WEB-040): cancelling a class,
+  «Reservar una clase», and whether she attended («Asistió», «No asistió»;
+  the history lists the classes only). Cancelled and missed Evaluations are
+  not listed under **Evaluaciones**. Book and cancel from Horario (Test 25);
 - the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
   the Role arrives with IDN-009, so today only the Administrator can (Test 79);
 - accrued revenue by validity days: decisions §11 asks for it beside the
@@ -3927,7 +4040,7 @@ real QR image (PAY-003).
    correctos.»; DevTools → Network shows `authentication-sessions` `401`
    `authentication_failed` in RFC 9457 form; Application → Cookies holds only
    `__Host-emma-admin-client`, HttpOnly, Secure, SameSite Lax, Path `/`,
-   host-only. Reload `/catalogo/planes`: the login page loads, not a `404`.
+   host-only. Reload `/ajustes/planes`: the login page loads, not a `404`.
 4. **Signed in** (WEB-010, verified 2026-10-14). In a private window with
    DevTools → Network (Preserve log), sign in as the production
    Administrator. `admin-web/authentication-sessions` answers `201` and
@@ -5538,7 +5651,7 @@ built app also runs under the Content-Security-Policy (Test 62), which
 must stay silent.
 
 1. **First load.** Signed in or not, open
-   [http://localhost:5173/catalogo/planes](http://localhost:5173/catalogo/planes)
+   [http://localhost:5173/ajustes/planes](http://localhost:5173/ajustes/planes)
    with the throttle on. Expected: from the first paint the whole window
    is the cream background with only the Emma logo centred in it, 300 px
    wide (240 px in a window narrower than 1024 px), fading in and then
@@ -6800,23 +6913,33 @@ Branch, up to the moment of the close.
 ## Test 77: work as the Coordinator (IDN-009)
 
 The Coordinator runs the studio's operation without seeing money
-([ADR-0102](./adr/0102-coordinator-role-without-money.md)). The fixtures
+([ADR-0102](./adr/0102-coordinator-role-without-money.md), widened by
+[ADR-0108](./adr/0108-widen-the-coordinator-role.md)). The fixtures
 (Test 5 A) include her: `carolina.rivas@example.com`, with the fixture
 password, holding every Branch.
 
 ### A. The admin web
 
 1. Start the API and the admin web (Test 24) and sign in as
-   `carolina.rivas@example.com`. The sidebar shows only **Horario**,
-   **Clientes**, and **Personal**; the account menu names her Role
-   «Coordinación».
+   `carolina.rivas@example.com`. The rail shows **Inicio**, **Horario**
+   (Clases · Nutrición), **Clientas** (Todas · Para contactar ·
+   Congelamientos), **Promociones** (Carrusel · Referidos · Contactos),
+   **Comentarios**, **Estudio** (Personal · Insumos · Equipos), **Informes**
+   (El mes) and **Ajustes** (Reglas del estudio), never Dinero; Estudio
+   carries the selected Branch's low-stock count. The top bar and the
+   account menu name her Role «Coordinación». A money page opened by address
+   returns her to Horario with «Esa sección es solo para administración.».
 2. In **Horario**, create a one-off Session, move one to another Trainer,
    and cancel one that has Bookings (Test 25): everything works as for the
    Administrator, at every Branch.
 3. Type `/back-office/pagos` (or `/reporte`, `/back-office/nomina`,
-   `/promociones`) in the address bar: you land on Horario with «Esa
-   sección es solo para administración.».
+   `/promociones/clases-de-campana`, `/informes/simulador`,
+   `/ajustes/planes`) in the address bar: you land on Horario with «Esa
+   sección es solo para administración.». `/clientas/fundadoras` now opens
+   Clientas › Todas with the **Fundadora** chip on, and no «lugares de
+   fundadora» line.
 4. In **Clientes**, there is no **Dar clases de campaña**. Open a Client:
+   the tabs are **Resumen · Reservas · Evaluaciones**, never **Pagos**;
    no «Crédito» row, no «Cerrar cuenta», no **Agregar clase de cortesía**,
    no **Devolver una clase**, no **¿Cómo nos conociste?**, and no «Bs»
    anywhere. Typing `/back-office/clientes/campana` lands on Horario with
@@ -6829,7 +6952,21 @@ password, holding every Branch.
    Role: «Solo administración invita y cambia roles. Puedes asignar las
    sucursales de una entrenadora.». Opening anyone else stays read-only
    with «Solo administración invita y cambia roles.».
-6. Sign in as `paola.mendoza@example.com`: **Editar perfil** works the same
+6. The pages ADR-0108 opens to her (BKO-010): in **Clientas ›
+   Congelamientos** she approves or rejects a requested Freeze as Test 92
+   describes. In **Promociones › Carrusel** she creates, edits, orders,
+   publishes, unpublishes and deletes a Promotion (Test 33); **Referidos**
+   and **Contactos** work as for the Administrator, the export and
+   «Quitar contacto» included. In **Comentarios** she filters, exports and
+   triages. In **Estudio › Insumos** there is no «Nuevo insumo» and a row's
+   name does not open it, but **Registrar retiro** and **Registrar
+   reposición** work and «Retiros del mes» lists the month; **Equipos**
+   works as for the Administrator. **Horario › Nutrición** lists the
+   Evaluations. **Ajustes › Reglas del estudio** shows «Reglas
+   configurables» as text with «Solo administración las cambia.», no
+   field and no **Guardar cambios**, and «Reglas fijas» without the paid
+   Evaluation row: no «Bs» anywhere.
+7. Sign in as `paola.mendoza@example.com`: **Editar perfil** works the same
    for the Administrator, and **Personal → Nuevo miembro** offers the Role
    **Coordinador**, which replaces the Branch chips with «Todas las
    sucursales (implícito por el rol)».
@@ -6858,6 +6995,12 @@ a disposable database and checks each one (Test 8, integration tests). By
 hand, with her bearer token from Swagger (Test 3): `GET
 /api/v1/administrator/payments`, `GET /api/v1/administrator/reports/income`,
 and `GET /api/v1/assistant/clients/{id}/plan-quotes` answer `403`;
+`GET /api/v1/administrator/studio-settings` answers with
+`evaluationPriceCentavos` and `nutritionistFeeCentavos` at `null`, and
+`POST /api/v1/administrator/supplies` answers `403`;
+with the Administrator's token, `POST /api/v1/sessions/{id}/bookings` with
+`{"clientId": "…"}` books that Client at any Branch, and `DELETE
+/api/v1/bookings/{id}` cancels it (ADR-0108: the owner books from Horario);
 `PATCH /api/v1/administrator/clients/{id}` with `{"name": "…", "phone":
 null}` answers the refreshed detail with `creditAvailableCentavos` at 0
 (Credit is retired, PAY-005), and `system.audit_records` gains
@@ -7167,11 +7310,13 @@ D. **The gap.** A nightly job ends a membership when more than 7 days are
    inbox notification titled «Membresía fundadora».
 E. **The income report.** A founder's later sale shows the list price, the
    discount (`discountReason` `founder`), and the amount paid.
-F. **Fundadoras (AW40).** As Paola, open **Back Office → Fundadoras**. The
-   subtitle reads «n de 40 lugares». Each row shows the number, the name,
-   the day (`dd/mm/aaaa`), and **Activa** or **Perdida**. There is no
-   create action. At 420 px each membership is a card. An empty studio
-   reads «Todavía no hay fundadoras.»
+F. **Fundadoras (AW40, a chip since WEB-040).** As Paola, open **Clientas ›
+   Todas** and press **Fundadora**: the table keeps the Clients holding a
+   live place, each with «Fundadora n.º N» under her name, and the line
+   «n de 40 lugares de fundadora otorgados» appears under the chips. A lost
+   place leaves the list. The old `/clientas/fundadoras` address opens this
+   view. The lost places and the day each was granted are no longer listed
+   in the admin web.
 
 ## Test 92: the freeze (BKM-012)
 
@@ -7213,9 +7358,9 @@ C. **The booking.** A Session inside an approved Freeze answers `409`
    `booking_before_start_date`. A Session outside the Freeze books as before.
 D. **The founder.** A founder whose Subscription was frozen is not ended by
    the nightly job: the stored end already includes the frozen days.
-E. **Who decides.** An Assistant, a Trainer, a Nutritionist, and a Client
-   get `403` on the decision. A Coordinator principal is rejected too;
-   IDN-009 makes that role real.
+E. **Who decides.** The Administrator and the Coordinator decide
+   (ADR-0108). An Assistant, a Trainer, a Nutritionist, and a Client get
+   `403` on the decision.
 
 ## Test 82: equipment, its faults, and the capacity flags (BKO-004)
 
@@ -7542,11 +7687,12 @@ brought actually paid for her first Plan, in the month that Payment was
 approved. Paola is the Administrator. Camila, the Assistant, cannot approve
 and cannot list the statements. Log in as Test 24 describes.
 
-1. **Calculate the month.** In the admin web open **Pagos a instructoras**
-   (above Nómina). The month stepper cannot go past the current month. Press
-   **Calcular mes**. Each Trainer with a line appears as a card: her name,
-   «Borrador», the total (`Bs 322,00`, never centavos), and a table of
-   Concepto, Detalle, and Monto.
+1. **Calculate the month.** In the admin web open **Dinero › Sueldos ›
+   Por aprobar**. The picker opens on **Mes**; its stepper cannot go past
+   the current month. Press **Calcular**. Each Trainer with a line appears
+   as a card: her name, the period («Octubre de 2026») and «Borrador», the
+   total (`Bs 322,00`, never centavos), and a table of Concepto, Detalle,
+   and Monto. Día, Semana, and Rango are Test 127.
 2. **Approve once.** Press **Aprobar** on one card. It reads «Aprobado» and
    Nómina gains one Salary Payment for that total. Pressing again, or
    calculating the month again, does not add a second payment.
@@ -7563,7 +7709,9 @@ and cannot list the statements. Log in as Test 24 describes.
 6. **«Mis pagos» in the Staff app (MOB-073).** Log in as Emma (Test 12) and
    open **Tu cuenta**. Perfil shows **Mis pagos** above «Notificaciones»;
    Camila, Paola, Gabriela, and Carolina do not have the row. It opens one
-   card per month, newest first: the month, «Aprobado» or «Borrador», the
+   card per statement, newest first: its period («Octubre 2026» for a whole
+   month, «20 de octubre de 2026» for a day, «26 de octubre – 1 de
+   noviembre de 2026» for a week or a range), «Aprobado» or «Borrador», the
    total with centavos (`Bs 322,00`), and one row per concept: «Clases
    dictadas · 3», «Canceladas por mínimo · 1», «Comisiones · 1». A draft
    says «Puede cambiar hasta que administración lo apruebe.» **Ver cada
@@ -8377,3 +8525,50 @@ C. **The founder price is the same whole boliviano everywhere (FIX-025).** As
    day shows esperado Bs 502,00, contado Bs 502,00, diferencia Bs 0,00.
    Mariana herself cannot pay cash while her in-app purchase is open: S10
    says «La clienta tiene una compra en curso desde la app.» (FIX-028).
+
+## Test 127: trainer pay for any period (BKO-009)
+
+A Trainer's Pay Statement covers a day, a week (Monday to Sunday), a date
+range, or a month ([ADR-0109](./adr/0109-pay-statements-for-any-period.md)).
+The Coordinator's stays a whole month. Two live statements of one person
+never overlap, so a class or a commission is never paid twice; the database
+refuses it. The migration `20261104090000_pay_statement_periods` must be
+applied (owner approval 2026-11-04). Use a copy of `pilates_dev_sim`, never
+the database itself, since approving creates Salary Payments. Log in as Paola
+(Test 24) and open **Dinero › Sueldos › Por aprobar**.
+
+1. **The picker.** **Día · Semana · Rango · Mes** sit above the cards, Mes
+   chosen. The address stays `/dinero/sueldos?month=AAAA-MM`. Choose
+   **Día**: the address gains `period=day&date=…`, the stepper reads
+   «Martes 3 de noviembre de 2026», and **Día siguiente** stops at today.
+   **Semana** reads «Semana del 2 – 8 de noviembre de 2026» and steps a
+   week. **Rango** shows **Desde** and **Hasta** as `dd/mm/aaaa`, both days
+   included; a Hasta before Desde says «La fecha final no puede ser anterior
+   a la inicial.» and disables **Calcular**. Reloading keeps the period.
+2. **A day.** On **Día**, pick a past day Emma taught and press
+   **Calcular**. Her card names that day (`03/11/2026`) with only that day's
+   classes. Carolina's card is not there: she shows only on **Mes**.
+3. **Approve the day.** Press **Aprobar** after the day is over in Bolivia
+   (before midnight it answers `409` `pay_statement_month_open`). Nómina
+   gains one Salary Payment.
+4. **The month leaves it alone.** Go to **Mes** for that month and press
+   **Calcular**. Emma's approved day is listed and no month draft for Emma
+   appears; Daniela and the rest get their month. The hourly worker skips
+   Emma for that month too. Pay her other days with **Rango**.
+5. **A draft is replaced.** For a month where Emma has only the worker's
+   month draft, calculate one **Semana**: on **Mes** the month draft is gone
+   and the week draft shows. **Calcular** on **Mes** again turns it back
+   into one month draft.
+6. **The API.** `GET /api/v1/administrator/pay-statements?from=2026-11-03&until=2026-11-04`
+   lists every statement that touches the day, each with `periodStart` and
+   `periodEnd` (`until` and `periodEnd` are the day after the last one);
+   `?month=2026-11` still works. `POST …/draft` takes the same queries. A
+   mixed query, an empty or reversed period, or one longer than 366 days
+   answers `400` `invalid_request`. Two drafts racing for overlapping
+   periods leave one; the loser answers `409`
+   `pay_statement_period_overlaps`.
+7. **«Mis pagos».** As Emma (Test 95 step 6) the day's card reads «3 de
+   noviembre de 2026» and a week «2 – 8 de noviembre de 2026»; a whole
+   month still reads «Noviembre 2026».
+8. **Narrow browser.** At 420 px the chips take the full width above the
+   stepper, and the range fields wrap.

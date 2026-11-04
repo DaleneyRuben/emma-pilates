@@ -1,7 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { PayrollPage } from "./payroll-page";
 
-const route = getRouteApi("/authenticated/back-office/nomina");
+const route = getRouteApi("/authenticated/dinero/sueldos/pagados");
 
 export function PayrollRoute() {
   const navigate = route.useNavigate();

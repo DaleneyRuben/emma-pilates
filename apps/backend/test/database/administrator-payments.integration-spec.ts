@@ -260,4 +260,22 @@ describe('Administrator Payment list (PostgreSQL)', () => {
     expect(page.items.map((item) => item.id)).toEqual([paymentIds.sofia]);
     expect(page).toMatchObject({ page: 2, pageSize: 1, totalItems: 5 });
   });
+
+  it('narrows the list to one Client for her file', async () => {
+    const { clientId } = await prisma.payment.findUniqueOrThrow({
+      where: { id: paymentIds.lucia },
+      select: { clientId: true },
+    });
+
+    const page = await ledger().list({
+      page: 1,
+      pageSize: 20,
+      status: 'all',
+      invoice: 'all',
+      clientId,
+    });
+
+    expect(page.items.map((item) => item.id)).toEqual([paymentIds.lucia]);
+    expect(page).toMatchObject({ totalItems: 1, pendingCount: 2 });
+  });
 });

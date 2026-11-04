@@ -88,7 +88,7 @@ export function EquipmentIssuesCard({
   return (
     <section
       aria-labelledby={titleId}
-      className="flex flex-col rounded-tarjeta border border-borde bg-blanco"
+      className="flex flex-col rounded-marco bg-lino"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-divisor px-4 py-3">
         <h2 id={titleId} className="font-serif text-[19px] text-texto">

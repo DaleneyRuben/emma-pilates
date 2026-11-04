@@ -30,7 +30,7 @@ const supplyTable = (rows = () => [detergent, paper]) =>
   });
 
 const openCreate = async () => {
-  const rendered = renderAdmin("/back-office/insumos");
+  const rendered = renderAdmin("/estudio/insumos");
   await screen.findByRole("cell", { name: "Detergente" });
   await rendered.user.click(
     screen.getByRole("button", { name: "Nuevo insumo" }),
@@ -40,7 +40,7 @@ const openCreate = async () => {
 };
 
 const openEdit = async (name = "Papel higiénico") => {
-  const rendered = renderAdmin("/back-office/insumos");
+  const rendered = renderAdmin("/estudio/insumos");
   await rendered.user.click(await screen.findByRole("button", { name }));
   const panel = await screen.findByRole("dialog", { name: "Editar insumo" });
   return { ...rendered, panel };

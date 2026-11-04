@@ -1,13 +1,14 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import {
   AdministrationError,
-  requireAdministrator,
+  requireOperations,
   type AdministratorActor,
 } from '../administration/administration-errors';
 
 // BE-022: the Promotion Contacts ADR-0097 keeps for former Clients who agreed
 // to promotions, and since BE-023 the live Clients with an open Promotions
-// Consent (ADR-0098), for Administrators only (their personal data, ADR-0054).
+// Consent (ADR-0098), for the Administrator and the Coordinator (their
+// personal data, ADR-0054; ADR-0108).
 export type PromotionContactKind = 'client' | 'former_client';
 
 export type PromotionContactRow = {
@@ -48,12 +49,18 @@ export interface PromotionContactStore {
 
 type Dependencies = { store: PromotionContactStore; now: () => Date };
 
+// The store records who acted, not which Role let her.
+const actorOf = (principal: AuthenticatedPrincipal): AdministratorActor => {
+  const { accountId, staffMemberId, audit } = requireOperations(principal);
+  return { accountId, staffMemberId, audit };
+};
+
 export const listPromotionContacts = async (
   command: { page: number; pageSize: number; query?: string },
   principal: AuthenticatedPrincipal,
   { store }: Dependencies,
 ): Promise<PromotionContactPage> => {
-  requireAdministrator(principal);
+  requireOperations(principal);
   const query = command.query?.trim() ?? '';
   return store.list({
     page: command.page,
@@ -67,7 +74,7 @@ export const exportPromotionContacts = async (
   principal: AuthenticatedPrincipal,
   { store, now }: Dependencies,
 ): Promise<PromotionContactRow[]> => {
-  const actor = requireAdministrator(principal);
+  const actor = actorOf(principal);
   const contacts = await store.listAll();
   await store.recordExport({
     actor,
@@ -84,7 +91,7 @@ export const withdrawPromotionContact = async (
   principal: AuthenticatedPrincipal,
   { store, now }: Dependencies,
 ): Promise<void> => {
-  const actor = requireAdministrator(principal);
+  const actor = actorOf(principal);
   const withdrawn = await store.withdraw({
     contactId: command.contactId,
     actor,

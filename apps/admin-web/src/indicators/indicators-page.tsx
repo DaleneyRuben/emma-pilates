@@ -7,6 +7,7 @@ import { addMonths, boliviaMonth } from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
 import { IndicatorChart } from "./indicator-chart";
 import { hasAmounts, monthKpisQueryOptions } from "./indicator-queries";
+import { RecommendationsSection } from "../recommendations/recommendations-page";
 import { MonthNarrative } from "./month-narrative";
 
 const tenths = new Intl.NumberFormat("es-BO", {
@@ -18,7 +19,7 @@ function Tile({ name, figure }: { name: string; figure: string }) {
   return (
     <section
       aria-label={name}
-      className="flex flex-col gap-1 rounded-tarjeta border border-borde bg-blanco px-5 py-4"
+      className="flex flex-col gap-1 rounded-marco bg-lino px-5 py-4"
     >
       <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
         {name}
@@ -30,7 +31,7 @@ function Tile({ name, figure }: { name: string; figure: string }) {
   );
 }
 
-export function IndicatorsPage() {
+export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
   const latest = boliviaMonth();
   const [month, setMonth] = useState(latest);
   const series = [addMonths(month, -2), addMonths(month, -1), month];
@@ -96,7 +97,7 @@ export function IndicatorsPage() {
             </div>
           ) : null}
           {current.data.sessionsHeld === 0 ? (
-            <p className="rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center text-cuerpo text-texto-secundario">
+            <p className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
               Sin clases dictadas en este mes.
             </p>
           ) : (
@@ -110,6 +111,7 @@ export function IndicatorsPage() {
           <MonthNarrative month={month} />
         </>
       )}
+      <RecommendationsSection month={month} readOnly={readOnly} />
     </article>
   );
 }

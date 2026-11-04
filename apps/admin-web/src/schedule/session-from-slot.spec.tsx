@@ -35,7 +35,7 @@ const weekHandler = (sessions: readonly unknown[] = weekSessions) =>
   http.get(apiUrl(sessionsPath), () => jsonResponse(sessions));
 
 const openWeek = async (week = nextMonday) => {
-  const view = renderAdmin(`/?week=${week}`);
+  const view = renderAdmin(`/horario?week=${week}`);
   await screen.findByRole("table", { name: "Semana" });
   return view;
 };
@@ -182,7 +182,7 @@ describe("AW02 on a narrow browser", () => {
   });
 
   it("keeps the header button as the only way to create", async () => {
-    renderAdmin(`/?week=${nextMonday}`);
+    renderAdmin(`/horario?week=${nextMonday}`);
     await screen.findByRole("tablist", { name: "Días de la semana" });
     expect(
       screen.queryByRole("button", { name: /^Nueva sesión el / }),

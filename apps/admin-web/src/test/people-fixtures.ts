@@ -30,18 +30,31 @@ export const clientRow = (
   accountStatus: "active",
   planName: "Paquete de 8 clases",
   subscriptionStatus: "active",
+  remainingClassAllowance: 5,
+  originalClassAllowance: 8,
+  planEndsOn: "2026-09-30",
+  founderNumber: null,
+  invitedByName: null,
   ...extra,
 });
 
+const withoutPlan = {
+  planName: null,
+  remainingClassAllowance: null,
+  originalClassAllowance: null,
+} as const;
+
 export const lucia = clientRow("Lucía Fernández");
 export const sofia = clientRow("Sofía Guzmán Rojas", {
-  planName: null,
+  ...withoutPlan,
   subscriptionStatus: "expired",
+  planEndsOn: "2026-06-30",
   phone: null,
 });
 export const ana = clientRow("Ana Quiroga", {
-  planName: null,
+  ...withoutPlan,
   subscriptionStatus: "none",
+  planEndsOn: null,
   accountStatus: "pending",
 });
 
@@ -52,6 +65,7 @@ export const clientPage = (
     totalItems: number;
     studioClientCount: number;
     activePlanClientCount: number;
+    founderClientCount: number;
   }> = {},
 ) => ({
   items,
@@ -60,6 +74,7 @@ export const clientPage = (
   totalItems: extra.totalItems ?? items.length,
   studioClientCount: extra.studioClientCount ?? 148,
   activePlanClientCount: extra.activePlanClientCount ?? 96,
+  founderClientCount: extra.founderClientCount ?? 12,
 });
 
 export const luciaDetail: AdminClientDetailDto = {

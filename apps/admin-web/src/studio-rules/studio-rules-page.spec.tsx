@@ -47,24 +47,25 @@ describe("AW36 Reglas del estudio", () => {
     server.use(...signedInHandlers());
   });
 
-  it("opens from the account menu", async () => {
+  it("opens from the global search, as an Ajustes tab", async () => {
     server.use(...settingsHandlers());
     const { user } = renderAdmin("/");
 
-    await user.click(
-      await screen.findByRole("button", { name: "Tu cuenta: Paola Mendoza" }),
+    await user.type(
+      await screen.findByRole("combobox", { name: "Buscar en todo" }),
+      "reglas",
     );
     await user.click(
-      await screen.findByRole("link", { name: "Reglas del estudio" }),
+      screen.getByRole("option", { name: "Ajustes · Reglas del estudio" }),
     );
 
     await heading();
-    expect(document.title).toBe("Reglas del estudio · Emma");
+    expect(document.title).toBe("Ajustes · Reglas del estudio · Emma");
   });
 
   it("shows the editable values and the fixed rules", async () => {
     server.use(...settingsHandlers());
-    renderAdmin("/reglas-del-estudio");
+    renderAdmin("/ajustes/reglas-del-estudio");
     await heading();
 
     expect(
@@ -101,7 +102,7 @@ describe("AW36 Reglas del estudio", () => {
 
   it("saves the changed values against the version it read", async () => {
     server.use(...settingsHandlers());
-    const { user } = renderAdmin("/reglas-del-estudio");
+    const { user } = renderAdmin("/ajustes/reglas-del-estudio");
     await heading();
 
     const minimum = await screen.findByLabelText(
@@ -131,7 +132,7 @@ describe("AW36 Reglas del estudio", () => {
 
   it("refuses values out of range before sending", async () => {
     server.use(...settingsHandlers());
-    const { user } = renderAdmin("/reglas-del-estudio");
+    const { user } = renderAdmin("/ajustes/reglas-del-estudio");
     await heading();
 
     const minimum = await screen.findByLabelText(
@@ -156,7 +157,7 @@ describe("AW36 Reglas del estudio", () => {
         return problemResponse(409, "studio_settings_version_conflict");
       }),
     );
-    const { user } = renderAdmin("/reglas-del-estudio");
+    const { user } = renderAdmin("/ajustes/reglas-del-estudio");
     await heading();
 
     const minimum = await screen.findByLabelText(
@@ -184,7 +185,7 @@ describe("AW36 Reglas del estudio", () => {
         problemResponse(403, "administration_access_denied"),
       ),
     );
-    renderAdmin("/reglas-del-estudio");
+    renderAdmin("/ajustes/reglas-del-estudio");
     await heading();
 
     expect(

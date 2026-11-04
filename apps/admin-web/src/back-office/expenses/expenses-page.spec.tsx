@@ -49,7 +49,7 @@ describe("AW13 Gastos on a desktop browser", () => {
         jsonResponse(expensePage([repairSeptember, maintenanceSeptember])),
       ),
     );
-    renderAdmin("/back-office/gastos");
+    renderAdmin("/dinero/gastos");
     await heading();
 
     expect(screen.getByText("Cargando gastos…")).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe("AW13 Gastos on a desktop browser", () => {
         ),
       ),
     );
-    const { router, user } = renderAdmin("/back-office/gastos");
+    const { router, user } = renderAdmin("/dinero/gastos");
     await rowOf("Mantenimiento");
 
     const filter = screen.getByLabelText("Categoría");
@@ -107,7 +107,7 @@ describe("AW13 Gastos on a desktop browser", () => {
       ),
     );
     const { router } = renderAdmin(
-      "/back-office/gastos?expenseCategoryId=8c000000-0000-5000-8000-000000000099&page=2",
+      "/dinero/gastos?expenseCategoryId=8c000000-0000-5000-8000-000000000099&page=2",
     );
     await rowOf("Mantenimiento");
 
@@ -133,7 +133,7 @@ describe("AW13 Gastos on a desktop browser", () => {
         ),
       ),
     );
-    const { user } = renderAdmin("/back-office/gastos");
+    const { user } = renderAdmin("/dinero/gastos");
     await rowOf("Reparación");
 
     await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
@@ -150,7 +150,7 @@ describe("AW13 Gastos on a desktop browser", () => {
 
   it("says when the Branch has no Expenses, in all or in one category", async () => {
     server.use(expenseTable(() => jsonResponse(expensePage([]))));
-    const { user } = renderAdmin("/back-office/gastos");
+    const { user } = renderAdmin("/dinero/gastos");
     expect(
       await screen.findByText("Todavía no hay gastos en esta sucursal."),
     ).toBeVisible();
@@ -165,7 +165,7 @@ describe("AW13 Gastos on a desktop browser", () => {
 
   it("offers a retry when the Expenses cannot load", async () => {
     server.use(expenseTable(() => problemResponse(500, "unexpected_error")));
-    renderAdmin("/back-office/gastos");
+    renderAdmin("/dinero/gastos");
     expect(
       await screen.findByText(
         "No pudimos cargar los gastos.",
@@ -180,7 +180,7 @@ describe("AW13 Gastos on a desktop browser", () => {
     server.use(
       expenseTable(() => problemResponse(403, "back_office_access_denied")),
     );
-    renderAdmin("/back-office/gastos");
+    renderAdmin("/dinero/gastos");
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
@@ -202,7 +202,7 @@ describe("AW13 Gastos on a narrow browser", () => {
     server.use(
       expenseTable(() => jsonResponse(expensePage([repairSeptember]))),
     );
-    renderAdmin("/back-office/gastos");
+    renderAdmin("/dinero/gastos");
     const row = await rowOf("Reparación");
     expect(
       within(row).getByRole("cell", { name: "15/09/2026" }),

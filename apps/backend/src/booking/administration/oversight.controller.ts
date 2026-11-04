@@ -53,8 +53,24 @@ export class AdministratorOversightController extends AdministrationController {
 
   @Get('evaluations')
   @ApiOperation({ operationId: 'listAdminEvaluations' })
-  @ApiQuery({ name: 'from', required: true, format: 'date-time' })
-  @ApiQuery({ name: 'until', required: true, format: 'date-time' })
+  @ApiQuery({
+    name: 'from',
+    required: false,
+    format: 'date-time',
+    description: 'Required with `until` unless `clientId` is given',
+  })
+  @ApiQuery({
+    name: 'until',
+    required: false,
+    format: 'date-time',
+    description: 'Required with `from` unless `clientId` is given',
+  })
+  @ApiQuery({
+    name: 'clientId',
+    required: false,
+    schema: { format: 'uuid' },
+    description: 'Only this Client’s Evaluations, newest first (her file)',
+  })
   @ApiQuery({
     name: 'nutritionistStaffMemberId',
     required: false,

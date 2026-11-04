@@ -1,7 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { PaymentsPage } from "./payments-page";
 
-const route = getRouteApi("/authenticated/back-office/pagos");
+const route = getRouteApi("/authenticated/dinero/pagos");
 
 export function PaymentsRoute() {
   const navigate = route.useNavigate();

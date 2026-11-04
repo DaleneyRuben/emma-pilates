@@ -18,6 +18,7 @@ import { staffProfileQueryOptions } from "../../session/staff-profile-query";
 import { useIsNarrowViewport } from "../use-media-query";
 import { AccountMenu } from "./account-menu";
 import { ChangePasswordPanel } from "./change-password-panel";
+import { roleLabelOf } from "./role-label";
 
 /**
  * AW33: the top-bar user cell on every authenticated page. A popover on
@@ -31,25 +32,38 @@ export function AccountCell() {
   const [panelOpen, setPanelOpen] = useState(false);
   const name = profile?.name ?? "";
 
+  // P01: the avatar in Rosa tinte, then her name over her Role.
   const trigger = (
     <button
       type="button"
       aria-label={name === "" ? "Tu cuenta" : `Tu cuenta: ${name}`}
-      className="flex items-center gap-2 rounded-control py-1 pr-1 pl-2 text-nota text-texto hover:bg-hover-fila focus-visible:shadow-foco"
+      className="flex h-11 items-center gap-2.5 rounded-tarjeta pr-2 pl-1 text-left text-texto hover:bg-lino focus-visible:shadow-foco"
     >
       <span
         aria-hidden="true"
-        className="inline-flex size-[26px] items-center justify-center rounded-full bg-rosa-empolvado font-serif text-ayuda text-blanco"
+        className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-rosa-tinte text-nota font-semibold text-rosa-enlace"
       >
         {initials(name)}
       </span>
-      <span className={cn(narrow && "sr-only")}>{name}</span>
+      {narrow ? (
+        <span className="sr-only">{name}</span>
+      ) : (
+        <span className="flex flex-col">
+          <span className="text-celda leading-tight font-semibold">{name}</span>
+          <span className="text-pie text-tenue">
+            {profile === undefined ? "" : roleLabelOf(profile)}
+          </span>
+        </span>
+      )}
       {narrow ? null : (
         <ChevronDown
-          size={14}
+          size={20}
           strokeWidth={1.6}
           aria-hidden="true"
-          className={cn("transition-transform", menuOpen && "rotate-180")}
+          className={cn(
+            "text-tenue transition-transform",
+            menuOpen && "rotate-180",
+          )}
         />
       )}
     </button>
@@ -64,7 +78,6 @@ export function AccountCell() {
       key={String(menuOpen)}
       profile={profile}
       onChangePassword={openPanel}
-      onNavigate={() => setMenuOpen(false)}
     />
   );
 

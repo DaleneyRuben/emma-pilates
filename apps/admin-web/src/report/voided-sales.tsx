@@ -10,7 +10,7 @@ export function VoidedSales({ sales }: { sales: VoidedSale[] }) {
   return (
     <section
       aria-label="Ventas anuladas"
-      className="flex flex-col gap-2 rounded-tarjeta border border-borde bg-blanco px-4 py-3"
+      className="flex flex-col gap-2 rounded-marco bg-lino px-4 py-3"
     >
       <h2 className="text-nota font-medium text-texto">Ventas anuladas</h2>
       <p className="text-ayuda text-texto-tenue">

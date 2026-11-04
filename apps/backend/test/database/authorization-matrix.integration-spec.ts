@@ -34,7 +34,7 @@ const matrix = {
   ...freezeAuthorizationRows(),
 };
 
-// IDN-009 / ADR-0102: the authorization matrix over the whole API, booted on
+// IDN-009 / ADR-0102 / ADR-0108: the authorization matrix over the whole API, booted on
 // PostgreSQL with the development fixtures. Each request gets a fresh
 // Authentication Session, so a logout row cannot end the next one.
 describe('authorization matrix: Administrator and Coordinator', () => {
@@ -42,7 +42,7 @@ describe('authorization matrix: Administrator and Coordinator', () => {
   let app: INestApplication<App>;
   let routes: { method: Method; path: string }[];
   let document: OpenApiDocument;
-  let realIds: RealIds;
+  let realIds: Record<Role, RealIds>;
 
   const credentialFor = async (
     role: Role,
@@ -79,7 +79,7 @@ describe('authorization matrix: Administrator and Coordinator', () => {
     const sample = sampleRequest(document, method, path);
     const address = `${concretePath(
       path,
-      row?.realIds ? realIds : undefined,
+      row?.realIds ? realIds[role] : undefined,
       row?.realIds === true ? {} : row?.realIds,
     )}${row?.query ?? sample.query}`;
     const browser =
@@ -103,7 +103,7 @@ describe('authorization matrix: Administrator and Coordinator', () => {
         .send(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
     } else if (method !== 'get' && method !== 'delete') {
       const body =
-        typeof row?.body === 'function' ? row.body(realIds) : row?.body;
+        typeof row?.body === 'function' ? row.body(realIds[role]) : row?.body;
       pending = pending.send(body ?? sample.body ?? {});
     }
     try {
@@ -153,7 +153,10 @@ describe('authorization matrix: Administrator and Coordinator', () => {
     });
     document = configureApplication(app) as unknown as OpenApiDocument;
     await app.init();
-    realIds = await findRealIds(world.prisma);
+    realIds = {
+      administrator: await findRealIds(world.prisma, 0),
+      coordinator: await findRealIds(world.prisma, 1),
+    };
     routes = Object.entries(document.paths).flatMap(([path, operations]) =>
       methods
         .filter((method) => method in (operations as object))

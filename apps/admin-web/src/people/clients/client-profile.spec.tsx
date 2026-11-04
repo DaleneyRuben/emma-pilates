@@ -37,7 +37,7 @@ const handlers = (detail: AdminClientDetailDto) => [
 ];
 
 const openLucia = async () => {
-  const rendered = renderAdmin("/back-office/clientes");
+  const rendered = renderAdmin("/clientas");
   await rendered.user.click(
     await screen.findByRole("button", { name: "Lucía Fernández" }),
   );

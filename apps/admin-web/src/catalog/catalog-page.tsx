@@ -116,12 +116,6 @@ export function CatalogPage<Row extends { id: string }>({
             actions === undefined) ? undefined : (
             <>
               {actions}
-              {createLabel === undefined ? null : (
-                <Button onClick={() => open()}>
-                  <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
-                  {createLabel}
-                </Button>
-              )}
               {panelActions.map((action) => (
                 <Button
                   key={action.label}
@@ -132,6 +126,13 @@ export function CatalogPage<Row extends { id: string }>({
                 </Button>
               ))}
               {links}
+              {/* Follow-up 233: the one primary action sits last, on the right. */}
+              {createLabel === undefined ? null : (
+                <Button onClick={() => open()}>
+                  <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
+                  {createLabel}
+                </Button>
+              )}
             </>
           )
         }

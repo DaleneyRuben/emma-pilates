@@ -70,7 +70,7 @@ const reports = (
   ),
 ];
 
-const path = "/reporte?from=2026-08-01&to=2026-09-30";
+const path = "/informes/dinero?from=2026-08-01&to=2026-09-30";
 const heading = () =>
   screen.findByRole("heading", {
     level: 1,
@@ -273,7 +273,7 @@ describe("AW16 Reporte on a desktop browser", () => {
 
   it("opens on the last six Bolivia months when the address names no range", async () => {
     server.use(...reports());
-    renderAdmin("/reporte");
+    renderAdmin("/informes/dinero");
     await heading();
 
     const range = defaultReportRange(boliviaToday());

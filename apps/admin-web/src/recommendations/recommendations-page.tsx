@@ -1,10 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
-import { PageHeader } from "../components/page/page-header";
-import { MonthStepper } from "../components/table/month-stepper";
 import { Button } from "../components/ui/button";
-import { boliviaMonth } from "../lib/bolivia-time";
 import type { RecommendationDto } from "@pilates/api-contracts";
 import {
   dismissRecommendationRequest,
@@ -30,7 +26,7 @@ function Finding({
   pending: boolean;
 }) {
   return (
-    <li className="flex flex-wrap items-center justify-between gap-3 rounded-tarjeta border border-borde bg-blanco px-5 py-4">
+    <li className="flex flex-wrap items-center justify-between gap-3 rounded-marco bg-lino px-5 py-4">
       <div className="flex min-w-0 flex-col gap-1">
         <p className="text-cuerpo text-texto">{item.detail}</p>
         <p className="text-nota text-texto-tenue">{stateLabel[item.state]}</p>
@@ -49,13 +45,17 @@ function Finding({
   );
 }
 
-export function RecommendationsPage({
+/**
+ * AW44 inside Informes › El mes (follow-up 232: «El mes also carries the
+ * recommendations»), for the month the page shows.
+ */
+export function RecommendationsSection({
+  month,
   readOnly = false,
 }: {
+  month: string;
   readOnly?: boolean;
 }) {
-  const latest = boliviaMonth();
-  const [month, setMonth] = useState(latest);
   const queryClient = useQueryClient();
   const query = useQuery(recommendationsQueryOptions(month));
   const dismiss = useMutation({
@@ -68,14 +68,16 @@ export function RecommendationsPage({
   });
 
   return (
-    <article className="flex flex-col gap-6">
-      <PageHeader
-        title="Recomendaciones"
-        subtitle="Hallazgos del mes a partir de los hechos del estudio"
-        actions={
-          <MonthStepper month={month} latest={latest} onChange={setMonth} />
-        }
-      />
+    <section
+      aria-labelledby="recomendaciones-del-mes"
+      className="flex flex-col gap-3"
+    >
+      <h2
+        id="recomendaciones-del-mes"
+        className="font-sans text-pie font-medium tracking-[0.12em] text-texto-tenue uppercase"
+      >
+        Recomendaciones del mes
+      </h2>
       {query.isError ? (
         <QueryFailure
           error={query.error}
@@ -87,7 +89,7 @@ export function RecommendationsPage({
       ) : query.data === undefined ? (
         <LoadingNotice>Cargando las recomendaciones…</LoadingNotice>
       ) : query.data.recommendations.length === 0 ? (
-        <p className="rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center text-cuerpo text-texto-secundario">
+        <p className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
           Nada que revisar este mes.
         </p>
       ) : (
@@ -103,6 +105,6 @@ export function RecommendationsPage({
           ))}
         </ul>
       )}
-    </article>
+    </section>
   );
 }

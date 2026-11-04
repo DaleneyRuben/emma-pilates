@@ -23,7 +23,7 @@ describe("cn", () => {
     );
     expect(screen.getByRole("button", { name: "Chico" })).toHaveClass(
       "text-blanco",
-      "text-nota",
+      "text-celda",
     );
   });
 

@@ -19,7 +19,7 @@ import {
 import { signedInHandlers } from "../test/session-handlers";
 
 const openPanel = async (button: string | RegExp, dialog: string) => {
-  const view = renderAdmin(`/?week=${nextMonday}`);
+  const view = renderAdmin(`/horario?week=${nextMonday}`);
   await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
   await view.user.click(screen.getByRole("button", { name: button }));
   const panel = await screen.findByRole("dialog", { name: dialog });
@@ -141,7 +141,7 @@ describe("AW03 Duración", () => {
 
   it("changes one Session's minutes and sends only that", async () => {
     const sent = capture("patch", `${sessionsPath}/${mondayReformer.id}`);
-    const view = renderAdmin(`/?week=${nextMonday}`);
+    const view = renderAdmin(`/horario?week=${nextMonday}`);
     await view.user.click(
       await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ }),
     );
@@ -162,7 +162,7 @@ describe("AW03 Duración", () => {
       "post",
       `${schedulesPath}/${weeklyScheduleId}/replacement`,
     );
-    const view = renderAdmin(`/?week=${nextMonday}`);
+    const view = renderAdmin(`/horario?week=${nextMonday}`);
     await view.user.click(
       await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ }),
     );

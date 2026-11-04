@@ -39,7 +39,7 @@ const reformerShort = [
 
 const showWeek = () => {
   server.use(http.get(apiUrl(sessionsPath), () => jsonResponse(weekSessions)));
-  renderAdmin(`/?week=${nextMonday}`);
+  renderAdmin(`/horario?week=${nextMonday}`);
 };
 
 // BKO-004, follow-up 170: Horario flags the Sessions with more places than
@@ -69,7 +69,7 @@ describe("AW02 equipment flags", () => {
       within(screen.getByText(/^2 sesiones/)).getByRole("link", {
         name: "Equipos",
       }),
-    ).toHaveAttribute("href", "/back-office/equipos");
+    ).toHaveAttribute("href", "/estudio/equipos");
     expect(
       screen.getByRole("button", {
         name: "Mat Pilates, 16:00, Daniela Ortiz, 10 de 10 lugares, 3 en lista de espera",

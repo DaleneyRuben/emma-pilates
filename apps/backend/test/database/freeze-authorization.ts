@@ -1,8 +1,8 @@
 import type { MatrixRow } from './authorization-matrix';
 
-const administratorOnly = (extra: Partial<MatrixRow> = {}): MatrixRow => ({
+const bothAllowed = (extra: Partial<MatrixRow> = {}): MatrixRow => ({
   administrator: 'allow',
-  coordinator: 'deny',
+  coordinator: 'allow',
   ...extra,
 });
 
@@ -12,7 +12,8 @@ const bothDenied = (): Pick<MatrixRow, 'administrator' | 'coordinator'> => ({
 });
 
 // BKM-012: the Client owns the request, so both Roles are refused alike
-// (owner-scoped). The decision is the Administrator's. A body the DTO
+// (owner-scoped). The Administrator and the Coordinator decide it
+// (ADR-0108); each Role decides a Freeze of its own. A body the DTO
 // accepts is required, or validation answers 400 before the Role check.
 export const freezeAuthorizationRows = (): Record<string, MatrixRow> => ({
   'POST /api/v1/freezes': {
@@ -26,16 +27,15 @@ export const freezeAuthorizationRows = (): Record<string, MatrixRow> => ({
     },
   },
   // These handlers read the bearer credential, not the admin-web cookie.
-  'GET /api/v1/administrator/freezes': administratorOnly({ bearer: true }),
-  'GET /api/v1/administrator/freezes/{freezeId}': administratorOnly({
+  'GET /api/v1/administrator/freezes': bothAllowed({ bearer: true }),
+  'GET /api/v1/administrator/freezes/{freezeId}': bothAllowed({
     bearer: true,
     realIds: { freezeId: 'freezeId' },
   }),
   // A real Freeze reaches the Role check. A missing id was 403 for both
   // Roles before that check ran, so the probe never saw the decision.
   'POST /api/v1/administrator/freezes/{freezeId}/decision': {
-    administrator: 'allow',
-    coordinator: 'deny',
+    ...bothAllowed(),
     bearer: true,
     realIds: { freezeId: 'freezeId' },
     body: { decision: 'refused' },

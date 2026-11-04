@@ -3175,17 +3175,28 @@
             }
           },
           {
-            "name": "until",
-            "required": true,
+            "name": "clientId",
+            "required": false,
             "in": "query",
+            "schema": {
+              "format": "uuid"
+            },
+            "description": "Only this Client’s Evaluations, newest first (her file)"
+          },
+          {
+            "name": "until",
+            "required": false,
+            "in": "query",
+            "description": "Required with `from` unless `clientId` is given",
             "schema": {
               "format": "date-time"
             }
           },
           {
             "name": "from",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Required with `until` unless `clientId` is given",
             "schema": {
               "format": "date-time"
             }
@@ -4456,6 +4467,22 @@
         "operationId": "listAdminClients",
         "parameters": [
           {
+            "name": "filter",
+            "required": false,
+            "in": "query",
+            "description": "One chip of Clientas › Todas: the plan state or a live Fundadora place",
+            "schema": {
+              "enum": [
+                "all",
+                "active",
+                "expired",
+                "none",
+                "founder"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "q",
             "required": false,
             "in": "query",
@@ -4588,6 +4615,15 @@
       "get": {
         "operationId": "listAdminPayments",
         "parameters": [
+          {
+            "name": "clientId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            },
+            "description": "Only this Client’s sales (her file’s Pagos tab)"
+          },
           {
             "name": "q",
             "required": false,
@@ -5614,6 +5650,43 @@
         "summary": "",
         "tags": [
           "StudioRules"
+        ]
+      }
+    },
+    "/api/v1/administrator/sessions/{sessionId}/roster": {
+      "get": {
+        "operationId": "getAdministratorSessionRoster",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorSessionRosterDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessionRoster"
         ]
       }
     },
@@ -8387,10 +8460,30 @@
         "parameters": [
           {
             "name": "month",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
               "example": "2026-09",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "First civil date of the period, with until",
+            "schema": {
+              "example": "2026-09-07",
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": false,
+            "in": "query",
+            "description": "The civil date after the last one (exclusive)",
+            "schema": {
+              "example": "2026-09-14",
               "type": "string"
             }
           }
@@ -8427,10 +8520,30 @@
         "parameters": [
           {
             "name": "month",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
               "example": "2026-09",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "First civil date of the period, with until",
+            "schema": {
+              "example": "2026-09-07",
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": false,
+            "in": "query",
+            "description": "The civil date after the last one (exclusive)",
+            "schema": {
+              "example": "2026-09-14",
               "type": "string"
             }
           }
@@ -13466,6 +13579,35 @@
               "none"
             ],
             "description": "`expired` when the Client had a Plan before, `none` if never"
+          },
+          "remainingClassAllowance": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Classes left on the active Subscription, null without one"
+          },
+          "originalClassAllowance": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Classes the active Subscription granted, null without one"
+          },
+          "planEndsOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The active Plan’s last day, or the last Plan’s when it expired; null if never"
+          },
+          "founderNumber": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 1,
+            "description": "The live Fundadora place’s number, if any"
+          },
+          "invitedByName": {
+            "type": "string",
+            "nullable": true,
+            "description": "The Client or Trainer whose Referral Code she used"
           }
         },
         "required": [
@@ -13475,7 +13617,12 @@
           "phone",
           "accountStatus",
           "planName",
-          "subscriptionStatus"
+          "subscriptionStatus",
+          "remainingClassAllowance",
+          "originalClassAllowance",
+          "planEndsOn",
+          "founderNumber",
+          "invitedByName"
         ]
       },
       "AdminClientPageDto": {
@@ -13510,6 +13657,11 @@
             "type": "number",
             "minimum": 0,
             "description": "Clients of the studio with an active Subscription today"
+          },
+          "founderClientCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clients of the studio holding a live Fundadora place"
           }
         },
         "required": [
@@ -13518,7 +13670,8 @@
           "pageSize",
           "totalItems",
           "studioClientCount",
-          "activePlanClientCount"
+          "activePlanClientCount",
+          "founderClientCount"
         ]
       },
       "AdminClientClosureOutlookDto": {
@@ -14433,11 +14586,13 @@
           },
           "evaluationPriceCentavos": {
             "type": "number",
-            "description": "BOB centavos"
+            "nullable": true,
+            "description": "BOB centavos; null for the Coordinator, who sees no amount"
           },
           "nutritionistFeeCentavos": {
             "type": "number",
-            "description": "BOB centavos"
+            "nullable": true,
+            "description": "BOB centavos; null for the Coordinator, who sees no amount"
           },
           "updatedAt": {
             "type": "string",
@@ -14568,6 +14723,90 @@
           "startDateLimitDays",
           "bookingWindowDays",
           "openingDate"
+        ]
+      },
+      "AdministratorRosterBookingDto": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "attendanceOutcome": {
+            "type": "string",
+            "enum": [
+              "attended",
+              "no_show"
+            ],
+            "nullable": true,
+            "description": "Null until the Trainer records Attendance"
+          }
+        },
+        "required": [
+          "bookingId",
+          "clientId",
+          "clientName",
+          "attendanceOutcome"
+        ]
+      },
+      "AdministratorRosterWaitlistEntryDto": {
+        "type": "object",
+        "properties": {
+          "waitlistEntryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Place in the open Waitlist"
+          }
+        },
+        "required": [
+          "waitlistEntryId",
+          "clientId",
+          "clientName",
+          "position"
+        ]
+      },
+      "AdministratorSessionRosterDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdministratorRosterBookingDto"
+            }
+          },
+          "waitlist": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdministratorRosterWaitlistEntryDto"
+            }
+          }
+        },
+        "required": [
+          "sessionId",
+          "bookings",
+          "waitlist"
         ]
       },
       "AcquisitionReferrerDto": {
@@ -16512,7 +16751,18 @@
           },
           "month": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "First day of the month the period starts in"
+          },
+          "periodStart": {
+            "type": "string",
+            "format": "date",
+            "description": "BKO-009: first day paid"
+          },
+          "periodEnd": {
+            "type": "string",
+            "format": "date",
+            "description": "BKO-009: the day after the last day paid (exclusive)"
           },
           "state": {
             "type": "string",
@@ -16542,6 +16792,8 @@
           "staffMemberId",
           "staffMemberName",
           "month",
+          "periodStart",
+          "periodEnd",
           "state",
           "totalCentavos",
           "salaryPaymentId",

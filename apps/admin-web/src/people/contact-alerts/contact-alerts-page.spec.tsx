@@ -64,7 +64,7 @@ describe("AW39 Para contactar", () => {
         jsonResponse(list([valeria, daniela, monica])),
       ),
     );
-    renderAdmin("/back-office/para-contactar");
+    renderAdmin("/clientas/para-contactar");
     expect(
       await screen.findByText(
         "3 clientas · seguimiento de sus primeros 90 días",
@@ -101,7 +101,7 @@ describe("AW39 Para contactar", () => {
         return new Response(null, { status: 204 });
       }),
     );
-    const { user } = renderAdmin("/back-office/para-contactar");
+    const { user } = renderAdmin("/clientas/para-contactar");
     await screen.findByText("Valeria Quiroga");
 
     await user.click(
@@ -125,7 +125,7 @@ describe("AW39 Para contactar", () => {
         problemResponse(500, "unexpected_error"),
       ),
     );
-    const { user } = renderAdmin("/back-office/para-contactar");
+    const { user } = renderAdmin("/clientas/para-contactar");
     await screen.findByText("Valeria Quiroga");
 
     await user.click(screen.getByRole("button", { name: "Contactada" }));
@@ -139,33 +139,28 @@ describe("AW39 Para contactar", () => {
 
   it("shows the empty card", async () => {
     server.use(http.get(apiUrl(path), () => jsonResponse(list([]))));
-    renderAdmin("/back-office/para-contactar");
+    renderAdmin("/clientas/para-contactar");
     expect(
       await screen.findByText("Nadie para contactar por ahora."),
     ).toBeVisible();
   });
 
-  it("is in the Coordinator's sidebar", async () => {
+  it("is a Clientas tab for the Coordinator", async () => {
     server.use(
       ...coordinatorHandlers(),
       http.get(apiUrl(path), () => jsonResponse(list([valeria]))),
     );
-    renderAdmin("/back-office/para-contactar");
+    renderAdmin("/clientas/para-contactar");
     await heading();
 
-    const sidebar = screen.getByRole("navigation", { name: "Secciones" });
+    const tabs = screen.getByRole("navigation", {
+      name: "Páginas de Clientas",
+    });
     expect(
-      within(sidebar)
+      within(tabs)
         .getAllByRole("link")
         .map((link) => link.textContent),
-    ).toEqual([
-      "Horario",
-      "Clientes",
-      "Para contactar",
-      "Personal",
-      "Indicadores",
-      "Recomendaciones",
-    ]);
+    ).toEqual(["Todas", "Para contactar", "Congelamientos"]);
   });
 });
 
@@ -178,7 +173,7 @@ describe("AW39 Para contactar at 420 px", () => {
 
   it("still names the Client and the actions", async () => {
     server.use(http.get(apiUrl(path), () => jsonResponse(list([valeria]))));
-    renderAdmin("/back-office/para-contactar");
+    renderAdmin("/clientas/para-contactar");
     expect(await screen.findByText("Valeria Quiroga")).toBeVisible();
     expect(
       screen.getByRole("button", { name: "Contactada" }),

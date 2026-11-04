@@ -17,7 +17,7 @@ type Result = { ok: true; message: string } | { ok: false; message: string };
 // AW24 draws the card's actions as full-width 40 px white buttons whose
 // disabled state keeps the white fill under a disabled-tone border.
 const cardButton =
-  "h-[40px] w-full bg-blanco text-fila-menu hover:text-primario disabled:border-deshabilitado disabled:bg-blanco";
+  "h-[40px] w-full bg-superficie text-fila-menu hover:text-primario disabled:bg-superficie";
 
 /**
  * AW24's pending invitation (follow-ups 35–36, WEB-012): the address with
@@ -88,7 +88,7 @@ export function PendingInvitation({
     );
 
   return (
-    <section className="flex flex-col gap-2.5 rounded-panel border border-borde bg-superficie-sutil p-3.5">
+    <section className="flex flex-col gap-2.5 rounded-marco bg-lino p-4">
       <div>
         <StatusPill tone="advertencia">Pendiente de activación</StatusPill>
       </div>

@@ -86,12 +86,19 @@ enum PayStatementLineKind {
   @@schema("back_office")
 }
 
-// One statement per Trainer per month. A draft is replaced; approval freezes
-// it and creates the Salary Payment. A removed statement keeps its rows.
+// A Staff Member's statement for a period [periodStart, periodEnd): a day, a
+// week, a range or a month for a Trainer, a month for the Coordinator
+// (ADR-0109). `month` is the first day of the period's month, kept for the
+// released Staff app. Two live statements of one Staff Member never overlap:
+// a raw EXCLUDE constraint in 20261104090000_pay_statement_periods. A draft is
+// replaced; approval freezes it and creates the Salary Payment. A removed
+// statement keeps its rows.
 model PayStatement {
   id                  String            @id @default(uuid()) @db.Uuid
   staffMemberId       String            @map("staff_member_id") @db.Uuid
   month               DateTime          @db.Date
+  periodStart         DateTime          @map("period_start") @db.Date
+  periodEnd           DateTime          @map("period_end") @db.Date
   state               PayStatementState @default(DRAFT)
   totalCentavos       Int               @map("total_centavos")
   salaryPaymentId     String?           @unique @map("salary_payment_id") @db.Uuid
@@ -107,6 +114,7 @@ model PayStatement {
 
   @@index([staffMemberId, month])
   @@index([month, state])
+  @@index([periodStart, periodEnd])
   @@index([approvedByAccountId])
   @@map("pay_statements")
   @@schema("back_office")

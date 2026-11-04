@@ -39,7 +39,7 @@ describe("the Coordinator Role in Personal", () => {
 
   it("lets the Administrator invite a Coordinator, who holds every Branch", async () => {
     server.use(...signedInHandlers(), allBranchesHandler(), ...staffHandlers());
-    const { user } = renderAdmin("/back-office/personal");
+    const { user } = renderAdmin("/estudio/personal");
 
     const row = await screen.findByRole("row", { name: /Carolina Rivas/ });
     expect(within(row).getByText("Coordinador")).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe("the Coordinator Role in Personal", () => {
         },
       ),
     );
-    const { user } = renderAdmin("/back-office/personal");
+    const { user } = renderAdmin("/estudio/personal");
 
     await user.click(
       await screen.findByRole("button", { name: "Emma Vargas" }),
@@ -119,7 +119,7 @@ describe("the Coordinator Role in Personal", () => {
         },
       ),
     );
-    const { user } = renderAdmin("/back-office/personal");
+    const { user } = renderAdmin("/estudio/personal");
 
     await user.click(await screen.findByRole("button", { name: "Lorena Paz" }));
     const panel = await screen.findByRole("dialog", { name: "Lorena Paz" });
@@ -135,7 +135,7 @@ describe("the Coordinator Role in Personal", () => {
       allBranchesHandler(),
       ...staffHandlers(),
     );
-    const { user } = renderAdmin("/back-office/personal");
+    const { user } = renderAdmin("/estudio/personal");
 
     await user.click(
       await screen.findByRole("button", { name: "Carolina Rivas" }),

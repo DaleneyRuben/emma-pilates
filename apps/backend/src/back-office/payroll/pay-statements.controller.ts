@@ -1,5 +1,5 @@
-import { parseCivilMonth } from '../civil-month';
 import {
+  applyDecorators,
   BadRequestException,
   Controller,
   Get,
@@ -28,15 +28,53 @@ import {
   run,
   type BackOfficeOperations,
 } from '../back-office-http';
+import { civilText, parsePayPeriod, type PayPeriod } from './pay-period';
 import { PayStatementDraftDto, PayStatementDto } from './pay-statements.dto';
 import { TrainerSalaryPaymentsController } from './trainer-salary-payments.controller';
 
-const civil = (date: Date): string => date.toISOString().slice(0, 10);
-
-const toDto = <Statement extends { month: Date }>(statement: Statement) => ({
+const toDto = <
+  Statement extends { month: Date; periodStart: Date; periodEnd: Date },
+>(
+  statement: Statement,
+) => ({
   ...statement,
-  month: civil(statement.month),
+  month: civilText(statement.month),
+  periodStart: civilText(statement.periodStart),
+  periodEnd: civilText(statement.periodEnd),
 });
+
+const requirePeriod = (query: {
+  month?: string;
+  from?: string;
+  until?: string;
+}): PayPeriod => {
+  const period = parsePayPeriod(query);
+  if (period === null) {
+    throw new BadRequestException({
+      code: 'invalid_request',
+      detail: 'Invalid period',
+    });
+  }
+  return period;
+};
+
+// BKO-009: a month, as the released clients send it, or any period.
+const periodQueries = () =>
+  applyDecorators(
+    ApiQuery({ name: 'month', required: false, example: '2026-09' }),
+    ApiQuery({
+      name: 'from',
+      required: false,
+      example: '2026-09-07',
+      description: 'First civil date of the period, with until',
+    }),
+    ApiQuery({
+      name: 'until',
+      required: false,
+      example: '2026-09-14',
+      description: 'The civil date after the last one (exclusive)',
+    }),
+  );
 
 // BKO-006: the Administrator drafts and approves; a Trainer reads her own.
 @Controller({ path: 'administrator/pay-statements', version: '1' })
@@ -51,26 +89,19 @@ export class AdministratorPayStatementsController extends BackOfficeController {
 
   @Get()
   @ApiOperation({ operationId: 'listPayStatements' })
-  @ApiQuery({ name: 'month', required: true, example: '2026-09' })
+  @periodQueries()
   @ApiOkResponse({ type: PayStatementDto, isArray: true })
   @Header('Cache-Control', 'no-store')
   async list(
     @Headers('authorization') authorization: string | undefined,
-    @Query('month') month: string,
+    @Query('month') month?: string,
+    @Query('from') from?: string,
+    @Query('until') until?: string,
   ): Promise<PayStatementDto[]> {
-    const civilMonthStart = parseCivilMonth(month);
-    if (civilMonthStart === null) {
-      throw new BadRequestException({
-        code: 'invalid_request',
-        detail: 'Invalid month',
-      });
-    }
+    const period = requirePeriod({ month, from, until });
     const principal = await this.authenticate(authorization);
     const statements = await run(() =>
-      this.operations.payStatements.listStatements(
-        { month: civilMonthStart },
-        principal,
-      ),
+      this.operations.payStatements.listStatements(period, principal),
     );
     return statements.map(toDto);
   }
@@ -78,23 +109,19 @@ export class AdministratorPayStatementsController extends BackOfficeController {
   @Post('draft')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ operationId: 'draftPayStatements' })
-  @ApiQuery({ name: 'month', required: true, example: '2026-09' })
+  @periodQueries()
   @ApiOkResponse({ type: PayStatementDraftDto })
   async draft(
     @Headers('authorization') authorization: string | undefined,
-    @Query('month') month: string,
+    @Query('month') month?: string,
+    @Query('from') from?: string,
+    @Query('until') until?: string,
   ): Promise<PayStatementDraftDto> {
-    const civilMonthStart = parseCivilMonth(month);
-    if (civilMonthStart === null) {
-      throw new BadRequestException({
-        code: 'invalid_request',
-        detail: 'Invalid month',
-      });
-    }
+    const period = requirePeriod({ month, from, until });
     const principal = await this.authenticate(authorization);
     return run(() =>
-      this.operations.payStatements.draftMonthAsAdministrator(
-        civilMonthStart,
+      this.operations.payStatements.draftPeriodAsAdministrator(
+        period,
         principal,
       ),
     );

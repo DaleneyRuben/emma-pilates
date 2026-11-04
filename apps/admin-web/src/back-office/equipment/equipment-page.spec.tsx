@@ -43,7 +43,7 @@ describe("AW37 Equipos on a desktop browser", () => {
 
   it("lists the Equipment by kind with its state and the open faults", async () => {
     server.use(...equipmentHandlers());
-    renderAdmin("/back-office/equipos");
+    renderAdmin("/estudio/equipos");
     await heading();
 
     expect(
@@ -87,7 +87,7 @@ describe("AW37 Equipos on a desktop browser", () => {
           : jsonResponse(piece("reformer", 9), 201),
       ),
     );
-    const { user } = renderAdmin("/back-office/equipos");
+    const { user } = renderAdmin("/estudio/equipos");
     await sectionOf(/^Reformers/);
 
     await user.click(screen.getByRole("button", { name: "Nuevo equipo" }));
@@ -116,7 +116,7 @@ describe("AW37 Equipos on a desktop browser", () => {
         jsonResponse(brokenSpring, 201),
       ),
     );
-    const { user } = renderAdmin("/back-office/equipos");
+    const { user } = renderAdmin("/estudio/equipos");
     const reformers = await sectionOf(/^Reformers/);
     await user.click(
       within(
@@ -153,7 +153,7 @@ describe("AW37 Equipos on a desktop browser", () => {
         jsonResponse({ ...reformer5, archivedAt: "2026-10-23T14:00:00.000Z" }),
       ),
     );
-    const { user } = renderAdmin("/back-office/equipos");
+    const { user } = renderAdmin("/estudio/equipos");
     const faults = await sectionOf(/^Fallas/);
     await user.click(
       (
@@ -191,7 +191,7 @@ describe("AW37 Equipos on a desktop browser", () => {
 
   it("shows the resolved faults with who resolved them", async () => {
     server.use(...equipmentHandlers());
-    const { user } = renderAdmin("/back-office/equipos");
+    const { user } = renderAdmin("/estudio/equipos");
     const faults = await sectionOf(/^Fallas/);
     await user.click(within(faults).getByRole("radio", { name: "Resueltas" }));
     expect(
@@ -206,7 +206,7 @@ describe("AW37 Equipos on a desktop browser", () => {
 
   it("says when the Branch has no Equipment yet", async () => {
     server.use(...equipmentHandlers([], [], []));
-    renderAdmin("/back-office/equipos");
+    renderAdmin("/estudio/equipos");
     expect(
       await screen.findByText("Todavía no hay equipos en esta sucursal."),
     ).toBeInTheDocument();
@@ -218,13 +218,16 @@ describe("AW37 Equipos on a narrow browser", () => {
   useNarrowViewport();
   beforeEach(() => server.use(...signedInHandlers()));
 
-  it("keeps the sections and the sidebar entry in the drawer", async () => {
+  it("keeps the sections and its destination in the drawer", async () => {
     server.use(...equipmentHandlers());
-    const { user } = renderAdmin("/back-office/equipos");
+    const { user } = renderAdmin("/estudio/equipos");
     await sectionOf(/^Reformers/);
     await user.click(screen.getByRole("button", { name: "Abrir menú" }));
     expect(
-      await screen.findByRole("link", { name: "Equipos" }),
-    ).toBeInTheDocument();
+      within(await screen.findByRole("dialog", { name: "Menú" })).getByRole(
+        "link",
+        { name: "Estudio" },
+      ),
+    ).toHaveAttribute("aria-current", "page");
   });
 });

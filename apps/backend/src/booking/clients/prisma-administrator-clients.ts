@@ -11,6 +11,7 @@ import type {
   AdministratorClientDirectory,
   AdministratorClientRow,
 } from './administrator-clients';
+import { directoryFilterCondition } from './client-directory-filter';
 
 const accountSelect = {
   select: {
@@ -29,6 +30,11 @@ const activeOn = (today: Date) =>
     startsOn: { lte: today },
     endsOn: { gte: today },
   }) satisfies Prisma.SubscriptionWhereInput;
+
+// A reserved place is not hers yet and a lost one is no longer.
+const liveFounderPlace = {
+  is: { status: 'ACTIVE', deletedAt: null },
+} satisfies Prisma.ClientWhereInput['founderMembership'];
 
 // Clients without an Account are unreachable for the studio and stay hidden,
 // as in the Assistant search.
@@ -56,46 +62,86 @@ export const createPrismaAdministratorClients = (
   const catalog = createCatalogRepository(prisma);
 
   const directory: AdministratorClientDirectory = {
-    list: async ({ page, pageSize, query, today }) => {
-      const search = searchCondition(query);
-      const [matches, [counted], studioClientCount, activePlanClientCount] =
-        await Promise.all([
-          prisma.$queryRaw<{ id: string }[]>`
+    list: async ({ page, pageSize, query, filter, today }) => {
+      const search = Prisma.sql`${searchCondition(query)} ${directoryFilterCondition(filter, today)}`;
+      const [
+        matches,
+        [counted],
+        studioClientCount,
+        activePlanClientCount,
+        founderClientCount,
+      ] = await Promise.all([
+        prisma.$queryRaw<{ id: string }[]>`
             SELECT c.id
             FROM booking.clients c
             JOIN system.accounts a ON a.client_id = c.id
             WHERE c.deleted_at IS NULL ${search}
             ORDER BY c.name, c.id
             LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`,
-          prisma.$queryRaw<{ total: bigint }[]>`
+        prisma.$queryRaw<{ total: bigint }[]>`
             SELECT count(*) AS total
             FROM booking.clients c
             JOIN system.accounts a ON a.client_id = c.id
             WHERE c.deleted_at IS NULL ${search}`,
-          prisma.client.count({ where: withAccount }),
-          prisma.client.count({
-            where: { ...withAccount, subscriptions: { some: activeOn(today) } },
-          }),
-        ]);
-      const rows = await prisma.client.findMany({
-        where: { id: { in: matches.map(({ id }) => id) } },
-        select: {
-          id: true,
-          name: true,
-          phone: true,
-          account: accountSelect,
-          subscriptions: {
-            where: activeOn(today),
-            select: { planNameSnapshot: true },
-            take: 1,
+        prisma.client.count({ where: withAccount }),
+        prisma.client.count({
+          where: { ...withAccount, subscriptions: { some: activeOn(today) } },
+        }),
+        prisma.client.count({
+          where: { ...withAccount, founderMembership: liveFounderPlace },
+        }),
+      ]);
+      const pageIds = matches.map(({ id }) => id);
+      const [rows, lastEnds] = await Promise.all([
+        prisma.client.findMany({
+          where: { id: { in: pageIds } },
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            account: accountSelect,
+            subscriptions: {
+              where: activeOn(today),
+              select: {
+                planNameSnapshot: true,
+                remainingClassAllowance: true,
+                originalClassAllowance: true,
+                endsOn: true,
+              },
+              take: 1,
+            },
+            founderMembership: {
+              select: { number: true, status: true, deletedAt: true },
+            },
+            acquisitions: {
+              where: { deletedAt: null },
+              select: {
+                referrerClient: { select: { name: true } },
+                referrerStaffMember: { select: { name: true } },
+              },
+              take: 1,
+            },
+            referralReceived: {
+              select: { referrer: { select: { name: true } } },
+            },
           },
-          _count: { select: { subscriptions: true } },
-        },
-      });
+        }),
+        prisma.subscription.groupBy({
+          by: ['clientId'],
+          where: { clientId: { in: pageIds } },
+          _max: { endsOn: true },
+        }),
+      ]);
+      const lastEndOf = new Map(
+        lastEnds.map((group) => [group.clientId, group._max.endsOn]),
+      );
       const byId = new Map(
         rows.flatMap((row): [string, AdministratorClientRow][] => {
           if (row.account === null) return [];
           const active = row.subscriptions[0];
+          const lastEnd = lastEndOf.get(row.id) ?? null;
+          const founder = row.founderMembership;
+          const acquisition = row.acquisitions[0];
           return [
             [
               row.id,
@@ -109,9 +155,26 @@ export const createPrismaAdministratorClients = (
                 subscriptionStatus:
                   active !== undefined
                     ? 'active'
-                    : row._count.subscriptions > 0
+                    : lastEnd !== null
                       ? 'expired'
                       : 'none',
+                remainingClassAllowance:
+                  active?.remainingClassAllowance ?? null,
+                originalClassAllowance: active?.originalClassAllowance ?? null,
+                planEndsOn: active?.endsOn ?? lastEnd,
+                founderNumber:
+                  founder !== null &&
+                  founder.status === 'ACTIVE' &&
+                  founder.deletedAt === null
+                    ? founder.number
+                    : null,
+                // The live attribution decides (booking ADR-0009); a Client
+                // registered before it was recorded keeps her Referral.
+                invitedByName:
+                  acquisition?.referrerStaffMember?.name ??
+                  acquisition?.referrerClient?.name ??
+                  row.referralReceived?.referrer.name ??
+                  null,
               },
             ],
           ];
@@ -124,6 +187,7 @@ export const createPrismaAdministratorClients = (
         totalItems: Number(counted?.total ?? 0),
         studioClientCount,
         activePlanClientCount,
+        founderClientCount,
       };
     },
 

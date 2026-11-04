@@ -130,8 +130,11 @@ export const parseAdminPaymentQuery = (value: unknown) =>
       status: z.enum(paymentStatusFilters).default('all'),
       invoice: z.enum(paymentInvoiceFilters).default('all'),
       q: z.string().trim().max(100).optional(),
+      clientId: z.uuid().optional(),
     })
-    .transform(({ q, ...filters }): AdministratorPaymentQuery =>
-      q === undefined || q === '' ? filters : { ...filters, query: q },
-    )
+    .transform(({ q, clientId, ...filters }): AdministratorPaymentQuery => ({
+      ...filters,
+      ...(q === undefined || q === '' ? {} : { query: q }),
+      ...(clientId === undefined ? {} : { clientId }),
+    }))
     .safeParse(value);

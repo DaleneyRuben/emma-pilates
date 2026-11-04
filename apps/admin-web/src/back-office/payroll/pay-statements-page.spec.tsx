@@ -15,6 +15,8 @@ const statement = {
   staffMemberId: "emma",
   staffMemberName: "Emma Vargas",
   month: "2026-09-01",
+  periodStart: "2026-09-01",
+  periodEnd: "2026-10-01",
   state: "draft",
   totalCentavos: 32_200,
   salaryPaymentId: null,
@@ -50,9 +52,7 @@ describe("Pagos a instructoras", () => {
         });
       }),
     );
-    const { user } = renderAdmin(
-      "/back-office/pagos-instructoras?month=2026-09",
-    );
+    const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
     expect(
       await screen.findByRole("heading", { name: "Emma Vargas" }),
@@ -70,7 +70,7 @@ describe("Pagos a instructoras", () => {
         problemResponse(403, "back_office_access_denied"),
       ),
     );
-    renderAdmin("/back-office/pagos-instructoras?month=2026-09");
+    renderAdmin("/dinero/sueldos?month=2026-09");
     expect(await screen.findByRole("alert")).toBeInTheDocument();
   });
 });

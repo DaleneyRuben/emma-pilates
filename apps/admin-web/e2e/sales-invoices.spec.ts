@@ -15,7 +15,7 @@ test("exports the unbilled sales and marks a cash sale's invoice issued", async 
     taxId: "4567891",
     name: "Renata Soliz",
   });
-  await signIn(page, "/back-office/pagos?status=all&invoice=unissued");
+  await signIn(page, "/dinero/pagos?status=all&invoice=unissued");
 
   const row = page.getByRole("row", { name: /Renata Soliz/ });
   await expect(row.getByText("Efectivo")).toBeVisible();
@@ -37,7 +37,7 @@ test("exports the unbilled sales and marks a cash sale's invoice issued", async 
     .click();
   await expect(page.getByText("No hay facturas pendientes.")).toBeVisible();
 
-  await page.goto("/back-office/pagos?status=all");
+  await page.goto("/dinero/pagos?status=all");
   const issued = page
     .getByRole("row", { name: /Renata Soliz/ })
     .filter({ hasText: "Efectivo" });

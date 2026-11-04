@@ -5,7 +5,7 @@ const tones = {
   advertencia:
     "bg-advertencia/15 text-advertencia-texto [&>span]:bg-advertencia",
   error: "bg-error/15 text-error-texto [&>span]:bg-error",
-  neutral: "bg-divisor text-texto-secundario [&>span]:bg-texto-muy-tenue",
+  neutral: "bg-borde-fuerte/50 text-texto-tenue [&>span]:bg-texto-muy-tenue",
 } as const;
 
 // Design system → Status pills: a tint of the semantic color, its darker
@@ -20,7 +20,7 @@ export function StatusPill({
   return (
     <span
       className={cn(
-        "inline-flex h-[22px] items-center gap-1.5 rounded-full px-2.5 text-ayuda font-medium",
+        "inline-flex h-[26px] items-center gap-1.5 rounded-full px-2.5 text-pie font-semibold whitespace-nowrap",
         tones[tone],
       )}
     >

@@ -30,4 +30,9 @@ export interface AdminClientPageDto {
    * @minimum 0
    */
   activePlanClientCount: number;
+  /**
+   * Clients of the studio holding a live Fundadora place
+   * @minimum 0
+   */
+  founderClientCount: number;
 }

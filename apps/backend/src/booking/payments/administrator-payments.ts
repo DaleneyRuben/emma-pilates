@@ -53,6 +53,8 @@ export type AdministratorPaymentQuery = {
   status: AdministratorPaymentStatusFilter;
   invoice: AdministratorPaymentInvoiceFilter;
   query?: string;
+  /** One Client's sales, for the Pagos tab of her file (WEB-040). */
+  clientId?: string;
 };
 
 export interface AdministratorPaymentLedger {
@@ -73,5 +75,6 @@ export const listAdministratorPayments = async (
     status: command.status,
     invoice: command.invoice,
     ...(query === '' ? {} : { query }),
+    ...(command.clientId === undefined ? {} : { clientId: command.clientId }),
   });
 };

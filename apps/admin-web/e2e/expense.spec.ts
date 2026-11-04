@@ -6,7 +6,7 @@ import { signIn } from "./support/session";
 test("records an Expense at Centro with an inline category", async ({
   page,
 }) => {
-  await signIn(page, "/back-office/gastos");
+  await signIn(page, "/dinero/gastos");
   await expect(
     page.getByText("Todavía no hay gastos en esta sucursal."),
   ).toBeVisible();

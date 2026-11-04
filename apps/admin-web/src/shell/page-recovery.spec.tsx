@@ -27,7 +27,7 @@ function FailingPage() {
 }
 
 function OtherPage() {
-  return <h1>Planes</h1>;
+  return <h1>Tipos de clase</h1>;
 }
 
 const buildRouter = (path: string) => {
@@ -39,7 +39,7 @@ const buildRouter = (path: string) => {
   });
   const otherRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: "/catalogo/planes",
+    path: "/ajustes/tipos-de-clase",
     component: OtherPage,
   });
   return createRouter({
@@ -107,15 +107,15 @@ describe("a page that fails while drawing (WEB-032, follow-up 105)", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
-  it("leaves the state behind when the sidebar moves to another page", async () => {
+  it("leaves the state behind when the rail moves to another page", async () => {
     const { user } = renderShellWith();
     await screen.findByRole("button", { name: "Reintentar" });
 
-    // The sidebar shows the money sections once the session names the Role.
-    await user.click(await screen.findByRole("link", { name: "Planes" }));
+    // The rail shows the money sections once the session names the Role.
+    await user.click(await screen.findByRole("link", { name: "Ajustes" }));
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Planes" }),
+      await screen.findByRole("heading", { level: 1, name: "Tipos de clase" }),
     ).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });

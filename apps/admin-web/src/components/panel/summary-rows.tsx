@@ -14,7 +14,7 @@ export function SummaryBlock({
       <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
         {title}
       </h3>
-      <dl className="flex flex-col divide-y divide-divisor rounded-control border border-divisor bg-superficie">
+      <dl className="flex flex-col divide-y divide-divisor rounded-marco bg-lino">
         {children}
       </dl>
     </section>

@@ -69,7 +69,7 @@ describe("the first-load state while the app starts", () => {
         return Response.json(paolaPrincipal);
       }),
     );
-    renderAdmin("/back-office/gastos");
+    renderAdmin("/dinero/gastos");
 
     // The probe answers outside any Testing Library call. Wait for the
     // state the page keeps while that probe runs, instead of a fixed delay

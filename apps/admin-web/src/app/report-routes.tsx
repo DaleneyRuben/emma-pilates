@@ -6,7 +6,7 @@ import { authenticatedRoute } from "./root-routes";
 // AW16 (WEB-009): the report's Branch and range live in the address.
 const reportRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/reporte",
+  path: "/informes/dinero",
   validateSearch: optionalSearch(reportSearchSchema),
   component: lazyRouteComponent(
     () => import("../report/report-route"),
@@ -16,24 +16,11 @@ const reportRoute = createRoute({
 
 const indicatorsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/reporte/indicadores",
+  path: "/informes",
   component: lazyRouteComponent(
     () => import("../indicators/indicators-route"),
     "IndicatorsRoute",
   ),
 });
 
-const recommendationsRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/recomendaciones",
-  component: lazyRouteComponent(
-    () => import("../recommendations/recommendations-route"),
-    "RecommendationsRoute",
-  ),
-});
-
-export const reportRoutes = [
-  reportRoute,
-  indicatorsRoute,
-  recommendationsRoute,
-];
+export const reportRoutes = [reportRoute, indicatorsRoute];

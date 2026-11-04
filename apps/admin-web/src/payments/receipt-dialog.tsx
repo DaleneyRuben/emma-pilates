@@ -40,7 +40,7 @@ export function ReceiptDialog({
           className={cn(
             "fixed z-50 flex flex-col gap-2 outline-none",
             narrow
-              ? "inset-0 overflow-y-auto bg-blanco"
+              ? "inset-0 overflow-y-auto bg-superficie"
               : "top-1/2 left-1/2 max-w-[min(900px,90vw)] -translate-x-1/2 -translate-y-1/2",
           )}
         >
@@ -49,7 +49,7 @@ export function ReceiptDialog({
           <div
             className={cn(
               "flex items-center justify-between gap-3",
-              narrow && "sticky top-0 bg-blanco px-4 py-3",
+              narrow && "sticky top-0 bg-superficie px-4 py-3",
             )}
           >
             <span
@@ -70,7 +70,7 @@ export function ReceiptDialog({
             className={cn(
               narrow
                 ? "w-full object-contain"
-                : "max-h-[90vh] max-w-full rounded-tarjeta border border-borde bg-blanco object-contain shadow-popover",
+                : "max-h-[90vh] max-w-full rounded-marco bg-lino object-contain shadow-popover",
             )}
           />
         </Dialog.Content>

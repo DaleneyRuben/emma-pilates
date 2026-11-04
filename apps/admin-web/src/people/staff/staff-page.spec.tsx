@@ -46,7 +46,7 @@ describe("AW23 Personal on a desktop browser", () => {
         jsonResponse(staffPage([camila, emma, paolaMember, rita, valentina])),
       ),
     );
-    renderAdmin("/back-office/personal");
+    renderAdmin("/estudio/personal");
 
     expect(
       await screen.findByRole("heading", { level: 1, name: "Personal" }),
@@ -91,7 +91,7 @@ describe("AW23 Personal on a desktop browser", () => {
         ),
       ),
     );
-    const { router, user } = renderAdmin("/back-office/personal?page=2");
+    const { router, user } = renderAdmin("/estudio/personal?page=2");
     await rowOf("Emma Vargas");
     const filter = screen.getByLabelText("Rol");
     expect(filter).toHaveValue("all");
@@ -121,7 +121,7 @@ describe("AW23 Personal on a desktop browser", () => {
 
   it("says when no Staff Member has the Role and when the table cannot load", async () => {
     server.use(staffTable(() => jsonResponse(staffPage([]))));
-    const { user } = renderAdmin("/back-office/personal?role=nutritionist");
+    const { user } = renderAdmin("/estudio/personal?role=nutritionist");
     expect(
       await screen.findByText("No hay miembros con este rol."),
     ).toBeInTheDocument();
@@ -139,7 +139,7 @@ describe("AW23 Personal on a desktop browser", () => {
 
   it("hides the create action from an Administrator who lost access", async () => {
     server.use(staffTable(() => problemResponse(403, "staff_access_denied")));
-    renderAdmin("/back-office/personal");
+    renderAdmin("/estudio/personal");
 
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
@@ -157,7 +157,7 @@ describe("AW23 Personal on a narrow browser", () => {
 
   it("shows one labelled card per Staff Member", async () => {
     server.use(staffTable(() => jsonResponse(staffPage([emma]))));
-    renderAdmin("/back-office/personal");
+    renderAdmin("/estudio/personal");
 
     expect(
       await screen.findByRole("cell", { name: "Centro, Equipetrol" }),

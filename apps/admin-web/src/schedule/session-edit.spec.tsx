@@ -37,7 +37,7 @@ const civil = (date: string) =>
   `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)}`;
 
 const openSession = async (name: RegExp) => {
-  const view = renderAdmin(`/?week=${nextMonday}`);
+  const view = renderAdmin(`/horario?week=${nextMonday}`);
   await view.user.click(await screen.findByRole("button", { name }));
   const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
   return { ...view, panel };

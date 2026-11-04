@@ -22,7 +22,7 @@ const codePath = `${staffMembersPath}/${emma.id}/referral-code`;
 const saved: unknown[] = [];
 
 const openMember = async (name: string) => {
-  const rendered = renderAdmin("/back-office/personal");
+  const rendered = renderAdmin("/estudio/personal");
   await rendered.user.click(await screen.findByRole("button", { name }));
   return {
     ...rendered,

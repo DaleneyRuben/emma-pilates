@@ -10,7 +10,7 @@ test("confirms one transfer and rejects another with a reason", async ({
 }) => {
   await sendTransfer("mariana@example.com");
   await sendTransfer("sofia@example.com");
-  await signIn(page, "/back-office/pagos");
+  await signIn(page, "/dinero/pagos");
   await expect(
     page.getByText("Todo el estudio · 2 transferencias esperando revisión"),
   ).toBeVisible();
@@ -72,7 +72,7 @@ test("confirms one transfer and rejects another with a reason", async ({
   ).toBeVisible();
 
   // Decided Payments stay as history under Todos and never open again.
-  await page.goto("/back-office/pagos?status=all");
+  await page.goto("/dinero/pagos?status=all");
   const mariana = page.getByRole("row", { name: /Mariana Peña/ });
   await expect(mariana.getByText("Confirmado")).toBeVisible();
   const sofia = page.getByRole("row", { name: /Sofía Guzmán/ });

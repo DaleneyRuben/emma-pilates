@@ -4,6 +4,7 @@ import { sidebar, signIn } from "./support/session";
 
 // IDN-009 / ADR-0102: the Coordinator runs the schedule, Clients, and Staff
 // from the admin web and never sees an amount; the API refuses the rest.
+// Her rail (ADR-0108) has every destination but Dinero.
 const noAmountOn = async (page: Page) => {
   await page.waitForLoadState("networkidle");
   expect(await page.locator("body").innerText()).not.toContain("Bs");
@@ -18,23 +19,27 @@ test.describe("the Coordinator's admin web", () => {
     // Renata has no Plan, so she is not one of them.
     await expect(
       sidebar(page).getByRole("link", {
-        name: "Para contactar, 3 para contactar",
+        name: "Clientas, 3 para contactar",
       }),
     ).toBeVisible();
     await expect(sidebar(page).getByRole("link")).toHaveText([
+      "Inicio",
       "Horario",
-      "Clientes",
-      "Para contactar3",
-      "Personal",
-      "Indicadores",
-      "Recomendaciones",
+      "3Clientas",
+      "Promociones",
+      "Comentarios",
+      "Estudio",
+      "Informes",
+      "Ajustes",
     ]);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Horario" }),
+      page.getByRole("heading", { level: 1, name: /^Buen/ }),
     ).toBeVisible();
     await noAmountOn(page);
 
-    await sidebar(page).getByRole("link", { name: "Clientes" }).click();
+    await sidebar(page)
+      .getByRole("link", { name: /^Clientas/ })
+      .click();
     await page.getByRole("button", { name: "Mariana Peña" }).click();
     const panel = page.getByRole("dialog", { name: "Mariana Peña" });
     await expect(
@@ -54,7 +59,7 @@ test.describe("the Coordinator's admin web", () => {
     await expect(panel.getByText("+591 70011888")).toBeVisible();
     await page.keyboard.press("Escape");
 
-    await sidebar(page).getByRole("link", { name: "Personal" }).click();
+    await sidebar(page).getByRole("link", { name: "Estudio" }).click();
     await expect(
       page.getByRole("heading", { level: 1, name: "Personal" }),
     ).toBeVisible();
@@ -67,12 +72,12 @@ test.describe("the Coordinator's admin web", () => {
   test("returns money pages to Horario and the API refuses their data", async ({
     page,
   }) => {
-    await signIn(page, "/back-office/pagos", fixtures.coordinator);
+    await signIn(page, "/dinero/pagos", fixtures.coordinator);
 
     await expect(
       page.getByText("Esa sección es solo para administración."),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/\?aviso=sin-acceso$/);
+    await expect(page).toHaveURL(/\/horario\?aviso=sin-acceso$/);
 
     for (const path of [
       "/api/v1/administrator/payments",

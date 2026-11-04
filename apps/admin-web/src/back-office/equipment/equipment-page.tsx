@@ -45,7 +45,7 @@ const nameOf = (piece: EquipmentDto) => equipmentName(piece.kind, piece.number);
 
 function EmptyEquipment({ onCreate }: { onCreate: () => void }) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-2 rounded-marco bg-lino px-6 py-10 text-center">
       <p className="text-texto-secundario">
         Todavía no hay equipos en esta sucursal.
       </p>

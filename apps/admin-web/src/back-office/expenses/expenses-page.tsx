@@ -17,6 +17,7 @@ import {
   expenseTableQueryOptions,
 } from "./expense-queries";
 import type { ExpenseSearch } from "./expense-search";
+import { ExpenseCategoriesEditor } from "./categories-page";
 
 const columns = createColumnHelper<AdminExpenseDto>();
 
@@ -75,6 +76,7 @@ function BranchExpenses({
           : "No hay gastos de esta categoría en esta sucursal."
       }
       panelTitles={{ create: "Nuevo gasto", edit: "Editar gasto" }}
+      panelActions={categoriesAction}
       filter={
         <ListFilter
           label="Categoría"
@@ -109,6 +111,10 @@ function BranchExpenses({
     />
   );
 }
+
+const categoriesAction = [
+  { label: "Editar categorías", render: () => <ExpenseCategoriesEditor /> },
+];
 
 // AW13: the selected Branch's recorded costs, each in one Expense Category.
 export function ExpensesPage({

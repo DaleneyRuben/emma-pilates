@@ -1,8 +1,11 @@
 import { http } from "msw";
 import { branchSuppliesHandler } from "./back-office-fixtures";
+import { clientFileHandlers } from "./client-file-handlers";
 import { activeBranchesHandler } from "./booking-handlers";
+import { coordinatorHomeHandlers, homeHandlers } from "./home-handlers";
 import { apiUrl, jsonResponse, problemResponse } from "./msw";
 import { pendingBadgeHandler } from "./payment-fixtures";
+import { emptyRosterHandler } from "./roster-fixtures";
 import { studioRulesHandler } from "./studio-settings-fixtures";
 
 export const currentSessionPath =
@@ -33,12 +36,13 @@ export const paolaProfile = {
 // reads the active Branches for the selector, and Horario (the landing page)
 // reads an empty week (and no equipment flags) unless a spec says otherwise; the Pagos badge reads no
 // pending transfers and the Insumos badge a Branch without Supplies; the
-// public studio rules (BKM-004) are today's.
+// public studio rules (BKM-004) are today's; a Client file's tabs are empty.
 export const signedInHandlers = () => [
   http.get(apiUrl(currentSessionPath), () => jsonResponse(paolaPrincipal)),
   http.get(apiUrl(staffProfilePath), () => jsonResponse(paolaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  emptyRosterHandler(),
   http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
     jsonResponse([]),
   ),
@@ -48,10 +52,13 @@ export const signedInHandlers = () => [
     jsonResponse({ items: [], totalItems: 0 }),
   ),
   studioRulesHandler(),
+  ...homeHandlers(),
+  ...clientFileHandlers({ payments: true }),
 ];
 
-// IDN-009: Carolina Rivas, the Coordinator (ADR-0102). Her shell reads no
-// money: no Pagos or Insumos badge handler, so such a read fails the spec.
+// IDN-009: Carolina Rivas, the Coordinator (ADR-0102, ADR-0108). Her shell
+// reads no money: no Pagos badge handler, so such a read fails the spec. She
+// runs Insumos, so the low-stock count answers her.
 export const carolinaPrincipal = {
   accountId: "4a7b0c1e-2f3d-5a6b-8c9d-0e1f2a3b4c5d",
   identity: {
@@ -76,12 +83,17 @@ export const coordinatorHandlers = () => [
   http.get(apiUrl(staffProfilePath), () => jsonResponse(carolinaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  emptyRosterHandler(),
   http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
     jsonResponse({ items: [], totalItems: 0 }),
   ),
   http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
     jsonResponse([]),
   ),
+  branchSuppliesHandler(),
+  ...coordinatorHomeHandlers(),
+  // She never reads a Payment, so a sales read fails her spec.
+  ...clientFileHandlers({ payments: false }),
 ];
 
 export const signedOutHandlers = () => [

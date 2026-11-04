@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { signIn } from "./support/session";
 
 const openSimulator = async (page: Page) => {
-  await signIn(page, "/simulador");
+  await signIn(page, "/informes/simulador");
   await expect(
     page.getByRole("heading", { level: 1, name: "Simulador" }),
   ).toBeVisible();
@@ -33,9 +33,9 @@ test("a narrow browser still shows the three horizons", async ({ page }) => {
   await page.getByRole("button", { name: "Abrir menú" }).click();
   await expect(
     page.getByRole("dialog", { name: "Menú" }).getByRole("link", {
-      name: "Simulador",
+      name: "Informes",
     }),
-  ).toBeVisible();
+  ).toHaveAttribute("aria-current", "page");
   await page.keyboard.press("Escape");
   const projection = page.getByRole("region", { name: "Proyección" });
   await expect(

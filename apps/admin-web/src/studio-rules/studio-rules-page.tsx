@@ -1,33 +1,42 @@
-import type { StudioSettingsDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
 import { QueryFailure } from "../components/page/query-failure";
-import { fixedRules, versionLine } from "./studio-rules-format";
+import { useAdminRole } from "../session/admin-role";
+import {
+  configurableRules,
+  fixedRules,
+  versionLine,
+} from "./studio-rules-format";
 import { StudioRulesForm } from "./studio-rules-form";
 import { studioSettingsQueryOptions } from "./studio-rules-queries";
 
-const cardClass =
-  "flex flex-col gap-4 rounded-tarjeta border border-borde bg-blanco p-6 max-md:p-4";
+const cardClass = "flex flex-col gap-4 rounded-marco bg-lino p-6 max-md:p-4";
 
 const conflictMessage =
   "Alguien guardó otras reglas mientras editabas. Te mostramos las actuales: revisa y vuelve a guardar.";
 
-function FixedRules({ settings }: { settings: StudioSettingsDto }) {
+function RuleCard({
+  title,
+  note,
+  rules,
+}: {
+  title: string;
+  note: string;
+  rules: readonly { label: string; value: string }[];
+}) {
   const titleId = useId();
   return (
     <section aria-labelledby={titleId} className={cardClass}>
       <div className="flex flex-col gap-1">
         <h2 id={titleId} className="text-titulo-panel text-texto">
-          Reglas fijas
+          {title}
         </h2>
-        <p className="text-ayuda text-texto-tenue">
-          Solo cambian con una actualización del sistema.
-        </p>
+        <p className="text-ayuda text-texto-tenue">{note}</p>
       </div>
       <dl className="flex flex-col divide-y divide-divisor">
-        {fixedRules(settings).map((rule) => (
+        {rules.map((rule) => (
           <div
             key={rule.label}
             className="flex justify-between gap-6 py-2.5 max-md:flex-col max-md:gap-0.5"
@@ -42,10 +51,11 @@ function FixedRules({ settings }: { settings: StudioSettingsDto }) {
 }
 
 // AW36 «Reglas del estudio» (BKM-004, ADR-0101): the Administrator edits the
-// configurable Studio Settings and sees the fixed ones. Opened from the
-// account menu (AW33).
+// configurable Studio Settings and sees the fixed ones. The Coordinator reads
+// both without a form and without amounts (ADR-0108).
 export function StudioRulesPage() {
   const settings = useQuery(studioSettingsQueryOptions());
+  const edits = useAdminRole() === "administrator";
   const [notice, setNotice] = useState<"saved" | "conflict" | null>(null);
   const formTitleId = useId();
 
@@ -75,26 +85,38 @@ export function StudioRulesPage() {
         />
       ) : (
         <>
-          <section aria-labelledby={formTitleId} className={cardClass}>
-            <div className="flex flex-col gap-1">
-              <h2 id={formTitleId} className="text-titulo-panel text-texto">
-                Puedes cambiar
-              </h2>
-              <p className="text-ayuda text-texto-tenue">
-                {versionLine(settings.data)}
-              </p>
-            </div>
-            <StudioRulesForm
-              key={settings.data.version}
-              settings={settings.data}
-              onSaved={() => setNotice("saved")}
-              onConflict={() => {
-                setNotice("conflict");
-                void settings.refetch();
-              }}
+          {edits ? (
+            <section aria-labelledby={formTitleId} className={cardClass}>
+              <div className="flex flex-col gap-1">
+                <h2 id={formTitleId} className="text-titulo-panel text-texto">
+                  Puedes cambiar
+                </h2>
+                <p className="text-ayuda text-texto-tenue">
+                  {versionLine(settings.data)}
+                </p>
+              </div>
+              <StudioRulesForm
+                key={settings.data.version}
+                settings={settings.data}
+                onSaved={() => setNotice("saved")}
+                onConflict={() => {
+                  setNotice("conflict");
+                  void settings.refetch();
+                }}
+              />
+            </section>
+          ) : (
+            <RuleCard
+              title="Reglas configurables"
+              note={`${versionLine(settings.data)}. Solo administración las cambia.`}
+              rules={configurableRules(settings.data)}
             />
-          </section>
-          <FixedRules settings={settings.data} />
+          )}
+          <RuleCard
+            title="Reglas fijas"
+            note="Solo cambian con una actualización del sistema."
+            rules={fixedRules(settings.data)}
+          />
         </>
       )}
     </div>

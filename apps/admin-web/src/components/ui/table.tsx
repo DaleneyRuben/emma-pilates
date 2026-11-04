@@ -8,7 +8,8 @@ export function Table({ className, ...props }: ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
-      className="w-full overflow-hidden rounded-tarjeta border border-borde bg-blanco max-md:border-0 max-md:bg-transparent"
+      // Follow-up 233: a table is a Lino card, with no border or shadow.
+      className="w-full overflow-hidden rounded-marco bg-lino max-md:bg-transparent"
     >
       <table
         data-slot="table"
@@ -26,7 +27,7 @@ export function TableHeader({ className, ...props }: ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("bg-superficie-sutil max-md:hidden", className)}
+      className={cn("max-md:hidden", className)}
       {...props}
     />
   );
@@ -47,7 +48,7 @@ export function TableRow({ className, ...props }: ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b border-divisor transition-colors last:border-b-0 hover:bg-hover-fila max-md:block max-md:rounded-tarjeta max-md:border max-md:border-borde max-md:bg-blanco max-md:p-3",
+        "border-t border-divisor transition-colors hover:bg-hover-fila max-md:block max-md:rounded-marco max-md:border-0 max-md:bg-lino max-md:p-4",
         className,
       )}
       {...props}
@@ -60,7 +61,7 @@ export function TableHead({ className, ...props }: ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-9 px-3 text-left align-middle text-cabecera-tabla font-medium tracking-[0.14em] text-texto-tenue uppercase",
+        "h-12 px-5 text-left align-middle text-pie font-medium tracking-[0.12em] whitespace-nowrap text-texto-tenue uppercase",
         className,
       )}
       {...props}
@@ -73,7 +74,7 @@ export function TableCell({ className, ...props }: ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-3 py-2.5 align-middle max-md:flex max-md:empty:hidden max-md:justify-between max-md:gap-4 max-md:px-0 max-md:py-1.5 max-md:before:text-cabecera-tabla max-md:before:font-medium max-md:before:tracking-[0.14em] max-md:before:text-texto-tenue max-md:before:uppercase max-md:before:content-[attr(data-label)]",
+        "px-5 py-3 align-middle max-md:flex max-md:empty:hidden max-md:justify-between max-md:gap-4 max-md:px-0 max-md:py-1.5 max-md:before:text-cabecera-tabla max-md:before:font-medium max-md:before:tracking-[0.14em] max-md:before:text-texto-tenue max-md:before:uppercase max-md:before:content-[attr(data-label)]",
         className,
       )}
       {...props}

@@ -1,7 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { StaffPage } from "./staff-page";
 
-const route = getRouteApi("/authenticated/back-office/personal");
+const route = getRouteApi("/authenticated/estudio/personal");
 
 export function StaffRoute() {
   const navigate = route.useNavigate();

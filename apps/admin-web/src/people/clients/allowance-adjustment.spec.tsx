@@ -44,7 +44,7 @@ describe("AW22 courtesy and class return", () => {
   });
 
   it("records a courtesy class on the Client's current Plan", async () => {
-    const { user } = renderAdmin("/back-office/clientes");
+    const { user } = renderAdmin("/clientas");
     await user.click(
       await screen.findByRole("button", { name: "Lucía Fernández" }),
     );
@@ -75,7 +75,7 @@ describe("AW22 courtesy and class return", () => {
   });
 
   it("records a returned class", async () => {
-    const { user } = renderAdmin("/back-office/clientes");
+    const { user } = renderAdmin("/clientas");
     await user.click(
       await screen.findByRole("button", { name: "Lucía Fernández" }),
     );

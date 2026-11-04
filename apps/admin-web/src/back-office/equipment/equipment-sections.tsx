@@ -40,7 +40,7 @@ function KindSection({
         <span className="text-texto-tenue tabular">· {items.length}</span>
       </h2>
       {items.length === 0 ? (
-        <p className="rounded-tarjeta border border-borde bg-blanco px-4 py-3 text-nota text-texto-tenue">
+        <p className="rounded-marco bg-lino px-4 py-3 text-nota text-texto-tenue">
           {`Sin ${kindPlural[kind].toLowerCase()} registrados.`}
         </p>
       ) : (

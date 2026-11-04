@@ -66,7 +66,7 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
 
   it("opens on the current Bolivia month under Insumos with a way back", async () => {
     server.use(history(() => jsonResponse(withdrawalPage([]))));
-    renderAdmin("/back-office/insumos/retiros");
+    renderAdmin("/estudio/insumos/retiros");
     await heading();
 
     expect(await screen.findByText("Sin retiros en este rango.")).toBeVisible();
@@ -84,7 +84,7 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
     expect(reads[0]?.has("supplyId")).toBe(false);
     expect(
       screen.getByRole("link", { name: "Volver a Insumos" }),
-    ).toHaveAttribute("href", "/back-office/insumos");
+    ).toHaveAttribute("href", "/estudio/insumos");
     expect(screen.getByRole("link", { name: "Insumos" })).toHaveAttribute(
       "aria-current",
       "page",
@@ -96,7 +96,7 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
 
   it("lists a month's Withdrawals newest first with the units per Supply", async () => {
     server.use(history(() => jsonResponse(september)));
-    renderAdmin("/back-office/insumos/retiros?month=2026-09");
+    renderAdmin("/estudio/insumos/retiros?month=2026-09");
 
     const paperRow = await rowOf("Papel higiénico");
     const quantity = within(paperRow).getByRole("cell", { name: "2" });
@@ -126,7 +126,7 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
       ),
     );
     const { router, user } = renderAdmin(
-      "/back-office/insumos/retiros?month=2026-09",
+      "/estudio/insumos/retiros?month=2026-09",
     );
     await rowOf("Papel higiénico");
 
@@ -181,7 +181,7 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
       history(() => jsonResponse(september)),
     );
     const { router, user } = renderAdmin(
-      `/back-office/insumos/retiros?month=2026-09&supplyId=${detergent.id}`,
+      `/estudio/insumos/retiros?month=2026-09&supplyId=${detergent.id}`,
     );
     await waitFor(() =>
       expect(screen.getByLabelText("Insumo")).toHaveValue(detergent.id),
@@ -209,7 +209,7 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
 
   it("reads the Branch the selector names", async () => {
     server.use(history(() => jsonResponse(september)));
-    const { user } = renderAdmin("/back-office/insumos/retiros?month=2026-09");
+    const { user } = renderAdmin("/estudio/insumos/retiros?month=2026-09");
     await rowOf("Papel higiénico");
 
     await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
@@ -225,7 +225,7 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
 
   it("offers a retry when the history cannot load", async () => {
     server.use(history(() => problemResponse(500, "unexpected_error")));
-    renderAdmin("/back-office/insumos/retiros");
+    renderAdmin("/estudio/insumos/retiros");
     expect(
       await screen.findByText(
         "No pudimos cargar los retiros.",
@@ -240,7 +240,7 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
     server.use(
       history(() => problemResponse(403, "back_office_access_denied")),
     );
-    renderAdmin("/back-office/insumos/retiros");
+    renderAdmin("/estudio/insumos/retiros");
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
@@ -257,7 +257,7 @@ describe("AW31 on a narrow browser", () => {
 
   it("labels each card's cells", async () => {
     server.use(history(() => jsonResponse(september)));
-    renderAdmin("/back-office/insumos/retiros?month=2026-09");
+    renderAdmin("/estudio/insumos/retiros?month=2026-09");
     const row = await rowOf("Detergente");
     expect(
       within(row).getByRole("cell", { name: "21/09/2026 · 11:00" }),

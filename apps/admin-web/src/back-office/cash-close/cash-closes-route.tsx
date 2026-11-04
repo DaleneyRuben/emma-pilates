@@ -1,7 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { CashClosesPage } from "./cash-closes-page";
 
-const route = getRouteApi("/authenticated/back-office/caja");
+const route = getRouteApi("/authenticated/dinero/caja");
 
 export function CashClosesRoute() {
   const navigate = route.useNavigate();

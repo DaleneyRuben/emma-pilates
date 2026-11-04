@@ -38,7 +38,8 @@ test.describe("authorization at the backend boundary", () => {
     expect(await refused.json()).toMatchObject({ code: "untrusted_origin" });
 
     // Nothing changed: the session still opens every page.
-    await sidebar(page).getByRole("link", { name: "Planes" }).click();
+    await sidebar(page).getByRole("link", { name: "Ajustes" }).click();
+    await page.getByRole("link", { name: "Planes" }).click();
     await expect(
       page.getByRole("heading", { level: 1, name: "Planes" }),
     ).toBeVisible();

@@ -35,7 +35,7 @@ const staffHandlers = (respond: () => Response) => [
 ];
 
 const openCreate = async () => {
-  const rendered = renderAdmin("/back-office/personal");
+  const rendered = renderAdmin("/estudio/personal");
   await screen.findByRole("cell", { name: /Emma Vargas/ });
   await rendered.user.click(
     screen.getByRole("button", { name: "Nuevo miembro" }),

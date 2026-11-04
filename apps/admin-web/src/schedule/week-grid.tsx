@@ -49,7 +49,7 @@ export function WeekGrid({
     <div
       role="table"
       aria-label="Semana"
-      className="overflow-hidden rounded-tarjeta border border-borde bg-blanco"
+      className="overflow-hidden rounded-marco bg-lino"
     >
       <div
         role="row"

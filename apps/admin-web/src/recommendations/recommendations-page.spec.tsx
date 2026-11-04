@@ -8,9 +8,8 @@ import {
   server,
   useMockServer,
 } from "../test/msw";
-import { renderAdmin } from "../test/render-admin";
-import { signedInHandlers } from "../test/session-handlers";
-import { RecommendationsPage } from "./recommendations-page";
+import userEvent from "@testing-library/user-event";
+import { RecommendationsSection } from "./recommendations-page";
 
 const listPath = "/api/v1/administrator/recommendations";
 
@@ -37,22 +36,29 @@ const list = (recommendations: unknown[]) =>
     jsonResponse({ month: "2026-10", recommendations }),
   );
 
-describe("AW44 Recomendaciones", () => {
-  useMockServer();
-  beforeEach(() => {
-    server.use(...signedInHandlers());
+// AW44 as Informes › El mes draws it, for the month the page shows.
+const renderSection = (readOnly = false) => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
   });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <RecommendationsSection month="2026-10" readOnly={readOnly} />
+    </QueryClientProvider>,
+  );
+  return { user: userEvent.setup() };
+};
+
+describe("AW44 Recomendaciones del mes", () => {
+  useMockServer();
 
   it("lists the month's findings and discards one", async () => {
     server.use(list([finding, inactive]));
-    const { user } = renderAdmin("/recomendaciones");
+    const { user } = renderSection();
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Recomendaciones" }),
+      screen.getByRole("region", { name: "Recomendaciones del mes" }),
     ).toBeVisible();
-    expect(
-      screen.getByRole("link", { name: "Recomendaciones" }),
-    ).toHaveAttribute("aria-current", "page");
     expect(await screen.findByText(finding.detail)).toBeVisible();
     expect(screen.getByText(inactive.detail)).toBeVisible();
     expect(screen.getAllByText("Nueva")).toHaveLength(2);
@@ -73,14 +79,7 @@ describe("AW44 Recomendaciones", () => {
 
   it("hides Descartar when the page is read only", async () => {
     server.use(list([finding]));
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    });
-    render(
-      <QueryClientProvider client={queryClient}>
-        <RecommendationsPage readOnly />
-      </QueryClientProvider>,
-    );
+    renderSection(true);
 
     expect(await screen.findByText(finding.detail)).toBeVisible();
     expect(screen.queryByRole("button", { name: "Descartar" })).toBeNull();
@@ -88,7 +87,7 @@ describe("AW44 Recomendaciones", () => {
 
   it("says the month has nothing to review", async () => {
     server.use(list([]));
-    renderAdmin("/recomendaciones");
+    renderSection();
 
     expect(await screen.findByText("Nada que revisar este mes.")).toBeVisible();
   });
@@ -99,7 +98,7 @@ describe("AW44 Recomendaciones", () => {
         problemResponse(500, "no_se_pudo", { detail: "No se pudo" }),
       ),
     );
-    renderAdmin("/recomendaciones");
+    renderSection();
 
     expect(
       await screen.findByText("No pudimos cargar las recomendaciones."),
@@ -109,7 +108,7 @@ describe("AW44 Recomendaciones", () => {
 
   it("shows the loading notice before the list arrives", async () => {
     server.use(http.get(apiUrl(listPath), () => new Promise(() => undefined)));
-    renderAdmin("/recomendaciones");
+    renderSection();
 
     expect(
       await screen.findByText("Cargando las recomendaciones…"),

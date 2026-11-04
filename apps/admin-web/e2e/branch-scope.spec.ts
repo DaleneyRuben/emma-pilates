@@ -6,7 +6,7 @@ import { signIn } from "./support/session";
 test("the Branch selector scopes Horario to the chosen Branch", async ({
   page,
 }) => {
-  await signIn(page);
+  await signIn(page, "/horario");
   // Next week is materialized in full whatever today's weekday is.
   await page.getByRole("button", { name: "Semana siguiente" }).click();
 
@@ -42,5 +42,5 @@ test("the Branch selector scopes Horario to the chosen Branch", async ({
     0,
   );
   // The week stays where it was: switching Branch never navigates.
-  await expect(page).toHaveURL(/\/\?week=\d{4}-\d{2}-\d{2}$/);
+  await expect(page).toHaveURL(/\/horario\?week=\d{4}-\d{2}-\d{2}$/);
 });

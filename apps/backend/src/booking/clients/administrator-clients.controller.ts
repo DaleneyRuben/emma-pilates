@@ -29,10 +29,12 @@ import { parseUuid } from '../booking.dto';
 import type {
   AdministratorClientDetail,
   AdministratorClientPage,
+  ClientDirectoryQuery,
 } from './administrator-clients';
 import {
   AdminClientDetailDto,
   AdminClientPageDto,
+  clientDirectoryFilters,
   parseClientDirectoryQuery,
   parseUpdateAdminClientProfile,
   UpdateAdminClientProfileDto,
@@ -44,7 +46,7 @@ export const administratorClientOperations = Symbol(
 
 export type AdministratorClientOperations = {
   list: (
-    query: { page: number; pageSize: number; query?: string },
+    query: ClientDirectoryQuery,
     principal: AuthenticatedPrincipal,
   ) => Promise<AdministratorClientPage>;
   read: (
@@ -59,6 +61,14 @@ export type AdministratorClientOperations = {
 };
 
 const civil = (date: Date): string => date.toISOString().slice(0, 10);
+
+const toPageDto = (page: AdministratorClientPage): AdminClientPageDto => ({
+  ...page,
+  items: page.items.map((item) => ({
+    ...item,
+    planEndsOn: item.planEndsOn === null ? null : civil(item.planEndsOn),
+  })),
+});
 
 const toDetailDto = (
   client: AdministratorClientDetail,
@@ -122,6 +132,13 @@ export class AdministratorClientsController {
     required: false,
     description: 'Name, email, or phone fragment, accents and case ignored',
   })
+  @ApiQuery({
+    name: 'filter',
+    required: false,
+    enum: clientDirectoryFilters,
+    description:
+      'One chip of Clientas › Todas: the plan state or a live Fundadora place',
+  })
   @ApiOkResponse({ type: AdminClientPageDto })
   @Header('Cache-Control', 'no-store')
   async list(
@@ -130,7 +147,7 @@ export class AdministratorClientsController {
   ): Promise<AdminClientPageDto> {
     const input = parsed(parseClientDirectoryQuery(query), 'Invalid filters');
     const principal = await this.authenticate(authorization);
-    return run(() => this.operations.list(input, principal));
+    return toPageDto(await run(() => this.operations.list(input, principal)));
   }
 
   @Get(':clientId')

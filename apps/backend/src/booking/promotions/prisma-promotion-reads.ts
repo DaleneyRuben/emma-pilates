@@ -11,7 +11,7 @@ import {
   type PublicImageVariant,
 } from '../../uploads/image-asset-attachments';
 import type { ImageVariantKind } from '../../uploads/image-variants';
-import { requireAdministrator } from '../administration/administration-errors';
+import { requireOperations } from '../administration/administration-errors';
 import {
   PromotionError,
   promotionState,
@@ -108,7 +108,7 @@ export const createPrismaPromotionReads = (
     listPromotions: async (
       principal: AuthenticatedPrincipal,
     ): Promise<AdminPromotionView[]> => {
-      requireAdministrator(principal);
+      requireOperations(principal);
       const rows = await prisma.promotion.findMany({
         where: { archivedAt: null },
         orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }],
@@ -123,7 +123,7 @@ export const createPrismaPromotionReads = (
       command: { promotionId: string; kind: PromotionImageKind },
       principal: AuthenticatedPrincipal,
     ): Promise<{ objectKey: string; mediaType: string }> => {
-      requireAdministrator(principal);
+      requireOperations(principal);
       const row = await prisma.promotion.findUnique({
         where: { id: command.promotionId },
         select: {

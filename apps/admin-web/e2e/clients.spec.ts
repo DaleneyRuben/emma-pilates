@@ -9,7 +9,7 @@ test("refuses to close a Client with a transfer in review, then closes another",
   page,
 }) => {
   await sendTransfer("sofia@example.com");
-  await signIn(page, "/back-office/clientes");
+  await signIn(page, "/clientas");
   await expect(page.getByText("Mostrando 6 de 6 clientas")).toBeVisible();
 
   await page.getByRole("button", { name: "Sofía Guzmán" }).click();
@@ -26,7 +26,7 @@ test("refuses to close a Client with a transfer in review, then closes another",
   ).toBeVisible();
   await expect(
     refused.getByRole("link", { name: "Ir a Pagos" }),
-  ).toHaveAttribute("href", "/back-office/pagos");
+  ).toHaveAttribute("href", "/dinero/pagos");
   await expect(
     refused.getByRole("button", { name: "Cerrar cuenta" }),
   ).toBeDisabled();

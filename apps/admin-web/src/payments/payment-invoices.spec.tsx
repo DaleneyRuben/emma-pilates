@@ -85,7 +85,7 @@ describe("AW28 Pagos invoices", () => {
         ),
       ),
     );
-    renderAdmin("/back-office/pagos?status=all");
+    renderAdmin("/dinero/pagos?status=all");
 
     const pending = await rowOf(/Sofía Guzmán/);
     expect(
@@ -127,7 +127,7 @@ describe("AW28 Pagos invoices", () => {
         ),
       ),
     );
-    const { router, user } = renderAdmin("/back-office/pagos");
+    const { router, user } = renderAdmin("/dinero/pagos");
     await rowOf(/Sofía Guzmán/);
 
     await user.selectOptions(
@@ -145,7 +145,7 @@ describe("AW28 Pagos invoices", () => {
 
   it("says when no sale is waiting for its invoice", async () => {
     server.use(paymentTable(() => jsonResponse(paymentPage([]))));
-    renderAdmin("/back-office/pagos?status=all&invoice=unissued");
+    renderAdmin("/dinero/pagos?status=all&invoice=unissued");
 
     const table = await screen.findByRole("table");
     expect(
@@ -195,7 +195,7 @@ describe("AW28 Pagos invoices", () => {
         },
       ),
     );
-    const { user } = renderAdmin("/back-office/pagos?status=all");
+    const { user } = renderAdmin("/dinero/pagos?status=all");
     await rowOf(/Ana Pérez/);
 
     await user.click(
@@ -222,7 +222,7 @@ describe("AW28 Pagos invoices", () => {
         () => problemResponse(409, "payment_not_confirmed"),
       ),
     );
-    const { user } = renderAdmin("/back-office/pagos?status=all");
+    const { user } = renderAdmin("/dinero/pagos?status=all");
     await rowOf(/Ana Pérez/);
 
     await user.click(
@@ -281,7 +281,7 @@ describe("AW28 Pagos invoices", () => {
         ),
       );
       const { user } = renderAdmin(
-        "/back-office/pagos?status=confirmed&invoice=unissued",
+        "/dinero/pagos?status=confirmed&invoice=unissued",
       );
       await rowOf(/Ana Pérez/);
 

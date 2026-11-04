@@ -4,8 +4,13 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ListAdminClientsFilter } from "./listAdminClientsFilter";
 
 export type ListAdminClientsParams = {
+  /**
+   * One chip of Clientas › Todas: the plan state or a live Fundadora place
+   */
+  filter?: ListAdminClientsFilter;
   /**
    * Name, email, or phone fragment, accents and case ignored
    */

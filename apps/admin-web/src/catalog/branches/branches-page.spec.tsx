@@ -47,7 +47,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
 
   it("shows loading, then the Branches with their addresses", async () => {
     server.use(branchTable(() => jsonResponse(page([centro, equipetrol]))));
-    renderAdmin("/catalogo/sucursales");
+    renderAdmin("/ajustes/sucursales");
     await heading();
 
     expect(screen.getByText("Cargando sucursales…")).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
         ),
       ),
     );
-    const { router, user } = renderAdmin("/catalogo/sucursales?page=2");
+    const { router, user } = renderAdmin("/ajustes/sucursales?page=2");
     await screen.findByRole("cell", { name: "Centro" });
     expect(tableReads.at(-1)?.get("page")).toBe("2");
 
@@ -91,7 +91,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
 
   it("says when no Branch matches and when the table cannot load", async () => {
     server.use(branchTable(() => jsonResponse(page([]))));
-    const { user } = renderAdmin("/catalogo/sucursales");
+    const { user } = renderAdmin("/ajustes/sucursales");
     expect(
       await screen.findByText("No hay sucursales con este filtro."),
     ).toBeInTheDocument();
@@ -113,7 +113,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
     server.use(
       branchTable(() => problemResponse(403, "administration_access_denied")),
     );
-    renderAdmin("/catalogo/sucursales");
+    renderAdmin("/ajustes/sucursales");
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
@@ -133,7 +133,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
         return jsonResponse(norteBranch, 201);
       }),
     );
-    const { user } = renderAdmin("/catalogo/sucursales");
+    const { user } = renderAdmin("/ajustes/sucursales");
     await screen.findByRole("cell", { name: "Centro" });
 
     await user.click(screen.getByRole("button", { name: "Nueva sucursal" }));
@@ -178,7 +178,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
         return jsonResponse({ ...centro, name: "Centro histórico" });
       }),
     );
-    const { user } = renderAdmin("/catalogo/sucursales");
+    const { user } = renderAdmin("/ajustes/sucursales");
 
     await user.click(await screen.findByRole("button", { name: "Centro" }));
     const panel = await screen.findByRole("dialog", {
@@ -212,7 +212,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
           : jsonResponse({ ...centro, archivedAt: "2026-09-23T12:00:00.000Z" });
       }),
     );
-    const { user } = renderAdmin("/catalogo/sucursales");
+    const { user } = renderAdmin("/ajustes/sucursales");
     await user.click(await screen.findByRole("button", { name: "Centro" }));
     const panel = await screen.findByRole("dialog", {
       name: "Editar sucursal",
@@ -263,7 +263,7 @@ describe("AW19 Sucursales on a narrow browser", () => {
 
   it("opens the Branch form as a full-screen sheet", async () => {
     server.use(branchTable(() => jsonResponse(page([centro]))));
-    const { user } = renderAdmin("/catalogo/sucursales");
+    const { user } = renderAdmin("/ajustes/sucursales");
     await screen.findByRole("cell", { name: "Centro" });
 
     await user.click(screen.getByRole("button", { name: "Nueva sucursal" }));
@@ -277,7 +277,7 @@ describe("AW19 Sucursales on a narrow browser", () => {
       branchTable(() => jsonResponse(page([centro]))),
       http.post(apiUrl(branchesPath), () => HttpResponse.error()),
     );
-    const { user } = renderAdmin("/catalogo/sucursales");
+    const { user } = renderAdmin("/ajustes/sucursales");
     await screen.findByRole("cell", { name: "Centro" });
     await user.click(screen.getByRole("button", { name: "Nueva sucursal" }));
     const panel = await screen.findByRole("dialog", { name: "Nueva sucursal" });

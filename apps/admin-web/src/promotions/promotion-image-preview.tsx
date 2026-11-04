@@ -45,7 +45,7 @@ export function PromotionImagePreview({
 
   return (
     <figure data-crop={crop} className="flex flex-col gap-1">
-      <div className="flex justify-center overflow-hidden rounded-control border border-borde bg-blanco">
+      <div className="flex justify-center overflow-hidden rounded-control bg-lino">
         <div style={box} className="relative max-w-full">
           <img
             src={image.previewUrl}

@@ -1,65 +1,84 @@
 import { useRouterState } from "@tanstack/react-router";
-import { Menu } from "lucide-react";
+import { Building2, Search } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "../components/ui/sheet";
-import { AccountCell } from "./account/account-cell";
 import { findNavigationItem } from "../app/navigation";
+import { AccountCell } from "./account/account-cell";
 import { BranchSelector } from "./branch/branch-selector";
-import { SidebarNav } from "./sidebar-nav";
+import { MenuDrawer } from "./rail/menu-drawer";
+import { GlobalSearch } from "./search/global-search";
 import { useIsNarrowViewport } from "./use-media-query";
+import { Wordmark } from "./wordmark";
 
-function MenuDrawer() {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Abrir menú">
-          <Menu size={20} strokeWidth={1.6} aria-hidden="true" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="overflow-y-auto">
-        <SheetTitle className="sr-only">Menú</SheetTitle>
-        <div className="flex h-14 items-center px-6 font-serif text-titulo-2 text-texto">
-          Emma
-        </div>
-        <SidebarNav onNavigate={() => setOpen(false)} />
-      </SheetContent>
-    </Sheet>
-  );
-}
-
-export function TopBar() {
+/**
+ * The Branch cell: the selector on a Branch page, «Todo el estudio» on a
+ * studio-wide one (follow-up 233), and a note where the page brings its own
+ * selector (AW16).
+ */
+export function BranchCell() {
   const narrow = useIsNarrowViewport();
-  const ownBranchFilter = useRouterState({
-    select: (state) =>
-      findNavigationItem(state.location.pathname)?.ownBranchFilter === true,
+  const item = useRouterState({
+    select: (state) => findNavigationItem(state.location.pathname),
   });
 
-  return (
-    <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-borde bg-blanco px-4 lg:px-6">
-      {narrow ? (
-        <>
+  if (item?.ownBranchFilter === true) {
+    return narrow ? null : (
+      <p className="text-nota text-tenue">
+        El reporte usa su propio filtro de sucursal
+      </p>
+    );
+  }
+  if (item?.studioWide === true) {
+    return (
+      <span className="flex h-11 items-center gap-2 rounded-tarjeta bg-lino px-3.5 text-cuerpo text-texto">
+        <Building2
+          size={20}
+          strokeWidth={1.6}
+          aria-hidden="true"
+          className="text-primario"
+        />
+        Todo el estudio
+      </span>
+    );
+  }
+  return <BranchSelector />;
+}
+
+// P01: the wordmark, the global search, the Branch cell and the signed-in
+// person on Marfil, with no bar of its own. P01d: at phone width the menu
+// button, the wordmark, a search button and the avatar.
+export function TopBar() {
+  const narrow = useIsNarrowViewport();
+  const [searching, setSearching] = useState(false);
+
+  if (narrow) {
+    return (
+      <header className="sticky top-0 z-40 flex flex-col bg-superficie">
+        <div className="flex h-16 items-center gap-2 px-3">
           <MenuDrawer />
-          <span className="font-serif text-titulo-2 text-texto">Emma</span>
-        </>
-      ) : null}
-      <div className="ml-auto flex items-center gap-2">
-        {!ownBranchFilter ? (
-          <BranchSelector />
-        ) : narrow ? null : (
-          <p className="text-nota text-texto-tenue">
-            El reporte usa su propio filtro de sucursal
-          </p>
-        )}
-        <AccountCell />
-      </div>
+          <Wordmark small className="flex-1 pl-1" />
+          <button
+            type="button"
+            aria-label="Buscar"
+            aria-expanded={searching}
+            onClick={() => setSearching((open) => !open)}
+            className="inline-flex size-11 items-center justify-center rounded-tarjeta bg-lino text-primario focus-visible:shadow-foco"
+          >
+            <Search size={22} strokeWidth={1.6} aria-hidden="true" />
+          </button>
+          <AccountCell />
+        </div>
+        {searching ? <GlobalSearch className="px-3 pb-3" /> : null}
+      </header>
+    );
+  }
+
+  return (
+    <header className="sticky top-0 z-40 flex flex-wrap items-center gap-4 bg-superficie px-10 py-5">
+      <Wordmark />
+      <GlobalSearch className="max-w-[560px] flex-[1_1_360px]" />
+      <span className="flex-1" />
+      <BranchCell />
+      <AccountCell />
     </header>
   );
 }

@@ -200,30 +200,19 @@ describe("AW26 Referidos on a desktop browser", () => {
     ).toBeInTheDocument();
   });
 
-  it("stays studio-wide when the Branch selector changes", async () => {
+  it("is studio-wide: «Todo el estudio», and reads no Branch", async () => {
     server.use(
       referralTable(() => jsonResponse(referralPage([andreaReferredCamila]))),
     );
-    const { user } = renderAdmin(path);
+    renderAdmin(path);
     await screen.findByRole("cell", { name: /Camila Vargas Ortiz/ });
 
-    await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
-    const popover = await screen.findByRole("dialog", { name: "Sucursal" });
     expect(
-      within(popover).getByText(
-        "Esta página no se filtra por sucursal — los referidos son del estudio, no de una sede.",
-      ),
-    ).toBeInTheDocument();
-    await user.click(
-      within(popover).getByRole("option", { name: /Equipetrol/ }),
-    );
-
-    expect(
-      await screen.findByRole("button", { name: "Sucursal Equipetrol" }),
+      within(screen.getByRole("banner")).getByText("Todo el estudio"),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("cell", { name: /Camila Vargas Ortiz/ }),
-    ).toBeVisible();
+      screen.queryByRole("button", { name: /^Sucursal/ }),
+    ).not.toBeInTheDocument();
     expect(reads).toHaveLength(1);
     expect(reads[0]?.has("branchId")).toBe(false);
   });

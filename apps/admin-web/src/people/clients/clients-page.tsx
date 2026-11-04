@@ -1,78 +1,37 @@
-import type { AdminClientDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
-import { createColumnHelper } from "@tanstack/react-table";
-import { CatalogPage, RowOpener } from "../../catalog/catalog-page";
-import { useAdminRole } from "../../session/admin-role";
+import { CatalogPage } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { countFormat } from "../../components/table/pagination";
 import { SearchFilter } from "../../components/table/search-filter";
-import { StatusPill } from "../../components/ui/status-pill";
+import { useAdminRole } from "../../session/admin-role";
 import type { ClientSearch } from "../people-search";
+import { clientColumns } from "./client-columns";
+import { ClientFilterChips } from "./client-filter-chips";
 import { clientTableQueryOptions } from "./client-queries";
 import { ClientDetailPanel } from "./client-detail-panel";
+import { founderPlacesQueryOptions } from "./founder-places-query";
 
 // Follow-up 28: every phrase that counts people is feminine.
 const clientas = (count: number) =>
   `${countFormat.format(count)} ${count === 1 ? "clienta" : "clientas"}`;
+const fundadoras = (count: number) =>
+  `${countFormat.format(count)} ${count === 1 ? "fundadora" : "fundadoras"}`;
+
+// The old Fundadoras page's subtitle, under the Fundadora chip for the
+// Administrator only (ADR-0102, ADR-0108).
+function FounderPlaces() {
+  const places = useQuery(founderPlacesQueryOptions());
+  if (places.data === undefined) return null;
+  return (
+    <p className="text-nota text-texto-tenue">
+      {countFormat.format(places.data.granted)} de{" "}
+      {countFormat.format(places.data.places)} lugares de fundadora otorgados
+    </p>
+  );
+}
 
 const origin =
   "Las cuentas se crean desde la app del personal o cuando la clienta se registra.";
-
-const columns = createColumnHelper<AdminClientDto>();
-
-const clientColumns = (open: (row: AdminClientDto) => void) => [
-  columns.accessor("name", {
-    header: "Nombre",
-    cell: ({ row }) => (
-      <RowOpener label={row.original.name} onOpen={() => open(row.original)} />
-    ),
-  }),
-  columns.accessor("email", {
-    header: "Contacto",
-    cell: ({ row }) => (
-      <span className="flex flex-col text-nota text-texto-secundario">
-        <span>{row.original.email}</span>
-        {row.original.phone === null ? null : (
-          <span className="text-texto-muy-tenue tabular">
-            {row.original.phone}
-          </span>
-        )}
-      </span>
-    ),
-  }),
-  columns.accessor("planName", {
-    header: "Plan",
-    cell: ({ row }) => {
-      const plan = row.original.planName;
-      if (plan !== null) {
-        return <span className="text-texto-secundario">{plan}</span>;
-      }
-      // expired had a Plan; none never bought one (AdminClientDto.subscriptionStatus).
-      return (
-        <span className="text-texto-muy-tenue">
-          {row.original.subscriptionStatus === "expired"
-            ? "Vencido"
-            : "Sin plan"}
-        </span>
-      );
-    },
-  }),
-  columns.accessor("subscriptionStatus", {
-    header: "Estado",
-    cell: ({ getValue }) => {
-      switch (getValue()) {
-        case "active":
-          return <StatusPill tone="exito">Activo</StatusPill>;
-        case "expired":
-          return <StatusPill tone="error">Expirado</StatusPill>;
-        default:
-          // Never bought a Plan: nothing expired (follow-up 54).
-          return <StatusPill tone="neutral">Sin plan</StatusPill>;
-      }
-    },
-  }),
-];
 
 function EmptyDirectory({ searching }: { searching: boolean }) {
   return (
@@ -94,6 +53,8 @@ function EmptyDirectory({ searching }: { searching: boolean }) {
 
 // AW21 with follow-ups 25 and 28: a read-only directory of every Client for
 // support lookups; accounts are born in the Staff app or by registration.
+// Follow-up 232 (WEB-040): chips for the plan state and Fundadora, and the
+// columns «Le quedan», «Vence», and «Invitada por».
 export function ClientsPage({
   search,
   onSearchChange,
@@ -102,8 +63,8 @@ export function ClientsPage({
   onSearchChange: SearchChange<ClientSearch>;
 }) {
   const query = useQuery(clientTableQueryOptions(search));
-  const role = useAdminRole();
   const studio = query.data?.studioClientCount;
+  const role = useAdminRole();
 
   return (
     <CatalogPage
@@ -111,30 +72,29 @@ export function ClientsPage({
       subtitle={
         query.data === undefined
           ? undefined
-          : `${clientas(query.data.studioClientCount)} · ${countFormat.format(query.data.activePlanClientCount)} con plan activo`
+          : `${clientas(query.data.studioClientCount)} · ${countFormat.format(query.data.activePlanClientCount)} con plan activo · ${fundadoras(query.data.founderClientCount)}`
       }
       loadingMessage="Cargando clientas…"
       what="las clientas"
       emptyMessage={<EmptyDirectory searching={search.q !== undefined} />}
       panelTitles={{ create: "Detalle de cliente", edit: (row) => row.name }}
-      actions={
-        role === "administrator" ? (
-          <Link
-            to="/back-office/clientes/campana"
-            className="inline-flex h-[38px] items-center rounded-control bg-primario px-4 text-cuerpo font-medium text-blanco shadow-boton hover:bg-primario-hover"
-          >
-            Dar clases de campaña
-          </Link>
-        ) : null
-      }
       filter={
-        <SearchFilter
-          label="Buscar por nombre, correo o teléfono"
-          value={search.q ?? ""}
-          onChange={(text) =>
-            onSearchChange({ q: text === "" ? undefined : text, page: 1 })
-          }
-        />
+        <div className="flex flex-col gap-3">
+          <SearchFilter
+            label="Buscar por nombre, correo o teléfono"
+            value={search.q ?? ""}
+            onChange={(text) =>
+              onSearchChange({ q: text === "" ? undefined : text, page: 1 })
+            }
+          />
+          <ClientFilterChips
+            value={search.filter}
+            onChange={(filter) => onSearchChange({ filter, page: 1 })}
+          />
+          {search.filter === "founder" && role === "administrator" ? (
+            <FounderPlaces />
+          ) : null}
+        </div>
       }
       search={search}
       onPageChange={(page) => onSearchChange({ page })}

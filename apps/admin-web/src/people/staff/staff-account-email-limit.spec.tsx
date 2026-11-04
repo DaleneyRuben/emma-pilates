@@ -87,7 +87,7 @@ describe("AW24 under the Administrator's email limit", () => {
       ),
       http.post(apiUrl(staffMembersPath), accountLimited),
     );
-    const { user } = renderAdmin("/back-office/personal");
+    const { user } = renderAdmin("/estudio/personal");
     await user.click(
       await screen.findByRole("button", { name: "Nuevo miembro" }),
     );

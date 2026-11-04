@@ -27,7 +27,7 @@ describe("Simulador on a desktop browser", () => {
   beforeEach(() => server.use(...signedInHandlers()));
 
   it("shows the owner's check and its derivation, and nothing is saved", async () => {
-    const { user } = renderAdmin("/simulador");
+    const { user } = renderAdmin("/informes/simulador");
     expect(await heading()).toBeVisible();
     expect(screen.getByText(/Nada se guarda/)).toBeVisible();
 
@@ -66,7 +66,7 @@ describe("Simulador on a desktop browser", () => {
   });
 
   it("moves the break-even up when the tax rate rises", async () => {
-    const { user } = renderAdmin("/simulador");
+    const { user } = renderAdmin("/informes/simulador");
     await heading();
     await fill(user, "Clases por semana", "33");
     await fill(user, "Pago por clase a la instructora (Bs)", "65");
@@ -88,7 +88,7 @@ describe("Simulador on a desktop browser", () => {
   // FIX-008 (review 2026-10-28): the Client price and Trainer pay were one
   // number, and the Bs 8 per student from the fifth was ignored.
   it("pays the Trainer Bs 8 for each student from the fifth", async () => {
-    const { user } = renderAdmin("/simulador");
+    const { user } = renderAdmin("/informes/simulador");
     await heading();
 
     await fill(user, "Alumnas por clase", "6");
@@ -108,7 +108,7 @@ describe("Simulador on a desktop browser", () => {
         jsonResponse({ ...paolaProfile, role: "assistant" }),
       ),
     );
-    renderAdmin("/simulador");
+    renderAdmin("/informes/simulador");
 
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
@@ -131,7 +131,7 @@ describe("Simulador on a narrow browser", () => {
   beforeEach(() => server.use(...signedInHandlers()));
 
   it("keeps the figures readable and the sidebar behind the menu", async () => {
-    renderAdmin("/simulador");
+    renderAdmin("/informes/simulador");
     expect(await heading()).toBeVisible();
     expect(
       screen.getByRole("region", { name: "Punto de equilibrio" }),

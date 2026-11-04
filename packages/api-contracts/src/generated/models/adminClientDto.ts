@@ -21,4 +21,32 @@ export interface AdminClientDto {
   planName: string | null;
   /** `expired` when the Client had a Plan before, `none` if never */
   subscriptionStatus: AdminClientDtoSubscriptionStatus;
+  /**
+   * Classes left on the active Subscription, null without one
+   * @minimum 0
+   * @nullable
+   */
+  remainingClassAllowance: number | null;
+  /**
+   * Classes the active Subscription granted, null without one
+   * @minimum 0
+   * @nullable
+   */
+  originalClassAllowance: number | null;
+  /**
+   * The active Plan’s last day, or the last Plan’s when it expired; null if never
+   * @nullable
+   */
+  planEndsOn: string | null;
+  /**
+   * The live Fundadora place’s number, if any
+   * @minimum 1
+   * @nullable
+   */
+  founderNumber: number | null;
+  /**
+   * The Client or Trainer whose Referral Code she used
+   * @nullable
+   */
+  invitedByName: string | null;
 }

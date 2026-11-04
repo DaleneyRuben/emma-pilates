@@ -51,6 +51,7 @@ import type {
   AdminSupplyPageDto,
   AdminWebPasswordRecoveryResultDto,
   AdministratorSessionAvailabilityDto,
+  AdministratorSessionRosterDto,
   AllowanceAdjustmentDto,
   AssistantCashPaymentDto,
   AssistantClientBookingDto,
@@ -12026,7 +12027,7 @@ export type listAdminEvaluationsResponseSuccess =
 export type listAdminEvaluationsResponse = listAdminEvaluationsResponseSuccess;
 
 export const getListAdminEvaluationsUrl = (
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
 ) => {
   const normalizedParams = new URLSearchParams();
 
@@ -12044,7 +12045,7 @@ export const getListAdminEvaluationsUrl = (
 };
 
 export const listAdminEvaluations = async (
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listAdminEvaluationsResponse> => {
@@ -12078,7 +12079,7 @@ export const getListAdminEvaluationsQueryOptions = <
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -12121,7 +12122,7 @@ export function useListAdminEvaluations<
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params: undefined | ListAdminEvaluationsParams,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -12149,7 +12150,7 @@ export function useListAdminEvaluations<
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -12177,7 +12178,7 @@ export function useListAdminEvaluations<
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -12198,7 +12199,7 @@ export function useListAdminEvaluations<
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -21884,6 +21885,214 @@ export function useGetStudioRules<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetStudioRulesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getAdministratorSessionRosterResponse200 = {
+  data: AdministratorSessionRosterDto;
+  status: 200;
+};
+
+export type getAdministratorSessionRosterResponseSuccess =
+  getAdministratorSessionRosterResponse200 & {
+    headers: Headers;
+  };
+export type getAdministratorSessionRosterResponse =
+  getAdministratorSessionRosterResponseSuccess;
+
+export const getGetAdministratorSessionRosterUrl = (sessionId: string) => {
+  return `/api/v1/administrator/sessions/${sessionId}/roster`;
+};
+
+export const getAdministratorSessionRoster = async (
+  sessionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAdministratorSessionRosterResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetAdministratorSessionRosterUrl(sessionId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAdministratorSessionRosterResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getAdministratorSessionRosterResponse;
+};
+
+export const getGetAdministratorSessionRosterQueryKey = (sessionId: string) => {
+  return [`/api/v1/administrator/sessions/${sessionId}/roster`] as const;
+};
+
+export const getGetAdministratorSessionRosterQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetAdministratorSessionRosterQueryKey(sessionId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getAdministratorSessionRoster>>
+  > = ({ signal }) =>
+    getAdministratorSessionRoster(
+      sessionId,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: sessionId !== null && sessionId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAdministratorSessionRosterQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAdministratorSessionRoster>>
+>;
+export type GetAdministratorSessionRosterQueryError = unknown;
+
+export function useGetAdministratorSessionRoster<
+  TData = Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+          TError,
+          Awaited<ReturnType<typeof getAdministratorSessionRoster>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdministratorSessionRoster<
+  TData = Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+          TError,
+          Awaited<ReturnType<typeof getAdministratorSessionRoster>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdministratorSessionRoster<
+  TData = Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetAdministratorSessionRoster<
+  TData = Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdministratorSessionRoster>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetAdministratorSessionRosterQueryOptions(
+    sessionId,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -32056,7 +32265,7 @@ export type listPayStatementsResponseSuccess = listPayStatementsResponse200 & {
 };
 export type listPayStatementsResponse = listPayStatementsResponseSuccess;
 
-export const getListPayStatementsUrl = (params: ListPayStatementsParams) => {
+export const getListPayStatementsUrl = (params?: ListPayStatementsParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -32073,7 +32282,7 @@ export const getListPayStatementsUrl = (params: ListPayStatementsParams) => {
 };
 
 export const listPayStatements = async (
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listPayStatementsResponse> => {
@@ -32105,7 +32314,7 @@ export const getListPayStatementsQueryOptions = <
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -32148,7 +32357,7 @@ export function useListPayStatements<
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params: undefined | ListPayStatementsParams,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -32176,7 +32385,7 @@ export function useListPayStatements<
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -32204,7 +32413,7 @@ export function useListPayStatements<
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -32225,7 +32434,7 @@ export function useListPayStatements<
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -32262,7 +32471,7 @@ export type draftPayStatementsResponseSuccess =
   };
 export type draftPayStatementsResponse = draftPayStatementsResponseSuccess;
 
-export const getDraftPayStatementsUrl = (params: DraftPayStatementsParams) => {
+export const getDraftPayStatementsUrl = (params?: DraftPayStatementsParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -32279,7 +32488,7 @@ export const getDraftPayStatementsUrl = (params: DraftPayStatementsParams) => {
 };
 
 export const draftPayStatements = async (
-  params: DraftPayStatementsParams,
+  params?: DraftPayStatementsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<draftPayStatementsResponse> => {
@@ -32347,7 +32556,7 @@ export type DraftPayStatementsMutationResult = NonNullable<
 
 export type DraftPayStatementsMutationError = unknown;
 export type DraftPayStatementsMutationVariables = {
-  params: DraftPayStatementsParams;
+  params?: DraftPayStatementsParams;
 };
 
 export const useDraftPayStatements = <TError = unknown, TContext = unknown>(

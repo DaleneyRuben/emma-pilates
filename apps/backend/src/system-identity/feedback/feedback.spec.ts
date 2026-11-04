@@ -13,7 +13,8 @@ import {
 const now = new Date('2026-10-23T15:00:00.000Z');
 
 const staff = (
-  role: 'trainer' | 'assistant' | 'nutritionist' | 'administrator',
+  role:
+    'trainer' | 'assistant' | 'nutritionist' | 'administrator' | 'coordinator',
 ): AuthenticatedPrincipal => ({
   accountId: `${role}-account`,
   authenticationSessionId: 'authentication-session-id',
@@ -219,6 +220,32 @@ describe('Feedback triage on the admin web (REL-012, ADR-0054)', () => {
     expect(store.list).not.toHaveBeenCalled();
     expect(store.listAll).not.toHaveBeenCalled();
     expect(store.triage).not.toHaveBeenCalled();
+  });
+
+  // ADR-0108: Comentarios carry no money, so the Coordinator triages too.
+  it('lets the Coordinator list, export, and triage', async () => {
+    const store = storeWith();
+    const coordinator = staff('coordinator');
+
+    await listFeedback(
+      { page: 1, pageSize: 20 },
+      coordinator,
+      dependencies(store),
+    );
+    await exportFeedback(coordinator, dependencies(store));
+    await triageFeedback(
+      { feedbackId: 'feedback-id', status: 'reviewed', changeNote: null },
+      coordinator,
+      dependencies(store),
+    );
+    expect(store.triage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actor: {
+          accountId: 'coordinator-account',
+          staffMemberId: 'coordinator-staff-member',
+        },
+      }),
+    );
   });
 
   it('lists a page with the status and app filters', async () => {

@@ -1,7 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { ExpensesPage } from "./expenses-page";
 
-const route = getRouteApi("/authenticated/back-office/gastos");
+const route = getRouteApi("/authenticated/dinero/gastos");
 
 export function ExpensesRoute() {
   const navigate = route.useNavigate();

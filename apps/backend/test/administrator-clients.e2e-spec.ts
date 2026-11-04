@@ -24,6 +24,11 @@ const row = {
   accountStatus: 'active',
   planName: 'Paquete de 8 clases',
   subscriptionStatus: 'active',
+  remainingClassAllowance: 5,
+  originalClassAllowance: 8,
+  planEndsOn: new Date('2026-09-30T00:00:00.000Z'),
+  founderNumber: 3,
+  invitedByName: 'Sofía Guzmán',
 };
 const directoryPage = {
   items: [row],
@@ -32,6 +37,7 @@ const directoryPage = {
   totalItems: 1,
   studioClientCount: 148,
   activePlanClientCount: 96,
+  founderClientCount: 12,
 };
 const detail = {
   id: clientId,
@@ -120,7 +126,12 @@ describe('administrator Client endpoints (e2e)', () => {
       .set('authorization', bearer)
       .expect(200)
       .expect('Cache-Control', 'no-store')
-      .expect(({ body }) => expect(body).toEqual(directoryPage));
+      .expect(({ body }) =>
+        expect(body).toEqual({
+          ...directoryPage,
+          items: [{ ...row, planEndsOn: '2026-09-30' }],
+        }),
+      );
     expect(operations.list).toHaveBeenCalledWith(
       { page: 1, pageSize: 20 },
       expect.objectContaining({ accountId: 'admin-account' }),
@@ -136,9 +147,30 @@ describe('administrator Client endpoints (e2e)', () => {
     );
   });
 
+  it('filters the directory by one chip, «all» being no filter (follow-up 232)', async () => {
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/clients?filter=founder&q=lu')
+      .set('authorization', bearer)
+      .expect(200);
+    expect(operations.list).toHaveBeenLastCalledWith(
+      { page: 1, pageSize: 20, query: 'lu', filter: 'founder' },
+      expect.anything(),
+    );
+
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/clients?filter=all')
+      .set('authorization', bearer)
+      .expect(200);
+    expect(operations.list).toHaveBeenLastCalledWith(
+      { page: 1, pageSize: 20 },
+      expect.anything(),
+    );
+  });
+
   it.each([
     ['an unknown filter', '?branchId=11111111-1111-4111-8111-111111111111'],
     ['a page size above 100', '?pageSize=101'],
+    ['an unknown chip', '?filter=vip'],
     ['a search longer than 100 characters', `?q=${'a'.repeat(101)}`],
   ])('refuses %s as invalid_request', async (_case, search) => {
     await request(app.getHttpServer())

@@ -18,8 +18,10 @@
   --color-primario: #b78380;
   --color-primario-hover: #a87370;
   --color-primario-presionado: #9c6764;
-  --color-primario-tinte: #efe0dc;
-  --color-primario-profundo: #8a5d59;
+  /* Follow-up 225 renames it Rosa tinte and warms it. */
+  --color-primario-tinte: #f2e4e1;
+  /* Follow-up 225: Rosa enlace, 5.9:1 on Lino. */
+  --color-primario-profundo: #7d4f4b;
   /* Follow-up 104: text on Palo de rosa tinte (AW35's «Activa» pill), as the
      mobile apps' primaryOnTint. */
   --color-primario-sobre-tinte: #7a4f4b;
@@ -29,21 +31,34 @@
 
   --color-texto: #4a4a4a;
   --color-texto-secundario: #6e6663;
-  --color-texto-tenue: #766d69;
+  --color-texto-tenue: #6f6662;
   --color-texto-muy-tenue: #7a716d;
 
-  --color-borde-fuerte: #d8c9bb;
-  --color-borde: #e4d8cc;
-  --color-divisor: #f2ebe2;
+  /* Follow-up 225: one hairline, Arena, for dividers and input borders. */
+  --color-borde-fuerte: #e6dbd0;
+  --color-borde: #e6dbd0;
+  --color-divisor: #e6dbd0;
 
   --color-exito: #7c9473;
   --color-exito-texto: #5f7457;
   --color-advertencia: #c99a4e;
   --color-advertencia-texto: #9a7434;
-  --color-error: #b25d4b;
+  --color-error: #a04e3e;
+  /* Follow-up 225: the Destructive button's ground. */
+  --color-error-tinte: #f7e5e0;
   --color-error-texto: #94493a;
   --color-deshabilitado: #e7dcd8;
   --color-deshabilitado-texto: #b3a9a5;
+
+  /* Follow-up 225 (visual system v2), the admin web's new shell first:
+     Lino surfaces without border or shadow, Rosa profundo as the one
+     emphasis, Rosa enlace for text buttons, and the hairline Arena. */
+  --color-lino: #f5efe9;
+  --color-rosa-tinte: #f2e4e1;
+  --color-rosa-profundo: #93615d;
+  --color-rosa-enlace: #7d4f4b;
+  --color-tenue: #6f6662;
+  --color-arena-linea: #e6dbd0;
 
   --color-scrim: rgba(74, 58, 48, 0.22);
   /* Follow-up 21: the enlarged receipt, the one overlay above another. */
@@ -90,11 +105,18 @@
   --text-ayuda--line-height: 1.4;
   --text-fila-menu: 13.5px;
   --text-fila-menu--line-height: 1.4;
+  /* Follow-up 225: the rail's labels, counts and the Role line, 12 px with
+     no tracking (Etiqueta is the tracked uppercase label). */
+  --text-pie: 12px;
+  --text-pie--line-height: 1.3;
 
   --radius-control: 8px;
   --radius-tarjeta: 12px;
   --radius-panel: 10px;
   --radius-marco: 16px;
+  /* Follow-up 225 §4 on the admin boards: a 44 px button. */
+  --radius-boton: 14px;
+  --radius-hero: 20px;
 
   --shadow-boton: 0 2px 6px rgba(183, 131, 128, 0.22);
   --shadow-tarjeta-hover: 0 6px 16px rgba(74, 58, 48, 0.1);
@@ -108,7 +130,7 @@
 
 @layer base {
   html {
-    background-color: var(--color-arena);
+    background-color: var(--color-superficie);
     color: var(--color-texto);
     font-family: var(--font-sans);
     font-size: var(--text-cuerpo);

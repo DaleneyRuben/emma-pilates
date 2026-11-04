@@ -22,7 +22,7 @@ const acquisitionPath = `${clientsPath}/${lucia.id}/acquisition`;
 const corrections: unknown[] = [];
 
 const openLucia = async () => {
-  const rendered = renderAdmin("/back-office/clientes");
+  const rendered = renderAdmin("/clientas");
   await rendered.user.click(
     await screen.findByRole("button", { name: "Lucía Fernández" }),
   );

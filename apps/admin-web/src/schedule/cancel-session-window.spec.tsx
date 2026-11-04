@@ -12,7 +12,7 @@ import { signedInHandlers } from "../test/session-handlers";
 import { studioRules, studioRulesPath } from "../test/studio-settings-fixtures";
 
 const openConfirmation = async () => {
-  const { user } = renderAdmin(`/?week=${nextMonday}`);
+  const { user } = renderAdmin(`/horario?week=${nextMonday}`);
   await user.click(
     await screen.findByRole("button", { name: /Mat Pilates, 16:00/ }),
   );

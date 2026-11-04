@@ -72,6 +72,12 @@ export class AdministratorPaymentListController {
     required: false,
     description: 'Client name fragment, accents and case ignored',
   })
+  @ApiQuery({
+    name: 'clientId',
+    required: false,
+    schema: { format: 'uuid' },
+    description: 'Only this Client’s sales (her file’s Pagos tab)',
+  })
   @ApiOkResponse({ type: AdminPaymentPageDto })
   @Header('Cache-Control', 'no-store')
   async list(

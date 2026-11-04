@@ -18,6 +18,8 @@ const statement = {
   staffMemberId: "carolina",
   staffMemberName: "Carolina Rivas",
   month: "2026-12-01",
+  periodStart: "2026-12-01",
+  periodEnd: "2027-01-01",
   state: "draft",
   totalCentavos: 403_000,
   salaryPaymentId: null,
@@ -30,13 +32,15 @@ const statement = {
 
 const statementsPath = "/api/v1/administrator/pay-statements";
 
-describe("Pago a la coordinadora", () => {
+// BKO-007 under Sueldos › Por aprobar (follow-up 232), beside the Trainers.
+describe("the Coordinator's pay statement", () => {
   useMockServer();
 
   it("shows the draft and approves it once", async () => {
     let approved = 0;
+    // Its own statements answer before Inicio's empty default.
+    server.use(...signedInHandlers());
     server.use(
-      ...signedInHandlers(),
       http.get(apiUrl(statementsPath), () =>
         jsonResponse(
           approved === 0
@@ -53,9 +57,7 @@ describe("Pago a la coordinadora", () => {
         });
       }),
     );
-    const { user } = renderAdmin(
-      "/back-office/pago-coordinadora?month=2026-12",
-    );
+    const { user } = renderAdmin("/dinero/sueldos?month=2026-12");
 
     expect(
       await screen.findByRole("heading", { name: "Carolina Rivas" }),
@@ -69,9 +71,7 @@ describe("Pago a la coordinadora", () => {
 
   it("sends the Coordinator back to Horario", async () => {
     server.use(...coordinatorHandlers());
-    const { router } = renderAdmin(
-      "/back-office/pago-coordinadora?month=2026-12",
-    );
+    const { router } = renderAdmin("/dinero/sueldos?month=2026-12");
 
     expect(
       await screen.findByRole("heading", { level: 1, name: "Horario" }),
@@ -79,17 +79,20 @@ describe("Pago a la coordinadora", () => {
     expect(
       await screen.findByText("Esa sección es solo para administración."),
     ).toBeInTheDocument();
-    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe("/horario"),
+    );
   });
 
   it("refuses an Assistant", async () => {
+    // Its own statements answer before Inicio's empty default.
+    server.use(...signedInHandlers());
     server.use(
-      ...signedInHandlers(),
       http.get(apiUrl(statementsPath), () =>
         problemResponse(403, "back_office_access_denied"),
       ),
     );
-    renderAdmin("/back-office/pago-coordinadora?month=2026-12");
+    renderAdmin("/dinero/sueldos?month=2026-12");
     expect(await screen.findByRole("alert")).toBeInTheDocument();
   });
 });
