@@ -13,6 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { CivilDateInput } from "../components/form/civil-date-input";
+import { civilDateValue } from "../components/form/civil-date";
 import { wholeNumberField } from "../components/form/number-field";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -28,10 +30,8 @@ const settingsSchema = z.object({
   renewalTargetMonths1To6Percent: percent(),
   renewalTargetMonths7To12Percent: percent(),
   renewalTargetFromMonth13Percent: percent(),
-  openingDate: z
-    .string()
-    .regex(/^(\d{4}-\d{2}-\d{2})?$/, "Elige una fecha válida.")
-    .transform((date) => (date === "" ? null : date)),
+  // dd/mm/aaaa whatever the browser's language (walkthrough 2026-11-04 n.º 4).
+  openingDate: civilDateValue.transform((date) => (date === "" ? null : date)),
 });
 
 type SettingsInput = z.input<typeof settingsSchema>;
@@ -121,7 +121,7 @@ export function StudioRulesForm({
           <FormLabel>{label}</FormLabel>
           <FormControl>
             {name === "openingDate" ? (
-              <Input type="date" {...field} />
+              <CivilDateInput {...field} />
             ) : (
               <Input inputMode="numeric" {...field} />
             )}
