@@ -53,7 +53,9 @@ describe("AW21 Clientes on a desktop browser", () => {
       within(row).getByRole("cell", { name: "Paquete de 8 clases" }),
     ).toBeInTheDocument();
     expect(within(row).getByText("Activo")).toBeInTheDocument();
-    expect(screen.getByText("148 clientas · 96 con plan activo")).toBeVisible();
+    expect(
+      screen.getByText("148 clientas · 96 con plan activo · 12 fundadoras"),
+    ).toBeVisible();
     expect(screen.getByText("Mostrando 3 de 148 clientas")).toBeVisible();
     expect(
       screen.queryByRole("button", { name: /Nuevo/ }),
@@ -229,6 +231,8 @@ describe("AW21 Clientes on a narrow browser", () => {
         name: "Buscar por nombre, correo o teléfono",
       }),
     ).toBeVisible();
-    expect(screen.getByText("148 clientas · 96 con plan activo")).toBeVisible();
+    expect(
+      screen.getByText("148 clientas · 96 con plan activo · 12 fundadoras"),
+    ).toBeVisible();
   });
 });

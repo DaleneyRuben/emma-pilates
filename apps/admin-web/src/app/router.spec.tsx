@@ -28,7 +28,7 @@ describe("admin navigation", () => {
       { label: "Horario", tabs: ["Clases", "Nutrición"] },
       {
         label: "Clientas",
-        tabs: ["Todas", "Para contactar", "Congelamientos", "Fundadoras"],
+        tabs: ["Todas", "Para contactar", "Congelamientos"],
       },
       {
         label: "Promociones",
@@ -83,7 +83,6 @@ describe("admin navigation", () => {
       "/clientas",
       "/clientas/para-contactar",
       "/clientas/congelamientos",
-      "/clientas/fundadoras",
       "/promociones",
       "/promociones/clases-de-campana",
       "/promociones/referidos",
@@ -133,7 +132,9 @@ describe("admin navigation", () => {
       "/back-office/clientes": "/clientas",
       "/back-office/clientes/campana": "/promociones/clases-de-campana",
       "/back-office/para-contactar": "/clientas/para-contactar",
-      "/back-office/fundadoras": "/clientas/fundadoras",
+      // WEB-040: Fundadora is a chip on Todas, no longer a page.
+      "/back-office/fundadoras": "/clientas?filter=founder",
+      "/clientas/fundadoras": "/clientas?filter=founder",
       "/back-office/congelamientos": "/clientas/congelamientos",
       "/back-office/pagos": "/dinero/pagos",
       "/back-office/caja": "/dinero/caja",
@@ -161,7 +162,7 @@ describe("admin navigation", () => {
     });
     const pages = new Set(navigationItems.map((item) => item.to));
     for (const target of Object.values(movedPaths)) {
-      expect(pages).toContain(target);
+      expect(pages).toContain(target.split("?")[0]);
     }
   });
 });
@@ -207,7 +208,7 @@ describe("admin routes", () => {
     const listPaths = navigationItems
       .filter((item) => item.list)
       .map((item) => item.to);
-    expect(listPaths).toHaveLength(14);
+    expect(listPaths).toHaveLength(13);
     expect(listPaths).not.toContain("/horario");
     expect(listPaths).not.toContain("/informes/dinero");
     // AW17 is the carousel: unpaged cards, not a table (WEB-006).

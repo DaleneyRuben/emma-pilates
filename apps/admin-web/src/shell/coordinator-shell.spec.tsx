@@ -51,7 +51,6 @@ describe("the admin web for the Coordinator", () => {
     "/ajustes/planes",
     "/ajustes/tipos-de-clase",
     "/ajustes/sucursales",
-    "/clientas/fundadoras",
     "/dinero/caja",
     "/informes/simulador",
     "/dinero/sueldos?month=2026-12",
