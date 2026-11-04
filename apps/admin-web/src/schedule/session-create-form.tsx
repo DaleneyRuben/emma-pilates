@@ -35,6 +35,8 @@ import {
   type CreateOutput,
 } from "./session-create-schema";
 import { WeeklyRowsField } from "./weekly-rows-field";
+import { toExclusiveEnd } from "./effective-until-dates";
+import { EffectiveUntilItem } from "./effective-until-field";
 
 /** A Bolivia date and wall clock picked from an empty AW02 slot. */
 export type SessionStart = { date: string; time: string };
@@ -76,6 +78,7 @@ export function SessionCreateForm({
         },
       ],
       effectiveFrom: start?.date ?? "",
+      effectiveUntil: "",
     },
   });
   const frequency = useWatch({ control: form.control, name: "frequency" });
@@ -104,6 +107,7 @@ export function SessionCreateForm({
               input: {
                 ...shared,
                 effectiveFrom: values.effectiveFrom,
+                effectiveUntil: toExclusiveEnd(values.effectiveUntil),
                 rows: values.rows.map((row) => ({
                   weekday: Number(row.weekday),
                   startsAtLocal: row.time,
@@ -266,6 +270,13 @@ export function SessionCreateForm({
                   <FormMessage />
                 </FormItem>
               )}
+            />
+          ) : null}
+          {frequency === "weekly" ? (
+            <FormField
+              control={form.control}
+              name="effectiveUntil"
+              render={({ field }) => <EffectiveUntilItem {...field} />}
             />
           ) : null}
           {failure === null ? null : (

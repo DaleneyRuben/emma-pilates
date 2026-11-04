@@ -28,6 +28,8 @@ const schedule = {
   capacity: 10,
   effectiveFrom: new Date('2026-09-22T00:00:00.000Z'),
   effectiveUntil: null,
+  pausedFrom: null,
+  pausedUntil: null,
   durationMinutes: 50,
   classType: { name: 'Mat Pilates' },
 };

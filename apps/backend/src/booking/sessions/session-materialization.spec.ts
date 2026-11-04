@@ -86,4 +86,31 @@ describe('Session materialization', () => {
       ),
     ).toEqual([]);
   });
+
+  // BKM-018: a pause publishes nothing on [pausedFrom, pausedUntil).
+  it('skips the dates of a pause and resumes after it', () => {
+    expect(
+      plannedSessions(
+        {
+          ...mondayReformer,
+          pausedFrom: civil('2026-10-05'),
+          pausedUntil: civil('2026-10-13'),
+        },
+        clock,
+      ).map((session) => session.startsAt),
+    ).toEqual([at('2026-09-28T11:00:00.000Z'), at('2026-10-19T11:00:00.000Z')]);
+  });
+
+  it('plans nothing from a pause without a return date', () => {
+    expect(
+      plannedSessions(
+        {
+          ...mondayReformer,
+          pausedFrom: civil('2026-10-05'),
+          pausedUntil: null,
+        },
+        clock,
+      ).map((session) => session.startsAt),
+    ).toEqual([at('2026-09-28T11:00:00.000Z')]);
+  });
 });

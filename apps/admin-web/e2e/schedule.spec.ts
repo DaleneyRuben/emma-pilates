@@ -60,8 +60,11 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
   await expect(edit.getByLabel("Fecha")).toHaveValue(formatCivilDate(saturday));
   await expect(edit.getByLabel("Duración")).toHaveValue("75");
   await expect(
+    edit.getByRole("button", { name: "Cancelar sesión" }),
+  ).toBeVisible();
+  await expect(
     edit.getByText(
-      "Sin reservas: si sigue vacía, el sistema la cancela sola 2 horas antes de empezar.",
+      "Si no llega a 2 reservas, el sistema la cancela sola 3 h antes de empezar.",
     ),
   ).toBeVisible();
   await edit.getByLabel("Hora").fill("12:00");

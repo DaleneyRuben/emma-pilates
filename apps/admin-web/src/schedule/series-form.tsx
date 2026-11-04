@@ -30,6 +30,12 @@ import { DurationField } from "./duration-field";
 import { sessionMinutesField } from "./duration-minutes";
 import { firstChangeDate } from "./schedule-dates";
 import { EndSeriesAction } from "./end-series-action";
+import {
+  fromExclusiveEnd,
+  lastDateProblem,
+  toExclusiveEnd,
+} from "./effective-until-dates";
+import { EffectiveUntilItem } from "./effective-until-field";
 import { branchTrainersQueryOptions } from "./schedule-queries";
 import { replacedNotice } from "./schedule-notices";
 import { scheduleProblem } from "./schedule-problems";
@@ -37,25 +43,40 @@ import { TrainerOptions, WeekdayOptions } from "./session-options";
 import { useScheduleChange } from "./use-schedule-change";
 
 const seriesSchema = (earliest: string) =>
-  z.object({
-    trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
-    weekday: z.string().regex(/^[1-7]$/, "Elige un día."),
-    time: z
-      .string()
-      .refine((time) => parseCivilTime(time) !== null, "Elige la hora."),
-    durationMinutes: sessionMinutesField,
-    capacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares."),
-    effectiveFrom: z
-      .string()
-      .refine(
-        (date) => parseCivilDate(date) !== null,
-        "Elige desde qué fecha rige.",
-      )
-      .refine(
-        (date) => date >= earliest,
-        "Elige una fecha desde hoy y posterior al inicio de la serie.",
-      ),
-  });
+  z
+    .object({
+      trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
+      weekday: z.string().regex(/^[1-7]$/, "Elige un día."),
+      time: z
+        .string()
+        .refine((time) => parseCivilTime(time) !== null, "Elige la hora."),
+      durationMinutes: sessionMinutesField,
+      capacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares."),
+      effectiveFrom: z
+        .string()
+        .refine(
+          (date) => parseCivilDate(date) !== null,
+          "Elige desde qué fecha rige.",
+        )
+        .refine(
+          (date) => date >= earliest,
+          "Elige una fecha desde hoy y posterior al inicio de la serie.",
+        ),
+      effectiveUntil: z.string(),
+    })
+    .superRefine((values, context) => {
+      const problem = lastDateProblem(
+        values.effectiveUntil,
+        values.effectiveFrom,
+      );
+      if (problem !== null) {
+        context.addIssue({
+          code: "custom",
+          path: ["effectiveUntil"],
+          message: problem,
+        });
+      }
+    });
 
 type SeriesInput = z.input<ReturnType<typeof seriesSchema>>;
 type SeriesOutput = z.output<ReturnType<typeof seriesSchema>>;
@@ -96,6 +117,7 @@ export function SeriesForm({
       durationMinutes: String(schedule.durationMinutes),
       capacity: String(schedule.capacity),
       effectiveFrom: defaultDate,
+      effectiveUntil: fromExclusiveEnd(schedule.effectiveUntil),
     },
   });
 
@@ -114,6 +136,7 @@ export function SeriesForm({
           durationMinutes: values.durationMinutes,
           capacity: values.capacity,
           effectiveFrom: values.effectiveFrom,
+          effectiveUntil: toExclusiveEnd(values.effectiveUntil),
         },
       });
       if (outcome.kind === "replace-schedule") {
@@ -219,6 +242,11 @@ export function SeriesForm({
                 <FormMessage />
               </FormItem>
             )}
+          />
+          <FormField
+            control={form.control}
+            name="effectiveUntil"
+            render={({ field }) => <EffectiveUntilItem {...field} />}
           />
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">

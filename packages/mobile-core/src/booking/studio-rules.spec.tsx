@@ -2,7 +2,12 @@ import { render, waitFor } from "@testing-library/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Text } from "react-native";
 
-import { bookingStripDays, formatCancellationWindow, useStudioRules } from "./studio-rules";
+import {
+  bookingStrip,
+  bookingWindowDays,
+  formatCancellationWindow,
+  useStudioRules,
+} from "./studio-rules";
 
 const rules = {
   cancellationWindowMinutes: 150,
@@ -63,17 +68,32 @@ describe("useStudioRules", () => {
   });
 });
 
-describe("bookingStripDays", () => {
+describe("bookingWindowDays", () => {
   it("follows the booking window, counting today", () => {
-    expect(bookingStripDays({ ...rules, bookingWindowDays: 3 })).toBe(3);
-    expect(bookingStripDays({ ...rules, bookingWindowDays: 1 })).toBe(1);
-  });
-
-  it("holds at most the seven chips the strip shares its width with", () => {
-    expect(bookingStripDays({ ...rules, bookingWindowDays: 14 })).toBe(7);
+    expect(bookingWindowDays({ ...rules, bookingWindowDays: 3 })).toBe(3);
+    expect(bookingWindowDays({ ...rules, bookingWindowDays: 30 })).toBe(30);
   });
 
   it("assumes the default seven days until the rules are read", () => {
-    expect(bookingStripDays(undefined)).toBe(7);
+    expect(bookingWindowDays(undefined)).toBe(7);
+  });
+});
+
+// FIX-031 (follow-up 234): seven chips share the strip's width, so a wider
+// window keeps today and five days on it and leaves the rest to «Otra».
+describe("bookingStrip", () => {
+  const days = (count: number) =>
+    Array.from({ length: count }, (_, index) => `2026-11-${String(index + 4).padStart(2, "0")}`);
+
+  it("puts a window of seven days or fewer on the strip", () => {
+    expect(bookingStrip(days(7))).toEqual({ strip: days(7), later: [] });
+    expect(bookingStrip(days(3))).toEqual({ strip: days(3), later: [] });
+  });
+
+  it("leaves the days after the sixth to «Otra» in a wider window", () => {
+    expect(bookingStrip(days(14))).toEqual({
+      strip: days(6),
+      later: days(14).slice(6),
+    });
   });
 });

@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Horario · serie en pausa</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.app{width:100%;min-height:1000px;display:flex;flex-wrap:wrap;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;position:relative}
+.rail{flex:1 1 96px;max-width:100%;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;text-decoration:none;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{position:relative;width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rb{position:absolute;top:-4px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#93615D;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;border:2px solid #F5EFE9}
+.rl{font-size:12px;font-weight:500}
+.col{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:20px 40px;position:relative}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+.search{flex:1 1 360px;max-width:560px;height:48px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;background:#F5EFE9}
+.search input,.find input{flex:1;min-width:0;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;outline:none;color:#4A4A4A}
+.kbd{font-size:12px;color:#6F6662;padding:2px 8px;border-radius:6px;background:#FAF7F2}
+.cb{height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border:0;border-radius:12px;background:#F5EFE9;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer}
+.me{height:44px;display:flex;align-items:center;gap:10px;padding:0 8px 0 4px;border:0;background:transparent;cursor:pointer;font-family:inherit;color:#4A4A4A;text-align:left}
+.menu{position:absolute;right:40px;top:72px;width:240px;background:#FAF7F2;border-radius:16px;box-shadow:0 8px 24px rgba(74,58,48,.16);padding:8px;z-index:9;display:flex;flex-direction:column}
+.menu a{height:44px;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:10px;text-decoration:none;color:#4A4A4A}.menu a:hover{background:#F5EFE9}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}.av.s{width:36px;height:36px}
+main{padding:8px 40px 56px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h3{margin:0;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sub{color:#6F6662}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}.hl{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E6DBD0}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;cursor:pointer;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent;display:inline-flex;align-items:center}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.cnt{margin-left:6px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:999px;background:#93615D;color:#fff}
+.card{background:#F5EFE9;border-radius:16px}.pad{padding:20px}
+.hero{background:#93615D;color:#fff;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}.hero .eyebrow{color:rgba(255,255,255,.75)}
+.big{font-family:Lora,serif;font-size:32px;font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:#6F6662}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 16px;min-height:60px}.row+.row{border-top:1px solid #E6DBD0}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#B78380;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:150px;display:flex;flex-direction:column;gap:2px}
+.strong{font-weight:600}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.p{background:#B78380;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}.d{background:#F7E5E0;color:#A04E3E}.dd{background:#A04E3E;color:#fff}.td{background:transparent;color:#A04E3E;padding:0 10px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.wait{background:rgba(201,154,78,.16);color:#7C5D2A}.bad{background:#F7E5E0;color:#A04E3E}.none{background:rgba(216,201,187,.34);color:#6F6662}.rose{background:#F2E4E1;color:#7D4F4B}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.f{height:36px;padding:0 14px;border-radius:999px;background:#F5EFE9;font:400 14px 'Work Sans',sans-serif;display:inline-flex;align-items:center;border:0;color:#4A4A4A;cursor:pointer}.f.on{background:#F2E4E1;color:#7D4F4B;font-weight:600}
+.find{flex:0 1 360px;min-width:220px;height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;border-radius:12px;background:#F5EFE9}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;white-space:nowrap}
+td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.22);display:flex;justify-content:flex-end;z-index:5}
+.panel{width:480px;max-width:100%;background:#FAF7F2;padding:28px;display:flex;flex-direction:column;gap:20px;overflow-y:auto}
+.ph{display:flex;align-items:flex-start;gap:12px}.ph h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:24px}
+.x{width:40px;height:40px;border:0;border-radius:12px;background:#F5EFE9;color:#6F6662;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.field{display:flex;flex-direction:column;gap:6px}.field>span{font-size:13px;font-weight:500}
+.input{height:44px;padding:0 14px;border:1px solid #E6DBD0;border-radius:12px;background:#F5EFE9;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;display:flex;align-items:center;justify-content:space-between;width:100%}
+.seg{display:flex;gap:2px;background:#F5EFE9;border-radius:12px;padding:3px}
+.seg button{flex:1;height:38px;border:0;border-radius:10px;background:transparent;font:500 14px 'Work Sans',sans-serif;color:#6F6662;cursor:pointer;padding:0 12px}.seg button.on{background:#FAF7F2;color:#7D4F4B;font-weight:600}
+.notice{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;border-left:4px solid #C99A4E;font-size:14px}.notice.err{border-left-color:#A04E3E}.notice.info{border-left-color:#B78380}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:24px;align-items:start}
+.empty{padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}.empty .disc{width:72px;height:72px}
+.lora{font-family:Lora,serif}
+.toast{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:#93615D;color:#fff;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:8;min-width:420px}
+.week{display:grid;grid-template-columns:repeat(7,minmax(140px,1fr));gap:12px;min-width:1000px}
+.day{display:flex;flex-direction:column;gap:8px}.day.past{opacity:.55}
+.dh{display:flex;align-items:baseline;gap:8px;padding:10px 12px;border-radius:12px}.dh.today{background:#93615D;color:#fff}
+.ses{background:#F5EFE9;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;border:0;text-align:left;font-family:inherit;color:#4A4A4A;cursor:pointer;width:100%}.ses.sel{outline:2px solid #93615D}
+.add{height:72px;border:1px dashed #E6DBD0;border-radius:12px;background:transparent;color:#7D4F4B;font:500 14px 'Work Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+</style>
+</helmet>
+<div class="app">
+  <nav class="rail" aria-label="Menú principal"><span class="mark" aria-label="Emma Pilates Studio">E</span>
+    <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><a class="{{r.cls}}" href="{{r.href}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span><sc-if value="{{r.badge}}" hint-placeholder-val="{{false}}"><span class="rb">{{r.badge}}</span></sc-if></span><span class="rl">{{r.label}}</span></a></sc-for>
+  </nav>
+  <div class="col">
+    <header class="top">
+      <span class="wm"><b>Emma</b><i>Pilates Studio</i></span>
+      <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
+      <span style="flex: 1"></span>
+      <button type="button" class="cb"><span class="ms" style="color: #B78380">location_on</span>Sucursal Centro<span class="ms" style="color: #6F6662">expand_more</span></button>
+      <button type="button" class="me" onClick="{{toggleMenu}}"><span class="av">PM</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Paola Mendoza</span><span style="font-size: 12px; color: #6F6662">Administración</span></span><span class="ms" style="color: #6F6662">expand_more</span></button>
+      <sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}"><div class="menu"><a href="#"><span class="ms" style="color: #B78380">key</span>Cambiar contraseña</a><a href="P10-Acceso.dc.html"><span class="ms" style="color: #B78380">logout</span>Cerrar sesión</a></div></sc-if>
+    </header>
+    <main>
+      <div class="head">
+        <div class="hl"><h1>Horario</h1><span class="sub">{{subtitle}}</span></div>
+        <sc-if value="{{isClases}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; align-items: center; gap: 4px; background: #F5EFE9; border-radius: 14px; padding: 4px">
+            <button type="button" class="btn sm t" aria-label="Semana anterior"><span class="ms">chevron_left</span></button>
+            <span class="lora" style="font-size: 17px; padding: 0 4px">2 – 8 de noviembre</span>
+            <button type="button" class="btn sm t" aria-label="Semana siguiente"><span class="ms">chevron_right</span></button>
+            <button type="button" class="btn sm s">Hoy</button>
+          </div>
+          <button type="button" class="btn p" onClick="{{openNew}}"><span class="ms">add</span>Nueva clase</button>
+        </sc-if>
+      </div>
+      <div class="tabs" role="tablist">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="2"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.go}}">{{t.label}}</button></sc-for>
+      </div>
+
+      <sc-if value="{{isClases}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div style="overflow-x: auto">
+            <div class="week">
+              <sc-for list="{{week}}" as="d" hint-placeholder-count="7">
+                <div class="{{d.cls}}">
+                  <div class="{{d.hcls}}"><span class="eyebrow" style="color: inherit">{{d.day}}</span><span class="lora" style="font-size: 22px">{{d.num}}</span><span style="font-size: 12px">{{d.tag}}</span></div>
+                  <sc-for list="{{d.sessions}}" as="s" hint-placeholder-count="2">
+                    <button type="button" class="{{s.cls}}" onClick="{{s.open}}">
+                      <span class="note" style="font-variant-numeric: tabular-nums">{{s.time}}</span>
+                      <span class="strong">{{s.cls2}}</span>
+                      <span class="note">{{s.who}}</span>
+                      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span style="font-size: 13px">{{s.seats}}</span><sc-if value="{{s.pill}}" hint-placeholder-val="{{false}}"><span class="{{s.pillCls}}">{{s.pill}}</span></sc-if></span>
+                    </button>
+                  </sc-for>
+                  <sc-if value="{{d.empty}}" hint-placeholder-val="{{false}}"><button type="button" class="add" onClick="{{openNew}}"><span class="ms" style="font-size: 18px">add</span>Agregar</button></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div class="notice"><span class="ms" style="color: #7C5D2A">history</span>Los días pasados se ven en gris y solo se pueden leer. Toca una clase para ver quiénes reservaron.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isNutri}}" hint-placeholder-val="{{false}}">
+        <div class="grid2">
+          <section style="display: flex; flex-direction: column; gap: 12px">
+            <h3>Evaluaciones de la semana · Gabriela Flores</h3>
+            <div class="card">
+              <sc-for list="{{evals}}" as="e" hint-placeholder-count="4">
+                <div class="row"><span class="lora" style="width: 96px; font-size: 16px">{{e.when}}</span><span class="grow"><span class="strong">{{e.n}}</span><span class="note">{{e.plan}}</span></span><span class="{{e.pillCls}}">{{e.kind}}</span></div>
+              </sc-for>
+            </div>
+          </section>
+          <section style="display: flex; flex-direction: column; gap: 12px">
+            <h3>Turnos libres</h3>
+            <div class="card pad" style="display: flex; flex-direction: column; gap: 16px">
+              <sc-for list="{{free}}" as="f" hint-placeholder-count="3">
+                <div style="display: flex; flex-direction: column; gap: 8px"><span class="strong">{{f.day}}</span><span class="filters"><sc-for list="{{f.slots}}" as="x" hint-placeholder-count="3"><span class="pill none">{{x}}</span></sc-for></span></div>
+              </sc-for>
+              <span class="note">Las clientas reservan su evaluación desde la app. Aquí ves qué queda libre para responderles.</span>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+
+  <sc-if value="{{panelOpen}}" hint-placeholder-val="{{false}}">
+    <div class="scrim">
+      <div class="panel" role="dialog" aria-label="Panel de la clase">
+
+        <sc-if value="{{pv.detalle}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; flex-direction: column; gap: 20px">
+            <div class="ph"><div style="flex: 1; display: flex; flex-direction: column; gap: 6px"><h2>{{sel.cls2}}</h2><span class="sub">{{sel.when}} · Centro</span><span class="filters"><span class="{{sel.seriesCls}}">{{sel.seriesPill}}</span><sc-if value="{{sel.full}}" hint-placeholder-val="{{true}}"><span class="pill rose">Llena</span></sc-if></span></div><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
+            <sc-if value="{{sel.past}}" hint-placeholder-val="{{false}}"><div class="notice info"><span class="ms" style="color: #93615D">lock</span>Clase pasada: solo lectura.</div></sc-if>
+            <div class="card">
+              <div class="row"><span class="disc"><span class="ms">person</span></span><span class="grow"><span>Entrenadora</span></span><span>{{sel.who}}</span></div>
+              <div class="row"><span class="disc"><span class="ms">event_seat</span></span><span class="grow"><span>Lugares</span></span><span>{{sel.seats}}</span></div>
+              <div class="row"><span class="disc"><span class="ms">hourglass_top</span></span><span class="grow"><span>Lista de espera</span></span><span>{{sel.waitCount}}</span></div>
+            </div>
+            <section style="display: flex; flex-direction: column; gap: 12px">
+              <h3>Reservaron ({{sel.bookedCount}})</h3>
+              <div class="card">
+                <sc-for list="{{sel.roster}}" as="b" hint-placeholder-count="6">
+                  <div class="row" style="min-height: 52px; padding: 8px 16px"><span class="av s">{{b.ini}}</span><span class="grow"><span class="strong">{{b.n}}</span><span class="note">{{b.note}}</span></span><sc-if value="{{sel.live}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm td">Quitar</button></sc-if></div>
+                </sc-for>
+              </div>
+            </section>
+            <sc-if value="{{sel.hasWait}}" hint-placeholder-val="{{false}}">
+              <section style="display: flex; flex-direction: column; gap: 12px">
+                <h3>Lista de espera ({{sel.waitCount}})</h3>
+                <div class="card">
+                  <sc-for list="{{sel.wait}}" as="w" hint-placeholder-count="2">
+                    <div class="row" style="min-height: 52px; padding: 8px 16px"><span class="lora" style="width: 24px; font-size: 18px; color: #93615D">{{w.pos}}</span><span class="grow"><span class="strong">{{w.n}}</span><span class="note">Entra sola si se libera un lugar</span></span></div>
+                  </sc-for>
+                </div>
+              </section>
+            </sc-if>
+            <sc-if value="{{paused}}" hint-placeholder-val="{{false}}"><div class="notice"><span class="ms" style="color: #7C5D2A">pause_circle</span>{{pauseNote}}</div></sc-if>
+            <sc-if value="{{sel.live}}" hint-placeholder-val="{{true}}">
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <button type="button" class="btn p" onClick="{{openBook}}"><span class="ms">person_add</span>{{sel.bookLabel}}</button>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><button type="button" class="btn s">Editar</button><sc-if value="{{paused}}" hint-placeholder-val="{{false}}"><button type="button" class="btn s" onClick="{{resume}}">Reanudar la serie</button></sc-if><sc-if value="{{notPaused}}" hint-placeholder-val="{{true}}"><button type="button" class="btn s" onClick="{{openPause}}">Pausar la serie</button></sc-if></div>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><button type="button" class="btn s">Terminar la serie</button><button type="button" class="btn d" onClick="{{openCancel}}">Cancelar esta clase</button></div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.reservar}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 20px">
+            <div class="ph"><button type="button" class="x" aria-label="Volver" onClick="{{backDetail}}"><span class="ms">arrow_back</span></button><div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><h2>Reservar a una clienta</h2><span class="sub">{{sel.cls2}} · {{sel.when}}</span></div></div>
+            <sc-if value="{{sel.full}}" hint-placeholder-val="{{true}}"><div class="notice"><span class="ms" style="color: #7C5D2A">hourglass_top</span>La clase está llena: la clienta entra a la lista de espera en el puesto {{sel.nextPos}}.</div></sc-if>
+            <label class="find" style="flex: none; width: 100%"><span class="ms" style="color: #B78380">search</span><input aria-label="Buscar clienta" placeholder="Nombre, correo o teléfono" value="Ma"></label>
+            <div class="card">
+              <sc-for list="{{results}}" as="c" hint-placeholder-count="3">
+                <div class="row"><span class="av s">{{c.ini}}</span><span class="grow"><span class="strong">{{c.n}}</span><span class="note">{{c.note}}</span></span><sc-if value="{{c.can}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm p" onClick="{{c.book}}">{{c.cta}}</button></sc-if><sc-if value="{{c.cannot}}" hint-placeholder-val="{{false}}"><span class="pill none">Sin plan activo</span></sc-if></div>
+              </sc-for>
+            </div>
+            <span class="note">La reserva usa una clase de su plan y le llega el aviso como si reservara ella.</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.nueva}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 18px">
+            <div class="ph"><h2 style="flex: 1">Nueva clase</h2><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
+            <label class="field"><span>Tipo de clase</span><span class="input">Reformer Pilates<span class="ms" style="color: #6F6662">expand_more</span></span></label>
+            <label class="field"><span>Entrenadora</span><span class="input">Emma Vargas<span class="ms" style="color: #6F6662">expand_more</span></span></label>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px"><label class="field"><span>Capacidad</span><span class="input">12</span></label><label class="field"><span>Duración</span><span class="input">50 minutos</span></label></div>
+            <div class="field"><span>Frecuencia</span><div class="seg"><sc-for list="{{freqs}}" as="q" hint-placeholder-count="2"><button type="button" class="{{q.cls}}" onClick="{{q.go}}">{{q.label}}</button></sc-for></div></div>
+            <sc-if value="{{once}}" hint-placeholder-val="{{false}}">
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px"><label class="field"><span>Fecha</span><span class="input">Sábado 7 de noviembre</span></label><label class="field"><span>Hora</span><span class="input">09:00</span></label></div>
+            </sc-if>
+            <sc-if value="{{weekly}}" hint-placeholder-val="{{true}}">
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px"><label class="field"><span>Vigente desde</span><span class="input">Lunes 9 de noviembre</span></label><label class="field"><span>Vigente hasta (opcional)</span><span class="input" style="color: #6F6662">Sin fecha de fin</span></label></div>
+                <div class="field"><span>Días y horas</span>
+                  <div class="card"><div class="row" style="min-height: 52px"><span class="grow">Lunes</span><span>07:00</span><button type="button" class="btn sm td" aria-label="Quitar lunes"><span class="ms">close</span></button></div><div class="row" style="min-height: 52px"><span class="grow">Miércoles</span><span>07:00</span><button type="button" class="btn sm td" aria-label="Quitar miércoles"><span class="ms">close</span></button></div></div>
+                  <button type="button" class="btn sm t" style="align-self: flex-start"><span class="ms">add</span>Agregar día</button>
+                </div>
+                <div class="notice info"><span class="ms" style="color: #93615D">all_inclusive</span>Sin fecha de fin, la serie sigue cada semana hasta que la pauses o la termines.</div>
+              </div>
+            </sc-if>
+            <div class="actions"><button type="button" class="btn t" onClick="{{close}}">Cancelar</button><button type="button" class="btn p" onClick="{{close}}">{{createLabel}}</button></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.pausar}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 20px">
+            <div class="ph"><button type="button" class="x" aria-label="Volver" onClick="{{backDetail}}"><span class="ms">arrow_back</span></button><h2 style="flex: 1">Pausar la serie</h2></div>
+            <div class="card"><div class="row"><span class="disc"><span class="ms">event_repeat</span></span><span class="grow"><span class="strong">Reformer Pilates · cada miércoles 07:00</span><span class="note">Emma Vargas · Sucursal Centro</span></span></div></div>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px"><label class="field"><span>Pausar desde</span><span class="input">Miércoles 23 de diciembre</span></label><label class="field"><span>Vuelve el (opcional)</span><span class="input" style="color: #6F6662">Hasta que la reanudes</span></label></div>
+            <div class="notice info"><span class="ms" style="color: #93615D">info</span>En esas fechas no se publican clases de la serie. Las que ya tienen reservas se mantienen; cancélalas una por una si hace falta.</div>
+            <div class="actions"><button type="button" class="btn t" onClick="{{backDetail}}">Volver</button><button type="button" class="btn p" onClick="{{confirmPause}}">Pausar la serie</button></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{pv.cancelar}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 20px">
+            <div class="ph"><button type="button" class="x" aria-label="Volver" onClick="{{backDetail}}"><span class="ms">arrow_back</span></button><h2 style="flex: 1">¿Cancelar esta clase?</h2></div>
+            <div class="card"><div class="row"><span class="disc"><span class="ms">event_busy</span></span><span class="grow"><span class="strong">{{sel.cls2}}</span><span class="note">{{sel.when}} · {{sel.who}}</span></span></div></div>
+            <div class="notice err"><span class="ms" style="color: #A04E3E">warning</span>{{sel.cancelNote}}</div>
+            <div class="actions"><button type="button" class="btn t" onClick="{{backDetail}}">Volver</button><button type="button" class="btn dd" onClick="{{confirmCancel}}">Sí, cancelar la clase</button></div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{toast}}" hint-placeholder-val="{{false}}"><div class="toast" role="status"><span class="ms">check_circle</span><span style="flex: 1">{{toast}}</span><button type="button" onClick="{{hideToast}}" aria-label="Cerrar aviso" style="border: 0; background: transparent; color: #fff; cursor: pointer"><span class="ms">close</span></button></div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"vista":{"editor":"enum","options":["pausar","pausada","detalle","nueva"],"default":"pausar"},"$preview":{"width":1440,"height":1000}}'>
+var RAIL = [['ini','home','Inicio','P01-Inicio.dc.html','','b'],['hor','calendar_month','Horario','P02-Horario.dc.html','','b'],['cli','group','Clientas','P03-Clientas.dc.html','4','b'],['pro','campaign','Promociones','P04-Promociones.dc.html','','b'],['com','forum','Comentarios','P05-Comentarios.dc.html','2','b'],['din','payments','Dinero','P06-Dinero.dc.html','4','a'],['est','storefront','Estudio','P07-Estudio.dc.html','1','b'],['inf','bar_chart','Informes','P08-Informes.dc.html','','b'],['aj','settings','Ajustes','P09-Ajustes.dc.html','','b']];
+function rail(active, admin) { return RAIL.filter(function (r) { return admin || r[5] === 'b'; }).map(function (r) { return { icon: r[1], label: r[2], href: r[3], badge: r[4], cls: 'ri' + (r[0] === active ? ' on' : '') }; }); }
+var NAMES = ['Lucía Fernández','Isabel Arce','Valeria Quiroga','Sofía Guzmán','Camila Torres','Andrea Rojas','Paula Méndez','Daniela Vaca','Natalia Suárez','Gabriela Ribera','Fernanda Justiniano','Carla Antelo','Lorena Saavedra','Patricia Roca','Verónica Áñez','Mariana Peña'];
+function ini(n) { return n.split(' ').map(function (p) { return p[0]; }).join('').slice(0, 2); }
+var WEEK = [
+  { day: 'Lun', num: '2', past: true, s: [['l1','07:00 – 07:50','Reformer Pilates','Emma Vargas',8,12,0,''],['l2','18:30 – 19:20','Reformer Pilates','Daniela Ortiz',11,12,0,'']] },
+  { day: 'Mar', num: '3', today: true, s: [['m1','09:00 – 09:50','Mat Pilates','Daniela Ortiz',14,14,2,''],['m2','18:30 – 19:20','Reformer Pilates','Daniela Ortiz',9,12,0,'']] },
+  { day: 'Mié', num: '4', s: [['x1','07:00 – 07:50','Reformer Pilates','Emma Vargas',6,12,0,''],['x2','18:30 – 19:20','Reformer Pilates','Daniela Ortiz',4,12,0,'']] },
+  { day: 'Jue', num: '5', s: [['j1','09:00 – 09:50','Mat Pilates','Daniela Ortiz',8,14,0,''],['j2','18:30 – 19:20','Reformer Pilates','Daniela Ortiz',3,12,0,'Faltan equipos']] },
+  { day: 'Vie', num: '6', s: [['v1','07:00 – 07:50','Reformer Pilates','Emma Vargas',5,12,0,''],['v2','18:30 – 19:20','Reformer Pilates','Daniela Ortiz',0,12,0,'']] },
+  { day: 'Sáb', num: '7', s: [] },
+  { day: 'Dom', num: '8', s: [] }
+];
+var DAYNAME = { Lun: 'Lunes 2', Mar: 'Martes 3', 'Mié': 'Miércoles 4', Jue: 'Jueves 5', Vie: 'Viernes 6' };
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var v = this.props.vista ?? 'pausar';
+    var tab = st.tab || (v === 'nutricion' ? 'nutri' : 'clases');
+    var panel = st.panel !== undefined ? st.panel : ({ detalle: 'detalle', pausada: 'detalle', pausar: 'pausar', reservar: 'reservar', nueva: 'nueva', cancelar: 'cancelar' }[v] || null);
+    var paused = st.paused !== undefined ? st.paused : v === 'pausada';
+    var selId = st.sel || 'x1';
+    var freq = st.freq || 'semana';
+    function set(o) { return function () { self.setState(o); }; }
+    var all = {};
+    var week = WEEK.map(function (d) {
+      return { day: d.day, num: d.num, tag: d.today ? 'Hoy' : '', empty: d.s.length === 0, cls: 'day' + (d.past ? ' past' : ''), hcls: 'dh' + (d.today ? ' today' : ''),
+        sessions: d.s.map(function (s) {
+          var full = s[4] === s[5];
+          var o = { id: s[0], time: s[1], cls2: s[2], who: s[3], booked: s[4], cap: s[5], wait: s[6], past: !!d.past, full: full, when: DAYNAME[d.day] + ' de noviembre · ' + s[1] };
+          all[s[0]] = o;
+          var pill = s[7] || (full ? 'Llena · ' + s[6] + ' en espera' : '');
+          return { cls2: s[2], time: s[1], who: s[3], seats: s[4] + ' de ' + s[5], pill: pill, pillCls: 'pill ' + (s[7] ? 'wait' : 'rose'), cls: 'ses' + (panel && selId === s[0] ? ' sel' : ''), open: set({ panel: 'detalle', sel: s[0] }) };
+        }) };
+    });
+    var s = all[selId];
+    var roster = NAMES.slice(0, s.booked).map(function (n, i) { return { n: n, ini: ini(n), note: ['Paquete de 8 clases · le quedan 5', 'Mensual 16 clases · le quedan 9', 'Paquete de 4 clases · le quedan 2'][i % 3] }; });
+    var wait = NAMES.slice(14, 14 + s.wait).map(function (n, i) { return { n: n, pos: String(i + 1) }; });
+    var sel = { seriesPill: paused ? 'Serie en pausa' : 'Serie semanal', seriesCls: paused ? 'pill wait' : 'pill rose', cls2: s.cls2, when: s.when, who: s.who, seats: s.booked + ' de ' + s.cap, bookedCount: s.booked, waitCount: s.wait, hasWait: s.wait > 0, full: s.full, past: s.past, live: !s.past,
+      roster: roster, wait: wait, nextPos: String(s.wait + 1), bookLabel: s.full ? 'Agregar a la lista de espera' : 'Reservar a una clienta',
+      cancelNote: s.booked > 0 ? ('Tiene ' + s.booked + ' reservas' + (s.wait ? ' y ' + s.wait + ' en espera' : '') + '. A cada clienta se le devuelve la clase y le llega un aviso.') : 'No tiene reservas. Se cancela y desaparece de la app.' };
+    var results = [['Mariana Peña', 'Paquete de 8 clases · le quedan 8', true], ['Martina Salvatierra', 'Sin plan activo', false], ['María José Ortiz', 'Mensual 16 clases · le quedan 12', true]].map(function (c) {
+      return { n: c[0], ini: ini(c[0]), note: c[1], can: c[2], cannot: !c[2], cta: s.full ? 'A la lista de espera' : 'Reservar',
+        book: set({ panel: 'detalle', toast: s.full ? c[0] + ' quedó en la lista de espera (puesto ' + (s.wait + 1) + ')' : c[0] + ' quedó reservada · le quedan 7 clases' }) };
+    });
+    var evals = [['Mié 4 · 10:00', 'Lucía Fernández', 'Paquete de 8 clases', 'Primera evaluación', 'rose'], ['Mié 4 · 11:00', 'Valeria Quiroga', 'Paquete de 8 clases', 'Seguimiento', 'none'], ['Jue 5 · 16:00', 'Isabel Arce', 'Mensual 16 clases', 'Seguimiento', 'none'], ['Vie 6 · 09:00', 'Camila Torres', 'Paquete de 4 clases', 'Primera evaluación', 'rose']].map(function (e) { return { when: e[0], n: e[1], plan: e[2], kind: e[3], pillCls: 'pill ' + e[4] }; });
+    var free = [{ day: 'Miércoles 4', slots: ['09:00', '12:00'] }, { day: 'Jueves 5', slots: ['15:00', '17:00', '18:00'] }, { day: 'Viernes 6', slots: ['10:00', '11:00'] }];
+    var tabs = [['clases', 'Clases'], ['nutri', 'Nutrición']].map(function (t) { return { label: t[1], cls: 'tab' + (t[0] === tab ? ' on' : ''), go: set({ tab: t[0], panel: null }) }; });
+    return { rail: rail('hor', true), tabs: tabs, week: week, sel: sel, results: results, evals: evals, free: free,
+      isClases: tab === 'clases', isNutri: tab === 'nutri', subtitle: tab === 'clases' ? 'Sucursal Centro · 10 clases esta semana' : 'Sucursal Centro · nutricionista Gabriela Flores',
+      panelOpen: !!panel, pv: { pausar: panel === 'pausar', detalle: panel === 'detalle', reservar: panel === 'reservar', nueva: panel === 'nueva', cancelar: panel === 'cancelar' },
+      freqs: [['una', 'Una sola vez'], ['semana', 'Cada semana']].map(function (q) { return { label: q[1], cls: q[0] === freq ? 'on' : '', go: set({ freq: q[0] }) }; }),
+      once: freq === 'una', weekly: freq === 'semana', createLabel: freq === 'una' ? 'Crear clase' : 'Crear serie',
+      openNew: set({ panel: 'nueva' }), paused: paused, notPaused: !paused, pauseNote: 'En pausa del 23 de diciembre al 5 de enero.', openPause: set({ panel: 'pausar' }), confirmPause: set({ panel: 'detalle', paused: true, toast: 'Serie en pausa · vuelve el miércoles 6 de enero' }), resume: set({ paused: false, toast: 'Serie reanudada · sus clases vuelven a la app' }), openBook: set({ panel: 'reservar' }), openCancel: set({ panel: 'cancelar' }), backDetail: set({ panel: 'detalle' }), close: set({ panel: null }),
+      confirmCancel: set({ panel: null, toast: 'Clase cancelada · avisamos a las clientas' }), toast: st.toast || '', hideToast: set({ toast: '' }),
+      menuOpen: !!st.menu, toggleMenu: set({ menu: !st.menu }) };
+  }
+}
+</script>
+</body>
+</html>

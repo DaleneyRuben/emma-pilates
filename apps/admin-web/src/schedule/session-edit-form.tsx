@@ -7,6 +7,7 @@ import { CancelSessionAction } from "./cancel-session-action";
 import { OccurrenceForm } from "./occurrence-form";
 import { branchSchedulesQueryOptions } from "./schedule-queries";
 import { SeriesForm } from "./series-form";
+import { SeriesPauseBar } from "./series-pause-bar";
 
 type Scope = "only" | "future";
 
@@ -44,6 +45,16 @@ export function SessionEditForm({
 
   return (
     <div className="flex flex-1 flex-col">
+      {schedule === undefined ? null : (
+        <div className="px-5 pt-2">
+          <SeriesPauseBar
+            schedule={schedule}
+            branchId={branchId}
+            onDone={onDone}
+            onFailure={setFailure}
+          />
+        </div>
+      )}
       {session.sessionScheduleId === null ? null : (
         <div className="px-5 pt-2">
           <ChoiceChips

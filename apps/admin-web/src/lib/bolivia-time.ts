@@ -123,6 +123,12 @@ export const formatDayTab = (date: string) => ({
 export const weekdayName = (weekday: number): string =>
   longWeekdays[weekday - 1] ?? "";
 
+/** "13 de agosto": a day whose weekday the sentence leaves out. */
+export function formatDayMonth(date: string): string {
+  const { day, month } = dayMonth(date);
+  return `${day} de ${month}`;
+}
+
 /** "jueves 13 de agosto", as a screen reader hears an AW02 slot's day. */
 export function formatLongDay(date: string): string {
   const { day, month } = dayMonth(date);

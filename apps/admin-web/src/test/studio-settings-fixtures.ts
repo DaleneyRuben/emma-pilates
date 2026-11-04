@@ -10,6 +10,7 @@ export const studioSettings = {
   cancellationWindowMinutes: 150,
   minimumBookings: 2,
   minimumBookingsCheckLeadMinutes: 180,
+  bookingWindowDays: 7,
   startDateLimitDays: 14,
   founderPlaces: 40,
   founderDiscountPercent: 15,
@@ -38,3 +39,15 @@ export const studioRules = {
 
 export const studioRulesHandler = (rules = studioRules) =>
   http.get(apiUrl(studioRulesPath), () => jsonResponse(rules));
+
+// The Studio Settings as each Role reads them: the Coordinator without the
+// Paid Evaluation's amounts (ADR-0108).
+export const studioSettingsHandler = (
+  settings: Omit<
+    typeof studioSettings,
+    "evaluationPriceCentavos" | "nutritionistFeeCentavos"
+  > & {
+    evaluationPriceCentavos: number | null;
+    nutritionistFeeCentavos: number | null;
+  } = studioSettings,
+) => http.get(apiUrl(studioSettingsPath), () => jsonResponse(settings));

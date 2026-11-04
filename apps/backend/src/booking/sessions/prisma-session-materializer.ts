@@ -27,6 +27,8 @@ export type MaterializableSchedule = {
   capacity: number;
   effectiveFrom: Date;
   effectiveUntil: Date | null;
+  pausedFrom: Date | null;
+  pausedUntil: Date | null;
 };
 
 // Inserts one schedule's missing occurrences across the horizon. ON CONFLICT
@@ -45,6 +47,8 @@ export const materializeSchedule = async (
       durationMinutes: schedule.durationMinutes,
       effectiveFrom: schedule.effectiveFrom,
       effectiveUntil: schedule.effectiveUntil,
+      pausedFrom: schedule.pausedFrom,
+      pausedUntil: schedule.pausedUntil,
     },
     clock,
   );
@@ -99,6 +103,8 @@ export const createPrismaSessionMaterializer = (
         capacity: true,
         effectiveFrom: true,
         effectiveUntil: true,
+        pausedFrom: true,
+        pausedUntil: true,
         trainer: {
           select: {
             branchAssignments: {

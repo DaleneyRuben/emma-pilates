@@ -18,6 +18,7 @@ const cancellationCause = (
     | 'NO_SUBSTITUTE_TRAINER'
     | 'SCHEDULE_CHANGED'
     | 'MINIMUM_NOT_MET'
+    | 'SCHEDULE_PAUSED'
     | null,
 ): string | null => (cause === 'MINIMUM_NOT_MET' ? 'minimum_not_met' : cause);
 

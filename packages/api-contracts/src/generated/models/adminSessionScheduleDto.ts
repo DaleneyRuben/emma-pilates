@@ -30,5 +30,15 @@ export interface AdminSessionScheduleDto {
    * @nullable
    */
   effectiveUntil: string | null;
+  /**
+   * BKM-018: first paused date, or null when not paused
+   * @nullable
+   */
+  pausedFrom: string | null;
+  /**
+   * BKM-018: first date with Sessions again (exclusive), or null: paused until resumed, or not paused
+   * @nullable
+   */
+  pausedUntil: string | null;
   classTypeName: string;
 }

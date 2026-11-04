@@ -23,6 +23,7 @@ const percent = () => wholeNumberField(0, 100, "Un porcentaje entre 0 y 100.");
 
 const settingsSchema = z.object({
   minimumBookings: wholeNumberField(1, 20, "Entre 1 y 20 reservas."),
+  bookingWindowDays: wholeNumberField(1, 30, "Entre 1 y 30 días."),
   taxRatePercent: percent(),
   renewalTargetMonths1To6Percent: percent(),
   renewalTargetMonths7To12Percent: percent(),
@@ -51,6 +52,7 @@ const failureMessage = (error: unknown): string => {
 
 const valuesOf = (settings: StudioSettingsDto): SettingsInput => ({
   minimumBookings: String(settings.minimumBookings),
+  bookingWindowDays: String(settings.bookingWindowDays),
   taxRatePercent: String(settings.taxRatePercent),
   renewalTargetMonths1To6Percent: String(
     settings.renewalTargetMonths1To6Percent,
@@ -144,6 +146,14 @@ export function StudioRulesForm({
             label: "Mínimo de reservas por clase",
             helper: `Una clase con menos reservas se cancela sola ${check} antes de empezar.`,
           })}
+          {renderField({
+            name: "bookingWindowDays",
+            label: "Días adelante que una clienta puede reservar",
+            helper:
+              "Contando hoy. Las apps solo dejan reservar dentro de esos días.",
+          })}
+        </div>
+        <div className="md:max-w-[calc(50%-8px)]">
           {renderField({
             name: "taxRatePercent",
             label: "Impuestos sobre las ventas (%)",

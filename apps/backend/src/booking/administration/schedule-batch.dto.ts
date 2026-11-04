@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
 import {
+  scheduleEndField,
   SessionScheduleCreationDto,
   sessionMinutes,
+  toScheduleEnd,
 } from './administration.dto';
 
 export class SessionScheduleRowDto {
@@ -24,6 +26,15 @@ export class SessionScheduleBatchInputDto {
   @ApiProperty({ minimum: 1 }) capacity!: number;
   @ApiProperty({ format: 'date', description: 'Vigente desde, today or later' })
   effectiveFrom!: string;
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    required: false,
+    description:
+      'Exclusive end shared by every row, after effectiveFrom (BKM-018); left out or null for no end',
+  })
+  effectiveUntil?: string | null;
   @ApiProperty({
     type: SessionScheduleRowDto,
     isArray: true,
@@ -48,6 +59,7 @@ export const parseScheduleBatchInput = (value: unknown) =>
       trainerStaffMemberId: z.uuid(),
       capacity: z.int().min(1).max(100),
       effectiveFrom: z.iso.date(),
+      effectiveUntil: scheduleEndField,
       rows: z
         .array(
           z.strictObject({
@@ -62,5 +74,6 @@ export const parseScheduleBatchInput = (value: unknown) =>
     .transform((input) => ({
       ...input,
       effectiveFrom: new Date(`${input.effectiveFrom}T00:00:00.000Z`),
+      effectiveUntil: toScheduleEnd(input.effectiveUntil),
     }))
     .safeParse(value);

@@ -146,6 +146,21 @@ export class AdminSessionScheduleDto {
     description: 'Exclusive end',
   })
   effectiveUntil!: string | null;
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description: 'BKM-018: first paused date, or null when not paused',
+  })
+  pausedFrom!: string | null;
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description:
+      'BKM-018: first date with Sessions again (exclusive), or null: paused until resumed, or not paused',
+  })
+  pausedUntil!: string | null;
   @ApiProperty() classTypeName!: string;
 }
 
@@ -159,6 +174,15 @@ export class SessionScheduleInputDto {
   @ApiProperty({ minimum: 1 }) capacity!: number;
   @ApiProperty({ format: 'date', description: 'Vigente desde, today or later' })
   effectiveFrom!: string;
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    required: false,
+    description:
+      'Exclusive end, after effectiveFrom (BKM-018); null for no end. Left out, a new series has no end and a replacement keeps the old end',
+  })
+  effectiveUntil?: string | null;
 }
 
 export class SessionScheduleEndInputDto {
@@ -246,12 +270,23 @@ const scheduleFields = {
   capacity: z.int().min(1).max(100),
 };
 
+// BKM-018: «Vigente hasta», optional, as an exclusive end date or null.
+export const scheduleEndField = civilDate.nullable().optional();
+
+export const toScheduleEnd = (value: string | null | undefined) =>
+  value === undefined || value === null ? value : toCivilDate(value);
+
 export const parseScheduleInput = (value: unknown) =>
   z
-    .strictObject({ ...scheduleFields, effectiveFrom: civilDate })
+    .strictObject({
+      ...scheduleFields,
+      effectiveFrom: civilDate,
+      effectiveUntil: scheduleEndField,
+    })
     .transform((input) => ({
       ...input,
       effectiveFrom: toCivilDate(input.effectiveFrom),
+      effectiveUntil: toScheduleEnd(input.effectiveUntil),
     }))
     .safeParse(value);
 

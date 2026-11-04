@@ -17,13 +17,24 @@ export function useStudioRules(fetcher: typeof globalThis.fetch): StudioRulesDto
   return rules.data?.status === 200 ? rules.data.data : undefined;
 }
 
-// FIX-026: how many days a booking strip offers. The Studio Rule's booking
+// FIX-026: how many days a booking screen offers. The Studio Rule's booking
 // window counts today, as the backend enforces it; the backend's default
-// until the rules are read. At most seven, because the chips share the width:
-// a wider window needs S13's «Otra» on the booking screens first.
+// until the rules are read.
 const defaultBookingWindowDays = 7;
-const stripMaxDays = 7;
 
-export function bookingStripDays(rules: StudioRulesDto | undefined): number {
-  return Math.min(rules?.bookingWindowDays ?? defaultBookingWindowDays, stripMaxDays);
+export function bookingWindowDays(rules: StudioRulesDto | undefined): number {
+  return rules?.bookingWindowDays ?? defaultBookingWindowDays;
+}
+
+// FIX-031 (follow-up 234): seven chips share a strip's width. A window of up
+// to seven days fills it; a wider one keeps today and five days and leaves
+// the rest to S13's «Otra».
+const stripChips = 7;
+
+export function bookingStrip(dates: readonly string[]): {
+  strip: string[];
+  later: string[];
+} {
+  if (dates.length <= stripChips) return { strip: [...dates], later: [] };
+  return { strip: dates.slice(0, stripChips - 1), later: dates.slice(stripChips - 1) };
 }

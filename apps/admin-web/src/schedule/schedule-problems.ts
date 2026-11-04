@@ -49,12 +49,16 @@ const problems: Record<string, Problem> = {
   invalid_request: {
     message: "Revisa los datos: hay un valor que no es válido.",
   },
+  session_schedule_paused: {
+    message:
+      "Esta serie ya está en pausa. Cierra el panel y actualiza el horario.",
+  },
+  session_schedule_not_paused: {
+    message:
+      "Esta serie ya no está en pausa. Cierra el panel y actualiza el horario.",
+  },
   session_not_cancellable: {
     message: "Esta sesión ya no se puede cancelar: empezó o ya fue cancelada.",
-  },
-  session_has_no_bookings: {
-    message:
-      "Esta sesión ya no tiene reservas; si sigue vacía, se cancela sola 2 horas antes.",
   },
   administration_access_denied: {
     message: "No tienes permiso para cambiar el horario.",

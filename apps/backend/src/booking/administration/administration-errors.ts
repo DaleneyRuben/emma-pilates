@@ -26,7 +26,9 @@ export type AdministrationErrorCode =
   | 'schedule_rows_overlap'
   | 'session_not_editable'
   | 'capacity_below_bookings'
-  | 'effective_date_invalid';
+  | 'effective_date_invalid'
+  | 'session_schedule_paused'
+  | 'session_schedule_not_paused';
 
 const statuses: Record<AdministrationErrorCode, number> = {
   administration_access_denied: 403,
@@ -51,6 +53,8 @@ const statuses: Record<AdministrationErrorCode, number> = {
   session_not_editable: 409,
   capacity_below_bookings: 409,
   effective_date_invalid: 400,
+  session_schedule_paused: 409,
+  session_schedule_not_paused: 409,
 };
 
 export class AdministrationError extends Error {

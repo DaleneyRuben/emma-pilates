@@ -1,4 +1,4 @@
-import { formatCivilDate } from "../lib/bolivia-time";
+import { formatCivilDate, formatLongDay } from "../lib/bolivia-time";
 import type { ScheduleChangeResult } from "./use-schedule-change";
 
 // What the page says after a change, so the Administrator sees how many
@@ -74,4 +74,14 @@ export const endedNotice = (
 };
 
 export const cancelledNotice = (affectedBookings: number): string =>
-  `Sesión cancelada: ${count(affectedBookings, "reserva reembolsada", "reservas reembolsadas")} y avisos enviados.`;
+  affectedBookings === 0
+    ? "Sesión cancelada."
+    : `Sesión cancelada: ${count(affectedBookings, "reserva reembolsada", "reservas reembolsadas")} y avisos enviados.`;
+
+// BKM-018 (follow-up 234): the toasts after pausing and resuming a series.
+export const pausedNotice = (pausedUntil: string | null): string =>
+  pausedUntil === null
+    ? "Serie en pausa hasta que la reanudes"
+    : `Serie en pausa · vuelve el ${formatLongDay(pausedUntil)}`;
+
+export const resumedNotice = "Serie reanudada · sus clases vuelven a la app";

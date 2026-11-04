@@ -11,6 +11,7 @@ import {
   formatTimeRange,
   hasStarted,
   LoadingState,
+  OtherDateSheet,
   QueryFailure,
   Screen,
   SectionTitle,
@@ -29,7 +30,6 @@ import { DayStrip, DayStripAction } from "../ui/day-strip";
 import { FilterChips } from "../ui/filter-chips";
 import { SessionRow } from "../ui/session-row";
 import { countLabel, dayHeading, noClassesOfType, startTime } from "../ui/session-time";
-import { OtherDateSheet } from "./other-date-sheet";
 
 export type CancellableSession = SessionAvailabilityDto & { branchName: string };
 
@@ -215,6 +215,7 @@ export function CancelClassScreen() {
           setChoosingDate(false);
         }}
         selected={selectedDate}
+        testIDPrefix="cancel-class-other"
         visible={choosingDate}
       />
     </Screen>

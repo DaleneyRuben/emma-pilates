@@ -35,6 +35,8 @@ export const scheduleSelect = {
   capacity: true,
   effectiveFrom: true,
   effectiveUntil: true,
+  pausedFrom: true,
+  pausedUntil: true,
   classType: { select: { name: true } },
 } satisfies Prisma.SessionScheduleSelect;
 
@@ -119,9 +121,28 @@ export const requireAssignable = async (
   return classType;
 };
 
+// BKM-018: a series' «Vigente hasta» is an exclusive end after its start.
+export const requireEndAfterStart = (input: {
+  effectiveFrom: Date;
+  effectiveUntil?: Date | null;
+}) => {
+  if (
+    input.effectiveUntil !== undefined &&
+    input.effectiveUntil !== null &&
+    input.effectiveUntil <= input.effectiveFrom
+  ) {
+    throw new AdministrationError('effective_date_invalid');
+  }
+};
+
 export const createAndMaterialize = async (
   transaction: Transaction,
-  input: ScheduleInput & { effectiveFrom: Date; effectiveUntil: Date | null },
+  input: ScheduleInput & {
+    effectiveFrom: Date;
+    effectiveUntil: Date | null;
+    pausedFrom?: Date | null;
+    pausedUntil?: Date | null;
+  },
   now: Date,
 ) => {
   const schedule = await transaction.sessionSchedule.create({
@@ -135,6 +156,8 @@ export const createAndMaterialize = async (
       capacity: input.capacity,
       effectiveFrom: input.effectiveFrom,
       effectiveUntil: input.effectiveUntil,
+      pausedFrom: input.pausedFrom ?? null,
+      pausedUntil: input.pausedUntil ?? null,
     },
     select: scheduleSelect,
   });
@@ -143,4 +166,27 @@ export const createAndMaterialize = async (
     now,
   });
   return { schedule, ...counts };
+};
+
+type Pause = { pausedFrom: Date | null; pausedUntil: Date | null };
+
+// BKM-018: the part of a pause inside a series' range [from, until), so a
+// series ended or replaced while paused keeps only its own share of it.
+export const pauseWithin = (
+  pause: Pause,
+  range: { from: Date | null; until: Date | null },
+): Pause => {
+  if (pause.pausedFrom === null) return { pausedFrom: null, pausedUntil: null };
+  const from =
+    range.from !== null && range.from > pause.pausedFrom
+      ? range.from
+      : pause.pausedFrom;
+  const until =
+    range.until === null ||
+    (pause.pausedUntil !== null && pause.pausedUntil < range.until)
+      ? pause.pausedUntil
+      : range.until;
+  return until !== null && until <= from
+    ? { pausedFrom: null, pausedUntil: null }
+    : { pausedFrom: from, pausedUntil: until };
 };

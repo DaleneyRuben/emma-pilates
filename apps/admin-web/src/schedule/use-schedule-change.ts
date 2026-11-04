@@ -4,6 +4,8 @@ import {
   createSessionSchedules,
   endSessionSchedule,
   getListSessionSchedulesQueryKey,
+  pauseSessionSchedule,
+  resumeSessionSchedule,
   replaceSessionSchedule,
   updateSession,
   type SessionCancellationDto,
@@ -13,7 +15,9 @@ import {
   type SessionScheduleBatchInputDto,
   type SessionScheduleEndDto,
   type SessionScheduleInputDto,
+  type SessionSchedulePauseDto,
   type SessionScheduleReplacementDto,
+  type SessionScheduleResumeDto,
 } from "@pilates/api-contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminFetch } from "../api/fetcher";
@@ -29,6 +33,13 @@ export type ScheduleChange =
       input: SessionScheduleInputDto;
     }
   | { kind: "end-schedule"; scheduleId: string; effectiveFrom: string }
+  | {
+      kind: "pause-schedule";
+      scheduleId: string;
+      pausedFrom: string;
+      pausedUntil: string | null;
+    }
+  | { kind: "resume-schedule"; scheduleId: string }
   | { kind: "cancel-session"; sessionId: string };
 
 export type ScheduleChangeResult =
@@ -37,6 +48,8 @@ export type ScheduleChangeResult =
   | { kind: "update-session" }
   | { kind: "replace-schedule"; result: SessionScheduleReplacementDto }
   | { kind: "end-schedule"; result: SessionScheduleEndDto }
+  | { kind: "pause-schedule"; result: SessionSchedulePauseDto }
+  | { kind: "resume-schedule"; result: SessionScheduleResumeDto }
   | { kind: "cancel-session"; result: SessionCancellationDto };
 
 async function send(change: ScheduleChange): Promise<ScheduleChangeResult> {
@@ -82,6 +95,25 @@ async function send(change: ScheduleChange): Promise<ScheduleChangeResult> {
             adminFetch,
           )
         ).data as SessionScheduleEndDto,
+      };
+    case "pause-schedule":
+      return {
+        kind: change.kind,
+        result: (
+          await pauseSessionSchedule(
+            change.scheduleId,
+            { pausedFrom: change.pausedFrom, pausedUntil: change.pausedUntil },
+            undefined,
+            adminFetch,
+          )
+        ).data as SessionSchedulePauseDto,
+      };
+    case "resume-schedule":
+      return {
+        kind: change.kind,
+        result: (
+          await resumeSessionSchedule(change.scheduleId, undefined, adminFetch)
+        ).data as SessionScheduleResumeDto,
       };
     case "cancel-session":
       return {

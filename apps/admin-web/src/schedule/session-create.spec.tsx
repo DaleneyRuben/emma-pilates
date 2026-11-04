@@ -161,6 +161,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
         trainerStaffMemberId: daniela.id,
         capacity: 12,
         effectiveFrom: nextMonday,
+        effectiveUntil: null,
         rows: [{ weekday: 3, startsAtLocal: "19:00", durationMinutes: 60 }],
       }),
     );

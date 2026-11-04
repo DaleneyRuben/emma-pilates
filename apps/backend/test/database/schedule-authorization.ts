@@ -9,6 +9,9 @@ export const scheduleAuthorizationRows = (): Record<string, MatrixRow> => ({
   'POST /api/v1/administrator/session-schedules/{scheduleId}/replacement': both,
   'POST /api/v1/administrator/session-schedules/{scheduleId}/end': both,
   'POST /api/v1/administrator/session-schedules/batch': both,
+  // BKM-018: pause a weekly series and resume it.
+  'POST /api/v1/administrator/session-schedules/{scheduleId}/pause': both,
+  'POST /api/v1/administrator/session-schedules/{scheduleId}/resume': both,
   'POST /api/v1/administrator/sessions': both,
   'GET /api/v1/administrator/sessions': both,
   'PATCH /api/v1/administrator/sessions/{sessionId}': both,

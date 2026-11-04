@@ -10,6 +10,7 @@ enum SessionCancellationCause {
   NO_SUBSTITUTE_TRAINER @map("no_substitute_trainer")
   SCHEDULE_CHANGED      @map("schedule_changed")
   MINIMUM_NOT_MET       @map("minimum_not_met")
+  SCHEDULE_PAUSED       @map("schedule_paused")
 
   @@schema("booking")
 }
@@ -84,6 +85,9 @@ model SessionSchedule {
   capacity             Int         @db.SmallInt
   effectiveFrom        DateTime    @map("effective_from") @db.Date
   effectiveUntil       DateTime?   @map("effective_until") @db.Date
+  // BKM-018: no Sessions on [pausedFrom, pausedUntil); null until = until resumed.
+  pausedFrom           DateTime?   @map("paused_from") @db.Date
+  pausedUntil          DateTime?   @map("paused_until") @db.Date
   createdAt            DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt            DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
   branch               Branch      @relation(fields: [branchId], references: [id], onDelete: Restrict)

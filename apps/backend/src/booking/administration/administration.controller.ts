@@ -62,6 +62,7 @@ import {
 } from './administration.dto';
 import { AdministratorOversightController } from './oversight.controller';
 import { AdministratorScheduleBatchController } from './schedule-batch.controller';
+import { AdministratorSchedulePauseController } from './schedule-pause.controller';
 import { toScheduleDto } from './schedule-mapping';
 
 export {
@@ -439,6 +440,7 @@ export const administrationControllers = [
   AdministratorPlansController,
   AdministratorSessionSchedulesController,
   AdministratorScheduleBatchController,
+  AdministratorSchedulePauseController,
   AdministratorSessionEditsController,
   AdministratorOversightController,
 ];

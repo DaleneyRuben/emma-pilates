@@ -49,6 +49,7 @@ numbered tests.
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 83) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
 | Trainer pay periods          | Calculate and approve a Trainer's pay by Día, Semana, Rango or Mes in Sueldos › Por aprobar, see an approved day keep the month from paying it again, and read the period in «Mis pagos» (Test 127) | The Coordinator stays monthly; the worker drafts whole months only, so a Trainer already paid by day or week that month is drafted by hand |
 | Studio transfer QR           | Upload the studio's transfer QR in Ajustes › QR del estudio, see it and its date, and read the same image on the apps' QR route; the Coordinator does not see the tab (Test 128) | Until the first upload the server's `TRANSFER_QR_IMAGE_PATH` file is served; a storage outage fails the route instead of falling back |
+| Weekly series and booking window | Edit the booking window in Reglas del estudio, cancel an empty class from Horario, give a weekly series a «Vigente hasta», pause and resume it, and reach a wider window's later days through «Otra» in both apps (Test 129) | A pause holds one range at a time; resuming early brings back only the classes the pause withdrew that have not started |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -2895,6 +2896,7 @@ Bolivia time, whatever time zone your computer uses.
    **Esta y las futuras** (change the weekly schedule from a **Vigente desde**
    date, with the series' own Duración: unbooked Sessions move, booked ones
    stay, and the page says how many of each). **Terminar la serie** stops the schedule from a date after asking.
+   **Vigente hasta (opcional)** and **Pausar la serie** (BKM-018) are Test 129.
    **Who booked (WEB-039).** Above the form the panel lists **Reservaron
    (N)** with each Client's name ("Nadie reservó todavía." when empty; a
    recorded Attendance adds "Asistió" or "No vino") and, when someone waits,
@@ -2914,12 +2916,16 @@ Bolivia time, whatever time zone your computer uses.
    goes back without booking. A class that has started shows "Clase pasada:
    solo lectura." with its list and no booking button or form. Signed in as
    `carolina.rivas@example.com`, the Coordinator sees and books the same way.
-4. **Cancelar sesión.** Only a Session with Bookings offers it (an empty one
-   says it cancels itself 2 hours before). The confirmation says every
-   Booking is refunded even inside the 2 h 30 window and that the waitlist is
-   notified; afterwards the Session disappears from the grid and the page
-   says "Sesión cancelada: N reservas reembolsadas y avisos enviados.". To try
-   it, book a Session first as a Client (Test 10 or the Staff app, Test 11).
+4. **Cancelar sesión.** Every Session that has not started offers it
+   (FIX-027). A Session below the Studio Rules' minimum also says "Si no llega
+   a 2 reservas, el sistema la cancela sola 3 h antes de empezar." (both
+   numbers come from Reglas del estudio). An empty Session asks "No tiene
+   reservas. Se cancela y desaparece de la app." and then says "Sesión
+   cancelada.". A booked one says every Booking is refunded even inside the
+   2 h 30 window and that the waitlist is notified; afterwards the Session
+   disappears from the grid and the page says "Sesión cancelada: N reservas
+   reembolsadas y avisos enviados.". To try that, book a Session first as a
+   Client (Test 10 or the Staff app, Test 11).
 5. **Sucursales, Tipos de clase, Planes.** Each is a dense table with
    pagination and one filter in the address (`?status=archived`,
    `?visibility=hidden`). **+ Nueva …** and a row open the side panel. A new
@@ -8505,13 +8511,11 @@ walkthrough exactly, add a Plan of Bs 590 as Paola first (AW04, or
 A. **Días para reservar por adelantado in the strips (FIX-026).** As Lucía,
    **Reservar** shows seven days, Hoy through the sixth day after it. As
    Camila, open Lucía, **Reservar clase**: the same seven days. Set the
-   window to 3 with Paola's `PUT /api/v1/administrator/studio-settings`
-   (`"bookingWindowDays":3`, the current `expectedVersion` and the other
-   fields as they are; the admin web does not edit it yet), log in again, and
+   window to 3 in the admin web's **Ajustes › Reglas del estudio** («Días
+   adelante que una clienta puede reservar», Test 129 A), log in again, and
    both strips show three days, wider chips sharing the same width. Set it
-   back to 7. With a window above 7 the strips still show seven days: the
-   chips share the width, and a wider window waits for S13's «Otra» on the
-   booking screens (FIX-031). A day chosen before the rules arrived that falls
+   back to 7. A window above 7 keeps today and five days on the strip and
+   adds **Otra** (FIX-031, Test 129 D). A day chosen before the rules arrived that falls
    past a shorter window goes back to Hoy. **Cancelar una clase** (S13) keeps
    its 30 days, and Horario and Mi agenda keep their week: they do not book.
 B. **The refusal.** A booking, Waitlist join or reschedule the window refuses
@@ -8624,3 +8628,61 @@ storage), and log in as Paola (Test 24).
    `administration_access_denied` (Test 77's matrix).
 8. **Narrow browser.** At 420 px open it from the menu drawer: the QR sits
    above the text and the button, with no sideways scroll.
+
+## Test 129: the booking window, empty classes, and weekly series on the admin web; «Otra» in the apps (FIX-026, FIX-027, BKM-018, FIX-031)
+
+The admin-web halves of FIX-026 and FIX-027, the weekly series' end date and
+pause (BKM-018, design follow-up 234), and the booking strips past seven days
+(FIX-031). The pause needs the migrations
+`20261104120000_schedule_paused_cause` and
+`20261104120100_session_schedule_pauses` (owner approval 2026-11-04). Use a
+copy of `pilates_golden` with them applied, never `pilates_dev_sim`, log in as
+Paola (Test 24), and keep the API at hand for the checks below.
+
+A. **The booking window (FIX-026).** **Ajustes › Reglas del estudio** shows
+   «Días adelante que una clienta puede reservar» (7) beside «Mínimo de
+   reservas por clase», with «Contando hoy. Las apps solo dejan reservar dentro
+   de esos días.». Set 14 and **Guardar cambios**: «Guardamos las reglas del
+   estudio.», the version goes up, and `GET /api/v1/studio-rules` answers
+   `"bookingWindowDays":14`. 0 or 31 says «Entre 1 y 30 días.» and sends
+   nothing. As Carolina the same row reads «14 días», read-only.
+B. **Cancel an empty class (FIX-027).** In **Horario** open a future class
+   with no Bookings: the panel ends with «Si no llega a 2 reservas, el
+   sistema la cancela sola 3 h antes de empezar.» and **Cancelar sesión**.
+   Confirm «No tiene reservas. Se cancela y desaparece de la app.»: the page
+   says «Sesión cancelada.» and the class leaves the week.
+C. **Vigente hasta (BKM-018).** **Nueva sesión › Cada semana** shows
+   **Vigente hasta (opcional)** under **Vigente desde**, «Sin fecha de fin» as
+   its placeholder and «Sin fecha de fin, la serie sigue cada semana hasta que
+   la pauses o la termines.». A last date before **Vigente desde** says «Elige
+   una fecha desde «Vigente desde» en adelante.». With Sábado 10:00 from
+   21/11/2026 until 05/12/2026 the series' last class is on 5 December
+   (`effective_until` is 2026-12-06, the day after). **Esta y las futuras**
+   shows the series' last date and can clear it (no end) or set one.
+D. **Pausar la serie (BKM-018).** Open a class of a weekly series: **Pausar
+   la serie** opens «Pausar la serie» with «En esas fechas no se publican
+   clases de la serie. Las que ya tienen reservas se mantienen; cancélalas una
+   por una si hace falta.», **Pausar desde** and **Vuelve el (opcional)**
+   («Hasta que la reanudes»). Pause from a Friday until the next Friday: the
+   page says «Serie en pausa · vuelve el viernes …», that Friday's class
+   leaves the week (`cancellation_cause = 'schedule_paused'`), and a booked
+   one would stay. Any class of the series now shows «Serie en pausa», «En
+   pausa del … al …» (the last paused day) and **Reanudar la serie**, which
+   brings the withdrawn classes back («Serie reanudada · sus clases vuelven a
+   la app»). Without a return date the notice reads «En pausa desde el …,
+   hasta que la reanudes.» and the worker publishes nothing for the series
+   until it is resumed. The API: `POST
+   /api/v1/administrator/session-schedules/{id}/pause` with `pausedFrom` (and
+   `pausedUntil`, exclusive, or null), `POST …/resume`; a second pause
+   answers `409 session_schedule_paused`, resuming an unpaused series `409
+   session_schedule_not_paused`, a past start `400 effective_date_invalid`.
+E. **«Otra» on the booking strips (FIX-031).** With the window at 14, as
+   Lucía **Reservar** shows Hoy and the next five days, then **Otra**
+   («Elegir otra fecha, hasta 14 días»). It opens «Elige otra fecha» with the
+   eighth to the fourteenth day; pick one and the chip shows its number in
+   Palo de rosa with that day's classes. As Camila, Lucía's **Reservar
+   clase** (S07) does the same. With 7 days or fewer there is no **Otra**.
+   Check on the iPhone 16 Pro, the iPad Pro 11 and the Android emulator.
+F. **Narrow browser.** At 420 px Reglas del estudio stacks the fields, the
+   «Pausar la serie» dialog stacks its two dates, and **Nueva sesión › Cada
+   semana** shows **Vigente hasta** full width.

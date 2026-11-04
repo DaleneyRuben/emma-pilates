@@ -114,6 +114,7 @@ describe("AW03 Cada semana with several days", () => {
         trainerStaffMemberId: daniela.id,
         capacity: mat.defaultCapacity,
         effectiveFrom: nextMonday,
+        effectiveUntil: null,
         rows: [
           { weekday: 1, startsAtLocal: "07:00", durationMinutes: 60 },
           { weekday: 3, startsAtLocal: "07:00", durationMinutes: 60 },

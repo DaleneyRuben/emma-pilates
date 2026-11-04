@@ -53,12 +53,37 @@ describe("Assistant Reservar booking window (FIX-026)", () => {
     expect(screen.getByTestId(`assistant-day-${dates[2]}`)).toBeOnTheScreen();
   });
 
-  it("keeps the strip at seven days when the window is wider", async () => {
-    const screen = await openBooking(14);
-    const dates = upcomingCivilDates(today, 8);
+  it("offers seven days and no «Otra» for a week-long window", async () => {
+    const screen = await openBooking(7);
+    const dates = upcomingCivilDates(today, 7);
 
     await waitFor(() => expect(screen.getByTestId(`assistant-day-${dates[6]}`)).toBeOnTheScreen());
-    expect(screen.queryByTestId(`assistant-day-${dates[7]}`)).not.toBeOnTheScreen();
+    expect(screen.queryByTestId("assistant-day-other")).not.toBeOnTheScreen();
+  });
+
+  // FIX-031 (follow-up 234, S07b): S13's «Otra» on the booking strip.
+  it("reaches the later days of a wider window through «Otra»", async () => {
+    const screen = await openBooking(14);
+    const dates = upcomingCivilDates(today, 14);
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Elegir otra fecha, hasta 14 días" }),
+      ).toBeOnTheScreen(),
+    );
+    expect(screen.getByTestId(`assistant-day-${dates[5]}`)).toBeOnTheScreen();
+    expect(screen.queryByTestId(`assistant-day-${dates[6]}`)).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByTestId("assistant-day-other"));
+    await waitFor(() => expect(screen.getByText("Elige otra fecha")).toBeOnTheScreen());
+    expect(screen.getByTestId(`assistant-other-${dates[13]}`)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByTestId(`assistant-other-${dates[10]}`));
+
+    await waitFor(() =>
+      expect(screen.getByTestId("assistant-day-other")).toHaveProp("accessibilityState", {
+        selected: true,
+      }),
+    );
   });
 
   it("goes back to today when the window turns out shorter than the chosen day", async () => {

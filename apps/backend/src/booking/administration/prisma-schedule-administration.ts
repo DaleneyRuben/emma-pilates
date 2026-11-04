@@ -1,12 +1,8 @@
-import {
-  BookingState,
-  SessionCancellationCause,
-  SessionState,
-} from '../../generated/prisma/enums';
+import { SessionCancellationCause } from '../../generated/prisma/enums';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate, boliviaInstant } from '../../time/bolivia-time';
+import { boliviaDate } from '../../time/bolivia-time';
 import {
   AdministrationError,
   requireOperations,
@@ -15,12 +11,15 @@ import {
 import {
   createAndMaterialize,
   isSessionLength,
+  pauseWithin,
   requireAssignable,
+  requireEndAfterStart,
   scheduleSelect,
   scheduleTransaction,
   type ScheduleInput,
 } from './schedule-writes';
 import { createPrismaSessionExceptions } from './prisma-session-exceptions';
+import { withdrawSessions } from './schedule-withdrawal';
 
 export type { ScheduleInput } from './schedule-writes';
 
@@ -45,54 +44,25 @@ export const createPrismaScheduleAdministration = (
     }
   };
 
-  // Cancels the schedule's unbooked, non-exception Sessions on or after the
-  // date that have not started; booked ones and exceptions stay (ADR-0059).
-  const withdrawFrom = async (
+  // Ending or replacing withdraws every unbooked Session from the date on.
+  const withdrawFrom = (
     transaction: Transaction,
     sessionScheduleId: string,
     from: Date,
     actor: AdministratorActor,
     now: Date,
-  ): Promise<{ cancelledSessions: number; keptSessions: number }> => {
-    const sessions = await transaction.session.findMany({
-      where: {
+  ) =>
+    withdrawSessions(
+      transaction,
+      {
         sessionScheduleId,
-        state: SessionState.SCHEDULED,
-        startsAt: { gte: boliviaInstant(from, 0), gt: now },
+        from,
+        until: null,
+        cause: SessionCancellationCause.SCHEDULE_CHANGED,
       },
-      select: {
-        id: true,
-        isException: true,
-        _count: {
-          select: {
-            bookings: { where: { state: BookingState.BOOKED } },
-            waitlistEntries: { where: { closedAt: null } },
-          },
-        },
-      },
-    });
-    const unbooked = sessions.filter(
-      (session) =>
-        !session.isException &&
-        session._count.bookings === 0 &&
-        session._count.waitlistEntries === 0,
+      actor,
+      now,
     );
-    if (unbooked.length > 0) {
-      await transaction.session.updateMany({
-        where: { id: { in: unbooked.map(({ id }) => id) } },
-        data: {
-          state: SessionState.CANCELLED,
-          cancellationCause: SessionCancellationCause.SCHEDULE_CHANGED,
-          cancelledAt: now,
-          cancelledByAccountId: actor.accountId,
-        },
-      });
-    }
-    return {
-      cancelledSessions: unbooked.length,
-      keptSessions: sessions.length - unbooked.length,
-    };
-  };
 
   const findSchedule = async (transaction: Transaction, id: string) => {
     const schedule = await transaction.sessionSchedule.findUnique({
@@ -144,7 +114,10 @@ export const createPrismaScheduleAdministration = (
     },
 
     createSchedule: async (
-      input: ScheduleInput & { effectiveFrom: Date },
+      input: ScheduleInput & {
+        effectiveFrom: Date;
+        effectiveUntil?: Date | null;
+      },
       principal: AuthenticatedPrincipal,
     ) => {
       requireOperations(principal);
@@ -153,30 +126,44 @@ export const createPrismaScheduleAdministration = (
       if (input.effectiveFrom < boliviaDate(now)) {
         throw new AdministrationError('effective_date_invalid');
       }
+      requireEndAfterStart(input);
       return transact(async (transaction) => {
         await requireAssignable(transaction, input);
         return createAndMaterialize(
           transaction,
-          { ...input, effectiveUntil: null },
+          { ...input, effectiveUntil: input.effectiveUntil ?? null },
           now,
         );
       });
     },
 
     replaceSchedule: async (
-      input: ScheduleInput & { sessionScheduleId: string; effectiveFrom: Date },
+      input: ScheduleInput & {
+        sessionScheduleId: string;
+        effectiveFrom: Date;
+        effectiveUntil?: Date | null;
+      },
       principal: AuthenticatedPrincipal,
     ) => {
       const actor = requireOperations(principal);
       requireScheduleValues(input);
+      requireEndAfterStart(input);
       const now = dependencies.now();
       return transact(async (transaction) => {
         const old = await findSchedule(transaction, input.sessionScheduleId);
         requireChangeDate(old, input.effectiveFrom, boliviaDate(now));
         await requireAssignable(transaction, input);
+        // Left out, the replacement keeps the old end (BKM-018).
+        const effectiveUntil =
+          input.effectiveUntil === undefined
+            ? old.effectiveUntil
+            : input.effectiveUntil;
         const ended = await transaction.sessionSchedule.update({
           where: { id: old.id },
-          data: { effectiveUntil: input.effectiveFrom },
+          data: {
+            effectiveUntil: input.effectiveFrom,
+            ...pauseWithin(old, { from: null, until: input.effectiveFrom }),
+          },
           select: scheduleSelect,
         });
         const withdrawn = await withdrawFrom(
@@ -186,9 +173,17 @@ export const createPrismaScheduleAdministration = (
           actor,
           now,
         );
+        // The rest of a pause carries over to the replacement (BKM-018).
         const created = await createAndMaterialize(
           transaction,
-          { ...input, effectiveUntil: old.effectiveUntil },
+          {
+            ...input,
+            effectiveUntil,
+            ...pauseWithin(old, {
+              from: input.effectiveFrom,
+              until: effectiveUntil,
+            }),
+          },
           now,
         );
         return {
@@ -212,7 +207,10 @@ export const createPrismaScheduleAdministration = (
         requireChangeDate(old, input.effectiveFrom, boliviaDate(now));
         const schedule = await transaction.sessionSchedule.update({
           where: { id: old.id },
-          data: { effectiveUntil: input.effectiveFrom },
+          data: {
+            effectiveUntil: input.effectiveFrom,
+            ...pauseWithin(old, { from: null, until: input.effectiveFrom }),
+          },
           select: scheduleSelect,
         });
         return {
