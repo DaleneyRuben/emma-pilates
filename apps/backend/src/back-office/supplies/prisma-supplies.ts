@@ -5,6 +5,7 @@ import {
   BackOfficeError,
   databaseCause,
   requireAdministrator,
+  requireSupplyKeeper,
 } from '../back-office-errors';
 import { requireActiveBranch } from '../booking-references';
 import { runIdempotent } from '../prisma-idempotency';
@@ -108,7 +109,7 @@ export const createPrismaSupplies = (
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ) => {
-    const actor = requireAdministrator(principal);
+    const actor = requireSupplyKeeper(principal);
     if (!isCount(input.quantity, 1)) {
       throw new BackOfficeError('invalid_back_office_value');
     }
@@ -157,7 +158,7 @@ export const createPrismaSupplies = (
       query: Paging & { branchId: string; status: SupplyStatus },
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      requireSupplyKeeper(principal);
       const where: Prisma.SupplyWhereInput = {
         branchId: query.branchId,
         ...statusFilters[query.status],
@@ -287,7 +288,7 @@ export const createPrismaSupplies = (
       query: Paging & { branchId: string; month: string; supplyId?: string },
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      requireSupplyKeeper(principal);
       const { start, end } = monthRange(query.month);
       const where: Prisma.WithdrawalWhereInput = {
         recordedAt: { gte: start, lt: end },

@@ -2,7 +2,7 @@ import { retrySerializable } from '../../database/retry-serializable';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { recordAdministratorAudit } from '../administration/administration-audit';
-import { requireAdministrator } from '../administration/administration-errors';
+import { requireOperations } from '../administration/administration-errors';
 import {
   updateStudioSettings,
   type EditableStudioSettings,
@@ -13,6 +13,11 @@ export type StudioSettingsView = StudioSettings & {
   updatedAt: Date;
   updatedByName: string | null;
 };
+
+// The amounts in the rules; the Coordinator reads them as null (ADR-0108).
+type Amounts = 'evaluationPriceCentavos' | 'nutritionistFeeCentavos';
+export type StudioSettingsReadView = Omit<StudioSettingsView, Amounts> &
+  Record<Amounts, number | null>;
 
 // The rules the apps show their Clients (GET /studio-rules, ADR-0101).
 export type StudioRules = {
@@ -114,9 +119,18 @@ export const createPrismaStudioSettings = (
   prisma: PrismaClient,
   dependencies: { now: () => Date },
 ) => ({
-  read: async (principal: AuthenticatedPrincipal) => {
-    requireAdministrator(principal);
-    return toView(await currentRow(prisma));
+  read: async (
+    principal: AuthenticatedPrincipal,
+  ): Promise<StudioSettingsReadView> => {
+    const actor = requireOperations(principal);
+    const view = toView(await currentRow(prisma));
+    return actor.role === 'administrator'
+      ? view
+      : {
+          ...view,
+          evaluationPriceCentavos: null,
+          nutritionistFeeCentavos: null,
+        };
   },
 
   update: (

@@ -115,11 +115,19 @@ export class StudioSettingsDto extends StudioSettingsValuesDto {
   @ApiProperty()
   inviteRewardClasses!: number;
 
-  @ApiProperty({ description: 'BOB centavos' })
-  evaluationPriceCentavos!: number;
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    description: 'BOB centavos; null for the Coordinator, who sees no amount',
+  })
+  evaluationPriceCentavos!: number | null;
 
-  @ApiProperty({ description: 'BOB centavos' })
-  nutritionistFeeCentavos!: number;
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    description: 'BOB centavos; null for the Coordinator, who sees no amount',
+  })
+  nutritionistFeeCentavos!: number | null;
 
   @ApiProperty({ format: 'date-time' })
   updatedAt!: string;

@@ -14,7 +14,7 @@ import {
 } from '../../uploads/image-asset-attachments';
 import type { ObjectStorage } from '../../uploads/object-storage';
 import {
-  requireAdministrator,
+  requireOperations,
   type AdministratorActor,
 } from '../administration/administration-errors';
 import {
@@ -122,7 +122,7 @@ export const createPrismaPromotionCommands = (
       principal: AuthenticatedPrincipal,
       idempotencyKey: string,
     ): Promise<AdminPromotionView> => {
-      const actor = requireAdministrator(principal);
+      const actor = requireOperations(principal);
       const values = requirePromotionValues(input);
       return runIdempotent(
         prisma,
@@ -171,7 +171,7 @@ export const createPrismaPromotionCommands = (
       input: PromotionInput & { promotionId: string },
       principal: AuthenticatedPrincipal,
     ): Promise<AdminPromotionView> => {
-      const actor = requireAdministrator(principal);
+      const actor = requireOperations(principal);
       const values = requirePromotionValues(input);
       return transact(async (transaction) => {
         const previous = await load(transaction, input.promotionId);
@@ -212,7 +212,7 @@ export const createPrismaPromotionCommands = (
       command: { promotionId: string },
       principal: AuthenticatedPrincipal,
     ): Promise<AdminPromotionView> => {
-      const actor = requireAdministrator(principal);
+      const actor = requireOperations(principal);
       return transact(async (transaction) => {
         const previous = await load(transaction, command.promotionId);
         if (previous.archivedAt !== null) {
@@ -246,7 +246,7 @@ export const createPrismaPromotionCommands = (
       command: { promotionId: string },
       principal: AuthenticatedPrincipal,
     ): Promise<AdminPromotionView> => {
-      const actor = requireAdministrator(principal);
+      const actor = requireOperations(principal);
       return transact(async (transaction) => {
         const previous = await load(transaction, command.promotionId);
         if (previous.publishedAt === null) return view(previous);
@@ -276,7 +276,7 @@ export const createPrismaPromotionCommands = (
       command: { promotionId: string },
       principal: AuthenticatedPrincipal,
     ): Promise<void> => {
-      const actor = requireAdministrator(principal);
+      const actor = requireOperations(principal);
       return transact(async (transaction) => {
         const previous = await load(transaction, command.promotionId);
         if (previous.archivedAt !== null) return;
@@ -303,7 +303,7 @@ export const createPrismaPromotionCommands = (
       command: { promotionIds: string[] },
       principal: AuthenticatedPrincipal,
     ): Promise<AdminPromotionView[]> => {
-      requireAdministrator(principal);
+      requireOperations(principal);
       return transact(async (transaction) => {
         const live = await transaction.promotion.findMany({
           where: { archivedAt: null },

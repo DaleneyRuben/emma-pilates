@@ -1,7 +1,7 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import { FreezeState } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { requireAdministrator } from '../administration/administration-errors';
+import { requireOperations } from '../administration/administration-errors';
 import { PaymentRuleError } from './payment-errors';
 
 const reviewSelect = {
@@ -34,7 +34,7 @@ const toReview = (row: {
 
 export const createFreezeReads = (prisma: PrismaClient) => ({
   listRequestedFreezes: async (principal: AuthenticatedPrincipal) => {
-    requireAdministrator(principal);
+    requireOperations(principal);
     const rows = await prisma.freeze.findMany({
       where: { state: FreezeState.REQUESTED, deletedAt: null },
       orderBy: { createdAt: 'asc' },
@@ -46,7 +46,7 @@ export const createFreezeReads = (prisma: PrismaClient) => ({
     command: { freezeId: string },
     principal: AuthenticatedPrincipal,
   ) => {
-    requireAdministrator(principal);
+    requireOperations(principal);
     const row = await prisma.freeze.findFirst({
       where: { id: command.freezeId, deletedAt: null },
       select: reviewSelect,

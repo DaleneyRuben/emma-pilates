@@ -133,14 +133,13 @@ const sender = (
     ? { app: 'client', role: 'client' }
     : { app: 'staff', role: principal.identity.role };
 
-// ADR-0054: triage is the Administrator's; the Coordinator may send feedback
-// (operations) but cannot open the admin list (ADR-0102).
-const requireAdministrator = (
-  principal: AuthenticatedPrincipal,
-): FeedbackActor => {
+// ADR-0054: triage is the Administrator's and, since it carries no money,
+// the Coordinator's (ADR-0108).
+const requireTriage = (principal: AuthenticatedPrincipal): FeedbackActor => {
   if (
     principal.identity.kind !== 'staff' ||
-    principal.identity.role !== 'administrator'
+    (principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
   ) {
     throw new FeedbackError('feedback_access_denied');
   }
@@ -184,7 +183,7 @@ export const listFeedback = async (
   principal: AuthenticatedPrincipal,
   { store }: Dependencies,
 ): Promise<FeedbackPage> => {
-  requireAdministrator(principal);
+  requireTriage(principal);
   return store.list(query);
 };
 
@@ -194,7 +193,7 @@ export const exportFeedback = async (
   principal: AuthenticatedPrincipal,
   { store, now }: Dependencies,
 ): Promise<FeedbackRow[]> => {
-  const actor = requireAdministrator(principal);
+  const actor = requireTriage(principal);
   const rows = await store.listAll();
   await store.recordExport({
     actor,
@@ -213,7 +212,7 @@ export const triageFeedback = async (
   principal: AuthenticatedPrincipal,
   { store, now }: Dependencies,
 ): Promise<FeedbackRow> => {
-  const actor = requireAdministrator(principal);
+  const actor = requireTriage(principal);
   const note = command.changeNote?.trim() ?? '';
   if (note.length > feedbackNoteMaxLength) {
     throw new FeedbackError('invalid_feedback');

@@ -17,16 +17,16 @@ export const worksAtBranch = (
   holdsEveryBranch(identity) || identity.branchIds.includes(branchId);
 
 /**
- * Front-desk Booking work on a Client's behalf: the Assistant at her assigned
- * Branches and the Coordinator at every Branch (ADR-0102).
+ * Booking work on a Client's behalf: the Assistant at her assigned Branches,
+ * and the Coordinator (ADR-0102) and the Administrator from Horario
+ * (ADR-0108) at every Branch.
  */
 export const actsForClientsAt = (
   principal: AuthenticatedPrincipal,
   branchId: string,
 ): boolean =>
   principal.identity.kind === 'staff' &&
-  (principal.identity.role === 'assistant' ||
-    principal.identity.role === 'coordinator') &&
+  (principal.identity.role === 'assistant' || runsOperations(principal)) &&
   worksAtBranch(principal.identity, branchId);
 
 /**

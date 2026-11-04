@@ -11,7 +11,10 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { boliviaDate } from '../../time/bolivia-time';
 import { readEvaluationKinds } from '../evaluations/evaluation-kinds';
 import { containsPattern } from '../search-pattern';
-import { requireAdministrator } from './administration-errors';
+import {
+  requireAdministrator,
+  requireOperations,
+} from './administration-errors';
 
 type Paging = { page: number; pageSize: number };
 
@@ -29,7 +32,9 @@ const methodNames: Record<
 };
 
 // ADM-001 slices D and E: read-only oversight for AW25–AW27 and the income
-// half of AW16 (expenses join from Back Office in BKO-002).
+// half of AW16 (expenses join from Back Office in BKO-002). The Evaluation
+// agenda and the Referrals carry no amount, so the Coordinator reads them
+// too (ADR-0108).
 export const createPrismaOversight = (
   prisma: PrismaClient,
   dependencies: { now: () => Date },
@@ -43,7 +48,7 @@ export const createPrismaOversight = (
     },
     principal: AuthenticatedPrincipal,
   ) => {
-    requireAdministrator(principal);
+    requireOperations(principal);
     const where: Prisma.EvaluationWhereInput = {
       state: EvaluationState.BOOKED,
       slot: {
@@ -103,7 +108,7 @@ export const createPrismaOversight = (
     query: Paging & { query?: string },
     principal: AuthenticatedPrincipal,
   ) => {
-    requireAdministrator(principal);
+    requireOperations(principal);
     const ids =
       query.query === undefined || query.query.trim() === ''
         ? undefined

@@ -84,6 +84,21 @@ export const requireAdministrator = (
   return { accountId: principal.accountId };
 };
 
+// Insumos' list and movements carry no amount: the Coordinator runs them with
+// the Administrator; the Supply catalog stays the Administrator's (ADR-0108).
+export const requireSupplyKeeper = (
+  principal: AuthenticatedPrincipal,
+): BackOfficeActor => {
+  if (
+    principal.identity.kind !== 'staff' ||
+    (principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
+  ) {
+    throw new BackOfficeError('back_office_access_denied');
+  }
+  return { accountId: principal.accountId };
+};
+
 // A Trainer reads her own pay (BKO-006). Anyone else, a Coordinator included
 // (ADR-0102), is denied.
 export const requireTrainer = (principal: AuthenticatedPrincipal): string => {

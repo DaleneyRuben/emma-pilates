@@ -1,5 +1,6 @@
 import type { NewNotification } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { runsOperations } from '../staff-access';
 import { PaymentRuleError } from './payment-errors';
 
 export class FreezeAccessDeniedError extends Error {
@@ -36,20 +37,17 @@ type DecideFreezeDependencies = {
   now(): Date;
 };
 
-const requireAdministrator = (principal: AuthenticatedPrincipal): void => {
-  if (
-    principal.identity.kind !== 'staff' ||
-    principal.identity.role !== 'administrator'
-  ) {
-    throw new FreezeAccessDeniedError();
-  }
+// A Freeze moves no money: the Administrator and the Coordinator decide it
+// (ADR-0108).
+const requireOperations = (principal: AuthenticatedPrincipal): void => {
+  if (!runsOperations(principal)) throw new FreezeAccessDeniedError();
 };
 
 export const decideFreeze = async (
   command: { freezeId: string; decision: 'approved' | 'refused' },
   dependencies: DecideFreezeDependencies,
 ): Promise<{ state: 'approved' | 'refused' }> => {
-  requireAdministrator(dependencies.principal);
+  requireOperations(dependencies.principal);
   const freeze = await dependencies.loadFreeze(command.freezeId);
   if (freeze === null) throw new FreezeAccessDeniedError();
   if (freeze.state !== 'requested') {

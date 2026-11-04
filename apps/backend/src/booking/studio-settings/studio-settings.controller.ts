@@ -23,7 +23,7 @@ import {
 import { run } from '../administration/administration-http';
 import type {
   StudioSettingsOperations,
-  StudioSettingsView,
+  StudioSettingsReadView,
 } from './prisma-studio-settings';
 import { StudioSettingsError } from './studio-settings';
 import {
@@ -55,13 +55,14 @@ const runSettings = <Result>(work: () => Promise<Result>): Promise<Result> =>
     }
   });
 
-const toDto = (view: StudioSettingsView): StudioSettingsDto => ({
+const toDto = (view: StudioSettingsReadView): StudioSettingsDto => ({
   ...view,
   updatedAt: view.updatedAt.toISOString(),
 });
 
 // «Reglas del estudio» (AW36, BKM-004): the Administrator reads every Studio
-// Setting and edits the configurable subset. Nothing here is cached.
+// Setting and edits the configurable subset; the Coordinator reads them
+// without amounts (ADR-0108). Nothing here is cached.
 @Controller({ path: 'administrator/studio-settings', version: '1' })
 @ApiBearerAuth()
 export class AdministratorStudioSettingsController {
