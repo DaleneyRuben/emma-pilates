@@ -1,8 +1,19 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { apiUrl, problemResponse, server, useMockServer } from "../test/msw";
+import {
+  apiUrl,
+  jsonResponse,
+  problemResponse,
+  server,
+  useMockServer,
+} from "../test/msw";
 import { emptyPageHandlers } from "../test/page-handlers";
 import { pendingBadgeHandler } from "../test/payment-fixtures";
+import {
+  payrollStaffHandler,
+  salaryPage,
+  salaryPaymentsPath,
+} from "../test/payroll-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
@@ -84,31 +95,42 @@ describe("admin shell", () => {
     });
 
     it("keeps the tab marked on its other views and switches between them", async () => {
-      const { user } = renderShell("/dinero/gastos");
-      await heading("Gastos");
-      await screen.findByRole("table");
+      server.use(
+        http.get(apiUrl(salaryPaymentsPath), () =>
+          jsonResponse(salaryPage([])),
+        ),
+        payrollStaffHandler(),
+        http.get(apiUrl("/api/v1/administrator/pay-statements"), () =>
+          jsonResponse([]),
+        ),
+      );
+      const { user } = renderShell("/dinero/sueldos/pagados");
+      await heading("Nómina");
 
       // The page header draws the views, so each look-up reads the current one.
       const views = () =>
-        screen.getByRole("navigation", { name: "Vistas de Gastos" });
+        screen.getByRole("navigation", { name: "Vistas de Sueldos" });
       expect(
         within(views())
           .getAllByRole("link")
           .map((link) => link.textContent),
-      ).toEqual(["Gastos", "Categorías"]);
-
-      await user.click(
-        within(views()).getByRole("link", { name: "Categorías" }),
-      );
-
-      await heading("Categorías de gasto");
+      ).toEqual(["Por aprobar", "Pagados"]);
+      expect(
+        within(views()).getByRole("link", { name: "Pagados" }),
+      ).toHaveAttribute("aria-current", "page");
       expect(
         within(
           screen.getByRole("navigation", { name: "Páginas de Dinero" }),
-        ).getByRole("link", { name: "Gastos" }),
+        ).getByRole("link", { name: "Sueldos" }),
       ).toHaveAttribute("aria-current", "page");
+
+      await user.click(
+        within(views()).getByRole("link", { name: "Por aprobar" }),
+      );
+
+      await heading("Sueldos por aprobar");
       expect(
-        within(views()).getByRole("link", { name: "Categorías" }),
+        within(views()).getByRole("link", { name: "Por aprobar" }),
       ).toHaveAttribute("aria-current", "page");
     });
 

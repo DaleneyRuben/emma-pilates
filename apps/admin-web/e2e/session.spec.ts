@@ -108,7 +108,7 @@ test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
     await page.getByRole("button", { name: "Iniciar sesión" }).click();
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Pagos a instructoras" }),
+      page.getByRole("heading", { level: 1, name: "Sueldos por aprobar" }),
     ).toBeVisible();
     await expect(page).toHaveURL(
       new RegExp(`^${webOrigin}/dinero/sueldos\\?month=\\d{4}-\\d{2}$`),

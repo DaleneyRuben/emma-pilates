@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { isForbidden } from "../../components/page/is-forbidden";
-import { PageHeader } from "../../components/page/page-header";
 import { PageNotice } from "../../components/page/page-notice";
 import {
   LoadingNotice,
@@ -55,7 +54,8 @@ function CategoryRow({
 // AW15: the studio's Expense Categories, plain labels with no Branch of
 // their own (BKO-001 D13). A label no Expense uses is deleted outright; a
 // used one keeps its history and cannot be (the backend refuses it too).
-export function ExpenseCategoriesPage() {
+// Follow-up 233 (P06): a panel opened from «Editar categorías» on Gastos.
+export function ExpenseCategoriesEditor() {
   const query = useQuery(expenseCategoriesQueryOptions());
   const change = useCategoryChange();
   const [notice, setNotice] = useState<string | null>(null);
@@ -81,11 +81,10 @@ export function ExpenseCategoriesPage() {
   };
 
   return (
-    <article className="flex flex-col gap-5">
-      <PageHeader
-        title="Categorías de gasto"
-        subtitle="Todo el estudio · agrupan los gastos de cada sucursal en el reporte."
-      />
+    <div className="flex flex-1 flex-col gap-5 px-7 py-4">
+      <p className="text-cuerpo text-texto-tenue">
+        Todo el estudio · agrupan los gastos de cada sucursal en el reporte.
+      </p>
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
       {failure === null ? null : (
         <p role="alert" className="text-nota text-error-texto">
@@ -101,7 +100,7 @@ export function ExpenseCategoriesPage() {
           onRetry={() => void query.refetch()}
         />
       ) : (
-        <section className="flex w-full max-w-[560px] flex-col overflow-hidden rounded-marco bg-lino">
+        <section className="flex w-full flex-col overflow-hidden rounded-marco bg-lino">
           {query.data.length === 0 ? (
             <p className="px-4 py-6 text-center text-nota text-texto-tenue">
               Todavía no hay categorías. Agrega la primera abajo.
@@ -121,7 +120,7 @@ export function ExpenseCategoriesPage() {
             </ul>
           )}
           {isForbidden(query.error) ? null : (
-            <div className="border-t border-borde bg-superficie-sutil px-4 py-3">
+            <div className="border-t border-divisor px-4 py-3">
               <CategoryAdder
                 onAdded={(category) => {
                   setFailure(null);
@@ -146,6 +145,6 @@ export function ExpenseCategoriesPage() {
       >
         <p>Deja de aparecer al registrar un gasto. Ningún gasto la usa.</p>
       </ConfirmDialog>
-    </article>
+    </div>
   );
 }

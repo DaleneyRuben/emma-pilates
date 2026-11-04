@@ -59,11 +59,7 @@ describe("admin navigation", () => {
         .filter((item) => item.views !== undefined)
         .map((item) => [item.to, item.views?.map((view) => view.to)]),
     ).toEqual([
-      [
-        "/dinero/sueldos",
-        ["/dinero/sueldos/coordinadora", "/dinero/sueldos/pagados"],
-      ],
-      ["/dinero/gastos", ["/dinero/gastos/categorias"]],
+      ["/dinero/sueldos", ["/dinero/sueldos/pagados"]],
       ["/estudio/insumos", ["/estudio/insumos/retiros"]],
     ]);
   });
@@ -95,9 +91,7 @@ describe("admin navigation", () => {
       "/comentarios",
       "/dinero/pagos",
       "/dinero/sueldos",
-      "/dinero/sueldos/coordinadora",
       "/dinero/sueldos/pagados",
-      "/dinero/gastos/categorias",
       "/estudio/personal",
       "/informes",
       "/informes/simulador",
@@ -144,13 +138,15 @@ describe("admin navigation", () => {
       "/back-office/personal": "/estudio/personal",
       "/back-office/nomina": "/dinero/sueldos/pagados",
       "/back-office/pagos-instructoras": "/dinero/sueldos",
-      "/back-office/pago-coordinadora": "/dinero/sueldos/coordinadora",
+      "/back-office/pago-coordinadora": "/dinero/sueldos",
       "/back-office/gastos": "/dinero/gastos",
-      "/back-office/categorias-de-gasto": "/dinero/gastos/categorias",
+      "/back-office/categorias-de-gasto": "/dinero/gastos",
       "/reporte": "/informes/dinero",
       "/reporte/indicadores": "/informes",
       "/recomendaciones": "/informes",
       "/informes/recomendaciones": "/informes",
+      "/dinero/gastos/categorias": "/dinero/gastos",
+      "/dinero/sueldos/coordinadora": "/dinero/sueldos",
       "/simulador": "/informes/simulador",
       "/reglas-del-estudio": "/ajustes/reglas-del-estudio",
       "/dinero": "/dinero/pagos",
@@ -205,7 +201,7 @@ describe("admin routes", () => {
     const listPaths = navigationItems
       .filter((item) => item.list)
       .map((item) => item.to);
-    expect(listPaths).toHaveLength(15);
+    expect(listPaths).toHaveLength(14);
     expect(listPaths).not.toContain("/horario");
     expect(listPaths).not.toContain("/informes/dinero");
     // AW17 is the carousel: unpaged cards, not a table (WEB-006).

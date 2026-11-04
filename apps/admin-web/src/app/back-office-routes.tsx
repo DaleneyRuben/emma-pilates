@@ -114,18 +114,6 @@ const withdrawalsRoute = createRoute({
   ),
 });
 
-const coordinatorPayRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/dinero/sueldos/coordinadora",
-  validateSearch: (search: Record<string, unknown>) => ({
-    month: typeof search.month === "string" ? search.month : boliviaMonth(),
-  }),
-  component: lazyRouteComponent(
-    () => import("../back-office/payroll/coordinator-pay-route"),
-    "CoordinatorPayRoute",
-  ),
-});
-
 const payStatementsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/dinero/sueldos",
@@ -168,17 +156,6 @@ const expensesRoute = createRoute({
   ),
 });
 
-// AW15 lists every label on one page, so it keeps only the list search.
-const expenseCategoriesRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/dinero/gastos/categorias",
-  validateSearch: optionalSearch(listSearchSchema),
-  component: lazyRouteComponent(
-    () => import("../back-office/expenses/categories-page"),
-    "ExpenseCategoriesPage",
-  ),
-});
-
 export const backOfficeRoutes = [
   clientsRoute,
   campaignRoute,
@@ -193,7 +170,5 @@ export const backOfficeRoutes = [
   staffRoute,
   payrollRoute,
   payStatementsRoute,
-  coordinatorPayRoute,
   expensesRoute,
-  expenseCategoriesRoute,
 ];

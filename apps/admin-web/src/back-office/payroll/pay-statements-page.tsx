@@ -15,6 +15,8 @@ import { StatementCard } from "./statement-card";
 
 // BKO-006: the Administrator drafts a month and approves each statement.
 // Approval creates the Salary Payment. A Trainer's own view is «Mis pagos».
+// Follow-up 232: Sueldos › Por aprobar holds every statement of the month,
+// the Coordinator's (BKO-007) among them; still monthly until BKO-009.
 export function PayStatementsPage({
   month,
   onMonthChange,
@@ -36,8 +38,8 @@ export function PayStatementsPage({
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
-        title="Pagos a instructoras"
-        subtitle="Todo el estudio · el cálculo sale de las tarifas vigentes."
+        title="Sueldos por aprobar"
+        subtitle="Todo el estudio · instructoras y coordinadora, con las tarifas vigentes."
         actions={
           <Button
             variant="secondary"

@@ -4,6 +4,8 @@ import {
   categoriesHandler,
   cleaning,
   expenseCategoriesPath,
+  expensePage,
+  expensesPath,
   maintenance,
   repair,
 } from "../../test/expense-fixtures";
@@ -18,21 +20,30 @@ import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
 
-const path = "/dinero/gastos/categorias";
-const heading = () =>
-  screen.findByRole("heading", { level: 1, name: "Categorías de gasto" });
+// Follow-up 233 (P06): the labels open in a panel from «Editar categorías»
+// on Gastos.
+const openCategories = async () => {
+  server.use(
+    http.get(apiUrl(expensesPath), () => jsonResponse(expensePage([]))),
+  );
+  const rendered = renderAdmin("/dinero/gastos");
+  await rendered.user.click(
+    await screen.findByRole("button", { name: "Editar categorías" }),
+  );
+  await panel();
+  return rendered;
+};
+const panel = () => screen.findByRole("dialog", { name: "Editar categorías" });
 const list = () => screen.findByRole("list", { name: "Categorías de gasto" });
 
-describe("AW15 Categorías de gasto on a desktop browser", () => {
+describe("AW15 Categorías de gasto in the Gastos panel on a desktop browser", () => {
   useMockServer();
   beforeEach(() => server.use(...signedInHandlers()));
 
   it("lists the studio's labels and lets only an unused one be deleted", async () => {
     server.use(categoriesHandler());
-    renderAdmin(path);
-    await heading();
+    await openCategories();
 
-    expect(screen.getByText("Cargando categorías…")).toBeInTheDocument();
     const items = within(await list()).getAllByRole("listitem");
     expect(items.map((item) => item.firstChild?.textContent)).toEqual([
       "Limpieza",
@@ -53,18 +64,6 @@ describe("AW15 Categorías de gasto on a desktop browser", () => {
     ).toBeVisible();
   });
 
-  it("is studio-wide: «Todo el estudio» instead of the Branch selector", async () => {
-    server.use(categoriesHandler());
-    renderAdmin(path);
-    await list();
-    expect(
-      within(screen.getByRole("banner")).getByText("Todo el estudio"),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: /^Sucursal/ }),
-    ).not.toBeInTheDocument();
-  });
-
   it("adds a label from the inline row", async () => {
     let categories = [maintenance, repair];
     let created: unknown;
@@ -76,7 +75,7 @@ describe("AW15 Categorías de gasto on a desktop browser", () => {
         return jsonResponse(cleaning, 201);
       }),
     );
-    const { user } = renderAdmin(path);
+    const { user } = await openCategories();
     await list();
 
     await user.type(
@@ -104,7 +103,7 @@ describe("AW15 Categorías de gasto on a desktop browser", () => {
         return new HttpResponse(null, { status: 204 });
       }),
     );
-    const { user } = renderAdmin(path);
+    const { user } = await openCategories();
     await user.click(
       await screen.findByRole("button", { name: "Eliminar Limpieza" }),
     );
@@ -137,7 +136,7 @@ describe("AW15 Categorías de gasto on a desktop browser", () => {
         return problemResponse(409, "expense_category_in_use");
       }),
     );
-    const { user } = renderAdmin(path);
+    const { user } = await openCategories();
     await user.click(
       await screen.findByRole("button", { name: "Eliminar Limpieza" }),
     );
@@ -159,7 +158,7 @@ describe("AW15 Categorías de gasto on a desktop browser", () => {
 
   it("invites the first label when there are none", async () => {
     server.use(categoriesHandler(() => []));
-    renderAdmin(path);
+    await openCategories();
     expect(
       await screen.findByText(
         "Todavía no hay categorías. Agrega la primera abajo.",
@@ -174,7 +173,7 @@ describe("AW15 Categorías de gasto on a desktop browser", () => {
         problemResponse(500, "unexpected_error"),
       ),
     );
-    renderAdmin(path);
+    await openCategories();
     expect(
       await screen.findByText(
         "No pudimos cargar las categorías.",
@@ -191,7 +190,7 @@ describe("AW15 Categorías de gasto on a desktop browser", () => {
         problemResponse(403, "back_office_access_denied"),
       ),
     );
-    renderAdmin(path);
+    await openCategories();
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
@@ -199,14 +198,14 @@ describe("AW15 Categorías de gasto on a desktop browser", () => {
   });
 });
 
-describe("AW15 Categorías de gasto on a narrow browser", () => {
+describe("AW15 Categorías de gasto in the Gastos panel on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
   beforeEach(() => server.use(...signedInHandlers()));
 
   it("keeps the list and the inline row usable", async () => {
     server.use(categoriesHandler());
-    renderAdmin(path);
+    await openCategories();
     expect(await list()).toBeVisible();
     expect(screen.getByRole("button", { name: "Agregar" })).toBeVisible();
   });

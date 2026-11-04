@@ -43,7 +43,7 @@ describe("the admin web for the Coordinator", () => {
     "/ajustes/planes",
     "/promociones",
     "/informes/simulador",
-    "/dinero/sueldos/coordinadora",
+    "/dinero/sueldos?month=2026-12",
     "/promociones/clases-de-campana",
     "/back-office/pagos",
   ])("returns %s to Horario with the notice", async (path) => {

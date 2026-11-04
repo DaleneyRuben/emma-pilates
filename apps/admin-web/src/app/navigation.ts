@@ -22,10 +22,8 @@ export type AdminPath =
   | "/dinero/pagos"
   | "/dinero/caja"
   | "/dinero/sueldos"
-  | "/dinero/sueldos/coordinadora"
   | "/dinero/sueldos/pagados"
   | "/dinero/gastos"
-  | "/dinero/gastos/categorias"
   | "/estudio/personal"
   | "/estudio/insumos"
   | "/estudio/insumos/retiros"
@@ -84,9 +82,8 @@ export type Destination = {
   tabs: readonly NavigationItem[];
 };
 
-// The Fundadoras and Recomendaciones tabs, and the Coordinadora and
-// Categorías views, stand in until their pages fold into Todas (WEB-040),
-// El mes, Por aprobar and Gastos' panel.
+// The Fundadoras tab stands in until Fundadora becomes a filter on Todas
+// (WEB-040).
 export const destinations: readonly Destination[] = [
   {
     label: "Inicio",
@@ -183,13 +180,8 @@ export const destinations: readonly Destination[] = [
         label: "Sueldos",
         to: "/dinero/sueldos",
         studioWide: true,
-        viewLabel: "Instructoras",
+        viewLabel: "Por aprobar",
         views: [
-          {
-            label: "Coordinadora",
-            to: "/dinero/sueldos/coordinadora",
-            studioWide: true,
-          },
           {
             label: "Pagados",
             to: "/dinero/sueldos/pagados",
@@ -202,15 +194,6 @@ export const destinations: readonly Destination[] = [
         label: "Gastos",
         to: "/dinero/gastos",
         list: true,
-        viewLabel: "Gastos",
-        views: [
-          {
-            label: "Categorías",
-            to: "/dinero/gastos/categorias",
-            list: true,
-            studioWide: true,
-          },
-        ],
       },
     ],
   },
@@ -353,9 +336,11 @@ export const movedPaths: Readonly<Record<string, AdminPath>> = {
   "/back-office/personal": "/estudio/personal",
   "/back-office/nomina": "/dinero/sueldos/pagados",
   "/back-office/pagos-instructoras": "/dinero/sueldos",
-  "/back-office/pago-coordinadora": "/dinero/sueldos/coordinadora",
+  "/back-office/pago-coordinadora": "/dinero/sueldos",
+  "/dinero/sueldos/coordinadora": "/dinero/sueldos",
   "/back-office/gastos": "/dinero/gastos",
-  "/back-office/categorias-de-gasto": "/dinero/gastos/categorias",
+  "/back-office/categorias-de-gasto": "/dinero/gastos",
+  "/dinero/gastos/categorias": "/dinero/gastos",
   "/reporte": "/informes/dinero",
   "/reporte/indicadores": "/informes",
   "/recomendaciones": "/informes",
