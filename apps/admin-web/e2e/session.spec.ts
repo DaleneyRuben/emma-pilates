@@ -59,7 +59,7 @@ test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
     await signIn(page, "/ajustes/planes?page=2");
 
     await expect(page).toHaveURL(
-      `${webOrigin}/catalogo/planes?page=2&pageSize=20&visibility=all`,
+      `${webOrigin}/ajustes/planes?page=2&pageSize=20&visibility=all`,
     );
     await expect(
       page.getByRole("heading", { level: 1, name: "Planes" }),
@@ -108,10 +108,10 @@ test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
     await page.getByRole("button", { name: "Iniciar sesión" }).click();
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Nómina" }),
+      page.getByRole("heading", { level: 1, name: "Pagos a instructoras" }),
     ).toBeVisible();
     await expect(page).toHaveURL(
-      `${webOrigin}/back-office/nomina?page=1&pageSize=20`,
+      new RegExp(`^${webOrigin}/dinero/sueldos\\?month=\\d{4}-\\d{2}$`),
     );
   });
 });

@@ -10,7 +10,7 @@ test("Personal keeps its Role filter in the address", async ({ page }) => {
   await page.getByLabel("Rol").selectOption("trainer");
 
   await expect(page).toHaveURL(
-    /\/back-office\/personal\?page=1&pageSize=20&role=trainer$/,
+    /\/estudio\/personal\?page=1&pageSize=20&role=trainer$/,
   );
   await expect(page.getByText("Mostrando 1–3 de 3 miembros")).toBeVisible();
   await expect(page.getByRole("cell", { name: /Emma Vargas/ })).toBeVisible();
