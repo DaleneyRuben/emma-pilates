@@ -136,6 +136,8 @@ export const mondaySchedule = {
   capacity: 10,
   effectiveFrom: addDays(nextMonday, -14),
   effectiveUntil: null,
+  pausedFrom: null as string | null,
+  pausedUntil: null as string | null,
   classTypeName: reformer.name,
   durationMinutes: 50,
 };
