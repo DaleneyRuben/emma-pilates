@@ -9,6 +9,7 @@ import { findRowClash, type ScheduleRow } from './schedule-rows';
 import {
   createAndMaterialize,
   requireAssignable,
+  requireEndAfterStart,
   scheduleTransaction,
 } from './schedule-writes';
 
@@ -18,6 +19,7 @@ export type ScheduleBatchInput = {
   trainerStaffMemberId: string;
   capacity: number;
   effectiveFrom: Date;
+  effectiveUntil?: Date | null;
   rows: ScheduleRow[];
 };
 
@@ -41,6 +43,7 @@ export const createPrismaScheduleBatch = (
       if (input.effectiveFrom < boliviaDate(now)) {
         throw new AdministrationError('effective_date_invalid');
       }
+      requireEndAfterStart(input);
       return transact(async (transaction) => {
         await requireAssignable(transaction, input);
         const clash = findRowClash(input.rows);
@@ -64,7 +67,7 @@ export const createPrismaScheduleBatch = (
                 startsAtLocal: row.startsAtLocal,
                 durationMinutes: row.durationMinutes,
                 effectiveFrom: input.effectiveFrom,
-                effectiveUntil: null,
+                effectiveUntil: input.effectiveUntil ?? null,
               },
               now,
             ),

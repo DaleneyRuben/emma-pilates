@@ -119,6 +119,20 @@ export const requireAssignable = async (
   return classType;
 };
 
+// BKM-018: a series' «Vigente hasta» is an exclusive end after its start.
+export const requireEndAfterStart = (input: {
+  effectiveFrom: Date;
+  effectiveUntil?: Date | null;
+}) => {
+  if (
+    input.effectiveUntil !== undefined &&
+    input.effectiveUntil !== null &&
+    input.effectiveUntil <= input.effectiveFrom
+  ) {
+    throw new AdministrationError('effective_date_invalid');
+  }
+};
+
 export const createAndMaterialize = async (
   transaction: Transaction,
   input: ScheduleInput & { effectiveFrom: Date; effectiveUntil: Date | null },

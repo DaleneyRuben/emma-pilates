@@ -16,6 +16,7 @@ import {
   createAndMaterialize,
   isSessionLength,
   requireAssignable,
+  requireEndAfterStart,
   scheduleSelect,
   scheduleTransaction,
   type ScheduleInput,
@@ -144,7 +145,10 @@ export const createPrismaScheduleAdministration = (
     },
 
     createSchedule: async (
-      input: ScheduleInput & { effectiveFrom: Date },
+      input: ScheduleInput & {
+        effectiveFrom: Date;
+        effectiveUntil?: Date | null;
+      },
       principal: AuthenticatedPrincipal,
     ) => {
       requireOperations(principal);
@@ -153,27 +157,38 @@ export const createPrismaScheduleAdministration = (
       if (input.effectiveFrom < boliviaDate(now)) {
         throw new AdministrationError('effective_date_invalid');
       }
+      requireEndAfterStart(input);
       return transact(async (transaction) => {
         await requireAssignable(transaction, input);
         return createAndMaterialize(
           transaction,
-          { ...input, effectiveUntil: null },
+          { ...input, effectiveUntil: input.effectiveUntil ?? null },
           now,
         );
       });
     },
 
     replaceSchedule: async (
-      input: ScheduleInput & { sessionScheduleId: string; effectiveFrom: Date },
+      input: ScheduleInput & {
+        sessionScheduleId: string;
+        effectiveFrom: Date;
+        effectiveUntil?: Date | null;
+      },
       principal: AuthenticatedPrincipal,
     ) => {
       const actor = requireOperations(principal);
       requireScheduleValues(input);
+      requireEndAfterStart(input);
       const now = dependencies.now();
       return transact(async (transaction) => {
         const old = await findSchedule(transaction, input.sessionScheduleId);
         requireChangeDate(old, input.effectiveFrom, boliviaDate(now));
         await requireAssignable(transaction, input);
+        // Left out, the replacement keeps the old end (BKM-018).
+        const effectiveUntil =
+          input.effectiveUntil === undefined
+            ? old.effectiveUntil
+            : input.effectiveUntil;
         const ended = await transaction.sessionSchedule.update({
           where: { id: old.id },
           data: { effectiveUntil: input.effectiveFrom },
@@ -188,7 +203,7 @@ export const createPrismaScheduleAdministration = (
         );
         const created = await createAndMaterialize(
           transaction,
-          { ...input, effectiveUntil: old.effectiveUntil },
+          { ...input, effectiveUntil },
           now,
         );
         return {
