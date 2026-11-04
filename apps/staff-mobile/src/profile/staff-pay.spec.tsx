@@ -96,6 +96,31 @@ describe("Staff Mis pagos", () => {
     expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
   });
 
+  // BKO-009: a Trainer may be paid by day, week or range, not only by month.
+  it("names a statement that is not a whole month by its days", async () => {
+    const week = {
+      ...approvedOctober,
+      id: "statement-week",
+      month: "2026-10-01",
+      periodStart: "2026-10-26",
+      periodEnd: "2026-11-02",
+    };
+    const day = {
+      ...approvedOctober,
+      id: "statement-day",
+      month: "2026-10-01",
+      periodStart: "2026-10-20",
+      periodEnd: "2026-10-21",
+    };
+    const screen = await openMyPay({ statements: () => jsonResponse([week, day]) });
+
+    await waitFor(() => {
+      expect(screen.getByText("26 de octubre – 1 de noviembre de 2026")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("20 de octubre de 2026")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Liquidación del 20 de octubre de 2026")).toBeOnTheScreen();
+  });
+
   it("says so when nothing was calculated or paid yet", async () => {
     const screen = await openMyPay({
       statements: () => jsonResponse([]),
