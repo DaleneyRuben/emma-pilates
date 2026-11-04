@@ -7,7 +7,7 @@ import { OBJECT_STORAGE } from '../../uploads/object-storage.module';
 import {
   transferInstructions,
   type TransferInstructions,
-} from '../payments/payments.controller';
+} from './transfer-instructions.controller';
 import { createStudioTransferQr } from './prisma-studio-transfer-qr';
 import {
   studioTransferQrControllers,

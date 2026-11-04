@@ -76,8 +76,8 @@ import {
   CreditPurchasesController,
   paymentCommands,
   PurchaseIntentsController,
-  TransferInstructionsController,
 } from './payments/payments.controller';
+import { TransferInstructionsController } from './transfer-qr/transfer-instructions.controller';
 import { createPrismaPaymentCommands } from './payments/prisma-payment-commands';
 import { readFounderRenewal } from './payments/prisma-founder-membership';
 import { priceFounderPlanList } from './payments/founder-plan-quote';

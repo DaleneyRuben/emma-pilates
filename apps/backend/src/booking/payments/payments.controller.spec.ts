@@ -7,8 +7,8 @@ import {
   ClientReferralsController,
   CreditPurchasesController,
   PurchaseIntentsController,
-  TransferInstructionsController,
 } from './payments.controller';
+import { TransferInstructionsController } from '../transfer-qr/transfer-instructions.controller';
 
 const bearer = 'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 const key = '11111111-1111-4111-8111-111111111111';

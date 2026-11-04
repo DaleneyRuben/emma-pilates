@@ -15,9 +15,11 @@ import {
   CreditPurchasesController,
   paymentCommands,
   PurchaseIntentsController,
+} from '../src/booking/payments/payments.controller';
+import {
   transferInstructions,
   TransferInstructionsController,
-} from '../src/booking/payments/payments.controller';
+} from '../src/booking/transfer-qr/transfer-instructions.controller';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';

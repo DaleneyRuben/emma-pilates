@@ -13,7 +13,6 @@ import {
   NotFoundException,
   Param,
   Post,
-  StreamableFile,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -23,7 +22,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiProduces,
 } from '@nestjs/swagger';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
 import {
@@ -45,23 +43,10 @@ import {
   PurchaseIntentDto,
   ReferralsDto,
   SubmitTransferDto,
-  TransferInstructionsDto,
 } from './payments.dto';
 import type { PaymentCommands } from './prisma-payment-commands';
-import type { ObjectStorage } from '../../uploads/object-storage';
-import { readTransferQr } from '../transfer-qr/transfer-qr-image';
 
 export const paymentCommands = Symbol('paymentCommands');
-export const transferInstructions = Symbol('transferInstructions');
-
-export type TransferInstructions = {
-  /** The server file served until the Administrator uploads a QR (WEB-038). */
-  qrImagePath: string;
-  storage: ObjectStorage;
-};
-
-export const transferQrRoute = '/api/v1/transfer-instructions/qr';
-
 const idempotencyHeader = {
   name: 'idempotency-key',
   required: true,
@@ -372,53 +357,5 @@ export class ClientReferralsController extends AuthenticatedPaymentController {
   ): Promise<ReferralsDto> {
     const principal = await this.authenticate(authorization);
     return runPaymentCommand(() => this.commands.readReferrals(principal));
-  }
-}
-
-@Controller({ path: 'transfer-instructions', version: '1' })
-@ApiBearerAuth()
-export class TransferInstructionsController {
-  constructor(
-    @Inject(transferInstructions)
-    private readonly instructions: TransferInstructions,
-    @Inject(authenticatedPrincipalResolver)
-    private readonly principalResolver: PrincipalResolver,
-  ) {}
-
-  @Get()
-  @ApiOperation({ operationId: 'getTransferInstructions' })
-  @ApiOkResponse({ type: TransferInstructionsDto })
-  @Header('Cache-Control', 'no-store')
-  async read(
-    @Headers('authorization') authorization: string | undefined,
-  ): Promise<TransferInstructionsDto> {
-    await authenticateBearer(this.principalResolver, authorization);
-    return {
-      // Deprecated by PAY-003; kept empty for older mobile releases.
-      beneficiaryName: '',
-      bankName: '',
-      accountNumber: '',
-      qrImageUrl: transferQrRoute,
-    };
-  }
-
-  @Get('qr')
-  @ApiOperation({ operationId: 'getTransferQrImage' })
-  @ApiProduces('image/png')
-  @ApiOkResponse({ schema: { type: 'string', format: 'binary' } })
-  @Header('Cache-Control', 'no-store')
-  @Header('Content-Type', 'image/png')
-  async qr(
-    @Headers('authorization') authorization: string | undefined,
-  ): Promise<StreamableFile> {
-    await authenticateBearer(this.principalResolver, authorization);
-    const qr = await readTransferQr(
-      this.instructions.storage,
-      this.instructions.qrImagePath,
-    );
-    if (qr === null) {
-      throw notFound('transfer_qr_not_found', 'No transfer QR is configured');
-    }
-    return new StreamableFile(qr);
   }
 }
