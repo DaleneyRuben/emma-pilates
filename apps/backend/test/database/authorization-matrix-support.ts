@@ -24,7 +24,13 @@ export type RealIds = {
 // The fixtures are dated September 2026 and the API runs on the real clock,
 // so the Booking rows of the matrix get two future Sessions of their own, a
 // Booking, and a Waitlist Entry for Bea, whose test Plan is still active.
-export const findRealIds = async (prisma: PrismaClient): Promise<RealIds> => {
+// Both Roles act for a Client (BKO-010), and the first one's cancellation or
+// decision would leave the second nothing to act on, so each Role gets its
+// own `round` of rows, two hours apart.
+export const findRealIds = async (
+  prisma: PrismaClient,
+  round: 0 | 1 = 0,
+): Promise<RealIds> => {
   const bea = deterministicId('test-client:bea');
   const subscription = await prisma.subscription.findFirstOrThrow({
     where: { clientId: bea },
@@ -35,7 +41,9 @@ export const findRealIds = async (prisma: PrismaClient): Promise<RealIds> => {
     select: { id: true },
   });
   const sessionAt = async (offsetDays: number) => {
-    const startsAt = new Date(Date.now() + offsetDays * day);
+    const startsAt = new Date(
+      Date.now() + offsetDays * day + round * 2 * 60 * 60_000,
+    );
     return prisma.session.create({
       data: {
         branchId: deterministicId('branch:urubo'),
@@ -80,10 +88,19 @@ export const findRealIds = async (prisma: PrismaClient): Promise<RealIds> => {
     });
   const booking = await bookOn(session.id);
   const rescheduled = await bookOn(waitlisted.id);
+  // One Freeze per Subscription: the second round freezes another Client's.
+  const frozen =
+    round === 0
+      ? { id: subscription.id, clientId: bea }
+      : await prisma.subscription.findFirstOrThrow({
+          where: { id: { not: subscription.id } },
+          orderBy: { id: 'asc' },
+          select: { id: true, clientId: true },
+        });
   const freeze = await prisma.freeze.create({
     data: {
-      subscriptionId: subscription.id,
-      clientId: bea,
+      subscriptionId: frozen.id,
+      clientId: frozen.clientId,
       startsOn: new Date('2026-11-01T00:00:00.000Z'),
       endsOn: new Date('2026-11-10T00:00:00.000Z'),
       reason: 'Viaje',

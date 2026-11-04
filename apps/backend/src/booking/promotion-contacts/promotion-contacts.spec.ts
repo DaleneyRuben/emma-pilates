@@ -8,7 +8,8 @@ import {
 } from './promotion-contacts';
 
 const staff = (
-  role: 'assistant' | 'administrator' | 'trainer' | 'nutritionist',
+  role:
+    'assistant' | 'administrator' | 'trainer' | 'nutritionist' | 'coordinator',
 ): AuthenticatedPrincipal => ({
   accountId: 'staff-account',
   authenticationSessionId: 'authentication-session-id',
@@ -16,7 +17,10 @@ const staff = (
     kind: 'staff',
     staffMemberId: 'staff-id',
     role,
-    branchIds: role === 'administrator' ? [] : ['branch-centro'],
+    branchIds:
+      role === 'administrator' || role === 'coordinator'
+        ? []
+        : ['branch-centro'],
   },
 });
 const administrator = staff('administrator');
@@ -162,5 +166,32 @@ describe('withdrawPromotionContact', () => {
       }),
     );
     expect(store.withdraw).not.toHaveBeenCalled();
+  });
+});
+
+// ADR-0108: the contacts carry no money, so the Coordinator lists, exports,
+// and withdraws them too.
+describe('the Coordinator on Contactos', () => {
+  it('lists, exports, and withdraws a contact', async () => {
+    const store = storeWith();
+    const coordinator = staff('coordinator');
+    const dependencies = { store, now: () => now };
+
+    await expect(
+      listPromotionContacts(
+        { page: 1, pageSize: 20 },
+        coordinator,
+        dependencies,
+      ),
+    ).resolves.toEqual(page);
+    await expect(
+      exportPromotionContacts(coordinator, dependencies),
+    ).resolves.toEqual([valeria]);
+    await withdrawPromotionContact(
+      { contactId: valeria.id },
+      coordinator,
+      dependencies,
+    );
+    expect(store.withdraw).toHaveBeenCalled();
   });
 });

@@ -189,3 +189,71 @@ describe('the Coordinator on the schedule (ADR-0102)', () => {
     });
   });
 });
+
+// ADR-0108: the owner books Clients from Horario too, at every Branch.
+describe('the Administrator acting for a Client (ADR-0108)', () => {
+  const administrator: AuthenticatedPrincipal = {
+    ...coordinator,
+    accountId: 'administrator-account-id',
+    identity: { ...coordinator.identity, role: 'administrator' },
+  } as AuthenticatedPrincipal;
+
+  it('books, waitlists, and cancels for a Client at any Branch', async () => {
+    const create = jest.fn().mockResolvedValue({ id: 'booking-id' });
+    await createBooking(
+      { sessionId: session.id, clientId: 'client-id' },
+      {
+        principal: administrator,
+        loadSession: jest.fn().mockResolvedValue(session),
+        countLiveBookings: jest.fn().mockResolvedValue(0),
+        findEligibleSubscription: jest
+          .fn()
+          .mockResolvedValue({ id: 'subscription-id' }),
+        hasOverlappingBooking: jest.fn().mockResolvedValue(false),
+        create,
+        now,
+      },
+    );
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        createdByAccountId: 'administrator-account-id',
+      }),
+    );
+
+    const join = jest.fn().mockResolvedValue({ id: 'entry-id' });
+    await joinWaitlist(
+      { sessionId: session.id, clientId: 'client-id' },
+      {
+        principal: administrator,
+        cancellationWindowMinutes: () => Promise.resolve(150),
+        loadSession: jest.fn().mockResolvedValue(session),
+        countLiveBookings: jest.fn().mockResolvedValue(session.capacity),
+        findEligibleSubscription: jest
+          .fn()
+          .mockResolvedValue({ id: 'subscription-id' }),
+        hasLiveBooking: jest.fn().mockResolvedValue(false),
+        hasActiveEntry: jest.fn().mockResolvedValue(false),
+        create: join,
+        now,
+      },
+    );
+    expect(join).toHaveBeenCalled();
+
+    const cancel = jest.fn().mockResolvedValue(undefined);
+    await cancelBooking(
+      { bookingId: booking.id },
+      {
+        principal: administrator,
+        cancellationWindowMinutes: () => Promise.resolve(150),
+        loadBooking: jest.fn().mockResolvedValue(booking),
+        cancel,
+        now,
+      },
+    );
+    expect(cancel).toHaveBeenCalledWith(
+      expect.objectContaining({
+        cancelledByAccountId: 'administrator-account-id',
+      }),
+    );
+  });
+});

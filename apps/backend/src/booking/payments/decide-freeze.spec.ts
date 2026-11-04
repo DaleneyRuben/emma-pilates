@@ -2,7 +2,8 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { decideFreeze } from './decide-freeze';
 
 const staff = (
-  role: 'assistant' | 'administrator' | 'trainer' | 'nutritionist',
+  role:
+    'assistant' | 'administrator' | 'trainer' | 'nutritionist' | 'coordinator',
 ): AuthenticatedPrincipal => ({
   accountId: `${role}-account`,
   authenticationSessionId: 'authentication-session-id',
@@ -10,7 +11,10 @@ const staff = (
     kind: 'staff',
     staffMemberId: `${role}-id`,
     role,
-    branchIds: role === 'administrator' ? [] : ['branch-centro'],
+    branchIds:
+      role === 'administrator' || role === 'coordinator'
+        ? []
+        : ['branch-centro'],
   },
 });
 
@@ -64,20 +68,35 @@ describe('decideFreeze', () => {
     });
   });
 
-  it('refuses an Assistant, a Trainer, a Nutritionist, a Client, and a Coordinator', async () => {
+  // ADR-0108: the Coordinator decides freezes too; no money is involved.
+  it('lets the Coordinator refuse', async () => {
+    const refuse = jest.fn().mockResolvedValue(undefined);
+
+    await expect(
+      decideFreeze(
+        { freezeId: freeze.id, decision: 'refused' },
+        {
+          principal: staff('coordinator'),
+          loadFreeze: jest.fn().mockResolvedValue(freeze),
+          approve: jest.fn(),
+          refuse,
+          record: jest.fn().mockResolvedValue(undefined),
+          now: () => new Date('2026-10-23T15:00:00.000Z'),
+        },
+      ),
+    ).resolves.toEqual({ state: 'refused' });
+    expect(refuse).toHaveBeenCalledWith(
+      expect.objectContaining({ decidedByAccountId: 'coordinator-account' }),
+    );
+  });
+
+  it('refuses an Assistant, a Trainer, a Nutritionist, and a Client', async () => {
     const loadFreeze = jest.fn();
     for (const principal of [
       staff('assistant'),
       staff('trainer'),
       staff('nutritionist'),
       client,
-      {
-        ...staff('administrator'),
-        identity: {
-          ...staff('administrator').identity,
-          role: 'coordinator' as 'administrator',
-        },
-      },
     ]) {
       await expect(
         decideFreeze(

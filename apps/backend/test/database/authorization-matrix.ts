@@ -6,12 +6,14 @@ import { studioFactsAuthorizationRows } from './studio-facts-authorization';
 import { supplyMovementAuthorizationRows } from './supply-movement-authorization';
 import type { RealIds } from './authorization-matrix-support';
 
-// IDN-009 / ADR-0102: every endpoint the API serves, with an explicit
-// decision for the Administrator and the Coordinator. «allow» means the Role
-// passes authorization (the request may still fail on its data); «deny»
-// means 403. The Coordinator is denied by default: an endpoint is «allow» for
-// her only for the operation she runs (the schedule, Sessions, Bookings on a
-// Client's behalf, Client profiles, Staff details) or her own Account.
+// IDN-009 / ADR-0102 / ADR-0108: every endpoint the API serves, with an
+// explicit decision for the Administrator and the Coordinator. «allow» means
+// the Role passes authorization (the request may still fail on its data);
+// «deny» means 403. The Coordinator is denied by default: an endpoint is
+// «allow» for her only for the operation she runs (the schedule, Sessions,
+// Bookings on a Client's behalf, Client profiles, Staff details, freezes,
+// the carousel, Comentarios, Insumos, Equipos, the Nutrición agenda, the
+// studio rules read) or her own Account; never money.
 // `authorization-matrix.integration-spec.ts` fails when a route is missing
 // here, when a row names a route that no longer exists, or when the API
 // answers differently.
@@ -58,12 +60,6 @@ export type MatrixRow = {
   public?: true;
 };
 
-/** The front desk's work on a Client's behalf: never the Administrator's. */
-const coordinatorOnly = (extra: Partial<MatrixRow> = {}): MatrixRow => ({
-  administrator: 'deny',
-  coordinator: 'allow',
-  ...extra,
-});
 const both = (access: Access, extra: Partial<MatrixRow> = {}): MatrixRow => ({
   administrator: access,
   coordinator: access,
@@ -136,7 +132,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/uploads/{id}': both('allow', { ownerScoped: true }),
 
   // REL-012: any signed-in Account may send feedback; triage is money-free
-  // operations the Administrator alone runs (ADR-0102).
+  // operations the Coordinator runs too (ADR-0108).
   'POST /api/v1/feedback': both('allow', {
     body: {
       type: 'suggestion',
@@ -147,10 +143,10 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
       osVersion: '18.2',
     },
   }),
-  'GET /api/v1/administrator/feedback': administratorOnly(),
-  'GET /api/v1/administrator/feedback/export': administratorOnly(),
+  'GET /api/v1/administrator/feedback': both('allow'),
+  'GET /api/v1/administrator/feedback/export': both('allow'),
   'GET /api/v1/administrator/founder-memberships': administratorOnly(),
-  'POST /api/v1/administrator/feedback/{feedbackId}/triage': administratorOnly({
+  'POST /api/v1/administrator/feedback/{feedbackId}/triage': both('allow', {
     body: { status: 'reviewed', changeNote: null },
   }),
 
@@ -201,24 +197,24 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/trainer/sessions': both('deny'),
   'GET /api/v1/trainer/sessions/{sessionId}/roster': both('deny'),
 
-  // Bookings on a Client's behalf: the Coordinator like the Assistant, at
-  // every Branch; the Administrator never books for a Client.
+  // Bookings on a Client's behalf: the Coordinator like the Assistant, and
+  // the Administrator from Horario, both at every Branch (ADR-0108).
   'GET /api/v1/sessions': both('allow'),
   'GET /api/v1/sessions/{sessionId}': both('allow'),
-  'POST /api/v1/sessions/{sessionId}/bookings': coordinatorOnly({
+  'POST /api/v1/sessions/{sessionId}/bookings': both('allow', {
     realIds: true,
     body: (ids) => ({ clientId: ids.clientId }),
   }),
-  'POST /api/v1/sessions/{sessionId}/waitlist-entries': coordinatorOnly({
+  'POST /api/v1/sessions/{sessionId}/waitlist-entries': both('allow', {
     realIds: true,
     body: (ids) => ({ clientId: ids.clientId }),
   }),
-  'DELETE /api/v1/bookings/{bookingId}': coordinatorOnly({ realIds: true }),
-  'POST /api/v1/bookings/{bookingId}/reschedule': coordinatorOnly({
+  'DELETE /api/v1/bookings/{bookingId}': both('allow', { realIds: true }),
+  'POST /api/v1/bookings/{bookingId}/reschedule': both('allow', {
     realIds: { bookingId: 'rescheduleBookingId' },
     body: (ids) => ({ targetSessionId: ids.otherSessionId }),
   }),
-  'DELETE /api/v1/waitlist-entries/{waitlistEntryId}': coordinatorOnly({
+  'DELETE /api/v1/waitlist-entries/{waitlistEntryId}': both('allow', {
     realIds: true,
   }),
   'GET /api/v1/assistant/clients': both('allow', { query: '?q=lu' }),
@@ -325,9 +321,9 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
 
   ...catalogAuthorizationRows(),
   'GET /api/v1/administrator/plans': administratorOnly(),
-  // BKM-004: the Administrator edits the studio rules. The public rules
-  // need no credential.
-  'GET /api/v1/administrator/studio-settings': administratorOnly(),
+  // BKM-004: the Administrator edits the studio rules; the Coordinator reads
+  // them without amounts (ADR-0108). The public rules need no credential.
+  'GET /api/v1/administrator/studio-settings': both('allow'),
   'PUT /api/v1/administrator/studio-settings': administratorOnly({
     body: {
       expectedVersion: 1,
@@ -364,11 +360,12 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   }),
   'PUT /api/v1/administrator/plans/{planId}/visibility': administratorOnly(),
 
-  // Oversight and money: Payments, Credit, Referrals, reports, Evaluations.
-  'GET /api/v1/administrator/evaluations': administratorOnly(),
+  // Oversight and money: Payments, reports. The Nutrición agenda and the
+  // Referrals carry no amount, so the Coordinator reads them (ADR-0108).
+  'GET /api/v1/administrator/evaluations': both('allow'),
   'DELETE /api/v1/administrator/evaluations/{evaluationId}':
     administratorOnly(),
-  'GET /api/v1/administrator/referrals': administratorOnly(),
+  'GET /api/v1/administrator/referrals': both('allow'),
   // PAY-005 retired Credit, so GET /administrator/credits is gone.
   'GET /api/v1/administrator/reports/income': administratorOnly(),
   // BKO-005: the month result and the opening budget are money. The month
@@ -395,24 +392,23 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'DELETE /api/v1/administrator/payments/{paymentId}/invoice-issued':
     administratorOnly(),
 
-  // Promotions and their contacts.
-  'GET /api/v1/administrator/promotions': administratorOnly(),
-  'POST /api/v1/administrator/promotions': administratorOnly(),
-  'PUT /api/v1/administrator/promotions/order': administratorOnly({
+  // The carousel and its contacts carry no amount: the Coordinator runs them
+  // (ADR-0108). Campaign classes stay the Administrator's.
+  'GET /api/v1/administrator/promotions': both('allow'),
+  'POST /api/v1/administrator/promotions': both('allow'),
+  'PUT /api/v1/administrator/promotions/order': both('allow', {
     body: { promotionIds: [uuid] },
   }),
-  'PUT /api/v1/administrator/promotions/{promotionId}': administratorOnly(),
-  'DELETE /api/v1/administrator/promotions/{promotionId}': administratorOnly(),
-  'POST /api/v1/administrator/promotions/{promotionId}/publish':
-    administratorOnly(),
+  'PUT /api/v1/administrator/promotions/{promotionId}': both('allow'),
+  'DELETE /api/v1/administrator/promotions/{promotionId}': both('allow'),
+  'POST /api/v1/administrator/promotions/{promotionId}/publish': both('allow'),
   'POST /api/v1/administrator/promotions/{promotionId}/unpublish':
-    administratorOnly(),
-  'GET /api/v1/administrator/promotions/{promotionId}/image':
-    administratorOnly(),
-  'GET /api/v1/administrator/promotion-contacts': administratorOnly(),
-  'GET /api/v1/administrator/promotion-contacts/export': administratorOnly(),
+    both('allow'),
+  'GET /api/v1/administrator/promotions/{promotionId}/image': both('allow'),
+  'GET /api/v1/administrator/promotion-contacts': both('allow'),
+  'GET /api/v1/administrator/promotion-contacts/export': both('allow'),
   'POST /api/v1/administrator/promotion-contacts/{contactId}/withdrawal':
-    administratorOnly(),
+    both('allow'),
 
   // BKO-003: closing the drawer is the Assistant's and the Administrator's.
   // The Coordinator sees no amount (ADR-0102), so every cash-close route
@@ -427,13 +423,14 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     query: `?branchId=${uuid}&month=2026-10`,
   }),
 
-  // Back Office: supplies, payroll, expenses.
-  'GET /api/v1/administrator/supplies': administratorOnly(),
+  // Back Office: supplies, payroll, expenses. The Coordinator lists Supplies
+  // and records their movements; the catalog stays the Administrator's.
+  'GET /api/v1/administrator/supplies': both('allow'),
   'POST /api/v1/administrator/supplies': administratorOnly(),
   'PUT /api/v1/administrator/supplies/{supplyId}': administratorOnly(),
   'POST /api/v1/administrator/supplies/{supplyId}/archive': administratorOnly(),
   ...supplyMovementAuthorizationRows(),
-  'GET /api/v1/administrator/withdrawals': administratorOnly(),
+  'GET /api/v1/administrator/withdrawals': both('allow'),
   ...payStatementAuthorizationRows(),
   ...studioFactsAuthorizationRows(),
   'GET /api/v1/administrator/salary-payments': administratorOnly(),
