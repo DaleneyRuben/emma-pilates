@@ -13,6 +13,16 @@ export type ListAdminEvaluationsParams = {
    */
   branchId?: unknown;
   nutritionistStaffMemberId?: unknown;
-  until: unknown;
-  from: unknown;
+  /**
+   * Only this Client’s Evaluations, newest first (her file)
+   */
+  clientId?: unknown;
+  /**
+   * Required with `from` unless `clientId` is given
+   */
+  until?: unknown;
+  /**
+   * Required with `until` unless `clientId` is given
+   */
+  from?: unknown;
 };

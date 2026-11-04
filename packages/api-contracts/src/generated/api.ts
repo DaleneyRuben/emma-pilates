@@ -12027,7 +12027,7 @@ export type listAdminEvaluationsResponseSuccess =
 export type listAdminEvaluationsResponse = listAdminEvaluationsResponseSuccess;
 
 export const getListAdminEvaluationsUrl = (
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
 ) => {
   const normalizedParams = new URLSearchParams();
 
@@ -12045,7 +12045,7 @@ export const getListAdminEvaluationsUrl = (
 };
 
 export const listAdminEvaluations = async (
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listAdminEvaluationsResponse> => {
@@ -12079,7 +12079,7 @@ export const getListAdminEvaluationsQueryOptions = <
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -12122,7 +12122,7 @@ export function useListAdminEvaluations<
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params: undefined | ListAdminEvaluationsParams,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -12150,7 +12150,7 @@ export function useListAdminEvaluations<
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -12178,7 +12178,7 @@ export function useListAdminEvaluations<
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -12199,7 +12199,7 @@ export function useListAdminEvaluations<
   TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
   TError = unknown,
 >(
-  params: ListAdminEvaluationsParams,
+  params?: ListAdminEvaluationsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<

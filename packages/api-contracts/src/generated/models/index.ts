@@ -241,6 +241,7 @@ export * from "./listAdminBranchesStatus";
 export * from "./listAdminCashClosesParams";
 export * from "./listAdminClassTypesParams";
 export * from "./listAdminClassTypesStatus";
+export * from "./listAdminClientsFilter";
 export * from "./listAdminClientsParams";
 export * from "./listAdminEvaluationsParams";
 export * from "./listAdminExpensesParams";

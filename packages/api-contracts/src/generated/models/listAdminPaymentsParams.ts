@@ -9,6 +9,10 @@ import type { ListAdminPaymentsStatus } from "./listAdminPaymentsStatus";
 
 export type ListAdminPaymentsParams = {
   /**
+   * Only this Client’s sales (her file’s Pagos tab)
+   */
+  clientId?: unknown;
+  /**
    * Client name fragment, accents and case ignored
    */
   q?: unknown;

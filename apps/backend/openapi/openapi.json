@@ -3175,17 +3175,28 @@
             }
           },
           {
-            "name": "until",
-            "required": true,
+            "name": "clientId",
+            "required": false,
             "in": "query",
+            "schema": {
+              "format": "uuid"
+            },
+            "description": "Only this Client’s Evaluations, newest first (her file)"
+          },
+          {
+            "name": "until",
+            "required": false,
+            "in": "query",
+            "description": "Required with `from` unless `clientId` is given",
             "schema": {
               "format": "date-time"
             }
           },
           {
             "name": "from",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Required with `until` unless `clientId` is given",
             "schema": {
               "format": "date-time"
             }
@@ -4456,6 +4467,22 @@
         "operationId": "listAdminClients",
         "parameters": [
           {
+            "name": "filter",
+            "required": false,
+            "in": "query",
+            "description": "One chip of Clientas › Todas: the plan state or a live Fundadora place",
+            "schema": {
+              "enum": [
+                "all",
+                "active",
+                "expired",
+                "none",
+                "founder"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "q",
             "required": false,
             "in": "query",
@@ -4588,6 +4615,15 @@
       "get": {
         "operationId": "listAdminPayments",
         "parameters": [
+          {
+            "name": "clientId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            },
+            "description": "Only this Client’s sales (her file’s Pagos tab)"
+          },
           {
             "name": "q",
             "required": false,
@@ -13503,6 +13539,35 @@
               "none"
             ],
             "description": "`expired` when the Client had a Plan before, `none` if never"
+          },
+          "remainingClassAllowance": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Classes left on the active Subscription, null without one"
+          },
+          "originalClassAllowance": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Classes the active Subscription granted, null without one"
+          },
+          "planEndsOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The active Plan’s last day, or the last Plan’s when it expired; null if never"
+          },
+          "founderNumber": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 1,
+            "description": "The live Fundadora place’s number, if any"
+          },
+          "invitedByName": {
+            "type": "string",
+            "nullable": true,
+            "description": "The Client or Trainer whose Referral Code she used"
           }
         },
         "required": [
@@ -13512,7 +13577,12 @@
           "phone",
           "accountStatus",
           "planName",
-          "subscriptionStatus"
+          "subscriptionStatus",
+          "remainingClassAllowance",
+          "originalClassAllowance",
+          "planEndsOn",
+          "founderNumber",
+          "invitedByName"
         ]
       },
       "AdminClientPageDto": {
@@ -13547,6 +13617,11 @@
             "type": "number",
             "minimum": 0,
             "description": "Clients of the studio with an active Subscription today"
+          },
+          "founderClientCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clients of the studio holding a live Fundadora place"
           }
         },
         "required": [
@@ -13555,7 +13630,8 @@
           "pageSize",
           "totalItems",
           "studioClientCount",
-          "activePlanClientCount"
+          "activePlanClientCount",
+          "founderClientCount"
         ]
       },
       "AdminClientClosureOutlookDto": {
