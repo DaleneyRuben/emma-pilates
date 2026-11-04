@@ -65,6 +65,10 @@ export const configurableRules = (settings: StudioSettingsDto): Rule[] => [
     value: count(settings.minimumBookings, "reserva", "reservas"),
   },
   {
+    label: "Días adelante que una clienta puede reservar",
+    value: count(settings.bookingWindowDays, "día", "días"),
+  },
+  {
     label: "Impuestos sobre las ventas",
     value: `${settings.taxRatePercent} %`,
   },
