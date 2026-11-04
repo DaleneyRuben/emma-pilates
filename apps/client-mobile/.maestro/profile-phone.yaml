@@ -1,0 +1,53 @@
+# Critical journey: the +591 is implicit (decision §19.20, FIX-036). Editar
+# perfil refuses a number that is not a Bolivian mobile, takes the 8 digits
+# alone, and Perfil shows them stored as «+591 XXXXXXXX». The flow puts
+# Lucía's fixture phone back at the end, so it can repeat on one database.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    id: "tab-profile"
+- extendedWaitUntil:
+    visible: "Cambiar contraseña"
+    timeout: 15000
+- tapOn: "Editar"
+- extendedWaitUntil:
+    visible: "Guardar cambios"
+    timeout: 10000
+- tapOn:
+    text: "\\+591 70011001"
+- eraseText: 20
+- inputText: "7000004"
+- tapOn: "Editar perfil"
+- tapOn: "Guardar cambios"
+- extendedWaitUntil:
+    visible: "Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567."
+    timeout: 10000
+- takeScreenshot: fix036-client-1-refused
+- tapOn:
+    text: "7000004"
+- eraseText: 20
+- inputText: "70011009"
+- tapOn: "Editar perfil"
+- tapOn: "Guardar cambios"
+- extendedWaitUntil:
+    visible: "Cambiar contraseña"
+    timeout: 15000
+- assertVisible: "\\+591 70011009"
+- takeScreenshot: fix036-client-2-saved
+- tapOn: "Editar"
+- extendedWaitUntil:
+    visible: "Guardar cambios"
+    timeout: 10000
+- tapOn:
+    text: "\\+591 70011009"
+- eraseText: 20
+- inputText: "70011001"
+- tapOn: "Editar perfil"
+- tapOn: "Guardar cambios"
+- extendedWaitUntil:
+    visible: "Cambiar contraseña"
+    timeout: 15000
+- assertVisible: "\\+591 70011001"
