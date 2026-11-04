@@ -5,7 +5,7 @@ import { signIn } from "./support/session";
 // instead of the browser's locale picker. The browser itself is set to
 // Europe/Madrid (playwright.config.ts), so a native input would not show this.
 const openNewSession = async (page: Page) => {
-  await signIn(page);
+  await signIn(page, "/horario");
   await expect(
     page.getByRole("heading", { level: 1, name: "Horario" }),
   ).toBeVisible();

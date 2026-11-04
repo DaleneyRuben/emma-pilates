@@ -21,7 +21,7 @@ const tile = (page: Page, name: string) => page.getByRole("region", { name });
 test("reports the studio's money and narrows it to one Branch", async ({
   page,
 }) => {
-  await signIn(page, "/reporte");
+  await signIn(page, "/informes/dinero");
   await expect(
     page.getByRole("heading", {
       level: 1,

@@ -3,7 +3,7 @@ import { fixtures } from "./environment";
 
 /**
  * AW01: a fixture Staff Member (the Administrator unless named) signs in
- * and lands on Horario.
+ * and lands on Inicio, or on the page `path` names.
  */
 export async function signIn(
   page: Page,
@@ -19,6 +19,7 @@ export async function signIn(
   ).toBeVisible();
 }
 
+/** Follow-up 232's icon rail, present from the lg breakpoint up. */
 export const sidebar = (page: Page) =>
   page.getByRole("navigation", { name: "Secciones" });
 

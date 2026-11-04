@@ -5,7 +5,7 @@ test("reads the month report and asks a question at 1440 and 420", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await signIn(page, "/reporte/indicadores");
+  await signIn(page, "/informes");
   await expect(
     page.getByRole("heading", { level: 1, name: "Indicadores" }),
   ).toBeVisible();
@@ -30,7 +30,10 @@ test("reads the month report and asks a question at 1440 and 420", async ({
 
   await page.setViewportSize({ width: 420, height: 860 });
   await page.getByRole("button", { name: "Abrir menú" }).click();
-  await page.getByRole("link", { name: "Indicadores" }).click();
+  await page
+    .getByRole("dialog", { name: "Menú" })
+    .getByRole("link", { name: "Informes" })
+    .click();
   await expect(report).toBeVisible();
   await expect(page.getByRole("region", { name: "Ocupación" })).toBeVisible();
 });

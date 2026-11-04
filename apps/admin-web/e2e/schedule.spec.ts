@@ -15,7 +15,7 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
 }) => {
   const monday = addDays(weekStartOf(boliviaToday()), 7);
   const saturday = addDays(monday, 5);
-  await signIn(page, `/?week=${monday}`);
+  await signIn(page, `/horario?week=${monday}`);
   await expect(
     page.getByRole("heading", { level: 1, name: "Horario" }),
   ).toBeVisible();

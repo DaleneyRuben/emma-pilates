@@ -12,7 +12,7 @@ test.use({ viewport: { width: 1440, height: 900 } });
 test("invites a Nutritionist and deactivates an Assistant", async ({
   page,
 }) => {
-  await signIn(page, "/back-office/personal");
+  await signIn(page, "/estudio/personal");
   await expect(page.getByRole("cell", { name: /Camila Rojas/ })).toBeVisible();
   expect(page.viewportSize()).toEqual({ width: 1440, height: 900 });
   const roleFilter = page.getByLabel("Rol");

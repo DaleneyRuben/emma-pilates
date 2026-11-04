@@ -42,7 +42,7 @@ test.describe("a 1024 px laptop", () => {
 
   test("keeps the week and the report readable", async ({ page }) => {
     const monday = addDays(weekStartOf(boliviaToday()), 7);
-    await signIn(page, `/?week=${monday}`);
+    await signIn(page, `/horario?week=${monday}`);
     await expect(
       page.getByRole("heading", { level: 1, name: "Horario" }),
     ).toBeVisible();
@@ -52,7 +52,11 @@ test.describe("a 1024 px laptop", () => {
     );
     await fullType(page);
 
-    await sidebar(page).getByRole("link", { name: "Reporte" }).click();
+    await sidebar(page).getByRole("link", { name: "Informes" }).click();
+    await page
+      .getByRole("navigation", { name: "Páginas de Informes" })
+      .getByRole("link", { name: "Dinero" })
+      .click();
     await expect(
       page.getByRole("heading", {
         level: 1,
@@ -69,14 +73,14 @@ test.describe("a 1024 px laptop", () => {
 });
 
 test.describe("the drawn widths", () => {
-  test("keep the sidebar at 1440 and the drawer at 420", async ({ page }) => {
+  test("keep the rail at 1440 and the menu at 420", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     const monday = addDays(weekStartOf(boliviaToday()), 7);
-    await signIn(page, `/?week=${monday}`);
+    await signIn(page, `/horario?week=${monday}`);
     await expect(sidebar(page)).toBeVisible();
     await fullType(page);
-    const sidebarBox = await sidebar(page).boundingBox();
-    expect(sidebarBox?.width ?? 0).toBeGreaterThan(220);
+    // Follow-up 232: a 96 px icon rail.
+    expect((await sidebar(page).boundingBox())?.width).toBe(96);
 
     await page.setViewportSize({ width: 420, height: 860 });
     await expect(sidebar(page)).toHaveCount(0);
@@ -86,7 +90,11 @@ test.describe("the drawn widths", () => {
     await page.getByRole("button", { name: "Abrir menú" }).click();
     await page
       .getByRole("dialog", { name: "Menú" })
-      .getByRole("link", { name: "Reporte" })
+      .getByRole("link", { name: "Informes" })
+      .click();
+    await page
+      .getByRole("navigation", { name: "Páginas de Informes" })
+      .getByRole("link", { name: "Dinero" })
       .click();
     await expect(
       page.getByRole("heading", {

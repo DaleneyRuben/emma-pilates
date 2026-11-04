@@ -5,13 +5,13 @@ import { sidebar, signIn, trackApiRequests } from "./support/session";
 const sessionPath = "/api/v1/admin-web/authentication-sessions/current";
 
 test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
-  test("signs in to Horario with a host-only HttpOnly cookie and logs out from the menu", async ({
+  test("signs in to Inicio with a host-only HttpOnly cookie and logs out from the menu", async ({
     page,
     context,
   }) => {
     await signIn(page);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Horario" }),
+      page.getByRole("heading", { level: 1, name: /^Buen/ }),
     ).toBeVisible();
 
     const session = (await context.cookies(webOrigin)).find(
@@ -45,18 +45,18 @@ test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
     ).toBe(false);
 
     // The old address needs a session again.
-    await page.goto("/back-office/gastos");
+    await page.goto("/dinero/gastos");
     await expect(page).toHaveURL(/\/iniciar-sesion\?redirect=/);
   });
 
   test("sends a signed-out visitor to Login and returns them to the address they wanted", async ({
     page,
   }) => {
-    await page.goto("/catalogo/planes?page=2");
+    await page.goto("/ajustes/planes?page=2");
     await expect(page).toHaveURL(/\/iniciar-sesion\?redirect=/);
     await expect(sidebar(page)).toHaveCount(0);
 
-    await signIn(page, "/catalogo/planes?page=2");
+    await signIn(page, "/ajustes/planes?page=2");
 
     await expect(page).toHaveURL(
       `${webOrigin}/catalogo/planes?page=2&pageSize=20&visibility=all`,
@@ -70,12 +70,12 @@ test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
     page,
   }) => {
     const api = trackApiRequests(page);
-    await signIn(page, "/back-office/gastos");
+    await signIn(page, "/dinero/gastos");
     await expect(
       page.getByRole("heading", { level: 1, name: "Gastos" }),
     ).toBeVisible();
     // The heading shows while the Branches still load; Gastos and the
-    // sidebar ask for the rest only then, and a 401 on any of them would
+    // rail ask for the rest only then, and a 401 on any of them would
     // reach Login before the click below (WEB-026).
     await expect(
       page.getByText(/^(Sin resultados|Mostrando .+)$/),
@@ -89,7 +89,10 @@ test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
     });
     expect(revoked.status()).toBe(204);
 
-    await sidebar(page).getByRole("link", { name: "Nómina" }).click();
+    await page
+      .getByRole("navigation", { name: "Páginas de Dinero" })
+      .getByRole("link", { name: "Sueldos" })
+      .click();
 
     await expect(
       page.getByText("Tu sesión terminó. Vuelve a iniciar sesión."),

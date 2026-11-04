@@ -4,7 +4,7 @@ import { signIn } from "./support/session";
 // AW23 as the representative list: an allowlisted filter lives in the
 // address (ADR-0042, ADR-0062) and survives a reload.
 test("Personal keeps its Role filter in the address", async ({ page }) => {
-  await signIn(page, "/back-office/personal");
+  await signIn(page, "/estudio/personal");
   await expect(page.getByText("Mostrando 1–7 de 7 miembros")).toBeVisible();
 
   await page.getByLabel("Rol").selectOption("trainer");
