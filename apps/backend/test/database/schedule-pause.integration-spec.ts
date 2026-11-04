@@ -254,4 +254,125 @@ describe('Prisma weekly series pause (BKM-018)', () => {
       ),
     ).resolves.toBe('administration_access_denied');
   });
+
+  // Review of pull request #286: a series ended or replaced while paused
+  // keeps only the part of its pause inside its own range.
+  it('never restores a class after the end of a series ended while paused', async () => {
+    const admin = await administrator();
+    const { schedule } = await schedules().createSchedule(
+      fridayAt('10:00'),
+      admin,
+    );
+    await pauses().pauseSchedule(
+      {
+        sessionScheduleId: schedule.id,
+        pausedFrom: civil('2026-10-01'),
+        pausedUntil: null,
+      },
+      admin,
+    );
+    const ended = await schedules().endSchedule(
+      { sessionScheduleId: schedule.id, effectiveFrom: civil('2026-10-09') },
+      admin,
+    );
+    expect(ended.schedule.pausedUntil).toEqual(civil('2026-10-09'));
+
+    await pauses().resumeSchedule({ sessionScheduleId: schedule.id }, admin);
+
+    expect(
+      (await sessionsOf(schedule.id)).map((s) => [s.startsAt, s.state]),
+    ).toEqual([
+      [bolivia('2026-09-25', '10:00'), 'SCHEDULED'],
+      [bolivia('2026-10-02', '10:00'), 'SCHEDULED'],
+      [bolivia('2026-10-09', '10:00'), 'CANCELLED'],
+      [bolivia('2026-10-16', '10:00'), 'CANCELLED'],
+    ]);
+  });
+
+  it('splits the pause between a series and its replacement', async () => {
+    const admin = await administrator();
+    const { schedule } = await schedules().createSchedule(
+      fridayAt('08:00'),
+      admin,
+    );
+    await pauses().pauseSchedule(
+      {
+        sessionScheduleId: schedule.id,
+        pausedFrom: civil('2026-10-01'),
+        pausedUntil: null,
+      },
+      admin,
+    );
+    const { ended, replacement } = await schedules().replaceSchedule(
+      {
+        ...fridayAt('08:00'),
+        capacity: 12,
+        sessionScheduleId: schedule.id,
+        effectiveFrom: civil('2026-10-09'),
+      },
+      admin,
+    );
+    expect([ended.pausedFrom, ended.pausedUntil]).toEqual([
+      civil('2026-10-01'),
+      civil('2026-10-09'),
+    ]);
+    expect([replacement.pausedFrom, replacement.pausedUntil]).toEqual([
+      civil('2026-10-09'),
+      null,
+    ]);
+
+    await pauses().resumeSchedule({ sessionScheduleId: schedule.id }, admin);
+    await pauses().resumeSchedule({ sessionScheduleId: replacement.id }, admin);
+
+    expect(
+      (await sessionsOf(schedule.id)).map((s) => [s.startsAt, s.state]),
+    ).toEqual([
+      [bolivia('2026-09-25', '08:00'), 'SCHEDULED'],
+      [bolivia('2026-10-02', '08:00'), 'SCHEDULED'],
+      [bolivia('2026-10-09', '08:00'), 'CANCELLED'],
+      [bolivia('2026-10-16', '08:00'), 'CANCELLED'],
+    ]);
+    expect(
+      (await sessionsOf(replacement.id)).map((s) => [s.startsAt, s.state]),
+    ).toEqual([
+      [bolivia('2026-10-09', '08:00'), 'SCHEDULED'],
+      [bolivia('2026-10-16', '08:00'), 'SCHEDULED'],
+    ]);
+  });
+
+  it('leaves a withdrawn class out when another class took its slot', async () => {
+    const admin = await administrator();
+    const { schedule } = await schedules().createSchedule(
+      fridayAt('06:00'),
+      admin,
+    );
+    await pauses().pauseSchedule(
+      {
+        sessionScheduleId: schedule.id,
+        pausedFrom: civil('2026-10-01'),
+        pausedUntil: civil('2026-10-08'),
+      },
+      admin,
+    );
+    await schedules().createSession(
+      {
+        branchId: centro,
+        classTypeId: mat,
+        trainerStaffMemberId: staff('daniela'),
+        startsAt: bolivia('2026-10-02', '06:00'),
+        durationMinutes: 50,
+      },
+      admin,
+    );
+
+    const result = await pauses().resumeSchedule(
+      { sessionScheduleId: schedule.id },
+      admin,
+    );
+
+    expect(result.restoredSessions).toBe(0);
+    expect((await sessionsOf(schedule.id)).map((s) => s.state)).toContain(
+      'CANCELLED',
+    );
+  });
 });
