@@ -13,7 +13,7 @@ export function IconRail() {
   return (
     <nav
       aria-label="Secciones"
-      className="sticky top-0 flex h-svh w-24 shrink-0 flex-col gap-1 overflow-y-auto bg-lino px-2 py-5"
+      className="sticky top-0 flex h-svh w-[96px] shrink-0 flex-col gap-1 overflow-y-auto bg-lino px-2 py-5"
     >
       <span
         role="img"
