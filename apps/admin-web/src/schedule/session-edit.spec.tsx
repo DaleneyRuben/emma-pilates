@@ -177,6 +177,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
         durationMinutes: 50,
         capacity: 10,
         effectiveFrom: dayOfNextWeek(0),
+        effectiveUntil: null,
       }),
     );
     expect(await screen.findByRole("status")).toHaveTextContent(
