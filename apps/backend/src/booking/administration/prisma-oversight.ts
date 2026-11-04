@@ -41,16 +41,20 @@ export const createPrismaOversight = (
 ) => ({
   listEvaluations: async (
     query: Paging & {
-      from: Date;
-      until: Date;
+      from?: Date;
+      until?: Date;
+      clientId?: string;
       nutritionistStaffMemberId?: string;
       branchId?: string;
     },
     principal: AuthenticatedPrincipal,
   ) => {
     requireOperations(principal);
+    // WEB-040: a Client's file reads all her Evaluations, newest first.
+    const forClient = query.clientId !== undefined;
     const where: Prisma.EvaluationWhereInput = {
       state: EvaluationState.BOOKED,
+      ...(forClient ? { clientId: query.clientId } : {}),
       slot: {
         startsAt: { gte: query.from, lt: query.until },
         ...(query.branchId === undefined ? {} : { branchId: query.branchId }),
@@ -62,7 +66,10 @@ export const createPrismaOversight = (
     const [rows, totalItems] = await Promise.all([
       prisma.evaluation.findMany({
         where,
-        orderBy: [{ slot: { startsAt: 'asc' } }, { id: 'asc' }],
+        orderBy: [
+          { slot: { startsAt: forClient ? 'desc' : 'asc' } },
+          { id: 'asc' },
+        ],
         skip: offset(query),
         take: query.pageSize,
         select: {

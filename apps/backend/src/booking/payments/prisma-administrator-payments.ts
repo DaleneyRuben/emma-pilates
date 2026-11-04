@@ -47,6 +47,11 @@ const searchCondition = (query: string | undefined) =>
     ? Prisma.empty
     : Prisma.sql`AND booking.search_text(c.name) LIKE booking.search_text(${containsPattern(query)})`;
 
+const clientCondition = (clientId: string | undefined) =>
+  clientId === undefined
+    ? Prisma.empty
+    : Prisma.sql`AND p.client_id = ${clientId}::uuid`;
+
 // A receipt is shown while its image is retained (ADR-0075), the same rule as
 // the review's `receiptOf`.
 const toRow = (row: PaymentRow): AdministratorPaymentRow => ({
@@ -88,12 +93,12 @@ const toRow = (row: PaymentRow): AdministratorPaymentRow => ({
 export const createPrismaAdministratorPayments = (
   prisma: PrismaClient,
 ): AdministratorPaymentLedger => ({
-  list: async ({ page, pageSize, status, invoice, query }) => {
+  list: async ({ page, pageSize, status, invoice, query, clientId }) => {
     // Transfers and cash sales are the accountant's list (PAY-007). A voided
     // cash sale is a mistake the Administrator must still see (PAY-006).
     const where = Prisma.sql`WHERE p.method IN ('transfer', 'cash')
       ${stateCondition(status)} ${invoiceCondition(invoice)}
-      ${searchCondition(query)}`;
+      ${searchCondition(query)} ${clientCondition(clientId)}`;
     const [rows, [counted], pendingCount] = await Promise.all([
       prisma.$queryRaw<PaymentRow[]>`
         SELECT p.id, p.client_id, c.name AS client_name,

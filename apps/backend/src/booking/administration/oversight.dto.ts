@@ -9,20 +9,28 @@ const paging = {
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 };
 
+// The agenda needs a range; one Client's file (WEB-040) may leave it out to
+// read all her Evaluations. Half a range is refused.
 export const parseEvaluationListQuery = (value: unknown) =>
   z
     .strictObject({
-      from: z.iso.datetime(),
-      until: z.iso.datetime(),
+      from: z.iso.datetime().optional(),
+      until: z.iso.datetime().optional(),
+      clientId: uuid.optional(),
       nutritionistStaffMemberId: uuid.optional(),
       branchId: uuid.optional(),
       ...paging,
     })
-    .refine(({ from, until }) => new Date(from) < new Date(until))
+    .refine(({ from, until, clientId }) =>
+      from === undefined || until === undefined
+        ? from === until && clientId !== undefined
+        : new Date(from) < new Date(until),
+    )
     .transform(({ from, until, ...input }) => ({
       ...input,
-      from: new Date(from),
-      until: new Date(until),
+      ...(from === undefined || until === undefined
+        ? {}
+        : { from: new Date(from), until: new Date(until) }),
     }))
     .safeParse(value);
 
