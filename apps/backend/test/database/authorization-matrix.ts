@@ -2,6 +2,7 @@ import { campaignAuthorizationRows } from './campaign-authorization';
 import { catalogAuthorizationRows } from './catalog-authorization';
 import { evaluationAuthorizationRows } from './evaluation-authorization';
 import { payStatementAuthorizationRows } from './pay-statement-authorization';
+import { scheduleAuthorizationRows } from './schedule-authorization';
 import { studioFactsAuthorizationRows } from './studio-facts-authorization';
 import { supplyMovementAuthorizationRows } from './supply-movement-authorization';
 import type { RealIds } from './authorization-matrix-support';
@@ -306,19 +307,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/staff-members/{staffMemberId}/deactivation':
     administratorOnly(),
 
-  // The schedule and its Sessions.
-  'GET /api/v1/administrator/session-schedules': both('allow'),
-  'POST /api/v1/administrator/session-schedules': both('allow'),
-  'POST /api/v1/administrator/session-schedules/{scheduleId}/replacement':
-    both('allow'),
-  'POST /api/v1/administrator/session-schedules/{scheduleId}/end':
-    both('allow'),
-  'POST /api/v1/administrator/session-schedules/batch': both('allow'),
-  'POST /api/v1/administrator/sessions': both('allow'),
-  'GET /api/v1/administrator/sessions': both('allow'),
-  'PATCH /api/v1/administrator/sessions/{sessionId}': both('allow'),
-  'POST /api/v1/administrator/sessions/{sessionId}/cancel': both('allow'),
-
+  ...scheduleAuthorizationRows(),
   ...catalogAuthorizationRows(),
   'GET /api/v1/administrator/plans': administratorOnly(),
   // BKM-004: the Administrator edits the studio rules; the Coordinator reads
