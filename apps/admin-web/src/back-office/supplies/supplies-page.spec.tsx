@@ -88,10 +88,11 @@ describe("AW08 Insumos on a desktop browser", () => {
           "Ver historial de retiros",
         ].includes(label ?? ""),
       );
+    // Follow-up 233: the one primary action sits last among the buttons.
     expect(actions).toEqual([
-      "Nuevo insumo",
       "Registrar retiro",
       "Registrar reposición",
+      "Nuevo insumo",
       "Ver historial de retiros",
     ]);
     expect(
