@@ -34,7 +34,7 @@ describe("cn", () => {
   it("keeps every font size index.css defines next to a text color", () => {
     const css = readFileSync(join(__dirname, "../index.css"), "utf8");
     const sizes = [...css.matchAll(/--text-([a-z0-9-]+):/g)]
-      .map((match) => match[1])
+      .map((match) => match[1] ?? "")
       .filter((name) => !name.includes("--"));
     expect(sizes).toContain("pie");
     for (const size of sizes) {
