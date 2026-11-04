@@ -8,6 +8,7 @@ import {
   spacing,
   typography,
 } from "@pilates/mobile-core";
+import type { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 /**
@@ -52,11 +53,13 @@ export function DayStrip({
   onSelect,
   selected,
   today,
+  trailing,
 }: {
   dates: readonly string[];
   onSelect: (date: string) => void;
   selected: string;
   today: string;
+  trailing?: ReactNode;
 }) {
   return (
     <View style={[styles.strip, styles.dayRow]} testID="browse-day-strip">
@@ -80,7 +83,40 @@ export function DayStrip({
           </Pressable>
         );
       })}
+      {trailing}
     </View>
+  );
+}
+
+/**
+ * C03d (FIX-031, follow-up 234): S13's «Otra» at the end of a strip whose
+ * booking window is wider than seven days; a later day picked there shows
+ * its number in Palo de rosa.
+ */
+export function DayStripOther({
+  accessibilityLabel,
+  label,
+  onPress,
+  selected,
+}: {
+  accessibilityLabel: string;
+  label: string;
+  onPress: () => void;
+  selected: boolean;
+}) {
+  return (
+    <Pressable
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={[styles.dayChip, styles.otherChip, selected && styles.daySelected]}
+      testID="browse-day-other"
+    >
+      <Text style={selected ? [styles.dayNumber, styles.onSelected] : styles.otherLabel}>
+        {label}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -161,6 +197,13 @@ const styles = StyleSheet.create({
     fontSize: typography.tabLabel,
   },
   onSelected: { color: colors.white },
+  otherChip: { backgroundColor: colors.primaryTint },
+  otherLabel: {
+    color: colors.primaryOnTint,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 12,
+    fontWeight: "600",
+  },
   // Horizontal strips keep their natural height: spare tablet height would
   // stretch them and an open Branch list would squash them.
   strip: { flexGrow: 0, flexShrink: 0 },

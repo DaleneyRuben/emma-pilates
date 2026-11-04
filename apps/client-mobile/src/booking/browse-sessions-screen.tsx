@@ -6,7 +6,8 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
-  bookingStripDays,
+  bookingStrip,
+  bookingWindowDays,
   boliviaCivilDate,
   civilDateRange,
   colors,
@@ -16,6 +17,7 @@ import {
   hasStarted,
   Heading,
   LoadingState,
+  OtherDateSheet,
   PickerCheck,
   QueryFailure,
   radii,
@@ -34,7 +36,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { BrowseEmptyState } from "./browse-empty-state";
-import { BranchLine, ClassTypeStrip, DayStrip } from "./browse-filters";
+import { BranchLine, ClassTypeStrip, DayStrip, DayStripOther } from "./browse-filters";
 import { SessionRow, seatsTag } from "./session-row";
 
 type BrowseNavigation = {
@@ -51,11 +53,14 @@ export function BrowseSessionsScreen() {
   const navigation = useNavigation<BrowseNavigation>();
   const fetcher = useClientFetcher();
   const today = boliviaCivilDate(new Date());
-  const stripDays = bookingStripDays(useStudioRules(fetcher));
-  const dates = useMemo(() => upcomingCivilDates(today, stripDays), [today, stripDays]);
+  const windowDays = bookingWindowDays(useStudioRules(fetcher));
+  const dates = useMemo(() => upcomingCivilDates(today, windowDays), [today, windowDays]);
+  const { strip, later } = bookingStrip(dates);
   const [chosenDate, setSelectedDate] = useState(today);
+  const [choosingDate, setChoosingDate] = useState(false);
   // A day chosen before the rules arrived may lie past a shorter window.
   const selectedDate = dates.includes(chosenDate) ? chosenDate : today;
+  const pickedLater = later.includes(selectedDate);
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
   const [classTypeId, setClassTypeId] = useState(allClassTypes);
   const [choosingBranch, setChoosingBranch] = useState(false);
@@ -135,7 +140,22 @@ export function BrowseSessionsScreen() {
           ))}
         </View>
       ) : null}
-      <DayStrip dates={dates} onSelect={setSelectedDate} selected={selectedDate} today={today} />
+      <DayStrip
+        dates={strip}
+        onSelect={setSelectedDate}
+        selected={selectedDate}
+        today={today}
+        trailing={
+          later.length === 0 ? undefined : (
+            <DayStripOther
+              accessibilityLabel={`Elegir otra fecha, hasta ${windowDays} días`}
+              label={pickedLater ? String(Number(selectedDate.slice(8, 10))) : "Otra"}
+              onPress={() => setChoosingDate(true)}
+              selected={pickedLater}
+            />
+          )
+        }
+      />
       <ClassTypeStrip
         onSelect={setClassTypeId}
         options={[
@@ -197,6 +217,17 @@ export function BrowseSessionsScreen() {
           })}
         </ScrollView>
       )}
+      <OtherDateSheet
+        dates={later}
+        onClose={() => setChoosingDate(false)}
+        onSelect={(date) => {
+          setSelectedDate(date);
+          setChoosingDate(false);
+        }}
+        selected={selectedDate}
+        testIDPrefix="browse-other"
+        visible={choosingDate}
+      />
     </Screen>
   );
 }
