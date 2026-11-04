@@ -1,97 +1,138 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { activeBranchesHandler, branchesPath } from "../test/booking-handlers";
 import { apiUrl, problemResponse, server, useMockServer } from "../test/msw";
 import { emptyPageHandlers } from "../test/page-handlers";
+import { pendingBadgeHandler } from "../test/payment-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
 
 const renderShell = (path = "/") => renderAdmin(path);
 
+const destinations = [
+  "Inicio",
+  "Horario",
+  "Clientas",
+  "Promociones",
+  "Comentarios",
+  "Dinero",
+  "Estudio",
+  "Informes",
+  "Ajustes",
+];
+
+// Follow-up 232 (P01–P09): the icon rail, the top bar with the global
+// search, and each destination's pages as tabs.
 describe("admin shell", () => {
   useMockServer();
   beforeEach(() => server.use(...signedInHandlers(), ...emptyPageHandlers()));
 
-  const heading = (name: string) =>
+  const heading = (name: string | RegExp) =>
     screen.findByRole("heading", { level: 1, name });
+  const rail = () => screen.getByRole("navigation", { name: "Secciones" });
 
-  describe("admin shell on a desktop browser", () => {
-    it("shows the sidebar groups in order with the current page marked", async () => {
+  describe("on a desktop browser", () => {
+    it("shows the nine destinations in the rail with the current one marked", async () => {
       renderShell("/");
-      await heading("Horario");
+      await heading(/^Buen/);
 
-      const sidebar = screen.getByRole("navigation", { name: "Secciones" });
       expect(
-        within(sidebar)
+        within(rail())
           .getAllByRole("link")
           .map((link) => link.textContent),
-      ).toEqual([
-        "Horario",
-        "Tipos de clase",
-        "Planes",
-        "Sucursales",
-        "Clientes",
-        "Para contactar",
-        "Fundadoras",
-        "Congelamientos",
-        "Pagos",
-        "Caja",
-        "Insumos",
-        "Equipos",
-        "Evaluaciones nutricionales",
-        "Personal",
-        "Pagos a instructoras",
-        "Pago a la coordinadora",
-        "Nómina",
-        "Gastos",
-        "Categorías de gasto",
-        "Reporte",
-        "Indicadores",
-        "Recomendaciones",
-        "Simulador",
-        "Promociones",
-        "Referidos",
-        "Comentarios",
-      ]);
-      expect(within(sidebar).getByText("Catálogo")).toBeInTheDocument();
-      expect(within(sidebar).getByText("Back Office")).toBeInTheDocument();
-      expect(within(sidebar).queryByText("Descuentos")).not.toBeInTheDocument();
+      ).toEqual(destinations);
       expect(
-        within(sidebar).getByRole("link", { name: "Horario" }),
+        within(rail()).getByRole("link", { name: "Inicio" }),
       ).toHaveAttribute("aria-current", "page");
+      expect(
+        within(rail()).getByRole("img", { name: "Emma Pilates Studio" }),
+      ).toBeInTheDocument();
       expect(
         screen.queryByRole("button", { name: "Abrir menú" }),
       ).not.toBeInTheDocument();
     });
 
-    it("navigates from the sidebar and moves the current marker", async () => {
-      const { user } = renderShell("/");
-      await heading("Horario");
+    it("opens a destination on its first tab and moves between its tabs", async () => {
+      const { user, router } = renderShell("/");
+      await heading(/^Buen/);
 
-      await user.click(screen.getByRole("link", { name: "Promociones" }));
+      await user.click(within(rail()).getByRole("link", { name: "Dinero" }));
 
-      await heading("Promociones");
-      const sidebar = screen.getByRole("navigation", { name: "Secciones" });
+      await heading("Pagos");
+      expect(router.state.location.pathname).toBe("/dinero/pagos");
       expect(
-        within(sidebar).getByRole("link", { name: "Promociones" }),
+        within(rail()).getByRole("link", { name: "Dinero" }),
       ).toHaveAttribute("aria-current", "page");
+      const tabs = screen.getByRole("navigation", { name: "Páginas de Dinero" });
       expect(
-        within(sidebar).getByRole("link", { name: "Horario" }),
-      ).not.toHaveAttribute("aria-current");
+        within(tabs)
+          .getAllByRole("link")
+          .map((link) => link.textContent),
+      ).toEqual(["Pagos", "Caja", "Sueldos", "Gastos"]);
+      expect(within(tabs).getByRole("link", { name: "Pagos" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+
+      await user.click(within(tabs).getByRole("link", { name: "Gastos" }));
+      await heading("Gastos");
+      expect(within(tabs).getByRole("link", { name: "Gastos" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
     });
 
-    it("draws the wordmark once, in the sidebar cell, and keeps the Branch and account cells in the top bar", async () => {
+    it("keeps the tab marked on its other views and switches between them", async () => {
+      const { user } = renderShell("/dinero/sueldos");
+      await heading("Pagos a instructoras");
+
+      const views = screen.getByRole("navigation", {
+        name: "Vistas de Sueldos",
+      });
+      expect(
+        within(views)
+          .getAllByRole("link")
+          .map((link) => link.textContent),
+      ).toEqual(["Instructoras", "Coordinadora", "Pagados"]);
+
+      await user.click(within(views).getByRole("link", { name: "Pagados" }));
+
+      await heading("Nómina");
+      expect(
+        within(
+          screen.getByRole("navigation", { name: "Páginas de Dinero" }),
+        ).getByRole("link", { name: "Sueldos" }),
+      ).toHaveAttribute("aria-current", "page");
+      expect(
+        within(views).getByRole("link", { name: "Pagados" }),
+      ).toHaveAttribute("aria-current", "page");
+    });
+
+    it("draws no tabs where the destination has one page", async () => {
       renderShell("/");
+      await heading(/^Buen/);
+
+      expect(
+        screen.queryByRole("navigation", { name: /^Páginas de/ }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("carries the wordmark, the search, the Branch and the account in the top bar", async () => {
+      renderShell("/horario");
       await heading("Horario");
 
-      // design/README.md: the "Emma" wordmark sits in the 236 px cell.
-      expect(screen.getAllByText("Emma")).toHaveLength(1);
       const topBar = screen.getByRole("banner");
-      expect(within(topBar).queryByText("Emma")).not.toBeInTheDocument();
+      expect(within(topBar).getByText("Emma")).toBeInTheDocument();
+      expect(within(topBar).getByText("Pilates Studio")).toBeInTheDocument();
+      expect(
+        within(topBar).getByRole("combobox", { name: "Buscar en todo" }),
+      ).toHaveAttribute(
+        "placeholder",
+        "Buscar una clienta, una clase, un pago o una página",
+      );
       expect(
         await within(topBar).findByRole("button", { name: "Sucursal Centro" }),
-      ).toHaveAttribute("aria-expanded", "false");
+      ).toBeInTheDocument();
       expect(
         await within(topBar).findByRole("button", {
           name: "Tu cuenta: Paola Mendoza",
@@ -101,211 +142,37 @@ describe("admin shell", () => {
 
     it("titles the document after the page and moves focus to the content on navigation, behind a skip link", async () => {
       const { user } = renderShell("/");
-      await heading("Horario");
-      expect(document.title).toBe("Horario · Emma");
+      await heading(/^Buen/);
+      expect(document.title).toBe("Inicio · Emma");
       const skip = screen.getByRole("link", { name: "Saltar al contenido" });
       expect(skip).toHaveAttribute("href", "#contenido");
       expect(screen.getByRole("main")).toHaveAttribute("id", "contenido");
 
-      await user.click(screen.getByRole("link", { name: "Gastos" }));
-      await heading("Gastos");
+      await user.click(within(rail()).getByRole("link", { name: "Horario" }));
+      await heading("Horario");
 
-      expect(document.title).toBe("Gastos · Emma");
+      expect(document.title).toBe("Horario · Clases · Emma");
       await waitFor(() => expect(screen.getByRole("main")).toHaveFocus());
     });
 
-    it("moves through the Branch options with the arrow keys and chooses with Enter", async () => {
-      const { user } = renderShell("/");
-      await heading("Horario");
-
-      await user.click(
-        await screen.findByRole("button", { name: "Sucursal Centro" }),
-      );
-      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
-      const options = within(popover).getAllByRole("option");
-      // Roving tabindex: the selected Branch is the one Tab reaches.
-      expect(options.map((option) => option.tabIndex)).toEqual([0, -1, -1]);
-      await waitFor(() => expect(options[0]).toHaveFocus());
-
-      await user.keyboard("{ArrowDown}");
-      expect(options[1]).toHaveFocus();
-      await user.keyboard("{ArrowDown}{ArrowDown}");
-      expect(options[0]).toHaveFocus();
-      await user.keyboard("{End}");
-      expect(options[2]).toHaveFocus();
-      await user.keyboard("{ArrowUp}");
-      expect(options[1]).toHaveFocus();
-      await user.keyboard("{Enter}");
+    it("counts what waits on the destination and on its tab", async () => {
+      server.use(pendingBadgeHandler(3));
+      renderShell("/dinero/caja");
+      await heading("Caja");
 
       expect(
-        screen.queryByRole("dialog", { name: "Sucursal" }),
-      ).not.toBeInTheDocument();
+        await within(rail()).findByRole("link", {
+          name: "Dinero, 3 por revisar",
+        }),
+      ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "Sucursal Equipetrol" }),
+        within(
+          screen.getByRole("navigation", { name: "Páginas de Dinero" }),
+        ).getByRole("link", { name: "Pagos, 3 por revisar" }),
       ).toBeInTheDocument();
     });
 
-    it("paints the main area in Superficie, as the handoff draws it", async () => {
-      renderShell("/");
-      await heading("Horario");
-
-      expect(screen.getByRole("main")).toHaveClass("bg-superficie");
-    });
-
-    it("switches the Branch from the selector without leaving the page or asking to confirm", async () => {
-      const { user } = renderShell("/");
-      await heading("Horario");
-
-      await user.click(
-        await screen.findByRole("button", { name: "Sucursal Centro" }),
-      );
-
-      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
-      const options = within(popover).getAllByRole("option");
-      expect(options.map((option) => option.textContent)).toEqual([
-        "CentroCalle Ayacucho 245",
-        "EquipetrolAv. San Martín 1120",
-        "NorteAv. Banzer, 4.º anillo",
-      ]);
-      expect(options[0]).toHaveAttribute("aria-selected", "true");
-      expect(options[2]).toHaveAttribute("aria-selected", "false");
-      expect(
-        within(popover).queryByText("Todas las sucursales"),
-      ).not.toBeInTheDocument();
-      expect(
-        within(popover).queryByText(/no se filtra por sucursal/),
-      ).not.toBeInTheDocument();
-
-      await user.click(within(popover).getByRole("option", { name: /Norte/ }));
-
-      expect(
-        screen.queryByRole("dialog", { name: "Sucursal" }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: "Sucursal Norte" }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("heading", { level: 1, name: "Horario" }),
-      ).toBeInTheDocument();
-    });
-
-    it("closes the selector with Escape and keeps the Branch", async () => {
-      const { user } = renderShell("/");
-      await heading("Horario");
-
-      await user.click(
-        await screen.findByRole("button", { name: "Sucursal Centro" }),
-      );
-      await screen.findByRole("dialog", { name: "Sucursal" });
-      await user.keyboard("{Escape}");
-
-      expect(
-        screen.queryByRole("dialog", { name: "Sucursal" }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: "Sucursal Centro" }),
-      ).toHaveAttribute("aria-expanded", "false");
-    });
-
-    it("says when the page is studio-wide but still lets the Branch change for the next page", async () => {
-      const { user } = renderShell("/back-office/pagos");
-      await heading("Pagos");
-
-      await user.click(
-        await screen.findByRole("button", { name: "Sucursal Centro" }),
-      );
-
-      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
-      expect(
-        within(popover).getByText(
-          "Esta página no se filtra por sucursal — los pagos son del estudio, no de una sede.",
-        ),
-      ).toBeInTheDocument();
-      expect(
-        within(popover).getByRole("option", { name: /Equipetrol/ }),
-      ).toBeEnabled();
-
-      await user.click(
-        within(popover).getByRole("option", { name: /Equipetrol/ }),
-      );
-      expect(
-        screen.getByRole("button", { name: "Sucursal Equipetrol" }),
-      ).toBeInTheDocument();
-
-      await user.click(screen.getByRole("link", { name: "Promociones" }));
-      await heading("Promociones");
-      expect(
-        screen.getByRole("button", { name: "Sucursal Equipetrol" }),
-      ).toBeInTheDocument();
-    });
-
-    it("reads the active Branches for the selector, so archived ones never appear", async () => {
-      const requests: URLSearchParams[] = [];
-      server.events.on("request:start", ({ request }) => {
-        const url = new URL(request.url);
-        if (url.pathname === branchesPath) requests.push(url.searchParams);
-      });
-      const { user } = renderShell("/");
-      await heading("Horario");
-
-      expect(
-        await screen.findByRole("button", { name: "Sucursal Centro" }),
-      ).toBeInTheDocument();
-      await user.click(
-        await screen.findByRole("button", { name: "Sucursal Centro" }),
-      );
-      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
-      expect(
-        within(popover).getByRole("option", { name: /Norte/ }),
-      ).toBeInTheDocument();
-      expect(requests.map((params) => params.get("status"))).toContain(
-        "active",
-      );
-      expect(requests.every((params) => params.get("pageSize") === "100")).toBe(
-        true,
-      );
-      server.events.removeAllListeners();
-    });
-
-    it("says when there is no active Branch yet and still links to Sucursales", async () => {
-      server.use(activeBranchesHandler([]));
-      const { user } = renderShell("/");
-      await heading("Horario");
-
-      const trigger = await screen.findByRole("button", {
-        name: "Sin sucursal",
-      });
-      await user.click(trigger);
-      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
-      expect(
-        within(popover).getByText("Todavía no hay sucursales activas."),
-      ).toBeInTheDocument();
-      expect(
-        within(popover).getByRole("link", { name: "Gestionar sucursales" }),
-      ).toBeInTheDocument();
-    });
-
-    it("says when the Branches could not be loaded", async () => {
-      server.use(
-        http.get(apiUrl(branchesPath), () =>
-          problemResponse(500, "unexpected_error"),
-        ),
-      );
-      const { user } = renderShell("/");
-      await heading("Horario");
-
-      await user.click(
-        await screen.findByRole("button", { name: "Sin sucursal" }),
-      );
-      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
-      expect(
-        await within(popover).findByText(
-          "No pudimos cargar las sucursales. Inténtalo de nuevo.",
-        ),
-      ).toBeInTheDocument();
-    });
-
-    it("shows no count beside Pagos or Insumos when either read fails", async () => {
+    it("shows no count beside Dinero or Estudio when either read fails", async () => {
       server.use(
         http.get(apiUrl("/api/v1/administrator/payments"), () =>
           problemResponse(500, "unexpected_error"),
@@ -315,52 +182,32 @@ describe("admin shell", () => {
         ),
       );
       renderShell("/");
-      await heading("Horario");
+      await heading(/^Buen/);
 
-      const sidebar = screen.getByRole("navigation", { name: "Secciones" });
       // The retry policy gives a 5xx one more try before the badge gives up.
       await waitFor(
         () => expect(screen.queryByRole("status")).not.toBeInTheDocument(),
         { timeout: 5_000 },
       );
       expect(
-        within(sidebar).getByRole("link", { name: /^Pagos$/ }),
-      ).toHaveTextContent(/^Pagos$/);
+        within(rail()).getByRole("link", { name: "Dinero" }),
+      ).toHaveTextContent(/^Dinero$/);
       expect(
-        within(sidebar).getByRole("link", { name: "Insumos" }),
-      ).toHaveTextContent(/^Insumos$/);
-    });
-
-    it("links to the Sucursales page from the selector", async () => {
-      const { user } = renderShell("/");
-      await heading("Horario");
-
-      await user.click(
-        await screen.findByRole("button", { name: "Sucursal Centro" }),
-      );
-      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
-      await user.click(
-        within(popover).getByRole("link", { name: "Gestionar sucursales" }),
-      );
-
-      await heading("Sucursales");
-      expect(
-        screen.queryByRole("dialog", { name: "Sucursal" }),
-      ).not.toBeInTheDocument();
+        within(rail()).getByRole("link", { name: "Estudio" }),
+      ).toHaveTextContent(/^Estudio$/);
     });
   });
 
-  describe("admin shell on a narrow browser", () => {
+  describe("on a narrow browser", () => {
     useNarrowViewport();
 
-    it("collapses the sidebar behind a hamburger drawer that closes after navigating", async () => {
+    it("opens the nine destinations from the menu button and closes after navigating", async () => {
       const { user } = renderShell("/");
-      await heading("Horario");
+      await heading(/^Buen/);
 
       expect(
         screen.queryByRole("navigation", { name: "Secciones" }),
       ).not.toBeInTheDocument();
-      // Without the sidebar cell, the top bar carries the one wordmark.
       expect(
         within(screen.getByRole("banner")).getByText("Emma"),
       ).toBeInTheDocument();
@@ -368,38 +215,35 @@ describe("admin shell", () => {
       await user.click(screen.getByRole("button", { name: "Abrir menú" }));
 
       const drawer = await screen.findByRole("dialog", { name: "Menú" });
-      await user.click(within(drawer).getByRole("link", { name: "Gastos" }));
+      expect(
+        within(drawer)
+          .getAllByRole("link")
+          .map((link) => link.textContent),
+      ).toEqual(destinations);
+      await user.click(within(drawer).getByRole("link", { name: "Estudio" }));
 
-      await heading("Gastos");
+      await heading("Personal");
       expect(
         screen.queryByRole("dialog", { name: "Menú" }),
       ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("navigation", { name: "Páginas de Estudio" }),
+      ).toBeInTheDocument();
     });
 
-    it("opens the Branch selector as a bottom sheet with the same rows and a title", async () => {
+    it("closes the menu from its own button", async () => {
       const { user } = renderShell("/");
-      await heading("Horario");
+      await heading(/^Buen/);
 
+      await user.click(screen.getByRole("button", { name: "Abrir menú" }));
+      const drawer = await screen.findByRole("dialog", { name: "Menú" });
       await user.click(
-        await screen.findByRole("button", { name: "Sucursal Centro" }),
-      );
-
-      const sheet = await screen.findByRole("dialog", { name: "Sucursal" });
-      expect(sheet).toHaveAttribute("data-side", "bottom");
-      // The sheet's label is its title, a heading like every other sheet's.
-      expect(
-        within(sheet).getByRole("heading", { name: "Sucursal" }),
-      ).toBeInTheDocument();
-      await user.click(
-        within(sheet).getByRole("option", { name: /Equipetrol/ }),
+        within(drawer).getByRole("button", { name: "Cerrar menú" }),
       );
 
       expect(
-        screen.queryByRole("dialog", { name: "Sucursal" }),
+        screen.queryByRole("dialog", { name: "Menú" }),
       ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: "Sucursal Equipetrol" }),
-      ).toBeInTheDocument();
     });
   });
 });

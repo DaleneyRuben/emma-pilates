@@ -29,6 +29,8 @@ describe("AW33 user menu on a desktop browser", () => {
     });
     expect(within(trigger).getByText("PM")).toBeInTheDocument();
     expect(within(trigger).getByText("Paola Mendoza")).toBeInTheDocument();
+    // Follow-up 232: the top bar names her Role under her name.
+    expect(within(trigger).getByText("Administración")).toBeInTheDocument();
 
     const menu = await openMenu(user);
     expect(menu).toHaveAttribute("data-presentation", "popover");
@@ -42,6 +44,8 @@ describe("AW33 user menu on a desktop browser", () => {
         .getAllByRole("button")
         .map((button) => button.textContent),
     ).toEqual(["Cambiar contraseña", "Cerrar sesión"]);
+    // Reglas del estudio moved to Ajustes (follow-up 232).
+    expect(within(menu).queryAllByRole("link")).toHaveLength(0);
   });
 
   it("changes the password in the side panel and keeps this browser signed in", async () => {

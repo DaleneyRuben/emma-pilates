@@ -11,47 +11,41 @@ import { clientPage } from "../test/people-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { coordinatorHandlers } from "../test/session-handlers";
 
-// IDN-009 / ADR-0102 (follow-up 155): the Coordinator's admin web is the
-// schedule, Clientes, Personal, the counts-only Indicadores page, and the
-// recommendations list. Money pages are neither shown nor opened. Descartar
+// IDN-009 / ADR-0102 (follow-up 155): the Coordinator's admin web is Inicio,
+// the schedule, Clientas, Personal, the counts-only Indicadores page, and the
+// recommendations list (BKO-010 widens it). Money pages are neither shown nor opened. Descartar
 // stays off her recommendations page.
 describe("the admin web for the Coordinator", () => {
   useMockServer();
   beforeEach(() => server.use(...coordinatorHandlers()));
 
-  const heading = (name: string) =>
+  const heading = (name: string | RegExp) =>
     screen.findByRole("heading", { level: 1, name });
 
-  it("shows only Horario, Clientes, and Personal in the sidebar", async () => {
+  it("shows only the destinations ADR-0102 opens to her in the rail", async () => {
     renderAdmin("/");
-    await heading("Horario");
+    await heading(/^Buen/);
 
-    const sidebar = screen.getByRole("navigation", { name: "Secciones" });
+    const rail = screen.getByRole("navigation", { name: "Secciones" });
     expect(
-      within(sidebar)
+      within(rail)
         .getAllByRole("link")
         .map((link) => link.textContent),
-    ).toEqual([
-      "Horario",
-      "Clientes",
-      "Para contactar",
-      "Personal",
-      "Indicadores",
-      "Recomendaciones",
-    ]);
-    expect(within(sidebar).queryByText("Catálogo")).not.toBeInTheDocument();
-    expect(within(sidebar).queryByText("Promociones")).not.toBeInTheDocument();
+    ).toEqual(["Inicio", "Horario", "Clientas", "Estudio", "Informes"]);
+    expect(within(rail).queryByText("Dinero")).not.toBeInTheDocument();
+    expect(within(rail).queryByText("Promociones")).not.toBeInTheDocument();
   });
 
   it.each([
-    "/back-office/pagos",
-    "/reporte",
-    "/back-office/nomina",
-    "/catalogo/planes",
+    "/dinero/pagos",
+    "/informes/dinero",
+    "/dinero/sueldos/pagados",
+    "/ajustes/planes",
     "/promociones",
-    "/simulador",
-    "/back-office/pago-coordinadora",
-    "/back-office/clientes/campana",
+    "/informes/simulador",
+    "/dinero/sueldos/coordinadora",
+    "/promociones/clases-de-campana",
+    "/back-office/pagos",
   ])("returns %s to Horario with the notice", async (path) => {
     const { router } = renderAdmin(path);
 
@@ -59,7 +53,9 @@ describe("the admin web for the Coordinator", () => {
     expect(
       await screen.findByText("Esa sección es solo para administración."),
     ).toBeInTheDocument();
-    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe("/horario"),
+    );
   });
 
   it("opens Indicadores with counts and no amount", async () => {
@@ -82,7 +78,7 @@ describe("the admin web for the Coordinator", () => {
         problemResponse(403, "studio_access_denied"),
       ),
     );
-    renderAdmin("/reporte/indicadores");
+    renderAdmin("/informes");
 
     await heading("Indicadores");
     expect(
@@ -90,7 +86,7 @@ describe("the admin web for the Coordinator", () => {
     ).toBeInTheDocument();
     expect(screen.queryByText(/Bs/)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Simulador" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Reporte" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Dinero" })).toBeNull();
     expect(screen.getByRole("link", { name: "Recomendaciones" })).toBeVisible();
     await waitFor(() =>
       expect(
@@ -120,7 +116,7 @@ describe("the admin web for the Coordinator", () => {
         }),
       ),
     );
-    renderAdmin("/recomendaciones");
+    renderAdmin("/informes/recomendaciones");
 
     await heading("Recomendaciones");
     expect(
@@ -138,7 +134,7 @@ describe("the admin web for the Coordinator", () => {
         jsonResponse(clientPage([])),
       ),
     );
-    renderAdmin("/back-office/clientes");
+    renderAdmin("/clientas");
 
     await heading("Clientes");
     expect(
@@ -148,11 +144,15 @@ describe("the admin web for the Coordinator", () => {
 
   it("names her Role in the account menu", async () => {
     const { user } = renderAdmin("/");
-    await heading("Horario");
+    await heading(/^Buen/);
 
     await user.click(
       await screen.findByRole("button", { name: /Carolina Rivas/ }),
     );
-    expect(await screen.findByText("Coordinación")).toBeInTheDocument();
+    expect(
+      within(await screen.findByRole("dialog", { name: "Tu cuenta" })).getByText(
+        "Coordinación",
+      ),
+    ).toBeInTheDocument();
   });
 });
