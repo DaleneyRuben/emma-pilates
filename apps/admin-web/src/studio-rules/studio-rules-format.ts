@@ -17,8 +17,23 @@ export function formatCancellationWindow(minutes: number): string {
 const count = (value: number, singular: string, plural: string) =>
   `${value} ${value === 1 ? singular : plural}`;
 
+type Rule = { label: string; value: string };
+
+// The Paid Evaluation's price and fee, which the Coordinator reads as null
+// (ADR-0108): no row then.
+const evaluationRule = (settings: StudioSettingsDto): Rule[] =>
+  settings.evaluationPriceCentavos === null ||
+  settings.nutritionistFeeCentavos === null
+    ? []
+    : [
+        {
+          label: "Evaluación nutricional pagada",
+          value: `${formatBolivianos(settings.evaluationPriceCentavos)} · ${formatBolivianos(settings.nutritionistFeeCentavos)} para la nutricionista`,
+        },
+      ];
+
 // AW36's «Reglas fijas»: the Studio Settings only a release changes.
-export const fixedRules = (settings: StudioSettingsDto) => [
+export const fixedRules = (settings: StudioSettingsDto): Rule[] => [
   {
     label: "Ventana de cancelación",
     value: `${formatCancellationWindow(settings.cancellationWindowMinutes)} antes de cada clase`,
@@ -39,9 +54,30 @@ export const fixedRules = (settings: StudioSettingsDto) => [
     label: "Invita a una amiga",
     value: `${count(settings.guestPassesPerClient, "clase de invitada", "clases de invitada")} por persona · ${count(settings.invitesPerHostPerMonth, "invitación", "invitaciones")} al mes · +${count(settings.inviteRewardClasses, "clase", "clases")} cuando la amiga compra`,
   },
+  ...evaluationRule(settings),
+];
+
+// The configurable rules as the Coordinator reads them, without the form
+// (ADR-0108): the Administrator alone saves them.
+export const configurableRules = (settings: StudioSettingsDto): Rule[] => [
   {
-    label: "Evaluación nutricional pagada",
-    value: `${formatBolivianos(settings.evaluationPriceCentavos)} · ${formatBolivianos(settings.nutritionistFeeCentavos)} para la nutricionista`,
+    label: "Mínimo de reservas por clase",
+    value: count(settings.minimumBookings, "reserva", "reservas"),
+  },
+  {
+    label: "Impuestos sobre las ventas",
+    value: `${settings.taxRatePercent} %`,
+  },
+  {
+    label: "Meta de renovación de la coordinadora",
+    value: `${settings.renewalTargetMonths1To6Percent} % en los meses 1 a 6 · ${settings.renewalTargetMonths7To12Percent} % en los meses 7 a 12 · ${settings.renewalTargetFromMonth13Percent} % desde el mes 13`,
+  },
+  {
+    label: "Fecha de apertura",
+    value:
+      settings.openingDate === null
+        ? "Todavía sin fecha"
+        : formatCivilDate(settings.openingDate),
   },
 ];
 

@@ -160,7 +160,7 @@ describe("AW39 Para contactar", () => {
       within(tabs)
         .getAllByRole("link")
         .map((link) => link.textContent),
-    ).toEqual(["Todas", "Para contactar"]);
+    ).toEqual(["Todas", "Para contactar", "Congelamientos"]);
   });
 });
 

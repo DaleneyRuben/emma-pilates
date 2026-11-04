@@ -60,7 +60,7 @@ export type NavigationItem = {
    * (AW16), so the top bar shows a note instead of the shell's.
    */
   ownBranchFilter?: true;
-  /** Open to the Coordinator too (ADR-0102): operations, never money. */
+  /** Open to the Coordinator too (ADR-0102, ADR-0108): operations, never money. */
   coordinator?: true;
 };
 
@@ -95,7 +95,12 @@ export const destinations: readonly Destination[] = [
     icon: "horario",
     tabs: [
       { label: "Clases", to: "/horario", coordinator: true },
-      { label: "Nutrición", to: "/horario/nutricion", list: true },
+      {
+        label: "Nutrición",
+        to: "/horario/nutricion",
+        list: true,
+        coordinator: true,
+      },
     ],
   },
   {
@@ -121,6 +126,7 @@ export const destinations: readonly Destination[] = [
         to: "/clientas/congelamientos",
         list: true,
         studioWide: true,
+        coordinator: true,
       },
       {
         label: "Fundadoras",
@@ -136,7 +142,12 @@ export const destinations: readonly Destination[] = [
     tabs: [
       // AW17 is the one list drawn as cards, unpaged, because its order is
       // what the page edits.
-      { label: "Carrusel", to: "/promociones", studioWide: true },
+      {
+        label: "Carrusel",
+        to: "/promociones",
+        studioWide: true,
+        coordinator: true,
+      },
       {
         label: "Clases de campaña",
         to: "/promociones/clases-de-campana",
@@ -147,8 +158,14 @@ export const destinations: readonly Destination[] = [
         to: "/promociones/referidos",
         list: true,
         studioWide: true,
+        coordinator: true,
       },
-      { label: "Contactos", to: "/promociones/contactos", studioWide: true },
+      {
+        label: "Contactos",
+        to: "/promociones/contactos",
+        studioWide: true,
+        coordinator: true,
+      },
     ],
   },
   {
@@ -161,6 +178,7 @@ export const destinations: readonly Destination[] = [
         to: "/comentarios",
         list: true,
         studioWide: true,
+        coordinator: true,
       },
     ],
   },
@@ -214,9 +232,16 @@ export const destinations: readonly Destination[] = [
         list: true,
         badge: "lowStock",
         viewLabel: "Stock",
-        views: [{ label: "Retiros del mes", to: "/estudio/insumos/retiros" }],
+        coordinator: true,
+        views: [
+          {
+            label: "Retiros del mes",
+            to: "/estudio/insumos/retiros",
+            coordinator: true,
+          },
+        ],
       },
-      { label: "Equipos", to: "/estudio/equipos" },
+      { label: "Equipos", to: "/estudio/equipos", coordinator: true },
     ],
   },
   {
@@ -249,6 +274,7 @@ export const destinations: readonly Destination[] = [
         label: "Reglas del estudio",
         to: "/ajustes/reglas-del-estudio",
         studioWide: true,
+        coordinator: true,
       },
     ],
   },
@@ -290,7 +316,7 @@ export const pageTitleOf = (pathname: string): string | undefined => {
 
 /**
  * The Administrator sees every page. Anyone else holds no money and sees
- * only what ADR-0102 opens to the Coordinator (BKO-010 widens it).
+ * only what ADR-0102 and ADR-0108 open to the Coordinator.
  */
 const mayOpen = (item: NavigationItem, role: AdminRole): boolean =>
   role === "administrator" || item.coordinator === true;

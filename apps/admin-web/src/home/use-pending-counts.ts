@@ -9,8 +9,9 @@ import type { PendingCounts } from "./home-pending";
 
 /**
  * What waits on Inicio, from the reads the tabs already make. The
- * Coordinator reads only the Para contactar count (ADR-0102 until
- * BKO-010); a read that fails counts nothing rather than blocking Inicio.
+ * Coordinator also reads freezes, new comments and low stock (ADR-0108),
+ * never payments or pay; a read that fails counts nothing rather than
+ * blocking Inicio.
  */
 export function usePendingCounts({
   seesMoney,
@@ -25,24 +26,20 @@ export function usePendingCounts({
     ...pendingPaymentCountQueryOptions(),
     enabled: seesMoney,
   });
-  const freezes = useQuery({
-    ...requestedFreezesQueryOptions(),
-    enabled: seesMoney,
-  });
+  const freezes = useQuery(requestedFreezesQueryOptions());
   const contactAlerts = useQuery(contactAlertCountQueryOptions());
-  const feedback = useQuery({
-    ...feedbackTableQueryOptions({
+  const feedback = useQuery(
+    feedbackTableQueryOptions({
       page: 1,
       pageSize: 20,
       status: "all",
       app: "all",
     }),
-    enabled: seesMoney,
-  });
+  );
   const lowStock = useQuery({
     ...branchSuppliesQueryOptions(branchId ?? ""),
     select: (page) => page.lowStockCount,
-    enabled: seesMoney && branchId !== undefined,
+    enabled: branchId !== undefined,
   });
   const statements = useQuery({
     ...payStatementsQueryOptions(month),

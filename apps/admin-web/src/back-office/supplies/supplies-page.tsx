@@ -13,6 +13,7 @@ import {
 } from "../../components/table/pagination";
 import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
+import { useAdminRole } from "../../session/admin-role";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
 import { SupplyMovementForm } from "./movement-panel";
@@ -21,31 +22,40 @@ import { supplyTableQueryOptions } from "./supply-queries";
 
 const columns = createColumnHelper<AdminSupplyDto>();
 
-const supplyColumns = (open: (row: AdminSupplyDto) => void) => [
-  columns.accessor("name", {
-    header: "Nombre",
-    cell: ({ row }) => (
-      <RowOpener label={row.original.name} onOpen={() => open(row.original)} />
-    ),
-  }),
-  columns.accessor("quantityOnHand", {
-    header: "Cantidad en stock",
-    meta: { align: "right" },
-    cell: ({ getValue }) => (
-      <span className="text-texto tabular">
-        {countFormat.format(getValue())}
-      </span>
-    ),
-  }),
-  // At or below the threshold (BKO-001 D8); nothing otherwise.
-  columns.accessor("lowStock", {
-    header: "Estado",
-    cell: ({ getValue }) =>
-      getValue() ? (
-        <StatusPill tone="advertencia">Stock bajo</StatusPill>
-      ) : null,
-  }),
-];
+// The Coordinator records movements but never edits a Supply (ADR-0108), so
+// her rows name the Supply without opening it.
+const supplyColumns =
+  (managesCatalog: boolean) => (open: (row: AdminSupplyDto) => void) => [
+    columns.accessor("name", {
+      header: "Nombre",
+      cell: ({ row }) =>
+        managesCatalog ? (
+          <RowOpener
+            label={row.original.name}
+            onOpen={() => open(row.original)}
+          />
+        ) : (
+          <span className="font-medium text-texto">{row.original.name}</span>
+        ),
+    }),
+    columns.accessor("quantityOnHand", {
+      header: "Cantidad en stock",
+      meta: { align: "right" },
+      cell: ({ getValue }) => (
+        <span className="text-texto tabular">
+          {countFormat.format(getValue())}
+        </span>
+      ),
+    }),
+    // At or below the threshold (BKO-001 D8); nothing otherwise.
+    columns.accessor("lowStock", {
+      header: "Estado",
+      cell: ({ getValue }) =>
+        getValue() ? (
+          <StatusPill tone="advertencia">Stock bajo</StatusPill>
+        ) : null,
+    }),
+  ];
 
 const lowStockLine = (branch: Branch, count: number | undefined) =>
   count === undefined
@@ -54,15 +64,17 @@ const lowStockLine = (branch: Branch, count: number | undefined) =>
       ? `Sucursal ${branch.name} · ningún insumo con stock bajo`
       : `Sucursal ${branch.name} · ${countFormat.format(count)} con stock bajo`;
 
-function EmptySupplies() {
+function EmptySupplies({ managesCatalog }: { managesCatalog: boolean }) {
   return (
     <span className="flex flex-col items-center gap-1">
       <span className="text-texto-secundario">
         Todavía no hay insumos en esta sucursal.
       </span>
-      <span className="text-nota text-texto-tenue">
-        Crea el primero con «Nuevo insumo».
-      </span>
+      {managesCatalog ? (
+        <span className="text-nota text-texto-tenue">
+          Crea el primero con «Nuevo insumo».
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -77,15 +89,16 @@ function BranchSupplies({
   onSearchChange: SearchChange<ListSearch>;
 }) {
   const query = useQuery(supplyTableQueryOptions(branch.id, search));
+  const managesCatalog = useAdminRole() === "administrator";
 
   return (
     <CatalogPage
       title="Insumos"
       subtitle={lowStockLine(branch, query.data?.lowStockCount)}
-      createLabel="Nuevo insumo"
+      createLabel={managesCatalog ? "Nuevo insumo" : undefined}
       loadingMessage="Cargando insumos…"
       what="los insumos"
-      emptyMessage={<EmptySupplies />}
+      emptyMessage={<EmptySupplies managesCatalog={managesCatalog} />}
       panelTitles={{ create: "Nuevo insumo", edit: "Editar insumo" }}
       filter={null}
       search={search}
@@ -96,7 +109,8 @@ function BranchSupplies({
           : `${pageRangeLabel(window)} ${window.totalItems === 1 ? "insumo" : "insumos"}`
       }
       query={query}
-      columns={supplyColumns}
+      columns={supplyColumns(managesCatalog)}
+      canOpen={() => managesCatalog}
       renderForm={(supply, done) => (
         <SupplyPanelForm branchId={branch.id} supply={supply} onDone={done} />
       )}

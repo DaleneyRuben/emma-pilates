@@ -70,7 +70,8 @@ export const countedName = (label: string, count: Count | undefined) =>
  * The rail the signed-in Role sees and what waits on it. The session Role is
  * administrator or coordinator; a profile that has answered and is neither
  * still reaches this shell, so money stays hidden from it. Until the profile
- * answers, the session Role decides (ADR-0102).
+ * answers, the session Role decides (ADR-0102). The Coordinator runs Insumos,
+ * so she gets the low-stock count, never the payments one (ADR-0108).
  */
 export function useRail(): Rail {
   const role = useAdminRole();
@@ -78,9 +79,13 @@ export function useRail(): Rail {
   const seesMoney =
     role === "administrator" &&
     (profile === undefined || profile.role === "administrator");
+  const runsStudio =
+    profile === undefined ||
+    profile.role === "administrator" ||
+    profile.role === "coordinator";
   const counts: Record<Badge, number> = {
     pendingPayments: usePendingPaymentCount(seesMoney),
-    lowStock: useLowStockCount(seesMoney),
+    lowStock: useLowStockCount(runsStudio),
     contactAlerts: useContactAlertCount(),
   };
   const place = useRouterState({
