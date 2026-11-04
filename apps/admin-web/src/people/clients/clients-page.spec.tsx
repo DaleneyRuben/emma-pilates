@@ -152,7 +152,11 @@ describe("AW21 Clientes on a desktop browser", () => {
     server.use(
       clientTable(() =>
         jsonResponse(
-          clientPage([], { studioClientCount: 0, activePlanClientCount: 0 }),
+          clientPage([], {
+            studioClientCount: 0,
+            activePlanClientCount: 0,
+            founderClientCount: 0,
+          }),
         ),
       ),
     );
@@ -161,7 +165,9 @@ describe("AW21 Clientes on a desktop browser", () => {
     expect(
       await screen.findByText("Todavía no hay clientas."),
     ).toBeInTheDocument();
-    expect(screen.getByText("0 clientas · 0 con plan activo")).toBeVisible();
+    expect(
+      screen.getByText("0 clientas · 0 con plan activo · 0 fundadoras"),
+    ).toBeVisible();
   });
 
   it("offers a retry when the directory cannot load", async () => {

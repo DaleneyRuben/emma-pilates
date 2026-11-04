@@ -116,7 +116,7 @@ describe("Clientas › Todas chips and columns", () => {
       within(row).getByRole("cell", { name: "Carla Rojas" }),
     ).toHaveAttribute("data-label", "Invitada por");
 
-    const expired = screen.getByRole("cell", { name: /Sofía Guzmán/ })
+    const expired = screen.getByRole("cell", { name: /Sofía Guzmán Rojas/ })
       .parentElement as HTMLElement;
     expect(
       within(expired).getByRole("cell", { name: "Venció el 30/06/2026" }),
