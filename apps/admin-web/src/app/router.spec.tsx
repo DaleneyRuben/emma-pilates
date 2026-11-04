@@ -43,7 +43,13 @@ describe("admin navigation", () => {
       },
       {
         label: "Ajustes",
-        tabs: ["Tipos de clase", "Planes", "Sucursales", "Reglas del estudio"],
+        tabs: [
+          "Tipos de clase",
+          "Planes",
+          "Sucursales",
+          "Reglas del estudio",
+          "QR del estudio",
+        ],
       },
     ]);
     expect(navigationItems.map((item) => item.label)).not.toContain(
@@ -98,6 +104,7 @@ describe("admin navigation", () => {
       "/ajustes/planes",
       "/ajustes/sucursales",
       "/ajustes/reglas-del-estudio",
+      "/ajustes/qr-del-estudio",
     ]);
   });
 
