@@ -8460,10 +8460,30 @@
         "parameters": [
           {
             "name": "month",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
               "example": "2026-09",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "First civil date of the period, with until",
+            "schema": {
+              "example": "2026-09-07",
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": false,
+            "in": "query",
+            "description": "The civil date after the last one (exclusive)",
+            "schema": {
+              "example": "2026-09-14",
               "type": "string"
             }
           }
@@ -8500,10 +8520,30 @@
         "parameters": [
           {
             "name": "month",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
               "example": "2026-09",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "First civil date of the period, with until",
+            "schema": {
+              "example": "2026-09-07",
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": false,
+            "in": "query",
+            "description": "The civil date after the last one (exclusive)",
+            "schema": {
+              "example": "2026-09-14",
               "type": "string"
             }
           }
@@ -16711,7 +16751,18 @@
           },
           "month": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "First day of the month the period starts in"
+          },
+          "periodStart": {
+            "type": "string",
+            "format": "date",
+            "description": "BKO-009: first day paid"
+          },
+          "periodEnd": {
+            "type": "string",
+            "format": "date",
+            "description": "BKO-009: the day after the last day paid (exclusive)"
           },
           "state": {
             "type": "string",
@@ -16741,6 +16792,8 @@
           "staffMemberId",
           "staffMemberName",
           "month",
+          "periodStart",
+          "periodEnd",
           "state",
           "totalCentavos",
           "salaryPaymentId",

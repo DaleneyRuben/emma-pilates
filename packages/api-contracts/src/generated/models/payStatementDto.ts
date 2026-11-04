@@ -11,7 +11,12 @@ export interface PayStatementDto {
   id: string;
   staffMemberId: string;
   staffMemberName: string;
+  /** First day of the month the period starts in */
   month: string;
+  /** BKO-009: first day paid */
+  periodStart: string;
+  /** BKO-009: the day after the last day paid (exclusive) */
+  periodEnd: string;
   state: PayStatementDtoState;
   /** BOB centavos */
   totalCentavos: number;

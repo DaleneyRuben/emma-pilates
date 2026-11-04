@@ -6,5 +6,13 @@
  */
 
 export type ListPayStatementsParams = {
-  month: string;
+  month?: string;
+  /**
+   * First civil date of the period, with until
+   */
+  from?: string;
+  /**
+   * The civil date after the last one (exclusive)
+   */
+  until?: string;
 };

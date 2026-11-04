@@ -32265,7 +32265,7 @@ export type listPayStatementsResponseSuccess = listPayStatementsResponse200 & {
 };
 export type listPayStatementsResponse = listPayStatementsResponseSuccess;
 
-export const getListPayStatementsUrl = (params: ListPayStatementsParams) => {
+export const getListPayStatementsUrl = (params?: ListPayStatementsParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -32282,7 +32282,7 @@ export const getListPayStatementsUrl = (params: ListPayStatementsParams) => {
 };
 
 export const listPayStatements = async (
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listPayStatementsResponse> => {
@@ -32314,7 +32314,7 @@ export const getListPayStatementsQueryOptions = <
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -32357,7 +32357,7 @@ export function useListPayStatements<
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params: undefined | ListPayStatementsParams,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -32385,7 +32385,7 @@ export function useListPayStatements<
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -32413,7 +32413,7 @@ export function useListPayStatements<
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -32434,7 +32434,7 @@ export function useListPayStatements<
   TData = Awaited<ReturnType<typeof listPayStatements>>,
   TError = unknown,
 >(
-  params: ListPayStatementsParams,
+  params?: ListPayStatementsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -32471,7 +32471,7 @@ export type draftPayStatementsResponseSuccess =
   };
 export type draftPayStatementsResponse = draftPayStatementsResponseSuccess;
 
-export const getDraftPayStatementsUrl = (params: DraftPayStatementsParams) => {
+export const getDraftPayStatementsUrl = (params?: DraftPayStatementsParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -32488,7 +32488,7 @@ export const getDraftPayStatementsUrl = (params: DraftPayStatementsParams) => {
 };
 
 export const draftPayStatements = async (
-  params: DraftPayStatementsParams,
+  params?: DraftPayStatementsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<draftPayStatementsResponse> => {
@@ -32556,7 +32556,7 @@ export type DraftPayStatementsMutationResult = NonNullable<
 
 export type DraftPayStatementsMutationError = unknown;
 export type DraftPayStatementsMutationVariables = {
-  params: DraftPayStatementsParams;
+  params?: DraftPayStatementsParams;
 };
 
 export const useDraftPayStatements = <TError = unknown, TContext = unknown>(
