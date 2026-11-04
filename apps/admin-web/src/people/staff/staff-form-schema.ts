@@ -4,19 +4,28 @@ import { holdsEveryBranch, staffRoles, type StaffRole } from "../people-search";
 const needsBranches = (role: unknown): boolean =>
   staffRoles.includes(role as StaffRole) && !holdsEveryBranch(role);
 
-// FIX-030 with MOB-070: a new member's phone is a Bolivian mobile, 8 digits
-// starting with 7 after +591. «Editar» shows the stored phone read-only, so it
-// accepts whatever was saved before the rule.
+// FIX-030 with MOB-070 and decision §19.20 (owner, 2026-11-04): a new
+// member's phone is a Bolivian mobile, 8 digits starting with 6 or 7. The +591
+// is implicit: typed or not, it is sent as «+591 XXXXXXXX», as the backend
+// stores it (`mobile-core`'s `bolivian-mobile.ts` has the same rule for the
+// apps). «Editar» shows the stored phone read-only, so it accepts whatever was
+// saved before the rule.
 const anyPhone = z.string().trim().max(40, "Hasta 40 caracteres.");
-const bolivianMobile = anyPhone.refine(
-  (phone) => phone === "" || /^\+591[\s-]*7(?:[\s-]?\d){7}$/.test(phone),
-  "Escribe un celular de Bolivia, por ejemplo +591 71234567.",
-);
+const mobilePattern = /^(?:\+?591[\s-]*)?([67](?:[\s-]?\d){7})$/;
+const bolivianMobile = anyPhone
+  .refine(
+    (phone) => phone === "" || mobilePattern.test(phone),
+    "Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567.",
+  )
+  .transform((phone) => {
+    const digits = mobilePattern.exec(phone)?.[1];
+    return digits === undefined ? phone : `+591 ${digits.replace(/\D/g, "")}`;
+  });
 
 // AW24 with follow-ups 33 and 35: a required email (the login), an optional
 // contact phone, exactly one Role, and Branches unless the Role is
 // Administrator or Coordinator, who hold every Branch implicitly.
-const staffSchema = (phone: typeof anyPhone) =>
+const staffSchema = (phone: z.ZodType<string, string>) =>
   z
     .object({
       name: z.string().trim().min(1, "Escribe el nombre.").max(120),
