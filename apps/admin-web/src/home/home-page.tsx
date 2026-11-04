@@ -120,7 +120,7 @@ export function HomePage() {
             : `${day} · Sucursal ${selectedBranch.name}`}
         </p>
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] items-start gap-4">
         <PendingCard rows={rows} />
         {selectedBranch === undefined ? null : (
           <TodayCard
