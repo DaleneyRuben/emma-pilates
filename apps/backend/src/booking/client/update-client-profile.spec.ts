@@ -8,7 +8,7 @@ const principal = {
 };
 
 describe('updateClientProfile', () => {
-  it('saves the trimmed name and phone for the authenticated Client', async () => {
+  it('saves the trimmed name and the phone with +591 for the authenticated Client', async () => {
     const saveProfile = jest.fn().mockResolvedValue({
       id: 'client-id',
       name: 'Lucía Fernández',
@@ -19,7 +19,7 @@ describe('updateClientProfile', () => {
 
     await expect(
       updateClientProfile(
-        { name: '  Lucía Fernández ', phone: ' +591 70011001 ' },
+        { name: '  Lucía Fernández ', phone: ' 7001 1001 ' },
         { principal, saveProfile },
       ),
     ).resolves.toMatchObject({ name: 'Lucía Fernández' });

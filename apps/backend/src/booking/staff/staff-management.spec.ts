@@ -22,7 +22,8 @@ describe('createStaffMember', () => {
   const command = {
     name: '  Andrea Suárez ',
     email: ' Andrea@Example.com ',
-    phone: '+591 70000001',
+    // Decision §19.20: the +591 is implicit.
+    phone: '70000001',
     role: 'trainer' as const,
     branchIds: ['centro'],
   };

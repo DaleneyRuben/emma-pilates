@@ -111,6 +111,20 @@ describe('updateAdministratorClientProfile', () => {
     },
   );
 
+  it('stores a phone typed without +591 with it (decision §19.20)', async () => {
+    const clients = directory();
+
+    await updateAdministratorClientProfile(
+      { clientId: 'client-id', name: 'Lucía', phone: '6001 2345' },
+      staff('administrator'),
+      { directory: clients, now: () => now },
+    );
+
+    expect(clients.saveProfile).toHaveBeenCalledWith(
+      expect.objectContaining({ phone: '+591 60012345' }),
+    );
+  });
+
   it('refuses the Assistant, a blank name, and an unknown Client', async () => {
     const clients = directory();
     await expect(
