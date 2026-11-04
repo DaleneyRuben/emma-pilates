@@ -3,6 +3,7 @@ import { parseCivilDate } from "../components/form/civil-date";
 import { parseCivilTime } from "../components/form/civil-time";
 import { wholeNumberField } from "../components/form/number-field";
 import { sessionMinutesMessage } from "./duration-minutes";
+import { lastDateProblem } from "./effective-until-dates";
 import { rowClash } from "./weekly-rows";
 
 const wallClock = (value: string): boolean => parseCivilTime(value) !== null;
@@ -32,6 +33,7 @@ export const createSchema = (today: string) =>
         }),
       ),
       effectiveFrom: z.string(),
+      effectiveUntil: z.string(),
     })
     .superRefine((values, context) => {
       const issue = (path: (string | number)[], message: string) =>
@@ -69,6 +71,11 @@ export const createSchema = (today: string) =>
         issue(["rows", clash.index, "time"], clash.message);
       }
       requireDate("effectiveFrom", "Elige desde qué fecha rige.");
+      const until = lastDateProblem(
+        values.effectiveUntil,
+        values.effectiveFrom,
+      );
+      if (until !== null) issue(["effectiveUntil"], until);
     });
 
 export type CreateInput = z.input<ReturnType<typeof createSchema>>;
