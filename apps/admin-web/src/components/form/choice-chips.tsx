@@ -1,9 +1,9 @@
 import { cn } from "../../lib/cn";
 
 const chipClass =
-  "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-tarjeta border border-borde bg-lino px-3 py-2 text-nota text-texto-secundario has-focus-visible:shadow-foco";
+  "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-lino px-3.5 py-2 text-nota text-texto-secundario has-focus-visible:shadow-foco";
 const chosenClass =
-  "border-primario bg-primario-tinte font-medium text-primario-profundo";
+  "bg-primario-tinte font-semibold text-primario-profundo";
 
 /**
  * A small exclusive choice drawn as side-by-side chips over native radios,
