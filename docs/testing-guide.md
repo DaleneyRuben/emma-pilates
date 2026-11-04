@@ -2651,17 +2651,22 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    "Descuentos" and no "Créditos" (`/promociones/creditos` shows «Página no
    encontrada»).
 2. **Tabs.** Click **Dinero**: the address becomes `/dinero/pagos` and the
-   page has tabs **Pagos · Caja · Sueldos · Gastos** under the top bar, the
-   current one underlined. **Sueldos** has a second row of views
-   (**Instructoras · Coordinadora · Pagados**), **Gastos** has **Gastos ·
-   Categorías**, and Estudio › **Insumos** has **Stock · Retiros del mes**.
+   page has its title (Lora) with its actions on the right, then the tabs
+   **Pagos · Caja · Sueldos · Gastos**, the current one underlined.
+   **Sueldos** has a second row of views (**Por aprobar · Pagados**: every
+   statement of the month, the Coordinator's included, then the payments
+   made), Gastos has **Editar categorías** opening the categories in a
+   panel, and Estudio › **Insumos** has **Stock · Retiros del mes**.
    The other destinations: Horario (Clases · Nutrición), Clientas (Todas ·
    Para contactar · Congelamientos · Fundadoras), Promociones (Carrusel ·
    Clases de campaña · Referidos · Contactos), Estudio (Personal · Insumos
-   · Equipos), Informes (El mes · Recomendaciones · Dinero · Simulador) and
-   Ajustes (Tipos de clase · Planes · Sucursales · Reglas del estudio).
-   Fundadoras, Recomendaciones, Coordinadora and Categorías are temporary
-   until their pages fold into Todas, El mes, Por aprobar and Gastos.
+   · Equipos), Informes (El mes · Dinero · Simulador; El mes ends with
+   «Recomendaciones del mes») and Ajustes (Tipos de clase · Planes ·
+   Sucursales · Reglas del estudio). Fundadoras stays a tab until it becomes
+   a filter on Todas (WEB-040).
+   Every page is on v2 (follow-up 233): Lino cards and tables with no
+   border or shadow on Marfil, Rosa tinte secondary buttons, text buttons
+   without underline, and notices as a Lino line with a Palo de rosa bar.
 3. **Old addresses.** Every address of the old sidebar still works and
    lands on its new page with its filters: `/back-office/gastos?page=2`
    opens `/dinero/gastos?page=2…`, `/ajustes/planes` opens
