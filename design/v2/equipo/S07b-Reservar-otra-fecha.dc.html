@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reservar una clase · otra fecha</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="S06-Resumen-cliente.dc.html" aria-label="Volver a la ficha de Lucía" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-family: Lora, Georgia, serif; font-size: 24px">Reservar una clase</span>
+  </div>
+  <div style="flex-grow: 1; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 16px">
+    <div style="background: #F5EFE9; border-radius: 14px; padding: 10px 16px; display: flex; align-items: center; gap: 12px">
+      <span style="width: 32px; height: 32px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-family: Lora, Georgia, serif; font-size: 13px; display: flex; align-items: center; justify-content: center; flex: none">LF</span>
+      <span style="font-size: 14px; color: #6F6662">Reservando para <strong style="color: #4A4A4A; font-weight: 600">Lucía Fernández</strong></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6F6662">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.3"></circle></svg>
+      <span>Sucursal <strong style="color: #4A4A4A; font-weight: 600">Achumani</strong></span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px">
+      <button style="height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; color: #6F6662">Hoy</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">2</span></button>
+      <span aria-current="date" style="height: 60px; border-radius: 14px; background: #B78380; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; font-weight: 600">mar</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">3</span></span>
+      <button style="height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; color: #6F6662">mié</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">4</span></button>
+      <button style="height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; color: #6F6662">jue</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">5</span></button>
+      <button style="height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; color: #6F6662">vie</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">6</span></button>
+      <button style="height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; color: #6F6662">sáb</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">7</span></button>
+      <sc-if value="{{otraIdle}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{openSheet}}" aria-label="Elegir otra fecha, hasta 14 días" style="height: 60px; border: none; border-radius: 14px; background: #F2E4E1; color: #7D4F4B; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7D4F4B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg><span style="font-size: 11px; font-weight: 600">Otra</span></button></sc-if><sc-if value="{{otraPicked}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{openSheet}}" aria-pressed="true" aria-label="Elegir otra fecha, hasta 14 días" style="height: 60px; border: none; border-radius: 14px; background: #B78380; color: #FFFFFF; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; font-weight: 600">Otra</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">{{otraLabel}}</span></button></sc-if>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <span aria-current="true" style="height: 36px; padding: 0 14px; border-radius: 999px; background: #F2E4E1; box-shadow: inset 0 0 0 1.5px #B78380; color: #7D4F4B; font-size: 14px; font-weight: 600; display: flex; align-items: center">Todas</span>
+      <button style="height: 36px; padding: 0 14px; border: none; border-radius: 999px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px">Reformer</button>
+      <button style="height: 36px; padding: 0 14px; border: none; border-radius: 999px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px">Mat</button>
+      <button style="height: 36px; padding: 0 14px; border: none; border-radius: 999px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px">Barre</button>
+      <a href="S07-Sin-clases.dc.html" style="height: 36px; padding: 0 14px; border-radius: 999px; background: #F5EFE9; color: #4A4A4A; font-size: 14px; display: flex; align-items: center; text-decoration: none">Prenatal</a>
+    </div>
+    <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Martes 3 de noviembre · 3 clases</span>
+      <a href="S08-Clase-llena.dc.html" style="background: #F5EFE9; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; color: #4A4A4A; text-decoration: none">
+        <span style="width: 56px; font-family: Lora, Georgia, serif; font-size: 20px; font-variant-numeric: tabular-nums; flex: none">07:00</span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 500">Reformer Intermedio</span><span style="font-size: 13px; color: #6F6662">Daniela Ortiz</span></span>
+        <span style="padding: 4px 10px; border-radius: 999px; background: #E6DBD0; font-size: 12px; font-weight: 600">Completa</span>
+      </a>
+      <a href="S08-Detalle-sesion.dc.html" style="background: #F5EFE9; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; color: #4A4A4A; text-decoration: none">
+        <span style="width: 56px; font-family: Lora, Georgia, serif; font-size: 20px; font-variant-numeric: tabular-nums; flex: none">09:30</span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 500">Mat Pilates</span><span style="font-size: 13px; color: #6F6662">Daniela Ortiz</span></span>
+        <span style="padding: 4px 10px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-size: 12px; font-weight: 600">4 cupos</span>
+      </a>
+      <a href="S21-Reservas-clienta.dc.html" style="background: #F5EFE9; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; color: #4A4A4A; text-decoration: none">
+        <span style="width: 56px; font-family: Lora, Georgia, serif; font-size: 20px; font-variant-numeric: tabular-nums; flex: none">19:15</span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 500">Barre</span><span style="font-size: 13px; color: #6F6662">Daniela Ortiz</span></span>
+        <span style="padding: 4px 10px; border-radius: 999px; background: #E6DBD0; font-size: 12px; font-weight: 600">Ya reservada</span>
+      </a>
+    </div>
+  </div>
+
+  <sc-if value="{{sheetOpen}}" hint-placeholder-val="{{true}}">
+    <div style="position: absolute; inset: 0; background: rgba(74, 74, 74, 0.35); display: flex; flex-direction: column; justify-content: flex-end">
+      <div role="dialog" aria-label="Elige otra fecha" style="background: #FAF7F2; border-radius: 24px 24px 0 0; padding: 12px 20px 32px; display: flex; flex-direction: column; gap: 16px">
+        <span aria-hidden="true" style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: #E6DBD0"></span>
+        <span style="font-family: Lora, Georgia, serif; font-size: 22px">Elige otra fecha</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="8">
+            <button type="button" aria-pressed="{{d.on}}" aria-label="{{d.label}}" onClick="{{d.pick}}" style="{{d.style}}"><span style="{{d.wkStyle}}">{{d.wk}}</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">{{d.num}}</span></button>
+          </sc-for>
+        </div>
+        <button type="button" onClick="{{closeSheet}}" style="height: 48px; border: none; background: transparent; color: #7D4F4B; font: 600 15px 'Work Sans', sans-serif">Cerrar</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"hojaAbierta":{"editor":"boolean","default":true},"$preview":{"width":390,"height":844}}'>
+var LATER = [
+      ['Domingo 8 de noviembre','dom','8'],['Lunes 9 de noviembre','lun','9'],['Martes 10 de noviembre','mar','10'],['Miércoles 11 de noviembre','mié','11'],
+      ['Jueves 12 de noviembre','jue','12'],['Viernes 13 de noviembre','vie','13'],['Sábado 14 de noviembre','sáb','14'],['Domingo 15 de noviembre','dom','15']
+];
+var CHIP = 'width: 44px; height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px';
+var CHIP_ON = 'width: 44px; height: 60px; border: none; border-radius: 14px; background: #B78380; color: #FFFFFF; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px';
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var open = st.open !== undefined ? st.open : (this.props.hojaAbierta ?? true);
+    var picked = st.picked || '';
+    return {
+      sheetOpen: open,
+      openSheet: function () { self.setState({ open: true }); },
+      closeSheet: function () { self.setState({ open: false }); },
+      otraLabel: picked || 'Otra',
+      otraPicked: !!picked, otraIdle: !picked,
+      days: LATER.map(function (d) { var on = d[2] === picked; return { label: d[0], wk: d[1], num: d[2], on: on, style: on ? CHIP_ON : CHIP, wkStyle: on ? 'font-size: 11px; font-weight: 600' : 'font-size: 11px; color: #6F6662', pick: function () { self.setState({ picked: d[2], open: false }); } }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

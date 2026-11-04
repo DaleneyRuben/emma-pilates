@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reservar · otra fecha</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 60px 20px 0; display: flex; flex-direction: column; gap: 16px">
+    <span style="font-family: Lora, Georgia, serif; font-size: 30px">Reservar una clase</span>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6F6662">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.3"></circle></svg>
+      <span>Sucursal <strong style="color: #4A4A4A; font-weight: 600">Achumani</strong></span>
+    </div>
+    <div style="display: flex; gap: 8px">
+      <a href="C03c-Reservar-dia-vacio.dc.html" style="width: 48px; height: 60px; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none"><span style="font-size: 11px; color: #6F6662">Hoy</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">2</span></a>
+      <button aria-pressed="true" style="width: 48px; height: 60px; border: none; border-radius: 14px; background: #B78380; color: #FFFFFF; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; font-weight: 600">mar</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">3</span></button>
+      <button style="width: 48px; height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; color: #6F6662">mié</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">4</span></button>
+      <button style="width: 48px; height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; color: #6F6662">jue</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">5</span></button>
+      <button style="width: 48px; height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; color: #6F6662">vie</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">6</span></button>
+      <button style="width: 48px; height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; color: #6F6662">sáb</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">7</span></button>
+      <sc-if value="{{otraIdle}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{openSheet}}" aria-label="Elegir otra fecha, hasta 14 días" style="width: 48px; height: 60px; border: none; border-radius: 14px; background: #F2E4E1; color: #7D4F4B; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7D4F4B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg><span style="font-size: 11px; font-weight: 600">Otra</span></button></sc-if><sc-if value="{{otraPicked}}" hint-placeholder-val="{{false}}"><button type="button" onClick="{{openSheet}}" aria-pressed="true" aria-label="Elegir otra fecha, hasta 14 días" style="width: 48px; height: 60px; border: none; border-radius: 14px; background: #B78380; color: #FFFFFF; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><span style="font-size: 11px; font-weight: 600">Otra</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">{{otraLabel}}</span></button></sc-if>
+    </div>
+    <div style="display: flex; gap: 8px">
+      <button aria-pressed="true" style="height: 36px; padding: 0 14px; border: none; border-radius: 999px; background: #93615D; color: #FFFFFF; font-family: inherit; font-size: 14px; font-weight: 600">Todas</button>
+      <button style="height: 36px; padding: 0 14px; border: none; border-radius: 999px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px">Mat</button>
+      <a href="C03b-Reservar-filtro-vacio.dc.html" style="height: 36px; padding: 0 14px; border-radius: 999px; background: #F5EFE9; color: #4A4A4A; font-size: 14px; display: flex; align-items: center; text-decoration: none">Prenatal</a>
+      <button style="height: 36px; padding: 0 14px; border: none; border-radius: 999px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 14px">Reformer</button>
+    </div>
+  </div>
+  <div style="flex-grow: 1; padding: 24px 20px 0; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Martes 3 de noviembre</span>
+      <span style="font-size: 13px; color: #6F6662">4 clases</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <a href="C04b-Detalle-sesion-llena.dc.html" style="min-height: 72px; box-sizing: border-box; background: #F5EFE9; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; color: #4A4A4A; text-decoration: none">
+        <span style="width: 52px; font-family: Lora, Georgia, serif; font-size: 20px; font-variant-numeric: tabular-nums">07:00</span>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 500">Reformer Pilates</span><span style="font-size: 13px; color: #6F6662">Emma Vargas · 50 min</span></div>
+        <span style="padding: 4px 10px; border-radius: 999px; background: #E6DBD0; color: #4A4A4A; font-size: 12px; font-weight: 600">Lleno</span>
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+      <a href="C04-Detalle-sesion.dc.html" style="min-height: 72px; box-sizing: border-box; background: #F5EFE9; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; color: #4A4A4A; text-decoration: none">
+        <span style="width: 52px; font-family: Lora, Georgia, serif; font-size: 20px; font-variant-numeric: tabular-nums">08:00</span>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 500">Mat Pilates</span><span style="font-size: 13px; color: #6F6662">Daniela Ortiz · 50 min</span></div>
+        <span style="padding: 4px 10px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-size: 12px; font-weight: 600">2 cupos</span>
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+      <a href="C04-Detalle-sesion.dc.html" style="min-height: 72px; box-sizing: border-box; background: #F5EFE9; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; color: #4A4A4A; text-decoration: none">
+        <span style="width: 52px; font-family: Lora, Georgia, serif; font-size: 20px; font-variant-numeric: tabular-nums">18:30</span>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 500">Reformer Pilates</span><span style="font-size: 13px; color: #6F6662">Emma Vargas · 50 min</span></div>
+        <span style="padding: 4px 10px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-size: 12px; font-weight: 600">5 cupos</span>
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+      <a href="C04-Detalle-sesion.dc.html" style="min-height: 72px; box-sizing: border-box; background: #F5EFE9; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; color: #4A4A4A; text-decoration: none">
+        <span style="width: 52px; font-family: Lora, Georgia, serif; font-size: 20px; font-variant-numeric: tabular-nums">19:30</span>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 500">Pilates Prenatal</span><span style="font-size: 13px; color: #6F6662">Andrea Suárez · 50 min</span></div>
+        <span style="padding: 4px 10px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-size: 12px; font-weight: 600">8 cupos</span>
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+    </div>
+  </div>
+  <nav aria-label="Principal" style="height: 82px; padding-bottom: 18px; box-sizing: border-box; background: #F5EFE9; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center">
+    <a href="C02-Inicio-con-plan.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linejoin="round"><path d="M4 10.5L12 4l8 6.5V20H4z"></path></svg>Inicio</a>
+    <span aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #93615D; font-size: 12px; font-weight: 600"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.6" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Reservar</span>
+    <a href="C05-Mis-reservas.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>Mis Reservas</a>
+    <a href="C18-Perfil.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"></circle><path d="M5 20c1-3.6 3.8-5.5 7-5.5s6 1.9 7 5.5"></path></svg>Perfil</a>
+  </nav>
+
+  <sc-if value="{{sheetOpen}}" hint-placeholder-val="{{true}}">
+    <div style="position: absolute; inset: 0; background: rgba(74, 74, 74, 0.35); display: flex; flex-direction: column; justify-content: flex-end">
+      <div role="dialog" aria-label="Elige otra fecha" style="background: #FAF7F2; border-radius: 24px 24px 0 0; padding: 12px 20px 32px; display: flex; flex-direction: column; gap: 16px">
+        <span aria-hidden="true" style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: #E6DBD0"></span>
+        <span style="font-family: Lora, Georgia, serif; font-size: 22px">Elige otra fecha</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="8">
+            <button type="button" aria-pressed="{{d.on}}" aria-label="{{d.label}}" onClick="{{d.pick}}" style="{{d.style}}"><span style="{{d.wkStyle}}">{{d.wk}}</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">{{d.num}}</span></button>
+          </sc-for>
+        </div>
+        <button type="button" onClick="{{closeSheet}}" style="height: 48px; border: none; background: transparent; color: #7D4F4B; font: 600 15px 'Work Sans', sans-serif">Cerrar</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"hojaAbierta":{"editor":"boolean","default":true},"$preview":{"width":390,"height":844}}'>
+var LATER = [
+      ['Domingo 8 de noviembre','dom','8'],['Lunes 9 de noviembre','lun','9'],['Martes 10 de noviembre','mar','10'],['Miércoles 11 de noviembre','mié','11'],
+      ['Jueves 12 de noviembre','jue','12'],['Viernes 13 de noviembre','vie','13'],['Sábado 14 de noviembre','sáb','14'],['Domingo 15 de noviembre','dom','15']
+];
+var CHIP = 'width: 44px; height: 60px; border: none; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px';
+var CHIP_ON = 'width: 44px; height: 60px; border: none; border-radius: 14px; background: #B78380; color: #FFFFFF; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px';
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var open = st.open !== undefined ? st.open : (this.props.hojaAbierta ?? true);
+    var picked = st.picked || '';
+    return {
+      sheetOpen: open,
+      openSheet: function () { self.setState({ open: true }); },
+      closeSheet: function () { self.setState({ open: false }); },
+      otraLabel: picked || 'Otra',
+      otraPicked: !!picked, otraIdle: !picked,
+      days: LATER.map(function (d) { var on = d[2] === picked; return { label: d[0], wk: d[1], num: d[2], on: on, style: on ? CHIP_ON : CHIP, wkStyle: on ? 'font-size: 11px; font-weight: 600' : 'font-size: 11px; color: #6F6662', pick: function () { self.setState({ picked: d[2], open: false }); } }; })
+    };
+  }
+}
+</script>
+</body>
+</html>
