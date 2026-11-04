@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { render, screen } from "@testing-library/react";
 import { Button } from "../components/ui/button";
 import { cn } from "./cn";
@@ -25,6 +27,19 @@ describe("cn", () => {
       "text-blanco",
       "text-celda",
     );
+  });
+
+  // Walkthrough 2026-11-04 n.º 1: the rail's `text-pie` was dropped as a
+  // color, so «Promociones» drew at 15 px and overflowed the 96 px rail.
+  it("keeps every font size index.css defines next to a text color", () => {
+    const css = readFileSync(join(__dirname, "../index.css"), "utf8");
+    const sizes = [...css.matchAll(/--text-([a-z0-9-]+):/g)]
+      .map((match) => match[1])
+      .filter((name) => !name.includes("--"));
+    expect(sizes).toContain("pie");
+    for (const size of sizes) {
+      expect(cn(`text-${size} text-texto`)).toBe(`text-${size} text-texto`);
+    }
   });
 
   it("still lets a later font size replace an earlier one", () => {
