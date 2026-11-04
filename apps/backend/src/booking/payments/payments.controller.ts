@@ -1,4 +1,3 @@
-import { createReadStream } from 'node:fs';
 import {
   BadRequestException,
   Body,
@@ -49,12 +48,16 @@ import {
   TransferInstructionsDto,
 } from './payments.dto';
 import type { PaymentCommands } from './prisma-payment-commands';
+import type { ObjectStorage } from '../../uploads/object-storage';
+import { readTransferQr } from '../transfer-qr/transfer-qr-image';
 
 export const paymentCommands = Symbol('paymentCommands');
 export const transferInstructions = Symbol('transferInstructions');
 
 export type TransferInstructions = {
+  /** The server file served until the Administrator uploads a QR (WEB-038). */
   qrImagePath: string;
+  storage: ObjectStorage;
 };
 
 export const transferQrRoute = '/api/v1/transfer-instructions/qr';
@@ -409,6 +412,11 @@ export class TransferInstructionsController {
     @Headers('authorization') authorization: string | undefined,
   ): Promise<StreamableFile> {
     await authenticateBearer(this.principalResolver, authorization);
-    return new StreamableFile(createReadStream(this.instructions.qrImagePath));
+    return new StreamableFile(
+      await readTransferQr(
+        this.instructions.storage,
+        this.instructions.qrImagePath,
+      ),
+    );
   }
 }

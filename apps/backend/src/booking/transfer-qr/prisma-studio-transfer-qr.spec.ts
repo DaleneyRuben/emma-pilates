@@ -4,7 +4,7 @@ import type { PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import type { ObjectStorage } from '../../uploads/object-storage';
 import { AdministrationError } from '../administration/administration-errors';
-import { createStudioTransferQr } from './studio-transfer-qr';
+import { createStudioTransferQr } from './prisma-studio-transfer-qr';
 import { TransferQrError, transferQrStorageKey } from './transfer-qr-image';
 
 const staff = (
@@ -33,18 +33,19 @@ const setup = (latest: { occurredAt: Date } | null = null) => {
     findFirst: jest.fn().mockResolvedValue(latest),
     create: jest.fn().mockResolvedValue({}),
   };
-  const storage: ObjectStorage & { replace: jest.Mock } = {
+  const replace = jest.fn().mockResolvedValue(undefined);
+  const storage: ObjectStorage = {
     put: jest.fn(),
     get: jest.fn(),
     delete: jest.fn(),
-    replace: jest.fn().mockResolvedValue(undefined),
+    replace,
   };
   const operations = createStudioTransferQr(
     { auditRecord } as unknown as PrismaClient,
     storage,
     { now: () => now },
   );
-  return { auditRecord, storage, operations };
+  return { auditRecord, storage: { replace }, operations };
 };
 
 const qrBytes = () =>
@@ -93,25 +94,28 @@ describe('studio transfer QR', () => {
     const [key, stored] = storage.replace.mock.calls[0] as [string, Buffer];
     expect(key).toBe(transferQrStorageKey);
     expect((await sharp(stored).metadata()).format).toBe('png');
-    expect(auditRecord.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        actionCode: 'studio_transfer_qr.replaced',
-        outcome: 'SUCCEEDED',
-        actorKind: 'ACCOUNT',
-        actorAccountId: 'administrator-account',
-        actorRole: 'ADMINISTRATOR',
-        targetType: 'studio_transfer_qr',
-        targetId: null,
-        branchId: null,
-        occurredAt: now,
-        metadata: {
-          byteSize: stored.byteLength,
-          width: 30,
-          height: 20,
-          sha256: createHash('sha256').update(stored).digest('hex'),
+    expect(auditRecord.create).toHaveBeenCalledTimes(1);
+    expect(auditRecord.create.mock.calls[0]).toMatchObject([
+      {
+        data: {
+          actionCode: 'studio_transfer_qr.replaced',
+          outcome: 'SUCCEEDED',
+          actorKind: 'ACCOUNT',
+          actorAccountId: 'administrator-account',
+          actorRole: 'ADMINISTRATOR',
+          targetType: 'studio_transfer_qr',
+          targetId: null,
+          branchId: null,
+          occurredAt: now,
+          metadata: {
+            byteSize: stored.byteLength,
+            width: 30,
+            height: 20,
+            sha256: createHash('sha256').update(stored).digest('hex'),
+          },
         },
-      }),
-    });
+      },
+    ]);
   });
 
   it('stores and audits nothing for an image it refuses', async () => {

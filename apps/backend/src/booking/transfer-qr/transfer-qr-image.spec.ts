@@ -107,24 +107,20 @@ describe('readTransferQr', () => {
   const fallbackPath = join(fallbackDirectory, 'qr.png');
   writeFileSync(fallbackPath, Buffer.from('server file'));
 
-  const storageAnswering = (
-    get: ObjectStorage['get'],
-  ): ObjectStorage & { get: jest.Mock } => ({
+  const storageAnswering = (answer: ObjectStorage['get']): ObjectStorage => ({
     put: jest.fn(),
     replace: jest.fn(),
     delete: jest.fn(),
-    get: jest.fn(get),
+    get: answer,
   });
 
   it('serves the uploaded QR from storage', async () => {
-    const storage = storageAnswering(() =>
-      Promise.resolve(Buffer.from('uploaded')),
-    );
+    const get = jest.fn(() => Promise.resolve(Buffer.from('uploaded')));
 
-    await expect(readTransferQr(storage, fallbackPath)).resolves.toEqual(
-      Buffer.from('uploaded'),
-    );
-    expect(storage.get).toHaveBeenCalledWith(transferQrStorageKey);
+    await expect(
+      readTransferQr(storageAnswering(get), fallbackPath),
+    ).resolves.toEqual(Buffer.from('uploaded'));
+    expect(get).toHaveBeenCalledWith(transferQrStorageKey);
   });
 
   it('falls back on the server file while nothing was uploaded', async () => {

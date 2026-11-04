@@ -1,7 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { Environment } from '../config/environment';
 import { PRISMA_CLIENT } from '../database/database.module';
 import { PrismaClient } from '../generated/prisma/client';
 import { NotificationsModule } from '../notifications/notifications.module';
@@ -78,9 +76,7 @@ import {
   CreditPurchasesController,
   paymentCommands,
   PurchaseIntentsController,
-  transferInstructions,
   TransferInstructionsController,
-  type TransferInstructions,
 } from './payments/payments.controller';
 import { createPrismaPaymentCommands } from './payments/prisma-payment-commands';
 import { readFounderRenewal } from './payments/prisma-founder-membership';
@@ -162,6 +158,7 @@ import { promotionsConsentWiring } from './promotions-consent/promotions-consent
 import { acquisitionWiring } from './acquisition/acquisition-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
 import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
+import { transferQrWiring } from './transfer-qr/transfer-qr-wiring';
 import { administratorSessionRosterWiring } from './sessions/administrator-session-roster-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
 import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
@@ -205,6 +202,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...promotionContactsWiring.controllers,
     ...promotionsConsentWiring.controllers,
     ...studioSettingsWiring.controllers,
+    ...transferQrWiring.controllers,
     ...administratorSessionRosterWiring.controllers,
     ...acquisitionWiring.controllers,
     ...clientPhotoWiring.controllers,
@@ -620,15 +618,6 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
       useExisting: OBJECT_STORAGE,
     },
     {
-      provide: transferInstructions,
-      inject: [ConfigService],
-      useFactory: (
-        config: ConfigService<Environment, true>,
-      ): TransferInstructions => ({
-        qrImagePath: config.getOrThrow('TRANSFER_QR_IMAGE_PATH'),
-      }),
-    },
-    {
       provide: evaluationCommands,
       inject: [PRISMA_CLIENT, NOTIFICATION_RECORDER],
       useFactory: (
@@ -676,6 +665,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...promotionContactsWiring.providers(PRISMA_CLIENT),
     ...promotionsConsentWiring.providers(PRISMA_CLIENT),
     ...studioSettingsWiring.providers(PRISMA_CLIENT),
+    ...transferQrWiring.providers(PRISMA_CLIENT),
     ...administratorSessionRosterWiring.providers(PRISMA_CLIENT),
     ...acquisitionWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),

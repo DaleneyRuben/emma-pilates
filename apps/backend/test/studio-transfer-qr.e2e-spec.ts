@@ -5,7 +5,7 @@ import { jest } from '@jest/globals';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AdministrationError } from '../src/booking/administration/administration-errors';
-import type { StudioTransferQr } from '../src/booking/transfer-qr/studio-transfer-qr';
+import type { StudioTransferQr } from '../src/booking/transfer-qr/prisma-studio-transfer-qr';
 import {
   studioTransferQrControllers,
   studioTransferQrOperations,
