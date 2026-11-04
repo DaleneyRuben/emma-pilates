@@ -14433,11 +14433,13 @@
           },
           "evaluationPriceCentavos": {
             "type": "number",
-            "description": "BOB centavos"
+            "nullable": true,
+            "description": "BOB centavos; null for the Coordinator, who sees no amount"
           },
           "nutritionistFeeCentavos": {
             "type": "number",
-            "description": "BOB centavos"
+            "nullable": true,
+            "description": "BOB centavos; null for the Coordinator, who sees no amount"
           },
           "updatedAt": {
             "type": "string",

@@ -52,10 +52,16 @@ export interface StudioSettingsDto {
   guestPassesPerClient: number;
   invitesPerHostPerMonth: number;
   inviteRewardClasses: number;
-  /** BOB centavos */
-  evaluationPriceCentavos: number;
-  /** BOB centavos */
-  nutritionistFeeCentavos: number;
+  /**
+   * BOB centavos; null for the Coordinator, who sees no amount
+   * @nullable
+   */
+  evaluationPriceCentavos: number | null;
+  /**
+   * BOB centavos; null for the Coordinator, who sees no amount
+   * @nullable
+   */
+  nutritionistFeeCentavos: number | null;
   updatedAt: string;
   /**
    * Who saved this version, or null for the seeded one
