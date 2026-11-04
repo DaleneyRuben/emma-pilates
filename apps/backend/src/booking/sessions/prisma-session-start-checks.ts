@@ -14,9 +14,14 @@ import {
   cancelBelowMinimum,
   checkedSessionSelect,
 } from './prisma-minimum-bookings-cancellation';
-import { isMinimumBookingsCheckDue, wasTaught } from './session-start-checks';
+import {
+  isMinimumBookingsCheckDue,
+  keepsStartedClass,
+} from './session-start-checks';
 
 type MinimumRule = { minimumBookings: number; leadMinutes: number };
+
+const skipNotice: NotificationRecorder = () => Promise.resolve();
 
 export const createPrismaSessionStartChecks = (
   prisma: PrismaClient,
@@ -59,7 +64,7 @@ export const createPrismaSessionStartChecks = (
 
           if (
             session.bookings.length >= rule.minimumBookings ||
-            wasTaught(session, now)
+            keepsStartedClass(session, now)
           ) {
             await transaction.session.update({
               where: { id: session.id },
@@ -68,10 +73,13 @@ export const createPrismaSessionStartChecks = (
             return 'checked';
           }
 
+          // A class that has started with nobody booked affects no one, so a
+          // missed check cancels it without a notice.
           await cancelBelowMinimum(transaction, session, {
             now,
             minimumBookings: rule.minimumBookings,
-            recordNotification,
+            recordNotification:
+              now >= session.startsAt ? skipNotice : recordNotification,
           });
           return 'cancelled';
         },

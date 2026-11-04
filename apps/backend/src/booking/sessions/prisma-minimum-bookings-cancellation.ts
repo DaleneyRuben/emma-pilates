@@ -50,7 +50,6 @@ export const checkedSessionSelect = {
       clientId: true,
       subscriptionId: true,
       client: { select: { account: { select: { id: true } } } },
-      attendanceRecord: { select: { outcome: true } },
     },
   },
   waitlistEntries: {

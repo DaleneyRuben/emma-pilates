@@ -12,19 +12,13 @@ export const isMinimumBookingsCheckDue = (
 ): boolean =>
   now.getTime() >= session.startsAt.getTime() - leadMinutes * 60_000;
 
-// A missed check never cancels a class that was taught: once it started, an
-// attended Booking proves it was (decision §19.19).
-export const wasTaught = (
-  session: {
-    startsAt: Date;
-    bookings: { attendanceRecord: { outcome: string } | null }[];
-  },
+// A missed check never cancels a class that has started with someone booked:
+// she may be in the room, and attendance is marked during or after the class
+// (decision §19.19). A started class with nobody booked is cancelled.
+export const keepsStartedClass = (
+  session: { startsAt: Date; bookings: unknown[] },
   now: Date,
-): boolean =>
-  now >= session.startsAt &&
-  session.bookings.some(
-    (booking) => booking.attendanceRecord?.outcome === 'ATTENDED',
-  );
+): boolean => now >= session.startsAt && session.bookings.length > 0;
 
 const momentParts = (instant: Date): Record<string, string> =>
   new Intl.DateTimeFormat('es-BO', {
