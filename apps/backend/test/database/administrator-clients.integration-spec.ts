@@ -139,7 +139,11 @@ describe('Administrator Client directory (PostgreSQL)', () => {
   });
 
   it('pages every Client with an Account by name with the current Plan and the studio counts', async () => {
-    const counts = { studioClientCount: 3, activePlanClientCount: 1 };
+    const counts = {
+      studioClientCount: 3,
+      activePlanClientCount: 1,
+      founderClientCount: 0,
+    };
 
     await expect(
       directory().list({ page: 1, pageSize: 2, today }),
@@ -153,6 +157,12 @@ describe('Administrator Client directory (PostgreSQL)', () => {
           accountStatus: 'pending',
           planName: null,
           subscriptionStatus: 'none',
+          remainingClassAllowance: null,
+          originalClassAllowance: null,
+          planEndsOn: null,
+          founderNumber: null,
+          // Registered before the acquisition question: the Referral names her.
+          invitedByName: 'Lucía Fernández',
         },
         {
           id: ids.lucia,
@@ -162,6 +172,11 @@ describe('Administrator Client directory (PostgreSQL)', () => {
           accountStatus: 'active',
           planName: 'Paquete de 8 clases',
           subscriptionStatus: 'active',
+          remainingClassAllowance: 5,
+          originalClassAllowance: 8,
+          planEndsOn: new Date('2026-09-30T00:00:00.000Z'),
+          founderNumber: null,
+          invitedByName: null,
         },
       ],
       page: 1,
@@ -177,6 +192,9 @@ describe('Administrator Client directory (PostgreSQL)', () => {
           id: ids.sofia,
           planName: null,
           subscriptionStatus: 'expired',
+          remainingClassAllowance: null,
+          planEndsOn: new Date('2026-06-30T00:00:00.000Z'),
+          invitedByName: 'Lucía Fernández',
         }),
       ],
       totalItems: 3,

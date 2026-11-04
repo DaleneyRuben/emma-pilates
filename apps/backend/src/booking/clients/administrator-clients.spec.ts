@@ -59,6 +59,7 @@ const emptyPage = {
   totalItems: 0,
   studioClientCount: 0,
   activePlanClientCount: 0,
+  founderClientCount: 0,
 };
 
 const directory = (
@@ -88,6 +89,22 @@ describe('Administrator Client directory', () => {
       page: 2,
       pageSize: 10,
       query: 'lucia',
+      today,
+    });
+  });
+
+  it('hands the chosen chip to the directory (follow-up 232)', async () => {
+    const clients = directory();
+
+    await listAdministratorClients(
+      { page: 1, pageSize: 20, filter: 'founder' },
+      administrator,
+      { directory: clients, now: () => now },
+    );
+    expect(clients.list).toHaveBeenCalledWith({
+      page: 1,
+      pageSize: 20,
+      filter: 'founder',
       today,
     });
   });
