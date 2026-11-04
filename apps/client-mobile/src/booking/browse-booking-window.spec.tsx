@@ -63,12 +63,40 @@ describe("Client Reservar booking window (FIX-026)", () => {
     expect(screen.getByTestId(`browse-day-${dates[2]}`)).toBeOnTheScreen();
   });
 
-  it("keeps the strip at seven days when the window is wider", async () => {
-    const screen = await openBrowse(14);
-    const dates = upcomingCivilDates(boliviaCivilDate(new Date()), 8);
+  it("offers seven days and no «Otra» for a week-long window", async () => {
+    const screen = await openBrowse(7);
+    const dates = upcomingCivilDates(boliviaCivilDate(new Date()), 7);
 
     await waitFor(() => expect(screen.getByTestId(`browse-day-${dates[6]}`)).toBeOnTheScreen());
-    expect(screen.queryByTestId(`browse-day-${dates[7]}`)).not.toBeOnTheScreen();
+    expect(screen.queryByTestId("browse-day-other")).not.toBeOnTheScreen();
+  });
+
+  // FIX-031 (follow-up 234, C03d): a wider window keeps today and five days
+  // on the strip and reaches the rest through «Otra».
+  it("reaches the later days of a wider window through «Otra»", async () => {
+    const screen = await openBrowse(14);
+    const dates = upcomingCivilDates(boliviaCivilDate(new Date()), 14);
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Elegir otra fecha, hasta 14 días" }),
+      ).toBeOnTheScreen(),
+    );
+    expect(screen.getByTestId(`browse-day-${dates[5]}`)).toBeOnTheScreen();
+    expect(screen.queryByTestId(`browse-day-${dates[6]}`)).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByTestId("browse-day-other"));
+    await waitFor(() => expect(screen.getByText("Elige otra fecha")).toBeOnTheScreen());
+    expect(screen.getByTestId(`browse-other-${dates[6]}`)).toBeOnTheScreen();
+    expect(screen.getByTestId(`browse-other-${dates[13]}`)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByTestId(`browse-other-${dates[10]}`));
+
+    await waitFor(() =>
+      expect(screen.getByTestId("browse-day-other")).toHaveProp("accessibilityState", {
+        selected: true,
+      }),
+    );
+    expect(screen.queryByText("Elige otra fecha")).not.toBeOnTheScreen();
   });
 
   it("goes back to today when the window turns out shorter than the chosen day", async () => {
