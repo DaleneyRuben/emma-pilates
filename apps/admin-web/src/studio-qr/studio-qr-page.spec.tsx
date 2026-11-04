@@ -79,7 +79,7 @@ describe("Ajustes › QR del estudio", () => {
     const image = await screen.findByRole("img", {
       name: "QR de transferencia del estudio",
     });
-    expect(image.getAttribute("src")).toMatch(/^blob:/);
+    expect(image.getAttribute("src")).toBe("data:image/png;base64,iVBORw==");
     expect(
       await screen.findByText("Actualizado el 15/10/2026"),
     ).toBeInTheDocument();
