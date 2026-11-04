@@ -16,6 +16,9 @@ import {
 // Plan's name, or whether the Client had one before.
 export type DirectorySubscriptionStatus = 'active' | 'expired' | 'none';
 
+/** Clientas › Todas's chips (follow-up 232); «Todas» is no filter. */
+export type ClientDirectoryFilter = DirectorySubscriptionStatus | 'founder';
+
 export type AdministratorClientRow = {
   id: string;
   name: string;
@@ -24,6 +27,15 @@ export type AdministratorClientRow = {
   accountStatus: ClientAccountStatus;
   planName: string | null;
   subscriptionStatus: DirectorySubscriptionStatus;
+  /** «Le quedan»: the active Subscription's classes, null without one. */
+  remainingClassAllowance: number | null;
+  originalClassAllowance: number | null;
+  /** «Vence»: the active Plan's last day, or when the last one ended. */
+  planEndsOn: Date | null;
+  /** The live Fundadora place's number (WEB-040). */
+  founderNumber: number | null;
+  /** «Invitada por»: the Client or Trainer whose code she used. */
+  invitedByName: string | null;
 };
 
 export type AdministratorClientPage = {
@@ -35,6 +47,8 @@ export type AdministratorClientPage = {
   /** Every Client of the studio, whatever the search. */
   studioClientCount: number;
   activePlanClientCount: number;
+  /** Clients of the studio holding a live Fundadora place. */
+  founderClientCount: number;
 };
 
 export type AdministratorClientRecord = {
@@ -70,6 +84,7 @@ export interface AdministratorClientDirectory {
     page: number;
     pageSize: number;
     query?: string;
+    filter?: ClientDirectoryFilter;
     today: Date;
   }) => Promise<AdministratorClientPage>;
   read: (clientId: string) => Promise<AdministratorClientRecord | null>;
@@ -107,8 +122,15 @@ type Dependencies = {
 // Client personal data is for the Administrator and the Coordinator
 // (ADR-0054, ADR-0102); Assistants keep their own bounded search for acting on
 // a Client's behalf.
+export type ClientDirectoryQuery = {
+  page: number;
+  pageSize: number;
+  query?: string;
+  filter?: ClientDirectoryFilter;
+};
+
 export const listAdministratorClients = async (
-  command: { page: number; pageSize: number; query?: string },
+  command: ClientDirectoryQuery,
   principal: AuthenticatedPrincipal,
   { directory, now }: Dependencies,
 ): Promise<AdministratorClientPage> => {
@@ -118,6 +140,7 @@ export const listAdministratorClients = async (
     page: command.page,
     pageSize: command.pageSize,
     ...(query === '' ? {} : { query }),
+    ...(command.filter === undefined ? {} : { filter: command.filter }),
     today: boliviaDate(now()),
   });
 };

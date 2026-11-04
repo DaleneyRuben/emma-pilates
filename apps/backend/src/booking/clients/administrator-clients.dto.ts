@@ -3,13 +3,23 @@ import { z } from 'zod';
 import { clientAccountStatuses } from '../assistant/assistant.dto';
 import type { ClientAccountStatus } from '../assistant/assistant-clients';
 import { ClientSubscriptionDto } from '../client/client-discovery.dto';
-import type { DirectorySubscriptionStatus } from './administrator-clients';
+import type {
+  ClientDirectoryFilter,
+  ClientDirectoryQuery,
+  DirectorySubscriptionStatus,
+} from './administrator-clients';
 
 export const directorySubscriptionStatuses = [
   'active',
   'expired',
   'none',
 ] as const satisfies readonly DirectorySubscriptionStatus[];
+
+export const clientDirectoryFilters = [
+  'all',
+  ...directorySubscriptionStatuses,
+  'founder',
+] as const satisfies readonly (ClientDirectoryFilter | 'all')[];
 
 export class AdminClientDto {
   @ApiProperty({ format: 'uuid' })
@@ -39,6 +49,46 @@ export class AdminClientDto {
     description: '`expired` when the Client had a Plan before, `none` if never',
   })
   subscriptionStatus!: DirectorySubscriptionStatus;
+
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    minimum: 0,
+    description: 'Classes left on the active Subscription, null without one',
+  })
+  remainingClassAllowance!: number | null;
+
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    minimum: 0,
+    description: 'Classes the active Subscription granted, null without one',
+  })
+  originalClassAllowance!: number | null;
+
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description:
+      'The active Plan’s last day, or the last Plan’s when it expired; null if never',
+  })
+  planEndsOn!: string | null;
+
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    minimum: 1,
+    description: 'The live Fundadora place’s number, if any',
+  })
+  founderNumber!: number | null;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'The Client or Trainer whose Referral Code she used',
+  })
+  invitedByName!: string | null;
 }
 
 export class AdminClientPageDto {
@@ -65,6 +115,12 @@ export class AdminClientPageDto {
     description: 'Clients of the studio with an active Subscription today',
   })
   activePlanClientCount!: number;
+
+  @ApiProperty({
+    minimum: 0,
+    description: 'Clients of the studio holding a live Fundadora place',
+  })
+  founderClientCount!: number;
 }
 
 export class AdminClientClosureOutlookDto {
@@ -128,7 +184,7 @@ export class AdminClientDetailDto {
   closure!: AdminClientClosureOutlookDto;
 }
 
-// Search is the directory's only filter; unknown parameters are refused
+// A search and one chip (follow-up 232); unknown parameters are refused
 // (ADR-0062).
 export const parseClientDirectoryQuery = (value: unknown) =>
   z
@@ -136,10 +192,13 @@ export const parseClientDirectoryQuery = (value: unknown) =>
       page: z.coerce.number().int().min(1).default(1),
       pageSize: z.coerce.number().int().min(1).max(100).default(20),
       q: z.string().trim().max(100).optional(),
+      filter: z.enum(clientDirectoryFilters).default('all'),
     })
-    .transform(({ q, ...paging }) =>
-      q === undefined || q === '' ? paging : { ...paging, query: q },
-    )
+    .transform(({ q, filter, ...paging }): ClientDirectoryQuery => ({
+      ...paging,
+      ...(q === undefined || q === '' ? {} : { query: q }),
+      ...(filter === 'all' ? {} : { filter }),
+    }))
     .safeParse(value);
 
 // IDN-009 (AW22 «Editar perfil»): the name and phone; the login email stays
