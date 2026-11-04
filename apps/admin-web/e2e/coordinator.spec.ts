@@ -4,7 +4,7 @@ import { sidebar, signIn } from "./support/session";
 
 // IDN-009 / ADR-0102: the Coordinator runs the schedule, Clients, and Staff
 // from the admin web and never sees an amount; the API refuses the rest.
-// Her rail has five of the nine destinations until BKO-010.
+// Her rail (ADR-0108) has every destination but Dinero.
 const noAmountOn = async (page: Page) => {
   await page.waitForLoadState("networkidle");
   expect(await page.locator("body").innerText()).not.toContain("Bs");
@@ -26,8 +26,11 @@ test.describe("the Coordinator's admin web", () => {
       "Inicio",
       "Horario",
       "3Clientas",
+      "Promociones",
+      "Comentarios",
       "Estudio",
       "Informes",
+      "Ajustes",
     ]);
     await expect(
       page.getByRole("heading", { level: 1, name: /^Buen/ }),
