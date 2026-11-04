@@ -47,6 +47,7 @@ numbered tests.
 | Weekly cap                   | Book up to the cap snapshotted on a Plan, see `classesLeftThisWeek` count down, and get `409 weekly_cap_reached` on the next Booking or Waitlist join unless an extra class remains (Test 91) | The «Te quedan N clases esta semana» line on Reservar is follow-up 203 and is still pending; the mobile screens were not walked on a device |
 | Money format                 | Whole bolivianos in both apps («Bs 560») and centavos on the admin web («Bs 560,00») (Test 112) | A leftover fraction of a boliviano is not in the fixtures; the unit tests cover the rounding. Credit is retired (PAY-005), so no screen shows a credit line |
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 83) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
+| Trainer pay periods          | Calculate and approve a Trainer's pay by Día, Semana, Rango or Mes in Sueldos › Por aprobar, see an approved day keep the month from paying it again, and read the period in «Mis pagos» (Test 127) | The Coordinator stays monthly; the worker drafts whole months only, so a Trainer already paid by day or week that month is drafted by hand |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -7686,11 +7687,12 @@ brought actually paid for her first Plan, in the month that Payment was
 approved. Paola is the Administrator. Camila, the Assistant, cannot approve
 and cannot list the statements. Log in as Test 24 describes.
 
-1. **Calculate the month.** In the admin web open **Pagos a instructoras**
-   (above Nómina). The month stepper cannot go past the current month. Press
-   **Calcular mes**. Each Trainer with a line appears as a card: her name,
-   «Borrador», the total (`Bs 322,00`, never centavos), and a table of
-   Concepto, Detalle, and Monto.
+1. **Calculate the month.** In the admin web open **Dinero › Sueldos ›
+   Por aprobar**. The picker opens on **Mes**; its stepper cannot go past
+   the current month. Press **Calcular**. Each Trainer with a line appears
+   as a card: her name, the period («Octubre de 2026») and «Borrador», the
+   total (`Bs 322,00`, never centavos), and a table of Concepto, Detalle,
+   and Monto. Día, Semana, and Rango are Test 127.
 2. **Approve once.** Press **Aprobar** on one card. It reads «Aprobado» and
    Nómina gains one Salary Payment for that total. Pressing again, or
    calculating the month again, does not add a second payment.
@@ -7707,7 +7709,9 @@ and cannot list the statements. Log in as Test 24 describes.
 6. **«Mis pagos» in the Staff app (MOB-073).** Log in as Emma (Test 12) and
    open **Tu cuenta**. Perfil shows **Mis pagos** above «Notificaciones»;
    Camila, Paola, Gabriela, and Carolina do not have the row. It opens one
-   card per month, newest first: the month, «Aprobado» or «Borrador», the
+   card per statement, newest first: its period («Octubre 2026» for a whole
+   month, «20 de octubre de 2026» for a day, «26 de octubre – 1 de
+   noviembre de 2026» for a week or a range), «Aprobado» or «Borrador», the
    total with centavos (`Bs 322,00`), and one row per concept: «Clases
    dictadas · 3», «Canceladas por mínimo · 1», «Comisiones · 1». A draft
    says «Puede cambiar hasta que administración lo apruebe.» **Ver cada
@@ -8521,3 +8525,50 @@ C. **The founder price is the same whole boliviano everywhere (FIX-025).** As
    day shows esperado Bs 502,00, contado Bs 502,00, diferencia Bs 0,00.
    Mariana herself cannot pay cash while her in-app purchase is open: S10
    says «La clienta tiene una compra en curso desde la app.» (FIX-028).
+
+## Test 127: trainer pay for any period (BKO-009)
+
+A Trainer's Pay Statement covers a day, a week (Monday to Sunday), a date
+range, or a month ([ADR-0109](./adr/0109-pay-statements-for-any-period.md)).
+The Coordinator's stays a whole month. Two live statements of one person
+never overlap, so a class or a commission is never paid twice; the database
+refuses it. The migration `20261104090000_pay_statement_periods` must be
+applied (owner approval 2026-11-04). Use a copy of `pilates_dev_sim`, never
+the database itself, since approving creates Salary Payments. Log in as Paola
+(Test 24) and open **Dinero › Sueldos › Por aprobar**.
+
+1. **The picker.** **Día · Semana · Rango · Mes** sit above the cards, Mes
+   chosen. The address stays `/dinero/sueldos?month=AAAA-MM`. Choose
+   **Día**: the address gains `period=day&date=…`, the stepper reads
+   «Martes 3 de noviembre de 2026», and **Día siguiente** stops at today.
+   **Semana** reads «Semana del 2 – 8 de noviembre de 2026» and steps a
+   week. **Rango** shows **Desde** and **Hasta** as `dd/mm/aaaa`, both days
+   included; a Hasta before Desde says «La fecha final no puede ser anterior
+   a la inicial.» and disables **Calcular**. Reloading keeps the period.
+2. **A day.** On **Día**, pick a past day Emma taught and press
+   **Calcular**. Her card names that day (`03/11/2026`) with only that day's
+   classes. Carolina's card is not there: she shows only on **Mes**.
+3. **Approve the day.** Press **Aprobar** after the day is over in Bolivia
+   (before midnight it answers `409` `pay_statement_month_open`). Nómina
+   gains one Salary Payment.
+4. **The month leaves it alone.** Go to **Mes** for that month and press
+   **Calcular**. Emma's approved day is listed and no month draft for Emma
+   appears; Daniela and the rest get their month. The hourly worker skips
+   Emma for that month too. Pay her other days with **Rango**.
+5. **A draft is replaced.** For a month where Emma has only the worker's
+   month draft, calculate one **Semana**: on **Mes** the month draft is gone
+   and the week draft shows. **Calcular** on **Mes** again turns it back
+   into one month draft.
+6. **The API.** `GET /api/v1/administrator/pay-statements?from=2026-11-03&until=2026-11-04`
+   lists every statement that touches the day, each with `periodStart` and
+   `periodEnd` (`until` and `periodEnd` are the day after the last one);
+   `?month=2026-11` still works. `POST …/draft` takes the same queries. A
+   mixed query, an empty or reversed period, or one longer than 366 days
+   answers `400` `invalid_request`. Two drafts racing for overlapping
+   periods leave one; the loser answers `409`
+   `pay_statement_period_overlaps`.
+7. **«Mis pagos».** As Emma (Test 95 step 6) the day's card reads «3 de
+   noviembre de 2026» and a week «2 – 8 de noviembre de 2026»; a whole
+   month still reads «Noviembre 2026».
+8. **Narrow browser.** At 420 px the chips take the full width above the
+   stepper, and the range fields wrap.
