@@ -1,3 +1,4 @@
+import { normalizeContactPhone } from '../../phone/bolivian-mobile';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import {
   activationWindow,
@@ -36,6 +37,7 @@ export const createStaffMember = async (
   const actor = requireAdministrator(principal);
   const now = dependencies.now();
   const email = command.email.trim().toLowerCase();
+  const phone = normalizeContactPhone(command.phone);
 
   return dependencies.unitOfWork.execute(async (transaction) => {
     const existing = await transaction.findAccountByEmail(email);
@@ -49,7 +51,7 @@ export const createStaffMember = async (
     ) {
       return reopenStaffInvitation(transaction, dependencies, actor, {
         staffMemberId: existing.staffMemberId,
-        phone: command.phone,
+        phone,
         now,
       });
     }
@@ -67,7 +69,7 @@ export const createStaffMember = async (
       staffMemberId,
       name: command.name.trim(),
       email,
-      phone: command.phone,
+      phone,
       role: command.role,
       branchIds,
       ...activationWindow(now),

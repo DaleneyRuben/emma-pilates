@@ -83,6 +83,8 @@ const sharedKernel = [
   'links',
   'monitoring',
   'openapi',
+  // The Bolivian mobile rule both contexts store phones by (decision §19.20).
+  'phone',
   'time',
 ];
 // Composition roots wire everything together.

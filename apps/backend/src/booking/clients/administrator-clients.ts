@@ -1,4 +1,5 @@
 import type { AuditActor } from '../../system-identity/authentication/audit-actor';
+import { normalizeContactPhone } from '../../phone/bolivian-mobile';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import {
@@ -169,11 +170,6 @@ export const readAdministratorClient = async (
   return { ...client, subscription, creditAvailableCentavos: 0, closure };
 };
 
-const normalizePhone = (phone: string | null): string | null => {
-  const trimmed = phone?.trim() ?? '';
-  return trimmed === '' ? null : trimmed;
-};
-
 // IDN-009: correcting a Client's name and phone (AW22 «Editar perfil»). The
 // login email stays the Client's own, through IDN-008's verified change.
 export const updateAdministratorClientProfile = async (
@@ -189,7 +185,7 @@ export const updateAdministratorClientProfile = async (
   return directory.saveProfile({
     clientId: client.id,
     name,
-    phone: normalizePhone(command.phone),
+    phone: normalizeContactPhone(command.phone),
     actor: actor.audit,
     occurredAt: now(),
     previous: { name: client.name, phone: client.phone },

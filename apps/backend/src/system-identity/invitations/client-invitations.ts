@@ -1,4 +1,5 @@
 import { normalizeReferralCode } from '../../booking/acquisition/acquisition';
+import { normalizeContactPhone } from '../../phone/bolivian-mobile';
 import { auditActorOf } from '../authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 import {
@@ -198,7 +199,7 @@ export const inviteClient = async (
         clientId,
         name: command.name.trim(),
         email,
-        phone: command.phone,
+        phone: normalizeContactPhone(command.phone),
         acquisitionChannel: command.acquisitionChannel ?? 'unknown',
         referredByCode: normalizeReferralCode(command.referralCode),
         pendingExpiresAt: new Date(
