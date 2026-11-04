@@ -141,4 +141,14 @@ describe('readTransferQr', () => {
 
     await expect(readTransferQr(storage, fallbackPath)).rejects.toBe(outage);
   });
+
+  it('answers null when neither an upload nor the server file exists', async () => {
+    const storage = storageAnswering(() =>
+      Promise.reject(new Error('storage_object_missing')),
+    );
+
+    await expect(
+      readTransferQr(storage, join(fallbackDirectory, 'absent.png')),
+    ).resolves.toBeNull();
+  });
 });

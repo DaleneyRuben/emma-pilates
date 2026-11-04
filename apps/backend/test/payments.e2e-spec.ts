@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { jest } from '@jest/globals';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import request from 'supertest';
@@ -375,6 +375,23 @@ describe('client payments (e2e)', () => {
       .set('authorization', bearer)
       .expect(500)
       .expect('Content-Type', /application\/problem\+json/);
+  });
+
+  it('answers 404 while no QR was uploaded and the server has no file', async () => {
+    qrStorage.get.mockRejectedValue(new Error('storage_object_missing'));
+    rmSync(qrImagePath);
+    try {
+      await request(app.getHttpServer())
+        .get('/api/v1/transfer-instructions/qr')
+        .set('authorization', bearer)
+        .expect(404)
+        .expect('Content-Type', /application\/problem\+json/)
+        .expect(({ body }: { body: { code: string } }) => {
+          expect(body.code).toBe('transfer_qr_not_found');
+        });
+    } finally {
+      writeFileSync(qrImagePath, serverQr);
+    }
   });
 
   it('requires authentication on every payment route', async () => {
