@@ -1,6 +1,6 @@
 # Calculate Trainer and Coordinator pay in the system
 
-Status: accepted (2026-10-23); changes the Back Office rule that pay is worked out outside the system
+Status: accepted (2026-10-23); changes the Back Office rule that pay is worked out outside the system; a Trainer's statement may cover any period since [ADR-0109](./0109-pay-statements-for-any-period.md)
 
 A Salary Payment recorded only an amount and a date; how it was reached happened outside. The owner's pay rules depend on facts the system already holds, so it now drafts a monthly **Pay Statement** for each Trainer and for the Coordinator from dated **Pay Rate Rules**:
 
