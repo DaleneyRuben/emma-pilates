@@ -269,6 +269,8 @@ export const createPrismaPayStatements = (
         id: randomUUID(),
         staffMemberId: input.staffMemberId,
         month: input.month,
+        periodStart: input.month,
+        periodEnd: monthEnd(input.month),
         totalCentavos: input.totalCentavos,
         createdAt: input.now,
         updatedAt: input.now,
