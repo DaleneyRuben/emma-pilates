@@ -2641,7 +2641,18 @@ check load first, and each page's code arrives the first time you open it
 tools (Network) you can see one small `*-route-*.js` file per page.
 
 1. **The rail.** On a desktop-width window the session opens on **Inicio**
-   («Buenos días, Paola», the day and the Branch). On the left, a narrow
+   («Buenos días, Paola», the day and the Branch). Inicio (WEB-043) shows
+   three cards side by side: **Por resolver** in Rosa profundo («N
+   pendientes» with what they are, or «Todo al día»), **Hoy en Centro**
+   (classes, bookings and occupancy, the next classes with «Llena» or «N de
+   M», **Ver horario**) and **Dinero** for the whole studio with **Hoy ·
+   Mes** (collected, Efectivo, QR confirmados, QR por revisar). Below them,
+   **Pendientes**: one row per waiting thing (transfers to review, freezes
+   to decide, clients to contact, new comments, low stock, salaries to
+   approve), each with **Revisar** opening its tab, or «Nada por resolver.»;
+   then **Recomendaciones del mes**. Carolina sees **Clientas** (active,
+   new this month, renewal) instead of Dinero and only the Para contactar
+   row. At 420 px the cards stack in one column. On the left, a narrow
    Lino rail carries the brand mark «E» and nine destinations, each an icon
    over its name: **Inicio, Horario, Clientas, Promociones, Comentarios,
    Dinero, Estudio, Informes, Ajustes** (follow-up 232). The current one is
