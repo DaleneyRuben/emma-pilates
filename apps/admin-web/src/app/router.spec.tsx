@@ -39,7 +39,7 @@ describe("admin navigation", () => {
       { label: "Estudio", tabs: ["Personal", "Insumos", "Equipos"] },
       {
         label: "Informes",
-        tabs: ["El mes", "Recomendaciones", "Dinero", "Simulador"],
+        tabs: ["El mes", "Dinero", "Simulador"],
       },
       {
         label: "Ajustes",
@@ -100,7 +100,6 @@ describe("admin navigation", () => {
       "/dinero/gastos/categorias",
       "/estudio/personal",
       "/informes",
-      "/informes/recomendaciones",
       "/informes/simulador",
       "/ajustes/tipos-de-clase",
       "/ajustes/planes",
@@ -121,7 +120,7 @@ describe("admin navigation", () => {
       { label: "Horario", tabs: ["Clases"] },
       { label: "Clientas", tabs: ["Todas", "Para contactar"] },
       { label: "Estudio", tabs: ["Personal"] },
-      { label: "Informes", tabs: ["El mes", "Recomendaciones"] },
+      { label: "Informes", tabs: ["El mes"] },
     ]);
     expect(destinationsFor("administrator")).toHaveLength(9);
   });
@@ -150,7 +149,8 @@ describe("admin navigation", () => {
       "/back-office/categorias-de-gasto": "/dinero/gastos/categorias",
       "/reporte": "/informes/dinero",
       "/reporte/indicadores": "/informes",
-      "/recomendaciones": "/informes/recomendaciones",
+      "/recomendaciones": "/informes",
+      "/informes/recomendaciones": "/informes",
       "/simulador": "/informes/simulador",
       "/reglas-del-estudio": "/ajustes/reglas-del-estudio",
       "/dinero": "/dinero/pagos",

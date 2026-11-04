@@ -14,7 +14,7 @@ export function IndicatorChart({
   return (
     <figure
       aria-label="Clases dictadas"
-      className="m-0 flex flex-col gap-3 rounded-tarjeta border border-borde bg-blanco px-5 py-4"
+      className="m-0 flex flex-col gap-3 rounded-marco bg-lino px-5 py-4"
     >
       <h2 className="text-titulo-panel text-texto">Clases dictadas</h2>
       <div className="h-48">

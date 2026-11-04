@@ -57,10 +57,20 @@ const narrativeHandlers = () => [
   http.get(apiUrl(narrativePath), () => jsonResponse(narrative)),
 ];
 
+const noRecommendations = () =>
+  http.get(apiUrl("/api/v1/administrator/recommendations"), () =>
+    jsonResponse({ month: "2026-11", recommendations: [] }),
+  );
+
 describe("AW39 Indicadores", () => {
   useMockServer();
   beforeEach(() => {
-    server.use(...signedInHandlers(), ...narrativeHandlers());
+    server.use(
+      ...signedInHandlers(),
+      ...narrativeHandlers(),
+      // Follow-up 232: El mes also carries the month's recommendations.
+      noRecommendations(),
+    );
   });
 
   it("shows the count tiles, the money figures, and a three-month chart for an Administrator", async () => {
@@ -202,6 +212,7 @@ describe("AW39 Indicadores", () => {
       ...signedInHandlers(),
       months({ month: "2026-10", ...counts, ...amounts }),
       http.get(apiUrl(narrativePath), () => new Promise(() => undefined)),
+      noRecommendations(),
     );
     renderAdmin("/informes");
 

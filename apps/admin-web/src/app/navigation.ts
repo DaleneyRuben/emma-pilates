@@ -31,7 +31,6 @@ export type AdminPath =
   | "/estudio/insumos/retiros"
   | "/estudio/equipos"
   | "/informes"
-  | "/informes/recomendaciones"
   | "/informes/dinero"
   | "/informes/simulador"
   | "/ajustes/tipos-de-clase"
@@ -242,12 +241,6 @@ export const destinations: readonly Destination[] = [
     icon: "informes",
     tabs: [
       { label: "El mes", to: "/informes", studioWide: true, coordinator: true },
-      {
-        label: "Recomendaciones",
-        to: "/informes/recomendaciones",
-        studioWide: true,
-        coordinator: true,
-      },
       { label: "Dinero", to: "/informes/dinero", ownBranchFilter: true },
       { label: "Simulador", to: "/informes/simulador", studioWide: true },
     ],
@@ -365,7 +358,8 @@ export const movedPaths: Readonly<Record<string, AdminPath>> = {
   "/back-office/categorias-de-gasto": "/dinero/gastos/categorias",
   "/reporte": "/informes/dinero",
   "/reporte/indicadores": "/informes",
-  "/recomendaciones": "/informes/recomendaciones",
+  "/recomendaciones": "/informes",
+  "/informes/recomendaciones": "/informes",
   "/simulador": "/informes/simulador",
   "/reglas-del-estudio": "/ajustes/reglas-del-estudio",
   "/dinero": "/dinero/pagos",

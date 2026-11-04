@@ -58,7 +58,7 @@ describe("the admin web for the Coordinator", () => {
     );
   });
 
-  it("opens Indicadores with counts and no amount", async () => {
+  it("opens El mes with counts, its recommendations and no amount or Descartar", async () => {
     server.use(
       http.get(apiUrl("/api/v1/administrator/reports/kpis"), () =>
         jsonResponse({
@@ -77,29 +77,6 @@ describe("the admin web for the Coordinator", () => {
       http.get(apiUrl("/api/v1/administrator/reports/narrative"), () =>
         problemResponse(403, "studio_access_denied"),
       ),
-    );
-    renderAdmin("/informes");
-
-    await heading("Indicadores");
-    expect(
-      await screen.findByRole("region", { name: "Ocupación" }),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(/Bs/)).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Simulador" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Dinero" })).toBeNull();
-    expect(screen.getByRole("link", { name: "Recomendaciones" })).toBeVisible();
-    await waitFor(() =>
-      expect(
-        screen.queryByText("Cargando el informe…"),
-      ).not.toBeInTheDocument(),
-    );
-    expect(
-      screen.queryByRole("region", { name: "Informe del mes" }),
-    ).toBeNull();
-  });
-
-  it("opens Recomendaciones without Descartar", async () => {
-    server.use(
       http.get(apiUrl("/api/v1/administrator/recommendations"), () =>
         jsonResponse({
           month: "2026-10",
@@ -116,9 +93,12 @@ describe("the admin web for the Coordinator", () => {
         }),
       ),
     );
-    renderAdmin("/informes/recomendaciones");
+    renderAdmin("/informes");
 
-    await heading("Recomendaciones");
+    await heading("Indicadores");
+    expect(
+      await screen.findByRole("region", { name: "Ocupación" }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByText(
         "Revisa el horario del martes: promedia 1,7 alumnas.",
@@ -126,6 +106,16 @@ describe("the admin web for the Coordinator", () => {
     ).toBeVisible();
     expect(screen.queryByRole("button", { name: "Descartar" })).toBeNull();
     expect(screen.queryByText(/Bs/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Simulador" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Dinero" })).toBeNull();
+    await waitFor(() =>
+      expect(
+        screen.queryByText("Cargando el informe…"),
+      ).not.toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByRole("region", { name: "Informe del mes" }),
+    ).toBeNull();
   });
 
   it("opens Clientes", async () => {

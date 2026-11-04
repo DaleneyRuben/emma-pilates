@@ -36,7 +36,7 @@ export function MonthNarrative({ month }: { month: string }) {
   return (
     <section
       aria-label="Informe del mes"
-      className="flex flex-col gap-4 rounded-tarjeta border border-borde bg-blanco px-5 py-4"
+      className="flex flex-col gap-4 rounded-marco bg-lino px-5 py-4"
     >
       <h2 className="font-serif text-titulo-3 text-texto">Informe del mes</h2>
       {report.paragraphs.map((paragraph) => (
