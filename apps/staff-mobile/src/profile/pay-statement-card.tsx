@@ -5,7 +5,6 @@ import {
   colors,
   EmphasisCard,
   fontFamilies,
-  formatMonthHeading,
   radii,
   spacing,
   surfaces,
@@ -15,6 +14,7 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { formatExactBolivianos } from "../ui/exact-bolivianos";
+import { payPeriodHeading } from "./pay-period-heading";
 
 type LineKind = PayStatementLineDto["kind"];
 
@@ -50,11 +50,6 @@ function summarize(lines: PayStatementLineDto[]) {
   });
 }
 
-// The statement's month is a civil date; noon in Bolivia keeps it in its month.
-function monthHeading(month: string): string {
-  return formatMonthHeading(`${month}T12:00:00-04:00`);
-}
-
 function AmountRow({
   label,
   detail,
@@ -75,12 +70,12 @@ function AmountRow({
   );
 }
 
-/** S29's hero: the month still open, on Rosa profundo (follow-up 225 §5). */
+/** S29's hero: the period still open, on Rosa profundo (follow-up 225 §5). */
 export function DraftStatementCard({ statement }: { statement: PayStatementDto }) {
-  const heading = monthHeading(statement.month);
+  const { heading, label } = payPeriodHeading(statement);
   const classes = statement.lines.filter((line) => line.kind === "class").length;
   return (
-    <View accessibilityLabel={`Liquidación de ${heading.toLowerCase()}`}>
+    <View accessibilityLabel={label}>
       <EmphasisCard
         eyebrow={heading}
         note={`${classes} ${classes === 1 ? "clase dictada" : "clases dictadas"} · puede cambiar hasta que administración lo apruebe.`}
@@ -95,10 +90,10 @@ export function DraftStatementCard({ statement }: { statement: PayStatementDto }
 
 export function PayStatementCard({ statement }: { statement: PayStatementDto }) {
   const [open, setOpen] = useState(false);
-  const heading = monthHeading(statement.month);
+  const { heading, label } = payPeriodHeading(statement);
   const approved = statement.state === "approved";
   return (
-    <View accessibilityLabel={`Liquidación de ${heading.toLowerCase()}`} style={styles.card}>
+    <View accessibilityLabel={label} style={styles.card}>
       <View style={styles.header}>
         <Text numberOfLines={1} style={styles.month}>
           {heading}
