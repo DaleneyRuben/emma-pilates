@@ -78,6 +78,7 @@ describe('trainer pay statements', () => {
           state: cause === null ? 'SCHEDULED' : 'CANCELLED',
           cancellationCause: cause,
           cancelledAt: cause === null ? null : fixtureNow,
+          minimumBookingsCheckCompletedAt: fixtureNow,
           bookingsAtWindowClose: students,
         },
       });
@@ -194,5 +195,39 @@ describe('trainer pay statements', () => {
     await expect(
       codeOf(statements().listStatements({ month: september }, await emma())),
     ).resolves.toBe('back_office_access_denied');
+  });
+
+  // Walkthrough 2026-11-04 n.º 2: with the worker down, a class with nobody
+  // booked kept its window-close snapshot of 0 but never had its Minimum
+  // Bookings check, and was paid as «0 alumnas». Only a checked class pays.
+  it('pays no class whose Minimum Bookings check never ran', async () => {
+    const emmaId = deterministicId('staff-member:emma');
+    const create = (day: string, checked: boolean, students: number) =>
+      world.prisma.session.create({
+        data: {
+          branchId: deterministicId('branch:centro'),
+          classTypeId: deterministicId('class-type:reformer'),
+          trainerStaffMemberId: emmaId,
+          startsAt: new Date(`2026-08-${day}T14:00:00.000Z`),
+          endsAt: new Date(`2026-08-${day}T15:00:00.000Z`),
+          capacity: 8,
+          minimumBookingsCheckCompletedAt: checked
+            ? new Date(`2026-08-${day}T11:00:00.000Z`)
+            : null,
+          bookingsAtWindowClose: students,
+        },
+      });
+    await create('04', false, 0);
+    await create('05', true, 3);
+
+    const facts = await trainerMonthFacts(
+      world.prisma,
+      new Date('2026-08-01T00:00:00.000Z'),
+      september,
+    );
+
+    expect(
+      facts.trainers.find((row) => row.staffMemberId === emmaId)?.sessions,
+    ).toEqual([{ bookingsAtWindowClose: 3, cancellationCause: null }]);
   });
 });

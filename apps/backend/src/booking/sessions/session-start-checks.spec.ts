@@ -16,7 +16,16 @@ const session = {
 const checkedAt = at('2026-09-22T19:00:30.000Z');
 
 describe('Session start checks', () => {
-  it('makes the Minimum Bookings check due from the configured lead time until the Session starts', () => {
+  it('keeps a missed Minimum Bookings check due after the Session starts, so a restarted worker settles it', () => {
+    expect(isMinimumBookingsCheckDue(session, session.startsAt, 180)).toBe(
+      true,
+    );
+    expect(
+      isMinimumBookingsCheckDue(session, at('2026-09-23T13:00:00.000Z'), 180),
+    ).toBe(true);
+  });
+
+  it('makes the Minimum Bookings check due from the configured lead time', () => {
     expect(
       isMinimumBookingsCheckDue(session, at('2026-09-22T18:59:59.999Z'), 180),
     ).toBe(false);
@@ -26,9 +35,6 @@ describe('Session start checks', () => {
     expect(
       isMinimumBookingsCheckDue(session, at('2026-09-22T21:59:59.999Z'), 180),
     ).toBe(true);
-    expect(
-      isMinimumBookingsCheckDue(session, at('2026-09-22T22:00:00.000Z'), 180),
-    ).toBe(false);
     expect(
       isMinimumBookingsCheckDue(session, at('2026-09-22T19:30:00.000Z'), 120),
     ).toBe(false);
