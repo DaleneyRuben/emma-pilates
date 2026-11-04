@@ -5653,6 +5653,81 @@
         ]
       }
     },
+    "/api/v1/administrator/transfer-qr": {
+      "get": {
+        "operationId": "getStudioTransferQr",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioTransferQrDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorTransferQr"
+        ]
+      },
+      "put": {
+        "operationId": "replaceStudioTransferQr",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "image/jpeg": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "image/png": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "image/webp": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioTransferQrDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorTransferQr"
+        ]
+      }
+    },
     "/api/v1/administrator/sessions/{sessionId}/roster": {
       "get": {
         "operationId": "getAdministratorSessionRoster",
@@ -14723,6 +14798,20 @@
           "startDateLimitDays",
           "bookingWindowDays",
           "openingDate"
+        ]
+      },
+      "StudioTransferQrDto": {
+        "type": "object",
+        "properties": {
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the Administrator last uploaded the QR, or null while the server file is still served"
+          }
+        },
+        "required": [
+          "updatedAt"
         ]
       },
       "AdministratorRosterBookingDto": {

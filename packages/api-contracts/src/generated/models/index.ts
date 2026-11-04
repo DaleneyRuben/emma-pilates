@@ -414,6 +414,7 @@ export * from "./studioRecomputeDto";
 export * from "./studioRecomputeInputDto";
 export * from "./studioRulesDto";
 export * from "./studioSettingsDto";
+export * from "./studioTransferQrDto";
 export * from "./submitTransferDto";
 export * from "./supplyChangeDto";
 export * from "./supplyInputDto";
