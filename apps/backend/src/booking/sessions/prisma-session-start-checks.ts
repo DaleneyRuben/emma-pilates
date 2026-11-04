@@ -14,7 +14,7 @@ import {
   cancelBelowMinimum,
   checkedSessionSelect,
 } from './prisma-minimum-bookings-cancellation';
-import { isMinimumBookingsCheckDue } from './session-start-checks';
+import { isMinimumBookingsCheckDue, wasTaught } from './session-start-checks';
 
 type MinimumRule = { minimumBookings: number; leadMinutes: number };
 
@@ -57,7 +57,10 @@ export const createPrismaSessionStartChecks = (
             return 'skipped';
           }
 
-          if (session.bookings.length >= rule.minimumBookings) {
+          if (
+            session.bookings.length >= rule.minimumBookings ||
+            wasTaught(session, now)
+          ) {
             await transaction.session.update({
               where: { id: session.id },
               data: { minimumBookingsCheckCompletedAt: now },
@@ -88,14 +91,13 @@ export const createPrismaSessionStartChecks = (
       minimumBookings: settings.minimumBookings,
       leadMinutes: settings.minimumBookingsCheckLeadMinutes,
     };
+    // Sessions already started are included: their check was missed while
+    // the worker was down (decision §19.19).
     const candidates = await prisma.session.findMany({
       where: {
         state: SessionState.SCHEDULED,
         minimumBookingsCheckCompletedAt: null,
-        startsAt: {
-          lte: new Date(now.getTime() + rule.leadMinutes * 60_000),
-          gt: now,
-        },
+        startsAt: { lte: new Date(now.getTime() + rule.leadMinutes * 60_000) },
       },
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
       select: { id: true },

@@ -81,7 +81,8 @@ describe('Prisma Session start checks: a missed Minimum Bookings check', () => {
         bookingId: booking.id,
         outcome: 'ATTENDED',
         recordedByAccountId: await world.accountIdOf(world.trainer.email),
-        recordedAt: new Date(startsAt.getTime() + 5 * 60_000),
+        // The real clock stamps updated_at, which may not precede it.
+        recordedAt: new Date(),
       },
     });
     const back = new Date(startsAt.getTime() + 2 * hour);

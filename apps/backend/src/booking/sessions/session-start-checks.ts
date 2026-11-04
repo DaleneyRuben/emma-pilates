@@ -3,15 +3,28 @@ import { boliviaDate } from '../../time/bolivia-time';
 
 // The one-time Minimum Bookings check falls due at the lead time in Studio
 // Settings (3 hours, ADR-0007). A check missed while the worker was down
-// still runs until the Session starts; once a class has begun, the Clients
-// who came are taught.
+// stays due after the Session starts (decision §19.19), so a restarted
+// worker settles it as it would have on time.
 export const isMinimumBookingsCheckDue = (
   session: { startsAt: Date },
   now: Date,
   leadMinutes: number,
 ): boolean =>
-  now.getTime() >= session.startsAt.getTime() - leadMinutes * 60_000 &&
-  now < session.startsAt;
+  now.getTime() >= session.startsAt.getTime() - leadMinutes * 60_000;
+
+// A missed check never cancels a class that was taught: once it started, an
+// attended Booking proves it was (decision §19.19).
+export const wasTaught = (
+  session: {
+    startsAt: Date;
+    bookings: { attendanceRecord: { outcome: string } | null }[];
+  },
+  now: Date,
+): boolean =>
+  now >= session.startsAt &&
+  session.bookings.some(
+    (booking) => booking.attendanceRecord?.outcome === 'ATTENDED',
+  );
 
 const momentParts = (instant: Date): Record<string, string> =>
   new Intl.DateTimeFormat('es-BO', {
