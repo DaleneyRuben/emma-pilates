@@ -24,7 +24,6 @@ describe("screen surfaces", () => {
     // v2 draws Marfil only where it sits on something else: a bottom sheet
     // over the scrim, and a chip or the QR box inside a Lino card.
     const onOtherSurfaces = [
-      "administrator/other-date-sheet.tsx",
       "assistant/front-desk-receipt-card.tsx",
       "assistant/invitation-menu.tsx",
       "trainer/trainer-roster-screen.tsx",

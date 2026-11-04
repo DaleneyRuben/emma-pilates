@@ -1,29 +1,29 @@
-import {
-  colors,
-  dayChipLabel,
-  fontFamilies,
-  formatSessionDate,
-  radii,
-  spacing,
-  TextButton,
-} from "@pilates/mobile-core";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { dayChipLabel, formatSessionDate } from "../time/session-format";
+import { fontFamilies } from "../ui/fonts";
+import { TextButton } from "../ui/text-button";
+import { colors, radii, spacing } from "../ui/tokens";
+
 /**
- * S13 «Otra»: the days after the strip, up to 30 ahead (walkthrough 23), as a
- * sheet of date chips. Cancelling a class has no 7-day booking limit.
+ * S13 «Otra»: the days after a day strip, as a sheet of date chips. S13
+ * reaches the 30 days a class can be cancelled ahead (walkthrough 23); the
+ * booking strips (C03, S07) the booking window's later days (FIX-031,
+ * follow-up 234).
  */
 export function OtherDateSheet({
   dates,
   onClose,
   onSelect,
   selected,
+  testIDPrefix,
   visible,
 }: {
   dates: readonly string[];
   onClose: () => void;
   onSelect: (date: string) => void;
   selected: string;
+  testIDPrefix: string;
   visible: boolean;
 }) {
   return (
@@ -43,7 +43,7 @@ export function OtherDateSheet({
                   key={date}
                   onPress={() => onSelect(date)}
                   style={[styles.day, isSelected && styles.selected]}
-                  testID={`cancel-class-other-${date}`}
+                  testID={`${testIDPrefix}-${date}`}
                 >
                   <Text style={[styles.weekday, isSelected && styles.onSelected]}>{weekday}</Text>
                   <Text style={[styles.number, isSelected && styles.onSelected]}>{day}</Text>

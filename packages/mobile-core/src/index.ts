@@ -24,6 +24,7 @@ export * from "./booking/plan-terms";
 export * from "./booking/weekly-cap-copy";
 export * from "./booking/seat-pill";
 export * from "./booking/session-card";
+export * from "./booking/other-date-sheet";
 export * from "./booking/studio-rules";
 export * from "./encoding/base64";
 export * from "./images/image-size";
