@@ -54,7 +54,8 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
       where: { id: cancelledBooking.id },
       data: {
         state: 'CANCELLED',
-        cancelledAt: clock,
+        cancelledAt: new Date(),
+        cancelledByAccountId: cancelled.accountId,
         cancellationCause: 'CLIENT_REQUEST',
       },
     });
@@ -82,7 +83,11 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
     }
     await prisma.waitlistEntry.update({
       where: { id: waiting[1].entry.id },
-      data: { closedAt: clock, closureReason: 'LEFT' },
+      data: {
+        closedAt: new Date(),
+        closureReason: 'LEFT',
+        closedByAccountId: waiting[1].accountId,
+      },
     });
 
     await expect(
