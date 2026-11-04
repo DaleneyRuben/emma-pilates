@@ -5617,6 +5617,43 @@
         ]
       }
     },
+    "/api/v1/administrator/sessions/{sessionId}/roster": {
+      "get": {
+        "operationId": "getAdministratorSessionRoster",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdministratorSessionRosterDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessionRoster"
+        ]
+      }
+    },
     "/api/v1/administrator/clients/{clientId}/acquisition": {
       "get": {
         "operationId": "getClientAcquisition",
@@ -14570,6 +14607,90 @@
           "startDateLimitDays",
           "bookingWindowDays",
           "openingDate"
+        ]
+      },
+      "AdministratorRosterBookingDto": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "attendanceOutcome": {
+            "type": "string",
+            "enum": [
+              "attended",
+              "no_show"
+            ],
+            "nullable": true,
+            "description": "Null until the Trainer records Attendance"
+          }
+        },
+        "required": [
+          "bookingId",
+          "clientId",
+          "clientName",
+          "attendanceOutcome"
+        ]
+      },
+      "AdministratorRosterWaitlistEntryDto": {
+        "type": "object",
+        "properties": {
+          "waitlistEntryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "position": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Place in the open Waitlist"
+          }
+        },
+        "required": [
+          "waitlistEntryId",
+          "clientId",
+          "clientName",
+          "position"
+        ]
+      },
+      "AdministratorSessionRosterDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdministratorRosterBookingDto"
+            }
+          },
+          "waitlist": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdministratorRosterWaitlistEntryDto"
+            }
+          }
+        },
+        "required": [
+          "sessionId",
+          "bookings",
+          "waitlist"
         ]
       },
       "AcquisitionReferrerDto": {
