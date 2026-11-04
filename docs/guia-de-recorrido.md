@@ -89,11 +89,19 @@ compartida.
    `PORT` debe ser `3100`. Si el archivo ya existía y apunta a otra base,
    cámbialo antes de seguir. No ejecutes `db:fixtures`.
 
-3. Crea las tablas:
+3. Crea las tablas y genera el cliente de la base de datos:
 
    ```sh
    pnpm --filter @pilates/backend db:migrate:deploy
+   pnpm --filter @pilates/backend prisma:generate
    ```
+
+   El primer comando actualiza la base de datos. El segundo crea el código
+   que el backend usa para leerla (`apps/backend/src/generated/prisma`), a
+   partir del esquema. Ese código no se guarda en el repositorio, así que
+   corre los dos comandos otra vez después de cada `git pull`. Sin el
+   segundo, el backend no compila: dice que no existen campos o tablas que
+   sí están en el esquema, como `periodStart` o `referralCode`.
 
 4. Abre tres Terminales y deja cada una abierta:
 
@@ -107,9 +115,8 @@ compartida.
    node --env-file=.env dist/src/worker-main.js
    ```
 
-   Después de cada `git pull`, corre antes del build
-   `pnpm --filter @pilates/backend prisma:generate`. Sin eso el build del
-   backend falla con errores de tipos y el worker arranca el `dist/` viejo.
+   Si saltaste el paso 3 después de un `git pull`, el build falla con
+   errores de tipos y el worker arranca el `dist/` viejo: vuelve al paso 3.
 
    `pnpm start:worker` no lee `apps/backend/.env`. Sin `--env-file` el
    worker se detiene al validar `DATABASE_URL` y no escribe los correos.
