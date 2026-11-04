@@ -10,6 +10,7 @@ export const studioSettings = {
   cancellationWindowMinutes: 150,
   minimumBookings: 2,
   minimumBookingsCheckLeadMinutes: 180,
+  bookingWindowDays: 7,
   startDateLimitDays: 14,
   founderPlaces: 40,
   founderDiscountPercent: 15,

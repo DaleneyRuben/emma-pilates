@@ -105,6 +105,10 @@ describe("the widened Coordinator", () => {
     expect(
       await screen.findByText("Mínimo de reservas por clase"),
     ).toBeVisible();
+    expect(
+      screen.getByText("Días adelante que una clienta puede reservar"),
+    ).toBeVisible();
+    expect(screen.getByText("7 días")).toBeVisible();
     expect(screen.queryByRole("textbox")).toBeNull();
     expect(screen.queryByRole("button", { name: /Guardar/ })).toBeNull();
     expect(screen.queryByText("Evaluación nutricional pagada")).toBeNull();

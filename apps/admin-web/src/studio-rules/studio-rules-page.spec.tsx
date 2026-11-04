@@ -78,6 +78,9 @@ describe("AW36 Reglas del estudio", () => {
     expect(screen.getByLabelText("Meses 7 a 12 (%)")).toHaveValue("85");
     expect(screen.getByLabelText("Desde el mes 13 (%)")).toHaveValue("90");
     expect(screen.getByLabelText("Fecha de apertura")).toHaveValue("");
+    expect(
+      screen.getByLabelText("Días adelante que una clienta puede reservar"),
+    ).toHaveValue("7");
 
     const fixed = screen.getByRole("region", { name: "Reglas fijas" });
     expect(
@@ -111,6 +114,11 @@ describe("AW36 Reglas del estudio", () => {
     await user.clear(minimum);
     await user.type(minimum, "3");
     await user.type(screen.getByLabelText("Fecha de apertura"), "2026-12-01");
+    const window = screen.getByLabelText(
+      "Días adelante que una clienta puede reservar",
+    );
+    await user.clear(window);
+    await user.type(window, "14");
     await user.click(screen.getByRole("button", { name: "Guardar cambios" }));
 
     expect(
@@ -125,6 +133,7 @@ describe("AW36 Reglas del estudio", () => {
         renewalTargetMonths7To12Percent: 85,
         renewalTargetFromMonth13Percent: 90,
         openingDate: "2026-12-01",
+        bookingWindowDays: 14,
       },
     ]);
     expect(await screen.findByText(/^Versión 4 ·/)).toBeVisible();
@@ -143,10 +152,16 @@ describe("AW36 Reglas del estudio", () => {
     const tax = screen.getByLabelText("Impuestos sobre las ventas (%)");
     await user.clear(tax);
     await user.type(tax, "120");
+    const window = screen.getByLabelText(
+      "Días adelante que una clienta puede reservar",
+    );
+    await user.clear(window);
+    await user.type(window, "31");
     await user.click(screen.getByRole("button", { name: "Guardar cambios" }));
 
     expect(await screen.findByText("Entre 1 y 20 reservas.")).toBeVisible();
     expect(screen.getByText("Un porcentaje entre 0 y 100.")).toBeVisible();
+    expect(screen.getByText("Entre 1 y 30 días.")).toBeVisible();
     expect(saved).toEqual([]);
   });
 
