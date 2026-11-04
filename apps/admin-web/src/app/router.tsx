@@ -92,6 +92,16 @@ const studioRulesRoute = createRoute({
   ),
 });
 
+// WEB-038: the transfer QR the apps show, replaced from the web.
+const studioQrRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/ajustes/qr-del-estudio",
+  component: lazyRouteComponent(
+    () => import("../studio-qr/studio-qr-route"),
+    "StudioQrRoute",
+  ),
+});
+
 const pageRoutes = [
   homeRoute,
   scheduleRoute,
@@ -100,6 +110,7 @@ const pageRoutes = [
   plansRoute,
   simulatorRoute,
   studioRulesRoute,
+  studioQrRoute,
   ...backOfficeRoutes,
   ...oversightRoutes,
   ...reportRoutes,

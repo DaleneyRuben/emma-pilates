@@ -48,6 +48,7 @@ numbered tests.
 | Money format                 | Whole bolivianos in both apps («Bs 560») and centavos on the admin web («Bs 560,00») (Test 112) | A leftover fraction of a boliviano is not in the fixtures; the unit tests cover the rounding. Credit is retired (PAY-005), so no screen shows a credit line |
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 83) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
 | Trainer pay periods          | Calculate and approve a Trainer's pay by Día, Semana, Rango or Mes in Sueldos › Por aprobar, see an approved day keep the month from paying it again, and read the period in «Mis pagos» (Test 127) | The Coordinator stays monthly; the worker drafts whole months only, so a Trainer already paid by day or week that month is drafted by hand |
+| Studio transfer QR           | Upload the studio's transfer QR in Ajustes › QR del estudio, see it and its date, and read the same image on the apps' QR route; the Coordinator does not see the tab (Test 128) | Until the first upload the server's `TRANSFER_QR_IMAGE_PATH` file is served; a storage outage fails the route instead of falling back |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -89,6 +90,7 @@ can be found by its design name.
 | --- | --- |
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
 | AW36 Reglas del estudio (from AW33) | 75, 112 |
+| P09 Ajustes › QR del estudio | 41, 128 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82, 111, 114 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81, 112 |
@@ -2674,7 +2676,8 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    Clases de campaña · Referidos · Contactos), Estudio (Personal · Insumos
    · Equipos), Informes (El mes · Dinero · Simulador; El mes ends with
    «Recomendaciones del mes») and Ajustes (Tipos de clase · Planes ·
-   Sucursales · Reglas del estudio). Fundadoras is no longer a tab: it is
+   Sucursales · Reglas del estudio · QR del estudio, the last for the
+   Administrator only, Test 128). Fundadoras is no longer a tab: it is
    the **Fundadora** chip on Clientas › Todas (WEB-040, Test 26).
    Every page is on v2 (follow-up 233): Lino cards and tables with no
    border or shadow on Marfil, Rosa tinte secondary buttons, text buttons
@@ -4187,6 +4190,9 @@ first if it is paused (runbook, «Pause and resume staging»).
 Since PAY-003 the backend no longer reads `TRANSFER_BENEFICIARY_NAME`,
 `TRANSFER_BANK_NAME`, or `TRANSFER_ACCOUNT_NUMBER`; only
 `TRANSFER_QR_IMAGE_PATH` remains, and production refuses to start without it.
+Since WEB-038 that file is only the fallback: the route serves the QR the
+Administrator uploads in **Ajustes › QR del estudio** (Test 128) and reads
+the file only while nothing was uploaded.
 `GET /transfer-instructions` keeps its three bank fields, always empty and
 marked deprecated in the contract, so app builds from before PAY-003 keep
 working until no supported release reads them. Start the API on
@@ -8572,3 +8578,49 @@ the database itself, since approving creates Salary Payments. Log in as Paola
    month still reads «Noviembre 2026».
 8. **Narrow browser.** At 420 px the chips take the full width above the
    stepper, and the range fields wrap.
+
+## Test 128: upload the studio's transfer QR from the admin web (WEB-038)
+
+The Administrator replaces the QR the Client app shows at checkout from
+**Ajustes › QR del estudio**, with no restart. The API keeps it in object
+storage under `studio/transfer-qr` as a PNG (any JPEG, PNG or WebP up to
+5 MB and 4096 px a side is re-encoded) and audits each upload as
+`studio_transfer_qr.replaced`. `GET /api/v1/transfer-instructions/qr` serves
+the uploaded QR and falls back on the `TRANSFER_QR_IMAGE_PATH` file only
+while nothing was uploaded; a storage outage answers `500` instead of the old
+QR, and with neither the route answers `404` `transfer_qr_not_found`. Use a
+copy of `pilates_golden` (each upload replaces the QR for every app on that
+storage), and log in as Paola (Test 24).
+
+1. **The tab.** **Ajustes** shows **Tipos de clase · Planes · Sucursales ·
+   Reglas del estudio · QR del estudio**. Open **QR del estudio**: a Lino
+   card with the current QR in a 220 px square, «QR de transferencia», the
+   note «Es el QR que ven las clientas al pagar desde la app. Al subir uno
+   nuevo, la app lo usa al instante.», **Subir un QR nuevo**, and «Es el QR
+   de prueba del servidor» while the server file is in use.
+2. **Too large.** Choose a PNG wider than 4096 px (or heavier than 5 MB):
+   «La imagen es muy grande. Elige una de hasta 5 MB y 4096 píxeles por
+   lado.» and the QR stays as it was. A file that is not an image reads «Ese
+   archivo no es una imagen que podamos usar. Elige un JPG, PNG o WEBP.»
+3. **Upload.** Choose a real QR (JPEG, PNG or WebP). The notice «Subimos el
+   QR nuevo. La app ya lo muestra.» appears, the square shows the new QR,
+   and the line reads «Actualizado el dd/mm/aaaa» with today's date.
+4. **The apps read it.** Open **Pago por transferencia** in the Client app
+   (Test 10 B), or
+   `curl -s -o /dev/null -w "%{http_code} %{content_type}\n" http://127.0.0.1:3100/api/v1/transfer-instructions/qr -H "authorization: Bearer $TOKEN"`
+   (Test 41): `200 image/png` and the new QR, without restarting the API.
+5. **The record.** `select action_code, target_type, metadata from
+   system.audit_records where action_code = 'studio_transfer_qr.replaced'`
+   shows Paola's upload with `byteSize`, `width`, `height` and `sha256`.
+6. **The API.** `GET /api/v1/administrator/transfer-qr` answers
+   `{"updatedAt": …}` (null before the first upload) with `no-store`.
+   `PUT` takes the raw bytes with `Content-Type: image/jpeg`, `image/png` or
+   `image/webp`; another type or bytes that do not decode answer `400`
+   `transfer_qr_invalid_image`, more than 5 MB `413` and more than 4096 px
+   `400`, both `transfer_qr_too_large`.
+7. **The Coordinator.** As Carolina the Ajustes tabs stop at **Reglas del
+   estudio**; `/ajustes/qr-del-estudio` returns her to Horario with «Esa
+   sección es solo para administración.», and both API routes answer `403`
+   `administration_access_denied` (Test 77's matrix).
+8. **Narrow browser.** At 420 px open it from the menu drawer: the QR sits
+   above the text and the button, with no sideways scroll.

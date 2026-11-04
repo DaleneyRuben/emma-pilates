@@ -33,7 +33,8 @@ export type AdminPath =
   | "/ajustes/tipos-de-clase"
   | "/ajustes/planes"
   | "/ajustes/sucursales"
-  | "/ajustes/reglas-del-estudio";
+  | "/ajustes/reglas-del-estudio"
+  | "/ajustes/qr-del-estudio";
 
 export type NavigationItem = {
   /** The tab's or view's label, as the boards in design/v2/admin draw it. */
@@ -266,6 +267,12 @@ export const destinations: readonly Destination[] = [
         to: "/ajustes/reglas-del-estudio",
         studioWide: true,
         coordinator: true,
+      },
+      // WEB-038: where clients send money, so the Administrator's alone.
+      {
+        label: "QR del estudio",
+        to: "/ajustes/qr-del-estudio",
+        studioWide: true,
       },
     ],
   },

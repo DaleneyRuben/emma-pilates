@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { jest } from '@jest/globals';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import request from 'supertest';
@@ -15,9 +15,11 @@ import {
   CreditPurchasesController,
   paymentCommands,
   PurchaseIntentsController,
+} from '../src/booking/payments/payments.controller';
+import {
   transferInstructions,
   TransferInstructionsController,
-} from '../src/booking/payments/payments.controller';
+} from '../src/booking/transfer-qr/transfer-instructions.controller';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
@@ -84,9 +86,16 @@ describe('client payments (e2e)', () => {
   };
   const qrDirectory = mkdtempSync(join(tmpdir(), 'pilates-qr-'));
   const qrImagePath = join(qrDirectory, 'qr.png');
+  const serverQr = Buffer.from('89504e470d0a1a0a', 'hex');
+  const qrStorage = {
+    put: jest.fn<() => Promise<void>>(),
+    replace: jest.fn<() => Promise<void>>(),
+    delete: jest.fn<() => Promise<void>>(),
+    get: jest.fn<(key: string) => Promise<Buffer>>(),
+  };
 
   beforeAll(() => {
-    writeFileSync(qrImagePath, Buffer.from('89504e470d0a1a0a', 'hex'));
+    writeFileSync(qrImagePath, serverQr);
   });
 
   beforeEach(async () => {
@@ -95,6 +104,9 @@ describe('client payments (e2e)', () => {
       authenticationSessionId: 'authentication-session-id',
       identity: { kind: 'client', clientId: 'client-id' },
     });
+    qrStorage.get.mockRejectedValue(
+      Object.assign(new Error('missing'), { code: 'ENOENT' }),
+    );
     commands.createPurchaseIntent.mockResolvedValue(intent);
     commands.attachReceipt.mockResolvedValue({
       ...intent,
@@ -132,6 +144,7 @@ describe('client payments (e2e)', () => {
           provide: transferInstructions,
           useValue: {
             qrImagePath,
+            storage: qrStorage,
           },
         },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
@@ -330,7 +343,57 @@ describe('client payments (e2e)', () => {
       .set('authorization', bearer)
       .expect(200)
       .expect('Content-Type', /image\/png/)
-      .expect('Cache-Control', 'no-store');
+      .expect('Cache-Control', 'no-store')
+      .expect(({ body }: { body: Buffer }) => {
+        expect(body).toEqual(serverQr);
+      });
+  });
+
+  it('serves the QR the Administrator uploaded instead of the server file', async () => {
+    const uploaded = Buffer.from('89504e470d0a1a0a0000', 'hex');
+    qrStorage.get.mockResolvedValue(uploaded);
+
+    await request(app.getHttpServer())
+      .get('/api/v1/transfer-instructions/qr')
+      .set('authorization', bearer)
+      .expect(200)
+      .expect('Content-Type', /image\/png/)
+      .expect('Cache-Control', 'no-store')
+      .expect(({ body }: { body: Buffer }) => {
+        expect(body).toEqual(uploaded);
+      });
+    expect(qrStorage.get).toHaveBeenCalledWith('studio/transfer-qr');
+  });
+
+  it('never serves the server file while storage is failing', async () => {
+    qrStorage.get.mockRejectedValue(
+      Object.assign(new Error('Service Unavailable'), {
+        $metadata: { httpStatusCode: 503 },
+      }),
+    );
+
+    await request(app.getHttpServer())
+      .get('/api/v1/transfer-instructions/qr')
+      .set('authorization', bearer)
+      .expect(500)
+      .expect('Content-Type', /application\/problem\+json/);
+  });
+
+  it('answers 404 while no QR was uploaded and the server has no file', async () => {
+    qrStorage.get.mockRejectedValue(new Error('storage_object_missing'));
+    rmSync(qrImagePath);
+    try {
+      await request(app.getHttpServer())
+        .get('/api/v1/transfer-instructions/qr')
+        .set('authorization', bearer)
+        .expect(404)
+        .expect('Content-Type', /application\/problem\+json/)
+        .expect(({ body }: { body: { code: string } }) => {
+          expect(body.code).toBe('transfer_qr_not_found');
+        });
+    } finally {
+      writeFileSync(qrImagePath, serverQr);
+    }
   });
 
   it('requires authentication on every payment route', async () => {

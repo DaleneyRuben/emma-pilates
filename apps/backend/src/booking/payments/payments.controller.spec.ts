@@ -7,8 +7,8 @@ import {
   ClientReferralsController,
   CreditPurchasesController,
   PurchaseIntentsController,
-  TransferInstructionsController,
 } from './payments.controller';
+import { TransferInstructionsController } from '../transfer-qr/transfer-instructions.controller';
 
 const bearer = 'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 const key = '11111111-1111-4111-8111-111111111111';
@@ -272,6 +272,12 @@ describe('TransferInstructionsController', () => {
   const controller = new TransferInstructionsController(
     {
       qrImagePath: '.data/transfer-qr.png',
+      storage: {
+        put: jest.fn(),
+        replace: jest.fn(),
+        get: jest.fn(),
+        delete: jest.fn(),
+      },
     },
     resolvePrincipal,
   );

@@ -199,6 +199,11 @@ Vuelve a dejar los valores de arriba si los cambiaste para probar.
 Sin esto no hay clase que reservar ni plan que vender. El orden importa:
 primero la sede, después el tipo de clase, después el plan.
 
+Antes de vender, sube el QR de transferencia del estudio en **Ajustes › QR
+del estudio**: es el que la clienta ve al pagar en la app, y la app usa el
+nuevo apenas lo subes. Mientras no subas ninguno, la página dice «Es el QR de
+prueba del servidor».
+
 ### Sucursales
 
 1. **Ajustes › Sucursales**. La lista está vacía. Pulsa **Nueva sucursal**.
@@ -898,6 +903,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Ajustes › Planes | Los ocho planes, vigencia, tope, precio | 2 |
 | Ajustes › Sucursales | Sedes y su archivo | 2, 18 |
 | Ajustes › Reglas del estudio | Las reglas que puedes cambiar y las fijas | 1 |
+| Ajustes › QR del estudio | El QR de transferencia que ven las clientas | 2 |
 ### App de clientas
 
 | Dónde | Qué haces ahí | Paso |
