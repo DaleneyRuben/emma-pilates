@@ -30,8 +30,12 @@ falta crearla para entender el resto.
   botón o el menú.
 - En el teléfono, la barra de abajo de la app de clientas tiene cuatro
   pestañas: **Inicio**, **Reservar**, **Mis Reservas** y **Perfil**.
-- En la web, el menú está a la izquierda en una ventana ancha. En una ventana
-  angosta se abre con **Abrir menú**.
+- En la web, el menú es un riel de íconos a la izquierda con nueve destinos:
+  **Inicio**, **Horario**, **Clientas**, **Promociones**, **Comentarios**,
+  **Dinero**, **Estudio**, **Informes** y **Ajustes**. Cada destino tiene
+  pestañas arriba. La guía los escribe así: **Ajustes › Planes** es el
+  destino **Ajustes**, pestaña **Planes**. En una ventana angosta el riel se
+  abre con **Abrir menú**.
 - Un panel se abre por la derecha. **Guardar** lo cierra cuando los datos
   sirven. **Cerrar** o Escape lo cierra sin guardar.
 - Las fechas se escriben `dd/mm/aaaa` y las horas `HH:mm`, en 24 horas. El
@@ -169,11 +173,11 @@ o abre el archivo `activation` del buzón local, y entra al enlace. Llegas a
 siete días y sirve una vez.
 
 Entra a la web con el correo de Ana y esa contraseña. La primera pantalla es
-**Horario**, vacía, con un aviso de que todavía no hay sucursal.
+**Inicio**: lo que hay por resolver, el día en el estudio y el dinero. Con
+el estudio vacío no hay nada que mostrar todavía.
 
-Antes de seguir, abre el menú de tu cuenta (tu nombre, arriba) y mira
-**Reglas del estudio**. Ahí viven las reglas que el resto del recorrido va a
-obedecer. Déjalas como vienen, y léelas:
+Antes de seguir, abre **Ajustes › Reglas del estudio**. Ahí viven las reglas
+que el resto del recorrido va a obedecer. Déjalas como vienen, y léelas:
 
 - Cancelación sin costo hasta 2 h 30 antes de la clase.
 - Una clase se dicta si tiene al menos 2 reservas. El sistema lo revisa 3 h
@@ -197,7 +201,7 @@ primero la sede, después el tipo de clase, después el plan.
 
 ### Sucursales
 
-1. Menú **Sucursales**. La lista está vacía. Pulsa **Nueva sucursal**.
+1. **Ajustes › Sucursales**. La lista está vacía. Pulsa **Nueva sucursal**.
 2. Nombre `Centro`. Dirección, la de verdad o `Av. San Martín 1120`.
    **Guardar**.
 3. La fila aparece en la lista. Ábrela: puedes corregir el nombre. No la
@@ -206,13 +210,13 @@ primero la sede, después el tipo de clase, después el plan.
 
 Arriba a la derecha está el selector de sede. Con una sola sede no hay nada
 que elegir. Cuando crees una segunda, todo lo que depende de una sede
-(horario, caja, equipos, gastos) cambia al cambiar el selector. Clientas,
-pagos, fundadoras y comentarios son del estudio entero: el selector lo dice
-en esas pantallas.
+(horario, caja, insumos, equipos, gastos) cambia al cambiar el selector.
+Clientas, pagos, sueldos, promociones y comentarios son del estudio entero:
+en esas pantallas el selector se reemplaza por **Todo el estudio**.
 
 ### Tipos de clase
 
-1. Menú **Tipos de clase**, **Nuevo tipo de clase**.
+1. **Ajustes › Tipos de clase**, **Nuevo tipo de clase**.
 2. Crea tres. La descripción es obligatoria: es el texto que la clienta lee
    al abrir la clase.
 
@@ -230,7 +234,7 @@ en esas pantallas.
 
 ### Planes
 
-Menú **Planes**, **Nuevo plan**. Crea los ocho de la tabla del estudio, en
+**Ajustes › Planes**, **Nuevo plan**. Crea los ocho de la tabla del estudio, en
 este orden, para que la app los muestre así. **Vigencia** es 30, 60 o 90
 días. **Tope semanal** solo existe en 60 y 90 días; en un plan de 30 días el
 campo está apagado. **Orden en la app** es el número de la fila.
@@ -252,7 +256,7 @@ hecha.
 
 ## Paso 3. Invitar al equipo
 
-Menú **Personal**. Ana ya está en la lista, con rol **Administración** y
+**Estudio › Personal**. Ana ya está en la lista, con rol **Administración** y
 estado **Activo**. Pulsa **Nuevo miembro** para cada persona.
 
 | Nombre | Correo | Teléfono | Rol | Sucursales |
@@ -302,12 +306,12 @@ tu contraseña?**. El correo «Crea una contraseña nueva» dura 30 minutos.
 
 ## Paso 5. Publicar la semana
 
-Vuelve a la web como Ana. Menú **Horario**. Elige la sede **Centro** si el
+Vuelve a la web como Ana. **Horario › Clases**. Elige la sede **Centro** si el
 selector ya tiene más de una.
 
 1. Pulsa **Nueva sesión**. El foco cae en **Una sola vez**.
 2. Tipo de clase **Mat Pilates**. Entrenadora **Daniela Ortiz**. Si Daniela
-   no aparece, no está asignada a esta sede: vuelve a **Personal** y
+   no aparece, no está asignada a esta sede: vuelve a **Estudio › Personal** y
    márcala.
 3. Para aprender el horario de verdad, cambia la frecuencia a **Cada
    semana**. Elige el lunes, la hora `09:00` y deja la duración que propone
@@ -321,10 +325,12 @@ selector ya tiene más de una.
 6. Crea también una clase **Una sola vez**, para mañana, de **Pilates
    Prenatal**, a la hora que quieras. Esa no se repite.
 
-Abre una clase de la grilla. Puedes cambiar la entrenadora de esa ocurrencia,
-moverla o cancelarla. Cancelar una clase sin reservas es directo. Cancelar
-una con reservas avisa a las clientas y devuelve la clase a cada una. Hazlo
-cuando Lucía ya tenga una reserva, en el paso 9.
+Abre una clase de la grilla. El panel muestra quiénes reservaron y la lista
+de espera, y tiene **Reservar a una clienta**. Puedes cambiar la entrenadora
+de esa ocurrencia, moverla, cancelarla o terminar la serie. Los días pasados
+se ven en gris y solo se leen. Cancelar una clase sin reservas es directo.
+Cancelar una con reservas avisa a las clientas y devuelve la clase a cada
+una. Hazlo cuando Lucía ya tenga una reserva, en el paso 9.
 
 En la app del equipo, Daniela abre **Mi agenda**. La tira de días dice
 `Lun 26`, `Mié 28`, y así. Al tocar el lunes aparece la clase de las 09:00,
@@ -387,7 +393,8 @@ En la app del equipo, Ana (o la dueña desde la web) recibe la novedad.
 1. Entra a la app del equipo como Ana. **Pagos pendientes** muestra el pago
    de Lucía. Ábrelo. La foto del comprobante se puede ampliar. **Confirmar
    pago** permanece apagado hasta que la foto cargó. Confírmalo.
-2. Lo mismo se puede hacer en la web, menú **Pagos**: abre la fila, mira el
+2. Lo mismo se puede hacer en la web, en **Dinero › Pagos**, o desde la fila
+   del pago en **Inicio**: abre la fila, mira el
    comprobante y confirma. Si el comprobante no sirve, rechaza y escribe el
    motivo. Lucía lo ve en la app como **Comprobante rechazado** y puede subir
    otro.
@@ -402,7 +409,7 @@ Cuando el pago queda confirmado:
 - Daniela queda como quien trajo a Lucía, por el código. Esa comisión aparece
   en el paso 15.
 
-Vuelve a **Pagos** en la web. La fila de Lucía muestra el NIT y el nombre.
+Vuelve a **Dinero › Pagos** en la web. La fila de Lucía muestra el NIT y el nombre.
 Pulsa **Marcar emitida** cuando la factura ya salió del sistema de
 facturación. El filtro **Sin factura emitida** esconde las que ya marcaste.
 **Anular venta** deshace una venta confirmada por error. No devuelve dinero.
@@ -479,7 +486,7 @@ Cierra la sesión de Ana en la app del equipo y entra como Camila.
    nota. **Cerrar caja**.
 3. La pantalla queda en **Caja cerrada**. Cerrar otra vez el mismo día, en la
    misma sede, no crea un segundo cierre.
-4. Ana ve el historial en la web, menú **Caja**, y puede cambiar de sede con
+4. Ana ve el historial en la web, en **Dinero › Caja**, y puede cambiar de sede con
    el selector. Un pago anulado o registrado después del cierre aparece como
    un ajuste al lado del cierre. El cierre en sí no se edita.
 
@@ -497,7 +504,9 @@ Entra a la app del equipo como Ana.
 3. **Ver la app como…** está en el perfil de Ana. El paso 16 lo recorre
    cuando las otras roles ya tienen algo que ver.
 
-En la web, abre la ficha de Lucía desde **Clientes**. Además de sus datos:
+En la web, abre la ficha de Lucía desde **Clientas › Todas**. Tiene cuatro
+pestañas: **Resumen**, **Reservas**, **Pagos** y **Evaluaciones**. Además de
+sus datos:
 
 - **Editar perfil** cambia nombre y teléfono. El correo de acceso lo cambia
   ella, desde su app.
@@ -514,13 +523,14 @@ Estos tres viven de un plan ya pagado. Hazlos en este orden.
 
 ### Fundadora
 
-En la web, menú **Fundadoras**. Lucía ya está en la lista, como la n.º 1: su
+En la web, **Clientas › Todas** con el filtro **Fundadora**. Lucía aparece
+como **Fundadora n.º 1**: su
 primer pago confirmado la hizo fundadora sola en el paso 7. Nadie la marca a
 mano.
 
 1. El descuento es 15 % en cualquier plan menos la clase suelta, y queda en
    la persona, no en el plan. La siguiente compra de Lucía, que no sea la
-   clase suelta, lo muestra en el pago. En **Pagos** la fila guarda el monto
+   clase suelta, lo muestra en el pago. En **Dinero › Pagos** la fila guarda el monto
    descontado.
 2. El lugar 41 se niega: la clienta número 41 paga el precio de lista y sí
    recibe la clase de regalo. Si Lucía deja pasar más de 7 días entre el fin
@@ -539,8 +549,9 @@ tiene un plan de 30 días, así que este paso necesita un trimestral.
    siguiente al fin del plan actual. Sube el comprobante y Ana lo confirma.
 2. En **Mi plan**, pide el congelamiento: fecha de inicio, fecha de fin
    dentro de los 15 días, y un motivo. No puede empezar ayer.
-3. Ana lo ve en la app del equipo, en **Congelamientos**, y en la web en el
-   menú **Congelamientos**. Lo aprueba. El fin del plan se corre exactamente
+3. Ana lo ve en la app del equipo, en **Congelamientos**, y en la web en
+   **Clientas › Congelamientos** y en **Inicio**. Lo aprueba (la
+   coordinadora también puede). El fin del plan se corre exactamente
    esos días.
 4. Durante esos días, Lucía no puede reservar. Al aprobar, ella recibe el
    aviso.
@@ -588,7 +599,7 @@ En la app de Lucía:
 4. Gabriela ve la reserva en su agenda, con el nombre de Lucía. Puede
    cancelarla desde ahí. La nota dice que se le avisará a Lucía.
 
-En la web, **Evaluaciones nutricionales** lista las mismas reservas. Es una
+En la web, **Horario › Nutrición** lista las mismas reservas. Es una
 lectura. El costo de Bs 50 por consulta entra al resultado del mes como costo
 de la nutricionista, no como un gasto que tengas que tipear.
 
@@ -629,7 +640,7 @@ En la web, como Ana.
 
 ### Promociones
 
-1. Menú **Promociones**. Pulsa la acción de crear. Una promoción nueva nace
+1. **Promociones › Carrusel**. Pulsa la acción de crear. Una promoción nueva nace
    como **Borrador**.
 2. Escribe el título y el texto, y sube la imagen. Guárdala. Sigue en
    borrador: la app no la muestra.
@@ -637,20 +648,20 @@ En la web, como Ana.
    Lucía la ve en el carrusel de **Inicio**. El orden de las tarjetas en la
    web es el orden del carrusel.
 4. Finalízala. Desaparece de la app y queda **Finalizada** en la lista.
-5. Desde promociones se abre **Contactos**: las clientas que aceptaron
+5. **Promociones › Contactos**: las clientas que aceptaron
    recibir promociones. Lucía tiene ese interruptor en su **Perfil**.
    Apágalo y vuelve a la web: su fila deja de estar disponible para un envío.
 
 ### Referidos
 
-Menú **Referidos**. Cuando Valeria se registró con el código de Lucía, la
-fila aparece aquí: quién invitó a quién, y si la invitada ya compró. Es una
-lectura. El premio, la clase extra, ya se sumó sola en el paso 11.
+**Promociones › Referidos**. Cuando Valeria se registró con el código de
+Lucía, la fila aparece aquí: quién invitó a quién, y si la invitada ya
+compró. Es una lectura. En **Clientas › Todas**, la columna **Invitada por**
+de Valeria dice Lucía. El premio, la clase extra, ya se sumó sola en el paso 11.
 
 ### Campaña
 
-En **Clientes**, abre la campaña (la página no tiene una entrada propia en el
-menú). Escribe un motivo, por ejemplo `Inicio de año`, y **Clases extra**
+**Promociones › Clases de campaña**. Escribe un motivo, por ejemplo `Inicio de año`, y **Clases extra**
 `1`. Elige a las clientas con plan vigente. Guardar suma la clase a cada una,
 con ese motivo, sin cambiar ningún precio. Una fundadora no acumula la
 campaña con su descuento: el descuento ya está en el precio, y la clase extra
@@ -658,19 +669,20 @@ es otra cosa. El sistema no deja usar la campaña como un descuento.
 
 ### Comentarios
 
-Menú **Comentarios**. El texto que Lucía envió desde la app está aquí, con
-la app, el tipo y la versión. Ábrelo, escribe **Qué cambiamos** y márcalo
-revisado. Puedes filtrar por estado y por app, y exportar el CSV. La
-coordinadora puede enviar comentarios desde su app y no puede abrir esta
-lista.
+**Comentarios**, en el riel. El texto que Lucía envió desde la app está
+aquí, con la app, el tipo y la versión. Ábrelo, escribe **Qué cambiamos** y
+márcalo revisado. Puedes filtrar por estado y por app, y exportar el CSV. Un
+comentario nuevo también aparece en **Inicio**. La coordinadora también
+abre esta lista.
 
 ## Paso 15. Dinero, equipo y el mes
 
-Todo esto es de la dueña. La coordinadora no ve estas pantallas.
+**Dinero** es solo de la dueña. **Estudio › Insumos** y **Estudio ›
+Equipos** también los usa la coordinadora, sin montos.
 
 ### Equipos
 
-1. Menú **Equipos**, con la sede **Centro**. **Nuevo equipo**. Crea 8
+1. **Estudio › Equipos**, con la sede **Centro**. **Nuevo equipo**. Crea 8
    reformers y 8 cadillacs, numerados, y los mats que uses. El número se
    repite dentro de la sede y el sistema lo rechaza.
 2. Daniela, en la app, abre una clase de reformer y **Reportar una falla**.
@@ -682,20 +694,24 @@ Todo esto es de la dueña. La coordinadora no ve estas pantallas.
 
 ### Insumos
 
-Menú **Insumos**. Crea un insumo con su stock mínimo. Registra una entrada y
-una salida. Cuando el stock baja del mínimo, la entrada del menú muestra el
-aviso **con stock bajo**.
+**Estudio › Insumos**. Crea un insumo con su stock mínimo. Registra una
+entrada y una salida; **Retiros del mes** lista las salidas. Cuando el stock
+baja del mínimo, el riel muestra un número en **Estudio** e **Inicio** lo
+lista en **Por resolver**.
 
 ### Gastos
 
-1. Menú **Categorías de gasto**. Crea `Alquiler`, `Luz` y `Limpieza`. Son del
-   estudio, no de una sede.
-2. Menú **Gastos**. **Registrar gasto**: categoría, monto, fecha y sede.
+1. **Dinero › Gastos**, **Editar categorías**. Crea `Alquiler`, `Luz` y
+   `Limpieza`. Son del estudio, no de una sede.
+2. **Nuevo gasto**: categoría, monto, fecha y sede.
    Un gasto de `300,50` se guarda como `Bs 300,50`.
 
-### Nómina y liquidaciones
+### Sueldos
 
-1. Menú **Pagos a instructoras**. Elige el mes actual. **Calcular mes**.
+1. **Dinero › Sueldos**, vista **Por aprobar**. Elige el período: **Día**,
+   **Semana**, **Rango** o **Mes**, y la fecha. **Calcular**. Un período no
+   se cruza con otro ya liquidado de la misma persona: una clase nunca se
+   paga dos veces.
    Daniela aparece si ya dictó una clase cuyo cierre de ventana ya pasó, o
    si ya se confirmó el primer plan de Lucía.
 2. Lee las líneas. Una clase con hasta 4 reservas al cierre de la ventana
@@ -704,48 +720,53 @@ aviso **con stock bajo**.
    clase cancelada por no llegar al mínimo de 2 paga Bs 25 a la instructora.
    El primer plan de Lucía paga el 10 % de lo que ella realmente pagó, una
    sola vez, en el mes en que se confirmó el pago.
-3. **Aprobar**. La tarjeta pasa a **Aprobado** y **Nómina** gana una fila por
-   ese monto. Calcular el mes otra vez no duplica el pago.
-4. Menú **Pago a la coordinadora**. Sin coordinadora, el mes no tiene a
-   quién liquidar. Cuando la invites, el cálculo es Bs 3.500 de base, más
+3. **Aprobar**. La tarjeta pasa a **Aprobado** y la vista **Pagados** gana
+   una fila por ese monto. Calcular el período otra vez no duplica el pago.
+4. La coordinadora cobra por mes: su tarjeta aparece en **Por aprobar** solo
+   con el período **Mes**. Sin coordinadora, el mes no tiene a quién
+   liquidar. Cuando la invites, el cálculo es Bs 3.500 de base, más
    Bs 50 por cada clienta nueva en un plan de 30 días y Bs 80 en uno de 60 o
    90, más Bs 400 si la renovación del mes llega a la meta. La clase suelta,
    el regalo y la invitada no generan esa comisión. Si la clienta llegó por
    una instructora, cobra la instructora y no la coordinadora.
-5. Menú **Nómina** lista los sueldos registrados. **Registrar pago** anota
+5. La vista **Pagados** lista los sueldos registrados, también los de
+   recepción y limpieza. **Registrar pago** anota
    un pago ya hecho, con persona, monto y fecha. **Comprobante** es
    opcional: sube la foto de la transferencia (JPG, PNG o WebP, hasta 10 MB).
    Para agregarla a un pago ya anotado, ábrelo, sube la foto y **Guardar**.
    La columna **Comprobante** muestra **Ver** cuando el pago tiene foto.
 6. En la app del equipo, Daniela abre **Tu cuenta** y luego **Mis pagos**.
-   Ve una tarjeta por mes, la más nueva arriba, con **Borrador** o
+   Ve una tarjeta por liquidación, la más nueva arriba, con **Borrador** o
    **Aprobado**, el total y la suma por concepto: clases dictadas,
    canceladas por mínimo y comisiones. **Ver cada clase** abre una línea por
    clase con sus alumnas y extras. Un borrador avisa que puede cambiar hasta
    que administración lo apruebe. Abajo, **Pagos recibidos** lista lo
-   que **Nómina** registró para ella, con fecha y monto. Un pago con foto
+   que **Dinero › Sueldos › Pagados** registró para ella, con fecha y monto. Un pago con foto
    muestra **Ver** y la abre a pantalla completa. Solo ve lo suyo. La
    coordinadora, la recepcionista y la nutricionista no tienen esa fila.
 
 ### El mes
 
-1. Menú **Reporte**. Elige el mes y la sede, o todas. Ves el ingreso en
+1. **Informes › Dinero**. Elige el período y la sede, o todas. Ves el ingreso en
    efectivo de la sede, y el ingreso por transferencia en la vista de todas
    las sedes. Los gastos de la sede están al lado. Un pago a personal es del
-   estudio: aparece en todas las sedes, no dentro de una sola.
-2. Menú **Indicadores**. Pide recalcular si el mes todavía no tiene cifras.
+   estudio: aparece en todas las sedes, no dentro de una sola. Más abajo
+   están las finanzas del mes: resultado, impuesto, punto de equilibrio y el
+   presupuesto frente a lo gastado.
+2. **Informes › El mes**. Pide recalcular si el mes todavía no tiene cifras.
    Son cantidades y montos del estudio: ocupación, clientas nuevas,
    renovación, ingreso cobrado e ingreso devengado por los días de vigencia.
    La coordinadora, cuando entre, ve las cantidades y no los montos.
-3. Menú **Recomendaciones**. Son reglas sobre el mes ya calculado: una clase
+3. Más abajo en **El mes** están las **Recomendaciones**, que también se
+   ven en **Inicio**. Son reglas sobre el mes ya calculado: una clase
    que no llena, un horario flojo, un gasto por encima del presupuesto. Con
    pocos días de datos la lista puede estar vacía. Eso es un mes joven, no
    un fallo.
-4. Menú **Simulador**. No lee la sede ni las ventas. Cambias precios, metas
+4. **Informes › Simulador**. No lee la sede ni las ventas. Cambias precios, metas
    y costos y ves un mes hipotético. Nada de lo que guardes aquí modifica un
    plan ni un pago.
 
-La fecha de apertura, en **Reglas del estudio**, decide en qué tramo de meta
+La fecha de apertura, en **Ajustes › Reglas del estudio**, decide en qué tramo de meta
 está el mes: 80 % los primeros seis meses, 85 % los siguientes seis, 90 %
 después.
 
@@ -765,18 +786,23 @@ sus clases, y con Gabriela, para ver **Mi disponibilidad**.
 
 ### Como coordinadora
 
-En la web, **Personal**, **Nuevo miembro**. Rol **Coordinador**. No elige
-sede. Invítala y deja que active su cuenta.
+En la web, **Estudio › Personal**, **Nuevo miembro**. Rol **Coordinador**.
+No elige sede. Invítala y deja que active su cuenta.
 
-Entra a la web con ella:
+Entra a la web con ella. Es el contacto con clientas y equipo, sin dinero:
 
-- Ve **Horario**, **Clientes**, **Para contactar**, **Personal** en lectura,
-  **Indicadores** en cantidades y **Recomendaciones** operativas.
-- No ve **Pagos**, **Caja**, **Nómina**, **Gastos**, **Reporte** con montos,
-  **Simulador**, **Promociones** ni **Comentarios**. Una dirección de esas,
-  escrita a mano, dice que no tiene permiso.
-- En **Clientes** puede abrir a Lucía y **Editar perfil**. No ve **Devolver
-  una clase** ni **Anular venta**.
+- El riel no tiene **Dinero**. **Inicio** muestra un resumen de clientas en
+  lugar del dinero, y sus pendientes no incluyen pagos ni sueldos.
+- Ve **Horario** (clases y nutrición, y puede reservar a una clienta),
+  **Clientas** (todas, para contactar y congelamientos, que puede aprobar o
+  rechazar), **Promociones** (puede crear y publicar en el carrusel; no ve
+  **Clases de campaña**), **Comentarios**, **Estudio** (personal solo para
+  asignar sedes, insumos y equipos), **Informes › El mes** sin montos y
+  **Ajustes › Reglas del estudio** solo para leer.
+- En la ficha de Lucía no tiene la pestaña **Pagos**, ni **Clase de
+  cortesía**, ni **Devolver una clase**: esas se las pide a la dueña.
+- Una dirección de **Dinero**, escrita a mano, la devuelve con el aviso de
+  que no tiene permiso.
 
 En la app del equipo entra a **Buscar cliente**, sin **+ Nuevo cliente** y
 sin **Registrar pago en efectivo**. Tiene **Cancelar una clase** y **Para
@@ -787,7 +813,7 @@ lista puede tener una fila o ninguna, según el día.
 
 ### Los primeros 90 días
 
-Menú **Para contactar** en la web, como Ana. Es la misma lista, con el motivo
+**Clientas › Para contactar** en la web, como Ana. Es la misma lista, con el motivo
 al lado de cada nombre. Contactar a alguien no se anota solo: cuando la
 llames, registra el contacto si la fila ofrece marcarlo. Si no ofrece la
 marca, la lista es una lectura y el registro queda en tu propia nota.
@@ -816,22 +842,22 @@ verlos, deja la semana creada y espera, o acepta leerlos al día siguiente.
   recordatorio del plan sale cuando la fecha de fin está cerca. Hace falta
   que el teléfono tenga permiso de avisos. En Expo Go los avisos push no
   llegan. Llegan en un build de desarrollo o en la app de la tienda.
-- Una vez por noche se recalculan los indicadores del mes. **Indicadores**
-  también tiene la acción de recalcular ahora, si no quieres esperar.
+- Una vez por noche se recalculan los indicadores del mes. **Informes › El
+  mes** también tiene la acción de recalcular ahora, si no quieres esperar.
 
 ## Paso 18. Segunda sede, archivo y recuperación
 
 Cuando el recorrido de una sede ya se entiende:
 
-1. Crea **Norte** en **Sucursales**. Asígnale a Daniela también, o invita a
-   otra entrenadora y asígnale solo Norte.
-2. Cambia el selector a Norte. **Horario**, **Caja**, **Equipos** y
-   **Gastos** están vacíos. **Clientes** sigue mostrando a Lucía: las
-   clientas son del estudio.
+1. Crea **Norte** en **Ajustes › Sucursales**. Asígnale a Daniela también,
+   o invita a otra entrenadora y asígnale solo Norte.
+2. Cambia el selector a Norte. **Horario**, **Dinero › Caja**, **Estudio ›
+   Equipos** y **Dinero › Gastos** están vacíos. **Clientas** sigue
+   mostrando a Lucía: las clientas son del estudio.
 3. Publica una clase en Norte y reserva desde la app eligiendo esa sede.
 4. Archiva un tipo de clase que ninguna semana vigente use. Desaparece del
    alta de sesiones y sigue en las clases ya creadas.
-5. En **Personal**, abre a una persona de prueba y **Desactivar cuenta**. No
+5. En **Estudio › Personal**, abre a una persona de prueba y **Desactivar cuenta**. No
    puede entrar a la app. Sus clases pasadas siguen en el historial.
 6. En el acceso de la app, **¿Olvidaste tu contraseña?** con el correo de
    Lucía manda el enlace de 30 minutos. Abrirlo deja crear otra contraseña.
@@ -845,36 +871,33 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 
 ### Web de administración
 
-| Menú | Qué haces ahí | Paso |
+| Destino › pestaña | Qué haces ahí | Paso |
 | --- | --- | --- |
-| Horario | Publicar, mover y cancelar clases | 5, 10 |
-| Tipos de clase | Nombre, descripción, capacidad, equipo | 2 |
-| Planes | Los ocho planes, vigencia, tope, precio | 2 |
-| Sucursales | Sedes y su archivo | 2, 18 |
-| Clientes | Ficha, perfil, cortesía, acceso de prueba, campaña | 10, 11, 14 |
-| Para contactar | Seguimiento de los primeros 90 días | 16 |
-| Fundadoras | Los 40 lugares y el 15 % | 11 |
-| Congelamientos | Aprobar el congelamiento de un trimestral | 11 |
-| Pagos | Confirmar, rechazar, anular, marcar factura | 7 |
-| Caja | Historial del cierre diario por sede | 9 |
-| Insumos | Stock, entradas, salidas, mínimo | 15 |
-| Equipos | Reformers, cadillacs, mats y fallas | 15 |
-| Evaluaciones nutricionales | Lectura de las consultas | 12 |
-| Personal | Invitar, cambiar rol y sede, desactivar | 3, 16 |
-| Pagos a instructoras | Calcular y aprobar el mes | 15 |
-| Pago a la coordinadora | Calcular y aprobar el mes | 15 |
-| Nómina | Registrar el sueldo pagado y su comprobante | 15 |
-| Gastos | Gastos de la sede | 15 |
-| Categorías de gasto | Nombres del estudio | 15 |
-| Reporte | Ingreso y gasto del mes | 15 |
-| Indicadores | Cantidades y montos del mes | 15 |
-| Recomendaciones | Reglas sobre el mes | 15 |
-| Simulador | Un mes hipotético, sin tocar ventas | 15 |
-| Promociones | Borrador, publicar, finalizar, contactos | 14 |
-| Referidos | Quién invitó a quién | 14 |
+| Inicio | Por resolver, el día, el dinero y las recomendaciones | 1, 7, 11, 15 |
+| Horario › Clases | Publicar, mover y cancelar clases; quién reservó; reservar a una clienta | 5, 10 |
+| Horario › Nutrición | Lectura de las consultas | 12 |
+| Clientas › Todas | Ficha con pestañas, filtro Fundadora, «Invitada por», cortesía, acceso de prueba | 10, 11 |
+| Clientas › Para contactar | Seguimiento de los primeros 90 días | 16 |
+| Clientas › Congelamientos | Aprobar el congelamiento de un trimestral | 11 |
+| Promociones › Carrusel | Borrador, publicar, finalizar | 14 |
+| Promociones › Clases de campaña | Clases extra para las clientas con plan | 14 |
+| Promociones › Referidos | Quién invitó a quién | 14 |
+| Promociones › Contactos | Quién acepta recibir promociones | 14 |
 | Comentarios | Lo que llega de las apps | 14 |
-| Reglas del estudio | Menú de la cuenta, no del lateral | 1 |
-
+| Dinero › Pagos | Confirmar, rechazar, anular, marcar factura | 7 |
+| Dinero › Caja | Historial del cierre diario por sede | 9 |
+| Dinero › Sueldos | Calcular y aprobar por período; sueldos pagados y su comprobante | 15 |
+| Dinero › Gastos | Gastos de la sede y sus categorías | 15 |
+| Estudio › Personal | Invitar, cambiar rol y sede, desactivar | 3, 16 |
+| Estudio › Insumos | Stock, entradas, salidas, mínimo, retiros del mes | 15 |
+| Estudio › Equipos | Reformers, cadillacs, mats y fallas | 15 |
+| Informes › El mes | Cantidades y montos del mes, informe y recomendaciones | 15 |
+| Informes › Dinero | Ingreso, gasto y finanzas del período | 15 |
+| Informes › Simulador | Un mes hipotético, sin tocar ventas | 15 |
+| Ajustes › Tipos de clase | Nombre, descripción, capacidad, equipo | 2 |
+| Ajustes › Planes | Los ocho planes, vigencia, tope, precio | 2 |
+| Ajustes › Sucursales | Sedes y su archivo | 2, 18 |
+| Ajustes › Reglas del estudio | Las reglas que puedes cambiar y las fijas | 1 |
 ### App de clientas
 
 | Dónde | Qué haces ahí | Paso |
