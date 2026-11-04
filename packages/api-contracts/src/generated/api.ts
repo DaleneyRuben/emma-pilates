@@ -246,7 +246,10 @@ import type {
   SessionScheduleEndDto,
   SessionScheduleEndInputDto,
   SessionScheduleInputDto,
+  SessionSchedulePauseDto,
+  SessionSchedulePauseInputDto,
   SessionScheduleReplacementDto,
+  SessionScheduleResumeDto,
   SetClientPhotoDto,
   SetPromotionsConsentDto,
   SetTrainerReferralCodeDto,
@@ -11549,6 +11552,249 @@ export const useCreateSessionSchedules = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(
     getCreateSessionSchedulesMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type pauseSessionScheduleResponse200 = {
+  data: SessionSchedulePauseDto;
+  status: 200;
+};
+
+export type pauseSessionScheduleResponseSuccess =
+  pauseSessionScheduleResponse200 & {
+    headers: Headers;
+  };
+export type pauseSessionScheduleResponse = pauseSessionScheduleResponseSuccess;
+
+export const getPauseSessionScheduleUrl = (scheduleId: string) => {
+  return `/api/v1/administrator/session-schedules/${scheduleId}/pause`;
+};
+
+export const pauseSessionSchedule = async (
+  scheduleId: string,
+  sessionSchedulePauseInputDto: SessionSchedulePauseInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<pauseSessionScheduleResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getPauseSessionScheduleUrl(scheduleId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(sessionSchedulePauseInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: pauseSessionScheduleResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as pauseSessionScheduleResponse;
+};
+
+export const getPauseSessionScheduleMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof pauseSessionSchedule>>,
+    TError,
+    PauseSessionScheduleMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof pauseSessionSchedule>>,
+  TError,
+  PauseSessionScheduleMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["pauseSessionSchedule"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof pauseSessionSchedule>>,
+    PauseSessionScheduleMutationVariables
+  > = (props) => {
+    const { scheduleId, data } = props ?? {};
+
+    return pauseSessionSchedule(scheduleId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PauseSessionScheduleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof pauseSessionSchedule>>
+>;
+export type PauseSessionScheduleMutationBody = SessionSchedulePauseInputDto;
+export type PauseSessionScheduleMutationError = unknown;
+export type PauseSessionScheduleMutationVariables = {
+  scheduleId: string;
+  data: SessionSchedulePauseInputDto;
+};
+
+export const usePauseSessionSchedule = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof pauseSessionSchedule>>,
+      TError,
+      PauseSessionScheduleMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof pauseSessionSchedule>>,
+  TError,
+  PauseSessionScheduleMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getPauseSessionScheduleMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type resumeSessionScheduleResponse200 = {
+  data: SessionScheduleResumeDto;
+  status: 200;
+};
+
+export type resumeSessionScheduleResponseSuccess =
+  resumeSessionScheduleResponse200 & {
+    headers: Headers;
+  };
+export type resumeSessionScheduleResponse =
+  resumeSessionScheduleResponseSuccess;
+
+export const getResumeSessionScheduleUrl = (scheduleId: string) => {
+  return `/api/v1/administrator/session-schedules/${scheduleId}/resume`;
+};
+
+export const resumeSessionSchedule = async (
+  scheduleId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<resumeSessionScheduleResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getResumeSessionScheduleUrl(scheduleId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resumeSessionScheduleResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as resumeSessionScheduleResponse;
+};
+
+export const getResumeSessionScheduleMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resumeSessionSchedule>>,
+    TError,
+    ResumeSessionScheduleMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resumeSessionSchedule>>,
+  TError,
+  ResumeSessionScheduleMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["resumeSessionSchedule"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resumeSessionSchedule>>,
+    ResumeSessionScheduleMutationVariables
+  > = (props) => {
+    const { scheduleId } = props ?? {};
+
+    return resumeSessionSchedule(scheduleId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResumeSessionScheduleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof resumeSessionSchedule>>
+>;
+
+export type ResumeSessionScheduleMutationError = unknown;
+export type ResumeSessionScheduleMutationVariables = { scheduleId: string };
+
+export const useResumeSessionSchedule = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resumeSessionSchedule>>,
+      TError,
+      ResumeSessionScheduleMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof resumeSessionSchedule>>,
+  TError,
+  ResumeSessionScheduleMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getResumeSessionScheduleMutationOptions(options),
     queryClient,
   );
 };
