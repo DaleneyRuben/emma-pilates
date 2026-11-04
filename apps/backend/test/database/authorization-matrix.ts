@@ -5,6 +5,7 @@ import { payStatementAuthorizationRows } from './pay-statement-authorization';
 import { scheduleAuthorizationRows } from './schedule-authorization';
 import { studioFactsAuthorizationRows } from './studio-facts-authorization';
 import { supplyMovementAuthorizationRows } from './supply-movement-authorization';
+import { transferQrAuthorizationRows } from './transfer-qr-authorization';
 import type { RealIds } from './authorization-matrix-support';
 
 // IDN-009 / ADR-0102 / ADR-0108: every endpoint the API serves, with an
@@ -466,6 +467,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     },
   }),
   ...campaignAuthorizationRows(),
+  ...transferQrAuthorizationRows(),
 };
 
 /** A concrete address for a templated path. */

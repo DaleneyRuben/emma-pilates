@@ -272,6 +272,12 @@ describe('TransferInstructionsController', () => {
   const controller = new TransferInstructionsController(
     {
       qrImagePath: '.data/transfer-qr.png',
+      storage: {
+        put: jest.fn(),
+        replace: jest.fn(),
+        get: jest.fn(),
+        delete: jest.fn(),
+      },
     },
     resolvePrincipal,
   );
