@@ -187,6 +187,16 @@ describe("AW21 Clientes on a desktop browser", () => {
     ).toBeInTheDocument();
   });
 
+  it("leaves the campaign to Promociones (follow-up 232)", async () => {
+    server.use(clientTable(() => jsonResponse(clientPage([lucia]))));
+    renderAdmin("/clientas");
+    await screen.findByRole("cell", { name: /Lucía Fernández/ });
+
+    expect(
+      screen.queryByRole("link", { name: "Dar clases de campaña" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("is studio-wide: «Todo el estudio» instead of the Branch selector", async () => {
     server.use(clientTable(() => jsonResponse(clientPage([lucia]))));
     renderAdmin("/clientas");
