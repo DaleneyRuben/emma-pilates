@@ -6,7 +6,11 @@ import { coordinatorHomeHandlers, homeHandlers } from "./home-handlers";
 import { apiUrl, jsonResponse, problemResponse } from "./msw";
 import { pendingBadgeHandler } from "./payment-fixtures";
 import { emptyRosterHandler } from "./roster-fixtures";
-import { studioRulesHandler } from "./studio-settings-fixtures";
+import {
+  studioRulesHandler,
+  studioSettings,
+  studioSettingsHandler,
+} from "./studio-settings-fixtures";
 
 export const currentSessionPath =
   "/api/v1/admin-web/authentication-sessions/current";
@@ -36,7 +40,8 @@ export const paolaProfile = {
 // reads the active Branches for the selector, and Horario (the landing page)
 // reads an empty week (and no equipment flags) unless a spec says otherwise; the Pagos badge reads no
 // pending transfers and the Insumos badge a Branch without Supplies; the
-// public studio rules (BKM-004) are today's; a Client file's tabs are empty.
+// public studio rules and the Studio Settings (BKM-004) are today's; a
+// Client file's tabs are empty.
 export const signedInHandlers = () => [
   http.get(apiUrl(currentSessionPath), () => jsonResponse(paolaPrincipal)),
   http.get(apiUrl(staffProfilePath), () => jsonResponse(paolaProfile)),
@@ -52,6 +57,7 @@ export const signedInHandlers = () => [
     jsonResponse({ items: [], totalItems: 0 }),
   ),
   studioRulesHandler(),
+  studioSettingsHandler(),
   ...homeHandlers(),
   ...clientFileHandlers({ payments: true }),
 ];
@@ -91,6 +97,11 @@ export const coordinatorHandlers = () => [
     jsonResponse([]),
   ),
   branchSuppliesHandler(),
+  studioSettingsHandler({
+    ...studioSettings,
+    evaluationPriceCentavos: null,
+    nutritionistFeeCentavos: null,
+  }),
   ...coordinatorHomeHandlers(),
   // She never reads a Payment, so a sales read fails her spec.
   ...clientFileHandlers({ payments: false }),

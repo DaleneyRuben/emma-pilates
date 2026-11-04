@@ -4,7 +4,10 @@ import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { formatCancellationWindow } from "../studio-rules/studio-rules-format";
-import { studioRulesQueryOptions } from "../studio-rules/studio-rules-queries";
+import {
+  studioRulesQueryOptions,
+  studioSettingsQueryOptions,
+} from "../studio-rules/studio-rules-queries";
 import { cancelledNotice } from "./schedule-notices";
 import { scheduleProblem } from "./schedule-problems";
 import { useScheduleChange } from "./use-schedule-change";
@@ -15,6 +18,9 @@ const refundCopy = (
   session: AdministratorSessionAvailabilityDto,
   cancellationWindowMinutes: number | undefined,
 ) => {
+  if (session.bookedCount === 0 && session.waitlistCount === 0) {
+    return "No tiene reservas. Se cancela y desaparece de la app.";
+  }
   const bookings =
     session.bookedCount === 1
       ? "Se cancela la reserva y la clienta recupera su clase"
@@ -32,10 +38,31 @@ const refundCopy = (
   return `${bookings}${window}. ${waitlist} No se puede deshacer.`;
 };
 
-// AW03 and S14: the last-resort cancellation of a Session that has Bookings
-// when no substitute Trainer can cover it. Every Booking is refunded, even
-// inside the Cancellation Window, and booked and waitlisted Clients are
-// notified. A Session without Bookings is cancelled by the 2-hour check.
+type MinimumCheck = { minimumBookings: number; leadMinutes: number };
+
+// The Studio Rule's minimum check (BKM-004): a Session below the minimum is
+// cancelled by the system before it starts. While the rules are unknown the
+// sentence leaves the numbers out and shows only for an empty Session.
+const minimumNote = (
+  bookedCount: number,
+  check: MinimumCheck | undefined,
+): string | null => {
+  if (check === undefined) {
+    return bookedCount === 0
+      ? "Si no llega al mínimo de reservas, el sistema la cancela sola antes de empezar."
+      : null;
+  }
+  if (bookedCount >= check.minimumBookings) return null;
+  const minimum =
+    check.minimumBookings === 1
+      ? "1 reserva"
+      : `${check.minimumBookings} reservas`;
+  return `Si no llega a ${minimum}, el sistema la cancela sola ${formatCancellationWindow(check.leadMinutes)} antes de empezar.`;
+};
+
+// AW03 and S14: cancelling a Session that has not started (FIX-027). Every
+// Booking is refunded, even inside the Cancellation Window, and booked and
+// waitlisted Clients are notified; an empty Session simply leaves the apps.
 export function CancelSessionAction({
   session,
   branchId,
@@ -49,16 +76,17 @@ export function CancelSessionAction({
 }) {
   const change = useScheduleChange(branchId);
   const studioRules = useQuery(studioRulesQueryOptions());
+  const settings = useQuery(studioSettingsQueryOptions());
   const [confirming, setConfirming] = useState(false);
-
-  if (session.bookedCount === 0) {
-    return (
-      <p className="text-center text-ayuda text-texto-tenue">
-        Sin reservas: si sigue vacía, el sistema la cancela sola 2 horas antes
-        de empezar.
-      </p>
-    );
-  }
+  const note = minimumNote(
+    session.bookedCount,
+    settings.data === undefined
+      ? undefined
+      : {
+          minimumBookings: settings.data.minimumBookings,
+          leadMinutes: settings.data.minimumBookingsCheckLeadMinutes,
+        },
+  );
 
   const cancel = async () => {
     try {
@@ -78,6 +106,9 @@ export function CancelSessionAction({
 
   return (
     <>
+      {note === null ? null : (
+        <p className="text-center text-ayuda text-texto-tenue">{note}</p>
+      )}
       <Button
         variant="link"
         className="self-center text-error hover:text-error-texto"

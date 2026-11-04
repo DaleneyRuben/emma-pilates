@@ -74,4 +74,6 @@ export const endedNotice = (
 };
 
 export const cancelledNotice = (affectedBookings: number): string =>
-  `Sesión cancelada: ${count(affectedBookings, "reserva reembolsada", "reservas reembolsadas")} y avisos enviados.`;
+  affectedBookings === 0
+    ? "Sesión cancelada."
+    : `Sesión cancelada: ${count(affectedBookings, "reserva reembolsada", "reservas reembolsadas")} y avisos enviados.`;

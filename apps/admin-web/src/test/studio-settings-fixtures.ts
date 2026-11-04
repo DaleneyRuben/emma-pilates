@@ -39,3 +39,15 @@ export const studioRules = {
 
 export const studioRulesHandler = (rules = studioRules) =>
   http.get(apiUrl(studioRulesPath), () => jsonResponse(rules));
+
+// The Studio Settings as each Role reads them: the Coordinator without the
+// Paid Evaluation's amounts (ADR-0108).
+export const studioSettingsHandler = (
+  settings: Omit<
+    typeof studioSettings,
+    "evaluationPriceCentavos" | "nutritionistFeeCentavos"
+  > & {
+    evaluationPriceCentavos: number | null;
+    nutritionistFeeCentavos: number | null;
+  } = studioSettings,
+) => http.get(apiUrl(studioSettingsPath), () => jsonResponse(settings));

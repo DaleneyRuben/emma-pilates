@@ -52,10 +52,6 @@ const problems: Record<string, Problem> = {
   session_not_cancellable: {
     message: "Esta sesión ya no se puede cancelar: empezó o ya fue cancelada.",
   },
-  session_has_no_bookings: {
-    message:
-      "Esta sesión ya no tiene reservas; si sigue vacía, se cancela sola 2 horas antes.",
-  },
   administration_access_denied: {
     message: "No tienes permiso para cambiar el horario.",
   },
