@@ -5,8 +5,6 @@ import { recordAdministratorAudit } from '../administration/administration-audit
 import { requireAdministrator } from '../administration/administration-errors';
 import { normalizeTransferQr, transferQrStorageKey } from './transfer-qr-image';
 
-export const transferQrReplacedAction = 'studio_transfer_qr.replaced';
-
 export type StudioTransferQrView = { updatedAt: Date | null };
 
 export type StudioTransferQr = {
@@ -28,7 +26,7 @@ export const createStudioTransferQr = (
   read: async (principal) => {
     requireAdministrator(principal);
     const latest = await prisma.auditRecord.findFirst({
-      where: { actionCode: transferQrReplacedAction },
+      where: { actionCode: 'studio_transfer_qr.replaced' },
       orderBy: { occurredAt: 'desc' },
       select: { occurredAt: true },
     });
@@ -41,7 +39,7 @@ export const createStudioTransferQr = (
     await storage.replace(transferQrStorageKey, qr.png);
     const occurredAt = dependencies.now();
     await recordAdministratorAudit(prisma, actor, {
-      actionCode: transferQrReplacedAction,
+      actionCode: 'studio_transfer_qr.replaced',
       targetType: 'studio_transfer_qr',
       targetId: null,
       metadata: {
