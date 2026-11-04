@@ -53,15 +53,6 @@ const freezesRoute = createRoute({
   ),
 });
 
-const foundersRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/clientas/fundadoras",
-  component: lazyRouteComponent(
-    () => import("../oversight/founders/founders-route"),
-    "FoundersRoute",
-  ),
-});
-
 const staffRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/estudio/personal",
@@ -160,7 +151,6 @@ export const backOfficeRoutes = [
   clientsRoute,
   campaignRoute,
   contactAlertsRoute,
-  foundersRoute,
   freezesRoute,
   paymentsRoute,
   cashClosesRoute,

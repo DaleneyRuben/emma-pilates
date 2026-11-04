@@ -13,7 +13,6 @@ export type AdminPath =
   | "/clientas"
   | "/clientas/para-contactar"
   | "/clientas/congelamientos"
-  | "/clientas/fundadoras"
   | "/promociones"
   | "/promociones/clases-de-campana"
   | "/promociones/referidos"
@@ -82,8 +81,6 @@ export type Destination = {
   tabs: readonly NavigationItem[];
 };
 
-// The Fundadoras tab stands in until Fundadora becomes a filter on Todas
-// (WEB-040).
 export const destinations: readonly Destination[] = [
   {
     label: "Inicio",
@@ -127,12 +124,6 @@ export const destinations: readonly Destination[] = [
         list: true,
         studioWide: true,
         coordinator: true,
-      },
-      {
-        label: "Fundadoras",
-        to: "/clientas/fundadoras",
-        list: true,
-        studioWide: true,
       },
     ],
   },
@@ -344,14 +335,18 @@ export const coordinatorMayOpen = (pathname: string): boolean => {
  * The old sidebar's addresses (and the bare destination roots) and the page
  * each now opens, so bookmarks and emailed links keep working.
  */
-export const movedPaths: Readonly<Record<string, AdminPath>> = {
+export const movedPaths: Readonly<
+  Record<string, AdminPath | `${AdminPath}?${string}`>
+> = {
   "/catalogo/tipos-de-clase": "/ajustes/tipos-de-clase",
   "/catalogo/planes": "/ajustes/planes",
   "/catalogo/sucursales": "/ajustes/sucursales",
   "/back-office/clientes": "/clientas",
   "/back-office/clientes/campana": "/promociones/clases-de-campana",
   "/back-office/para-contactar": "/clientas/para-contactar",
-  "/back-office/fundadoras": "/clientas/fundadoras",
+  // WEB-040: Fundadora is a chip on Todas, no longer a page.
+  "/back-office/fundadoras": "/clientas?filter=founder",
+  "/clientas/fundadoras": "/clientas?filter=founder",
   "/back-office/congelamientos": "/clientas/congelamientos",
   "/back-office/pagos": "/dinero/pagos",
   "/back-office/caja": "/dinero/caja",

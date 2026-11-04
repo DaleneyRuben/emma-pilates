@@ -1,10 +1,16 @@
 import { z } from "zod";
 import { listSearchSchema } from "../components/table/pagination";
 
-// AW21: search is the directory's only filter (Clients have no Branch); the
-// backend ignores accents and case (STAFF-004) and caps it at 100 characters.
+/** Clientas › Todas's chips after «Todas» (follow-up 232, WEB-040). */
+export const clientFilters = ["active", "none", "expired", "founder"] as const;
+export type ClientFilter = (typeof clientFilters)[number];
+
+// AW21: a search (Clients have no Branch) and one chip; «Todas» leaves the
+// chip out of the address. The backend ignores accents and case (STAFF-004)
+// and caps the search at 100 characters.
 export const clientSearchSchema = listSearchSchema.extend({
   q: z.string().trim().min(1).max(100).optional().catch(undefined),
+  filter: z.enum(clientFilters).optional().catch(undefined),
 });
 export type ClientSearch = z.infer<typeof clientSearchSchema>;
 

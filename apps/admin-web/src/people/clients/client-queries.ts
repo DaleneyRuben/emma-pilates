@@ -15,6 +15,7 @@ export const clientTableQueryOptions = (search: ClientSearch) => {
     page: search.page,
     pageSize: search.pageSize,
     ...(search.q === undefined ? {} : { q: search.q }),
+    ...(search.filter === undefined ? {} : { filter: search.filter }),
   };
   return queryOptions({
     queryKey: getListAdminClientsQueryKey(params),
