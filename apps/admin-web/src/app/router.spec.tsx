@@ -103,7 +103,7 @@ describe("admin navigation", () => {
   });
 
   // ADR-0102 until BKO-010: operations, never money.
-  it("gives the Coordinator only the pages ADR-0102 opens to her", () => {
+  it("gives the Coordinator only the pages ADR-0102 and ADR-0108 open to her", () => {
     expect(
       destinationsFor("coordinator").map((destination) => ({
         label: destination.label,
@@ -111,10 +111,16 @@ describe("admin navigation", () => {
       })),
     ).toEqual([
       { label: "Inicio", tabs: ["Inicio"] },
-      { label: "Horario", tabs: ["Clases"] },
-      { label: "Clientas", tabs: ["Todas", "Para contactar"] },
-      { label: "Estudio", tabs: ["Personal"] },
+      { label: "Horario", tabs: ["Clases", "Nutrición"] },
+      {
+        label: "Clientas",
+        tabs: ["Todas", "Para contactar", "Congelamientos"],
+      },
+      { label: "Promociones", tabs: ["Carrusel", "Referidos", "Contactos"] },
+      { label: "Comentarios", tabs: ["Comentarios"] },
+      { label: "Estudio", tabs: ["Personal", "Insumos", "Equipos"] },
       { label: "Informes", tabs: ["El mes"] },
+      { label: "Ajustes", tabs: ["Reglas del estudio"] },
     ]);
     expect(destinationsFor("administrator")).toHaveLength(9);
   });

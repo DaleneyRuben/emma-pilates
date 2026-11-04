@@ -11,10 +11,10 @@ import { clientPage } from "../test/people-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { coordinatorHandlers } from "../test/session-handlers";
 
-// IDN-009 / ADR-0102 (follow-up 155): the Coordinator's admin web is Inicio,
-// the schedule, Clientas, Personal, the counts-only Indicadores page, and the
-// recommendations list (BKO-010 widens it). Money pages are neither shown nor opened. Descartar
-// stays off her recommendations page.
+// IDN-009 / ADR-0102 (follow-up 155) and ADR-0108 (follow-up 232): the
+// Coordinator's admin web is every destination but Dinero, with only the
+// tabs that hold no money. Money pages are neither shown nor opened.
+// Descartar stays off her recommendations page.
 describe("the admin web for the Coordinator", () => {
   useMockServer();
   beforeEach(() => server.use(...coordinatorHandlers()));
@@ -22,7 +22,7 @@ describe("the admin web for the Coordinator", () => {
   const heading = (name: string | RegExp) =>
     screen.findByRole("heading", { level: 1, name });
 
-  it("shows only the destinations ADR-0102 opens to her in the rail", async () => {
+  it("shows only the destinations ADR-0108 opens to her in the rail", async () => {
     renderAdmin("/");
     await heading(/^Buen/);
 
@@ -31,9 +31,17 @@ describe("the admin web for the Coordinator", () => {
       within(rail)
         .getAllByRole("link")
         .map((link) => link.textContent),
-    ).toEqual(["Inicio", "Horario", "Clientas", "Estudio", "Informes"]);
+    ).toEqual([
+      "Inicio",
+      "Horario",
+      "Clientas",
+      "Promociones",
+      "Comentarios",
+      "Estudio",
+      "Informes",
+      "Ajustes",
+    ]);
     expect(within(rail).queryByText("Dinero")).not.toBeInTheDocument();
-    expect(within(rail).queryByText("Promociones")).not.toBeInTheDocument();
   });
 
   it.each([
@@ -41,7 +49,10 @@ describe("the admin web for the Coordinator", () => {
     "/informes/dinero",
     "/dinero/sueldos/pagados",
     "/ajustes/planes",
-    "/promociones",
+    "/ajustes/tipos-de-clase",
+    "/ajustes/sucursales",
+    "/clientas/fundadoras",
+    "/dinero/caja",
     "/informes/simulador",
     "/dinero/sueldos?month=2026-12",
     "/promociones/clases-de-campana",

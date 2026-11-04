@@ -35,8 +35,12 @@ export const homeHandlers = () => [
   ),
 ];
 
-// The Coordinator's Inicio reads counts, never money (ADR-0102).
+// The Coordinator's Inicio reads counts, never money (ADR-0102): Para
+// contactar, the requested freezes and the new comments (ADR-0108), and the
+// month's KPIs instead of Dinero.
 export const coordinatorHomeHandlers = () => [
+  http.get(apiUrl(freezesPath), () => jsonResponse([])),
+  http.get(apiUrl(feedbackPath), () => jsonResponse(feedbackPage([]))),
   http.get(apiUrl(kpisPath), () =>
     jsonResponse({
       month: "2026-11",

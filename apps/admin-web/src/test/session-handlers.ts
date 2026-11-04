@@ -52,8 +52,9 @@ export const signedInHandlers = () => [
   ...homeHandlers(),
 ];
 
-// IDN-009: Carolina Rivas, the Coordinator (ADR-0102). Her shell reads no
-// money: no Pagos or Insumos badge handler, so such a read fails the spec.
+// IDN-009: Carolina Rivas, the Coordinator (ADR-0102, ADR-0108). Her shell
+// reads no money: no Pagos badge handler, so such a read fails the spec. She
+// runs Insumos, so the low-stock count answers her.
 export const carolinaPrincipal = {
   accountId: "4a7b0c1e-2f3d-5a6b-8c9d-0e1f2a3b4c5d",
   identity: {
@@ -84,6 +85,7 @@ export const coordinatorHandlers = () => [
   http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
     jsonResponse([]),
   ),
+  branchSuppliesHandler(),
   ...coordinatorHomeHandlers(),
 ];
 
