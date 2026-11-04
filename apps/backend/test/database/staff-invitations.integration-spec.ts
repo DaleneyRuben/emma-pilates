@@ -156,11 +156,12 @@ describe('Prisma staff invitations', () => {
   });
 
   // FIX-030: Camila's phone, typed when she was invited, stays on her row,
-  // and inviting her again with a phone fills the one she lacked.
+  // and inviting her again with a phone fills the one she lacked; both are
+  // stored with the implicit +591 (decision §19.20).
   it('keeps the phone of an invitation and of a reopened one', async () => {
     await expect(
       invite('camila.phone@example.com', '70000001'),
-    ).resolves.toMatchObject({ phone: '70000001' });
+    ).resolves.toMatchObject({ phone: '+591 70000001' });
 
     const first = await invite('camila.later@example.com');
     later();
@@ -169,7 +170,7 @@ describe('Prisma staff invitations', () => {
     ).resolves.toMatchObject({
       id: first.id,
       invitationReopened: true,
-      phone: '70000002',
+      phone: '+591 70000002',
     });
   });
 
