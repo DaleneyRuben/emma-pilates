@@ -4,7 +4,7 @@ import {
 } from '../../generated/prisma/enums';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
+import { boliviaDate, boliviaInstant } from '../../time/bolivia-time';
 import { materializeSchedule } from '../sessions/prisma-session-materializer';
 import {
   AdministrationError,
@@ -130,7 +130,13 @@ export const createPrismaSchedulePauses = (
             sessionScheduleId: old.id,
             state: SessionState.CANCELLED,
             cancellationCause: SessionCancellationCause.SCHEDULE_PAUSED,
-            startsAt: { gt: now },
+            // Never past the series' own end (review of pull request #286).
+            startsAt: {
+              gt: now,
+              ...(old.effectiveUntil === null
+                ? {}
+                : { lt: boliviaInstant(old.effectiveUntil, 0) }),
+            },
           },
           orderBy: { startsAt: 'asc' },
           select: {

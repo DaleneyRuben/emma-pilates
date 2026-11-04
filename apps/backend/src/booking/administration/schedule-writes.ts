@@ -167,3 +167,26 @@ export const createAndMaterialize = async (
   });
   return { schedule, ...counts };
 };
+
+type Pause = { pausedFrom: Date | null; pausedUntil: Date | null };
+
+// BKM-018: the part of a pause inside a series' range [from, until), so a
+// series ended or replaced while paused keeps only its own share of it.
+export const pauseWithin = (
+  pause: Pause,
+  range: { from: Date | null; until: Date | null },
+): Pause => {
+  if (pause.pausedFrom === null) return { pausedFrom: null, pausedUntil: null };
+  const from =
+    range.from !== null && range.from > pause.pausedFrom
+      ? range.from
+      : pause.pausedFrom;
+  const until =
+    range.until === null ||
+    (pause.pausedUntil !== null && pause.pausedUntil < range.until)
+      ? pause.pausedUntil
+      : range.until;
+  return until !== null && until <= from
+    ? { pausedFrom: null, pausedUntil: null }
+    : { pausedFrom: from, pausedUntil: until };
+};

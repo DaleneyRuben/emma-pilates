@@ -11,6 +11,7 @@ import {
 import {
   createAndMaterialize,
   isSessionLength,
+  pauseWithin,
   requireAssignable,
   requireEndAfterStart,
   scheduleSelect,
@@ -159,7 +160,10 @@ export const createPrismaScheduleAdministration = (
             : input.effectiveUntil;
         const ended = await transaction.sessionSchedule.update({
           where: { id: old.id },
-          data: { effectiveUntil: input.effectiveFrom },
+          data: {
+            effectiveUntil: input.effectiveFrom,
+            ...pauseWithin(old, { from: null, until: input.effectiveFrom }),
+          },
           select: scheduleSelect,
         });
         const withdrawn = await withdrawFrom(
@@ -169,17 +173,16 @@ export const createPrismaScheduleAdministration = (
           actor,
           now,
         );
-        // A pause still ahead carries over to the replacement (BKM-018).
-        const pauseAhead =
-          old.pausedFrom !== null &&
-          (old.pausedUntil === null || old.pausedUntil > input.effectiveFrom);
+        // The rest of a pause carries over to the replacement (BKM-018).
         const created = await createAndMaterialize(
           transaction,
           {
             ...input,
             effectiveUntil,
-            pausedFrom: pauseAhead ? old.pausedFrom : null,
-            pausedUntil: pauseAhead ? old.pausedUntil : null,
+            ...pauseWithin(old, {
+              from: input.effectiveFrom,
+              until: effectiveUntil,
+            }),
           },
           now,
         );
@@ -204,7 +207,10 @@ export const createPrismaScheduleAdministration = (
         requireChangeDate(old, input.effectiveFrom, boliviaDate(now));
         const schedule = await transaction.sessionSchedule.update({
           where: { id: old.id },
-          data: { effectiveUntil: input.effectiveFrom },
+          data: {
+            effectiveUntil: input.effectiveFrom,
+            ...pauseWithin(old, { from: null, until: input.effectiveFrom }),
+          },
           select: scheduleSelect,
         });
         return {
