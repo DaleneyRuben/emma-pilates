@@ -4,6 +4,7 @@ import { activeBranchesHandler } from "./booking-handlers";
 import { coordinatorHomeHandlers, homeHandlers } from "./home-handlers";
 import { apiUrl, jsonResponse, problemResponse } from "./msw";
 import { pendingBadgeHandler } from "./payment-fixtures";
+import { emptyRosterHandler } from "./roster-fixtures";
 import { studioRulesHandler } from "./studio-settings-fixtures";
 
 export const currentSessionPath =
@@ -40,6 +41,7 @@ export const signedInHandlers = () => [
   http.get(apiUrl(staffProfilePath), () => jsonResponse(paolaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  emptyRosterHandler(),
   http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
     jsonResponse([]),
   ),
@@ -79,6 +81,7 @@ export const coordinatorHandlers = () => [
   http.get(apiUrl(staffProfilePath), () => jsonResponse(carolinaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  emptyRosterHandler(),
   http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
     jsonResponse({ items: [], totalItems: 0 }),
   ),
