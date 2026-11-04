@@ -120,6 +120,16 @@ describe('administrator Payment list endpoint (e2e)', () => {
       },
       expect.anything(),
     );
+
+    const clientId = '11111111-1111-4111-8111-111111111111';
+    await request(app.getHttpServer())
+      .get(`/api/v1/administrator/payments?clientId=${clientId}`)
+      .set('authorization', bearer)
+      .expect(200);
+    expect(operations.list).toHaveBeenLastCalledWith(
+      { page: 1, pageSize: 20, status: 'all', invoice: 'all', clientId },
+      expect.anything(),
+    );
   });
 
   it.each([
@@ -127,6 +137,7 @@ describe('administrator Payment list endpoint (e2e)', () => {
     ['a state outside the allowlist', '?status=completed'],
     ['an invoice filter outside the allowlist', '?invoice=issued'],
     ['a page size above 100', '?pageSize=101'],
+    ['a Client that is not an identifier', '?clientId=lucia'],
     ['a search longer than 100 characters', `?q=${'a'.repeat(101)}`],
   ])('refuses %s as invalid_request', async (_case, search) => {
     await request(app.getHttpServer())

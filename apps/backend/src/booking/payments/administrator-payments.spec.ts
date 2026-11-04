@@ -62,6 +62,25 @@ describe('Administrator Payment list', () => {
     });
   });
 
+  it('narrows the sales to one Client for her file (WEB-040)', async () => {
+    const payments = ledger();
+    const clientId = '11111111-1111-4111-8111-111111111111';
+
+    await listAdministratorPayments(
+      { page: 1, pageSize: 20, status: 'all', invoice: 'all', clientId },
+      administrator,
+      { ledger: payments },
+    );
+
+    expect(payments.list).toHaveBeenCalledWith({
+      page: 1,
+      pageSize: 20,
+      status: 'all',
+      invoice: 'all',
+      clientId,
+    });
+  });
+
   it('drops a blank search instead of matching every name', async () => {
     const payments = ledger();
 

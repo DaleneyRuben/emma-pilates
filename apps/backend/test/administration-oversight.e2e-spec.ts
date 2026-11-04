@@ -111,4 +111,33 @@ describe('administration oversight endpoints (e2e)', () => {
     }
     expect(oversight.listEvaluations).not.toHaveBeenCalled();
   });
+
+  // WEB-040: the Client file's Evaluaciones tab reads one Client's
+  // Evaluations, so the range is optional only when a Client is named.
+  it('reads one Client’s Evaluations without a range', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/v1/administrator/evaluations?clientId=${centro}`)
+      .set('authorization', bearer)
+      .expect(200);
+
+    expect(oversight.listEvaluations).toHaveBeenCalledWith(
+      { clientId: centro, page: 1, pageSize: 20 },
+      expect.anything(),
+    );
+  });
+
+  it.each([
+    ['no range and no Client', ''],
+    ['half a range', `clientId=${centro}&from=2026-09-21T04:00:00.000Z`],
+    ['a Client that is not an identifier', 'clientId=ana'],
+  ])('refuses %s as invalid_request', async (_case, search) => {
+    await request(app.getHttpServer())
+      .get(`/api/v1/administrator/evaluations?${search}`)
+      .set('authorization', bearer)
+      .expect(400)
+      .expect(({ body }: { body: { code: string } }) =>
+        expect(body.code).toBe('invalid_request'),
+      );
+    expect(oversight.listEvaluations).not.toHaveBeenCalled();
+  });
 });

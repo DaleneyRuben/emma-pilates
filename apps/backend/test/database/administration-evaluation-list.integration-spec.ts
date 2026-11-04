@@ -125,4 +125,17 @@ describe('Prisma administration Evaluation list for AW25', () => {
       ['Ana Justiniano', 'follow_up'],
     ]);
   });
+
+  it('lists one Client’s Evaluations newest first whatever the date', async () => {
+    const page = await oversight().listEvaluations(
+      { clientId: deterministicId('test-client:ana'), page: 1, pageSize: 20 },
+      await administrator(),
+    );
+
+    expect(page.items.map((item) => [item.clientName, item.kind])).toEqual([
+      ['Ana Justiniano', 'follow_up'],
+      ['Ana Justiniano', 'first'],
+    ]);
+    expect(page.totalItems).toBe(2);
+  });
 });
