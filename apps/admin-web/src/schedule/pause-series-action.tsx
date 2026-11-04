@@ -69,7 +69,7 @@ export function PauseSeriesAction({
         En esas fechas no se publican clases de la serie. Las que ya tienen
         reservas se mantienen; cancélalas una por una si hace falta.
       </p>
-      <div className="grid grid-cols-2 gap-3 pt-1">
+      <div className="flex flex-col gap-3 pt-1">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor={fromId}>Pausar desde</Label>
           <CivilDateInput id={fromId} value={from} onChange={setFrom} />
