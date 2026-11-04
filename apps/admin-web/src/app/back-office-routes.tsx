@@ -1,8 +1,8 @@
 import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 import { cashCloseSearchSchema } from "../back-office/cash-close/cash-close-search";
 import { expenseSearchSchema } from "../back-office/expenses/expense-search";
+import { validatePayStatementsSearch } from "../back-office/payroll/pay-period-search";
 import { payrollSearchSchema } from "../back-office/payroll/payroll-search";
-import { boliviaMonth } from "../lib/bolivia-time";
 import { withdrawalSearchSchema } from "../back-office/supplies/supply-search";
 import {
   listSearchSchema,
@@ -108,9 +108,7 @@ const withdrawalsRoute = createRoute({
 const payStatementsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/dinero/sueldos",
-  validateSearch: (search: Record<string, unknown>) => ({
-    month: typeof search.month === "string" ? search.month : boliviaMonth(),
-  }),
+  validateSearch: validatePayStatementsSearch,
   component: lazyRouteComponent(
     () => import("../back-office/payroll/pay-statements-route"),
     "PayStatementsRoute",

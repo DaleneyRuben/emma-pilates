@@ -87,12 +87,12 @@ describe("the pay period picker", () => {
     await user.click(screen.getByRole("button", { name: "Calcular" }));
 
     await waitFor(() => expect(drafted).toHaveLength(1));
-    const week = Object.fromEntries(drafted[0]);
+    const week = Object.fromEntries(drafted[0] ?? []);
     expect(Object.keys(week)).toEqual(["from", "until"]);
-    const days =
-      (Date.parse(week.until) - Date.parse(week.from)) / (24 * 3_600_000);
-    expect(days).toBe(7);
-    expect(new Date(`${week.from}T00:00:00Z`).getUTCDay()).toBe(1);
+    const from = new Date(`${week.from ?? ""}T00:00:00Z`);
+    const until = new Date(`${week.until ?? ""}T00:00:00Z`);
+    expect((until.getTime() - from.getTime()) / (24 * 3_600_000)).toBe(7);
+    expect(from.getUTCDay()).toBe(1);
   });
 
   it("asks for a range between two typed dates, the last one included", async () => {

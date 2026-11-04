@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { formatBolivianos } from "../../lib/money";
+import { formatPayPeriod, type PayPeriodQuery } from "./pay-period-search";
 import {
   approvePayStatementRequest,
   payStatementsQueryOptions,
@@ -26,17 +27,17 @@ const lineKind = (kind: PayStatementDto["lines"][number]["kind"]) => {
 
 export function StatementCard({
   statement,
-  month,
+  period,
 }: {
   statement: PayStatementDto;
-  month: string;
+  period: PayPeriodQuery;
 }) {
   const queryClient = useQueryClient();
   const approve = useMutation({
     mutationFn: () => approvePayStatementRequest(statement.id),
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: payStatementsQueryOptions(month).queryKey,
+        queryKey: payStatementsQueryOptions(period).queryKey,
       }),
   });
   return (
@@ -47,7 +48,13 @@ export function StatementCard({
             {statement.staffMemberName}
           </h2>
           <p className="text-nota text-texto-tenue">
-            {statement.state === "approved" ? "Aprobado" : "Borrador"}
+            <span>
+              {formatPayPeriod(statement.periodStart, statement.periodEnd)}
+            </span>
+            {" · "}
+            <span>
+              {statement.state === "approved" ? "Aprobado" : "Borrador"}
+            </span>
           </p>
         </div>
         <p className="font-serif text-[28px] text-texto tabular">

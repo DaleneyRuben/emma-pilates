@@ -7,17 +7,18 @@ import {
 } from "@pilates/api-contracts";
 import { queryOptions } from "@tanstack/react-query";
 import { adminFetch } from "../../api/fetcher";
+import type { PayPeriodQuery } from "./pay-period-search";
 
-export const payStatementsQueryOptions = (month: string) =>
+export const payStatementsQueryOptions = (period: PayPeriodQuery) =>
   queryOptions({
-    queryKey: getListPayStatementsQueryKey({ month }),
+    queryKey: getListPayStatementsQueryKey(period),
     queryFn: async ({ signal }) =>
-      (await listPayStatements({ month }, { signal }, adminFetch))
+      (await listPayStatements(period, { signal }, adminFetch))
         .data as PayStatementDto[],
   });
 
-export const draftPayStatementsRequest = (month: string) =>
-  draftPayStatements({ month }, undefined, adminFetch).then(
+export const draftPayStatementsRequest = (period: PayPeriodQuery) =>
+  draftPayStatements(period, undefined, adminFetch).then(
     (response) => response.data,
   );
 

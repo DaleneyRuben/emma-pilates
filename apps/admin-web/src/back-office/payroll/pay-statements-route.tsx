@@ -8,8 +8,8 @@ export function PayStatementsRoute() {
   const navigate = route.useNavigate();
   return (
     <PayStatementsPage
-      month={search.month}
-      onMonthChange={(month) => navigate({ search: { month } })}
+      search={search}
+      onSearchChange={(next) => navigate({ search: next })}
     />
   );
 }

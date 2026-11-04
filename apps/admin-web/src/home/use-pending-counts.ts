@@ -42,7 +42,7 @@ export function usePendingCounts({
     enabled: branchId !== undefined,
   });
   const statements = useQuery({
-    ...payStatementsQueryOptions(month),
+    ...payStatementsQueryOptions({ month }),
     enabled: seesMoney,
   });
 

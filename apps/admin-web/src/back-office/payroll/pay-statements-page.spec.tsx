@@ -15,6 +15,8 @@ const statement = {
   staffMemberId: "emma",
   staffMemberName: "Emma Vargas",
   month: "2026-09-01",
+  periodStart: "2026-09-01",
+  periodEnd: "2026-10-01",
   state: "draft",
   totalCentavos: 32_200,
   salaryPaymentId: null,
