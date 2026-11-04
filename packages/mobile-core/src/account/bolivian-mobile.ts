@@ -12,6 +12,9 @@ export const isBolivianMobileOrBlank = (value: string): boolean => {
   return trimmed === "" || bolivianMobile.test(trimmed);
 };
 
+// Red stub: decision §19.20 arrives with the next commit.
+export const normalizeBolivianMobile = (value: string): string => value;
+
 export const bolivianMobileSchema = z
   .string()
   .refine(isBolivianMobileOrBlank, bolivianMobileMessage);

@@ -182,7 +182,8 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     );
     await user.type(
       within(panel).getByLabelText("Teléfono (opcional)"),
-      "+591 70000000",
+      // Decision §19.20: the +591 is implicit and sent.
+      "70000000",
     );
     await user.click(
       within(panel).getByRole("radio", { name: "Administración" }),
@@ -202,8 +203,9 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     );
   });
 
-  // FIX-030 with MOB-070: a Bolivian mobile, 8 digits after +591.
-  it.each(["7000004", "70000001"])(
+  // FIX-030 with MOB-070 and decision §19.20: a Bolivian mobile, 8 digits
+  // starting with 6 or 7.
+  it.each(["7000004", "80000001"])(
     "refuses the phone %s before sending anything",
     async (typed) => {
       server.use(...staffHandlers(() => jsonResponse(valentina, 201)));
@@ -225,7 +227,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
 
       expect(
         await within(panel).findByText(
-          "Escribe un celular de Bolivia, por ejemplo +591 71234567.",
+          "Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567.",
         ),
       ).toBeInTheDocument();
       expect(created).toEqual([]);
