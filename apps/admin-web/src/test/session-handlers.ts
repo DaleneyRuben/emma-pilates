@@ -1,6 +1,7 @@
 import { http } from "msw";
 import { branchSuppliesHandler } from "./back-office-fixtures";
 import { activeBranchesHandler } from "./booking-handlers";
+import { coordinatorHomeHandlers, homeHandlers } from "./home-handlers";
 import { apiUrl, jsonResponse, problemResponse } from "./msw";
 import { pendingBadgeHandler } from "./payment-fixtures";
 import { studioRulesHandler } from "./studio-settings-fixtures";
@@ -48,6 +49,7 @@ export const signedInHandlers = () => [
     jsonResponse({ items: [], totalItems: 0 }),
   ),
   studioRulesHandler(),
+  ...homeHandlers(),
 ];
 
 // IDN-009: Carolina Rivas, the Coordinator (ADR-0102). Her shell reads no
@@ -82,6 +84,7 @@ export const coordinatorHandlers = () => [
   http.get(apiUrl("/api/v1/administrator/equipment-flags"), () =>
     jsonResponse([]),
   ),
+  ...coordinatorHomeHandlers(),
 ];
 
 export const signedOutHandlers = () => [
