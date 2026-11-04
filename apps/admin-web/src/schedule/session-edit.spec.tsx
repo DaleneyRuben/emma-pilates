@@ -31,6 +31,10 @@ import {
   weeklyScheduleId,
 } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
+import {
+  studioSettings,
+  studioSettingsPath,
+} from "../test/studio-settings-fixtures";
 import { useNarrowViewport } from "../test/viewport";
 
 const civil = (date: string) =>
@@ -268,18 +272,52 @@ describe("AW03 Editar sesión on a desktop browser", () => {
     );
   });
 
-  it("explains that an empty Session cancels itself instead of offering cancellation", async () => {
+  it("cancels a future Session with no Bookings and names the minimum check", async () => {
+    server.use(
+      http.get(apiUrl(studioSettingsPath), () => jsonResponse(studioSettings)),
+      http.post(apiUrl(`${sessionsPath}/${saturdayEmpty.id}/cancel`), () =>
+        jsonResponse({ affectedBookings: 0 }),
+      ),
+    );
+    const { panel, user } = await openSession(/Reformer Pilates, 09:00/);
+
+    expect(
+      await within(panel).findByText(
+        "Si no llega a 2 reservas, el sistema la cancela sola 3 h antes de empezar.",
+      ),
+    ).toBeInTheDocument();
+    await user.click(
+      within(panel).getByRole("button", { name: "Cancelar sesión" }),
+    );
+    const confirm = await screen.findByRole("alertdialog", {
+      name: "¿Cancelar esta sesión?",
+    });
+    expect(
+      within(confirm).getByText(
+        "No tiene reservas. Se cancela y desaparece de la app.",
+      ),
+    ).toBeInTheDocument();
+    await user.click(
+      within(confirm).getByRole("button", { name: "Cancelar sesión" }),
+    );
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Sesión cancelada.",
+    );
+    expect(saturdayEmpty.bookedCount).toBe(0);
+  });
+
+  it("leaves the numbers out of the minimum check while the rules are unknown", async () => {
+    server.use(
+      http.get(apiUrl(studioSettingsPath), () => jsonResponse({}, 503)),
+    );
     const { panel } = await openSession(/Reformer Pilates, 09:00/);
 
     expect(
-      within(panel).queryByRole("button", { name: "Cancelar sesión" }),
-    ).not.toBeInTheDocument();
-    expect(
-      within(panel).getByText(
-        "Sin reservas: si sigue vacía, el sistema la cancela sola 2 horas antes de empezar.",
+      await within(panel).findByText(
+        "Si no llega al mínimo de reservas, el sistema la cancela sola antes de empezar.",
       ),
     ).toBeInTheDocument();
-    expect(saturdayEmpty.bookedCount).toBe(0);
   });
 });
 
