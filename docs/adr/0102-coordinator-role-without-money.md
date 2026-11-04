@@ -1,6 +1,6 @@
 # Add a Coordinator Role that runs operations without seeing money
 
-Status: accepted (2026-10-23)
+Status: accepted (2026-10-23); partly superseded by [ADR-0108](./0108-widen-the-coordinator-role.md), which opens freezes, the carousel, Comentarios, Insumos, the Nutrición agenda, and the studio rules read to her, and lets the Administrator book for Clients
 
 The studio has a marketing and operations coordinator. The owner gives her a Role of her own, `coordinator`, with access to the admin web's operational sections and to the Staff app, under one line: operations yes, money no.
 

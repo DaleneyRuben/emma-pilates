@@ -38,6 +38,7 @@ Accepted architecture decisions:
 - [x] Let an Administrator see and act in the Staff app as one Trainer, Assistant, or Nutritionist for 30 minutes through an Impersonation row on their own Authentication Session, with a banner, an exit, and audit records naming both people (ADR-0100).
 - [x] Keep the studio's configurable rules in one versioned, audited Studio Settings record that the apps read instead of hard-coding rules (ADR-0101).
 - [x] Give the Coordinator a Role that runs operations on the admin web and the Staff app without seeing any amount, enforced in the backend (ADR-0102).
+- [x] Widen the Coordinator to freezes, the carousel, Comentarios, Insumos, the Nutrición agenda, and a read-only studio rules page, still without amounts, and let the Administrator book for Clients (ADR-0108).
 - [x] Put finance and analytics in a read-only Studio Management context with its own facts schema and shared pure calculations; AI receives aggregates only (ADR-0103).
 - [x] Reset production once after Google approves the Client app, the only exception to soft deletion (ADR-0104).
 - [x] Calculate Trainer and Coordinator Pay Statements in the system from dated rates, approved by the Administrator (ADR-0105).
