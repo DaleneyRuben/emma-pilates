@@ -12,6 +12,7 @@ const bookingRejections: Record<string, string> = {
   booking_before_start_date:
     "Tu plan todavía no empieza: podrás reservar desde su fecha de inicio.",
   booking_during_freeze: "Tu plan está congelado en esa fecha.",
+  booking_window_exceeded: "Esa clase todavía no abre para reservar.",
   guest_pass_last_place: "Un pase de invitada no puede tomar el último lugar.",
   guest_pass_already_used: "Tu pase de invitada ya se usó.",
   // Session detail (04) raises these. Reprogramar raises booking_overlap too

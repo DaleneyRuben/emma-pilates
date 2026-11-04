@@ -17,6 +17,7 @@ export const studioRules = {
   plansFromPriceCentavos: 56_000,
   startDateLimitDays: 14,
   openingDate: null,
+  bookingWindowDays: 7,
 };
 
 const defaultRoutes: Record<string, Route> = {

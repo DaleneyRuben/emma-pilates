@@ -137,6 +137,7 @@ describe("Client booking rejection messages", () => {
       "Tu plan todavía no empieza: podrás reservar desde su fecha de inicio.",
     ],
     ["booking_during_freeze", "Tu plan está congelado en esa fecha."],
+    ["booking_window_exceeded", "Esa clase todavía no abre para reservar."],
   ])("names a refused reschedule by %s", async (code, message) => {
     const { from, until } = civilDateRange(boliviaCivilDate(new Date(insideWindow.startsAt)));
     const alternative = {
