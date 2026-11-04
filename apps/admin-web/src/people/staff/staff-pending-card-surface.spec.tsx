@@ -12,18 +12,16 @@ const pendingCard = (panel: HTMLElement) => {
   return card;
 };
 
-// The full-width, 40 px white button of AW24's pending card (in px: the root
-// is 15 px, so 2.5rem draws 37.5), with the frame's disabled border instead
-// of the filled disabled button.
+// The full-width, 40 px button of AW24's pending card (in px: the root is
+// 15 px, so 2.5rem draws 37.5): on v2 (follow-up 225) a Marfil button on the
+// Lino card, with no border, and the same ground while disabled.
 const cardButton = [
   "h-[40px]",
   "w-full",
-  "bg-blanco",
-  "border-borde-fuerte",
+  "bg-superficie",
   "text-texto",
   "text-fila-menu",
-  "disabled:border-deshabilitado",
-  "disabled:bg-blanco",
+  "disabled:bg-superficie",
 ];
 
 // WEB-015: AW24's pending card as the export draws it.
@@ -33,17 +31,11 @@ describe("AW24's pending card surface", () => {
     server.use(...signedInHandlers(), allBranchesHandler(), list()),
   );
 
-  it("draws the card on Superficie sutil with the card border", async () => {
+  it("draws the card as a Lino card with no border (follow-up 225)", async () => {
     const { panel } = await openMember("Valentina Soria");
 
     const card = pendingCard(panel);
-    expect(card).toHaveClass(
-      "gap-2.5",
-      "rounded-panel",
-      "border-borde",
-      "bg-superficie-sutil",
-      "p-3.5",
-    );
+    expect(card).toHaveClass("gap-2.5", "rounded-marco", "bg-lino", "p-4");
     expect(card).not.toHaveClass("bg-advertencia/10");
   });
 
@@ -62,7 +54,7 @@ describe("AW24's pending card surface", () => {
     );
   });
 
-  it("draws «Reenviar enlace» as the full-width white button", async () => {
+  it("draws «Reenviar enlace» as the full-width Marfil button", async () => {
     const { panel } = await openMember("Valentina Soria");
 
     expect(
@@ -72,7 +64,7 @@ describe("AW24's pending card surface", () => {
     ).toHaveClass(...cardButton);
   });
 
-  it("draws «Guardar correo» and «Cancelar» as two equal white buttons", async () => {
+  it("draws «Guardar correo» and «Cancelar» as two equal Marfil buttons", async () => {
     const { panel, user } = await openMember("Valentina Soria");
     const card = within(pendingCard(panel));
 

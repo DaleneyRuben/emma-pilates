@@ -135,7 +135,7 @@ function ReportTabs({
               "rounded-control border px-3 py-1.5 text-nota",
               selected
                 ? "border-primario bg-primario-tinte font-medium text-primario-profundo"
-                : "border-borde bg-blanco text-texto-secundario",
+                : "border-transparent bg-lino text-texto-secundario",
             )}
           >
             {tab.label}
@@ -258,7 +258,7 @@ export function ReportPage({
           />
           {income.data.totalCentavos === 0 &&
           expenses.data.totalCentavos === 0 ? (
-            <p className="rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center text-cuerpo text-texto-secundario">
+            <p className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
               Sin ingresos ni gastos en este rango.
             </p>
           ) : (

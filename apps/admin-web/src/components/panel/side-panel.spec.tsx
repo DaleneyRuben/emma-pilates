@@ -2,21 +2,18 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { SidePanel } from "./side-panel";
 
 describe("SidePanel", () => {
-  it("closes with the handoff's bordered 30 px square, the one the receipt viewer draws", () => {
+  it("closes with follow-up 233's 40 px Lino square, the one the receipt viewer draws", () => {
     render(
       <SidePanel open onOpenChange={() => undefined} title="Nueva sucursal">
         <p>Formulario</p>
       </SidePanel>,
     );
 
-    // design/README.md, side-panel header: 30px square close button, 1px
-    // Borde, Superficie fill, hover border in Palo de rosa (follow-up 21).
+    // Follow-up 233 (the boards' .x): a 40 px Lino square, no border.
     expect(screen.getByRole("button", { name: "Cerrar" })).toHaveClass(
-      "size-[30px]",
-      "border",
-      "border-borde",
-      "bg-superficie",
-      "hover:border-primario",
+      "size-[40px]",
+      "bg-lino",
+      "rounded-tarjeta",
     );
   });
 

@@ -86,17 +86,20 @@ describe("admin shell", () => {
     it("keeps the tab marked on its other views and switches between them", async () => {
       const { user } = renderShell("/dinero/gastos");
       await heading("Gastos");
+      await screen.findByRole("table");
 
-      const views = screen.getByRole("navigation", {
-        name: "Vistas de Gastos",
-      });
+      // The page header draws the views, so each look-up reads the current one.
+      const views = () =>
+        screen.getByRole("navigation", { name: "Vistas de Gastos" });
       expect(
-        within(views)
+        within(views())
           .getAllByRole("link")
           .map((link) => link.textContent),
       ).toEqual(["Gastos", "Categorías"]);
 
-      await user.click(within(views).getByRole("link", { name: "Categorías" }));
+      await user.click(
+        within(views()).getByRole("link", { name: "Categorías" }),
+      );
 
       await heading("Categorías de gasto");
       expect(
@@ -105,7 +108,7 @@ describe("admin shell", () => {
         ).getByRole("link", { name: "Gastos" }),
       ).toHaveAttribute("aria-current", "page");
       expect(
-        within(views).getByRole("link", { name: "Categorías" }),
+        within(views()).getByRole("link", { name: "Categorías" }),
       ).toHaveAttribute("aria-current", "page");
     });
 

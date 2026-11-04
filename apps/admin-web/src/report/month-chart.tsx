@@ -59,7 +59,7 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
   return (
     <figure
       aria-labelledby={titleId}
-      className="m-0 flex flex-col gap-4 rounded-tarjeta border border-borde bg-blanco px-5 py-4"
+      className="m-0 flex flex-col gap-4 rounded-marco bg-lino px-5 py-4"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="flex flex-col gap-0.5">
@@ -140,7 +140,7 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
                 left: `${((shownIndex + 0.5) / months.length) * 100}%`,
                 transform: `translateX(-${((shownIndex + 0.5) / months.length) * 100}%)`,
               }}
-              className="pointer-events-none absolute top-0 z-10 flex flex-col gap-0.5 rounded-control border border-borde bg-blanco px-3 py-2 text-nota text-texto shadow-popover tabular"
+              className="pointer-events-none absolute top-0 z-10 flex flex-col gap-0.5 rounded-control bg-lino px-3 py-2 text-nota text-texto shadow-popover tabular"
             >
               <span className="font-medium">{formatMonth(shown.month)}</span>
               <span className="flex items-center gap-1.5">

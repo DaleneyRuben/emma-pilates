@@ -49,8 +49,7 @@ const failureMessage = (error: unknown): string => {
   return "No pudimos dar las clases. Inténtalo de nuevo.";
 };
 
-const cardClass =
-  "flex flex-col gap-4 rounded-tarjeta border border-borde bg-blanco p-6 max-md:p-4";
+const cardClass = "flex flex-col gap-4 rounded-marco bg-lino p-6 max-md:p-4";
 
 // AW21 (BKM-015): the Administrator grants extra classes for a campaign, a
 // start of year or a holiday, to every Client with a live Plan. A Client

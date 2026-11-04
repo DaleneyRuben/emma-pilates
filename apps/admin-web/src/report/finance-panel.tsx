@@ -34,7 +34,7 @@ function Figure({
     <section
       aria-label={name}
       className={cn(
-        "flex flex-col gap-1.5 rounded-tarjeta border border-borde border-t-[3px] bg-blanco px-5 py-4",
+        "flex flex-col gap-1.5 rounded-marco border-t-[3px] bg-lino px-5 py-4",
         rule,
       )}
     >
@@ -122,7 +122,7 @@ function EmptyBudget({ month }: { month: string }) {
       }),
   });
   return (
-    <div className="flex flex-col items-center gap-3 rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-marco bg-lino px-6 py-10 text-center">
       <p className="text-cuerpo text-texto-secundario">
         Aún no hay presupuesto.
       </p>

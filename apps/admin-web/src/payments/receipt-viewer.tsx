@@ -90,7 +90,7 @@ export function ReceiptViewer({
       <button
         type="button"
         onClick={() => setEnlarged(true)}
-        className="flex justify-center overflow-hidden rounded-control border border-borde bg-blanco focus-visible:shadow-foco"
+        className="flex justify-center overflow-hidden rounded-control bg-lino focus-visible:shadow-foco"
       >
         <img
           key={attempt}

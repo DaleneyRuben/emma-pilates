@@ -18,7 +18,7 @@ function Tile({
     <section
       aria-label={name}
       className={cn(
-        "flex min-w-0 flex-col gap-1.5 rounded-tarjeta border border-borde border-t-[3px] bg-blanco px-5 py-4 lg:px-3 xl:px-5",
+        "flex min-w-0 flex-col gap-1.5 rounded-marco border-t-[3px] bg-lino px-5 py-4 lg:px-3 xl:px-5",
         rule,
       )}
     >

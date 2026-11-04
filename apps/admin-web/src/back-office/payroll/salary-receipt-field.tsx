@@ -121,7 +121,7 @@ export function SalaryReceiptField({
           Subir foto del comprobante
         </button>
       ) : (
-        <div className="flex items-center gap-3 rounded-control border border-borde-fuerte bg-blanco p-2.5">
+        <div className="flex items-center gap-3 rounded-tarjeta border border-borde bg-lino p-2.5">
           <img
             src={shown.thumbnail}
             alt="Comprobante del pago"

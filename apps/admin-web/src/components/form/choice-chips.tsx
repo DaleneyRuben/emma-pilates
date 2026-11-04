@@ -1,7 +1,7 @@
 import { cn } from "../../lib/cn";
 
 const chipClass =
-  "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-control border border-borde-fuerte bg-blanco px-3 py-2 text-nota text-texto-secundario has-focus-visible:shadow-foco";
+  "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-tarjeta border border-borde bg-lino px-3 py-2 text-nota text-texto-secundario has-focus-visible:shadow-foco";
 const chosenClass =
   "border-primario bg-primario-tinte font-medium text-primario-profundo";
 

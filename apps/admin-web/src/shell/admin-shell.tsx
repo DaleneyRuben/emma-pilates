@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { pageTitleOf } from "../app/navigation";
 import { useDocumentTitle } from "../app/use-document-title";
 import { PageRecoveryState } from "../components/page/page-recovery-state";
+import { PageTabsContext } from "../components/page/page-tabs-context";
 import { activeBranchesQueryOptions } from "./branch/branch-queries";
 import { BranchProvider } from "./branch/branch-provider";
 import { DestinationTabs } from "./destination-tabs";
@@ -12,13 +13,15 @@ import { BranchCell, TopBar } from "./top-bar";
 import { useIsNarrowViewport } from "./use-media-query";
 
 // Follow-up 232 (P01): the icon rail on the left, the top bar and the page
-// on Marfil, and the destination's tabs above the page; at phone width the
-// rail becomes the menu drawer and the Branch cell moves above the tabs. A
+// on Marfil (each page's header draws its destination's tabs); at phone
+// width the rail becomes the menu drawer and the Branch cell moves above
+// the page. A
 // page that throws while drawing is replaced by the recovery state inside
 // the main area (WEB-032); Reintentar resets it, and so does another page's
 // match once it is committed (the location moves before the matches do, so
 // the pathname would reset the boundary onto the page that just failed).
 const noBranches: never[] = [];
+const tabs = <DestinationTabs />;
 
 // Moving to another page puts focus on its content, so a keyboard or screen
 // reader user does not start again from the top of the rail; the first page
@@ -74,14 +77,15 @@ export function AdminShell() {
                 <BranchCell />
               </div>
             ) : null}
-            <DestinationTabs />
             <div className="min-w-0">
-              <CatchBoundary
-                getResetKey={() => pageKey}
-                errorComponent={PageRecoveryState}
-              >
-                <Outlet />
-              </CatchBoundary>
+              <PageTabsContext.Provider value={tabs}>
+                <CatchBoundary
+                  getResetKey={() => pageKey}
+                  errorComponent={PageRecoveryState}
+                >
+                  <Outlet />
+                </CatchBoundary>
+              </PageTabsContext.Provider>
             </div>
           </main>
         </div>

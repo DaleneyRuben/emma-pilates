@@ -3,28 +3,29 @@ import { Slot } from "radix-ui";
 import type { ComponentProps } from "react";
 import { cn } from "../../lib/cn";
 
-// Design system → Buttons. One solid (primary) button per view.
+// Follow-up 225 §4 (the admin boards' .btn): Primary in Palo de rosa,
+// Secondary on Rosa tinte with a Rosa enlace label, Text with no underline,
+// Destructive on its pale ground; no borders and no shadows. One solid
+// (primary) button per view.
 export const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-control font-medium transition-colors focus-visible:border-primario focus-visible:shadow-foco disabled:pointer-events-none disabled:border-transparent disabled:bg-deshabilitado disabled:text-deshabilitado-texto disabled:shadow-none [&_svg]:shrink-0",
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-boton font-semibold transition-colors focus-visible:shadow-foco disabled:pointer-events-none disabled:bg-deshabilitado disabled:text-deshabilitado-texto disabled:shadow-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         primary:
-          "bg-primario text-blanco shadow-boton hover:bg-primario-hover focus-visible:shadow-foco-solido active:bg-primario-presionado",
+          "bg-primario text-blanco hover:bg-primario-hover focus-visible:shadow-foco-solido active:bg-primario-presionado",
         secondary:
-          "border border-primario bg-transparent text-primario hover:bg-tinte-suave",
-        link: "h-auto px-0 text-primario underline-offset-4 hover:text-primario-presionado hover:underline",
-        neutral:
-          "border border-borde-fuerte bg-superficie text-texto hover:border-primario",
-        destructive:
-          "border border-error bg-transparent text-error hover:bg-error/10 hover:text-error-texto",
-        ghost: "text-texto-secundario hover:bg-hover-fila hover:text-texto",
+          "bg-primario-tinte text-primario-profundo hover:bg-rosa-empolvado/40",
+        link: "h-auto px-0 text-primario-profundo hover:text-primario-presionado",
+        neutral: "bg-lino text-texto hover:bg-primario-tinte",
+        destructive: "bg-error-tinte text-error hover:text-error-texto",
+        ghost: "text-primario-profundo hover:bg-lino",
       },
       size: {
-        sm: "h-[30px] px-3 text-nota",
-        md: "h-[38px] px-4 text-cuerpo",
-        lg: "h-[46px] px-5 text-cuerpo",
-        icon: "size-[38px] p-0",
+        sm: "h-[36px] rounded-tarjeta px-3.5 text-celda",
+        md: "h-[44px] px-[18px] text-cuerpo",
+        lg: "h-[52px] px-5 text-cuerpo",
+        icon: "size-[44px] p-0",
       },
     },
     defaultVariants: {

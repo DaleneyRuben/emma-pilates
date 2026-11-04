@@ -20,7 +20,7 @@ export function MinutesInput({
   return (
     <div
       className={cn(
-        "flex h-[44px] min-w-0 items-center overflow-hidden rounded-control border border-borde-fuerte bg-blanco focus-within:border-primario focus-within:shadow-foco has-[[aria-invalid=true]]:border-error",
+        "flex h-[44px] min-w-0 items-center overflow-hidden rounded-tarjeta border border-borde bg-lino focus-within:border-primario focus-within:shadow-foco has-[[aria-invalid=true]]:border-error",
         className,
       )}
     >

@@ -40,7 +40,7 @@ export function StatementCard({
       }),
   });
   return (
-    <article className="flex flex-col gap-3 rounded-tarjeta border border-borde bg-blanco p-4">
+    <article className="flex flex-col gap-3 rounded-marco bg-lino p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="text-titulo-panel text-texto">

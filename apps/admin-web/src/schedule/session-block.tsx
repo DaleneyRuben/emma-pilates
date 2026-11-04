@@ -55,7 +55,7 @@ export function SessionBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border-l-[3px] px-2 py-1 text-left transition-shadow hover:shadow-tarjeta-hover focus-visible:shadow-foco lg:px-1.5 xl:px-2",
+        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border-l-[3px] px-2 py-1 text-left transition-shadow hover:bg-primario-tinte/40 focus-visible:shadow-foco lg:px-1.5 xl:px-2",
         full
           ? "border-advertencia bg-advertencia/12"
           : "border-primario bg-primario-tinte",

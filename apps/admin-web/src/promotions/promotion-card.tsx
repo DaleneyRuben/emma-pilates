@@ -62,7 +62,7 @@ export function PromotionCard({
           : { transform: `translateY(${card.offsetY}px) rotate(-0.6deg)` }
       }
       className={cn(
-        "relative flex cursor-pointer items-center gap-3 rounded-tarjeta border border-borde bg-blanco py-3 pr-4 pl-1 transition-shadow hover:shadow-tarjeta-hover",
+        "relative flex cursor-pointer items-center gap-3 rounded-marco bg-lino py-3 pr-4 pl-1 transition-shadow hover:bg-primario-tinte/40",
         card.dragging && "z-10 border-primario shadow-arrastre",
         card.dimmed && "opacity-[0.55]",
       )}

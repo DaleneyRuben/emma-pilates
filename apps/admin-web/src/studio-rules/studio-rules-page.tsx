@@ -8,8 +8,7 @@ import { fixedRules, versionLine } from "./studio-rules-format";
 import { StudioRulesForm } from "./studio-rules-form";
 import { studioSettingsQueryOptions } from "./studio-rules-queries";
 
-const cardClass =
-  "flex flex-col gap-4 rounded-tarjeta border border-borde bg-blanco p-6 max-md:p-4";
+const cardClass = "flex flex-col gap-4 rounded-marco bg-lino p-6 max-md:p-4";
 
 const conflictMessage =
   "Alguien guardó otras reglas mientras editabas. Te mostramos las actuales: revisa y vuelve a guardar.";

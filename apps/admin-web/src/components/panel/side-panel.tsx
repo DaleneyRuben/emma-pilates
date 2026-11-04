@@ -48,7 +48,7 @@ export function SidePanel({
               ?.focus();
           }}
         >
-          <SheetHeader className="pr-12">
+          <SheetHeader className="pr-20">
             <SheetTitle>{title}</SheetTitle>
             {description === undefined ? null : (
               <SheetDescription>{description}</SheetDescription>
@@ -62,12 +62,12 @@ export function SidePanel({
 }
 
 export function SidePanelBody({ children }: { children: ReactNode }) {
-  return <div className="flex flex-1 flex-col gap-4 px-5 py-4">{children}</div>;
+  return <div className="flex flex-1 flex-col gap-5 px-7 py-4">{children}</div>;
 }
 
 export function SidePanelFooter({ children }: { children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-3 border-t border-borde px-5 py-4">
+    <div className="flex flex-col gap-3 border-t border-divisor px-7 py-4">
       {children}
     </div>
   );
