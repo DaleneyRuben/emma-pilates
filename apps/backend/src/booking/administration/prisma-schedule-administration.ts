@@ -1,12 +1,8 @@
-import {
-  BookingState,
-  SessionCancellationCause,
-  SessionState,
-} from '../../generated/prisma/enums';
+import { SessionCancellationCause } from '../../generated/prisma/enums';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate, boliviaInstant } from '../../time/bolivia-time';
+import { boliviaDate } from '../../time/bolivia-time';
 import {
   AdministrationError,
   requireOperations,
@@ -22,6 +18,7 @@ import {
   type ScheduleInput,
 } from './schedule-writes';
 import { createPrismaSessionExceptions } from './prisma-session-exceptions';
+import { withdrawSessions } from './schedule-withdrawal';
 
 export type { ScheduleInput } from './schedule-writes';
 
@@ -46,54 +43,25 @@ export const createPrismaScheduleAdministration = (
     }
   };
 
-  // Cancels the schedule's unbooked, non-exception Sessions on or after the
-  // date that have not started; booked ones and exceptions stay (ADR-0059).
-  const withdrawFrom = async (
+  // Ending or replacing withdraws every unbooked Session from the date on.
+  const withdrawFrom = (
     transaction: Transaction,
     sessionScheduleId: string,
     from: Date,
     actor: AdministratorActor,
     now: Date,
-  ): Promise<{ cancelledSessions: number; keptSessions: number }> => {
-    const sessions = await transaction.session.findMany({
-      where: {
+  ) =>
+    withdrawSessions(
+      transaction,
+      {
         sessionScheduleId,
-        state: SessionState.SCHEDULED,
-        startsAt: { gte: boliviaInstant(from, 0), gt: now },
+        from,
+        until: null,
+        cause: SessionCancellationCause.SCHEDULE_CHANGED,
       },
-      select: {
-        id: true,
-        isException: true,
-        _count: {
-          select: {
-            bookings: { where: { state: BookingState.BOOKED } },
-            waitlistEntries: { where: { closedAt: null } },
-          },
-        },
-      },
-    });
-    const unbooked = sessions.filter(
-      (session) =>
-        !session.isException &&
-        session._count.bookings === 0 &&
-        session._count.waitlistEntries === 0,
+      actor,
+      now,
     );
-    if (unbooked.length > 0) {
-      await transaction.session.updateMany({
-        where: { id: { in: unbooked.map(({ id }) => id) } },
-        data: {
-          state: SessionState.CANCELLED,
-          cancellationCause: SessionCancellationCause.SCHEDULE_CHANGED,
-          cancelledAt: now,
-          cancelledByAccountId: actor.accountId,
-        },
-      });
-    }
-    return {
-      cancelledSessions: unbooked.length,
-      keptSessions: sessions.length - unbooked.length,
-    };
-  };
 
   const findSchedule = async (transaction: Transaction, id: string) => {
     const schedule = await transaction.sessionSchedule.findUnique({
@@ -201,9 +169,18 @@ export const createPrismaScheduleAdministration = (
           actor,
           now,
         );
+        // A pause still ahead carries over to the replacement (BKM-018).
+        const pauseAhead =
+          old.pausedFrom !== null &&
+          (old.pausedUntil === null || old.pausedUntil > input.effectiveFrom);
         const created = await createAndMaterialize(
           transaction,
-          { ...input, effectiveUntil },
+          {
+            ...input,
+            effectiveUntil,
+            pausedFrom: pauseAhead ? old.pausedFrom : null,
+            pausedUntil: pauseAhead ? old.pausedUntil : null,
+          },
           now,
         );
         return {

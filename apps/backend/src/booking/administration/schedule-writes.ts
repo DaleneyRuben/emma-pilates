@@ -35,6 +35,8 @@ export const scheduleSelect = {
   capacity: true,
   effectiveFrom: true,
   effectiveUntil: true,
+  pausedFrom: true,
+  pausedUntil: true,
   classType: { select: { name: true } },
 } satisfies Prisma.SessionScheduleSelect;
 
@@ -135,7 +137,12 @@ export const requireEndAfterStart = (input: {
 
 export const createAndMaterialize = async (
   transaction: Transaction,
-  input: ScheduleInput & { effectiveFrom: Date; effectiveUntil: Date | null },
+  input: ScheduleInput & {
+    effectiveFrom: Date;
+    effectiveUntil: Date | null;
+    pausedFrom?: Date | null;
+    pausedUntil?: Date | null;
+  },
   now: Date,
 ) => {
   const schedule = await transaction.sessionSchedule.create({
@@ -149,6 +156,8 @@ export const createAndMaterialize = async (
       capacity: input.capacity,
       effectiveFrom: input.effectiveFrom,
       effectiveUntil: input.effectiveUntil,
+      pausedFrom: input.pausedFrom ?? null,
+      pausedUntil: input.pausedUntil ?? null,
     },
     select: scheduleSelect,
   });
