@@ -47,7 +47,7 @@ describe("AW08 Insumos on a desktop browser", () => {
     server.use(
       supplyTable(() => jsonResponse(supplyPage([alcohol, detergent, paper]))),
     );
-    renderAdmin("/back-office/insumos");
+    renderAdmin("/estudio/insumos");
     await heading();
 
     expect(screen.getByText("Cargando insumos…")).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe("AW08 Insumos on a desktop browser", () => {
 
   it("offers the four header actions of follow-ups 07 and 48", async () => {
     server.use(supplyTable(() => jsonResponse(supplyPage([detergent]))));
-    renderAdmin("/back-office/insumos");
+    renderAdmin("/estudio/insumos");
     await rowOf("Detergente");
 
     const actions = screen
@@ -96,10 +96,7 @@ describe("AW08 Insumos on a desktop browser", () => {
     ]);
     expect(
       screen.getByRole("link", { name: "Ver historial de retiros" }),
-    ).toHaveAttribute(
-      "href",
-      "/back-office/insumos/retiros?page=1&pageSize=20",
-    );
+    ).toHaveAttribute("href", "/estudio/insumos/retiros?page=1&pageSize=20");
     expect(screen.getByText("Sucursal Centro · ningún insumo con stock bajo"));
   });
 
@@ -118,7 +115,7 @@ describe("AW08 Insumos on a desktop browser", () => {
         ),
       ),
     );
-    const { user } = renderAdmin("/back-office/insumos?page=2");
+    const { user } = renderAdmin("/estudio/insumos?page=2");
     await rowOf("Detergente");
     expect(reads.at(-1)?.get("page")).toBe("2");
 
@@ -138,7 +135,7 @@ describe("AW08 Insumos on a desktop browser", () => {
 
   it("says when the Branch has no Supplies yet", async () => {
     server.use(supplyTable(() => jsonResponse(supplyPage([]))));
-    renderAdmin("/back-office/insumos");
+    renderAdmin("/estudio/insumos");
     expect(
       await screen.findByText("Todavía no hay insumos en esta sucursal."),
     ).toBeInTheDocument();
@@ -149,7 +146,7 @@ describe("AW08 Insumos on a desktop browser", () => {
 
   it("offers a retry when the Supplies cannot load", async () => {
     server.use(supplyTable(() => problemResponse(500, "unexpected_error")));
-    renderAdmin("/back-office/insumos");
+    renderAdmin("/estudio/insumos");
     expect(
       await screen.findByText(
         "No pudimos cargar los insumos.",
@@ -164,7 +161,7 @@ describe("AW08 Insumos on a desktop browser", () => {
     server.use(
       supplyTable(() => problemResponse(403, "back_office_access_denied")),
     );
-    renderAdmin("/back-office/insumos");
+    renderAdmin("/estudio/insumos");
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
@@ -182,18 +179,19 @@ describe("Insumos sidebar badge", () => {
   useMockServer();
   beforeEach(() => server.use(...signedInHandlers()));
 
-  it("counts the selected Branch's low-stock Supplies on every page in the warning tint", async () => {
+  it("counts the selected Branch's low-stock Supplies on Estudio from every page", async () => {
     server.use(
       branchSuppliesHandler([alcohol, detergent, paper], centro.id),
       branchSuppliesHandler([], equipetrol.id),
     );
-    const { user } = renderAdmin("/");
+    const { user } = renderAdmin("/horario");
     await screen.findByRole("heading", { level: 1, name: "Horario" });
 
+    // Follow-up 232: the count rides on Estudio in the rail.
     const link = await screen.findByRole("link", {
-      name: "Insumos, 2 con stock bajo",
+      name: "Estudio, 2 con stock bajo",
     });
-    expect(within(link).getByText("2")).toHaveClass("text-advertencia-texto");
+    expect(within(link).getByText("2")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
     await user.click(
@@ -203,7 +201,7 @@ describe("Insumos sidebar badge", () => {
       ),
     );
     expect(
-      await screen.findByRole("link", { name: "Insumos" }),
+      await screen.findByRole("link", { name: "Estudio" }),
     ).not.toHaveTextContent(/\d/);
   });
 });
@@ -218,7 +216,7 @@ describe("AW08 Insumos on a narrow browser", () => {
       branchSuppliesHandler([paper]),
       supplyTable(() => jsonResponse(supplyPage([paper]))),
     );
-    const { user } = renderAdmin("/back-office/insumos");
+    const { user } = renderAdmin("/estudio/insumos");
     const row = await rowOf("Papel higiénico");
     expect(within(row).getByText("Stock bajo").closest("td")).toHaveAttribute(
       "data-label",
@@ -227,7 +225,7 @@ describe("AW08 Insumos on a narrow browser", () => {
 
     await user.click(screen.getByRole("button", { name: "Abrir menú" }));
     expect(
-      await screen.findByRole("link", { name: "Insumos, 1 con stock bajo" }),
+      await screen.findByRole("link", { name: "Estudio, 1 con stock bajo" }),
     ).toBeInTheDocument();
   });
 });

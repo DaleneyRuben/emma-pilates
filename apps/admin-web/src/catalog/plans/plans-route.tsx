@@ -1,7 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { PlansPage } from "./plans-page";
 
-const route = getRouteApi("/authenticated/catalogo/planes");
+const route = getRouteApi("/authenticated/ajustes/planes");
 
 export function PlansRoute() {
   const navigate = route.useNavigate();

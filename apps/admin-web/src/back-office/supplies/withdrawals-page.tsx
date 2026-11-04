@@ -110,7 +110,7 @@ function BranchWithdrawals({
   return (
     <article className="flex flex-col gap-5">
       <Link
-        to="/back-office/insumos"
+        to="/estudio/insumos"
         className="inline-flex items-center gap-1 self-start rounded-control text-nota text-primario hover:text-primario-presionado focus-visible:shadow-foco"
       >
         <ChevronLeft size={14} strokeWidth={1.8} aria-hidden="true" />

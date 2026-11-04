@@ -32,7 +32,7 @@ const expenseTable = () =>
   });
 
 const openCreate = async () => {
-  const rendered = renderAdmin("/back-office/gastos");
+  const rendered = renderAdmin("/dinero/gastos");
   await screen.findByRole("cell", { name: /Reparación/ });
   await rendered.user.click(
     screen.getByRole("button", { name: "Nuevo gasto" }),
@@ -178,7 +178,7 @@ describe("AW14 Expense form on a desktop browser", () => {
         },
       ),
     );
-    const { user } = renderAdmin("/back-office/gastos");
+    const { user } = renderAdmin("/dinero/gastos");
     await user.click(await screen.findByRole("button", { name: "Reparación" }));
     const panel = await screen.findByRole("dialog", { name: "Editar gasto" });
     expect(within(panel).getByLabelText("Categoría")).toHaveValue(repair.id);

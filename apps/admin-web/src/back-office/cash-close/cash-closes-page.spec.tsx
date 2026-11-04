@@ -124,7 +124,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
         }),
       ),
     );
-    renderAdmin("/back-office/caja");
+    renderAdmin("/dinero/caja");
     await heading();
 
     expect(
@@ -173,7 +173,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
         }),
       ),
     );
-    renderAdmin("/back-office/caja?month=2026-10");
+    renderAdmin("/dinero/caja?month=2026-10");
 
     const day = await rowOf("vie 23/10");
     expect(
@@ -183,7 +183,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
 
   it("lists the month's days with their status, highlighting differences and flagging days left unclosed", async () => {
     server.use(history(() => jsonResponse(october)));
-    renderAdmin("/back-office/caja?month=2026-10");
+    renderAdmin("/dinero/caja?month=2026-10");
 
     expect(
       await screen.findByText("1 día con ventas en efectivo sin cierre"),
@@ -241,7 +241,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
 
   it("moves to the previous month in the address", async () => {
     server.use(history(() => jsonResponse(october)));
-    const { user } = renderAdmin("/back-office/caja?month=2026-10");
+    const { user } = renderAdmin("/dinero/caja?month=2026-10");
     await rowOf("vie 23/10");
 
     await user.click(screen.getByRole("button", { name: "Mes anterior" }));
@@ -252,7 +252,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
 
   it("says when the history cannot load", async () => {
     server.use(history(() => problemResponse(500, "server_error")));
-    renderAdmin("/back-office/caja?month=2026-10");
+    renderAdmin("/dinero/caja?month=2026-10");
 
     expect(
       await screen.findByText(/No pudimos cargar los cierres de caja/),
@@ -269,7 +269,7 @@ describe("AW151 Cierres de caja on a narrow browser", () => {
 
   it("labels each figure so the rows read as cards", async () => {
     server.use(history(() => jsonResponse(october)));
-    renderAdmin("/back-office/caja?month=2026-10");
+    renderAdmin("/dinero/caja?month=2026-10");
 
     const short = await rowOf("vie 23/10");
     expect(

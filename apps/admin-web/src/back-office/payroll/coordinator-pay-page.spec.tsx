@@ -53,9 +53,7 @@ describe("Pago a la coordinadora", () => {
         });
       }),
     );
-    const { user } = renderAdmin(
-      "/back-office/pago-coordinadora?month=2026-12",
-    );
+    const { user } = renderAdmin("/dinero/sueldos/coordinadora?month=2026-12");
 
     expect(
       await screen.findByRole("heading", { name: "Carolina Rivas" }),
@@ -70,7 +68,7 @@ describe("Pago a la coordinadora", () => {
   it("sends the Coordinator back to Horario", async () => {
     server.use(...coordinatorHandlers());
     const { router } = renderAdmin(
-      "/back-office/pago-coordinadora?month=2026-12",
+      "/dinero/sueldos/coordinadora?month=2026-12",
     );
 
     expect(
@@ -79,7 +77,9 @@ describe("Pago a la coordinadora", () => {
     expect(
       await screen.findByText("Esa sección es solo para administración."),
     ).toBeInTheDocument();
-    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe("/horario"),
+    );
   });
 
   it("refuses an Assistant", async () => {
@@ -89,7 +89,7 @@ describe("Pago a la coordinadora", () => {
         problemResponse(403, "back_office_access_denied"),
       ),
     );
-    renderAdmin("/back-office/pago-coordinadora?month=2026-12");
+    renderAdmin("/dinero/sueldos/coordinadora?month=2026-12");
     expect(await screen.findByRole("alert")).toBeInTheDocument();
   });
 });

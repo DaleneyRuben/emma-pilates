@@ -1,65 +1,63 @@
 import type { AdminRole } from "../session/admin-role";
 
 /**
- * The admin sidebar as design follow-up 30 (§5) and the design system fix
- * it: Horario, Catálogo, Back Office, Reporte, Promociones, in this order,
- * and never "Descuentos" (ADR-0007). Every entry is a typed route.
+ * The admin web's structure as follow-up 232 approves it: an icon rail with
+ * nine destinations, each destination's pages as tabs under its title, and
+ * a tab's own views (Sueldos, Gastos, Insumos) as a switch under the tabs.
+ * Every page is a typed route; never "Descuentos" (ADR-0007).
  */
 export type AdminPath =
   | "/"
-  | "/catalogo/tipos-de-clase"
-  | "/catalogo/planes"
-  | "/catalogo/sucursales"
-  | "/back-office/clientes"
-  | "/back-office/clientes/campana"
-  | "/back-office/para-contactar"
-  | "/back-office/fundadoras"
-  | "/back-office/congelamientos"
-  | "/back-office/pagos"
-  | "/back-office/caja"
-  | "/back-office/insumos"
-  | "/back-office/equipos"
-  | "/back-office/evaluaciones-nutricionales"
-  | "/back-office/personal"
-  | "/back-office/nomina"
-  | "/back-office/pagos-instructoras"
-  | "/back-office/pago-coordinadora"
-  | "/back-office/gastos"
-  | "/back-office/categorias-de-gasto"
-  | "/reporte"
-  | "/reporte/indicadores"
-  | "/recomendaciones"
-  | "/simulador"
+  | "/horario"
+  | "/horario/nutricion"
+  | "/clientas"
+  | "/clientas/para-contactar"
+  | "/clientas/congelamientos"
+  | "/clientas/fundadoras"
   | "/promociones"
+  | "/promociones/clases-de-campana"
   | "/promociones/referidos"
+  | "/promociones/contactos"
   | "/comentarios"
-  | "/reglas-del-estudio";
+  | "/dinero/pagos"
+  | "/dinero/caja"
+  | "/dinero/sueldos"
+  | "/dinero/sueldos/coordinadora"
+  | "/dinero/sueldos/pagados"
+  | "/dinero/gastos"
+  | "/dinero/gastos/categorias"
+  | "/estudio/personal"
+  | "/estudio/insumos"
+  | "/estudio/insumos/retiros"
+  | "/estudio/equipos"
+  | "/informes"
+  | "/informes/recomendaciones"
+  | "/informes/dinero"
+  | "/informes/simulador"
+  | "/ajustes/tipos-de-clase"
+  | "/ajustes/planes"
+  | "/ajustes/sucursales"
+  | "/ajustes/reglas-del-estudio";
 
 export type NavigationItem = {
+  /** The tab's or view's label, as the boards in design/v2/admin draw it. */
   label: string;
   to: AdminPath;
-  /** The design screen (docs/design/prompts/admin-web) this entry opens. */
-  screen: string;
   /**
-   * Set on the studio-wide pages where the Branch selector is shown but not
-   * applied (AW34 frame 2); the text completes "Esta página no se filtra por
-   * sucursal — …".
+   * A studio-wide page: the top bar shows «Todo el estudio» instead of the
+   * Branch selector (follow-up 233, «Rules the boards follow»).
    */
-  studioWide?: string;
+  studioWide?: true;
   /** A dense list page (design system → List pages) with page-and-offset search. */
   list?: true;
-  /**
-   * A count beside the link (design system → Back Office): the transfers
-   * waiting in Pagos, or the selected Branch's low-stock Supplies in the
-   * warning tint beside Insumos.
-   */
+  /** A count beside the tab, also summed onto its destination in the rail. */
   badge?: "pendingPayments" | "lowStock" | "contactAlerts";
   /**
-   * Its sub-pages keep it marked: every page under it (AW31 is a view of
-   * Insumos), or only the listed ones where siblings share its prefix
-   * (AW35 under Promociones, beside Referidos).
+   * The tab's other views, drawn after it (named `viewLabel`) as a switch
+   * under the tabs; each view keeps the tab marked.
    */
-  subPages?: true | readonly string[];
+  views?: readonly NavigationItem[];
+  viewLabel?: string;
   /**
    * The page brings its own Branch selector with «Todas las sucursales»
    * (AW16), so the top bar shows a note instead of the shell's.
@@ -67,269 +65,310 @@ export type NavigationItem = {
   ownBranchFilter?: true;
   /** Open to the Coordinator too (ADR-0102): operations, never money. */
   coordinator?: true;
-  /**
-   * Amounts. The sidebar and the address guard hide this from anyone who
-   * is not an Administrator (ADR-0102, ADR-0103).
-   */
-  administratorOnly?: true;
 };
 
-export type NavigationGroup = {
-  label?: string;
-  items: readonly NavigationItem[];
+export type DestinationIcon =
+  | "inicio"
+  | "horario"
+  | "clientas"
+  | "promociones"
+  | "comentarios"
+  | "dinero"
+  | "estudio"
+  | "informes"
+  | "ajustes";
+
+export type Destination = {
+  label: string;
+  icon: DestinationIcon;
+  /** Its pages, drawn as tabs when more than one is open to the Role. */
+  tabs: readonly NavigationItem[];
 };
 
-export const navigationGroups: readonly NavigationGroup[] = [
-  { items: [{ label: "Horario", to: "/", screen: "AW02", coordinator: true }] },
+// The Fundadoras and Recomendaciones tabs, and the Coordinadora and
+// Categorías views, stand in until their pages fold into Todas (WEB-040),
+// El mes, Por aprobar and Gastos' panel.
+export const destinations: readonly Destination[] = [
   {
-    label: "Catálogo",
-    items: [
-      {
-        label: "Tipos de clase",
-        to: "/catalogo/tipos-de-clase",
-        screen: "AW06",
-        list: true,
-      },
-      {
-        label: "Planes",
-        to: "/catalogo/planes",
-        screen: "AW04",
-        list: true,
-      },
-      {
-        label: "Sucursales",
-        to: "/catalogo/sucursales",
-        screen: "AW19",
-        list: true,
-      },
+    label: "Inicio",
+    icon: "inicio",
+    tabs: [{ label: "Inicio", to: "/", coordinator: true }],
+  },
+  {
+    label: "Horario",
+    icon: "horario",
+    tabs: [
+      { label: "Clases", to: "/horario", coordinator: true },
+      { label: "Nutrición", to: "/horario/nutricion", list: true },
     ],
   },
   {
-    label: "Back Office",
-    items: [
+    label: "Clientas",
+    icon: "clientas",
+    tabs: [
       {
-        label: "Clientes",
-        to: "/back-office/clientes",
-        screen: "AW21",
+        label: "Todas",
+        to: "/clientas",
         list: true,
-        subPages: ["/back-office/clientes/campana"],
+        studioWide: true,
         coordinator: true,
-        studioWide: "las clientas son del estudio, no de una sede.",
       },
       {
         label: "Para contactar",
-        to: "/back-office/para-contactar",
-        screen: "AW39",
-        coordinator: true,
+        to: "/clientas/para-contactar",
+        studioWide: true,
         badge: "contactAlerts",
-        studioWide: "las clientas son del estudio, no de una sede.",
-      },
-      {
-        label: "Fundadoras",
-        to: "/back-office/fundadoras",
-        screen: "AW40",
-        list: true,
-        studioWide: "las fundadoras son del estudio, no de una sede.",
+        coordinator: true,
       },
       {
         label: "Congelamientos",
-        to: "/back-office/congelamientos",
-        screen: "AW41",
+        to: "/clientas/congelamientos",
         list: true,
-        studioWide: "los congelamientos son del estudio, no de una sede.",
+        studioWide: true,
       },
       {
-        label: "Pagos",
-        to: "/back-office/pagos",
-        screen: "AW28",
+        label: "Fundadoras",
+        to: "/clientas/fundadoras",
         list: true,
-        badge: "pendingPayments",
-        studioWide: "los pagos son del estudio, no de una sede.",
-      },
-      {
-        label: "Caja",
-        to: "/back-office/caja",
-        screen: "AW151",
-      },
-      {
-        label: "Insumos",
-        to: "/back-office/insumos",
-        screen: "AW08",
-        list: true,
-        badge: "lowStock",
-        subPages: true,
-      },
-      { label: "Equipos", to: "/back-office/equipos", screen: "AW37" },
-      {
-        label: "Evaluaciones nutricionales",
-        to: "/back-office/evaluaciones-nutricionales",
-        screen: "AW25",
-        list: true,
-      },
-      {
-        label: "Personal",
-        to: "/back-office/personal",
-        screen: "AW23",
-        list: true,
-        coordinator: true,
-      },
-      {
-        label: "Pagos a instructoras",
-        to: "/back-office/pagos-instructoras",
-        screen: "AW11",
-        studioWide: "los pagos a instructoras son del estudio, no de una sede.",
-      },
-      {
-        label: "Pago a la coordinadora",
-        to: "/back-office/pago-coordinadora",
-        screen: "AW11",
-        studioWide: "el pago a la coordinadora es del estudio, no de una sede.",
-      },
-      {
-        label: "Nómina",
-        to: "/back-office/nomina",
-        screen: "AW11",
-        list: true,
-        studioWide: "la nómina es del estudio, no de una sede.",
-      },
-      {
-        label: "Gastos",
-        to: "/back-office/gastos",
-        screen: "AW13",
-        list: true,
-      },
-      {
-        label: "Categorías de gasto",
-        to: "/back-office/categorias-de-gasto",
-        screen: "AW15",
-        list: true,
-        studioWide: "las categorías de gasto son del estudio, no de una sede.",
-      },
-    ],
-  },
-  {
-    items: [
-      {
-        label: "Reporte",
-        to: "/reporte",
-        screen: "AW16",
-        ownBranchFilter: true,
-      },
-      {
-        label: "Indicadores",
-        to: "/reporte/indicadores",
-        screen: "AW43",
-        coordinator: true,
-        studioWide: "los indicadores del mes son del estudio, no de una sede.",
-      },
-      {
-        label: "Recomendaciones",
-        to: "/recomendaciones",
-        screen: "AW44",
-        coordinator: true,
-        studioWide:
-          "las recomendaciones del mes son del estudio, no de una sede.",
-      },
-      {
-        label: "Simulador",
-        to: "/simulador",
-        screen: "AW42",
-        studioWide: "el simulador no lee una sede.",
-        administratorOnly: true,
+        studioWide: true,
       },
     ],
   },
   {
     label: "Promociones",
-    items: [
+    icon: "promociones",
+    tabs: [
       // AW17 is the one list drawn as cards, unpaged, because its order is
       // what the page edits.
+      { label: "Carrusel", to: "/promociones", studioWide: true },
       {
-        label: "Promociones",
-        to: "/promociones",
-        screen: "AW17",
-        subPages: ["/promociones/contactos"],
+        label: "Clases de campaña",
+        to: "/promociones/clases-de-campana",
+        studioWide: true,
       },
       {
         label: "Referidos",
         to: "/promociones/referidos",
-        screen: "AW26",
         list: true,
-        studioWide: "los referidos son del estudio, no de una sede.",
+        studioWide: true,
       },
+      { label: "Contactos", to: "/promociones/contactos", studioWide: true },
     ],
   },
-  // AW38 (REL-012): «Enviar comentarios» from both apps.
   {
-    items: [
+    label: "Comentarios",
+    icon: "comentarios",
+    // AW38 (REL-012): «Enviar comentarios» from both apps.
+    tabs: [
       {
         label: "Comentarios",
         to: "/comentarios",
-        screen: "AW38",
         list: true,
-        studioWide: "los comentarios llegan de las apps, no de una sede.",
+        studioWide: true,
+      },
+    ],
+  },
+  {
+    label: "Dinero",
+    icon: "dinero",
+    tabs: [
+      {
+        label: "Pagos",
+        to: "/dinero/pagos",
+        list: true,
+        badge: "pendingPayments",
+        studioWide: true,
+      },
+      { label: "Caja", to: "/dinero/caja" },
+      {
+        label: "Sueldos",
+        to: "/dinero/sueldos",
+        studioWide: true,
+        viewLabel: "Instructoras",
+        views: [
+          {
+            label: "Coordinadora",
+            to: "/dinero/sueldos/coordinadora",
+            studioWide: true,
+          },
+          {
+            label: "Pagados",
+            to: "/dinero/sueldos/pagados",
+            list: true,
+            studioWide: true,
+          },
+        ],
+      },
+      {
+        label: "Gastos",
+        to: "/dinero/gastos",
+        list: true,
+        viewLabel: "Gastos",
+        views: [
+          {
+            label: "Categorías",
+            to: "/dinero/gastos/categorias",
+            list: true,
+            studioWide: true,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Estudio",
+    icon: "estudio",
+    tabs: [
+      {
+        label: "Personal",
+        to: "/estudio/personal",
+        list: true,
+        studioWide: true,
+        coordinator: true,
+      },
+      {
+        label: "Insumos",
+        to: "/estudio/insumos",
+        list: true,
+        badge: "lowStock",
+        viewLabel: "Stock",
+        views: [{ label: "Retiros del mes", to: "/estudio/insumos/retiros" }],
+      },
+      { label: "Equipos", to: "/estudio/equipos" },
+    ],
+  },
+  {
+    label: "Informes",
+    icon: "informes",
+    tabs: [
+      { label: "El mes", to: "/informes", studioWide: true, coordinator: true },
+      {
+        label: "Recomendaciones",
+        to: "/informes/recomendaciones",
+        studioWide: true,
+        coordinator: true,
+      },
+      { label: "Dinero", to: "/informes/dinero", ownBranchFilter: true },
+      { label: "Simulador", to: "/informes/simulador", studioWide: true },
+    ],
+  },
+  {
+    label: "Ajustes",
+    icon: "ajustes",
+    tabs: [
+      {
+        label: "Tipos de clase",
+        to: "/ajustes/tipos-de-clase",
+        list: true,
+        studioWide: true,
+      },
+      { label: "Planes", to: "/ajustes/planes", list: true, studioWide: true },
+      {
+        label: "Sucursales",
+        to: "/ajustes/sucursales",
+        list: true,
+        studioWide: true,
+      },
+      {
+        label: "Reglas del estudio",
+        to: "/ajustes/reglas-del-estudio",
+        studioWide: true,
       },
     ],
   },
 ];
 
-/**
- * Pages the account menu (AW33) opens rather than the sidebar; they still
- * name the browser tab and the Branch selector's studio-wide note.
- */
-export const accountMenuItems: readonly NavigationItem[] = [
-  {
-    label: "Reglas del estudio",
-    to: "/reglas-del-estudio",
-    screen: "AW36",
-    studioWide: "las reglas son del estudio, no de una sede.",
-  },
-];
+/** Where a page sits: its destination, its tab, and itself (a tab or a view). */
+export type Place = {
+  destination: Destination;
+  tab: NavigationItem;
+  page: NavigationItem;
+};
 
-export const navigationItems: readonly NavigationItem[] = [
-  ...navigationGroups.flatMap((group) => group.items),
-  ...accountMenuItems,
-];
+const places: readonly Place[] = destinations.flatMap((destination) =>
+  destination.tabs.flatMap((tab) =>
+    [tab, ...(tab.views ?? [])].map((page) => ({ destination, tab, page })),
+  ),
+);
+
+/** Every page once: each tab, then its other views. */
+export const navigationItems: readonly NavigationItem[] = places.map(
+  (place) => place.page,
+);
+
+export const placeOf = (pathname: string): Place | undefined =>
+  places.find((place) => place.page.to === pathname);
 
 export const findNavigationItem = (
   pathname: string,
-): NavigationItem | undefined =>
-  navigationItems.find((item) => item.to === pathname);
+): NavigationItem | undefined => placeOf(pathname)?.page;
 
-/** The entry a page belongs to, its sub-pages (AW31 under Insumos) included. */
-export const navigationItemOf = (
-  pathname: string,
-): NavigationItem | undefined =>
-  findNavigationItem(pathname) ??
-  navigationItems.find((item) =>
-    item.subPages === true
-      ? pathname.startsWith(`${item.to}/`)
-      : (item.subPages?.includes(pathname) ?? false),
-  );
+/** The browser tab names the page: «Dinero · Pagos», or just «Inicio». */
+export const pageTitleOf = (pathname: string): string | undefined => {
+  const place = placeOf(pathname);
+  if (place === undefined) return undefined;
+  return place.destination.tabs.length === 1
+    ? place.destination.label
+    : `${place.destination.label} · ${place.page.label}`;
+};
 
-/** The sidebar a Role sees: anyone but the Administrator holds no money. */
-export const navigationGroupsFor = (
-  role: AdminRole,
-): readonly NavigationGroup[] =>
-  navigationGroups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter(
-        (item) =>
-          (item.administratorOnly !== true || role === "administrator") &&
-          (role === "administrator" || item.coordinator === true),
-      ),
+/**
+ * The Administrator sees every page. Anyone else holds no money and sees
+ * only what ADR-0102 opens to the Coordinator (BKO-010 widens it).
+ */
+const mayOpen = (item: NavigationItem, role: AdminRole): boolean =>
+  role === "administrator" || item.coordinator === true;
+
+/** The rail a Role sees: a destination with no open page is left out. */
+export const destinationsFor = (role: AdminRole): readonly Destination[] =>
+  destinations
+    .map((destination) => ({
+      ...destination,
+      tabs: destination.tabs.filter((tab) => mayOpen(tab, role)),
     }))
-    .filter((group) => group.items.length > 0);
+    .filter((destination) => destination.tabs.length > 0);
 
 /** Whether the Coordinator may open a page; the API refuses the rest. */
-const coordinatorDeniedPaths = ["/back-office/clientes/campana"];
-
 export const coordinatorMayOpen = (pathname: string): boolean => {
-  const item = navigationItemOf(pathname);
+  const place = placeOf(pathname);
   return (
-    item?.administratorOnly !== true &&
-    item?.coordinator === true &&
-    !coordinatorDeniedPaths.includes(pathname)
+    place !== undefined &&
+    mayOpen(place.tab, "coordinator") &&
+    mayOpen(place.page, "coordinator")
   );
+};
+
+/**
+ * The old sidebar's addresses (and the bare destination roots) and the page
+ * each now opens, so bookmarks and emailed links keep working.
+ */
+export const movedPaths: Readonly<Record<string, AdminPath>> = {
+  "/catalogo/tipos-de-clase": "/ajustes/tipos-de-clase",
+  "/catalogo/planes": "/ajustes/planes",
+  "/catalogo/sucursales": "/ajustes/sucursales",
+  "/back-office/clientes": "/clientas",
+  "/back-office/clientes/campana": "/promociones/clases-de-campana",
+  "/back-office/para-contactar": "/clientas/para-contactar",
+  "/back-office/fundadoras": "/clientas/fundadoras",
+  "/back-office/congelamientos": "/clientas/congelamientos",
+  "/back-office/pagos": "/dinero/pagos",
+  "/back-office/caja": "/dinero/caja",
+  "/back-office/insumos": "/estudio/insumos",
+  "/back-office/insumos/retiros": "/estudio/insumos/retiros",
+  "/back-office/equipos": "/estudio/equipos",
+  "/back-office/evaluaciones-nutricionales": "/horario/nutricion",
+  "/back-office/personal": "/estudio/personal",
+  "/back-office/nomina": "/dinero/sueldos/pagados",
+  "/back-office/pagos-instructoras": "/dinero/sueldos",
+  "/back-office/pago-coordinadora": "/dinero/sueldos/coordinadora",
+  "/back-office/gastos": "/dinero/gastos",
+  "/back-office/categorias-de-gasto": "/dinero/gastos/categorias",
+  "/reporte": "/informes/dinero",
+  "/reporte/indicadores": "/informes",
+  "/recomendaciones": "/informes/recomendaciones",
+  "/simulador": "/informes/simulador",
+  "/reglas-del-estudio": "/ajustes/reglas-del-estudio",
+  "/dinero": "/dinero/pagos",
+  "/estudio": "/estudio/personal",
+  "/ajustes": "/ajustes/tipos-de-clase",
 };

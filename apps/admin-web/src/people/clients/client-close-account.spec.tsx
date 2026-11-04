@@ -44,7 +44,7 @@ const handlers = (
 ];
 
 const openDialog = async () => {
-  const rendered = renderAdmin("/back-office/clientes");
+  const rendered = renderAdmin("/clientas");
   await rendered.user.click(
     await screen.findByRole("button", { name: "Lucía Fernández" }),
   );
@@ -147,7 +147,7 @@ describe("AW22 Cerrar cuenta", () => {
     ).toBeInTheDocument();
     expect(
       within(dialog).getByRole("link", { name: "Ir a Pagos" }),
-    ).toHaveAttribute("href", "/back-office/pagos");
+    ).toHaveAttribute("href", "/dinero/pagos");
     expect(
       within(dialog).getByRole("button", { name: "Cerrar cuenta" }),
     ).toBeDisabled();

@@ -1,12 +1,10 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { activeBranchesHandler, branchesPath } from "../../test/booking-handlers";
 import {
-  apiUrl,
-  problemResponse,
-  server,
-  useMockServer,
-} from "../../test/msw";
+  activeBranchesHandler,
+  branchesPath,
+} from "../../test/booking-handlers";
+import { apiUrl, problemResponse, server, useMockServer } from "../../test/msw";
 import { emptyPageHandlers } from "../../test/page-handlers";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
@@ -130,8 +128,9 @@ describe("the Branch selector", () => {
       ).not.toBeInTheDocument();
 
       await user.click(
-        within(screen.getByRole("navigation", { name: "Páginas de Dinero" }))
-          .getByRole("link", { name: "Caja" }),
+        within(
+          screen.getByRole("navigation", { name: "Páginas de Dinero" }),
+        ).getByRole("link", { name: "Gastos" }),
       );
       expect(
         await within(topBar).findByRole("button", {

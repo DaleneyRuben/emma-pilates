@@ -33,7 +33,7 @@ export function EquipmentFlagsNotice({
     >
       {`${count} más lugares que ${what} funcionando. Baja su capacidad o revisa `}
       <Link
-        to="/back-office/equipos"
+        to="/estudio/equipos"
         className="font-medium text-primario-profundo underline-offset-2 hover:underline"
       >
         Equipos

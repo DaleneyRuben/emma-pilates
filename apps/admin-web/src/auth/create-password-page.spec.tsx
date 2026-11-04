@@ -57,7 +57,7 @@ describe("AW32 Crear contraseña", () => {
     await user.click(save);
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Horario" }),
+      await screen.findByRole("heading", { level: 1, name: /^Buen/ }),
     ).toBeInTheDocument();
     expect(completed).toEqual({
       token: "recovery-secret",

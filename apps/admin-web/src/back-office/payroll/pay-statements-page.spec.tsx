@@ -50,9 +50,7 @@ describe("Pagos a instructoras", () => {
         });
       }),
     );
-    const { user } = renderAdmin(
-      "/back-office/pagos-instructoras?month=2026-09",
-    );
+    const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
     expect(
       await screen.findByRole("heading", { name: "Emma Vargas" }),
@@ -70,7 +68,7 @@ describe("Pagos a instructoras", () => {
         problemResponse(403, "back_office_access_denied"),
       ),
     );
-    renderAdmin("/back-office/pagos-instructoras?month=2026-09");
+    renderAdmin("/dinero/sueldos?month=2026-09");
     expect(await screen.findByRole("alert")).toBeInTheDocument();
   });
 });

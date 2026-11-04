@@ -43,12 +43,7 @@ describe("admin navigation", () => {
       },
       {
         label: "Ajustes",
-        tabs: [
-          "Tipos de clase",
-          "Planes",
-          "Sucursales",
-          "Reglas del estudio",
-        ],
+        tabs: ["Tipos de clase", "Planes", "Sucursales", "Reglas del estudio"],
       },
     ]);
     expect(navigationItems.map((item) => item.label)).not.toContain(

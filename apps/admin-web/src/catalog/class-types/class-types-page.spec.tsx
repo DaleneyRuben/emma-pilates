@@ -48,7 +48,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
 
   it("lists Class Types with capacity and equipment but no duration, filtered from the address", async () => {
     server.use(classTypeTable(() => jsonResponse(page([mat, reformer]))));
-    const { router, user } = renderAdmin("/catalogo/tipos-de-clase");
+    const { router, user } = renderAdmin("/ajustes/tipos-de-clase");
 
     expect(
       await screen.findByRole("heading", { level: 1, name: "Tipos de clase" }),
@@ -76,7 +76,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
 
   it("shows the empty, failed, and forbidden states", async () => {
     server.use(classTypeTable(() => jsonResponse(page([]))));
-    const { user } = renderAdmin("/catalogo/tipos-de-clase");
+    const { user } = renderAdmin("/ajustes/tipos-de-clase");
     expect(
       await screen.findByText("No hay tipos de clase con este filtro."),
     ).toBeInTheDocument();
@@ -104,7 +104,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
           : jsonResponse(page([reformer])),
       ),
     );
-    const { user } = renderAdmin("/catalogo/tipos-de-clase");
+    const { user } = renderAdmin("/ajustes/tipos-de-clase");
 
     // A 5xx is retried once before the page gives up (query-client.ts).
     expect(
@@ -130,7 +130,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
         return jsonResponse({ ...mat, id: "new" }, 201);
       }),
     );
-    const { user } = renderAdmin("/catalogo/tipos-de-clase");
+    const { user } = renderAdmin("/ajustes/tipos-de-clase");
     await screen.findByRole("cell", { name: /Reformer Pilates/ });
 
     await user.click(
@@ -185,7 +185,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
         problemResponse(409, "class_type_name_taken"),
       ),
     );
-    const { user } = renderAdmin("/catalogo/tipos-de-clase");
+    const { user } = renderAdmin("/ajustes/tipos-de-clase");
     await screen.findByRole("cell", { name: /Reformer Pilates/ });
     await user.click(
       screen.getByRole("button", { name: "Nuevo tipo de clase" }),
@@ -223,7 +223,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
         problemResponse(409, "class_type_in_use"),
       ),
     );
-    const { user } = renderAdmin("/catalogo/tipos-de-clase");
+    const { user } = renderAdmin("/ajustes/tipos-de-clase");
     await user.click(
       await screen.findByRole("button", { name: "Reformer Pilates" }),
     );
@@ -276,7 +276,7 @@ describe("AW06 Tipos de clase on a narrow browser", () => {
 
   it("opens the Class Type form as a full-screen sheet", async () => {
     server.use(classTypeTable(() => jsonResponse(page([reformer]))));
-    const { user } = renderAdmin("/catalogo/tipos-de-clase");
+    const { user } = renderAdmin("/ajustes/tipos-de-clase");
     await user.click(
       await screen.findByRole("button", { name: "Reformer Pilates" }),
     );

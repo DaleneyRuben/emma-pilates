@@ -146,7 +146,7 @@ describe("AW33 user menu on a desktop browser", () => {
         return new HttpResponse(null, { status: 204 });
       }),
     );
-    const { router, user } = renderAdmin("/back-office/gastos");
+    const { router, user } = renderAdmin("/dinero/gastos");
     let menu = await openMenu(user);
 
     await user.click(

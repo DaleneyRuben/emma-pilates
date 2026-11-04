@@ -1,7 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { ReportPage } from "./report-page";
 
-const route = getRouteApi("/authenticated/reporte");
+const route = getRouteApi("/authenticated/informes/dinero");
 
 export function ReportRoute() {
   const navigate = route.useNavigate();

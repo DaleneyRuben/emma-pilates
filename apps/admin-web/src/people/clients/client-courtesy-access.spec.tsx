@@ -61,7 +61,7 @@ const granted = (endsOn: string) => {
 };
 
 const openPanel = async () => {
-  const rendered = renderAdmin("/back-office/clientes");
+  const rendered = renderAdmin("/clientas");
   await rendered.user.click(
     await screen.findByRole("button", { name: "Lucía Fernández" }),
   );
@@ -196,7 +196,7 @@ describe("AW22 Acceso de prueba (REL-011)", () => {
     ).toBeInTheDocument();
     expect(
       within(dialog).getByRole("link", { name: "Ir a Pagos" }),
-    ).toHaveAttribute("href", "/back-office/pagos");
+    ).toHaveAttribute("href", "/dinero/pagos");
   });
 
   it("explains a failure and lets the Administrator try again with the same key", async () => {

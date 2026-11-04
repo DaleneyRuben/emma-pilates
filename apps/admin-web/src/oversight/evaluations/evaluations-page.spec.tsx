@@ -41,7 +41,7 @@ const nutritionists = () =>
     return jsonResponse({ ...staffPage([veronica, lorena]), pageSize: 100 });
   });
 
-const path = "/back-office/evaluaciones-nutricionales";
+const path = "/horario/nutricion";
 const september21 = `${path}?week=2026-09-21`;
 const heading = () =>
   screen.findByRole("heading", {

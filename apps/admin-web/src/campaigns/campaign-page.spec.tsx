@@ -48,7 +48,7 @@ describe("AW21 Campaña", () => {
   });
 
   it("opens from Clientes and shows how many Clients will receive the campaign", async () => {
-    const { user } = renderAdmin("/back-office/clientes");
+    const { user } = renderAdmin("/clientas");
 
     await user.click(
       await screen.findByRole("link", { name: "Dar clases de campaña" }),
@@ -62,7 +62,7 @@ describe("AW21 Campaña", () => {
   });
 
   it("submits the campaign and shows the granted and skipped counts", async () => {
-    const { user } = renderAdmin("/back-office/clientes/campana");
+    const { user } = renderAdmin("/promociones/clases-de-campana");
 
     await user.type(
       await screen.findByLabelText("Nombre de la campaña"),

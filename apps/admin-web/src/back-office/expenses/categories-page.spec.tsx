@@ -18,7 +18,7 @@ import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
 
-const path = "/back-office/categorias-de-gasto";
+const path = "/dinero/gastos/categorias";
 const heading = () =>
   screen.findByRole("heading", { level: 1, name: "Categorías de gasto" });
 const list = () => screen.findByRole("list", { name: "Categorías de gasto" });
@@ -53,16 +53,16 @@ describe("AW15 Categorías de gasto on a desktop browser", () => {
     ).toBeVisible();
   });
 
-  it("names the page studio-wide in the Branch selector", async () => {
+  it("is studio-wide: «Todo el estudio» instead of the Branch selector", async () => {
     server.use(categoriesHandler());
-    const { user } = renderAdmin(path);
+    renderAdmin(path);
     await list();
-    await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
     expect(
-      within(await screen.findByRole("dialog", { name: "Sucursal" })).getByText(
-        "Esta página no se filtra por sucursal — las categorías de gasto son del estudio, no de una sede.",
-      ),
+      within(screen.getByRole("banner")).getByText("Todo el estudio"),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /^Sucursal/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("adds a label from the inline row", async () => {

@@ -1,7 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { ClassTypesPage } from "./class-types-page";
 
-const route = getRouteApi("/authenticated/catalogo/tipos-de-clase");
+const route = getRouteApi("/authenticated/ajustes/tipos-de-clase");
 
 export function ClassTypesRoute() {
   const navigate = route.useNavigate();

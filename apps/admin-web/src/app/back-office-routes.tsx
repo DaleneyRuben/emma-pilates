@@ -16,7 +16,7 @@ import { authenticatedRoute } from "./root-routes";
 // its own chunk, loaded when its route is matched or preloaded on intent.
 const clientsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/clientes",
+  path: "/clientas",
   validateSearch: optionalSearch(clientSearchSchema),
   component: lazyRouteComponent(
     () => import("../people/clients/clients-route"),
@@ -28,7 +28,7 @@ const clientsRoute = createRoute({
 // sidebar entry.
 const campaignRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/clientes/campana",
+  path: "/promociones/clases-de-campana",
   component: lazyRouteComponent(
     () => import("../campaigns/campaign-route"),
     "CampaignRoute",
@@ -37,7 +37,7 @@ const campaignRoute = createRoute({
 
 const contactAlertsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/para-contactar",
+  path: "/clientas/para-contactar",
   component: lazyRouteComponent(
     () => import("../people/contact-alerts/contact-alerts-route"),
     "ContactAlertsRoute",
@@ -46,7 +46,7 @@ const contactAlertsRoute = createRoute({
 
 const freezesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/congelamientos",
+  path: "/clientas/congelamientos",
   component: lazyRouteComponent(
     () => import("../oversight/freezes/freezes-route"),
     "FreezesRoute",
@@ -55,7 +55,7 @@ const freezesRoute = createRoute({
 
 const foundersRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/fundadoras",
+  path: "/clientas/fundadoras",
   component: lazyRouteComponent(
     () => import("../oversight/founders/founders-route"),
     "FoundersRoute",
@@ -64,7 +64,7 @@ const foundersRoute = createRoute({
 
 const staffRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/personal",
+  path: "/estudio/personal",
   validateSearch: optionalSearch(staffSearchSchema),
   component: lazyRouteComponent(
     () => import("../people/staff/staff-route"),
@@ -74,7 +74,7 @@ const staffRoute = createRoute({
 
 const paymentsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/pagos",
+  path: "/dinero/pagos",
   validateSearch: optionalSearch(paymentSearchSchema),
   component: lazyRouteComponent(
     () => import("../payments/payments-route"),
@@ -85,7 +85,7 @@ const paymentsRoute = createRoute({
 // AW151: the selected Branch's Cash Closes, one Bolivia month at a time.
 const cashClosesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/caja",
+  path: "/dinero/caja",
   validateSearch: optionalSearch(cashCloseSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/cash-close/cash-closes-route"),
@@ -95,7 +95,7 @@ const cashClosesRoute = createRoute({
 
 const suppliesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/insumos",
+  path: "/estudio/insumos",
   validateSearch: optionalSearch(listSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/supplies/supplies-route"),
@@ -106,7 +106,7 @@ const suppliesRoute = createRoute({
 // AW31 is a view of Insumos, not a sidebar entry of its own.
 const withdrawalsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/insumos/retiros",
+  path: "/estudio/insumos/retiros",
   validateSearch: optionalSearch(withdrawalSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/supplies/withdrawals-route"),
@@ -116,7 +116,7 @@ const withdrawalsRoute = createRoute({
 
 const coordinatorPayRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/pago-coordinadora",
+  path: "/dinero/sueldos/coordinadora",
   validateSearch: (search: Record<string, unknown>) => ({
     month: typeof search.month === "string" ? search.month : boliviaMonth(),
   }),
@@ -128,7 +128,7 @@ const coordinatorPayRoute = createRoute({
 
 const payStatementsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/pagos-instructoras",
+  path: "/dinero/sueldos",
   validateSearch: (search: Record<string, unknown>) => ({
     month: typeof search.month === "string" ? search.month : boliviaMonth(),
   }),
@@ -141,7 +141,7 @@ const payStatementsRoute = createRoute({
 // AW37 (BKO-004): one Branch's Equipment on one page, so no list search.
 const equipmentRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/equipos",
+  path: "/estudio/equipos",
   component: lazyRouteComponent(
     () => import("../back-office/equipment/equipment-page"),
     "EquipmentPage",
@@ -150,7 +150,7 @@ const equipmentRoute = createRoute({
 
 const payrollRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/nomina",
+  path: "/dinero/sueldos/pagados",
   validateSearch: optionalSearch(payrollSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/payroll/payroll-route"),
@@ -160,7 +160,7 @@ const payrollRoute = createRoute({
 
 const expensesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/gastos",
+  path: "/dinero/gastos",
   validateSearch: optionalSearch(expenseSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/expenses/expenses-route"),
@@ -171,7 +171,7 @@ const expensesRoute = createRoute({
 // AW15 lists every label on one page, so it keeps only the list search.
 const expenseCategoriesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/categorias-de-gasto",
+  path: "/dinero/gastos/categorias",
   validateSearch: optionalSearch(listSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/expenses/categories-page"),

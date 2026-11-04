@@ -10,7 +10,7 @@ import { authenticatedRoute } from "./root-routes";
 // carousel (WEB-006): AW17, one chunk each.
 const evaluationsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/back-office/evaluaciones-nutricionales",
+  path: "/horario/nutricion",
   validateSearch: optionalSearch(evaluationSearchSchema),
   component: lazyRouteComponent(
     () => import("../oversight/evaluations/evaluations-route"),

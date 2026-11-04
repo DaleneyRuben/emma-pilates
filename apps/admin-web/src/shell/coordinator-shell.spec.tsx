@@ -150,9 +150,9 @@ describe("the admin web for the Coordinator", () => {
       await screen.findByRole("button", { name: /Carolina Rivas/ }),
     );
     expect(
-      within(await screen.findByRole("dialog", { name: "Tu cuenta" })).getByText(
-        "Coordinación",
-      ),
+      within(
+        await screen.findByRole("dialog", { name: "Tu cuenta" }),
+      ).getByText("Coordinación"),
     ).toBeInTheDocument();
   });
 });

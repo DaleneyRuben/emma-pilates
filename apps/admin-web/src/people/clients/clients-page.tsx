@@ -120,7 +120,7 @@ export function ClientsPage({
       actions={
         role === "administrator" ? (
           <Link
-            to="/back-office/clientes/campana"
+            to="/promociones/clases-de-campana"
             className="inline-flex h-[38px] items-center rounded-control bg-primario px-4 text-cuerpo font-medium text-blanco shadow-boton hover:bg-primario-hover"
           >
             Dar clases de campaña

@@ -1,9 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { EvaluationsPage } from "./evaluations-page";
 
-const route = getRouteApi(
-  "/authenticated/back-office/evaluaciones-nutricionales",
-);
+const route = getRouteApi("/authenticated/horario/nutricion");
 
 export function EvaluationsRoute() {
   const navigate = route.useNavigate();

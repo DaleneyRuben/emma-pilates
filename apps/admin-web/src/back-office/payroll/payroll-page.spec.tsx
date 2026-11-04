@@ -47,7 +47,7 @@ describe("AW11 Nómina on a desktop browser", () => {
         jsonResponse(salaryPage([emmaSeptember, camilaSeptember])),
       ),
     );
-    renderAdmin("/back-office/nomina");
+    renderAdmin("/dinero/sueldos/pagados");
     await heading();
 
     expect(screen.getByText("Cargando pagos…")).toBeInTheDocument();
@@ -85,7 +85,7 @@ describe("AW11 Nómina on a desktop browser", () => {
         ),
       ),
     );
-    const { router, user } = renderAdmin("/back-office/nomina");
+    const { router, user } = renderAdmin("/dinero/sueldos/pagados");
     await rowOf("Camila Rojas");
 
     const filter = screen.getByLabelText("Empleado");
@@ -119,7 +119,7 @@ describe("AW11 Nómina on a desktop browser", () => {
       ),
     );
     const { router } = renderAdmin(
-      "/back-office/nomina?staffMemberId=5f000000-0000-5000-8000-000000000099&page=2",
+      "/dinero/sueldos/pagados?staffMemberId=5f000000-0000-5000-8000-000000000099&page=2",
     );
     await rowOf("Camila Rojas");
 
@@ -133,30 +133,22 @@ describe("AW11 Nómina on a desktop browser", () => {
     expect(reads.at(-1)?.has("staffMemberId")).toBe(false);
   });
 
-  it("stays the same list whichever Branch the selector names", async () => {
+  it("is studio-wide: «Todo el estudio» instead of the Branch selector", async () => {
     server.use(payrollTable(() => jsonResponse(salaryPage([emmaSeptember]))));
-    const { user } = renderAdmin("/back-office/nomina");
+    renderAdmin("/dinero/sueldos/pagados");
     await rowOf("Emma Vargas");
-    const before = reads.length;
 
-    await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
-    const popover = await screen.findByRole("dialog", { name: "Sucursal" });
     expect(
-      within(popover).getByText(
-        "Esta página no se filtra por sucursal — la nómina es del estudio, no de una sede.",
-      ),
+      within(screen.getByRole("banner")).getByText("Todo el estudio"),
     ).toBeInTheDocument();
-    await user.click(
-      within(popover).getByRole("option", { name: /Equipetrol/ }),
-    );
-
-    expect(await rowOf("Emma Vargas")).toBeVisible();
-    expect(reads).toHaveLength(before);
+    expect(
+      screen.queryByRole("button", { name: /^Sucursal/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("says when nothing was recorded, for everyone or for one person", async () => {
     server.use(payrollTable(() => jsonResponse(salaryPage([]))));
-    const { user } = renderAdmin("/back-office/nomina");
+    const { user } = renderAdmin("/dinero/sueldos/pagados");
     expect(
       await screen.findByText("Todavía no hay pagos registrados."),
     ).toBeVisible();
@@ -169,7 +161,7 @@ describe("AW11 Nómina on a desktop browser", () => {
 
   it("offers a retry when the payroll cannot load", async () => {
     server.use(payrollTable(() => problemResponse(500, "unexpected_error")));
-    renderAdmin("/back-office/nomina");
+    renderAdmin("/dinero/sueldos/pagados");
     expect(
       await screen.findByText(
         "No pudimos cargar la nómina.",
@@ -184,7 +176,7 @@ describe("AW11 Nómina on a desktop browser", () => {
     server.use(
       payrollTable(() => problemResponse(403, "back_office_access_denied")),
     );
-    renderAdmin("/back-office/nomina");
+    renderAdmin("/dinero/sueldos/pagados");
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
@@ -204,7 +196,7 @@ describe("AW11 Nómina on a narrow browser", () => {
 
   it("labels each card's cells", async () => {
     server.use(payrollTable(() => jsonResponse(salaryPage([emmaSeptember]))));
-    renderAdmin("/back-office/nomina");
+    renderAdmin("/dinero/sueldos/pagados");
     const row = await rowOf("Emma Vargas");
     expect(
       within(row).getByRole("cell", { name: "20/09/2026" }),

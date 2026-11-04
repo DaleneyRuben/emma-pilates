@@ -39,7 +39,7 @@ const answerReviews = () =>
   handlers((paymentId) => jsonResponse(reviews[paymentId] ?? {}));
 
 const open = async (name: string) => {
-  const rendered = renderAdmin("/back-office/pagos");
+  const rendered = renderAdmin("/dinero/pagos");
   await rendered.user.click(await screen.findByRole("button", { name }));
   return {
     ...rendered,

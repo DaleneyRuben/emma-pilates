@@ -16,15 +16,26 @@ import { oversightRoutes } from "./oversight-routes";
 import { reportRoutes } from "./report-routes";
 import { optionalSearch } from "../components/table/pagination";
 import { pagePendingOptions } from "./page-pending";
+import { movedRoutes } from "./moved-routes";
 import { authenticatedRoute, publicRoutes, rootRoute } from "./root-routes";
 
 // List pages validate their page-and-offset search and allowlisted filters
 // (ADR-0061/0062) so the URL, not component state, owns them (ADR-0042).
 // Every page is its own chunk (ADR-0023 route-level code splitting): the
 // entry keeps the session guard, the shell, and the sign-in pages.
-const scheduleRoute = createRoute({
+// P01 (follow-up 232): where every session starts.
+const homeRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/",
+  component: lazyRouteComponent(
+    () => import("../home/home-route"),
+    "HomeRoute",
+  ),
+});
+
+const scheduleRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/horario",
   validateSearch: optionalSearch(scheduleSearchSchema),
   component: lazyRouteComponent(
     () => import("../schedule/schedule-route"),
@@ -34,7 +45,7 @@ const scheduleRoute = createRoute({
 
 const branchesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/catalogo/sucursales",
+  path: "/ajustes/sucursales",
   validateSearch: optionalSearch(catalogStatusSearchSchema),
   component: lazyRouteComponent(
     () => import("../catalog/branches/branches-route"),
@@ -44,7 +55,7 @@ const branchesRoute = createRoute({
 
 const classTypesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/catalogo/tipos-de-clase",
+  path: "/ajustes/tipos-de-clase",
   validateSearch: optionalSearch(catalogStatusSearchSchema),
   component: lazyRouteComponent(
     () => import("../catalog/class-types/class-types-route"),
@@ -54,7 +65,7 @@ const classTypesRoute = createRoute({
 
 const plansRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/catalogo/planes",
+  path: "/ajustes/planes",
   validateSearch: optionalSearch(planSearchSchema),
   component: lazyRouteComponent(
     () => import("../catalog/plans/plans-route"),
@@ -62,19 +73,19 @@ const plansRoute = createRoute({
   ),
 });
 
-// AW36 (BKM-004): opened from the account menu, not the sidebar.
 const simulatorRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/simulador",
+  path: "/informes/simulador",
   component: lazyRouteComponent(
     () => import("../simulator/simulator-route"),
     "SimulatorRoute",
   ),
 });
 
+// AW36 (BKM-004): an Ajustes tab, out of the account menu (follow-up 232).
 const studioRulesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: "/reglas-del-estudio",
+  path: "/ajustes/reglas-del-estudio",
   component: lazyRouteComponent(
     () => import("../studio-rules/studio-rules-route"),
     "StudioRulesRoute",
@@ -82,6 +93,7 @@ const studioRulesRoute = createRoute({
 });
 
 const pageRoutes = [
+  homeRoute,
   scheduleRoute,
   branchesRoute,
   classTypesRoute,
@@ -108,6 +120,7 @@ export const preloadAdminPages = (): Promise<unknown> =>
 
 const routeTree = rootRoute.addChildren([
   ...publicRoutes,
+  ...movedRoutes,
   authenticatedRoute.addChildren(pageRoutes),
 ]);
 

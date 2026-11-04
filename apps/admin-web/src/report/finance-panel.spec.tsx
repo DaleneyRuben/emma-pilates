@@ -52,7 +52,7 @@ describe("AW16 Finanzas on a desktop browser", () => {
 
   it("keeps the report as the page and opens Finanzas from its tab", async () => {
     server.use(...finance());
-    const { user, router } = renderAdmin("/reporte");
+    const { user, router } = renderAdmin("/informes/dinero");
     expect(
       await screen.findByRole("heading", {
         level: 1,
@@ -120,7 +120,7 @@ describe("AW16 Finanzas on a desktop browser", () => {
         }),
       ),
     );
-    renderAdmin("/reporte?vista=finanzas&month=2026-10");
+    renderAdmin("/informes/dinero?vista=finanzas&month=2026-10");
 
     expect(
       await screen.findByText("Sueldos pagados Bs 12.000,00"),
@@ -145,7 +145,9 @@ describe("AW16 Finanzas on a desktop browser", () => {
         return jsonResponse({ seeded: true });
       }),
     );
-    const { user } = renderAdmin("/reporte?vista=finanzas&month=2026-10");
+    const { user } = renderAdmin(
+      "/informes/dinero?vista=finanzas&month=2026-10",
+    );
     expect(await screen.findByText("Aún no hay presupuesto.")).toBeVisible();
 
     await user.click(
@@ -161,7 +163,7 @@ describe("AW16 Finanzas on a desktop browser", () => {
   it("steps back a month and keeps it in the address", async () => {
     server.use(...finance());
     const { user, router } = renderAdmin(
-      "/reporte?vista=finanzas&month=2026-10",
+      "/informes/dinero?vista=finanzas&month=2026-10",
     );
     await screen.findByRole("region", { name: "Ingresos en caja" });
 
@@ -175,7 +177,7 @@ describe("AW16 Finanzas on a desktop browser", () => {
 
   it("offers a retry when the month cannot load", async () => {
     server.use(...finance(() => problemResponse(500, "unexpected_error")));
-    renderAdmin("/reporte?vista=finanzas");
+    renderAdmin("/informes/dinero?vista=finanzas");
 
     expect(
       await screen.findByText("No pudimos cargar las finanzas."),
@@ -191,7 +193,7 @@ describe("AW16 Finanzas on a narrow browser", () => {
 
   it("turns the budget table into labelled cards", async () => {
     server.use(...finance());
-    renderAdmin("/reporte?vista=finanzas&month=2026-10");
+    renderAdmin("/informes/dinero?vista=finanzas&month=2026-10");
 
     const table = await screen.findByRole("table", {
       name: "Presupuesto frente a lo gastado",

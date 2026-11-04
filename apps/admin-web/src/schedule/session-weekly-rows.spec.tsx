@@ -24,7 +24,7 @@ import { signedInHandlers } from "../test/session-handlers";
 const batchPath = `${schedulesPath}/batch`;
 
 const openWeekly = async () => {
-  const view = renderAdmin(`/?week=${nextMonday}`);
+  const view = renderAdmin(`/horario?week=${nextMonday}`);
   await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
   await view.user.click(screen.getByRole("button", { name: "Nueva sesión" }));
   const panel = await screen.findByRole("dialog", { name: "Nueva sesión" });

@@ -17,9 +17,7 @@ describe("the global search", () => {
   const search = () => screen.getByRole("combobox", { name: "Buscar en todo" });
 
   describe("for the Administrator", () => {
-    beforeEach(() =>
-      server.use(...signedInHandlers(), ...emptyPageHandlers()),
-    );
+    beforeEach(() => server.use(...signedInHandlers(), ...emptyPageHandlers()));
 
     it("finds a page by its name, accents aside, and opens it with Enter", async () => {
       const { user, router } = renderAdmin("/");
@@ -92,14 +90,13 @@ describe("the global search", () => {
       const { user, router } = renderAdmin("/");
       await heading(/^Buen/);
 
-      await user.type(search(), "reglas");
+      await user.type(search(), "clases");
       await user.click(
-        screen.getByRole("option", { name: "Ajustes · Reglas del estudio" }),
+        screen.getByRole("option", { name: "Horario · Clases" }),
       );
 
-      expect(router.state.location.pathname).toBe(
-        "/ajustes/reglas-del-estudio",
-      );
+      await heading("Horario");
+      expect(router.state.location.pathname).toBe("/horario");
     });
   });
 

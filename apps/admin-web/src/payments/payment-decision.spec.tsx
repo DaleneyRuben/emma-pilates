@@ -46,7 +46,7 @@ const pageHandlers = () => [
 ];
 
 const openSofia = async () => {
-  const rendered = renderAdmin("/back-office/pagos");
+  const rendered = renderAdmin("/dinero/pagos");
   await rendered.user.click(
     await screen.findByRole("button", { name: "Sofía Guzmán" }),
   );

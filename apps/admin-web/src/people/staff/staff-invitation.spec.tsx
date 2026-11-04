@@ -149,7 +149,7 @@ describe("AW24 Nuevo miembro with a known email", () => {
   });
 
   const openCreate = async () => {
-    const rendered = renderAdmin("/back-office/personal");
+    const rendered = renderAdmin("/estudio/personal");
     await rendered.user.click(
       await screen.findByRole("button", { name: "Nuevo miembro" }),
     );

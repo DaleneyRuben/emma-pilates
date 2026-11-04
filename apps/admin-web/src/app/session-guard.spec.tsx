@@ -10,7 +10,7 @@ import {
   signedOutHandlers,
 } from "../test/session-handlers";
 
-const heading = (name: string) =>
+const heading = (name: string | RegExp) =>
   screen.findByRole("heading", { level: 1, name });
 
 describe("admin session guard", () => {
@@ -18,14 +18,12 @@ describe("admin session guard", () => {
 
   it("sends a signed-out visitor to Login and remembers the page they wanted", async () => {
     server.use(...signedOutHandlers());
-    const { router } = renderAdmin(
-      "/back-office/evaluaciones-nutricionales?page=2",
-    );
+    const { router } = renderAdmin("/horario/nutricion?page=2");
 
     expect(await heading("Iniciar sesión")).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/iniciar-sesion");
     expect(router.state.location.search).toEqual({
-      redirect: "/back-office/evaluaciones-nutricionales?page=2&pageSize=20",
+      redirect: "/horario/nutricion?page=2&pageSize=20",
     });
     expect(
       screen.queryByRole("navigation", { name: "Secciones" }),
@@ -34,7 +32,7 @@ describe("admin session guard", () => {
 
   it("restores a signed-in browser session at startup without asking again", async () => {
     server.use(...signedInHandlers(), ...emptyPageHandlers());
-    renderAdmin("/back-office/evaluaciones-nutricionales");
+    renderAdmin("/horario/nutricion");
 
     expect(await heading("Evaluaciones nutricionales")).toBeInTheDocument();
     expect(
@@ -42,17 +40,17 @@ describe("admin session guard", () => {
     ).toBeInTheDocument();
   });
 
-  it("sends a signed-in Administrator away from Login to the schedule", async () => {
+  it("sends a signed-in Administrator away from Login to Inicio", async () => {
     server.use(...signedInHandlers());
     const { router } = renderAdmin("/iniciar-sesion");
 
-    expect(await heading("Horario")).toBeInTheDocument();
+    expect(await heading(/^Buen/)).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/");
   });
 
   it("returns to Login once, with a notice, when a later request finds the session ended", async () => {
     server.use(...signedInHandlers(), ...emptyPageHandlers());
-    const { router, queryClient } = renderAdmin("/back-office/gastos");
+    const { router, queryClient } = renderAdmin("/dinero/gastos");
     await heading("Gastos");
     server.use(...signedOutHandlers());
 
@@ -74,7 +72,7 @@ describe("admin session guard", () => {
       screen.getByText("Tu sesión terminó. Vuelve a iniciar sesión."),
     ).toBeInTheDocument();
     expect(router.state.location.search).toEqual({
-      redirect: "/back-office/gastos?page=1&pageSize=20",
+      redirect: "/dinero/gastos?page=1&pageSize=20",
       notice: "session-ended",
     });
     expect(router.history.length).toBe(2);
@@ -90,7 +88,7 @@ describe("admin session guard", () => {
         return new HttpResponse(null, { status: 204 });
       }),
     );
-    const { router, queryClient, user } = renderAdmin("/back-office/gastos");
+    const { router, queryClient, user } = renderAdmin("/dinero/gastos");
     await heading("Gastos");
 
     await user.click(await screen.findByRole("button", { name: /Tu cuenta/ }));
@@ -107,7 +105,7 @@ describe("admin session guard", () => {
     server.use(...signedInHandlers(), ...emptyPageHandlers());
     await act(() =>
       router.navigate({
-        to: "/back-office/gastos",
+        to: "/dinero/gastos",
         search: { page: 1, pageSize: 20 },
       }),
     );

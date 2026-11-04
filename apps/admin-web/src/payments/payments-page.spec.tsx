@@ -49,7 +49,7 @@ describe("AW28 Pagos on a desktop browser", () => {
         jsonResponse(paymentPage([luciaPayment, sofiaPayment])),
       ),
     );
-    renderAdmin("/back-office/pagos");
+    renderAdmin("/dinero/pagos");
     await heading();
 
     expect(screen.getByText("Cargando pagos…")).toBeInTheDocument();
@@ -91,7 +91,7 @@ describe("AW28 Pagos on a desktop browser", () => {
         ),
       ),
     );
-    const { router, user } = renderAdmin("/back-office/pagos");
+    const { router, user } = renderAdmin("/dinero/pagos");
     await rowOf(/Sofía Guzmán/);
 
     await user.selectOptions(screen.getByLabelText("Estado"), "Todos");
@@ -121,7 +121,7 @@ describe("AW28 Pagos on a desktop browser", () => {
         ),
       ),
     );
-    const { router, user } = renderAdmin("/back-office/pagos?page=2");
+    const { router, user } = renderAdmin("/dinero/pagos?page=2");
     await rowOf(/Lucía Fernández/);
 
     await user.type(
@@ -151,7 +151,7 @@ describe("AW28 Pagos on a desktop browser", () => {
         problemResponse(500, "unexpected_error"),
       ),
     );
-    const { user } = renderAdmin("/back-office/pagos?status=all");
+    const { user } = renderAdmin("/dinero/pagos?status=all");
 
     await user.click(await rowOf(/Valeria Quiroga/));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -169,7 +169,7 @@ describe("AW28 Pagos on a desktop browser", () => {
     server.use(
       paymentTable(() => jsonResponse(paymentPage([], { pendingCount: 0 }))),
     );
-    renderAdmin("/back-office/pagos");
+    renderAdmin("/dinero/pagos");
 
     const table = await screen.findByRole("table");
     expect(
@@ -187,7 +187,7 @@ describe("AW28 Pagos on a desktop browser", () => {
 
   it("says a search found no Payment and keeps the table header", async () => {
     server.use(paymentTable(() => jsonResponse(paymentPage([]))));
-    renderAdmin("/back-office/pagos?q=rodrigues&status=all");
+    renderAdmin("/dinero/pagos?q=rodrigues&status=all");
 
     const table = await screen.findByRole("table");
     expect(
@@ -213,7 +213,7 @@ describe("AW28 Pagos on a desktop browser", () => {
           : jsonResponse(paymentPage([sofiaPayment])),
       ),
     );
-    const { user } = renderAdmin("/back-office/pagos");
+    const { user } = renderAdmin("/dinero/pagos");
 
     expect(
       await screen.findByText(
@@ -231,22 +231,22 @@ describe("AW28 Pagos on a desktop browser", () => {
     server.use(
       paymentTable(() => problemResponse(403, "administration_access_denied")),
     );
-    renderAdmin("/back-office/pagos");
+    renderAdmin("/dinero/pagos");
 
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
   });
 
-  it("counts the pending transfers next to Pagos in the sidebar", async () => {
+  it("counts the pending transfers on Dinero in the rail", async () => {
     server.use(
       paymentTable(() => jsonResponse(paymentPage([sofiaPayment]))),
       ...emptyPageHandlers(),
     );
-    renderAdmin("/back-office/clientes");
+    renderAdmin("/clientas");
 
     expect(
-      await screen.findByRole("link", { name: "Pagos, 6 por revisar" }),
+      await screen.findByRole("link", { name: "Dinero, 6 por revisar" }),
     ).toBeInTheDocument();
   });
 });
@@ -260,7 +260,7 @@ describe("AW28 Pagos without pending transfers in the sidebar", () => {
 
   it("shows no badge when nothing waits", async () => {
     server.use(paymentTable(() => jsonResponse(paymentPage([]))));
-    renderAdmin("/back-office/pagos");
+    renderAdmin("/dinero/pagos");
     await heading();
 
     expect(screen.getByRole("link", { name: /^Pagos$/ })).toBeInTheDocument();
@@ -277,7 +277,7 @@ describe("AW28 Pagos on a narrow browser", () => {
 
   it("keeps the filters above one labelled card per Payment", async () => {
     server.use(paymentTable(() => jsonResponse(paymentPage([sofiaPayment]))));
-    renderAdmin("/back-office/pagos");
+    renderAdmin("/dinero/pagos");
 
     const plan = await screen.findByRole("cell", {
       name: "Paquete de 8 clases",

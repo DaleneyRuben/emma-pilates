@@ -94,7 +94,7 @@ describe("busy submit buttons (WEB-023, follow-up 93)", () => {
         },
       ),
     );
-    const { user } = renderAdmin("/catalogo/planes");
+    const { user } = renderAdmin("/ajustes/planes");
     await user.click(
       await screen.findByRole("button", { name: "Mensual 16 clases" }),
     );
@@ -124,7 +124,7 @@ describe("busy submit buttons (WEB-023, follow-up 93)", () => {
         },
       ),
     );
-    const { user } = renderAdmin(`/?week=${nextMonday}`);
+    const { user } = renderAdmin(`/horario?week=${nextMonday}`);
     await user.click(
       await screen.findByRole("button", { name: /Mat Pilates, 16:00/ }),
     );

@@ -29,7 +29,7 @@ const payrollTable = (rows = () => [emmaSeptember]) =>
   });
 
 const openCreate = async () => {
-  const rendered = renderAdmin("/back-office/nomina");
+  const rendered = renderAdmin("/dinero/sueldos/pagados");
   await screen.findByRole("cell", { name: /Emma Vargas/ });
   await rendered.user.click(
     screen.getByRole("button", { name: "Registrar pago" }),
@@ -169,7 +169,7 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
         },
       ),
     );
-    const { user } = renderAdmin("/back-office/nomina");
+    const { user } = renderAdmin("/dinero/sueldos/pagados");
     await user.click(
       await screen.findByRole("button", { name: "Emma Vargas" }),
     );

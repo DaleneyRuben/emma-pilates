@@ -58,7 +58,7 @@ const movement = (
 const openPanel = async (
   action: "Registrar retiro" | "Registrar reposición",
 ) => {
-  const rendered = renderAdmin("/back-office/insumos");
+  const rendered = renderAdmin("/estudio/insumos");
   await screen.findByRole("cell", { name: "Detergente" });
   await rendered.user.click(screen.getByRole("button", { name: action }));
   const panel = await screen.findByRole("dialog", { name: action });

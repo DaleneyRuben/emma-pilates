@@ -65,12 +65,12 @@ describe("AW39 Indicadores", () => {
 
   it("shows the count tiles, the money figures, and a three-month chart for an Administrator", async () => {
     server.use(months({ month: "2026-10", ...counts, ...amounts }));
-    renderAdmin("/reporte/indicadores");
+    renderAdmin("/informes");
 
     expect(
       await screen.findByRole("heading", { level: 1, name: "Indicadores" }),
     ).toBeVisible();
-    expect(screen.getByRole("link", { name: "Indicadores" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "El mes" })).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -116,7 +116,7 @@ describe("AW39 Indicadores", () => {
       months({ month: "2026-10", ...counts, ...amounts }),
       ...narrativeHandlers(),
     );
-    const { user } = renderAdmin("/reporte/indicadores");
+    const { user } = renderAdmin("/informes");
 
     expect(
       await screen.findByRole("region", { name: "Informe del mes" }),
@@ -161,7 +161,7 @@ describe("AW39 Indicadores", () => {
         problemResponse(403, "studio_access_denied"),
       ),
     );
-    renderAdmin("/reporte/indicadores");
+    renderAdmin("/informes");
 
     expect(
       await screen.findByRole("region", { name: "Ocupación" }),
@@ -188,7 +188,7 @@ describe("AW39 Indicadores", () => {
         }),
       ),
     );
-    renderAdmin("/reporte/indicadores");
+    renderAdmin("/informes");
 
     expect(
       await screen.findByText("En octubre de 2026 no se dictaron clases."),
@@ -203,7 +203,7 @@ describe("AW39 Indicadores", () => {
       months({ month: "2026-10", ...counts, ...amounts }),
       http.get(apiUrl(narrativePath), () => new Promise(() => undefined)),
     );
-    renderAdmin("/reporte/indicadores");
+    renderAdmin("/informes");
 
     expect(await screen.findByText("Cargando el informe…")).toBeVisible();
     expect(screen.getByRole("region", { name: "Ocupación" })).toBeVisible();
@@ -211,7 +211,7 @@ describe("AW39 Indicadores", () => {
 
   it("hides every money figure when the payload has no centavo keys", async () => {
     server.use(months({ month: "2026-10", ...counts }));
-    renderAdmin("/reporte/indicadores");
+    renderAdmin("/informes");
 
     expect(
       await screen.findByRole("region", { name: "Ocupación" }),
@@ -231,7 +231,7 @@ describe("AW39 Indicadores", () => {
         occupancyPercent: 0,
       }),
     );
-    renderAdmin("/reporte/indicadores");
+    renderAdmin("/informes");
 
     expect(
       await screen.findByText("Sin clases dictadas en este mes."),
@@ -247,7 +247,7 @@ describe("AW39 Indicadores", () => {
         problemResponse(500, "no_se_pudo", { detail: "No se pudo" }),
       ),
     );
-    renderAdmin("/reporte/indicadores");
+    renderAdmin("/informes");
 
     expect(
       await screen.findByText("No pudimos cargar los indicadores."),

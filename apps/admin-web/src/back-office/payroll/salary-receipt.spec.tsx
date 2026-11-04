@@ -41,7 +41,7 @@ describe("Salary Payment receipts on the admin web", () => {
         jsonResponse(salaryPage([withReceipt, camilaSeptember])),
       ),
     );
-    const { user } = renderAdmin("/back-office/nomina");
+    const { user } = renderAdmin("/dinero/sueldos/pagados");
 
     expect(
       await screen.findByRole("columnheader", { name: "Comprobante" }),
@@ -75,7 +75,7 @@ describe("Salary Payment receipts on the admin web", () => {
         return jsonResponse(withReceipt, 201);
       }),
     );
-    const { user } = renderAdmin("/back-office/nomina");
+    const { user } = renderAdmin("/dinero/sueldos/pagados");
     await screen.findByRole("button", { name: "Emma Vargas" });
     await user.click(screen.getByRole("button", { name: "Registrar pago" }));
     const panel = await screen.findByRole("dialog", { name: "Registrar pago" });
@@ -114,7 +114,7 @@ describe("Salary Payment receipts on the admin web", () => {
         },
       ),
     );
-    const { user } = renderAdmin("/back-office/nomina");
+    const { user } = renderAdmin("/dinero/sueldos/pagados");
     await user.click(
       await screen.findByRole("button", { name: "Emma Vargas" }),
     );
@@ -138,7 +138,7 @@ describe("Salary Payment receipts on the admin web", () => {
         jsonResponse(salaryPage([withReceipt])),
       ),
     );
-    const { user } = renderAdmin("/back-office/nomina");
+    const { user } = renderAdmin("/dinero/sueldos/pagados");
     await user.click(
       await screen.findByRole("button", { name: "Emma Vargas" }),
     );
@@ -161,7 +161,7 @@ describe("Salary Payment receipts on the admin web", () => {
         jsonResponse(salaryPage([emmaSeptember])),
       ),
     );
-    const { user } = renderAdmin("/back-office/nomina");
+    const { user } = renderAdmin("/dinero/sueldos/pagados");
     await screen.findByRole("button", { name: "Emma Vargas" });
     await user.click(screen.getByRole("button", { name: "Registrar pago" }));
     const panel = await screen.findByRole("dialog", { name: "Registrar pago" });

@@ -57,7 +57,7 @@ describe("AW28 Anular venta", () => {
         },
       ),
     );
-    const { user } = renderAdmin("/back-office/pagos");
+    const { user } = renderAdmin("/dinero/pagos");
     await screen.findByRole("heading", { level: 1, name: "Pagos" });
     await user.selectOptions(
       screen.getByRole("combobox", { name: "Estado" }),
@@ -107,7 +107,7 @@ describe("AW28 Anular venta", () => {
         problemResponse(409, "payment_already_voided"),
       ),
     );
-    const { user } = renderAdmin("/back-office/pagos?status=confirmed");
+    const { user } = renderAdmin("/dinero/pagos?status=confirmed");
     const row = (await screen.findByRole("cell", { name: /Valeria Quiroga/ }))
       .parentElement as HTMLElement;
     await user.click(within(row).getByRole("button", { name: "Anular venta" }));
@@ -136,7 +136,7 @@ describe("AW28 Anular venta", () => {
         jsonResponse(paymentPage([evaluation], { pendingCount: 0 })),
       ),
     );
-    renderAdmin("/back-office/pagos?status=confirmed");
+    renderAdmin("/dinero/pagos?status=confirmed");
     const row = (await screen.findByRole("cell", { name: /Lucía Fernández/ }))
       .parentElement as HTMLElement;
 

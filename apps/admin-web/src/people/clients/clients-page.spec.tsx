@@ -40,7 +40,7 @@ describe("AW21 Clientes on a desktop browser", () => {
     server.use(
       clientTable(() => jsonResponse(clientPage([ana, lucia, sofia]))),
     );
-    renderAdmin("/back-office/clientes");
+    renderAdmin("/clientas");
     await heading();
 
     expect(screen.getByText("Cargando clientas…")).toBeInTheDocument();
@@ -64,7 +64,7 @@ describe("AW21 Clientes on a desktop browser", () => {
 
   it("marks an expired Plan and a Client who never had one", async () => {
     server.use(clientTable(() => jsonResponse(clientPage([ana, sofia]))));
-    renderAdmin("/back-office/clientes");
+    renderAdmin("/clientas");
 
     const expired = (await screen.findByRole("cell", { name: /Sofía Guzmán/ }))
       .parentElement as HTMLElement;
@@ -90,7 +90,7 @@ describe("AW21 Clientes on a desktop browser", () => {
         ),
       ),
     );
-    const { router, user } = renderAdmin("/back-office/clientes?page=2");
+    const { router, user } = renderAdmin("/clientas?page=2");
     await screen.findByRole("cell", { name: /Ana Quiroga/ });
 
     await user.type(
@@ -116,7 +116,7 @@ describe("AW21 Clientes on a desktop browser", () => {
 
   it("says a search found no one without offering to create an account", async () => {
     server.use(clientTable(() => jsonResponse(clientPage([]))));
-    renderAdmin("/back-office/clientes?q=rodrigues");
+    renderAdmin("/clientas?q=rodrigues");
 
     const table = await screen.findByRole("table");
     expect(
@@ -154,7 +154,7 @@ describe("AW21 Clientes on a desktop browser", () => {
         ),
       ),
     );
-    renderAdmin("/back-office/clientes");
+    renderAdmin("/clientas");
 
     expect(
       await screen.findByText("Todavía no hay clientas."),
@@ -164,7 +164,7 @@ describe("AW21 Clientes on a desktop browser", () => {
 
   it("offers a retry when the directory cannot load", async () => {
     server.use(clientTable(() => problemResponse(500, "unexpected_error")));
-    renderAdmin("/back-office/clientes");
+    renderAdmin("/clientas");
 
     expect(
       await screen.findByText(
@@ -180,22 +180,24 @@ describe("AW21 Clientes on a desktop browser", () => {
     server.use(
       clientTable(() => problemResponse(403, "administration_access_denied")),
     );
-    renderAdmin("/back-office/clientes");
+    renderAdmin("/clientas");
 
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
   });
 
-  it("notes in the Branch selector that Clients belong to the studio", async () => {
+  it("is studio-wide: «Todo el estudio» instead of the Branch selector", async () => {
     server.use(clientTable(() => jsonResponse(clientPage([lucia]))));
-    const { user } = renderAdmin("/back-office/clientes");
+    renderAdmin("/clientas");
     await screen.findByRole("cell", { name: /Lucía Fernández/ });
 
-    await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
     expect(
-      await screen.findByText(/Esta página no se filtra por sucursal/),
+      within(screen.getByRole("banner")).getByText("Todo el estudio"),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /^Sucursal/ }),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -206,7 +208,7 @@ describe("AW21 Clientes on a narrow browser", () => {
 
   it("keeps the search above one labelled card per Client", async () => {
     server.use(clientTable(() => jsonResponse(clientPage([lucia]))));
-    renderAdmin("/back-office/clientes");
+    renderAdmin("/clientas");
 
     const plan = await screen.findByRole("cell", {
       name: "Paquete de 8 clases",

@@ -61,7 +61,7 @@ describe("AW04 Planes on a desktop browser", () => {
 
   it("lists Plans with a fixed class count, their validity in days, the Weekly Cap, and the price in BOB", async () => {
     server.use(planTable(() => jsonResponse(page([mensual, anual]))));
-    renderAdmin("/catalogo/planes");
+    renderAdmin("/ajustes/planes");
 
     expect(await screen.findByText("Cargando planes…")).toBeInTheDocument();
     const row = (
@@ -101,7 +101,7 @@ describe("AW04 Planes on a desktop browser", () => {
         ),
       ),
     );
-    const { router, user } = renderAdmin("/catalogo/planes");
+    const { router, user } = renderAdmin("/ajustes/planes");
     await screen.findByRole("cell", { name: /Bimestral 16 clases/ });
 
     await user.selectOptions(screen.getByLabelText("Visibilidad"), "hidden");
@@ -118,7 +118,7 @@ describe("AW04 Planes on a desktop browser", () => {
 
   it("shows a failed read with a retry", async () => {
     server.use(planTable(() => problemResponse(404, "not_found")));
-    renderAdmin("/catalogo/planes");
+    renderAdmin("/ajustes/planes");
     expect(
       await screen.findByText("No pudimos cargar los planes."),
     ).toBeInTheDocument();
@@ -128,7 +128,7 @@ describe("AW04 Planes on a desktop browser", () => {
     server.use(
       planTable(() => problemResponse(403, "administration_access_denied")),
     );
-    renderAdmin("/catalogo/planes");
+    renderAdmin("/ajustes/planes");
 
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
@@ -147,7 +147,7 @@ describe("AW04 Planes on a desktop browser", () => {
         return jsonResponse({ ...mensual, id: "new" }, 201);
       }),
     );
-    const { user } = renderAdmin("/catalogo/planes");
+    const { user } = renderAdmin("/ajustes/planes");
     const panel = await openNewPlan(user);
 
     expect(
@@ -203,7 +203,7 @@ describe("AW04 Planes on a desktop browser", () => {
         return jsonResponse(mensual);
       }),
     );
-    const { user } = renderAdmin("/catalogo/planes");
+    const { user } = renderAdmin("/ajustes/planes");
     await user.click(
       await screen.findByRole("button", { name: "Bimestral 16 clases" }),
     );
@@ -249,7 +249,7 @@ describe("AW04 Planes on a desktop browser", () => {
         },
       ),
     );
-    const { user } = renderAdmin("/catalogo/planes");
+    const { user } = renderAdmin("/ajustes/planes");
 
     await user.click(
       await screen.findByRole("button", { name: "Bimestral 16 clases" }),
@@ -285,7 +285,7 @@ describe("AW04 Planes on a narrow browser", () => {
         problemResponse(400, "invalid_catalog_value"),
       ),
     );
-    const { user } = renderAdmin("/catalogo/planes");
+    const { user } = renderAdmin("/ajustes/planes");
     const panel = await openNewPlan(user);
     expect(panel).toHaveAttribute("data-presentation", "full-screen");
 

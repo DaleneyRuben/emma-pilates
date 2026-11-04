@@ -34,7 +34,7 @@ describe("AW37 Fundadoras", () => {
 
   it("lists number, name, since, and status with no create action", async () => {
     server.use(http.get(apiUrl(foundersPath), () => jsonResponse(page)));
-    renderAdmin("/back-office/fundadoras");
+    renderAdmin("/clientas/fundadoras");
 
     expect(
       await screen.findByRole("heading", { level: 1, name: "Fundadoras" }),
@@ -58,7 +58,7 @@ describe("AW37 Fundadoras", () => {
         jsonResponse({ items: [], granted: 0, places: 40 }),
       ),
     );
-    renderAdmin("/back-office/fundadoras");
+    renderAdmin("/clientas/fundadoras");
 
     expect(
       await screen.findByText("Todavía no hay fundadoras."),
@@ -78,7 +78,7 @@ describe("AW37 Fundadoras on a narrow browser", () => {
 
   it("keeps the number and the name on the card", async () => {
     server.use(http.get(apiUrl(foundersPath), () => jsonResponse(page)));
-    renderAdmin("/back-office/fundadoras");
+    renderAdmin("/clientas/fundadoras");
 
     expect(await screen.findByText("Lucía Fernández")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();

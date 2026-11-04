@@ -15,7 +15,7 @@ import { signedInHandlers } from "../test/session-handlers";
 let review: PaymentReviewDto = reviewOf(sofiaPayment);
 
 const openConfirmation = async () => {
-  const { user } = renderAdmin("/back-office/pagos");
+  const { user } = renderAdmin("/dinero/pagos");
   await user.click(await screen.findByRole("button", { name: "Sofía Guzmán" }));
   const panel = await screen.findByRole("dialog", { name: "Revisar pago" });
   await within(panel).findByText("Monto a verificar");

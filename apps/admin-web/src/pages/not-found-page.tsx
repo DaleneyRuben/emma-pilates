@@ -12,7 +12,7 @@ export function NotFoundPage() {
           to="/"
           className="mt-3 inline-block text-cuerpo font-medium text-primario underline-offset-4 hover:text-primario-presionado hover:underline"
         >
-          Volver al horario
+          Volver al inicio
         </Link>
       </section>
     </article>

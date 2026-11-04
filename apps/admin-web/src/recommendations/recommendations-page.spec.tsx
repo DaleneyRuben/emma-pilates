@@ -45,7 +45,7 @@ describe("AW44 Recomendaciones", () => {
 
   it("lists the month's findings and discards one", async () => {
     server.use(list([finding, inactive]));
-    const { user } = renderAdmin("/recomendaciones");
+    const { user } = renderAdmin("/informes/recomendaciones");
 
     expect(
       await screen.findByRole("heading", { level: 1, name: "Recomendaciones" }),
@@ -88,7 +88,7 @@ describe("AW44 Recomendaciones", () => {
 
   it("says the month has nothing to review", async () => {
     server.use(list([]));
-    renderAdmin("/recomendaciones");
+    renderAdmin("/informes/recomendaciones");
 
     expect(await screen.findByText("Nada que revisar este mes.")).toBeVisible();
   });
@@ -99,7 +99,7 @@ describe("AW44 Recomendaciones", () => {
         problemResponse(500, "no_se_pudo", { detail: "No se pudo" }),
       ),
     );
-    renderAdmin("/recomendaciones");
+    renderAdmin("/informes/recomendaciones");
 
     expect(
       await screen.findByText("No pudimos cargar las recomendaciones."),
@@ -109,7 +109,7 @@ describe("AW44 Recomendaciones", () => {
 
   it("shows the loading notice before the list arrives", async () => {
     server.use(http.get(apiUrl(listPath), () => new Promise(() => undefined)));
-    renderAdmin("/recomendaciones");
+    renderAdmin("/informes/recomendaciones");
 
     expect(
       await screen.findByText("Cargando las recomendaciones…"),

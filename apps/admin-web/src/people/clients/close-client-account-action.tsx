@@ -89,7 +89,7 @@ export function CloseClientAccountAction({
               No se puede cerrar todavía: tiene un pago por transferencia en
               revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.
             </span>
-            <Link to="/back-office/pagos" className="font-medium text-primario">
+            <Link to="/dinero/pagos" className="font-medium text-primario">
               Ir a Pagos
             </Link>
           </div>

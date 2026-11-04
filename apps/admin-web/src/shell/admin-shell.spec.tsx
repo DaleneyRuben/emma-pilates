@@ -63,7 +63,9 @@ describe("admin shell", () => {
       expect(
         within(rail()).getByRole("link", { name: "Dinero" }),
       ).toHaveAttribute("aria-current", "page");
-      const tabs = screen.getByRole("navigation", { name: "Páginas de Dinero" });
+      const tabs = screen.getByRole("navigation", {
+        name: "Páginas de Dinero",
+      });
       expect(
         within(tabs)
           .getAllByRole("link")
@@ -76,35 +78,34 @@ describe("admin shell", () => {
 
       await user.click(within(tabs).getByRole("link", { name: "Gastos" }));
       await heading("Gastos");
-      expect(within(tabs).getByRole("link", { name: "Gastos" })).toHaveAttribute(
-        "aria-current",
-        "page",
-      );
+      expect(
+        within(tabs).getByRole("link", { name: "Gastos" }),
+      ).toHaveAttribute("aria-current", "page");
     });
 
     it("keeps the tab marked on its other views and switches between them", async () => {
-      const { user } = renderShell("/dinero/sueldos");
-      await heading("Pagos a instructoras");
+      const { user } = renderShell("/dinero/gastos");
+      await heading("Gastos");
 
       const views = screen.getByRole("navigation", {
-        name: "Vistas de Sueldos",
+        name: "Vistas de Gastos",
       });
       expect(
         within(views)
           .getAllByRole("link")
           .map((link) => link.textContent),
-      ).toEqual(["Instructoras", "Coordinadora", "Pagados"]);
+      ).toEqual(["Gastos", "Categorías"]);
 
-      await user.click(within(views).getByRole("link", { name: "Pagados" }));
+      await user.click(within(views).getByRole("link", { name: "Categorías" }));
 
-      await heading("Nómina");
+      await heading("Categorías de gasto");
       expect(
         within(
           screen.getByRole("navigation", { name: "Páginas de Dinero" }),
-        ).getByRole("link", { name: "Sueldos" }),
+        ).getByRole("link", { name: "Gastos" }),
       ).toHaveAttribute("aria-current", "page");
       expect(
-        within(views).getByRole("link", { name: "Pagados" }),
+        within(views).getByRole("link", { name: "Categorías" }),
       ).toHaveAttribute("aria-current", "page");
     });
 
@@ -157,8 +158,8 @@ describe("admin shell", () => {
 
     it("counts what waits on the destination and on its tab", async () => {
       server.use(pendingBadgeHandler(3));
-      renderShell("/dinero/caja");
-      await heading("Caja");
+      renderShell("/dinero/gastos");
+      await heading("Gastos");
 
       expect(
         await within(rail()).findByRole("link", {

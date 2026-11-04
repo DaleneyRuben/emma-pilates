@@ -43,9 +43,7 @@ describe("AW01 Login", () => {
         return jsonResponse(paolaPrincipal, 201);
       }),
     );
-    const { router, user } = renderAdmin(
-      "/back-office/evaluaciones-nutricionales?page=2",
-    );
+    const { router, user } = renderAdmin("/horario/nutricion?page=2");
 
     await fillLogin(user);
 
@@ -56,7 +54,7 @@ describe("AW01 Login", () => {
       }),
     ).toBeInTheDocument();
     expect(router.state.location.href).toBe(
-      "/back-office/evaluaciones-nutricionales?page=2&pageSize=20",
+      "/horario/nutricion?page=2&pageSize=20",
     );
     expect(body).toEqual({
       email: "paola.mendoza@example.com",
@@ -64,7 +62,7 @@ describe("AW01 Login", () => {
     });
   });
 
-  it("opens the schedule after a direct sign-in", async () => {
+  it("opens Inicio after a direct sign-in", async () => {
     server.use(
       http.post(apiUrl(loginPath), () => {
         server.use(...signedInHandlers());
@@ -76,7 +74,7 @@ describe("AW01 Login", () => {
     await fillLogin(user);
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Horario" }),
+      await screen.findByRole("heading", { level: 1, name: /^Buen/ }),
     ).toBeInTheDocument();
   });
 

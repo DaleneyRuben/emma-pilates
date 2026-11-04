@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Check, ChevronDown, MapPin } from "lucide-react";
 import {
   useId,
@@ -7,7 +7,6 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
-import { findNavigationItem } from "../../app/navigation";
 import {
   Popover,
   PopoverContent,
@@ -53,14 +52,12 @@ function moveFocus(event: KeyboardEvent<HTMLDivElement>) {
 function BranchRows({
   title,
   labelId,
-  studioWideNote,
   onDone,
   rowHeightClass,
 }: {
   /** The "Sucursal" label: a plain line in the popover, the sheet's title. */
   title: ReactNode;
   labelId: string;
-  studioWideNote: string | undefined;
   onDone: () => void;
   rowHeightClass: string;
 }) {
@@ -75,11 +72,6 @@ function BranchRows({
   return (
     <div className="flex flex-col py-2">
       {title}
-      {studioWideNote === undefined ? null : (
-        <p className="mx-2 mb-2 rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
-          Esta página no se filtra por sucursal — {studioWideNote}
-        </p>
-      )}
       {branches.length === 0 ? (
         <p
           role={status === "error" ? "alert" : undefined}
@@ -135,7 +127,7 @@ function BranchRows({
       </div>
       <div className="mx-4 my-2 h-px bg-divisor" aria-hidden="true" />
       <Link
-        to="/catalogo/sucursales"
+        to="/ajustes/sucursales"
         onClick={onDone}
         className="flex h-9 items-center px-4 text-fila-menu text-primario hover:bg-hover-fila hover:text-primario-presionado"
       >
@@ -162,34 +154,30 @@ function BranchTrigger({
     <button
       type="button"
       className={cn(
-        "flex h-[38px] items-center gap-2 rounded-control border border-transparent px-3 text-nota text-texto hover:border-borde-fuerte hover:bg-superficie",
-        open && "border-borde-fuerte bg-superficie",
+        "flex h-11 items-center gap-2 rounded-tarjeta bg-lino px-3.5 text-cuerpo text-texto hover:bg-rosa-tinte",
+        open && "bg-rosa-tinte",
         className,
       )}
       {...props}
     >
       <MapPin
-        size={16}
+        size={20}
         strokeWidth={1.6}
         aria-hidden="true"
-        className="text-texto-tenue"
+        className="text-primario"
       />
       {branch === undefined ? (
-        <span className="text-texto-tenue">Sin sucursal</span>
+        <span className="text-tenue">Sin sucursal</span>
       ) : (
-        <>
-          <span className="text-texto-tenue">Sucursal</span>{" "}
-          <span className="font-medium">{branch.name}</span>
-        </>
+        <span>
+          Sucursal <span>{branch.name}</span>
+        </span>
       )}
       <ChevronDown
-        size={14}
-        strokeWidth={1.8}
+        size={20}
+        strokeWidth={1.6}
         aria-hidden="true"
-        className={cn(
-          "text-texto-tenue transition-transform",
-          open && "rotate-180",
-        )}
+        className={cn("text-tenue transition-transform", open && "rotate-180")}
       />
     </button>
   );
@@ -200,10 +188,6 @@ export function BranchSelector() {
   const labelId = useId();
   const narrow = useIsNarrowViewport();
   const { selectedBranch } = useBranchSelection();
-  const pathname = useRouterState({
-    select: (state) => state.location.pathname,
-  });
-  const studioWideNote = findNavigationItem(pathname)?.studioWide;
   const close = () => setOpen(false);
 
   if (narrow) {
@@ -226,7 +210,6 @@ export function BranchSelector() {
               </SheetTitle>
             }
             labelId={labelId}
-            studioWideNote={studioWideNote}
             onDone={close}
             rowHeightClass="min-h-12"
           />
@@ -248,7 +231,6 @@ export function BranchSelector() {
             </p>
           }
           labelId={labelId}
-          studioWideNote={studioWideNote}
           onDone={close}
           rowHeightClass="min-h-10"
         />

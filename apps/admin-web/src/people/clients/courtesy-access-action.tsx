@@ -126,10 +126,7 @@ export function CourtesyAccessAction({
           >
             <span>{problem}</span>
             {problem === refusals.payment_pending_exists ? (
-              <Link
-                to="/back-office/pagos"
-                className="font-medium text-primario"
-              >
+              <Link to="/dinero/pagos" className="font-medium text-primario">
                 Ir a Pagos
               </Link>
             ) : null}

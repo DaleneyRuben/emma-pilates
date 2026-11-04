@@ -125,7 +125,7 @@ function BranchSupplies({
       links={
         <Button asChild variant="link" className="px-2">
           <Link
-            to="/back-office/insumos/retiros"
+            to="/estudio/insumos/retiros"
             search={{ page: 1, pageSize: defaultPageSize }}
           >
             Ver historial de retiros

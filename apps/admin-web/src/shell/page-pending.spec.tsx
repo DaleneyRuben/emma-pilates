@@ -48,7 +48,7 @@ const buildRouter = (chunk: Promise<PageModule>) => {
   });
   const plansRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: "/catalogo/planes",
+    path: "/ajustes/planes",
     component: lazyRouteComponent(() => chunk, "PlansPage"),
   });
   return createRouter({
@@ -87,7 +87,7 @@ describe("a page slow to arrive (WEB-035, follow-up 107)", () => {
     // The navigation settles only when the chunk arrives, so it is not
     // awaited; the act scope flushes what it renders at once.
     await act(async () => {
-      void router.navigate({ to: "/catalogo/planes" });
+      void router.navigate({ to: "/ajustes/planes" });
     });
     return router;
   };

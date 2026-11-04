@@ -40,7 +40,7 @@ describe("Horario cache after a change", () => {
         jsonResponse({}),
       ),
     );
-    const { user } = renderAdmin(`/?week=${nextMonday}`);
+    const { user } = renderAdmin(`/horario?week=${nextMonday}`);
     await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
 
     await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
