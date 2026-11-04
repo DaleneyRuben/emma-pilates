@@ -80,17 +80,22 @@ export const normalizeTransferQr = async (
 };
 
 // The uploaded QR, or the server's TRANSFER_QR_IMAGE_PATH file until the
-// Administrator uploads one. Only a missing object falls back: the QR decides
-// where clients send money, so an outage must fail instead of serving an old
-// one.
+// Administrator uploads one; null when neither exists. Only a missing object
+// falls back: the QR decides where clients send money, so an outage must fail
+// instead of serving an old one.
 export const readTransferQr = async (
   storage: ObjectStorage,
   fallbackPath: string,
-): Promise<Buffer> => {
+): Promise<Buffer | null> => {
   try {
     return await storage.get(transferQrStorageKey);
   } catch (error) {
     if (!isStorageObjectMissing(error)) throw error;
-    return readFile(fallbackPath);
+  }
+  try {
+    return await readFile(fallbackPath);
+  } catch (error) {
+    if (isStorageObjectMissing(error)) return null;
+    throw error;
   }
 };

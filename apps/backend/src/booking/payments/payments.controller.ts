@@ -412,11 +412,13 @@ export class TransferInstructionsController {
     @Headers('authorization') authorization: string | undefined,
   ): Promise<StreamableFile> {
     await authenticateBearer(this.principalResolver, authorization);
-    return new StreamableFile(
-      await readTransferQr(
-        this.instructions.storage,
-        this.instructions.qrImagePath,
-      ),
+    const qr = await readTransferQr(
+      this.instructions.storage,
+      this.instructions.qrImagePath,
     );
+    if (qr === null) {
+      throw notFound('transfer_qr_not_found', 'No transfer QR is configured');
+    }
+    return new StreamableFile(qr);
   }
 }
