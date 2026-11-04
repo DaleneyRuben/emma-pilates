@@ -16,6 +16,7 @@ export type BackOfficeErrorCode =
   | 'salary_receipt_not_found'
   | 'pay_statement_not_found'
   | 'pay_statement_month_open'
+  | 'pay_statement_period_overlaps'
   | 'expense_not_found'
   | 'expense_category_not_found'
   | 'expense_category_name_taken'
@@ -45,6 +46,7 @@ const statuses: Record<BackOfficeErrorCode, number> = {
   salary_receipt_not_found: 404,
   pay_statement_not_found: 404,
   pay_statement_month_open: 409,
+  pay_statement_period_overlaps: 409,
   expense_not_found: 404,
   expense_category_not_found: 404,
   expense_category_name_taken: 409,

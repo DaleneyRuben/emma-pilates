@@ -33,6 +33,7 @@ describe('pay statements for any period', () => {
   let world: EvaluationTestWorld;
   const emmaId = deterministicId('staff-member:emma');
   const danielaId = deterministicId('staff-member:daniela');
+  const andreaId = deterministicId('staff-member:andrea');
   const carolinaId = deterministicId('staff-member:carolina');
   const branchId = deterministicId('branch:centro');
   const classTypeId = deterministicId('class-type:reformer');
@@ -110,7 +111,7 @@ describe('pay statements for any period', () => {
       // Another Staff Member, the next period, and a removed statement do not
       // block.
       await expect(
-        insert(emmaId, '2028-01-10', '2028-01-11'),
+        insert(andreaId, '2028-01-10', '2028-01-11'),
       ).resolves.toBeDefined();
       await expect(
         insert(danielaId, '2028-02-01', '2028-02-08'),
