@@ -74,6 +74,8 @@ const fileHandlers = () => [
     jsonResponse(history),
   ),
   http.get(apiUrl("/api/v1/administrator/payments"), ({ request }) => {
+    // The Pagos badge reads the studio's pending count.
+    if (!new URL(request.url).searchParams.has("clientId")) return undefined;
     fileReads.push(request.url);
     return jsonResponse(
       paymentPage([
@@ -88,6 +90,7 @@ const fileHandlers = () => [
     );
   }),
   http.get(apiUrl("/api/v1/administrator/evaluations"), ({ request }) => {
+    if (!new URL(request.url).searchParams.has("clientId")) return undefined;
     fileReads.push(request.url);
     return jsonResponse(
       evaluationPage([
@@ -126,7 +129,7 @@ describe("The Client file's tabs", () => {
   });
 
   it("opens on Resumen with the four tabs for the Administrator", async () => {
-    server.use(...signedInHandlers(), ...fileHandlers());
+    server.use(...fileHandlers(), ...signedInHandlers());
     const { panel } = await openLucia();
 
     expect(tabNames(panel)).toEqual([
@@ -145,7 +148,7 @@ describe("The Client file's tabs", () => {
   });
 
   it("lists the upcoming classes, the waitlist, and the past classes under Reservas", async () => {
-    server.use(...signedInHandlers(), ...fileHandlers());
+    server.use(...fileHandlers(), ...signedInHandlers());
     const { panel, user } = await openLucia();
 
     await user.click(within(panel).getByRole("tab", { name: "Reservas" }));
@@ -165,7 +168,7 @@ describe("The Client file's tabs", () => {
   });
 
   it("lists her sales under Pagos with a way to Dinero", async () => {
-    server.use(...signedInHandlers(), ...fileHandlers());
+    server.use(...fileHandlers(), ...signedInHandlers());
     const { panel, user } = await openLucia();
 
     await user.click(within(panel).getByRole("tab", { name: "Pagos" }));
@@ -185,7 +188,7 @@ describe("The Client file's tabs", () => {
   });
 
   it("lists her Evaluations, the coming one and the done one", async () => {
-    server.use(...signedInHandlers(), ...fileHandlers());
+    server.use(...fileHandlers(), ...signedInHandlers());
     const { panel, user } = await openLucia();
 
     await user.click(within(panel).getByRole("tab", { name: "Evaluaciones" }));
@@ -205,7 +208,7 @@ describe("The Client file's tabs", () => {
   });
 
   it("hides Pagos, courtesy classes, and returning a class from the Coordinator", async () => {
-    server.use(...coordinatorHandlers(), ...fileHandlers());
+    server.use(...fileHandlers(), ...coordinatorHandlers());
     const { panel } = await openLucia();
 
     expect(tabNames(panel)).toEqual(["Resumen", "Reservas", "Evaluaciones"]);
@@ -226,7 +229,7 @@ describe("The Client file at 420 px", () => {
   useNarrowViewport();
 
   it("fills the screen with the same tabs", async () => {
-    server.use(...signedInHandlers(), ...fileHandlers());
+    server.use(...fileHandlers(), ...signedInHandlers());
     const { panel } = await openLucia();
 
     expect(panel).toHaveAttribute("data-presentation", "full-screen");
