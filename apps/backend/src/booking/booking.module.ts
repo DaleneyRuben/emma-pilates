@@ -149,6 +149,7 @@ import { createPrismaCatalogAdministration } from './administration/prisma-catal
 import { createPrismaCatalogLists } from './administration/prisma-catalog-lists';
 import { createPrismaOversight } from './administration/prisma-oversight';
 import { createPrismaScheduleAdministration } from './administration/prisma-schedule-administration';
+import { createPrismaSchedulePauses } from './administration/prisma-schedule-pauses';
 import { createPrismaScheduleBatch } from './administration/prisma-schedule-batch';
 import { accountClosure } from './account-closure/account-closure-provider';
 import { adminWebReads } from './admin-web-reads';
@@ -646,6 +647,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
               recordNotification,
             }),
             ...createPrismaScheduleBatch(prisma, { now }),
+            ...createPrismaSchedulePauses(prisma, { now }),
           },
           oversight: createPrismaOversight(prisma, { now }),
           cancelEvaluation: (evaluationId, principal) =>

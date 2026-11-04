@@ -146,6 +146,21 @@ export class AdminSessionScheduleDto {
     description: 'Exclusive end',
   })
   effectiveUntil!: string | null;
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description: 'BKM-018: first paused date, or null when not paused',
+  })
+  pausedFrom!: string | null;
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description:
+      'BKM-018: first date with Sessions again (exclusive), or null: paused until resumed, or not paused',
+  })
+  pausedUntil!: string | null;
   @ApiProperty() classTypeName!: string;
 }
 

@@ -14,6 +14,8 @@ type ScheduleRow = {
   capacity: number;
   effectiveFrom: Date;
   effectiveUntil: Date | null;
+  pausedFrom: Date | null;
+  pausedUntil: Date | null;
   classType: { name: string };
 };
 
@@ -29,6 +31,8 @@ export const toScheduleDto = (
   capacity: schedule.capacity,
   effectiveFrom: civil(schedule.effectiveFrom)!,
   effectiveUntil: civil(schedule.effectiveUntil),
+  pausedFrom: civil(schedule.pausedFrom),
+  pausedUntil: civil(schedule.pausedUntil),
   classTypeName: schedule.classType.name,
   durationMinutes: schedule.durationMinutes,
 });
