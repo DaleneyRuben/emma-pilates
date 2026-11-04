@@ -48,9 +48,7 @@ describe("Inicio for the Administrator", () => {
       ["Revisar", "/clientas/para-contactar"],
     ]);
     expect(within(list).getByText("2 pagos por revisar")).toBeVisible();
-    expect(
-      within(list).getByText("1 congelamiento por decidir"),
-    ).toBeVisible();
+    expect(within(list).getByText("1 congelamiento por decidir")).toBeVisible();
   });
 
   it("says everything is up to date when nothing waits", async () => {
@@ -77,15 +75,17 @@ describe("Inicio for the Administrator", () => {
     const money = await screen.findByRole("region", { name: "Dinero" });
     expect(await within(money).findByText("Bs 802")).toBeVisible();
     expect(within(money).getByText("Efectivo")).toBeVisible();
-    expect(
-      within(money).getByRole("button", { name: "Hoy" }),
-    ).toHaveAttribute("aria-pressed", "true");
+    expect(within(money).getByRole("button", { name: "Hoy" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
 
     await user.click(within(money).getByRole("button", { name: "Mes" }));
 
-    expect(
-      within(money).getByRole("button", { name: "Mes" }),
-    ).toHaveAttribute("aria-pressed", "true");
+    expect(within(money).getByRole("button", { name: "Mes" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
     expect(new Set(ranges).size).toBe(2);
   });
 

@@ -36,8 +36,9 @@ describe("the Coordinator's pay statement", () => {
 
   it("shows the draft and approves it once", async () => {
     let approved = 0;
+    // Its own statements answer before Inicio's empty default.
+    server.use(...signedInHandlers());
     server.use(
-      ...signedInHandlers(),
       http.get(apiUrl(statementsPath), () =>
         jsonResponse(
           approved === 0
@@ -82,8 +83,9 @@ describe("the Coordinator's pay statement", () => {
   });
 
   it("refuses an Assistant", async () => {
+    // Its own statements answer before Inicio's empty default.
+    server.use(...signedInHandlers());
     server.use(
-      ...signedInHandlers(),
       http.get(apiUrl(statementsPath), () =>
         problemResponse(403, "back_office_access_denied"),
       ),

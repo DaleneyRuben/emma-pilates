@@ -136,7 +136,10 @@ export function todaySummary<Session extends DaySession>(
   const todays = sessions
     .filter((session) => boliviaParts(session.startsAt).date === today)
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-  const bookings = todays.reduce((sum, session) => sum + session.bookedCount, 0);
+  const bookings = todays.reduce(
+    (sum, session) => sum + session.bookedCount,
+    0,
+  );
   const capacity = todays.reduce((sum, session) => sum + session.capacity, 0);
   return {
     classes: todays.length,
