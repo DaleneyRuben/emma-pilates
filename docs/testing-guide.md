@@ -3063,8 +3063,11 @@ the same four names as the Staff app and the user menu, UX-005),
    name>.". The phone follows FIX-036's rule (`12345` shows "Escribe un
    celular de Bolivia de 8 dígitos, por ejemplo 71234567." and nothing is
    sent), a stored phone from before the rule (`+54 9 11 5555 0000`) can stay
-   as it is while you change something else, and clearing the field removes
-   the phone. Each change writes a `staff_member.contact_changed` audit record
+   as it is while you change something else (it is never rewritten unless
+   you edit it), and clearing the field removes the phone. When the name or
+   phone saves but a Role or Branch change after it is refused, the panel
+   says "Guardamos el nombre y el teléfono, pero no el resto." before the
+   reason. Each change writes a `staff_member.contact_changed` audit record
    with the old and new values (`PUT
    /api/v1/administrator/staff-members/{id}/contact`, Administrator only: a
    Coordinator gets 403). An active member's login email is a read-only row
