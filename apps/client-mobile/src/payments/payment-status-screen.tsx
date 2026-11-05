@@ -18,6 +18,7 @@ import { useResendReceipt } from "./use-resend-receipt";
 
 type StatusNavigation = {
   goBack: () => void;
+  popToTop: () => void;
   navigate: (screen: "Booking" | "HomeTab", params: { screen: "Browse" | "Home" }) => void;
 };
 
@@ -31,13 +32,20 @@ export function PaymentStatusScreen() {
   });
   const { busy: retrying, error, resend } = useResendReceipt();
 
-  const goHome = () => navigation.navigate("HomeTab", { screen: "Home" });
+  // Leaving for another tab first returns this stack to its root, so Perfil
+  // or Reservar is not left on the spent payment without its tab bar.
+  const leaveFor = (screen: "Booking" | "HomeTab", target: "Browse" | "Home") => {
+    navigation.popToTop();
+    navigation.navigate(screen, { screen: target });
+  };
+  const goHome = () => leaveFor("HomeTab", "Home");
 
   // The result has no back arrow: the Android back button leads home like
   // «Volver al inicio», never to the spent payment screen (MOB-074).
   useFocusEffect(
     useCallback(() => {
       const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+        navigation.popToTop();
         navigation.navigate("HomeTab", { screen: "Home" });
         return true;
       });
@@ -73,7 +81,7 @@ export function PaymentStatusScreen() {
         onHome={goHome}
         onPrimary={
           current.state === "confirmed"
-            ? () => navigation.navigate("Booking", { screen: "Browse" })
+            ? () => leaveFor("Booking", "Browse")
             : current.state === "rejected"
               ? () => void resend(current.planId)
               : undefined

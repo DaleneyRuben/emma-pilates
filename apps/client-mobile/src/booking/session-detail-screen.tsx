@@ -80,7 +80,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   });
   const studioRules = useStudioRules(fetcher);
   const subscription = useGetCurrentClientSubscription({ fetcher });
-  const { standing } = usePaymentStanding(fetcher);
+  const { pending: paymentPending, standing } = usePaymentStanding(fetcher);
   const resendReceipt = useResendReceipt();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -275,6 +275,10 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
               testID="session-book"
             />
           </>
+        ) : paymentPending ? (
+          // The reason waits for the Payment, so «Necesitas un plan» never
+          // flashes for a Client whose receipt is in review.
+          <PrimaryButton disabled label="Reservar" />
         ) : (
           <BookingOffFooter
             busy={resendReceipt.busy}
