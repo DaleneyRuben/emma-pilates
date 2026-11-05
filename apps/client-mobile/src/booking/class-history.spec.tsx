@@ -3,7 +3,7 @@ import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { StyleSheet } from "react-native";
 
 import App from "../../App";
-import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
+import { createClientRuntime, jsonResponse, routeFetcher, staffPhotoRoute } from "../test-support";
 
 jest.setTimeout(20_000);
 
@@ -33,6 +33,7 @@ const history = [
     sessionId: "session-3",
     classTypeName: "Mat Pilates",
     trainerName: "Daniela Ortiz",
+    trainerPhoto: { imageAssetId: "asset-daniela" },
     branchName: "Urubó",
     startsAt: "2026-09-05T13:00:00.000Z",
     endsAt: "2026-09-05T13:50:00.000Z",
@@ -42,6 +43,7 @@ const history = [
     sessionId: "session-2",
     classTypeName: "Reformer Pilates",
     trainerName: "Emma Vargas",
+    trainerPhoto: null,
     branchName: "Centro",
     startsAt: "2026-08-26T11:00:00.000Z",
     endsAt: "2026-08-26T11:50:00.000Z",
@@ -51,6 +53,7 @@ const history = [
     sessionId: "session-1",
     classTypeName: "Reformer Pilates",
     trainerName: "Emma Vargas",
+    trainerPhoto: null,
     branchName: "Centro",
     startsAt: "2026-08-19T11:00:00.000Z",
     endsAt: "2026-08-19T11:50:00.000Z",
@@ -58,18 +61,16 @@ const history = [
 ];
 
 async function openHistory(entries: unknown[]) {
-  const screen = await render(
-    <App
-      runtime={createClientRuntime(
-        routeFetcher({
-          "/api/v1/clients/current": () => jsonResponse(profile),
-          "/api/v1/clients/current/subscription": () => jsonResponse(active),
-          "/api/v1/bookings": () => jsonResponse([]),
-          "/api/v1/bookings/history": () => jsonResponse(entries),
-        }),
-      )}
-    />,
-  );
+  const fetcher = routeFetcher({
+    "/api/v1/clients/current": () => jsonResponse(profile),
+    "/api/v1/clients/current/subscription": () => jsonResponse(active),
+    "/api/v1/bookings": () => jsonResponse([]),
+    "/api/v1/bookings/history": () => jsonResponse(entries),
+    ...staffPhotoRoute("asset-daniela"),
+  });
+  const screen = Object.assign(await render(<App runtime={createClientRuntime(fetcher)} />), {
+    fetcher,
+  });
 
   await waitFor(
     () => {
@@ -113,6 +114,19 @@ describe("Client Class History", () => {
       screen.getByLabelText("sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
     ).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Cancelar reserva" })).not.toBeOnTheScreen();
+  });
+
+  // FIX-041 (follow-up 242, C05d): her 20 px face comes before her name.
+  it("leads each row's trainer with her photo, or her initials without one", async () => {
+    const screen = await openHistory(history);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveStyle({ height: 20 });
+    });
+    expect(screen.fetcher).toHaveBeenCalledWith(
+      "/api/v1/staff-photos/asset-daniela?variant=thumbnail",
+    );
+    expect(screen.getAllByText("EV")).toHaveLength(2);
   });
 
   // MOB-040: the 07 frame draws rows between rules on Superficie, not cards.
