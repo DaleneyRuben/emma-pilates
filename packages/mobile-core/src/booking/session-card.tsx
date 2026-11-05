@@ -23,6 +23,7 @@ export function SessionCard({
   testID,
   time,
   title,
+  trainerFace,
   trainerName,
 }: {
   accessibilityLabel: string;
@@ -33,6 +34,8 @@ export function SessionCard({
   testID?: string;
   time: string;
   title: string;
+  /** FIX-041: the Trainer's photo in place of the person glyph. */
+  trainerFace?: ReactNode;
   trainerName: string;
 }) {
   return (
@@ -52,9 +55,16 @@ export function SessionCard({
         {tag}
       </View>
       <CardFooter>
-        <DetailLine icon="person" style={styles.trainer}>
-          {trainerName}
-        </DetailLine>
+        {trainerFace === undefined ? (
+          <DetailLine icon="person" style={styles.trainer}>
+            {trainerName}
+          </DetailLine>
+        ) : (
+          <View style={styles.faceLine}>
+            {trainerFace}
+            <Text style={styles.trainer}>{trainerName}</Text>
+          </View>
+        )}
         {footerEnd}
       </CardFooter>
     </Pressable>
@@ -84,5 +94,11 @@ const styles = StyleSheet.create({
     fontSize: typography.titleSmall,
   },
   titles: { flexShrink: 1, gap: spacing.xs },
-  trainer: { color: colors.textSecondary, fontSize: 14 },
+  faceLine: { alignItems: "center", flexDirection: "row", flexShrink: 1, gap: spacing.sm },
+  trainer: {
+    color: colors.textSecondary,
+    flexShrink: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+  },
 });

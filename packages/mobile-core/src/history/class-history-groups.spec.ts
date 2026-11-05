@@ -10,6 +10,7 @@ const entry = (bookingId: string, startsAt: string) => ({
   sessionId: `session-${bookingId}`,
   classTypeName: "Reformer Pilates",
   trainerName: "Emma Vargas",
+  trainerPhoto: null,
   branchName: "Centro",
   startsAt,
   endsAt: startsAt,
