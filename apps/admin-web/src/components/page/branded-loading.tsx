@@ -30,12 +30,14 @@ function useIsFirstLoader(id: string) {
     shown.push(id);
     notify();
     return () => {
-      shown.splice(shown.indexOf(id), 1);
+      const index = shown.indexOf(id);
+      if (index !== -1) shown.splice(index, 1);
       notify();
     };
   }, [id]);
-  const first = useSyncExternalStore(subscribe, firstShown, firstShown);
-  return first === undefined || first === id;
+  // Nothing until this area is registered: two areas mounting together
+  // never paint two logos, even for one frame.
+  return useSyncExternalStore(subscribe, firstShown, firstShown) === id;
 }
 
 export function BrandedLoading({
