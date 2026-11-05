@@ -57,8 +57,9 @@ env:
       id: "pending-card"
     timeout: 20000
 - assertVisible: "Cuenta pendiente de activación"
-# Decision §19.20: the phone typed without +591 is stored with it.
-- assertVisible: "\\+591 70012345 · .*"
+# Decision §19.20: the phone typed without +591 is stored with it; FIX-037
+# shows it after its flag.
+- assertVisible: ".*\\+591 70012345 · .*"
 - assertVisible: "Reenviar enlace"
 - assertNotVisible: "Registrar pago en efectivo"
 - takeScreenshot: staff-coordinator-new-client-2-pending
