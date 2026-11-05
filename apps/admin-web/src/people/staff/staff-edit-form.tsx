@@ -19,8 +19,9 @@ import {
   CancelInvitationAction,
   PendingInvitation,
 } from "./staff-pending-invitation";
+import { StaffContactField } from "./staff-contact-field";
 import {
-  staffFormSchema,
+  staffEditSchema,
   type StaffFormInput,
   type StaffFormOutput,
 } from "./staff-form-schema";
@@ -33,8 +34,9 @@ import { TrainerReferralCodeField } from "./trainer-referral-code-field";
 const sameSet = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((id) => b.includes(id));
 
-// AW24 edit: Role and Branches are separate backend commands; a Role change
-// carries the new Branches so both land together (IDN-007).
+// AW24 edit: contact, Role and Branches are separate backend commands; a
+// Role change carries the new Branches so both land together (IDN-007).
+// FIX-038: the name and the phone go first, as one contact command.
 export function StaffEditForm({
   member,
   onDone,
@@ -47,7 +49,7 @@ export function StaffEditForm({
   const [failure, setFailure] = useState<string | null>(null);
   const limit = useEmailLimit();
   const form = useForm<StaffFormInput, unknown, StaffFormOutput>({
-    resolver: zodResolver(staffFormSchema),
+    resolver: zodResolver(staffEditSchema(member.phone)),
     defaultValues: {
       name: member.name,
       email: member.email,
@@ -67,17 +69,30 @@ export function StaffEditForm({
       : ids.filter((id) => branches.data.some((branch) => branch.id === id));
 
   const submit = form.handleSubmit(
-    async ({ role: next, branchIds: chosen }) => {
+    async ({ name, phone, role: next, branchIds: chosen }) => {
       setFailure(null);
       const branchIds = shown(chosen);
+      const contactChanged = name !== member.name || phone !== member.phone;
       const roleChanged = next !== member.role;
       const branchesChanged =
         !holdsEveryBranch(next) && !sameSet(branchIds, shown(member.branchIds));
-      if (!roleChanged && !branchesChanged) {
+      if (!contactChanged && !roleChanged && !branchesChanged) {
         onDone();
         return;
       }
       try {
+        if (contactChanged) {
+          await change.mutateAsync({
+            kind: "contact",
+            staffMemberId: member.id,
+            name,
+            phone,
+          });
+        }
+        if (!roleChanged && !branchesChanged) {
+          onDone(`Guardamos los cambios de ${name}.`);
+          return;
+        }
         await change.mutateAsync(
           roleChanged
             ? {
@@ -89,7 +104,7 @@ export function StaffEditForm({
               }
             : { kind: "branches", staffMemberId: member.id, branchIds },
         );
-        onDone(`Guardamos los cambios de ${member.name}.`);
+        onDone(`Guardamos los cambios de ${name}.`);
       } catch (error) {
         const problem = staffProblem(error);
         if (problem.field === "branchIds") {
@@ -106,15 +121,15 @@ export function StaffEditForm({
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
           {member.status === "pending" ? (
-            <>
-              <EmailLimitNotice limit={limit} />
-              <StaffContact member={member} only={["name"]} />
-              <PendingInvitation limit={limit} member={member} />
-              <StaffContact member={member} only={["phone"]} />
-            </>
+            <EmailLimitNotice limit={limit} />
+          ) : null}
+          <StaffContactField control={form.control} name="name" />
+          {member.status === "pending" ? (
+            <PendingInvitation limit={limit} member={member} />
           ) : (
-            <StaffContact member={member} />
+            <StaffContact member={member} only={["email"]} />
           )}
+          <StaffContactField control={form.control} name="phone" />
           <StaffRoleFields
             control={form.control}
             role={role}
