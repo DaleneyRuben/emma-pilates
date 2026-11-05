@@ -84,6 +84,7 @@ export const listSessionsAcrossBranches =
     from: Date;
     until: Date;
     limit: number;
+    includeCancelled?: boolean;
   }): Promise<AdministratorSessionAvailabilityDto[]> =>
     (await findScheduledSessions(prisma, input)).map(
       ({ availability, ...schedule }) => ({ ...availability, ...schedule }),

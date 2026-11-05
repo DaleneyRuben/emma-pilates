@@ -93,7 +93,9 @@ export class TrainerScheduleController {
   async list(
     @Query('on') on: string,
     @Headers('authorization') authorization: string | undefined,
+    @Query('includeCancelled') includeCancelled?: string,
   ): Promise<TrainerScheduleSessionDto[]> {
+    void includeCancelled;
     const parsedOn = parseCalendarDate(on);
     if (parsedOn === null) throw invalidRequest('Invalid schedule date');
     const principal = await this.authenticate(authorization);

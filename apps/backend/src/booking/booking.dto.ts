@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import { sessionCancellationCauses } from './sessions/session-cancellation';
 
 export class CreateBookingDto {
   @ApiPropertyOptional({ format: 'uuid' })
@@ -102,6 +103,19 @@ export class SessionAvailabilityDto {
   classesLeftThisWeek?: number | null;
 }
 
+// FIX-042: a cancelled Session the Horario or the Trainer's agenda shows in
+// place, with why it was cancelled and how many it had booked by then.
+export class SessionCancellationDto {
+  @ApiProperty({ enum: sessionCancellationCauses })
+  cause!: (typeof sessionCancellationCauses)[number];
+
+  @ApiProperty({ format: 'date-time' })
+  cancelledAt!: Date;
+
+  @ApiProperty({ minimum: 0 })
+  bookedCount!: number;
+}
+
 // The Administrator's projection (API-002, WEB-003): the same Session plus
 // the weekly schedule that generated it, so an edit can offer "Esta y las
 // futuras", and whether it is already an exception.
@@ -111,6 +125,9 @@ export class AdministratorSessionAvailabilityDto extends SessionAvailabilityDto 
 
   @ApiProperty()
   isException!: boolean;
+
+  @ApiPropertyOptional({ type: () => SessionCancellationDto, nullable: true })
+  cancellation?: SessionCancellationDto | null;
 }
 
 export class TrainerScheduleSessionDto {
@@ -134,6 +151,9 @@ export class TrainerScheduleSessionDto {
 
   @ApiProperty({ minimum: 0 })
   bookedCount!: number;
+
+  @ApiPropertyOptional({ type: () => SessionCancellationDto, nullable: true })
+  cancellation?: SessionCancellationDto | null;
 }
 
 export class TrainerRosterBookingDto {

@@ -1,5 +1,6 @@
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from './commands/create-booking';
+import type { SessionCancellation } from './sessions/session-cancellation';
 
 export type TrainerScheduleSession = {
   sessionId: string;
@@ -9,6 +10,7 @@ export type TrainerScheduleSession = {
   endsAt: Date;
   capacity: number;
   bookedCount: number;
+  cancellation: SessionCancellation | null;
 };
 
 type ListTrainerScheduleDependencies = {

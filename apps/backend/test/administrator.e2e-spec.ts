@@ -336,6 +336,27 @@ describe('administrator payments and sessions (e2e)', () => {
       )
       .set('authorization', bearer)
       .expect(400);
+    await request(app.getHttpServer())
+      .get(
+        '/api/v1/administrator/sessions?from=2026-09-21T04:00:00.000Z&until=2026-09-28T04:00:00.000Z&includeCancelled=true',
+      )
+      .set('authorization', bearer)
+      .expect(200);
+    expect(searchSessions).toHaveBeenLastCalledWith(
+      {
+        from: new Date('2026-09-21T04:00:00.000Z'),
+        until: new Date('2026-09-28T04:00:00.000Z'),
+        limit: 50,
+        includeCancelled: true,
+      },
+      expect.anything(),
+    );
+    await request(app.getHttpServer())
+      .get(
+        '/api/v1/administrator/sessions?from=2026-09-21T04:00:00.000Z&until=2026-09-28T04:00:00.000Z&includeCancelled=yes',
+      )
+      .set('authorization', bearer)
+      .expect(400);
     searchSessions.mockRejectedValueOnce(new BookingAccessDeniedError());
     await request(app.getHttpServer())
       .get(

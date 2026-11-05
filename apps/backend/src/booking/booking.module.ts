@@ -273,6 +273,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
                     endsAt: session.endsAt,
                     capacity: session.capacity,
                     bookedCount: session._count.bookings,
+                    cancellation: null,
                   })),
                 );
             },
