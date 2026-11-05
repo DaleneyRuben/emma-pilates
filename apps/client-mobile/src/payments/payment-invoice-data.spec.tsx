@@ -29,7 +29,6 @@ const receiptRoutes = {
     jsonResponse({ id: "asset-1", state: "ready", mediaType: "image/jpeg" }),
   "POST /api/v1/purchase-intents/intent-1/receipt": () =>
     jsonResponse({ ...intent, receiptAttached: true }),
-  "/api/v1/payments/current": () => jsonResponse(payment),
 };
 
 async function openPaymentWithReceipt(prefill: typeof ana | null) {
@@ -44,6 +43,12 @@ async function openPaymentWithReceipt(prefill: typeof ana | null) {
         submitted(JSON.parse(String(init?.body)));
         return jsonResponse(payment, 201);
       },
+      // No Payment exists until the receipt is sent (follow-up 246: a
+      // pending one turns Inicio into «Tu pago está en revisión»).
+      "/api/v1/payments/current": () =>
+        submitted.mock.calls.length === 0
+          ? jsonResponse({ code: "payment_not_found", status: 404 }, 404)
+          : jsonResponse(payment),
     }),
   );
   await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));

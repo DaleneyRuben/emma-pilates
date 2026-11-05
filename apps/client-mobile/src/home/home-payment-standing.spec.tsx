@@ -40,7 +40,8 @@ describe("Client Home with a payment in review or rejected", () => {
     });
 
     expect(screen.getByText("En revisión")).toBeOnTheScreen();
-    expect(screen.getByText("Tu pago está en revisión")).toBeOnTheScreen();
+    // The card's title and the locked booking row's note.
+    expect(screen.getAllByText("Tu pago está en revisión")).toHaveLength(2);
     expect(screen.getByText("Paquete de 8 clases · Bs 502")).toBeOnTheScreen();
     expect(screen.getByText("Te avisamos apenas el estudio lo confirme.")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).toBeNull();
@@ -49,7 +50,6 @@ describe("Client Home with a payment in review or rejected", () => {
     // The locked booking row says why.
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeDisabled();
     expect(screen.queryByText("Necesitas un plan activo")).toBeNull();
-    expect(screen.getAllByText("Tu pago está en revisión")).toHaveLength(2);
 
     await fireEvent.press(screen.getByRole("button", { name: "Ver estado del pago" }));
     await waitFor(() => {

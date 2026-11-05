@@ -15,15 +15,17 @@ import {
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { usePaymentStanding } from "../payments/payment-standing";
 import { formatBolivianos } from "./plan-format";
 
 type PlansNavigation = {
   goBack: () => void;
   navigate: (screen: "PlanDetail", params: { planId: string }) => void;
+  replace: (screen: "PaymentStatus") => void;
 };
 
 /** C08's terms line: «Válido por 30 días», or «60 días · hasta 3 por semana». */
@@ -106,11 +108,19 @@ export function PlansScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  // Follow-up 246 §5: while a payment is in review or rejected, every way
+  // into Elegir plan opens that payment instead (owner, 2026-11-05: after a
+  // rejection, only another receipt for the same Plan).
+  const { pending: paymentPending, standing } = usePaymentStanding(fetcher);
+  const blocked = standing.kind !== "none";
+  useEffect(() => {
+    if (blocked) navigation.replace("PaymentStatus");
+  }, [blocked, navigation]);
 
   return (
     <Screen style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Elige tu plan" />
-      {plans.isPending ? (
+      {plans.isPending || paymentPending || blocked ? (
         <LoadingState label="Cargando planes" />
       ) : plans.isError || plans.data.status !== 200 ? (
         <QueryFailure label="No pudimos cargar los planes." onRetry={() => void plans.refetch()} />

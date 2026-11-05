@@ -125,7 +125,11 @@ describe("Client purchase flow", () => {
         calls.push("submit");
         return jsonResponse(payment, 201);
       },
-      "/api/v1/payments/current": () => jsonResponse(payment),
+      // No Payment until the receipt is sent (follow-up 246).
+      "/api/v1/payments/current": () =>
+        calls.includes("submit")
+          ? jsonResponse(payment)
+          : jsonResponse({ code: "payment_not_found" }, 404),
     });
     const screen = await openPlanDetail(fetcher);
     await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
@@ -178,9 +182,11 @@ describe("Client purchase flow", () => {
       backgroundColor: "#B78380",
     });
     await fireEvent.press(screen.getByRole("button", { name: "Volver al inicio" }));
+    // Walkthrough n.º 22: Inicio says the payment is in review, never «Comprar un plan».
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Ver estado del pago" })).toBeOnTheScreen();
     });
+    expect(screen.queryByRole("button", { name: "Comprar un plan" })).toBeNull();
   });
 
   it("never buys with Credit, even when an older API reports enough of it (PAY-005)", async () => {

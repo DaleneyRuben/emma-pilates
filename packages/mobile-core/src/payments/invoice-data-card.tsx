@@ -38,6 +38,19 @@ export const invoiceDataPayload = (choice: InvoiceChoice): InvoiceData | null | 
   return { taxId, name };
 };
 
+/**
+ * Why an opened invoice holds the sale back (walkthrough n.º 23, follow-up
+ * 246 C10c): the NIT or CI first, then the name; `null` once it is complete.
+ */
+export const invoiceIncompleteNote = (choice: InvoiceChoice): string | null => {
+  if (invoiceDataPayload(choice) !== "incomplete") return null;
+  const taxId = choice.taxId.trim();
+  if (taxId === "" || !taxIdCharacters.test(taxId) || !/\d/.test(taxId)) {
+    return "Completa el NIT o CI, o cierra la factura";
+  }
+  return "Completa el nombre o razón social, o cierra la factura";
+};
+
 function ChoicePill({
   label,
   onPress,

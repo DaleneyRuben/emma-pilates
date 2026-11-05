@@ -16,7 +16,6 @@ import {
   ScreenTopBar,
   SectionTitle,
   spacing,
-  TextButton,
   typography,
   usePushNotifications,
   useStudioRules,
@@ -31,6 +30,9 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatCivilDate } from "../home/home-format";
+import { usePaymentStanding } from "../payments/payment-standing";
+import { useResendReceipt } from "../payments/use-resend-receipt";
+import { BookingOffFooter, bookingOffReason } from "./booking-off-footer";
 import { SessionFacts, SessionHero } from "./session-facts";
 
 export type ConfirmedBooking = {
@@ -44,7 +46,7 @@ export type ConfirmedBooking = {
 type DetailNavigation = {
   goBack: () => void;
   navigate: {
-    (screen: "Plans"): void;
+    (screen: "Plans" | "PaymentStatus"): void;
     (
       screen: "Bookings",
       params: { screen: "MyBookings"; params: { confirmed: ConfirmedBooking } },
@@ -78,6 +80,8 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   });
   const studioRules = useStudioRules(fetcher);
   const subscription = useGetCurrentClientSubscription({ fetcher });
+  const { standing } = usePaymentStanding(fetcher);
+  const resendReceipt = useResendReceipt();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [forcedFull, setForcedFull] = useState(false);
@@ -113,9 +117,13 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
 
   const detail = session.data.data;
   const view = subscription.data?.status === 200 ? subscription.data.data : null;
-  const hasAllowance =
+  const hasPlan =
     view !== null &&
     (view.status === "active" || view.status === "expiring_soon") &&
+    view.subscription !== null &&
+    view.subscription !== undefined;
+  const hasAllowance =
+    hasPlan &&
     ((view.subscription?.remainingClassAllowance ?? 0) > 0 ||
       (view.subscription?.extraClassesLine ?? null) !== null);
   const full = forcedFull || detail.availableSeats === 0;
@@ -268,11 +276,17 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
             />
           </>
         ) : (
-          <>
-            <BodyText style={styles.note}>No te quedan clases en tu plan.</BodyText>
-            <PrimaryButton disabled label="Reservar" />
-            <TextButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
-          </>
+          <BookingOffFooter
+            busy={resendReceipt.busy}
+            error={resendReceipt.error}
+            onAction={() => {
+              if (standing.kind === "in_review") navigation.navigate("PaymentStatus");
+              else if (standing.kind === "rejected")
+                void resendReceipt.resend(standing.payment.planId);
+              else navigation.navigate("Plans");
+            }}
+            reason={bookingOffReason(standing, hasPlan)}
+          />
         )}
       </View>
     </Screen>

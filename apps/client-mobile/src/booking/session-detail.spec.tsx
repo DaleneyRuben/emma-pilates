@@ -2,12 +2,7 @@ import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-nati
 import { clearMobileQueryCache, createMemoryPushPlatform } from "@pilates/mobile-core";
 
 import { jsonResponse, studioRules } from "../test-support";
-import {
-  classType,
-  detail,
-  insideWindowStartsAt,
-  openDetail,
-} from "./session-detail-test-support";
+import { classType, detail, insideWindowStartsAt, openDetail } from "./session-detail-test-support";
 
 jest.setTimeout(20_000);
 
