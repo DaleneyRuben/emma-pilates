@@ -35,20 +35,21 @@ const invitingRoles: Partial<Record<StaffRoleCode, Actor['role']>> = {
 };
 
 export const requireAssistant = (principal: AuthenticatedPrincipal): Actor => {
+  // ADR-0100: an Administrator seeing the app as a Staff Member acts as
+  // that member, and the audit record names the Administrator.
+  const { identity } = principal;
   if (
-    principal.identity.kind !== 'staff' ||
-    (principal.identity.role !== 'assistant' &&
-      principal.identity.role !== 'administrator' &&
-      principal.identity.role !== 'coordinator')
+    identity.kind !== 'staff' ||
+    invitingRoles[identity.role.toUpperCase() as StaffRoleCode] === undefined
   ) {
     throw new InvitationAccessDeniedError();
   }
-  // ADR-0100: an Administrator seeing the app as an Assistant acts as the
-  // Assistant, and the audit record names the Administrator.
   const actor = auditActorOf(principal);
+  const role = actor.role === null ? undefined : invitingRoles[actor.role];
+  if (role === undefined) throw new InvitationAccessDeniedError();
   return {
     accountId: actor.accountId,
-    role: (actor.role && invitingRoles[actor.role]) ?? 'assistant',
+    role,
     impersonationId: actor.impersonationId,
   };
 };
