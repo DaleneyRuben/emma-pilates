@@ -29,6 +29,7 @@ import {
 } from "./contacts-csv";
 import { KindPill } from "./kind-pill";
 import { WithdrawContactAction } from "./withdraw-contact-action";
+import { phoneWithFlag } from "../../lib/phone-number";
 
 const contactos = (count: number) =>
   `${countFormat.format(count)} ${count === 1 ? "contacto" : "contactos"}`;
@@ -59,7 +60,9 @@ const contactColumns = (onWithdrawn: (notice: string) => void) => [
       return phone === null ? (
         <span className="text-texto-muy-tenue">—</span>
       ) : (
-        <span className="text-texto-secundario tabular">{phone}</span>
+        <span className="text-texto-secundario tabular">
+          {phoneWithFlag(phone)}
+        </span>
       );
     },
   }),

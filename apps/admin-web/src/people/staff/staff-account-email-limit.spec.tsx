@@ -97,6 +97,7 @@ describe("AW24 under the Administrator's email limit", () => {
       within(panel).getByLabelText("Correo electrónico"),
       "sara@emmapilates.bo",
     );
+    await user.type(within(panel).getByLabelText("Celular"), "71234567");
     await user.click(
       within(panel).getByRole("radio", { name: "Administración" }),
     );

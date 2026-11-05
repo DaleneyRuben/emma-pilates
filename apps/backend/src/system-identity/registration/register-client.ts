@@ -2,6 +2,7 @@ import type {
   AcquisitionChannel,
   DeclaredAcquisitionChannel,
 } from '../../booking/acquisition/acquisition';
+import { normalizeContactPhone } from '../../phone/bolivian-mobile';
 import type { AuthenticationEmailJob } from '../../jobs/authentication-email/authentication-email-job';
 import type { EncryptedAuthenticationLink } from '../security/authentication-link-cipher';
 import type { IssuedAuthenticationToken } from '../security/authentication-token-service';
@@ -22,6 +23,7 @@ type NewSelfRegistration = {
   clientId: string;
   name: string;
   email: string;
+  phone: string | null;
   passwordHash: string;
   referredByCode: string | null;
   acquisitionChannel: AcquisitionChannel;
@@ -86,6 +88,8 @@ export type RegisterClientCommand = {
   referralCode?: string;
   /** BKM-011: absent from store builds older than the question. */
   acquisitionChannel?: DeclaredAcquisitionChannel;
+  /** FIX-037: absent from store builds older than the field. */
+  phone?: string;
 };
 
 export type RegisterClientResult = {
@@ -220,6 +224,7 @@ export class RegisterClient {
           clientId,
           name: command.name.trim(),
           email,
+          phone: normalizeContactPhone(command.phone),
           passwordHash,
           referredByCode: command.referralCode?.trim().toUpperCase() || null,
           acquisitionChannel: command.acquisitionChannel ?? 'unknown',

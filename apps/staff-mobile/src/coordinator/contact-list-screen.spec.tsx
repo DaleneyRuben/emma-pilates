@@ -68,7 +68,7 @@ describe("S28 Para contactar", () => {
     const { screen } = await openContactList();
 
     expect(screen.getByText("Valeria Quiroga")).toBeOnTheScreen();
-    expect(screen.getByText("+591 70011005 · empezó el 2 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("🇧🇴 +591 70011005 · empezó el 2 de octubre")).toBeOnTheScreen();
     expect(screen.getAllByText("7 días sin reservar").length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Abrir WhatsApp" })).toBeOnTheScreen();
 

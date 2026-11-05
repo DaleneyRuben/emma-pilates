@@ -84,7 +84,7 @@ th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
       <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
       <span style="flex: 1"></span>
       <button type="button" class="cb"><span class="ms" style="color: #B78380">{{branch.icon}}</span>{{branch.label}}<sc-if value="{{branch.pick}}" hint-placeholder-val="{{true}}"><span class="ms" style="color: #6F6662">expand_more</span></sc-if></button>
-      <span class="me"><span class="av">{{who.ini}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span></span>
+      <span class="me"><span class="av" style="overflow: hidden"><sc-if value="{{who.photo}}" hint-placeholder-val="{{true}}"><img src="paola.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"></sc-if><sc-if value="{{who.noPhoto}}" hint-placeholder-val="{{false}}">{{who.ini}}</sc-if></span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span></span>
     </header>
     <main>
       <div class="head">
@@ -102,7 +102,7 @@ th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
             <thead><tr><th>Persona</th><th>Contacto</th><th>Rol</th><th>Sedes</th><th>Estado</th><th></th></tr></thead>
             <tbody>
               <sc-for list="{{staff}}" as="m" hint-placeholder-count="6">
-                <tr><td><span style="display: flex; align-items: center; gap: 12px"><span class="av s">{{m.ini}}</span><span class="strong">{{m.n}}</span></span></td><td><span style="display: flex; flex-direction: column"><span>{{m.mail}}</span><span class="note">{{m.tel}}</span></span></td><td>{{m.role}}</td><td>{{m.branches}}</td><td><span class="{{m.pillCls}}">{{m.state}}</span></td><td style="text-align: right"><button type="button" class="btn sm t" onClick="{{openMember}}">Abrir</button></td></tr>
+                <tr><td><span style="display: flex; align-items: center; gap: 12px"><span class="av s" style="width: 40px; height: 40px; overflow: hidden"><sc-if value="{{m.hasPhoto}}" hint-placeholder-val="{{true}}"><img src="{{m.photo}}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"></sc-if><sc-if value="{{m.noPhoto}}" hint-placeholder-val="{{false}}">{{m.ini}}</sc-if></span><span class="strong">{{m.n}}</span></span></td><td><span style="display: flex; flex-direction: column"><span>{{m.mail}}</span><span class="note">{{m.tel}}</span></span></td><td>{{m.role}}</td><td>{{m.branches}}</td><td><span class="{{m.pillCls}}">{{m.state}}</span></td><td style="text-align: right"><button type="button" class="btn sm t" onClick="{{openMember}}">Abrir</button></td></tr>
               </sc-for>
             </tbody>
           </table></div>
@@ -157,8 +157,8 @@ th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
 
   <sc-if value="{{member}}" hint-placeholder-val="{{false}}">
     <div class="scrim"><div class="panel" role="dialog" aria-label="Persona del equipo">
-      <div class="ph"><span class="av">DO</span><div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><h2>Daniela Ortiz</h2><span class="note">daniela.ortiz@example.com · 🇧🇴 +591 70022002</span></div><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
-      <sc-if value="{{coord}}" hint-placeholder-val="{{false}}"><div class="notice"><span class="ms" style="color: #93615D">info</span>Puedes cambiar sus sedes. Invitar y cambiar roles lo hace Administración.</div></sc-if>
+      <div class="ph"><img src="daniela.jpg" alt="Foto de Daniela Ortiz" style="width: 96px; height: 96px; border-radius: 999px; object-fit: cover; flex: none"><div style="flex: 1; display: flex; flex-direction: column; gap: 8px"><h2>Daniela Ortiz</h2><span class="note">daniela.ortiz@example.com · 🇧🇴 +591 70022002</span><span style="display: flex; flex-wrap: wrap; gap: 4px; margin-left: -2px"><button type="button" class="btn sm s"><span class="ms" style="font-size: 18px">upload</span>Cambiar foto</button><button type="button" class="btn sm t">Quitar foto</button></span><span class="note">JPG, PNG o WebP, hasta 10 MB.</span></div><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
+      <sc-if value="{{coord}}" hint-placeholder-val="{{false}}"><div class="notice"><span class="ms" style="color: #93615D">info</span>Puedes cambiar sus sedes y su foto. Invitar y cambiar roles lo hace Administración.</div></sc-if>
       <label class="field"><span>Rol</span><span class="input">Entrenadora<sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><span class="ms" style="color: #6F6662">expand_more</span></sc-if></span></label>
       <div class="field"><span>Sedes</span><div class="card" style="padding: 4px 16px"><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Centro</label><label class="check"><span class="box"></span>Equipetrol</label><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Urubó</label></div></div>
       <sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><label class="field"><span>Código de referido</span><span class="input">DANIELA<span class="note">Ella también puede cambiarlo</span></span></label></sc-if>
@@ -191,7 +191,7 @@ class Component extends DCLogic {
     var sv = st.sv || 'stock';
     function set(o) { return function () { self.setState(o); }; }
     var staff = [['EV', 'Emma Vargas', 'emma.vargas@example.com', '🇧🇴 +591 70022001', 'Entrenadora', 'Centro, Equipetrol, Urubó', 'Activa', 'ok'], ['DO', 'Daniela Ortiz', 'daniela.ortiz@example.com', '🇧🇴 +591 70022002', 'Entrenadora', 'Centro, Urubó', 'Activa', 'ok'], ['AS', 'Andrea Suárez', 'andrea.suarez@example.com', '🇦🇷 +54 91123456789', 'Entrenadora', 'Equipetrol', 'Activa', 'ok'], ['CR', 'Camila Rojas', 'camila.rojas@example.com', '🇧🇴 +591 70022004', 'Recepción', 'Centro', 'Activa', 'ok'], ['GF', 'Gabriela Flores', 'gabriela.flores@example.com', '🇧🇴 +591 70022005', 'Nutricionista', 'Centro', 'Activa', 'ok'], ['CR', 'Carolina Rivas', 'carolina.rivas@example.com', '🇧🇴 +591 70022006', 'Coordinadora', 'Todas', 'Activa', 'ok'], ['LM', 'Luciana Montaño', 'luciana@example.com', '🇧🇴 +591 70022007', 'Entrenadora', 'Centro', 'Invitación enviada', 'wait']].map(function (m) {
-      return { ini: m[0], n: m[1], mail: m[2], tel: m[3], role: m[4], branches: m[5], state: m[6], pillCls: 'pill ' + m[7] };
+      return { photo: m[0] === 'EV' ? 'emma.jpg' : (m[0] === 'DO' ? 'daniela.jpg' : ''), hasPhoto: m[0] === 'EV' || m[0] === 'DO', noPhoto: !(m[0] === 'EV' || m[0] === 'DO'), ini: m[0], n: m[1], mail: m[2], tel: m[3], role: m[4], branches: m[5], state: m[6], pillCls: 'pill ' + m[7] };
     });
     var subs = { personal: 'El equipo es del estudio, no de una sede', insumos: 'Sucursal Centro · 1 con stock bajo', equipos: 'Sucursal Centro · 1 falla abierta' };
     return { rail: rail('est', admin), staff: staff, subtitle: subs[tab], admin: admin, coord: !admin, showInvite: admin && tab === 'personal',
@@ -201,7 +201,7 @@ class Component extends DCLogic {
       supViews: [['stock', 'Stock'], ['retiros', 'Retiros del mes']].map(function (w) { return { label: w[1], cls: w[0] === sv ? 'on' : '', go: set({ sv: w[0] }) }; }),
       sup: { stock: sv === 'stock', retiros: sv === 'retiros' },
       member: !!st.member, invite: !!st.invite, openMember: set({ member: true, invite: false }), openInvite: set({ invite: true, member: false }), close: set({ member: false, invite: false }),
-      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación' } };
+      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración', photo: true, noPhoto: false } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación', photo: false, noPhoto: true } };
   }
 }
 </script>

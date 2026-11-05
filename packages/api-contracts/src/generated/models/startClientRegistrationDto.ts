@@ -14,4 +14,6 @@ export interface StartClientRegistrationDto {
   referralCode?: string;
   /** «¿Cómo nos conociste?» Required by current builds; a build that omits it registers as `unknown` (BKM-011) */
   acquisitionChannel?: StartClientRegistrationDtoAcquisitionChannel;
+  /** Mobile number with its country code, stored as «+<code> <digits>» (Bolivia: 8 digits starting with 6 or 7). Required by current builds; a build that omits it registers without a phone (FIX-037) */
+  phone?: string;
 }

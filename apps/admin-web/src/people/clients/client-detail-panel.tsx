@@ -30,6 +30,7 @@ import { ClientPaymentsTab } from "./client-payments-tab";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
 import { CourtesyAccessAction } from "./courtesy-access-action";
+import { phoneWithFlag } from "../../lib/phone-number";
 
 const clientDetailQueryOptions = (clientId: string) =>
   queryOptions({
@@ -166,7 +167,7 @@ function ContactBlock({ client }: { client: AdminClientDetailDto }) {
         {client.phone === null ? (
           <span className="text-texto-muy-tenue">Sin teléfono</span>
         ) : (
-          <span className="tabular">{client.phone}</span>
+          <span className="tabular">{phoneWithFlag(client.phone)}</span>
         )}
       </SummaryRow>
     </SummaryBlock>

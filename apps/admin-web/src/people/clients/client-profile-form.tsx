@@ -13,29 +13,37 @@ import { adminFetch } from "../../api/fetcher";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { PhoneFormField } from "../../components/form/phone-field";
+import {
+  phoneValue,
+  keptOrRequiredPhone,
+} from "../../components/form/phone-value";
 import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 
-const profileSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, "Escribe el nombre de la clienta.")
-    .max(100, "Usa como máximo 100 caracteres."),
-  phone: z.string().trim().max(30, "Usa como máximo 30 caracteres."),
-});
+const profileSchema = (stored: string | null) =>
+  z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, "Escribe el nombre de la clienta.")
+      .max(100, "Usa como máximo 100 caracteres."),
+    phone: keptOrRequiredPhone(stored),
+  });
 
-type ProfileValues = z.infer<typeof profileSchema>;
+type ProfileInput = z.input<ReturnType<typeof profileSchema>>;
+type ProfileValues = z.output<ReturnType<typeof profileSchema>>;
 
 // IDN-009 (follow-up 156): the Administrator and the Coordinator correct a
 // Client's name and phone in place; the login email stays hers (IDN-008).
+// FIX-037 (follow-up 236): the phone is the «Celular» field; a stored phone
+// left untouched goes back as it was, and any change must be a valid mobile.
 export function ClientProfileForm({
   client,
   onCancel,
@@ -54,16 +62,16 @@ export function ClientProfileForm({
           client.id,
           {
             name: values.name,
-            phone: values.phone === "" ? null : values.phone,
+            phone: values.phone,
           },
           undefined,
           adminFetch,
         )
       ).data as AdminClientDetailDto,
   });
-  const form = useForm<ProfileValues>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: { name: client.name, phone: client.phone ?? "" },
+  const form = useForm<ProfileInput, unknown, ProfileValues>({
+    resolver: zodResolver(profileSchema(client.phone)),
+    defaultValues: { name: client.name, phone: phoneValue(client.phone) },
   });
 
   const submit = form.handleSubmit(async (values) => {
@@ -96,20 +104,7 @@ export function ClientProfileForm({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Teléfono</FormLabel>
-              <FormControl>
-                <Input inputMode="tel" autoComplete="off" {...field} />
-              </FormControl>
-              <FormDescription>Opcional</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <PhoneFormField control={form.control} name="phone" />
         <SummaryBlock title="Correo">
           <SummaryRow label="Correo">{client.email}</SummaryRow>
           <p className="px-3 py-2 text-ayuda text-texto-tenue">
