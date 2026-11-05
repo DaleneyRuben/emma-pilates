@@ -309,6 +309,15 @@ necesita que el correo nuevo lo confirme (todavía no está). El de una
 lectura, y la coordinadora solo puede cambiar las sucursales de una
 entrenadora.
 
+**Foto de perfil.** En el mismo panel, arriba, está el círculo de la
+persona con **Cambiar foto**. Elige una foto JPG, PNG o WebP de hasta 10 MB:
+aparece al momento con «Subiendo foto…» y queda guardada sin pulsar
+**Guardar**. **Quitar foto** la saca y vuelven las iniciales. Un PDF o una
+imagen más pesada dice «Elige una foto JPG, PNG o WebP de hasta 10 MB.». La
+coordinadora también puede cambiar la foto de cualquiera. La foto se ve en la
+lista de **Personal**, en **Horario** junto al nombre de la entrenadora y,
+la tuya, arriba a la derecha.
+
 ## Paso 4. El equipo entra a su app
 
 Abre la app del equipo. La pantalla es **Acceso del equipo**. No hay
@@ -317,9 +326,11 @@ Abre la app del equipo. La pantalla es **Acceso del equipo**. No hay
 1. Daniela entra con su correo y la contraseña que acaba de crear. Llega a
    **Mi agenda**, con la ceja **Entrenadora** y su saludo. La semana está
    vacía: todavía no hay clases.
-2. Arriba a la derecha está **Tu cuenta**. Ábrelo. **Perfil** muestra su
-   nombre, su correo, el rol y la sede, y dice que sus datos los actualiza
-   administración. Desde ahí salen **Notificaciones**, **Cambiar
+2. Abre **Perfil**. Muestra su nombre, su correo, el rol y la sede, y dice
+   que su nombre y su correo los actualiza administración. Su círculo tiene
+   sus iniciales y **Cambiar foto**: elige una foto de la galería y queda
+   puesta («Subiendo foto…» mientras sube); con foto aparece también
+   **Quitar foto**. Desde Perfil salen **Notificaciones**, **Cambiar
    contraseña** y **Enviar comentarios**.
 3. Cierra sesión. Camila entra y llega a **Buscar cliente**, vacío, con
    **+ Nuevo cliente** y **Cerrar caja**. Gabriela entra y llega a su agenda
@@ -449,7 +460,10 @@ En la app de clientas, como Lucía, con el plan ya vigente.
 1. **Reservar**. Elige la sede si hay más de una. La tira de días y la tira
    de tipos se desplazan de lado. Elige el día del mat de las 09:00.
 2. Abre la clase. Ves el tipo, la hora, la sede, **Daniela Ortiz** con
-   **Entrenadora certificada**, los cupos y la descripción que escribiste.
+   **Entrenadora certificada** (con su foto si ya puso una; si no, sus
+   iniciales), los cupos y la descripción que escribiste. En la lista de
+   **Reservar**, en **Mis Reservas** y en el historial su foto chica va antes
+   de su nombre.
 3. **Reservar**. La clase pasa a **Mis Reservas**, con la fecha, la hora y la
    sede. **Mi plan** baja una clase.
 4. Reserva también el reformer del miércoles, para tener dos reservas y
@@ -951,7 +965,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Entrenadora | Mi agenda | Pasar lista, reportar una falla, Mis pagos | 5, 8, 15 |
 | Nutricionista | Agenda | Mi disponibilidad, cancelar una consulta | 12 |
 | Coordinador | Buscar cliente | Para contactar, cancelar una clase, sin dinero y sin alta | 16 |
-| Todas | Perfil, desde Tu cuenta | Avisos, contraseña, comentarios, cerrar sesión | 4 |
+| Todas | Perfil | Foto de perfil, avisos, contraseña, comentarios, cerrar sesión | 4 |
 
 ## Cuando algo no aparece
 
