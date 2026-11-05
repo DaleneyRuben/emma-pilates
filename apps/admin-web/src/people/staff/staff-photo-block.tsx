@@ -87,7 +87,7 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
                 </span>
               )}
               <span className="text-ayuda text-texto-tenue">
-                JPG, PNG o WebP, hasta 10 MB.
+                JPG, PNG o WebP, hasta 5 MB.
               </span>
             </>
           ) : null}

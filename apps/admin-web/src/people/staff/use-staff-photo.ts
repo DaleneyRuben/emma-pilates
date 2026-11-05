@@ -19,7 +19,7 @@ export type StaffPhotoStatus =
   | { kind: "failed"; message: string };
 
 export const staffPhotoMessages = {
-  wrongFile: "Elige una foto JPG, PNG o WebP de hasta 10 MB.",
+  wrongFile: "Elige una foto JPG, PNG o WebP de hasta 5 MB.",
   uploadFailed: "No pudimos subir la foto. Inténtalo de nuevo.",
   removeFailed: "No pudimos quitar la foto. Inténtalo de nuevo.",
 } as const;
@@ -27,7 +27,8 @@ export const staffPhotoMessages = {
 // Follow-up 242's file line, checked before any call is made.
 export const staffPhotoAccept = "image/jpeg,image/png,image/webp";
 const acceptedTypes = staffPhotoAccept.split(",");
-const maxBytes = 10 * 1024 * 1024;
+// ADR-0072: a profile photo is at most 5 MB.
+const maxBytes = 5 * 1024 * 1024;
 
 /**
  * FIX-041: the member panel's photo saves the moment its upload finishes,
