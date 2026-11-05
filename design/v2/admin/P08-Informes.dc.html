@@ -83,7 +83,7 @@ th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
       <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
       <span style="flex: 1"></span>
       <button type="button" class="cb"><span class="ms" style="color: #B78380">apartment</span>{{branchLabel}}<span class="ms" style="color: #6F6662">expand_more</span></button>
-      <span class="me"><span class="av">{{who.ini}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span></span>
+      <span class="me"><span class="av" style="overflow: hidden"><sc-if value="{{who.photo}}" hint-placeholder-val="{{true}}"><img src="paola.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"></sc-if><sc-if value="{{who.noPhoto}}" hint-placeholder-val="{{false}}">{{who.ini}}</sc-if></span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span></span>
     </header>
     <main>
       <div class="head">
@@ -222,7 +222,7 @@ class Component extends DCLogic {
       tabs: all.map(function (t) { return { label: t[1], cls: 'tab' + (t[0] === tab ? ' on' : ''), go: set({ tab: t[0] }) }; }),
       is: { mes: tab === 'mes', dinero: tab === 'dinero', sim: tab === 'sim' }, showMonth: tab === 'mes',
       branchLabel: 'Todas las sucursales',
-      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación' } };
+      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración', photo: true, noPhoto: false } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación', photo: false, noPhoto: true } };
   }
 }
 </script>
