@@ -39,7 +39,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen();
     });
-    expect(screen.getByText("+591 70011001 · lucia@example.com")).toBeOnTheScreen();
+    expect(screen.getByText("🇧🇴 +591 70011001 · lucia@example.com")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" }));
     await waitFor(() => {

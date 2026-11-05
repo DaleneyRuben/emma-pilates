@@ -159,7 +159,7 @@ describe("Client Profile", () => {
     const screen = await openProfile();
 
     expect(screen.getByText("sofia@example.com")).toBeOnTheScreen();
-    expect(screen.getByText("+591 70011004")).toBeOnTheScreen();
+    expect(screen.getByText("🇧🇴 +591 70011004")).toBeOnTheScreen();
     expect(screen.getByText("Vencido")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Mi plan, Vencido" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeOnTheScreen();

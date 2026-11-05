@@ -27,6 +27,7 @@ import { useInClientPanel } from "./assistant-workspace";
 import { PlanHero } from "./plan-hero";
 import { StateCard } from "./state-card";
 import { PendingInvitationCard } from "./pending-invitation-card";
+import { describeContact } from "./assistant-format";
 
 export type ClientContext = { clientId: string; clientName: string };
 
@@ -116,9 +117,7 @@ export function ClientOverviewScreen({
             <Text accessibilityLabel={client.name} accessibilityRole="header" style={styles.name}>
               {client.name}
             </Text>
-            <Text style={styles.contact}>
-              {client.phone ? `${client.phone} · ${client.email}` : client.email}
-            </Text>
+            <Text style={styles.contact}>{describeContact(client.phone, client.email)}</Text>
           </View>
         </View>
         {pending && sells ? (

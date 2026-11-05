@@ -18,6 +18,7 @@ import {
   TextButton,
   usePullToRefresh,
   useRefetchOnFocus,
+  phoneWithFlag,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -50,7 +51,7 @@ function ContactCard({
         <View style={styles.identityBody}>
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.quiet}>
-            {`${item.phone ?? "Sin teléfono"} · ${started.charAt(0).toLowerCase()}${started.slice(1)}`}
+            {`${item.phone === null ? "Sin teléfono" : phoneWithFlag(item.phone)} · ${started.charAt(0).toLowerCase()}${started.slice(1)}`}
           </Text>
         </View>
       </View>
