@@ -63,6 +63,10 @@ th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
 .input{min-height:44px;padding:10px 14px;border:1px solid #E6DBD0;border-radius:12px;background:#F5EFE9;color:#4A4A4A;display:flex;align-items:center;justify-content:space-between;width:100%}
 .check{display:flex;align-items:center;gap:10px;min-height:44px}.box{width:22px;height:22px;border-radius:6px;border:1.5px solid #B78380;display:flex;align-items:center;justify-content:center;color:#fff}.box.on{background:#B78380}
 .notice{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;border-left:4px solid #B78380;font-size:14px}
+.wfx{display:flex;min-height:44px;border:1px solid #E6DBD0;border-radius:12px;background:#F5EFE9}
+.wpb{flex:none;display:flex;align-items:center;gap:6px;padding:0 10px 0 12px;border:0;border-right:1px solid #E6DBD0;background:transparent;font:600 15px 'Work Sans',sans-serif;color:#7D4F4B;cursor:pointer;border-radius:12px 0 0 12px}
+.wfx input,.input input{flex:1;min-width:0;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;padding:0 14px;outline:none}
+.input input{padding:0}
 .actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .lora{font-family:Lora,serif}
 .seg{display:flex;gap:2px;background:#F5EFE9;border-radius:12px;padding:3px}
@@ -85,7 +89,7 @@ th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
     <main>
       <div class="head">
         <div class="hl"><h1>Estudio</h1><span class="sub">{{subtitle}}</span></div>
-        <sc-if value="{{showInvite}}" hint-placeholder-val="{{true}}"><button type="button" class="btn p" onClick="{{openMember}}"><span class="ms">person_add</span>Invitar a alguien</button></sc-if>
+        <sc-if value="{{showInvite}}" hint-placeholder-val="{{true}}"><button type="button" class="btn p" onClick="{{openInvite}}"><span class="ms">person_add</span>Invitar a alguien</button></sc-if>
         <sc-if value="{{is.insumos}}" hint-placeholder-val="{{false}}"><button type="button" class="btn p"><span class="ms">add</span>Nuevo insumo</button></sc-if>
         <sc-if value="{{is.equipos}}" hint-placeholder-val="{{false}}"><button type="button" class="btn p"><span class="ms">add</span>Nuevo equipo</button></sc-if>
       </div>
@@ -153,12 +157,24 @@ th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
 
   <sc-if value="{{member}}" hint-placeholder-val="{{false}}">
     <div class="scrim"><div class="panel" role="dialog" aria-label="Persona del equipo">
-      <div class="ph"><span class="av">DO</span><div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><h2>Daniela Ortiz</h2><span class="note">daniela.ortiz@example.com · +591 70022002</span></div><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
+      <div class="ph"><span class="av">DO</span><div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><h2>Daniela Ortiz</h2><span class="note">daniela.ortiz@example.com · 🇧🇴 +591 70022002</span></div><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
       <sc-if value="{{coord}}" hint-placeholder-val="{{false}}"><div class="notice"><span class="ms" style="color: #93615D">info</span>Puedes cambiar sus sedes. Invitar y cambiar roles lo hace Administración.</div></sc-if>
       <label class="field"><span>Rol</span><span class="input">Entrenadora<sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><span class="ms" style="color: #6F6662">expand_more</span></sc-if></span></label>
       <div class="field"><span>Sedes</span><div class="card" style="padding: 4px 16px"><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Centro</label><label class="check"><span class="box"></span>Equipetrol</label><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Urubó</label></div></div>
       <sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><label class="field"><span>Código de referido</span><span class="input">DANIELA<span class="note">Ella también puede cambiarlo</span></span></label></sc-if>
       <div class="actions" style="justify-content: space-between"><sc-if value="{{admin}}" hint-placeholder-val="{{true}}"><button type="button" class="btn td">Desactivar cuenta</button></sc-if><span style="display: flex; gap: 8px; margin-left: auto"><button type="button" class="btn t" onClick="{{close}}">Cancelar</button><button type="button" class="btn p" onClick="{{close}}">Guardar</button></span></div>
+    </div></div>
+  </sc-if>
+  <sc-if value="{{invite}}" hint-placeholder-val="{{false}}">
+    <div class="scrim"><div class="panel" role="dialog" aria-label="Invitar a alguien">
+      <div class="ph"><h2>Invitar a alguien</h2><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
+      <label class="field"><span>Nombre</span><span class="input"><input value="Rocío Paz" aria-label="Nombre"></span></label>
+      <label class="field"><span>Correo electrónico</span><span class="input"><input type="email" value="rocio.paz@example.com" aria-label="Correo electrónico"></span></label>
+      <div class="field"><span>Celular</span><div class="wfx"><button type="button" class="wpb" aria-label="País: Bolivia, +591"><span style="font-size: 15px; line-height: 1">🇧🇴</span>+591<span class="ms" style="font-size: 18px">expand_more</span></button><input type="tel" inputmode="numeric" value="71234567" placeholder="8 dígitos" aria-label="Celular"></div><span class="note">La recepción lo usa para escribirle por WhatsApp.</span></div>
+      <label class="field"><span>Rol</span><span class="input">Entrenadora<span class="ms" style="color: #6F6662">expand_more</span></span></label>
+      <div class="field"><span>Sedes</span><div class="card" style="padding: 4px 16px"><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Centro</label><label class="check"><span class="box"></span>Equipetrol</label><label class="check"><span class="box"></span>Urubó</label></div></div>
+      <span class="note">Le enviamos un enlace de activación al correo. Vence en 7 días.</span>
+      <div class="actions"><button type="button" class="btn t" onClick="{{close}}">Cancelar</button><button type="button" class="btn p" onClick="{{close}}">Enviar invitación</button></div>
     </div></div>
   </sc-if>
 </div>
@@ -174,17 +190,17 @@ class Component extends DCLogic {
     var tab = st.tab || 'personal';
     var sv = st.sv || 'stock';
     function set(o) { return function () { self.setState(o); }; }
-    var staff = [['EV', 'Emma Vargas', 'emma.vargas@example.com', '+591 70022001', 'Entrenadora', 'Centro, Equipetrol, Urubó', 'Activa', 'ok'], ['DO', 'Daniela Ortiz', 'daniela.ortiz@example.com', '+591 70022002', 'Entrenadora', 'Centro, Urubó', 'Activa', 'ok'], ['AS', 'Andrea Suárez', 'andrea.suarez@example.com', '+591 70022003', 'Entrenadora', 'Equipetrol', 'Activa', 'ok'], ['CR', 'Camila Rojas', 'camila.rojas@example.com', '+591 70022004', 'Recepción', 'Centro', 'Activa', 'ok'], ['GF', 'Gabriela Flores', 'gabriela.flores@example.com', '+591 70022005', 'Nutricionista', 'Centro', 'Activa', 'ok'], ['CR', 'Carolina Rivas', 'carolina.rivas@example.com', '+591 70022006', 'Coordinadora', 'Todas', 'Activa', 'ok'], ['LM', 'Luciana Montaño', 'luciana@example.com', '+591 70022007', 'Entrenadora', 'Centro', 'Invitación enviada', 'wait']].map(function (m) {
+    var staff = [['EV', 'Emma Vargas', 'emma.vargas@example.com', '🇧🇴 +591 70022001', 'Entrenadora', 'Centro, Equipetrol, Urubó', 'Activa', 'ok'], ['DO', 'Daniela Ortiz', 'daniela.ortiz@example.com', '🇧🇴 +591 70022002', 'Entrenadora', 'Centro, Urubó', 'Activa', 'ok'], ['AS', 'Andrea Suárez', 'andrea.suarez@example.com', '🇦🇷 +54 91123456789', 'Entrenadora', 'Equipetrol', 'Activa', 'ok'], ['CR', 'Camila Rojas', 'camila.rojas@example.com', '🇧🇴 +591 70022004', 'Recepción', 'Centro', 'Activa', 'ok'], ['GF', 'Gabriela Flores', 'gabriela.flores@example.com', '🇧🇴 +591 70022005', 'Nutricionista', 'Centro', 'Activa', 'ok'], ['CR', 'Carolina Rivas', 'carolina.rivas@example.com', '🇧🇴 +591 70022006', 'Coordinadora', 'Todas', 'Activa', 'ok'], ['LM', 'Luciana Montaño', 'luciana@example.com', '🇧🇴 +591 70022007', 'Entrenadora', 'Centro', 'Invitación enviada', 'wait']].map(function (m) {
       return { ini: m[0], n: m[1], mail: m[2], tel: m[3], role: m[4], branches: m[5], state: m[6], pillCls: 'pill ' + m[7] };
     });
     var subs = { personal: 'El equipo es del estudio, no de una sede', insumos: 'Sucursal Centro · 1 con stock bajo', equipos: 'Sucursal Centro · 1 falla abierta' };
     return { rail: rail('est', admin), staff: staff, subtitle: subs[tab], admin: admin, coord: !admin, showInvite: admin && tab === 'personal',
       branch: tab === 'personal' ? { icon: 'apartment', label: 'Todo el estudio', pick: false } : { icon: 'location_on', label: 'Sucursal Centro', pick: true },
-      tabs: [['personal', 'Personal', ''], ['insumos', 'Insumos', '1'], ['equipos', 'Equipos', '1']].map(function (t) { return { label: t[1], count: t[2], cls: 'tab' + (t[0] === tab ? ' on' : ''), go: set({ tab: t[0], member: false }) }; }),
+      tabs: [['personal', 'Personal', ''], ['insumos', 'Insumos', '1'], ['equipos', 'Equipos', '1']].map(function (t) { return { label: t[1], count: t[2], cls: 'tab' + (t[0] === tab ? ' on' : ''), go: set({ tab: t[0], member: false, invite: false }) }; }),
       is: { personal: tab === 'personal', insumos: tab === 'insumos', equipos: tab === 'equipos' },
       supViews: [['stock', 'Stock'], ['retiros', 'Retiros del mes']].map(function (w) { return { label: w[1], cls: w[0] === sv ? 'on' : '', go: set({ sv: w[0] }) }; }),
       sup: { stock: sv === 'stock', retiros: sv === 'retiros' },
-      member: !!st.member, openMember: set({ member: true }), close: set({ member: false }),
+      member: !!st.member, invite: !!st.invite, openMember: set({ member: true, invite: false }), openInvite: set({ invite: true, member: false }), close: set({ member: false, invite: false }),
       who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación' } };
   }
 }
