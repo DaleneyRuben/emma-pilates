@@ -61,7 +61,7 @@ function CancelledBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border border-dashed border-texto-muy-tenue/40 bg-superficie px-2 py-1 text-left text-texto-tenue transition-shadow hover:bg-lino focus-visible:shadow-foco lg:px-1.5 xl:px-2",
+        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border-l-[3px] border-dashed border-texto-muy-tenue/60 bg-superficie px-2 py-1 text-left text-texto-tenue transition-shadow hover:bg-lino focus-visible:shadow-foco lg:px-1.5 xl:px-2",
         className,
       )}
     >
@@ -71,7 +71,7 @@ function CancelledBlock({
       <span className="w-full text-[11px] leading-tight whitespace-nowrap tabular lg:text-ayuda">
         {start} – {end} · {session.trainerName}
       </span>
-      <span className="w-full truncate text-ayuda leading-tight font-medium">
+      <span className="w-full shrink-0 truncate text-ayuda leading-tight font-medium">
         {causeShortLabel(cause)}
       </span>
     </button>

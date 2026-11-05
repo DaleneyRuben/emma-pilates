@@ -32,11 +32,12 @@ export function cancellationNote(
 ): string {
   const moment = boliviaParts(cancellation.cancelledAt);
   const when = `el ${formatLongDay(moment.date)} a las ${moment.time}`;
+  const booked = cancellation.bookedCount > 0;
   switch (cancellation.cause) {
     case "minimum_not_met":
-      return `Se canceló sola ${when}: no llegó al mínimo de reservas. Las clientas que reservaron recuperaron su clase.`;
+      return `Se canceló sola ${when}: no llegó al mínimo de reservas.${booked ? " Las clientas que reservaron recuperaron su clase." : ""}`;
     case "studio":
-      return `La canceló el estudio ${when}. Las clientas que reservaron recuperaron su clase y les llegó un aviso.`;
+      return `La canceló el estudio ${when}.${booked ? " Las clientas que reservaron recuperaron su clase y les llegó un aviso." : ""}`;
     case "schedule_paused":
       return "Esta clase no se publica: su serie está en pausa.";
   }
