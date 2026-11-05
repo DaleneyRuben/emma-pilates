@@ -62,15 +62,16 @@ describe("Client email change", () => {
     );
 
     expect(screen.getByLabelText("Correo electrónico")).not.toHaveProp("editable", false);
-    // MOB-070: a number that is not a Bolivian mobile is refused before the save.
-    await fireEvent.changeText(screen.getByLabelText("Teléfono"), "+54 9 11 1234 5678");
+    // FIX-037: with Bolivia chosen, a number that is not a Bolivian mobile is
+    // refused before the save.
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "5123456");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar cambios" }));
     expect(
-      screen.getByText("Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567."),
+      screen.getByText("Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7."),
     ).toBeOnTheScreen();
     expect(calls).toEqual([]);
     // Decision §19.20: the +591 is implicit and sent.
-    await fireEvent.changeText(screen.getByLabelText("Teléfono"), "7001 1004");
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "7001 1004");
     expect(
       screen.queryByText("Para cambiar tu correo, escríbenos al estudio."),
     ).not.toBeOnTheScreen();
