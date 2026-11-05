@@ -5,6 +5,7 @@ import { emptyIncome, freezesPath } from "../test/home-handlers";
 import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
 import { pendingBadgeHandler } from "../test/payment-fixtures";
 import { incomeReportPath } from "../test/report-fixtures";
+import { findBrandedLoading } from "../test/branded-loading";
 import { renderAdmin } from "../test/render-admin";
 import {
   coordinatorHandlers,
@@ -57,6 +58,19 @@ describe("Inicio for the Administrator", () => {
     const card = await screen.findByRole("region", { name: "Por resolver" });
     expect(await within(card).findByText("Todo al día")).toBeVisible();
     expect(screen.getByText("Nada por resolver.")).toBeVisible();
+  });
+
+  it("shows the branded loading state, not «Todo al día», until it knows what waits (WEB-045)", async () => {
+    server.use(
+      http.get(apiUrl(freezesPath), () => new Promise(() => undefined)),
+    );
+    renderAdmin("/");
+
+    await findBrandedLoading("Cargando el inicio…");
+    expect(screen.getByRole("heading", { level: 1 })).toBeVisible();
+    expect(screen.queryByRole("region", { name: "Por resolver" })).toBeNull();
+    expect(screen.queryByText("Nada por resolver.")).toBeNull();
+    expect(screen.queryAllByRole("status")).toHaveLength(1);
   });
 
   it("shows today's money for the whole studio and switches to the month", async () => {

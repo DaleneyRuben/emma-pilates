@@ -2,6 +2,7 @@ import { screen, waitFor } from "@testing-library/react";
 import { http } from "msw";
 import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
 import { emptyPageHandlers } from "../test/page-handlers";
+import { findBrandedLoading } from "../test/branded-loading";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 
@@ -60,6 +61,15 @@ describe("AW21 Campaña", () => {
     ).toBeVisible();
     expect(await screen.findByText("12 clientas la recibirán.")).toBeVisible();
     expect(screen.getByText("Sofía no tiene un plan vigente.")).toBeVisible();
+  });
+
+  it("shows the branded loading state while the Clients load (WEB-045)", async () => {
+    server.use(
+      http.get(apiUrl(previewPath), () => new Promise(() => undefined)),
+    );
+    renderAdmin("/promociones/clases-de-campana");
+
+    await findBrandedLoading("Cargando las clientas…");
   });
 
   it("submits the campaign and shows the granted and skipped counts", async () => {

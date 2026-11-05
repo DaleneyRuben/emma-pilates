@@ -18,6 +18,7 @@ import {
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
+import { expectBrandedLoading } from "../test/branded-loading";
 
 const reviewReads: string[] = [];
 const handlers = (
@@ -105,7 +106,7 @@ describe("AW29 Revisar pago on a desktop browser", () => {
     );
     const { panel } = await open("Sofía Guzmán");
 
-    expect(within(panel).getByText("Cargando el pago…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando el pago…", within(panel));
     expect(await within(panel).findByText("Monto a verificar")).toBeVisible();
   });
 
