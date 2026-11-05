@@ -19,26 +19,31 @@ import {
   FormMessage,
 } from "../../components/form/form";
 import { PhoneFormField } from "../../components/form/phone-field";
-import { phoneValue, requiredPhone } from "../../components/form/phone-value";
+import {
+  phoneValue,
+  keptOrRequiredPhone,
+} from "../../components/form/phone-value";
 import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 
-const profileSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, "Escribe el nombre de la clienta.")
-    .max(100, "Usa como máximo 100 caracteres."),
-  phone: requiredPhone,
-});
+const profileSchema = (stored: string | null) =>
+  z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, "Escribe el nombre de la clienta.")
+      .max(100, "Usa como máximo 100 caracteres."),
+    phone: keptOrRequiredPhone(stored),
+  });
 
-type ProfileInput = z.input<typeof profileSchema>;
-type ProfileValues = z.output<typeof profileSchema>;
+type ProfileInput = z.input<ReturnType<typeof profileSchema>>;
+type ProfileValues = z.output<ReturnType<typeof profileSchema>>;
 
 // IDN-009 (follow-up 156): the Administrator and the Coordinator correct a
 // Client's name and phone in place; the login email stays hers (IDN-008).
-// FIX-037 (follow-up 236): the phone is the required «Celular» field.
+// FIX-037 (follow-up 236): the phone is the «Celular» field; a stored phone
+// left untouched goes back as it was, and any change must be a valid mobile.
 export function ClientProfileForm({
   client,
   onCancel,
@@ -65,7 +70,7 @@ export function ClientProfileForm({
       ).data as AdminClientDetailDto,
   });
   const form = useForm<ProfileInput, unknown, ProfileValues>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema(client.phone)),
     defaultValues: { name: client.name, phone: phoneValue(client.phone) },
   });
 

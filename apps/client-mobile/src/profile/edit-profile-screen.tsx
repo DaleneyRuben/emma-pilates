@@ -35,17 +35,27 @@ import { useClientFetcher } from "../client-fetcher";
 import { EmailChangeSection, normalizeEmail } from "./email-change-section";
 import { ProfilePhotoSection } from "./profile-photo-section";
 
-const profileSchema = z.object({
-  name: z.string().trim().min(1, "Escribe tu nombre."),
-  email: z.string().trim().email("Escribe un correo válido."),
-  // FIX-037: the mobile is required, with its country (follow-up 236).
-  phone: z.custom<PhoneValue>().superRefine((phone, context) => {
-    const problem = phoneProblem(phone.country, phone.digits);
-    if (problem !== null) context.addIssue({ code: "custom", message: problem });
-  }),
-});
+// FIX-037: the mobile is required, with its country (follow-up 236). A stored
+// phone left untouched (none, or one from before the rule) goes back as it
+// was; any change must be a valid mobile.
+const isUntouched = (phone: PhoneValue, stored: string | null): boolean => {
+  const start = parseStoredPhone(stored);
+  // By code: the form keeps a copy of the country, not the same object.
+  return phone.country.iso === start.country.iso && phone.digits === start.digits;
+};
 
-type ProfileValues = z.infer<typeof profileSchema>;
+const profileSchema = (stored: string | null) =>
+  z.object({
+    name: z.string().trim().min(1, "Escribe tu nombre."),
+    email: z.string().trim().email("Escribe un correo válido."),
+    phone: z.custom<PhoneValue>().superRefine((phone, context) => {
+      if (isUntouched(phone, stored)) return;
+      const problem = phoneProblem(phone.country, phone.digits);
+      if (problem !== null) context.addIssue({ code: "custom", message: problem });
+    }),
+  });
+
+type ProfileValues = z.infer<ReturnType<typeof profileSchema>>;
 
 function EditProfileForm({
   client,
@@ -66,7 +76,7 @@ function EditProfileForm({
     reset,
   } = useForm<ProfileValues>({
     defaultValues: defaults,
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema(client.phone ?? null)),
   });
 
   const save = handleSubmit(async (values) => {
@@ -75,7 +85,9 @@ function EditProfileForm({
     const response = await updateCurrentClientProfile(
       {
         name: values.name.trim(),
-        phone: storedPhone(values.phone.country, values.phone.digits),
+        phone: isUntouched(values.phone, client.phone ?? null)
+          ? (client.phone ?? null)
+          : storedPhone(values.phone.country, values.phone.digits),
       },
       { headers: { "Content-Type": "application/json" } },
       fetcher,
