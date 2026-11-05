@@ -50,7 +50,7 @@ numbered tests.
 | Trainer pay periods          | Calculate and approve a Trainer's pay by Día, Semana, Rango or Mes in Sueldos › Por aprobar, see an approved day keep the month from paying it again, and read the period in «Mis pagos» (Test 127) | The Coordinator stays monthly; the worker drafts whole months only, so a Trainer already paid by day or week that month is drafted by hand |
 | Studio transfer QR           | Upload the studio's transfer QR in Ajustes › QR del estudio, see it and its date, and read the same image on the apps' QR route; the Coordinator does not see the tab (Test 128) | Until the first upload the server's `TRANSFER_QR_IMAGE_PATH` file is served; a storage outage fails the route instead of falling back |
 | Weekly series and booking window | Edit the booking window in Reglas del estudio, cancel an empty class from Horario, give a weekly series a «Vigente hasta», pause and resume it, and reach a wider window's later days through «Otra» in both apps (Test 129) | A pause holds one range at a time; resuming early brings back only the classes the pause withdrew that have not started |
-| Second walkthrough fixes | The rail's labels at 12 px, a missed Minimum Bookings check settled when the worker comes back, «Fecha de apertura» as dd/mm/aaaa, and phones without +591 (Test 130) | The normalization migration needs the user's approval before it reaches production |
+| Second walkthrough fixes | The rail's labels at 12 px, a missed Minimum Bookings check settled when the worker comes back, «Fecha de apertura» as dd/mm/aaaa, and phones without +591 (Test 130) | The phone normalization migration runs once on deploy |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -8696,8 +8696,8 @@ F. **Narrow browser.** At 420 px Reglas del estudio stacks the fields, the
 ## Test 130: the second walkthrough's fixes (FIX-032 to FIX-036)
 
 Findings 1 to 5 of the second hand walkthrough (2026-11-04). The phones need
-the migration `20261104180000_normalize_bolivian_mobiles` (data only; it
-needs the user's approval before merge). Use a copy of `pilates_golden` or of
+the migration `20261104180000_normalize_bolivian_mobiles` (data only;
+approved by the user 2026-11-05). Use a copy of `pilates_golden` or of
 the walkthrough's backup with it applied, never `pilates_dev_sim`.
 
 A. **The rail (FIX-032).** At 1440 px and in a wide window (1900 px), every
