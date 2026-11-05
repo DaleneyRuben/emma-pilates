@@ -18,7 +18,7 @@ export function WaitNotice({
   return (
     <div
       role="status"
-      className="flex items-start gap-3 rounded-[12px] border border-borde-fuerte bg-lino px-3.5 py-3"
+      className="flex items-start gap-3 rounded-tarjeta border border-borde-fuerte bg-lino px-3.5 py-3"
     >
       <Clock3
         size={18}
