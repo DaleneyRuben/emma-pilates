@@ -401,7 +401,9 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    paso 14.
 5. **Reservar** muestra la semana, pero al abrir una clase **Reservar** está
    apagado y el aviso dice «Necesitas un plan para reservar.», con **Comprar
-   un plan** debajo. (A quien le quedan 0 clases de su plan le dice, en
+   un plan** debajo. La fila del plazo dice el día, en hora de La Paz:
+   «Cancela sin costo hasta hoy a las 05:30», «hasta mañana a las 05:30» o
+   «hasta el sáb 7 a las 05:30». (A quien le quedan 0 clases de su plan le dice, en
    cambio, «No te quedan clases en tu plan.».)
 6. **Mis Reservas** está vacío, con **Ver historial**. El historial también
    está vacío.

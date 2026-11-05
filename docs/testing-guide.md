@@ -8897,15 +8897,23 @@ D. **Rejected (C02d).** Log in as Sofía. **Inicio** shows «Pago rechazado»,
 E. **The invoice reason (C10c).** On that payment, attach a receipt and open
    **¿Necesitas factura?** with both fields empty: **Enviar comprobante** is
    off and above it reads «Completa el NIT o CI, o cierra la factura». Type a
-   NIT: it reads «Completa el nombre o razón social, o cierra la factura».
+   NIT: it reads «Completa el nombre o razón social, o cierra la factura»
+   (a NIT without a digit, such as `ABC`, reads «Revisa el NIT o CI, o
+   cierra la factura»).
    Type the name, or close the invoice: «El estudio revisa tu pago y te
    avisa por la app» and the button turns on.
 F. **After the decision.** Paola confirms Mariana's payment: Inicio shows
    her Plan card and she books. Once Sofía sends another receipt, her card
    changes to «Tu pago está en revisión».
+G. **The deadline's day (walkthrough n.º 27).** As Lucía, open a class later
+   today: the row reads «Cancela sin costo hasta hoy a las HH:MM». A class
+   early tomorrow (before the window reaches back past midnight) reads
+   «hasta mañana a las HH:MM», and one further out names it: «hasta el sáb 7
+   a las 05:30». Days are counted in La Paz time.
 
 Specs: `home-payment-standing.spec.tsx`, `session-detail-reasons.spec.tsx`,
 `plans-payment-gate.spec.tsx`, `payment-invoice-data.spec.tsx`,
 `purchase-flow.spec.tsx`, `payment-status-back.spec.tsx`,
-`invoice-data-card.spec.tsx`. Maestro: `purchase-plan-transfer.yaml` now
+`invoice-data-card.spec.tsx`, `session-format.spec.ts` (the deadline's
+day, near midnight included). Maestro: `purchase-plan-transfer.yaml` now
 checks Inicio and the class detail after the receipt.
