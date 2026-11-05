@@ -21,7 +21,7 @@ export function usePendingCounts({
   seesMoney: boolean;
   branchId: string | undefined;
   month: string;
-}): PendingCounts {
+}): PendingCounts & { loading: boolean } {
   const payments = useQuery({
     ...pendingPaymentCountQueryOptions(),
     enabled: seesMoney,
@@ -47,6 +47,16 @@ export function usePendingCounts({
   });
 
   return {
+    // WEB-045: until every read Inicio counts has answered (or failed), it
+    // cannot say «Todo al día»; it shows the branded loading state instead.
+    loading: [
+      payments,
+      freezes,
+      contactAlerts,
+      feedback,
+      lowStock,
+      statements,
+    ].some((query) => query.isLoading),
     payments: payments.data ?? 0,
     freezes: freezes.data?.totalItems ?? 0,
     contactAlerts: contactAlerts.data ?? 0,

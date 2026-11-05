@@ -92,7 +92,8 @@ describe("AW16 Reporte on a desktop browser", () => {
     renderAdmin(path);
     await heading();
 
-    expectBrandedLoading("Cargando el reporte…");
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+    expectBrandedLoading("Cargando el ingreso devengado…");
     expect(
       await within(
         await screen.findByRole("region", { name: "Ingresos" }),

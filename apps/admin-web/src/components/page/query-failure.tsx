@@ -1,3 +1,4 @@
+import { BrandedLoading } from "./branded-loading";
 import { Button } from "../ui/button";
 import { isForbidden } from "./is-forbidden";
 
@@ -41,13 +42,11 @@ export function QueryFailure({
   );
 }
 
+/**
+ * A page, tab, or panel waiting for its first read: follow-up 94's branded
+ * state (WEB-045), the logo alone after 400 ms, announced with the page's
+ * label. Kept under this name so every page keeps its import.
+ */
 export function LoadingNotice({ children }: { children: string }) {
-  return (
-    <p
-      role="status"
-      className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-tenue"
-    >
-      {children}
-    </p>
-  );
+  return <BrandedLoading label={children} delayed />;
 }
