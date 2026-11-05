@@ -51,6 +51,7 @@ numbered tests.
 | Studio transfer QR           | Upload the studio's transfer QR in Ajustes › QR del estudio, see it and its date, and read the same image on the apps' QR route; the Coordinator does not see the tab (Test 128) | Until the first upload the server's `TRANSFER_QR_IMAGE_PATH` file is served; a storage outage fails the route instead of falling back |
 | Weekly series and booking window | Edit the booking window in Reglas del estudio, cancel an empty class from Horario, give a weekly series a «Vigente hasta», pause and resume it, and reach a wider window's later days through «Otra» in both apps (Test 129) | A pause holds one range at a time; resuming early brings back only the classes the pause withdrew that have not started |
 | Second walkthrough fixes | The rail's labels at 12 px, a missed Minimum Bookings check settled when the worker comes back, «Fecha de apertura» as dd/mm/aaaa, and phones without +591 (Test 130) | The phone normalization migration runs once on deploy |
+| The web's sign-in with the logo | Login, «¿Olvidaste tu contraseña?» and «Crea tu contraseña» with the studio's logo beside the form, their notices, errors and the throttled wait, at 1440 and 420 px (Test 131) | Busy buttons last only while a request is in flight |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -90,7 +91,7 @@ can be found by its design name.
 
 | Admin web | Tests |
 | --- | --- |
-| AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
+| AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44, 131 |
 | AW36 Reglas del estudio (from AW33) | 75, 112 |
 | P09 Ajustes › QR del estudio | 41, 128 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
@@ -2754,9 +2755,10 @@ pnpm dev:admin
 
 1. **Signed out.** Open
    [http://localhost:5173/ajustes/planes](http://localhost:5173/ajustes/planes).
-   You land on the Login card (Emma, the tagline, **Correo electrónico**,
-   **Contraseña**, **Iniciar sesión**, **¿Olvidaste tu contraseña?**) with no
-   sidebar, and the address remembers `redirect=/ajustes/planes…`.
+   You land on Login (WEB-044, Test 131: the studio's logo on a pale rose
+   panel, then **Inicia sesión**, **Correo electrónico**, **Contraseña**,
+   **Iniciar sesión**, **¿Olvidaste tu contraseña?**) with no sidebar, and
+   the address remembers `redirect=/ajustes/planes…`.
 2. **Neutral rejection.** Log in as `camila.rojas@example.com` with the fixture
    password `emma-local-2026`. She is an Assistant, so the card says "El correo
    o la contraseña no son correctos.", exactly as for a wrong password or an
@@ -2799,8 +2801,9 @@ pnpm dev:admin
    answers `401 authentication_required`.
 8. **Throttling.** On Login, submit a made-up email such as
    `nobody.admin-login@example.com` with any password six times. The seventh
-   try shows "Demasiados intentos. Intenta de nuevo en un momento." with a
-   countdown from the server (0:30 at first) and a disabled button.
+   try shows "Demasiados intentos. Intenta de nuevo en un momento." in a
+   neutral box with a clock (not red text, since WEB-044), a countdown from
+   the server ("Podrás intentarlo en 0:30" at first) and a disabled button.
 9. **Recovery.** **¿Olvidaste tu contraseña?** opens **Recuperar contraseña**.
    Any email gives the same "Revisa tu correo" state ("El enlace vence en 30
    minutos.") whether or not it belongs to an Account. Once the device or
@@ -8738,3 +8741,44 @@ E. **Phones (FIX-036).** Test 125 H for the forms. After the migration,
    `normalize-bolivian-mobiles.integration-spec.ts`,
    `new-client-phone.spec.tsx`, `email-change.spec.tsx`,
    `staff-create.spec.tsx`.
+
+## Test 131: the web's sign-in with the logo panel (WEB-044)
+
+The owner chose proposal A of DES-007 on 2026-11-05 (board `P10`, design
+follow-ups 237 to 239). Any database copy works; the worker is needed only
+for step D's link.
+
+A. **Login at 1440 px.** Open
+   [http://localhost:5173/iniciar-sesion](http://localhost:5173/iniciar-sesion).
+   The left half is a pale rose (Rosa tinte) panel with the studio's logo in
+   colour, the «Emma» script with «PILATES STUDIO» and the drawing; the right
+   half is the page's cream (Marfil) with the form directly on it, no card.
+   The form reads **Inicia sesión** in Lora, «Para Administración y
+   Coordinación.», **Correo electrónico**, **Contraseña** with the eye,
+   **Iniciar sesión** (the only filled button) and **¿Olvidaste tu
+   contraseña?** as a rose text button without an underline. Nothing reads
+   «Emma» alone as a wordmark and there is no tagline.
+B. **Notices and errors.** `?notice=session-ended` adds a Lino row with a
+   clock in a rose disc: «Tu sesión terminó. Vuelve a iniciar sesión.»;
+   `?notice=activated` and `?notice=password-updated` show their lines with a
+   check. A wrong password (`camila.rojas@example.com`, any password) adds a
+   Lino row with a red alert icon, «El correo o la contraseña no son
+   correctos.», between the fields and the button; the text itself is not
+   red. Throttling (Test 24 step 8) shows the clock box with the countdown.
+C. **Recovery.** **¿Olvidaste tu contraseña?** opens the same frame titled
+   **Recupera tu contraseña** with «Te enviaremos un enlace para restablecer
+   tu contraseña.». **Enviar enlace** shows **Revisa tu correo** under a rose
+   disc with an envelope, «El enlace vence en 30 minutos.» and **Volver a
+   iniciar sesión**.
+D. **Create password.** With the worker running, a captured recovery or
+   activation link (Test 34) opened on port 5173 shows **Crea una contraseña
+   nueva** or **Crea tu contraseña** in the same frame, both fields with the
+   eye and **Guardar contraseña** disabled until they match.
+   `?token=not-a-real-link-secret` shows **Este enlace no es válido** under a
+   rose disc with a broken link.
+E. **At 420 px.** Narrow the window (or the device toolbar) to 420 px: the
+   logo moves to a 200 px band at the top and the form follows below, with no
+   sideways scroll, on all three screens.
+
+Specs: `login-page.spec.tsx`, `recover-password-page.spec.tsx`,
+`create-password-page.spec.tsx`, `session-guard.spec.tsx`.

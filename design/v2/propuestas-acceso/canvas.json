@@ -1,0 +1,80 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-05T18:53:51Z"
+ },
+ "title": "Emma Pilates Studio · Inicio de sesión de la web",
+ "launch": {
+  "view": "focused",
+  "file": "Main.dc.html"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1240,
+   "title": "Inicio de sesión de la web · elige una propuesta",
+   "is_interactive": true
+  },
+  "A1-Web.dc.html": {
+   "x": 0,
+   "y": 1400,
+   "w": 1440,
+   "h": 1000,
+   "title": "A · Panel con el logo · computadora 1440",
+   "is_interactive": true
+  },
+  "A2-Web-420.dc.html": {
+   "x": 1520,
+   "y": 1400,
+   "w": 420,
+   "h": 1240,
+   "title": "A · Panel con el logo · celular 420",
+   "is_interactive": true
+  },
+  "B1-Web.dc.html": {
+   "x": 0,
+   "y": 2800,
+   "w": 1440,
+   "h": 1000,
+   "title": "B · Bloque fuerte · computadora 1440",
+   "is_interactive": true
+  },
+  "B2-Web-420.dc.html": {
+   "x": 1520,
+   "y": 2800,
+   "w": 420,
+   "h": 1240,
+   "title": "B · Bloque fuerte · celular 420",
+   "is_interactive": true
+  },
+  "C1-Web.dc.html": {
+   "x": 0,
+   "y": 4200,
+   "w": 1440,
+   "h": 1000,
+   "title": "C · Tarjeta que se ve · computadora 1440",
+   "is_interactive": true
+  },
+  "C2-Web-420.dc.html": {
+   "x": 1520,
+   "y": 4200,
+   "w": 420,
+   "h": 1240,
+   "title": "C · Tarjeta que se ve · celular 420",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "A1-Web.dc.html",
+  "A2-Web-420.dc.html",
+  "B1-Web.dc.html",
+  "B2-Web-420.dc.html",
+  "C1-Web.dc.html",
+  "C2-Web-420.dc.html"
+ ]
+}
