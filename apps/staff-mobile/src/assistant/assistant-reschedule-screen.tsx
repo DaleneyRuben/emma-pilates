@@ -18,6 +18,7 @@ import {
   SeatPill,
   SessionCard,
   spacing,
+  StaffFace,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -147,6 +148,14 @@ export function AssistantRescheduleScreen({
                 selected={selected}
                 time={formatTimeRange(session.startsAt, session.endsAt)}
                 title={session.classTypeName}
+                trainerFace={
+                  <StaffFace
+                    fetcher={fetcher}
+                    name={session.trainerName}
+                    photo={session.trainerPhoto}
+                    size={20}
+                  />
+                }
                 trainerName={session.trainerName}
               />
             );

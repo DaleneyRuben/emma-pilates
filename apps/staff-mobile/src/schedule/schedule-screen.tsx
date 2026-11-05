@@ -16,6 +16,7 @@ import {
   Screen,
   SectionTitle,
   spacing,
+  StaffFace,
   StateScreen,
   typography,
   upcomingCivilDates,
@@ -157,6 +158,14 @@ export function ScheduleScreen() {
                   pill={selling ? seats(session) : undefined}
                   pillTone={session.availableSeats === 0 ? "neutral" : "tint"}
                   subtitle={booked(session)}
+                  subtitleLead={
+                    <StaffFace
+                      fetcher={fetcher}
+                      name={session.trainerName}
+                      photo={session.trainerPhoto}
+                      size={20}
+                    />
+                  }
                   testID={`schedule-session-${session.id}`}
                   time={startTime(session.startsAt, session.endsAt)}
                   title={session.classTypeName}

@@ -17,6 +17,7 @@ import {
   Screen,
   SectionTitle,
   spacing,
+  StaffFace,
   StateScreen,
   upcomingCivilDates,
   useStudioRules,
@@ -210,6 +211,14 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
                   // Her own Booking takes the neutral pill, like a full class.
                   pillTone={booked || session.availableSeats === 0 ? "neutral" : "tint"}
                   subtitle={session.trainerName}
+                  subtitleLead={
+                    <StaffFace
+                      fetcher={fetcher}
+                      name={session.trainerName}
+                      photo={session.trainerPhoto}
+                      size={20}
+                    />
+                  }
                   testID={`session-card-${session.id}`}
                   time={startTime(session.startsAt, session.endsAt)}
                   title={session.classTypeName}
