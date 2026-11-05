@@ -39,16 +39,19 @@ export const requiredPhone = phoneValueSchema
  */
 export const keptOrRequiredPhone = (stored: string | null) => {
   const start = phoneValue(stored);
-  return phoneValueSchema.pipe(
-    z.union([
-      z
-        .custom<PhoneValue>(
-          (value) =>
-            (value as PhoneValue).iso === start.iso &&
-            (value as PhoneValue).digits === start.digits,
-        )
-        .transform(() => stored),
-      requiredPhone,
-    ]),
-  );
+  const untouched = (value: PhoneValue) =>
+    value.iso === start.iso && value.digits === start.digits;
+  return phoneValueSchema
+    .superRefine((value, context) => {
+      if (untouched(value)) return;
+      const problem = phoneProblem(phoneCountryByIso(value.iso), value.digits);
+      if (problem !== null) {
+        context.addIssue({ code: "custom", message: problem });
+      }
+    })
+    .transform((value) =>
+      untouched(value)
+        ? stored
+        : storedPhone(phoneCountryByIso(value.iso), value.digits),
+    );
 };
