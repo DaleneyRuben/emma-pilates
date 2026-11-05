@@ -126,11 +126,12 @@ function CountryRows({
         country={country}
         key={country.iso}
         onPick={onPick}
-        selected={country === selected}
+        selected={country.iso === selected.iso}
       />
     ));
   }
-  const others = (list: readonly PhoneCountry[]) => list.filter((country) => country !== selected);
+  const others = (list: readonly PhoneCountry[]) =>
+    list.filter((country) => country.iso !== selected.iso);
   return (
     <>
       <CountryRow country={selected} onPick={onPick} selected />
