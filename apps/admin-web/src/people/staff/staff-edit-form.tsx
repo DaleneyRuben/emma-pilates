@@ -80,6 +80,7 @@ export function StaffEditForm({
         onDone();
         return;
       }
+      let contactSaved = false;
       try {
         if (contactChanged) {
           await change.mutateAsync({
@@ -88,6 +89,7 @@ export function StaffEditForm({
             name,
             phone,
           });
+          contactSaved = true;
         }
         if (!roleChanged && !branchesChanged) {
           onDone(`Guardamos los cambios de ${name}.`);
@@ -107,10 +109,15 @@ export function StaffEditForm({
         onDone(`Guardamos los cambios de ${name}.`);
       } catch (error) {
         const problem = staffProblem(error);
+        // The contact landed before the Role or Branches failed.
+        const saved = contactSaved
+          ? "Guardamos el nombre y el teléfono, pero no el resto. "
+          : "";
         if (problem.field === "branchIds") {
           form.setError("branchIds", { message: problem.message });
+          if (saved !== "") setFailure(saved.trim());
         } else {
-          setFailure(problem.message);
+          setFailure(`${saved}${problem.message}`);
         }
       }
     },
