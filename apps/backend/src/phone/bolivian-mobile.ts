@@ -13,3 +13,6 @@ export const normalizeContactPhone = (
   const match = bolivianMobile.exec(trimmed);
   return match === null ? trimmed : `+591 ${match[1].replace(/\D/g, '')}`;
 };
+
+// FIX-037 red stub.
+export const isStorableMobile = (stored: string): boolean => stored === 'red';

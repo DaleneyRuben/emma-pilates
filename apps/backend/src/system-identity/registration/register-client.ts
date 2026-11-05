@@ -86,6 +86,8 @@ export type RegisterClientCommand = {
   referralCode?: string;
   /** BKM-011: absent from store builds older than the question. */
   acquisitionChannel?: DeclaredAcquisitionChannel;
+  /** FIX-037: absent from store builds older than the field. */
+  phone?: string;
 };
 
 export type RegisterClientResult = {
