@@ -310,10 +310,10 @@ lectura, y la coordinadora solo puede cambiar las sucursales de una
 entrenadora.
 
 **Foto de perfil.** En el mismo panel, arriba, está el círculo de la
-persona con **Cambiar foto**. Elige una foto JPG, PNG o WebP de hasta 10 MB:
+persona con **Cambiar foto**. Elige una foto JPG, PNG o WebP de hasta 5 MB:
 aparece al momento con «Subiendo foto…» y queda guardada sin pulsar
 **Guardar**. **Quitar foto** la saca y vuelven las iniciales. Un PDF o una
-imagen más pesada dice «Elige una foto JPG, PNG o WebP de hasta 10 MB.». La
+imagen más pesada dice «Elige una foto JPG, PNG o WebP de hasta 5 MB.». La
 coordinadora también puede cambiar la foto de cualquiera. La foto se ve en la
 lista de **Personal**, en **Horario** junto al nombre de la entrenadora y,
 la tuya, arriba a la derecha.

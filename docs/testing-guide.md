@@ -8826,8 +8826,8 @@ B. **Anyone's photo, admin web.** As Paola (Administrator) open **Estudio ›
    Personal**: every member shows her photo or her initials in a 40 px
    circle. **Abrir** on Daniela Ortiz opens the panel with a 96 px circle,
    **Cambiar foto**, **Quitar foto** when there is one, and «JPG, PNG o WebP,
-   hasta 10 MB.». A PDF or a 12 MB image shows «Elige una foto JPG, PNG o
-   WebP de hasta 10 MB.» before anything uploads. The photo saves without
+   hasta 5 MB.» (ADR-0072). A PDF or a 6 MB image shows «Elige una foto JPG, PNG o
+   WebP de hasta 5 MB.» before anything uploads. The photo saves without
    **Guardar**. As Carolina (Coordinator) the same panel lets her change the
    photo too, and her notice reads «Puedes cambiar sus sedes y su foto.
    Invitar y cambiar roles lo hace Administración.»
