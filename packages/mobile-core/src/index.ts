@@ -1,6 +1,6 @@
 export * from "./acquisition/acquisition-channel-field";
 export * from "./acquisition/own-referral-code";
-export * from "./account/bolivian-mobile";
+export * from "./account/phone-number";
 export * from "./account/change-password-screen";
 export * from "./account/email-change-link-screen";
 export * from "./account/feedback-metadata";
@@ -68,6 +68,8 @@ export * from "./ui/emphasis-card";
 export * from "./ui/empty-state";
 export * from "./ui/fonts";
 export * from "./ui/form-field";
+export * from "./ui/country-picker";
+export * from "./ui/phone-field";
 export * from "./ui/form-scroll-view";
 export * from "./ui/full-screen-image";
 export * from "./ui/glyph";

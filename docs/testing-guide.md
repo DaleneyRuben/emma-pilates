@@ -52,6 +52,7 @@ numbered tests.
 | Weekly series and booking window | Edit the booking window in Reglas del estudio, cancel an empty class from Horario, give a weekly series a «Vigente hasta», pause and resume it, and reach a wider window's later days through «Otra» in both apps (Test 129) | A pause holds one range at a time; resuming early brings back only the classes the pause withdrew that have not started |
 | Second walkthrough fixes | The rail's labels at 12 px, a missed Minimum Bookings check settled when the worker comes back, «Fecha de apertura» as dd/mm/aaaa, and phones without +591 (Test 130) | The phone normalization migration runs once on deploy |
 | The web's sign-in with the logo | Login, «¿Olvidaste tu contraseña?» and «Crea tu contraseña» with the studio's logo beside the form, their notices, errors and the throttled wait, at 1440 and 420 px (Test 131) | Busy buttons last only while a request is in flight |
+| Phones with a country code | «Celular» with a flag prefix and a country list in Regístrate (required), Editar perfil, Nuevo cliente, Invitar a alguien and the client's «Editar perfil» on the web; numbers with their flag in every list; WhatsApp in the number's own country (Test 132) | A store build older than FIX-037 registers without a phone |
 | Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and Horario, and next to the Trainer's name in the client's Reservar, class detail, Mis reservas and Historial (Test 134) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
@@ -175,10 +176,11 @@ You should see:
 - **¿Olvidaste tu contraseña?** and, at the bottom, "¿No tienes una cuenta?
   **Regístrate**".
 
-Tap **Regístrate**. Confirm that the form asks only for name, email,
+Tap **Regístrate**. Confirm that the form asks for name, email, mobile,
 password, and password confirmation («Repite la contraseña»), plus a collapsed
 **¿Tienes un código de referido?** that opens a **Código de referido** field.
-It must not ask for a phone number. Two different passwords show "Las
+It also asks for **Celular**, with **🇧🇴 +591** preselected (FIX-037, Test
+132). Two different passwords show "Las
 contraseñas no coinciden." under the second field and send nothing; fewer than
 8 characters show "Mínimo 8 caracteres.". The button reads **Crear cuenta** and
 "¿Ya tienes una cuenta? **Inicia sesión**" returns to Login. Tap **¿Olvidaste tu
@@ -1974,7 +1976,7 @@ stays enabled. Should two Assistants race, the confirmation still answers
 ### E. Invite a new Client and manage the invitation
 
 From **Buscar cliente** tap **+ Nuevo cliente**. Fill **Nombre**, **Correo
-electrónico**, and optionally **Teléfono (opcional)**, pick one answer under
+electrónico**, and **Celular** (required, with its country; Test 132), pick one answer under
 **¿Cómo nos conociste?**, and optionally type a **Código de referido
 (opcional)** (Test 79); the form explains
 "Enviaremos un enlace de activación al correo. Vence en 7 días." **Crear
@@ -8521,7 +8523,8 @@ H. **Phones (FIX-030, FIX-036).** The +591 is implicit (owner, 2026-11-04):
    a phone: the reopened invitation keeps the phone typed (the cause of
    Camila's missing phone). Nuevo cliente in the staff app and **Editar
    perfil** in the client app take and refuse the same numbers. The client
-   app's registration has no phone field. Test 130 E has the rest.
+   app's registration has no phone field (FIX-037 adds one, Test 132). Test
+   130 E has the rest.
 I. **The guide (FIX-029).** `docs/guia-de-recorrido.md` says to run
    `prisma:generate` after a pull, gives the
    `POST /api/v1/client-email-verifications` command for the iPhone
@@ -8758,7 +8761,7 @@ E. **Phones (FIX-036).** Test 125 H for the forms. After the migration,
    treatment. `PATCH /api/v1/clients/current` with
    `"phone":"71234567"` answers `"phone":"+591 71234567"`; a foreign number is
    saved as typed, so an older app keeps working. Specs:
-   `bolivian-mobile.spec.ts` (backend and `mobile-core`),
+   `bolivian-mobile.spec.ts` (backend; `mobile-core`'s rule is `phone-number.spec.ts` since FIX-037),
    `normalize-bolivian-mobiles.integration-spec.ts`,
    `new-client-phone.spec.tsx`, `email-change.spec.tsx`,
    `staff-create.spec.tsx`.
@@ -8803,6 +8806,60 @@ E. **At 420 px.** Narrow the window (or the device toolbar) to 420 px: the
 
 Specs: `login-page.spec.tsx`, `recover-password-page.spec.tsx`,
 `create-password-page.spec.tsx`, `session-guard.spec.tsx`.
+
+## Test 132: phones with a country code (FIX-037)
+
+Proposal A of DES-006 (follow-up 236): one «Celular» field whose left end is
+a tappable flag and code, «🇧🇴 +591 ⌄», and the digits after it. Any country
+is stored as `+<code> <digits>`; Bolivia keeps Test 130's rule. No migration.
+Use a copy of `pilates_golden`.
+
+A. **Registration (C01b).** In the Client app tap **Regístrate**. «Celular»
+   sits after the email with **🇧🇴 +591**, the placeholder «8 dígitos» and
+   «Te escribimos por WhatsApp si hace falta.» under it. **Crear cuenta** with
+   it empty shows «Escribe tu celular. Lo necesitamos para escribirte por
+   WhatsApp.»; `5123456` shows «Un celular de Bolivia tiene 8 dígitos y
+   empieza con 6 o 7.»; nothing is sent. `7123 4567` registers, and after the
+   email link **Perfil** shows `🇧🇴 +591 71234567`.
+B. **The country list.** Tap **🇧🇴 +591**. On the iPhone and iPad a sheet
+   opens with a grabber, «Elige el país», **Cancelar** and «Buscar país o
+   código»; on Android a full-screen list with a back arrow and the search in
+   the top bar. Bolivia comes first, ticked, then «Frecuentes» (Argentina,
+   Brasil, Chile, Perú, Paraguay) and «Todos los países» A–Z. `peru` and
+   `+51` both find Perú. Picking it closes the list, the prefix reads
+   **🇵🇪 +51**, the placeholder «9 dígitos», and the digits already typed stay.
+   `81234` says «Un celular de Perú tiene 9 dígitos y empieza con 9.».
+C. **Editar perfil (C22).** The field shows the stored number split into its
+   country and digits. Emptying it refuses the save with the same «Escribe tu
+   celular…» line. Pick Perú, type `912 345 678`, save: the API receives
+   `+51 912345678` and Perfil shows `🇵🇪 +51 912345678`.
+D. **Nuevo cliente (S05), Staff app.** The phone row of the grouped card is
+   the prefix, a hairline, and «Celular» over the digits, without
+   «(opcional)». It is required and sends `+<code> <digits>`. The client's
+   overview, the search rows and «Para contactar» show the number with its
+   flag; **Abrir WhatsApp** opens `wa.me/51912345678` for a Peruvian number,
+   not `wa.me/59151…`.
+E. **Admin web.** At 1440 px and at 420 px: **Estudio › Personal › Nuevo
+   miembro** asks for «Celular» (required, helper «La recepción lo usa para
+   escribirle por WhatsApp.»); the prefix opens a popover with the search,
+   the ticked country, «Frecuentes» and «Todos los países», usable with the
+   arrow keys and closed with Escape. The staff table, the member panel, the
+   client table, the client's Contacto card, «Para contactar» and the
+   promotion contacts show the flag. A client's **Editar perfil** uses the
+   same field.
+F. **The API.** `POST /api/v1/client-registrations` takes an optional
+   `phone`: `+591 71234567` and `+54 91123456789` are stored as sent;
+   `+591 5123456`, an empty string or text answer `400`; leaving it out (a
+   store build older than FIX-037) registers without a phone. Profile edits,
+   invitations and staff creation store a typed `+51 912-345-678` as
+   `+51 912345678`.
+
+Specs: `phone-number.spec.ts` (mobile-core and admin web),
+`phone-field.spec.tsx` (both), `registration-phone.spec.tsx`,
+`register-client-phone.spec.ts`, `bolivian-mobile.spec.ts`,
+`new-client-phone.spec.tsx`, `contact-phone.spec.ts`,
+`profile-screen.spec.tsx`, `email-change.spec.tsx`, `staff-create.spec.tsx`,
+`contact-alerts-page.spec.tsx`.
 
 ## Test 134: the staff profile photo (FIX-041)
 

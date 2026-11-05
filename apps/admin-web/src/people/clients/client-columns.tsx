@@ -3,6 +3,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { RowOpener } from "../../catalog/catalog-page";
 import { StatusPill } from "../../components/ui/status-pill";
 import { formatCivilDate } from "../../lib/bolivia-time";
+import { phoneWithFlag } from "../../lib/phone-number";
 
 const columns = createColumnHelper<AdminClientDto>();
 
@@ -41,7 +42,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
         <span>{row.original.email}</span>
         {row.original.phone === null ? null : (
           <span className="text-texto-muy-tenue tabular">
-            {row.original.phone}
+            {phoneWithFlag(row.original.phone)}
           </span>
         )}
       </span>

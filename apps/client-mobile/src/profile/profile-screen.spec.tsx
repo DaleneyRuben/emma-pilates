@@ -159,7 +159,7 @@ describe("Client Profile", () => {
     const screen = await openProfile();
 
     expect(screen.getByText("sofia@example.com")).toBeOnTheScreen();
-    expect(screen.getByText("+591 70011004")).toBeOnTheScreen();
+    expect(screen.getByText("🇧🇴 +591 70011004")).toBeOnTheScreen();
     expect(screen.getByText("Vencido")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Mi plan, Vencido" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeOnTheScreen();
@@ -257,7 +257,7 @@ describe("Client Profile", () => {
           "/api/v1/clients/current": () => jsonResponse(current),
           "PATCH /api/v1/clients/current": (init) => {
             saved(JSON.parse(String(init?.body)));
-            current = { ...profile, name: "Sofía Guzmán Vega", phone: null };
+            current = { ...profile, name: "Sofía Guzmán Vega", phone: "+51 912345678" };
             return jsonResponse(current);
           },
         }),
@@ -273,13 +273,25 @@ describe("Client Profile", () => {
     expect(screen.getByLabelText("Correo electrónico")).toHaveProp("value", "sofia@example.com");
 
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Sofía Guzmán Vega");
-    await fireEvent.changeText(screen.getByLabelText("Teléfono"), "");
+    // FIX-037: the mobile is required here too, with its country.
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "");
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar cambios" }));
+    expect(
+      screen.getByRole("alert", {
+        name: "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+      }),
+    ).toBeOnTheScreen();
+    expect(saved).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole("button", { name: "País: Bolivia, +591" }));
+    await fireEvent.press(screen.getAllByRole("button", { name: "Perú, +51" })[0]);
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "912 345 678");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar cambios" }));
 
     await waitFor(() => {
       expect(saved).toHaveBeenCalledWith({
         name: "Sofía Guzmán Vega",
-        phone: null,
+        phone: "+51 912345678",
       });
       expect(screen.getByText("Sofía Guzmán Vega")).toBeOnTheScreen();
     });

@@ -9,6 +9,7 @@ import {
   fontFamilies,
   NoticeRow,
   PersonAvatar,
+  phoneWithFlag,
   spacing,
   TextButton,
   typography,
@@ -97,7 +98,7 @@ export function StaffPhotoSummary({ member, note }: { member: StaffProfileDto; n
         <View style={styles.body}>
           <Text style={styles.name}>{member.name}</Text>
           <Text style={styles.detail}>{member.email}</Text>
-          {member.phone ? <Text style={styles.detail}>{member.phone}</Text> : null}
+          {member.phone ? <Text style={styles.detail}>{phoneWithFlag(member.phone)}</Text> : null}
           <View style={styles.actions}>
             {state.status === "uploading" || state.status === "removing" ? (
               <Text style={styles.busy}>

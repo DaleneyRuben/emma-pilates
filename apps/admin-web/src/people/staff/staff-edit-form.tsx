@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Form } from "../../components/form/form";
+import { PhoneFormField } from "../../components/form/phone-field";
+import { phoneValue } from "../../components/form/phone-value";
 import {
   SidePanelBody,
   SidePanelFooter,
@@ -54,7 +56,7 @@ export function StaffEditForm({
     defaultValues: {
       name: member.name,
       email: member.email,
-      phone: member.phone ?? "",
+      phone: phoneValue(member.phone),
       role: member.role as StaffRole,
       branchIds: member.branchIds,
     },
@@ -139,7 +141,7 @@ export function StaffEditForm({
           ) : (
             <StaffContact member={member} only={["email"]} />
           )}
-          <StaffContactField control={form.control} name="phone" />
+          <PhoneFormField control={form.control} name="phone" />
           <StaffRoleFields
             control={form.control}
             role={role}

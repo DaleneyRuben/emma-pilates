@@ -15,6 +15,7 @@ import { branchNames, roleLabels, statusPills } from "./staff-format";
 import { useAdminRole } from "../../session/admin-role";
 import { StaffPanelForm } from "./staff-panel";
 import { staffTableQueryOptions } from "./staff-queries";
+import { phoneWithFlag } from "../../lib/phone-number";
 
 const roleOptions: { value: StaffSearch["role"]; label: string }[] = [
   { value: "all", label: "Todos" },
@@ -59,7 +60,7 @@ const staffColumns =
           <span>{row.original.email}</span>
           {row.original.phone === null ? null : (
             <span className="text-texto-muy-tenue tabular">
-              {row.original.phone}
+              {phoneWithFlag(row.original.phone)}
             </span>
           )}
         </span>

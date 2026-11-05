@@ -1,3 +1,5 @@
+import { phoneWithFlag } from "@pilates/mobile-core";
+
 const civilDateFormatter = new Intl.DateTimeFormat("es-BO", {
   day: "numeric",
   month: "long",
@@ -37,7 +39,7 @@ export function describeClasses(count: number): string {
 }
 
 export function describeContact(phone: string | null | undefined, email: string): string {
-  return phone ? `${phone} · ${email}` : email;
+  return phone ? `${phoneWithFlag(phone)} · ${email}` : email;
 }
 
 // S06 «Reenvío limitado»: the recipient lane is full; the current link still works.

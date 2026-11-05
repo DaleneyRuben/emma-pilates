@@ -5,6 +5,7 @@ import { SidePanelBody } from "../../components/panel/side-panel";
 import { namesById } from "../../lib/named";
 import type { StaffRole } from "../people-search";
 import { branchNames, roleLabels } from "./staff-format";
+import { phoneWithFlag } from "../../lib/phone-number";
 import { StaffPhotoBlock } from "./staff-photo-block";
 
 type ContactRow = "name" | "email" | "phone";
@@ -22,7 +23,10 @@ export function StaffContact({
   const all = {
     name: ["Nombre", member.name],
     email: ["Correo", member.email],
-    phone: ["Teléfono", member.phone ?? "Sin teléfono"],
+    phone: [
+      "Teléfono",
+      member.phone === null ? "Sin teléfono" : phoneWithFlag(member.phone),
+    ],
   } as const;
   const rows = only.map((row) => all[row]);
   return (

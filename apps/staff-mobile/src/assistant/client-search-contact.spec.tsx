@@ -18,10 +18,10 @@ describe("Assistant search result contact", () => {
 
     await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
     await waitFor(() => {
-      expect(screen.getByText("+591 70011001 · lucia@example.com")).toBeOnTheScreen();
+      expect(screen.getByText("🇧🇴 +591 70011001 · lucia@example.com")).toBeOnTheScreen();
     });
 
-    const contact = screen.getByText("+591 70011001 · lucia@example.com");
+    const contact = screen.getByText("🇧🇴 +591 70011001 · lucia@example.com");
     expect(contact).toHaveProp("numberOfLines", 1);
     expect(contact).toHaveProp("ellipsizeMode", "tail");
   });

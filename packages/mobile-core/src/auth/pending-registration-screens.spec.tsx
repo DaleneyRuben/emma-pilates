@@ -37,6 +37,7 @@ async function registerAndCheckEmail(api: AuthenticationApi) {
     "lucia.mendosa@example.com",
   );
   await fireEvent.changeText(screen.getByLabelText("Contraseña"), "pilates2026");
+  await fireEvent.changeText(screen.getByLabelText("Celular"), "70712345");
   await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "pilates2026");
   await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
   await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));

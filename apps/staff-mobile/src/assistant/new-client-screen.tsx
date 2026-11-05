@@ -6,9 +6,10 @@ import {
   formatCountdown,
   FormField,
   FormScrollView,
-  bolivianMobileMessage,
-  isBolivianMobileOrBlank,
-  normalizeBolivianMobile,
+  bolivia,
+  phoneProblem,
+  storedPhone,
+  type PhoneValue,
   IconRowGroup,
   NoticeRow,
   PrimaryButton,
@@ -26,6 +27,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { GroupedField } from "../ui/grouped-field";
+import { GroupedPhoneField } from "../ui/grouped-phone-field";
 import { CenteredCard } from "./assistant-layout";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import {
@@ -60,7 +62,7 @@ export function NewClientScreen() {
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState<PhoneValue>({ country: bolivia, digits: "" });
   const [channel, setChannel] = useState<AcquisitionChannelChoice | null>(null);
   const [referralCode, setReferralCode] = useState("");
   const [codeUnknown, setCodeUnknown] = useState(false);
@@ -82,8 +84,9 @@ export function NewClientScreen() {
       ? "Escribe un correo válido."
       : undefined;
 
-  const phoneError =
-    submitted && !isBolivianMobileOrBlank(phone) ? bolivianMobileMessage : undefined;
+  // FIX-037: «Celular» is required, with its country (follow-up 236).
+  const phoneMistake = phoneProblem(phone.country, phone.digits);
+  const phoneError = submitted && phoneMistake !== null ? phoneMistake : undefined;
   const channelError = submitted && channel === null ? acquisitionChannelRequired : undefined;
 
   const workspace = useAssistantWorkspace();
@@ -105,7 +108,7 @@ export function NewClientScreen() {
     if (
       name.trim().length === 0 ||
       !emailPattern.test(email.trim()) ||
-      !isBolivianMobileOrBlank(phone) ||
+      phoneMistake !== null ||
       channel === null
     ) {
       return;
@@ -116,7 +119,7 @@ export function NewClientScreen() {
       const result = await api.inviteClient({
         name: name.trim(),
         email: email.trim(),
-        phone: phone.trim().length === 0 ? null : normalizeBolivianMobile(phone),
+        phone: storedPhone(phone.country, phone.digits),
         acquisitionChannel: channel,
         ...(code === "" ? {} : { referralCode: code }),
       });
@@ -223,12 +226,9 @@ export function NewClientScreen() {
                     testID="new-client-email"
                     value={email}
                   />
-                  <GroupedField
+                  <GroupedPhoneField
                     error={phoneError}
-                    keyboardType="phone-pad"
-                    label="Teléfono (opcional)"
-                    onChangeText={setPhone}
-                    placeholder="71234567"
+                    onChange={setPhone}
                     testID="new-client-phone"
                     value={phone}
                   />
