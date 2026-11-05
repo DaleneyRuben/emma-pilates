@@ -81,6 +81,11 @@ describe("phone numbers with a country code (FIX-037)", () => {
       country: argentina,
       digits: "91123456789",
     });
+    // A number saved before FIX-037 with spaces still reads into its country.
+    expect(parseStoredPhone("+54 9 11 5555 0000")).toEqual({
+      country: argentina,
+      digits: "91155550000",
+    });
     expect(parseStoredPhone(null)).toEqual({ country: bolivia, digits: "" });
     expect(parseStoredPhone("700 12345")).toEqual({
       country: bolivia,

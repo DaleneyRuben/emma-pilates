@@ -43,9 +43,7 @@ describe("phone numbers with a country code (FIX-037)", () => {
 
   it("checks other countries with their own length and first digit", () => {
     expect(phoneProblem(peru, "912345678")).toBeNull();
-    expect(phoneProblem(peru, "81234")).toBe(
-      "Un celular de Perú tiene 9 dígitos y empieza con 9.",
-    );
+    expect(phoneProblem(peru, "81234")).toBe("Un celular de Perú tiene 9 dígitos y empieza con 9.");
     expect(phoneProblem(argentina, "91123456789")).toBeNull();
     expect(phoneProblem(phoneCountryByIso("US"), "3055550123")).toBeNull();
     expect(phoneProblem(phoneCountryByIso("US"), "305555")).toBe(
@@ -72,6 +70,11 @@ describe("phone numbers with a country code (FIX-037)", () => {
     expect(parseStoredPhone("+54 91123456789")).toEqual({
       country: argentina,
       digits: "91123456789",
+    });
+    // A number saved before FIX-037 with spaces still reads into its country.
+    expect(parseStoredPhone("+54 9 11 5555 0000")).toEqual({
+      country: argentina,
+      digits: "91155550000",
     });
     expect(parseStoredPhone(null)).toEqual({ country: bolivia, digits: "" });
     expect(parseStoredPhone("700 12345")).toEqual({ country: bolivia, digits: "70012345" });
