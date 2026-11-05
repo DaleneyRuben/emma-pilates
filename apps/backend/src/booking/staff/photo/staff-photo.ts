@@ -1,4 +1,8 @@
-import type { AuditActor } from '../../../system-identity/authentication/audit-actor';
+import { ImageAssetNotAttachableError } from '../../../uploads/image-asset-attachments';
+import {
+  auditActorOf,
+  type AuditActor,
+} from '../../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../../system-identity/authentication/resolve-authenticated-principal';
 
 // FIX-041 (decision §20.23): a Staff Member's profile photo, set by herself
@@ -18,12 +22,21 @@ export type StaffPhotoErrorCode =
   | 'staff_member_not_found'
   | 'staff_member_deactivated';
 
+const statuses: Record<StaffPhotoErrorCode, number> = {
+  profile_photo_not_ready: 409,
+  profile_photo_not_found: 404,
+  staff_access_denied: 403,
+  staff_member_not_found: 404,
+  staff_member_deactivated: 409,
+};
+
 export class StaffPhotoError extends Error {
-  readonly status = 500;
+  readonly status: number;
 
   constructor(readonly code: StaffPhotoErrorCode) {
     super(code);
     this.name = 'StaffPhotoError';
+    this.status = statuses[code];
   }
 }
 
@@ -59,34 +72,129 @@ export type StaffPhotoResult = {
 
 type Dependencies = { gateway: StaffPhotoGateway; now: () => Date };
 
-const notImplemented = (): Promise<never> =>
-  Promise.reject(new Error('not implemented'));
+const ownStaffMemberId = (principal: AuthenticatedPrincipal): string => {
+  if (principal.identity.kind !== 'staff') {
+    throw new StaffPhotoError('staff_access_denied');
+  }
+  return principal.identity.staffMemberId;
+};
 
-export const setOwnStaffPhoto: (
+// The owner's decision: the Administrator and the Coordinator change anyone's
+// photo on the team, not only a Trainer's.
+const requirePhotoManager = (principal: AuthenticatedPrincipal): void => {
+  if (
+    principal.identity.kind !== 'staff' ||
+    (principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
+  ) {
+    throw new StaffPhotoError('staff_access_denied');
+  }
+};
+
+const requireMember = async (
+  gateway: StaffPhotoGateway,
+  staffMemberId: string,
+): Promise<StaffPhotoMember> => {
+  const member = await gateway.findMember(staffMemberId);
+  if (member === null) throw new StaffPhotoError('staff_member_not_found');
+  if (member.status === 'deactivated') {
+    throw new StaffPhotoError('staff_member_deactivated');
+  }
+  return member;
+};
+
+const replace = async (
+  member: StaffPhotoMember,
+  imageAssetId: string,
+  principal: AuthenticatedPrincipal,
+  dependencies: Dependencies,
+): Promise<StaffPhotoResult> => {
+  try {
+    const photo = await dependencies.gateway.replacePhoto({
+      staffMemberId: member.id,
+      targetAccountId: member.accountId,
+      actor: auditActorOf(principal),
+      // The upload belongs to whoever declared it: herself or the manager.
+      ownerAccountId: principal.accountId,
+      imageAssetId,
+      now: dependencies.now(),
+    });
+    return { staffMemberId: member.id, photo };
+  } catch (error) {
+    if (error instanceof ImageAssetNotAttachableError) {
+      throw new StaffPhotoError('profile_photo_not_ready');
+    }
+    throw error;
+  }
+};
+
+const remove = async (
+  member: StaffPhotoMember,
+  principal: AuthenticatedPrincipal,
+  dependencies: Dependencies,
+): Promise<StaffPhotoResult> => {
+  await dependencies.gateway.removePhoto({
+    staffMemberId: member.id,
+    targetAccountId: member.accountId,
+    actor: auditActorOf(principal),
+    now: dependencies.now(),
+  });
+  return { staffMemberId: member.id, photo: null };
+};
+
+export const setOwnStaffPhoto = async (
   command: { imageAssetId: string },
   principal: AuthenticatedPrincipal,
   dependencies: Dependencies,
-) => Promise<StaffPhotoResult> = notImplemented;
+): Promise<StaffPhotoResult> => {
+  const staffMemberId = ownStaffMemberId(principal);
+  const member = await requireMember(dependencies.gateway, staffMemberId);
+  return replace(member, command.imageAssetId, principal, dependencies);
+};
 
-export const removeOwnStaffPhoto: (
+export const removeOwnStaffPhoto = async (
   principal: AuthenticatedPrincipal,
   dependencies: Dependencies,
-) => Promise<StaffPhotoResult> = notImplemented;
+): Promise<StaffPhotoResult> => {
+  const staffMemberId = ownStaffMemberId(principal);
+  const member = await requireMember(dependencies.gateway, staffMemberId);
+  return remove(member, principal, dependencies);
+};
 
-export const setStaffMemberPhoto: (
+export const setStaffMemberPhoto = async (
   command: { staffMemberId: string; imageAssetId: string },
   principal: AuthenticatedPrincipal,
   dependencies: Dependencies,
-) => Promise<StaffPhotoResult> = notImplemented;
+): Promise<StaffPhotoResult> => {
+  requirePhotoManager(principal);
+  const member = await requireMember(
+    dependencies.gateway,
+    command.staffMemberId,
+  );
+  return replace(member, command.imageAssetId, principal, dependencies);
+};
 
-export const removeStaffMemberPhoto: (
+export const removeStaffMemberPhoto = async (
   command: { staffMemberId: string },
   principal: AuthenticatedPrincipal,
   dependencies: Dependencies,
-) => Promise<StaffPhotoResult> = notImplemented;
+): Promise<StaffPhotoResult> => {
+  requirePhotoManager(principal);
+  const member = await requireMember(
+    dependencies.gateway,
+    command.staffMemberId,
+  );
+  return remove(member, principal, dependencies);
+};
 
-export const readStaffPhoto: (
+// Anyone signed in sees the team's faces: the Client next to her Trainer,
+// the Staff in Horario. Only an asset a Staff Member shows now is served.
+export const readStaffPhoto = async (
   query: { imageAssetId: string; variant: StaffPhotoVariant },
-  principal: AuthenticatedPrincipal,
+  _principal: AuthenticatedPrincipal,
   dependencies: { gateway: StaffPhotoGateway },
-) => Promise<{ objectKey: string; mediaType: string }> = notImplemented;
+): Promise<{ objectKey: string; mediaType: string }> => {
+  const object = await dependencies.gateway.readPhotoObject(query);
+  if (object === null) throw new StaffPhotoError('profile_photo_not_found');
+  return object;
+};
