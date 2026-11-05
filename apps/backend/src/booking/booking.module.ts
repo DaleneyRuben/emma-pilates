@@ -163,6 +163,7 @@ import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
 import { transferQrWiring } from './transfer-qr/transfer-qr-wiring';
 import { administratorSessionRosterWiring } from './sessions/administrator-session-roster-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
+import { staffPhotoWiring } from './staff/photo/staff-photo-wiring';
 import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
 import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
 
@@ -208,6 +209,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...administratorSessionRosterWiring.controllers,
     ...acquisitionWiring.controllers,
     ...clientPhotoWiring.controllers,
+    ...staffPhotoWiring.controllers,
     ...first90DaysWiring.controllers,
     ...invoiceDataWiring.controllers,
     EvaluationSlotsController,
@@ -674,6 +676,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...administratorSessionRosterWiring.providers(PRISMA_CLIENT),
     ...acquisitionWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
+    ...staffPhotoWiring.providers(PRISMA_CLIENT),
     ...first90DaysWiring.providers(PRISMA_CLIENT),
     ...invoiceDataWiring.providers(PRISMA_CLIENT),
   ],
