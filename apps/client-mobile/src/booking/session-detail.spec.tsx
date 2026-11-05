@@ -28,7 +28,11 @@ describe("Client Session detail", () => {
     expect(facts.getByText("Emma Vargas")).toBeOnTheScreen();
     expect(facts.getByText("Entrenadora")).toBeOnTheScreen();
     expect(facts.getByText("Centro")).toBeOnTheScreen();
-    expect(facts.getByText(/^Cancela sin costo hasta las \d{2}:\d{2}$/)).toBeOnTheScreen();
+    // Walkthrough n.º 27: the limit names its day. The class starts four hours
+    // from now, so the limit is today, or tomorrow near midnight.
+    expect(
+      facts.getByText(/^Cancela sin costo hasta (hoy|mañana) a las \d{2}:\d{2}$/),
+    ).toBeOnTheScreen();
     expect(screen.getByText(/ · 75 minutos$/)).toBeOnTheScreen();
     expect(screen.getByText("de 12 cupos libres")).toBeOnTheScreen();
     expect(screen.getByText(classType.description)).toBeOnTheScreen();

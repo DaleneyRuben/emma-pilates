@@ -115,3 +115,8 @@ export function formatMonthHeading(startsAt: string): string {
 export function formatSessionDate(startsAt: string): string {
   return longDateFormatter.format(new Date(startsAt)).replace(",", "");
 }
+
+/** Walkthrough n.º 27: the free-cancellation limit with its day (not built yet). */
+export function formatCancellationDeadline(deadline: Date, now: Date): string {
+  return `${deadline.getTime() - now.getTime()}`;
+}

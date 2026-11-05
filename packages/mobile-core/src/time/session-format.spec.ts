@@ -3,6 +3,7 @@ import {
   civilDateRange,
   agendaDayChipLabel,
   dayChipLabel,
+  formatCancellationDeadline,
   formatMonthHeading,
   formatSessionDate,
   formatStartTime,
@@ -83,5 +84,44 @@ describe("Session formatting", () => {
 
   it("writes a Session's start alone in La Paz time, as Inicio's next class does", () => {
     expect(formatStartTime("2026-09-21T12:00:00.000Z")).toBe("08:00");
+  });
+
+  // Walkthrough n.º 27: the free-cancellation limit names its day, in La Paz.
+  describe("the free-cancellation deadline", () => {
+    // Friday 6 November 2026, La Paz (UTC−4).
+    const at = (local: string) => new Date(`${local}-04:00`);
+
+    it("says «hoy» when the deadline falls today", () => {
+      expect(formatCancellationDeadline(at("2026-11-06T05:30:00"), at("2026-11-06T01:00:00"))).toBe(
+        "hoy a las 05:30",
+      );
+    });
+
+    it("says «mañana» when the deadline falls tomorrow", () => {
+      expect(formatCancellationDeadline(at("2026-11-07T05:30:00"), at("2026-11-06T20:00:00"))).toBe(
+        "mañana a las 05:30",
+      );
+    });
+
+    it("names the weekday and the day otherwise", () => {
+      expect(formatCancellationDeadline(at("2026-11-07T05:30:00"), at("2026-11-05T09:00:00"))).toBe(
+        "el sáb 7 a las 05:30",
+      );
+    });
+
+    it("counts days in La Paz, not in UTC, around midnight", () => {
+      // 19:00 and 22:00 in La Paz are 23:00 and 02:00 the next day in UTC.
+      expect(formatCancellationDeadline(at("2026-11-06T22:00:00"), at("2026-11-06T19:00:00"))).toBe(
+        "hoy a las 22:00",
+      );
+      // One minute before midnight, a deadline just after it is tomorrow.
+      expect(formatCancellationDeadline(at("2026-11-07T00:00:00"), at("2026-11-06T23:59:00"))).toBe(
+        "mañana a las 00:00",
+      );
+      // Just after midnight, the same instant is today.
+      expect(formatCancellationDeadline(at("2026-11-07T00:30:00"), at("2026-11-07T00:01:00"))).toBe(
+        "hoy a las 00:30",
+      );
+    });
   });
 });
