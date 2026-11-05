@@ -103,7 +103,8 @@ describe('changeStaffContact', () => {
     expect(transaction.recordAudit).not.toHaveBeenCalled();
   });
 
-  it('keeps a phone that is not a Bolivian mobile as typed', async () => {
+  // FIX-037: a number from another country is stored «+<code> <digits>».
+  it('stores a foreign mobile with its country code', async () => {
     const transaction = createTransaction();
 
     await changeStaffContact(
@@ -118,7 +119,7 @@ describe('changeStaffContact', () => {
 
     expect(transaction.setPhone).toHaveBeenCalledWith({
       staffMemberId: 'staff-1',
-      phone: '+54 9 11 5555 0000',
+      phone: '+54 91155550000',
     });
   });
 

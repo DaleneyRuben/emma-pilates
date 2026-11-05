@@ -79,7 +79,7 @@ describe("AW24's pending panel limit placement", () => {
 
     const card = pendingCard(panel);
     expect(follows(contactRow(panel, "Nombre"), card)).toBe(true);
-    expect(follows(card, contactRow(panel, "Teléfono (opcional)"))).toBe(true);
+    expect(follows(card, contactRow(panel, "Celular"))).toBe(true);
     expect(within(panel).queryByText("Correo", { selector: "dt" })).toBeNull();
     expect(within(card).getByText(valentina.email)).toBeVisible();
   });
