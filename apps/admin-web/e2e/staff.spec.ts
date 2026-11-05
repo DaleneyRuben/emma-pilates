@@ -42,6 +42,8 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   ).toBeVisible();
   await panel.getByLabel("Nombre", { exact: true }).fill("Valentina Soria");
   await panel.getByLabel("Correo electrónico").fill("valentina@emmapilates.bo");
+  // FIX-037: «Celular» is required; the prefix button's label is «País: …».
+  await panel.getByLabel("Celular", { exact: true }).fill("71234567");
   // The radio and the chip inputs are visually hidden; their labels take
   // the click.
   await panel
@@ -89,14 +91,16 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   // FIX-038: the Administrator gives an active member a phone.
   await page.getByRole("button", { name: "Camila Rojas" }).click();
   const contact = page.getByRole("dialog", { name: "Editar miembro" });
-  await contact.getByLabel("Teléfono (opcional)").fill("7000 0001");
+  await contact.getByLabel("Celular", { exact: true }).fill("7000 0001");
   await contact.getByRole("button", { name: "Guardar", exact: true }).click();
   await expect(
     page.getByText("Guardamos los cambios de Camila Rojas."),
   ).toBeVisible();
   await expect(contact).toHaveCount(0);
   await expect(
-    page.getByRole("row", { name: /Camila Rojas/ }).getByText("+591 70000001"),
+    page
+      .getByRole("row", { name: /Camila Rojas/ })
+      .getByText("🇧🇴 +591 70000001"),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Camila Rojas" }).click();

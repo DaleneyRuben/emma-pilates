@@ -266,19 +266,29 @@ hecha.
 **Estudio › Personal**. Ana ya está en la lista, con rol **Administración** y
 estado **Activo**. Pulsa **Nuevo miembro** para cada persona.
 
-| Nombre | Correo | Teléfono | Rol | Sucursales |
+| Nombre | Correo | Celular | Rol | Sucursales |
 | --- | --- | --- | --- | --- |
-| Camila Rojas | camila@example.com | 70000001 | Asistente | Centro |
-| Daniela Ortiz | daniela@example.com | 70000002 | Entrenadora | Centro |
-| Gabriela Flores | gabriela@example.com | 70000003 | Nutricionista | Centro |
+| Camila Rojas | camila@example.com | 🇧🇴 +591 · 70000001 | Asistente | Centro |
+| Daniela Ortiz | daniela@example.com | 🇧🇴 +591 · 70000002 | Entrenadora | Centro |
+| Gabriela Flores | gabriela@example.com | 🇦🇷 +54 · 91123456789 | Nutricionista | Centro |
 
-El teléfono se escribe con los 8 dígitos solos: el `+591` va implícito. Un
-celular de Bolivia empieza con 6 o 7. Lo puedes escribir con espacios o
-guiones, o con el `+591` delante. Al guardar, la lista lo muestra siempre como
-`+591 70000001`. Un número de 7 dígitos, o que empieza con otro número,
-muestra «Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567.» y
-no se guarda. Vale igual para **Nuevo cliente** en la app del equipo y para
-**Editar perfil** en la app de la clienta.
+**Celular** es obligatorio. A la izquierda del campo está el país, con
+**🇧🇴 +591** ya elegido: para Bolivia escribes solo los 8 dígitos. Un celular
+de Bolivia empieza con 6 o 7, y lo puedes escribir con espacios o guiones.
+Para Gabriela, pulsa **🇧🇴 +591**, busca `Argentina` (o `+54`) en la lista y
+elígelo; después escribe sus 11 dígitos. Al guardar, la lista muestra cada
+número con su bandera: `🇧🇴 +591 70000001`, `🇦🇷 +54 91123456789`.
+
+- Vacío: «Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.»
+- Un número de Bolivia de 7 dígitos, o que empieza con otro número: «Un
+  celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.»
+- Con otro país, la regla de ese país, por ejemplo «Un celular de Perú tiene
+  9 dígitos y empieza con 9.»
+
+En los tres casos no se guarda nada. El campo es el mismo en **Nuevo
+cliente** de la app del equipo, en **Regístrate** y **Editar perfil** de la
+app de la clienta, y en **Editar perfil** de la ficha de una clienta en la
+web.
 
 **Guardar** manda el correo de activación. La fila queda **Pendiente**.
 Ábrela y verás **Reenviar enlace**, **Cambiar correo** y **Cancelar
@@ -298,11 +308,12 @@ Una persona con rol **Administración** o **Coordinador** no elige sede: ve
 todas. Las demás solo ven las sedes que marques.
 
 **Editar miembro.** Abre a Camila (o a cualquier otra persona, activa o
-pendiente). **Nombre** y **Teléfono (opcional)** son campos: corrige el
-nombre, escribe `70000001` si le falta el teléfono y pulsa **Guardar**. La
-lista muestra el nombre nuevo y `+591 70000001`, con el aviso «Guardamos los
-cambios de …». El teléfono sigue la regla de arriba; uno guardado antes de la
-regla se puede dejar como está. Borrar el teléfono lo quita. El correo de una
+pendiente). **Nombre** y **Celular** son campos: corrige el nombre, escribe
+`70000001` si le falta el celular y pulsa **Guardar**. La lista muestra el
+nombre nuevo y `🇧🇴 +591 70000001`, con el aviso «Guardamos los cambios de
+…». El celular es el mismo campo de arriba, con su país; si no lo tocas, el
+que estaba (aunque sea de antes de la regla, o ninguno) se guarda igual. Un
+celular que cambias tiene que ser válido, y no se puede borrar. El correo de una
 persona **activa** se ve pero no se edita: es con el que entra, y cambiarlo
 necesita que el correo nuevo lo confirme (todavía no está). El de una
 **pendiente** se cambia con **Cambiar correo**. Tu propia fila sigue de solo
@@ -371,7 +382,10 @@ lista.
 Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
 
 1. Pulsa **Regístrate**. El formulario pide nombre, correo, contraseña y
-   confirmar contraseña. El teléfono es opcional. Abre **¿Cómo nos
+   confirmar contraseña, y el **Celular**, que es obligatorio: con **🇧🇴
+   +591** ya elegido, escribe `70712345`. Si lo dejas vacío, **Crear cuenta**
+   muestra «Escribe tu celular. Lo necesitamos para escribirte por
+   WhatsApp.» y no crea nada. Abre **¿Cómo nos
    conociste?** y elige **Una instructora**. En el código de referido escribe
    el código de Daniela. **Crear cuenta**.
 2. La pantalla pasa a **Revisa tu correo**. El enlace dura 24 horas. Si
@@ -479,7 +493,8 @@ Cierra la sesión de Ana en la app del equipo y entra como Camila.
    cliente Lucía Fernández** si ese es el nombre completo que registró.
    Ábrelo. Ves el plan, la próxima reserva y el historial.
 2. **+ Nuevo cliente**. Crea a una clienta que llega al estudio sin la app:
-   nombre, correo, teléfono, **¿Cómo nos conociste?** y, si trae un código,
+   nombre, correo, **Celular** (obligatorio, con su país), **¿Cómo nos
+   conociste?** y, si trae un código,
    el código. **Guardar** le manda un enlace para que cree su contraseña.
    Mientras no lo abre, su ficha dice **Cuenta pendiente de activación**, con
    **Reenviar enlace** y **Cancelar invitación**.
@@ -634,7 +649,9 @@ de la nutricionista, no como un gasto que tengas que tipear.
 
 Con Lucía todavía en la app, recorre lo que no es comprar ni reservar.
 
-1. **Perfil**, **Editar**. Cambia el teléfono y guarda. Para cambiar el
+1. **Perfil**, **Editar**. Cambia el **Celular** y guarda: pulsa **🇧🇴 +591**,
+   elige **Perú** y escribe `912345678`. **Perfil** lo muestra como
+   `🇵🇪 +51 912345678`. Vaciarlo no se puede: el celular es obligatorio. Para cambiar el
    correo, escribe uno nuevo y guarda. La pantalla queda en **Revisa tu
    correo nuevo**. El enlace llega al correo nuevo y dura 24 horas. El correo
    viejo recibe un aviso, sin enlace. Hasta que abre el enlace, sigue

@@ -35,7 +35,7 @@ describe("Assistant rows", () => {
     expect(row).toHaveStyle({ alignItems: "center", flexDirection: "row", minHeight: 64 });
     expect(screen.getByText("LF")).toHaveStyle({ fontFamily: "Lora_400Regular" });
     expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
-    expect(screen.getByText("+591 70011001 · lucia@example.com")).toHaveStyle({
+    expect(screen.getByText("🇧🇴 +591 70011001 · lucia@example.com")).toHaveStyle({
       color: "#6F6662",
       fontSize: 13,
     });

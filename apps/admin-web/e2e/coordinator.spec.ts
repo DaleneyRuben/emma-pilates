@@ -51,7 +51,7 @@ test.describe("the Coordinator's admin web", () => {
     await noAmountOn(page);
 
     await panel.getByRole("button", { name: "Editar perfil" }).click();
-    await panel.getByLabel("Teléfono").fill("+591 70011888");
+    await panel.getByLabel("Celular", { exact: true }).fill("70011888");
     await panel.getByRole("button", { name: "Guardar cambios" }).click();
     await expect(
       panel.getByText("Guardamos los cambios del perfil."),

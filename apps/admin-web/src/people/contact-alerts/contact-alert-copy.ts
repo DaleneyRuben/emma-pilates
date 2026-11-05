@@ -17,10 +17,16 @@ export const startedOnLabel = (civilDate: string): string => {
   return `${day}/${month}/${year}`;
 };
 
+// wa.me takes the digits alone, code first. FIX-037: a stored «+<code>
+// <digits>» already carries its country (any country); an older number
+// without one is Bolivian.
 export const whatsAppHref = (phone: string): string | null => {
   const digits = phone.replace(/\D/g, "");
   if (digits.length === 0) return null;
-  const withCountry = digits.startsWith("591") ? digits : `591${digits}`;
+  const withCountry =
+    phone.trim().startsWith("+") || digits.startsWith("591")
+      ? digits
+      : `591${digits}`;
   return `https://wa.me/${withCountry}`;
 };
 

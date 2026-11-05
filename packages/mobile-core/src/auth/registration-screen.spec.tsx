@@ -35,6 +35,7 @@ async function fillForm(
 ) {
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Lucía Mendoza");
   await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "lucia@example.com");
+  await fireEvent.changeText(screen.getByLabelText("Celular"), "70712345");
   await fireEvent.changeText(screen.getByLabelText("Contraseña"), "pilates2026");
   await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), confirmation);
   await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
@@ -73,6 +74,7 @@ describe("Client registration (01)", () => {
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Lucía Mendoza");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "lucia@example.com");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "corta");
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "70712345");
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "corta");
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
@@ -95,6 +97,7 @@ describe("Client registration (01)", () => {
       email: "lucia@example.com",
       name: "Lucía Mendoza",
       password: "pilates2026",
+      phone: "+591 70712345",
       referralCode: "EMMA-2026",
     });
     expect(screen.getByText("Revisa tu correo")).toBeOnTheScreen();
@@ -155,6 +158,7 @@ describe("Client registration (01) acquisition channel", () => {
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Lucía Mendoza");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "lucia@example.com");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "pilates2026");
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "70712345");
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "pilates2026");
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 

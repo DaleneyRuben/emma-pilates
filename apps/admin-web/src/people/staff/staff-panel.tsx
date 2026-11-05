@@ -16,6 +16,7 @@ import {
   SidePanelBody,
   SidePanelFooter,
 } from "../../components/panel/side-panel";
+import { PhoneFormField } from "../../components/form/phone-field";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { WaitNotice } from "../../auth/request-limit-notice";
@@ -43,7 +44,6 @@ import { StaffRoleFields } from "./staff-role-fields";
 const contactFields = [
   ["name", "Nombre", "text", "name"],
   ["email", "Correo electrónico", "email", "email"],
-  ["phone", "Teléfono (opcional)", "tel", "tel"],
 ] as const;
 
 const helpers: Partial<Record<keyof StaffFormInput, string>> = {
@@ -120,6 +120,11 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
               )}
             />
           ))}
+          <PhoneFormField
+            control={form.control}
+            name="phone"
+            description="La recepción lo usa para escribirle por WhatsApp."
+          />
           <StaffRoleFields control={form.control} role={role} />
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
