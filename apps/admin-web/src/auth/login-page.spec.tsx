@@ -97,8 +97,23 @@ describe("AW01 Login", () => {
     // Walkthrough of 2026-11-02: the brand without the tagline.
     expect(screen.queryByText(/Bienestar/)).toBeNull();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Iniciar sesión",
+      "Inicia sesión",
     );
+  });
+
+  // DES-007 (follow-up 239): the logo beside a visible title.
+  it("shows the studio's logo beside a visible title", async () => {
+    renderAdmin("/iniciar-sesion");
+
+    expect(
+      await screen.findByRole("img", { name: "Emma Pilates Studio" }),
+    ).toHaveAttribute("src", "/emma-logo.png");
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Inicia sesión" }),
+    ).not.toHaveClass("sr-only");
+    expect(
+      screen.getByText("Para Administración y Coordinación."),
+    ).toBeInTheDocument();
   });
 
   it("counts down the server's Retry-After before allowing another attempt", async () => {
@@ -113,11 +128,13 @@ describe("AW01 Login", () => {
 
     await fillLogin(user);
 
-    const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent(
+    // DES-007: a neutral pause like recovery's, not an error.
+    const wait = await screen.findByRole("status");
+    expect(wait).toHaveTextContent(
       "Demasiados intentos. Intenta de nuevo en un momento.",
     );
-    expect(alert).toHaveTextContent("Podrás intentarlo en 0:02.");
+    expect(wait).toHaveTextContent("Podrás intentarlo en 0:02.");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Iniciar sesión" }),
     ).toBeDisabled();
@@ -134,7 +151,7 @@ describe("AW01 Login", () => {
         ).toBeEnabled(),
       { timeout: 3000 },
     );
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   it("asks for a valid email and a password before calling the backend", async () => {

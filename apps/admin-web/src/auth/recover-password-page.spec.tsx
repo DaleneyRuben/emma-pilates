@@ -22,6 +22,21 @@ const request = async (user: ReturnType<typeof renderAdmin>["user"]) => {
 describe("AW30 Recuperar contraseña", () => {
   useMockServer();
 
+  // DES-007 (follow-up 239): the same frame as Login, with a visible title.
+  it("titles the page beside the studio's logo", async () => {
+    renderAdmin("/recuperar-contrasena");
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Recupera tu contraseña",
+      }),
+    ).not.toHaveClass("sr-only");
+    expect(
+      screen.getByRole("img", { name: "Emma Pilates Studio" }),
+    ).toBeInTheDocument();
+  });
+
   it("explains the email link and leads back to Login", async () => {
     renderAdmin("/recuperar-contrasena");
 

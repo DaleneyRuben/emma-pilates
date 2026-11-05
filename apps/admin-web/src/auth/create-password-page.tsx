@@ -7,13 +7,15 @@ import {
 } from "@pilates/api-contracts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { Link2Off } from "lucide-react";
 import { useState } from "react";
 import { adminFetch } from "../api/fetcher";
 import { useDocumentTitle } from "../app/use-document-title";
 import { buttonVariants } from "../components/ui/button";
 import { currentSessionQueryOptions } from "../session/session-queries";
 import { useStartSession } from "../session/use-start-session";
-import { AuthLayout } from "./auth-layout";
+import { AuthHeading, AuthLayout } from "./auth-layout";
+import { MessageDisc } from "./auth-notices";
 import { BackToLoginLink } from "./back-to-login-link";
 import { CreatePasswordForm } from "./create-password-form";
 
@@ -40,9 +42,10 @@ const copy: Record<Purpose, { title: string; line: string }> = {
 
 function Message({ title, children }: { title: string; children: string }) {
   return (
-    <div className="flex flex-col gap-2 text-center">
-      <h1 className="font-serif text-titulo-2 text-texto">{title}</h1>
-      <p className="text-cuerpo text-texto-secundario">{children}</p>
+    <div className="flex flex-col items-center gap-3 text-center">
+      <MessageDisc icon={Link2Off} />
+      <h1 className="font-serif text-titulo-1 text-texto">{title}</h1>
+      <p className="text-cuerpo text-texto-tenue">{children}</p>
     </div>
   );
 }
@@ -202,14 +205,10 @@ export function CreatePasswordPage({ token }: { token: string | undefined }) {
       ) : null}
       {typeof state === "object" && state.status === "current" ? (
         <>
-          <div className="flex flex-col gap-2 text-center">
-            <h1 className="font-serif text-titulo-2 text-texto">
-              {copy[state.purpose].title}
-            </h1>
-            <p className="text-cuerpo text-texto-secundario">
-              {copy[state.purpose].line}
-            </p>
-          </div>
+          <AuthHeading
+            title={copy[state.purpose].title}
+            line={copy[state.purpose].line}
+          />
           <CreatePasswordForm
             failed={failed}
             onSubmit={(password) => submit(password, state.purpose)}

@@ -1,17 +1,35 @@
 import type { ReactNode } from "react";
 
-// AW01/AW30/AW32: no sidebar or top bar before a session exists; a centered
-// card on desktop that fills the width, with less padding, when narrow.
+// P10 (follow-up 239, DES-007 proposal A): the studio's logo on a Rosa tinte
+// panel beside the form, which sits on the page's Marfil without a card.
+// Under 900 px the panel becomes a band above the form.
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <main className="flex min-h-svh items-center justify-center bg-arena px-4 py-10 text-texto">
-      <div className="flex w-full max-w-[420px] flex-col gap-6 rounded-marco bg-lino px-5 py-8 sm:px-10 sm:py-10">
-        <div className="flex flex-col items-center gap-1 text-center">
-          <p className="font-serif text-display text-texto">Emma</p>
-          <p className="text-nota text-texto-tenue">Pilates Studio</p>
+    <div className="flex min-h-svh flex-col bg-superficie text-texto min-[900px]:flex-row">
+      <aside className="flex h-[200px] flex-none items-center justify-center bg-rosa-tinte p-5 min-[900px]:h-auto min-[900px]:w-1/2 min-[900px]:p-12">
+        <img
+          src="/emma-logo.png"
+          alt="Emma Pilates Studio"
+          width={800}
+          height={333}
+          className="h-auto w-[240px] max-w-full min-[900px]:w-[440px]"
+        />
+      </aside>
+      <main className="flex flex-1 justify-center px-5 pt-8 pb-10 min-[900px]:items-center min-[900px]:px-10 min-[900px]:py-12">
+        <div className="flex w-full max-w-[400px] flex-col gap-4">
+          {children}
         </div>
-        {children}
-      </div>
-    </main>
+      </main>
+    </div>
+  );
+}
+
+/** The screen's visible title and the line under it. */
+export function AuthHeading({ title, line }: { title: string; line: string }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <h1 className="font-serif text-titulo-1 text-texto">{title}</h1>
+      <p className="text-cuerpo text-texto-tenue">{line}</p>
+    </div>
   );
 }

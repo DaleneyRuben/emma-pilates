@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { requestPasswordRecovery } from "@pilates/api-contracts";
-import { CircleCheck } from "lucide-react";
+import { MailCheck } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,7 +18,8 @@ import {
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { emailField } from "./auth-fields";
-import { AuthLayout } from "./auth-layout";
+import { AuthHeading, AuthLayout } from "./auth-layout";
+import { MessageDisc, WarningRow } from "./auth-notices";
 import { BackToLoginLink } from "./back-to-login-link";
 import { RequestLimitNotice } from "./request-limit-notice";
 import { useCountdown } from "./use-countdown";
@@ -29,13 +30,8 @@ type RecoveryValues = z.infer<typeof recoverySchema>;
 function SentState() {
   return (
     <div className="flex flex-col items-center gap-3 text-center">
-      <CircleCheck
-        size={40}
-        strokeWidth={1.4}
-        className="text-exito"
-        aria-hidden="true"
-      />
-      <h1 className="font-serif text-titulo-2 text-texto">Revisa tu correo</h1>
+      <MessageDisc icon={MailCheck} />
+      <h1 className="font-serif text-titulo-1 text-texto">Revisa tu correo</h1>
       <p className="text-cuerpo text-texto-secundario">
         Si el correo corresponde a una cuenta, te enviamos un enlace para
         restablecer tu contraseña.
@@ -86,10 +82,10 @@ export function RecoverPasswordPage() {
 
   return (
     <AuthLayout>
-      <h1 className="sr-only">Recuperar contraseña</h1>
-      <p className="text-center text-cuerpo text-texto-secundario">
-        Te enviaremos un enlace para restablecer tu contraseña.
-      </p>
+      <AuthHeading
+        title="Recupera tu contraseña"
+        line="Te enviaremos un enlace para restablecer tu contraseña."
+      />
       <Form {...form}>
         <form onSubmit={submit} noValidate className="flex flex-col gap-4">
           {throttled ? <RequestLimitNotice seconds={waitSeconds} /> : null}
@@ -112,9 +108,9 @@ export function RecoverPasswordPage() {
             )}
           />
           {!throttled && failed ? (
-            <p role="alert" className="text-nota text-error-texto">
+            <WarningRow>
               No pudimos enviar el enlace. Inténtalo de nuevo en unos minutos.
-            </p>
+            </WarningRow>
           ) : null}
           <Button
             type="submit"

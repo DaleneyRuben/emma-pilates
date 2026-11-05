@@ -11,6 +11,7 @@ import {
 } from "../components/form/form";
 import { Button } from "../components/ui/button";
 import { PasswordInput } from "../components/ui/password-input";
+import { WarningRow } from "./auth-notices";
 import { newPasswordField, withMatchingConfirmation } from "./password-fields";
 
 const createPasswordSchema = withMatchingConfirmation(
@@ -70,10 +71,10 @@ export function CreatePasswordForm({
           )}
         />
         {failed ? (
-          <p role="alert" className="text-nota text-error-texto">
+          <WarningRow>
             No pudimos guardar la contraseña. Inténtalo de nuevo en unos
             minutos.
-          </p>
+          </WarningRow>
         ) : null}
         <Button type="submit" size="lg" disabled={!isValid} busy={isSubmitting}>
           Guardar contraseña
