@@ -42,6 +42,8 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   ).toBeVisible();
   await panel.getByLabel("Nombre", { exact: true }).fill("Valentina Soria");
   await panel.getByLabel("Correo electrónico").fill("valentina@emmapilates.bo");
+  // FIX-037: «Celular» is required; the prefix button's label is «País: …».
+  await panel.getByLabel("Celular", { exact: true }).fill("71234567");
   // The radio and the chip inputs are visually hidden; their labels take
   // the click.
   await panel

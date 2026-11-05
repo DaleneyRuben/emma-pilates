@@ -57,6 +57,7 @@ describe("the Coordinator Role in Personal", () => {
       within(panel).getByLabelText("Correo electrónico"),
       "carolina.rivas@example.com",
     );
+    await user.type(within(panel).getByLabelText("Celular"), "71234567");
     const roles = within(panel).getByRole("group", { name: "Rol" });
     await user.click(within(roles).getByRole("radio", { name: "Coordinador" }));
     expect(

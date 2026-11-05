@@ -61,7 +61,7 @@ describe("AW35 Contactos para promociones", () => {
     expect(
       within(row).getByRole("cell", { name: "valeria@example.com" }),
     ).toHaveAttribute("data-label", "Correo");
-    expect(within(row).getByText("+591 70011005")).toBeInTheDocument();
+    expect(within(row).getByText("🇧🇴 +591 70011005")).toBeInTheDocument();
     expect(within(row).getByText("19/10/2026")).toBeInTheDocument();
     const noPhone = await rowOf("Daniela Rojas");
     expect(within(noPhone).getByText("—")).toBeInTheDocument();
