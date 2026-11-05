@@ -43,10 +43,12 @@ import {
 } from './staff-management';
 import {
   ChangeStaffBranchesDto,
+  ChangeStaffContactDto,
   ChangeStaffRoleDto,
   CorrectStaffEmailDto,
   CreateStaffMemberDto,
   parseChangeStaffBranches,
+  parseChangeStaffContact,
   parseChangeStaffRole,
   parseCorrectStaffEmail,
   parseCreateStaffMember,
@@ -107,6 +109,10 @@ export type StaffManagementOperations = {
     command: { staffMemberId: string },
     principal: Principal,
   ) => Promise<void>;
+  changeContact: (
+    command: { staffMemberId: string; name: string; phone: string | null },
+    principal: Principal,
+  ) => Promise<StaffMemberRecord>;
 };
 
 const statuses: Record<StaffManagementErrorCode, number> = {
@@ -333,6 +339,29 @@ export class AdministratorStaffMembersController {
     const principal = await this.authenticate(authorization);
     return run(() =>
       this.operations.changeRole({ staffMemberId: id, ...parsed }, principal),
+    );
+  }
+
+  @Put(':staffMemberId/contact')
+  @ApiOperation({ operationId: 'changeStaffMemberContact' })
+  @ApiParam({ name: 'staffMemberId', format: 'uuid' })
+  @ApiBody({ type: ChangeStaffContactDto })
+  @ApiOkResponse({ type: StaffMemberDto })
+  @Header('Cache-Control', 'no-store')
+  async changeContact(
+    @Param('staffMemberId') staffMemberId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: unknown,
+  ): Promise<StaffMemberDto> {
+    const id = requireStaffMemberId(staffMemberId);
+    const parsed = parseChangeStaffContact(body);
+    if (parsed === null) throw invalidRequest('Invalid Staff Member contact');
+    const principal = await this.authenticate(authorization);
+    return run(() =>
+      this.operations.changeContact(
+        { staffMemberId: id, ...parsed },
+        principal,
+      ),
     );
   }
 
