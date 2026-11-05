@@ -372,7 +372,7 @@ describe("Assistant Client flows", () => {
     ).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Nombre"), " Ana Nueva ");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "Ana@Example.com");
-    await fireEvent.changeText(screen.getByLabelText("Teléfono (opcional)"), "+591 70000000");
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "+591 70000000");
     await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
