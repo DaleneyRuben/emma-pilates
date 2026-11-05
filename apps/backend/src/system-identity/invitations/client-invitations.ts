@@ -1,6 +1,7 @@
 import { normalizeReferralCode } from '../../booking/acquisition/acquisition';
 import { normalizeContactPhone } from '../../phone/bolivian-mobile';
 import { auditActorOf } from '../authentication/audit-actor';
+import type { StaffRoleCode } from '../authentication/staff-role';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 import {
   activationLifetimeMilliseconds,
@@ -25,11 +26,20 @@ import {
 
 export * from './client-invitations-model';
 
+// FIX-040 (2026-11-05): the Coordinator registers new Clients too, and
+// follows up their invitation like the Assistant. Selling stays apart.
+const invitingRoles: Partial<Record<StaffRoleCode, Actor['role']>> = {
+  ASSISTANT: 'assistant',
+  ADMINISTRATOR: 'administrator',
+  COORDINATOR: 'coordinator',
+};
+
 export const requireAssistant = (principal: AuthenticatedPrincipal): Actor => {
   if (
     principal.identity.kind !== 'staff' ||
     (principal.identity.role !== 'assistant' &&
-      principal.identity.role !== 'administrator')
+      principal.identity.role !== 'administrator' &&
+      principal.identity.role !== 'coordinator')
   ) {
     throw new InvitationAccessDeniedError();
   }
@@ -38,7 +48,7 @@ export const requireAssistant = (principal: AuthenticatedPrincipal): Actor => {
   const actor = auditActorOf(principal);
   return {
     accountId: actor.accountId,
-    role: actor.role === 'ADMINISTRATOR' ? 'administrator' : 'assistant',
+    role: (actor.role && invitingRoles[actor.role]) ?? 'assistant',
     impersonationId: actor.impersonationId,
   };
 };

@@ -200,7 +200,7 @@ describe('inviteClient', () => {
     expect(transaction.createInvitation).not.toHaveBeenCalled();
   });
 
-  it('is open to Assistants and Administrators only', async () => {
+  it('denies Clients and Trainers', async () => {
     for (const principal of [client, staff('trainer')]) {
       await expect(
         inviteClient(command, principal, dependencies(createTransaction())),
