@@ -18,16 +18,21 @@ describe("staff receipt native modules", () => {
       source("./new-client-screen.tsx"),
       source("./pending-invitation-card.tsx"),
       source("./self-registered-notice.tsx"),
+      source("../profile/staff-profile-screen.tsx"),
+      source("../profile/staff-photo-summary.tsx"),
     ].join("\n");
 
     expect(startup).not.toMatch(
-      /front-desk-receipt-upload|expo-image-manipulator|expo-image-picker/,
+      /front-desk-receipt-upload|uploads\/image-upload|expo-image-manipulator|expo-image-picker/,
     );
     expect(source("./confirm-cash-payment-screen.tsx")).not.toMatch(
       /from\s*["']\.\/front-desk-receipt-upload["']/,
     );
     expect(source("./load-receipt-upload.ts")).toMatch(
       /import\(\s*["']\.\/front-desk-receipt-upload["']\s*\)/,
+    );
+    expect(source("../uploads/load-image-upload.ts")).toMatch(
+      /import\(\s*["']\.\/image-upload["']\s*\)/,
     );
   });
 });

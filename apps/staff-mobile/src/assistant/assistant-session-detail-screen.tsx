@@ -18,6 +18,7 @@ import {
   QueryFailure,
   Screen,
   spacing,
+  StaffFace,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -28,6 +29,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
+import { FaceRow } from "../ui/face-row";
 import { dayHeading } from "../ui/session-time";
 import { CenteredCard } from "./assistant-layout";
 import { CapacitySummary } from "./capacity-summary";
@@ -215,7 +217,19 @@ export function AssistantSessionDetailScreen({
             when={`${dayHeading(boliviaCivilDate(new Date(detail.startsAt)))} · ${formatTimeRange(detail.startsAt, detail.endsAt).split(" – ")[0]}`}
           />
           <IconRowGroup>
-            <IconRow icon="person" label={detail.trainerName} value="Entrenadora" />
+            <FaceRow
+              face={
+                <StaffFace
+                  fetcher={fetcher}
+                  name={detail.trainerName}
+                  photo={detail.trainerPhoto}
+                  size={36}
+                />
+              }
+              label={detail.trainerName}
+              testID="session-trainer-row"
+              value="Entrenadora"
+            />
             <IconRow icon="pin" label={`Sucursal ${detail.branch.name}`} />
             <IconRow
               icon="clock"

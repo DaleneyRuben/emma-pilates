@@ -23,9 +23,9 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import appConfig from "../../app.json";
 import { useStaffFetcher } from "../staff-fetcher";
-import { InitialsDisc } from "../ui/person-row";
 import { RootHeader } from "../ui/root-header";
 import { ProfileRow } from "./profile-row";
+import { StaffPhotoSummary } from "./staff-photo-summary";
 import { branchesLabel, roleLabel } from "./staff-labels";
 
 type ProfileNavigation = {
@@ -83,19 +83,14 @@ export function StaffProfileScreen() {
     <Screen style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
         {header}
-        <View style={styles.summary}>
-          <InitialsDisc name={member.name} size={56} />
-          <View style={styles.summaryBody}>
-            <Text style={styles.name}>{member.name}</Text>
-            <Text style={styles.detail}>{member.email}</Text>
-            {member.phone ? <Text style={styles.detail}>{member.phone}</Text> : null}
-            <Text style={styles.note}>
-              {administrator
-                ? "Tus datos se editan en la web de administración."
-                : "Tus datos los actualiza administración."}
-            </Text>
-          </View>
-        </View>
+        <StaffPhotoSummary
+          member={member}
+          note={
+            administrator
+              ? "Tus datos se editan en la web de administración."
+              : "Tu nombre y tu correo los actualiza administración."
+          }
+        />
         <View>
           <SectionTitle>Tu cuenta</SectionTitle>
           <IconRowGroup>
@@ -172,7 +167,6 @@ export function StaffProfileScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
   footer: {
     color: colors.textMuted,
     fontFamily: fontFamilies.body,
@@ -180,9 +174,5 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     textAlign: "center",
   },
-  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   screen: { paddingHorizontal: spacing.xlSm },
-  summary: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
-  summaryBody: { flex: 1, gap: spacing.xxs },
 });
