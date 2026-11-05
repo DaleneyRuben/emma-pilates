@@ -1,0 +1,123 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-05T21:42:00Z"
+ },
+ "title": "Emma Pilates Studio · Horario y Editar sesión",
+ "launch": {
+  "view": "focused",
+  "file": "Main.dc.html"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1500,
+   "title": "Horario y Editar sesión · empieza aquí",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "H1-Horario-canceladas.dc.html": {
+   "x": 0,
+   "y": 1740,
+   "w": 1440,
+   "h": 1080,
+   "title": "Clases canceladas · computadora 1440",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "H2-Horario-canceladas-420.dc.html": {
+   "x": 1520,
+   "y": 1740,
+   "w": 420,
+   "h": 2440,
+   "title": "Clases canceladas · celular 420",
+   "is_interactive": true
+  },
+  "S1-Mi-agenda-iPhone.dc.html": {
+   "x": 2020,
+   "y": 1740,
+   "w": 390,
+   "h": 844,
+   "title": "Mi agenda de la entrenadora · iPhone",
+   "is_interactive": true
+  },
+  "S2-Mi-agenda-Android.dc.html": {
+   "x": 2490,
+   "y": 1740,
+   "w": 412,
+   "h": 915,
+   "title": "Mi agenda de la entrenadora · Android",
+   "is_interactive": true
+  },
+  "A1-Editar-sesion.dc.html": {
+   "x": 0,
+   "y": 4300,
+   "w": 1440,
+   "h": 1080,
+   "title": "A · Lista y acciones abajo (recomendada) · computadora 1440",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "A2-Editar-sesion-420.dc.html": {
+   "x": 1520,
+   "y": 4300,
+   "w": 420,
+   "h": 2440,
+   "title": "A · Lista y acciones abajo (recomendada) · celular 420",
+   "is_interactive": true
+  },
+  "B1-Editar-sesion.dc.html": {
+   "x": 0,
+   "y": 6980,
+   "w": 1440,
+   "h": 1080,
+   "title": "B · Dos pestañas · computadora 1440",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "B2-Editar-sesion-420.dc.html": {
+   "x": 1520,
+   "y": 6980,
+   "w": 420,
+   "h": 2440,
+   "title": "B · Dos pestañas · celular 420",
+   "is_interactive": true
+  },
+  "C1-Editar-sesion.dc.html": {
+   "x": 0,
+   "y": 9660,
+   "w": 1440,
+   "h": 1080,
+   "title": "C · Menú de la serie · computadora 1440",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "C2-Editar-sesion-420.dc.html": {
+   "x": 1520,
+   "y": 9660,
+   "w": 420,
+   "h": 2440,
+   "title": "C · Menú de la serie · celular 420",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "H1-Horario-canceladas.dc.html",
+  "H2-Horario-canceladas-420.dc.html",
+  "S1-Mi-agenda-iPhone.dc.html",
+  "S2-Mi-agenda-Android.dc.html",
+  "A1-Editar-sesion.dc.html",
+  "A2-Editar-sesion-420.dc.html",
+  "B1-Editar-sesion.dc.html",
+  "B2-Editar-sesion-420.dc.html",
+  "C1-Editar-sesion.dc.html",
+  "C2-Editar-sesion-420.dc.html"
+ ],
+ "notes": {},
+ "designSystems": []
+}
