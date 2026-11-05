@@ -85,7 +85,7 @@ export type InvitationAudit = {
     | 'client_invitation.verification_sent'
     | 'client_invitation.cancelled';
   actorAccountId: string;
-  actorRole: 'assistant' | 'administrator';
+  actorRole: Actor['role'];
   impersonationId: string | null;
   targetAccountId: string;
   correlationId: string;
@@ -184,7 +184,7 @@ export type InviteClientResult = {
 
 export type Actor = {
   accountId: string;
-  role: 'assistant' | 'administrator';
+  role: 'assistant' | 'administrator' | 'coordinator';
   /** FUT-001: the Impersonation the audit record points at, if any. */
   impersonationId: string | null;
 };

@@ -174,6 +174,7 @@ La coordinadora **no puede ver nada relacionado con dinero**. Sí puede gestiona
 | Asignar instructoras y reemplazos | ✓ | ✓ |
 | Cancelar una clase futura, con o sin reservas (§18) | ✓ | ✓ |
 | Ver y editar perfiles de clientas y sus reservas | ✓ | ✓ |
+| Crear clientas nuevas y seguir su invitación (§20.25) | ✓ | ✓ |
 | Ver clases restantes y vencimientos de clientas | ✓ | ✓ |
 | Ver asistencia, ocupación, clientas nuevas y renovación (en cantidades) | ✓ | ✓ |
 | Gestionar personal (datos, horarios) | ✓ | ✓ |
@@ -291,3 +292,5 @@ Hallazgos del segundo recorrido a mano (2026-11-04). La dueña dio confianza gen
     - Las clases canceladas ya no desaparecen. Quedan en su lugar, apagadas y con el motivo, en el Horario de la web y en la agenda de la entrenadora: «Cancelada · mínimo no alcanzado» (revisión de las 3 h), «Cancelada por el estudio» (la canceló la administradora o la coordinadora) o «Serie en pausa» (la retiró la pausa de su serie). Al tocarla en la web se abre solo para leer; en la agenda no se toca, porque no hay asistencia que marcar. Una clase retirada porque se cambió o se terminó su serie no se muestra: es planificación, no una cancelación, y la clase nueva ocupa su lugar.
     - El riel de la web empieza en **Inicio**, sin la «E» arriba; la marca queda en «Emma Pilates Studio» de la barra superior.
     - **Editar sesión** sigue la propuesta **A · Lista y acciones abajo**. Arriba, «Reservaron (n)» con un botón chico **+ Reservar** y la lista simple de reservas. Debajo, **Aplicar cambios a** (Solo esta sesión / Esta y las futuras) justo encima de los campos. Abajo, Guardar y **Cancelar esta clase**. Al final, una fila «Serie semanal» con **Pausar la serie** y **Terminar la serie**, visibles en los dos modos.
+
+25. **La coordinadora crea clientas nuevas (§7).** Decidido por la dueña el 2026-11-05: «quiero que la coordinadora pueda agregar nuevos clientes también». En la app del equipo, **Buscar cliente** le muestra **+ Nuevo cliente**, con el mismo formulario y las mismas reglas que la recepcionista: el enlace de activación por correo, el límite de correos por persona del equipo, y la auditoría a su nombre. En la ficha de la clienta que creó sigue la invitación como la recepcionista: **Reenviar enlace**, **Cambiar correo** y **Cancelar invitación**. **Cobrar sigue sin ser suyo:** no registra pagos en efectivo, no ve precios ni montos (§7). La web no tiene una pantalla para crear clientas para nadie; si se agrega, la coordinadora también la tendrá.

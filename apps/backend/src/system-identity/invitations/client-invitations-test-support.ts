@@ -4,7 +4,8 @@ import type { ClientInvitationTransaction } from './client-invitations';
 export const now = new Date('2026-09-22T15:00:00.000Z');
 export const day = 24 * 60 * 60 * 1_000;
 export const staff = (
-  role: 'assistant' | 'administrator' | 'trainer',
+  role:
+    'assistant' | 'administrator' | 'coordinator' | 'nutritionist' | 'trainer',
 ): AuthenticatedPrincipal => ({
   accountId: 'assistant-account',
   authenticationSessionId: 'session',
