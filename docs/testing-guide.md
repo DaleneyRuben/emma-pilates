@@ -8802,3 +8802,55 @@ E. **At 420 px.** Narrow the window (or the device toolbar) to 420 px: the
 
 Specs: `login-page.spec.tsx`, `recover-password-page.spec.tsx`,
 `create-password-page.spec.tsx`, `session-guard.spec.tsx`.
+
+## Test 134: cancelled classes in the Horario and the agenda, Editar sesión on proposal A, the rail without «E» (FIX-042)
+
+The owner's decisions of 2026-11-05 (decisiones §20.24, design follow-ups
+243 to 245, DES-009). Use a fixtures copy with the API **and the worker**
+running: the worker's 3-hour check cancels today's classes that have fewer
+than 2 bookings, which gives real «mínimo no alcanzado» cancellations.
+
+A. **Seed through the API** as Paola (`paola.mendoza@example.com`): cancel a
+   class two or more days ahead (`POST /administrator/sessions/:id/cancel`)
+   and pause another weekly series from two days ahead for two weeks
+   (`POST /administrator/session-schedules/:id/pause` with `pausedFrom` and
+   `pausedUntil`).
+B. **The week at 1440 px.** **Horario › Clases**: the rail starts at
+   **Inicio** with no «E» above it. Today's cancelled classes stay in their
+   slot with a dashed left edge and no fill: class, time and trainer, then
+   **Cancelada · mínimo**. The subtitle reads «N sesiones esta semana · M
+   canceladas». Next week shows **Cancelada · estudio** and **Serie en
+   pausa** on the class you cancelled and the paused series. A series you
+   changed or ended leaves nothing behind.
+C. **Read-only panel.** Click a cancelled class: the panel is titled **Clase
+   cancelada**, with the cause pill, «Se canceló sola el jueves 5 de
+   noviembre a las HH:MM: no llegó al mínimo de reservas.» (adding «Las
+   clientas que reservaron recuperaron su clase.» only when it had bookings),
+   or «La canceló el estudio el …», or «Esta clase no se publica: su serie
+   está en pausa.», and the Entrenadora and Lugares rows («N de M al
+   cancelarse»). No booking button, no fields, no Guardar.
+D. **Editar sesión (proposal A).** Open a standing class of a weekly series:
+   **Reservaron (n)** with a small **Reservar** button beside it (on a full
+   class, **Lista de espera**), the bookings as a plain list, then **Aplicar
+   cambios a** over **Solo esta sesión / Esta y las futuras** and the fields,
+   **Guardar** and **Cancelar esta clase** (its confirmation is «¿Cancelar
+   esta clase?» with **Sí, cancelar la clase**), and last a row «Serie semanal
+   · cada miércoles 07:00» with **Pausar la serie** (or **Reanudar la
+   serie**) and **Terminar la serie** in both scopes. Every button stays
+   inside the panel's margins.
+E. **At 420 px.** The day list shows the cancelled classes the same way; the
+   panel opens full screen with the same order and no sideways scroll.
+F. **Mi agenda (Staff app).** Log in as the trainer of today's cancelled
+   classes on the iPhone 16 Pro, the iPad and Android: the cancelled classes
+   keep a muted card with a dashed edge, the class and the cause pill under
+   it, and no chevron; tapping does nothing. The title counts them («Hoy · 2
+   clases · 1 cancelada», or «Hoy · 2 canceladas» when none stands), and «Hoy
+   no tienes clases» shows only for a day with nothing at all. An older app
+   build, which does not ask for `includeCancelled`, keeps showing only the
+   standing classes.
+
+Specs: `cancelled-sessions.spec.tsx`, `session-cancellation.spec.ts`,
+`session-edit.spec.tsx`, `admin-shell.spec.tsx` (admin web);
+`agenda-cancelled.spec.tsx` (Staff app); `administrator-sessions` and
+`trainer-schedule` integration specs, `booking.controller.spec.ts` and
+`administrator.e2e-spec.ts` (backend).

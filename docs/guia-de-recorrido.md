@@ -352,19 +352,39 @@ selector ya tiene más de una.
 6. Crea también una clase **Una sola vez**, para mañana, de **Pilates
    Prenatal**, a la hora que quieras. Esa no se repite.
 
-Abre una clase de la grilla. El panel muestra quiénes reservaron y la lista
-de espera, y tiene **Reservar a una clienta**. Puedes cambiar la entrenadora
-de esa ocurrencia, moverla, cancelarla o terminar la serie. Los días pasados
-se ven en gris y solo se leen. Cancelar una clase sin reservas es directo.
-Cancelar una con reservas avisa a las clientas y devuelve la clase a cada
-una. Hazlo cuando Lucía ya tenga una reserva, en el paso 9.
+El riel de la izquierda empieza en **Inicio**, sin la «E» arriba; la marca
+queda en «Emma Pilates Studio» de la barra de arriba.
+
+Abre una clase de la grilla. Arriba, **Reservaron (n)** con el botón chico
+**Reservar** al lado y, debajo, la lista simple de quienes reservaron y la
+lista de espera. Después, **Aplicar cambios a** (**Solo esta sesión** o
+**Esta y las futuras**) justo encima de los campos que cambia: entrenadora,
+fecha, hora, duración y capacidad. Abajo, **Guardar** y **Cancelar esta
+clase**. Al final, la fila «Serie semanal · cada miércoles 18:30» con
+**Pausar la serie** y **Terminar la serie**, en los dos modos. Una clase
+pasada solo se lee. Cancelar una clase sin reservas es directo. Cancelar una
+con reservas avisa a las clientas y devuelve la clase a cada una. Hazlo
+cuando Lucía ya tenga una reserva, en el paso 9.
+
+Las clases canceladas no desaparecen: quedan en su lugar, apagadas, con un
+borde punteado y el motivo: **Cancelada · mínimo** (no llegó al mínimo en la
+revisión de las 3 h), **Cancelada · estudio** (la cancelaste tú o la
+coordinadora) o **Serie en pausa**. El subtítulo las cuenta aparte
+(«5 sesiones esta semana · 2 canceladas»). Al tocar una se abre **Clase
+cancelada**, solo para leer: el motivo, cuándo pasó y cuántas reservas tenía.
+Una clase que se quitó porque cambiaste o terminaste la serie no se muestra:
+la clase nueva ocupa su lugar.
 
 En la app del equipo, Daniela abre **Mi agenda**. La tira de días dice
 `Lun 26`, `Mié 28`, y así. Al tocar el lunes aparece la clase de las 09:00,
 con `0 de 12 reservados` si dejaste la capacidad en 12, o `0 de 10` si
 guardaste el cambio del paso 2. Toca la clase: la lista de asistencia está
 vacía y **Guardar asistencia** está apagado, porque no hay a quién pasar
-lista.
+lista. Si una de sus clases del día se canceló, sigue en la lista, apagada,
+con «Cancelada · mínimo no alcanzado» o «Cancelada por el estudio» y sin
+flecha: no se abre. El título lo cuenta («Hoy · 2 clases · 1 cancelada»), y
+un día con todas canceladas dice «Hoy · 5 canceladas» en vez de «Hoy no
+tienes clases».
 
 ## Paso 6. Lo que la clienta ve antes de comprar
 
