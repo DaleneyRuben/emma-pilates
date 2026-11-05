@@ -230,7 +230,9 @@ describe('staff profile photo (PostgreSQL)', () => {
       imageAssetId: upload.id,
       now,
     });
-    const classType = await prisma.classType.findFirstOrThrow();
+    const classType = await prisma.classType.create({
+      data: { name: 'Mat Pilates', description: 'Mat', defaultCapacity: 8 },
+    });
     const branch = await prisma.branch.create({
       data: { name: randomUUID(), address: 'Calle Uno' },
     });
