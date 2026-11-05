@@ -12,7 +12,7 @@ import {
 
 beforeEach(resetIds);
 
-// FIX-038, decision §19.21: the Administrator corrects another Staff
+// FIX-038, decision §20.21: the Administrator corrects another Staff
 // Member's name and phone, active or pending.
 describe('changeStaffContact', () => {
   it('saves a new name and a normalized phone and audits old and new values', async () => {
@@ -101,6 +101,25 @@ describe('changeStaffContact', () => {
     expect(transaction.setName).not.toHaveBeenCalled();
     expect(transaction.setPhone).not.toHaveBeenCalled();
     expect(transaction.recordAudit).not.toHaveBeenCalled();
+  });
+
+  it('keeps a phone that is not a Bolivian mobile as typed', async () => {
+    const transaction = createTransaction();
+
+    await changeStaffContact(
+      {
+        staffMemberId: 'staff-1',
+        name: 'Daniela Ortiz',
+        phone: ' +54 9 11 5555 0000 ',
+      },
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.setPhone).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      phone: '+54 9 11 5555 0000',
+    });
   });
 
   it('corrects a pending invitation too', async () => {

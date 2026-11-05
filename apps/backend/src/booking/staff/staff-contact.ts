@@ -9,7 +9,7 @@ import {
   type StaffMemberRecord,
 } from './staff-management-model';
 
-// FIX-038, decision §19.21 (owner, 2026-11-05): the Administrator corrects
+// FIX-038, decision §20.21 (owner, 2026-11-05): the Administrator corrects
 // another Staff Member's name and phone, active or pending. The login email
 // is not part of this command: a pending one has «Cambiar correo», and an
 // active one needs a confirmed change. The audit keeps the old and the new
