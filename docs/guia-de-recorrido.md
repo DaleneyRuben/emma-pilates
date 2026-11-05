@@ -852,9 +852,10 @@ En la app del equipo entra a **Buscar cliente**. Tiene **+ Nuevo cliente**,
 el mismo formulario de la recepcionista: crea una clienta con un correo
 nuevo, y su ficha muestra la tarjeta **Cuenta pendiente de activación** con
 **Reenviar enlace**, sin **Registrar pago en efectivo** (el cobro sigue en
-recepción). Tiene **Cancelar una clase** y **Para contactar**. **Para contactar** lista a quien el seguimiento de los primeros
-90 días marcó: día 2, semana 1, día 30, día 90, una alerta de 7 días sin
-venir, o menos de 4 clases usadas. Con una sola clienta recién llegada, la
+recepción). Tiene **Cancelar una clase** y **Para contactar**. **Para
+contactar** lista a quien el seguimiento de los primeros 90 días marcó: día
+2, semana 1, día 30, día 90, una alerta de 7 días sin venir, o menos de 4
+clases usadas. Con una sola clienta recién llegada, la
 lista puede tener una fila o ninguna, según el día.
 
 ### Los primeros 90 días
