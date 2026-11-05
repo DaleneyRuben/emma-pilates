@@ -67,6 +67,11 @@ describe("Client Home with a payment in review or rejected", () => {
     expect(screen.getByText("El monto del comprobante no coincide con el plan.")).toBeOnTheScreen();
     expect(screen.getByText("Paquete de 8 clases · Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Tu pago no se confirmó")).toBeOnTheScreen();
+    // Screen readers hear why the row is locked (its label hides the note).
+    expect(screen.getByRole("button", { name: "Reservar una clase" })).toHaveProp(
+      "accessibilityHint",
+      "Tu pago no se confirmó",
+    );
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).toBeNull();
   });
 
