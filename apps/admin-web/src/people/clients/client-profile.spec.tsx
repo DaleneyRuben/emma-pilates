@@ -94,6 +94,33 @@ describe("AW22 Editar perfil", () => {
     expect(within(panel).getByText(luciaDetail.email)).toBeInTheDocument();
   });
 
+  // FIX-037 review: a stored phone left untouched goes back as it was, even
+  // one from a country outside the list or from before the rule.
+  it("keeps an untouched stored phone when only the name changes", async () => {
+    server.use(
+      ...signedInHandlers(),
+      ...handlers({ ...luciaDetail, phone: "+44 7911123456" }),
+    );
+    const { panel, user } = await openLucia();
+
+    await user.click(
+      await within(panel).findByRole("button", { name: "Editar perfil" }),
+    );
+    const name = within(panel).getByLabelText("Nombre");
+    await user.clear(name);
+    await user.type(name, "Lucía Fernández Paz");
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
+
+    expect(
+      await within(panel).findByText("Guardamos los cambios del perfil."),
+    ).toBeInTheDocument();
+    expect(saved).toEqual([
+      { name: "Lucía Fernández Paz", phone: "+44 7911123456" },
+    ]);
+  });
+
   it("asks for a name and keeps the form on a failed save", async () => {
     server.use(...signedInHandlers(), ...handlers(luciaDetail));
     const { panel, user } = await openLucia();

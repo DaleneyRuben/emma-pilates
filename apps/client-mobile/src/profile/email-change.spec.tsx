@@ -142,6 +142,33 @@ describe("Client email change", () => {
     expect(calls).toEqual(["patch"]);
   });
 
+  // FIX-037 review: a Client with no phone yet still saves her name; the
+  // untouched stored phone goes back as it was.
+  it("saves the name of a Client who has no phone yet", async () => {
+    const bodies: unknown[] = [];
+    const withoutPhone = { ...profile, phone: null };
+    const screen = await openEditProfile(
+      createClientRuntime(
+        routeFetcher({
+          ...readRoutes,
+          "/api/v1/clients/current": () => jsonResponse(withoutPhone),
+          "/api/v1/accounts/current/email-change": () => jsonResponse({ pending: null }),
+          "PATCH /api/v1/clients/current": (init) => {
+            bodies.push(JSON.parse(String(init?.body)));
+            return jsonResponse(withoutPhone);
+          },
+        }),
+      ),
+    );
+
+    await fireEvent.changeText(screen.getByLabelText("Nombre"), "Sofía Guzmán Vega");
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar cambios" }));
+
+    await waitFor(() => {
+      expect(bodies).toEqual([{ name: "Sofía Guzmán Vega", phone: null }]);
+    });
+  });
+
   it("confirms the change from the link while signed in and refreshes the profile", async () => {
     let email = "sofia@example.com";
     const runtime = createClientRuntime(
