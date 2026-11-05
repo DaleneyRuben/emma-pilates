@@ -1,6 +1,12 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { apiUrl, jsonResponse, server, useMockServer } from "../../test/msw";
+import {
+  apiUrl,
+  jsonResponse,
+  problemResponse,
+  server,
+  useMockServer,
+} from "../../test/msw";
 import {
   allBranchesHandler,
   camila,
@@ -30,7 +36,7 @@ const contactSaved = (body: Partial<typeof emma>, base = camila) =>
     record(() => jsonResponse({ ...base, ...body })),
   );
 
-// FIX-038, decision §19.21 (owner, 2026-11-05): the Administrator edits the
+// FIX-038, decision §20.21 (owner, 2026-11-05): the Administrator edits the
 // name and phone of every other member, active or pending.
 describe("AW24 Editar miembro contact", () => {
   useMockServer();
@@ -145,6 +151,61 @@ describe("AW24 Editar miembro contact", () => {
         },
       ]),
     );
+  });
+
+  it("never rewrites a stored phone that only looks like the rule", async () => {
+    const unnormalized = { ...emma, phone: "77712345" };
+    server.use(
+      listOf(unnormalized),
+      http.put(
+        apiUrl(`${memberPath(emma.id)}/role`),
+        record(() => jsonResponse({ ...unnormalized, role: "administrator" })),
+      ),
+    );
+    const { panel, user } = await openMember("Emma Vargas");
+
+    await user.click(
+      within(panel).getByRole("radio", { name: "Administración" }),
+    );
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+
+    await waitFor(() =>
+      expect(sent).toEqual([
+        {
+          method: "PUT",
+          path: `${memberPath(emma.id)}/role`,
+          body: { role: "administrator" },
+        },
+      ]),
+    );
+  });
+
+  it("says the contact was saved when the Role change after it fails", async () => {
+    server.use(
+      listOf(emma),
+      contactSaved({ name: "Emma Vargas Paz" }, emma),
+      http.put(
+        apiUrl(`${memberPath(emma.id)}/role`),
+        record(() => problemResponse(409, "trainer_has_upcoming_sessions")),
+      ),
+    );
+    const { panel, user } = await openMember("Emma Vargas");
+
+    const name = within(panel).getByLabelText("Nombre");
+    await user.clear(name);
+    await user.type(name, "Emma Vargas Paz");
+    await user.click(within(panel).getByRole("radio", { name: "Asistente" }));
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+
+    expect(
+      await within(panel).findByText(
+        /^Guardamos el nombre y el teléfono, pero no el resto\./,
+      ),
+    ).toBeVisible();
+    expect(sent.map(({ path }) => path)).toEqual([
+      `${memberPath(emma.id)}/contact`,
+      `${memberPath(emma.id)}/role`,
+    ]);
   });
 
   it("corrects a pending member's name around the invitation card", async () => {
