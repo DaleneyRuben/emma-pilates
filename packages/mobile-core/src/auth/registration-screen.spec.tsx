@@ -35,6 +35,7 @@ async function fillForm(
 ) {
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Lucía Mendoza");
   await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "lucia@example.com");
+  await fireEvent.changeText(screen.getByLabelText("Celular"), "70712345");
   await fireEvent.changeText(screen.getByLabelText("Contraseña"), "pilates2026");
   await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), confirmation);
   await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
