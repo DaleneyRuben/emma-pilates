@@ -25,7 +25,7 @@ describe("PhoneField", () => {
   it("starts on Bolivia with an 8-digit placeholder and the helper", async () => {
     const screen = await render(<Harness />);
 
-    expect(screen.getByRole("button", { name: "País: Bolivia, +591" })).toBeOnTheScreen();
+    expect(screen.getAllByRole("button", { name: "País: Bolivia, +591" })).toHaveLength(2);
     expect(screen.getByLabelText("Celular")).toHaveProp("placeholder", "8 dígitos");
     expect(screen.getByText("Te escribimos por WhatsApp si hace falta.")).toBeOnTheScreen();
   });
@@ -41,7 +41,7 @@ describe("PhoneField", () => {
   it("opens the country list from the prefix and switches to the picked country", async () => {
     const screen = await render(<Harness initial={{ country: bolivia, digits: "912345678" }} />);
 
-    await fireEvent.press(screen.getByRole("button", { name: "País: Bolivia, +591" }));
+    await fireEvent.press(screen.getAllByRole("button", { name: "País: Bolivia, +591" })[0]);
 
     expect(screen.getByText("Elige el país")).toBeOnTheScreen();
     expect(screen.getByText("Frecuentes")).toBeOnTheScreen();
@@ -59,7 +59,7 @@ describe("PhoneField", () => {
   it("filters the list by name or code and closes on «Cancelar»", async () => {
     const screen = await render(<Harness />);
 
-    await fireEvent.press(screen.getByRole("button", { name: "País: Bolivia, +591" }));
+    await fireEvent.press(screen.getAllByRole("button", { name: "País: Bolivia, +591" })[0]);
     await fireEvent.changeText(screen.getByLabelText("Buscar país o código"), "+595");
 
     expect(screen.getByRole("button", { name: "Paraguay, +595" })).toBeOnTheScreen();
