@@ -131,6 +131,7 @@ describe('staff email budget (e2e)', () => {
     deactivate: done(),
     correctEmail: done(),
     cancelInvitation: done(),
+    changeContact: done(),
   };
   const operationOf = (name: (typeof endpoints)[number]['operation']) =>
     name === 'correctStaffEmail'
