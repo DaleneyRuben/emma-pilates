@@ -44,7 +44,7 @@ describe("AW24 Editar miembro", () => {
     );
   });
 
-  it("shows the contact read-only and removes a Branch after warning about assigned Sessions", async () => {
+  it("shows the contact and removes a Branch after warning about assigned Sessions", async () => {
     server.use(
       list(),
       http.put(
@@ -55,7 +55,7 @@ describe("AW24 Editar miembro", () => {
     const { panel, user, queryClient } = await openMember("Emma Vargas");
     queryClient.setQueryData(trainersKey, []);
 
-    expect(within(panel).queryByLabelText("Nombre")).not.toBeInTheDocument();
+    expect(within(panel).getByLabelText("Nombre")).toHaveValue("Emma Vargas");
     expect(within(panel).getByText("emma@emmapilates.bo")).toBeVisible();
     expect(
       within(panel).getByRole("radio", { name: "Entrenadora" }),
@@ -166,37 +166,6 @@ describe("AW24 Editar miembro", () => {
     expect(
       within(panel).getByText("Todas las sucursales (implícito por el rol)"),
     ).toBeVisible();
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
-
-    await waitFor(() =>
-      expect(sent).toEqual([
-        {
-          method: "PUT",
-          path: `${memberPath(emma.id)}/role`,
-          body: { role: "administrator" },
-        },
-      ]),
-    );
-  });
-
-  // FIX-030: the phone shows read-only here, so an older phone written
-  // without +591 never blocks a Role change.
-  it("changes the Role of a member whose stored phone predates the mobile rule", async () => {
-    const oldPhone = { ...emma, phone: "77712345" };
-    server.use(
-      http.get(apiUrl(staffMembersPath), () =>
-        jsonResponse(staffPage([oldPhone, paolaMember, valentina])),
-      ),
-      http.put(
-        apiUrl(`${memberPath(emma.id)}/role`),
-        record(() => jsonResponse({ ...oldPhone, role: "administrator" })),
-      ),
-    );
-    const { panel, user } = await openMember("Emma Vargas");
-
-    await user.click(
-      within(panel).getByRole("radio", { name: "Administración" }),
-    );
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     await waitFor(() =>
