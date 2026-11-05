@@ -2,14 +2,21 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-nati
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
-import { assistantRoutes, lucia, newClient, overview } from "../assistant/assistant-fixtures";
+import {
+  assistantRoutes,
+  invitation,
+  lucia,
+  newClient,
+  overview,
+} from "../assistant/assistant-fixtures";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
 
 jest.setTimeout(20_000);
 
 // IDN-009 / ADR-0102 (follow-up 158): the Coordinator's own stack searches
-// Clients and manages their Bookings like the Assistant, never sells or
-// registers a Client, and cancels a class like the Administrator.
+// Clients and manages their Bookings like the Assistant, never sells, and
+// cancels a class like the Administrator. FIX-040 (2026-11-05): she registers
+// new Clients with the Assistant's form and follows up their invitation.
 const carolina = {
   id: "staff-carolina",
   name: "Carolina Rivas",
@@ -32,6 +39,8 @@ const coordinatorRoutes = (extra: Parameters<typeof routeFetcher>[0] = {}) => ({
       recentHistory: [],
       creditAvailableCentavos: 0,
     }),
+  "/api/v1/assistant/client-invitations/client-new": () => jsonResponse(invitation),
+  "/api/v1/assistant/clients?query=zzz": () => jsonResponse([]),
   "/api/v1/administrator/sessions": () => jsonResponse([]),
   "/api/v1/administrator/contact-alerts": () => jsonResponse({ items: [], totalItems: 0 }),
   ...extra,
@@ -68,10 +77,10 @@ describe("the Coordinator's Staff app", () => {
   });
 
   // v2: Para contactar and Horario (with «Cancelar una clase») are her tabs now.
-  it("lands on Buscar cliente without «Nuevo cliente», beside her own tabs", async () => {
+  it("lands on Buscar cliente with «Nuevo cliente», beside her own tabs", async () => {
     const { screen } = await openAsCoordinator();
 
-    expect(screen.queryByRole("button", { name: /Nuevo cliente/ })).toBeNull();
+    expect(screen.getByTestId("client-search-new-client")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Cancelar una clase" })).toBeNull();
     expect(screen.getByTestId("tab-contacts")).toBeOnTheScreen();
     expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen();
@@ -88,14 +97,52 @@ describe("the Coordinator's Staff app", () => {
     expect(reads.some((path) => path.includes("plan-quotes"))).toBe(false);
   });
 
-  it("tells her a Client without a Plan needs one, with no invitation actions", async () => {
-    const { screen, fetcher } = await openAsCoordinator();
-    await openClient(screen, "ana", newClient.name);
+  it("offers «Nuevo cliente» when the search finds no one", async () => {
+    const { screen } = await openAsCoordinator();
 
+    await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "zzz");
+    await waitFor(() => {
+      expect(screen.getByText("No encontramos a nadie")).toBeOnTheScreen();
+    });
+    expect(screen.getByTestId("client-search-empty-new-client")).toBeOnTheScreen();
+  });
+
+  it("registers a new Client with the Assistant's form and follows up her invitation, without selling", async () => {
+    const invited = jest.fn();
+    const { screen } = await openAsCoordinator(
+      coordinatorRoutes({
+        "POST /api/v1/assistant/client-invitations": (init) => {
+          invited(JSON.parse(String(init?.body)));
+          return jsonResponse(
+            { status: "invited", clientId: "client-new", email: "ana@example.com" },
+            201,
+          );
+        },
+      }),
+    );
+
+    await fireEvent.press(screen.getByTestId("client-search-new-client"));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+    });
+    await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Ana Nueva")).toBeOnTheScreen();
+    });
+    expect(invited).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "Ana Nueva", email: "ana@example.com" }),
+    );
+    await waitFor(() => {
+      expect(screen.getByText("Cuenta pendiente de activación")).toBeOnTheScreen();
+    });
+    expect(screen.getByRole("button", { name: "Reenviar enlace" })).toBeOnTheScreen();
     expect(screen.getByText("La clienta necesita un plan activo para reservar.")).toBeOnTheScreen();
-    expect(screen.queryByText(/Registra un pago/)).toBeNull();
-    const reads = fetcher.mock.calls.map(([input]) => String(input));
-    expect(reads.some((path) => path.includes("client-invitations"))).toBe(false);
+    expect(screen.queryByRole("button", { name: "Registrar pago en efectivo" })).toBeNull();
+    expect(screen.queryByText(/Puede comprar su plan/)).toBeNull();
   });
 
   it("names her Role «Coordinación» and every Branch on Perfil", async () => {
