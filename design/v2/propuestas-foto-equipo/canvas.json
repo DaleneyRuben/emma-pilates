@@ -1,0 +1,136 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-05T21:29:13Z"
+ },
+ "title": "Emma Pilates Studio · Foto de perfil del equipo",
+ "launch": {
+  "view": "focused",
+  "file": "Main.dc.html"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1100,
+   "title": "Foto de perfil del equipo · elige una propuesta",
+   "is_interactive": true
+  },
+  "A1-Equipo-iPhone.dc.html": {
+   "x": 0,
+   "y": 1260,
+   "w": 390,
+   "h": 1034,
+   "title": "A · Botones a la vista · App del equipo · iPhone (Perfil, S08, Horario)",
+   "is_interactive": true
+  },
+  "A2-Equipo-Android.dc.html": {
+   "x": 470,
+   "y": 1260,
+   "w": 412,
+   "h": 1105,
+   "title": "A · Botones a la vista · App del equipo · Android",
+   "is_interactive": true
+  },
+  "A3-Clienta-iPhone.dc.html": {
+   "x": 962,
+   "y": 1260,
+   "w": 390,
+   "h": 954,
+   "title": "A · Botones a la vista · App de la clienta · iPhone (C03, C04, C05)",
+   "is_interactive": true
+  },
+  "A4-Clienta-Android.dc.html": {
+   "x": 1432,
+   "y": 1260,
+   "w": 412,
+   "h": 1025,
+   "title": "A · Botones a la vista · App de la clienta · Android",
+   "is_interactive": true
+  },
+  "A5-Web.dc.html": {
+   "x": 1924,
+   "y": 1260,
+   "w": 1440,
+   "h": 1100,
+   "title": "A · Botones a la vista · Web 1440 · Personal, Editar miembro, barra de arriba, Horario",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "A6-Web-420.dc.html": {
+   "x": 3444,
+   "y": 1260,
+   "w": 420,
+   "h": 1330,
+   "title": "A · Botones a la vista · Web 420",
+   "is_interactive": true
+  },
+  "B1-Equipo-iPhone.dc.html": {
+   "x": 0,
+   "y": 2700,
+   "w": 390,
+   "h": 1034,
+   "title": "B · Toca la foto · App del equipo · iPhone (Perfil, S08, Horario)",
+   "is_interactive": true
+  },
+  "B2-Equipo-Android.dc.html": {
+   "x": 470,
+   "y": 2700,
+   "w": 412,
+   "h": 1105,
+   "title": "B · Toca la foto · App del equipo · Android",
+   "is_interactive": true
+  },
+  "B3-Clienta-iPhone.dc.html": {
+   "x": 962,
+   "y": 2700,
+   "w": 390,
+   "h": 954,
+   "title": "B · Toca la foto · App de la clienta · iPhone (C03, C04, C05)",
+   "is_interactive": true
+  },
+  "B4-Clienta-Android.dc.html": {
+   "x": 1432,
+   "y": 2700,
+   "w": 412,
+   "h": 1025,
+   "title": "B · Toca la foto · App de la clienta · Android",
+   "is_interactive": true
+  },
+  "B5-Web.dc.html": {
+   "x": 1924,
+   "y": 2700,
+   "w": 1440,
+   "h": 1100,
+   "title": "B · Toca la foto · Web 1440 · Personal, Editar miembro, barra de arriba, Horario",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "B6-Web-420.dc.html": {
+   "x": 3444,
+   "y": 2700,
+   "w": 420,
+   "h": 1330,
+   "title": "B · Toca la foto · Web 420",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "A1-Equipo-iPhone.dc.html",
+  "A2-Equipo-Android.dc.html",
+  "A3-Clienta-iPhone.dc.html",
+  "A4-Clienta-Android.dc.html",
+  "A5-Web.dc.html",
+  "A6-Web-420.dc.html",
+  "B1-Equipo-iPhone.dc.html",
+  "B2-Equipo-Android.dc.html",
+  "B3-Clienta-iPhone.dc.html",
+  "B4-Clienta-Android.dc.html",
+  "B5-Web.dc.html",
+  "B6-Web-420.dc.html"
+ ]
+}
