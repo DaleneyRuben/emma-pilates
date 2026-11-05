@@ -9,16 +9,20 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
-  bolivianMobileSchema,
   colors,
   FormField,
   FormScrollView,
   LoadingState,
+  parseStoredPhone,
+  PhoneField,
+  phoneProblem,
   PrimaryButton,
   QueryFailure,
   Screen,
   ScreenTopBar,
   spacing,
+  storedPhone,
+  type PhoneValue,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,7 +38,11 @@ import { ProfilePhotoSection } from "./profile-photo-section";
 const profileSchema = z.object({
   name: z.string().trim().min(1, "Escribe tu nombre."),
   email: z.string().trim().email("Escribe un correo válido."),
-  phone: bolivianMobileSchema,
+  // FIX-037: the mobile is required, with its country (follow-up 236).
+  phone: z.custom<PhoneValue>().superRefine((phone, context) => {
+    const problem = phoneProblem(phone.country, phone.digits);
+    if (problem !== null) context.addIssue({ code: "custom", message: problem });
+  }),
 });
 
 type ProfileValues = z.infer<typeof profileSchema>;
@@ -67,7 +75,7 @@ function EditProfileForm({
     const response = await updateCurrentClientProfile(
       {
         name: values.name.trim(),
-        phone: values.phone.trim() === "" ? null : values.phone.trim(),
+        phone: storedPhone(values.phone.country, values.phone.digits),
       },
       { headers: { "Content-Type": "application/json" } },
       fetcher,
@@ -146,15 +154,7 @@ function EditProfileForm({
         control={control}
         name="phone"
         render={({ field }) => (
-          <FormField
-            error={errors.phone?.message}
-            keyboardType="phone-pad"
-            label="Teléfono"
-            onBlur={field.onBlur}
-            onChangeText={field.onChange}
-            placeholder="71234567"
-            value={field.value}
-          />
+          <PhoneField error={errors.phone?.message} onChange={field.onChange} value={field.value} />
         )}
       />
       {failed ? (
@@ -202,7 +202,7 @@ export function EditProfileScreen() {
       {header}
       <EditProfileForm
         client={client}
-        defaults={{ name: client.name, email: client.email, phone: client.phone ?? "" }}
+        defaults={{ name: client.name, email: client.email, phone: parseStoredPhone(client.phone) }}
         onSaved={() => navigation.goBack()}
       />
     </Screen>
