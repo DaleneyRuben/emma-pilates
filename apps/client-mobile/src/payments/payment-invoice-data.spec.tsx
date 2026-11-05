@@ -134,6 +134,24 @@ describe("Client payment invoice data", () => {
     });
   });
 
+  // Walkthrough n.º 23, follow-up 246 (C10c): the off button says why.
+  it("says what is missing while the open invoice is incomplete", async () => {
+    const { screen } = await openPaymentWithReceipt(null);
+
+    await fireEvent.press(screen.getByRole("button", { name: "¿Necesitas factura?" }));
+    expect(screen.getByText("Completa el NIT o CI, o cierra la factura")).toBeOnTheScreen();
+    expect(screen.queryByText("El estudio revisa tu pago y te avisa por la app")).toBeNull();
+
+    await fireEvent.changeText(screen.getByLabelText("NIT o CI"), "1020304050");
+    expect(
+      screen.getByText("Completa el nombre o razón social, o cierra la factura"),
+    ).toBeOnTheScreen();
+
+    await fireEvent.changeText(screen.getByLabelText("Nombre o razón social"), "Estudio Ana SRL");
+    expect(screen.getByText("El estudio revisa tu pago y te avisa por la app")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeEnabled();
+  });
+
   it("shows the amount on the hero and the two numbered steps", async () => {
     const { screen } = await openPaymentWithReceipt(null);
 
