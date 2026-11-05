@@ -23,6 +23,7 @@ import {
   radii,
   Screen,
   spacing,
+  StaffFace,
   typography,
   upcomingCivilDates,
   usePullToRefresh,
@@ -210,6 +211,14 @@ export function BrowseSessionsScreen() {
                   onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
                   session={session}
                   testID={`session-card-${session.id}`}
+                  trainerFace={
+                    <StaffFace
+                      fetcher={fetcher}
+                      name={session.trainerName}
+                      photo={session.trainerPhoto}
+                      size={20}
+                    />
+                  }
                 />
                 {left === null ? null : <BodyText style={styles.left}>{left}</BodyText>}
               </View>
