@@ -5,6 +5,7 @@ import { SidePanelBody } from "../../components/panel/side-panel";
 import { namesById } from "../../lib/named";
 import type { StaffRole } from "../people-search";
 import { branchNames, roleLabels } from "./staff-format";
+import { StaffPhotoBlock } from "./staff-photo-block";
 
 type ContactRow = "name" | "email" | "phone";
 
@@ -61,6 +62,7 @@ export function StaffReadOnly({
 
   return (
     <SidePanelBody>
+      <StaffPhotoBlock member={member} />
       <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
         {note}
       </p>

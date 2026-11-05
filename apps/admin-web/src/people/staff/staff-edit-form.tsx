@@ -25,6 +25,7 @@ import {
   type StaffFormInput,
   type StaffFormOutput,
 } from "./staff-form-schema";
+import { StaffPhotoBlock } from "./staff-photo-block";
 import { staffProblem } from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 import { StaffContact } from "./staff-read-only";
@@ -127,9 +128,11 @@ export function StaffEditForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          {/* A limit notice stays first in the body (AW24). */}
           {member.status === "pending" ? (
             <EmailLimitNotice limit={limit} />
           ) : null}
+          <StaffPhotoBlock member={member} />
           <StaffContactField control={form.control} name="name" />
           {member.status === "pending" ? (
             <PendingInvitation limit={limit} member={member} />

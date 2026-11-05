@@ -121,6 +121,7 @@ export const member = (
   branchIds: [centro.id],
   status: "active",
   activationExpiresAt: null,
+  photo: null,
   ...extra,
 });
 
