@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Horario y Editar sesión</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.wrap{min-height:1500px;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;padding:48px 56px;display:flex;flex-direction:column;gap:28px}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+.sub{color:#6F6662;line-height:1.5}
+.pc{background:#F5EFE9;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;flex:1 1 360px}
+.pc h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:24px;flex:1}
+.lt{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-family:Lora,serif;font-size:18px;display:flex;align-items:center;justify-content:center}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;background:#F2E4E1;color:#7D4F4B}
+.lk{height:36px;padding:0 12px;border-radius:12px;background:#F2E4E1;color:#7D4F4B;font-size:13px;font-weight:600;display:inline-flex;align-items:center;text-decoration:none}
+.mini{height:200px;border-radius:10px;background:#FAF7F2;box-shadow:inset 0 0 0 1px #E6DBD0;padding:14px 16px;display:flex;flex-direction:column;gap:7px}
+.mini i{display:block;height:9px;border-radius:4px;background:#E6DBD0}
+.mini i.r{background:#F5EFE9;box-shadow:inset 0 0 0 1px #E6DBD0;height:14px}
+.mini i.b{background:#B78380;height:14px;width:30%;align-self:flex-end}
+.mini i.s{background:#F2E4E1;height:12px;width:22%}
+.mini i.d{background:transparent;color:#A04E3E;height:12px;width:28%;box-shadow:inset 0 -2px 0 #A04E3E}
+.mini .ln{display:flex;gap:6px;align-items:center}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+td,th[scope=row]{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:top;line-height:1.45}
+th[scope=row]{text-transform:none;letter-spacing:0;font-size:14px;color:#4A4A4A;font-weight:600;width:220px}
+.fx{background:#F5EFE9;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:10px;flex:1 1 300px}
+.fx b{font-family:Lora,serif;font-weight:400;font-size:20px}
+</style>
+</helmet>
+<div class="wrap">
+<div style="display:flex;flex-direction:column;gap:6px"><span class="eyebrow">Emma Pilates Studio · propuestas</span><h1>Horario y Editar sesión</h1>
+<span class="sub" style="max-width:900px">Tres cosas del recorrido del Horario. Dos ya las decidió la dueña y aquí se ven dibujadas; la tercera, cómo ordenar «Editar sesión» para que no se vea abultada, tiene tres propuestas para elegir. Cada tablero es un prototipo: la franja oscura de arriba cambia de estado, y los botones de la pantalla también funcionan.</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:20px"><section class="fx"><b>Clases canceladas a la vista</b><span class="sub">Decidido por la dueña: quedan en su lugar, apagadas, con el motivo: «Cancelada · mínimo no alcanzado», «Cancelada por el estudio» o «Serie en pausa». Al tocarlas se abre el panel solo para leer.</span><div style="display:flex;flex-wrap:wrap;gap:6px"><a class="lk" href="H1-Horario-canceladas.dc.html">Horario · 1440</a><a class="lk" href="H2-Horario-canceladas-420.dc.html">Horario · 420</a><a class="lk" href="S1-Mi-agenda-iPhone.dc.html">Agenda · iPhone</a><a class="lk" href="S2-Mi-agenda-Android.dc.html">Agenda · Android</a></div></section><section class="fx"><b>Sin la «E» en el menú</b><span class="sub">Decidido por la dueña: el menú de la izquierda empieza en Inicio. La marca queda arriba, en «Emma Pilates Studio». Se ve en todos los tableros de la web.</span></section></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">Editar sesión · elige una</span>
+<div style="display:flex;flex-wrap:wrap;gap:20px"><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">A</span><h2>Lista y acciones abajo</h2><span class="pill">Recomendada</span></div><p class="sub" style="margin:0">Lo que propuso la dueña, afinado: «Reservaron (1)» con un botón chico «+ Reservar» al lado y la lista simple; «Aplicar cambios a» justo encima de los campos; Guardar y «Cancelar esta clase» abajo, y debajo una fila tranquila con «Pausar la serie» y «Terminar la serie».</p><div class="mini"><div class="ln"><i style="width:40%"></i><span style="flex:1"></span><i class="s"></i></div><i class="r"></i><i style="width:100%;height:1px"></i><i style="width:30%"></i><i class="r" style="height:20px"></i><i class="r"></i><i class="r"></i><div class="ln"><i class="d"></i><span style="flex:1"></span><i class="b"></i></div><div class="ln"><i style="width:35%"></i><i class="s"></i><i class="s"></i></div></div><div style="display:flex;flex-wrap:wrap;gap:6px"><a class="lk" href="A1-Editar-sesion.dc.html">Computadora · 1440</a><a class="lk" href="A2-Editar-sesion-420.dc.html">Celular · 420</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">B</span><h2>Dos pestañas</h2></div><p class="sub" style="margin:0">El panel se parte en «Reservas (1)» y «Editar». Cada pestaña es corta, pero mientras editas no ves quién reservó.</p><div class="mini"><div class="ln"><i style="width:22%;height:12px;background:#93615D"></i><i style="width:16%;height:12px"></i></div><i class="r"></i><i class="r"></i><i class="s" style="width:100%;height:16px"></i></div><div style="display:flex;flex-wrap:wrap;gap:6px"><a class="lk" href="B1-Editar-sesion.dc.html">Computadora · 1440</a><a class="lk" href="B2-Editar-sesion-420.dc.html">Celular · 420</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">C</span><h2>Menú de la serie</h2></div><p class="sub" style="margin:0">Como A, pero «Pausar la serie», «Terminar la serie» y «Cancelar esta clase» van a un menú «⋯» arriba. Lo más limpio, pero cancelar queda escondido.</p><div class="mini"><div class="ln"><i style="width:40%"></i><span style="flex:1"></span><i style="width:8%;height:14px;background:#F5EFE9"></i></div><div class="ln"><span style="flex:1"></span><i class="s"></i></div><i class="r"></i><i style="width:100%;height:1px"></i><i class="r" style="height:20px"></i><i class="r"></i><i class="r"></i><i class="b"></i></div><div style="display:flex;flex-wrap:wrap;gap:6px"><a class="lk" href="C1-Editar-sesion.dc.html">Computadora · 1440</a><a class="lk" href="C2-Editar-sesion-420.dc.html">Celular · 420</a></div></section></div></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">Comparación</span>
+<div class="tw"><table><thead><tr><th></th><th>A · Lista y acciones abajo</th><th>B · Dos pestañas</th><th>C · Menú de la serie</th></tr></thead><tbody><tr><th scope="row">Qué se ve primero</th><td>Quién reservó, con el botón para reservar al lado</td><td>Quién reservó (o los campos, si está vacía)</td><td>Quién reservó, con el botón para reservar al lado</td></tr><tr><th scope="row">Cuánto se desplaza</th><td>Un poco más que hoy en una clase con muchas reservas; nada en 1440 con pocas</td><td>Lo menos: cada pestaña cabe sin desplazarse</td><td>Menos que A: no lleva la fila de la serie</td></tr><tr><th scope="row">Dónde quedan las acciones de la serie</th><td>A la vista, abajo, separadas de esta clase</td><td>Abajo en «Editar»; no se ven desde «Reservas»</td><td>En el menú «⋯»: hay que saber buscarlas</td></tr><tr><th scope="row">Riesgo de tocar algo sin querer</th><td>Bajo: cancelar es texto rojo al lado opuesto de Guardar</td><td>Bajo</td><td>Lo más bajo, pero también lo menos visible</td></tr><tr><th scope="row">Trabajo</th><td>El menor: mover piezas que ya existen</td><td>Medio: pestañas nuevas en el panel</td><td>Medio: un menú nuevo</td></tr></tbody></table></div>
+<p class="sub" style="margin:0;max-width:900px"><b style="color:#4A4A4A">Recomendada: A.</b> Todo queda en una sola vista y cada botón está junto a lo que cambia: reservar junto a las reservas, «Aplicar cambios a» junto a los campos, y las acciones de la serie juntas, abajo, lejos de esta clase. B esconde las reservas mientras editas; C esconde «Cancelar esta clase» dentro de un menú.</p></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic { renderVals() { return {}; } }
+</script>
+</body>
+</html>

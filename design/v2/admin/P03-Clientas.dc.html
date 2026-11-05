@@ -74,7 +74,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:#FDF7F2}
 </style>
 </helmet>
 <div class="app">
-  <nav class="rail" aria-label="Menú principal"><span class="mark" aria-label="Emma Pilates Studio">E</span>
+  <nav class="rail" aria-label="Menú principal">
     <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><a class="{{r.cls}}" href="{{r.href}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span><sc-if value="{{r.badge}}" hint-placeholder-val="{{false}}"><span class="rb">{{r.badge}}</span></sc-if></span><span class="rl">{{r.label}}</span></a></sc-for>
   </nav>
   <div class="col">
