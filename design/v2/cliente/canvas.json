@@ -1,7 +1,7 @@
 {"v":3,"createdOnFiles":{"v":1,"at":"2026-11-02T21:30:00Z"},"title":"Emma v2 · App de clientas","launch":{"view":"focused","file":"Main.dc.html"},"pages":[],
 "boards":{
 "Main.dc.html":{"x":0,"y":0,"w":390,"h":844,"is_interactive":true,"title":"C01 Iniciar sesión"},
-"C01b-Registrate.dc.html":{"x":470,"y":0,"w":390,"h":844,"is_interactive":true,"title":"C01 Regístrate"},
+"C01b-Registrate.dc.html":{"x":470,"y":0,"w":390,"h":930,"is_interactive":true,"title":"C01 Regístrate"},
 "C01c-Revisa-tu-correo.dc.html":{"x":940,"y":0,"w":390,"h":844,"is_interactive":true,"title":"C01 Revisa tu correo"},
 "C20-Recuperar-contrasena.dc.html":{"x":1410,"y":0,"w":390,"h":844,"is_interactive":true,"title":"C20 Recuperar contraseña"},
 "C20b-Recuperar-enviado.dc.html":{"x":1880,"y":0,"w":390,"h":844,"is_interactive":true,"title":"C20 Recuperar · enlace enviado"},

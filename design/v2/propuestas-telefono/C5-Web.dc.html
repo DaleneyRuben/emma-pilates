@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Estudio · celular</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.app{width:100%;min-height:1000px;display:flex;flex-wrap:wrap;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;position:relative}
+.rail{flex:1 1 96px;max-width:100%;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;text-decoration:none;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{position:relative;width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rb{position:absolute;top:-4px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#93615D;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;border:2px solid #F5EFE9}
+.rl{font-size:12px;font-weight:500}
+.col{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:20px 40px}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+.search{flex:1 1 360px;max-width:560px;height:48px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;background:#F5EFE9}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;outline:none}
+.kbd{font-size:12px;color:#6F6662;padding:2px 8px;border-radius:6px;background:#FAF7F2}
+.cb{height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border:0;border-radius:12px;background:#F5EFE9;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer}
+.me{height:44px;display:flex;align-items:center;gap:10px;padding:0 8px 0 4px;color:#4A4A4A}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}.av.s{width:36px;height:36px}
+main{padding:8px 40px 56px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h3{margin:0;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sub{color:#6F6662}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}.hl{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E6DBD0}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;cursor:pointer;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent;display:inline-flex;align-items:center}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.cnt{margin-left:6px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:999px;background:#93615D;color:#fff}
+.card{background:#F5EFE9;border-radius:16px}
+.note{font-size:13px;color:#6F6662}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 16px;min-height:56px}.row+.row{border-top:1px solid #E6DBD0}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#B78380;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:150px;display:flex;flex-direction:column;gap:2px}
+.strong{font-weight:600}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.p{background:#B78380;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}.d{background:#F7E5E0;color:#A04E3E}.td{background:transparent;color:#A04E3E;padding:0 10px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.wait{background:rgba(201,154,78,.16);color:#7C5D2A}.bad{background:#F7E5E0;color:#A04E3E}.none{background:rgba(216,201,187,.34);color:#6F6662}.rose{background:#F2E4E1;color:#7D4F4B}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.f{height:36px;padding:0 14px;border-radius:999px;background:#F5EFE9;font:400 14px 'Work Sans',sans-serif;border:0;color:#4A4A4A;cursor:pointer;display:inline-flex;align-items:center}.f.on{background:#F2E4E1;color:#7D4F4B;font-weight:600}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;white-space:nowrap}
+td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.22);display:flex;justify-content:flex-end;z-index:5}
+.panel{width:480px;max-width:100%;background:#FAF7F2;padding:28px;display:flex;flex-direction:column;gap:18px;overflow-y:auto}
+.ph{display:flex;align-items:flex-start;gap:12px}.ph h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:24px;flex:1}
+.x{width:40px;height:40px;border:0;border-radius:12px;background:#F5EFE9;color:#6F6662;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.field{display:flex;flex-direction:column;gap:6px}.field>span{font-size:13px;font-weight:500}
+.input{min-height:44px;padding:10px 14px;border:1px solid #E6DBD0;border-radius:12px;background:#F5EFE9;color:#4A4A4A;display:flex;align-items:center;justify-content:space-between;width:100%}
+.check{display:flex;align-items:center;gap:10px;min-height:44px}.box{width:22px;height:22px;border-radius:6px;border:1.5px solid #B78380;display:flex;align-items:center;justify-content:center;color:#fff}.box.on{background:#B78380}
+.notice{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;border-left:4px solid #B78380;font-size:14px}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.lora{font-family:Lora,serif}
+.seg{display:flex;gap:2px;background:#F5EFE9;border-radius:12px;padding:3px}
+.seg button{height:38px;border:0;border-radius:10px;background:transparent;font:500 14px 'Work Sans',sans-serif;color:#6F6662;cursor:pointer;padding:0 14px}.seg button.on{background:#FAF7F2;color:#7D4F4B;font-weight:600}
+.stock{width:120px;height:6px;border-radius:999px;background:#E6DBD0;overflow:hidden}.stock span{display:block;height:100%;background:#B78380;border-radius:999px}.stock.low span{background:#C99A4E}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}.av.s{width:36px;height:36px}.av.l{width:56px;height:56px;font-size:17px}
+.hero{background:#93615D;color:#fff;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}.hero .eyebrow{color:rgba(255,255,255,.75)}
+.big{font-family:Lora,serif;font-size:32px;font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:999px;background:rgba(255,255,255,.25);overflow:hidden}.bar span{display:block;height:100%;background:#fff;border-radius:999px}
+.pad{padding:16px}
+.wfx{display:flex;min-height:44px;border:1px solid #E6DBD0;border-radius:12px;background:#F5EFE9;overflow:visible;position:relative}
+.wfx.err,.input.err{border:1.5px solid #A04E3E}
+.wpb{flex:none;display:flex;align-items:center;gap:6px;padding:0 10px 0 12px;border:0;border-right:1px solid #E6DBD0;background:transparent;font:600 15px 'Work Sans',sans-serif;color:#7D4F4B;cursor:pointer;border-radius:12px 0 0 12px}
+.wfx input,.input input{flex:1;min-width:0;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;padding:0 14px;outline:none}
+.input input{padding:0}
+.wfl{font-size:15px;line-height:1}
+.ferr{font-size:13px;color:#A04E3E;display:flex;gap:6px;align-items:flex-start}
+.fhelp{font-size:13px;color:#6F6662}
+.pop{position:absolute;left:0;top:calc(100% + 6px);width:340px;max-width:calc(100vw - 40px);background:#FAF7F2;border-radius:16px;box-shadow:0 12px 32px rgba(74,58,48,.18);z-index:8;padding:8px 0;display:flex;flex-direction:column}
+.psrch{margin:4px 12px 8px;height:40px;border-radius:10px;background:#F5EFE9;display:flex;align-items:center;gap:8px;padding:0 12px;font-size:14px;color:#8E847F}
+.prow{height:40px;display:flex;align-items:center;gap:12px;padding:0 16px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer;text-align:left;width:100%}
+.prow.on{background:#F2E4E1}.prow .n{flex:1}.prow .c{color:#6F6662;font-size:14px}
+.psec{padding:10px 16px 4px;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.qlinkw{align-self:flex-start;height:32px;padding:0;border:0;background:transparent;font:600 14px 'Work Sans',sans-serif;color:#7D4F4B;cursor:pointer}
+.app.narrow{min-height:0}
+</style>
+</helmet>
+<div class="app">
+  <nav class="rail" aria-label="Menú principal"><span class="mark" aria-label="Emma Pilates Studio">E</span>
+    <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><a class="{{r.cls}}" href="{{r.href}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span><sc-if value="{{r.badge}}" hint-placeholder-val="{{false}}"><span class="rb">{{r.badge}}</span></sc-if></span><span class="rl">{{r.label}}</span></a></sc-for>
+  </nav>
+  <div class="col">
+    <header class="top">
+      <span class="wm"><b>Emma</b><i>Pilates Studio</i></span>
+      <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
+      <span style="flex: 1"></span>
+      <button type="button" class="cb"><span class="ms" style="color: #B78380">{{branch.icon}}</span>{{branch.label}}<sc-if value="{{branch.pick}}" hint-placeholder-val="{{true}}"><span class="ms" style="color: #6F6662">expand_more</span></sc-if></button>
+      <span class="me"><span class="av">{{who.ini}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span></span>
+    </header>
+    <main>
+      <div class="head">
+        <div class="hl"><h1>Estudio</h1><span class="sub">El equipo es del estudio, no de una sede</span></div>
+        <button type="button" class="btn s" onClick="{{go.ficha}}"><span class="ms">person</span>Ver una ficha de clienta</button>
+        <button type="button" class="btn p" onClick="{{go.form}}"><span class="ms">person_add</span>Invitar a alguien</button>
+      </div>
+      <div class="tabs" role="tablist"><button type="button" role="tab" class="tab on">Personal</button><button type="button" role="tab" class="tab">Insumos<span class="cnt">1</span></button><button type="button" role="tab" class="tab">Equipos<span class="cnt">1</span></button></div>
+      <div class="tw"><table>
+        <thead><tr><th>Persona</th><th>Contacto</th><th>Rol</th><th>Sedes</th><th>Estado</th><th></th></tr></thead>
+        <tbody><tr><td><span style="display: flex; align-items: center; gap: 12px"><span class="av s">EV</span><span class="strong">Emma Vargas</span></span></td><td><span style="display: flex; flex-direction: column"><span>emma.vargas@example.com</span><span class="note">70022001</span></span></td><td>Entrenadora</td><td>Centro, Equipetrol, Urubó</td><td><span class="pill ok">Activa</span></td><td style="text-align: right"><button type="button" class="btn sm t">Abrir</button></td></tr><tr><td><span style="display: flex; align-items: center; gap: 12px"><span class="av s">DO</span><span class="strong">Daniela Ortiz</span></span></td><td><span style="display: flex; flex-direction: column"><span>daniela.ortiz@example.com</span><span class="note">60022002</span></span></td><td>Entrenadora</td><td>Centro, Urubó</td><td><span class="pill ok">Activa</span></td><td style="text-align: right"><button type="button" class="btn sm t">Abrir</button></td></tr><tr><td><span style="display: flex; align-items: center; gap: 12px"><span class="av s">AS</span><span class="strong">Andrea Suárez</span></span></td><td><span style="display: flex; flex-direction: column"><span>andrea.suarez@example.com</span><span class="note">+54 91123456789 · Argentina</span></span></td><td>Entrenadora</td><td>Equipetrol</td><td><span class="pill ok">Activa</span></td><td style="text-align: right"><button type="button" class="btn sm t">Abrir</button></td></tr><tr><td><span style="display: flex; align-items: center; gap: 12px"><span class="av s">CR</span><span class="strong">Camila Rojas</span></span></td><td><span style="display: flex; flex-direction: column"><span>camila.rojas@example.com</span><span class="note">70022004</span></span></td><td>Recepción</td><td>Centro</td><td><span class="pill ok">Activa</span></td><td style="text-align: right"><button type="button" class="btn sm t">Abrir</button></td></tr><tr><td><span style="display: flex; align-items: center; gap: 12px"><span class="av s">CV</span><span class="strong">Carolina Rivas</span></span></td><td><span style="display: flex; flex-direction: column"><span>carolina.rivas@example.com</span><span class="note">70022005</span></span></td><td>Coordinación</td><td>Todo el estudio</td><td><span class="pill ok">Activa</span></td><td style="text-align: right"><button type="button" class="btn sm t">Abrir</button></td></tr></tbody>
+      </table></div>
+    </main>
+  </div>
+  <sc-if value="{{is.form}}" hint-placeholder-val="{{true}}"><div class="scrim"><div class="panel" role="dialog" aria-label="Invitar a alguien">
+      <div class="ph"><h2>Invitar a alguien</h2><button type="button" class="x" aria-label="Cerrar" onClick="{{go.lista}}"><span class="ms">close</span></button></div>
+      <label class="field"><span>Nombre</span><span class="input"><input value="Rocío Paz" aria-label="Nombre"></span></label>
+      <label class="field"><span>Correo electrónico</span><span class="input"><input value="rocio.paz@example.com" aria-label="Correo electrónico"></span></label>
+      <div class="field"><span>Celular</span><span class="input"><input type="tel" value="71234567" placeholder="71234567" aria-label="Celular"></span><span class="fhelp">La recepción lo usa para escribirle por WhatsApp.</span><button type="button" class="qlinkw" onClick="{{go.pop}}">¿El número no es de Bolivia?</button></div>
+      <label class="field"><span>Rol</span><span class="input">Entrenadora<span class="ms" style="color: #6F6662">expand_more</span></span></label>
+      <div class="field"><span>Sedes</span><div class="card" style="padding: 4px 16px"><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Centro</label><label class="check"><span class="box"></span>Equipetrol</label><label class="check"><span class="box"></span>Urubó</label></div></div>
+      <span class="note">Le enviamos un enlace de activación al correo. Vence en 7 días.</span>
+      <div class="actions"><button type="button" class="btn t" onClick="{{go.lista}}">Cancelar</button><button type="button" class="btn p" onClick="{{go.lista}}">Enviar invitación</button></div>
+    </div></div></sc-if>
+  <sc-if value="{{is.pop}}" hint-placeholder-val="{{false}}"><div class="scrim"><div class="panel" role="dialog" aria-label="Invitar a alguien">
+      <div class="ph"><h2>Invitar a alguien</h2><button type="button" class="x" aria-label="Cerrar" onClick="{{go.lista}}"><span class="ms">close</span></button></div>
+      <label class="field"><span>Nombre</span><span class="input"><input value="Rocío Paz" aria-label="Nombre"></span></label>
+      <label class="field"><span>Correo electrónico</span><span class="input"><input value="rocio.paz@example.com" aria-label="Correo electrónico"></span></label>
+      <div class="field"><span>Celular</span><div class="wfx"><button type="button" class="wpb" onClick="{{go.pop}}" aria-label="País: Bolivia, +591"><span class="wfl">🇧🇴</span>+591<span class="ms" style="font-size: 18px">expand_more</span></button><input type="tel" value="71234567" placeholder="71234567" aria-label="Celular"><div class="pop" role="dialog" aria-label="Elige el país"><div class="psrch"><span class="ms" style="color: #B78380">search</span>Buscar país o código</div><button type="button" class="prow on" onClick="{{go.form}}"><span class="wfl">🇧🇴</span><span class="n">Bolivia</span><span class="c">+591</span><span class="ms" style="color: #93615D">check</span></button><div class="psec">Frecuentes</div><button type="button" class="prow" onClick="{{go.form}}"><span class="wfl">🇦🇷</span><span class="n">Argentina</span><span class="c">+54</span></button><button type="button" class="prow" onClick="{{go.form}}"><span class="wfl">🇧🇷</span><span class="n">Brasil</span><span class="c">+55</span></button><button type="button" class="prow" onClick="{{go.form}}"><span class="wfl">🇨🇱</span><span class="n">Chile</span><span class="c">+56</span></button><button type="button" class="prow" onClick="{{go.pe}}"><span class="wfl">🇵🇪</span><span class="n">Perú</span><span class="c">+51</span></button><button type="button" class="prow" onClick="{{go.form}}"><span class="wfl">🇵🇾</span><span class="n">Paraguay</span><span class="c">+595</span></button><div class="psec">Todos los países</div><button type="button" class="prow" onClick="{{go.form}}"><span class="wfl">🇩🇪</span><span class="n">Alemania</span><span class="c">+49</span></button><button type="button" class="prow" onClick="{{go.form}}"><span class="wfl">🇦🇷</span><span class="n">Argentina</span><span class="c">+54</span></button><button type="button" class="prow" onClick="{{go.form}}"><span class="wfl">🇧🇷</span><span class="n">Brasil</span><span class="c">+55</span></button></div></div><span class="fhelp">La recepción lo usa para escribirle por WhatsApp.</span></div>
+      <label class="field"><span>Rol</span><span class="input">Entrenadora<span class="ms" style="color: #6F6662">expand_more</span></span></label>
+      <div class="field"><span>Sedes</span><div class="card" style="padding: 4px 16px"><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Centro</label><label class="check"><span class="box"></span>Equipetrol</label><label class="check"><span class="box"></span>Urubó</label></div></div>
+      <span class="note">Le enviamos un enlace de activación al correo. Vence en 7 días.</span>
+      <div class="actions"><button type="button" class="btn t" onClick="{{go.lista}}">Cancelar</button><button type="button" class="btn p" onClick="{{go.lista}}">Enviar invitación</button></div>
+    </div></div></sc-if>
+  <sc-if value="{{is.pe}}" hint-placeholder-val="{{false}}"><div class="scrim"><div class="panel" role="dialog" aria-label="Invitar a alguien">
+      <div class="ph"><h2>Invitar a alguien</h2><button type="button" class="x" aria-label="Cerrar" onClick="{{go.lista}}"><span class="ms">close</span></button></div>
+      <label class="field"><span>Nombre</span><span class="input"><input value="Rocío Paz" aria-label="Nombre"></span></label>
+      <label class="field"><span>Correo electrónico</span><span class="input"><input value="rocio.paz@example.com" aria-label="Correo electrónico"></span></label>
+      <div class="field"><span>Celular</span><div class="wfx"><button type="button" class="wpb" onClick="{{go.pop}}" aria-label="País: Perú, +51"><span class="wfl">🇵🇪</span>+51<span class="ms" style="font-size: 18px">expand_more</span></button><input type="tel" value="912345678" placeholder="912345678" aria-label="Celular"></div><span class="fhelp">La recepción lo usa para escribirle por WhatsApp.</span><button type="button" class="qlinkw" onClick="{{go.form}}">Usar un número de Bolivia</button></div>
+      <label class="field"><span>Rol</span><span class="input">Entrenadora<span class="ms" style="color: #6F6662">expand_more</span></span></label>
+      <div class="field"><span>Sedes</span><div class="card" style="padding: 4px 16px"><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Centro</label><label class="check"><span class="box"></span>Equipetrol</label><label class="check"><span class="box"></span>Urubó</label></div></div>
+      <span class="note">Le enviamos un enlace de activación al correo. Vence en 7 días.</span>
+      <div class="actions"><button type="button" class="btn t" onClick="{{go.lista}}">Cancelar</button><button type="button" class="btn p" onClick="{{go.lista}}">Enviar invitación</button></div>
+    </div></div></sc-if>
+  <sc-if value="{{is.req}}" hint-placeholder-val="{{false}}"><div class="scrim"><div class="panel" role="dialog" aria-label="Invitar a alguien">
+      <div class="ph"><h2>Invitar a alguien</h2><button type="button" class="x" aria-label="Cerrar" onClick="{{go.lista}}"><span class="ms">close</span></button></div>
+      <label class="field"><span>Nombre</span><span class="input"><input value="Rocío Paz" aria-label="Nombre"></span></label>
+      <label class="field"><span>Correo electrónico</span><span class="input"><input value="rocio.paz@example.com" aria-label="Correo electrónico"></span></label>
+      <div class="field"><span>Celular</span><span class="input err"><input type="tel" value="" placeholder="71234567" aria-label="Celular"></span><span class="ferr" role="alert"><span class="ms" style="font-size: 16px">error</span>Escribe su celular. Lo necesitamos para escribirle por WhatsApp.</span><button type="button" class="qlinkw" onClick="{{go.pop}}">¿El número no es de Bolivia?</button></div>
+      <label class="field"><span>Rol</span><span class="input">Entrenadora<span class="ms" style="color: #6F6662">expand_more</span></span></label>
+      <div class="field"><span>Sedes</span><div class="card" style="padding: 4px 16px"><label class="check"><span class="box on"><span class="ms" style="font-size: 16px">check</span></span>Centro</label><label class="check"><span class="box"></span>Equipetrol</label><label class="check"><span class="box"></span>Urubó</label></div></div>
+      <span class="note">Le enviamos un enlace de activación al correo. Vence en 7 días.</span>
+      <div class="actions"><button type="button" class="btn t" onClick="{{go.lista}}">Cancelar</button><button type="button" class="btn p" onClick="{{go.lista}}">Enviar invitación</button></div>
+    </div></div></sc-if>
+  <sc-if value="{{is.ficha}}" hint-placeholder-val="{{false}}"><div class="scrim"><div class="panel" role="dialog" aria-label="Ficha de la clienta">
+      <div class="ph"><span class="av l">VR</span><div style="flex: 1; display: flex; flex-direction: column; gap: 6px"><h2>Valentina Ríos</h2><span class="filters"><span class="pill ok">Plan activo</span></span></div><button type="button" class="x" aria-label="Cerrar" onClick="{{go.lista}}"><span class="ms">close</span></button></div>
+      <div class="tabs" role="tablist"><button type="button" role="tab" class="tab on">Resumen</button><button type="button" role="tab" class="tab">Reservas</button><button type="button" role="tab" class="tab">Pagos</button><button type="button" role="tab" class="tab">Nutrición</button></div>
+      <div class="hero"><span class="eyebrow">Plan 8 clases</span><span class="big">5 clases</span><span class="bar"><span style="width: 62%"></span></span><span style="font-size: 14px; color: rgba(255,255,255,.88)">Vence el 2 de diciembre</span></div>
+      <section style="display: flex; flex-direction: column; gap: 12px"><h3>Contacto</h3>
+        <div class="card"><div class="row"><span class="disc"><span class="ms">mail</span></span><span class="grow">valentina.rios@correo.com</span></div><div class="row"><span class="disc"><span class="ms">call</span></span><span class="grow">+51 912345678 · Perú</span><a href="https://wa.me/51912345678" class="btn sm s">WhatsApp</a></div></div>
+      </section>
+      <section style="display: flex; flex-direction: column; gap: 12px"><h3>Para comparar, una clienta de Bolivia</h3>
+        <div class="card"><div class="row"><span class="disc"><span class="ms">call</span></span><span class="grow"><span>Lucía Fernández</span><span class="note">71234567</span></span><a href="https://wa.me/59171234567" class="btn sm s">WhatsApp</a></div></div>
+      </section>
+      <button type="button" class="btn s">Editar perfil</button>
+    </div></div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"vista": {"editor": "enum", "options": ["Invitar a alguien", "Elegir país", "Otro país", "Falta el celular", "Ficha de clienta", "Lista de Personal"], "default": "Invitar a alguien"}, "$preview": {"width": 1440, "height": 1000}}'>
+var RAIL = [['ini','home','Inicio','P01-Inicio.dc.html','','b'],['hor','calendar_month','Horario','P02-Horario.dc.html','','b'],['cli','group','Clientas','P03-Clientas.dc.html','4','b'],['pro','campaign','Promociones','P04-Promociones.dc.html','','b'],['com','forum','Comentarios','P05-Comentarios.dc.html','2','b'],['din','payments','Dinero','P06-Dinero.dc.html','4','a'],['est','storefront','Estudio','P07-Estudio.dc.html','1','b'],['inf','bar_chart','Informes','P08-Informes.dc.html','','b'],['aj','settings','Ajustes','P09-Ajustes.dc.html','','b']];
+function rail(active, admin) { return RAIL.filter(function (r) { return admin || r[5] === 'b'; }).map(function (r) { return { icon: r[1], label: r[2], href: r[3], badge: r[4], cls: 'ri' + (r[0] === active ? ' on' : '') }; }); }
+var VISTAS = {"Invitar a alguien": "form", "Elegir país": "pop", "Otro país": "pe", "Falta el celular": "req", "Ficha de clienta": "ficha", "Lista de Personal": "lista"};
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var from = (this.props.vista ?? 'Invitar a alguien');
+    var v = st.from === from && st.v ? st.v : VISTAS[from];
+    function go(x) { return function () { self.setState({ v: x, from: from }); }; }
+    var is = { form: v === 'form', pop: v === 'pop', pe: v === 'pe', req: v === 'req', inv: v === 'inv', ficha: v === 'ficha', lista: v === 'lista' };
+    return { rail: rail('est', true), branch: { icon: 'apartment', label: 'Todo el estudio', pick: false }, who: { name: 'Paola Mendoza', ini: 'PM', role: 'Administración' }, is: is, go: { form: go('form'), pop: go('pop'), pe: go('pe'), req: go('req'), ficha: go('ficha'), lista: go('lista') } };
+  }
+}
+</script>
+</body>
+</html>
