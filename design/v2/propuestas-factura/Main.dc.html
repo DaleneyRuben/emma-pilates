@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Entregar la factura</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.wrap{min-height:1300px;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;padding:48px 56px;display:flex;flex-direction:column;gap:28px}
+.eyebrow{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:24px}
+.sub{color:#6F6662;line-height:1.55;max-width:980px}
+.cols{display:flex;gap:20px;flex-wrap:wrap}
+.pc{background:#F5EFE9;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:12px;flex:1 1 380px}
+.pc ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.bd{background:#F5EFE9;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#4A4A4A;min-height:112px}
+.bd b{font-weight:600;color:#7D4F4B}.bd span{font-size:13px;color:#6F6662;line-height:1.45}
+.q{background:#F2E4E1;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:8px}
+.q ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;line-height:1.5}
+</style>
+</helmet>
+<div class="wrap">
+<div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">Emma Pilates Studio · propuesta</span><h1>Entregar la factura a la clienta</h1>
+<span class="sub">Mariana pagó su Paquete de 8 clases por transferencia y pidió factura con NIT 123456. Hoy el sistema guarda esos datos, pero no hay forma de darle la factura. Con esta propuesta, Administración, Coordinación y Recepción suben la factura emitida (PDF o foto) en el pago, desde la web o desde la app del equipo, y la clienta la ve y la descarga en <b>Mis facturas</b>. Cada tarjeta abre su prototipo; arriba de cada pantalla hay botones para ver todos los estados.</span></div>
+<div class="cols">
+<div class="pc"><h2>Cómo funciona</h2><ul>
+<li>La factura se sigue emitiendo en el sistema de facturación de siempre (sin SIAT).</li>
+<li>Se sube en un pago <b>confirmado</b> de una clienta que pidió factura: PDF, JPG o PNG, hasta 10 MB.</li>
+<li>Al subirla, el pago queda «Factura emitida» con quién y cuándo, y la clienta recibe el aviso «Tu factura está lista».</li>
+<li>«Reemplazar» sube otra; «Quitar factura» pregunta antes. Ninguna se borra: queda el historial.</li>
+<li>Revisar pago muestra si pidió factura y a nombre de quién.</li>
+</ul></div>
+<div class="pc"><h2>Lo que cambia</h2><ul>
+<li>El botón «Marcar emitida» desaparece: marcar emitida es subir la factura, así la clienta siempre la recibe. Las marcas antiguas dicen «Emitida · sin archivo» y se puede subir el archivo.</li>
+<li>El filtro «Sin factura emitida» pasa a «Factura por subir».</li>
+<li>Coordinación y Recepción, que no tienen la pestaña Pagos, entran a «Facturas por subir» desde Clientes.</li>
+</ul></div>
+</div>
+<div class="q"><h2>Para decidir</h2><ol>
+<li>¿Quitamos «Marcar emitida» (recomendado) o la dejamos para facturas entregadas en papel?</li>
+<li>Un pago «Sin factura»: ¿debe poder recibir una factura igual? En la propuesta, no.</li>
+<li>Si se anula un pago con factura subida, la clienta la sigue viendo con la nota «Pago anulado». ¿Está bien?</li>
+</ol></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">App del equipo</span><div class="grid"><a class="bd" href="E1-Revisar-pago.dc.html"><b>E1 · Revisar pago</b><span>La fila «Factura · NIT 123456 · Mariana Quiroga», o «Sin factura».</span></a><a class="bd" href="E2-Pagos.dc.html"><b>E2 · Pagos (Administración)</b><span>Al confirmar: «Facturas por subir» en Accesos.</span></a><a class="bd" href="E3-Clientes.dc.html"><b>E3 · Clientes (Recepción, Coordinación)</b><span>La misma entrada arriba de Clientes.</span></a><a class="bd" href="E4-Facturas.dc.html"><b>E4 · Facturas</b><span>Por subir · Subidas · nada por subir.</span></a><a class="bd" href="E5-Factura-del-pago.dc.html"><b>E5 · Factura del pago</b><span>Subir, subiendo, error, emitida, reemplazar y quitar.</span></a></div></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">Web de administración</span><div class="grid"><a class="bd" href="W1-Pagos-web.dc.html"><b>W1 · Dinero › Pagos · 1440</b><span>La columna Factura y el panel con cada estado.</span></a><a class="bd" href="W2-Pagos-web-420.dc.html"><b>W2 · Dinero › Pagos · 420</b><span>Lo mismo en el celular.</span></a></div></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">App de la clienta</span><div class="grid"><a class="bd" href="K1-Perfil.dc.html"><b>K1 · Perfil</b><span>La fila «Mis facturas · 1 nueva».</span></a><a class="bd" href="K2-Mis-facturas-iPhone.dc.html"><b>K2 · Mis facturas · iPhone</b><span>Vacía, lista, aviso, abierta, descargar y compartir.</span></a><a class="bd" href="K3-Mis-facturas-Android.dc.html"><b>K3 · Mis facturas · Android</b><span>Lo mismo; descargar la guarda en Descargas.</span></a></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
