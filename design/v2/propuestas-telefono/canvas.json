@@ -1,0 +1,191 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-05T04:17:00Z"
+ },
+ "title": "Emma Pilates Studio · Celular con código de país",
+ "launch": {
+  "view": "focused",
+  "file": "Main.dc.html"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1100,
+   "title": "Celular con código de país · elige una propuesta",
+   "is_interactive": true
+  },
+  "A1-Registrate.dc.html": {
+   "x": 0,
+   "y": 1260,
+   "w": 390,
+   "h": 844,
+   "title": "A · Prefijo con bandera · Regístrate (C01b) (toca el código)",
+   "is_interactive": true
+  },
+  "A2-Editar-perfil.dc.html": {
+   "x": 470,
+   "y": 1260,
+   "w": 390,
+   "h": 844,
+   "title": "A · Prefijo con bandera · Editar perfil (C22) (toca el código)",
+   "is_interactive": true
+  },
+  "A3-Nuevo-cliente.dc.html": {
+   "x": 940,
+   "y": 1260,
+   "w": 390,
+   "h": 844,
+   "title": "A · Prefijo con bandera · Nuevo cliente · equipo (S05) (toca el código)",
+   "is_interactive": true
+  },
+  "A4-Para-contactar.dc.html": {
+   "x": 1410,
+   "y": 1260,
+   "w": 390,
+   "h": 844,
+   "title": "A · Prefijo con bandera · Para contactar · equipo (S28)",
+   "is_interactive": true
+  },
+  "A5-Web.dc.html": {
+   "x": 1880,
+   "y": 1260,
+   "w": 1440,
+   "h": 1000,
+   "title": "A · Prefijo con bandera · Web 1440 · Personal, Invitar, ficha (toca el código)",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "A6-Web-420.dc.html": {
+   "x": 3400,
+   "y": 1260,
+   "w": 420,
+   "h": 1100,
+   "title": "A · Prefijo con bandera · Web 420 · Invitar a alguien (toca el código)",
+   "is_interactive": true
+  },
+  "B1-Registrate.dc.html": {
+   "x": 0,
+   "y": 2560,
+   "w": 390,
+   "h": 844,
+   "title": "B · Código sin bandera · Regístrate (C01b) (toca el código)",
+   "is_interactive": true
+  },
+  "B2-Editar-perfil.dc.html": {
+   "x": 470,
+   "y": 2560,
+   "w": 390,
+   "h": 844,
+   "title": "B · Código sin bandera · Editar perfil (C22) (toca el código)",
+   "is_interactive": true
+  },
+  "B3-Nuevo-cliente.dc.html": {
+   "x": 940,
+   "y": 2560,
+   "w": 390,
+   "h": 844,
+   "title": "B · Código sin bandera · Nuevo cliente · equipo (S05) (toca el código)",
+   "is_interactive": true
+  },
+  "B4-Para-contactar.dc.html": {
+   "x": 1410,
+   "y": 2560,
+   "w": 390,
+   "h": 844,
+   "title": "B · Código sin bandera · Para contactar · equipo (S28)",
+   "is_interactive": true
+  },
+  "B5-Web.dc.html": {
+   "x": 1880,
+   "y": 2560,
+   "w": 1440,
+   "h": 1000,
+   "title": "B · Código sin bandera · Web 1440 · Personal, Invitar, ficha (toca el código)",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "B6-Web-420.dc.html": {
+   "x": 3400,
+   "y": 2560,
+   "w": 420,
+   "h": 1100,
+   "title": "B · Código sin bandera · Web 420 · Invitar a alguien (toca el código)",
+   "is_interactive": true
+  },
+  "C1-Registrate.dc.html": {
+   "x": 0,
+   "y": 3860,
+   "w": 390,
+   "h": 844,
+   "title": "C · Bolivia sin preguntar · Regístrate (C01b) (toca el código)",
+   "is_interactive": true
+  },
+  "C2-Editar-perfil.dc.html": {
+   "x": 470,
+   "y": 3860,
+   "w": 390,
+   "h": 844,
+   "title": "C · Bolivia sin preguntar · Editar perfil (C22) (toca el código)",
+   "is_interactive": true
+  },
+  "C3-Nuevo-cliente.dc.html": {
+   "x": 940,
+   "y": 3860,
+   "w": 390,
+   "h": 844,
+   "title": "C · Bolivia sin preguntar · Nuevo cliente · equipo (S05) (toca el código)",
+   "is_interactive": true
+  },
+  "C4-Para-contactar.dc.html": {
+   "x": 1410,
+   "y": 3860,
+   "w": 390,
+   "h": 844,
+   "title": "C · Bolivia sin preguntar · Para contactar · equipo (S28)",
+   "is_interactive": true
+  },
+  "C5-Web.dc.html": {
+   "x": 1880,
+   "y": 3860,
+   "w": 1440,
+   "h": 1000,
+   "title": "C · Bolivia sin preguntar · Web 1440 · Personal, Invitar, ficha (toca el código)",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "C6-Web-420.dc.html": {
+   "x": 3400,
+   "y": 3860,
+   "w": 420,
+   "h": 1100,
+   "title": "C · Bolivia sin preguntar · Web 420 · Invitar a alguien (toca el código)",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "A1-Registrate.dc.html",
+  "A2-Editar-perfil.dc.html",
+  "A3-Nuevo-cliente.dc.html",
+  "A4-Para-contactar.dc.html",
+  "A5-Web.dc.html",
+  "A6-Web-420.dc.html",
+  "B1-Registrate.dc.html",
+  "B2-Editar-perfil.dc.html",
+  "B3-Nuevo-cliente.dc.html",
+  "B4-Para-contactar.dc.html",
+  "B5-Web.dc.html",
+  "B6-Web-420.dc.html",
+  "C1-Registrate.dc.html",
+  "C2-Editar-perfil.dc.html",
+  "C3-Nuevo-cliente.dc.html",
+  "C4-Para-contactar.dc.html",
+  "C5-Web.dc.html",
+  "C6-Web-420.dc.html"
+ ]
+}
