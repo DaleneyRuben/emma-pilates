@@ -2165,6 +2165,53 @@
         ]
       }
     },
+    "/api/v1/administrator/staff-members/{staffMemberId}/contact": {
+      "put": {
+        "operationId": "changeStaffMemberContact",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeStaffContactDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffMemberDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorStaffMembers"
+        ]
+      }
+    },
     "/api/v1/administrator/staff-members/{staffMemberId}/branches": {
       "put": {
         "operationId": "changeStaffMemberBranches",
@@ -11408,6 +11455,25 @@
         },
         "required": [
           "role"
+        ]
+      },
+      "ChangeStaffContactDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 40
+          }
+        },
+        "required": [
+          "name",
+          "phone"
         ]
       },
       "ChangeStaffBranchesDto": {

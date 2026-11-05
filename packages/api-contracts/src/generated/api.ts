@@ -76,6 +76,7 @@ import type {
   ChangeCurrentPasswordDto,
   ChangeOwnReferralCodeDto,
   ChangeStaffBranchesDto,
+  ChangeStaffContactDto,
   ChangeStaffRoleDto,
   ClassHistoryEntryDto,
   ClassTypeDto,
@@ -8930,6 +8931,146 @@ export const useChangeStaffMemberRole = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(
     getChangeStaffMemberRoleMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type changeStaffMemberContactResponse200 = {
+  data: StaffMemberDto;
+  status: 200;
+};
+
+export type changeStaffMemberContactResponseSuccess =
+  changeStaffMemberContactResponse200 & {
+    headers: Headers;
+  };
+export type changeStaffMemberContactResponse =
+  changeStaffMemberContactResponseSuccess;
+
+export const getChangeStaffMemberContactUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/contact`;
+};
+
+export const changeStaffMemberContact = async (
+  staffMemberId: string,
+  changeStaffContactDto: ChangeStaffContactDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<changeStaffMemberContactResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getChangeStaffMemberContactUrl(staffMemberId),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(changeStaffContactDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: changeStaffMemberContactResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as changeStaffMemberContactResponse;
+};
+
+export const getChangeStaffMemberContactMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof changeStaffMemberContact>>,
+    TError,
+    ChangeStaffMemberContactMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof changeStaffMemberContact>>,
+  TError,
+  ChangeStaffMemberContactMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["changeStaffMemberContact"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof changeStaffMemberContact>>,
+    ChangeStaffMemberContactMutationVariables
+  > = (props) => {
+    const { staffMemberId, data } = props ?? {};
+
+    return changeStaffMemberContact(
+      staffMemberId,
+      data,
+      fetchOptions,
+      fetcherFn,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ChangeStaffMemberContactMutationResult = NonNullable<
+  Awaited<ReturnType<typeof changeStaffMemberContact>>
+>;
+export type ChangeStaffMemberContactMutationBody = ChangeStaffContactDto;
+export type ChangeStaffMemberContactMutationError = unknown;
+export type ChangeStaffMemberContactMutationVariables = {
+  staffMemberId: string;
+  data: ChangeStaffContactDto;
+};
+
+export const useChangeStaffMemberContact = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof changeStaffMemberContact>>,
+      TError,
+      ChangeStaffMemberContactMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof changeStaffMemberContact>>,
+  TError,
+  ChangeStaffMemberContactMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getChangeStaffMemberContactMutationOptions(options),
     queryClient,
   );
 };
