@@ -56,6 +56,16 @@ describe("PhoneField", () => {
     expect(screen.getByLabelText("Celular")).toHaveProp("value", "912345678");
   });
 
+  // A form library keeps a copy of the value: the country is matched by code.
+  it("ticks the chosen country once when the value holds a copy of it", async () => {
+    const screen = await render(<Harness initial={{ country: { ...bolivia }, digits: "" }} />);
+
+    await fireEvent.press(screen.getAllByRole("button", { name: "País: Bolivia, +591" })[0]);
+
+    expect(screen.getAllByRole("button", { name: "Bolivia, +591" })).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "Bolivia, +591", selected: true })).toBeOnTheScreen();
+  });
+
   it("filters the list by name or code and closes on «Cancelar»", async () => {
     const screen = await render(<Harness />);
 
