@@ -1,3 +1,4 @@
+import { staffPhotoOf } from './staff/photo/staff-photo-of';
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
 import type {
   AdministratorSessionAvailabilityDto,
@@ -36,7 +37,7 @@ const findScheduledSessions = async (
       capacity: true,
       branch: { select: { name: true } },
       classType: { select: { name: true } },
-      trainer: { select: { name: true } },
+      trainer: { select: { name: true, profileImageAssetId: true } },
       _count: {
         select: {
           bookings: { where: { state: 'BOOKED' } },
@@ -55,6 +56,7 @@ const findScheduledSessions = async (
       trainerStaffMemberId: session.trainerStaffMemberId,
       classTypeName: session.classType.name,
       trainerName: session.trainer.name,
+      trainerPhoto: staffPhotoOf(session.trainer.profileImageAssetId),
       startsAt: session.startsAt,
       endsAt: session.endsAt,
       capacity: session.capacity,

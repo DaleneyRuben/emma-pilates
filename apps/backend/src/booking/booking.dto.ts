@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import { StaffPhotoDto } from './staff/photo/staff-photo.dto';
 
 export class CreateBookingDto {
   @ApiPropertyOptional({ format: 'uuid' })
@@ -23,6 +24,14 @@ export class ClassHistoryEntryDto {
 
   @ApiProperty()
   trainerName!: string;
+
+  @ApiProperty({
+    type: StaffPhotoDto,
+    nullable: true,
+    description:
+      'The Trainer photo (FIX-041), null while her initials stand in',
+  })
+  trainerPhoto!: StaffPhotoDto | null;
 
   @ApiProperty()
   branchName!: string;
@@ -73,6 +82,14 @@ export class SessionAvailabilityDto {
 
   @ApiProperty()
   trainerName!: string;
+
+  @ApiProperty({
+    type: StaffPhotoDto,
+    nullable: true,
+    description:
+      'The Trainer photo (FIX-041), null while her initials stand in',
+  })
+  trainerPhoto!: StaffPhotoDto | null;
 
   @ApiProperty({ format: 'date-time' })
   startsAt!: Date;
