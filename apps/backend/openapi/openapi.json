@@ -1414,6 +1414,14 @@
             "schema": {
               "format": "date"
             }
+          },
+          {
+            "name": "includeCancelled",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -3162,6 +3170,14 @@
       "get": {
         "operationId": "listAdministratorSessions",
         "parameters": [
+          {
+            "name": "includeCancelled",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
           {
             "name": "branchId",
             "required": false,
@@ -10682,6 +10698,32 @@
           "endsAt"
         ]
       },
+      "SessionCancellationSummaryDto": {
+        "type": "object",
+        "properties": {
+          "cause": {
+            "type": "string",
+            "enum": [
+              "minimum_not_met",
+              "studio",
+              "schedule_paused"
+            ]
+          },
+          "cancelledAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "bookedCount": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "cause",
+          "cancelledAt",
+          "bookedCount"
+        ]
+      },
       "TrainerScheduleSessionDto": {
         "type": "object",
         "properties": {
@@ -10710,6 +10752,15 @@
           "bookedCount": {
             "type": "number",
             "minimum": 0
+          },
+          "cancellation": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SessionCancellationSummaryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -13504,6 +13555,15 @@
           },
           "isException": {
             "type": "boolean"
+          },
+          "cancellation": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SessionCancellationSummaryDto"
+              }
+            ]
           }
         },
         "required": [

@@ -18,11 +18,12 @@ type ListTrainerScheduleDependencies = {
   findSessions(input: {
     trainerStaffMemberId: string;
     on: Date;
+    includeCancelled: boolean;
   }): Promise<TrainerScheduleSession[]>;
 };
 
 export const listTrainerSchedule = async (
-  input: { on: Date },
+  input: { on: Date; includeCancelled: boolean },
   dependencies: ListTrainerScheduleDependencies,
 ): Promise<TrainerScheduleSession[]> => {
   if (
@@ -35,5 +36,6 @@ export const listTrainerSchedule = async (
   return dependencies.findSessions({
     trainerStaffMemberId: dependencies.principal.identity.staffMemberId,
     on: input.on,
+    includeCancelled: input.includeCancelled,
   });
 };
