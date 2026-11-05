@@ -4,7 +4,7 @@ import {
   fontFamilies,
   formatSessionDate,
   formatSessionMinutes,
-  formatStartTime,
+  formatCancellationDeadline,
   formatTimeRange,
   IconRow,
   IconRowGroup,
@@ -90,7 +90,7 @@ export function SessionFacts({
       ? null
       : {
           icon: "undo" as const,
-          label: `Cancela sin costo hasta las ${formatStartTime(deadline.toISOString())}`,
+          label: `Cancela sin costo hasta ${formatCancellationDeadline(deadline, new Date(mountedAt))}`,
         };
   return (
     <View>
