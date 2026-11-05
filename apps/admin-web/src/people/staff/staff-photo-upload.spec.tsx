@@ -27,7 +27,7 @@ import {
   type UploadSeen,
 } from "../../test/upload-fixtures";
 
-const fileLine = "JPG, PNG o WebP, hasta 10 MB.";
+const fileLine = "JPG, PNG o WebP, hasta 5 MB.";
 
 // FIX-041 (follow-ups 242, 247): the member panel's photo block saves the
 // photo the moment its upload finishes, apart from «Guardar».
@@ -103,17 +103,17 @@ describe("the member panel's photo upload", () => {
     ).toBeInTheDocument();
   });
 
-  it("refuses a file over 10 MB before uploading it", async () => {
+  it("refuses a file over 5 MB before uploading it (ADR-0072)", async () => {
     server.use(...uploadHandlers(seen), ...photoHandlers(emma.id, calls));
     const { panel, user } = await openMember("Emma Vargas");
     const big = imageFile("enorme.jpg", "image/jpeg");
-    Object.defineProperty(big, "size", { value: 11 * 1024 * 1024 });
+    Object.defineProperty(big, "size", { value: 6 * 1024 * 1024 });
 
     await user.upload(photoFileInput(panel), big);
 
     expect(
       await within(panel).findByText(
-        "Elige una foto JPG, PNG o WebP de hasta 10 MB.",
+        "Elige una foto JPG, PNG o WebP de hasta 5 MB.",
       ),
     ).toBeVisible();
     expect(seen.declared).toBeUndefined();
