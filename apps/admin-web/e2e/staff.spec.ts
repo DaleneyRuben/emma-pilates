@@ -86,6 +86,19 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   await expect(valentina).toHaveCount(0);
   await expect(page.getByText("Mostrando 1–7 de 7 miembros")).toBeVisible();
 
+  // FIX-038: the Administrator gives an active member a phone.
+  await page.getByRole("button", { name: "Camila Rojas" }).click();
+  const contact = page.getByRole("dialog", { name: "Editar miembro" });
+  await contact.getByLabel("Teléfono (opcional)").fill("7000 0001");
+  await contact.getByRole("button", { name: "Guardar", exact: true }).click();
+  await expect(
+    page.getByText("Guardamos los cambios de Camila Rojas."),
+  ).toBeVisible();
+  await expect(contact).toHaveCount(0);
+  await expect(
+    page.getByRole("row", { name: /Camila Rojas/ }).getByText("+591 70000001"),
+  ).toBeVisible();
+
   await page.getByRole("button", { name: "Camila Rojas" }).click();
   const camila = page.getByRole("dialog", { name: "Editar miembro" });
   await camila.getByRole("button", { name: "Desactivar cuenta" }).click();
