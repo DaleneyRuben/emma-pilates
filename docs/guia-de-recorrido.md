@@ -308,11 +308,12 @@ Una persona con rol **Administración** o **Coordinador** no elige sede: ve
 todas. Las demás solo ven las sedes que marques.
 
 **Editar miembro.** Abre a Camila (o a cualquier otra persona, activa o
-pendiente). **Nombre** y **Teléfono (opcional)** son campos: corrige el
-nombre, escribe `70000001` si le falta el teléfono y pulsa **Guardar**. La
-lista muestra el nombre nuevo y `+591 70000001`, con el aviso «Guardamos los
-cambios de …». El teléfono sigue la regla de arriba; uno guardado antes de la
-regla se puede dejar como está. Borrar el teléfono lo quita. El correo de una
+pendiente). **Nombre** y **Celular** son campos: corrige el nombre, escribe
+`70000001` si le falta el celular y pulsa **Guardar**. La lista muestra el
+nombre nuevo y `🇧🇴 +591 70000001`, con el aviso «Guardamos los cambios de
+…». El celular es el mismo campo de arriba, con su país; si no lo tocas, el
+que estaba (aunque sea de antes de la regla, o ninguno) se guarda igual. Un
+celular que cambias tiene que ser válido, y no se puede borrar. El correo de una
 persona **activa** se ve pero no se edita: es con el que entra, y cambiarlo
 necesita que el correo nuevo lo confirme (todavía no está). El de una
 **pendiente** se cambia con **Cambiar correo**. Tu propia fila sigue de solo
