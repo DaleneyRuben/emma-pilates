@@ -4,6 +4,10 @@ import {
   declaredAcquisitionChannels,
   type DeclaredAcquisitionChannel,
 } from '../../booking/acquisition/acquisition';
+import {
+  isStorableMobile,
+  normalizeContactPhone,
+} from '../../phone/bolivian-mobile';
 
 const startClientRegistrationSchema = z.strictObject({
   name: z.string().trim().min(1),
@@ -11,6 +15,11 @@ const startClientRegistrationSchema = z.strictObject({
   password: z.string().min(1),
   referralCode: z.string().trim().min(1).max(64).optional(),
   acquisitionChannel: z.enum(declaredAcquisitionChannels).optional(),
+  phone: z
+    .string()
+    .transform((phone) => normalizeContactPhone(phone) ?? '')
+    .refine(isStorableMobile)
+    .optional(),
 });
 
 const correctPendingClientEmailSchema = z.strictObject({
@@ -45,6 +54,13 @@ export class StartClientRegistrationDto {
       '«¿Cómo nos conociste?» Required by current builds; a build that omits it registers as `unknown` (BKM-011)',
   })
   acquisitionChannel?: DeclaredAcquisitionChannel;
+
+  @ApiPropertyOptional({
+    example: '+591 71234567',
+    description:
+      'Mobile number with its country code, stored as «+<code> <digits>» (Bolivia: 8 digits starting with 6 or 7). Required by current builds; a build that omits it registers without a phone (FIX-037)',
+  })
+  phone?: string;
 }
 
 export class PendingClientRegistrationDto {

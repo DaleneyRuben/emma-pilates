@@ -24,6 +24,7 @@ import {
   typography,
   useMobileIdentity,
   useRefetchOnFocus,
+  phoneWithFlag,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -101,7 +102,7 @@ export function ProfileScreen() {
           <View style={styles.summaryBody}>
             <Text style={styles.name}>{client.name}</Text>
             <BodyText>{client.email}</BodyText>
-            {client.phone ? <BodyText>{client.phone}</BodyText> : null}
+            {client.phone ? <BodyText>{phoneWithFlag(client.phone)}</BodyText> : null}
           </View>
           <TextButton label="Editar" onPress={() => navigation.navigate("EditProfile")} />
         </View>

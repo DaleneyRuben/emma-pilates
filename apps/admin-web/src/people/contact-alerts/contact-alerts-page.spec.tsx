@@ -39,7 +39,7 @@ const daniela: ContactAlertItemDto = {
 const monica: ContactAlertItemDto = {
   clientId: "c1000000-0000-5000-8000-000000000003",
   name: "Mónica Salvatierra",
-  phone: "+591 77140233",
+  phone: "+54 91123456789",
   startedOn: "2026-09-20",
   reasons: ["fewer_than_4_classes_in_first_30_days"],
 };
@@ -73,12 +73,21 @@ describe("AW39 Para contactar", () => {
     const row = (await screen.findByText("Valeria Quiroga")).closest(
       "tr",
     ) as HTMLElement;
-    expect(within(row).getByText("+591 70011005")).toBeInTheDocument();
+    expect(within(row).getByText("🇧🇴 +591 70011005")).toBeInTheDocument();
     expect(within(row).getByText("7 días sin reservar")).toBeInTheDocument();
     expect(within(row).getByText("02/10/2026")).toBeInTheDocument();
     const whatsapp = within(row).getByRole("link", { name: "Abrir WhatsApp" });
     expect(whatsapp).toHaveAttribute("href", "https://wa.me/59170011005");
     expect(whatsapp).toHaveAttribute("target", "_blank");
+
+    // FIX-037: a foreign number keeps its own code in the WhatsApp link.
+    const foreign = screen
+      .getByText("Mónica Salvatierra")
+      .closest("tr") as HTMLElement;
+    expect(within(foreign).getByText("🇦🇷 +54 91123456789")).toBeVisible();
+    expect(
+      within(foreign).getByRole("link", { name: "Abrir WhatsApp" }),
+    ).toHaveAttribute("href", "https://wa.me/5491123456789");
 
     const withoutPhone = screen
       .getByText("Daniela Rojas")

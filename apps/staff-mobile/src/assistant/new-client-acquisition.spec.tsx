@@ -24,6 +24,7 @@ async function openForm(screen: Awaited<ReturnType<typeof openClientSearch>>) {
     expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
   });
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
+  await fireEvent.changeText(screen.getByLabelText("Celular"), "70000001");
   await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
 }
 
@@ -62,7 +63,7 @@ describe("Assistant new Client acquisition (S05)", () => {
     expect(invited).toHaveBeenCalledWith({
       name: "Ana Nueva",
       email: "ana@example.com",
-      phone: null,
+      phone: "+591 70000001",
       acquisitionChannel: "trainer",
       referralCode: "carla",
     });

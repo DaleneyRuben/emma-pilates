@@ -162,6 +162,10 @@ describe("AW24 Nuevo miembro with a known email", () => {
       within(panel).getByLabelText("Correo electrónico"),
       "valentina@emmapilates.bo",
     );
+    await rendered.user.type(
+      within(panel).getByLabelText("Celular"),
+      "71234567",
+    );
     return { ...rendered, panel };
   };
 

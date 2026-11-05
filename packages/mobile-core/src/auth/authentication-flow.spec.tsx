@@ -39,6 +39,7 @@ describe("AuthenticationFlow", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Regístrate" }));
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Clienta");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "70712345");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "local password");
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "local password");
     await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
@@ -49,6 +50,7 @@ describe("AuthenticationFlow", () => {
       email: "ana@example.com",
       name: "Ana Clienta",
       password: "local password",
+      phone: "+591 70712345",
     });
     expect(screen.getByText("Revisa tu correo")).toBeOnTheScreen();
     expect(screen.getByText("ana@example.com")).toBeOnTheScreen();
@@ -85,6 +87,7 @@ describe("AuthenticationFlow", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Regístrate" }));
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Clienta");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "70712345");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "password");
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "password");
     await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));

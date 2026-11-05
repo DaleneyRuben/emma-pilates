@@ -6,8 +6,10 @@ import {
   acquisitionChannelRequired,
   type AcquisitionChannelChoice,
 } from "../acquisition/acquisition-channel-field";
+import { bolivia, phoneProblem, storedPhone } from "../account/phone-number";
 import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
+import { PhoneField, type PhoneValue } from "../ui/phone-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { colors, spacing, typography } from "../ui/tokens";
 import { AuthenticationScreen } from "./auth-layout";
@@ -37,6 +39,7 @@ export function RegistrationScreen({
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState<PhoneValue>({ country: bolivia, digits: "" });
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [channel, setChannel] = useState<AcquisitionChannelChoice | null>(null);
@@ -51,6 +54,8 @@ export function RegistrationScreen({
   const nameError = submitted && name.trim() === "" ? "Escribe tu nombre." : undefined;
   const emailError =
     submitted && !email.includes("@") ? "Escribe un correo electrónico válido." : undefined;
+  const phoneMistake = phoneProblem(phone.country, phone.digits);
+  const phoneError = submitted && phoneMistake !== null ? phoneMistake : undefined;
   const passwordError =
     submitted && password.length < minimumPasswordLength ? "Mínimo 8 caracteres." : undefined;
   const confirmationError =
@@ -67,6 +72,7 @@ export function RegistrationScreen({
     if (
       name.trim() === "" ||
       !email.includes("@") ||
+      phoneMistake !== null ||
       password.length < minimumPasswordLength ||
       password !== confirmation ||
       channel === null
@@ -83,6 +89,7 @@ export function RegistrationScreen({
         email: email.trim(),
         name: name.trim(),
         password,
+        phone: storedPhone(phone.country, phone.digits),
         ...(referralOpen && code !== "" ? { referralCode: code } : {}),
       });
       onRegistered(restartPendingWindow(result));
@@ -132,6 +139,12 @@ export function RegistrationScreen({
         onChangeText={setEmail}
         placeholder="tu@correo.com"
         value={email}
+      />
+      <PhoneField
+        error={phoneError}
+        helper="Te escribimos por WhatsApp si hace falta."
+        onChange={setPhone}
+        value={phone}
       />
       <FormField
         autoComplete="new-password"

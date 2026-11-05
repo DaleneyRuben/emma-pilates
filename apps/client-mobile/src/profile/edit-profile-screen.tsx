@@ -9,16 +9,20 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
-  bolivianMobileSchema,
   colors,
   FormField,
   FormScrollView,
   LoadingState,
+  parseStoredPhone,
+  PhoneField,
+  phoneProblem,
   PrimaryButton,
   QueryFailure,
   Screen,
   ScreenTopBar,
   spacing,
+  storedPhone,
+  type PhoneValue,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -31,13 +35,27 @@ import { useClientFetcher } from "../client-fetcher";
 import { EmailChangeSection, normalizeEmail } from "./email-change-section";
 import { ProfilePhotoSection } from "./profile-photo-section";
 
-const profileSchema = z.object({
-  name: z.string().trim().min(1, "Escribe tu nombre."),
-  email: z.string().trim().email("Escribe un correo válido."),
-  phone: bolivianMobileSchema,
-});
+// FIX-037: the mobile is required, with its country (follow-up 236). A stored
+// phone left untouched (none, or one from before the rule) goes back as it
+// was; any change must be a valid mobile.
+const isUntouched = (phone: PhoneValue, stored: string | null): boolean => {
+  const start = parseStoredPhone(stored);
+  // By code: the form keeps a copy of the country, not the same object.
+  return phone.country.iso === start.country.iso && phone.digits === start.digits;
+};
 
-type ProfileValues = z.infer<typeof profileSchema>;
+const profileSchema = (stored: string | null) =>
+  z.object({
+    name: z.string().trim().min(1, "Escribe tu nombre."),
+    email: z.string().trim().email("Escribe un correo válido."),
+    phone: z.custom<PhoneValue>().superRefine((phone, context) => {
+      if (isUntouched(phone, stored)) return;
+      const problem = phoneProblem(phone.country, phone.digits);
+      if (problem !== null) context.addIssue({ code: "custom", message: problem });
+    }),
+  });
+
+type ProfileValues = z.infer<ReturnType<typeof profileSchema>>;
 
 function EditProfileForm({
   client,
@@ -58,7 +76,7 @@ function EditProfileForm({
     reset,
   } = useForm<ProfileValues>({
     defaultValues: defaults,
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema(client.phone ?? null)),
   });
 
   const save = handleSubmit(async (values) => {
@@ -67,7 +85,9 @@ function EditProfileForm({
     const response = await updateCurrentClientProfile(
       {
         name: values.name.trim(),
-        phone: values.phone.trim() === "" ? null : values.phone.trim(),
+        phone: isUntouched(values.phone, client.phone ?? null)
+          ? (client.phone ?? null)
+          : storedPhone(values.phone.country, values.phone.digits),
       },
       { headers: { "Content-Type": "application/json" } },
       fetcher,
@@ -146,15 +166,7 @@ function EditProfileForm({
         control={control}
         name="phone"
         render={({ field }) => (
-          <FormField
-            error={errors.phone?.message}
-            keyboardType="phone-pad"
-            label="Teléfono"
-            onBlur={field.onBlur}
-            onChangeText={field.onChange}
-            placeholder="71234567"
-            value={field.value}
-          />
+          <PhoneField error={errors.phone?.message} onChange={field.onChange} value={field.value} />
         )}
       />
       {failed ? (
@@ -202,7 +214,7 @@ export function EditProfileScreen() {
       {header}
       <EditProfileForm
         client={client}
-        defaults={{ name: client.name, email: client.email, phone: client.phone ?? "" }}
+        defaults={{ name: client.name, email: client.email, phone: parseStoredPhone(client.phone) }}
         onSaved={() => navigation.goBack()}
       />
     </Screen>

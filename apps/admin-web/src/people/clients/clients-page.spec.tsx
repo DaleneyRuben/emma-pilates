@@ -49,6 +49,7 @@ describe("AW21 Clientes on a desktop browser", () => {
     expect(
       within(row).getByRole("cell", { name: /lucia@example.com/ }),
     ).toHaveAttribute("data-label", "Contacto");
+    expect(within(row).getByText("🇧🇴 +591 70011001")).toBeInTheDocument();
     expect(
       within(row).getByRole("cell", { name: "Paquete de 8 clases" }),
     ).toBeInTheDocument();
