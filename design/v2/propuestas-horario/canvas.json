@@ -24,7 +24,7 @@
    "x": 0,
    "y": 1740,
    "w": 1440,
-   "h": 1080,
+   "h": 1200,
    "title": "Clases canceladas · computadora 1440",
    "is_interactive": true,
    "expand": "fill"
@@ -33,7 +33,7 @@
    "x": 1520,
    "y": 1740,
    "w": 420,
-   "h": 2440,
+   "h": 3190,
    "title": "Clases canceladas · celular 420",
    "is_interactive": true
   },
@@ -55,52 +55,52 @@
   },
   "A1-Editar-sesion.dc.html": {
    "x": 0,
-   "y": 4300,
+   "y": 5050,
    "w": 1440,
-   "h": 1080,
+   "h": 1200,
    "title": "A · Lista y acciones abajo (recomendada) · computadora 1440",
    "is_interactive": true,
    "expand": "fill"
   },
   "A2-Editar-sesion-420.dc.html": {
    "x": 1520,
-   "y": 4300,
+   "y": 5050,
    "w": 420,
-   "h": 2440,
+   "h": 3190,
    "title": "A · Lista y acciones abajo (recomendada) · celular 420",
    "is_interactive": true
   },
   "B1-Editar-sesion.dc.html": {
    "x": 0,
-   "y": 6980,
+   "y": 8360,
    "w": 1440,
-   "h": 1080,
+   "h": 1200,
    "title": "B · Dos pestañas · computadora 1440",
    "is_interactive": true,
    "expand": "fill"
   },
   "B2-Editar-sesion-420.dc.html": {
    "x": 1520,
-   "y": 6980,
+   "y": 8360,
    "w": 420,
-   "h": 2440,
+   "h": 3190,
    "title": "B · Dos pestañas · celular 420",
    "is_interactive": true
   },
   "C1-Editar-sesion.dc.html": {
    "x": 0,
-   "y": 9660,
+   "y": 11670,
    "w": 1440,
-   "h": 1080,
+   "h": 1200,
    "title": "C · Menú de la serie · computadora 1440",
    "is_interactive": true,
    "expand": "fill"
   },
   "C2-Editar-sesion-420.dc.html": {
    "x": 1520,
-   "y": 9660,
+   "y": 11670,
    "w": 420,
-   "h": 2440,
+   "h": 3190,
    "title": "C · Menú de la serie · celular 420",
    "is_interactive": true
   }
