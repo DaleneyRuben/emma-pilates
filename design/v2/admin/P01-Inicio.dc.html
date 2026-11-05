@@ -18,8 +18,7 @@ input::placeholder{color:#6F6662}
 </helmet>
 <div style="width: 100%; min-height: 1000px; display: flex; flex-wrap: wrap; background: #FAF7F2; font-family: 'Work Sans', sans-serif; color: #4A4A4A; font-size: 15px">
   <nav aria-label="Menú principal" style="flex: 1 1 96px; max-width: 100%; background: #F5EFE9; padding: 20px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
-    <span style="font-family: 'Lora', serif; font-size: 24px; color: #93615D; text-align: center; padding-bottom: 12px" aria-label="Emma Pilates Studio">E</span>
-    <sc-for list="{{dest}}" as="d" hint-placeholder-count="9">
+        <sc-for list="{{dest}}" as="d" hint-placeholder-count="9">
       <a href="{{d.href}}" style="{{d.style}}">
         <span style="{{d.pillStyle}}"><span class="ms" style="font-size: 22px">{{d.icon}}</span><sc-if value="{{d.badge}}" hint-placeholder-val="{{false}}"><span style="position: absolute; top: -4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 999px; background: #93615D; color: #FFFFFF; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; border: 2px solid #F5EFE9">{{d.badge}}</span></sc-if></span>
         <span style="font-size: 12px; font-weight: 500">{{d.label}}</span>
