@@ -2,6 +2,9 @@ import { randomUUID } from 'node:crypto';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { createPrismaAdapter } from '../../src/database/prisma-adapter';
 import { toPrismaBytes } from '../../src/database/prisma-bytes';
+import { createCatalogRepository } from '../../src/booking/catalog/prisma-catalog-repository';
+import { listSessionAvailability } from '../../src/booking/session-availability';
+import { createPrismaStaffDirectory } from '../../src/booking/staff/prisma-staff-management';
 import { createPrismaStaffPhoto } from '../../src/booking/staff/photo/prisma-staff-photo';
 import { ImageAssetNotAttachableError } from '../../src/uploads/image-asset-attachments';
 import {
@@ -213,6 +216,55 @@ describe('staff profile photo (PostgreSQL)', () => {
     expect(records.map((record) => record.actionCode)).toEqual([
       'staff_member.photo_changed',
       'staff_member.photo_removed',
+    ]);
+  });
+
+  it('names the photo on Perfil, Personal, and every Session a Trainer gives', async () => {
+    const trainer = await staffMember();
+    const upload = await photoUpload(trainer.accountId);
+    await gateway.replacePhoto({
+      staffMemberId: trainer.staffMemberId,
+      targetAccountId: trainer.accountId,
+      actor: actorOf(trainer.accountId),
+      ownerAccountId: trainer.accountId,
+      imageAssetId: upload.id,
+      now,
+    });
+    const classType = await prisma.classType.findFirstOrThrow();
+    const branch = await prisma.branch.create({
+      data: { name: randomUUID(), address: 'Calle Uno' },
+    });
+    const startsAt = new Date(Date.now() + 48 * 60 * 60 * 1_000);
+    const session = await prisma.session.create({
+      data: {
+        branchId: branch.id,
+        classTypeId: classType.id,
+        trainerStaffMemberId: trainer.staffMemberId,
+        startsAt,
+        endsAt: new Date(startsAt.getTime() + 60 * 60 * 1_000),
+        capacity: 8,
+      },
+    });
+    const photo = { imageAssetId: upload.id };
+    const catalog = createCatalogRepository(prisma);
+
+    await expect(
+      catalog.findStaffProfile(trainer.staffMemberId),
+    ).resolves.toMatchObject({ photo });
+    await expect(
+      createPrismaStaffDirectory(prisma).read(trainer.staffMemberId),
+    ).resolves.toMatchObject({ photo });
+    await expect(catalog.findSessionDetail(session.id)).resolves.toMatchObject({
+      trainerPhoto: photo,
+    });
+    const availability = await listSessionAvailability(prisma)({
+      branchId: branch.id,
+      from: new Date(startsAt.getTime() - 1),
+      until: new Date(startsAt.getTime() + 1),
+      limit: 5,
+    });
+    expect(availability).toEqual([
+      expect.objectContaining({ id: session.id, trainerPhoto: photo }),
     ]);
   });
 });
