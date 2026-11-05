@@ -37,7 +37,7 @@ input::placeholder{color:#6F6662}
       </label>
       <span style="flex: 1"></span>
       <button type="button" style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border: 0; border-radius: 12px; background: #F5EFE9; font-size: 15px; cursor: pointer"><span class="ms" style="font-size: 20px; color: #B78380">location_on</span>Sucursal Centro<span class="ms" style="font-size: 20px; color: #6F6662">expand_more</span></button>
-      <button type="button" style="height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 4px; border: 0; border-radius: 12px; background: transparent; cursor: pointer"><span style="width: 40px; height: 40px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center">{{who.ini}}</span><span style="display: flex; flex-direction: column; align-items: flex-start"><span style="font-size: 14px; font-weight: 600; color: #4A4A4A">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span><span class="ms" style="font-size: 20px; color: #6F6662">expand_more</span></button>
+      <button type="button" style="height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 4px; border: 0; border-radius: 12px; background: transparent; cursor: pointer"><span style="width: 40px; height: 40px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; overflow: hidden"><sc-if value="{{who.photo}}" hint-placeholder-val="{{true}}"><img src="paola.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"></sc-if><sc-if value="{{who.noPhoto}}" hint-placeholder-val="{{false}}">{{who.ini}}</sc-if></span><span style="display: flex; flex-direction: column; align-items: flex-start"><span style="font-size: 14px; font-weight: 600; color: #4A4A4A">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span><span class="ms" style="font-size: 20px; color: #6F6662">expand_more</span></button>
     </header>
 
     <main style="padding: 8px 40px 56px; display: flex; flex-direction: column; gap: 24px">
@@ -197,7 +197,7 @@ class Component extends DCLogic {
     var sum = admin
       ? { count: '6 pendientes', detail: '1 pago por QR · 1 congelamiento · 3 clientas para contactar · 2 comentarios · stock bajo · 3 sueldos' }
       : { count: '4 pendientes', detail: '1 congelamiento · 3 clientas para contactar · 2 comentarios · stock bajo' };
-    var who = admin ? { name: 'Paola Mendoza', first: 'Paola', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', first: 'Carolina', ini: 'CR', role: 'Coordinación' };
+    var who = admin ? { name: 'Paola Mendoza', first: 'Paola', ini: 'PM', role: 'Administración', photo: true, noPhoto: false } : { name: 'Carolina Rivas', first: 'Carolina', ini: 'CR', role: 'Coordinación', photo: false, noPhoto: true };
     return { dest: dest, admin: admin, coord: !admin, busy: !calm, calm: calm, moneyTabs: moneyTabs, money: money, inbox: inbox, recs: recs, today: today, sum: sum, who: who };
   }
 }
