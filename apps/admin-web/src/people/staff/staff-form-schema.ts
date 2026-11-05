@@ -9,7 +9,8 @@ const needsBranches = (role: unknown): boolean =>
 // implicit: typed or not, it is sent as «+591 XXXXXXXX», as the backend
 // stores it (`mobile-core`'s `bolivian-mobile.ts` has the same rule for the
 // apps). FIX-038: «Editar» lets the Administrator change it, and a phone saved
-// before the rule (`kept`) is accepted as it is, so it never blocks «Guardar».
+// before the rule (`kept`) is kept exactly as it is: it never blocks «Guardar»
+// and is never rewritten by a save that does not touch it.
 const anyPhone = z.string().trim().max(40, "Hasta 40 caracteres.");
 const mobilePattern = /^(?:\+?591[\s-]*)?([67](?:[\s-]?\d){7})$/;
 const bolivianMobile = (kept = "") =>
@@ -19,6 +20,7 @@ const bolivianMobile = (kept = "") =>
       "Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567.",
     )
     .transform((phone) => {
+      if (kept !== "" && phone === kept) return kept;
       const digits = mobilePattern.exec(phone)?.[1];
       return digits === undefined ? phone : `+591 ${digits.replace(/\D/g, "")}`;
     });
