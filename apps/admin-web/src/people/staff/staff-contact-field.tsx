@@ -10,12 +10,13 @@ import { Input } from "../../components/ui/input";
 import type { StaffFormInput, StaffFormOutput } from "./staff-form-schema";
 
 const fields = {
-  name: { label: "Nombre", type: "text", autoComplete: "name" },
-  phone: { label: "Teléfono (opcional)", type: "tel", autoComplete: "tel" },
+  name: { label: "Nombre", type: "text", autoComplete: "off" },
+  phone: { label: "Teléfono (opcional)", type: "tel", autoComplete: "off" },
 } as const;
 
 // FIX-038: «Editar miembro» draws the name and the phone with the same
 // fields as «Nuevo miembro», on either side of a pending invitation card.
+// They describe another person, so the browser offers no autofill.
 export function StaffContactField({
   control,
   name,
