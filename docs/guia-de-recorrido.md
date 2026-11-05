@@ -297,6 +297,18 @@ de referido**, una vez cada 30 días. Los otros roles no tienen código.
 Una persona con rol **Administración** o **Coordinador** no elige sede: ve
 todas. Las demás solo ven las sedes que marques.
 
+**Editar miembro.** Abre a Camila (o a cualquier otra persona, activa o
+pendiente). **Nombre** y **Teléfono (opcional)** son campos: corrige el
+nombre, escribe `70000001` si le falta el teléfono y pulsa **Guardar**. La
+lista muestra el nombre nuevo y `+591 70000001`, con el aviso «Guardamos los
+cambios de …». El teléfono sigue la regla de arriba; uno guardado antes de la
+regla se puede dejar como está. Borrar el teléfono lo quita. El correo de una
+persona **activa** se ve pero no se edita: es con el que entra, y cambiarlo
+necesita que el correo nuevo lo confirme (todavía no está). El de una
+**pendiente** se cambia con **Cambiar correo**. Tu propia fila sigue de solo
+lectura, y la coordinadora solo puede cambiar las sucursales de una
+entrenadora.
+
 ## Paso 4. El equipo entra a su app
 
 Abre la app del equipo. La pantalla es **Acceso del equipo**. No hay

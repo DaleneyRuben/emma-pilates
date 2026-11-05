@@ -29,7 +29,7 @@ numbered tests.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the nine-destination rail and its tabs, the old addresses that still work, the global search, the Branch cell, and the narrow-browser menu (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation, who booked a class and its waitlist, booking a Client into it) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients with the plan and Fundadora chips, «Le quedan», «Vence» and «Invitada por», open the Client file's Resumen, Reservas, Pagos, and Evaluaciones tabs, and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111); tell an expired Plan from a Client who never bought one on Clientes (Test 113); read Horario and the report at 1024 px (Test 114) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the nine-destination rail and its tabs, the old addresses that still work, the global search, the Branch cell, and the narrow-browser menu (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation, who booked a class and its waitlist, booking a Client into it) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients with the plan and Fundadora chips, «Le quedan», «Vence» and «Invitada por», open the Client file's Resumen, Reservas, Pagos, and Evaluaciones tabs, and create, change (name, phone, Role, Branches), and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111); tell an expired Plan from a Client who never bought one on Clientes (Test 113); read Horario and the report at 1024 px (Test 114) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
@@ -3055,15 +3055,28 @@ the same four names as the Staff app and the user menu, UX-005),
    enlace nuevo; su rol y sus sucursales no cambiaron." (within a minute of
    the last email it answers "Ya enviamos un correo a esa dirección hace
    poco…" instead).
-6. **Editar miembro.** Click a Staff Member. The name, email, and phone are
-   read-only. Change the Role or the Branches and **Guardar**: the page says
+6. **Editar miembro.** Click a Staff Member. Since FIX-038 (decision
+   §20.21) **Nombre** and **Teléfono (opcional)** are fields for every other
+   member, active or pending: correct the name, type `70000001` for a member
+   without a phone (Camila Rojas), and **Guardar**: the list shows the new name
+   and `+591 70000001`, and the page says "Guardamos los cambios de <new
+   name>.". The phone follows FIX-036's rule (`12345` shows "Escribe un
+   celular de Bolivia de 8 dígitos, por ejemplo 71234567." and nothing is
+   sent), a stored phone from before the rule (`+54 9 11 5555 0000`) can stay
+   as it is while you change something else, and clearing the field removes
+   the phone. Each change writes a `staff_member.contact_changed` audit record
+   with the old and new values (`PUT
+   /api/v1/administrator/staff-members/{id}/contact`, Administrator only: a
+   Coordinator gets 403). An active member's login email is a read-only row
+   between the two fields (a confirmed change for staff is FIX-039). Change
+   the Role or the Branches and **Guardar**: the page says
    "Guardamos los cambios de …". The chips list the active Branches; a
    member still assigned to a Branch archived since shows only the active
    ones, and saving sends only those (the archived assignment is dropped
    rather than refused). A Trainer who still leads upcoming Sessions
    (Emma Vargas) keeps her Branch and the panel explains to swap her in
    Horario first. A pending member shows **Pendiente de activación** between
-   the Nombre and Teléfono rows (there is no separate Correo row), in a pale
+   the Nombre and Teléfono fields (there is no separate Correo row), in a pale
    card with a thin beige border: the address with **Cambiar correo** at the
    end of the same line (Nuevo correo, "Los enlaces enviados a … dejarán de
    funcionar; enviaremos uno nuevo de 7 días.", then **Guardar correo** and
@@ -3072,7 +3085,7 @@ the same four names as the Staff app and the user menu, UX-005),
    cambio, la invitación se elimina. Es distinto de los 7 días de cada
    enlace.", and a full-width white **Reenviar enlace** (greyed text and
    border while it waits); a second email within a minute shows,
-   after a clock icon at the top of the panel above the Nombre row, "Ya
+   after a clock icon at the top of the panel above the Nombre field, "Ya
    enviamos un correo a esa dirección hace poco. El enlace vigente sigue
    sirviendo." and "Podrás reenviarlo en 0:59." from the server's wait, with
    **Reenviar enlace** disabled. Its
@@ -3691,6 +3704,10 @@ The following are not ready for manual product testing:
   «Reservar una clase», and whether she attended («Asistió», «No asistió»;
   the history lists the classes only). Cancelled and missed Evaluations are
   not listed under **Evaluaciones**. Book and cancel from Horario (Test 25);
+- changing the login email of an active Staff Member or Client from the
+  admin web: it needs a confirmed change the new address opens, and the
+  Staff app and the web have no page for that link yet (FIX-039). A pending
+  member's email changes with **Cambiar correo** (Test 26);
 - the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
   the Role arrives with IDN-009, so today only the Administrator can (Test 79);
 - accrued revenue by validity days: decisions §11 asks for it beside the
