@@ -88,6 +88,25 @@ describe("Client Home with a payment in review or rejected", () => {
     expect(created).toHaveBeenCalledWith({ planId: payment.planId });
   });
 
+  it("starts one payment when «Subir otro comprobante» is tapped twice", async () => {
+    const created = jest.fn();
+    const screen = await openHome({
+      "/api/v1/payments/current": () => jsonResponse(rejectedPayment),
+      "POST /api/v1/purchase-intents": () => {
+        created();
+        return jsonResponse(intent, 201);
+      },
+    });
+    const resend = screen.getByRole("button", { name: "Subir otro comprobante" });
+
+    await Promise.all([fireEvent.press(resend), fireEvent.press(resend)]);
+
+    await waitFor(() => {
+      expect(screen.getByText("2 · Sube tu comprobante")).toBeOnTheScreen();
+    });
+    expect(created).toHaveBeenCalledTimes(1);
+  });
+
   it("resumes the payment she already started instead of failing", async () => {
     const screen = await openHome({
       "/api/v1/payments/current": () => jsonResponse(rejectedPayment),

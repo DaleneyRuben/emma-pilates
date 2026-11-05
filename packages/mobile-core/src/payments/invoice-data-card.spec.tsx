@@ -41,7 +41,7 @@ describe("the invoice choice", () => {
 
     expect(invoiceIncompleteNote(open)).toBe("Completa el NIT o CI, o cierra la factura");
     expect(invoiceIncompleteNote({ ...open, taxId: "abc", name: "Ana" })).toBe(
-      "Completa el NIT o CI, o cierra la factura",
+      "Revisa el NIT o CI, o cierra la factura",
     );
     expect(invoiceIncompleteNote({ ...open, taxId: "4567891" })).toBe(
       "Completa el nombre o razón social, o cierra la factura",

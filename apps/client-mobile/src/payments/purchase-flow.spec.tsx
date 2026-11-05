@@ -170,6 +170,9 @@ describe("Client purchase flow", () => {
       expect(screen.getByText("Tu pago está en revisión")).toBeOnTheScreen();
     });
     expect(calls.at(-1)).toBe("submit");
+    // Review of FIX-043: the Plans screen under the payment must not open a
+    // second Estado del pago when the payment turns pending.
+    expect(screen.getAllByText(/Nuestro equipo está revisando tu comprobante/)).toHaveLength(1);
     // Walkthrough n.º 15: the owner's copy, centred, with the facts and a real button.
     expect(
       screen.getByText(
