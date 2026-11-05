@@ -63,8 +63,24 @@ describe("AW22 Editar perfil", () => {
     const name = within(panel).getByLabelText("Nombre");
     await user.clear(name);
     await user.type(name, "Lucía Fernández Paz");
-    const phone = within(panel).getByLabelText("Teléfono");
+    // FIX-037: «Celular» is required and starts from the stored number.
+    expect(
+      within(panel).getByRole("button", { name: "País: Bolivia, +591" }),
+    ).toBeInTheDocument();
+    const phone = within(panel).getByLabelText("Celular");
+    expect(phone).toHaveValue("70011001");
     await user.clear(phone);
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
+    expect(
+      await within(panel).findByText(
+        "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+      ),
+    ).toBeInTheDocument();
+    expect(saved).toEqual([]);
+
+    await user.type(phone, "71234567");
     await user.click(
       within(panel).getByRole("button", { name: "Guardar cambios" }),
     );
@@ -72,8 +88,37 @@ describe("AW22 Editar perfil", () => {
     expect(
       await within(panel).findByText("Guardamos los cambios del perfil."),
     ).toBeInTheDocument();
-    expect(saved).toEqual([{ name: "Lucía Fernández Paz", phone: null }]);
+    expect(saved).toEqual([
+      { name: "Lucía Fernández Paz", phone: "+591 71234567" },
+    ]);
     expect(within(panel).getByText(luciaDetail.email)).toBeInTheDocument();
+  });
+
+  // FIX-037 review: a stored phone left untouched goes back as it was, even
+  // one from a country outside the list or from before the rule.
+  it("keeps an untouched stored phone when only the name changes", async () => {
+    server.use(
+      ...signedInHandlers(),
+      ...handlers({ ...luciaDetail, phone: "+44 7911123456" }),
+    );
+    const { panel, user } = await openLucia();
+
+    await user.click(
+      await within(panel).findByRole("button", { name: "Editar perfil" }),
+    );
+    const name = within(panel).getByLabelText("Nombre");
+    await user.clear(name);
+    await user.type(name, "Lucía Fernández Paz");
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
+
+    expect(
+      await within(panel).findByText("Guardamos los cambios del perfil."),
+    ).toBeInTheDocument();
+    expect(saved).toEqual([
+      { name: "Lucía Fernández Paz", phone: "+44 7911123456" },
+    ]);
   });
 
   it("asks for a name and keeps the form on a failed save", async () => {

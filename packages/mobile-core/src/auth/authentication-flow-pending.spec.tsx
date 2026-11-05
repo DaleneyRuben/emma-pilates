@@ -163,6 +163,7 @@ describe("AuthenticationFlow pending registration across launches", () => {
     await fireEvent.press(await screen.findByRole("button", { name: "Regístrate" }));
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Clienta");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "70712345");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "password");
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "password");
     await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));

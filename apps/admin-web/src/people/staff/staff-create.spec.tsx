@@ -87,6 +87,16 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(await within(panel).findByText("Escribe el nombre.")).toBeVisible();
     expect(within(panel).getByText("Escribe un correo válido.")).toBeVisible();
+    expect(
+      within(panel).getByText(
+        "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+      ),
+    ).toBeVisible();
+    expect(
+      within(panel).getByText(
+        "La recepción lo usa para escribirle por WhatsApp.",
+      ),
+    ).toBeVisible();
     expect(within(panel).getByText("Elige un rol.")).toBeVisible();
 
     await user.click(within(roles).getByRole("radio", { name: "Entrenadora" }));
@@ -138,6 +148,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       within(panel).getByLabelText("Correo electrónico"),
       "valentina@emmapilates.bo",
     );
+    await user.type(within(panel).getByLabelText("Celular"), "71234567");
     await user.click(
       within(panel).getByRole("radio", { name: "Nutricionista" }),
     );
@@ -154,7 +165,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       {
         name: "Valentina Soria",
         email: "valentina@emmapilates.bo",
-        phone: null,
+        phone: "+591 71234567",
         role: "nutritionist",
         branchIds: [centro.id, norte.id],
       },
@@ -171,7 +182,8 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     expect(queryClient.getQueryState(branchesKey)?.isInvalidated).toBe(false);
   });
 
-  it("creates an Administrator without Branches and keeps an optional phone", async () => {
+  // FIX-037 (follow-up 236): «Celular» takes a number from any country.
+  it("creates an Administrator without Branches with a foreign mobile", async () => {
     server.use(...staffHandlers(() => jsonResponse(valentina, 201)));
     const { panel, user } = await openCreate();
 
@@ -180,11 +192,14 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       within(panel).getByLabelText("Correo electrónico"),
       "sara@emmapilates.bo",
     );
-    await user.type(
-      within(panel).getByLabelText("Teléfono (opcional)"),
-      // Decision §19.20: the +591 is implicit and sent.
-      "70000000",
+    await user.click(
+      within(panel).getByRole("button", { name: "País: Bolivia, +591" }),
     );
+    const frequent = await screen.findByRole("group", { name: "Frecuentes" });
+    await user.click(
+      within(frequent).getByRole("option", { name: "Argentina +54" }),
+    );
+    await user.type(within(panel).getByLabelText("Celular"), "9 11 2345 6789");
     await user.click(
       within(panel).getByRole("radio", { name: "Administración" }),
     );
@@ -195,7 +210,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
         {
           name: "Sara Paz",
           email: "sara@emmapilates.bo",
-          phone: "+591 70000000",
+          phone: "+54 91123456789",
           role: "administrator",
           branchIds: [],
         },
@@ -203,7 +218,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     );
   });
 
-  // FIX-030 with MOB-070 and decision §19.20: a Bolivian mobile, 8 digits
+  // FIX-036/FIX-037 and decision §19.20: a Bolivian mobile has 8 digits
   // starting with 6 or 7.
   it.each(["7000004", "80000001"])(
     "refuses the phone %s before sending anything",
@@ -216,10 +231,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
         within(panel).getByLabelText("Correo electrónico"),
         "camila@emmapilates.bo",
       );
-      await user.type(
-        within(panel).getByLabelText("Teléfono (opcional)"),
-        typed,
-      );
+      await user.type(within(panel).getByLabelText("Celular"), typed);
       await user.click(
         within(panel).getByRole("radio", { name: "Administración" }),
       );
@@ -227,7 +239,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
 
       expect(
         await within(panel).findByText(
-          "Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567.",
+          "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.",
         ),
       ).toBeInTheDocument();
       expect(created).toEqual([]);
@@ -243,6 +255,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       within(panel).getByLabelText("Correo electrónico"),
       "emma@emmapilates.bo",
     );
+    await user.type(within(panel).getByLabelText("Celular"), "71234567");
     await user.click(within(panel).getByRole("radio", { name: "Asistente" }));
     await user.click(within(panel).getByRole("checkbox", { name: "Centro" }));
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
@@ -267,6 +280,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       within(panel).getByLabelText("Correo electrónico"),
       "sara@emmapilates.bo",
     );
+    await user.type(within(panel).getByLabelText("Celular"), "71234567");
     await user.click(
       within(panel).getByRole("radio", { name: "Administración" }),
     );

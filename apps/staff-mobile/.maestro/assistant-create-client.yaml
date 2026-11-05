@@ -2,7 +2,8 @@
 # on her overview with the invitation pending (S06). The email is new on
 # every run (scripts/seed.js «new-client»), so the flow can repeat on the same
 # database; each run leaves one more pending invitation. The phone goes in
-# without +591 and the overview shows it stored with it (FIX-036).
+# without +591 and the overview shows it stored with it and its flag
+# (FIX-036, FIX-037).
 appId: ${APP_ID}
 env:
   EMAIL: camila.rojas@example.com
@@ -59,6 +60,7 @@ env:
       id: "pending-card"
     timeout: 20000
 - assertVisible: "Cuenta pendiente de activación"
-# Decision §19.20: the phone typed without +591 is stored with it.
-- assertVisible: "\\+591 70012345 · .*"
+# Decision §19.20: the phone typed without +591 is stored with it; FIX-037
+# shows it after its flag.
+- assertVisible: ".*\\+591 70012345 · .*"
 - takeScreenshot: staff-new-client-2-pending

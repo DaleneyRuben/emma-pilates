@@ -64,6 +64,7 @@ describe("AW23 Personal on a desktop browser", () => {
     expect(
       within(emmaRow).getByRole("cell", { name: /emma@emmapilates.bo/ }),
     ).toHaveAttribute("data-label", "Contacto");
+    expect(within(emmaRow).getByText("🇧🇴 +591 70822001")).toBeInTheDocument();
 
     const paolaRow = await rowOf("Paola Mendoza");
     expect(

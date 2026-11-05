@@ -63,7 +63,7 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
       await within(panel).findByText("Cliente desde 12/04/2024"),
     ).toBeInTheDocument();
     expect(within(panel).getByText("lucia@example.com")).toBeInTheDocument();
-    expect(within(panel).getByText("+591 70011001")).toBeInTheDocument();
+    expect(within(panel).getByText("🇧🇴 +591 70011001")).toBeInTheDocument();
     expect(within(panel).getByText("Paquete de 8 clases")).toBeInTheDocument();
     expect(within(panel).getByText("Activo")).toBeInTheDocument();
     expect(

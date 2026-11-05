@@ -199,6 +199,7 @@ describe("Assistant flows on a tablet", () => {
     });
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.changeText(screen.getByLabelText("Celular"), "70000001");
     await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
     await waitFor(() => {
@@ -250,6 +251,7 @@ describe("Assistant flows on a tablet", () => {
       });
       await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
       await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+      await fireEvent.changeText(screen.getByLabelText("Celular"), "70000001");
       await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
       await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
       await waitFor(() => {

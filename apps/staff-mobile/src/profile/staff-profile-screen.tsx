@@ -16,6 +16,7 @@ import {
   spacing,
   typography,
   useMobileIdentity,
+  phoneWithFlag,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -88,7 +89,7 @@ export function StaffProfileScreen() {
           <View style={styles.summaryBody}>
             <Text style={styles.name}>{member.name}</Text>
             <Text style={styles.detail}>{member.email}</Text>
-            {member.phone ? <Text style={styles.detail}>{member.phone}</Text> : null}
+            {member.phone ? <Text style={styles.detail}>{phoneWithFlag(member.phone)}</Text> : null}
             <Text style={styles.note}>
               {administrator
                 ? "Tus datos se editan en la web de administración."

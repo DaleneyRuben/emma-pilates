@@ -57,7 +57,7 @@ describe("AW24 Editar miembro contact", () => {
     const { panel, user } = await openMember("Camila Rojas");
 
     const name = within(panel).getByLabelText("Nombre");
-    const phone = within(panel).getByLabelText("Teléfono (opcional)");
+    const phone = within(panel).getByLabelText("Celular");
     expect(name).toHaveValue("Camila Rojas");
     expect(phone).toHaveValue("");
     // The login email of an active account stays as it is here.
@@ -85,22 +85,21 @@ describe("AW24 Editar miembro contact", () => {
     ).toBeVisible();
   });
 
-  it("clears a phone", async () => {
-    server.use(listOf(emma), contactSaved({ phone: null }, emma));
+  // FIX-037: «Celular» is required wherever it is a field; a stored phone
+  // cannot be cleared.
+  it("refuses to clear a stored phone", async () => {
+    server.use(listOf(emma));
     const { panel, user } = await openMember("Emma Vargas");
 
-    await user.clear(within(panel).getByLabelText("Teléfono (opcional)"));
+    await user.clear(within(panel).getByLabelText("Celular"));
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
-    await waitFor(() =>
-      expect(sent).toEqual([
-        {
-          method: "PUT",
-          path: `${memberPath(emma.id)}/contact`,
-          body: { name: "Emma Vargas", phone: null },
-        },
-      ]),
-    );
+    expect(
+      await within(panel).findByText(
+        "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+      ),
+    ).toBeVisible();
+    expect(sent).toEqual([]);
   });
 
   it("asks for a Bolivian mobile and a name before sending", async () => {
@@ -108,16 +107,13 @@ describe("AW24 Editar miembro contact", () => {
     const { panel, user } = await openMember("Camila Rojas");
 
     await user.clear(within(panel).getByLabelText("Nombre"));
-    await user.type(
-      within(panel).getByLabelText("Teléfono (opcional)"),
-      "12345",
-    );
+    await user.type(within(panel).getByLabelText("Celular"), "12345");
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     expect(await within(panel).findByText("Escribe el nombre.")).toBeVisible();
     expect(
       within(panel).getByText(
-        "Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567.",
+        "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.",
       ),
     ).toBeVisible();
     expect(sent).toEqual([]);
@@ -134,9 +130,11 @@ describe("AW24 Editar miembro contact", () => {
     );
     const { panel, user } = await openMember("Emma Vargas");
 
-    expect(within(panel).getByLabelText("Teléfono (opcional)")).toHaveValue(
-      "+54 9 11 5555 0000",
-    );
+    // FIX-037: it reads into its country and goes back untouched.
+    expect(
+      within(panel).getByRole("button", { name: "País: Argentina, +54" }),
+    ).toBeVisible();
+    expect(within(panel).getByLabelText("Celular")).toHaveValue("91155550000");
     await user.click(
       within(panel).getByRole("radio", { name: "Administración" }),
     );

@@ -83,7 +83,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:#FDF7F2}
       <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
       <span style="flex: 1"></span>
       <span class="cb" style="cursor: default"><span class="ms" style="color: #B78380">apartment</span>Todo el estudio</span>
-      <button type="button" class="me" onClick="{{toggleMenu}}"><span class="av">{{who.ini}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span><span class="ms" style="color: #6F6662">expand_more</span></button>
+      <button type="button" class="me" onClick="{{toggleMenu}}"><span class="av" style="overflow: hidden"><sc-if value="{{who.photo}}" hint-placeholder-val="{{true}}"><img src="paola.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"></sc-if><sc-if value="{{who.noPhoto}}" hint-placeholder-val="{{false}}">{{who.ini}}</sc-if></span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{who.name}}</span><span style="font-size: 12px; color: #6F6662">{{who.role}}</span></span><span class="ms" style="color: #6F6662">expand_more</span></button>
       <sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}"><div class="menu"><a href="#"><span class="ms" style="color: #B78380">key</span>Cambiar contraseña</a><a href="P10-Acceso.dc.html"><span class="ms" style="color: #B78380">logout</span>Cerrar sesión</a></div></sc-if>
     </header>
     <main>
@@ -246,7 +246,7 @@ class Component extends DCLogic {
       is: { todas: tab === 'todas', contactar: tab === 'contactar', cong: tab === 'cong' },
       panelOpen: !!panel, sel: sel, ftabs: ftabs, fv: { resumen: ftab === 'resumen', reservas: ftab === 'reservas', pagos: ftab === 'pagos', eval: ftab === 'eval' },
       admin: admin, coord: !admin, showCourtesy: admin && c.left !== null, close: set({ panel: null }),
-      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración' } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación' },
+      who: admin ? { name: 'Paola Mendoza', ini: 'PM', role: 'Administración', photo: true, noPhoto: false } : { name: 'Carolina Rivas', ini: 'CR', role: 'Coordinación', photo: false, noPhoto: true },
       menuOpen: !!st.menu, toggleMenu: set({ menu: !st.menu }) };
   }
 }

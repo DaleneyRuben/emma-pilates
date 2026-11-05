@@ -121,6 +121,7 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
       data: {
         id: registration.clientId,
         name: registration.name,
+        phone: registration.phone,
         // BKM-017: a readable code from her name, reserved in this transaction.
         referralCode: await claimReadableReferralCode(
           this.transaction,
