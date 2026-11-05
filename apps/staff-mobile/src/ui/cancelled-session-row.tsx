@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 /**
  * FIX-042 (S02, S02b; follow-up 245): a cancelled class keeps its place on
- * the agenda, muted: Marfil with a dashed edge, the start and length, the
+ * the agenda, muted: no fill of its own, a dashed edge, the start and length, the
  * class, and its cause under it. It opens nothing, since there is no
  * attendance to take.
  */
@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
   quiet: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
   row: {
     alignItems: "center",
-    backgroundColor: colors.surface,
     borderColor: "#D8C9BB",
     borderRadius: radii.card,
     borderStyle: "dashed",
