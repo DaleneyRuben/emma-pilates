@@ -8760,7 +8760,7 @@ E. **Phones (FIX-036).** Test 125 H for the forms. After the migration,
    treatment. `PATCH /api/v1/clients/current` with
    `"phone":"71234567"` answers `"phone":"+591 71234567"`; a foreign number is
    saved as typed, so an older app keeps working. Specs:
-   `bolivian-mobile.spec.ts` (backend and `mobile-core`),
+   `bolivian-mobile.spec.ts` (backend; `mobile-core`'s rule is `phone-number.spec.ts` since FIX-037),
    `normalize-bolivian-mobiles.integration-spec.ts`,
    `new-client-phone.spec.tsx`, `email-change.spec.tsx`,
    `staff-create.spec.tsx`.
