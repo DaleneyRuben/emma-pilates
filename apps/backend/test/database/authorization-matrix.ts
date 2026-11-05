@@ -305,6 +305,10 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     administratorOnly(),
   'PUT /api/v1/administrator/staff-members/{staffMemberId}/role':
     administratorOnly(),
+  // FIX-038: correcting another member's name and phone stays the
+  // Administrator's; the Coordinator only assigns a Trainer's Branches.
+  'PUT /api/v1/administrator/staff-members/{staffMemberId}/contact':
+    administratorOnly({ body: { name: 'Nombre', phone: null } }),
   'POST /api/v1/administrator/staff-members/{staffMemberId}/deactivation':
     administratorOnly(),
 

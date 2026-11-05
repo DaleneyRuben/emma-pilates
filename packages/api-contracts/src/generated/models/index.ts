@@ -103,6 +103,7 @@ export * from "./cashTodayDto";
 export * from "./changeCurrentPasswordDto";
 export * from "./changeOwnReferralCodeDto";
 export * from "./changeStaffBranchesDto";
+export * from "./changeStaffContactDto";
 export * from "./changeStaffRoleDto";
 export * from "./changeStaffRoleDtoRole";
 export * from "./classHistoryEntryDto";

@@ -122,6 +122,7 @@ import {
   cancelStaffInvitation,
   correctStaffInvitationEmail,
 } from './staff/staff-invitations';
+import { changeStaffContact } from './staff/staff-contact';
 import {
   AdministratorStaffMembersController,
   staffManagementOperations,
@@ -408,6 +409,8 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
             correctStaffInvitationEmail(command, principal, dependencies),
           cancelInvitation: (command, principal) =>
             cancelStaffInvitation(command, principal, dependencies),
+          changeContact: (command, principal) =>
+            changeStaffContact(command, principal, dependencies),
         };
       },
     },

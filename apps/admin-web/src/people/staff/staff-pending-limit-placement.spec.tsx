@@ -16,9 +16,12 @@ const pendingCard = (panel: HTMLElement) => {
   return card;
 };
 
+// FIX-038: the name and the phone are fields now.
 const contactRow = (panel: HTMLElement, label: string) => {
-  const row = within(panel).getByText(label, { selector: "dt" }).parentElement;
-  if (row === null) throw new Error(`no ${label} row`);
+  const row = within(panel)
+    .getByLabelText(label)
+    .closest('[data-slot="form-item"]');
+  if (row === null) throw new Error(`no ${label} field`);
   return row;
 };
 
@@ -76,7 +79,7 @@ describe("AW24's pending panel limit placement", () => {
 
     const card = pendingCard(panel);
     expect(follows(contactRow(panel, "Nombre"), card)).toBe(true);
-    expect(follows(card, contactRow(panel, "Teléfono"))).toBe(true);
+    expect(follows(card, contactRow(panel, "Teléfono (opcional)"))).toBe(true);
     expect(within(panel).queryByText("Correo", { selector: "dt" })).toBeNull();
     expect(within(card).getByText(valentina.email)).toBeVisible();
   });

@@ -8,8 +8,9 @@ import { branchNames, roleLabels } from "./staff-format";
 
 type ContactRow = "name" | "email" | "phone";
 
-// The contact a Staff Member was invited with; no command edits it yet.
-// AW24 splits it around a pending card, which shows the address itself.
+// A Staff Member's contact as read-only rows: the Coordinator's view, the
+// Administrator's own and deactivated accounts, and an active member's login
+// email in «Editar miembro» (FIX-038 makes the name and phone fields there).
 export function StaffContact({
   member,
   only = ["name", "email", "phone"],

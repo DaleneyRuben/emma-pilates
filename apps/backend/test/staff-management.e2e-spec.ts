@@ -49,6 +49,7 @@ describe('administrator staff members (e2e)', () => {
     deactivate: jest.fn<() => Promise<unknown>>(),
     correctEmail: jest.fn<() => Promise<unknown>>(),
     cancelInvitation: jest.fn<() => Promise<void>>(),
+    changeContact: jest.fn<() => Promise<unknown>>(),
   };
 
   beforeEach(async () => {
@@ -82,6 +83,11 @@ describe('administrator staff members (e2e)', () => {
       email: 'rocio.p@example.com',
     });
     operations.cancelInvitation.mockResolvedValue(undefined);
+    operations.changeContact.mockResolvedValue({
+      ...member,
+      name: 'Rocío Paz Soria',
+      phone: '+591 70000004',
+    });
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [AdministratorStaffMembersController],
@@ -284,6 +290,56 @@ describe('administrator staff members (e2e)', () => {
       { staffMemberId: staffId },
       expect.anything(),
     );
+  });
+
+  it('changes the name and phone of another Staff Member (FIX-038)', async () => {
+    await request(app.getHttpServer())
+      .put(`/api/v1/administrator/staff-members/${staffId}/contact`)
+      .set('authorization', bearer)
+      .send({ name: 'Rocío Paz Soria', phone: '70000004' })
+      .expect(200)
+      .expect('Cache-Control', 'no-store')
+      .expect(({ body }: { body: { name: string; phone: string } }) =>
+        expect(body).toMatchObject({
+          name: 'Rocío Paz Soria',
+          phone: '+591 70000004',
+        }),
+      );
+    expect(operations.changeContact).toHaveBeenCalledWith(
+      { staffMemberId: staffId, name: 'Rocío Paz Soria', phone: '70000004' },
+      expect.anything(),
+    );
+
+    await request(app.getHttpServer())
+      .put(`/api/v1/administrator/staff-members/${staffId}/contact`)
+      .set('authorization', bearer)
+      .send({ name: 'Rocío Paz', phone: null })
+      .expect(200);
+    expect(operations.changeContact).toHaveBeenLastCalledWith(
+      { staffMemberId: staffId, name: 'Rocío Paz', phone: null },
+      expect.anything(),
+    );
+
+    for (const body of [
+      { name: '', phone: null },
+      { name: 'Rocío', phone: null, email: 'otra@example.com' },
+      { name: 'Rocío' },
+    ]) {
+      await request(app.getHttpServer())
+        .put(`/api/v1/administrator/staff-members/${staffId}/contact`)
+        .set('authorization', bearer)
+        .send(body)
+        .expect(400);
+    }
+
+    operations.changeContact.mockRejectedValueOnce(
+      new StaffManagementError('staff_access_denied'),
+    );
+    await request(app.getHttpServer())
+      .put(`/api/v1/administrator/staff-members/${staffId}/contact`)
+      .set('authorization', bearer)
+      .send({ name: 'Rocío', phone: null })
+      .expect(403);
   });
 
   it('says when a limited email can be sent again and when an invitation reopened', async () => {

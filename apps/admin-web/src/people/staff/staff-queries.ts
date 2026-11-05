@@ -1,6 +1,7 @@
 import {
   cancelStaffMemberInvitation,
   changeStaffMemberBranches,
+  changeStaffMemberContact,
   changeStaffMemberRole,
   correctStaffMemberEmail,
   createStaffMember,
@@ -43,6 +44,12 @@ type StaffChange =
   | { kind: "resend"; staffMemberId: string }
   | { kind: "role"; staffMemberId: string; input: ChangeStaffRoleDto }
   | { kind: "branches"; staffMemberId: string; branchIds: string[] }
+  | {
+      kind: "contact";
+      staffMemberId: string;
+      name: string;
+      phone: string | null;
+    }
   | { kind: "deactivate"; staffMemberId: string }
   | { kind: "correctEmail"; staffMemberId: string; email: string }
   | { kind: "cancelInvitation"; staffMemberId: string };
@@ -68,6 +75,13 @@ const send = async (change: StaffChange) => {
       return changeStaffMemberBranches(
         change.staffMemberId,
         { branchIds: change.branchIds },
+        undefined,
+        adminFetch,
+      );
+    case "contact":
+      return changeStaffMemberContact(
+        change.staffMemberId,
+        { name: change.name, phone: change.phone },
         undefined,
         adminFetch,
       );

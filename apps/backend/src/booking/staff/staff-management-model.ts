@@ -67,7 +67,8 @@ export type StaffAudit = {
     | 'staff_member.deactivated'
     | 'staff_member.email_corrected'
     | 'staff_member.invitation_cancelled'
-    | 'staff_member.invitation_reopened';
+    | 'staff_member.invitation_reopened'
+    | 'staff_member.contact_changed';
   actorAccountId: string;
   actorRole: AuditActor['role'];
   impersonationId: string | null;
@@ -125,8 +126,16 @@ export interface StaffManagementTransaction {
     pendingExpiresAt: Date;
     activationExpiresAt: Date;
   }) => Promise<void>;
-  /** FIX-030: a reopened invitation takes the phone typed again. */
-  setPhone: (input: { staffMemberId: string; phone: string }) => Promise<void>;
+  /**
+   * FIX-030: a reopened invitation takes the phone typed again; FIX-038 lets
+   * the Administrator correct or clear it.
+   */
+  setPhone: (input: {
+    staffMemberId: string;
+    phone: string | null;
+  }) => Promise<void>;
+  /** FIX-038: the Administrator corrects the name. */
+  setName: (input: { staffMemberId: string; name: string }) => Promise<void>;
   reissueActivation: (input: {
     accountId: string;
     email: string;

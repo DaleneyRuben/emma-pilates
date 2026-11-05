@@ -69,6 +69,16 @@ export class CorrectStaffEmailDto {
   email!: string;
 }
 
+// FIX-038: the Administrator's correction of another member's contact. The
+// phone follows decision §19.20 on the server too (`normalizeContactPhone`).
+export class ChangeStaffContactDto {
+  @ApiProperty({ minLength: 1, maxLength: 120 })
+  name!: string;
+
+  @ApiProperty({ type: String, nullable: true, maxLength: 40 })
+  phone!: string | null;
+}
+
 export class StaffMemberPageDto {
   @ApiProperty({ type: StaffMemberDto, isArray: true })
   items!: StaffMemberDto[];
@@ -136,6 +146,18 @@ const roleSchema = z.strictObject({
 });
 
 const branchesSchema = z.strictObject({ branchIds: branchIdsSchema });
+
+const contactSchema = z.strictObject({
+  name: z.string().trim().min(1).max(120),
+  phone: z.string().trim().max(40).nullable(),
+});
+
+export const parseChangeStaffContact = (value: unknown) => {
+  const parsed = contactSchema.safeParse(value);
+  if (!parsed.success) return null;
+  const { name, phone } = parsed.data;
+  return { name, phone: phone === '' ? null : phone };
+};
 
 const emailCorrectionSchema = z.strictObject({ email: z.email() });
 
