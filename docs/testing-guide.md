@@ -3059,7 +3059,7 @@ the same four names as the Staff app and the user menu, UX-005),
    the last email it answers "Ya enviamos un correo a esa dirección hace
    poco…" instead).
 6. **Editar miembro.** Click a Staff Member. Since FIX-038 (decision
-   §20.21) **Nombre** and **Teléfono (opcional)** are fields for every other
+   §20.22) **Nombre** and **Teléfono (opcional)** are fields for every other
    member, active or pending: correct the name, type `70000001` for a member
    without a phone (Camila Rojas), and **Guardar**: the list shows the new name
    and `+591 70000001`, and the page says "Guardamos los cambios de <new

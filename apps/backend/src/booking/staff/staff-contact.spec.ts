@@ -12,7 +12,7 @@ import {
 
 beforeEach(resetIds);
 
-// FIX-038, decision §20.21: the Administrator corrects another Staff
+// FIX-038, decision §20.22: the Administrator corrects another Staff
 // Member's name and phone, active or pending.
 describe('changeStaffContact', () => {
   it('saves a new name and a normalized phone and audits old and new values', async () => {

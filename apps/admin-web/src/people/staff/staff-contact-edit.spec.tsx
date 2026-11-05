@@ -36,7 +36,7 @@ const contactSaved = (body: Partial<typeof emma>, base = camila) =>
     record(() => jsonResponse({ ...base, ...body })),
   );
 
-// FIX-038, decision §20.21 (owner, 2026-11-05): the Administrator edits the
+// FIX-038, decision §20.22 (owner, 2026-11-05): the Administrator edits the
 // name and phone of every other member, active or pending.
 describe("AW24 Editar miembro contact", () => {
   useMockServer();
