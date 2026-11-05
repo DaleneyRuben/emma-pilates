@@ -13,6 +13,7 @@ import {
   cancelStaffInvitation,
   correctStaffInvitationEmail,
 } from '../../src/booking/staff/staff-invitations';
+import { changeStaffContact } from '../../src/booking/staff/staff-contact';
 import {
   createPrismaStaffDirectory,
   PrismaStaffManagementUnitOfWork,
@@ -213,6 +214,42 @@ describe('Prisma staff invitations', () => {
     later();
     await expect(invite('cancel.me@example.com')).resolves.toMatchObject({
       status: 'pending',
+    });
+  });
+
+  // FIX-038: the Administrator corrects an active member's name and gives
+  // her back a phone; the audit keeps both values.
+  it('changes an active member’s name and phone and audits old and new', async () => {
+    const camila = staffId('camila');
+    const before = await prisma.staffMember.findUniqueOrThrow({
+      where: { id: camila },
+      select: { name: true, phone: true },
+    });
+
+    const updated = await changeStaffContact(
+      { staffMemberId: camila, name: 'Camila Rojas Vaca', phone: '7000 0001' },
+      paola,
+      dependencies(),
+    );
+
+    expect(updated).toMatchObject({
+      name: 'Camila Rojas Vaca',
+      phone: '+591 70000001',
+      status: 'active',
+    });
+    const audit = await prisma.auditRecord.findFirstOrThrow({
+      where: { actionCode: 'staff_member.contact_changed' },
+      orderBy: { occurredAt: 'desc' },
+    });
+    expect(audit).toMatchObject({
+      actorAccountId: paola.accountId,
+      targetId: updated.accountId,
+      metadata: {
+        previousName: before.name,
+        name: 'Camila Rojas Vaca',
+        previousPhone: before.phone ?? '',
+        phone: '+591 70000001',
+      },
     });
   });
 });
