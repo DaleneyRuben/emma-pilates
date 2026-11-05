@@ -118,11 +118,12 @@ export const storedPhone = (target: PhoneCountry, typed: string): string =>
 export const parseStoredPhone = (
   stored: string | null | undefined,
 ): { country: PhoneCountry; digits: string } => {
+  // «+<code> <digits>», or a number saved before FIX-037 with spaces or dashes.
   const [, dial, digits] =
-    /^\+(\d{1,3}) (\d+)$/.exec(stored?.trim() ?? "") ?? [];
+    /^\+(\d{1,3})[\s-]+(\d[\d\s-]*)$/.exec(stored?.trim() ?? "") ?? [];
   const owner = dial === undefined ? undefined : flagOwner(dial);
   if (owner !== undefined && digits !== undefined)
-    return { country: owner, digits };
+    return { country: owner, digits: digits.replace(/\D/g, "") };
   return { country: bolivia, digits: (stored ?? "").replace(/\D/g, "") };
 };
 
