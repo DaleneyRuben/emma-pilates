@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { StaffPhotoDto } from "./staffPhotoDto";
 import type { UpcomingBookingDtoKind } from "./upcomingBookingDtoKind";
 
 export interface UpcomingBookingDto {
@@ -14,6 +15,11 @@ export interface UpcomingBookingDto {
   branchId: string;
   classTypeName: string;
   trainerName: string;
+  /**
+   * The Trainer photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  trainerPhoto: StaffPhotoDto | null;
   branchName: string;
   startsAt: string;
   endsAt: string;

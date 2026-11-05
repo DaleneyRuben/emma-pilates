@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { StaffBranchDto } from "./staffBranchDto";
+import type { StaffPhotoDto } from "./staffPhotoDto";
 import type { StaffProfileDtoRole } from "./staffProfileDtoRole";
 
 export interface StaffProfileDto {
@@ -15,4 +16,9 @@ export interface StaffProfileDto {
   phone?: string | null;
   role: StaffProfileDtoRole;
   branches: StaffBranchDto[];
+  /**
+   * Her profile photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  photo: StaffPhotoDto | null;
 }
