@@ -63,9 +63,6 @@ function NewClientButton({ onPress }: { onPress: () => void }) {
 export function ClientSearchScreen() {
   const navigation = useNavigation<ClientSearchNavigation>();
   const fetcher = useStaffFetcher();
-  // ADR-0102: only the Assistant registers new Clients; the Coordinator
-  // cancels a class from here instead (follow-up 158).
-  const coordinator = useStaffRole() === "coordinator";
   const [text, setText] = useState("");
   const [query, setQuery] = useState("");
 
@@ -135,7 +132,7 @@ export function ClientSearchScreen() {
           </Pressable>
         )}
       </View>
-      {coordinator || (searching && clients.length === 0 && results.data?.status === 200) ? null : (
+      {searching && clients.length === 0 && results.data?.status === 200 ? null : (
         <NewClientButton onPress={() => navigation.navigate("NewClient")} />
       )}
       {!searching ? (
@@ -151,15 +148,11 @@ export function ClientSearchScreen() {
           icon="person"
           layout="inList"
           note="Revisa cómo lo escribiste o crea una ficha nueva."
-          primaryAction={
-            coordinator
-              ? undefined
-              : {
-                  label: "Nuevo cliente",
-                  onPress: () => navigation.navigate("NewClient"),
-                  testID: "client-search-empty-new-client",
-                }
-          }
+          primaryAction={{
+            label: "Nuevo cliente",
+            onPress: () => navigation.navigate("NewClient"),
+            testID: "client-search-empty-new-client",
+          }}
           title="No encontramos a nadie"
         />
       ) : (
