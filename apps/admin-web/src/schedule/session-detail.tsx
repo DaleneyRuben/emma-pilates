@@ -12,8 +12,8 @@ import { sessionRosterQueryOptions } from "./session-roster-queries";
 type Session = AdministratorSessionAvailabilityDto;
 
 // WEB-039: the class panel. Who booked and who waits come first; a class
-// still to come adds «Reservar a una clienta» and the edit form, a past one
-// stays read-only.
+// still to come adds «Reservar a una clienta» beside them (FIX-042, proposal
+// A) and the edit form, a past one stays read-only.
 export function SessionDetail({
   session,
   branchId,
@@ -58,13 +58,26 @@ export function SessionDetail({
             </Button>
           </div>
         ) : (
-          <SessionRoster roster={roster.data} />
-        )}
-        {past ? null : (
-          <Button variant="secondary" onClick={onBook}>
-            <UserPlus size={16} strokeWidth={1.8} aria-hidden="true" />
-            {full ? "Agregar a la lista de espera" : "Reservar a una clienta"}
-          </Button>
+          <SessionRoster
+            roster={roster.data}
+            action={
+              past ? null : (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={onBook}
+                  aria-label={
+                    full
+                      ? "Agregar a la lista de espera"
+                      : "Reservar a una clienta"
+                  }
+                >
+                  <UserPlus size={16} strokeWidth={1.8} aria-hidden="true" />
+                  {full ? "Lista de espera" : "Reservar"}
+                </Button>
+              )
+            }
+          />
         )}
       </div>
       {past ? null : (

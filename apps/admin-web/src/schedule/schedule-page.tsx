@@ -28,6 +28,16 @@ type Session = AdministratorSessionAvailabilityDto;
 const sessionCount = (count: number) =>
   count === 1 ? "1 sesión esta semana" : `${count} sesiones esta semana`;
 
+// FIX-042: the week's cancelled classes are counted apart from the rest.
+const weekCount = (sessions: readonly Session[]) => {
+  const cancelled = sessions.filter(
+    (session) => (session.cancellation ?? null) !== null,
+  ).length;
+  const standing = sessionCount(sessions.length - cancelled);
+  if (cancelled === 0) return standing;
+  return `${standing} · ${cancelled === 1 ? "1 cancelada" : `${cancelled} canceladas`}`;
+};
+
 // AW02: the selected Branch's week in Bolivia time (ADR-0057). Sessions,
 // not schedules, are drawn: a weekly schedule shows up through the Sessions
 // it has materialized up to 30 days ahead (ADR-0059).
@@ -50,7 +60,9 @@ function BranchSchedule({
       : null,
   );
   const [day, setDay] = useState<string | null>(null);
-  const sessions = useQuery(weekSessionsQueryOptions(branch.id, monday));
+  const sessions = useQuery(
+    weekSessionsQueryOptions(branch.id, monday, { includeCancelled: true }),
+  );
   // BKO-004: a failed read only hides the flags; the week stays usable.
   const flags = useQuery(weekFlagsQueryOptions(branch.id, monday));
   const flagged = useMemo(
@@ -76,7 +88,7 @@ function BranchSchedule({
         title="Horario"
         subtitle={
           sessions.isSuccess
-            ? `Sucursal ${branch.name} · sala única · ${sessionCount(count)}`
+            ? `Sucursal ${branch.name} · sala única · ${weekCount(sessions.data)}`
             : `Sucursal ${branch.name} · sala única`
         }
         actions={
