@@ -70,6 +70,7 @@ describe('RegisterClient', () => {
       clientId: 'client-id',
       name: 'Ana Pérez',
       email: 'ana@example.com',
+      phone: null,
       passwordHash: 'argon2id-password-hash',
       referredByCode: 'REF-LUCIA',
       acquisitionChannel: 'unknown',
