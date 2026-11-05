@@ -19,4 +19,6 @@ export const staffPhotoAuthorizationRows = (): Record<string, MatrixRow> => ({
   }),
   'DELETE /api/v1/administrator/staff-members/{staffMemberId}/photo': allow(),
   'GET /api/v1/staff-photos/{imageAssetId}': allow(),
+  // Finding n.º 30: any Staff Role reads a Client photo by asset.
+  'GET /api/v1/client-photos/{imageAssetId}': allow(),
 });

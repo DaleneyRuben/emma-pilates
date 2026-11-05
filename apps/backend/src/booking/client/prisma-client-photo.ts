@@ -62,6 +62,37 @@ export const createPrismaClientPhoto = (
       select: { profileImageAssetId: true, account: { select: { id: true } } },
     });
 
+  const readPhotoObject: ClientPhotoGateway['readPhotoObject'] = async (
+    input,
+  ) => {
+    const client = await prisma.client.findUnique({
+      where: { id: input.clientId },
+      select: {
+        profileImageAsset: {
+          select: {
+            variants: {
+              where: {
+                kind: variantKinds[input.variant],
+                visibility: ImageVariantVisibility.PRIVATE,
+                deleteRequestedAt: null,
+                deletedAt: null,
+              },
+              select: { storageKey: true, mediaType: true },
+              take: 1,
+            },
+          },
+        },
+      },
+    });
+    const variant = client?.profileImageAsset?.variants[0];
+    return variant === undefined
+      ? null
+      : {
+          objectKey: variant.storageKey,
+          mediaType: imageMediaTypes[variant.mediaType],
+        };
+  };
+
   return {
     replacePhoto: async (input) => {
       await retrySerializable(() =>
@@ -127,33 +158,16 @@ export const createPrismaClientPhoto = (
       );
     },
 
-    readPhotoObject: async (input) => {
+    readPhotoObject,
+
+    readPhotoObjectByAsset: async (input) => {
       const client = await prisma.client.findUnique({
-        where: { id: input.clientId },
-        select: {
-          profileImageAsset: {
-            select: {
-              variants: {
-                where: {
-                  kind: variantKinds[input.variant],
-                  visibility: ImageVariantVisibility.PRIVATE,
-                  deleteRequestedAt: null,
-                  deletedAt: null,
-                },
-                select: { storageKey: true, mediaType: true },
-                take: 1,
-              },
-            },
-          },
-        },
+        where: { profileImageAssetId: input.imageAssetId },
+        select: { id: true },
       });
-      const variant = client?.profileImageAsset?.variants[0];
-      return variant === undefined
+      return client === null
         ? null
-        : {
-            objectKey: variant.storageKey,
-            mediaType: imageMediaTypes[variant.mediaType],
-          };
+        : readPhotoObject({ clientId: client.id, variant: input.variant });
     },
   };
 };
