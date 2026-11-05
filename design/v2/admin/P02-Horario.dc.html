@@ -93,7 +93,7 @@ td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
       <label class="search"><span class="ms" style="font-size: 22px; color: #B78380">search</span><input aria-label="Buscar en todo" placeholder="Buscar una clienta, una clase, un pago o una página"><span class="kbd">Ctrl K</span></label>
       <span style="flex: 1"></span>
       <button type="button" class="cb"><span class="ms" style="color: #B78380">location_on</span>Sucursal Centro<span class="ms" style="color: #6F6662">expand_more</span></button>
-      <button type="button" class="me" onClick="{{toggleMenu}}"><span class="av">PM</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Paola Mendoza</span><span style="font-size: 12px; color: #6F6662">Administración</span></span><span class="ms" style="color: #6F6662">expand_more</span></button>
+      <button type="button" class="me" onClick="{{toggleMenu}}"><span class="av" style="overflow: hidden"><img src="paola.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"></span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Paola Mendoza</span><span style="font-size: 12px; color: #6F6662">Administración</span></span><span class="ms" style="color: #6F6662">expand_more</span></button>
       <sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}"><div class="menu"><a href="#"><span class="ms" style="color: #B78380">key</span>Cambiar contraseña</a><a href="P10-Acceso.dc.html"><span class="ms" style="color: #B78380">logout</span>Cerrar sesión</a></div></sc-if>
     </header>
     <main>
@@ -124,7 +124,7 @@ td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
                     <button type="button" class="{{s.cls}}" onClick="{{s.open}}">
                       <span class="note" style="font-variant-numeric: tabular-nums">{{s.time}}</span>
                       <span class="strong">{{s.cls2}}</span>
-                      <span class="note">{{s.who}}</span>
+                      <span class="note" style="display: flex; align-items: center; gap: 6px"><img src="{{s.photo}}" alt="" style="width: 20px; height: 20px; border-radius: 999px; object-fit: cover; flex: none">{{s.who}}</span>
                       <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span style="font-size: 13px">{{s.seats}}</span><sc-if value="{{s.pill}}" hint-placeholder-val="{{false}}"><span class="{{s.pillCls}}">{{s.pill}}</span></sc-if></span>
                     </button>
                   </sc-for>
@@ -170,7 +170,7 @@ td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
             <div class="ph"><div style="flex: 1; display: flex; flex-direction: column; gap: 6px"><h2>{{sel.cls2}}</h2><span class="sub">{{sel.when}} · Centro</span><span class="filters"><span class="pill rose">Serie semanal</span><sc-if value="{{sel.full}}" hint-placeholder-val="{{true}}"><span class="pill rose">Llena</span></sc-if></span></div><button type="button" class="x" aria-label="Cerrar" onClick="{{close}}"><span class="ms">close</span></button></div>
             <sc-if value="{{sel.past}}" hint-placeholder-val="{{false}}"><div class="notice info"><span class="ms" style="color: #93615D">lock</span>Clase pasada: solo lectura.</div></sc-if>
             <div class="card">
-              <div class="row"><span class="disc"><span class="ms">person</span></span><span class="grow"><span>Entrenadora</span></span><span>{{sel.who}}</span></div>
+              <div class="row"><img src="{{sel.photo}}" alt="" style="width: 36px; height: 36px; border-radius: 999px; object-fit: cover; flex: none"><span class="grow"><span>Entrenadora</span></span><span>{{sel.who}}</span></div>
               <div class="row"><span class="disc"><span class="ms">event_seat</span></span><span class="grow"><span>Lugares</span></span><span>{{sel.seats}}</span></div>
               <div class="row"><span class="disc"><span class="ms">hourglass_top</span></span><span class="grow"><span>Lista de espera</span></span><span>{{sel.waitCount}}</span></div>
             </div>
@@ -284,16 +284,16 @@ class Component extends DCLogic {
       return { day: d.day, num: d.num, tag: d.today ? 'Hoy' : '', empty: d.s.length === 0, cls: 'day' + (d.past ? ' past' : ''), hcls: 'dh' + (d.today ? ' today' : ''),
         sessions: d.s.map(function (s) {
           var full = s[4] === s[5];
-          var o = { id: s[0], time: s[1], cls2: s[2], who: s[3], booked: s[4], cap: s[5], wait: s[6], past: !!d.past, full: full, when: DAYNAME[d.day] + ' de noviembre · ' + s[1] };
+          var o = { id: s[0], time: s[1], cls2: s[2], who: s[3], photo: (s[3] === 'Emma Vargas' ? 'emma.jpg' : 'daniela.jpg'), booked: s[4], cap: s[5], wait: s[6], past: !!d.past, full: full, when: DAYNAME[d.day] + ' de noviembre · ' + s[1] };
           all[s[0]] = o;
           var pill = s[7] || (full ? 'Llena · ' + s[6] + ' en espera' : '');
-          return { cls2: s[2], time: s[1], who: s[3], seats: s[4] + ' de ' + s[5], pill: pill, pillCls: 'pill ' + (s[7] ? 'wait' : 'rose'), cls: 'ses' + (panel && selId === s[0] ? ' sel' : ''), open: set({ panel: 'detalle', sel: s[0] }) };
+          return { cls2: s[2], time: s[1], who: s[3], photo: (s[3] === 'Emma Vargas' ? 'emma.jpg' : 'daniela.jpg'), seats: s[4] + ' de ' + s[5], pill: pill, pillCls: 'pill ' + (s[7] ? 'wait' : 'rose'), cls: 'ses' + (panel && selId === s[0] ? ' sel' : ''), open: set({ panel: 'detalle', sel: s[0] }) };
         }) };
     });
     var s = all[selId];
     var roster = NAMES.slice(0, s.booked).map(function (n, i) { return { n: n, ini: ini(n), note: ['Paquete de 8 clases · le quedan 5', 'Mensual 16 clases · le quedan 9', 'Paquete de 4 clases · le quedan 2'][i % 3] }; });
     var wait = NAMES.slice(14, 14 + s.wait).map(function (n, i) { return { n: n, pos: String(i + 1) }; });
-    var sel = { cls2: s.cls2, when: s.when, who: s.who, seats: s.booked + ' de ' + s.cap, bookedCount: s.booked, waitCount: s.wait, hasWait: s.wait > 0, full: s.full, past: s.past, live: !s.past,
+    var sel = { photo: s.photo, cls2: s.cls2, when: s.when, who: s.who, seats: s.booked + ' de ' + s.cap, bookedCount: s.booked, waitCount: s.wait, hasWait: s.wait > 0, full: s.full, past: s.past, live: !s.past,
       roster: roster, wait: wait, nextPos: String(s.wait + 1), bookLabel: s.full ? 'Agregar a la lista de espera' : 'Reservar a una clienta',
       cancelNote: s.booked > 0 ? ('Tiene ' + s.booked + ' reservas' + (s.wait ? ' y ' + s.wait + ' en espera' : '') + '. A cada clienta se le devuelve la clase y le llega un aviso.') : 'No tiene reservas. Se cancela y desaparece de la app.' };
     var results = [['Mariana Peña', 'Paquete de 8 clases · le quedan 8', true], ['Martina Salvatierra', 'Sin plan activo', false], ['María José Ortiz', 'Mensual 16 clases · le quedan 12', true]].map(function (c) {
