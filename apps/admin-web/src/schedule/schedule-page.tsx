@@ -28,6 +28,9 @@ type Session = AdministratorSessionAvailabilityDto;
 const sessionCount = (count: number) =>
   count === 1 ? "1 sesión esta semana" : `${count} sesiones esta semana`;
 
+const standingCount = (sessions: readonly Session[]) =>
+  sessions.filter((session) => (session.cancellation ?? null) === null).length;
+
 // FIX-042: the week's cancelled classes are counted apart from the rest.
 const weekCount = (sessions: readonly Session[]) => {
   const cancelled = sessions.filter(
@@ -120,7 +123,7 @@ function BranchSchedule({
         />
       ) : (
         <>
-          {count === 0 ? (
+          {standingCount(sessions.data) === 0 ? (
             <p className="text-nota text-texto-tenue">
               No hay sesiones programadas esta semana.
             </p>

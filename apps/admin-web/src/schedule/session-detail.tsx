@@ -32,6 +32,20 @@ export function SessionDetail({
   const full =
     seatsTaken(session, roster.data?.bookings.length) >= session.capacity;
 
+  const book = past ? null : (
+    <Button
+      variant="secondary"
+      size="sm"
+      onClick={onBook}
+      aria-label={
+        full ? "Agregar a la lista de espera" : "Reservar a una clienta"
+      }
+    >
+      <UserPlus size={16} strokeWidth={1.8} aria-hidden="true" />
+      {full ? "Lista de espera" : "Reservar"}
+    </Button>
+  );
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-col gap-5 px-7 py-4">
@@ -43,7 +57,12 @@ export function SessionDetail({
           </p>
         ) : null}
         {roster.isPending ? (
-          <LoadingNotice>Cargando quiénes reservaron…</LoadingNotice>
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <LoadingNotice>Cargando quiénes reservaron…</LoadingNotice>
+            </div>
+            {book}
+          </div>
         ) : roster.isError ? (
           <div role="alert" className="flex items-center gap-3">
             <p className="flex-1 text-celda text-texto-secundario">
@@ -56,28 +75,10 @@ export function SessionDetail({
             >
               Reintentar
             </Button>
+            {book}
           </div>
         ) : (
-          <SessionRoster
-            roster={roster.data}
-            action={
-              past ? null : (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={onBook}
-                  aria-label={
-                    full
-                      ? "Agregar a la lista de espera"
-                      : "Reservar a una clienta"
-                  }
-                >
-                  <UserPlus size={16} strokeWidth={1.8} aria-hidden="true" />
-                  {full ? "Lista de espera" : "Reservar"}
-                </Button>
-              )
-            }
-          />
+          <SessionRoster roster={roster.data} action={book} />
         )}
       </div>
       {past ? null : (
