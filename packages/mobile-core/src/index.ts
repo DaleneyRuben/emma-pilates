@@ -1,6 +1,7 @@
 export * from "./acquisition/acquisition-channel-field";
 export * from "./acquisition/own-referral-code";
 export * from "./account/bolivian-mobile";
+export * from "./account/phone-number";
 export * from "./account/change-password-screen";
 export * from "./account/email-change-link-screen";
 export * from "./account/feedback-metadata";
