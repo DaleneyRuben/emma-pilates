@@ -42,8 +42,9 @@ const profileWith = (photo: { imageAssetId: string } | null) =>
     jsonResponse({ ...paolaProfile, photo }),
   );
 
-const accountChip = () =>
-  screen.findByRole("button", { name: "Tu cuenta: Paola Mendoza" });
+// An open panel hides the shell from the accessibility tree.
+const accountChip = (hidden = false) =>
+  screen.findByRole("button", { name: "Tu cuenta: Paola Mendoza", hidden });
 
 // FIX-041 (follow-up 242): her photo, or her initials, wherever the web
 // names a Staff Member with a circle.
@@ -129,10 +130,13 @@ describe("staff photos on the admin web", () => {
 
     await user.upload(photoFileInput(panel), imageFile("paola.png"));
 
-    const chip = await accountChip();
+    const chip = await accountChip(true);
     await waitFor(() =>
       expect(
-        within(chip).getByRole("img", { name: "Foto de Paola Mendoza" }),
+        within(chip).getByRole("img", {
+          name: "Foto de Paola Mendoza",
+          hidden: true,
+        }),
       ).toHaveAttribute("src", thumbnailUrl(uploadedAssetId)),
     );
   });
