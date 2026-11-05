@@ -178,7 +178,7 @@ describe("AW33 user menu on a desktop browser", () => {
     );
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Iniciar sesión" }),
+      await screen.findByRole("heading", { level: 1, name: "Inicia sesión" }),
     ).toBeInTheDocument();
     expect(loggedOut).toBe(true);
     expect(router.state.location.search).toEqual({});

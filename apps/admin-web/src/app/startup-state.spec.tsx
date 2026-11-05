@@ -84,7 +84,7 @@ describe("the first-load state while the app starts", () => {
     server.use(...signedOutHandlers());
     renderAdmin("/");
 
-    await heading("Iniciar sesión");
+    await heading("Inicia sesión");
     await waitFor(() => expect(startupState()).not.toBeInTheDocument());
   });
 

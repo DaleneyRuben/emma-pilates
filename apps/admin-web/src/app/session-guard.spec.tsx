@@ -20,7 +20,7 @@ describe("admin session guard", () => {
     server.use(...signedOutHandlers());
     const { router } = renderAdmin("/horario/nutricion?page=2");
 
-    expect(await heading("Iniciar sesión")).toBeInTheDocument();
+    expect(await heading("Inicia sesión")).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/iniciar-sesion");
     expect(router.state.location.search).toEqual({
       redirect: "/horario/nutricion?page=2&pageSize=20",
@@ -67,7 +67,7 @@ describe("admin session guard", () => {
       ]);
     });
 
-    expect(await heading("Iniciar sesión")).toBeInTheDocument();
+    expect(await heading("Inicia sesión")).toBeInTheDocument();
     expect(
       screen.getByText("Tu sesión terminó. Vuelve a iniciar sesión."),
     ).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe("admin session guard", () => {
     await user.click(
       within(menu).getByRole("button", { name: "Cerrar sesión" }),
     );
-    await heading("Iniciar sesión");
+    await heading("Inicia sesión");
 
     // Another tab signed in; this tab goes back and the probe finds a session.
     server.use(...signedInHandlers(), ...emptyPageHandlers());
@@ -124,7 +124,7 @@ describe("admin session guard", () => {
         .catch(() => undefined);
     });
 
-    expect(await heading("Iniciar sesión")).toBeInTheDocument();
+    expect(await heading("Inicia sesión")).toBeInTheDocument();
     expect(
       screen.getByText("Tu sesión terminó. Vuelve a iniciar sesión."),
     ).toBeInTheDocument();

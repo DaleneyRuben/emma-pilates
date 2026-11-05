@@ -22,7 +22,9 @@ import { Input } from "../components/ui/input";
 import { PasswordInput } from "../components/ui/password-input";
 import { useStartSession } from "../session/use-start-session";
 import { emailField } from "./auth-fields";
-import { ThrottledNotice } from "./throttled-notice";
+import { WarningRow } from "./auth-notices";
+import { authTextLinkClass } from "./back-to-login-link";
+import { WaitNotice } from "./request-limit-notice";
 import { useCountdown } from "./use-countdown";
 
 const loginSchema = z.object({
@@ -105,22 +107,27 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
             </FormItem>
           )}
         />
-        {throttled ? <ThrottledNotice seconds={waitSeconds} /> : null}
+        {throttled ? (
+          // DES-007: the same neutral pause as recovery, never red text.
+          <WaitNotice
+            message="Demasiados intentos. Intenta de nuevo en un momento."
+            seconds={waitSeconds}
+            waitLabel="Podrás intentarlo en"
+          />
+        ) : null}
         {!throttled && failure === "rejected" ? (
-          <p role="alert" className="text-nota text-error-texto">
-            El correo o la contraseña no son correctos.
-          </p>
+          <WarningRow>El correo o la contraseña no son correctos.</WarningRow>
         ) : null}
         {!throttled && failure === "untrusted" ? (
-          <p role="alert" className="text-nota text-error-texto">
+          <WarningRow>
             No podemos iniciar sesión desde esta dirección. Abre el panel desde
             su enlace habitual.
-          </p>
+          </WarningRow>
         ) : null}
         {!throttled && failure === "unavailable" ? (
-          <p role="alert" className="text-nota text-error-texto">
+          <WarningRow>
             No pudimos iniciar sesión. Inténtalo de nuevo en unos minutos.
-          </p>
+          </WarningRow>
         ) : null}
         <Button
           type="submit"
@@ -130,10 +137,7 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
         >
           Iniciar sesión
         </Button>
-        <Link
-          to="/recuperar-contrasena"
-          className="self-center text-nota font-medium text-primario underline-offset-4 hover:text-primario-presionado hover:underline"
-        >
+        <Link to="/recuperar-contrasena" className={authTextLinkClass}>
           ¿Olvidaste tu contraseña?
         </Link>
       </form>

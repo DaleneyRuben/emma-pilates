@@ -1,27 +1,37 @@
+import { CircleCheck, Clock3, type LucideIcon } from "lucide-react";
 import { useDocumentTitle } from "../app/use-document-title";
 import type { LoginNotice, LoginSearch } from "./auth-search";
-import { AuthLayout } from "./auth-layout";
+import { AuthHeading, AuthLayout } from "./auth-layout";
+import { InfoRow } from "./auth-notices";
 import { LoginForm } from "./login-form";
 
-const noticeText: Record<LoginNotice, string> = {
-  "session-ended": "Tu sesión terminó. Vuelve a iniciar sesión.",
-  activated: "Tu cuenta está activa. Inicia sesión con tu nueva contraseña.",
-  "password-updated":
-    "Tu contraseña se actualizó. Inicia sesión con la nueva contraseña.",
+const notices: Record<LoginNotice, { icon: LucideIcon; text: string }> = {
+  "session-ended": {
+    icon: Clock3,
+    text: "Tu sesión terminó. Vuelve a iniciar sesión.",
+  },
+  activated: {
+    icon: CircleCheck,
+    text: "Tu cuenta está activa. Inicia sesión con tu nueva contraseña.",
+  },
+  "password-updated": {
+    icon: CircleCheck,
+    text: "Tu contraseña se actualizó. Inicia sesión con la nueva contraseña.",
+  },
 };
 
 export function LoginPage({ search }: { search: LoginSearch }) {
   useDocumentTitle("Iniciar sesión");
   return (
     <AuthLayout>
-      <h1 className="sr-only">Iniciar sesión</h1>
+      <AuthHeading
+        title="Inicia sesión"
+        line="Para Administración y Coordinación."
+      />
       {search.notice === undefined ? null : (
-        <p
-          role="status"
-          className="rounded-control bg-superficie px-3 py-2 text-nota text-texto-secundario"
-        >
-          {noticeText[search.notice]}
-        </p>
+        <InfoRow icon={notices[search.notice].icon}>
+          {notices[search.notice].text}
+        </InfoRow>
       )}
       <LoginForm redirect={search.redirect} />
     </AuthLayout>
