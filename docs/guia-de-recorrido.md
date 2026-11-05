@@ -393,12 +393,16 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    confirmes, canceles el registro o pasen 7 días.
 3. Abre el correo «Confirma tu correo para activar tu cuenta» y pulsa
    **Confirmar mi correo**. Entras a **Inicio**.
-4. **Inicio** saluda `Hola, Lucía`. No hay plan. El atajo grande dice
-   **Comprar un plan**. Debajo están **Reservar una clase**, **Evaluación
-   nutricional** e **Invita a una amiga**. El carrusel de promociones está
-   vacío hasta el paso 14.
-5. **Reservar** muestra la semana, pero al abrir una clase no deja reservar:
-   no hay plan vigente.
+4. **Inicio** saluda `Hola, Lucía`. No hay plan. La tarjeta grande dice
+   «Elige tu plan y empieza a moverte», con **Comprar un plan**. Debajo, en
+   **Accesos rápidos**, **Reservar una clase** está con candado y dice
+   «Necesitas un plan activo»; al lado, **Evaluación nutricional** e
+   **Invita a una amiga**. El carrusel de promociones está vacío hasta el
+   paso 14.
+5. **Reservar** muestra la semana, pero al abrir una clase **Reservar** está
+   apagado y el aviso dice «Necesitas un plan para reservar.», con **Comprar
+   un plan** debajo. (A quien le quedan 0 clases de su plan le dice, en
+   cambio, «No te quedan clases en tu plan.».)
 6. **Mis Reservas** está vacío, con **Ver historial**. El historial también
    está vacío.
 7. **Perfil** muestra el nombre, el correo y **Editar**. Las filas son **Mi
@@ -421,13 +425,25 @@ Quédate en la app de clientas, como Lucía.
    de lugares.
 2. Abre **8 clases**. La vigencia dice 30 días. Elige la fecha de inicio:
    hoy, o cualquier día de los próximos 14. Más lejos no se puede.
-3. Completa los datos de factura: **NIT o CI** y el nombre o la razón social.
-   La factura se emite fuera del sistema. Esto solo la deja anotada.
+3. En la pantalla de pago, abre **¿Necesitas factura?** y completa **NIT o
+   CI** y el nombre o la razón social. La factura se emite fuera del sistema.
+   Esto solo la deja anotada. Mientras la factura está abierta y le falta un
+   dato, **Enviar comprobante** se apaga y encima dice qué falta: «Completa
+   el NIT o CI, o cierra la factura» (o «Completa el nombre o razón social, o
+   cierra la factura»). Si la cierras, se envía sin factura.
 4. La pantalla de pago muestra el monto y el QR del estudio. No muestra
    número de cuenta ni banco. Transfiere el monto de mentira, o usa cualquier
    imagen como comprobante, y súbela. El estado pasa a **Pago en revisión**.
-5. Mientras está en revisión, **Reservar** no deja tomar un lugar. **Inicio**
-   lo dice.
+5. **Volver al inicio**. **Inicio** ya no ofrece **Comprar un plan**: la
+   tarjeta grande dice «En revisión · Tu pago está en revisión», con
+   «Paquete de 8 clases · Bs 502» y **Ver estado del pago**, que abre
+   **Estado del pago**. El atajo **Reservar una clase** sigue con candado y
+   dice «Tu pago está en revisión».
+6. Mientras está en revisión, **Reservar** no deja tomar un lugar: el detalle
+   de la clase dice «Tu pago está en revisión. Podrás reservar cuando el
+   estudio lo confirme.», con **Ver estado del pago**. Cualquier camino a
+   **Elegir plan** (Mi plan, Evaluación nutricional › **Ver planes**) abre
+   **Estado del pago** en vez de empezar otra compra.
 
 En la app del equipo, Ana (o la dueña desde la web) recibe la novedad.
 
@@ -437,8 +453,13 @@ En la app del equipo, Ana (o la dueña desde la web) recibe la novedad.
 2. Lo mismo se puede hacer en la web, en **Dinero › Pagos**, o desde la fila
    del pago en **Inicio**: abre la fila, mira el
    comprobante y confirma. Si el comprobante no sirve, rechaza y escribe el
-   motivo. Lucía lo ve en la app como **Comprobante rechazado** y puede subir
-   otro.
+   motivo. Lucía lo ve en la app: **Inicio** dice «Pago rechazado · No
+   pudimos confirmar tu pago», con el motivo, el plan y el monto, y **Subir
+   otro comprobante**, que abre de nuevo el pago del mismo plan (no deja
+   elegir otro plan). El atajo dice «Tu pago no se confirmó», el detalle de
+   una clase dice «No pudimos confirmar tu pago.» con **Subir otro
+   comprobante**, y **Elegir plan** lleva a ese pago rechazado. La tarjeta
+   sigue en **Inicio** hasta que envíe otro comprobante.
 
 Cuando el pago queda confirmado:
 

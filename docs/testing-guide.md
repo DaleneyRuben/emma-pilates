@@ -8859,3 +8859,53 @@ Specs: `phone-number.spec.ts` (mobile-core and admin web),
 `new-client-phone.spec.tsx`, `contact-phone.spec.ts`,
 `profile-screen.spec.tsx`, `email-change.spec.tsx`, `staff-create.spec.tsx`,
 `contact-alerts-page.spec.tsx`.
+
+## Test 133: the client's payment in review and rejected receipt (FIX-043)
+
+The owner approved follow-up 246 (DES-010) on 2026-11-05: a payment in review
+or a rejected receipt is a state of its own, never another «Comprar un plan».
+Use a fresh fixtures copy with the API and the worker running (Test 5A,
+Test 46). Seed through the API, as the Staff suite's `seed.mjs` does:
+Mariana buys «Paquete de 8 clases» by transfer and sends a receipt (in
+review); Sofía does the same and Paola rejects it with the reason «El monto
+del comprobante no coincide con el plan.» (`POST
+/administrator/payments/{id}/reject`). Isabel's Plan has 0 classes left.
+
+A. **In review (C02c).** Log in as Mariana. **Inicio**'s rose card shows the
+   pill «En revisión», «Tu pago está en revisión», «Paquete de 8 clases ·
+   Bs N» with the amount she transferred, «Te avisamos apenas el
+   estudio lo confirme.» and **Ver estado del pago**; there is no **Comprar
+   un plan**. **Reservar una clase** under **Accesos rápidos** is locked with
+   «Tu pago está en revisión». Tapping the card or its button opens **Estado
+   del pago**.
+B. **The class detail (C04c–C04f).** In **Reservar**, open any class.
+   Mariana: **Reservar** is off with «Tu pago está en revisión. Podrás
+   reservar cuando el estudio lo confirme.» and **Ver estado del pago**.
+   Isabel: «No te quedan clases en tu plan.» with **Comprar un plan**. A new
+   Client without a Plan: «Necesitas un plan para reservar.» with **Comprar
+   un plan**. Lucía (classes left) still books.
+C. **Elegir plan.** As Mariana, go to **Perfil › Mi plan › Comprar un plan**
+   (or **Evaluación nutricional › Ver planes**): **Estado del pago** opens
+   instead of the Plans.
+D. **Rejected (C02d).** Log in as Sofía. **Inicio** shows «Pago rechazado»,
+   «No pudimos confirmar tu pago», the reason, the Plan and the amount, and
+   **Subir otro comprobante**; the booking shortcut says «Tu pago no se
+   confirmó». **Subir otro comprobante** opens the payment of the same Plan
+   (a payment she already started opens again instead of failing). A class
+   detail says «No pudimos confirmar tu pago.» with **Subir otro
+   comprobante**. Elegir plan opens the rejected payment.
+E. **The invoice reason (C10c).** On that payment, attach a receipt and open
+   **¿Necesitas factura?** with both fields empty: **Enviar comprobante** is
+   off and above it reads «Completa el NIT o CI, o cierra la factura». Type a
+   NIT: it reads «Completa el nombre o razón social, o cierra la factura».
+   Type the name, or close the invoice: «El estudio revisa tu pago y te
+   avisa por la app» and the button turns on.
+F. **After the decision.** Paola confirms Mariana's payment: Inicio shows
+   her Plan card and she books. Once Sofía sends another receipt, her card
+   changes to «Tu pago está en revisión».
+
+Specs: `home-payment-standing.spec.tsx`, `session-detail-reasons.spec.tsx`,
+`plans-payment-gate.spec.tsx`, `payment-invoice-data.spec.tsx`,
+`purchase-flow.spec.tsx`, `payment-status-back.spec.tsx`,
+`invoice-data-card.spec.tsx`. Maestro: `purchase-plan-transfer.yaml` now
+checks Inicio and the class detail after the receipt.
