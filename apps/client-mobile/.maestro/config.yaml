@@ -16,6 +16,7 @@ executionOrder:
     - login-errors-and-recovery
     - book-and-cancel-class
     - email-change
+    - profile-phone
     - evaluation-book-and-cancel
     - home-plan-and-notifications
     - profile-photo

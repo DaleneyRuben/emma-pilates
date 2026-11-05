@@ -20,6 +20,7 @@ const emmaFontSizes = [
   "etiqueta-campo",
   "ayuda",
   "fila-menu",
+  "pie",
 ];
 
 const twMerge = extendTailwindMerge({

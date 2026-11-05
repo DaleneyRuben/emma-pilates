@@ -189,8 +189,10 @@ que el resto del recorrido va a obedecer. Déjalas como vienen, y léelas:
   Bs 50 al estudio.
 - El impuesto es 16 %.
 
-Lo que sí puedes cambiar ahí, y solo la dueña, es el mínimo de reservas, el
-impuesto, las metas de renovación y la fecha de apertura. Guarda un cambio y
+Lo que sí puedes cambiar ahí, y solo la dueña, es el mínimo de reservas, los
+días adelante que una clienta puede reservar (7, de 1 a 30, contando hoy), el
+impuesto, las metas de renovación y la fecha de apertura. La fecha se escribe
+como `dd/mm/aaaa`, sea cual sea el idioma del navegador. Guarda un cambio y
 vuelve a entrar: el número nuevo es el que usan las apps, sin reinstalarlas.
 Vuelve a dejar los valores de arriba si los cambiaste para probar.
 
@@ -269,6 +271,14 @@ estado **Activo**. Pulsa **Nuevo miembro** para cada persona.
 | Camila Rojas | camila@example.com | 70000001 | Asistente | Centro |
 | Daniela Ortiz | daniela@example.com | 70000002 | Entrenadora | Centro |
 | Gabriela Flores | gabriela@example.com | 70000003 | Nutricionista | Centro |
+
+El teléfono se escribe con los 8 dígitos solos: el `+591` va implícito. Un
+celular de Bolivia empieza con 6 o 7. Lo puedes escribir con espacios o
+guiones, o con el `+591` delante. Al guardar, la lista lo muestra siempre como
+`+591 70000001`. Un número de 7 dígitos, o que empieza con otro número,
+muestra «Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567.» y
+no se guarda. Vale igual para **Nuevo cliente** en la app del equipo y para
+**Editar perfil** en la app de la clienta.
 
 **Guardar** manda el correo de activación. La fila queda **Pendiente**.
 Ábrela y verás **Reenviar enlace**, **Cambiar correo** y **Cancelar

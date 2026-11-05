@@ -1,5 +1,6 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import { normalizeContactPhone } from '../../phone/bolivian-mobile';
 import type { ClientProfile } from './client-profile';
 
 export type ClientProfileChanges = {
@@ -13,11 +14,6 @@ type UpdateClientProfileDependencies = {
     clientId: string,
     changes: ClientProfileChanges,
   ): Promise<ClientProfile>;
-};
-
-const normalizePhone = (phone: string | null): string | null => {
-  const trimmed = phone?.trim() ?? '';
-  return trimmed === '' ? null : trimmed;
 };
 
 export const updateClientProfile = async (
@@ -35,6 +31,6 @@ export const updateClientProfile = async (
 
   return dependencies.saveProfile(dependencies.principal.identity.clientId, {
     name,
-    phone: normalizePhone(command.phone),
+    phone: normalizeContactPhone(command.phone),
   });
 };

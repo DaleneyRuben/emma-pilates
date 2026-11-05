@@ -28,7 +28,8 @@ describe('inviteClient', () => {
   const command = {
     name: '  Ana Nueva ',
     email: 'Ana@Example.com',
-    phone: '+591 70000000',
+    // Decision §19.20: the +591 is implicit.
+    phone: '7000 0000',
   };
 
   it('creates the pending Client and Account, a 7-day activation link, and a 30-day pending invitation', async () => {

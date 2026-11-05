@@ -60,6 +60,7 @@ describe('pay statements for any period', () => {
         endsAt: new Date(`${date}T15:00:00.000Z`),
         capacity: 8,
         state: 'SCHEDULED',
+        minimumBookingsCheckCompletedAt: new Date(`${date}T11:00:00.000Z`),
         bookingsAtWindowClose: 3,
       },
     });

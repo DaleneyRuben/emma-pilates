@@ -113,7 +113,11 @@ describe("AW36 Reglas del estudio", () => {
     );
     await user.clear(minimum);
     await user.type(minimum, "3");
-    await user.type(screen.getByLabelText("Fecha de apertura"), "2026-12-01");
+    // Walkthrough 2026-11-04 n.º 4: dd/mm/aaaa, whatever the browser's language.
+    const opening = screen.getByLabelText("Fecha de apertura");
+    expect(opening).toHaveAttribute("placeholder", "dd/mm/aaaa");
+    await user.type(opening, "01122026");
+    expect(opening).toHaveValue("01/12/2026");
     const window = screen.getByLabelText(
       "Días adelante que una clienta puede reservar",
     );
@@ -137,6 +141,37 @@ describe("AW36 Reglas del estudio", () => {
       },
     ]);
     expect(await screen.findByText(/^Versión 4 ·/)).toBeVisible();
+  });
+
+  it("shows a stored opening date as dd/mm/aaaa and sends none once it is cleared", async () => {
+    current = { ...studioSettings, openingDate: "2026-12-01" };
+    server.use(...settingsHandlers());
+    const { user } = renderAdmin("/ajustes/reglas-del-estudio");
+    await heading();
+
+    const opening = await screen.findByLabelText("Fecha de apertura");
+    expect(opening).toHaveValue("01/12/2026");
+    await user.clear(opening);
+    await user.click(screen.getByRole("button", { name: "Guardar cambios" }));
+
+    await waitFor(() =>
+      expect(saved).toEqual([expect.objectContaining({ openingDate: null })]),
+    );
+  });
+
+  it("refuses an opening date that is not a real day before sending", async () => {
+    server.use(...settingsHandlers());
+    const { user } = renderAdmin("/ajustes/reglas-del-estudio");
+    await heading();
+
+    await user.type(
+      await screen.findByLabelText("Fecha de apertura"),
+      "31022027",
+    );
+    await user.click(screen.getByRole("button", { name: "Guardar cambios" }));
+
+    expect(await screen.findByText("Elige una fecha válida.")).toBeVisible();
+    expect(saved).toEqual([]);
   });
 
   it("refuses values out of range before sending", async () => {

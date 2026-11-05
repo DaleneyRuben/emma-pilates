@@ -24,7 +24,9 @@ const cancellationCause = (
 
 // Booking owns Sessions and Payments. Back Office asks for them here and
 // never writes those tables (ADR-0103). A taught class needs its window-close
-// snapshot; a minimum_not_met cancellation pays instead. The commission is
+// snapshot and its Minimum Bookings check (a class whose check never ran was
+// never confirmed, decision §19.19); a minimum_not_met cancellation pays
+// instead. The commission is
 // the first real Plan of a Client the Trainer brought (never a single class,
 // and never again after a voided first one). The month is cut in Bolivia.
 export const trainerMonthFacts = async (
@@ -46,7 +48,11 @@ export const trainerMonthFacts = async (
         startsAt: { gte: window.from, lt: window.until },
         trainer: { role: 'TRAINER', deletedAt: null },
         OR: [
-          { state: 'SCHEDULED', bookingsAtWindowClose: { not: null } },
+          {
+            state: 'SCHEDULED',
+            bookingsAtWindowClose: { not: null },
+            minimumBookingsCheckCompletedAt: { not: null },
+          },
           { state: 'CANCELLED', cancellationCause: 'MINIMUM_NOT_MET' },
         ],
       },

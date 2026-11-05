@@ -8,6 +8,7 @@ import {
   FormScrollView,
   bolivianMobileMessage,
   isBolivianMobileOrBlank,
+  normalizeBolivianMobile,
   IconRowGroup,
   NoticeRow,
   PrimaryButton,
@@ -115,7 +116,7 @@ export function NewClientScreen() {
       const result = await api.inviteClient({
         name: name.trim(),
         email: email.trim(),
-        phone: phone.trim().length === 0 ? null : phone.trim(),
+        phone: phone.trim().length === 0 ? null : normalizeBolivianMobile(phone),
         acquisitionChannel: channel,
         ...(code === "" ? {} : { referralCode: code }),
       });
@@ -227,7 +228,7 @@ export function NewClientScreen() {
                     keyboardType="phone-pad"
                     label="Teléfono (opcional)"
                     onChangeText={setPhone}
-                    placeholder="+591 700 00000"
+                    placeholder="71234567"
                     testID="new-client-phone"
                     value={phone}
                   />

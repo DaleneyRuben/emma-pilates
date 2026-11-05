@@ -50,6 +50,7 @@ numbered tests.
 | Trainer pay periods          | Calculate and approve a Trainer's pay by Día, Semana, Rango or Mes in Sueldos › Por aprobar, see an approved day keep the month from paying it again, and read the period in «Mis pagos» (Test 127) | The Coordinator stays monthly; the worker drafts whole months only, so a Trainer already paid by day or week that month is drafted by hand |
 | Studio transfer QR           | Upload the studio's transfer QR in Ajustes › QR del estudio, see it and its date, and read the same image on the apps' QR route; the Coordinator does not see the tab (Test 128) | Until the first upload the server's `TRANSFER_QR_IMAGE_PATH` file is served; a storage outage fails the route instead of falling back |
 | Weekly series and booking window | Edit the booking window in Reglas del estudio, cancel an empty class from Horario, give a weekly series a «Vigente hasta», pause and resume it, and reach a wider window's later days through «Otra» in both apps (Test 129) | A pause holds one range at a time; resuming early brings back only the classes the pause withdrew that have not started |
+| Second walkthrough fixes | The rail's labels at 12 px, a missed Minimum Bookings check settled when the worker comes back, «Fecha de apertura» as dd/mm/aaaa, and phones without +591 (Test 130) | The phone normalization migration runs once on deploy |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -2095,7 +2096,10 @@ Load the fixtures (Test 5A), start the backend, and start the worker with
   stays scheduled. Either way the check is recorded in
   `empty_booking_check_completed_at` (the column kept its BOOK-004 name) and
   never runs again for that Session, even if its Bookings later drop. A
-  Session that started before the worker could check it is left alone.
+  check missed while the worker was down runs when it comes back (FIX-033,
+  Test 130 B). Before the start it cancels as above. Once the class has
+  started, a class with nobody booked is cancelled as `minimum_not_met`
+  without a notice, and a class with someone booked is left to be taught.
 - **Sessions whose Cancellation Window has closed** (2.5 hours before the
   start, from Studio Settings). Each scheduled Session records its live
   Bookings in `bookings_at_window_close` once, as they stood at the close:
@@ -8485,13 +8489,15 @@ F. **Launch places (BKM-019).** With 40 places and few founders, **Elige tu
 G. **The tagline is gone.** The six authentication emails and the browser
    page of a link end with «Emma Pilates Studio» alone; so do the web's
    sign-in card and the public site.
-H. **Phones (FIX-030).** On the web, invite a staff member with `70000001`
-   and with `7000004`: both say «Escribe un celular de Bolivia, por ejemplo
-   +591 71234567.» and nothing is sent; `+591 70000001` is saved. Invite the
-   same pending address again with a phone: the reopened invitation keeps
-   the phone typed (the cause of Camila's missing phone). Nuevo cliente in
-   the staff app refuses the same two numbers. The client app's registration
-   has no phone field; **Editar perfil** already validates it (MOB-070).
+H. **Phones (FIX-030, FIX-036).** The +591 is implicit (owner, 2026-11-04):
+   on the web, invite a staff member with `70000001`, `6000 0002` or
+   `+591 70000001`, and each is saved as `+591 …` with one space. `7000004`
+   and `80000001` say «Escribe un celular de Bolivia de 8 dígitos, por ejemplo
+   71234567.» and nothing is sent. Invite the same pending address again with
+   a phone: the reopened invitation keeps the phone typed (the cause of
+   Camila's missing phone). Nuevo cliente in the staff app and **Editar
+   perfil** in the client app take and refuse the same numbers. The client
+   app's registration has no phone field. Test 130 E has the rest.
 I. **The guide (FIX-029).** `docs/guia-de-recorrido.md` says to run
    `prisma:generate` after a pull, gives the
    `POST /api/v1/client-email-verifications` command for the iPhone
@@ -8686,3 +8692,49 @@ E. **«Otra» on the booking strips (FIX-031).** With the window at 14, as
 F. **Narrow browser.** At 420 px Reglas del estudio stacks the fields, the
    «Pausar la serie» dialog stacks its two dates, and **Nueva sesión › Cada
    semana** shows **Vigente hasta** full width.
+
+## Test 130: the second walkthrough's fixes (FIX-032 to FIX-036)
+
+Findings 1 to 5 of the second hand walkthrough (2026-11-04). The phones need
+the migration `20261104180000_normalize_bolivian_mobiles` (data only;
+approved by the user 2026-11-05). Use a copy of `pilates_golden` or of
+the walkthrough's backup with it applied, never `pilates_dev_sim`.
+
+A. **The rail (FIX-032).** At 1440 px and in a wide window (1900 px), every
+   label of the rail on the left, «Promociones» and «Comentarios» included,
+   sits whole inside the 96 px rail at 12 px. The status pills and the table
+   headers, which share that size, draw at 12 px too. Spec:
+   `e2e/icon-rail.spec.ts`, `cn.spec.tsx`.
+B. **A missed Minimum Bookings check (FIX-033).** Stop the worker and let
+   two classes start: one with nobody booked and one with a single Booking
+   (create them with `POST /api/v1/administrator/sessions` a few minutes
+   ahead, and book the second for Lucía). Start the worker again. Within a
+   minute the empty class is `cancelled` with `minimum_not_met` and nobody
+   gets a notice; the booked one stays scheduled, Lucía keeps her Booking,
+   and its check is recorded. Inicio no longer shows the empty class as
+   today's class. A class that has not started yet is cancelled with the
+   usual notices. On the walkthrough's backup the five past empty classes of
+   3 and 4 November go this way. Specs:
+   `session-start-checks-overdue.integration-spec.ts`,
+   `session-start-checks.spec.ts`.
+C. **No pay for an unchecked class (FIX-033).** In **Dinero › Sueldos**, the
+   Trainer's draft has no «0 alumnas» line for a class whose check never ran:
+   after B the five classes read «Mínimo no alcanzado» at Bs 25, as if the
+   worker had been up. Spec: `trainer-pay.integration-spec.ts`.
+D. **Reglas del estudio (FIX-034, FIX-035).** «Días adelante que una
+   clienta puede reservar» is there (Test 129 A). «Fecha de apertura» shows
+   «dd/mm/aaaa» as its placeholder in a browser set to English; typing
+   `01122026` shows «01/12/2026», a stored date shows the same way, a cleared
+   field saves no date, and «31/02/2027» says «Elige una fecha válida.».
+   Specs: `studio-rules-page.spec.tsx`, `e2e/date-fields.spec.ts`.
+E. **Phones (FIX-036).** Test 125 H for the forms. After the migration,
+   **Estudio › Personal** shows Daniela and Gabriela as `+591 70000002` and
+   `+591 70000003`, like Paula; a stored phone that is not a Bolivian mobile
+   (Sofía's `7000004`) stays as it was; promotion contacts get the same
+   treatment. `PATCH /api/v1/clients/current` with
+   `"phone":"71234567"` answers `"phone":"+591 71234567"`; a foreign number is
+   saved as typed, so an older app keeps working. Specs:
+   `bolivian-mobile.spec.ts` (backend and `mobile-core`),
+   `normalize-bolivian-mobiles.integration-spec.ts`,
+   `new-client-phone.spec.tsx`, `email-change.spec.tsx`,
+   `staff-create.spec.tsx`.

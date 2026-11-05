@@ -41,3 +41,25 @@ test.describe("AW03 date and time fields", () => {
     });
   }
 });
+
+// Walkthrough 2026-11-04 n.º 4: Reglas del estudio's «Fecha de apertura» was
+// the native date control and showed mm/dd/yyyy in an English browser. It
+// only types here: a saved opening date would change what the other
+// journeys may sell.
+test.describe("AW36 Fecha de apertura", () => {
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 420, height: 860 },
+  ]) {
+    test(`types 01/12/2026 at ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await signIn(page, "/ajustes/reglas-del-estudio");
+      const date = page.getByRole("textbox", { name: "Fecha de apertura" });
+      await expect(date).toHaveAttribute("placeholder", "dd/mm/aaaa");
+
+      await date.pressSequentially("01122026");
+
+      await expect(date).toHaveValue("01/12/2026");
+    });
+  }
+});

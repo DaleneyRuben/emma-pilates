@@ -152,7 +152,7 @@ function EditProfileForm({
             label="Teléfono"
             onBlur={field.onBlur}
             onChangeText={field.onChange}
-            placeholder="+591 7xxxxxxx"
+            placeholder="71234567"
             value={field.value}
           />
         )}
