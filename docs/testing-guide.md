@@ -1890,7 +1890,7 @@ ficha nueva.» and **Nuevo cliente** as the next step. Screen titles stay «clie
 cliente», «Ver cliente», «Selecciona un cliente…»); prose
 about the person says «clienta» (UX-005). Tap Lucía: the overview shows her
 Plan card (Test 124 D), **Reservar clase** and, only when she can buy,
-**Registrar pago en efectivo**, then «Reservas» with **Próximas reservas**
+**Registrar pago**, then «Reservas» with **Próximas reservas**
 (her next class on the right) and **Historial de clases**. A Client without a
 Plan reads «Sin plan activo» under a card icon, with «Registra un pago para
 activar un plan y poder reservarle clases.» and **Registrar pago en
@@ -1950,7 +1950,7 @@ way.
 
 ### D. Take a cash Payment
 
-Open `mariana@example.com` (no Plan) and tap **Registrar pago en efectivo**.
+Open `mariana@example.com` (no Plan) and tap **Registrar pago**.
 **Elige un plan** shows "Registrando pago para: Mariana Peña" and the Plans
 under «Planes disponibles» at their full price, with no Credit notice
 (PAY-005). Tap one: **Registrar pago** asks «¿Cómo paga?» (**Efectivo** |
@@ -2021,7 +2021,7 @@ the 360 pt column (MOB-046). Tapping a result highlights it and shows her
 overview in the right panel without navigating away; **Próximas reservas** and
 **Historial de clases** also open in that panel (the empty reservations
 state centres in the panel with its button), with **Volver** returning
-to the overview. **Reservar clase**, **Registrar pago en efectivo**, and
+to the overview. **Reservar clase**, **Registrar pago**, and
 **Nuevo cliente** open full-screen: the classes (each card with its Trainer
 line and chevron) and the Plans show as a two-column grid, and the Session detail, the cash confirmation, and the new
 Client form sit in a centered card. Finishing a booking, a cash Payment, or a
@@ -7041,7 +7041,7 @@ password, holding every Branch.
    **Reenviar enlace** and the ⋯ menu («Invitación de …»: **Cambiar
    correo**, **Cancelar invitación**, **Cerrar**), then «Sin plan activo»
    with «La clienta necesita un plan activo para reservar.» and no
-   **Registrar pago en efectivo**. The activation email reaches the local
+   **Registrar pago**. The activation email reaches the local
    capture, and `system.audit_records` has `client_invitation.created` with
    her Account and `actor_role = coordinator`. A search with no result
    («No encontramos a nadie») offers **Nuevo cliente** too. The invitation
@@ -7049,7 +7049,7 @@ password, holding every Branch.
    ones (`plan-quotes`, cash payments) still answer `403` (step C).
 3. Search `luc` and open Lucía: **Reservar clase**, **Próximas reservas** and
    **Historial de clases** work as for the Assistant (Test 11 B and C) at
-   any Branch, but there is no **Registrar pago en efectivo**.
+   any Branch, but there is no **Registrar pago**.
 4. Perfil reads «Coordinación» and «Todas las sucursales».
 5. As the Administrator, Perfil → «Ver la app como…» lists her under
    «Coordinación»; seeing the app as her shows the same stack under the
@@ -7325,7 +7325,7 @@ A. **The chip row (09 and S10).** As Lucía, open **Mi plan** (12) and tap
    Open **Paquete de 8 clases**: under **Qué incluye** a row labelled
    **Fecha de inicio** offers chips from **Hoy** through 14 days, and **Hoy**
    starts selected. The row scrolls sideways. As Camila, search Sofía, tap
-   **Registrar pago en efectivo**, and open the same Plan: **Confirmar pago
+   **Registrar pago**, and open the same Plan: **Confirmar pago
    en efectivo** (S10) shows the same row above **Confirmar pago recibido**.
 B. **The chosen date.** As Sofía, `POST /api/v1/purchase-intents` with the
    Plan id and `startsOn` inside the window answers `201` and echoes
@@ -8410,10 +8410,10 @@ D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search fiel
    Vence en 7 días.» The Client file (S06): initials, name, contact; the Plan
    as the Rosa profundo card (classes left in large Lora, a white bar, «Vence
    el …», **Activo**/**Vencido**); one primary **Reservar clase**;
-   **Registrar pago en efectivo** only when she can buy (never with a Plan
+   **Registrar pago** only when she can buy (never with a Plan
    already queued, which shows «Ya tiene un plan siguiente.»); «Reservas» rows
    **Próximas reservas** and **Historial de clases**. Without a Plan, a Lino
-   card «Sin plan activo» with **Registrar pago en efectivo** and no
+   card «Sin plan activo» with **Registrar pago** and no
    **Reservar clase**. A pending Account (Sofía) shows one Lino line «Cuenta
    pendiente de activación · El enlace vence el …», a ⋯ menu («Invitación de
    Sofía»: **Cambiar correo**, **Cancelar invitación**, **Cerrar**) and
@@ -8433,8 +8433,8 @@ D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search fiel
    **Confirmar pago en efectivo**; the result is the centred «¡Pago
    registrado!» with Plan («8 clases» once), Cobrado en efectivo, Vence and
    **Volver a Clientes**. QR shows «Monto exacto a transferir» and the studio
-   QR, **Fotografiar comprobante** (then «Comprobante fotografiado · Todavía no
-   se envió» and **Fotografiar otra vez**), and a separate **Enviar
+   QR, **Fotografiar comprobante** and **Elegir de la galería** (then
+   «Comprobante listo · Todavía no se envió» and **Cambiar**, Test 143), and a separate **Enviar
    comprobante**; the result is «Comprobante enviado» with an **En revisión**
    pill. When a QR receipt is already pending, the cash way is off and the
    app says «La clienta tiene un pago en revisión.» Reservas de Lucía
@@ -9221,3 +9221,65 @@ F. **Refusals (API).** `PUT /api/v1/staff/payments/{id}/invoice` answers 409
    is gone (404). The Client's
    `GET /api/v1/clients/current/invoices/{id}/file` of someone else's payment
    is 404 `invoice_not_found`.
+
+## Test 143: second walkthrough Paso 9 — next Plan date, phone prompt, receipt from the gallery, tab bars (FIX-050, DES-013)
+
+Booking ADR-0013 and design follow-ups 253–254. Run the API on a fresh copy
+of the walkthrough database (`createdb -T pilates_dev_sim pilates_<you>`) and
+both apps on the iPhone 16 Pro, the iPad and Android.
+
+A. **Copy (n.º 32, 40).** As Camila, a client file shows **Reservar clase**
+   and **Registrar pago** (never «Registrar pago en efectivo»); the
+   Coordinator's file shows neither payment button. The eyebrow reads
+   «Asistente · Centro» on **Clientes** and on **Horario** alike.
+B. **Next Plan start date (n.º 35).** Give Rocío a cash Plan, then
+   **Registrar pago** again. **Fecha de inicio** offers 28 days, from the day
+   after the current end (selected) to 28 days after it; the line reads «El
+   plan actual de Rocío vence el … El nuevo empieza el …; se puede elegir
+   hasta el …». Pick a day ten days after the end and confirm cash: the new
+   Subscription starts that day and the current one keeps its end. By API,
+   `startsOn` 29 days after the end answers 409 `start_date_out_of_window`;
+   no `startsOn` still queues the day after (older builds).
+C. **Founder place kept.** With a founder (`booking.founder_memberships`
+   ACTIVE), buy the next Plan 20 days after the end: the sale keeps the 15 %
+   (`discount_reason = founder`) and the membership stays ACTIVE, also after
+   running the founder job on a day more than 7 days after the end (the
+   integration spec `advance-plan-start` covers the cash sale, the front-desk
+   transfer confirmed later, and the nightly job).
+D. **«Comprobante enviado» (n.º 37).** Same client, **QR**, pick a day, send a
+   receipt: «Administración lo revisa y programa el plan siguiente de Rocío,
+   que empieza el …. No entra en la caja de hoy.» with an **Empieza** row. A
+   first Plan still says «… y activa el plan de …».
+E. **Client renewal.** As a Client with classes left, **Mi plan** says
+   «Eliges cuándo empieza el nuevo: desde el …, al día siguiente de que venza
+   este, hasta 4 semanas después.»; **Renovar mi plan** › a Plan shows the
+   same 28-day strip with «Tu plan actual vence el …»; **Pagar** creates the
+   purchase intent with the chosen `startsOn`.
+F. **Receipt from the gallery (n.º 38).** **Registrar pago › QR**: the
+   **Comprobante** card with **Fotografiar comprobante** and **Elegir de la
+   galería**. On the iOS Simulator the camera does not fire, so drop an
+   image into the Simulator's Photos first (drag a PNG onto it) and use the
+   gallery. After either: «Comprobante listo · Todavía no se envió» and
+   **Cambiar**, which shows the two buttons again.
+G. **Phone prompt (n.º 34).** Set a Client's phone to null, and another's to
+   `7000004`, in `booking.clients`. Opening the Client app shows over
+   **Inicio** «Agrega tu celular» (or «Revisa tu celular» with the number and
+   «Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.»). A valid
+   number and **Guardar** store `+591 7xxxxxxx` and show «Celular
+   guardado»; **Ahora no** closes it until the app is opened again. A Client
+   with a valid number never sees it.
+H. **Tab bars (follow-up 254 § 3).** Staff: the bar stays on the client
+   file, Reservas de …, Notificaciones, Facturas por subir and the trainer's
+   attendance list; it hides inside Registrar pago (Elige un plan included),
+   Reservar para… (class list and detail), Reprogramar, Nuevo cliente,
+   Cancelar una clase, Revisar pago, Revisar congelamiento, Factura del
+   pago, Cambiar contraseña, Enviar comentarios, Reportar una falla, Mi
+   código and Ver la app como. The Assistant's **Caja** keeps its bar (a
+   tab root); the Administrator's Cerrar caja, opened from Pagos, hides it.
+   Client: the bar stays on the class detail, Mi plan, Notificaciones, Mis
+   evaluaciones, Invita a una amiga and Mis facturas; it hides while buying
+   a plan (Elige tu plan, Detalle del plan, Pago, Estado del pago), booking
+   an evaluation, Reprogramar, Editar perfil, Cambiar contraseña, Enviar
+   comentarios and Cerrar mi cuenta. A screen with the bar puts its last
+   content above the bar, not under it.
+
