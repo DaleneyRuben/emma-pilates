@@ -168,7 +168,8 @@ export const loseFounderForGap = async (
 };
 
 // A transfer confirmed later is judged on the day it was sold (booking
-// ADR-0013), read from its Payment.
+// ADR-0013): the day she committed to its Purchase Intent, else the day the
+// Payment was recorded.
 export const loseFounderForGapOfSale = async (
   transaction: Transaction,
   input: {
@@ -181,13 +182,16 @@ export const loseFounderForGapOfSale = async (
 ): Promise<boolean> => {
   const sold = await transaction.payment.findUniqueOrThrow({
     where: { id: input.paymentId },
-    select: { createdAt: true },
+    select: {
+      createdAt: true,
+      purchaseIntent: { select: { createdAt: true } },
+    },
   });
   return loseFounderForGap(transaction, {
     clientId: input.clientId,
     nextStart: input.nextStart,
     today: input.today,
-    soldOn: boliviaDate(sold.createdAt),
+    soldOn: boliviaDate(sold.purchaseIntent?.createdAt ?? sold.createdAt),
     now: input.now,
   });
 };

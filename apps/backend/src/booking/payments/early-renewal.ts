@@ -74,7 +74,26 @@ export const decideRenewal = (context: {
     };
   }
 
-  const startsOn = context.requested ?? context.today;
+  // booking ADR-0013: a start chosen inside the next Plan window, after the
+  // current end, queues behind it even once its classes are spent, so an
+  // advance transfer still confirms on the day it was sold for.
+  const requested = context.requested;
+  if (
+    !context.current.courtesy &&
+    requested !== null &&
+    requested.getTime() > context.current.endsOn.getTime() &&
+    requested.getTime() <=
+      context.current.endsOn.getTime() +
+        nextPlanStartWindowDays * dayMilliseconds
+  ) {
+    return {
+      startsOn: requested,
+      chosen: false,
+      subscriptionIdToEndEarly: null,
+    };
+  }
+
+  const startsOn = requested ?? context.today;
   return {
     startsOn,
     chosen: true,

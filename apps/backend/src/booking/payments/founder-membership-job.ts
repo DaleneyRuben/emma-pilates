@@ -26,6 +26,15 @@ const addDays = (date: Date, days: number): Date =>
 // will pass the frozen days when it exists.
 type NextStart = { startsOn: Date; soldAt: Date | null };
 
+// The day a next Plan was sold: its Purchase Intent's, else its Payment's.
+const soldAt = (
+  payment: {
+    createdAt: Date;
+    purchaseIntent: { createdAt: Date } | null;
+  } | null,
+): Date | null =>
+  payment?.purchaseIntent?.createdAt ?? payment?.createdAt ?? null;
+
 const earliest = (starts: NextStart[]): NextStart | null =>
   starts.reduce<NextStart | null>(
     (soonest, start) =>
@@ -40,7 +49,10 @@ const realEnd = (
     endsOn: Date;
     startsOn: Date;
     state: string;
-    payment: { createdAt: Date } | null;
+    payment: {
+      createdAt: Date;
+      purchaseIntent: { createdAt: Date } | null;
+    } | null;
   }[],
   pendingStarts: NextStart[],
   today: Date,
@@ -68,7 +80,7 @@ const realEnd = (
       )
       .map((subscription) => ({
         startsOn: subscription.startsOn,
-        soldAt: subscription.payment?.createdAt ?? null,
+        soldAt: soldAt(subscription.payment),
       })),
     ...pendingStarts,
   ]);
@@ -125,12 +137,21 @@ export const createFounderMembershipJob = (
                     startsOn: true,
                     endsOn: true,
                     state: true,
-                    payment: { select: { createdAt: true } },
+                    payment: {
+                      select: {
+                        createdAt: true,
+                        purchaseIntent: { select: { createdAt: true } },
+                      },
+                    },
                   },
                 },
                 payments: {
                   where: { state: PaymentState.PENDING },
-                  select: { startsOn: true, createdAt: true },
+                  select: {
+                    startsOn: true,
+                    createdAt: true,
+                    purchaseIntent: { select: { createdAt: true } },
+                  },
                 },
               },
             },
@@ -141,7 +162,7 @@ export const createFounderMembershipJob = (
             row.client.subscriptions,
             row.client.payments.map((payment) => ({
               startsOn: payment.startsOn,
-              soldAt: payment.createdAt,
+              soldAt: soldAt(payment),
             })),
             today,
           );
