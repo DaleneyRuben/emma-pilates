@@ -154,4 +154,16 @@ describe('normalizeInvoiceFileName', () => {
     expect(name).toHaveLength(invoiceFileNameMaxLength);
     expect(name.endsWith('.pdf')).toBe(true);
   });
+
+  it('never cuts an emoji in half and drops a lone surrogate', () => {
+    const cut = normalizeInvoiceFileName(
+      `${'a'.repeat(115)}😀😀😀.pdf`,
+      'application/pdf',
+    );
+    expect(() => encodeURIComponent(cut)).not.toThrow();
+    expect(cut.endsWith('.pdf')).toBe(true);
+    expect(
+      normalizeInvoiceFileName('factura\uD800.pdf', 'application/pdf'),
+    ).toBe('factura.pdf');
+  });
 });

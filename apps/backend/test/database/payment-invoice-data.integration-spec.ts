@@ -174,15 +174,17 @@ describe('Invoice Data (PostgreSQL)', () => {
       invoice: 'all',
     });
 
+    // FIX-044: «Factura por subir» is a confirmed sale with Invoice Data and
+    // no file; an old mark without a file still waits for its file.
     const unbilledIds = unbilledPage.items.map((item) => item.id);
     expect(unbilledIds).toContain(unbilledPayment.id);
-    expect(unbilledIds).not.toContain(billedPayment.id);
+    expect(unbilledIds).toContain(billedPayment.id);
     expect(
       unbilledPage.items.every(
         (item) =>
           item.state === 'confirmed' &&
           item.invoiceData !== null &&
-          item.invoiceIssued === null,
+          item.invoiceFile === null,
       ),
     ).toBe(true);
     expect(unbilledPage.totalItems).toBe(unbilledPage.items.length);

@@ -229,6 +229,15 @@ describe('Invoice files (PostgreSQL)', () => {
     expect(await failure(upload(payment.id, administrator, later))).toBe(
       'payment_voided',
     );
+    expect(
+      await failure(
+        invoices().remove({
+          paymentId: payment.id,
+          principal: administrator,
+          now: later,
+        }),
+      ),
+    ).toBe('payment_voided');
     await expect(
       invoices().listForClient(buyer.clientId),
     ).resolves.toMatchObject([{ state: 'ready', voided: true }]);
@@ -322,6 +331,18 @@ describe('Invoice files (PostgreSQL)', () => {
       mariana,
     );
     const none = await cash((await world.newClient('No pidió')).clientId, null);
+    // A mark set before FIX-044 has no file, so it still waits for one.
+    const oldMark = await cash(
+      (await world.newClient('Marca antigua')).clientId,
+      mariana,
+    );
+    await world.prisma.payment.update({
+      where: { id: oldMark.id },
+      data: {
+        invoiceIssuedAt: now,
+        invoiceIssuedByAccountId: administrator.accountId,
+      },
+    });
     await upload(done.id, assistant);
 
     const pending = (await invoices().listForStaff('pending')).map(
@@ -332,6 +353,7 @@ describe('Invoice files (PostgreSQL)', () => {
     );
 
     expect(pending).toContain(waiting.id);
+    expect(pending).toContain(oldMark.id);
     expect(pending).not.toContain(done.id);
     expect(pending).not.toContain(none.id);
     expect(uploaded).toContain(done.id);

@@ -188,6 +188,23 @@ describe('Invoice file endpoints (e2e)', () => {
     );
   });
 
+  it('names the download with the extension of what it serves', async () => {
+    operations.staffFile.mockResolvedValueOnce({
+      objectKey: `private/invoice/${assetId}/document`,
+      mediaType: 'application/pdf',
+      fileName: "Factura (O'Brien).html",
+    });
+
+    await request(app.getHttpServer())
+      .get(`/api/v1/staff/payments/${paymentId}/invoice/file`)
+      .set('authorization', bearer)
+      .expect(200)
+      .expect(
+        'Content-Disposition',
+        `attachment; filename="Factura (O'Brien).pdf"; filename*=UTF-8''Factura%20%28O%27Brien%29.pdf`,
+      );
+  });
+
   it('serves the Client her own list and refuses anonymous callers', async () => {
     operations.clientList.mockResolvedValueOnce([]);
 
