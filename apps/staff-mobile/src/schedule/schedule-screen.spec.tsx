@@ -38,7 +38,7 @@ describe("Horario (v2 HOR boards)", () => {
   it("shows the Assistant a read-only day with seats and the way to book", async () => {
     const screen = await openSchedule("assistant", assistant);
 
-    expect(screen.getByText("Asistente · Sucursal Centro")).toBeOnTheScreen();
+    expect(screen.getByText("Asistente · Centro")).toBeOnTheScreen();
     expect(screen.getByText("Emma Vargas · 6 de 12 reservados")).toBeOnTheScreen();
     expect(screen.getByText("6 cupos")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: /Reformer Pilates/ })).not.toBeOnTheScreen();
