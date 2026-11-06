@@ -16,12 +16,13 @@ import { useState } from "react";
 
 import { useClientFetcher } from "../client-fetcher";
 
-// «Ahora no» holds for this app session; the next launch asks again.
-let snoozed = false;
+// «Ahora no» holds for this app session and this Client; the next launch,
+// or another Client signing in, asks again.
+let snoozedClientId: string | null = null;
 
 /** Spec seam: a new app session. */
 export function resetPhonePrompt() {
-  snoozed = false;
+  snoozedClientId = null;
 }
 
 /**
@@ -36,7 +37,7 @@ export function PhonePrompt({ client }: { client: ClientProfileDto }) {
   const start = parseStoredPhone(stored);
   const missing = stored === null || stored.trim() === "";
   const needed = missing || phoneProblem(start.country, start.digits) !== null;
-  const [open, setOpen] = useState(needed && !snoozed);
+  const [open, setOpen] = useState(snoozedClientId !== client.id);
   const [phone, setPhone] = useState<PhoneValue>(start);
   const [touched, setTouched] = useState(!missing);
   const [busy, setBusy] = useState(false);
@@ -46,7 +47,7 @@ export function PhonePrompt({ client }: { client: ClientProfileDto }) {
   const problem = touched ? phoneProblem(phone.country, phone.digits) : null;
 
   const later = () => {
-    snoozed = true;
+    snoozedClientId = client.id;
     setOpen(false);
   };
 
@@ -89,7 +90,8 @@ export function PhonePrompt({ client }: { client: ClientProfileDto }) {
         onLater={later}
         onSave={() => void save()}
         value={phone}
-        visible={open}
+        // A refetch that brings a valid number (saved elsewhere) closes it.
+        visible={open && needed}
       />
       {saved ? <BrandToast onClose={() => setSaved(false)} title="Celular guardado" /> : null}
     </>
