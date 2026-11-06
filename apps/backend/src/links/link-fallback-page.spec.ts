@@ -82,4 +82,20 @@ describe('renderLinkFallbackPage', () => {
       }),
     ).toBeNull();
   });
+
+  // FIX-039: the studio's email change is confirmed in the Staff app or, on a
+  // computer, on the admin web's own page.
+  it('offers a Staff Member the admin web to confirm a new email', () => {
+    const page = renderLinkFallbackPage({
+      identityKind: 'staff',
+      purpose: 'confirm-email-change',
+      token: 'secret/1&x',
+      adminWebOrigin,
+    });
+
+    expect(page).toContain('Para confirmar tu correo nuevo, abre este enlace');
+    expect(page).toContain(
+      'href="https://emma-pilates-admin.vercel.app/confirmar-correo?token=secret%2F1%26x"',
+    );
+  });
 });

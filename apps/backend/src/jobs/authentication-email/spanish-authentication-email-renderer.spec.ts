@@ -121,4 +121,48 @@ describe('SpanishAuthenticationEmailRenderer', () => {
       ).toContain(lifetime);
     }
   });
+
+  // FIX-039 (DES-012): a Staff Member's email changes only when the studio
+  // asks (the Staff app has no self-service change), so her two emails say so.
+  it("words a Staff Member's email change as the studio's", () => {
+    const link = renderer.render({
+      recipient: 'daniela.nueva@example.com',
+      purpose: 'email_change',
+      identityKind: 'staff',
+      linkSecret: 'secret-1',
+      newEmail: 'daniela.nueva@example.com',
+    });
+    const notice = renderer.render({
+      recipient: 'daniela.ortiz@example.com',
+      purpose: 'email_change_notice',
+      identityKind: 'staff',
+      linkSecret: null,
+      newEmail: 'daniela.nueva@example.com',
+    });
+
+    expect(link.subject).toBe('Confirma tu correo nuevo');
+    expect(link.text).toContain(
+      'El estudio cambió el correo con el que entras a la app del equipo de Emma Pilates Studio por este. Abre el enlace para confirmarlo.',
+    );
+    expect(link.text).toContain(
+      'Este enlace vence en 24 horas. Hasta que lo confirmes, sigues entrando con tu correo anterior.',
+    );
+    expect(link.text).toContain(
+      'Si no esperabas este cambio, habla con el estudio.',
+    );
+    expect(link.link).toBe(
+      'https://links.emmapilates.test/staff/authentication/confirm-email-change?token=secret-1',
+    );
+    expect(link.text).not.toContain('Pediste');
+
+    expect(notice.subject).toBe('El estudio está cambiando tu correo');
+    expect(notice.text).toContain(
+      'El estudio pidió que entres a la app del equipo de Emma Pilates Studio con daniela.nueva@example.com. Nada cambia hasta que ese correo confirme el enlace que le enviamos.',
+    );
+    expect(notice.text).toContain(
+      'Si no lo esperabas, habla con el estudio: pueden cancelar el cambio.',
+    );
+    expect(notice.link).toBeNull();
+    expect(notice.text).not.toContain('Editar perfil');
+  });
 });
