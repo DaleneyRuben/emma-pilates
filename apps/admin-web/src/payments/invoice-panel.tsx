@@ -85,7 +85,11 @@ function InvoiceBody({ invoice }: { invoice: StaffInvoiceDto }) {
         <InvoiceFileCard
           invoice={invoice}
           file={invoice.file}
-          onReplace={() => setReplacing(true)}
+          onReplace={
+            data !== null && !invoice.voided
+              ? () => setReplacing(true)
+              : undefined
+          }
         />
       ) : null}
       {canUpload ? (

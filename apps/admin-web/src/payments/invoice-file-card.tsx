@@ -30,7 +30,8 @@ export function InvoiceFileCard({
 }: {
   invoice: StaffInvoiceDto;
   file: StaffInvoiceFileDto;
-  onReplace: () => void;
+  /** Absent when no new file may be attached (a voided sale, no data). */
+  onReplace?: () => void;
 }) {
   const [asking, setAsking] = useState(false);
   const remove = useRemoveInvoice(invoice.paymentId);
@@ -62,17 +63,22 @@ export function InvoiceFileCard({
           Descargar
         </a>
         <span className="flex-1" />
-        <Button variant="ghost" size="sm" onClick={onReplace}>
-          Reemplazar
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-error hover:text-error-texto"
-          onClick={() => setAsking(true)}
-        >
-          Quitar factura
-        </Button>
+        {onReplace === undefined ? null : (
+          <Button variant="ghost" size="sm" onClick={onReplace}>
+            Reemplazar
+          </Button>
+        )}
+        {/* Owner, 2026-11-05: a voided sale's invoice stays with the Client. */}
+        {invoice.voided ? null : (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-error hover:text-error-texto"
+            onClick={() => setAsking(true)}
+          >
+            Quitar factura
+          </Button>
+        )}
       </div>
       {remove.isError ? (
         <WarningRow>

@@ -83,6 +83,7 @@ const useSettleInvoice = (paymentId: string) => {
  */
 export function useUploadInvoice(paymentId: string) {
   const settle = useSettleInvoice(paymentId);
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
       file,
@@ -107,6 +108,11 @@ export function useUploadInvoice(paymentId: string) {
       }
     },
     onSuccess: settle,
+    // The payment changed meanwhile (a void, say): read it again.
+    onError: () =>
+      queryClient.invalidateQueries({
+        queryKey: getGetStaffPaymentInvoiceQueryKey(paymentId),
+      }),
   });
 }
 

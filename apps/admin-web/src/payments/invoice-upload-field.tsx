@@ -20,6 +20,9 @@ const conflicts: Record<string, string> = {
   payment_without_invoice_data: "La clienta no pidió factura en este pago.",
 };
 
+const isConflict = (error: unknown): boolean =>
+  isApiError(error) && conflicts[error.code] !== undefined;
+
 const failureMessage = (error: unknown): string =>
   (isApiError(error) ? conflicts[error.code] : undefined) ??
   uploadFailureMessage(error, "invoice");
@@ -158,7 +161,7 @@ export function InvoiceUploadField({
             >
               Elegir otro archivo
             </Button>
-            {chosen === null ? null : (
+            {chosen === null || isConflict(upload.error) ? null : (
               <Button onClick={() => send(chosen, assetOf(upload.error))}>
                 Reintentar
               </Button>
