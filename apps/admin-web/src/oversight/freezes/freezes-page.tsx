@@ -6,6 +6,7 @@ import { useState } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { ApiError } from "../../api/problem";
 import { CatalogPage } from "../../catalog/catalog-page";
+import { ClientPhoto } from "../../components/client-photo";
 import { Button } from "../../components/ui/button";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { requestedFreezesQueryOptions } from "./freeze-queries";
@@ -86,8 +87,16 @@ export function FreezesPage() {
   const freezeColumns = () => [
     columns.accessor("clientName", {
       header: "Clienta",
-      cell: ({ getValue }) => (
-        <span className="font-medium text-texto">{getValue()}</span>
+      cell: ({ row }) => (
+        <span className="flex items-center gap-2.5">
+          <ClientPhoto
+            name={row.original.clientName}
+            photo={row.original.clientPhoto}
+          />
+          <span className="font-medium text-texto">
+            {row.original.clientName}
+          </span>
+        </span>
       ),
     }),
     columns.accessor("planName", {
