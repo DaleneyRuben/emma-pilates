@@ -162,6 +162,7 @@ model Payment {
   invoiceIssuedAt          DateTime? @map("invoice_issued_at") @db.Timestamptz(3)
   invoiceIssuedByAccountId String?   @map("invoice_issued_by_account_id") @db.Uuid
   invoiceIssuedByAccount   Account?  @relation("PaymentInvoiceIssuedBy", fields: [invoiceIssuedByAccountId], references: [id], onDelete: Restrict)
+  invoices                 PaymentInvoice[]
 
   @@unique([id, clientId])
   @@unique([id, clientId, planId])
@@ -174,6 +175,35 @@ model Payment {
   @@index([decidedByAccountId, decidedAt])
   @@index([voidedByAccountId])
   @@map("payments")
+  @@schema("booking")
+}
+
+// FIX-044 (owner, 2026-11-05): the issued invoice uploaded on a Payment. One
+// current row per Payment (a partial unique index on payment_id where
+// removed_at is null, in the migration); a replaced or removed one stays,
+// hidden, with who removed it and why (ADR-0086).
+model PaymentInvoice {
+  id                 String    @id @default(uuid()) @db.Uuid
+  paymentId          String    @map("payment_id") @db.Uuid
+  imageAssetId       String    @unique @map("image_asset_id") @db.Uuid
+  fileName           String    @map("file_name")
+  uploadedByAccountId String   @map("uploaded_by_account_id") @db.Uuid
+  uploadedAt         DateTime  @map("uploaded_at") @db.Timestamptz(3)
+  removedAt          DateTime? @map("removed_at") @db.Timestamptz(3)
+  removedByAccountId String?   @map("removed_by_account_id") @db.Uuid
+  // 'replaced' or 'removed' (a CHECK in the migration).
+  removalReason      String?   @map("removal_reason")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  payment            Payment   @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  imageAsset         ImageAsset @relation("PaymentInvoiceFile", fields: [imageAssetId], references: [id], onDelete: Restrict)
+  uploadedByAccount  Account   @relation("PaymentInvoiceUploadedBy", fields: [uploadedByAccountId], references: [id], onDelete: Restrict)
+  removedByAccount   Account?  @relation("PaymentInvoiceRemovedBy", fields: [removedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([paymentId])
+  @@index([uploadedByAccountId])
+  @@index([removedByAccountId])
+  @@map("payment_invoices")
   @@schema("booking")
 }
 
