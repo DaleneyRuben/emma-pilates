@@ -16,6 +16,7 @@ export const paymentRow = (
   id: `9a000000-0000-5000-8000-0000000000${suffix}`,
   clientId: `c1000000-0000-5000-8000-0000000000${suffix}`,
   clientName,
+  clientPhoto: null,
   planName: "Paquete de 8 clases",
   kind: "plan",
   planPriceCentavos: 56_000,
@@ -88,6 +89,7 @@ export const reviewOf = (
   rejectionReason: null,
   subscriptionId: null,
   clientName: row.clientName,
+  clientPhoto: row.clientPhoto,
   receipt: row.receiptAvailable
     ? {
         imageAssetId: "1a000000-0000-5000-8000-000000000001",

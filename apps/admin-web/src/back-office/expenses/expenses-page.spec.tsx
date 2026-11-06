@@ -20,6 +20,7 @@ import {
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 const expenseTable = (respond: (params: URLSearchParams) => Response) =>
@@ -52,7 +53,7 @@ describe("AW13 Gastos on a desktop browser", () => {
     renderAdmin("/dinero/gastos");
     await heading();
 
-    expect(screen.getByText("Cargando gastos…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando gastos…");
     const row = await rowOf("Reparación");
     const amount = within(row).getByRole("cell", { name: "Bs 450,50" });
     expect(amount).toHaveAttribute("data-label", "Monto");

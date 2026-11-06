@@ -19,6 +19,7 @@ import {
   ApiProperty,
   ApiPropertyOptional,
 } from '@nestjs/swagger';
+import { StaffPhotoDto } from '../staff/photo/staff-photo.dto';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
 import {
   authenticateBearer,
@@ -61,6 +62,14 @@ export class UpcomingBookingDto {
 
   @ApiProperty()
   trainerName!: string;
+
+  @ApiProperty({
+    type: StaffPhotoDto,
+    nullable: true,
+    description:
+      'The Trainer photo (FIX-041), null while her initials stand in',
+  })
+  trainerPhoto!: StaffPhotoDto | null;
 
   @ApiProperty()
   branchName!: string;

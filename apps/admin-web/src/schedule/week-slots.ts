@@ -41,9 +41,11 @@ export function dayItems(
     session,
     minutes: spans[index]?.start ?? 0,
   }));
+  // A slot paints first, then a cancelled class, then a live one, so a
+  // replacement created over a cancelled class sits on top (FIX-042).
+  const layer = (item: (typeof slots)[number] | (typeof blocks)[number]) =>
+    item.kind === "slot" ? 0 : (item.session.cancellation ?? null) ? 1 : 2;
   return [...slots, ...blocks].sort(
-    (a, b) =>
-      a.minutes - b.minutes ||
-      (a.kind === b.kind ? 0 : a.kind === "slot" ? -1 : 1),
+    (a, b) => a.minutes - b.minutes || layer(a) - layer(b),
   );
 }

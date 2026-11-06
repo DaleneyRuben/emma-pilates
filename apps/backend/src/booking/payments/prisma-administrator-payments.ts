@@ -1,4 +1,5 @@
 import { Prisma, type PrismaClient } from '../../generated/prisma/client';
+import { clientPhotoOf } from '../client/client-photo-of';
 import { containsPattern } from '../search-pattern';
 import type {
   AdministratorPaymentInvoiceFilter,
@@ -14,6 +15,7 @@ type PaymentRow = {
   id: string;
   client_id: string;
   client_name: string;
+  client_profile_image_asset_id: string | null;
   plan_name: string;
   kind: 'plan' | 'evaluation';
   method: 'transfer' | 'cash';
@@ -64,6 +66,7 @@ const toRow = (row: PaymentRow): AdministratorPaymentRow => ({
   id: row.id,
   clientId: row.client_id,
   clientName: row.client_name,
+  clientPhoto: clientPhotoOf(row.client_profile_image_asset_id),
   planName: saleLabel({
     kind: row.kind,
     planNameSnapshot: row.plan_name,
@@ -118,6 +121,7 @@ export const createPrismaAdministratorPayments = (
     const [rows, [counted], pendingCount] = await Promise.all([
       prisma.$queryRaw<PaymentRow[]>`
         SELECT p.id, p.client_id, c.name AS client_name,
+          c.profile_image_asset_id AS client_profile_image_asset_id,
           p.plan_name_snapshot AS plan_name, p.kind::text AS kind,
           p.method::text AS method,
           p.plan_price_centavos, p.credit_applied_centavos,

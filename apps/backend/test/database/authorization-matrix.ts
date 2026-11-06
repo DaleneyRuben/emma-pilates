@@ -5,6 +5,7 @@ import { payStatementAuthorizationRows } from './pay-statement-authorization';
 import { scheduleAuthorizationRows } from './schedule-authorization';
 import { studioFactsAuthorizationRows } from './studio-facts-authorization';
 import { supplyMovementAuthorizationRows } from './supply-movement-authorization';
+import { staffPhotoAuthorizationRows } from './staff-photo-authorization';
 import { transferQrAuthorizationRows } from './transfer-qr-authorization';
 import type { RealIds } from './authorization-matrix-support';
 
@@ -13,9 +14,9 @@ import type { RealIds } from './authorization-matrix-support';
 // the Role passes authorization (the request may still fail on its data);
 // «deny» means 403. The Coordinator is denied by default: an endpoint is
 // «allow» for her only for the operation she runs (the schedule, Sessions,
-// Bookings on a Client's behalf, Client profiles, Staff details, freezes,
-// the carousel, Comentarios, Insumos, Equipos, the Nutrición agenda, the
-// studio rules read) or her own Account; never money.
+// Bookings on a Client's behalf, Client profiles, new Clients (FIX-040),
+// Staff details, freezes, the carousel, Comentarios, Insumos, Equipos, the
+// Nutrición agenda, the studio rules read) or her own Account; never money.
 // `authorization-matrix.integration-spec.ts` fails when a route is missing
 // here, when a row names a route that no longer exists, or when the API
 // answers differently.
@@ -225,7 +226,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/assistant/clients/{clientId}': both('allow'),
   'GET /api/v1/assistant/clients/{clientId}/bookings': both('allow'),
   'GET /api/v1/assistant/clients/{clientId}/class-history': both('allow'),
-  // Selling and registering new Clients stay at the front desk.
+  // Selling stays at the front desk and with the Administrator.
   'GET /api/v1/assistant/clients/{clientId}/plan-quotes': administratorOnly(),
   'POST /api/v1/assistant/clients/{clientId}/cash-payments': administratorOnly({
     body: {
@@ -246,16 +247,17 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
       imageAssetId: uuid,
     },
   }),
-  'POST /api/v1/assistant/client-invitations': administratorOnly(),
-  'GET /api/v1/assistant/client-invitations/{clientId}': administratorOnly(),
+  // FIX-040 (2026-11-05): the Coordinator registers new Clients and follows
+  // up their invitation like the Assistant; she still never sells.
+  'POST /api/v1/assistant/client-invitations': both('allow'),
+  'GET /api/v1/assistant/client-invitations/{clientId}': both('allow'),
   'POST /api/v1/assistant/client-invitations/{clientId}/email-corrections':
-    administratorOnly(),
-  'POST /api/v1/assistant/client-invitations/{clientId}/resends':
-    administratorOnly(),
+    both('allow'),
+  'POST /api/v1/assistant/client-invitations/{clientId}/resends': both('allow'),
   'POST /api/v1/assistant/client-invitations/{clientId}/verification-emails':
-    administratorOnly(),
+    both('allow'),
   'POST /api/v1/assistant/client-invitations/{clientId}/cancellation':
-    administratorOnly(),
+    both('allow'),
 
   // Clients: the directory, the detail without amounts, and corrections.
   'GET /api/v1/administrator/clients': both('allow'),
@@ -485,6 +487,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   }),
   ...campaignAuthorizationRows(),
   ...transferQrAuthorizationRows(),
+  ...staffPhotoAuthorizationRows(),
 };
 
 /** A concrete address for a templated path. */

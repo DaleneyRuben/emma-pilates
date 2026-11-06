@@ -1,0 +1,50 @@
+# Critical journey (FIX-041): a Staff Member sets and removes her own photo
+# on Perfil, and sees a Client's photo where she appears (finding n.º 30).
+# Needs the worker running, an image in the device's photo library
+# (`xcrun simctl addmedia <udid> photo.jpg`, or `adb push` on Android), and
+# Lucía with a photo (Test 135 G).
+appId: ${APP_ID}
+env:
+  EMAIL: camila.rojas@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-profile"
+    timeout: 30000
+- runFlow: subflows/park-dev-gear.yaml
+# The parked developer gear sits on the Perfil tab's right half; tap its left.
+- tapOn:
+    point: "78%,95%"
+- extendedWaitUntil:
+    visible: "Cambiar foto"
+    timeout: 15000
+- assertVisible: "Tu nombre y tu correo los actualiza administración."
+- assertNotVisible: "Quitar foto"
+- takeScreenshot: fix041-staff-1-perfil-initials
+- tapOn: "Cambiar foto"
+- runFlow: subflows/pick-first-photo.yaml
+- extendedWaitUntil:
+    visible: "Quitar foto"
+    timeout: 60000
+- assertVisible: "Foto de Camila Rojas"
+- assertNotVisible: "Se recorta.*"
+- takeScreenshot: fix041-staff-2-perfil-photo
+- tapOn: "Quitar foto"
+- extendedWaitUntil:
+    notVisible: "Quitar foto"
+    timeout: 20000
+- assertNotVisible: "Foto de Camila Rojas"
+- takeScreenshot: fix041-staff-3-perfil-removed
+- tapOn:
+    id: "tab-clients"
+- tapOn:
+    id: "client-search-input"
+- inputText: "Lucía"
+# The row carries its own label, so Maestro cannot read the photo's; the
+# screenshot shows her photo in place of «LF».
+- extendedWaitUntil:
+    visible: ".*Lucía Fernández.*"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: fix041-staff-4-client-face

@@ -37,7 +37,7 @@ type SelectPlanNavigation = {
 };
 
 export function SelectPlanScreen({ route }: { route: { params: ClientContext } }) {
-  const { clientId, clientName } = route.params;
+  const { clientId, clientName, clientPhoto } = route.params;
   const navigation = useNavigation<SelectPlanNavigation>();
   const fetcher = useStaffFetcher();
   // FIX-019: S10 names the fixed renewal start from the overview, so the Plans
@@ -51,7 +51,11 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
   const header = (
     <>
       <BackBar onBack={() => navigation.goBack()} title="Elige un plan" />
-      <ClientBanner action="Registrando pago para" clientName={clientName} />
+      <ClientBanner
+        action="Registrando pago para"
+        clientName={clientName}
+        clientPhoto={clientPhoto}
+      />
     </>
   );
 
@@ -101,6 +105,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
                 navigation.navigate("ConfirmCashPayment", {
                   clientId,
                   clientName,
+                  clientPhoto,
                   quote: plan,
                   ...(renewalStartsOn === undefined ? {} : { renewalStartsOn }),
                 })

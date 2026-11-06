@@ -8,6 +8,7 @@ import {
   createClientWithSubscription,
   createFixture,
 } from './booking-command-test-support';
+import { attachClientPhoto } from './client-photo-test-support';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -34,7 +35,7 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
     await context?.stop();
   });
 
-  it('lists the booked Clients and the open Waitlist in queue order, without cancelled Bookings or closed entries', async () => {
+  it('lists the booked Clients and the open Waitlist in queue order with their photos, without cancelled Bookings or closed entries', async () => {
     const fixture = await createFixture(prisma, { capacity: 2, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const booked = await commands.create(
@@ -64,6 +65,7 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
       { sessionId: fixture.sessionId },
       asClient(second),
     );
+    const secondPhoto = await attachClientPhoto(prisma, second.clientId);
 
     const names = ['Dora', 'Eva', 'Fabi'];
     const waiting = [];
@@ -81,6 +83,7 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
         ),
       });
     }
+    const doraPhoto = await attachClientPhoto(prisma, waiting[0].clientId);
     await prisma.waitlistEntry.update({
       where: { id: waiting[1].entry.id },
       data: {
@@ -99,12 +102,14 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
           bookingId: booked.id,
           clientId: fixture.clientId,
           clientName: 'Ana',
+          clientPhoto: null,
           attendanceOutcome: null,
         },
         {
           bookingId: secondBooking.id,
           clientId: second.clientId,
           clientName: 'Bea',
+          clientPhoto: { imageAssetId: secondPhoto },
           attendanceOutcome: null,
         },
       ],
@@ -113,12 +118,14 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
           waitlistEntryId: waiting[0].entry.id,
           clientId: waiting[0].clientId,
           clientName: 'Dora',
+          clientPhoto: { imageAssetId: doraPhoto },
           position: 1,
         },
         {
           waitlistEntryId: waiting[2].entry.id,
           clientId: waiting[2].clientId,
           clientName: 'Fabi',
+          clientPhoto: null,
           position: 2,
         },
       ],

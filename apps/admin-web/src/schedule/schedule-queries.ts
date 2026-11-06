@@ -24,18 +24,25 @@ export const weekSessionLimit = 100;
 const weekParams = (
   branchId: string,
   monday: string,
+  includeCancelled: boolean,
 ): ListAdministratorSessionsParams => ({
   from: boliviaInstant(monday, "00:00"),
   until: boliviaInstant(addDays(monday, 7), "00:00"),
   limit: weekSessionLimit,
   branchId,
+  ...(includeCancelled ? { includeCancelled: true } : {}),
 });
 
 // ADR-0042: the key carries the Branch and the week, so switching Branch
 // never shows another Branch's Sessions and a change can invalidate exactly
-// the selected Branch's weeks.
-export const weekSessionsQueryOptions = (branchId: string, monday: string) => {
-  const params = weekParams(branchId, monday);
+// the selected Branch's weeks. The Horario also asks for the week's cancelled
+// Sessions (FIX-042); Inicio does not.
+export const weekSessionsQueryOptions = (
+  branchId: string,
+  monday: string,
+  { includeCancelled = false }: { includeCancelled?: boolean } = {},
+) => {
+  const params = weekParams(branchId, monday, includeCancelled);
   return queryOptions({
     queryKey: getListAdministratorSessionsQueryKey(params),
     queryFn: async ({ signal }) =>

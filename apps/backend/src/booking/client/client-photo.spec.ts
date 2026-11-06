@@ -36,6 +36,7 @@ const gateway = (): jest.Mocked<ClientPhotoGateway> => ({
   replacePhoto: jest.fn().mockResolvedValue(profile),
   removePhoto: jest.fn().mockResolvedValue(undefined),
   readPhotoObject: jest.fn().mockResolvedValue(null),
+  readPhotoObjectByAsset: jest.fn().mockResolvedValue(null),
 });
 
 describe('setClientPhoto', () => {

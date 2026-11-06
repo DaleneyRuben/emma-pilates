@@ -3,6 +3,7 @@ import { impersonating, openImpersonation } from './impersonation-test-support';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { PaymentRuleError } from '../../src/booking/payments/payment-errors';
 import { createPrismaReceiptRead } from '../../src/booking/payments/prisma-receipt-read';
+import { attachClientPhoto } from './client-photo-test-support';
 import {
   codeOf,
   fixtures,
@@ -73,11 +74,12 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     ).resolves.toBe('purchase_intent_not_open');
   });
 
-  it('lists pending transfers oldest first and describes one for review', async () => {
+  it('lists pending transfers oldest first, with each Client photo, and describes one for review', async () => {
     const admin = await staffPrincipal('paola.mendoza@example.com');
     const trainer = await staffPrincipal('emma.vargas@example.com');
     const first = await newClient('Primera Pendiente');
     const second = await newClient('Segunda Pendiente');
+    const firstPhoto = await attachClientPhoto(prisma, first.clientId);
     const submit = async (buyer: typeof first, at: Date) => {
       const intent = await commands(at).createPurchaseIntent(
         { planId: plan.id },
@@ -112,11 +114,15 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     expect(ids.indexOf(older.id)).toBeLessThan(ids.indexOf(newer.id));
     expect(pending.find((entry) => entry.id === older.id)).toMatchObject({
       clientName: 'Primera Pendiente',
+      clientPhoto: { imageAssetId: firstPhoto },
       planName: 'Paquete de 8 clases',
       // Her first real Plan reserves a founder place, so the review shows 15 %.
       amountDueCentavos: 47_600,
       submittedAt: now,
       receiptAvailable: true,
+    });
+    expect(pending.find((entry) => entry.id === newer.id)).toMatchObject({
+      clientPhoto: null,
     });
 
     await expect(
@@ -124,6 +130,7 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     ).resolves.toMatchObject({
       id: older.id,
       clientName: 'Primera Pendiente',
+      clientPhoto: { imageAssetId: firstPhoto },
       state: 'pending',
       receipt: { imageAssetId: receipt.id, mediaType: 'image/jpeg' },
     });

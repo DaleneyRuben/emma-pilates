@@ -77,7 +77,9 @@ export function AdminShell() {
                 <BranchCell />
               </div>
             ) : null}
-            <div className="min-w-0">
+            {/* WEB-045: a flex column, so a loading state in the page can
+                grow into what the main area has left (src/carga.css). */}
+            <div className="flex min-w-0 flex-col">
               <PageTabsContext.Provider value={tabs}>
                 <CatchBoundary
                   getResetKey={() => pageKey}

@@ -1,0 +1,22 @@
+# Critical journey (FIX-041): the Client sees her Trainer's photo next to her
+# name in Reservar. Needs Emma Vargas with a photo (Test 135 A) and a class
+# of hers in the coming days. The row carries its own label, so Maestro
+# cannot read the photo's: the screenshot is the evidence.
+appId: ${APP_ID}
+env:
+  EMAIL: mariana@example.com
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    id: "tab-booking"
+- extendedWaitUntil:
+    visible: ".*Emma Vargas.*|Ver mañana"
+    timeout: 30000
+- tapOn:
+    text: "Ver mañana"
+    optional: true
+- extendedWaitUntil:
+    visible: ".*Emma Vargas.*"
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: fix041-client-1-reservar-trainer-face

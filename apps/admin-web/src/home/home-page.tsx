@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { LoadingNotice } from "../components/page/query-failure";
 import { countFormat } from "../components/table/pagination";
 import {
   boliviaMonth,
@@ -96,7 +97,7 @@ export function HomePage() {
   const seesMoney =
     role === "administrator" &&
     (profile === undefined || profile.role === "administrator");
-  const { selectedBranch } = useBranchSelection();
+  const { selectedBranch, status: branchStatus } = useBranchSelection();
   const { title, day } = homeGreeting(profile?.name ?? "");
   const today = boliviaToday();
   const month = boliviaMonth();
@@ -120,23 +121,29 @@ export function HomePage() {
             : `${day} · Sucursal ${selectedBranch.name}`}
         </p>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] items-start gap-4">
-        <PendingCard rows={rows} />
-        {selectedBranch === undefined ? null : (
-          <TodayCard
-            branch={selectedBranch}
-            today={today}
-            monday={weekStartOf(today)}
-          />
-        )}
-        {seesMoney ? (
-          <MoneyCard today={today} pendingPayments={counts.payments} />
-        ) : (
-          <ClientsCard month={month} />
-        )}
-      </div>
-      <PendingList rows={rows} />
-      <RecommendationsSection month={month} readOnly={!seesMoney} />
+      {counts.loading || branchStatus === "pending" ? (
+        <LoadingNotice>Cargando el inicio…</LoadingNotice>
+      ) : (
+        <>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] items-start gap-4">
+            <PendingCard rows={rows} />
+            {selectedBranch === undefined ? null : (
+              <TodayCard
+                branch={selectedBranch}
+                today={today}
+                monday={weekStartOf(today)}
+              />
+            )}
+            {seesMoney ? (
+              <MoneyCard today={today} pendingPayments={counts.payments} />
+            ) : (
+              <ClientsCard month={month} />
+            )}
+          </div>
+          <PendingList rows={rows} />
+          <RecommendationsSection month={month} readOnly={!seesMoney} />
+        </>
+      )}
     </div>
   );
 }

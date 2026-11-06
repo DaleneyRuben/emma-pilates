@@ -1,0 +1,65 @@
+# Critical journey (FIX-040): the Coordinator creates a Client's account with
+# the Assistant's form (S05), lands on her overview with the invitation
+# pending (S06), and is offered no cash sale. A fresh email on every run.
+appId: ${APP_ID}
+env:
+  EMAIL: carolina.rivas@example.com
+---
+- runScript:
+    file: scripts/seed.js
+    env:
+      SEED: new-client
+- runFlow: subflows/login.yaml
+- runFlow: subflows/park-dev-gear.yaml
+- extendedWaitUntil:
+    visible:
+      id: "client-search-new-client"
+    timeout: 30000
+- tapOn:
+    id: "client-search-new-client"
+- extendedWaitUntil:
+    visible:
+      id: "new-client-name"
+    timeout: 10000
+- tapOn:
+    id: "new-client-name"
+- waitForAnimationToEnd
+- inputText: "Rosa Maestro"
+# The phone pad has no return key: type the phone first and close the
+# email keyboard with its return key, so it never covers «Crear cuenta».
+- tapOn:
+    id: "new-client-phone"
+- waitForAnimationToEnd
+- inputText: "70012345"
+- tapOn:
+    id: "new-client-email"
+- waitForAnimationToEnd
+- inputText: ${output.email}
+- pressKey: Enter
+# BKM-011: «¿Cómo nos conociste?» is required (follow-up 141).
+- scrollUntilVisible:
+    element:
+      id: "acquisition-channel-walk_in"
+    direction: DOWN
+# A tap while the scroll still moves is lost.
+- waitForAnimationToEnd
+- tapOn:
+    id: "acquisition-channel-walk_in"
+- takeScreenshot: staff-coordinator-new-client-1-form
+- scrollUntilVisible:
+    element:
+      id: "new-client-submit"
+    direction: DOWN
+- tapOn:
+    id: "new-client-submit"
+- extendedWaitUntil:
+    visible:
+      id: "pending-card"
+    timeout: 20000
+- assertVisible: "Cuenta pendiente de activación"
+# Decision §19.20: the phone typed without +591 is stored with it; FIX-037
+# shows it after its flag.
+- assertVisible: ".*\\+591 70012345 · .*"
+- assertVisible: "Reenviar enlace"
+- assertNotVisible: "Registrar pago en efectivo"
+- takeScreenshot: staff-coordinator-new-client-2-pending

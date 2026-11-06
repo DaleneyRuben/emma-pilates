@@ -1,4 +1,8 @@
 import type { PrismaClient } from '../../generated/prisma/client';
+import {
+  clientNameAndPhoto,
+  clientNameSelect,
+} from '../client/client-photo-of';
 import type { FindAdministratorSessionRoster } from './administrator-session-roster';
 
 const outcomes = { ATTENDED: 'attended', NO_SHOW: 'no_show' } as const;
@@ -18,7 +22,7 @@ export const findAdministratorSessionRoster =
           select: {
             id: true,
             clientId: true,
-            client: { select: { name: true } },
+            client: clientNameSelect,
             attendanceRecord: { select: { outcome: true } },
           },
           orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
@@ -28,7 +32,7 @@ export const findAdministratorSessionRoster =
           select: {
             id: true,
             clientId: true,
-            client: { select: { name: true } },
+            client: clientNameSelect,
           },
           orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
         },
@@ -41,7 +45,7 @@ export const findAdministratorSessionRoster =
       bookings: session.bookings.map((booking) => ({
         bookingId: booking.id,
         clientId: booking.clientId,
-        clientName: booking.client.name,
+        ...clientNameAndPhoto(booking.client),
         attendanceOutcome:
           booking.attendanceRecord === null
             ? null
@@ -50,7 +54,7 @@ export const findAdministratorSessionRoster =
       waitlist: session.waitlistEntries.map((entry, index) => ({
         waitlistEntryId: entry.id,
         clientId: entry.clientId,
-        clientName: entry.client.name,
+        ...clientNameAndPhoto(entry.client),
         position: index + 1,
       })),
     };

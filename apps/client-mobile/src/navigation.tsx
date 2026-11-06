@@ -4,6 +4,7 @@ import {
   EmailChangeLinkScreen,
   MobileQueryProvider,
   type MobileNavigationProps,
+  popTabToRootOnPress,
   tabStackScreenLayout,
   typography,
 } from "@pilates/mobile-core";
@@ -127,6 +128,8 @@ const tabOptions =
   };
 
 const ClientTabs = createBottomTabNavigator({
+  // Walkthrough n.º 28: tapping a tab opens it on its root screen.
+  screenListeners: popTabToRootOnPress,
   // Labels stay under the icons on a tablet too.
   screenOptions: {
     headerShown: false,

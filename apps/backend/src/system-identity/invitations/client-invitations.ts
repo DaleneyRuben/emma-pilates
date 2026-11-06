@@ -1,6 +1,7 @@
 import { normalizeReferralCode } from '../../booking/acquisition/acquisition';
 import { normalizeContactPhone } from '../../phone/bolivian-mobile';
 import { auditActorOf } from '../authentication/audit-actor';
+import type { StaffRoleCode } from '../authentication/staff-role';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 import {
   activationLifetimeMilliseconds,
@@ -25,20 +26,30 @@ import {
 
 export * from './client-invitations-model';
 
+// FIX-040 (2026-11-05): the Coordinator registers new Clients too, and
+// follows up their invitation like the Assistant. Selling stays apart.
+const invitingRoles: Partial<Record<StaffRoleCode, Actor['role']>> = {
+  ASSISTANT: 'assistant',
+  ADMINISTRATOR: 'administrator',
+  COORDINATOR: 'coordinator',
+};
+
 export const requireAssistant = (principal: AuthenticatedPrincipal): Actor => {
+  // ADR-0100: an Administrator seeing the app as a Staff Member acts as
+  // that member, and the audit record names the Administrator.
+  const { identity } = principal;
   if (
-    principal.identity.kind !== 'staff' ||
-    (principal.identity.role !== 'assistant' &&
-      principal.identity.role !== 'administrator')
+    identity.kind !== 'staff' ||
+    invitingRoles[identity.role.toUpperCase() as StaffRoleCode] === undefined
   ) {
     throw new InvitationAccessDeniedError();
   }
-  // ADR-0100: an Administrator seeing the app as an Assistant acts as the
-  // Assistant, and the audit record names the Administrator.
   const actor = auditActorOf(principal);
+  const role = actor.role === null ? undefined : invitingRoles[actor.role];
+  if (role === undefined) throw new InvitationAccessDeniedError();
   return {
     accountId: actor.accountId,
-    role: actor.role === 'ADMINISTRATOR' ? 'administrator' : 'assistant',
+    role,
     impersonationId: actor.impersonationId,
   };
 };

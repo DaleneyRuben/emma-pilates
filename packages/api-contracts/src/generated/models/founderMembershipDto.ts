@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ClientPhotoDto } from "./clientPhotoDto";
 import type { FounderMembershipDtoStatus } from "./founderMembershipDtoStatus";
 
 export interface FounderMembershipDto {
@@ -14,6 +15,11 @@ export interface FounderMembershipDto {
    */
   number: number;
   clientName: string;
+  /**
+   * The Client photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  clientPhoto: ClientPhotoDto | null;
   since: string;
   status: FounderMembershipDtoStatus;
 }

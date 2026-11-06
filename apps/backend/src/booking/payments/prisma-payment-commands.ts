@@ -20,12 +20,17 @@ import { toPrismaBytes } from '../../database/prisma-bytes';
 import { retrySerializable } from '../../database/retry-serializable';
 import {
   recordNotification as defaultNotificationRecorder,
+  settleReviewNotices,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { decideEvaluationTransfer } from '../evaluations/evaluation-payment-decision';
+import {
+  clientNameAndPhoto,
+  clientNameSelect,
+} from '../client/client-photo-of';
 import { evaluationReceiptOf } from '../evaluations/evaluation-payment-receipt';
 import { createFreezeCommands } from './prisma-freeze';
 import { createFreezeReads } from './prisma-freeze-reads';
@@ -1022,6 +1027,10 @@ export function createPrismaPaymentCommands(
 
     const paymentId = await serializable(async (transaction) => {
       const payment = await loadTransferPayment(transaction, command.paymentId);
+      await settleReviewNotices(transaction, {
+        businessEventKey: `payment-submitted:${payment.id}`,
+        settledAt: dependencies.now(),
+      });
       if (payment.kind === PaymentKind.EVALUATION) {
         const settings =
           await transaction.studioSettingsVersion.findFirstOrThrow({
@@ -1191,6 +1200,10 @@ export function createPrismaPaymentCommands(
 
     const paymentId = await serializable(async (transaction) => {
       const payment = await loadTransferPayment(transaction, command.paymentId);
+      await settleReviewNotices(transaction, {
+        businessEventKey: `payment-submitted:${payment.id}`,
+        settledAt: dependencies.now(),
+      });
       if (payment.kind === PaymentKind.EVALUATION) {
         await decideEvaluationTransfer(transaction, recordNotification, {
           paymentId: payment.id,
@@ -1414,7 +1427,7 @@ export function createPrismaPaymentCommands(
         planNameSnapshot: true,
         amountDueCentavos: true,
         submittedAt: true,
-        client: { select: { name: true } },
+        client: clientNameSelect,
         purchaseIntent: {
           select: { receiptImageAsset: { select: receiptSelect } },
         },
@@ -1422,7 +1435,7 @@ export function createPrismaPaymentCommands(
     });
     return rows.map((row) => ({
       id: row.id,
-      clientName: row.client.name,
+      ...clientNameAndPhoto(row.client),
       planName: row.planNameSnapshot,
       amountDueCentavos: row.amountDueCentavos,
       submittedAt: row.submittedAt,
@@ -1436,7 +1449,7 @@ export function createPrismaPaymentCommands(
       where: { id: paymentId },
       select: {
         ...paymentSelect,
-        client: { select: { name: true } },
+        client: clientNameSelect,
         invoiceTaxId: true,
         invoiceName: true,
         purchaseIntent: {
@@ -1460,7 +1473,7 @@ export function createPrismaPaymentCommands(
     );
     return {
       ...toPaymentView(row),
-      clientName: row.client.name,
+      ...clientNameAndPhoto(row.client),
       // FIX-044: S12 shows whether she asked for an invoice, and in whose name.
       invoiceData:
         row.invoiceTaxId === null || row.invoiceName === null

@@ -92,6 +92,23 @@ export const createNotificationRecorder =
     });
   };
 
+// A «to review» notice stops asking once its subject is decided (walkthrough
+// n.º 13): every unread copy of that business event is marked read, so no
+// teammate's bell keeps counting a receipt or a Freeze someone else settled.
+export const settleReviewNotices = (
+  transaction: Prisma.TransactionClient,
+  input: { businessEventKey: string; settledAt: Date },
+): Promise<unknown> =>
+  transaction.notification.updateMany({
+    where: {
+      businessEventKey: input.businessEventKey,
+      readAt: null,
+      deletedAt: null,
+      createdAt: { lte: input.settledAt },
+    },
+    data: { readAt: input.settledAt },
+  });
+
 export const createNotificationStore = (prisma: PrismaClient) => ({
   record: recordNotification,
   findPage: (input: {

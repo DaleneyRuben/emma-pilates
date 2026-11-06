@@ -25,6 +25,7 @@ import { staffMembersPath, staffPage } from "../../test/people-fixtures";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 const staffReads: URLSearchParams[] = [];
@@ -67,7 +68,7 @@ describe("AW25 Evaluaciones nutricionales on a desktop browser", () => {
     const { user } = renderAdmin(september21);
     await heading();
 
-    expect(screen.getByText("Cargando evaluaciones…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando evaluaciones…");
     const row = (await screen.findByRole("cell", { name: /Andrea Céspedes/ }))
       .parentElement as HTMLElement;
     expect(within(row).getByText("Primera evaluación")).toBeInTheDocument();

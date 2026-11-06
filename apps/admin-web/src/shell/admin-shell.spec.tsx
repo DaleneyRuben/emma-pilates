@@ -55,9 +55,12 @@ describe("admin shell", () => {
       expect(
         within(rail()).getByRole("link", { name: "Inicio" }),
       ).toHaveAttribute("aria-current", "page");
+      // FIX-042 (decisiones §20.24): no «E» above the rail; it starts at
+      // Inicio and the brand stays in the top bar.
       expect(
-        within(rail()).getByRole("img", { name: "Emma Pilates Studio" }),
-      ).toBeInTheDocument();
+        within(rail()).queryByRole("img", { name: "Emma Pilates Studio" }),
+      ).toBeNull();
+      expect(rail().firstElementChild).toHaveAccessibleName("Inicio");
       expect(
         screen.queryByRole("button", { name: "Abrir menú" }),
       ).not.toBeInTheDocument();

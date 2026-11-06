@@ -1,4 +1,9 @@
-import { colors, fontFamilies, tabStackScreenLayout } from "@pilates/mobile-core";
+import {
+  colors,
+  fontFamilies,
+  popTabToRootOnPress,
+  tabStackScreenLayout,
+} from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createStaticNavigation,
@@ -62,10 +67,12 @@ const profileScreens = {
   ReferralCode: StaffReferralCodeScreen,
 };
 
-// A Client's file and everything reached from it (S06–S10, S21, S22). The
-// Coordinator never sells nor registers (ADR-0102), so she drops `sellingScreens`.
+// A Client's file and everything reached from it (S05–S10, S21, S22). The
+// Coordinator registers Clients (FIX-040) but never sells (ADR-0102), so she
+// drops `sellingScreens`.
 const clientScreens = {
   ClientSearch: ClientSearchScreen,
+  NewClient: NewClientScreen,
   ClientOverview: ClientOverviewScreen,
   BrowseSessions: BrowseSessionsScreen,
   SessionDetail: AssistantSessionDetailScreen,
@@ -79,7 +86,6 @@ const clientScreens = {
   Invoice: InvoiceScreen,
 };
 const sellingScreens = {
-  NewClient: NewClientScreen,
   SelectPlan: SelectPlanScreen,
   ConfirmCashPayment: ConfirmCashPaymentScreen,
 };
@@ -112,6 +118,8 @@ const profileTab = {
 
 // Follow-up 225 §8: one tab bar per role, drawn like the client's, on Lino.
 const tabConfig = {
+  // Walkthrough n.º 28: tapping a tab opens it on its root screen.
+  screenListeners: popTabToRootOnPress,
   screenOptions: {
     headerShown: false,
     tabBarActiveTintColor: colors.emphasis,

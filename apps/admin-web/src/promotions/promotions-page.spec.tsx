@@ -16,6 +16,7 @@ import {
 } from "../test/promotion-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
+import { findBrandedLoading } from "../test/branded-loading";
 
 const card = async (headline: string) =>
   screen.findByRole("article", { name: headline });
@@ -37,7 +38,7 @@ describe("AW17 Promociones", () => {
     server.use(promotionList([reformer, barre, horario, verano]));
     renderAdmin("/promociones");
 
-    expect(await screen.findByText("Cargando promociones…")).toBeVisible();
+    await findBrandedLoading("Cargando promociones…");
     const list = await screen.findByRole("list", {
       name: "Promociones en el orden del carrusel",
     });

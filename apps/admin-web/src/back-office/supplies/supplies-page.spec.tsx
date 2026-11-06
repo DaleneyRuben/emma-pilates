@@ -20,6 +20,7 @@ import {
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 // The table's own read; the badge and panel list (100 rows) fall through.
@@ -50,7 +51,7 @@ describe("AW08 Insumos on a desktop browser", () => {
     renderAdmin("/estudio/insumos");
     await heading();
 
-    expect(screen.getByText("Cargando insumos…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando insumos…");
     const paperRow = await rowOf("Papel higiénico");
     const stock = within(paperRow).getByRole("cell", { name: "2" });
     expect(stock).toHaveAttribute("data-label", "Cantidad en stock");

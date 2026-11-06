@@ -1,9 +1,4 @@
-import {
-  createPurchaseIntent,
-  getGetCurrentPurchaseIntentQueryKey,
-  useGetCurrentClientSubscription,
-  useGetCurrentPayment,
-} from "@pilates/api-contracts";
+import { useGetCurrentClientSubscription, useGetCurrentPayment } from "@pilates/api-contracts";
 import {
   BackLink,
   BodyText,
@@ -14,41 +9,43 @@ import {
   spacing,
 } from "@pilates/mobile-core";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { useQueryClient } from "@tanstack/react-query";
-import { randomUUID } from "expo-crypto";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { BackHandler, StyleSheet } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { PaymentStatusView } from "./payment-status-view";
+import { useResendReceipt } from "./use-resend-receipt";
 
 type StatusNavigation = {
   goBack: () => void;
-  navigate: (
-    screen: "Booking" | "HomeTab" | "Payment",
-    params?: { screen: "Browse" | "Home" } | { purchaseIntentId: string },
-  ) => void;
+  popToTop: () => void;
+  navigate: (screen: "Booking" | "HomeTab", params: { screen: "Browse" | "Home" }) => void;
 };
 
 export function PaymentStatusScreen() {
   const navigation = useNavigation<StatusNavigation>();
   const fetcher = useClientFetcher();
-  const queryClient = useQueryClient();
   const payment = useGetCurrentPayment({ fetcher, query: { refetchOnMount: "always" } });
   const subscription = useGetCurrentClientSubscription({
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  const [retrying, setRetrying] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { busy: retrying, error, resend } = useResendReceipt();
 
-  const goHome = () => navigation.navigate("HomeTab", { screen: "Home" });
+  // Leaving for another tab first returns this stack to its root, so Perfil
+  // or Reservar is not left on the spent payment without its tab bar.
+  const leaveFor = (screen: "Booking" | "HomeTab", target: "Browse" | "Home") => {
+    navigation.popToTop();
+    navigation.navigate(screen, { screen: target });
+  };
+  const goHome = () => leaveFor("HomeTab", "Home");
 
   // The result has no back arrow: the Android back button leads home like
   // «Volver al inicio», never to the spent payment screen (MOB-074).
   useFocusEffect(
     useCallback(() => {
       const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+        navigation.popToTop();
         navigation.navigate("HomeTab", { screen: "Home" });
         return true;
       });
@@ -76,25 +73,6 @@ export function PaymentStatusScreen() {
   const active =
     subscription.data?.status === 200 ? (subscription.data.data.subscription ?? null) : null;
 
-  const startAgain = async () => {
-    setError(null);
-    setRetrying(true);
-    try {
-      const response = await createPurchaseIntent(
-        { planId: current.planId },
-        { headers: { "idempotency-key": randomUUID() } },
-        fetcher,
-      );
-      if (response.status !== 201) throw new Error("intent_failed");
-      await queryClient.invalidateQueries({ queryKey: getGetCurrentPurchaseIntentQueryKey() });
-      navigation.navigate("Payment", { purchaseIntentId: response.data.id });
-    } catch {
-      setError("No pudimos iniciar un nuevo pago. Inténtalo de nuevo.");
-    } finally {
-      setRetrying(false);
-    }
-  };
-
   return (
     <Screen style={styles.screen}>
       <PaymentStatusView
@@ -103,9 +81,9 @@ export function PaymentStatusScreen() {
         onHome={goHome}
         onPrimary={
           current.state === "confirmed"
-            ? () => navigation.navigate("Booking", { screen: "Browse" })
+            ? () => leaveFor("Booking", "Browse")
             : current.state === "rejected"
-              ? () => void startAgain()
+              ? () => void resend(current.planId)
               : undefined
         }
         payment={current}

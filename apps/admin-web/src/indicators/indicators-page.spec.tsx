@@ -9,6 +9,7 @@ import {
 } from "../test/msw";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
+import { findBrandedLoading } from "../test/branded-loading";
 
 const kpisPath = "/api/v1/administrator/reports/kpis";
 const narrativePath = "/api/v1/administrator/reports/narrative";
@@ -216,7 +217,7 @@ describe("AW39 Indicadores", () => {
     );
     renderAdmin("/informes");
 
-    expect(await screen.findByText("Cargando el informe…")).toBeVisible();
+    await findBrandedLoading("Cargando el informe…");
     expect(screen.getByRole("region", { name: "Ocupación" })).toBeVisible();
   });
 

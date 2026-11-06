@@ -28,9 +28,11 @@ executionOrder:
     - fix003-reject
     - administrator-cancel-session
     - assistant-create-client
+    - coordinator-create-client
     - assistant-cash-payment-and-booking
     - fix227-cash
     - fix227-reject
     - fix227-expired-confirm
     - assistant-cash-close
     - trainer-attendance
+    - staff-profile-photo

@@ -36,7 +36,7 @@ numbered tests.
 | Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
-| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
+| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, «+ Nuevo cliente» with the invitation card since FIX-040, Bookings, «Cancelar una clase», no sale); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation, class, and Plan reminders (Tests 7 and 105), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
@@ -53,6 +53,7 @@ numbered tests.
 | Second walkthrough fixes | The rail's labels at 12 px, a missed Minimum Bookings check settled when the worker comes back, «Fecha de apertura» as dd/mm/aaaa, and phones without +591 (Test 130) | The phone normalization migration runs once on deploy |
 | The web's sign-in with the logo | Login, «¿Olvidaste tu contraseña?» and «Crea tu contraseña» with the studio's logo beside the form, their notices, errors and the throttled wait, at 1440 and 420 px (Test 131) | Busy buttons last only while a request is in flight |
 | Phones with a country code | «Celular» with a flag prefix and a country list in Regístrate (required), Editar perfil, Nuevo cliente, Invitar a alguien and the client's «Editar perfil» on the web; numbers with their flag in every list; WhatsApp in the number's own country (Test 132) | A store build older than FIX-037 registers without a phone |
+| Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and Horario, and next to the Trainer's name in the client's Reservar, class detail, Mis reservas and Historial (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -1615,8 +1616,8 @@ larger circle with the initials and the link **Cambiar foto**. Tapping it
 opens the photo library; pick an image and it appears inside the circle at
 once, centre-cropped, with "Subiendo foto…" under it while the upload runs
 (declare, upload, finalize, wait for the worker, attach: a few seconds). Then
-"Se recorta al centro en forma de círculo." and a second link, **Quitar
-foto**, appear. **Volver** shows the same photo in the Perfil summary card.
+a second link, **Quitar foto**, appears; no line about cropping shows
+(follow-up 247, FIX-041). **Volver** shows the same photo in the Perfil summary card.
 **Quitar foto** removes it: the initials come back on both screens. HEIC
 photos are converted to JPEG on the phone; the API keeps a 320 px display
 and a 96 px thumbnail variant without metadata and releases them at once when
@@ -2086,16 +2087,17 @@ Load the fixtures (Test 5A), start the backend, and start the worker with
   cancelled with cause `minimum_not_met` and no actor. Each of its Bookings is
   cancelled as `session_cancelled` with no actor and the class goes back to the
   Client's Plan. Each booked Client receives a push and an inbox entry
-  "Tu clase de Mat Pilates de hoy 18:00 se canceló porque no llegó al mínimo
-  de reservas. Te devolvimos la clase a tu plan. Hoy hay lugar en Reformer
-  19:00 y Mat Pilates 20:00." It names the later Sessions that day at the same
+  "Tu clase de Mat Pilates del martes 22 de septiembre, 18:00 se canceló
+  porque no llegó al mínimo de reservas. Te devolvimos la clase a tu plan. Ese
+  día hay lugar en Reformer 19:00 y Mat Pilates 20:00." (the notice always
+  names the day, never "de hoy", because it stays in the inbox afterwards) It names the later Sessions that day at the same
   Branch that still have places and that she has not booked (four at most,
-  then "y N más"), or ends "Hoy ya no quedan otras clases con lugar."; tapping
+  then "y N más"), or ends "Ese día ya no quedan otras clases con lugar."; tapping
   it opens Mis Reservas. The open Waitlist Entries close as
   `session_cancelled` and each waitlisted Client receives "La clase de … a la
   que estabas en lista de espera fue cancelada." The Trainer receives "Tu
-  clase de Mat Pilates de hoy 18:00 se canceló: no llegó al mínimo de 2
-  reservas.", which opens their agenda. A Session that reaches the minimum
+  clase de Mat Pilates del martes 22 de septiembre, 18:00 se canceló: no llegó
+  al mínimo de 2 reservas.", which opens their agenda. A Session that reaches the minimum
   stays scheduled. Either way the check is recorded in
   `empty_booking_check_completed_at` (the column kept its BOOK-004 name) and
   never runs again for that Session, even if its Bookings later drop. A
@@ -7018,15 +7020,23 @@ password, holding every Branch.
 ### B. The Staff app
 
 1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. She
-   lands on **Buscar cliente** without «+ Nuevo cliente» and with
-   **Cancelar una clase**, which opens the Administrator's cancellation
-   screens (Test 10 D).
-2. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
+   lands on **Buscar cliente** with «+ Nuevo cliente» (FIX-040), and
+   **Horario** has **Cancelar una clase**, which opens the Administrator's
+   cancellation screens (Test 10 D).
+2. **+ Nuevo cliente** opens the Assistant's form (Test 9 E): create a Client
+   with a fresh email. Her overview shows **Cuenta pendiente de activación**
+   with **Reenviar enlace** and the «Más opciones» menu (**Cambiar correo**,
+   **Cancelar invitación**), «La clienta necesita un plan activo para
+   reservar.», and no «Registrar pago en efectivo». The activation email
+   reaches the local capture, and `audit_log` has `client_invitation.created`
+   with her Account and the Role `COORDINATOR`. A search with no result offers
+   **Nuevo cliente** too.
+3. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
    for the Assistant (Test 11 B and C) at any Branch, but there is no
    «Registrar pago en efectivo». A Client without a Plan reads «La clienta
    necesita un plan activo para reservar.».
-3. Perfil reads «Coordinación» and «Todas las sucursales».
-4. As the Administrator, Perfil → «Ver la app como…» lists her under
+4. Perfil reads «Coordinación» and «Todas las sucursales».
+5. As the Administrator, Perfil → «Ver la app como…» lists her under
    «Coordinación»; seeing the app as her shows the same stack under the
    banner (Test 67).
 
@@ -8449,7 +8459,8 @@ F. **Nutricionista.** Mi agenda (S15): «Nutricionista · …», days as section
    «Aún no publicaste horarios». Nuevo/Editar horario (S17): a fixed Branch
    with one Branch, the turnos as a row, **Guardar** fixed with **Eliminar
    horario** as an Error text button.
-G. **Coordinación.** Buscar cliente has no **Nuevo cliente**; Horario has a
+G. **Coordinación.** Buscar cliente has **Nuevo cliente** like the Assistant's
+   (FIX-040), with no cash sale on the Client's file; Horario has a
    **Cancelar una clase** row and «Solo lectura. Para reservar, abre la ficha
    de una clienta.»; Para contactar (S28) shows each Client with her reasons
    as pills and **Abrir WhatsApp** / **Marcar contactada** as text actions,
@@ -8862,6 +8873,233 @@ Specs: `phone-number.spec.ts` (mobile-core and admin web),
 `new-client-phone.spec.tsx`, `contact-phone.spec.ts`,
 `profile-screen.spec.tsx`, `email-change.spec.tsx`, `staff-create.spec.tsx`,
 `contact-alerts-page.spec.tsx`.
+## Test 133: the client's payment in review and rejected receipt (FIX-043)
+
+The owner approved follow-up 246 (DES-010) on 2026-11-05: a payment in review
+or a rejected receipt is a state of its own, never another «Comprar un plan».
+Use a fresh fixtures copy with the API and the worker running (Test 5A,
+Test 46). Seed through the API, as the Staff suite's `seed.mjs` does:
+Mariana buys «Paquete de 8 clases» by transfer and sends a receipt (in
+review); Sofía does the same and Paola rejects it with the reason «El monto
+del comprobante no coincide con el plan.» (`POST
+/administrator/payments/{id}/reject`). Isabel's Plan has 0 classes left.
+
+A. **In review (C02c).** Log in as Mariana. **Inicio**'s rose card shows the
+   pill «En revisión», «Tu pago está en revisión», «Paquete de 8 clases ·
+   Bs N» with the amount she transferred, «Te avisamos apenas el
+   estudio lo confirme.» and **Ver estado del pago**; there is no **Comprar
+   un plan**. **Reservar una clase** under **Accesos rápidos** is locked with
+   «Tu pago está en revisión». Tapping the card or its button opens **Estado
+   del pago**.
+B. **The class detail (C04c–C04f).** In **Reservar**, open any class.
+   Mariana: **Reservar** is off with «Tu pago está en revisión. Podrás
+   reservar cuando el estudio lo confirme.» and **Ver estado del pago**.
+   Isabel: «No te quedan clases en tu plan.» with **Comprar un plan**. A new
+   Client without a Plan: «Necesitas un plan para reservar.» with **Comprar
+   un plan**. Lucía (classes left) still books.
+C. **Elegir plan.** As Mariana, go to **Perfil › Mi plan › Comprar un plan**
+   (or **Evaluación nutricional › Ver planes**): **Estado del pago** opens
+   instead of the Plans.
+D. **Rejected (C02d).** Log in as Sofía. **Inicio** shows «Pago rechazado»,
+   «No pudimos confirmar tu pago», the reason, the Plan and the amount, and
+   **Subir otro comprobante**; the booking shortcut says «Tu pago no se
+   confirmó». **Subir otro comprobante** opens the payment of the same Plan
+   (a payment she already started opens again instead of failing). A class
+   detail says «No pudimos confirmar tu pago.» with **Subir otro
+   comprobante**. Elegir plan opens the rejected payment.
+E. **The invoice reason (C10c).** On that payment, attach a receipt and open
+   **¿Necesitas factura?** with both fields empty: **Enviar comprobante** is
+   off and above it reads «Completa el NIT o CI, o cierra la factura». Type a
+   NIT: it reads «Completa el nombre o razón social, o cierra la factura»
+   (a NIT without a digit, such as `ABC`, reads «Revisa el NIT o CI, o
+   cierra la factura»).
+   Type the name, or close the invoice: «El estudio revisa tu pago y te
+   avisa por la app» and the button turns on.
+F. **After the decision.** Paola confirms Mariana's payment: Inicio shows
+   her Plan card and she books. Once Sofía sends another receipt, her card
+   changes to «Tu pago está en revisión».
+G. **The deadline's day (walkthrough n.º 27).** As Lucía, open a class later
+   today: the row reads «Cancela sin costo hasta hoy a las HH:MM». A class
+   early tomorrow (before the window reaches back past midnight) reads
+   «hasta mañana a las HH:MM», and one further out names it: «hasta el sáb 7
+   a las 05:30». Days are counted in La Paz time.
+H. **Tabs reopen on their root (walkthrough n.º 28).** As Lucía, book a
+   class: the app lands on **Mis reservas**. Tap **Reservar**: the day strip
+   and its classes show (the day chosen before stays chosen), not the class
+   detail. Tapping any tab of either app opens it on its root screen
+   (`popTabToRootOnPress`): in the Staff app, open a Client's file under
+   **Clientes**, tap **Horario**, then **Clientes**, and the search shows. Only
+   the tap does it: a notification that opens another tab still comes back
+   to Notificaciones with **Volver**.
+I. **A cancellation is confirmed (walkthrough n.º 29).** As Lucía, cancel a
+   booking outside the window: the row goes and the toast reads «Reserva
+   cancelada · La clase volvió a tu plan · Te quedan N clases». As Camila,
+   cancel one of Lucía's bookings from her file: «Reserva cancelada · La
+   clase volvió a su plan». A cancellation inside the window is refused, so
+   no toast says the class was lost.
+
+Specs: `home-payment-standing.spec.tsx`, `session-detail-reasons.spec.tsx`,
+`plans-payment-gate.spec.tsx`, `payment-invoice-data.spec.tsx`,
+`purchase-flow.spec.tsx`, `payment-status-back.spec.tsx`,
+`invoice-data-card.spec.tsx`, `session-format.spec.ts` (the deadline's
+day, near midnight included), `tab-root.spec.tsx`, `booking-toast-cancel.spec.tsx`,
+the Staff app's `role-tabs.spec.tsx` and `client-bookings-toast.spec.tsx`. Maestro: `purchase-plan-transfer.yaml` now
+checks Inicio and the class detail after the receipt.
+
+## Test 134: cancelled classes in the Horario and the agenda, Editar sesión on proposal A, the rail without «E» (FIX-042)
+
+The owner's decisions of 2026-11-05 (decisiones §20.24, design follow-ups
+243 to 245, DES-009). Use a fixtures copy with the API **and the worker**
+running: the worker's 3-hour check cancels today's classes that have fewer
+than 2 bookings, which gives real «mínimo no alcanzado» cancellations.
+
+A. **Seed through the API** as Paola (`paola.mendoza@example.com`): cancel a
+   class two or more days ahead (`POST /administrator/sessions/:id/cancel`)
+   and pause another weekly series from two days ahead for two weeks
+   (`POST /administrator/session-schedules/:id/pause` with `pausedFrom` and
+   `pausedUntil`).
+B. **The week at 1440 px.** **Horario › Clases**: the rail starts at
+   **Inicio** with no «E» above it. Today's cancelled classes stay in their
+   slot with a dashed left edge and no fill: class, time and trainer, then
+   **Cancelada · mínimo**. The subtitle reads «N sesiones esta semana · M
+   canceladas». Next week shows **Cancelada · estudio** and **Serie en
+   pausa** on the class you cancelled and the paused series. A series you
+   changed or ended leaves nothing behind.
+C. **Read-only panel.** Click a cancelled class: the panel is titled **Clase
+   cancelada**, with the cause pill, «Se canceló sola el jueves 5 de
+   noviembre a las HH:MM: no llegó al mínimo de reservas.» (adding «Las
+   clientas que reservaron recuperaron su clase.» only when it had bookings),
+   or «La canceló el estudio el …», or «Esta clase no se publica: su serie
+   está en pausa.», and the Entrenadora and Lugares rows («N de M al
+   cancelarse»). No booking button, no fields, no Guardar.
+D. **Editar sesión (proposal A).** Open a standing class of a weekly series:
+   **Reservaron (n)** with a small **Reservar** button beside it (on a full
+   class, **Lista de espera**), the bookings as a plain list, then **Aplicar
+   cambios a** over **Solo esta sesión / Esta y las futuras** and the fields,
+   **Guardar** and **Cancelar esta clase** (its confirmation is «¿Cancelar
+   esta clase?» with **Sí, cancelar la clase**), and last a row «Serie semanal
+   · cada miércoles 07:00» with **Pausar la serie** (or **Reanudar la
+   serie**) and **Terminar la serie** in both scopes. Every button stays
+   inside the panel's margins.
+E. **At 420 px.** The day list shows the cancelled classes the same way; the
+   panel opens full screen with the same order and no sideways scroll.
+F. **Mi agenda (Staff app).** Log in as the trainer of today's cancelled
+   classes on the iPhone 16 Pro, the iPad and Android: the cancelled classes
+   keep a muted card with a dashed edge, the class and the cause pill under
+   it, and no chevron; tapping does nothing. The title counts them («Hoy · 2
+   clases · 1 cancelada», or «Hoy · 2 canceladas» when none stands), and «Hoy
+   no tienes clases» shows only for a day with nothing at all. An older app
+   build, which does not ask for `includeCancelled`, keeps showing only the
+   standing classes.
+
+Specs: `cancelled-sessions.spec.tsx`, `session-cancellation.spec.ts`,
+`session-edit.spec.tsx`, `admin-shell.spec.tsx` (admin web);
+`agenda-cancelled.spec.tsx` (Staff app); `administrator-sessions` and
+`trainer-schedule` integration specs, `booking.controller.spec.ts` and
+`administrator.e2e-spec.ts` (backend).
+
+## Test 135: the staff profile photo (FIX-041)
+
+The owner chose proposal A of DES-008 on 2026-11-05 (decisiones §20.23;
+design follow-ups 240 to 242 and 247). Use a database copy with the fixtures
+(Test 5A) and run the API **with the worker**: an upload stays processing
+without it. Keep a JPEG of a face in the Simulator's library
+(`xcrun simctl addmedia <udid> photo.jpg`) or `adb push` it on Android.
+
+A. **Her own photo, Staff app.** Log in as Emma Vargas (Trainer) and open
+   **Perfil**. Her 72 px circle shows «EV» on a pale rose disc, and under her
+   name and email sits **Cambiar foto**. Tap it, pick the photo: it shows at
+   once under a light veil with a ring and «Subiendo foto…», then stays.
+   **Quitar foto** now sits beside **Cambiar foto**. The note reads «Tu
+   nombre y tu correo los actualiza administración.»; there is no line about
+   cropping (follow-up 247). **Quitar foto** brings «EV» back at once with
+   «Quitando foto…». With the API stopped, both actions end in a Lino row
+   with a red alert icon: «No pudimos subir la foto. Inténtalo de nuevo.» /
+   «No pudimos quitar la foto. Inténtalo de nuevo.»
+B. **Anyone's photo, admin web.** As Paola (Administrator) open **Estudio ›
+   Personal**: every member shows her photo or her initials in a 40 px
+   circle. **Abrir** on Daniela Ortiz opens the panel with a 96 px circle,
+   **Cambiar foto**, **Quitar foto** when there is one, and «JPG, PNG o WebP,
+   hasta 5 MB.» (ADR-0072). A PDF or a 6 MB image shows «Elige una foto JPG, PNG o
+   WebP de hasta 5 MB.» before anything uploads. The photo saves without
+   **Guardar**. As Carolina (Coordinator) the same panel lets her change the
+   photo too, and her notice reads «Puedes cambiar sus sedes y su foto.
+   Invitar y cambiar roles lo hace Administración.»
+C. **The top bar.** Paola's own photo (set in step A from her Staff app
+   Perfil) replaces «PM» in the account chip at the top right of every page.
+D. **Where the Trainer appears.** With Emma's photo set: the admin web's
+   **Horario** blocks show a 20 px photo before «Emma Vargas»; the Staff
+   app's **Horario** lines and an Assistant's class detail («Entrenadora»
+   row, 36 px) show it too; a client (Lucía) sees it before the Trainer's
+   name in **Reservar**, in the class detail's «La clase», in **Mis
+   reservas** and in **Historial**. A Trainer without a photo shows her
+   initials in the same places.
+E. **The API.** `PUT /api/v1/staff-members/current/photo`, `PUT` and
+   `DELETE /api/v1/administrator/staff-members/{id}/photo` (Administrator and
+   Coordinator; anyone else `403 staff_access_denied`, a deactivated member
+   `409 staff_member_deactivated`), and `GET /api/v1/staff-photos/{imageAssetId}?variant=thumbnail`
+   for any signed-in Account: `Cache-Control: private, no-cache`, an `ETag`,
+   and `304` with `If-None-Match`; an asset no Staff Member shows answers
+   `404 profile_photo_not_found`. Each change writes
+   `staff_member.photo_changed` / `staff_member.photo_removed` on the
+   member's Account with the actor who made it.
+F. **At 420 px** the admin web's member panel fills the width and the
+   controls wrap without sideways scroll.
+G. **Clients' photos where the staff see them** (walkthrough n.º 30). Give
+   Mariana a photo from the client app's **Editar perfil**. Her initials
+   «MQ» become her photo in the Trainer's class roster, Buscar cliente and
+   her file, Pagos pendientes and Revisar pago, Para contactar and
+   Congelamientos in the Staff app, and in Clientas, her file, Dinero ›
+   Pagos, the class panel's «Reservaron» and Inicio's pending list on the
+   admin web. `GET /api/v1/client-photos/{imageAssetId}` answers any Staff
+   Role (`private, no-cache`, `ETag`, `304`) and `403 booking_access_denied`
+   to a Client.
+
+Specs: `staff-photo.spec.ts`, `staff-photo.e2e-spec.ts`,
+`staff-photo.integration-spec.ts`, `staff-photo.spec.tsx` (mobile-core), and
+the apps' Perfil, Personal, Horario, Reservar and Mis reservas specs.
+
+## Test 140: the Emma logo on every loading page of the admin web (WEB-045)
+
+The owner asked on 2026-11-05 for the logo wherever the web is loading
+something, centred (follow-ups 94, 107 and 250). Any database copy works.
+To see each state long enough, slow the network: in Chrome DevTools open
+Network and pick **Slow 3G**, or put a small delaying proxy between the web
+and the API (`ADMIN_API_PROXY_TARGET` pointing at it).
+
+A. **First load.** Open [http://localhost:5173](http://localhost:5173)
+   signed in. The whole window is cream (Crema) with only the logo in the
+   middle, from the first instant; then the shell appears.
+B. **Pages at 1440 px.** With the network slowed, open each page from the
+   rail: Inicio, Horario (Clases, Nutrición), Clientas (the list, Para
+   contactar, Congelamientos), Promociones (Promociones, Clases de campaña,
+   Referidos, Contactos), Comentarios, Dinero (Pagos, Caja, Sueldos and
+   Pagados, Gastos), Estudio (Personal, Insumos and Retiros, Equipos),
+   Informes (El mes, Dinero, Simulador) and Ajustes (every tab). Each keeps
+   its title, tabs, filters and buttons, and after a short moment shows
+   **only the logo**, breathing, centred in the space under them (not at the
+   top, not in a box, no «Cargando …» text). A fast answer never flashes it.
+   Inicio shows the logo under the greeting and never says «Todo al día»
+   before its counts arrive. Informes › Dinero shows one logo, not two.
+C. **Side panels.** Open a client from Clientas: the file shows the logo in
+   the middle of the panel while it loads, and again on Reservas, Pagos and
+   Evaluaciones the first time each tab opens. Open a class on Horario and a
+   payment on Dinero › Pagos: same. On Estudio › Equipos, switch the
+   «Fallas» chips: the logo shows in the card's place while they load.
+D. **At 420 px.** Narrow the window to 420 px and repeat a few pages and a
+   panel: the logo is 240 px wide and centred under the page's header, with
+   no sideways scroll.
+E. **Reduce Motion.** With the system's Reduce Motion on, the logo appears
+   still (no fade, no breathing), after the same short moment.
+F. **What keeps its own pattern.** A busy button keeps its spinner; a
+   select reading its options («Cargando sucursales…») keeps that text; the
+   Dinero card on Inicio keeps its own short line when it switches Hoy / Mes;
+   «No pudimos cargar …» keeps its card with **Reintentar**.
+
+Specs: `branded-loading.spec.tsx`, `page-pending.spec.tsx`,
+`home-page.spec.tsx`, `campaign-page.spec.tsx`, `studio-rules-page.spec.tsx`,
+and every page spec that asserts its loading state through
+`src/test/branded-loading.ts`.
 
 ## Test 136: the issued invoice, uploaded and handed to the Client (FIX-044)
 

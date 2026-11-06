@@ -2,6 +2,7 @@ import { useGetPaymentReview } from "@pilates/api-contracts";
 import {
   CardActionRow,
   cardWithActionRow,
+  ClientFace,
   colors,
   EmphasisCard,
   fontFamilies,
@@ -175,6 +176,14 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
             <PersonRow
               amount={formatBolivianos(payment.amountDueCentavos)}
               detail={payment.planName}
+              face={
+                <ClientFace
+                  fetcher={fetcher}
+                  name={payment.clientName}
+                  photo={payment.clientPhoto}
+                  size={36}
+                />
+              }
               name={payment.clientName}
             />
           </IconRowGroup>

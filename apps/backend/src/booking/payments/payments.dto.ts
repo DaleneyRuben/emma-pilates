@@ -5,6 +5,7 @@ import {
   InvoiceDataDto,
   invoiceDataField,
 } from './invoice-data/invoice-data.dto';
+import { ClientPhotoDto } from '../client/client-discovery.dto';
 
 const uuid = z.uuid();
 
@@ -278,6 +279,13 @@ export class PendingPaymentDto {
   @ApiProperty()
   clientName!: string;
 
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'The Client photo (FIX-041), null while her initials stand in',
+  })
+  clientPhoto!: ClientPhotoDto | null;
+
   @ApiProperty()
   planName!: string;
 
@@ -310,6 +318,13 @@ export class PaymentReviewDto extends PaymentDto {
       'FIX-044: the NIT or CI and name she asked the invoice for; null is «Sin factura»',
   })
   invoiceData!: InvoiceDataDto | null;
+
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'The Client photo (FIX-041), null while her initials stand in',
+  })
+  clientPhoto!: ClientPhotoDto | null;
 
   @ApiPropertyOptional({ type: PaymentReceiptDto, nullable: true })
   receipt!: PaymentReceiptDto | null;

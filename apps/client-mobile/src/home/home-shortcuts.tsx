@@ -42,7 +42,9 @@ function Disc({ icon }: { icon: GlyphName }) {
 /** The locked «Reservar una clase» row without a Plan: a note and the lock. */
 export function LockedShortcutRow({ label, note }: { label: string; note: string }) {
   return (
+    // The label hides the note from screen readers, so the hint carries it.
     <Pressable
+      accessibilityHint={note}
       accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ disabled: true }}

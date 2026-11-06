@@ -1,3 +1,4 @@
+import type { ClientPhotoRef } from '../client/client-photo-of';
 import {
   PaymentMethod,
   PaymentState,
@@ -78,6 +79,7 @@ export type ReferralsView = {
 export type PendingPaymentSummary = {
   id: string;
   clientName: string;
+  clientPhoto: ClientPhotoRef;
   planName: string;
   amountDueCentavos: number;
   submittedAt: Date;
@@ -87,6 +89,7 @@ export type PendingPaymentSummary = {
 export type PaymentReview = PaymentView & {
   clientName: string;
   invoiceData: { taxId: string; name: string } | null;
+  clientPhoto: ClientPhotoRef;
   receipt: { imageAssetId: string; mediaType: string } | null;
 };
 

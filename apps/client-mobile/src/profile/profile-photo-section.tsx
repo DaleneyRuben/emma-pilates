@@ -75,9 +75,6 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
   return (
     <View style={styles.section}>
       <ClientAvatar name={client.name} photoUri={shownUri} size={96} />
-      {shownUri === null ? null : (
-        <BodyText style={styles.note}>Se recorta al centro en forma de círculo.</BodyText>
-      )}
       {state.status === "uploading" ? (
         <BodyText accessibilityLabel="Subiendo foto" style={styles.note}>
           Subiendo foto…

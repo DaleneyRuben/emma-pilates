@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import { StaffPhotoDto } from '../staff/photo/staff-photo.dto';
 import type { ClientSubscriptionStatus } from './client-subscription';
 
 export class UpdateClientProfileDto {
@@ -257,6 +258,14 @@ export class SessionDetailDto {
 
   @ApiProperty()
   trainerName!: string;
+
+  @ApiProperty({
+    type: StaffPhotoDto,
+    nullable: true,
+    description:
+      'The Trainer photo (FIX-041), null while her initials stand in',
+  })
+  trainerPhoto!: StaffPhotoDto | null;
 
   @ApiProperty({ format: 'date-time' })
   startsAt!: Date;
