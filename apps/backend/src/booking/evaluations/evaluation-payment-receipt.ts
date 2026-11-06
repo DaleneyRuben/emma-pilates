@@ -182,8 +182,8 @@ export const evaluationReceiptOf = (
     | {
         id: string;
         deletedAt: Date | null;
-        declaredMediaType: 'JPEG' | 'PNG' | 'WEBP';
-        verifiedMediaType: 'JPEG' | 'PNG' | 'WEBP' | null;
+        declaredMediaType: 'JPEG' | 'PNG' | 'WEBP' | 'PDF';
+        verifiedMediaType: 'JPEG' | 'PNG' | 'WEBP' | 'PDF' | null;
       }
     | null
     | undefined,
@@ -195,6 +195,7 @@ export const evaluationReceiptOf = (
     JPEG: 'image/jpeg',
     PNG: 'image/png',
     WEBP: 'image/webp',
+    PDF: 'application/pdf',
   } as const;
   return {
     imageAssetId: asset.id,

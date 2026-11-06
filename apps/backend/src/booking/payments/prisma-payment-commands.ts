@@ -109,6 +109,7 @@ const mediaTypes: Record<ImageMediaType, string> = {
   [ImageMediaType.JPEG]: 'image/jpeg',
   [ImageMediaType.PNG]: 'image/png',
   [ImageMediaType.WEBP]: 'image/webp',
+  [ImageMediaType.PDF]: 'application/pdf',
 };
 
 const abbreviateName = (name: string): string => {

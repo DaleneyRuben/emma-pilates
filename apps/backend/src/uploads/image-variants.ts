@@ -7,9 +7,10 @@ export type ImageVariantKind =
   | 'readable'
   | 'promotion_480'
   | 'promotion_960'
-  | 'promotion_1440';
+  | 'promotion_1440'
+  | 'document';
 
-export type VariantMediaType = 'image/jpeg' | 'image/webp';
+export type VariantMediaType = 'image/jpeg' | 'image/webp' | 'application/pdf';
 
 type VariantPlan = {
   kind: ImageVariantKind;
@@ -49,6 +50,21 @@ export const variantPlans: Readonly<
       kind: 'thumbnail',
       box: { width: 96, height: 96 },
       fit: 'cover',
+      encode: { format: 'jpeg', quality: 80, chroma: '4:2:0' },
+    },
+  ],
+  // FIX-044: an invoice photo reads like a receipt; a PDF has no plan.
+  invoice: [
+    {
+      kind: 'readable',
+      box: { width: 2048, height: 2048 },
+      fit: 'inside',
+      encode: { format: 'jpeg', quality: 85, chroma: '4:4:4' },
+    },
+    {
+      kind: 'thumbnail',
+      box: { width: 800, height: 800 },
+      fit: 'inside',
       encode: { format: 'jpeg', quality: 80, chroma: '4:2:0' },
     },
   ],
@@ -133,10 +149,27 @@ const orientedSize = (
   return swapped ? { width: height, height: width } : { width, height };
 };
 
+const isPdf = (bytes: Buffer): boolean =>
+  bytes.subarray(0, 5).toString('latin1') === '%PDF-';
+
 export const buildImageVariants = async (
   bytes: Buffer,
   purpose: ImagePurpose,
 ): Promise<BuiltImageVariant[]> => {
+  // FIX-044: a verified PDF invoice is kept byte for byte; the server never
+  // renders it.
+  if (purpose === 'invoice' && isPdf(bytes)) {
+    return [
+      {
+        kind: 'document',
+        mediaType: 'application/pdf',
+        bytes,
+        byteSize: bytes.byteLength,
+        width: 0,
+        height: 0,
+      },
+    ];
+  }
   const metadata = await sharp(bytes).metadata();
   if ((metadata.pages ?? 1) > 1) {
     throw new Error('image_animated_not_allowed');

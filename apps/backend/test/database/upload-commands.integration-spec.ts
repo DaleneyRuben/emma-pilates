@@ -185,6 +185,62 @@ describe('Prisma upload commands', () => {
     });
   });
 
+  // FIX-044: an invoice PDF is checked and kept byte for byte as one private
+  // `document` variant, with no pixel size.
+  it('verifies an invoice PDF and keeps it as its document variant', async () => {
+    await withRollback(async (tx) => {
+      const account = await createAccount(tx);
+      const bytes = Buffer.from('%PDF-1.7\n1 0 obj\n<< >>\nendobj\n%%EOF\n');
+      const checksum = createHash('sha256').update(bytes).digest();
+      const commands = createPrismaUploadCommands(
+        tx,
+        storage,
+        () => new Date('2026-11-05T14:00:00Z'),
+        boss,
+      );
+      const jobCommands = createFinalizeUploadJobCommands(
+        tx,
+        storage,
+        () => new Date('2026-11-05T14:01:00Z'),
+      );
+
+      const intent = await commands.createPendingUpload({
+        ownerAccountId: account.id,
+        purpose: 'invoice',
+        mediaType: 'application/pdf',
+        byteSize: bytes.byteLength,
+        checksum,
+      });
+      await storage.put(intent.pendingObjectKey, bytes);
+      await commands.finalizeUpload({ imageAssetId: intent.id }, account.id);
+      await jobCommands.process({ imageAssetId: intent.id });
+
+      const asset = await tx.imageAsset.findUniqueOrThrow({
+        where: { id: intent.id },
+        include: { variants: true },
+      });
+      expect(asset).toMatchObject({
+        state: 'READY',
+        purpose: 'INVOICE',
+        verifiedMediaType: 'PDF',
+        verifiedWidth: 0,
+        verifiedHeight: 0,
+      });
+      expect(asset.variants).toHaveLength(1);
+      expect(asset.variants[0]).toMatchObject({
+        kind: 'DOCUMENT',
+        mediaType: 'PDF',
+        width: 0,
+        height: 0,
+        storageKey: `private/invoice/${intent.id}/document`,
+      });
+      await expect(storage.get(asset.variants[0].storageKey)).resolves.toEqual(
+        bytes,
+      );
+      await storage.delete(asset.variants[0].storageKey);
+    });
+  });
+
   it('keeps variant rows a retried verification replaces, marked removed', async () => {
     await withRollback(async (tx) => {
       const account = await createAccount(tx);
