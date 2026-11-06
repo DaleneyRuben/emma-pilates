@@ -36,6 +36,10 @@ const metrics = {
   insets: { bottom: 34, left: 0, right: 0, top: 62 },
 };
 
+const failing = jest.fn(() =>
+  Promise.resolve(new Response(null, { status: 500 })),
+) as unknown as typeof globalThis.fetch;
+
 const renderInvoice = (fetcher: typeof globalThis.fetch) =>
   render(
     <SafeAreaProvider initialMetrics={metrics}>
@@ -43,6 +47,7 @@ const renderInvoice = (fetcher: typeof globalThis.fetch) =>
         <PdfInvoice
           cacheKey={["invoice", "payment-1"]}
           fetcher={fetcher}
+          fileName="Factura 204.pdf"
           footer={<Text>Descargar</Text>}
           pageUrl={(page) => `/invoices/payment-1/file/pages/${page}`}
         />
@@ -57,6 +62,13 @@ describe("loadPdfPage", () => {
     expect(page.pageCount).toBe(2);
     expect(page.aspectRatio).toBeCloseTo(1400 / 1980);
     expect(page.uri.startsWith("data:image/png;base64,")).toBe(true);
+  });
+
+  // Review of FIX-051: the API draws at most 100 pages.
+  it("counts at most the 100 pages the API draws", async () => {
+    const page = await loadPdfPage(pageFetcher(300), "/pages/1");
+
+    expect(page.pageCount).toBe(100);
   });
 
   it("throws when the page cannot be drawn, so the query retries", async () => {
@@ -99,5 +111,14 @@ describe("PdfInvoice", () => {
     await waitFor(() => {
       expect(screen.queryByText("Factura · 1 de 2")).toBeNull();
     });
+  });
+
+  // Review of FIX-051: when the first page cannot be drawn, the file's name
+  // shows instead of a spinner that never ends.
+  it("falls back to the file's name when the first page fails", async () => {
+    const screen = await renderInvoice(failing);
+
+    expect(await screen.findByText("Factura 204.pdf", {}, { timeout: 5000 })).toBeOnTheScreen();
+    expect(screen.getByLabelText("Factura en PDF")).toBeOnTheScreen();
   });
 });
