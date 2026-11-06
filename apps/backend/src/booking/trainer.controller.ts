@@ -20,6 +20,7 @@ import type { AuthenticatedPrincipal } from '../system-identity/authentication/r
 import {
   parseAttendance,
   parseCalendarDate,
+  parseOptionalFlag,
   parseUuid,
   TrainerScheduleSessionDto,
   TrainerSessionRosterDto,
@@ -89,17 +90,24 @@ export class TrainerScheduleController {
   @Get()
   @ApiOperation({ operationId: 'listTrainerSchedule' })
   @ApiQuery({ name: 'on', required: true, schema: { format: 'date' } })
+  @ApiQuery({ name: 'includeCancelled', required: false, type: Boolean })
   @ApiOkResponse({ type: TrainerScheduleSessionDto, isArray: true })
   async list(
     @Query('on') on: string,
     @Headers('authorization') authorization: string | undefined,
+    @Query('includeCancelled') includeCancelled?: string,
   ): Promise<TrainerScheduleSessionDto[]> {
     const parsedOn = parseCalendarDate(on);
     if (parsedOn === null) throw invalidRequest('Invalid schedule date');
+    const withCancelled = parseOptionalFlag(includeCancelled);
+    if (withCancelled === null) throw invalidRequest('Invalid schedule flag');
     const principal = await this.authenticate(authorization);
 
     try {
-      return await this.listTrainerSchedule({ on: parsedOn }, principal);
+      return await this.listTrainerSchedule(
+        { on: parsedOn, includeCancelled: withCancelled },
+        principal,
+      );
     } catch (error) {
       return rethrowAsProblem(error);
     }

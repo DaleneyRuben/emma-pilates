@@ -18,9 +18,9 @@ const openConfirmation = async () => {
   );
   const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
   await user.click(
-    within(panel).getByRole("button", { name: "Cancelar sesión" }),
+    within(panel).getByRole("button", { name: "Cancelar esta clase" }),
   );
-  return screen.findByRole("alertdialog", { name: "¿Cancelar esta sesión?" });
+  return screen.findByRole("alertdialog", { name: "¿Cancelar esta clase?" });
 };
 
 // BKM-004: AW03's last-resort cancellation names the Cancellation Window

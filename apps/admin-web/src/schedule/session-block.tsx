@@ -1,4 +1,5 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
+import { StaffPhoto } from "../components/staff-photo";
 import { boliviaParts } from "../lib/bolivia-time";
 import { cn } from "../lib/cn";
 import {
@@ -7,6 +8,11 @@ import {
   type EquipmentFlag,
 } from "./equipment-flag-data";
 import { EquipmentFlagLine } from "./equipment-flags";
+import {
+  cancellationOf,
+  causeLabel,
+  causeShortLabel,
+} from "./session-cancellation";
 
 type Session = AdministratorSessionAvailabilityDto;
 
@@ -29,10 +35,85 @@ const occupancy = (session: Session): string =>
       : "Llena"
     : `${session.bookedCount}/${session.capacity}`;
 
+// FIX-042: a cancelled class keeps its place, muted, with its cause.
+function CancelledBlock({
+  session,
+  onOpen,
+  className,
+  style,
+}: {
+  session: Session;
+  onOpen: (session: Session) => void;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const cause = cancellationOf(session)?.cause ?? "studio";
+  const start = boliviaParts(session.startsAt).time;
+  const end = boliviaParts(session.endsAt).time;
+  return (
+    <button
+      type="button"
+      aria-label={[
+        session.classTypeName,
+        start,
+        session.trainerName,
+        causeLabel(cause),
+      ].join(", ")}
+      onClick={() => onOpen(session)}
+      style={style}
+      className={cn(
+        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border-l-[3px] border-dashed border-texto-muy-tenue/60 bg-superficie px-2 py-1 text-left text-texto-tenue transition-shadow hover:bg-lino focus-visible:shadow-foco lg:px-1.5 xl:px-2",
+        className,
+      )}
+    >
+      <span className="w-full text-ayuda leading-tight whitespace-nowrap text-texto xl:text-[12.5px]">
+        {session.classTypeName}
+      </span>
+      <span className="w-full text-[11px] leading-tight whitespace-nowrap tabular lg:text-ayuda">
+        {start} – {end} · {session.trainerName}
+      </span>
+      <span className="w-full shrink-0 truncate text-ayuda leading-tight font-medium">
+        {causeShortLabel(cause)}
+      </span>
+    </button>
+  );
+}
+
 // AW02: each block names the Class Type, the Bolivia start time, and the
 // Trainer; a full Session reads as such, with its waitlist. A Session with
 // more places than working Equipment carries the warning (follow-up 170).
 export function SessionBlock({
+  session,
+  onOpen,
+  className,
+  style,
+}: {
+  session: Session;
+  onOpen: (session: Session) => void;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  if (cancellationOf(session) !== null) {
+    return (
+      <CancelledBlock
+        session={session}
+        onOpen={onOpen}
+        className={className}
+        style={style}
+      />
+    );
+  }
+  return (
+    <StandingBlock
+      session={session}
+      onOpen={onOpen}
+      className={className}
+      style={style}
+    />
+  );
+}
+
+function StandingBlock({
   session,
   onOpen,
   className,
@@ -68,7 +149,17 @@ export function SessionBlock({
       </span>
       <span className="w-full text-[11px] leading-tight whitespace-nowrap text-texto-secundario tabular lg:text-ayuda">
         {start} – {end}
-        <span className="text-texto-tenue"> · {session.trainerName}</span>
+        <span className="text-texto-tenue"> · </span>
+        {/* Follow-up 242: her 20 px photo leads her name, when she has one. */}
+        {session.trainerPhoto === null ? null : (
+          <StaffPhoto
+            name={session.trainerName}
+            photo={session.trainerPhoto}
+            size={20}
+            className="mr-1 align-middle"
+          />
+        )}
+        <span className="text-texto-tenue">{session.trainerName}</span>
       </span>
       <span
         className={cn(

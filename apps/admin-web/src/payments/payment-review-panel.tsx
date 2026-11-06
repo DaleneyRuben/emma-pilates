@@ -1,6 +1,7 @@
 import type { AdminPaymentDto, PaymentReviewDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { isApiError } from "../api/problem";
+import { ClientPhoto } from "../components/client-photo";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { SidePanelBody } from "../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../components/panel/summary-rows";
@@ -58,6 +59,12 @@ function ReviewBody({
             Otra persona ya decidió este pago.
           </p>
         )}
+        {/* FIX-041: whose transfer it is; her name heads the panel. */}
+        <ClientPhoto
+          name={review.clientName}
+          photo={review.clientPhoto}
+          size={40}
+        />
         <PaymentSummary review={review} />
         <ReceiptViewer
           receiptUrl={review.receiptUrl ?? null}

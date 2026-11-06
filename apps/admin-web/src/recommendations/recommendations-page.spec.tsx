@@ -10,6 +10,7 @@ import {
 } from "../test/msw";
 import userEvent from "@testing-library/user-event";
 import { RecommendationsSection } from "./recommendations-page";
+import { findBrandedLoading } from "../test/branded-loading";
 
 const listPath = "/api/v1/administrator/recommendations";
 
@@ -110,8 +111,6 @@ describe("AW44 Recomendaciones del mes", () => {
     server.use(http.get(apiUrl(listPath), () => new Promise(() => undefined)));
     renderSection();
 
-    expect(
-      await screen.findByText("Cargando las recomendaciones…"),
-    ).toBeVisible();
+    await findBrandedLoading("Cargando las recomendaciones…");
   });
 });

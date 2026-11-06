@@ -18,6 +18,7 @@ import { SubscriptionScreen } from "../subscription/subscription-screen";
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
+  useIsFocused: () => true,
   useNavigation: () => ({ goBack: jest.fn(), navigate: jest.fn(), popTo: jest.fn() }),
 }));
 

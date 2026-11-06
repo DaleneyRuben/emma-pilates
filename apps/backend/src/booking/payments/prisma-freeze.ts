@@ -8,7 +8,10 @@ import {
   StaffRole,
 } from '../../generated/prisma/client';
 import { retrySerializable } from '../../database/retry-serializable';
-import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
+import {
+  settleReviewNotices,
+  type NotificationRecorder,
+} from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { decideFreeze, FreezeAccessDeniedError } from './decide-freeze';
@@ -156,6 +159,15 @@ export const createFreezeCommands = (
     });
   };
 
+  const settleFreezeRequest = (
+    transaction: Prisma.TransactionClient,
+    input: { freezeId: string; decidedAt: Date },
+  ) =>
+    settleReviewNotices(transaction, {
+      businessEventKey: `freeze-requested:${input.freezeId}`,
+      settledAt: input.decidedAt,
+    });
+
   const decide = async (
     command: { freezeId: string; decision: 'approved' | 'refused' },
     principal: AuthenticatedPrincipal,
@@ -191,8 +203,14 @@ export const createFreezeCommands = (
                 endsOn: row.endsOn,
               };
             },
-            approve: (input) => approveFreeze(transaction, input),
-            refuse: (input) => refuseFreeze(transaction, input),
+            approve: async (input) => {
+              await approveFreeze(transaction, input);
+              await settleFreezeRequest(transaction, input);
+            },
+            refuse: async (input) => {
+              await refuseFreeze(transaction, input);
+              await settleFreezeRequest(transaction, input);
+            },
             record: (notification) =>
               dependencies.recordNotification(transaction, notification),
             now: dependencies.now,

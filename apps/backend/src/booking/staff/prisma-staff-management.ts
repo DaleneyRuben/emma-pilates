@@ -1,3 +1,4 @@
+import { staffPhotoOf } from './photo/staff-photo-of';
 import type { PgBoss } from 'pg-boss';
 import { retrySerializable } from '../../database/retry-serializable';
 import {
@@ -43,6 +44,7 @@ const staffSelect = {
   name: true,
   phone: true,
   role: true,
+  profileImageAssetId: true,
   branchAssignments: {
     where: { deletedAt: null },
     select: { branchId: true },
@@ -91,6 +93,7 @@ const toRecord = (row: StaffRow): StaffMemberRecord | null => {
       status === 'pending'
         ? (row.account.authenticationTokens[0]?.expiresAt ?? null)
         : null,
+    photo: staffPhotoOf(row.profileImageAssetId),
   };
 };
 

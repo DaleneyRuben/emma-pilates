@@ -6,6 +6,7 @@ import {
   startEvaluationTestWorld,
   type EvaluationTestWorld,
 } from './evaluation-test-support';
+import { attachClientPhoto } from './client-photo-test-support';
 
 const codeOf = async (work: Promise<unknown>): Promise<string> => {
   try {
@@ -22,6 +23,7 @@ describe('Prisma administration oversight reads', () => {
   const oversight = () =>
     createPrismaOversight(world.prisma, { now: () => fixtureNow });
   const administrator = () => world.principalOf('paola.mendoza@example.com');
+  let anaPhoto: string;
 
   beforeAll(async () => {
     world = await startEvaluationTestWorld();
@@ -47,13 +49,17 @@ describe('Prisma administration oversight reads', () => {
         createdByAccountId: ana.account!.id,
       },
     });
+    anaPhoto = await attachClientPhoto(world.prisma, ana.id);
+    await world.prisma.founderMembership.create({
+      data: { clientId: ana.id, number: 1, since: fixtureNow },
+    });
   });
 
   afterAll(async () => {
     await world?.stop();
   });
 
-  it('lists booked Evaluations in a date range for Administrators only', async () => {
+  it('lists booked Evaluations in a date range, with the Client photo, for Administrators only', async () => {
     const page = await oversight().listEvaluations(
       {
         from: new Date('2026-09-21T04:00:00.000Z'),
@@ -67,6 +73,7 @@ describe('Prisma administration oversight reads', () => {
     expect(page.totalItems).toBe(1);
     expect(page.items[0]).toMatchObject({
       clientName: 'Ana Justiniano',
+      clientPhoto: { imageAssetId: anaPhoto },
       nutritionistName: expect.any(String) as string,
       branchName: expect.any(String) as string,
     });
@@ -78,6 +85,20 @@ describe('Prisma administration oversight reads', () => {
         ),
       ),
     ).resolves.toBe('administration_access_denied');
+  });
+
+  it('lists the Fundadoras with each Client photo', async () => {
+    await expect(
+      oversight().listFounders(await administrator()),
+    ).resolves.toMatchObject({
+      items: [
+        {
+          number: 1,
+          clientName: 'Ana Justiniano',
+          clientPhoto: { imageAssetId: anaPhoto },
+        },
+      ],
+    });
   });
 
   it('lists Referrals searchable by either Client without accents', async () => {

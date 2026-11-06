@@ -67,7 +67,8 @@ describe("Assistant reschedule option card", () => {
       borderTopColor: "#EFE7DE",
       paddingTop: 12,
     });
-    expect(card.getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
+    // FIX-041: her face (here her initials) leads her name.
+    expect(card.getByText("EV")).toBeOnTheScreen();
     expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
     expect(card.getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "#F2E4E1",

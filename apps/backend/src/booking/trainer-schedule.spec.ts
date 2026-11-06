@@ -18,7 +18,7 @@ describe('listTrainerSchedule', () => {
 
     await expect(
       listTrainerSchedule(
-        { on },
+        { on, includeCancelled: true },
         {
           principal: {
             accountId: 'trainer-account-id',
@@ -48,13 +48,14 @@ describe('listTrainerSchedule', () => {
     expect(findSessions).toHaveBeenCalledWith({
       trainerStaffMemberId: 'trainer-id',
       on,
+      includeCancelled: true,
     });
   });
 
   it('denies a Client access to a Trainer schedule', async () => {
     await expect(
       listTrainerSchedule(
-        { on },
+        { on, includeCancelled: true },
         {
           principal: {
             accountId: 'client-account-id',

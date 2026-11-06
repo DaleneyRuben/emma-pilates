@@ -5,6 +5,7 @@ import { boliviaDate } from '../../time/bolivia-time';
 import { accountStatus } from '../assistant/prisma-assistant-client-repository';
 import { closureScope } from '../account-closure/closure-scope';
 import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
+import { clientPhotoOf } from '../client/client-photo-of';
 import { toSubscriptionSummary } from '../client/client-subscription';
 import { containsPattern } from '../search-pattern';
 import type {
@@ -98,6 +99,7 @@ export const createPrismaAdministratorClients = (
           select: {
             id: true,
             name: true,
+            profileImageAssetId: true,
             phone: true,
             account: accountSelect,
             subscriptions: {
@@ -148,6 +150,7 @@ export const createPrismaAdministratorClients = (
               {
                 id: row.id,
                 name: row.name,
+                photo: clientPhotoOf(row.profileImageAssetId),
                 email: row.account.email,
                 phone: row.phone,
                 accountStatus: accountStatus(row.account),
@@ -197,6 +200,7 @@ export const createPrismaAdministratorClients = (
         select: {
           id: true,
           name: true,
+          profileImageAssetId: true,
           phone: true,
           referralCode: true,
           createdAt: true,
@@ -208,6 +212,7 @@ export const createPrismaAdministratorClients = (
       return {
         id: row.id,
         name: row.name,
+        photo: clientPhotoOf(row.profileImageAssetId),
         email: row.account.email,
         phone: row.phone,
         accountStatus: accountStatus(row.account),

@@ -16,6 +16,7 @@ import {
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const antigua = {
   id: "0b6f6f2e-1d38-5a52-9d44-7a0cf0a1c009",
@@ -50,7 +51,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
     renderAdmin("/ajustes/sucursales");
     await heading();
 
-    expect(screen.getByText("Cargando sucursales…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando sucursales…");
     const row = (await screen.findByRole("cell", { name: "Equipetrol" }))
       .parentElement as HTMLElement;
     expect(

@@ -17,9 +17,15 @@ import {
   valeriaPayment,
 } from "../test/payment-fixtures";
 import { emptyPageHandlers } from "../test/page-handlers";
+import {
+  expectClientInitials,
+  expectClientPhoto,
+  herPhoto,
+} from "../test/client-photo-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
+import { expectBrandedLoading } from "../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 // The sidebar badge's one-row read falls through to its own handler.
@@ -43,6 +49,23 @@ describe("AW28 Pagos on a desktop browser", () => {
     server.use(pendingBadgeHandler(6));
   });
 
+  it("FIX-041 shows the Client's photo, or her initials without one", async () => {
+    server.use(
+      paymentTable(() =>
+        jsonResponse(
+          paymentPage([
+            { ...luciaPayment, clientPhoto: herPhoto },
+            sofiaPayment,
+          ]),
+        ),
+      ),
+    );
+    renderAdmin("/dinero/pagos");
+
+    expectClientPhoto(await rowOf(/Lucía Fernández/), "Lucía Fernández");
+    expectClientInitials(await rowOf(/Sofía Guzmán/), "Sofía Guzmán", "SG");
+  });
+
   it("lists the pending transfers first by default with the studio count", async () => {
     server.use(
       paymentTable(() =>
@@ -52,7 +75,7 @@ describe("AW28 Pagos on a desktop browser", () => {
     renderAdmin("/dinero/pagos");
     await heading();
 
-    expect(screen.getByText("Cargando pagos…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando pagos…");
     const sofia = await rowOf(/Sofía Guzmán/);
     const amount = within(sofia).getByRole("cell", { name: /Bs 500,00/ });
     expect(amount).toHaveAttribute("data-label", "Monto");

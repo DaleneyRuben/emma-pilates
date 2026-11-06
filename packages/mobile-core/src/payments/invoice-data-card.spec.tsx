@@ -5,6 +5,7 @@ import {
   InvoiceDataCard,
   invoiceChoiceFrom,
   invoiceDataPayload,
+  invoiceIncompleteNote,
   type InvoiceChoice,
 } from "./invoice-data-card";
 
@@ -32,6 +33,21 @@ describe("the invoice choice", () => {
       prefilled: false,
     });
     expect(invoiceDataPayload(invoiceChoiceFrom(null))).toBeNull();
+  });
+
+  // Walkthrough n.º 23, follow-up 246 (C10c): the reason the sale waits.
+  it("names what an opened invoice still needs", () => {
+    const open = { wantsInvoice: true, taxId: "", name: "", prefilled: false };
+
+    expect(invoiceIncompleteNote(open)).toBe("Completa el NIT o CI, o cierra la factura");
+    expect(invoiceIncompleteNote({ ...open, taxId: "abc", name: "Ana" })).toBe(
+      "Revisa el NIT o CI, o cierra la factura",
+    );
+    expect(invoiceIncompleteNote({ ...open, taxId: "4567891" })).toBe(
+      "Completa el nombre o razón social, o cierra la factura",
+    );
+    expect(invoiceIncompleteNote({ ...open, ...ana })).toBeNull();
+    expect(invoiceIncompleteNote(invoiceChoiceFrom(null))).toBeNull();
   });
 
   it("starts «Con factura» with the last sale's data", () => {

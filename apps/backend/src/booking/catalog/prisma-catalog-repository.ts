@@ -1,6 +1,7 @@
+import { staffPhotoOf } from '../staff/photo/staff-photo-of';
 import type { Prisma } from '../../generated/prisma/client';
 import { extraClassesLine } from '../payments/allowance-adjustment-copy';
-import type { StaffProfile } from '../staff/staff-profile';
+import { findStaffProfile } from '../staff/prisma-staff-profile';
 import type { CatalogRepository } from './catalog-repository';
 
 const planSelect = {
@@ -163,7 +164,7 @@ export function createCatalogRepository(
                 description: true,
               },
             },
-            trainer: { select: { name: true } },
+            trainer: { select: { name: true, profileImageAssetId: true } },
             _count: {
               select: {
                 bookings: { where: { state: 'BOOKED' } },
@@ -185,6 +186,7 @@ export function createCatalogRepository(
                     60_000,
                 },
                 trainerName: session.trainer.name,
+                trainerPhoto: staffPhotoOf(session.trainer.profileImageAssetId),
                 startsAt: session.startsAt,
                 endsAt: session.endsAt,
                 capacity: session.capacity,
@@ -202,7 +204,7 @@ export function createCatalogRepository(
         startsAt: true,
         endsAt: true,
         classType: { select: { name: true } },
-        trainer: { select: { name: true } },
+        trainer: { select: { name: true, profileImageAssetId: true } },
         branch: { select: { id: true, name: true } },
       } as const;
       const [bookings, entries] = await Promise.all([
@@ -228,6 +230,7 @@ export function createCatalogRepository(
         branchId: session.branch.id,
         classTypeName: session.classType.name,
         trainerName: session.trainer.name,
+        trainerPhoto: staffPhotoOf(session.trainer.profileImageAssetId),
         branchName: session.branch.name,
         startsAt: session.startsAt,
         endsAt: session.endsAt,
@@ -267,7 +270,7 @@ export function createCatalogRepository(
                 startsAt: true,
                 endsAt: true,
                 classType: { select: { name: true } },
-                trainer: { select: { name: true } },
+                trainer: { select: { name: true, profileImageAssetId: true } },
                 branch: { select: { name: true } },
               },
             },
@@ -279,42 +282,15 @@ export function createCatalogRepository(
             sessionId: booking.session.id,
             classTypeName: booking.session.classType.name,
             trainerName: booking.session.trainer.name,
+            trainerPhoto: staffPhotoOf(
+              booking.session.trainer.profileImageAssetId,
+            ),
             branchName: booking.session.branch.name,
             startsAt: booking.session.startsAt,
             endsAt: booking.session.endsAt,
           })),
         ),
-    findStaffProfile: (staffMemberId) =>
-      prisma.staffMember
-        .findUnique({
-          where: { id: staffMemberId },
-          select: {
-            id: true,
-            name: true,
-            phone: true,
-            role: true,
-            account: { select: { email: true } },
-            branchAssignments: {
-              where: { deletedAt: null },
-              select: { branch: { select: { id: true, name: true } } },
-              orderBy: { branch: { name: 'asc' } },
-            },
-          },
-        })
-        .then((member) =>
-          member === null || member.account === null
-            ? null
-            : {
-                id: member.id,
-                name: member.name,
-                email: member.account.email,
-                phone: member.phone,
-                role: member.role.toLowerCase() as StaffProfile['role'],
-                branches: member.branchAssignments.map(
-                  (assignment) => assignment.branch,
-                ),
-              },
-        ),
+    findStaffProfile: findStaffProfile(prisma),
     findClassType: (id) =>
       prisma.classType.findUnique({ where: { id }, select: classTypeSelect }),
     findSessionSchedule: (id) =>

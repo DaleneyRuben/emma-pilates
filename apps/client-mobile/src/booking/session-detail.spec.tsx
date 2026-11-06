@@ -1,134 +1,10 @@
-import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
+import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache, createMemoryPushPlatform } from "@pilates/mobile-core";
 
-import App from "../../App";
-import { createClientRuntime, jsonResponse, routeFetcher, studioRules } from "../test-support";
-import { boliviaCivilDate, civilDateRange } from "@pilates/mobile-core";
+import { jsonResponse, studioRules } from "../test-support";
+import { classType, detail, insideWindowStartsAt, openDetail } from "./session-detail-test-support";
 
 jest.setTimeout(20_000);
-
-const profile = {
-  id: "client-1",
-  name: "Lucía Fernández",
-  email: "lucia@example.com",
-  phone: null,
-  referralCode: "REF-LUCIA",
-};
-
-const subscription = (remaining: number) => ({
-  status: "active",
-  subscription: {
-    id: "subscription-1",
-    planName: "Paquete de 8 clases",
-    originalClassAllowance: 8,
-    remainingClassAllowance: remaining,
-    startsOn: "2026-09-11",
-    endsOn: "2026-10-11",
-  },
-});
-
-const branch = { id: "branch-centro", name: "Centro", address: "Calle Ayacucho 245" };
-const classType = {
-  id: "class-reformer",
-  name: "Reformer Pilates",
-  description: "Clase de Pilates con Reformer, ideal para tonificar todo el cuerpo.",
-  // Deprecated: the Session's own minutes come from startsAt and endsAt
-  // (WEB-027, booking ADR-0004).
-  durationMinutes: 60,
-};
-// Outside the seeded 2 h 30 window, so a full Session still offers the Waitlist.
-const startsAt = new Date(Date.now() + 4 * 60 * 60 * 1_000);
-const endsAt = new Date(startsAt.getTime() + 75 * 60 * 1_000);
-const insideWindowStartsAt = new Date(Date.now() + 60 * 60 * 1_000);
-const { from, until } = civilDateRange(boliviaCivilDate(new Date()));
-const listUrl = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
-
-const listed = (availableSeats: number) => ({
-  id: "session-1",
-  branchId: branch.id,
-  classTypeId: classType.id,
-  trainerStaffMemberId: "trainer-1",
-  classTypeName: classType.name,
-  trainerName: "Emma Vargas",
-  startsAt: startsAt.toISOString(),
-  endsAt: endsAt.toISOString(),
-  capacity: 12,
-  bookedCount: 12 - availableSeats,
-  availableSeats,
-  waitlistCount: 0,
-});
-
-const detail = (availableSeats: number, classesLeftThisWeek?: number | null) => ({
-  id: "session-1",
-  branch,
-  classType,
-  trainerName: "Emma Vargas",
-  startsAt: startsAt.toISOString(),
-  endsAt: endsAt.toISOString(),
-  capacity: 12,
-  bookedCount: 12 - availableSeats,
-  availableSeats,
-  waitlistCount: 0,
-  ...(classesLeftThisWeek === undefined ? {} : { classesLeftThisWeek }),
-});
-
-async function openDetail(
-  routes: Parameters<typeof routeFetcher>[0],
-  remaining = 5,
-  availableSeats = 3,
-  runtime: Parameters<typeof createClientRuntime>[1] = {},
-  sessionStartsAt = startsAt,
-) {
-  let subscriptionRemaining = remaining;
-  const fetcher = routeFetcher({
-    "/api/v1/clients/current": () => jsonResponse(profile),
-    "/api/v1/clients/current/subscription": () => jsonResponse(subscription(subscriptionRemaining)),
-    "/api/v1/branches": () => jsonResponse([branch]),
-    "/api/v1/class-types": () => jsonResponse([classType]),
-    [listUrl]: () =>
-      jsonResponse([
-        {
-          ...listed(availableSeats),
-          startsAt: sessionStartsAt.toISOString(),
-          endsAt: new Date(sessionStartsAt.getTime() + 75 * 60 * 1_000).toISOString(),
-        },
-      ]),
-    "/api/v1/sessions/session-1": () =>
-      jsonResponse({
-        ...detail(availableSeats),
-        startsAt: sessionStartsAt.toISOString(),
-        endsAt: new Date(sessionStartsAt.getTime() + 75 * 60 * 1_000).toISOString(),
-      }),
-    ...routes,
-  });
-  const screen = await render(<App runtime={createClientRuntime(fetcher, runtime)} />);
-
-  await waitFor(
-    () => {
-      expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen();
-    },
-    { timeout: 10_000 },
-  );
-  await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
-  await waitFor(
-    () => {
-      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
-    },
-    { timeout: 5_000 },
-  );
-  await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
-  await waitFor(() => {
-    expect(screen.getByText("Sobre la clase")).toBeOnTheScreen();
-  });
-
-  return {
-    screen,
-    fetcher,
-    consumeAllowance: () => {
-      subscriptionRemaining -= 1;
-    },
-  };
-}
 
 describe("Client Session detail", () => {
   afterEach(async () => {
@@ -152,7 +28,11 @@ describe("Client Session detail", () => {
     expect(facts.getByText("Emma Vargas")).toBeOnTheScreen();
     expect(facts.getByText("Entrenadora")).toBeOnTheScreen();
     expect(facts.getByText("Centro")).toBeOnTheScreen();
-    expect(facts.getByText(/^Cancela sin costo hasta las \d{2}:\d{2}$/)).toBeOnTheScreen();
+    // Walkthrough n.º 27: the limit names its day. The class starts four hours
+    // from now, so the limit is today, or tomorrow near midnight.
+    expect(
+      facts.getByText(/^Cancela sin costo hasta (hoy|mañana) a las \d{2}:\d{2}$/),
+    ).toBeOnTheScreen();
     expect(screen.getByText(/ · 75 minutos$/)).toBeOnTheScreen();
     expect(screen.getByText("de 12 cupos libres")).toBeOnTheScreen();
     expect(screen.getByText(classType.description)).toBeOnTheScreen();

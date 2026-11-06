@@ -43,6 +43,11 @@ export type ClientPhotoGateway = {
     clientId: string;
     variant: ClientPhotoVariant;
   }) => Promise<{ objectKey: string; mediaType: string } | null>;
+  /** Finding n.º 30: the photo a staff read model names, by its asset. */
+  readPhotoObjectByAsset: (input: {
+    imageAssetId: string;
+    variant: ClientPhotoVariant;
+  }) => Promise<{ objectKey: string; mediaType: string } | null>;
 };
 
 const requireClient = (principal: AuthenticatedPrincipal): string => {

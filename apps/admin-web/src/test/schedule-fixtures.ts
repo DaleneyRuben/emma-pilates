@@ -45,6 +45,7 @@ const trainer = (id: string, name: string, status = "active") => ({
   branchIds: [centro.id],
   status,
   activationExpiresAt: null,
+  photo: null,
 });
 export const valeria = trainer(
   "9a000000-0000-5000-8000-000000000001",
@@ -87,6 +88,7 @@ const session = (
     trainerStaffMemberId: trainerMember.id,
     classTypeName: classType.name,
     trainerName: trainerMember.name,
+    trainerPhoto: null,
     startsAt,
     endsAt: new Date(
       new Date(startsAt).getTime() + (extra.minutes ?? 50) * 60_000,

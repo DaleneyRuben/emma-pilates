@@ -28,6 +28,7 @@ const today = new Date('2026-10-08T00:00:00.000Z');
 const valeria: OpenContactAlert = {
   clientId: 'client-valeria',
   name: 'Valeria Quiroga',
+  photo: null,
   phone: '+591 70011005',
   startedOn,
   reason: 'no_booking_7_days',
@@ -44,6 +45,7 @@ describe('visibleContactAlerts', () => {
         {
           clientId: 'client-daniela',
           name: 'Daniela Rojas',
+          photo: null,
           phone: null,
           startedOn: new Date('2026-10-05T00:00:00.000Z'),
           reason: 'fewer_than_2_classes_by_day_15',
@@ -53,6 +55,7 @@ describe('visibleContactAlerts', () => {
         {
           clientId: 'client-daniela',
           name: 'Daniela Rojas',
+          photo: null,
           phone: null,
           startedOn: new Date('2026-10-05T00:00:00.000Z'),
           reason: 'no_booking_7_days',
@@ -62,6 +65,7 @@ describe('visibleContactAlerts', () => {
         {
           clientId: 'client-booked',
           name: 'Ya reservó',
+          photo: null,
           phone: '+591 70011006',
           startedOn,
           reason: 'no_booking_7_days',
@@ -99,6 +103,7 @@ describe('listContactAlerts', () => {
         {
           clientId: 'client-valeria',
           name: 'Valeria Quiroga',
+          photo: null,
           phone: '+591 70011005',
           startedOn,
           reasons: ['no_booking_7_days'],
@@ -113,6 +118,7 @@ describe('listContactAlerts', () => {
         {
           clientId: 'client-valeria',
           name: 'Valeria Quiroga',
+          photo: null,
           phone: '+591 70011005',
           startedOn,
           reasons: ['no_booking_7_days'],

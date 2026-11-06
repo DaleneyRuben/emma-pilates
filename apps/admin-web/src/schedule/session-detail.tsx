@@ -12,8 +12,8 @@ import { sessionRosterQueryOptions } from "./session-roster-queries";
 type Session = AdministratorSessionAvailabilityDto;
 
 // WEB-039: the class panel. Who booked and who waits come first; a class
-// still to come adds «Reservar a una clienta» and the edit form, a past one
-// stays read-only.
+// still to come adds «Reservar a una clienta» beside them (FIX-042, proposal
+// A) and the edit form, a past one stays read-only.
 export function SessionDetail({
   session,
   branchId,
@@ -32,6 +32,20 @@ export function SessionDetail({
   const full =
     seatsTaken(session, roster.data?.bookings.length) >= session.capacity;
 
+  const book = past ? null : (
+    <Button
+      variant="secondary"
+      size="sm"
+      onClick={onBook}
+      aria-label={
+        full ? "Agregar a la lista de espera" : "Reservar a una clienta"
+      }
+    >
+      <UserPlus size={16} strokeWidth={1.8} aria-hidden="true" />
+      {full ? "Lista de espera" : "Reservar"}
+    </Button>
+  );
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-col gap-5 px-7 py-4">
@@ -43,7 +57,14 @@ export function SessionDetail({
           </p>
         ) : null}
         {roster.isPending ? (
-          <LoadingNotice>Cargando quiénes reservaron…</LoadingNotice>
+          // WEB-045: the button where the roster's header puts it, and the
+          // logo centred across the panel under it, not squeezed beside it.
+          <div className="flex flex-col gap-3">
+            {book === null ? null : (
+              <div className="flex min-h-9 justify-end">{book}</div>
+            )}
+            <LoadingNotice>Cargando quiénes reservaron…</LoadingNotice>
+          </div>
         ) : roster.isError ? (
           <div role="alert" className="flex items-center gap-3">
             <p className="flex-1 text-celda text-texto-secundario">
@@ -56,15 +77,10 @@ export function SessionDetail({
             >
               Reintentar
             </Button>
+            {book}
           </div>
         ) : (
-          <SessionRoster roster={roster.data} />
-        )}
-        {past ? null : (
-          <Button variant="secondary" onClick={onBook}>
-            <UserPlus size={16} strokeWidth={1.8} aria-hidden="true" />
-            {full ? "Agregar a la lista de espera" : "Reservar a una clienta"}
-          </Button>
+          <SessionRoster roster={roster.data} action={book} />
         )}
       </div>
       {past ? null : (

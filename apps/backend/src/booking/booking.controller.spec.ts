@@ -252,9 +252,32 @@ describe('BookingController', () => {
     ]);
 
     expect(listTrainerSchedule).toHaveBeenCalledWith(
-      { on: new Date('2026-09-10T00:00:00.000Z') },
+      { on: new Date('2026-09-10T00:00:00.000Z'), includeCancelled: false },
       principal,
     );
+  });
+
+  it('asks for the day’s cancelled classes only when the agenda says so (FIX-042)', async () => {
+    const listTrainerSchedule = jest.fn().mockResolvedValue([]);
+    const controller = new TrainerScheduleController(
+      listTrainerSchedule,
+      resolvePrincipal,
+    );
+    const bearer = 'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+
+    await controller.list('2026-09-10', bearer, 'true');
+    expect(listTrainerSchedule).toHaveBeenLastCalledWith(
+      { on: new Date('2026-09-10T00:00:00.000Z'), includeCancelled: true },
+      principal,
+    );
+    await controller.list('2026-09-10', bearer, 'false');
+    expect(listTrainerSchedule).toHaveBeenLastCalledWith(
+      { on: new Date('2026-09-10T00:00:00.000Z'), includeCancelled: false },
+      principal,
+    );
+    await expect(
+      controller.list('2026-09-10', bearer, 'yes'),
+    ).rejects.toThrow();
   });
 
   it('returns the authenticated Trainer’s Session roster', async () => {

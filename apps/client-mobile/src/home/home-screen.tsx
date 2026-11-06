@@ -2,6 +2,7 @@ import {
   getGetCurrentClientProfileQueryKey,
   getGetCurrentClientReferralsQueryKey,
   getGetCurrentClientSubscriptionQueryKey,
+  getGetCurrentPaymentQueryKey,
   getListEvaluationsQueryKey,
   getListPromotionsQueryKey,
   getListUpcomingBookingsQueryKey,
@@ -30,8 +31,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
+import { usePaymentStanding } from "../payments/payment-standing";
+import { useResendReceipt } from "../payments/use-resend-receipt";
 import { HomeHeader } from "./home-header";
 import { evaluationShortcut, referralShortcut } from "./home-format";
+import { bookingLockNote, PaymentInReviewCard, PaymentRejectedCard } from "./home-payment-card";
 import { ActivePlanCard, PurchasePlanCard } from "./home-plan-card";
 import { LockedShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
 import { NextClassCard, nextBookedClass } from "./next-class-card";
@@ -43,6 +47,7 @@ type HomeNavigation = {
       | "Booking"
       | "Bookings"
       | "Plans"
+      | "PaymentStatus"
       | "Subscription"
       | "EvaluationAvailability"
       | "MyEvaluations"
@@ -74,9 +79,12 @@ export function HomeScreen() {
   const promotions = useListPromotions(queryOptions);
   const bookings = useListUpcomingBookings(queryOptions);
   const studioRules = useStudioRules(fetcher);
+  const { pending: paymentPending, standing } = usePaymentStanding(fetcher);
+  const resendReceipt = useResendReceipt();
   const queryKeys = [
     getGetCurrentClientProfileQueryKey(),
     getGetCurrentClientSubscriptionQueryKey(),
+    getGetCurrentPaymentQueryKey(),
     getListEvaluationsQueryKey({ scope: "upcoming" }),
     getGetCurrentClientReferralsQueryKey(),
     getListPromotionsQueryKey(),
@@ -108,7 +116,9 @@ export function HomeScreen() {
     loadedProfile !== undefined &&
     loadedSubscription !== undefined;
 
-  if (profile.isPending || subscription.isPending) {
+  // Follow-up 246: the hero waits for the Payment too, so a Client whose
+  // receipt is in review never sees «Comprar un plan» flash first.
+  if (profile.isPending || subscription.isPending || paymentPending) {
     return (
       <Screen>
         <Heading accessibilityLabel="Inicio">Inicio</Heading>
@@ -182,6 +192,18 @@ export function HomeScreen() {
             status={view.status as "active" | "expiring_soon"}
             subscription={view.subscription!}
           />
+        ) : standing.kind === "in_review" ? (
+          <PaymentInReviewCard
+            onOpen={() => navigation.navigate("PaymentStatus")}
+            payment={standing.payment}
+          />
+        ) : standing.kind === "rejected" ? (
+          <PaymentRejectedCard
+            busy={resendReceipt.busy}
+            error={resendReceipt.error}
+            onResend={() => void resendReceipt.resend(standing.payment.planId)}
+            payment={standing.payment}
+          />
         ) : (
           <PurchasePlanCard
             onPurchase={() => navigation.navigate("Plans")}
@@ -204,7 +226,14 @@ export function HomeScreen() {
             </ShortcutTiles>
           ) : (
             <>
-              <LockedShortcutRow label="Reservar una clase" note="Necesitas un plan activo" />
+              <LockedShortcutRow
+                label="Reservar una clase"
+                note={
+                  standing.kind === "none"
+                    ? "Necesitas un plan activo"
+                    : bookingLockNote[standing.kind]
+                }
+              />
               <ShortcutTiles>
                 <ShortcutTile
                   {...evaluationTile}

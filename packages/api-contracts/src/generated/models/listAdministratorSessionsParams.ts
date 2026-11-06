@@ -6,6 +6,7 @@
  */
 
 export type ListAdministratorSessionsParams = {
+  includeCancelled?: boolean;
   branchId?: unknown;
   limit?: number;
   until: unknown;

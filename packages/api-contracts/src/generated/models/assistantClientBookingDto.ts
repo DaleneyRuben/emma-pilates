@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { AssistantClientBookingDtoKind } from "./assistantClientBookingDtoKind";
+import type { StaffPhotoDto } from "./staffPhotoDto";
 
 export interface AssistantClientBookingDto {
   kind: AssistantClientBookingDtoKind;
@@ -14,6 +15,11 @@ export interface AssistantClientBookingDto {
   branchId: string;
   classTypeName: string;
   trainerName: string;
+  /**
+   * The Trainer photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  trainerPhoto: StaffPhotoDto | null;
   branchName: string;
   startsAt: string;
   endsAt: string;

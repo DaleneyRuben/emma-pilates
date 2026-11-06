@@ -1,5 +1,6 @@
 import { useListRequestedFreezes } from "@pilates/api-contracts";
 import {
+  ClientFace,
   IconRowGroup,
   LoadingState,
   QueryFailure,
@@ -81,6 +82,14 @@ export function FreezesScreen() {
                 <PersonRow
                   accessibilityLabel={`Revisar congelamiento de ${freeze.clientName}`}
                   detail={`${freezeRange(freeze.startsOn, freeze.endsOn)} · ${freezeDays(freeze.startsOn, freeze.endsOn)} · ${freeze.reason}`}
+                  face={
+                    <ClientFace
+                      fetcher={fetcher}
+                      name={freeze.clientName}
+                      photo={freeze.clientPhoto}
+                      size={36}
+                    />
+                  }
                   key={freeze.id}
                   name={freeze.clientName}
                   onPress={() => navigation.navigate("ReviewFreeze", { freezeId: freeze.id })}

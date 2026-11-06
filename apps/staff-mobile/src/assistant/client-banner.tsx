@@ -1,13 +1,14 @@
-import { colors, fontFamilies, radii, spacing } from "@pilates/mobile-core";
+import { ClientFace, colors, fontFamilies, radii, spacing } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
-import { InitialsDisc } from "../ui/person-row";
+import { useStaffFetcher } from "../staff-fetcher";
 
 // The persistent reminder of whose behalf the Assistant is acting on (v2 S07,
-// S08, S09, S10): her initials and «Reservando para **Lucía**» on Lino.
+// S08, S09, S10): her face (finding n.º 30) and «Reservando para **Lucía**» on Lino.
 export function ClientBanner({
   action,
   clientName,
+  clientPhoto,
   detail,
 }: {
   action:
@@ -17,12 +18,14 @@ export function ClientBanner({
     | "Viendo reservas de"
     | "Viendo historial de";
   clientName: string;
+  clientPhoto: { imageAssetId: string } | null;
   /** A quiet tail such as «8 clases en su plan». */
   detail?: string;
 }) {
+  const fetcher = useStaffFetcher();
   return (
     <View style={styles.banner} testID="client-banner">
-      <InitialsDisc name={clientName} size={32} />
+      <ClientFace fetcher={fetcher} name={clientName} photo={clientPhoto} size={32} />
       <Text style={styles.text}>
         {`${action} `}
         <Text style={styles.name}>{clientName}</Text>

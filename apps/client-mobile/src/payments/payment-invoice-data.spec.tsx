@@ -29,7 +29,6 @@ const receiptRoutes = {
     jsonResponse({ id: "asset-1", state: "ready", mediaType: "image/jpeg" }),
   "POST /api/v1/purchase-intents/intent-1/receipt": () =>
     jsonResponse({ ...intent, receiptAttached: true }),
-  "/api/v1/payments/current": () => jsonResponse(payment),
 };
 
 async function openPaymentWithReceipt(prefill: typeof ana | null) {
@@ -44,6 +43,12 @@ async function openPaymentWithReceipt(prefill: typeof ana | null) {
         submitted(JSON.parse(String(init?.body)));
         return jsonResponse(payment, 201);
       },
+      // No Payment exists until the receipt is sent (follow-up 246: a
+      // pending one turns Inicio into «Tu pago está en revisión»).
+      "/api/v1/payments/current": () =>
+        submitted.mock.calls.length === 0
+          ? jsonResponse({ code: "payment_not_found", status: 404 }, 404)
+          : jsonResponse(payment),
     }),
   );
   await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
@@ -132,6 +137,24 @@ describe("Client payment invoice data", () => {
         invoiceData: { taxId: "1020304050", name: "Estudio Ana SRL" },
       });
     });
+  });
+
+  // Walkthrough n.º 23, follow-up 246 (C10c): the off button says why.
+  it("says what is missing while the open invoice is incomplete", async () => {
+    const { screen } = await openPaymentWithReceipt(null);
+
+    await fireEvent.press(screen.getByRole("button", { name: "¿Necesitas factura?" }));
+    expect(screen.getByText("Completa el NIT o CI, o cierra la factura")).toBeOnTheScreen();
+    expect(screen.queryByText("El estudio revisa tu pago y te avisa por la app")).toBeNull();
+
+    await fireEvent.changeText(screen.getByLabelText("NIT o CI"), "1020304050");
+    expect(
+      screen.getByText("Completa el nombre o razón social, o cierra la factura"),
+    ).toBeOnTheScreen();
+
+    await fireEvent.changeText(screen.getByLabelText("Nombre o razón social"), "Estudio Ana SRL");
+    expect(screen.getByText("El estudio revisa tu pago y te avisa por la app")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeEnabled();
   });
 
   it("shows the amount on the hero and the two numbered steps", async () => {

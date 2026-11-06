@@ -1,3 +1,4 @@
+import type { StaffPhotoRef } from './photo/staff-photo-of';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 
@@ -9,6 +10,7 @@ export type StaffProfile = {
   role:
     'trainer' | 'nutritionist' | 'assistant' | 'administrator' | 'coordinator';
   branches: { id: string; name: string }[];
+  photo: StaffPhotoRef;
 };
 
 type LoadStaffProfileDependencies = {

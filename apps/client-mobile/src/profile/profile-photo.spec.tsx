@@ -114,7 +114,8 @@ describe("Client profile photo", () => {
         uri: photoDataUri,
       });
     });
-    expect(screen.getByText("Se recorta al centro en forma de círculo.")).toBeOnTheScreen();
+    // Finding n.º 21 (follow-up 247): the crop caption is gone.
+    expect(screen.queryByText("Se recorta al centro en forma de círculo.")).toBeNull();
     expect(screen.getByRole("button", { name: "Quitar foto" })).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByLabelText("Volver"));

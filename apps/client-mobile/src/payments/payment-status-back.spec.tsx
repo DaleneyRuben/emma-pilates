@@ -37,10 +37,17 @@ describe("the Android back button on the payment result", () => {
 
   it("goes to Inicio instead of the spent payment screen", async () => {
     const back = trackBackListeners();
+    let refused = false;
     const fetcher = routeFetcher({
       ...baseRoutes(0),
-      "POST /api/v1/purchase-intents": () => jsonResponse({ code: "payment_pending_exists" }, 409),
-      "/api/v1/payments/current": () => jsonResponse(payment),
+      "POST /api/v1/purchase-intents": () => {
+        refused = true;
+        return jsonResponse({ code: "payment_pending_exists" }, 409);
+      },
+      // Inicio saw no Payment; the server refuses the purchase because a
+      // receipt sent from elsewhere is pending (follow-up 246's gate came late).
+      "/api/v1/payments/current": () =>
+        refused ? jsonResponse(payment) : jsonResponse({ code: "payment_not_found" }, 404),
     });
     const screen = await openPlanDetail(fetcher);
 
@@ -53,9 +60,10 @@ describe("the Android back button on the payment result", () => {
     });
 
     expect(handled).toBe(true);
+    // Inicio, now showing the pending payment's card (follow-up 246).
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen(),
+      expect(screen.getByRole("button", { name: "Ver estado del pago" })).toBeOnTheScreen(),
     );
-    expect(screen.queryByText("Tu pago está en revisión")).toBeNull();
+    expect(screen.queryByText(/Nuestro equipo está revisando/)).toBeNull();
   });
 });

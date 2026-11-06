@@ -7,6 +7,7 @@ import {
   server,
   useMockServer,
 } from "../test/msw";
+import { findBrandedLoading } from "../test/branded-loading";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import {
@@ -61,6 +62,15 @@ describe("AW36 Reglas del estudio", () => {
 
     await heading();
     expect(document.title).toBe("Ajustes · Reglas del estudio · Emma");
+  });
+
+  it("shows the branded loading state while the rules load (WEB-045)", async () => {
+    server.use(
+      http.get(apiUrl(studioSettingsPath), () => new Promise(() => undefined)),
+    );
+    renderAdmin("/ajustes/reglas-del-estudio");
+
+    await findBrandedLoading("Cargando las reglas…");
   });
 
   it("shows the editable values and the fixed rules", async () => {

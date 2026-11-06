@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 
 import { ClassHistoryList } from "./class-history-list";
 
@@ -14,6 +14,7 @@ const entry = (
   sessionId: `session-${bookingId}`,
   classTypeName,
   trainerName,
+  trainerPhoto: null,
   branchName,
   startsAt,
   endsAt: startsAt,
@@ -87,5 +88,18 @@ describe("ClassHistoryList", () => {
     expect(
       screen.getByLabelText("sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
     ).toBeOnTheScreen();
+  });
+
+  it("puts the face the app draws before each Trainer's name (FIX-041)", async () => {
+    const screen = await render(
+      <ClassHistoryList
+        entries={history}
+        lead="Has asistido a"
+        trainerFace={(item) => <Text>{`cara de ${item.trainerName}`}</Text>}
+      />,
+    );
+
+    expect(screen.getByText("cara de Daniela Ortiz")).toBeOnTheScreen();
+    expect(screen.getAllByText("cara de Emma Vargas")).toHaveLength(2);
   });
 });

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
-import { QueryFailure } from "../components/page/query-failure";
+import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { useAdminRole } from "../session/admin-role";
 import {
   configurableRules,
@@ -76,7 +76,7 @@ export function StudioRulesPage() {
         </p>
       ) : null}
       {settings.isPending ? (
-        <p className="text-nota text-texto-tenue">Cargando las reglas…</p>
+        <LoadingNotice>Cargando las reglas…</LoadingNotice>
       ) : settings.isError ? (
         <QueryFailure
           error={settings.error}

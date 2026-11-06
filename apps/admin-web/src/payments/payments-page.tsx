@@ -9,7 +9,7 @@ import { countFormat } from "../components/table/pagination";
 import { SearchFilter } from "../components/table/search-filter";
 import { Button } from "../components/ui/button";
 import { formatCivilMoment } from "../lib/bolivia-time";
-import { initials } from "../lib/initials";
+import { ClientPhoto } from "../components/client-photo";
 import { formatBolivianos } from "../lib/money";
 import { saveFile } from "../lib/save-file";
 import { InvoiceCell } from "./invoice-cell";
@@ -94,12 +94,10 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
     header: "Cliente",
     cell: ({ row }) => (
       <span className="flex items-center gap-2.5">
-        <span
-          aria-hidden="true"
-          className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primario-tinte text-[11px] font-medium text-primario-profundo"
-        >
-          {initials(row.original.clientName)}
-        </span>
+        <ClientPhoto
+          name={row.original.clientName}
+          photo={row.original.clientPhoto}
+        />
         {row.original.state === "pending" ? (
           <RowOpener
             label={row.original.clientName}

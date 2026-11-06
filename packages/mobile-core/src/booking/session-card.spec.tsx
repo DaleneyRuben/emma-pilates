@@ -98,4 +98,20 @@ describe("SessionCard testID", () => {
       screen.getByRole("button", { name: "Reformer Pilates 07:00 – 07:50" }),
     );
   });
+
+  it("puts the Trainer's face in place of the person glyph when given one (FIX-041)", async () => {
+    const screen = await render(
+      <SessionCard
+        accessibilityLabel="Mat Pilates 08:00"
+        onPress={jest.fn()}
+        time="08:00"
+        title="Mat Pilates"
+        trainerFace={<Text>cara</Text>}
+        trainerName="Daniela Ortiz"
+      />,
+    );
+
+    expect(screen.getByText("cara", hidden)).toBeOnTheScreen();
+    expect(screen.getByText("Daniela Ortiz", hidden)).toBeOnTheScreen();
+  });
 });

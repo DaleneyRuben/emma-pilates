@@ -121,7 +121,7 @@ describe("the admin web for the Coordinator", () => {
     expect(screen.queryByRole("link", { name: "Dinero" })).toBeNull();
     await waitFor(() =>
       expect(
-        screen.queryByText("Cargando el informe…"),
+        screen.queryByRole("status", { name: "Cargando el informe…" }),
       ).not.toBeInTheDocument(),
     );
     expect(

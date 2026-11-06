@@ -15,6 +15,7 @@ const session = {
   id: "session-1",
   startsAt: "2026-11-03T13:00:00.000Z",
   trainerName: "Daniela Ortiz",
+  trainerPhoto: null,
   trainerStaffMemberId: "trainer-1",
   waitlistCount: 0,
 };

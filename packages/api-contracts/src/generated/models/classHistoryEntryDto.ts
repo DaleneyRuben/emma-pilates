@@ -4,12 +4,18 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { StaffPhotoDto } from "./staffPhotoDto";
 
 export interface ClassHistoryEntryDto {
   bookingId: string;
   sessionId: string;
   classTypeName: string;
   trainerName: string;
+  /**
+   * The Trainer photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  trainerPhoto: StaffPhotoDto | null;
   branchName: string;
   startsAt: string;
   endsAt: string;

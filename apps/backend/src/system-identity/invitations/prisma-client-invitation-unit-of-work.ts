@@ -53,6 +53,7 @@ export class PrismaClientInvitationUnitOfWork implements ClientInvitationUnitOfW
 const staffRoles: Record<InvitationAudit['actorRole'], StaffRole> = {
   assistant: StaffRole.ASSISTANT,
   administrator: StaffRole.ADMINISTRATOR,
+  coordinator: StaffRole.COORDINATOR,
 };
 
 // The registration transaction already owns the recipient throttle, the

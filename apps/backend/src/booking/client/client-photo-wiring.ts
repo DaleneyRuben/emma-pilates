@@ -12,12 +12,18 @@ import {
   clientPhotoOperations,
   type ClientPhotoOperations,
 } from './client-photo.controller';
+import { readClientPhotoForStaff } from './client-photo-for-staff';
+import {
+  ClientPhotoForStaffController,
+  clientPhotoForStaff,
+  type ClientPhotoForStaffRead,
+} from './client-photo-for-staff.controller';
 import { createPrismaClientPhoto } from './prisma-client-photo';
 
 // MOB-020's photo slice, wired here so booking.module.ts, already past the
 // file-size limit, gains two lines (the promotions-wiring pattern).
 export const clientPhotoWiring = {
-  controllers: [ClientPhotoController],
+  controllers: [ClientPhotoController, ClientPhotoForStaffController],
   providers: (prismaToken: symbol): Provider[] => [
     {
       provide: clientPhotoObjectStorage,
@@ -36,6 +42,15 @@ export const clientPhotoWiring = {
           read: (query, principal) =>
             readClientPhoto(query, principal, { gateway }),
         };
+      },
+    },
+    {
+      provide: clientPhotoForStaff,
+      inject: [prismaToken],
+      useFactory: (prisma: PrismaClient): ClientPhotoForStaffRead => {
+        const reader = createPrismaClientPhoto(prisma);
+        return (query, principal) =>
+          readClientPhotoForStaff(query, principal, { reader });
       },
     },
   ],

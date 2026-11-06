@@ -15,9 +15,15 @@ import {
   lucia,
   luciaDetail,
 } from "../../test/people-fixtures";
+import {
+  expectClientInitials,
+  expectClientPhoto,
+  herPhoto,
+} from "../../test/client-photo-fixtures";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const detailReads: string[] = [];
 const handlers = (respond: () => Response) => [
@@ -49,6 +55,22 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
   beforeEach(() => {
     detailReads.length = 0;
     server.use(...signedInHandlers(), acquisitionHandler());
+  });
+
+  it("FIX-041 heads the file with her photo", async () => {
+    server.use(
+      ...handlers(() => jsonResponse({ ...luciaDetail, photo: herPhoto })),
+    );
+    const { panel } = await openLucia();
+    await within(panel).findByText("Cliente desde 12/04/2024");
+    expectClientPhoto(panel, "Lucía Fernández");
+  });
+
+  it("FIX-041 heads the file with her initials when she has no photo", async () => {
+    server.use(...handlers(() => jsonResponse(luciaDetail)));
+    const { panel } = await openLucia();
+    await within(panel).findByText("Cliente desde 12/04/2024");
+    expectClientInitials(panel, "Lucía Fernández", "LF");
   });
 
   it("summarizes contact, the current Plan, and referrals read-only, without Credit (PAY-005)", async () => {
@@ -116,7 +138,7 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
     );
     const { panel } = await openLucia();
 
-    expect(within(panel).getByText("Cargando la ficha…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando la ficha…", within(panel));
   });
 
   it("collapses the Plan to the last expiry when none is active", async () => {

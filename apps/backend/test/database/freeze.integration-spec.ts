@@ -410,5 +410,11 @@ describe('freeze', () => {
       accountId: client.accountId,
       type: 'freeze_refused',
     });
+    // Walkthrough n.º 13: the decision settles every operator's request notice.
+    const notices = await prisma.notification.findMany({
+      where: { businessEventKey: `freeze-requested:${requested.id}` },
+    });
+    expect(notices.length).toBeGreaterThan(0);
+    expect(notices.filter((notice) => notice.readAt === null)).toEqual([]);
   });
 });

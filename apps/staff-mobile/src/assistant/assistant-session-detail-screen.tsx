@@ -18,6 +18,7 @@ import {
   QueryFailure,
   Screen,
   spacing,
+  StaffFace,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -28,6 +29,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
+import { FaceRow } from "../ui/face-row";
 import { dayHeading } from "../ui/session-time";
 import { CenteredCard } from "./assistant-layout";
 import { CapacitySummary } from "./capacity-summary";
@@ -67,7 +69,7 @@ export function AssistantSessionDetailScreen({
 }: {
   route: { params: ClientContext & { sessionId: string } };
 }) {
-  const { clientId, clientName, sessionId } = route.params;
+  const { clientId, clientName, clientPhoto, sessionId } = route.params;
   const showClientBookings = useShowClientBookings();
   const navigation = useNavigation<DetailNavigation>();
   const fetcher = useStaffFetcher();
@@ -95,6 +97,7 @@ export function AssistantSessionDetailScreen({
       <ClientBanner
         action="Reservando para"
         clientName={clientName}
+        clientPhoto={clientPhoto}
         detail={
           left === undefined ? undefined : `${left} ${left === 1 ? "clase" : "clases"} en su plan`
         }
@@ -165,6 +168,7 @@ export function AssistantSessionDetailScreen({
       showClientBookings({
         clientId,
         clientName,
+        clientPhoto,
         confirmed: {
           bookingId: booking.id,
           classTypeName: detail.classType.name,
@@ -215,7 +219,19 @@ export function AssistantSessionDetailScreen({
             when={`${dayHeading(boliviaCivilDate(new Date(detail.startsAt)))} · ${formatTimeRange(detail.startsAt, detail.endsAt).split(" – ")[0]}`}
           />
           <IconRowGroup>
-            <IconRow icon="person" label={detail.trainerName} value="Entrenadora" />
+            <FaceRow
+              face={
+                <StaffFace
+                  fetcher={fetcher}
+                  name={detail.trainerName}
+                  photo={detail.trainerPhoto}
+                  size={36}
+                />
+              }
+              label={detail.trainerName}
+              testID="session-trainer-row"
+              value="Entrenadora"
+            />
             <IconRow icon="pin" label={`Sucursal ${detail.branch.name}`} />
             <IconRow
               icon="clock"
@@ -268,7 +284,9 @@ export function AssistantSessionDetailScreen({
               </BodyText>
               <TextButton
                 label="Registrar pago"
-                onPress={() => navigation.navigate("SelectPlan", { clientId, clientName })}
+                onPress={() =>
+                  navigation.navigate("SelectPlan", { clientId, clientName, clientPhoto })
+                }
               />
             </>
           )}

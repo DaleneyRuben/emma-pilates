@@ -115,3 +115,17 @@ export function formatMonthHeading(startsAt: string): string {
 export function formatSessionDate(startsAt: string): string {
   return longDateFormatter.format(new Date(startsAt)).replace(",", "");
 }
+
+/**
+ * The free-cancellation limit with its day, in La Paz (walkthrough n.º 27):
+ * «hoy a las 05:30», «mañana a las 05:30», or «el sáb 7 a las 05:30».
+ */
+export function formatCancellationDeadline(deadline: Date, now: Date): string {
+  const time = `a las ${formatStartTime(deadline.toISOString())}`;
+  const day = boliviaCivilDate(deadline);
+  const [today, tomorrow] = upcomingCivilDates(boliviaCivilDate(now), 2);
+  if (day === today) return `hoy ${time}`;
+  if (day === tomorrow) return `mañana ${time}`;
+  const { weekday, day: dayOfMonth } = dayChipLabel(day);
+  return `el ${weekday} ${dayOfMonth} ${time}`;
+}

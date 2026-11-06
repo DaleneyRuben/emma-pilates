@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { branchSuppliesQueryOptions } from "../back-office/supplies/supply-queries";
 import { payStatementsQueryOptions } from "../back-office/payroll/pay-statement-queries";
 import { feedbackTableQueryOptions } from "../feedback/feedback-queries";
@@ -21,7 +21,7 @@ export function usePendingCounts({
   seesMoney: boolean;
   branchId: string | undefined;
   month: string;
-}): PendingCounts {
+}): PendingCounts & { loading: boolean } {
   const payments = useQuery({
     ...pendingPaymentCountQueryOptions(),
     enabled: seesMoney,
@@ -40,6 +40,9 @@ export function usePendingCounts({
     ...branchSuppliesQueryOptions(branchId ?? ""),
     select: (page) => page.lowStockCount,
     enabled: branchId !== undefined,
+    // A Branch switch keeps the previous count until the new one arrives,
+    // so Inicio keeps its cards instead of going back to the logo.
+    placeholderData: keepPreviousData,
   });
   const statements = useQuery({
     ...payStatementsQueryOptions({ month }),
@@ -47,6 +50,18 @@ export function usePendingCounts({
   });
 
   return {
+    // WEB-045: until every read Inicio counts has answered (or failed), it
+    // cannot say «Todo al día»; it shows the branded loading state instead.
+    // A paused read (offline) still counts as loading; a disabled one does
+    // not.
+    loading: [
+      payments,
+      freezes,
+      contactAlerts,
+      feedback,
+      lowStock,
+      statements,
+    ].some((query) => query.isPending && query.fetchStatus !== "idle"),
     payments: payments.data ?? 0,
     freezes: freezes.data?.totalItems ?? 0,
     contactAlerts: contactAlerts.data ?? 0,

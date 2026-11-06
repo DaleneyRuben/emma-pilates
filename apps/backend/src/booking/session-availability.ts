@@ -1,8 +1,15 @@
+import { staffPhotoOf } from './staff/photo/staff-photo-of';
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
 import type {
   AdministratorSessionAvailabilityDto,
   SessionAvailabilityDto,
 } from './booking.dto';
+import {
+  cancellationFields,
+  countBookingsAtCancellation,
+  shownSessionStates,
+  toSessionCancellation,
+} from './sessions/session-cancellation';
 
 export type SessionAvailabilityHandler = (input: {
   branchId: string;
@@ -13,11 +20,17 @@ export type SessionAvailabilityHandler = (input: {
 
 const findScheduledSessions = async (
   prisma: PrismaClient,
-  input: { branchId?: string; from: Date; until: Date; limit: number },
+  input: {
+    branchId?: string;
+    from: Date;
+    until: Date;
+    limit: number;
+    includeCancelled?: boolean;
+  },
 ) => {
   const where: Prisma.SessionWhereInput = {
     ...(input.branchId === undefined ? {} : { branchId: input.branchId }),
-    state: 'SCHEDULED',
+    ...shownSessionStates(input.includeCancelled === true),
     startsAt: { gte: input.from, lt: input.until },
   };
   const sessions = await prisma.session.findMany({
@@ -28,6 +41,7 @@ const findScheduledSessions = async (
       id: true,
       sessionScheduleId: true,
       isException: true,
+      ...cancellationFields,
       branchId: true,
       classTypeId: true,
       trainerStaffMemberId: true,
@@ -36,7 +50,7 @@ const findScheduledSessions = async (
       capacity: true,
       branch: { select: { name: true } },
       classType: { select: { name: true } },
-      trainer: { select: { name: true } },
+      trainer: { select: { name: true, profileImageAssetId: true } },
       _count: {
         select: {
           bookings: { where: { state: 'BOOKED' } },
@@ -46,6 +60,10 @@ const findScheduledSessions = async (
     },
   });
 
+  const bookedAtCancellation = await countBookingsAtCancellation(
+    prisma,
+    sessions,
+  );
   return sessions.map((session) => ({
     availability: {
       id: session.id,
@@ -55,6 +73,7 @@ const findScheduledSessions = async (
       trainerStaffMemberId: session.trainerStaffMemberId,
       classTypeName: session.classType.name,
       trainerName: session.trainer.name,
+      trainerPhoto: staffPhotoOf(session.trainer.profileImageAssetId),
       startsAt: session.startsAt,
       endsAt: session.endsAt,
       capacity: session.capacity,
@@ -64,6 +83,7 @@ const findScheduledSessions = async (
     },
     sessionScheduleId: session.sessionScheduleId,
     isException: session.isException,
+    cancellation: toSessionCancellation(session, bookedAtCancellation),
   }));
 };
 
@@ -76,7 +96,8 @@ export const listSessionAvailability =
 
 // API-002: every Branch at once, for the Administrator's Session search;
 // WEB-003's week grid narrows it to the selected Branch and needs to know
-// which Sessions a weekly schedule generated.
+// which Sessions a weekly schedule generated; FIX-042 asks for its
+// cancelled Sessions too, with their cause.
 export const listSessionsAcrossBranches =
   (prisma: PrismaClient) =>
   async (input: {
@@ -84,6 +105,7 @@ export const listSessionsAcrossBranches =
     from: Date;
     until: Date;
     limit: number;
+    includeCancelled?: boolean;
   }): Promise<AdministratorSessionAvailabilityDto[]> =>
     (await findScheduledSessions(prisma, input)).map(
       ({ availability, ...schedule }) => ({ ...availability, ...schedule }),
