@@ -1,4 +1,4 @@
-import { loadPrivateImage, loadPrivateImageWithRatio } from "./private-image";
+import { loadPrivateImage, loadPrivateImageWithRatio, loadProfilePhoto } from "./private-image";
 
 const pngBytes = Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10]);
 
@@ -63,5 +63,35 @@ describe("loadPrivateImageWithRatio", () => {
     await expect(loadPrivateImageWithRatio(fetcher, "/receipt")).resolves.toMatchObject({
       aspectRatio: 1,
     });
+  });
+});
+
+// FIX-041: a profile photo that is gone (404) is "no photo"; any other
+// failure throws, so the query retries instead of caching the initials.
+describe("loadProfilePhoto", () => {
+  it("returns the photo as a data URI", async () => {
+    const fetcher = jest
+      .fn()
+      .mockResolvedValue(
+        new Response(pngBytes, { headers: { "Content-Type": "image/png" }, status: 200 }),
+      );
+
+    await expect(loadProfilePhoto(fetcher, "/api/v1/staff-photos/a")).resolves.toBe(
+      "data:image/png;base64,iVBORw0KGgo=",
+    );
+  });
+
+  it("returns null for a photo that no longer exists", async () => {
+    const fetcher = jest.fn().mockResolvedValue(new Response(null, { status: 404 }));
+
+    await expect(loadProfilePhoto(fetcher, "/api/v1/staff-photos/a")).resolves.toBeNull();
+  });
+
+  it("throws on any other failure", async () => {
+    const fetcher = jest.fn().mockResolvedValue(new Response(null, { status: 503 }));
+
+    await expect(loadProfilePhoto(fetcher, "/api/v1/staff-photos/a")).rejects.toThrow(
+      "profile_photo_unavailable",
+    );
   });
 });

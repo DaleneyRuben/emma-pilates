@@ -27,3 +27,9 @@ export async function loadPrivateImageWithRatio(
   const aspectRatio = size === null || size.height === 0 ? 1 : size.width / size.height;
   return { aspectRatio, uri: `data:${type};base64,${encodeBase64(bytes)}` };
 }
+
+// Stub until FIX-041's review fix lands.
+export const loadProfilePhoto: (
+  fetcher: typeof globalThis.fetch,
+  url: string,
+) => Promise<string | null> = () => Promise.reject(new Error("not implemented"));
