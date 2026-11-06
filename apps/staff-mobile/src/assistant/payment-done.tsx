@@ -14,6 +14,7 @@ export function PaymentDone({
   kind,
   onBack,
   scheduled,
+  startsOn,
 }: {
   amount: string;
   classes: string;
@@ -23,6 +24,8 @@ export function PaymentDone({
   onBack: () => void;
   /** A renewal starts later instead of at once. */
   scheduled: boolean;
+  /** The scheduled Plan's first day, «20 de octubre». */
+  startsOn?: string;
 }) {
   const cash = kind === "cash";
   // The only way on is «Volver a Clientes»: the Android back button takes it
@@ -43,7 +46,9 @@ export function PaymentDone({
           ? scheduled
             ? `El plan de ${firstName} queda programado y el efectivo entró en la caja de hoy.`
             : `El plan de ${firstName} ya está activo y el efectivo entró en la caja de hoy.`
-          : `Administración lo revisa y activa el plan de ${firstName}. No entra en la caja de hoy.`
+          : scheduled && startsOn !== undefined
+            ? `Administración lo revisa y programa el plan siguiente de ${firstName}, que empieza el ${startsOn}. No entra en la caja de hoy.`
+            : `Administración lo revisa y activa el plan de ${firstName}. No entra en la caja de hoy.`
       }
       primaryAction={{ label: "Volver a Clientes", onPress: onBack, testID: "cash-back-to-client" }}
       title={cash ? "¡Pago registrado!" : "Comprobante enviado"}
@@ -51,6 +56,9 @@ export function PaymentDone({
       <View style={styles.summary}>
         <IconRowGroup>
           <ValueRow label="Plan" value={classes} />
+          {scheduled && startsOn !== undefined ? (
+            <ValueRow label="Empieza" value={startsOn} />
+          ) : null}
           <ValueRow label={cash ? "Cobrado en efectivo" : "Transferencia por QR"} value={amount} />
           {cash ? (
             endsOn === undefined ? null : (
