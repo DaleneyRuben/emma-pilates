@@ -82,10 +82,12 @@ const cancelClassScreens = { CancelClass: CancelClassScreen, CancelSession: Canc
 
 const tabBarStyle = { backgroundColor: colors.card, borderTopWidth: 0 };
 
-// The bar shows only while the tab's stack is on its root screen.
+// The bar shows only while the tab's stack is on its root screen. Walkthrough
+// n.º 28: leaving a tab pops its stack, so a tab always reopens on its root.
 export const tabOptions =
   (title: string, icon: StaffTabIconName, root: string) =>
   ({ route }: { route: RouteProp<ParamListBase> }) => ({
+    popToTopOnBlur: true,
     tabBarButtonTestID: `tab-${icon}`,
     tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) =>
       icon === "contacts" ? (

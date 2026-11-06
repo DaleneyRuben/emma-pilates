@@ -108,12 +108,14 @@ const ProfileStack = createNativeStackNavigator({
 const tabBarStyle = { backgroundColor: colors.card, borderTopColor: colors.borderStrong };
 
 // Follow-up 227: a pushed screen (with a back arrow) has no tab bar, so the
-// bar shows only while the tab's stack is on its root screen.
+// bar shows only while the tab's stack is on its root screen. Walkthrough
+// n.º 28: leaving a tab pops its stack, so a tab always reopens on its root.
 const tabOptions =
   (title: string, icon: ClientTabIconName, root: string) =>
   ({ route }: { route: Parameters<typeof getFocusedRouteNameFromRoute>[0] }) => {
     const focused = getFocusedRouteNameFromRoute(route) ?? root;
     return {
+      popToTopOnBlur: true,
       tabBarButtonTestID: `tab-${icon}`,
       tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
       tabBarStyle: focused === root ? tabBarStyle : { display: "none" as const },
