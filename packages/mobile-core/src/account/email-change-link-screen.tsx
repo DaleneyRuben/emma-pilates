@@ -34,6 +34,26 @@ const copy: Record<Outcome, { badge: OutcomeBadgeProps; title: string; body: str
   },
 };
 
+// FIX-039 (DES-012): a Staff Member's change was asked by the studio.
+const staffCopy: Record<Outcome, { badge: OutcomeBadgeProps; title: string; body: string }> = {
+  changed: {
+    badge: { icon: "check", tone: "success" },
+    title: "Correo confirmado",
+    body: "Desde ahora entras con tu correo nuevo. Tu contraseña no cambió.",
+  },
+  expired: {
+    badge: { icon: "clock", tone: "primary" },
+    title: "El enlace ya no sirve",
+    body: "Este enlace venció o ya no sirve. Pide en el estudio que te envíen otro; mientras tanto sigues entrando con tu correo anterior.",
+  },
+  invalid: copy.invalid,
+  email_unavailable: {
+    badge: { icon: "at", tone: "primary" },
+    title: "No pudimos cambiar el correo",
+    body: "Ese correo ya lo usa otra cuenta, así que no lo cambiamos. Habla con el estudio.",
+  },
+};
+
 const confirming = {
   badge: { icon: "mail", tone: "primary" },
   title: "Confirmando tu correo",
@@ -44,10 +64,13 @@ const confirming = {
 // completing it needs no session and starts none.
 export function EmailChangeLinkScreen({
   api,
+  audience = "client",
   onDone,
   token,
 }: {
   api: { completeEmailChange: (token: string) => Promise<{ status: Outcome }> };
+  /** «staff» when the studio asked for the change (FIX-039). */
+  audience?: "client" | "staff";
   onDone: (changed: boolean) => void;
   token: string;
 }) {
@@ -68,7 +91,7 @@ export function EmailChangeLinkScreen({
     };
   }, [api, token]);
 
-  const shown = outcome === null ? confirming : copy[outcome];
+  const shown = outcome === null ? confirming : (audience === "staff" ? staffCopy : copy)[outcome];
 
   return (
     <AuthenticationScreen badge={shown.badge} title={shown.title}>

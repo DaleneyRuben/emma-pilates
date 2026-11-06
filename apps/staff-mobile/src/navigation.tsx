@@ -1,5 +1,6 @@
 import {
   AuthenticationFlow,
+  EmailChangeLinkScreen,
   type MobileNavigationProps,
   MobileQueryProvider,
 } from "@pilates/mobile-core";
@@ -57,6 +58,14 @@ export function StaffNavigation({
   role,
 }: MobileNavigationProps) {
   const fetcher = apiFetcher ?? unavailableFetcher;
+  // FIX-039: the link the studio's email change sends to the new address is
+  // confirmed here, signed in or not; it needs no session and starts none.
+  const [handledLink, setHandledLink] = useState<string | null>(null);
+  const emailChangeToken =
+    authenticationIntent?.type === "confirm-email-change" &&
+    authenticationIntent.token !== handledLink
+      ? authenticationIntent.token
+      : null;
   const [notice, setNotice] = useState<string | null>(null);
   const refresh = useCallback(() => refreshSession?.() ?? Promise.resolve(), [refreshSession]);
   const leave = useCallback(
@@ -84,6 +93,17 @@ export function StaffNavigation({
     () => ({ impersonation: impersonation ?? null, notice, clearNotice, refreshSession: refresh }),
     [clearNotice, impersonation, notice, refresh],
   );
+
+  if (emailChangeToken !== null) {
+    return (
+      <EmailChangeLinkScreen
+        api={authenticationApi}
+        audience="staff"
+        onDone={() => setHandledLink(emailChangeToken)}
+        token={emailChangeToken}
+      />
+    );
+  }
 
   if (role !== undefined && role !== "client") {
     const AuthenticatedStaffNavigation = roleNavigation[role];
@@ -127,7 +147,12 @@ export function StaffNavigation({
     <AuthenticationFlow
       allowClientRegistration={false}
       api={authenticationApi}
-      intent={authenticationIntent?.type === "verify-email" ? null : authenticationIntent}
+      intent={
+        authenticationIntent?.type === "verify-email" ||
+        authenticationIntent?.type === "confirm-email-change"
+          ? null
+          : authenticationIntent
+      }
       onBiometricUnlock={onBiometricUnlock}
       onLogin={onLogin}
       onRecoveryCredential={onRecoveryCredential}
