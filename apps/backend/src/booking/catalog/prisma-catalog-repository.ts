@@ -1,7 +1,7 @@
 import { staffPhotoOf } from '../staff/photo/staff-photo-of';
 import type { Prisma } from '../../generated/prisma/client';
 import { extraClassesLine } from '../payments/allowance-adjustment-copy';
-import type { StaffProfile } from '../staff/staff-profile';
+import { findStaffProfile } from '../staff/prisma-staff-profile';
 import type { CatalogRepository } from './catalog-repository';
 
 const planSelect = {
@@ -290,39 +290,7 @@ export function createCatalogRepository(
             endsAt: booking.session.endsAt,
           })),
         ),
-    findStaffProfile: (staffMemberId) =>
-      prisma.staffMember
-        .findUnique({
-          where: { id: staffMemberId },
-          select: {
-            id: true,
-            name: true,
-            phone: true,
-            role: true,
-            profileImageAssetId: true,
-            account: { select: { email: true } },
-            branchAssignments: {
-              where: { deletedAt: null },
-              select: { branch: { select: { id: true, name: true } } },
-              orderBy: { branch: { name: 'asc' } },
-            },
-          },
-        })
-        .then((member) =>
-          member === null || member.account === null
-            ? null
-            : {
-                id: member.id,
-                name: member.name,
-                email: member.account.email,
-                phone: member.phone,
-                role: member.role.toLowerCase() as StaffProfile['role'],
-                photo: staffPhotoOf(member.profileImageAssetId),
-                branches: member.branchAssignments.map(
-                  (assignment) => assignment.branch,
-                ),
-              },
-        ),
+    findStaffProfile: findStaffProfile(prisma),
     findClassType: (id) =>
       prisma.classType.findUnique({ where: { id }, select: classTypeSelect }),
     findSessionSchedule: (id) =>
