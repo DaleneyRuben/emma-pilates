@@ -10,7 +10,7 @@ jest.mock("expo-file-system/legacy", () => ({
   StorageAccessFramework: {
     getUriForDirectoryInRoot: jest.fn((folder: string) => `content://root/${folder}`),
     requestDirectoryPermissionsAsync: jest.fn(),
-    createFileAsync: jest.fn().mockResolvedValue("content://root/Download/factura"),
+    createFileAsync: jest.fn().mockResolvedValue("content://root/Documents/factura"),
   },
 }));
 
@@ -30,10 +30,10 @@ describe("downloadInvoice on Android", () => {
     Object.defineProperty(Platform, "OS", { value: original, configurable: true });
   });
 
-  it("opens the folder picker in Descargas and saves the PDF there", async () => {
+  it("opens the folder picker in Documentos and saves the PDF there", async () => {
     access.requestDirectoryPermissionsAsync.mockResolvedValue({
       granted: true,
-      directoryUri: "content://root/Download",
+      directoryUri: "content://root/Documents",
     });
 
     await expect(
@@ -45,9 +45,11 @@ describe("downloadInvoice on Android", () => {
       }),
     ).resolves.toBe("saved");
 
-    expect(access.requestDirectoryPermissionsAsync).toHaveBeenCalledWith("content://root/Download");
+    expect(access.requestDirectoryPermissionsAsync).toHaveBeenCalledWith(
+      "content://root/Documents",
+    );
     expect(access.createFileAsync).toHaveBeenCalledWith(
-      "content://root/Download",
+      "content://root/Documents",
       "factura-000123",
       "application/pdf",
     );
