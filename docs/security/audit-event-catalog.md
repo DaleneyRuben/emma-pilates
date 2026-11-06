@@ -54,6 +54,8 @@ beyond what the table below names.
 | `staff_member.invitation_cancelled` | Booking & Membership | An Administrator cancels a pending Staff Member's invitation from AW24 «Cancelar invitación»; the pending Account and Staff Member are marked removed, never deleted (WEB-012 W3, W7; ADR-0086) | Administrator | `account` | — | `email` (the address is free for a new invitation) |
 | `staff_member.invitation_reopened` | Booking & Membership | An Administrator enters a pending Staff Member's email again in «Nuevo miembro»: the existing invitation's Activation Link is reissued instead of creating a second member (WEB-012 W4, W7) | Administrator | `account` | — | — |
 | `staff_member.contact_changed` | Booking & Membership | An Administrator corrects another Staff Member's name or phone, active or pending, from AW24 «Editar miembro» (FIX-038, decision §20.22); only what changed is written, and an absent phone is `""` | Administrator | `account` | — | `previousName`, `name`, `previousPhone`, `phone` |
+| `staff_member.email_change_requested` | Booking & Membership | An Administrator asks to change another active Staff Member's login email from AW24 «Editar miembro»; a 24-hour link goes to the new address and a notice to the current one, and the login email changes only when the link is opened (FIX-039, IDN-008); the completion is `account.email_changed` | Administrator | `account` | — | `previousEmail`, `email` |
+| `staff_member.email_change_cancelled` | Booking & Membership | An Administrator cancels that pending change; its link stops working (FIX-039) | Administrator | `account` | — | `email` (the address that was waiting) |
 | `staff_member.photo_changed` | Booking & Membership | A Staff Member attaches or replaces her profile photo from Perfil, or the Administrator or the Coordinator does it for her from Estudio › Personal (FIX-041, decision §20.23); a replaced photo's variants are released at once (ADR-0076) | The Staff Member herself, an Administrator, or the Coordinator | `account` (the Staff Member's) | — | `replaced` |
 | `staff_member.photo_removed` | Booking & Membership | A Staff Member's profile photo is removed by herself, an Administrator, or the Coordinator (FIX-041); its variants are released at once (ADR-0076) | The Staff Member herself, an Administrator, or the Coordinator | `account` (the Staff Member's) | — | — |
 | `branch.created` | Booking & Membership | An Administrator creates a Branch (ADM-001 slice A) | Administrator | `branch` | the new Branch | `name` |
@@ -179,7 +181,8 @@ which replaced G7:
   they recorded, because the triggers forbid rewriting a record; the
   personal-data runbook tells the person so when they ask. In the same way
   `staff_member.contact_changed` keeps the Staff Member's old and new name and
-  phone.
+  phone, and `staff_member.email_change_requested` and
+  `staff_member.email_change_cancelled` keep the addresses they name.
 - `promotion_contact.withdrawn` and `promotions_consent.withdrawn` record a
   «stop promotions» request without copying the contact's name, email, or
   phone.
