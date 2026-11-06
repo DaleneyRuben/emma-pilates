@@ -206,6 +206,8 @@ export * from "./freezeReviewDto";
 export * from "./freezeReviewDtoState";
 export * from "./getAdminPromotionImageParams";
 export * from "./getAdminPromotionImageVariant";
+export * from "./getClientPhotoForStaffParams";
+export * from "./getClientPhotoForStaffVariant";
 export * from "./getCurrentClientPhotoParams";
 export * from "./getCurrentClientPhotoVariant";
 export * from "./getExpenseReportParams";

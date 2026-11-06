@@ -135,6 +135,7 @@ import type {
   FreezeRequestDto,
   FreezeReviewDto,
   GetAdminPromotionImageParams,
+  GetClientPhotoForStaffParams,
   GetCurrentClientPhotoParams,
   GetExpenseReportParams,
   GetIncomeReportParams,
@@ -24445,6 +24446,241 @@ export function useGetCurrentClientPhoto<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetCurrentClientPhotoQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getClientPhotoForStaffResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getClientPhotoForStaffResponseSuccess =
+  getClientPhotoForStaffResponse200 & {
+    headers: Headers;
+  };
+export type getClientPhotoForStaffResponse =
+  getClientPhotoForStaffResponseSuccess;
+
+export const getGetClientPhotoForStaffUrl = (
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/client-photos/${imageAssetId}?${stringifiedParams}`
+    : `/api/v1/client-photos/${imageAssetId}`;
+};
+
+export const getClientPhotoForStaff = async (
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getClientPhotoForStaffResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetClientPhotoForStaffUrl(imageAssetId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getClientPhotoForStaffResponse["data"] =
+    body as getClientPhotoForStaffResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getClientPhotoForStaffResponse;
+};
+
+export const getGetClientPhotoForStaffQueryKey = (
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+) => {
+  return [
+    `/api/v1/client-photos/${imageAssetId}`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetClientPhotoForStaffQueryOptions = <
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetClientPhotoForStaffQueryKey(imageAssetId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getClientPhotoForStaff>>
+  > = ({ signal }) =>
+    getClientPhotoForStaff(
+      imageAssetId,
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: imageAssetId !== null && imageAssetId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetClientPhotoForStaffQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getClientPhotoForStaff>>
+>;
+export type GetClientPhotoForStaffQueryError = unknown;
+
+export function useGetClientPhotoForStaff<
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params: undefined | GetClientPhotoForStaffParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+          TError,
+          Awaited<ReturnType<typeof getClientPhotoForStaff>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientPhotoForStaff<
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+          TError,
+          Awaited<ReturnType<typeof getClientPhotoForStaff>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientPhotoForStaff<
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetClientPhotoForStaff<
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetClientPhotoForStaffQueryOptions(
+    imageAssetId,
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

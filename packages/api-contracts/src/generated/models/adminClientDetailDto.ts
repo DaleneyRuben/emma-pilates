@@ -6,11 +6,17 @@
  */
 import type { AdminClientClosureOutlookDto } from "./adminClientClosureOutlookDto";
 import type { AdminClientDetailDtoAccountStatus } from "./adminClientDetailDtoAccountStatus";
+import type { ClientPhotoDto } from "./clientPhotoDto";
 import type { ClientSubscriptionDto } from "./clientSubscriptionDto";
 
 export interface AdminClientDetailDto {
   id: string;
   name: string;
+  /**
+   * Her photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  photo: ClientPhotoDto | null;
   email: string;
   /** @nullable */
   phone: string | null;

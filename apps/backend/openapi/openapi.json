@@ -6252,6 +6252,55 @@
         ]
       }
     },
+    "/api/v1/client-photos/{imageAssetId}": {
+      "get": {
+        "operationId": "getClientPhotoForStaff",
+        "parameters": [
+          {
+            "name": "imageAssetId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "display",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientPhotoForStaff"
+        ]
+      }
+    },
     "/api/v1/staff-members/current/photo": {
       "put": {
         "operationId": "setCurrentStaffMemberPhoto",
@@ -10938,6 +10987,18 @@
           "bookedCount"
         ]
       },
+      "ClientPhotoDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "imageAssetId"
+        ]
+      },
       "TrainerRosterBookingDto": {
         "type": "object",
         "properties": {
@@ -10947,6 +11008,16 @@
           },
           "clientName": {
             "type": "string"
+          },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
           },
           "attendanceOutcome": {
             "type": "string",
@@ -10959,7 +11030,8 @@
         },
         "required": [
           "bookingId",
-          "clientName"
+          "clientName",
+          "clientPhoto"
         ]
       },
       "TrainerSessionRosterDto": {
@@ -10997,18 +11069,6 @@
           "startsAt",
           "endsAt",
           "bookings"
-        ]
-      },
-      "ClientPhotoDto": {
-        "type": "object",
-        "properties": {
-          "imageAssetId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "imageAssetId"
         ]
       },
       "ClientProfileDto": {
@@ -12474,6 +12534,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "nutritionistStaffMemberId": {
             "type": "string",
             "format": "uuid"
@@ -12508,6 +12578,7 @@
         "required": [
           "evaluationId",
           "clientName",
+          "clientPhoto",
           "nutritionistStaffMemberId",
           "nutritionistName",
           "branchId",
@@ -12643,6 +12714,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "since": {
             "format": "date-time",
             "type": "string"
@@ -12659,6 +12740,7 @@
           "membershipId",
           "number",
           "clientName",
+          "clientPhoto",
           "since",
           "status"
         ]
@@ -13395,6 +13477,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "planName": {
             "type": "string"
           },
@@ -13413,6 +13505,7 @@
         "required": [
           "id",
           "clientName",
+          "clientPhoto",
           "planName",
           "amountDueCentavos",
           "submittedAt",
@@ -13535,6 +13628,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "receipt": {
             "nullable": true,
             "type": "object",
@@ -13563,7 +13666,8 @@
           "creditAppliedCentavos",
           "amountDueCentavos",
           "submittedAt",
-          "clientName"
+          "clientName",
+          "clientPhoto"
         ]
       },
       "RejectPaymentDto": {
@@ -13588,6 +13692,16 @@
           },
           "clientName": {
             "type": "string"
+          },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
           },
           "planName": {
             "type": "string"
@@ -13615,6 +13729,7 @@
         "required": [
           "id",
           "clientName",
+          "clientPhoto",
           "planName",
           "startsOn",
           "endsOn",
@@ -13817,6 +13932,16 @@
           "name": {
             "type": "string"
           },
+          "photo": {
+            "nullable": true,
+            "description": "Her photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "email": {
             "type": "string",
             "format": "email"
@@ -13837,6 +13962,7 @@
         "required": [
           "id",
           "name",
+          "photo",
           "email",
           "accountStatus"
         ]
@@ -14144,6 +14270,16 @@
           "name": {
             "type": "string"
           },
+          "photo": {
+            "nullable": true,
+            "description": "Her photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "email": {
             "type": "string",
             "format": "email"
@@ -14207,6 +14343,7 @@
         "required": [
           "id",
           "name",
+          "photo",
           "email",
           "phone",
           "accountStatus",
@@ -14308,6 +14445,16 @@
           "name": {
             "type": "string"
           },
+          "photo": {
+            "nullable": true,
+            "description": "Her photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "email": {
             "type": "string",
             "format": "email"
@@ -14353,6 +14500,7 @@
         "required": [
           "id",
           "name",
+          "photo",
           "email",
           "phone",
           "accountStatus",
@@ -14413,6 +14561,16 @@
           },
           "clientName": {
             "type": "string"
+          },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
           },
           "planName": {
             "type": "string"
@@ -14500,6 +14658,7 @@
           "id",
           "clientId",
           "clientName",
+          "clientPhoto",
           "planName",
           "kind",
           "planPriceCentavos",
@@ -15347,6 +15506,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "attendanceOutcome": {
             "type": "string",
             "enum": [
@@ -15361,6 +15530,7 @@
           "bookingId",
           "clientId",
           "clientName",
+          "clientPhoto",
           "attendanceOutcome"
         ]
       },
@@ -15378,6 +15548,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "position": {
             "type": "number",
             "minimum": 1,
@@ -15388,6 +15568,7 @@
           "waitlistEntryId",
           "clientId",
           "clientName",
+          "clientPhoto",
           "position"
         ]
       },
@@ -15673,6 +15854,16 @@
           "name": {
             "type": "string"
           },
+          "photo": {
+            "nullable": true,
+            "description": "Her photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "phone": {
             "type": "string",
             "nullable": true
@@ -15697,6 +15888,7 @@
         "required": [
           "clientId",
           "name",
+          "photo",
           "phone",
           "startedOn",
           "reasons"
@@ -16032,6 +16224,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "startsAt": {
             "format": "date-time",
             "type": "string"
@@ -16063,6 +16265,7 @@
         "required": [
           "evaluationId",
           "clientName",
+          "clientPhoto",
           "startsAt",
           "endsAt",
           "durationMinutes",

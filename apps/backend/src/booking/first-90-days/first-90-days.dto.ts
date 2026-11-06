@@ -3,6 +3,7 @@ import {
   contactAlertReasons,
   type ContactAlertReason,
 } from './first-90-days-alerts';
+import { ClientPhotoDto } from '../client/client-discovery.dto';
 
 export class ContactAlertItemDto {
   @ApiProperty({ format: 'uuid' })
@@ -10,6 +11,13 @@ export class ContactAlertItemDto {
 
   @ApiProperty()
   name!: string;
+
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'Her photo (FIX-041), null while her initials stand in',
+  })
+  photo!: ClientPhotoDto | null;
 
   @ApiProperty({ type: String, nullable: true })
   phone!: string | null;

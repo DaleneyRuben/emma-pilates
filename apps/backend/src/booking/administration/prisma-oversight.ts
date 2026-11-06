@@ -9,6 +9,10 @@ import {
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
+import {
+  clientNameAndPhoto,
+  clientNameSelect,
+} from '../client/client-photo-of';
 import { readEvaluationKinds } from '../evaluations/evaluation-kinds';
 import { containsPattern } from '../search-pattern';
 import {
@@ -75,7 +79,7 @@ export const createPrismaOversight = (
         select: {
           id: true,
           clientId: true,
-          client: { select: { name: true } },
+          client: clientNameSelect,
           slot: {
             select: {
               startsAt: true,
@@ -96,7 +100,7 @@ export const createPrismaOversight = (
     return {
       items: rows.map((row) => ({
         evaluationId: row.id,
-        clientName: row.client.name,
+        ...clientNameAndPhoto(row.client),
         nutritionistStaffMemberId: row.slot.nutritionist.id,
         nutritionistName: row.slot.nutritionist.name,
         branchId: row.slot.branchId,
@@ -203,7 +207,7 @@ export const createPrismaOversight = (
           number: true,
           since: true,
           status: true,
-          client: { select: { name: true } },
+          client: clientNameSelect,
         },
       }),
       prisma.founderMembership.count({
@@ -226,7 +230,7 @@ export const createPrismaOversight = (
       items: rows.map((row) => ({
         membershipId: row.id,
         number: row.number,
-        clientName: row.client.name,
+        ...clientNameAndPhoto(row.client),
         since: row.since,
         status:
           row.status === FounderMembershipStatus.LOST
