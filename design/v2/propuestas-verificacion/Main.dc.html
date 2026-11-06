@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Hallazgos 42–46 · elige una propuesta por tema</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0}*{box-sizing:border-box}
+a{color:#7D4F4B}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';flex:none}
+.dev{position:relative;overflow:hidden;background:#FAF7F2;color:#4A4A4A;font-family:'Work Sans',system-ui,sans-serif;display:flex;flex-direction:column;width:390px;height:844px}
+.tb{height:52px;flex:none;margin-top:54px;padding:0 8px;display:flex;align-items:center;gap:4px}
+.tb .tt{font-family:Lora,Georgia,serif;font-size:24px}
+.tbc{justify-content:space-between}.tbc .tt{font-family:'Work Sans',sans-serif;font-size:17px;font-weight:600}
+.ib{width:44px;height:44px;border:0;background:transparent;color:#4A4A4A;display:flex;align-items:center;justify-content:center;border-radius:12px;text-decoration:none}
+.body{flex:1;min-height:0;overflow:hidden;padding:8px 20px 0;display:flex;flex-direction:column;gap:24px}
+.mid{flex:1;min-height:0;padding:0 32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.top{justify-content:flex-start;padding-top:48px}
+.ic{width:72px;height:72px;border-radius:999px;background:#F2E4E1;display:flex;align-items:center;justify-content:center;color:#93615D;margin-bottom:4px}.ic .ms{font-size:34px}
+.ic.ok{background:rgba(124,148,115,.16);color:#4F6347}.ic.bad{background:#F7E5E0;color:#A04E3E}
+.t24{font-family:Lora,Georgia,serif;font-size:24px}
+.p{font-size:15px;line-height:1.5}.mu{color:#6F6662}.em{font-weight:600;color:#4A4A4A}
+.foot{flex:none;padding:12px 20px 30px;display:flex;flex-direction:column;gap:8px}
+.btn{height:52px;border:0;border-radius:14px;font:600 17px 'Work Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;width:100%}
+.btn.p{background:#B78380;color:#fff}.btn.s{background:#F2E4E1;color:#7D4F4B}
+.btn.o{background:transparent;color:#4A4A4A;box-shadow:inset 0 0 0 1px #D8C9BB}
+.btn.q{height:44px;background:transparent;color:#7D4F4B;font-size:15px}
+.eb{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sec{display:flex;flex-direction:column;gap:12px}
+.grp{background:#F5EFE9;border-radius:16px;display:flex;flex-direction:column}
+.row{min-height:56px;padding:0 16px;display:flex;align-items:center;gap:12px;color:#4A4A4A;text-decoration:none}
+.row .l{flex:1;font-size:16px}.row .v{font-size:14px;color:#6F6662}
+.hr{height:1px;background:#E6DBD0;margin-left:64px}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#B78380;display:flex;align-items:center;justify-content:center;flex:none}.disc .ms{font-size:19px}
+.disc.err{background:#F7E5E0;color:#A04E3E}
+.row.err{color:#A04E3E}.row.err .l{font-weight:500}
+.chev{color:#6F6662;font-size:18px}
+.ver{font-size:12px;color:#6F6662;text-align:center}
+.nav{height:82px;padding-bottom:18px;background:#F5EFE9;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;flex:none}
+.nav span{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:#6F6662}.nav span.on{color:#93615D;font-weight:600}
+.nav .ms{font-size:22px}
+.card{background:#F5EFE9;border-radius:16px}
+.kv{min-height:48px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;font-size:15px}.kv+.kv{border-top:1px solid #E6DBD0}.kv span:first-child{color:#6F6662}
+.strip{display:flex;gap:8px;overflow-x:auto;margin-right:-20px;padding-right:20px;scrollbar-width:none;align-items:flex-end}
+.chip{width:52px;height:60px;flex:none;border-radius:14px;background:#F5EFE9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#4A4A4A}
+.chip .w{font-size:11px;color:#6F6662}.chip .d{font-family:Lora,Georgia,serif;font-size:18px}.chip .m{font-size:11px;color:#6F6662}
+.chip.on{background:#B78380;color:#fff}.chip.on .w,.chip.on .m{color:#fff;font-weight:600}
+.chip.tall{height:72px}
+.mon{flex:none;width:30px;height:60px;display:flex;align-items:center;justify-content:center}
+.mon span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#93615D}
+.tag{font-size:10px;font-weight:600;color:#93615D}.chip.on .tag{color:#fff}
+.line{font-size:14px;line-height:20px;color:#6F6662}
+.sum{background:#F5EFE9;border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:2px}
+.page{background:#fff;border:1px solid #E6DBD0;border-radius:8px;aspect-ratio:210/297;padding:14px 13px;display:flex;flex-direction:column;gap:6px;font-family:'Work Sans',sans-serif;color:#4A4A4A;overflow:hidden}
+.page .pt{font-family:Lora,serif;font-size:13px}.page .pl{height:4px;border-radius:2px;background:#E6DBD0}
+.page .tbl{margin-top:6px;border-top:1px solid #E6DBD0;display:flex;flex-direction:column;gap:5px;padding-top:6px}
+.page .r{display:flex;justify-content:space-between;font-size:7px}
+.page .fs{font-size:7px;color:#6F6662}
+.pill{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;background:rgba(74,74,74,.72);color:#fff}
+.dark{background:#2F2A28;color:#fff}
+.sheetbg{position:absolute;inset:0;background:rgba(74,58,48,.32);display:flex;flex-direction:column;justify-content:flex-end}
+.sheet{background:#FAF7F2;border-radius:20px 20px 0 0;height:92%;display:flex;flex-direction:column}
+.grab{width:36px;height:5px;border-radius:999px;background:#D8C9BB;margin:8px auto 0}
+.hint{position:absolute;left:12px;right:12px;top:6px;background:rgba(147,97,93,.94);color:#fff;font-size:12px;line-height:1.35;border-radius:10px;padding:8px 10px}
+.wm{font-family:Lora,Georgia,serif;font-size:30px;text-align:center}
+
+.wrap{min-height:2600px;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;padding:48px 56px;display:flex;flex-direction:column;gap:36px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h3{margin:0;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sub{color:#6F6662;line-height:1.5;max-width:900px}
+.cards{display:flex;flex-wrap:wrap;gap:20px}
+.pc{background:#F5EFE9;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;flex:1 1 360px}
+.pc h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:24px;flex:1}
+.lt{width:36px;height:36px;border-radius:999px;background:#93615D;color:#fff;font-family:Lora,serif;font-size:18px;display:flex;align-items:center;justify-content:center;flex:none}
+.rec{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;background:#F2E4E1;color:#7D4F4B}
+.lk{height:36px;padding:0 12px;border-radius:12px;background:#F2E4E1;color:#7D4F4B;font-size:13px;font-weight:600;display:inline-flex;align-items:center;text-decoration:none}
+.lks{display:flex;flex-wrap:wrap;gap:6px}
+.today{font-size:14px}.today a{font-weight:600}
+</style>
+</helmet>
+<div class="wrap">
+<div style="display:flex;flex-direction:column;gap:6px"><span class="eb">Emma Pilates Studio · hallazgos 42–46 de la verificación</span><h1>Fechas, cerrar sesión, factura en PDF y pantallas cortas</h1>
+<span class="sub">Cuatro temas, tres maneras de resolver cada uno. Cada tarjeta abre sus pantallas; en ellas se puede tocar para seguir. Una banda rosa abajo explica cada pantalla (no es parte del diseño).</span></div>
+<section style="display:flex;flex-direction:column;gap:14px"><h3>1 · La tira «Fecha de inicio» no dice el mes (n.º 42)</h3><span class="sub">Registrar pago (equipo) y Renovar mi plan (clienta) usan la misma tira: del día siguiente al vencimiento hasta 4 semanas después, así que cruza de diciembre a enero. Se ve la de la clienta; el equipo queda igual.</span><span class="today">Hoy: <a href="F-Hoy.dc.html">la tira de hoy</a></span><div class="cards"><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">A</span><h2>Mes en cada día</h2><span class="rec">Recomendada</span></div><p class="sub" style="margin:0">Cada día lleva el mes debajo del número: «dom · 6 · dic». Siempre claro, sin importar dónde se mire; la tira queda un poco más alta.</p><div class="lks"><a class="lk" href="F-A1-Diciembre.dc.html">Al abrir</a><a class="lk" href="F-A2-Enero.dc.html">Cruzando a enero</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">B</span><h2>Separador de mes</h2></div><p class="sub" style="margin:0">Los días quedan como hoy; al principio y donde cambia el mes, una etiqueta vertical «DICIEMBRE» / «ENERO» dentro de la tira.</p><div class="lks"><a class="lk" href="F-B1-Diciembre.dc.html">Al abrir</a><a class="lk" href="F-B2-Enero.dc.html">Cruzando a enero</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">C</span><h2>Mes arriba de la tira</h2></div><p class="sub" style="margin:0">Arriba a la derecha el mes que se ve («Diciembre 2026», «Diciembre – enero») y el día 1 lleva «ene». Lo más liviano, pero hay que mirar dos lugares.</p><div class="lks"><a class="lk" href="F-C1-Diciembre.dc.html">Al abrir</a><a class="lk" href="F-C2-Enero.dc.html">Cruzando a enero</a></div></section></div></section>
+<section style="display:flex;flex-direction:column;gap:14px"><h3>2 · «Cerrar mi cuenta» y «Cerrar sesión» (n.º 43 y 44)</h3><span class="sub">«Cerrar mi cuenta» en rojo, suelto, justo debajo de «Cerrar sesión» se puede tocar por error. Y «Cerrar sesión» se ve distinto en cada app. Las dos piden «¿Cerrar sesión?» con la misma hoja.</span><span class="today">Hoy: <a href="P-Hoy-Clienta.dc.html">clienta</a> · <a href="P-Hoy-Equipo.dc.html">equipo</a> · <a href="P-Hoja.dc.html">la hoja «¿Cerrar sesión?»</a></span><div class="cards"><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">A</span><h2>Fila neutra y cuenta en Editar perfil</h2><span class="rec">Recomendada</span></div><p class="sub" style="margin:0">«Cerrar sesión» es la última fila de Cuenta, neutra, igual en las dos apps. «Cerrar mi cuenta» sale de Perfil y va al final de Editar perfil, gris, con una línea que dice qué hace.</p><div class="lks"><a class="lk" href="P-A1-Clienta.dc.html">Perfil clienta</a><a class="lk" href="P-A2-Equipo.dc.html">Perfil equipo</a><a class="lk" href="P-A3-Editar-perfil.dc.html">Editar perfil</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">B</span><h2>Botón aparte</h2></div><p class="sub" style="margin:0">«Cerrar sesión» es un botón con borde debajo de los grupos, en las dos apps. «Cerrar mi cuenta» es una fila gris con flecha dentro de Cuenta.</p><div class="lks"><a class="lk" href="P-B1-Clienta.dc.html">Perfil clienta</a><a class="lk" href="P-B2-Equipo.dc.html">Perfil equipo</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">C</span><h2>Rojo como el equipo</h2></div><p class="sub" style="margin:0">«Cerrar sesión» en rojo como hoy en el equipo, también en la clienta. «Cerrar mi cuenta» queda como un enlace chico gris junto a la versión.</p><div class="lks"><a class="lk" href="P-C1-Clienta.dc.html">Perfil clienta</a><a class="lk" href="P-C2-Equipo.dc.html">Perfil equipo</a></div></section></div></section>
+<section style="display:flex;flex-direction:column;gap:14px"><h3>3 · La factura en PDF (n.º 45)</h3><span class="sub">Con una foto se ve la factura; con un PDF solo un ícono y «Receipt.pdf». La primera página se muestra como miniatura y el PDF entero se abre dentro de la app, con Descargar y Compartir. En la app del equipo, igual (hoy manda a la web). En la web el navegador ya abre el PDF; solo se agrega la miniatura.</span><span class="today">Hoy: <a href="V-Hoy.dc.html">factura en PDF</a></span><div class="cards"><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">A</span><h2>Miniatura y visor a pantalla completa</h2><span class="rec">Recomendada</span></div><p class="sub" style="margin:0">La primera página grande, como una foto, con «Ver · 2 páginas». Al tocarla, un visor oscuro a pantalla completa con todas las páginas, Compartir y Descargar.</p><div class="lks"><a class="lk" href="V-A1-Factura.dc.html">Factura</a><a class="lk" href="V-A2-Visor.dc.html">Visor</a><a class="lk" href="V-A3-Equipo.dc.html">App del equipo</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">B</span><h2>Fila de archivo y hoja</h2></div><p class="sub" style="margin:0">Una fila con la miniatura chica, «PDF · 2 páginas» y «Ver factura», como un adjunto. El visor sube en una hoja que se cierra deslizando.</p><div class="lks"><a class="lk" href="V-B1-Factura.dc.html">Factura</a><a class="lk" href="V-B2-Hoja.dc.html">Hoja</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">C</span><h2>La factura entera en la pantalla</h2></div><p class="sub" style="margin:0">Sin visor aparte: las páginas a lo ancho, una debajo de otra, con Compartir y Descargar abajo. Los datos del pago quedan al final.</p><div class="lks"><a class="lk" href="V-C1-Factura.dc.html">Factura</a></div></section></div></section>
+<section style="display:flex;flex-direction:column;gap:14px"><h3>4 · Pantallas cortas del acceso (n.º 46)</h3><span class="sub">«Revisa tu correo», contraseña enviada, cuenta activa y enlace vencido: hoy el contenido queda arriba y media pantalla vacía. Las mismas pantallas sirven a las dos apps.</span><span class="today">Hoy: <a href="R-Hoy-Correo.dc.html">Revisa tu correo</a> · <a href="R-Hoy-Enlace.dc.html">enlace vencido</a></span><div class="cards"><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">A</span><h2>Centro y botones abajo</h2><span class="rec">Recomendada</span></div><p class="sub" style="margin:0">El texto al centro y los botones abajo, al alcance del pulgar. Es como ya se ve «Tu pago está en revisión» y como estaba el diseño aprobado de Revisa tu correo.</p><div class="lks"><a class="lk" href="R-A1-Correo.dc.html">Revisa tu correo</a><a class="lk" href="R-A2-Enlace.dc.html">Enlace vencido</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">B</span><h2>Todo al centro</h2></div><p class="sub" style="margin:0">Ícono, texto y botones juntos, centrados en la pantalla. Compacto; los botones quedan a media altura.</p><div class="lks"><a class="lk" href="R-B1-Correo.dc.html">Revisa tu correo</a><a class="lk" href="R-B2-Enlace.dc.html">Enlace vencido</a></div></section><section class="pc"><div style="display:flex;align-items:center;gap:10px"><span class="lt">C</span><h2>Marca arriba</h2></div><p class="sub" style="margin:0">«Emma Pilates Studio» arriba como en Iniciar sesión, el texto al centro y los botones abajo.</p><div class="lks"><a class="lk" href="R-C1-Correo.dc.html">Revisa tu correo</a><a class="lk" href="R-C2-Enlace.dc.html">Enlace vencido</a></div></section></div></section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2600}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
