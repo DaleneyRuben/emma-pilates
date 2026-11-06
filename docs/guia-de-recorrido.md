@@ -341,9 +341,9 @@ la tuya, arriba a la derecha.
 Abre la app del equipo. La pantalla es **Acceso del equipo**. No hay
 **Regístrate**: el equipo no se crea solo.
 
-Cada rol tiene su barra de abajo, y todas terminan en **Perfil**. Arriba a la
-derecha está la campana de **Notificaciones**, con el número de avisos sin
-leer.
+Cada rol tiene su barra de abajo, y todas terminan en **Perfil**. En la
+primera pestaña de cada rol, arriba a la derecha, está la campana de
+**Notificaciones**, con el número de avisos sin leer.
 
 | Rol | Barra de abajo |
 | --- | --- |
@@ -360,11 +360,11 @@ leer.
    ves aquí.
 2. Abre **Perfil**. Muestra su nombre, su correo y su celular, con la nota
    «Tu nombre y tu correo los actualiza administración.». Debajo, **Tu
-   cuenta**: **Rol**, **Sucursal**, **Mis pagos** y **Tu código de
-   referido**. Su círculo tiene sus iniciales y **Cambiar foto**: elige una
+   cuenta** con **Rol** y **Sucursal**, y **Ajustes** con **Mis pagos**, **Tu
+   código de referido**, **Notificaciones**, **Cambiar contraseña**,
+   **Enviar comentarios** y **Cerrar sesión**. Su círculo tiene sus iniciales y **Cambiar foto**: elige una
    foto de la galería y queda puesta («Subiendo foto…» mientras sube); con
-   foto aparece también **Quitar foto**. Al final salen **Notificaciones**,
-   **Cambiar contraseña**, **Enviar comentarios** y **Cerrar sesión**.
+   foto aparece también **Quitar foto**.
 3. Cierra sesión. Camila entra y llega a **Clientes**, con **+ Nuevo
    cliente**: la búsqueda pide al menos dos letras o números. **Cerrar caja**
    vive en la pestaña **Caja**. Gabriela entra y llega a su **Agenda** de
@@ -374,7 +374,8 @@ leer.
    pendientes** vacío dice «Todo al día», con **Ver el horario**, y debajo
    **Accesos**: **Cancelar una clase**, **Congelamientos** y **Cerrar caja**.
    Su perfil dice «Tus datos se editan en la web de administración.»,
-   **Sucursales** «Todas las sucursales» y, además, **Ver la app como…**.
+   **Sucursales** «Todas las sucursales» y, en **Ajustes**, además **Ver la
+   app como…**.
    Déjalo para el paso 16.
 
 Si alguien olvida la contraseña, en el acceso del equipo está **¿Olvidaste
@@ -459,7 +460,7 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    «Necesitas un plan activo»; siguen **Evaluación nutricional** e **Invita a
    una amiga**. El carrusel de promociones está vacío hasta el paso 14.
 5. **Reservar** muestra la semana, pero al abrir una clase no deja reservar:
-   dice «Necesitas un plan para reservar.», con el botón para elegir uno.
+   **Reservar** está apagado y la clase ofrece comprar un plan.
 6. **Mis Reservas** tiene dos pestañas, **Próximas** e **Historial**.
    **Próximas** dice «Aún no tienes reservas», con **Reservar una clase**;
    **Historial** dice «Todavía no tomaste clases».
@@ -547,7 +548,7 @@ En la app de clientas, como Lucía, con el plan ya vigente.
    Dentro de las 2 h 30 esa lista ya cerró y el botón no aparece.
 
 En la app del equipo, Camila puede hacer lo mismo por una clienta: **Clientes**,
-el nombre de Lucía, **Ver cliente**, **Reservar una clase**. Si
+el nombre de Lucía, toca su fila y **Reservar clase**. Si
 Lucía ya tiene esa clase, la fila dice **Ya reservada** y el detalle no
 ofrece **Reservar**.
 
