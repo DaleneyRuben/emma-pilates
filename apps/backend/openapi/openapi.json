@@ -6963,6 +6963,59 @@
         ]
       }
     },
+    "/api/v1/staff/payments/{paymentId}/invoice/file/pages/{page}": {
+      "get": {
+        "operationId": "getStaffPaymentInvoicePage",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "headers": {
+              "X-Page-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "description": "",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffInvoice"
+        ]
+      }
+    },
     "/api/v1/clients/current/invoices": {
       "get": {
         "operationId": "listCurrentClientInvoices",
@@ -7020,6 +7073,59 @@
                   "format": "binary"
                 }
               },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientInvoice"
+        ]
+      }
+    },
+    "/api/v1/clients/current/invoices/{paymentId}/file/pages/{page}": {
+      "get": {
+        "operationId": "getCurrentClientInvoicePage",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "headers": {
+              "X-Page-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "description": "",
+            "content": {
               "image/png": {
                 "schema": {
                   "type": "string",

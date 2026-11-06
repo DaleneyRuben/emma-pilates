@@ -27347,6 +27347,232 @@ export function useGetStaffPaymentInvoiceFile<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export type getStaffPaymentInvoicePageResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getStaffPaymentInvoicePageResponseSuccess =
+  getStaffPaymentInvoicePageResponse200 & {
+    headers: Headers;
+  };
+export type getStaffPaymentInvoicePageResponse =
+  getStaffPaymentInvoicePageResponseSuccess;
+
+export const getGetStaffPaymentInvoicePageUrl = (
+  paymentId: string,
+  page: unknown,
+) => {
+  return `/api/v1/staff/payments/${paymentId}/invoice/file/pages/${page}`;
+};
+
+export const getStaffPaymentInvoicePage = async (
+  paymentId: string,
+  page: unknown,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getStaffPaymentInvoicePageResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetStaffPaymentInvoicePageUrl(paymentId, page),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getStaffPaymentInvoicePageResponse["data"] =
+    body as getStaffPaymentInvoicePageResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getStaffPaymentInvoicePageResponse;
+};
+
+export const getGetStaffPaymentInvoicePageQueryKey = (
+  paymentId: string,
+  page: unknown,
+) => {
+  return [
+    `/api/v1/staff/payments/${paymentId}/invoice/file/pages/${page}`,
+  ] as const;
+};
+
+export const getGetStaffPaymentInvoicePageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetStaffPaymentInvoicePageQueryKey(paymentId, page);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>
+  > = ({ signal }) =>
+    getStaffPaymentInvoicePage(
+      paymentId,
+      page,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled:
+      paymentId !== null &&
+      paymentId !== undefined &&
+      page !== null &&
+      page !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStaffPaymentInvoicePageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>
+>;
+export type GetStaffPaymentInvoicePageQueryError = unknown;
+
+export function useGetStaffPaymentInvoicePage<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffPaymentInvoicePage<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffPaymentInvoicePage<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetStaffPaymentInvoicePage<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoicePage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetStaffPaymentInvoicePageQueryOptions(
+    paymentId,
+    page,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type listCurrentClientInvoicesResponse200 = {
   data: ClientInvoiceListDto;
   status: 200;
@@ -27738,6 +27964,232 @@ export function useGetCurrentClientInvoiceFile<
 } {
   const queryOptions = getGetCurrentClientInvoiceFileQueryOptions(
     paymentId,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getCurrentClientInvoicePageResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getCurrentClientInvoicePageResponseSuccess =
+  getCurrentClientInvoicePageResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentClientInvoicePageResponse =
+  getCurrentClientInvoicePageResponseSuccess;
+
+export const getGetCurrentClientInvoicePageUrl = (
+  paymentId: string,
+  page: unknown,
+) => {
+  return `/api/v1/clients/current/invoices/${paymentId}/file/pages/${page}`;
+};
+
+export const getCurrentClientInvoicePage = async (
+  paymentId: string,
+  page: unknown,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentClientInvoicePageResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetCurrentClientInvoicePageUrl(paymentId, page),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getCurrentClientInvoicePageResponse["data"] =
+    body as getCurrentClientInvoicePageResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentClientInvoicePageResponse;
+};
+
+export const getGetCurrentClientInvoicePageQueryKey = (
+  paymentId: string,
+  page: unknown,
+) => {
+  return [
+    `/api/v1/clients/current/invoices/${paymentId}/file/pages/${page}`,
+  ] as const;
+};
+
+export const getGetCurrentClientInvoicePageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetCurrentClientInvoicePageQueryKey(paymentId, page);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentClientInvoicePage>>
+  > = ({ signal }) =>
+    getCurrentClientInvoicePage(
+      paymentId,
+      page,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled:
+      paymentId !== null &&
+      paymentId !== undefined &&
+      page !== null &&
+      page !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentClientInvoicePageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentClientInvoicePage>>
+>;
+export type GetCurrentClientInvoicePageQueryError = unknown;
+
+export function useGetCurrentClientInvoicePage<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientInvoicePage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientInvoicePage<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientInvoicePage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientInvoicePage<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentClientInvoicePage<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  page: unknown,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoicePage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentClientInvoicePageQueryOptions(
+    paymentId,
+    page,
     options,
   );
 
