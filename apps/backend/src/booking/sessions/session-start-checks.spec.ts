@@ -57,7 +57,7 @@ describe('Session start checks', () => {
       businessEventKey: 'session-cancelled:session-1',
       title: 'Clase cancelada',
       message:
-        'Tu clase de Mat Pilates de hoy 18:00 se canceló: no llegó al mínimo de 2 reservas.',
+        'Tu clase de Mat Pilates del martes 22 de septiembre, 18:00 se canceló: no llegó al mínimo de 2 reservas.',
       destination: { type: 'trainer_schedule', id: null },
       occurredAt: checkedAt,
     });
@@ -105,7 +105,7 @@ describe('Session start checks', () => {
       businessEventKey: 'session-cancelled:session-1',
       title: 'Clase cancelada',
       message:
-        'Tu clase de Mat Pilates de hoy 18:00 se canceló porque no llegó al mínimo de reservas. Te devolvimos la clase a tu plan. Hoy hay lugar en Reformer 19:00 y Mat Pilates 20:30.',
+        'Tu clase de Mat Pilates del martes 22 de septiembre, 18:00 se canceló porque no llegó al mínimo de reservas. Te devolvimos la clase a tu plan. Ese día hay lugar en Reformer 19:00 y Mat Pilates 20:30.',
       destination: { type: 'session', id: 'session-1' },
       occurredAt: checkedAt,
     });
@@ -128,7 +128,7 @@ describe('Session start checks', () => {
         alternatives: [16, 17, 19, 20, 21, 22].map((hour) => later(hour)),
       }).message,
     ).toMatch(
-      / Hoy hay lugar en Reformer 16:00, Reformer 17:00, Reformer 19:00, Reformer 20:00 y 2 más\.$/,
+      / Ese día hay lugar en Reformer 16:00, Reformer 17:00, Reformer 19:00, Reformer 20:00 y 2 más\.$/,
     );
   });
 
@@ -142,7 +142,7 @@ describe('Session start checks', () => {
         occurredAt: checkedAt,
         alternatives: [],
       }).message,
-    ).toMatch(/ Hoy ya no quedan otras clases con lugar\.$/);
+    ).toMatch(/ Ese día ya no quedan otras clases con lugar\.$/);
     expect(
       minimumNotMetClientNotice({
         accountId: 'client-account',
