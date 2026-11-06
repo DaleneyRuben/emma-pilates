@@ -1,5 +1,4 @@
 import type { NewNotification } from '../../notifications/prisma-notification-store';
-import { boliviaDate } from '../../time/bolivia-time';
 
 // The one-time Minimum Bookings check falls due at the lead time in Studio
 // Settings (3 hours, ADR-0007). A check missed while the worker was down
@@ -41,18 +40,12 @@ const timeOf = (instant: Date): string => {
   return `${parts.hour}:${parts.minute}`;
 };
 
-const isSameBoliviaDay = (first: Date, second: Date): boolean =>
-  boliviaDate(first).getTime() === boliviaDate(second).getTime();
-
-// "de hoy 18:00", or "del miércoles 23 de septiembre, 07:00" on another
-// Bolivia day.
-const sessionMoment = (startsAt: Date, now: Date): string => {
+// "del miércoles 23 de septiembre, 07:00": always the Bolivia day, never "de
+// hoy", because the notice stays in the inbox after that day (walkthrough
+// n.º 11 read «de hoy 18:00» next to «Ayer, 16:15»).
+const sessionMoment = (startsAt: Date): string => {
   const parts = momentParts(startsAt);
-  const time = `${parts.hour}:${parts.minute}`;
-
-  return isSameBoliviaDay(startsAt, now)
-    ? `de hoy ${time}`
-    : `del ${parts.weekday} ${parts.day} de ${parts.month}, ${time}`;
+  return `del ${parts.weekday} ${parts.day} de ${parts.month}, ${parts.hour}:${parts.minute}`;
 };
 
 const cancelledNotice = (
@@ -80,7 +73,7 @@ export const minimumNotMetTrainerNotice = (facts: {
 }): NewNotification =>
   cancelledNotice(
     facts,
-    `Tu clase de ${facts.classTypeName} ${sessionMoment(facts.startsAt, facts.occurredAt)} se canceló: no llegó al mínimo de ${facts.minimumBookings} reservas.`,
+    `Tu clase de ${facts.classTypeName} ${sessionMoment(facts.startsAt)} se canceló: no llegó al mínimo de ${facts.minimumBookings} reservas.`,
     { type: 'trainer_schedule', id: null },
   );
 
@@ -112,17 +105,14 @@ export const minimumNotMetClientNotice = (facts: {
   occurredAt: Date;
   alternatives: AlternativeSession[];
 }): NewNotification => {
-  const day = isSameBoliviaDay(facts.startsAt, facts.occurredAt)
-    ? 'Hoy'
-    : 'Ese día';
   const others =
     facts.alternatives.length === 0
-      ? `${day} ya no quedan otras clases con lugar.`
-      : `${day} hay lugar en ${alternativesText(facts.alternatives)}.`;
+      ? `Ese día ya no quedan otras clases con lugar.`
+      : `Ese día hay lugar en ${alternativesText(facts.alternatives)}.`;
 
   return cancelledNotice(
     facts,
-    `Tu clase de ${facts.classTypeName} ${sessionMoment(facts.startsAt, facts.occurredAt)} se canceló porque no llegó al mínimo de reservas. Te devolvimos la clase a tu plan. ${others}`,
+    `Tu clase de ${facts.classTypeName} ${sessionMoment(facts.startsAt)} se canceló porque no llegó al mínimo de reservas. Te devolvimos la clase a tu plan. ${others}`,
     { type: 'session', id: facts.sessionId },
   );
 };

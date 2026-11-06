@@ -20,6 +20,7 @@ import { toPrismaBytes } from '../../database/prisma-bytes';
 import { retrySerializable } from '../../database/retry-serializable';
 import {
   recordNotification as defaultNotificationRecorder,
+  settleReviewNotices,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
@@ -1025,6 +1026,10 @@ export function createPrismaPaymentCommands(
 
     const paymentId = await serializable(async (transaction) => {
       const payment = await loadTransferPayment(transaction, command.paymentId);
+      await settleReviewNotices(transaction, {
+        businessEventKey: `payment-submitted:${payment.id}`,
+        settledAt: dependencies.now(),
+      });
       if (payment.kind === PaymentKind.EVALUATION) {
         const settings =
           await transaction.studioSettingsVersion.findFirstOrThrow({
@@ -1194,6 +1199,10 @@ export function createPrismaPaymentCommands(
 
     const paymentId = await serializable(async (transaction) => {
       const payment = await loadTransferPayment(transaction, command.paymentId);
+      await settleReviewNotices(transaction, {
+        businessEventKey: `payment-submitted:${payment.id}`,
+        settledAt: dependencies.now(),
+      });
       if (payment.kind === PaymentKind.EVALUATION) {
         await decideEvaluationTransfer(transaction, recordNotification, {
           paymentId: payment.id,

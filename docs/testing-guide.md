@@ -2087,16 +2087,17 @@ Load the fixtures (Test 5A), start the backend, and start the worker with
   cancelled with cause `minimum_not_met` and no actor. Each of its Bookings is
   cancelled as `session_cancelled` with no actor and the class goes back to the
   Client's Plan. Each booked Client receives a push and an inbox entry
-  "Tu clase de Mat Pilates de hoy 18:00 se canceló porque no llegó al mínimo
-  de reservas. Te devolvimos la clase a tu plan. Hoy hay lugar en Reformer
-  19:00 y Mat Pilates 20:00." It names the later Sessions that day at the same
+  "Tu clase de Mat Pilates del martes 22 de septiembre, 18:00 se canceló
+  porque no llegó al mínimo de reservas. Te devolvimos la clase a tu plan. Ese
+  día hay lugar en Reformer 19:00 y Mat Pilates 20:00." (the notice always
+  names the day, never "de hoy", because it stays in the inbox afterwards) It names the later Sessions that day at the same
   Branch that still have places and that she has not booked (four at most,
-  then "y N más"), or ends "Hoy ya no quedan otras clases con lugar."; tapping
+  then "y N más"), or ends "Ese día ya no quedan otras clases con lugar."; tapping
   it opens Mis Reservas. The open Waitlist Entries close as
   `session_cancelled` and each waitlisted Client receives "La clase de … a la
   que estabas en lista de espera fue cancelada." The Trainer receives "Tu
-  clase de Mat Pilates de hoy 18:00 se canceló: no llegó al mínimo de 2
-  reservas.", which opens their agenda. A Session that reaches the minimum
+  clase de Mat Pilates del martes 22 de septiembre, 18:00 se canceló: no llegó
+  al mínimo de 2 reservas.", which opens their agenda. A Session that reaches the minimum
   stays scheduled. Either way the check is recorded in
   `empty_booking_check_completed_at` (the column kept its BOOK-004 name) and
   never runs again for that Session, even if its Bookings later drop. A

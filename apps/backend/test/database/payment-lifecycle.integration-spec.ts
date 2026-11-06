@@ -278,6 +278,21 @@ describe('Prisma payment lifecycle', () => {
     ).resolves.toMatchObject({
       message: 'Tu pago fue confirmado. ¡Ya puedes reservar clases!',
     });
+    // Walkthrough n.º 13: the review notice settles with the decision.
+    await expect(
+      prisma.notification.findMany({
+        where: { businessEventKey: `payment-submitted:${pending.id}` },
+        select: { readAt: true },
+      }),
+    ).resolves.toEqual(expect.arrayContaining([{ readAt: decidedAt }]));
+    await expect(
+      prisma.notification.count({
+        where: {
+          businessEventKey: `payment-submitted:${pending.id}`,
+          readAt: null,
+        },
+      }),
+    ).resolves.toBe(0);
     await expect(
       prisma.imageAsset.findUniqueOrThrow({ where: { id: receipt.id } }),
     ).resolves.toMatchObject({
@@ -354,6 +369,14 @@ describe('Prisma payment lifecycle', () => {
       message:
         'Tu comprobante fue rechazado: El monto no coincide con el plan. Sube uno nuevo para activar tu plan.',
     });
+    await expect(
+      prisma.notification.count({
+        where: {
+          businessEventKey: `payment-submitted:${pending.id}`,
+          readAt: null,
+        },
+      }),
+    ).resolves.toBe(0);
     await expect(
       commands().rejectTransfer(
         { paymentId: pending.id, reason: 'El monto no coincide con el plan.' },
