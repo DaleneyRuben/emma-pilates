@@ -1437,6 +1437,8 @@ export function createPrismaPaymentCommands(
       select: {
         ...paymentSelect,
         client: { select: { name: true } },
+        invoiceTaxId: true,
+        invoiceName: true,
         purchaseIntent: {
           select: { receiptImageAsset: { select: receiptSelect } },
         },
@@ -1459,6 +1461,11 @@ export function createPrismaPaymentCommands(
     return {
       ...toPaymentView(row),
       clientName: row.client.name,
+      // FIX-044: S12 shows whether she asked for an invoice, and in whose name.
+      invoiceData:
+        row.invoiceTaxId === null || row.invoiceName === null
+          ? null
+          : { taxId: row.invoiceTaxId, name: row.invoiceName },
       receipt:
         receipt === null
           ? null

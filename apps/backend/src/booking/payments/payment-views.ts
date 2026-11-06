@@ -86,6 +86,7 @@ export type PendingPaymentSummary = {
 
 export type PaymentReview = PaymentView & {
   clientName: string;
+  invoiceData: { taxId: string; name: string } | null;
   receipt: { imageAssetId: string; mediaType: string } | null;
 };
 
