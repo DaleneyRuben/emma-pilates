@@ -84,7 +84,7 @@ describe("AW21 Clientes on a desktop browser", () => {
     expectClientPhoto(withPhoto, "Lucía Fernández");
     const without = screen.getByRole("cell", { name: /Sofía Guzmán/ })
       .parentElement as HTMLElement;
-    expectClientInitials(without, "Sofía Guzmán", "SG");
+    expectClientInitials(without, "Sofía Guzmán Rojas", "SR");
   });
 
   it("marks an expired Plan and a Client who never had one", async () => {
