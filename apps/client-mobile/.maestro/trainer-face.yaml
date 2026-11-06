@@ -1,0 +1,14 @@
+# Critical journey (FIX-041): the Client sees her Trainer's photo next to her
+# name in Reservar. Needs Emma Vargas with a photo (Test 134 A) and a class
+# of hers on the visible day.
+appId: ${APP_ID}
+env:
+  EMAIL: mariana@example.com
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    id: "tab-booking"
+- extendedWaitUntil:
+    visible: "Foto de .*"
+    timeout: 30000
+- takeScreenshot: fix041-client-1-reservar-trainer-face
