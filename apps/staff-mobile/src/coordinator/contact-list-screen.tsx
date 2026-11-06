@@ -6,10 +6,12 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
+  ClientFace,
   colors,
   fontFamilies,
   LoadingState,
   NoticeRow,
+  phoneWithFlag,
   QueryFailure,
   Screen,
   spacing,
@@ -18,14 +20,12 @@ import {
   TextButton,
   usePullToRefresh,
   useRefetchOnFocus,
-  phoneWithFlag,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { Linking, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { InitialsDisc } from "../ui/person-row";
 import { RootHeader } from "../ui/root-header";
 import { StatusPill } from "../ui/session-row";
 import { useIsTablet } from "../ui/use-is-tablet";
@@ -42,12 +42,13 @@ function ContactCard({
   busy: boolean;
   onContacted: (item: ContactAlertItemDto) => void;
 }) {
+  const fetcher = useStaffFetcher();
   const href = item.phone === null ? null : whatsAppHref(item.phone);
   const started = startedOnLabel(item.startedOn);
   return (
     <View style={styles.card}>
       <View style={styles.identity}>
-        <InitialsDisc name={item.name} />
+        <ClientFace fetcher={fetcher} name={item.name} photo={item.photo} size={36} />
         <View style={styles.identityBody}>
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.quiet}>

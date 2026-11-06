@@ -14,14 +14,16 @@ import { ClientRecordsHeader } from "./client-records-header";
 import type { ClientContext } from "./client-overview-screen";
 
 export function ClientHistoryScreen({ route }: { route: { params: ClientContext } }) {
-  const { clientId, clientName } = route.params;
+  const { clientId, clientName, clientPhoto } = route.params;
   const fetcher = useStaffFetcher();
   const history = useListAssistantClientHistory(clientId, {
     fetcher,
     query: { refetchOnMount: "always" },
   });
 
-  const header = <ClientRecordsHeader context={{ clientId, clientName }} selected="history" />;
+  const header = (
+    <ClientRecordsHeader context={{ clientId, clientName, clientPhoto }} selected="history" />
+  );
 
   if (history.isPending) {
     return (

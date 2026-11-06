@@ -52,7 +52,7 @@ function seatsTag(session: SessionAvailabilityDto): string {
 
 /** S07 Reservar una clase, for the Client named in the banner (v2). */
 export function BrowseSessionsScreen({ route }: { route: { params: ClientContext } }) {
-  const { clientId, clientName } = route.params;
+  const { clientId, clientName, clientPhoto } = route.params;
   const navigation = useNavigation<BrowseNavigation>();
   const fetcher = useStaffFetcher();
   const today = boliviaCivilDate(new Date());
@@ -84,7 +84,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
   const header = (
     <>
       <BackBar onBack={() => navigation.goBack()} title="Reservar una clase" />
-      <ClientBanner action="Reservando para" clientName={clientName} />
+      <ClientBanner action="Reservando para" clientName={clientName} clientPhoto={clientPhoto} />
     </>
   );
 
@@ -204,6 +204,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
                     navigation.navigate("SessionDetail", {
                       clientId,
                       clientName,
+                      clientPhoto,
                       sessionId: session.id,
                     })
                   }

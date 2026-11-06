@@ -5,6 +5,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
+  ClientFace,
   colors,
   EmptyState,
   fontFamilies,
@@ -193,7 +194,18 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
                     })}
                   </View>
                 ) : (
-                  <PersonRow key={booking.bookingId} name={booking.clientName} />
+                  <PersonRow
+                    face={
+                      <ClientFace
+                        fetcher={fetcher}
+                        name={booking.clientName}
+                        photo={booking.clientPhoto}
+                        size={36}
+                      />
+                    }
+                    key={booking.bookingId}
+                    name={booking.clientName}
+                  />
                 ),
               )}
             </IconRowGroup>

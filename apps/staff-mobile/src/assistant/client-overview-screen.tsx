@@ -1,6 +1,7 @@
 import { useGetAssistantClientOverview } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
+  ClientFace,
   colors,
   dayChipLabel,
   fontFamilies,
@@ -22,14 +23,18 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
 import { BackBar } from "../ui/back-bar";
-import { InitialsDisc } from "../ui/person-row";
 import { useInClientPanel } from "./assistant-workspace";
 import { PlanHero } from "./plan-hero";
 import { StateCard } from "./state-card";
 import { PendingInvitationCard } from "./pending-invitation-card";
 import { describeContact } from "./assistant-format";
 
-export type ClientContext = { clientId: string; clientName: string };
+/** Whose behalf the Assistant acts on, carried from her file to each step. */
+export type ClientContext = {
+  clientId: string;
+  clientName: string;
+  clientPhoto: { imageAssetId: string } | null;
+};
 
 type OverviewNavigation = {
   goBack: () => void;
@@ -91,7 +96,11 @@ export function ClientOverviewScreen({
 
   const data = overview.data.data;
   const { client } = data;
-  const context: ClientContext = { clientId: client.id, clientName: client.name };
+  const context: ClientContext = {
+    clientId: client.id,
+    clientName: client.name,
+    clientPhoto: client.photo,
+  };
   const active =
     data.subscription.status === "active" || data.subscription.status === "expiring_soon";
   const subscription = data.subscription.subscription ?? null;
@@ -112,7 +121,7 @@ export function ClientOverviewScreen({
       {back}
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.identity}>
-          <InitialsDisc name={client.name} size={56} />
+          <ClientFace fetcher={fetcher} name={client.name} photo={client.photo} size={56} />
           <View style={styles.identityBody}>
             <Text accessibilityLabel={client.name} accessibilityRole="header" style={styles.name}>
               {client.name}

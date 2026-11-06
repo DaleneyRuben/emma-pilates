@@ -24,6 +24,7 @@ export const lucia = {
   email: "lucia@example.com",
   phone: "+591 70011001",
   accountStatus: "active",
+  photo: null,
 };
 
 export const subscription = {

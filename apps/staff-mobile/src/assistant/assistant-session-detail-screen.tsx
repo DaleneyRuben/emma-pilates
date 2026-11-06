@@ -69,7 +69,7 @@ export function AssistantSessionDetailScreen({
 }: {
   route: { params: ClientContext & { sessionId: string } };
 }) {
-  const { clientId, clientName, sessionId } = route.params;
+  const { clientId, clientName, clientPhoto, sessionId } = route.params;
   const showClientBookings = useShowClientBookings();
   const navigation = useNavigation<DetailNavigation>();
   const fetcher = useStaffFetcher();
@@ -97,6 +97,7 @@ export function AssistantSessionDetailScreen({
       <ClientBanner
         action="Reservando para"
         clientName={clientName}
+        clientPhoto={clientPhoto}
         detail={
           left === undefined ? undefined : `${left} ${left === 1 ? "clase" : "clases"} en su plan`
         }
@@ -167,6 +168,7 @@ export function AssistantSessionDetailScreen({
       showClientBookings({
         clientId,
         clientName,
+        clientPhoto,
         confirmed: {
           bookingId: booking.id,
           classTypeName: detail.classType.name,
@@ -282,7 +284,9 @@ export function AssistantSessionDetailScreen({
               </BodyText>
               <TextButton
                 label="Registrar pago"
-                onPress={() => navigation.navigate("SelectPlan", { clientId, clientName })}
+                onPress={() =>
+                  navigation.navigate("SelectPlan", { clientId, clientName, clientPhoto })
+                }
               />
             </>
           )}

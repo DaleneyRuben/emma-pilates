@@ -24,6 +24,7 @@ const valeria: ContactAlertItemDto = {
   clientId: "client-valeria",
   name: "Valeria Quiroga",
   phone: "+591 70011005",
+  photo: null,
   startedOn: "2026-10-02",
   reasons: ["no_booking_7_days"],
 };
@@ -32,6 +33,7 @@ const daniela: ContactAlertItemDto = {
   clientId: "client-daniela",
   name: "Daniela Rojas",
   phone: null,
+  photo: null,
   startedOn: "2026-10-05",
   reasons: ["fewer_than_2_classes_by_day_15", "no_booking_7_days"],
 };
