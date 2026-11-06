@@ -68,7 +68,7 @@ describe("Client faces on the staff screens", () => {
     expect(screen.getByText("LF")).toBeOnTheScreen();
   });
 
-  it("puts her face on Pagos pendientes and on Revisar pago", async () => {
+  it("puts her face on Pagos pendientes and on the rejection of Revisar pago", async () => {
     const payment = (id: string, clientName: string, clientPhoto: unknown) => ({
       id,
       clientName,
@@ -115,7 +115,13 @@ describe("Client faces on the staff screens", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Revisar pago de Ana Pérez" }));
     await waitFor(() => expect(screen.getByText("Monto a verificar")).toBeOnTheScreen());
-    await waitFor(() => expect(screen.getByLabelText("Foto de Ana Pérez")).toBeOnTheScreen());
+    // Revisar pago draws her row (and so her face) once rejecting.
+    const before = screen.queryAllByLabelText("Foto de Ana Pérez").length;
+    await fireEvent.press(screen.getByTestId("review-reject"));
+    await waitFor(() => expect(screen.getByTestId("review-reject-reason")).toBeOnTheScreen());
+    await waitFor(() =>
+      expect(screen.getAllByLabelText("Foto de Ana Pérez")).toHaveLength(before + 1),
+    );
   });
 
   it("puts her face on the Coordinator's Para contactar", async () => {
