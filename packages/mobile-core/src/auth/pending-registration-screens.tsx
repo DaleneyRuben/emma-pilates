@@ -145,7 +145,7 @@ export function CheckEmailScreen({
         Ábrelo para activar tu cuenta y después inicia sesión.
       </BodyText>
       {resent && !waiting ? (
-        <View accessibilityRole="text" style={styles.resent} testID="resent-notice">
+        <View accessibilityLiveRegion="polite" style={styles.resent} testID="resent-notice">
           <BodyText>Te enviamos otro correo. Usa el enlace más reciente.</BodyText>
         </View>
       ) : null}
