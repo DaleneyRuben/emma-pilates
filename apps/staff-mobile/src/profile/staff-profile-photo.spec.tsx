@@ -194,6 +194,37 @@ describe("Staff Perfil photo", () => {
     expect(screen.queryByText("Subiendo foto…")).toBeNull();
   });
 
+  it("keeps the chosen photo until the stored one loads, then refreshes the other lists (review)", async () => {
+    pickedPhoto();
+    const calls: string[] = [];
+    let sessionsReads = 0;
+    const fetcher = routeFetcher(
+      routes(daniela, {
+        ...uploadRoutes(calls),
+        "/api/v1/trainer/sessions": () => {
+          sessionsReads += 1;
+          return jsonResponse([]);
+        },
+        "/api/v1/staff-photos/asset-new?variant=display": () => new Promise<Response>(() => {}),
+        "PUT /api/v1/staff-members/current/photo": () =>
+          jsonResponse({ staffMemberId: "staff-1", photo: { imageAssetId: "asset-new" } }),
+      }),
+    );
+    const screen = await openProfile(fetcher, "trainer");
+    const readsBefore = sessionsReads;
+
+    await fireEvent.press(screen.getByRole("button", { name: "Cambiar foto" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Quitar foto" })).toBeOnTheScreen(),
+    );
+    expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveProp("source", {
+      uri: "file:///me.jpg",
+    });
+    expect(screen.queryByText("DO")).toBeNull();
+    await waitFor(() => expect(sessionsReads).toBeGreaterThan(readsBefore));
+  });
+
   it("shows the chosen photo under the veil while it uploads", async () => {
     pickedPhoto();
     const screen = await openProfile(
