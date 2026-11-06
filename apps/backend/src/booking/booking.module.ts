@@ -107,6 +107,7 @@ import {
 } from './session-availability';
 import { listAdministratorSessions } from './sessions/administrator-sessions';
 import { listTrainerSchedule } from './trainer-schedule';
+import { findTrainerScheduleSessions } from './trainer-schedule-sessions';
 import { loadTrainerSessionRoster } from './trainer-session-roster';
 
 import {
@@ -236,46 +237,12 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
       useFactory:
         (prisma: PrismaClient) =>
         (
-          input: { on: Date },
+          input: { on: Date; includeCancelled: boolean },
           principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
         ) =>
           listTrainerSchedule(input, {
             principal,
-            findSessions: ({ trainerStaffMemberId, on }) => {
-              const start = new Date(on.getTime() + 4 * 60 * 60 * 1_000);
-              const end = new Date(start.getTime() + 24 * 60 * 60 * 1_000);
-              return prisma.session
-                .findMany({
-                  where: {
-                    trainerStaffMemberId,
-                    state: 'SCHEDULED',
-                    startsAt: { gte: start, lt: end },
-                  },
-                  select: {
-                    id: true,
-                    startsAt: true,
-                    endsAt: true,
-                    capacity: true,
-                    classType: { select: { name: true } },
-                    branch: { select: { name: true } },
-                    _count: {
-                      select: { bookings: { where: { state: 'BOOKED' } } },
-                    },
-                  },
-                  orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
-                })
-                .then((sessions) =>
-                  sessions.map((session) => ({
-                    sessionId: session.id,
-                    classTypeName: session.classType.name,
-                    branchName: session.branch.name,
-                    startsAt: session.startsAt,
-                    endsAt: session.endsAt,
-                    capacity: session.capacity,
-                    bookedCount: session._count.bookings,
-                  })),
-                );
-            },
+            findSessions: findTrainerScheduleSessions(prisma),
           }),
     },
     {

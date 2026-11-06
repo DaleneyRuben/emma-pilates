@@ -113,4 +113,118 @@ describe('Sessions across every Branch', () => {
     expect(clientFacing[0]).not.toHaveProperty('sessionScheduleId');
     expect(clientFacing[0]).not.toHaveProperty('isException');
   });
+
+  it('shows the week grid its cancelled Sessions with their cause, keeping the ones a series change withdrew hidden (FIX-042)', async () => {
+    const from = new Date(Date.now() + 8 * day);
+    const until = new Date(from.getTime() + 7 * day);
+    const [minimum, studio, paused, changed, zero] =
+      await prisma.session.findMany({
+        where: { state: 'SCHEDULED', startsAt: { gte: from, lt: until } },
+        orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+        take: 5,
+      });
+    const account = await prisma.account.findFirstOrThrow();
+    const cancelledAt = new Date(from.getTime() - day);
+    const cancel = (
+      id: string,
+      cause:
+        | 'MINIMUM_NOT_MET'
+        | 'NO_SUBSTITUTE_TRAINER'
+        | 'SCHEDULE_PAUSED'
+        | 'SCHEDULE_CHANGED'
+        | 'ZERO_BOOKINGS',
+    ) =>
+      prisma.session.update({
+        where: { id },
+        data: {
+          state: 'CANCELLED',
+          cancellationCause: cause,
+          cancelledAt,
+          cancelledByAccountId:
+            cause === 'MINIMUM_NOT_MET' || cause === 'ZERO_BOOKINGS'
+              ? null
+              : account.id,
+        },
+      });
+    await cancel(minimum.id, 'MINIMUM_NOT_MET');
+    await cancel(studio.id, 'NO_SUBSTITUTE_TRAINER');
+    await cancel(paused.id, 'SCHEDULE_PAUSED');
+    await cancel(changed.id, 'SCHEDULE_CHANGED');
+    await cancel(zero.id, 'ZERO_BOOKINGS');
+    const subscription = await prisma.subscription.findFirstOrThrow();
+    await prisma.booking.create({
+      data: {
+        sessionId: studio.id,
+        clientId: subscription.clientId,
+        subscriptionId: subscription.id,
+        createdByAccountId: account.id,
+        state: 'CANCELLED',
+        cancellationCause: 'SESSION_CANCELLED',
+        cancelledAt,
+      },
+    });
+
+    // A Booking the client cancelled earlier is not one the class had.
+    await prisma.booking.create({
+      data: {
+        sessionId: studio.id,
+        clientId: subscription.clientId,
+        subscriptionId: subscription.id,
+        createdByAccountId: account.id,
+        state: 'CANCELLED',
+        cancellationCause: 'CLIENT_REQUEST',
+        cancelledAt,
+        cancelledByAccountId: account.id,
+      },
+    });
+
+    const withCancelled = await listSessionsAcrossBranches(prisma)({
+      from,
+      until,
+      limit: 100,
+      includeCancelled: true,
+    });
+    const byId = new Map(withCancelled.map((session) => [session.id, session]));
+    expect(byId.get(minimum.id)?.cancellation).toEqual({
+      cause: 'minimum_not_met',
+      cancelledAt,
+      bookedCount: 0,
+    });
+    expect(byId.get(studio.id)?.cancellation).toEqual({
+      cause: 'studio',
+      cancelledAt,
+      bookedCount: 1,
+    });
+    expect(byId.get(paused.id)?.cancellation).toEqual(
+      expect.objectContaining({ cause: 'schedule_paused' }),
+    );
+    expect(byId.has(changed.id)).toBe(false);
+    expect(byId.get(zero.id)?.cancellation).toEqual(
+      expect.objectContaining({ cause: 'minimum_not_met' }),
+    );
+    const ofBranch = await listSessionsAcrossBranches(prisma)({
+      branchId: minimum.branchId,
+      from,
+      until,
+      limit: 100,
+      includeCancelled: true,
+    });
+    expect(new Set(ofBranch.map((session) => session.branchId))).toEqual(
+      new Set([minimum.branchId]),
+    );
+    expect(ofBranch.map((session) => session.id)).toContain(minimum.id);
+    const standing = withCancelled.find((session) => !session.cancellation);
+    expect(standing?.cancellation).toBeNull();
+
+    const withoutCancelled = await listSessionsAcrossBranches(prisma)({
+      from,
+      until,
+      limit: 100,
+    });
+    expect(
+      withoutCancelled.filter((session) =>
+        [minimum.id, studio.id, paused.id].includes(session.id),
+      ),
+    ).toEqual([]);
+  });
 });

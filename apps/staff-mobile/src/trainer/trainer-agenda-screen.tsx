@@ -25,10 +25,12 @@ import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { CancelledSessionRow } from "../ui/cancelled-session-row";
 import { DayStrip } from "../ui/day-strip";
 import { RootHeader } from "../ui/root-header";
 import { SessionRow } from "../ui/session-row";
-import { countLabel, dayHeading, minutesLabel, startTime } from "../ui/session-time";
+import { dayHeading, minutesLabel, startTime } from "../ui/session-time";
+import { agendaHeading, causeLabel } from "./agenda-cancellations";
 import { requireOk } from "./require-ok";
 
 type TrainerAgendaNavigation = {
@@ -46,19 +48,18 @@ export function TrainerAgendaScreen() {
   const today = boliviaCivilDate(new Date());
   const dates = useMemo(() => upcomingCivilDates(today, 7), [today]);
   const [selectedDate, setSelectedDate] = useState(today);
-  const schedule = useListTrainerSchedule(
-    { on: selectedDate },
-    {
-      fetcher,
-      query: {
-        queryFn: ({ signal }) =>
-          listTrainerSchedule({ on: selectedDate }, { signal }, fetcher).then((response) =>
-            requireOk(response, "The agenda could not be loaded"),
-          ),
-        refetchOnMount: "always",
-      },
+  // FIX-042: the day's cancelled classes come too, shown muted in place.
+  const params = { on: selectedDate, includeCancelled: true };
+  const schedule = useListTrainerSchedule(params, {
+    fetcher,
+    query: {
+      queryFn: ({ signal }) =>
+        listTrainerSchedule(params, { signal }, fetcher).then((response) =>
+          requireOk(response, "The agenda could not be loaded"),
+        ),
+      refetchOnMount: "always",
     },
-  );
+  });
   const queryKeys = [getListTrainerScheduleQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
@@ -145,11 +146,24 @@ export function TrainerAgendaScreen() {
           />
         ) : (
           <View>
-            <SectionTitle>
-              {`${dayName} · ${countLabel(sessions.length, "clase", "clases")}`}
-            </SectionTitle>
+            <SectionTitle>{agendaHeading(dayName, sessions)}</SectionTitle>
             <View style={styles.list}>
               {sessions.map((session) => {
+                const cancellation = session.cancellation ?? null;
+                if (cancellation !== null) {
+                  const cause = causeLabel(cancellation.cause);
+                  return (
+                    <CancelledSessionRow
+                      accessibilityLabel={`${session.classTypeName}, ${formatTimeRange(session.startsAt, session.endsAt)}, ${cause}`}
+                      cause={cause}
+                      duration={minutesLabel(session.startsAt, session.endsAt)}
+                      key={session.sessionId}
+                      testID={`agenda-cancelled-${session.sessionId}`}
+                      time={startTime(session.startsAt, session.endsAt)}
+                      title={session.classTypeName}
+                    />
+                  );
+                }
                 const full = session.bookedCount >= session.capacity;
                 const booked =
                   session.bookedCount === 0

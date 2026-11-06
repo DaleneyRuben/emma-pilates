@@ -240,6 +240,7 @@ export class AdministratorSessionsController {
   @ApiQuery({ name: 'until', required: true, format: 'date-time' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'branchId', required: false, schema: { format: 'uuid' } })
+  @ApiQuery({ name: 'includeCancelled', required: false, type: Boolean })
   @ApiOkResponse({ type: AdministratorSessionAvailabilityDto, isArray: true })
   @Header('Cache-Control', 'no-store')
   async search(

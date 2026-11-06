@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import { sessionCancellationCauses } from './sessions/session-cancellation';
 
 export class CreateBookingDto {
   @ApiPropertyOptional({ format: 'uuid' })
@@ -102,6 +103,19 @@ export class SessionAvailabilityDto {
   classesLeftThisWeek?: number | null;
 }
 
+// FIX-042: a cancelled Session the Horario or the Trainer's agenda shows in
+// place, with why it was cancelled and how many it had booked by then.
+export class SessionCancellationSummaryDto {
+  @ApiProperty({ enum: sessionCancellationCauses })
+  cause!: (typeof sessionCancellationCauses)[number];
+
+  @ApiProperty({ format: 'date-time' })
+  cancelledAt!: Date;
+
+  @ApiProperty({ minimum: 0 })
+  bookedCount!: number;
+}
+
 // The Administrator's projection (API-002, WEB-003): the same Session plus
 // the weekly schedule that generated it, so an edit can offer "Esta y las
 // futuras", and whether it is already an exception.
@@ -111,6 +125,12 @@ export class AdministratorSessionAvailabilityDto extends SessionAvailabilityDto 
 
   @ApiProperty()
   isException!: boolean;
+
+  @ApiPropertyOptional({
+    type: () => SessionCancellationSummaryDto,
+    nullable: true,
+  })
+  cancellation?: SessionCancellationSummaryDto | null;
 }
 
 export class TrainerScheduleSessionDto {
@@ -134,6 +154,12 @@ export class TrainerScheduleSessionDto {
 
   @ApiProperty({ minimum: 0 })
   bookedCount!: number;
+
+  @ApiPropertyOptional({
+    type: () => SessionCancellationSummaryDto,
+    nullable: true,
+  })
+  cancellation?: SessionCancellationSummaryDto | null;
 }
 
 export class TrainerRosterBookingDto {
@@ -227,6 +253,7 @@ const administratorSessionQuerySchema = z
     until: z.iso.datetime(),
     limit: z.coerce.number().int().min(1).max(100).default(50),
     branchId: z.uuid().optional(),
+    includeCancelled: z.enum(['true', 'false']).optional(),
   })
   .refine(({ from, until }) => new Date(from) < new Date(until), {
     message: 'until must be after from',
@@ -234,7 +261,13 @@ const administratorSessionQuerySchema = z
 
 export const parseAdministratorSessionQuery = (
   value: unknown,
-): { from: Date; until: Date; limit: number; branchId?: string } | null => {
+): {
+  from: Date;
+  until: Date;
+  limit: number;
+  branchId?: string;
+  includeCancelled?: true;
+} | null => {
   const result = administratorSessionQuerySchema.safeParse(value);
   if (!result.success) return null;
   return {
@@ -244,8 +277,19 @@ export const parseAdministratorSessionQuery = (
     ...(result.data.branchId === undefined
       ? {}
       : { branchId: result.data.branchId }),
+    ...(result.data.includeCancelled === 'true'
+      ? { includeCancelled: true as const }
+      : {}),
   };
 };
+
+// FIX-042: an optional `true`/`false` query flag; anything else is invalid.
+export const parseOptionalFlag = (value: unknown): boolean | null =>
+  value === undefined || value === 'false'
+    ? false
+    : value === 'true'
+      ? true
+      : null;
 
 export const parseUuid = (value: unknown): string | null => {
   const result = uuidSchema.safeParse(value);

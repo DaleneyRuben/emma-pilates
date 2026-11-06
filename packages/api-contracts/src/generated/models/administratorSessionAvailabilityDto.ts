@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { SessionCancellationSummaryDto } from "./sessionCancellationSummaryDto";
 
 export interface AdministratorSessionAvailabilityDto {
   id: string;
@@ -32,4 +33,6 @@ export interface AdministratorSessionAvailabilityDto {
   /** @nullable */
   sessionScheduleId: string | null;
   isException: boolean;
+  /** @nullable */
+  cancellation?: SessionCancellationSummaryDto | null;
 }

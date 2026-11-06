@@ -130,13 +130,13 @@ describe("busy submit buttons (WEB-023, follow-up 93)", () => {
     );
     const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
     await user.click(
-      within(panel).getByRole("button", { name: "Cancelar sesión" }),
+      within(panel).getByRole("button", { name: "Cancelar esta clase" }),
     );
     const confirm = await screen.findByRole("alertdialog", {
-      name: "¿Cancelar esta sesión?",
+      name: "¿Cancelar esta clase?",
     });
     const yes = within(confirm).getByRole("button", {
-      name: "Cancelar sesión",
+      name: "Sí, cancelar la clase",
     });
 
     await user.click(yes);

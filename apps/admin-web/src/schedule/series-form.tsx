@@ -4,7 +4,7 @@ import type {
   AdministratorSessionAvailabilityDto,
 } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -29,7 +29,6 @@ import { boliviaParts, boliviaToday } from "../lib/bolivia-time";
 import { DurationField } from "./duration-field";
 import { sessionMinutesField } from "./duration-minutes";
 import { firstChangeDate } from "./schedule-dates";
-import { EndSeriesAction } from "./end-series-action";
 import {
   fromExclusiveEnd,
   lastDateProblem,
@@ -107,7 +106,6 @@ export function SeriesForm({
   const defaultDate = sessionDate > earliest ? sessionDate : earliest;
   const change = useScheduleChange(branchId);
   const trainers = useQuery(branchTrainersQueryOptions(branchId));
-  const [ending, setEnding] = useState(false);
   const form = useForm<SeriesInput, unknown, SeriesOutput>({
     resolver: zodResolver(seriesSchema(earliest)),
     defaultValues: {
@@ -258,26 +256,9 @@ export function SeriesForm({
           <Button type="submit" size="lg" busy={change.isPending}>
             Guardar
           </Button>
-          <Button
-            variant="link"
-            className="self-center"
-            onClick={() => setEnding(true)}
-          >
-            Terminar la serie
-          </Button>
           {footer}
         </SidePanelFooter>
       </form>
-      <EndSeriesAction
-        open={ending}
-        onOpenChange={setEnding}
-        schedule={schedule}
-        branchId={branchId}
-        earliest={earliest}
-        defaultDate={defaultDate}
-        onDone={onDone}
-        onFailure={onFailure}
-      />
     </Form>
   );
 }

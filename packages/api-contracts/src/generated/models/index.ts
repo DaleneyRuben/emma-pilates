@@ -381,6 +381,8 @@ export * from "./sendFeedbackDtoPlatform";
 export * from "./sendFeedbackDtoType";
 export * from "./sessionAvailabilityDto";
 export * from "./sessionCancellationDto";
+export * from "./sessionCancellationSummaryDto";
+export * from "./sessionCancellationSummaryDtoCause";
 export * from "./sessionChangeDto";
 export * from "./sessionDetailDto";
 export * from "./sessionEquipmentDto";
