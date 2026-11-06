@@ -36,7 +36,7 @@ numbered tests.
 | Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
-| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, «+ Nuevo cliente» with the invitation card since FIX-040, Bookings, «Cancelar una clase», no sale); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
+| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, «Nuevo cliente» with the invitation card since FIX-040, Bookings, «Cancelar una clase», no sale); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation, class, and Plan reminders (Tests 7 and 105), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
@@ -54,6 +54,7 @@ numbered tests.
 | The web's sign-in with the logo | Login, «¿Olvidaste tu contraseña?» and «Crea tu contraseña» with the studio's logo beside the form, their notices, errors and the throttled wait, at 1440 and 420 px (Test 131) | Busy buttons last only while a request is in flight |
 | Phones with a country code | «Celular» with a flag prefix and a country list in Regístrate (required), Editar perfil, Nuevo cliente, Invitar a alguien and the client's «Editar perfil» on the web; numbers with their flag in every list; WhatsApp in the number's own country (Test 132) | A store build older than FIX-037 registers without a phone |
 | Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and Horario, and next to the Trainer's name in the client's Reservar, class detail, Mis reservas and Historial (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
+| Settled review notices | A confirmed or rejected receipt and a decided Freeze mark every Administrator's «… por revisar» notice read; a Minimum Bookings cancellation notice names its day (Test 141) | Notices already stale before FIX-046 stay unread |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -202,10 +203,11 @@ Reservar shows a small grey "Reservar una clase" instead of a title, and
 Notificaciones keeps **Marcar leídas** at the end of the bar. In the Staff
 app, the Assistant's client overview, the class list, the class detail, the
 plan picker, the cash payment, and the Trainer's attendance list keep their
-large title under a chevron; the other screens (Perfil, Notificaciones,
+large title under a chevron; the other pushed screens (Notificaciones,
 Reservas de la clienta, Historial de clases, Revisar pago, Cancelar una
-clase, Mi disponibilidad with **+ Nuevo horario** in the bar, and the
-schedule form) use the bar. On an iPad the pre-session screens sit in a
+clase, and the schedule form) use the bar. Each tab's first screen
+(Perfil, Mi disponibilidad with **Nuevo horario** fixed at the bottom, and
+the rest of Test 124 A) has no back arrow. On an iPad the pre-session screens sit in a
 centred phone-width column. Every screen in both apps sits on the same light
 warm Superficie as Login, and its cards (the plan, the Perfil groups, the
 class cards, the Branch picker) are white with a thin warm-beige border and
@@ -878,7 +880,7 @@ copy of your database, as in G.
    The first twenty print `201`, the twenty-first `429` (add `-D -` to see
    `Retry-After: 900`). Paola, the Administrator, still creates a Staff Member
    (`201`): each Account has its own budget.
-2. **In the apps.** With Camila's budget full, **+ Nuevo cliente** shows
+2. **In the apps.** With Camila's budget full, **Nuevo cliente** shows
    "Enviaste muchos correos en poco tiempo. Espera un momento para enviar
    otro; los enlaces que ya enviaste siguen sirviendo." after a clock icon,
    above the fields, with "Podrás intentarlo en m:ss." and **Crear cuenta**
@@ -1678,21 +1680,22 @@ on Android, where the old native dialog drew Material teal buttons.
 
 Start the Staff app on port 8082 (`pnpm --filter @pilates/staff-mobile start`)
 and open `exp://127.0.0.1:8082` in Expo Go. Log in as
-`emma.vargas@example.com`. Every role root shows a circular avatar with two
-initials at the top right (accessibility label "Tu cuenta"; with unread
-notifications it carries a Palo de rosa profundo dot and reads "Tu cuenta,
-notificaciones sin leer"); tap it to open
-**Perfil**. The screen is read-only: name, email, "Tus datos los actualiza
-administración.", **Rol** (`Entrenadora`), **Sucursales** (`Centro, Equipetrol,
-Urubó`), the **Notificaciones** row (with the unread count) and the
-**Cambiar contraseña** row, both ending in the quiet chevron of 18, the
-outlined **Cerrar sesión** button, and the version footer «Emma Pilates
+`emma.vargas@example.com`. **Perfil** is the last tab of every role (Test
+124 A); no root shows an avatar any more, and the unread count sits on the
+root's bell and on the **Notificaciones** row. Perfil shows her photo or
+initials with **Cambiar foto** (Test 135 A), her name and email, and «Tu
+nombre y tu correo los actualiza administración.»; «Tu cuenta» with **Rol**
+(`Entrenadora`) and **Sucursales** (`Centro, Equipetrol, Urubó`); «Ajustes»
+with **Mis pagos**, **Tu código de referido**, **Notificaciones** (with the
+unread count), **Cambiar contraseña**, **Enviar comentarios** and **Cerrar
+sesión** as the last row in Error; then the version footer «Emma Pilates
 Studio · versión 1.0.1» (the value in the Staff app's `app.json`, Test 81).
-Log in as
-`paola.mendoza@example.com` to see **Administración** with "Todas las
-sucursales". The staff inbox draws the same bare empty state as the Client's
-(quiet bell, Lora title) with the line "Te avisaremos aquí cuando haya algo
-que necesite tu atención."
+Log in as `paola.mendoza@example.com` to see **Administración** with "Todas
+las sucursales", «Tus datos se editan en la web de administración.» and
+**Ver la app como…** first under «Ajustes». The staff inbox draws the same
+bare empty state as the Client's (quiet bell, Lora title) with the line "Te
+avisaremos aquí cuando haya algo que necesite tu atención." and **Volver a
+mi agenda** for the Trainer and the Nutritionist.
 
 ### F. Offline behaviour
 
@@ -1871,7 +1874,8 @@ PAY-005 still works against this API: it reads `GET
 
 Start the Staff app (Test 1B) with the backend and worker running (Test 2 and
 the worker command from Test 5) and log in as `camila.rojas@example.com`
-(Assistant assigned to Centro). The Assistant root is **Buscar cliente**.
+(Assistant assigned to Centro). Her tabs are **Clientes · Horario · Caja ·
+Perfil** (Test 124 A); **Clientes** opens on **Buscar cliente**.
 
 ### A. Find a Client and read her overview
 
@@ -1881,22 +1885,20 @@ first letter in a tinted circle, her name over «phone · email» (one line,
 trimmed with an ellipsis when the row is narrower, MOB-046), and a Palo de
 rosa chevron (MOB-042); a still-pending Client carries a **Pendiente** tag
 before the chevron. With no match the screen
-reads "No se encontró ningún cliente." and keeps **+ Nuevo cliente** as the
-next step. The hint under that title says "Revisa el nombre o crea la cuenta
-de la clienta." Screen titles stay «cliente» («Buscar cliente», «Nuevo
-cliente», «Ver cliente», «Volver al cliente», «Selecciona un cliente…»); prose
-about the person says «clienta» (UX-005). Tap Lucía: the overview shows her Plan card ("Paquete de 8 clases",
-"N clases restantes", "Vence el …", **Activa**), her next reservation, the
-**Reservar clase** and **Registrar pago en efectivo** actions, **Ver
-reservas** (only while a Plan is active), and the **Historial** card with her
-last two classes and **Ver historial completo**. A Client without a Plan reads
-"Sin plan activo" under a card icon, with "Esta clienta no tiene clases
-disponibles. Registra un pago para activar un plan y poder reservar." and
-**Reservar clase** disabled.
+reads «No encontramos a nadie» with «Revisa cómo lo escribiste o crea una
+ficha nueva.» and **Nuevo cliente** as the next step. Screen titles stay «cliente» («Buscar cliente», «Nuevo
+cliente», «Ver cliente», «Selecciona un cliente…»); prose
+about the person says «clienta» (UX-005). Tap Lucía: the overview shows her
+Plan card (Test 124 D), **Reservar clase** and, only when she can buy,
+**Registrar pago en efectivo**, then «Reservas» with **Próximas reservas**
+(her next class on the right) and **Historial de clases**. A Client without a
+Plan reads «Sin plan activo» under a card icon, with «Registra un pago para
+activar un plan y poder reservarle clases.» and **Registrar pago en
+efectivo**, and no **Reservar clase**.
 
 ### B. Bookings, cancellation, and history
 
-**Ver reservas** opens **Reservas de la clienta** under the banner "Viendo
+**Próximas reservas** opens **Reservas de la clienta** under the banner "Viendo
 reservas de: Lucía Fernández". Cards mirror the Client app: **Cancelar** for a
 reservation outside the 2 h 30 window, **No cancelable** plus **Reprogramar**
 inside it, **En lista de espera** plus **Salir de la lista de espera**.
@@ -1911,7 +1913,7 @@ on the shared confirmation sheet (UX-014), then **Sí, cancelar reserva** and
 clienta no tiene reservas próximas." in Lora 21, the line "Puedes reservarle
 una clase desde el horario del estudio.", and **Reservar una clase** under
 them (MOB-041; `lucia@example.com` has a Plan and no upcoming Booking in the
-fixtures). **Ver historial completo** opens
+fixtures). **Historial de clases** opens
 **Historial de clases** under "Viendo historial de: …", drawn exactly like the
 Client's own (Test 5 B): «Ha asistido a» over «N clases desde <mes>», then
 month groups ("Septiembre 2026" with its count) of rows between thin rules
@@ -1949,43 +1951,40 @@ way.
 ### D. Take a cash Payment
 
 Open `mariana@example.com` (no Plan) and tap **Registrar pago en efectivo**.
-**Elige un plan** shows "Registrando pago para: Mariana Peña" and the four
-Plans at their full price, with no Credit notice (PAY-005). Tap one:
-**Confirmar pago en efectivo** shows **Precio del plan** and **Monto a cobrar
-en efectivo**, both the full price; when you are
-assigned to several Branches a chip row asks where you received the cash.
-Between the breakdown and the note, **Datos para la factura** (PAY-007,
-follow-up 146) works as in the Client app. Walked on 2026-10-23 on the iPhone
-16 Pro, the iPad Pro 11-inch (M4), and the Android emulator, reached from
-Sofía's overview, and stopped before **Confirmar pago recibido**. **Sin factura** ("La venta se
-registra sin datos de factura.") for a Client without earlier invoice data,
-**Con factura** with her last NIT or CI and name ("Datos de su última compra.
-Confírmalos con la clienta.") otherwise, and **Confirmar pago recibido** waits
-for both fields once **Con factura** is chosen.
-**Confirmar pago recibido** activates the Plan at once and shows
-"¡Pago registrado!" with the Plan, its classes, and "Vence el …";
-**Volver al cliente** returns to the overview, now **Activa**, and **Volver**
-from there goes back to **Buscar cliente**. While a Client's Plan is still
-in force (paid through today with classes left or an upcoming Booking, as
-Lucía's is), **Registrar pago en efectivo** on the overview is disabled with
-"Podrá comprar otro plan cuando este termine." under it, so the picker never
-opens (UX-003); Isabel's Plan has no classes left and no Booking, so hers
-stays enabled. Should two Assistants race, the confirmation still answers
-"La clienta ya tiene un plan activo."
+**Elige un plan** shows "Registrando pago para: Mariana Peña" and the Plans
+under «Planes disponibles» at their full price, with no Credit notice
+(PAY-005). Tap one: **Registrar pago** asks «¿Cómo paga?» (**Efectivo** |
+**QR**); **Efectivo** shows «A cobrar» with the Plan and «Total en efectivo»,
+the full price. When you are assigned to several Branches a chip row asks
+«Sucursal donde recibes el efectivo». The folded «¿Necesita factura? · Por
+defecto, sin factura» (PAY-007, follow-up 146) opens the invoice data: «La
+venta se registra sin datos de factura.» for a Client without earlier
+invoice data, her last NIT or CI and name («Datos de su última compra.
+Confírmalos con la clienta.») otherwise. **Confirmar pago en efectivo**
+activates the Plan at once and shows the centred «¡Pago registrado!» with
+the Plan, «Cobrado en efectivo» and «Vence»; **Volver a Clientes** returns
+to **Buscar cliente**. A Client who already has a next Plan queued reads «Ya
+tiene un plan siguiente.» on the overview and is offered no cash sale
+(UX-003). Should two Assistants race, the confirmation still
+answers «La clienta ya tiene un plan activo.» The QR way is Test 124 D.
 
 ### E. Invite a new Client and manage the invitation
 
-From **Buscar cliente** tap **+ Nuevo cliente**. Fill **Nombre**, **Correo
+From **Buscar cliente** tap **Nuevo cliente**. Fill **Nombre**, **Correo
 electrónico**, and **Celular** (required, with its country; Test 132), pick one answer under
-**¿Cómo nos conociste?**, and optionally type a **Código de referido
-(opcional)** (Test 79); the form explains
-"Enviaremos un enlace de activación al correo. Vence en 7 días." **Crear
+**¿Cómo nos conoció?**, and for «Una instructora» or «Recomendación de una
+amiga» optionally type **Código de la instructora (opcional)** or **Código de
+la amiga (opcional)** (Test 79); the form explains
+"Le enviaremos un enlace de activación al correo. Vence en 7 días." **Crear
 cuenta** creates the pending Client, queues the activation email (the worker
 delivers it to the local capture), and opens her overview with the card
-**Cuenta pendiente de activación**: the email, "El enlace de activación vence
-el …", the 30-day removal note under a thin rule, **Cambiar correo** (a link under the
-address), **Reenviar enlace**, and **Cancelar invitación** (confirmed with
-"¿Cancelar la invitación de …?", then back to **Buscar cliente**). A second
+**Cuenta pendiente de activación** · «El enlace vence el …», **Reenviar
+enlace**, and a ⋯ button («Más opciones de la invitación») that opens the
+sheet «Invitación de Ana» with **Cambiar correo** («Anula los enlaces al
+correo anterior»; **Nuevo correo**, **Guardar correo**, **Cancelar**),
+**Cancelar invitación** («Libera el correo y borra la cuenta pendiente»;
+confirmed with «¿Cancelar la invitación de …?» and **Sí, cancelar
+invitación**, then back to **Buscar cliente**) and **Cerrar**. A second
 send within a minute shows, inside the card, a white box with a clock: "Ya
 enviamos un correo a esa dirección hace poco. El enlace vigente sigue
 sirviendo." with "Podrás reenviarlo en 0:59." counting down from the server,
@@ -2005,8 +2004,9 @@ invitación**, because she already chose a password; its button is the card's
 48 pt one, and a second send within a minute shows the same white clock box
 as **Reenviar enlace**. To create one, register
 from the Client app (Test 4) and search for her by email. Once the pending Client has a Payment or Booking, **Cancelar
-invitación** is replaced by "La cuenta ya tiene pagos o reservas, así que la
-invitación se mantiene." and the account stays pending until she activates
+invitación** in the sheet reads «Ya tiene pagos o reservas, así que se
+mantiene» (the API answers «La cuenta ya tiene pagos o reservas, así que la
+invitación se mantiene.») and the account stays pending until she activates
 it.
 
 ### F. Tablet layout
@@ -2018,11 +2018,11 @@ a circle, "Selecciona un cliente para ver sus detalles", and "Busca por
 nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin
 perder la lista.". A result row keeps «phone · email» on one trimmed line in
 the 360 pt column (MOB-046). Tapping a result highlights it and shows her
-overview in the right panel without navigating away; **Ver reservas** and
-**Ver historial completo** also open in that panel (the empty reservations
+overview in the right panel without navigating away; **Próximas reservas** and
+**Historial de clases** also open in that panel (the empty reservations
 state centres in the panel with its button), with **Volver** returning
 to the overview. **Reservar clase**, **Registrar pago en efectivo**, and
-**+ Nuevo cliente** open full-screen: the classes (each card with its Trainer
+**Nuevo cliente** open full-screen: the classes (each card with its Trainer
 line and chevron) and the Plans show as a two-column grid, and the Session detail, the cash confirmation, and the new
 Client form sit in a centered card. Finishing a booking, a cash Payment, or a
 new Client returns to the split with that Client in the panel (also when the
@@ -2220,7 +2220,7 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
 2. **Mi disponibilidad** lists the weekly blocks from Monday to Sunday with
    their turnos and bookings, and "Desde…"/"Hasta…" when a block starts later
    or ends.
-3. **+ Nuevo horario**: pick a day, a start and end on the 15-minute grid, and
+3. **Nuevo horario** (fixed at the bottom): pick a day, a start and end on the 15-minute grid, and
    the date it starts ("A partir del", today by default). The preview counts the
    turnos ("1 turno de 45 min", "3 turnos de 45 min"), and reopening a time
    sheet marks the current time in Palo de rosa profundo with a check. A
@@ -3049,7 +3049,8 @@ the same four names as the Staff app and the user menu, UX-005),
    time and stays in the address (`?role=trainer`).
 5. **Nuevo miembro.** **+ Nuevo miembro** opens the 408 px panel: Nombre,
    Correo electrónico ("Le enviaremos un enlace de activación a este correo.
-   Vence en 7 días."), Teléfono (opcional), the four Roles as a 2×2 choice, and
+   Vence en 7 días."), **Celular** (required, with the country prefix of
+   Test 132 E and "La recepción lo usa para escribirle por WhatsApp."), the Roles, and
    the Branches as chips. Choosing **Administración** replaces the chips with
    "Todas las sucursales (implícito por el rol)". **Guardar** with empty fields
    marks each one; an email of another Staff Member is marked on its field,
@@ -3063,15 +3064,17 @@ the same four names as the Staff app and the user menu, UX-005),
    the last email it answers "Ya enviamos un correo a esa dirección hace
    poco…" instead).
 6. **Editar miembro.** Click a Staff Member. Since FIX-038 (decision
-   §20.22) **Nombre** and **Teléfono (opcional)** are fields for every other
+   §20.22) the panel opens with her photo (Test 135 B), then **Nombre** and
+   **Celular** (FIX-037's field with the flag prefix) are fields for every other
    member, active or pending: correct the name, type `70000001` for a member
    without a phone (Camila Rojas), and **Guardar**: the list shows the new name
-   and `+591 70000001`, and the page says "Guardamos los cambios de <new
-   name>.". The phone follows FIX-036's rule (`12345` shows "Escribe un
-   celular de Bolivia de 8 dígitos, por ejemplo 71234567." and nothing is
+   and `🇧🇴 +591 70000001`, and the page says "Guardamos los cambios de <new
+   name>.". The phone follows Test 132's rule (`12345` shows "Un celular de
+   Bolivia tiene 8 dígitos y empieza con 6 o 7." and nothing is
    sent), a stored phone from before the rule (`+54 9 11 5555 0000`) can stay
    as it is while you change something else (it is never rewritten unless
-   you edit it), and clearing the field removes the phone. When the name or
+   you edit it), and clearing a stored phone refuses the save with "Escribe
+   tu celular. Lo necesitamos para escribirte por WhatsApp.". When the name or
    phone saves but a Role or Branch change after it is refused, the panel
    says "Guardamos el nombre y el teléfono, pero no el resto." before the
    reason. Each change writes a `staff_member.contact_changed` audit record
@@ -3086,7 +3089,7 @@ the same four names as the Staff app and the user menu, UX-005),
    rather than refused). A Trainer who still leads upcoming Sessions
    (Emma Vargas) keeps her Branch and the panel explains to swap her in
    Horario first. A pending member shows **Pendiente de activación** between
-   the Nombre and Teléfono fields (there is no separate Correo row), in a pale
+   the Nombre and Celular fields (there is no separate Correo row), in a pale
    card with a thin beige border: the address with **Cambiar correo** at the
    end of the same line (Nuevo correo, "Los enlaces enviados a … dejarán de
    funcionar; enviaremos uno nuevo de 7 días.", then **Guardar correo** and
@@ -4887,7 +4890,7 @@ hardware-keyboard toolbar, which covers nothing and proves nothing
    Expected: «Guardar cambios», pinned under the form, rises above the
    keyboard. Perfil → «Cambiar contraseña» and «Cerrar mi cuenta» behave the
    same way with their own buttons.
-4. Staff, signed in as `camila.rojas@example.com`: «+ Nuevo cliente» → tap
+4. Staff, signed in as `camila.rojas@example.com`: «Nuevo cliente» → tap
    «Teléfono (opcional)». Expected: the field and «Crear cuenta» stay above
    the keypad. As the Administrator, «Revisar pago» → «Rechazar» lifts its
    reason field the same way.
@@ -5753,10 +5756,10 @@ Start the API and the Staff app as Test 1 and Test 2 describe and log in as
    como Emma Vargas?» in Lora) and states the 30 minutes and that everything
    is recorded in your name; the quiet «Cancelar» link leaves everything as
    it is, the solid Palo de rosa «Ver como Emma» spins while the start runs.
-4. The app re-draws as Emma: her «Mi agenda» root under a fixed Palo de rosa
-   profundo strip reading «Viendo como Emma Vargas» over «Entrenadora ·
-   Quedan 29 min», with «Salir» at its right. The strip stays over every
-   screen, the avatar shows her initials, and Perfil shows her read-only data
+4. The app re-draws as Emma: her tabs (**Agenda · Mis pagos · Perfil**) on
+   her Agenda under a fixed Palo de rosa profundo strip reading «Viendo como
+   Emma Vargas» over «Entrenadora · Quedan 29 min», with «Salir» at its
+   right. The strip stays over every screen, and Perfil shows her data
    without the «Ver la app como…» row. No notification permission is offered
    and this phone is not registered as her push device.
 5. Tap «Salir»: you are back on Pagos pendientes with the notice «Dejaste de
@@ -6494,8 +6497,9 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
 1B) and log in as `emma.vargas@example.com` with `emma-local-2026`.
 
 1. **Mi agenda** shows **Entrenadora** in small capitals over "Hola, Emma"
-   (UX-007). The Nutritionist root still shows its own **Nutricionista**
-   eyebrow; the other roots do not gain one.
+   (UX-007). Since the v2 Staff app every root carries its eyebrow:
+   **Nutricionista**, «Asistente · Centro» on Buscar cliente,
+   «Administración» on Pagos pendientes (Test 124).
 2. The day strip names each of the same seven days it already showed, as
    "Mié 21": the short weekday with its accent, a capital first letter, then
    the day number. Saturday reads **Sáb** and Sunday **Dom**, so the two are
@@ -6911,10 +6915,11 @@ Branch, up to the moment of the close.
    and 23).
 2. Log in to the Staff app as `camila.rojas@example.com` and sell a Plan in
    cash at Centro to a Client without one (Mariana or Sofía, Test 19).
-3. Press «Cerrar caja» beside the avatar on Buscar cliente. Expected: today
-   and «Centro» under the title, «EFECTIVO ESPERADO» with the sale's amount
-   in two decimals (for example «Bs 520,00»), «1 venta en efectivo hoy en
-   Centro», and «Cerrar caja» disabled until a count is typed. If the profile
+3. Open the **Caja** tab (S25). Expected: «Viernes 23 de octubre · Centro»
+   (today) over the title **Cerrar caja**, «Efectivo esperado» with the
+   sale's amount in two decimals (for example «Bs 520,00»), «1 venta en
+   efectivo hoy en Centro», «Hay un solo cierre por día y no se corrige
+   después.», and **Cerrar caja** disabled until «Efectivo contado» is typed. If the profile
    or Branch list fails to load, the screen shows «No pudimos cargar la caja
    de hoy.» with **Reintentar**, not an endless «Cargando la caja de hoy»
    (FIX-011).
@@ -6924,19 +6929,22 @@ Branch, up to the moment of the close.
    amber; «12,345» is not read and keeps the button off. Cash-close amounts
    always show two decimals (es-BO); the rest of the Staff app still rounds
    to whole bolivianos.
-5. Add a note and press «Cerrar caja». Expected: «Caja cerrada» with the
-   expected, counted, and difference lines (still with two decimals), the
-   note, and «Cerrada por Camila Rojas a las hh:mm.», and in `psql` one
+5. Add a «Nota (opcional)» and press **Cerrar caja**. Expected: «Caja
+   cerrada» with «La cerró Camila Rojas a las hh:mm.», the «Efectivo
+   esperado», «Efectivo contado», «Diferencia» and «Nota» rows (still with
+   two decimals), and **Ir a Clientes**, and in `psql` one
    `back_office.cash_closes` row plus a `cash_close.recorded` audit record
    (actor role `ASSISTANT`, the Branch, `businessDate`, the amounts).
-6. Open «Cerrar caja» again. Expected: the same closed state, no form. A second
+6. Open the **Caja** tab again. Expected: the title **Caja** and the same
+   closed state, no form. A second
    `POST /api/v1/cash-closes` for that Branch today with another
    Idempotency-Key answers `409` `cash_close_already_recorded`; the same key
    replays the first answer. `GET /api/v1/cash-closes/today?branchId=<Urubó>`
    as Camila answers `403` `branch_not_assigned`; as a Trainer, `403`
    `back_office_access_denied`.
-7. Log in as `paola.mendoza@example.com`: «Cerrar caja» sits beside the avatar
-   on Pagos pendientes and offers every Branch as chips. Close another Branch.
+7. Log in as `paola.mendoza@example.com`: **Cerrar caja** is a row under
+   «Accesos» on **Pagos** (Pagos pendientes), opens with **Pagos** as its
+   back button, and offers every Branch under «Sucursal». Close another Branch.
 8. On the admin web, open Back Office › «Caja» (after Pagos). Expected: AW151
    «Cierres de caja» for the selected Branch and the current month, one row
    per day with cash sales or a close, newest first: «Cerrada», «Sin cierre»
@@ -6990,11 +6998,13 @@ password, holding every Branch.
    **Guardar cambios**: «Guardamos los cambios del perfil.» and the new
    phone. Empty the name to see «Escribe el nombre de la clienta.». The
    email stays read-only («La clienta cambia su correo desde su app.»).
-5. In **Personal**, there is no «Nuevo miembro». Opening a Trainer shows
-   her Branches as chips and **Guardar**, and nothing that changes her
-   Role: «Solo administración invita y cambia roles. Puedes asignar las
-   sucursales de una entrenadora.». Opening anyone else stays read-only
-   with «Solo administración invita y cambia roles.».
+5. In **Personal**, there is no «Nuevo miembro». Opening an active Trainer
+   shows her photo with **Cambiar foto** (Test 135 B), «Puedes cambiar sus
+   sedes y su foto. Invitar y cambiar roles lo hace Administración.», her
+   contact as read-only rows, her Branches as chips and **Guardar**, and
+   nothing that changes her name, phone or Role. Opening anyone else shows
+   the photo block and otherwise stays read-only with «Solo administración
+   invita y cambia roles.».
 6. The pages ADR-0108 opens to her (BKO-010): in **Clientas ›
    Congelamientos** she approves or rejects a requested Freeze as Test 92
    describes. In **Promociones › Carrusel** she creates, edits, orders,
@@ -7016,22 +7026,26 @@ password, holding every Branch.
 
 ### B. The Staff app
 
-1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. She
-   lands on **Buscar cliente** with «+ Nuevo cliente» (FIX-040), and
-   **Horario** has **Cancelar una clase**, which opens the Administrator's
-   cancellation screens (Test 10 D).
-2. **+ Nuevo cliente** opens the Assistant's form (Test 9 E): create a Client
-   with a fresh email. Her overview shows **Cuenta pendiente de activación**
-   with **Reenviar enlace** and the «Más opciones» menu (**Cambiar correo**,
-   **Cancelar invitación**), «La clienta necesita un plan activo para
-   reservar.», and no «Registrar pago en efectivo». The activation email
-   reaches the local capture, and `audit_log` has `client_invitation.created`
-   with her Account and the Role `COORDINATOR`. A search with no result offers
-   **Nuevo cliente** too.
-3. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
-   for the Assistant (Test 11 B and C) at any Branch, but there is no
-   «Registrar pago en efectivo». A Client without a Plan reads «La clienta
-   necesita un plan activo para reservar.».
+1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. Her
+   tabs are **Clientes · Para contactar · Horario · Perfil**; **Clientes**
+   opens on **Buscar cliente** with the Rosa tinte **Nuevo cliente** button
+   under the search (FIX-040), and **Horario** has the **Cancelar una clase**
+   row, which opens the Administrator's cancellation screens (Test 10 D).
+2. **Nuevo cliente** opens the Assistant's form (Test 11 E, with the required
+   «Celular» of Test 132): create a Client with a fresh email. Her file
+   shows **Cuenta pendiente de activación** · «El enlace vence el …» with
+   **Reenviar enlace** and the ⋯ menu («Invitación de …»: **Cambiar
+   correo**, **Cancelar invitación**, **Cerrar**), then «Sin plan activo»
+   with «La clienta necesita un plan activo para reservar.» and no
+   **Registrar pago en efectivo**. The activation email reaches the local
+   capture, and `system.audit_records` has `client_invitation.created` with
+   her Account and `actor_role = coordinator`. A search with no result
+   («No encontramos a nadie») offers **Nuevo cliente** too. The invitation
+   endpoints (`/api/v1/assistant/client-invitations…`) answer her; the cash
+   ones (`plan-quotes`, cash payments) still answer `403` (step C).
+3. Search `luc` and open Lucía: **Reservar clase**, **Próximas reservas** and
+   **Historial de clases** work as for the Assistant (Test 11 B and C) at
+   any Branch, but there is no **Registrar pago en efectivo**.
 4. Perfil reads «Coordinación» and «Todas las sucursales».
 5. As the Administrator, Perfil → «Ver la app como…» lists her under
    «Coordinación»; seeing the app as her shows the same stack under the
@@ -7510,10 +7524,13 @@ on day 90, and she appears on **Para contactar** when she stops booking.
 
 ### B. The Staff app
 
-Log in as `carolina.rivas@example.com` (Test 9 E). **Buscar cliente** shows
-**Para contactar** under **Cancelar una clase**. It opens the same list:
-the Client, her phone, the reason, **Abrir WhatsApp**, and **Contactada**.
-With nobody to write to it reads «Nadie para contactar por ahora.».
+Log in as `carolina.rivas@example.com` (Test 9 E). **Para contactar** is
+her second tab, with the count of Clients waiting on it. It opens the same
+list: the Client with her photo or initials, her phone with its flag, the
+reasons as pills, **Abrir WhatsApp** and **Marcar contactada**; marking one
+shows the toast «…, contactada · Sale de la lista y queda registrado a tu
+nombre». With nobody to write to it reads «Nadie para contactar» with
+**Buscar una clienta** (Test 124 G).
 
 ### C. The Client app
 
@@ -8352,10 +8369,12 @@ A. **One tab bar per role.** The bar is Lino; the current tab is Rosa
    «Entérate al momento» and «Te avisamos apenas cambie una clase, llegue una
    reserva o haya un pago por revisar.» **Ver la app como…** (Paola, from
    Perfil) still opens the strip and the person's own tabs.
-B. **Perfil (S23).** Initials, name, email and «Tus datos los actualiza
-   administración.» («…se editan en la web de administración.» for Paola);
+B. **Perfil (S23).** The photo or initials with **Cambiar foto** (Test 135
+   A), name, email and «Tu nombre y tu correo los actualiza administración.»
+   («Tus datos se editan en la web de administración.» for Paola);
    «Tu cuenta» rows **Rol** and **Sucursal(es)**; «Ajustes» rows (**Ver la app
-   como…** for Paola, **Mis pagos** for the Trainer, **Notificaciones** with a
+   como…** for Paola, **Mis pagos** and **Tu código de referido** for the
+   Trainer, **Notificaciones** with a
    Rosa tinte count, **Cambiar contraseña**, **Enviar comentarios**) and
    **Cerrar sesión** as the last row in Error, which opens «¿Cerrar sesión?».
    The footer reads «Emma Pilates Studio · versión …».
@@ -8887,8 +8906,8 @@ A. **In review (C02c).** Log in as Mariana. **Inicio**'s rose card shows the
    Bs N» with the amount she transferred, «Te avisamos apenas el
    estudio lo confirme.» and **Ver estado del pago**; there is no **Comprar
    un plan**. **Reservar una clase** under **Accesos rápidos** is locked with
-   «Tu pago está en revisión». Tapping the card or its button opens **Estado
-   del pago**.
+   «Tu pago está en revisión». Tapping the card or its button opens the payment
+   status (11 Estado del pago), titled «Tu pago está en revisión».
 B. **The class detail (C04c–C04f).** In **Reservar**, open any class.
    Mariana: **Reservar** is off with «Tu pago está en revisión. Podrás
    reservar cuando el estudio lo confirme.» and **Ver estado del pago**.
@@ -8896,8 +8915,8 @@ B. **The class detail (C04c–C04f).** In **Reservar**, open any class.
    Client without a Plan: «Necesitas un plan para reservar.» with **Comprar
    un plan**. Lucía (classes left) still books.
 C. **Elegir plan.** As Mariana, go to **Perfil › Mi plan › Comprar un plan**
-   (or **Evaluación nutricional › Ver planes**): **Estado del pago** opens
-   instead of the Plans.
+   (or **Evaluación nutricional › Ver planes**): the payment status
+   («Tu pago está en revisión») opens instead of the Plans.
 D. **Rejected (C02d).** Log in as Sofía. **Inicio** shows «Pago rechazado»,
    «No pudimos confirmar tu pago», the reason, the Plan and the amount, and
    **Subir otro comprobante**; the booking shortcut says «Tu pago no se
@@ -8981,7 +9000,7 @@ D. **Editar sesión (proposal A).** Open a standing class of a weekly series:
    inside the panel's margins.
 E. **At 420 px.** The day list shows the cancelled classes the same way; the
    panel opens full screen with the same order and no sideways scroll.
-F. **Mi agenda (Staff app).** Log in as the trainer of today's cancelled
+F. **Agenda (Staff app).** Log in as the trainer of today's cancelled
    classes on the iPhone 16 Pro, the iPad and Android: the cancelled classes
    keep a muted card with a dashed edge, the class and the cause pill under
    it, and no chevron; tapping does nothing. The title counts them («Hoy · 2
@@ -9045,7 +9064,7 @@ F. **At 420 px** the admin web's member panel fills the width and the
    controls wrap without sideways scroll.
 G. **Clients' photos where the staff see them** (walkthrough n.º 30). Give
    Mariana a photo from the client app's **Editar perfil**. Her initials
-   «MQ» become her photo in the Trainer's class roster, Buscar cliente and
+   «MQ» become her photo in the Trainer's class roster, **Clientes** (Buscar cliente) and
    her file, Pagos pendientes and Revisar pago, Para contactar and
    Congelamientos in the Staff app, and in Clientas, her file, Dinero ›
    Pagos, the class panel's «Reservaron» and Inicio's pending list on the
@@ -9070,7 +9089,7 @@ A. **First load.** Open [http://localhost:5173](http://localhost:5173)
    middle, from the first instant; then the shell appears.
 B. **Pages at 1440 px.** With the network slowed, open each page from the
    rail: Inicio, Horario (Clases, Nutrición), Clientas (the list, Para
-   contactar, Congelamientos), Promociones (Promociones, Clases de campaña,
+   contactar, Congelamientos), Promociones (Carrusel, Clases de campaña,
    Referidos, Contactos), Comentarios, Dinero (Pagos, Caja, Sueldos and
    Pagados, Gastos), Estudio (Personal, Insumos and Retiros, Equipos),
    Informes (El mes, Dinero, Simulador) and Ajustes (every tab). Each keeps
@@ -9098,3 +9117,40 @@ Specs: `branded-loading.spec.tsx`, `page-pending.spec.tsx`,
 `home-page.spec.tsx`, `campaign-page.spec.tsx`, `studio-rules-page.spec.tsx`,
 and every page spec that asserts its loading state through
 `src/test/branded-loading.ts`.
+
+## Test 141: review notices that settle, and cancellation notices that name the day (FIX-045, FIX-046)
+
+Second walkthrough findings n.º 11 and 13 (2026-11-04), with no design
+change. Use a fixtures copy (Test 5 A) with the API and the worker running,
+and two Administrators signed in: Paola in the Staff app and another
+Administrator through Swagger (or a second Simulator).
+
+A. **A decided receipt stops asking (n.º 13).** As Mariana in the Client app,
+   send a transfer receipt (Test 10). Both Administrators get «Comprobante
+   por revisar», and **Pagos pendientes**' bell counts it. Paola confirms it
+   (or rejects it) from **Revisar pago**: the other Administrator's copy is
+   read at once (`readAt` set to the decision's time), her bell no longer
+   counts it, and the inbox draws it as read. A receipt the Assistant sends
+   from the Staff app's QR way (Test 124 D) settles the same way. A notice
+   created after the decision is never marked by it.
+B. **A decided Freeze stops asking.** As Lucía request a Freeze (Test 92):
+   the Administrators get «Congelamiento por revisar». Approving or
+   refusing it from **Pagos › Congelamientos** (Staff app) or **Clientas ›
+   Congelamientos** (admin web) marks every unread copy read in the same
+   transaction. A decision refused as a conflict (someone decided it first)
+   leaves the notices as they were. Notices that were already stale before
+   FIX-046 stay unread: nothing back-fills them.
+C. **A minimum cancellation names the day (n.º 11).** Let the worker cancel a
+   class for the Minimum Bookings (Test 13). Lucía's notice reads «Tu clase de
+   Mat Pilates del miércoles 4 de noviembre, 18:00 se canceló porque no llegó
+   al mínimo de reservas. Te devolvimos la clase a tu plan.», then «Ese día
+   hay lugar en Reformer 19:00 y Mat Pilates 20:00.» or «Ese día ya no quedan
+   otras clases con lugar.»; the Trainer's reads «Tu clase de Mat Pilates del
+   miércoles 4 de noviembre, 18:00 se canceló: no llegó al mínimo de 2
+   reservas.». Never «de hoy», so the line still reads right the next day
+   beside «Ayer, HH:MM».
+D. **The root lint.** `pnpm lint` at the repository root exits 0;
+   `packages/studio-economics` lints with its own flat config.
+
+Specs: `payment-lifecycle.integration-spec.ts`, `freeze.integration-spec.ts`,
+`session-start-checks.spec.ts`.
