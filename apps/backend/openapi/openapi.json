@@ -11520,7 +11520,7 @@
           "renewalStartsOn": {
             "type": "string",
             "format": "date",
-            "description": "A Plan bought now starts on this date, the day after the current Plan ends, and no Start Date is chosen: the current Plan still has classes. Absent when she chooses the date."
+            "description": "The current Plan still has classes, so a Plan bought now starts after it ends: this is the day after its end, the default, and any day through 27 days later may be chosen (booking ADR-0013). Absent when she chooses from today."
           }
         },
         "required": [
@@ -13311,7 +13311,7 @@
           "startsOn": {
             "type": "string",
             "format": "date",
-            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today, or the day after the current Plan ends while it still has classes; then any day through 28 days after that end may be chosen (booking ADR-0013). Older builds omit it."
           }
         },
         "required": [
@@ -14475,7 +14475,7 @@
           "startsOn": {
             "type": "string",
             "format": "date",
-            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today, or the day after the current Plan ends while it still has classes; then any day through 28 days after that end may be chosen (booking ADR-0013). Older builds omit it."
           },
           "invoiceData": {
             "nullable": true,
@@ -14533,7 +14533,7 @@
           "startsOn": {
             "type": "string",
             "format": "date",
-            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today, or the day after the current Plan ends while it still has classes; then any day through 28 days after that end may be chosen (booking ADR-0013). Older builds omit it."
           }
         },
         "required": [
