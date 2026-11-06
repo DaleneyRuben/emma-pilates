@@ -2,7 +2,13 @@ import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
-import { assistantRoutes, expiredOverview, openLucia } from "./assistant-fixtures";
+import {
+  assistantRoutes,
+  expiredOverview,
+  openLucia,
+  overview,
+  subscription,
+} from "./assistant-fixtures";
 
 jest.setTimeout(20_000);
 
@@ -70,6 +76,38 @@ describe("Registrar pago by QR (S10)", () => {
         "Administración lo revisa y activa el plan de Lucía. No entra en la caja de hoy.",
       ),
     ).toBeOnTheScreen();
+  });
+
+  // Walkthrough 2 n.º 37: a next Plan is scheduled, not activated.
+  it("says the next Plan is scheduled and from which day", async () => {
+    const screen = await openRegisterPayment({
+      "/api/v1/assistant/clients/client-lucia": () =>
+        jsonResponse({
+          ...overview,
+          subscription: { status: "active", subscription, renewalStartsOn: "2026-10-13" },
+        }),
+      "/api/v1/studio-rules": () =>
+        jsonResponse({ cancellationWindowHours: 2.5, openingDate: null, startDateLimitDays: 14 }),
+      "POST /api/v1/assistant/clients/client-lucia/transfer-payments": () =>
+        jsonResponse({ id: "payment-1", state: "pending" }, 201),
+    });
+
+    await fireEvent.press(screen.getByRole("tab", { name: "QR" }));
+    await fireEvent.press(screen.getByTestId("start-date-2026-10-20"));
+    await fireEvent.press(screen.getByRole("button", { name: "Fotografiar comprobante" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeEnabled(),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
+
+    await waitFor(() => expect(screen.getByText("Comprobante enviado")).toBeOnTheScreen());
+    expect(
+      screen.getByText(
+        "Administración lo revisa y programa el plan siguiente de Lucía, que empieza el 20 de octubre. No entra en la caja de hoy.",
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Empieza")).toBeOnTheScreen();
+    expect(screen.getByText("20 de octubre")).toBeOnTheScreen();
   });
 
   it("says why the cash is refused while a receipt is in review", async () => {
