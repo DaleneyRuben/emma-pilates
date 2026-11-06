@@ -36,7 +36,7 @@ describe("StartDateChooser", () => {
       backgroundColor: colors.card,
       borderRadius: 14,
       borderWidth: 0,
-      height: 60,
+      height: 72,
       minWidth: 52,
     });
     expect(screen.getByTestId("start-date-2026-11-02")).toHaveStyle({
