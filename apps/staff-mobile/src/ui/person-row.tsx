@@ -12,7 +12,8 @@ export function InitialsDisc({ name, size = 36 }: { name: string; size?: number 
 }
 
 /**
- * A person in a Lino list group: initials, the name over one quiet line, an
+ * A person in a Lino list group: initials (or the `face` given, such as a
+ * Client's `ClientFace`, finding n.º 30), the name over one quiet line, an
  * optional trailing value (an amount in Lora 18, a pill) and a chevron when it
  * opens something. Put rows in `IconRowGroup` for the hairline inset 64.
  */
@@ -20,6 +21,7 @@ export function PersonRow({
   accessibilityLabel,
   amount,
   detail,
+  face,
   name,
   onPress,
   selected = false,
@@ -29,6 +31,7 @@ export function PersonRow({
   accessibilityLabel?: string;
   amount?: string;
   detail?: string;
+  face?: ReactNode;
   name: string;
   onPress?: () => void;
   selected?: boolean;
@@ -37,7 +40,7 @@ export function PersonRow({
 }) {
   const content = (
     <>
-      <InitialsDisc name={name} />
+      {face ?? <InitialsDisc name={name} />}
       <View style={styles.body}>
         <Text style={styles.name}>{name}</Text>
         {detail === undefined ? null : (

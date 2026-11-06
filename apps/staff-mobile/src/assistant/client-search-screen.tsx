@@ -3,6 +3,7 @@ import {
   useSearchAssistantClients,
 } from "@pilates/api-contracts";
 import {
+  ClientFace,
   colors,
   fontFamilies,
   Glyph,
@@ -173,6 +174,9 @@ export function ClientSearchScreen() {
               <PersonRow
                 accessibilityLabel={`Ver cliente ${client.name}`}
                 detail={describeContact(client.phone, client.email)}
+                face={
+                  <ClientFace fetcher={fetcher} name={client.name} photo={client.photo} size={36} />
+                }
                 key={client.id}
                 name={client.name}
                 onPress={() => open(client.id)}

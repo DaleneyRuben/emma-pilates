@@ -81,7 +81,7 @@ export function ConfirmCashPaymentScreen({
 }: {
   route: { params: ClientContext & { quote: PlanQuoteDto; renewalStartsOn?: string } };
 }) {
-  const { clientId, clientName, quote, renewalStartsOn } = route.params;
+  const { clientId, clientName, clientPhoto, quote, renewalStartsOn } = route.params;
   const navigation = useNavigation<ConfirmNavigation>();
   const workspace = useAssistantWorkspace();
   const fetcher = useStaffFetcher();
@@ -243,6 +243,7 @@ export function ConfirmCashPaymentScreen({
           <ClientBanner
             action="Para"
             clientName={clientName}
+            clientPhoto={clientPhoto}
             detail={`plan de ${describeClasses(quote.classAllowance)}`}
           />
           <View>

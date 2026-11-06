@@ -11,9 +11,12 @@ export type ClientPanel =
       view: "bookings";
       clientId: string;
       clientName: string;
+      clientPhoto: ClientPhoto;
       confirmed?: ConfirmedBooking;
     }
-  | { view: "history"; clientId: string; clientName: string };
+  | { view: "history"; clientId: string; clientName: string; clientPhoto: ClientPhoto };
+
+type ClientPhoto = { imageAssetId: string } | null;
 
 type AssistantWorkspace = {
   /** Counts every `show`, so reopening the same Client remounts her panel. */

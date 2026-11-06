@@ -11,6 +11,7 @@ describe("ClientBanner", () => {
         <ClientBanner
           action="Reservando para"
           clientName="Lucía Fernández"
+          clientPhoto={null}
           detail="8 clases en su plan"
         />
       </QueryClientProvider>,

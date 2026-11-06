@@ -66,7 +66,7 @@ export function AssistantRescheduleScreen({
 }: {
   route: { params: ClientContext & { booking: AssistantClientBookingDto } };
 }) {
-  const { booking, clientId, clientName } = route.params;
+  const { booking, clientId, clientName, clientPhoto } = route.params;
   const showClientBookings = useShowClientBookings();
   const navigation = useNavigation<RescheduleNavigation>();
   const fetcher = useStaffFetcher();
@@ -90,6 +90,7 @@ export function AssistantRescheduleScreen({
       showClientBookings({
         clientId,
         clientName,
+        clientPhoto,
         confirmed: {
           bookingId: rescheduled.id,
           classTypeName: target.classTypeName,
@@ -113,7 +114,7 @@ export function AssistantRescheduleScreen({
   return (
     <Screen style={styles.screen}>
       <BackBar onBack={() => navigation.goBack()} title="Reprogramar clase" />
-      <ClientBanner action="Viendo reservas de" clientName={clientName} />
+      <ClientBanner action="Viendo reservas de" clientName={clientName} clientPhoto={clientPhoto} />
       <View style={styles.current}>
         <BodyText style={styles.currentLabel}>Reserva actual</BodyText>
         <Text style={styles.currentTitle}>{booking.classTypeName}</Text>
