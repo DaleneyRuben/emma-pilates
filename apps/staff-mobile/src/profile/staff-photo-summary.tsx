@@ -23,7 +23,7 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { loadImageUpload } from "../uploads/load-image-upload";
 
 type PhotoState =
-  | { status: "idle" }
+  | { status: "idle"; previewUri?: string }
   | { status: "uploading"; localUri: string }
   | { status: "removing" }
   | { status: "failed"; message: string };
@@ -44,13 +44,27 @@ export function StaffPhotoSummary({ member, note }: { member: StaffProfileDto; n
   const queryClient = useQueryClient();
   const [state, setState] = useState<PhotoState>({ status: "idle" });
   const storedUri = useStaffPhoto(fetcher, member.photo, "display");
+  // The picked photo stays until the stored one loads: no initials between.
   const shownUri =
-    state.status === "uploading" ? state.localUri : state.status === "removing" ? null : storedUri;
+    state.status === "uploading"
+      ? state.localUri
+      : state.status === "removing"
+        ? null
+        : (storedUri ?? (state.status === "idle" ? (state.previewUri ?? null) : null));
 
   const remember = (photo: StaffProfileDto["photo"]) =>
     queryClient.setQueryData<ProfileQueryData>(getGetCurrentStaffMemberProfileQueryKey(), (old) =>
       old === undefined || old.status !== 200 ? old : { ...old, data: { ...old.data, photo } },
     );
+
+  // Horario, S08 and the rosters may show her: refetch them so none keeps
+  // the asset the change just released (ADR-0076).
+  const refreshOthers = () =>
+    void queryClient.invalidateQueries({
+      predicate: (query) =>
+        query.queryKey[0] !== "staff-photo" &&
+        query.queryKey[0] !== getGetCurrentStaffMemberProfileQueryKey()[0],
+    });
 
   const change = async () => {
     try {
@@ -66,7 +80,8 @@ export function StaffPhotoSummary({ member, note }: { member: StaffProfileDto; n
       );
       if (response.status !== 200) throw new Error("photo_attachment_failed");
       remember(response.data.photo);
-      setState({ status: "idle" });
+      setState({ status: "idle", previewUri: picked.uri });
+      refreshOthers();
     } catch {
       setState({ status: "failed", message: uploadFailed });
     }
@@ -78,6 +93,7 @@ export function StaffPhotoSummary({ member, note }: { member: StaffProfileDto; n
       const response = await removeCurrentStaffMemberPhoto(undefined, fetcher);
       if (response.status !== 204) throw new Error("photo_removal_failed");
       remember(null);
+      refreshOthers();
       setState({ status: "idle" });
     } catch {
       setState({ status: "failed", message: removalFailed });

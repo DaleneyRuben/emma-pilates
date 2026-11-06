@@ -205,7 +205,8 @@ describe("Staff Perfil photo", () => {
           sessionsReads += 1;
           return jsonResponse([]);
         },
-        "/api/v1/staff-photos/asset-new?variant=display": () => new Promise<Response>(() => {}),
+        "/api/v1/staff-photos/asset-new?variant=display": () =>
+          new Promise<Response>(() => {}) as unknown as Response,
         "PUT /api/v1/staff-members/current/photo": () =>
           jsonResponse({ staffMemberId: "staff-1", photo: { imageAssetId: "asset-new" } }),
       }),
