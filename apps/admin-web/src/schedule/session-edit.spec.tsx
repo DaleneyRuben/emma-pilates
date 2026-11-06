@@ -224,6 +224,43 @@ describe("AW03 Editar sesión on a desktop browser", () => {
     );
   });
 
+  it("lays the panel out as the owner chose: bookings with their button, the scope over the fields, the series below (FIX-042)", async () => {
+    const { panel } = await openSession(/Reformer Pilates, 07:00/);
+
+    const booked = await within(panel).findByRole("region", {
+      name: /Reservaron/,
+    });
+    expect(
+      within(booked).getByRole("button", { name: "Reservar a una clienta" }),
+    ).toHaveTextContent("Reservar");
+    const scope = within(panel).getByRole("group", {
+      name: "Aplicar cambios a",
+    });
+    expect(within(panel).getByText("Aplicar cambios a")).not.toHaveClass(
+      "sr-only",
+    );
+    const save = within(panel).getByRole("button", { name: "Guardar" });
+    const pause = await within(panel).findByRole("button", {
+      name: "Pausar la serie",
+    });
+    const end = within(panel).getByRole("button", {
+      name: "Terminar la serie",
+    });
+    const cancel = within(panel).getByRole("button", {
+      name: "Cancelar esta clase",
+    });
+    const follows = (a: Element, b: Element) =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(follows(booked, scope)).toBe(true);
+    expect(follows(scope, save)).toBe(true);
+    expect(follows(save, pause)).toBe(true);
+    expect(follows(cancel, pause)).toBe(true);
+    expect(follows(pause, end)).toBe(true);
+    expect(
+      within(panel).getByText(/Serie semanal · cada lunes 07:00/),
+    ).toBeInTheDocument();
+  });
+
   it("cancels a booked Session as a last resort, naming the refunds and the notified waitlist", async () => {
     let calls = 0;
     server.use(
@@ -245,10 +282,10 @@ describe("AW03 Editar sesión on a desktop browser", () => {
 
     const cancel = async () => {
       await user.click(
-        within(panel).getByRole("button", { name: "Cancelar sesión" }),
+        within(panel).getByRole("button", { name: "Cancelar esta clase" }),
       );
       const confirm = await screen.findByRole("alertdialog", {
-        name: "¿Cancelar esta sesión?",
+        name: "¿Cancelar esta clase?",
       });
       expect(
         within(confirm).getByText(
@@ -256,7 +293,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
         ),
       ).toBeInTheDocument();
       await user.click(
-        within(confirm).getByRole("button", { name: "Cancelar sesión" }),
+        within(confirm).getByRole("button", { name: "Sí, cancelar la clase" }),
       );
     };
 
@@ -288,10 +325,10 @@ describe("AW03 Editar sesión on a desktop browser", () => {
       ),
     ).toBeInTheDocument();
     await user.click(
-      within(panel).getByRole("button", { name: "Cancelar sesión" }),
+      within(panel).getByRole("button", { name: "Cancelar esta clase" }),
     );
     const confirm = await screen.findByRole("alertdialog", {
-      name: "¿Cancelar esta sesión?",
+      name: "¿Cancelar esta clase?",
     });
     expect(
       within(confirm).getByText(
@@ -299,7 +336,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
       ),
     ).toBeInTheDocument();
     await user.click(
-      within(confirm).getByRole("button", { name: "Cancelar sesión" }),
+      within(confirm).getByRole("button", { name: "Sí, cancelar la clase" }),
     );
 
     expect(await screen.findByRole("status")).toHaveTextContent(

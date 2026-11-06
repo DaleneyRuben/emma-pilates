@@ -16,6 +16,7 @@ export function ChoiceChips<Value extends string>({
   options,
   onChange,
   className,
+  showLegend = false,
 }: {
   legend: string;
   name: string;
@@ -24,10 +25,18 @@ export function ChoiceChips<Value extends string>({
   options: readonly (readonly [Value, string])[];
   onChange: (value: Value) => void;
   className?: string;
+  /** Draw the legend as a field label above the chips. */
+  showLegend?: boolean;
 }) {
   return (
     <fieldset className={cn("flex gap-2", className)}>
-      <legend className="sr-only">{legend}</legend>
+      <legend
+        className={
+          showLegend ? "mb-2 text-celda font-medium text-texto" : "sr-only"
+        }
+      >
+        {legend}
+      </legend>
       {options.map(([option, label]) => (
         <label
           key={option}

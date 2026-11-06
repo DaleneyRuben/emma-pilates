@@ -60,7 +60,7 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
   await expect(edit.getByLabel("Fecha")).toHaveValue(formatCivilDate(saturday));
   await expect(edit.getByLabel("Duración")).toHaveValue("75");
   await expect(
-    edit.getByRole("button", { name: "Cancelar sesión" }),
+    edit.getByRole("button", { name: "Cancelar esta clase" }),
   ).toBeVisible();
   await expect(
     edit.getByText(

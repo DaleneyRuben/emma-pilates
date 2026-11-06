@@ -152,6 +152,22 @@ describe("WEB-039 who booked a class and booking a Client from Horario", () => {
     expectClientInitials(waiting, "Sofía Guzmán", "SG");
   });
 
+  it("keeps the booking button when the roster cannot be read (FIX-042 review)", async () => {
+    server.use(
+      http.get(apiUrl(rosterPath(mondayReformer.id)), () =>
+        problemResponse(500, "internal_error"),
+      ),
+    );
+    const { panel } = await openSession(/Reformer Pilates, 07:00/);
+
+    expect(
+      await within(panel).findByText("No pudimos cargar quiénes reservaron."),
+    ).toBeInTheDocument();
+    expect(
+      within(panel).getByRole("button", { name: "Reservar a una clienta" }),
+    ).toBeInTheDocument();
+  });
+
   it("books a picked Client with a fresh idempotency key and says so", async () => {
     let request: { body: unknown; key: string | null } | null = null;
     server.use(

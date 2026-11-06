@@ -7,6 +7,8 @@ import { Button } from "../components/ui/button";
 import type { Branch } from "../shell/branch/branch-context";
 import { formatSessionMoment } from "../lib/bolivia-time";
 import { BookClientForm } from "./book-client-form";
+import { CancelledSessionView } from "./cancelled-session-view";
+import { cancellationOf } from "./session-cancellation";
 import { SessionCreateForm, type SessionStart } from "./session-create-form";
 import { SessionDetail } from "./session-detail";
 import { seatsTaken } from "./session-seats";
@@ -85,6 +87,7 @@ export function SessionPanel({
     null,
   );
   const session = state.mode === "edit" ? state.session : null;
+  const cancellation = session === null ? null : cancellationOf(session);
   const booking = session !== null && bookingFor === session.id;
 
   const close = () => {
@@ -102,14 +105,16 @@ export function SessionPanel({
       title={
         session === null
           ? "Nueva sesión"
-          : booking
-            ? "Reservar a una clienta"
-            : "Editar sesión"
+          : cancellation !== null
+            ? "Clase cancelada"
+            : booking
+              ? "Reservar a una clienta"
+              : "Editar sesión"
       }
       description={
         session === null
           ? `Sucursal ${branch.name} · sala única`
-          : booking
+          : booking || cancellation !== null
             ? `${session.classTypeName} · ${formatSessionMoment(session.startsAt)}`
             : occupancyLine(session)
       }
@@ -122,7 +127,10 @@ export function SessionPanel({
           onDone={onDone}
         />
       ) : null}
-      {session !== null && booking ? (
+      {session !== null && cancellation !== null ? (
+        <CancelledSessionView session={session} cancellation={cancellation} />
+      ) : null}
+      {session !== null && cancellation === null && booking ? (
         <BookingView
           key={session.id}
           session={session}
@@ -134,7 +142,7 @@ export function SessionPanel({
           }}
         />
       ) : null}
-      {session !== null && !booking ? (
+      {session !== null && cancellation === null && !booking ? (
         <SessionDetail
           key={session.id}
           session={session}

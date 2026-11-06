@@ -7,4 +7,5 @@
 
 export type ListTrainerScheduleParams = {
   on: unknown;
+  includeCancelled?: boolean;
 };

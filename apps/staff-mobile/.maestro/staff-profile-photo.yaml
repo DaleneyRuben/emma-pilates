@@ -2,7 +2,7 @@
 # on Perfil, and sees a Client's photo where she appears (finding n.º 30).
 # Needs the worker running, an image in the device's photo library
 # (`xcrun simctl addmedia <udid> photo.jpg`, or `adb push` on Android), and
-# Lucía with a photo (Test 134 G).
+# Lucía with a photo (Test 135 G).
 appId: ${APP_ID}
 env:
   EMAIL: camila.rojas@example.com
