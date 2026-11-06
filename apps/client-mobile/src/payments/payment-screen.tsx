@@ -14,6 +14,7 @@ import {
   FormScrollView,
   invoiceChoiceFrom,
   invoiceDataPayload,
+  invoiceIncompleteNote,
   type InvoiceChoice,
   LoadingState,
   PrimaryButton,
@@ -187,7 +188,9 @@ export function PaymentScreen() {
         <BodyText style={styles.note}>
           {receipt === null
             ? "Adjunta tu comprobante para continuar"
-            : "El estudio revisa tu pago y te avisa por la app"}
+            : invoiceData === "incomplete"
+              ? (invoiceIncompleteNote(invoice) ?? "")
+              : "El estudio revisa tu pago y te avisa por la app"}
         </BodyText>
         <PrimaryButton
           busy={submitting}

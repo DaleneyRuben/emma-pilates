@@ -113,6 +113,11 @@ describe("the booking toast after a cancellation", () => {
     await fireEvent.press(await screen.findByRole("button", { name: "Cancelar reserva" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Sí, cancelar reserva" }));
 
+    // Walkthrough n.º 29: the cancellation says so, like a booking does; a
+    // cancellation the API accepts always gives the class back. The count is
+    // the refreshed one from its first frame (review of FIX-043).
+    await waitFor(() => expect(screen.getByText("Reserva cancelada")).toBeOnTheScreen());
+    expect(screen.getByText("La clase volvió a tu plan · Te quedan 5 clases")).toBeOnTheScreen();
     await waitFor(() => expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen());
     expect(screen.queryByText("Reserva confirmada")).toBeNull();
   });

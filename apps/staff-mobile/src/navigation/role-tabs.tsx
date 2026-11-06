@@ -1,4 +1,9 @@
-import { colors, fontFamilies, tabStackScreenLayout } from "@pilates/mobile-core";
+import {
+  colors,
+  fontFamilies,
+  popTabToRootOnPress,
+  tabStackScreenLayout,
+} from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createStaticNavigation,
@@ -107,6 +112,8 @@ const profileTab = {
 
 // Follow-up 225 §8: one tab bar per role, drawn like the client's, on Lino.
 const tabConfig = {
+  // Walkthrough n.º 28: tapping a tab opens it on its root screen.
+  screenListeners: popTabToRootOnPress,
   screenOptions: {
     headerShown: false,
     tabBarActiveTintColor: colors.emphasis,
