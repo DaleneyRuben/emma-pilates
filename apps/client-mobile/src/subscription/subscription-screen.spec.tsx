@@ -111,7 +111,7 @@ describe("Refreshed Mi plan (Client 12)", () => {
     expect(screen.getByText("Renovación anticipada")).toBeOnTheScreen();
     expect(
       screen.getByText(
-        "Eliges cuándo empieza el nuevo: desde el 25 de septiembre, al día siguiente de que venza este, hasta 4 semanas después.",
+        "Eliges cuándo empieza el nuevo: entre el 25 de septiembre, al día siguiente de que venza este, y el 22 de octubre.",
       ),
     ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Renovar mi plan" }));
