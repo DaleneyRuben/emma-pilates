@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ClientPhotoDto } from "./clientPhotoDto";
 import type { InvoiceDataDto } from "./invoiceDataDto";
 import type { PaymentReceiptDto } from "./paymentReceiptDto";
 import type { PaymentReviewDtoDurationDays } from "./paymentReviewDtoDurationDays";
@@ -51,6 +52,11 @@ export interface PaymentReviewDto {
    * @nullable
    */
   invoiceData?: InvoiceDataDto | null;
+  /**
+   * The Client photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  clientPhoto: ClientPhotoDto | null;
   /** @nullable */
   receipt?: PaymentReceiptDto | null;
   /**
