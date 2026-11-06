@@ -6981,6 +6981,7 @@
             "required": true,
             "in": "path",
             "schema": {
+              "type": "integer",
               "minimum": 1
             }
           }
@@ -7111,6 +7112,7 @@
             "required": true,
             "in": "path",
             "schema": {
+              "type": "integer",
               "minimum": 1
             }
           }

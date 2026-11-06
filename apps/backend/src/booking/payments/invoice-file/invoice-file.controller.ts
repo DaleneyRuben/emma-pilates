@@ -169,7 +169,7 @@ const sendPage = async (
 
 const pageDocs = [
   ApiParam({ name: 'paymentId', format: 'uuid' }),
-  ApiParam({ name: 'page', type: 'integer', schema: { minimum: 1 } }),
+  ApiParam({ name: 'page', schema: { type: 'integer', minimum: 1 } }),
   ApiProduces('image/png'),
   ApiOkResponse({
     schema: { type: 'string', format: 'binary' },

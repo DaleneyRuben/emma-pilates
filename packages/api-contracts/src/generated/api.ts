@@ -27361,14 +27361,14 @@ export type getStaffPaymentInvoicePageResponse =
 
 export const getGetStaffPaymentInvoicePageUrl = (
   paymentId: string,
-  page: unknown,
+  page: number,
 ) => {
   return `/api/v1/staff/payments/${paymentId}/invoice/file/pages/${page}`;
 };
 
 export const getStaffPaymentInvoicePage = async (
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getStaffPaymentInvoicePageResponse> => {
@@ -27392,7 +27392,7 @@ export const getStaffPaymentInvoicePage = async (
 
 export const getGetStaffPaymentInvoicePageQueryKey = (
   paymentId: string,
-  page: unknown,
+  page: number,
 ) => {
   return [
     `/api/v1/staff/payments/${paymentId}/invoice/file/pages/${page}`,
@@ -27404,7 +27404,7 @@ export const getGetStaffPaymentInvoicePageQueryOptions = <
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -27463,7 +27463,7 @@ export function useGetStaffPaymentInvoicePage<
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -27492,7 +27492,7 @@ export function useGetStaffPaymentInvoicePage<
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -27521,7 +27521,7 @@ export function useGetStaffPaymentInvoicePage<
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -27543,7 +27543,7 @@ export function useGetStaffPaymentInvoicePage<
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -27989,14 +27989,14 @@ export type getCurrentClientInvoicePageResponse =
 
 export const getGetCurrentClientInvoicePageUrl = (
   paymentId: string,
-  page: unknown,
+  page: number,
 ) => {
   return `/api/v1/clients/current/invoices/${paymentId}/file/pages/${page}`;
 };
 
 export const getCurrentClientInvoicePage = async (
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getCurrentClientInvoicePageResponse> => {
@@ -28020,7 +28020,7 @@ export const getCurrentClientInvoicePage = async (
 
 export const getGetCurrentClientInvoicePageQueryKey = (
   paymentId: string,
-  page: unknown,
+  page: number,
 ) => {
   return [
     `/api/v1/clients/current/invoices/${paymentId}/file/pages/${page}`,
@@ -28032,7 +28032,7 @@ export const getGetCurrentClientInvoicePageQueryOptions = <
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -28091,7 +28091,7 @@ export function useGetCurrentClientInvoicePage<
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -28120,7 +28120,7 @@ export function useGetCurrentClientInvoicePage<
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -28149,7 +28149,7 @@ export function useGetCurrentClientInvoicePage<
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -28171,7 +28171,7 @@ export function useGetCurrentClientInvoicePage<
   TError = unknown,
 >(
   paymentId: string,
-  page: unknown,
+  page: number,
   options?: {
     query?: Partial<
       UseQueryOptions<
