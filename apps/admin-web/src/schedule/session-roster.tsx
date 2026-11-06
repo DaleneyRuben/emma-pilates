@@ -11,24 +11,29 @@ const attendance: Record<string, string> = {
 
 function RosterSection({
   title,
+  action,
   children,
 }: {
   title: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const id = useId();
   return (
     <section aria-labelledby={id} className="flex flex-col gap-2">
-      <h3 id={id} className="text-celda font-semibold text-texto">
-        {title}
-      </h3>
+      <div className="flex min-h-9 items-center gap-3">
+        <h3 id={id} className="flex-1 text-celda font-semibold text-texto">
+          {title}
+        </h3>
+        {action}
+      </div>
       {children}
     </section>
   );
 }
 
 const rowClass =
-  "flex min-h-[44px] items-center gap-3 px-4 py-2 text-celda text-texto";
+  "flex min-h-[44px] items-center gap-3 px-1 py-2 text-celda text-texto";
 
 function BookedRow({ booking }: { booking: AdministratorRosterBookingDto }) {
   const outcome =
@@ -47,18 +52,25 @@ function BookedRow({ booking }: { booking: AdministratorRosterBookingDto }) {
 
 // WEB-039 (board P02, the class panel): who booked, then the Waitlist in
 // queue order. Names only: the panel never shows a plan or an amount.
+// FIX-042 (proposal A): plain lists, with the booking button beside the
+// «Reservaron» title.
 export function SessionRoster({
   roster,
+  action,
 }: {
   roster: AdministratorSessionRosterDto;
+  action?: React.ReactNode;
 }) {
   return (
     <>
-      <RosterSection title={`Reservaron (${roster.bookings.length})`}>
+      <RosterSection
+        title={`Reservaron (${roster.bookings.length})`}
+        action={action}
+      >
         {roster.bookings.length === 0 ? (
           <p className="text-celda text-texto-tenue">Nadie reservó todavía.</p>
         ) : (
-          <ul className="divide-y divide-divisor rounded-tarjeta bg-lino">
+          <ul className="divide-y divide-divisor border-y border-divisor">
             {roster.bookings.map((booking) => (
               <BookedRow key={booking.bookingId} booking={booking} />
             ))}
@@ -67,7 +79,7 @@ export function SessionRoster({
       </RosterSection>
       {roster.waitlist.length === 0 ? null : (
         <RosterSection title={`Lista de espera (${roster.waitlist.length})`}>
-          <ol className="divide-y divide-divisor rounded-tarjeta bg-lino">
+          <ol className="divide-y divide-divisor border-y border-divisor">
             {roster.waitlist.map((entry) => (
               <li key={entry.waitlistEntryId} className={rowClass}>
                 <span className="w-6 font-serif text-[18px] text-rosa-profundo tabular">

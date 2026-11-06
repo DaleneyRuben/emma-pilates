@@ -1,5 +1,6 @@
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from './commands/create-booking';
+import type { SessionCancellation } from './sessions/session-cancellation';
 
 export type TrainerScheduleSession = {
   sessionId: string;
@@ -9,6 +10,7 @@ export type TrainerScheduleSession = {
   endsAt: Date;
   capacity: number;
   bookedCount: number;
+  cancellation: SessionCancellation | null;
 };
 
 type ListTrainerScheduleDependencies = {
@@ -16,11 +18,12 @@ type ListTrainerScheduleDependencies = {
   findSessions(input: {
     trainerStaffMemberId: string;
     on: Date;
+    includeCancelled: boolean;
   }): Promise<TrainerScheduleSession[]>;
 };
 
 export const listTrainerSchedule = async (
-  input: { on: Date },
+  input: { on: Date; includeCancelled: boolean },
   dependencies: ListTrainerScheduleDependencies,
 ): Promise<TrainerScheduleSession[]> => {
   if (
@@ -33,5 +36,6 @@ export const listTrainerSchedule = async (
   return dependencies.findSessions({
     trainerStaffMemberId: dependencies.principal.identity.staffMemberId,
     on: input.on,
+    includeCancelled: input.includeCancelled,
   });
 };

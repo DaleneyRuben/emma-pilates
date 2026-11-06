@@ -45,7 +45,7 @@ export type AttendanceHandler = (
   principal: AuthenticatedPrincipal,
 ) => Promise<void>;
 export type TrainerScheduleHandler = (
-  input: { on: Date },
+  input: { on: Date; includeCancelled: boolean },
   principal: AuthenticatedPrincipal,
 ) => Promise<TrainerScheduleSession[]>;
 export type TrainerSessionRosterHandler = (
