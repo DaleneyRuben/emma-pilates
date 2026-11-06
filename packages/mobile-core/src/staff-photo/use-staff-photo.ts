@@ -1,7 +1,7 @@
 import { getGetStaffPhotoUrl } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 
-import { loadPrivateImage } from "../api/private-image";
+import { loadProfilePhoto } from "../api/private-image";
 
 export type StaffPhotoVariant = "display" | "thumbnail";
 
@@ -18,7 +18,7 @@ export function useStaffPhoto(
   const imageAssetId = photo?.imageAssetId ?? null;
   const query = useQuery({
     queryKey: ["staff-photo", imageAssetId, variant],
-    queryFn: () => loadPrivateImage(fetcher, getGetStaffPhotoUrl(imageAssetId ?? "", { variant })),
+    queryFn: () => loadProfilePhoto(fetcher, getGetStaffPhotoUrl(imageAssetId ?? "", { variant })),
     enabled: imageAssetId !== null,
     staleTime: Infinity,
   });

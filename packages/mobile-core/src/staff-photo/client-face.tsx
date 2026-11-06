@@ -1,7 +1,7 @@
 import { getGetClientPhotoForStaffUrl } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 
-import { loadPrivateImage } from "../api/private-image";
+import { loadProfilePhoto } from "../api/private-image";
 import { PersonAvatar } from "./person-avatar";
 import type { StaffPhotoVariant } from "./use-staff-photo";
 
@@ -28,7 +28,7 @@ export function ClientFace({
   const query = useQuery({
     queryKey: ["client-photo-for-staff", imageAssetId, variant],
     queryFn: () =>
-      loadPrivateImage(fetcher, getGetClientPhotoForStaffUrl(imageAssetId ?? "", { variant })),
+      loadProfilePhoto(fetcher, getGetClientPhotoForStaffUrl(imageAssetId ?? "", { variant })),
     enabled: imageAssetId !== null,
     staleTime: Infinity,
   });

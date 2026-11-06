@@ -28,8 +28,16 @@ export async function loadPrivateImageWithRatio(
   return { aspectRatio, uri: `data:${type};base64,${encodeBase64(bytes)}` };
 }
 
-// Stub until FIX-041's review fix lands.
-export const loadProfilePhoto: (
+// FIX-041: a profile photo that is gone (404) is "no photo"; any other
+// failure throws, so a query retries it instead of keeping the initials.
+export async function loadProfilePhoto(
   fetcher: typeof globalThis.fetch,
   url: string,
-) => Promise<string | null> = () => Promise.reject(new Error("not implemented"));
+): Promise<string | null> {
+  const response = await fetcher(url);
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error("profile_photo_unavailable");
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  const type = response.headers.get("Content-Type") ?? "image/jpeg";
+  return `data:${type};base64,${encodeBase64(bytes)}`;
+}
