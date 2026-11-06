@@ -225,5 +225,28 @@ describe("Dinero › Pagos invoice upload", () => {
         "Este pago fue anulado y ya no recibe factura.",
       ),
     ).toBeVisible();
+    expect(
+      within(panel).queryByRole("button", { name: "Reintentar" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps a voided sale's invoice: no Reemplazar, no Quitar", async () => {
+    server.use(
+      http.get(apiUrl(invoicePath), () =>
+        jsonResponse({ ...uploaded, voided: true }),
+      ),
+    );
+    const { panel } = await open();
+
+    expect(
+      await within(panel).findByRole("link", { name: "Descargar factura" }),
+    ).toBeVisible();
+    expect(within(panel).getByText("Anulado")).toBeVisible();
+    expect(
+      within(panel).queryByRole("button", { name: "Reemplazar" }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(panel).queryByRole("button", { name: "Quitar factura" }),
+    ).not.toBeInTheDocument();
   });
 });
