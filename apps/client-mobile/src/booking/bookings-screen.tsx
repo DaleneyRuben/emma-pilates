@@ -99,13 +99,15 @@ export function BookingsScreen({
     cancelStarted.current = true;
     setCancelInFlight(true);
     setFailure(null);
+    setCancelledShown(false);
+    let accepted = false;
     try {
       const response = await cancelBooking(cancelling.bookingId, undefined, fetcher);
       if (response.status === 204) {
         // «Reserva confirmada · Te quedan N clases» no longer holds once a
         // Booking is cancelled, often the one it confirmed (MOB-074).
         dismissConfirmed();
-        setCancelledShown(true);
+        accepted = true;
       } else {
         setFailure(
           bookingRejectionMessage(problemCode(response.data)) ??
@@ -119,12 +121,15 @@ export function BookingsScreen({
       setCancelInFlight(false);
       setCancelling(null);
       await refresh();
+      // After the refresh, so the toast's count is the one the cancel left.
+      if (accepted) setCancelledShown(true);
     }
   };
 
   const leave = async (item: UpcomingBookingDto) => {
     if (item.waitlistEntryId === undefined) return;
     setFailure(null);
+    setCancelledShown(false);
     try {
       const response = await leaveWaitlist(item.waitlistEntryId, undefined, fetcher);
       if (response.status !== 204) {
@@ -141,6 +146,8 @@ export function BookingsScreen({
     subscription.data?.status === 200
       ? subscription.data.data.subscription?.remainingClassAllowance
       : undefined;
+  const planName =
+    subscription.data?.status === 200 ? subscription.data.data.subscription?.planName : undefined;
   const items = upcoming.data?.status === 200 ? upcoming.data.data : [];
 
   return (
@@ -233,9 +240,11 @@ export function BookingsScreen({
           // The API accepts a cancellation only outside the window, and every
           // accepted one gives the class back (restoreBookedClass).
           note={
-            remaining === undefined
-              ? "La clase volvió a tu plan"
-              : `La clase volvió a tu plan · Te ${remaining === 1 ? "queda 1 clase" : `quedan ${remaining} clases`}`
+            planName === "Pase de invitada"
+              ? "Tu pase de invitada vuelve a estar disponible."
+              : remaining === undefined
+                ? "La clase volvió a tu plan"
+                : `La clase volvió a tu plan · Te ${remaining === 1 ? "queda 1 clase" : `quedan ${remaining} clases`}`
           }
           onClose={() => setCancelledShown(false)}
           title="Reserva cancelada"

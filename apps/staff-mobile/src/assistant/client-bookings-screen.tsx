@@ -158,23 +158,27 @@ export function ClientBookingsScreen({
   const confirmCancel = async () => {
     if (cancelling === null || cancelling.bookingId === undefined) return;
     setFailure(null);
+    setCancelledShown(false);
+    let accepted = false;
     try {
       await api.cancelBooking(cancelling.bookingId);
       // «Reserva confirmada» no longer holds once a booking is cancelled,
       // often the one it confirmed (MOB-074).
       dismissNotice();
-      setCancelledShown(true);
+      accepted = true;
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
     } finally {
       setCancelling(null);
       await refresh();
+      if (accepted) setCancelledShown(true);
     }
   };
 
   const leave = async (item: AssistantClientBookingDto) => {
     if (item.waitlistEntryId === undefined) return;
     setFailure(null);
+    setCancelledShown(false);
     try {
       await api.leaveWaitlist(item.waitlistEntryId);
     } catch {
