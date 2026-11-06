@@ -215,7 +215,7 @@ describe("Client Profile", () => {
       expect(screen.getByText("2 sin leer")).toBeOnTheScreen();
     });
     // MOB-070: the footer reads the installed app version, not a hard-coded 1.0.
-    expect(screen.getByText("Emma Pilates Studio · versión 1.0.1")).toBeOnTheScreen();
+    expect(screen.getByText("Emma Pilates Studio · versión 1.0.1 ·")).toBeOnTheScreen();
 
     await fireEvent.press(
       screen.getByRole("button", {
