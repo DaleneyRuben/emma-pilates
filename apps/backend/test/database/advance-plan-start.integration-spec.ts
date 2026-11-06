@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { createFounderMembershipJob } from '../../src/booking/payments/founder-membership-job';
+import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
+import { toPrismaBytes } from '../../src/database/prisma-bytes';
 import {
   codeOf,
   fixtures,
@@ -152,6 +154,101 @@ describe('next Plan start window and the Founder place (PostgreSQL)', () => {
       () => new Date(`${after(current.endsOn, 12)}T15:00:00.000Z`),
     );
     await job.execute();
+
+    await expect(membershipOf(client.clientId)).resolves.toMatchObject({
+      status: 'ACTIVE',
+    });
+  });
+
+  // Review fix 1: the current Plan running out of classes after the sale
+  // must not make an advance transfer unconfirmable.
+  it('confirms an advance transfer after the current Plan has used its classes', async () => {
+    const { client, current } = await founderWithPlan('Sin clases después');
+    const staff = await assistant();
+    const receipt = await world.readyReceipt(staff.accountId);
+    const pending = await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: client.clientId,
+        planId: plan.id,
+        branchId: centro().id,
+        imageAssetId: receipt.id,
+        startsOn: after(current.endsOn, 25),
+      },
+      staff,
+      randomUUID(),
+    );
+    await prisma.subscription.update({
+      where: { id: current.id },
+      data: { remainingClassAllowance: 0 },
+    });
+
+    await world
+      .commands()
+      .confirmTransfer(
+        { paymentId: pending.id },
+        await world.staffPrincipal('paola.mendoza@example.com'),
+      );
+
+    const next = await prisma.subscription.findFirstOrThrow({
+      where: { paymentId: pending.id },
+    });
+    expect(civil(next.startsOn)).toBe(after(current.endsOn, 25));
+    await expect(
+      prisma.subscription.findUniqueOrThrow({ where: { id: current.id } }),
+    ).resolves.toMatchObject({ endsOn: current.endsOn });
+  });
+
+  // Review fix 3: the Client's own transfer is sold when she commits to the
+  // Purchase Intent, not when the receipt arrives the next day.
+  it('judges the founder place on the purchase intent day', async () => {
+    const { client, current } = await founderWithPlan(
+      'Intención el último día',
+    );
+    const endDay = civil(current.endsOn);
+    const intentAt = new Date(`${endDay}T20:00:00.000Z`);
+    const submitAt = new Date(`${after(current.endsOn, 1)}T13:00:00.000Z`);
+    const intent = await createPrismaPaymentCommands(prisma, {
+      now: () => intentAt,
+    }).createPurchaseIntent(
+      { planId: plan.id, startsOn: after(current.endsOn, 15) },
+      client,
+      randomUUID(),
+    );
+    const receipt = await prisma.imageAsset.create({
+      data: {
+        ownerAccountId: client.accountId,
+        purpose: 'TRANSFER_RECEIPT',
+        state: 'READY',
+        pendingObjectKey: `pending/${randomUUID()}`,
+        declaredMediaType: 'JPEG',
+        declaredByteSize: 1234,
+        declaredChecksum: toPrismaBytes(Buffer.alloc(32, 1)),
+        createdAt: submitAt,
+        expiresAt: new Date(submitAt.getTime() + 15 * 60 * 1_000),
+        finalizedAt: submitAt,
+      },
+      select: { id: true },
+    });
+    const later = createPrismaPaymentCommands(prisma, { now: () => submitAt });
+    await later.attachReceipt(
+      { purchaseIntentId: intent.id, imageAssetId: receipt.id },
+      client,
+      randomUUID(),
+    );
+    const payment = await later.submitTransfer(
+      { purchaseIntentId: intent.id },
+      client,
+      randomUUID(),
+    );
+
+    await later.confirmTransfer(
+      { paymentId: payment.id },
+      await world.staffPrincipal('paola.mendoza@example.com'),
+    );
+    await createFounderMembershipJob(
+      prisma,
+      () => new Date(`${after(current.endsOn, 10)}T15:00:00.000Z`),
+    ).execute();
 
     await expect(membershipOf(client.clientId)).resolves.toMatchObject({
       status: 'ACTIVE',

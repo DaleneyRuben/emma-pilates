@@ -116,6 +116,47 @@ describe('freeze', () => {
     ).resolves.toMatchObject({ amountDueCentavos: sale.amountDueCentavos });
   });
 
+  // booking ADR-0013 review fix 2: a pending advance transfer caps the
+  // Freeze as a queued Subscription does, or it could not be confirmed.
+  it('refuses a Freeze whose extension would reach a pending next Plan', async () => {
+    const client = await world.newClient('Congelada con QR pendiente');
+    const sale = await cash(client.clientId, quarterly.id);
+    const subscription = await prisma.subscription.findFirstOrThrow({
+      where: { paymentId: sale.id },
+    });
+    const assistant = await world.staffPrincipal('camila.rojas@example.com');
+    const receipt = await world.readyReceipt(assistant.accountId);
+    const nextStart = new Date(subscription.endsOn.getTime() + 5 * 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: client.clientId,
+        planId: quarterly.id,
+        branchId: fixtures.branches.find((branch) => branch.name === 'Centro')!
+          .id,
+        imageAssetId: receipt.id,
+        startsOn: nextStart,
+      },
+      assistant,
+      randomUUID(),
+    );
+
+    await expect(
+      codeOf(
+        createPrismaPaymentCommands(prisma, { now: () => now }).requestFreeze(
+          {
+            subscriptionId: subscription.id,
+            startsOn: '2026-10-01',
+            endsOn: '2026-10-10',
+            reason: 'Viaje',
+          },
+          client,
+        ),
+      ),
+    ).resolves.toBe('freeze_not_allowed');
+  });
+
   it('refuses a 60-day Plan, more than 15 days, and a start in the past', async () => {
     const short = await prisma.plan.findFirstOrThrow({
       where: { name: 'Bimestral 16 clases' },
