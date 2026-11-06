@@ -25,6 +25,7 @@ export const clientRow = (
 ): AdminClientDto => ({
   id: `c1000000-0000-5000-8000-${String(name.length).padStart(12, "0")}`,
   name,
+  photo: null,
   email: `${plain(name)}@example.com`,
   phone: "+591 70011001",
   accountStatus: "active",
@@ -80,6 +81,7 @@ export const clientPage = (
 export const luciaDetail: AdminClientDetailDto = {
   id: lucia.id,
   name: lucia.name,
+  photo: null,
   email: lucia.email,
   phone: lucia.phone,
   accountStatus: "active",
