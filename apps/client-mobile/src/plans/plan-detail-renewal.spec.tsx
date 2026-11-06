@@ -7,8 +7,8 @@ import { createClientRuntime, jsonResponse, routeFetcher, studioRules } from "..
 
 jest.setTimeout(30_000);
 
-// FIX-002 (booking ADR-0005): a renewal while the current Plan still has
-// classes starts the day after it ends, and no Start Date is chosen.
+// FIX-002 (booking ADR-0005, ADR-0013): a renewal while the current Plan still
+// has classes starts inside the next Plan window, after the current end.
 const current = {
   id: "subscription-1",
   planName: "Paquete de 8 clases",
@@ -50,21 +50,31 @@ describe("Renewing from the Plan detail", () => {
     clearMobileQueryCache();
   });
 
-  it("names the fixed start instead of offering dates while classes remain", async () => {
+  // booking ADR-0013 (design follow-up 254 § 4): the next Plan picks a day
+  // from the day after the current end through 28 days after it.
+  it("offers the next Plan's days from the day after the current end", async () => {
     const { created, screen } = await renewFrom({
       status: "active",
       subscription: current,
       renewalStartsOn: "2026-09-25",
     });
 
-    expect(screen.queryByTestId("start-date-chooser")).toBeNull();
+    expect(screen.getByTestId("start-date-2026-09-25")).toHaveProp("accessibilityState", {
+      selected: true,
+    });
+    expect(screen.getByTestId("start-date-2026-10-22")).toBeOnTheScreen();
+    expect(screen.queryByTestId("start-date-2026-10-23")).toBeNull();
+    expect(screen.queryByText(/al terminar el actual/)).toBeNull();
+    await fireEvent.press(screen.getByTestId("start-date-2026-10-01"));
     expect(
-      screen.getByText("Tu nuevo plan empieza el 25 de septiembre, al terminar el actual."),
+      screen.getByText(
+        "Tu plan actual vence el 24 de septiembre. El nuevo empieza el 1 de octubre; se puede elegir hasta el 22 de octubre.",
+      ),
     ).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
     await waitFor(() => {
-      expect(created).toHaveBeenCalledWith({ planId: "plan-8" });
+      expect(created).toHaveBeenCalledWith({ planId: "plan-8", startsOn: "2026-10-01" });
     });
   });
 
