@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { InvoiceDataDto } from "./invoiceDataDto";
 import type { PaymentReceiptDto } from "./paymentReceiptDto";
 import type { PaymentReviewDtoDurationDays } from "./paymentReviewDtoDurationDays";
 import type { PaymentReviewDtoDurationMonths } from "./paymentReviewDtoDurationMonths";
@@ -45,6 +46,11 @@ export interface PaymentReviewDto {
   /** @nullable */
   subscriptionId?: string | null;
   clientName: string;
+  /**
+   * FIX-044: the NIT or CI and name she asked the invoice for; null is «Sin factura»
+   * @nullable
+   */
+  invoiceData?: InvoiceDataDto | null;
   /** @nullable */
   receipt?: PaymentReceiptDto | null;
   /**
