@@ -168,9 +168,13 @@ Cuando Ana ya activó, se niega siempre: las siguientes personas se crean
 desde la web.
 
 El worker deja el correo «Activa tu cuenta en Emma Pilates Studio». Ábrelo,
-o abre el archivo `activation` del buzón local, y entra al enlace. Llegas a
-**Crear contraseña**. Escribe una contraseña y confírmala. El enlace dura
-siete días y sirve una vez.
+o abre el archivo `activation` del buzón local. En local el enlace del correo
+(`https://links.emmapilates.test/…/activate-account?token=…`) no abre nada:
+copia lo que va después de `token=` y ábrelo en la web como
+`http://localhost:5173/crear-contrasena?token=EL_TOKEN`. Pegar la ruta del
+enlace en `localhost:5173` da «Página no encontrada». Llegas a **Crear
+contraseña**. Escribe una contraseña y confírmala. El enlace dura siete días
+y sirve una vez.
 
 Entra a la web con el correo de Ana y esa contraseña. La primera pantalla es
 **Inicio**: lo que hay por resolver, el día en el estudio y el dinero. Con
@@ -296,7 +300,10 @@ invitación**. Reenviar demasiado seguido muestra el aviso de límite, con la
 cuenta atrás.
 
 Cada persona abre su correo, entra al enlace y crea su contraseña. Ese
-enlace abre la web, no la app. Cuando termina, su fila pasa a **Activo**.
+enlace abre la web, no la app. En local, igual que en el paso 1, copia el
+`token=` del enlace y ábrelo como
+`http://localhost:5173/crear-contrasena?token=EL_TOKEN`. Cuando termina, su
+fila pasa a **Activo**.
 
 Abre a Daniela. Una entrenadora recibe su código de referido sola, al
 crearla: sale de su nombre, en mayúsculas y sin tildes (`DANIELA`; si ya
@@ -334,21 +341,41 @@ la tuya, arriba a la derecha.
 Abre la app del equipo. La pantalla es **Acceso del equipo**. No hay
 **Regístrate**: el equipo no se crea solo.
 
+Cada rol tiene su barra de abajo, y todas terminan en **Perfil**. Arriba a la
+derecha está la campana de **Notificaciones**, con el número de avisos sin
+leer.
+
+| Rol | Barra de abajo |
+| --- | --- |
+| Entrenadora | **Agenda** · **Mis pagos** · **Perfil** |
+| Asistente | **Clientes** · **Horario** · **Caja** · **Perfil** |
+| Nutricionista | **Agenda** · **Disponibilidad** · **Perfil** |
+| Administración | **Pagos** · **Clientes** · **Horario** · **Perfil** |
+| Coordinación | **Clientes** · **Para contactar** · **Horario** · **Perfil** |
+
 1. Daniela entra con su correo y la contraseña que acaba de crear. Llega a
-   **Mi agenda**, con la ceja **Entrenadora** y su saludo. La semana está
-   vacía: todavía no hay clases.
-2. Abre **Perfil**. Muestra su nombre, su correo, el rol y la sede, y dice
-   que su nombre y su correo los actualiza administración. Su círculo tiene
-   sus iniciales y **Cambiar foto**: elige una foto de la galería y queda
-   puesta («Subiendo foto…» mientras sube); con foto aparece también
-   **Quitar foto**. Desde Perfil salen **Notificaciones**, **Cambiar
-   contraseña** y **Enviar comentarios**.
-3. Cierra sesión. Camila entra y llega a **Buscar cliente**, vacío, con
-   **+ Nuevo cliente** y **Cerrar caja**. Gabriela entra y llega a su agenda
-   de nutrición, vacía, con **Mi disponibilidad**.
-4. Ana también puede entrar a la app del equipo. Llega a **Pagos
-   pendientes**, vacío, con **Cerrar caja** y **Cancelar una clase**. En su
-   perfil aparece además **Ver la app como…**. Déjalo para el paso 16.
+   **Agenda**: arriba «Entrenadora · » y la fecha, `Hola, Daniela`, y la tira
+   **Esta semana** con **Hoy** y los seis días siguientes. Si todavía no
+   publicaste clases, el día está vacío; si la semana ya tiene clases, las
+   ves aquí.
+2. Abre **Perfil**. Muestra su nombre, su correo y su celular, con la nota
+   «Tu nombre y tu correo los actualiza administración.». Debajo, **Tu
+   cuenta**: **Rol**, **Sucursal**, **Mis pagos** y **Tu código de
+   referido**. Su círculo tiene sus iniciales y **Cambiar foto**: elige una
+   foto de la galería y queda puesta («Subiendo foto…» mientras sube); con
+   foto aparece también **Quitar foto**. Al final salen **Notificaciones**,
+   **Cambiar contraseña**, **Enviar comentarios** y **Cerrar sesión**.
+3. Cierra sesión. Camila entra y llega a **Clientes**, con **+ Nuevo
+   cliente**: la búsqueda pide al menos dos letras o números. **Cerrar caja**
+   vive en la pestaña **Caja**. Gabriela entra y llega a su **Agenda** de
+   nutrición; vacía dice «No tienes evaluaciones», con **Ver mi
+   disponibilidad**.
+4. Ana también puede entrar a la app del equipo. Llega a **Pagos**: **Pagos
+   pendientes** vacío dice «Todo al día», con **Ver el horario**, y debajo
+   **Accesos**: **Cancelar una clase**, **Congelamientos** y **Cerrar caja**.
+   Su perfil dice «Tus datos se editan en la web de administración.»,
+   **Sucursales** «Todas las sucursales» y, además, **Ver la app como…**.
+   Déjalo para el paso 16.
 
 Si alguien olvida la contraseña, en el acceso del equipo está **¿Olvidaste
 tu contraseña?**. El correo «Crea una contraseña nueva» dura 30 minutos.
@@ -397,12 +424,14 @@ cancelada**, solo para leer: el motivo, cuándo pasó y cuántas reservas tenía
 Una clase que se quitó porque cambiaste o terminaste la serie no se muestra:
 la clase nueva ocupa su lugar.
 
-En la app del equipo, Daniela abre **Mi agenda**. La tira de días dice
-`Lun 26`, `Mié 28`, y así. Al tocar el lunes aparece la clase de las 09:00,
+En la app del equipo, Daniela abre **Agenda**. La tira **Esta semana**
+muestra **Hoy** y los días siguientes (`lun 9`, `mié 11`, y así), y el botón
+**Hoy** vuelve al día de hoy. Al tocar el lunes aparece la clase de las 09:00,
 con `0 de 12 reservados` si dejaste la capacidad en 12, o `0 de 10` si
 guardaste el cambio del paso 2. Toca la clase: la lista de asistencia está
-vacía y **Guardar asistencia** está apagado, porque no hay a quién pasar
-lista. Si una de sus clases del día se canceló, sigue en la lista, apagada,
+vacía, dice «Podrás marcar asistencia cuando empiece la clase.» y
+**Guardar asistencia** está apagado. Arriba está **Reportar una falla**, para
+avisar de un equipo que no funciona. Si una de sus clases del día se canceló, sigue en la lista, apagada,
 con «Cancelada · mínimo no alcanzado» o «Cancelada por el estudio» y sin
 flecha: no se abre. El título lo cuenta («Hoy · 2 clases · 1 cancelada»), y
 un día con todas canceladas dice «Hoy · 5 canceladas» en vez de «Hoy no
@@ -424,18 +453,22 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    confirmes, canceles el registro o pasen 7 días.
 3. Abre el correo «Confirma tu correo para activar tu cuenta» y pulsa
    **Confirmar mi correo**. Entras a **Inicio**.
-4. **Inicio** saluda `Hola, Lucía`. No hay plan. El atajo grande dice
-   **Comprar un plan**. Debajo están **Reservar una clase**, **Evaluación
-   nutricional** e **Invita a una amiga**. El carrusel de promociones está
-   vacío hasta el paso 14.
+4. **Inicio** saluda `Hola, Lucía`. No hay plan. La tarjeta grande dice
+   «Elige tu plan y empieza a moverte», con «Desde Bs 80» y **Comprar un
+   plan**. Debajo, **Reservar una clase** está con candado y la nota
+   «Necesitas un plan activo»; siguen **Evaluación nutricional** e **Invita a
+   una amiga**. El carrusel de promociones está vacío hasta el paso 14.
 5. **Reservar** muestra la semana, pero al abrir una clase no deja reservar:
-   no hay plan vigente.
-6. **Mis Reservas** está vacío, con **Ver historial**. El historial también
-   está vacío.
-7. **Perfil** muestra el nombre, el correo y **Editar**. Las filas son **Mi
-   plan**, **Evaluación nutricional**, **Mis evaluaciones**, **Invita a una
-   amiga**, **Notificaciones**, **Cambiar contraseña** y **Enviar
-   comentarios**. Al final, **Cerrar sesión** y **Cerrar mi cuenta**.
+   dice «Necesitas un plan para reservar.», con el botón para elegir uno.
+6. **Mis Reservas** tiene dos pestañas, **Próximas** e **Historial**.
+   **Próximas** dice «Aún no tienes reservas», con **Reservar una clase**;
+   **Historial** dice «Todavía no tomaste clases».
+7. **Perfil** muestra el nombre, el correo y **Editar**, en tres grupos:
+   **Tu plan y tus clases** (**Mi plan**, **Evaluación nutricional**, **Mis
+   evaluaciones**, **Invita a una amiga**), **Preferencias**
+   (**Notificaciones** y **Recibir promociones**) y **Cuenta** (**Cambiar
+   contraseña** y **Enviar comentarios**). Al final, **Cerrar sesión** y
+   **Cerrar mi cuenta**.
 
 Si el correo tarda, el archivo del buzón local tiene el mismo enlace.
 
@@ -494,7 +527,7 @@ En la app de clientas, como Lucía, con el plan ya vigente.
 1. **Reservar**. Elige la sede si hay más de una. La tira de días y la tira
    de tipos se desplazan de lado. Elige el día del mat de las 09:00.
 2. Abre la clase. Ves el tipo, la hora, la sede, **Daniela Ortiz** con
-   **Entrenadora certificada** (con su foto si ya puso una; si no, sus
+   **Entrenadora** (con su foto si ya puso una; si no, sus
    iniciales), los cupos y la descripción que escribiste. En la lista de
    **Reservar**, en **Mis Reservas** y en el historial su foto chica va antes
    de su nombre.
@@ -513,14 +546,15 @@ En la app de clientas, como Lucía, con el plan ya vigente.
 6. Si la clase está llena, el botón es **Unirme a la lista de espera**.
    Dentro de las 2 h 30 esa lista ya cerró y el botón no aparece.
 
-En la app del equipo, Camila puede hacer lo mismo por una clienta: **Buscar
-cliente**, el nombre de Lucía, **Ver cliente**, **Reservar una clase**. Si
+En la app del equipo, Camila puede hacer lo mismo por una clienta: **Clientes**,
+el nombre de Lucía, **Ver cliente**, **Reservar una clase**. Si
 Lucía ya tiene esa clase, la fila dice **Ya reservada** y el detalle no
 ofrece **Reservar**.
 
-Daniela, en **Mi agenda**, abre la clase de mañana. Ahora hay una reserva.
-Después de que la clase terminó, marca asistió o no asistió y pulsa
-**Guardar asistencia**. Antes de que termine, la lista se lee y no se guarda.
+Daniela, en **Agenda**, abre la clase de mañana. Ahora hay una reserva.
+Antes de que empiece, la lista se lee y dice «Podrás marcar asistencia
+cuando empiece la clase.». Desde que la clase empieza, marca asistió o no
+asistió y pulsa **Guardar asistencia**.
 
 ## Paso 9. Lo que hace la recepcionista
 
@@ -816,7 +850,7 @@ lista en **Por resolver**.
    opcional: sube la foto de la transferencia (JPG, PNG o WebP, hasta 10 MB).
    Para agregarla a un pago ya anotado, ábrelo, sube la foto y **Guardar**.
    La columna **Comprobante** muestra **Ver** cuando el pago tiene foto.
-6. En la app del equipo, Daniela abre **Tu cuenta** y luego **Mis pagos**.
+6. En la app del equipo, Daniela abre la pestaña **Mis pagos**.
    Ve una tarjeta por liquidación, la más nueva arriba, con **Borrador** o
    **Aprobado**, el total y la suma por concepto: clases dictadas,
    canceladas por mínimo y comisiones. **Ver cada clase** abre una línea por
@@ -1003,11 +1037,11 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 
 | Rol | Primera pantalla | Qué más hace | Paso |
 | --- | --- | --- | --- |
-| Administración | Pagos pendientes | Cancelar una clase, congelamientos, caja, ver como otra persona | 4, 7, 10, 16 |
-| Asistente | Buscar cliente | Alta, efectivo, comprobante de mostrador, reservas, caja | 9 |
-| Entrenadora | Mi agenda | Pasar lista, reportar una falla, Mis pagos | 5, 8, 15 |
-| Nutricionista | Agenda | Mi disponibilidad, cancelar una consulta | 12 |
-| Coordinador | Buscar cliente | Para contactar, cancelar una clase, sin dinero y sin alta | 16 |
+| Administración | Pagos | Clientes, Horario, cancelar una clase, congelamientos, caja, ver como otra persona | 4, 7, 10, 16 |
+| Asistente | Clientes | Alta, efectivo, comprobante de mostrador, reservas, Horario, Caja | 9 |
+| Entrenadora | Agenda | Pasar lista, reportar una falla, Mis pagos | 5, 8, 15 |
+| Nutricionista | Agenda | Disponibilidad, cancelar una consulta | 12 |
+| Coordinador | Clientes | Alta, Para contactar, Horario, cancelar una clase, sin dinero | 16 |
 | Todas | Perfil | Foto de perfil, avisos, contraseña, comentarios, cerrar sesión | 4 |
 
 ## Cuando algo no aparece
