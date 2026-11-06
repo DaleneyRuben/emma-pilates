@@ -109,6 +109,7 @@ import { listAdministratorSessions } from './sessions/administrator-sessions';
 import { listTrainerSchedule } from './trainer-schedule';
 import { findTrainerScheduleSessions } from './trainer-schedule-sessions';
 import { loadTrainerSessionRoster } from './trainer-session-roster';
+import { findTrainerSessionRoster } from './prisma-trainer-session-roster';
 
 import {
   changeStaffBranches,
@@ -164,6 +165,7 @@ import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
 import { transferQrWiring } from './transfer-qr/transfer-qr-wiring';
 import { administratorSessionRosterWiring } from './sessions/administrator-session-roster-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
+import { staffPhotoWiring } from './staff/photo/staff-photo-wiring';
 import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
 import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
 
@@ -209,6 +211,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...administratorSessionRosterWiring.controllers,
     ...acquisitionWiring.controllers,
     ...clientPhotoWiring.controllers,
+    ...staffPhotoWiring.controllers,
     ...first90DaysWiring.controllers,
     ...invoiceDataWiring.controllers,
     EvaluationSlotsController,
@@ -256,50 +259,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
         ) =>
           loadTrainerSessionRoster(input, {
             principal,
-            findRoster: (sessionId) =>
-              prisma.session
-                .findUnique({
-                  where: { id: sessionId },
-                  select: {
-                    id: true,
-                    trainerStaffMemberId: true,
-                    startsAt: true,
-                    endsAt: true,
-                    classType: { select: { name: true } },
-                    branch: { select: { name: true } },
-                    bookings: {
-                      where: { state: 'BOOKED' },
-                      select: {
-                        id: true,
-                        client: { select: { name: true } },
-                        attendanceRecord: { select: { outcome: true } },
-                      },
-                      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-                    },
-                  },
-                })
-                .then((session) =>
-                  session === null
-                    ? null
-                    : {
-                        sessionId: session.id,
-                        trainerStaffMemberId: session.trainerStaffMemberId,
-                        classTypeName: session.classType.name,
-                        branchName: session.branch.name,
-                        startsAt: session.startsAt,
-                        endsAt: session.endsAt,
-                        bookings: session.bookings.map((booking) => ({
-                          bookingId: booking.id,
-                          clientName: booking.client.name,
-                          attendanceOutcome:
-                            booking.attendanceRecord?.outcome === 'ATTENDED'
-                              ? 'attended'
-                              : booking.attendanceRecord?.outcome === 'NO_SHOW'
-                                ? 'no_show'
-                                : null,
-                        })),
-                      },
-                ),
+            findRoster: findTrainerSessionRoster(prisma),
           }),
     },
     {
@@ -641,6 +601,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...administratorSessionRosterWiring.providers(PRISMA_CLIENT),
     ...acquisitionWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
+    ...staffPhotoWiring.providers(PRISMA_CLIENT),
     ...first90DaysWiring.providers(PRISMA_CLIENT),
     ...invoiceDataWiring.providers(PRISMA_CLIENT),
   ],

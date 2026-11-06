@@ -20,12 +20,14 @@ export const roster = (
     bookingId: `b1000000-0000-5000-8000-${String(index + 1).padStart(12, "0")}`,
     clientId: `c2000000-0000-5000-8000-${String(index + 1).padStart(12, "0")}`,
     clientName,
+    clientPhoto: null,
     attendanceOutcome: null,
   })),
   waitlist: waitlist.map((clientName, index) => ({
     waitlistEntryId: `e1000000-0000-5000-8000-${String(index + 1).padStart(12, "0")}`,
     clientId: `c3000000-0000-5000-8000-${String(index + 1).padStart(12, "0")}`,
     clientName,
+    clientPhoto: null,
     position: index + 1,
   })),
 });

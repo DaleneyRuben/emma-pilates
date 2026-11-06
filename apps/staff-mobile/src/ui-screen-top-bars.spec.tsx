@@ -17,7 +17,7 @@ jest.mock("@react-navigation/native", () => ({
 // Every request stays pending, so each screen shows its loading state.
 const pending = (() => new Promise<Response>(() => undefined)) as typeof globalThis.fetch;
 
-const client = { clientId: "client-1", clientName: "Valeria Áñez" };
+const client = { clientId: "client-1", clientName: "Valeria Áñez", clientPhoto: null };
 const session = {
   branchName: "Centro",
   classTypeName: "Reformer Intermedio",

@@ -10,6 +10,7 @@ import type {
   AdministratorPaymentInvoiceFilter,
   AdministratorPaymentStatusFilter,
 } from './administrator-payments';
+import { ClientPhotoDto } from '../client/client-discovery.dto';
 
 const paymentStates = [
   'pending',
@@ -36,6 +37,13 @@ export class AdminPaymentDto {
 
   @ApiProperty()
   clientName!: string;
+
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'The Client photo (FIX-041), null while her initials stand in',
+  })
+  clientPhoto!: ClientPhotoDto | null;
 
   @ApiProperty()
   planName!: string;

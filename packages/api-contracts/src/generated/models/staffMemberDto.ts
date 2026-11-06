@@ -6,6 +6,7 @@
  */
 import type { StaffMemberDtoRole } from "./staffMemberDtoRole";
 import type { StaffMemberDtoStatus } from "./staffMemberDtoStatus";
+import type { StaffPhotoDto } from "./staffPhotoDto";
 
 export interface StaffMemberDto {
   id: string;
@@ -23,6 +24,11 @@ export interface StaffMemberDto {
    * @nullable
    */
   activationExpiresAt: string | null;
+  /**
+   * Her profile photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  photo: StaffPhotoDto | null;
   /** true when the create reopened a pending invitation with the same email; its Role and Branches did not change */
   invitationReopened?: boolean;
 }

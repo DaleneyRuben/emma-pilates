@@ -4,11 +4,17 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ClientPhotoDto } from "./clientPhotoDto";
 import type { FreezeReviewDtoState } from "./freezeReviewDtoState";
 
 export interface FreezeReviewDto {
   id: string;
   clientName: string;
+  /**
+   * The Client photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  clientPhoto: ClientPhotoDto | null;
   planName: string;
   startsOn: string;
   endsOn: string;

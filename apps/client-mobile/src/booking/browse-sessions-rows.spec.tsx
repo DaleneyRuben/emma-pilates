@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/re
 import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
-import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
+import { createClientRuntime, jsonResponse, routeFetcher, staffPhotoRoute } from "../test-support";
 
 jest.setTimeout(20_000);
 
@@ -34,13 +34,19 @@ const classType = {
 };
 const today = boliviaCivilDate(new Date());
 const { from, until } = civilDateRange(today);
-const session = (id: string, startsAt: Date, availableSeats: number) => ({
+const session = (
+  id: string,
+  startsAt: Date,
+  availableSeats: number,
+  trainerPhoto: { imageAssetId: string } | null = null,
+) => ({
   id,
   branchId: "branch-centro",
   classTypeId: classType.id,
   trainerStaffMemberId: "trainer-1",
   classTypeName: classType.name,
   trainerName: "Emma Vargas",
+  trainerPhoto,
   startsAt: startsAt.toISOString(),
   endsAt: new Date(startsAt.getTime() + 50 * 60_000).toISOString(),
   capacity: 12,
@@ -58,27 +64,23 @@ describe("Client class list rows", () => {
   });
 
   async function openClassList() {
-    const screen = await render(
-      <App
-        runtime={createClientRuntime(
-          routeFetcher({
-            "/api/v1/clients/current": () => jsonResponse(profile),
-            "/api/v1/clients/current/subscription": () => jsonResponse(active),
-            "/api/v1/branches": () =>
-              jsonResponse([
-                { id: "branch-centro", name: "Centro", address: "Calle Ayacucho 245" },
-              ]),
-            "/api/v1/class-types": () => jsonResponse([classType]),
-            [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
-              () =>
-                jsonResponse([
-                  session("session-1", new Date(Date.now() + 60 * 60_000), 3),
-                  session("session-2", new Date(Date.now() + 2 * 60 * 60_000), 0),
-                ]),
-          }),
-        )}
-      />,
-    );
+    const fetcher = routeFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () => jsonResponse(active),
+      "/api/v1/branches": () =>
+        jsonResponse([{ id: "branch-centro", name: "Centro", address: "Calle Ayacucho 245" }]),
+      "/api/v1/class-types": () => jsonResponse([classType]),
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+        () =>
+          jsonResponse([
+            session("session-1", new Date(Date.now() + 60 * 60_000), 3, {
+              imageAssetId: "asset-emma",
+            }),
+            session("session-2", new Date(Date.now() + 2 * 60 * 60_000), 0),
+          ]),
+      ...staffPhotoRoute("asset-emma"),
+    });
+    const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen();
     });
@@ -94,7 +96,7 @@ describe("Client class list rows", () => {
     const cards = screen
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((card) => within(card));
-    return { cards, screen };
+    return { cards, fetcher, screen };
   }
 
   it("shows the only Branch fixed and draws the v2 rows", async () => {
@@ -122,6 +124,19 @@ describe("Client class list rows", () => {
       expect(card.getByTestId("chevron", hidden)).toHaveProp("stroke", "#6F6662");
     }
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
+  });
+
+  // FIX-041 (follow-up 242): the trainer line leads with her 20 px face.
+  it("leads the trainer line with her photo, or her initials without one", async () => {
+    const { cards, fetcher } = await openClassList();
+
+    await waitFor(() => {
+      expect(cards[0].getByLabelText("Foto de Emma Vargas")).toHaveStyle({ height: 20, width: 20 });
+    });
+    expect(fetcher).toHaveBeenCalledWith("/api/v1/staff-photos/asset-emma?variant=thumbnail");
+    expect(cards[0].getByText("Emma Vargas · 50 min")).toHaveProp("numberOfLines", 1);
+    expect(cards[1].getByText("EV")).toBeOnTheScreen();
+    expect(cards[1].queryByLabelText("Foto de Emma Vargas")).toBeNull();
   });
 
   // MOB-074 walk: a fixed 56 pt width broke «09:00» in Lora 20 into «09:0» and

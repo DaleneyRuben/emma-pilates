@@ -1,3 +1,4 @@
+import type { ClientPhotoRef } from '../client/client-photo-of';
 import type { AuditActor } from '../../system-identity/authentication/audit-actor';
 import { normalizeContactPhone } from '../../phone/bolivian-mobile';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
@@ -23,6 +24,7 @@ export type ClientDirectoryFilter = DirectorySubscriptionStatus | 'founder';
 export type AdministratorClientRow = {
   id: string;
   name: string;
+  photo: ClientPhotoRef;
   email: string;
   phone: string | null;
   accountStatus: ClientAccountStatus;
@@ -55,6 +57,7 @@ export type AdministratorClientPage = {
 export type AdministratorClientRecord = {
   id: string;
   name: string;
+  photo: ClientPhotoRef;
   email: string;
   phone: string | null;
   accountStatus: ClientAccountStatus;

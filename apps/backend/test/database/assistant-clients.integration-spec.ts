@@ -8,6 +8,7 @@ import {
   DatabaseTestContext,
   startDatabaseTestContext,
 } from './database-test-context';
+import { attachClientPhoto } from './client-photo-test-support';
 
 const today = new Date('2026-09-21T00:00:00.000Z');
 
@@ -70,6 +71,7 @@ describe('Assistant Client repository', () => {
         email: 'lucia@example.com',
         phone: lucia.phone,
         accountStatus: 'active',
+        photo: null,
       },
     ]);
     await expect(
@@ -118,6 +120,22 @@ describe('Assistant Client repository', () => {
     await expect(
       repository().searchClients({ query: 'example.com', limit: 2 }),
     ).resolves.toHaveLength(2);
+  });
+
+  it('names the Client photo in search and in the lookup the overview reads', async () => {
+    const photo = await attachClientPhoto(prisma, sofia.id);
+
+    await expect(
+      repository().searchClients({ query: 'GUZMAN', limit: 20 }),
+    ).resolves.toEqual([
+      expect.objectContaining({ id: sofia.id, photo: { imageAssetId: photo } }),
+    ]);
+    await expect(repository().findClient(sofia.id)).resolves.toMatchObject({
+      photo: { imageAssetId: photo },
+    });
+    await expect(repository().findClient(lucia.id)).resolves.toMatchObject({
+      photo: null,
+    });
   });
 
   it('reports pending and disabled Accounts and unknown Clients', async () => {

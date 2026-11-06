@@ -125,7 +125,7 @@ export function ClientBookingsScreen({
 }: {
   route: { params: ClientContext & { confirmed?: ConfirmedBooking } };
 }) {
-  const { clientId, clientName } = route.params;
+  const { clientId, clientName, clientPhoto } = route.params;
   const navigation = useNavigation<BookingsNavigation>();
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
@@ -189,7 +189,7 @@ export function ClientBookingsScreen({
   };
 
   const items = upcoming.data?.status === 200 ? upcoming.data.data : [];
-  const context = { clientId, clientName };
+  const context = { clientId, clientName, clientPhoto };
 
   return (
     <Screen style={styles.screen}>

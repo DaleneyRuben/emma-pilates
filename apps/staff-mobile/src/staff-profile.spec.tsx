@@ -17,6 +17,7 @@ const trainerProfile = {
     { id: "branch-1", name: "Centro" },
     { id: "branch-2", name: "Equipetrol" },
   ],
+  photo: null,
 };
 
 const administratorProfile = {
@@ -67,7 +68,9 @@ describe("Staff Perfil", () => {
 
     expect(screen.getByText("emma.vargas@example.com")).toBeOnTheScreen();
     expect(screen.getByText("+591 707 45210")).toBeOnTheScreen();
-    expect(screen.getByText("Tus datos los actualiza administración.")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Tu nombre y tu correo los actualiza administración."),
+    ).toBeOnTheScreen();
     expect(screen.getByText("Rol")).toBeOnTheScreen();
     expect(screen.getByText("Entrenadora")).toBeOnTheScreen();
     expect(screen.getByText("Sucursales")).toBeOnTheScreen();

@@ -1,3 +1,4 @@
+import type { StaffPhotoRef } from '../staff/photo/staff-photo-of';
 export type PlanSummary = {
   id: string;
   name: string;
@@ -93,6 +94,7 @@ export type SessionDetail = {
     durationMinutes: number;
   };
   trainerName: string;
+  trainerPhoto: StaffPhotoRef;
   startsAt: Date;
   endsAt: Date;
   capacity: number;

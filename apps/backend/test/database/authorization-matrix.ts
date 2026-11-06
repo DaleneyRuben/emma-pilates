@@ -5,6 +5,7 @@ import { payStatementAuthorizationRows } from './pay-statement-authorization';
 import { scheduleAuthorizationRows } from './schedule-authorization';
 import { studioFactsAuthorizationRows } from './studio-facts-authorization';
 import { supplyMovementAuthorizationRows } from './supply-movement-authorization';
+import { staffPhotoAuthorizationRows } from './staff-photo-authorization';
 import { transferQrAuthorizationRows } from './transfer-qr-authorization';
 import type { RealIds } from './authorization-matrix-support';
 
@@ -473,6 +474,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   }),
   ...campaignAuthorizationRows(),
   ...transferQrAuthorizationRows(),
+  ...staffPhotoAuthorizationRows(),
 };
 
 /** A concrete address for a templated path. */

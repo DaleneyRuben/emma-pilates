@@ -6,12 +6,18 @@
  */
 import type { BranchDto } from "./branchDto";
 import type { ClassTypeDto } from "./classTypeDto";
+import type { StaffPhotoDto } from "./staffPhotoDto";
 
 export interface SessionDetailDto {
   id: string;
   branch: BranchDto;
   classType: ClassTypeDto;
   trainerName: string;
+  /**
+   * The Trainer photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  trainerPhoto: StaffPhotoDto | null;
   startsAt: string;
   endsAt: string;
   /** @minimum 1 */

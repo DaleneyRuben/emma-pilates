@@ -35,6 +35,7 @@ export const record = (
   branchIds: ['centro', 'urubo'],
   status: 'active',
   activationExpiresAt: null,
+  photo: null,
   ...overrides,
 });
 

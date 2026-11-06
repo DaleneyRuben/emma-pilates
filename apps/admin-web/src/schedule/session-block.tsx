@@ -1,4 +1,5 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
+import { StaffPhoto } from "../components/staff-photo";
 import { boliviaParts } from "../lib/bolivia-time";
 import { cn } from "../lib/cn";
 import {
@@ -148,7 +149,17 @@ function StandingBlock({
       </span>
       <span className="w-full text-[11px] leading-tight whitespace-nowrap text-texto-secundario tabular lg:text-ayuda">
         {start} – {end}
-        <span className="text-texto-tenue"> · {session.trainerName}</span>
+        <span className="text-texto-tenue"> · </span>
+        {/* Follow-up 242: her 20 px photo leads her name, when she has one. */}
+        {session.trainerPhoto === null ? null : (
+          <StaffPhoto
+            name={session.trainerName}
+            photo={session.trainerPhoto}
+            size={20}
+            className="mr-1 align-middle"
+          />
+        )}
+        <span className="text-texto-tenue">{session.trainerName}</span>
       </span>
       <span
         className={cn(

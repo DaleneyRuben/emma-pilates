@@ -24,6 +24,7 @@ import {
   trainerBranchesSchema,
   type TrainerBranchesInput,
 } from "./staff-form-schema";
+import { StaffPhotoBlock } from "./staff-photo-block";
 
 function BranchChips({
   field,
@@ -95,9 +96,10 @@ export function StaffBranchForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <StaffPhotoBlock member={member} />
           <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
-            Solo administración invita y cambia roles. Puedes asignar las
-            sucursales de una entrenadora.
+            Puedes cambiar sus sedes y su foto. Invitar y cambiar roles lo hace
+            Administración.
           </p>
           <StaffContact member={member} />
           <FormField
