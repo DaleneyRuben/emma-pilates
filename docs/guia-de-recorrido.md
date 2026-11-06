@@ -587,64 +587,125 @@ asistió y pulsa **Guardar asistencia**.
 
 ## Paso 9. Lo que hace la recepcionista
 
-Cierra la sesión de Ana en la app del equipo y entra como Camila.
+Cierra la sesión de Ana en la app del equipo (**Perfil** › **Cerrar sesión**)
+y entra como Camila. Su barra de abajo es **Clientes** · **Horario** ·
+**Caja** · **Perfil**, y llega a **Clientes**: arriba «Asistente · Centro» y
+el título **Buscar cliente**, el campo «Nombre, teléfono o correo» y, debajo,
+el botón **Nuevo cliente**. En un iPad la búsqueda queda a la izquierda y la
+ficha se abre a la derecha, sin perder la lista.
 
-1. **Buscar cliente**. Escribe `Lucía`. El resultado se anuncia como **Ver
-   cliente Lucía Fernández** si ese es el nombre completo que registró.
-   Ábrelo. Ves el plan, la próxima reserva y el historial.
-2. **+ Nuevo cliente**. Crea a una clienta que llega al estudio sin la app:
-   nombre, correo, **Celular** (obligatorio, con su país), **¿Cómo nos
-   conociste?** y, si trae un código,
-   el código. **Guardar** le manda un enlace para que cree su contraseña.
-   Mientras no lo abre, su ficha dice **Cuenta pendiente de activación**, con
-   **Reenviar enlace** y **Cancelar invitación**.
-3. Si esa clienta ya se había registrado sola y no confirmó el correo, la
-   ficha no le manda un enlace de activación. Le ofrece **Enviar enlace de
-   verificación**, que es el mismo correo de 24 horas.
-4. Con una clienta sin plan vigente, **Registrar pago en efectivo** abre la
-   lista de planes. Elige **4 clases**, la fecha de inicio, el NIT o CI y el
-   nombre. **Confirmar pago en efectivo**. El plan queda activo en el acto,
-   sin pasar por la dueña. El efectivo entra en la caja de la sede.
-5. Si la clienta paga por QR en el mostrador, Camila sube la foto del
-   comprobante. Ese pago sí queda en **Pagos pendientes** hasta que Ana lo
-   confirma. En la app de desarrollo, fotografiar el comprobante necesita un
-   build que incluya el módulo de la cámara. Elegir una imagen de la galería
-   recorre el mismo camino.
-6. Mientras el plan sigue vigente y todavía tiene clases o una reserva
-   futura, **Registrar pago en efectivo** está apagado y la nota dice que
-   podrá comprar otro cuando este termine. Una renovación anticipada, el
-   plan siguiente que empieza el día después de que vence el actual, se
-   compra desde la app de la clienta, no como un segundo efectivo del mismo
-   periodo.
-7. En la ficha, **Reservas de la clienta** cancela una reserva o la
-   reprograma el mismo día, con la misma hoja de confirmación. **Historial
-   de clases** lista lo ya pasado, en filas, sin tarjetas.
+1. Escribe `Lucía` en el campo. Con una sola letra dice «Escribe al menos dos
+   letras o números para buscar.». Cada resultado muestra la foto (o las
+   iniciales), el nombre, el teléfono y el correo; una cuenta sin activar
+   lleva la marca **Pendiente**. Si nadie coincide, dice «No encontramos a
+   nadie», con **Nuevo cliente**. Toca la fila de Lucía (el lector de
+   pantalla la anuncia como «Ver cliente Lucía Fernández»).
+2. La ficha muestra su foto, su nombre y su contacto; la tarjeta rosa del
+   plan, con el nombre del plan, **Activo**, «N clases restantes de 8» y
+   «Vence el …»; los botones **Reservar clase** y **Registrar pago en
+   efectivo**; y el grupo **Reservas**, con **Próximas reservas** (al lado, el
+   día y la hora de la próxima, por ejemplo «Lun 9 · 09:00») e **Historial de
+   clases**. **Clientes**, arriba a la izquierda, vuelve a la búsqueda.
+3. Vuelve a la búsqueda y pulsa **Nuevo cliente**. Crea a una clienta que
+   llega al estudio sin la app: **Nombre**, **Correo electrónico**,
+   **Celular** (obligatorio, con su país, como en el paso 3) y **¿Cómo nos
+   conoció?**. Si eliges una amiga o una instructora aparece el campo del
+   código, opcional; un código que no existe dice «No encontramos ese
+   código. Revísalo o déjalo vacío.». **Crear cuenta** le manda un enlace
+   para que cree su contraseña y abre su ficha: la tarjeta **Cuenta
+   pendiente de activación** dice «El enlace vence el …» y tiene **Reenviar
+   enlace**. El botón **⋯** de la tarjeta abre **Cambiar correo** y
+   **Cancelar invitación**. En la búsqueda su fila lleva **Pendiente**.
+4. Si escribes el correo de una clienta que ya se registró sola y no
+   confirmó el correo, no se crea nada nuevo: la pantalla dice «Este correo
+   ya se registró desde la app y espera verificación.», con **Enviar enlace
+   de verificación** (el mismo correo de 24 horas) y **Ver cliente**.
+5. Con una clienta sin plan, la ficha dice **Sin plan activo** y
+   **Registrar pago en efectivo** abre **Elige un plan**, con la franja
+   «Registrando pago para …». Elige **4 clases**. La pantalla **Registrar
+   pago** pregunta **¿Cómo paga?**: **Efectivo** o **QR**. Con **Efectivo**
+   ves **A cobrar** (el precio, el **Descuento** si es fundadora y **Total en
+   efectivo**), la fecha de inicio, la **Sucursal donde recibes el
+   efectivo** y **¿Necesita factura?** («Por defecto, sin factura»; si la
+   abres, el NIT o CI y el nombre, y si ya compró antes trae los datos de su
+   última compra). **Confirmar pago en efectivo** muestra **¡Pago
+   registrado!**: el plan queda activo en el acto, sin pasar por la dueña, y
+   el efectivo entra en la caja de hoy de esa sede. **Volver a Clientes**.
+6. Si la clienta paga por QR en el mostrador, elige **QR**. La pantalla
+   muestra el QR del estudio con el monto exacto, para que ella transfiera.
+   **Fotografiar comprobante** abre la cámara (si no hay permiso de cámara,
+   la galería) y la foto queda como «Comprobante fotografiado · Todavía no se
+   envió». **Enviar comprobante** muestra **Comprobante enviado**, con el
+   estado **En revisión**: ese pago queda en **Pagos pendientes** hasta que
+   Ana lo confirma, y no entra en la caja. Mientras un pago está en
+   revisión, el otro camino queda apagado.
+7. Con un plan vigente que todavía tiene clases o una reserva futura,
+   **Registrar pago en efectivo** vende el plan siguiente: **Registrar pago**
+   no deja elegir la fecha y dice «El nuevo plan empieza el …, al terminar el
+   actual.», y al confirmar el plan queda programado. Si ya tiene un plan
+   siguiente, el botón no está y la ficha dice «Ya tiene un plan
+   siguiente.».
+8. **Reservar clase** abre **Reservar una clase**, con la franja
+   «Reservando para Lucía», la sede, los días (y **Otra** para una fecha más
+   adelante) y los tipos de clase. Una clase que ya tiene dice **Ya
+   reservada**. En el detalle, el botón es **Reservar para Lucía**; con la
+   clase llena, **Anotarla en la lista de espera**.
+9. **Próximas reservas** lista sus reservas con **Reprogramar** y
+   **Cancelar reserva** (o **Salir de la lista** si está en espera).
+   Cancelar abre la hoja «¿Cancelar esta reserva de Lucía?», con **Sí,
+   cancelar la reserva** y **No, volver**; al cancelar aparece «Reserva
+   cancelada · La clase volvió a su plan». **Reprogramar** solo ofrece otra
+   clase del mismo día. **Historial de clases** lista lo ya pasado, en filas,
+   sin tarjetas.
+
+En la pestaña **Horario**, Camila ve la semana de la sede, solo para leer:
+cada clase con su hora, la entrenadora (con su foto), las reservas y los
+cupos libres, o **Completa**. **Reservar para una clienta** la lleva a
+**Clientes**: se reserva desde la ficha.
 
 **Cerrar caja**, al final del turno:
 
-1. Pulsa **Cerrar caja** en la búsqueda. El sistema muestra el efectivo que
-   debería haber, según los pagos en efectivo confirmados hoy en esta sede.
-2. Cuenta el cajón y escribe el monto contado. Si no coincide, escribe la
-   nota. **Cerrar caja**.
-3. La pantalla queda en **Caja cerrada**. Cerrar otra vez el mismo día, en la
-   misma sede, no crea un segundo cierre.
-4. Ana ve el historial en la web, en **Dinero › Caja**, y puede cambiar de sede con
-   el selector. Un pago anulado o registrado después del cierre aparece como
-   un ajuste al lado del cierre. El cierre en sí no se edita.
+1. Abre la pestaña **Caja**. El título es **Cerrar caja**, con el día y la
+   sede arriba. La tarjeta **Efectivo esperado** suma los pagos en efectivo
+   confirmados hoy en esta sede («1 venta en efectivo hoy en Centro»). Con
+   más de una sede, elige la sede arriba.
+2. Cuenta el cajón y escribe el **Efectivo contado**. Debajo aparece la
+   diferencia: **Cuadra**, **Falta efectivo** o **Sobra efectivo**. Si no
+   coincide, escribe la **Nota (opcional)**. La pantalla avisa «Hay un solo
+   cierre por día y no se corrige después.». Pulsa **Cerrar caja**.
+3. La pantalla queda en **Caja cerrada**, con quién la cerró y a qué hora,
+   lo esperado, lo contado y la diferencia, y el botón **Ir a Clientes**.
+   Volver a **Caja** el mismo día, en la misma sede, muestra ese cierre: no
+   se crea un segundo.
+4. Ana ve el historial en la web, en **Dinero › Caja**, y puede cambiar de
+   sede con el selector. Un pago anulado o registrado después del cierre
+   aparece como un ajuste al lado del cierre. El cierre en sí no se edita.
 
 ## Paso 10. La dueña mueve la operación desde el teléfono
 
-Entra a la app del equipo como Ana.
+Entra a la app del equipo como Ana. Su barra es **Pagos** · **Clientes** ·
+**Horario** · **Perfil**.
 
-1. **Cancelar una clase**. Elige la sede, el día y la clase de prenatal que
-   creaste para una sola vez. Si no tiene reservas, la confirmación es corta.
-   Si Lucía está anotada, el texto dice cuántas reservas se cancelan, que la
-   clase se devuelve aunque ya no pudieran cancelar solas, y que se avisa a
-   la clienta y a la entrenadora. Confirma solo si quieres perder esa clase.
-2. **Pagos pendientes** ya lo usaste. Una fila vacía dice que no hay nada en
-   revisión.
-3. **Ver la app como…** está en el perfil de Ana. El paso 16 lo recorre
-   cuando las otras roles ya tienen algo que ver.
+1. **Pagos** abre **Pagos pendientes**. Con nada en revisión dice «Todo al
+   día», con **Ver el horario**. Debajo, en **Accesos**, están **Cancelar una
+   clase**, **Congelamientos** y **Cerrar caja** (la misma caja de Camila,
+   con **Volver** en lugar de **Ir a Clientes**).
+2. **Cancelar una clase** (desde **Accesos** o desde arriba de la pestaña
+   **Horario**). Elige la sede (o **Todas las sucursales**), el día (**Otra**
+   abre una fecha de los próximos 30 días) y el tipo, y toca la clase de
+   prenatal que creaste para una sola vez. Cada fila dice **Sin reservas** o
+   cuántas tiene. **Cancelar sesión** explica **Qué va a pasar**: sin
+   reservas, solo «Esto no se puede deshacer. La clase no tiene reservas.»;
+   con Lucía anotada, «Se cancela la reserva», «Cada clienta recupera su
+   clase, aun fuera del plazo de 2 h 30» y «Avisamos a cada clienta por
+   notificación». **Sí, cancelar sesión** muestra **Sesión cancelada**;
+   **Volver** la deja como estaba. Confirma solo si quieres perder esa clase.
+3. **Clientes** es la misma búsqueda y la misma ficha de Camila, con el
+   cobro en efectivo. **Horario** es la semana para leer, con **Cancelar una
+   clase** arriba.
+4. **Ver la app como…** está en el **Perfil** de Ana, en el grupo
+   **Ajustes**. El paso 16 lo recorre cuando los otros roles ya tienen algo
+   que ver.
 
 En la web, abre la ficha de Lucía desde **Clientas › Todas**. Tiene cuatro
 pestañas: **Resumen**, **Reservas**, **Pagos** y **Evaluaciones**. Además de
@@ -652,8 +713,9 @@ sus datos:
 
 - **Editar perfil** cambia nombre y teléfono. El correo de acceso lo cambia
   ella, desde su app.
-- **Devolver una clase** suma una clase con un motivo. Es una cortesía. Solo
-  la dueña la ve y la guarda. La recepcionista no tiene ese botón.
+- **Devolver una clase** suma una clase con un motivo; **Agregar clase de
+  cortesía** suma una de regalo. Ninguna es un pago. Solo la dueña las ve y
+  las guarda. La recepcionista no tiene esos botones.
 - **Acceso de prueba** otorga el plan oculto de 16 clases a Bs 0, hasta la
   fecha que elijas. Es para las testers de la tienda y las cuentas de
   revisión. No cuenta como ingreso, ni como fundadora, ni como comisión.
@@ -1083,8 +1145,10 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
   hay archivo, el worker no está encendido o no usa la misma base.
 - Un botón de guardar se queda pensando: la API del puerto 3100 no está
   respondiendo. Vuelve a la Terminal de `pnpm dev:backend`.
-- La recepcionista no puede cobrar en efectivo: el plan vigente todavía
-  tiene clases o una reserva futura.
+- La recepcionista no ve **Registrar pago en efectivo**: la clienta ya
+  tiene un plan siguiente comprado. Si el cobro se niega con «La clienta
+  tiene un pago en revisión.», hay una transferencia esperando a Ana en
+  **Pagos pendientes**.
 - La consulta sale pagada cuando esperabas gratis: el plan no es de 90 días,
   o la consulta gratis del trimestre ya se usó.
 - El congelamiento no se ofrece: el plan vigente no es de 90 días, ya se usó
