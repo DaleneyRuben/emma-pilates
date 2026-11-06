@@ -135,7 +135,7 @@ export function SubscriptionScreen() {
             <SectionTitle>Renovación anticipada</SectionTitle>
             <OutlinedButton label="Renovar mi plan" onPress={() => navigation.navigate("Plans")} />
             <BodyText style={styles.note}>
-              {`El nuevo empieza el ${formatCivilDate(renewalStartsOn)}, al día siguiente de que venza este`}
+              {`Eliges cuándo empieza el nuevo: desde el ${formatCivilDate(renewalStartsOn)}, al día siguiente de que venza este, hasta 4 semanas después.`}
             </BodyText>
           </View>
         )}
