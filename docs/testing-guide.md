@@ -3560,8 +3560,10 @@ and the teardown's «stopped the three servers and dropped database …» line
 are both in the step's log). The runner has no browser, so the shared setup
 action installs the pinned Chromium (`playwright install chromium`, kept in
 GitHub's cache under `~/.cache/ms-playwright` by Playwright version, about
-fifteen seconds to download when the cache is cold) and its system packages
-(`playwright install-deps chromium`, about fifteen seconds on every run).
+fifteen seconds to download when the cache is cold). It skips
+`playwright install-deps`: the `ubuntu-24.04` image already has Chromium's
+system libraries, and that apt step once took over ten minutes on a slow
+Ubuntu mirror.
 The backend starts with its development defaults: no secret is needed. A
 failed run uploads `apps/admin-web/test-results/` (the traces, the
 screenshots, and the API, worker, and preview stderr) as the `web-e2e-test-results`
