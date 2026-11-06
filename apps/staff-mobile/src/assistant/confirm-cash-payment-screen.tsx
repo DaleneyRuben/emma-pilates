@@ -44,6 +44,7 @@ import {
   FrontDeskReceiptCard,
   StudioQrCard,
   type FrontDeskReceipt,
+  type ReceiptSource,
 } from "./front-desk-receipt-card";
 import { InvoiceDisclosure } from "./invoice-disclosure";
 import { loadReceiptUpload } from "./load-receipt-upload";
@@ -122,14 +123,14 @@ export function ConfirmCashPaymentScreen({
     setFailure((code !== null ? paymentProblems[code] : undefined) ?? fallback);
   };
 
-  const photograph = async () => {
+  const chooseReceipt = async (source: ReceiptSource) => {
     if (photographing) return;
     setPhotographing(true);
     setFailure(null);
     try {
-      const { photographTransferReceipt } = await loadReceiptUpload();
-      const photographed = await photographTransferReceipt(fetcher);
-      if (photographed !== null) setReceipt(photographed);
+      const { chooseTransferReceipt } = await loadReceiptUpload();
+      const chosen = await chooseTransferReceipt(fetcher, source);
+      if (chosen !== null) setReceipt(chosen);
     } catch {
       setFailure("No pudimos subir la foto. Inténtalo de nuevo.");
     } finally {
@@ -287,7 +288,10 @@ export function ConfirmCashPaymentScreen({
           ) : (
             <>
               <StudioQrCard amount={amount} />
-              <FrontDeskReceiptCard onPhotograph={() => void photograph()} receipt={receipt} />
+              <FrontDeskReceiptCard
+                onChoose={(source) => void chooseReceipt(source)}
+                receipt={receipt}
+              />
             </>
           )}
           {renewalStartsOn !== undefined ? (
