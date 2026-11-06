@@ -373,7 +373,7 @@ primera pestaña de cada rol, arriba a la derecha, está la campana de
    **Enviar comentarios** y **Cerrar sesión**. Su círculo tiene sus iniciales y **Cambiar foto**: elige una
    foto de la galería y queda puesta («Subiendo foto…» mientras sube); con
    foto aparece también **Quitar foto**.
-3. Cierra sesión. Camila entra y llega a **Clientes**, con **+ Nuevo
+3. Cierra sesión. Camila entra y llega a **Clientes**, con **Nuevo
    cliente**: la búsqueda pide al menos dos letras o números. **Cerrar caja**
    vive en la pestaña **Caja**. Gabriela entra y llega a su **Agenda** de
    nutrición; vacía dice «No tienes evaluaciones», con **Ver mi
@@ -662,9 +662,10 @@ ficha se abre a la derecha, sin perder la lista.
    adelante) y los tipos de clase. Una clase que ya tiene dice **Ya
    reservada**. En el detalle, el botón es **Reservar para Lucía**; con la
    clase llena, **Anotarla en la lista de espera**.
-9. **Próximas reservas** lista sus reservas con **Reprogramar** y
-   **Cancelar reserva** (o **Salir de la lista** si está en espera).
-   Cancelar abre la hoja «¿Cancelar esta reserva de Lucía?», con **Sí,
+9. **Próximas reservas** lista sus reservas. Cada una tiene un solo botón:
+   **Cancelar reserva** fuera de las 2 h 30, **Reprogramar** dentro, o
+   **Salir de la lista** si está en espera. Cancelar abre la hoja
+   «¿Cancelar esta reserva de Lucía Fernández?», con **Sí,
    cancelar la reserva** y **No, volver**; al cancelar aparece «Reserva
    cancelada · La clase volvió a su plan». **Reprogramar** solo ofrece otra
    clase del mismo día. **Historial de clases** lista lo ya pasado, en filas,
@@ -725,13 +726,15 @@ sus datos:
 
 - **Editar perfil** cambia nombre y teléfono. El correo de acceso lo cambia
   ella, desde su app.
-- **Devolver una clase** suma una clase con un motivo; **Agregar clase de
-  cortesía** suma una de regalo. Ninguna es un pago. Solo la dueña las ve y
-  las guarda. La recepcionista no tiene esos botones.
-- **Acceso de prueba** otorga el plan oculto de 16 clases a Bs 0, hasta la
-  fecha que elijas. Es para las testers de la tienda y las cuentas de
-  revisión. No cuenta como ingreso, ni como fundadora, ni como comisión.
-  No se lo des a Lucía si quieres seguir el recorrido de una clienta real.
+- Mientras tiene un plan vigente, **Devolver una clase** y **Agregar clase
+  de cortesía** suman clases a ese plan: eliges cuántas en **Clases** y
+  confirmas. Ninguna es un pago. Solo la dueña las ve y las guarda. La
+  recepcionista no tiene esos botones.
+- **Acceso de prueba** aparece solo en la ficha de una clienta sin plan
+  vigente, así que Lucía no lo tiene. Otorga el plan oculto de 16 clases a
+  Bs 0, hasta la fecha que elijas. Es para las testers de la tienda y las
+  cuentas de revisión. No cuenta como ingreso, ni como fundadora, ni como
+  comisión.
 
 ## Paso 11. Fundadoras, congelamiento e invitación
 
@@ -763,8 +766,13 @@ tiene un plan de 30 días, así que este paso necesita un trimestral.
 1. En la app de Lucía, compra **Trimestral 24 clases** como renovación
    anticipada. Elige la fecha de inicio que el sistema ofrece: el día
    siguiente al fin del plan actual. Sube el comprobante y Ana lo confirma.
+   **Solicitar congelamiento** solo aparece cuando el trimestral ya está en
+   curso: mientras siga el plan de 30 días, **Mi plan** no lo ofrece. Haz
+   el resto de este paso cuando empiece el trimestral, o con una clienta de
+   prueba cuyo plan vigente ya sea uno de 90 días.
 2. En **Mi plan**, pulsa **Solicitar congelamiento**: fecha de inicio,
-   fecha de fin dentro de los 15 días, y un motivo. No puede empezar ayer.
+   fecha de fin dentro de los 15 días, y un motivo. Una fecha pasada
+   se niega al enviarla.
 3. Ana lo ve en la app del equipo, en **Pagos** › **Accesos** ›
    **Congelamientos**, y en la web en **Clientas › Congelamientos** y en
    **Inicio**. Lo aprueba (la coordinadora también puede, desde la web). El
@@ -800,8 +808,9 @@ Entra a la app del equipo como Gabriela.
    siguiente). Cada turno que la clienta ve dura 45 minutos, recortados de
    ese bloque: el bloque dura al menos 45 minutos, en tramos de 15.
    **Guardar**.
-3. El bloque aparece en **Horarios semanales** como `Lunes, 9:00 – 13:00`, o
-   la hora que hayas puesto, con cuántas evaluaciones tiene reservadas.
+3. El bloque aparece en **Horarios semanales** con el día abreviado,
+   `9:00 – 13:00` (o la hora que hayas puesto) y «N cupos · sin reservas» o
+   cuántas evaluaciones tiene reservadas.
    Tócalo: se abre **Editar horario**. **Eliminar horario** abre «¿Quitar
    este horario?», que dice desde qué fecha deja de existir, con **Quitar
    horario**. Si el bloque ya tiene una evaluación reservada, **Guardar**
@@ -813,8 +822,9 @@ En la app de Lucía:
 1. **Perfil**, **Evaluación nutricional**. Solo aparecen días con un turno
    todavía abierto. Un turno desaparece 3 horas antes de empezar. Elige uno
    y pulsa **Confirmar evaluación**.
-2. Con el plan de 30 días, la consulta se paga: Bs 70, por QR en la app o en
-   efectivo en el estudio. Con el trimestral ya confirmado, la primera
+2. Con el plan de 30 días, la consulta se paga: Bs 70, por QR en la app,
+   transfiriendo y subiendo el comprobante, que Ana confirma. No hay cobro
+   en efectivo de la consulta. Con el trimestral ya confirmado, la primera
    consulta del trimestre es gratis. La segunda, en el mismo trimestre, se
    paga.
 3. Reserva un turno. **Mis evaluaciones** lo muestra, con **Reprogramar** y
@@ -848,8 +858,8 @@ Con Lucía todavía en la app, recorre lo que no es comprar ni reservar.
    sigue abierta.
 4. **Notificaciones** separa **Sin leer** y **Anteriores**. Al tocar una, se
    marca leída; **Marcar leídas** las marca todas. En **Perfil**, la fila
-   dice «N sin leer». Si el conteo es mayor que cero, la pestaña **Perfil**
-   muestra el número. Con cero, no hay pastilla.
+   dice «N sin leer», y la campana de **Inicio** muestra el número. La
+   pestaña **Perfil** no lleva número.
 5. **Enviar comentarios** manda un texto a la dueña. Puedes mandar hasta 10
    en 24 horas. El undécimo se niega.
 6. Vuelve a **Inicio** y arrastra hacia abajo. La lista se refresca y el
@@ -892,11 +902,12 @@ de Valeria dice Lucía. El premio, la clase extra, ya se sumó sola en el paso 1
 
 ### Campaña
 
-**Promociones › Clases de campaña**. Escribe un motivo, por ejemplo `Inicio de año`, y **Clases extra**
-`1`. Elige a las clientas con plan vigente. Guardar suma la clase a cada una,
-con ese motivo, sin cambiar ningún precio. Una fundadora no acumula la
-campaña con su descuento: el descuento ya está en el precio, y la clase extra
-es otra cosa. El sistema no deja usar la campaña como un descuento.
+**Promociones › Clases de campaña**. Escribe el **Nombre de la campaña**, por
+ejemplo `Inicio de año`, y **Clases extra** `1`. Elige a las clientas con
+plan vigente. Guardar suma la clase a cada una, con ese nombre, sin cambiar
+ningún precio. Las fundadoras no entran en la campaña: su beneficio es el
+descuento, así que Lucía no aparece en la lista. El sistema no deja usar la
+campaña como un descuento.
 
 ### Comentarios
 
@@ -1036,8 +1047,8 @@ Entra a la web con ella. Es el contacto con clientas y equipo, sin dinero:
   **Clases de campaña**), **Comentarios**, **Estudio** (personal solo para
   asignar sedes, insumos y equipos), **Informes › El mes** sin montos y
   **Ajustes › Reglas del estudio** solo para leer.
-- En la ficha de Lucía no tiene la pestaña **Pagos**, ni **Clase de
-  cortesía**, ni **Devolver una clase**: esas se las pide a la dueña.
+- En la ficha de Lucía no tiene la pestaña **Pagos**, ni **Agregar
+  clase de cortesía**, ni **Devolver una clase**: esas se las pide a la dueña.
 - Una dirección de **Dinero**, escrita a mano, la devuelve con el aviso de
   que no tiene permiso.
 
@@ -1120,7 +1131,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Destino › pestaña | Qué haces ahí | Paso |
 | --- | --- | --- |
 | Inicio | Por resolver, el día, el dinero y las recomendaciones | 1, 7, 11, 15 |
-| Horario › Clases | Publicar, mover y cancelar clases; quién reservó; reservar a una clienta | 5, 10 |
+| Horario › Clases | Publicar, mover y cancelar clases; quién reservó; reservar a una clienta | 5 |
 | Horario › Nutrición | Lectura de las consultas | 12 |
 | Clientas › Todas | Ficha con pestañas, filtro Fundadora, «Invitada por», cortesía, acceso de prueba | 10, 11 |
 | Clientas › Para contactar | Seguimiento de los primeros 90 días | 16 |
@@ -1188,5 +1199,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
   **Pagos pendientes**.
 - La consulta sale pagada cuando esperabas gratis: el plan no es de 90 días,
   o la consulta gratis del trimestre ya se usó.
-- El congelamiento no se ofrece: el plan vigente no es de 90 días, ya se usó
-  el único congelamiento, o la fecha empieza en el pasado.
+- El congelamiento no se ofrece: el plan vigente no es de 90 días (un
+  trimestral comprado como renovación cuenta recién cuando empieza), o ya
+  tiene un congelamiento pedido o usado. Una fecha de inicio pasada no lo
+  esconde: se niega al enviar.
