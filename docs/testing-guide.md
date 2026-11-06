@@ -3167,14 +3167,15 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    panel says "Otra persona ya decidió este pago." with the new state (and the
    reason of a rejection) and offers no buttons.
 
-8. **Factura** (PAY-007, follow-up 147). Choose **Estado: Todos**. The
-   **Factura** column shows the NIT or CI with the name under it, or "Sin
-   factura" (Valeria's fixture cash sale). On a **Confirmado** row,
-   **Marcar emitida** turns into the **Emitida** pill with "por Paola Mendoza ·
-   dd/mm/aaaa" and **Deshacer**, which brings the button back; pending and
-   rejected rows show only the data. The **Factura** filter's **Sin factura
-   emitida** (`?invoice=unissued`) lists only the confirmed sales with invoice
-   data not marked yet, or "No hay facturas pendientes." when there are none.
+8. **Factura** (PAY-007, follow-up 147; since FIX-044, Test 136). Choose
+   **Estado: Todos**. The **Factura** column shows the NIT or CI with the name
+   under it, or "Sin factura" (Valeria's fixture cash sale). A **Confirmado**
+   row with invoice data shows **Por emitir** and **Subir factura**, which
+   opens the payment's panel; an uploaded one shows **Emitida** "por <name> ·
+   dd/mm/aaaa". «Marcar emitida» and «Deshacer» are gone. The **Factura**
+   filter's **Factura por subir** (`?invoice=unissued`) lists only the
+   confirmed sales with invoice data not issued yet, or "No hay facturas
+   pendientes." when there are none.
 9. **Exportar CSV** downloads `pagos-aaaa-mm-dd.csv` with every row the
    filters match, every page, not only the one on screen: «Fecha», «Cliente»,
    «Plan», «Método», «Monto (Bs)», «Estado», «NIT o CI», «Nombre o razón
@@ -3505,9 +3506,11 @@ take about a minute:
 17. **The Coordinator (IDN-009, Test 77).** She signs in and reaches Horario,
     Clientes, and Personal, and the page holds no «Bs». A money address
     returns her to Horario, and the API refuses that data.
-18. **Unbilled sales (PAY-007, Test 27).** A cash sale with invoice data
-    waits under «Sin factura emitida». The CSV holds what the filter shows,
-    and «Marcar emitida» records who marked it.
+18. **Unbilled sales (PAY-007, Test 27; FIX-044, Test 136).** A cash sale
+    with invoice data waits under «Factura por subir». The CSV holds what the
+    filter shows, and uploading a PDF from its panel (the worker checks it)
+    shows **Descargar factura**, downloads it under its own name, and turns
+    the row **Emitida** with who uploaded it.
 19. **The month report (STU-007, Test 103).** Indicadores at 1440 and at 420
     shows «Informe del mes», and a question on that report gets an answer.
 20. **The simulator (STU-005, Test 101).** Simulador shows the three horizons
@@ -8859,3 +8862,63 @@ Specs: `phone-number.spec.ts` (mobile-core and admin web),
 `new-client-phone.spec.tsx`, `contact-phone.spec.ts`,
 `profile-screen.spec.tsx`, `email-change.spec.tsx`, `staff-create.spec.tsx`,
 `contact-alerts-page.spec.tsx`.
+
+## Test 136: the issued invoice, uploaded and handed to the Client (FIX-044)
+
+Design follow-up 248 (DES-011). The Administrator, the Coordinator and the
+Assistant upload the issued invoice on a confirmed payment that has invoice
+data; that marks it «Factura emitida» and the Client gets it in «Mis
+facturas». Two migrations (`20261105200000_payment_invoices`,
+`20261105200100_pdf_invoice_dimensions`). Use a copy of `pilates_golden`
+with the API **and the worker** running (uploads stay «processing» without
+it). Sell Mariana a plan with NIT `123456` and the name «Mariana Quiroga»
+(Paso 7 of the walkthrough).
+
+A. **Revisar pago (S12).** Before confirming, the Staff app shows the row
+   **Factura** «NIT 123456 · Mariana Quiroga» and «Podrás subir la factura
+   cuando confirmes el pago.». A sale without invoice data shows **Sin
+   factura** «No la pidió». The admin web's review panel shows the same data.
+B. **Web upload (W1/W2).** In **Dinero › Pagos** at 1440 and 420 px the
+   confirmed row shows **Por emitir** and **Subir factura**. The panel
+   **Factura** lists the payment, the NIT or CI, the name and the state, and a
+   dashed box «Arrastra aquí la factura o elige un archivo» · «PDF, JPG o PNG,
+   hasta 10 MB». Drop a PDF: a progress bar, then the file card «PDF · n KB ·
+   subida por Paola Mendoza · fecha», **Descargar** (saves it under its own
+   name), **Reemplazar** and **Quitar factura**. A `.docx` or a file over
+   10 MB says «Este archivo no sirve. Sube un PDF, JPG o PNG de hasta 10 MB.»
+   and sends nothing. With the API stopped mid-upload: «No pudimos subir la
+   factura. Revisa tu conexión e inténtalo de nuevo.» and **Reintentar**.
+C. **Replace and remove.** **Reemplazar** uploads another file; the row keeps
+   «Emitida» with the new uploader. **Quitar factura** asks «¿Quitar la
+   factura?» and returns the payment to **Por emitir**. In the database both
+   earlier rows of `booking.payment_invoices` stay, with `removed_at`, who,
+   and `replaced` or `removed`; `system.audit_records` holds
+   `payment.invoice_uploaded` and `payment.invoice_removed`.
+D. **Staff app (E2–E5).** As Paola: **Pagos › Accesos › Facturas por subir**
+   with the count. As Camila (Assistant) and Carolina (Coordinator):
+   **Clientes › Facturas por subir**. The list has **Por subir · n** and
+   **Subidas**. Open Mariana: the hero, «Datos de la factura», the dashed
+   «Sube la factura emitida». **Subir factura** offers **Tomar foto** and
+   **Elegir de la galería**; after the upload the toast «Factura subida» and
+   the file card with **Ver factura**. **Quitar factura** asks in a sheet. A
+   PDF uploaded from the web shows «El PDF se abre desde la web de
+   administración.» (the app has no document picker yet, FIX-045).
+E. **Mis facturas (K1–K3).** As Mariana, the notification «Tu factura está
+   lista · La factura de tu Paquete de 8 clases ya está en Mis facturas.»
+   opens **Mis facturas** (also **Perfil › Mis facturas**). Rows read
+   «Paquete de 8 clases · 5 nov 2026 · Bs 502» with **Lista**, **En
+   preparación** (asked, not uploaded) or **Pago anulado** (voided after the
+   upload; the invoice stays). An empty list says «Aún no tienes facturas».
+   Open a ready one: the preview (the photo, or a page with the PDF's name),
+   compra, NIT o CI, a nombre de, emitida, and **Descargar**: on the iPhone and
+   iPad the share sheet (**Guardar en Archivos**); on Android the folder
+   picker, then «Factura guardada». An «En preparación» one says «El estudio
+   está preparando tu factura» and has no **Descargar**.
+F. **Refusals (API).** `PUT /api/v1/staff/payments/{id}/invoice` answers 409
+   `payment_without_invoice_data` on a «Sin factura» sale, `payment_voided` on
+   a voided one, `payment_not_confirmed` on a pending one, and
+   `invoice_file_not_attachable` for an upload that is not a ready `invoice`
+   of the caller; a Trainer or Nutritionist gets 403. `POST …/invoice-issued`
+   is gone (404). The Client's
+   `GET /api/v1/clients/current/invoices/{id}/file` of someone else's payment
+   is 404 `invoice_not_found`.

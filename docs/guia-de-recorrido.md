@@ -50,8 +50,9 @@ falta crearla para entender el resto.
 
 - No hay tarjeta de catering en **Mi plan**. El convenio todavía no está
   definido.
-- La factura se emite fuera del sistema. Aquí solo se anota el NIT o CI y se
-  marca **Factura emitida**.
+- La factura se emite fuera del sistema (sin SIAT). Aquí se anota el NIT o
+  CI y, una vez emitida, se sube el PDF o la foto: así queda **Factura
+  emitida** y la clienta la descarga en **Mis facturas**.
 - Un enlace de correo abre la app en un teléfono Android con la app
   instalada. En el simulador de iPhone el enlace no abre la app: copia el
   enlace del correo, o del archivo del buzón local, y ábrelo en el navegador
@@ -422,7 +423,8 @@ Quédate en la app de clientas, como Lucía.
 2. Abre **8 clases**. La vigencia dice 30 días. Elige la fecha de inicio:
    hoy, o cualquier día de los próximos 14. Más lejos no se puede.
 3. Completa los datos de factura: **NIT o CI** y el nombre o la razón social.
-   La factura se emite fuera del sistema. Esto solo la deja anotada.
+   La factura se emite fuera del sistema; el estudio la sube después y Lucía
+   la recibe en **Perfil › Mis facturas**.
 4. La pantalla de pago muestra el monto y el QR del estudio. No muestra
    número de cuenta ni banco. Transfiere el monto de mentira, o usa cualquier
    imagen como comprobante, y súbela. El estado pasa a **Pago en revisión**.
@@ -432,8 +434,10 @@ Quédate en la app de clientas, como Lucía.
 En la app del equipo, Ana (o la dueña desde la web) recibe la novedad.
 
 1. Entra a la app del equipo como Ana. **Pagos pendientes** muestra el pago
-   de Lucía. Ábrelo. La foto del comprobante se puede ampliar. **Confirmar
-   pago** permanece apagado hasta que la foto cargó. Confírmalo.
+   de Lucía. Ábrelo. La fila **Factura** dice «NIT … · nombre» (o **Sin
+   factura** si no la pidió), con «Podrás subir la factura cuando confirmes
+   el pago.». La foto del comprobante se puede ampliar. **Confirmar pago**
+   permanece apagado hasta que la foto cargó. Confírmalo.
 2. Lo mismo se puede hacer en la web, en **Dinero › Pagos**, o desde la fila
    del pago en **Inicio**: abre la fila, mira el
    comprobante y confirma. Si el comprobante no sirve, rechaza y escribe el
@@ -450,9 +454,27 @@ Cuando el pago queda confirmado:
 - Daniela queda como quien trajo a Lucía, por el código. Esa comisión aparece
   en el paso 15.
 
-Vuelve a **Dinero › Pagos** en la web. La fila de Lucía muestra el NIT y el nombre.
-Pulsa **Marcar emitida** cuando la factura ya salió del sistema de
-facturación. El filtro **Sin factura emitida** esconde las que ya marcaste.
+Emite la factura en el sistema de facturación de siempre y súbela:
+
+- **En la web**, en **Dinero › Pagos**: la fila de Lucía muestra el NIT, el
+  nombre y **Por emitir**. Pulsa **Subir factura** (o la fila) y elige el PDF
+  o la foto (PDF, JPG o PNG, hasta 10 MB). Queda **Emitida**, con quién y
+  cuándo, y aparece **Descargar**, **Reemplazar** y **Quitar factura** (pide
+  confirmación; nada se borra). El filtro **Factura por subir** muestra las
+  que faltan.
+- **En la app del equipo**: la dueña entra desde **Pagos › Facturas por
+  subir**; Ana (recepción) y Carolina (coordinación) desde **Clientes ›
+  Facturas por subir**. Abre el pago, **Subir factura**, **Tomar foto** o
+  **Elegir de la galería**. Desde el teléfono se sube una foto; el PDF se
+  sube desde la web.
+- Lucía recibe el aviso **Tu factura está lista** y la ve en **Perfil › Mis
+  facturas**: **Lista**, o **En preparación** mientras no se sube. Al abrirla,
+  **Descargar** abre el menú para guardar o compartir en iPhone y la guarda en
+  la carpeta que elija en Android.
+
+**Marcar emitida** ya no existe: una factura cuenta como emitida solo cuando
+se sube el archivo. Una marca antigua sin archivo se ve como **Emitida · sin
+archivo** y deja subirlo.
 **Anular venta** deshace una venta confirmada por error. No devuelve dinero.
 Solo la dueña puede anular. La recepcionista no.
 
@@ -928,7 +950,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Promociones › Referidos | Quién invitó a quién | 14 |
 | Promociones › Contactos | Quién acepta recibir promociones | 14 |
 | Comentarios | Lo que llega de las apps | 14 |
-| Dinero › Pagos | Confirmar, rechazar, anular, marcar factura | 7 |
+| Dinero › Pagos | Confirmar, rechazar, anular, subir la factura | 7 |
 | Dinero › Caja | Historial del cierre diario por sede | 9 |
 | Dinero › Sueldos | Calcular y aprobar por período; sueldos pagados y su comprobante | 15 |
 | Dinero › Gastos | Gastos de la sede y sus categorías | 15 |
