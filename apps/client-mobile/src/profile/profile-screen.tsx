@@ -47,7 +47,8 @@ type ProfileNavigation = {
       | "CloseAccount"
       | "Referrals"
       | "EvaluationAvailability"
-      | "MyEvaluations",
+      | "MyEvaluations"
+      | "MyInvoices",
   ) => void;
 };
 
@@ -127,6 +128,12 @@ export function ProfileScreen() {
               icon="document"
               label="Mis evaluaciones"
               onPress={() => navigation.navigate("MyEvaluations")}
+            />
+            <IconRow
+              chevron
+              icon="receipt"
+              label="Mis facturas"
+              onPress={() => navigation.navigate("MyInvoices")}
             />
             <IconRow
               chevron
