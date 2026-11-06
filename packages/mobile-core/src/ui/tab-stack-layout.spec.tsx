@@ -42,7 +42,10 @@ describe("tabStackScreenLayout", () => {
 // Design follow-up 254 § 3: the bar stays on browsing screens and hides only
 // inside a task, so only a task keeps the bottom safe area itself.
 describe("createTabStackScreenLayout", () => {
-  const layout = createTabStackScreenLayout(new Set(["EditProfile"]));
+  const layout = createTabStackScreenLayout(
+    new Set(["EditProfile", "CashClose"]),
+    new Set(["Home", "CashClose"]),
+  );
 
   it("drops the bottom safe area on a pushed browsing screen, which keeps the bar", async () => {
     const screen = await render(
@@ -66,6 +69,39 @@ describe("createTabStackScreenLayout", () => {
     );
 
     expect(edgesOf(screen.getByTestId("app-screen"))).toEqual(["top", "right", "bottom", "left"]);
+  });
+});
+
+describe("createTabStackScreenLayout at the bottom of a stack", () => {
+  const layout = createTabStackScreenLayout(
+    new Set(["PaymentStatus", "CashClose"]),
+    new Set(["Profile", "CashClose"]),
+  );
+
+  // A notification opened on a cold start puts a task at the bottom of its
+  // stack; the bar is hidden there, so the task keeps the safe area.
+  it("keeps the bottom safe area for a task that a link opened first", async () => {
+    const screen = await render(
+      layout({
+        children: <Screen testID="app-screen" />,
+        navigation: navigationWithRoot("status"),
+        route: { key: "status", name: "PaymentStatus" },
+      }),
+    );
+
+    expect(edgesOf(screen.getByTestId("app-screen"))).toEqual(["top", "right", "bottom", "left"]);
+  });
+
+  it("drops it on a tab root that another tab opens as a task", async () => {
+    const screen = await render(
+      layout({
+        children: <Screen testID="app-screen" />,
+        navigation: navigationWithRoot("cash"),
+        route: { key: "cash", name: "CashClose" },
+      }),
+    );
+
+    expect(edgesOf(screen.getByTestId("app-screen"))).toEqual(["top", "right", "left"]);
   });
 });
 
