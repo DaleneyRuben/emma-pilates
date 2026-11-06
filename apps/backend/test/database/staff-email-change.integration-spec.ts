@@ -161,7 +161,9 @@ describe('studio email change for a Staff Member (PostgreSQL)', () => {
       paola,
       dependencies(),
     );
-    const firstToken = first[0].authenticationTokenId;
+    const firstToken = first.find(
+      ({ purpose }) => purpose === 'email_change',
+    )!.authenticationTokenId;
     await expect(
       prisma.authenticationToken.findUniqueOrThrow({
         where: { id: firstToken },
@@ -184,7 +186,19 @@ describe('studio email change for a Staff Member (PostgreSQL)', () => {
       paola,
       dependencies(),
     );
-    const last = (await jobsFor(asked.accountId)).at(-1)!;
+    // pg-boss lists jobs in no set order: take the link whose token is live.
+    const links = (await jobsFor(asked.accountId)).filter(
+      ({ purpose }) => purpose === 'email_change',
+    );
+    const live = await prisma.authenticationToken.findFirstOrThrow({
+      where: {
+        id: { in: links.map((job) => job.authenticationTokenId) },
+        invalidatedAt: null,
+        usedAt: null,
+      },
+      select: { id: true },
+    });
+    const last = links.find((job) => job.authenticationTokenId === live.id)!;
     const secret = await cipher.decrypt(
       last.encryptedLinkSecret,
       last.encryptionKeyId,
