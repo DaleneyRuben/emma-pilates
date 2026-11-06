@@ -9245,14 +9245,16 @@ C. **Founder place kept.** With a founder (`booking.founder_memberships`
    (`discount_reason = founder`) and the membership stays ACTIVE, also after
    running the founder job on a day more than 7 days after the end (the
    integration spec `advance-plan-start` covers the cash sale, the front-desk
-   transfer confirmed later, and the nightly job).
+   transfer confirmed later, a receipt sent the day after the intent, an
+   advance transfer confirmed after the current Plan spent its classes, the
+   nightly job, and a Freeze refused while a next-Plan transfer is pending).
 D. **«Comprobante enviado» (n.º 37).** Same client, **QR**, pick a day, send a
    receipt: «Administración lo revisa y programa el plan siguiente de Rocío,
    que empieza el …. No entra en la caja de hoy.» with an **Empieza** row. A
    first Plan still says «… y activa el plan de …».
 E. **Client renewal.** As a Client with classes left, **Mi plan** says
-   «Eliges cuándo empieza el nuevo: desde el …, al día siguiente de que venza
-   este, hasta 4 semanas después.»; **Renovar mi plan** › a Plan shows the
+   «Eliges cuándo empieza el nuevo: entre el …, al día siguiente de que venza
+   este, y el ….» (28 days after the end); **Renovar mi plan** › a Plan shows the
    same 28-day strip with «Tu plan actual vence el …»; **Pagar** creates the
    purchase intent with the chosen `startsOn`.
 F. **Receipt from the gallery (n.º 38).** **Registrar pago › QR**: the
