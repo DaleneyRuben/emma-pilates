@@ -194,6 +194,7 @@ export function ProfileScreen() {
             accessibilityRole="button"
             hitSlop={spacing.md}
             onPress={() => navigation.navigate("CloseAccount")}
+            testID="profile-close-account"
           >
             <Text style={[styles.footer, styles.closeAccount]}>Cerrar mi cuenta</Text>
           </Pressable>
