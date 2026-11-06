@@ -9334,6 +9334,408 @@ export const useDeactivateStaffMember = <TError = unknown, TContext = unknown>(
   );
 };
 
+export type requestStaffMemberEmailChangeResponse200 = {
+  data: StaffMemberDto;
+  status: 200;
+};
+
+export type requestStaffMemberEmailChangeResponse429 = {
+  data: void;
+  status: 429;
+};
+
+export type requestStaffMemberEmailChangeResponseSuccess =
+  requestStaffMemberEmailChangeResponse200 & {
+    headers: Headers;
+  };
+export type requestStaffMemberEmailChangeResponseError =
+  requestStaffMemberEmailChangeResponse429 & {
+    headers: Headers;
+  };
+
+export type requestStaffMemberEmailChangeResponse =
+  | requestStaffMemberEmailChangeResponseSuccess
+  | requestStaffMemberEmailChangeResponseError;
+
+export const getRequestStaffMemberEmailChangeUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/email-change`;
+};
+
+export const requestStaffMemberEmailChange = async (
+  staffMemberId: string,
+  correctStaffEmailDto: CorrectStaffEmailDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<requestStaffMemberEmailChangeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getRequestStaffMemberEmailChangeUrl(staffMemberId),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(correctStaffEmailDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: requestStaffMemberEmailChangeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as requestStaffMemberEmailChangeResponse;
+};
+
+export const getRequestStaffMemberEmailChangeMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestStaffMemberEmailChange>>,
+    TError,
+    RequestStaffMemberEmailChangeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestStaffMemberEmailChange>>,
+  TError,
+  RequestStaffMemberEmailChangeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["requestStaffMemberEmailChange"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestStaffMemberEmailChange>>,
+    RequestStaffMemberEmailChangeMutationVariables
+  > = (props) => {
+    const { staffMemberId, data } = props ?? {};
+
+    return requestStaffMemberEmailChange(
+      staffMemberId,
+      data,
+      fetchOptions,
+      fetcherFn,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestStaffMemberEmailChangeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestStaffMemberEmailChange>>
+>;
+export type RequestStaffMemberEmailChangeMutationBody = CorrectStaffEmailDto;
+export type RequestStaffMemberEmailChangeMutationError = void;
+export type RequestStaffMemberEmailChangeMutationVariables = {
+  staffMemberId: string;
+  data: CorrectStaffEmailDto;
+};
+
+export const useRequestStaffMemberEmailChange = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof requestStaffMemberEmailChange>>,
+      TError,
+      RequestStaffMemberEmailChangeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof requestStaffMemberEmailChange>>,
+  TError,
+  RequestStaffMemberEmailChangeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRequestStaffMemberEmailChangeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type cancelStaffMemberEmailChangeResponse200 = {
+  data: StaffMemberDto;
+  status: 200;
+};
+
+export type cancelStaffMemberEmailChangeResponseSuccess =
+  cancelStaffMemberEmailChangeResponse200 & {
+    headers: Headers;
+  };
+export type cancelStaffMemberEmailChangeResponse =
+  cancelStaffMemberEmailChangeResponseSuccess;
+
+export const getCancelStaffMemberEmailChangeUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/email-change`;
+};
+
+export const cancelStaffMemberEmailChange = async (
+  staffMemberId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<cancelStaffMemberEmailChangeResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getCancelStaffMemberEmailChangeUrl(staffMemberId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelStaffMemberEmailChangeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as cancelStaffMemberEmailChangeResponse;
+};
+
+export const getCancelStaffMemberEmailChangeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cancelStaffMemberEmailChange>>,
+    TError,
+    CancelStaffMemberEmailChangeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cancelStaffMemberEmailChange>>,
+  TError,
+  CancelStaffMemberEmailChangeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["cancelStaffMemberEmailChange"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cancelStaffMemberEmailChange>>,
+    CancelStaffMemberEmailChangeMutationVariables
+  > = (props) => {
+    const { staffMemberId } = props ?? {};
+
+    return cancelStaffMemberEmailChange(staffMemberId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CancelStaffMemberEmailChangeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cancelStaffMemberEmailChange>>
+>;
+
+export type CancelStaffMemberEmailChangeMutationError = unknown;
+export type CancelStaffMemberEmailChangeMutationVariables = {
+  staffMemberId: string;
+};
+
+export const useCancelStaffMemberEmailChange = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof cancelStaffMemberEmailChange>>,
+      TError,
+      CancelStaffMemberEmailChangeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof cancelStaffMemberEmailChange>>,
+  TError,
+  CancelStaffMemberEmailChangeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCancelStaffMemberEmailChangeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type resendStaffMemberEmailChangeResponse200 = {
+  data: StaffMemberDto;
+  status: 200;
+};
+
+export type resendStaffMemberEmailChangeResponse429 = {
+  data: void;
+  status: 429;
+};
+
+export type resendStaffMemberEmailChangeResponseSuccess =
+  resendStaffMemberEmailChangeResponse200 & {
+    headers: Headers;
+  };
+export type resendStaffMemberEmailChangeResponseError =
+  resendStaffMemberEmailChangeResponse429 & {
+    headers: Headers;
+  };
+
+export type resendStaffMemberEmailChangeResponse =
+  | resendStaffMemberEmailChangeResponseSuccess
+  | resendStaffMemberEmailChangeResponseError;
+
+export const getResendStaffMemberEmailChangeUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/email-change/resends`;
+};
+
+export const resendStaffMemberEmailChange = async (
+  staffMemberId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<resendStaffMemberEmailChangeResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getResendStaffMemberEmailChangeUrl(staffMemberId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resendStaffMemberEmailChangeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as resendStaffMemberEmailChangeResponse;
+};
+
+export const getResendStaffMemberEmailChangeMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resendStaffMemberEmailChange>>,
+    TError,
+    ResendStaffMemberEmailChangeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resendStaffMemberEmailChange>>,
+  TError,
+  ResendStaffMemberEmailChangeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["resendStaffMemberEmailChange"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resendStaffMemberEmailChange>>,
+    ResendStaffMemberEmailChangeMutationVariables
+  > = (props) => {
+    const { staffMemberId } = props ?? {};
+
+    return resendStaffMemberEmailChange(staffMemberId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResendStaffMemberEmailChangeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof resendStaffMemberEmailChange>>
+>;
+
+export type ResendStaffMemberEmailChangeMutationError = void;
+export type ResendStaffMemberEmailChangeMutationVariables = {
+  staffMemberId: string;
+};
+
+export const useResendStaffMemberEmailChange = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resendStaffMemberEmailChange>>,
+      TError,
+      ResendStaffMemberEmailChangeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof resendStaffMemberEmailChange>>,
+  TError,
+  ResendStaffMemberEmailChangeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getResendStaffMemberEmailChangeMutationOptions(options),
+    queryClient,
+  );
+};
+
 export type createBranchResponse201 = {
   data: AdminBranchDto;
   status: 201;
