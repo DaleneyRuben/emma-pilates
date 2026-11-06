@@ -61,8 +61,8 @@ export function BrandedLoading({
         className={cn("carga-logo", delayed && "carga-logo-demora")}
         src="/emma-logo.png"
         alt=""
-        width={800}
-        height={333}
+        width={1312}
+        height={565}
       />
     </div>
   );

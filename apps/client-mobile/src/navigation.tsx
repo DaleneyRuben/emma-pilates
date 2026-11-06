@@ -24,6 +24,8 @@ import { ClientTabIcon, type ClientTabIconName } from "./client-tab-icon";
 import { BookEvaluationScreen } from "./evaluations/book-evaluation-screen";
 import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availability-screen";
 import { MyEvaluationsScreen } from "./evaluations/my-evaluations-screen";
+import { InvoiceDetailScreen } from "./invoices/invoice-detail-screen";
+import { MyInvoicesScreen } from "./invoices/my-invoices-screen";
 import { HomeScreen } from "./home/home-screen";
 import { ClientPushNotifications } from "./notifications/client-push-notifications";
 import { PaymentScreen } from "./payments/payment-screen";
@@ -58,6 +60,9 @@ const shortcutScreens = {
   BookEvaluation: BookEvaluationScreen,
   MyEvaluations: MyEvaluationsScreen,
   Referrals: ReferralsScreen,
+  // FIX-044: «Mis facturas» opens from Perfil and from its notification.
+  MyInvoices: MyInvoicesScreen,
+  InvoiceDetail: InvoiceDetailScreen,
 };
 
 const HomeStack = createNativeStackNavigator({

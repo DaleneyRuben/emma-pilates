@@ -18,8 +18,8 @@ const halfBreathMilliseconds = 1400;
 const rest = { opacity: 0.55, scale: 0.96 };
 const top = { opacity: 1, scale: 1 };
 
-// The logo is 800 × 333; tablets start at the Staff app's 768 pt split width.
-const logoAspect = 333 / 800;
+// The logo is 1312 × 565 (the owner's 2026-11-06 file, background removed); tablets start at the Staff app's 768 pt split width.
+const logoAspect = 565 / 1312;
 const tabletMinimumWidth = 768;
 
 /**

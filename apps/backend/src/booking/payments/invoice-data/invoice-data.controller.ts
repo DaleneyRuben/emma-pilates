@@ -1,16 +1,12 @@
 import {
   Controller,
-  Delete,
   ForbiddenException,
   Get,
   Header,
   Headers,
-  HttpCode,
   HttpException,
-  HttpStatus,
   Inject,
   Param,
-  Post,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -29,12 +25,8 @@ import {
   run as runAdministration,
 } from '../../administration/administration-http';
 import { BookingAccessDeniedError } from '../../commands/create-booking';
-import {
-  InvoiceDataError,
-  type InvoiceData,
-  type InvoiceIssuedView,
-} from './invoice-data';
-import { InvoiceIssuedDto, LastInvoiceDataDto } from './invoice-data.dto';
+import { InvoiceDataError, type InvoiceData } from './invoice-data';
+import { LastInvoiceDataDto } from './invoice-data.dto';
 
 export const invoiceDataOperations = Symbol('invoiceDataOperations');
 
@@ -46,14 +38,6 @@ export type InvoiceDataOperations = {
     command: { clientId: string },
     principal: AuthenticatedPrincipal,
   ) => Promise<InvoiceData | null>;
-  mark: (
-    command: { paymentId: string },
-    principal: AuthenticatedPrincipal,
-  ) => Promise<InvoiceIssuedView>;
-  unmark: (
-    command: { paymentId: string },
-    principal: AuthenticatedPrincipal,
-  ) => Promise<InvoiceIssuedView>;
 };
 
 const run = <Result>(work: () => Promise<Result>): Promise<Result> =>
@@ -138,46 +122,5 @@ export class AssistantInvoiceDataController extends InvoiceDataController {
       this.operations.readAssistant({ clientId: id }, principal),
     );
     return { invoiceData };
-  }
-}
-
-// PAY-007: the Administrator's «Factura emitida» mark on AW28 (ADR-0012).
-@Controller({ path: 'administrator/payments', version: '1' })
-@ApiBearerAuth()
-export class AdministratorInvoiceIssuedController extends InvoiceDataController {
-  constructor(
-    @Inject(invoiceDataOperations) operations: InvoiceDataOperations,
-    @Inject(authenticatedPrincipalResolver) resolver: PrincipalResolver,
-  ) {
-    super(operations, resolver);
-  }
-
-  @Post(':paymentId/invoice-issued')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ operationId: 'markPaymentInvoiceIssued' })
-  @ApiParam({ name: 'paymentId', format: 'uuid' })
-  @ApiOkResponse({ type: InvoiceIssuedDto })
-  @Header('Cache-Control', 'no-store')
-  async mark(
-    @Param('paymentId') paymentId: string,
-    @Headers('authorization') authorization: string | undefined,
-  ): Promise<InvoiceIssuedDto> {
-    const id = requireId(paymentId, 'Invalid Payment identifier');
-    const principal = await this.authenticate(authorization);
-    return run(() => this.operations.mark({ paymentId: id }, principal));
-  }
-
-  @Delete(':paymentId/invoice-issued')
-  @ApiOperation({ operationId: 'unmarkPaymentInvoiceIssued' })
-  @ApiParam({ name: 'paymentId', format: 'uuid' })
-  @ApiOkResponse({ type: InvoiceIssuedDto })
-  @Header('Cache-Control', 'no-store')
-  async unmark(
-    @Param('paymentId') paymentId: string,
-    @Headers('authorization') authorization: string | undefined,
-  ): Promise<InvoiceIssuedDto> {
-    const id = requireId(paymentId, 'Invalid Payment identifier');
-    const principal = await this.authenticate(authorization);
-    return run(() => this.operations.unmark({ paymentId: id }, principal));
   }
 }

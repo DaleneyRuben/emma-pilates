@@ -114,6 +114,7 @@ const mediaTypes: Record<ImageMediaType, string> = {
   [ImageMediaType.JPEG]: 'image/jpeg',
   [ImageMediaType.PNG]: 'image/png',
   [ImageMediaType.WEBP]: 'image/webp',
+  [ImageMediaType.PDF]: 'application/pdf',
 };
 
 const abbreviateName = (name: string): string => {
@@ -1449,6 +1450,8 @@ export function createPrismaPaymentCommands(
       select: {
         ...paymentSelect,
         client: clientNameSelect,
+        invoiceTaxId: true,
+        invoiceName: true,
         purchaseIntent: {
           select: { receiptImageAsset: { select: receiptSelect } },
         },
@@ -1471,6 +1474,11 @@ export function createPrismaPaymentCommands(
     return {
       ...toPaymentView(row),
       ...clientNameAndPhoto(row.client),
+      // FIX-044: S12 shows whether she asked for an invoice, and in whose name.
+      invoiceData:
+        row.invoiceTaxId === null || row.invoiceName === null
+          ? null
+          : { taxId: row.invoiceTaxId, name: row.invoiceName },
       receipt:
         receipt === null
           ? null

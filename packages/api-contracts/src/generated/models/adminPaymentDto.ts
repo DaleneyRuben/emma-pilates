@@ -10,6 +10,7 @@ import type { AdminPaymentDtoState } from "./adminPaymentDtoState";
 import type { ClientPhotoDto } from "./clientPhotoDto";
 import type { InvoiceDataDto } from "./invoiceDataDto";
 import type { InvoiceIssuedMarkDto } from "./invoiceIssuedMarkDto";
+import type { StaffInvoiceFileDto } from "./staffInvoiceFileDto";
 
 export interface AdminPaymentDto {
   id: string;
@@ -61,4 +62,9 @@ export interface AdminPaymentDto {
    * @nullable
    */
   invoiceIssued: InvoiceIssuedMarkDto | null;
+  /**
+   * The uploaded invoice (FIX-044); null with a mark is «Emitida · sin archivo»
+   * @nullable
+   */
+  invoiceFile: StaffInvoiceFileDto | null;
 }

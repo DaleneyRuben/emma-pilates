@@ -1,11 +1,16 @@
 export type ClientNotificationRoute =
-  | readonly ["ProfileTab", { screen: "Subscription" | "MyEvaluations" | "PaymentStatus" }]
+  | readonly [
+      "ProfileTab",
+      { screen: "Subscription" | "MyEvaluations" | "PaymentStatus" | "MyInvoices" },
+    ]
   | readonly ["Bookings", { screen: "MyBookings" }];
 
 const routes: Readonly<Record<string, ClientNotificationRoute>> = {
   subscription: ["ProfileTab", { screen: "Subscription" }],
   evaluation: ["ProfileTab", { screen: "MyEvaluations" }],
   payment: ["ProfileTab", { screen: "PaymentStatus" }],
+  // FIX-044: «Tu factura está lista».
+  invoice: ["ProfileTab", { screen: "MyInvoices" }],
   booking: ["Bookings", { screen: "MyBookings" }],
   // A cancelled Session has no detail to open; its Bookings do.
   session: ["Bookings", { screen: "MyBookings" }],

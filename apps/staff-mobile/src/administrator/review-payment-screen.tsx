@@ -98,6 +98,8 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
   }
 
   const payment = review.data.data;
+  // FIX-044: whether she asked for an invoice, and in whose name (n.º 24).
+  const invoiceData = payment.invoiceData ?? null;
   const trimmedReason = reason.trim();
 
   const decide = async (decision: () => Promise<unknown>, notice: PaymentsNotice) => {
@@ -241,7 +243,19 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
         <IconRowGroup>
           <IconRow icon="credit" label="Transferencia" />
           <IconRow icon="clock" label={`Enviado el ${formatSubmittedAt(payment.submittedAt)}`} />
+          {invoiceData === null ? (
+            <IconRow icon="receipt" label="Sin factura" value="No la pidió" />
+          ) : (
+            <IconRow
+              icon="receipt"
+              label="Factura"
+              value={`NIT ${invoiceData.taxId} · ${invoiceData.name}`}
+            />
+          )}
         </IconRowGroup>
+        {invoiceData === null || payment.state !== "pending" ? null : (
+          <Text style={styles.invoiceNote}>Podrás subir la factura cuando confirmes el pago.</Text>
+        )}
         <View style={[styles.receiptCard, receiptUri === null ? null : cardWithActionRow]}>
           <SectionTitle>Comprobante</SectionTitle>
           {receiptView}
@@ -272,6 +286,13 @@ const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.xl },
   field: { gap: spacing.xs },
   helper: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  invoiceNote: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    marginTop: -spacing.md,
+    paddingHorizontal: spacing.xs,
+  },
   reasonInput: { minHeight: 96, textAlignVertical: "top" },
   receipt: { borderRadius: radii.inset, width: "100%" },
   receiptCard: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },

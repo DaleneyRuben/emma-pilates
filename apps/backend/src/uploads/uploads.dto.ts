@@ -6,13 +6,16 @@ const imagePurposes: [ImagePurpose, ...ImagePurpose[]] = [
   'profile_photo',
   'transfer_receipt',
   'promotion',
+  'invoice',
 ];
 
 export class CreatePendingUploadDto {
   @ApiProperty({ enum: imagePurposes })
   purpose!: ImagePurpose;
 
-  @ApiProperty({ enum: ['image/jpeg', 'image/png', 'image/webp'] })
+  @ApiProperty({
+    enum: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+  })
   mediaType!: string;
 
   @ApiProperty({ minimum: 1 })

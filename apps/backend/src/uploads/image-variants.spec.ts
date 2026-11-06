@@ -166,4 +166,32 @@ describe('buildImageVariants', () => {
       { width: 1440, height: 810 },
     ]);
   });
+
+  it('keeps an invoice PDF as uploaded, as one document variant', async () => {
+    const pdf = Buffer.from('%PDF-1.7\n1 0 obj\n<< >>\nendobj\n%%EOF\n');
+
+    expect(await buildImageVariants(pdf, 'invoice')).toEqual([
+      {
+        kind: 'document',
+        mediaType: 'application/pdf',
+        bytes: pdf,
+        byteSize: pdf.byteLength,
+        width: 0,
+        height: 0,
+      },
+    ]);
+  });
+
+  it('builds the receipt variants for an invoice photo', async () => {
+    const variants = await buildImageVariants(
+      await image(1170, 2532, 'jpeg'),
+      'invoice',
+    );
+
+    expect(variants.map((variant) => variant.kind)).toEqual([
+      'readable',
+      'thumbnail',
+    ]);
+    expect(variants[0].mediaType).toBe('image/jpeg');
+  });
 });

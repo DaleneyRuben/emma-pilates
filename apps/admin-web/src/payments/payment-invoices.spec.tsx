@@ -1,12 +1,6 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import {
-  apiUrl,
-  jsonResponse,
-  problemResponse,
-  server,
-  useMockServer,
-} from "../test/msw";
+import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
 import {
   paymentPage,
   paymentRow,
@@ -98,18 +92,27 @@ describe("AW28 Pagos invoices", () => {
 
     const cash = await rowOf(/Ana Pérez/);
     expect(within(cash).getByRole("cell", { name: "Efectivo" })).toBeVisible();
+    // FIX-044: «Marcar emitida» is gone; the invoice is uploaded instead.
+    expect(within(invoiceCell(cash)).getByText("Por emitir")).toBeVisible();
     expect(
-      within(cash).getByRole("button", { name: "Marcar emitida: Ana Pérez" }),
+      within(cash).getByRole("button", { name: "Subir factura: Ana Pérez" }),
     ).toBeVisible();
+    expect(
+      within(cash).queryByRole("button", { name: /Marcar emitida/ }),
+    ).not.toBeInTheDocument();
 
+    // A mark set before FIX-044 has no file: «Emitida · sin archivo».
     const issued = await rowOf(/Valeria Quiroga/);
     expect(within(invoiceCell(issued)).getByText("Emitida")).toBeVisible();
+    expect(within(invoiceCell(issued)).getByText("sin archivo")).toBeVisible();
     expect(
-      within(issued).getByText("por Paola Mendoza · 23/10/2026"),
+      within(issued).getByRole("button", {
+        name: "Subir factura: Valeria Quiroga",
+      }),
     ).toBeVisible();
     expect(
-      within(issued).getByRole("button", { name: "Deshacer: Valeria Quiroga" }),
-    ).toBeVisible();
+      within(issued).queryByRole("button", { name: /Deshacer/ }),
+    ).not.toBeInTheDocument();
 
     const plain = await rowOf(/Isabel Arce/);
     expect(within(invoiceCell(plain)).getByText("Sin factura")).toBeVisible();
@@ -132,7 +135,7 @@ describe("AW28 Pagos invoices", () => {
 
     await user.selectOptions(
       screen.getByLabelText("Factura"),
-      "Sin factura emitida",
+      "Factura por subir",
     );
 
     expect(await rowOf(/Ana Pérez/)).toBeInTheDocument();
@@ -151,89 +154,6 @@ describe("AW28 Pagos invoices", () => {
     expect(
       await within(table).findByText("No hay facturas pendientes."),
     ).toBeInTheDocument();
-  });
-
-  it("marks an invoice issued and undoes it, then reads the list again", async () => {
-    const calls: string[] = [];
-    let issued = false;
-    server.use(
-      paymentTable(() =>
-        jsonResponse(
-          paymentPage([
-            issued
-              ? {
-                  ...unbilledCash,
-                  invoiceIssued: {
-                    issuedAt: "2026-10-23T15:00:00.000Z",
-                    issuedByName: "Paola Mendoza",
-                  },
-                }
-              : unbilledCash,
-          ]),
-        ),
-      ),
-      http.post(
-        apiUrl(`${paymentsPath}/${unbilledCash.id}/invoice-issued`),
-        () => {
-          calls.push("mark");
-          issued = true;
-          return jsonResponse({
-            paymentId: unbilledCash.id,
-            invoiceIssued: null,
-          });
-        },
-      ),
-      http.delete(
-        apiUrl(`${paymentsPath}/${unbilledCash.id}/invoice-issued`),
-        () => {
-          calls.push("unmark");
-          issued = false;
-          return jsonResponse({
-            paymentId: unbilledCash.id,
-            invoiceIssued: null,
-          });
-        },
-      ),
-    );
-    const { user } = renderAdmin("/dinero/pagos?status=all");
-    await rowOf(/Ana Pérez/);
-
-    await user.click(
-      screen.getByRole("button", { name: "Marcar emitida: Ana Pérez" }),
-    );
-    expect(
-      await screen.findByText("por Paola Mendoza · 23/10/2026"),
-    ).toBeVisible();
-
-    await user.click(
-      screen.getByRole("button", { name: "Deshacer: Ana Pérez" }),
-    );
-    expect(
-      await screen.findByRole("button", { name: "Marcar emitida: Ana Pérez" }),
-    ).toBeVisible();
-    expect(calls).toEqual(["mark", "unmark"]);
-  });
-
-  it("says so when the mark cannot be saved", async () => {
-    server.use(
-      paymentTable(() => jsonResponse(paymentPage([unbilledCash]))),
-      http.post(
-        apiUrl(`${paymentsPath}/${unbilledCash.id}/invoice-issued`),
-        () => problemResponse(409, "payment_not_confirmed"),
-      ),
-    );
-    const { user } = renderAdmin("/dinero/pagos?status=all");
-    await rowOf(/Ana Pérez/);
-
-    await user.click(
-      screen.getByRole("button", { name: "Marcar emitida: Ana Pérez" }),
-    );
-
-    expect(
-      await screen.findByText(
-        "No pudimos guardar la marca de factura. Inténtalo de nuevo.",
-      ),
-    ).toBeVisible();
   });
 
   describe("Exportar CSV", () => {

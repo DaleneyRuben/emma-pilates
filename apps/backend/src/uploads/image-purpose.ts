@@ -1,4 +1,5 @@
-export type ImagePurpose = 'profile_photo' | 'transfer_receipt' | 'promotion';
+export type ImagePurpose =
+  'profile_photo' | 'transfer_receipt' | 'promotion' | 'invoice';
 
 type ImageUploadDeclaration = {
   purpose: ImagePurpose;
@@ -13,14 +14,23 @@ const purposeLimits: Readonly<
   transfer_receipt: { maxByteSize: 10 * 1024 * 1024, maxAxisPixels: 6_000 },
   profile_photo: { maxByteSize: 5 * 1024 * 1024, maxAxisPixels: 4_096 },
   promotion: { maxByteSize: 20 * 1024 * 1024, maxAxisPixels: 6_000 },
+  // FIX-044: the issued invoice, a PDF or a photo, as large as a receipt.
+  invoice: { maxByteSize: 10 * 1024 * 1024, maxAxisPixels: 6_000 },
 };
 
-const acceptedMediaTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const imageMediaTypes = ['image/jpeg', 'image/png', 'image/webp'];
+const acceptedMediaTypes: Readonly<Record<ImagePurpose, ReadonlySet<string>>> =
+  {
+    transfer_receipt: new Set(imageMediaTypes),
+    profile_photo: new Set(imageMediaTypes),
+    promotion: new Set(imageMediaTypes),
+    invoice: new Set(['application/pdf', 'image/jpeg', 'image/png']),
+  };
 
 export const validateImageUploadDeclaration = (
   declaration: ImageUploadDeclaration,
 ): { maxAxisPixels: number } => {
-  if (!acceptedMediaTypes.has(declaration.mediaType)) {
+  if (!acceptedMediaTypes[declaration.purpose].has(declaration.mediaType)) {
     throw new Error('image_media_type_invalid');
   }
 

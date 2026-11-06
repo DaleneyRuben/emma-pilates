@@ -7,6 +7,6 @@
 
 export interface InvoiceIssuedMarkDto {
   issuedAt: string;
-  /** The Administrator who marked it */
+  /** The Staff Member who uploaded the invoice, or marked it before FIX-044 */
   issuedByName: string;
 }
