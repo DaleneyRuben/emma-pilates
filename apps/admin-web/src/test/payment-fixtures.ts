@@ -30,6 +30,7 @@ export const paymentRow = (
   method: "transfer",
   invoiceData: null,
   invoiceIssued: null,
+  invoiceFile: null,
   ...extra,
 });
 
