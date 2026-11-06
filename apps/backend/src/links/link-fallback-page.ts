@@ -23,6 +23,8 @@ const actions: Record<
   staff: {
     'activate-account': 'activar tu cuenta',
     'recover-password': 'crear tu contraseña nueva',
+    // FIX-039: the email change the studio asked for.
+    'confirm-email-change': 'confirmar tu correo nuevo',
   },
 };
 
@@ -62,12 +64,17 @@ export const renderLinkFallbackPage = (
 
   const app = apps[input.identityKind];
   // Administrators usually work on a computer, where the admin web's
-  // create-password page already completes activation and recovery.
+  // create-password page already completes activation and recovery, and
+  // its confirm-email page an email change (FIX-039).
+  const browserPage =
+    input.purpose === 'confirm-email-change'
+      ? 'confirmar-correo'
+      : 'crear-contrasena';
   const browser =
     input.identityKind === 'staff' && input.token !== null
       ? paragraph('¿Estás en la computadora? También puedes seguir aquí:') +
         button(
-          `${input.adminWebOrigin}/crear-contrasena?token=${encodeURIComponent(input.token)}`,
+          `${input.adminWebOrigin}/${browserPage}?token=${encodeURIComponent(input.token)}`,
           'Continuar en el navegador',
           false,
         )

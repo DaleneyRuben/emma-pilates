@@ -54,8 +54,9 @@ describe("AuthenticationFlow", () => {
     });
     expect(screen.getByText("Revisa tu correo")).toBeOnTheScreen();
     expect(screen.getByText("ana@example.com")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Cambiar correo" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reenviar correo" })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "¿Correo equivocado? Ver opciones" }));
+    expect(screen.getByRole("button", { name: "Cambiar correo" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cancelar registro" })).toBeOnTheScreen();
   });
 
@@ -92,12 +93,13 @@ describe("AuthenticationFlow", () => {
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "password");
     await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+    await fireEvent.press(screen.getByRole("button", { name: "¿Correo equivocado? Ver opciones" }));
     await fireEvent.press(screen.getByRole("button", { name: "Cambiar correo" }));
     await fireEvent.changeText(
       screen.getByLabelText("Correo electrónico"),
       "ana.corrected@example.com",
     );
-    await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace" }));
 
     expect(correctRegistrationEmail).toHaveBeenCalledWith({
       email: "ana.corrected@example.com",
@@ -107,8 +109,11 @@ describe("AuthenticationFlow", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Reenviar correo" }));
     expect(resendRegistrationVerification).toHaveBeenCalledWith("continuation");
-    expect(screen.getByText(/Si el envío está disponible/)).toBeOnTheScreen();
+    expect(
+      screen.getByText("Te enviamos otro correo. Usa el enlace más reciente."),
+    ).toBeOnTheScreen();
 
+    await fireEvent.press(screen.getByRole("button", { name: "¿Correo equivocado? Ver opciones" }));
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar registro" }));
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar registro" }));
     expect(cancelRegistration).toHaveBeenCalledWith("continuation");

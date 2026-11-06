@@ -113,6 +113,18 @@ export type StaffManagementOperations = {
     command: { staffMemberId: string; name: string; phone: string | null },
     principal: Principal,
   ) => Promise<StaffMemberRecord>;
+  requestEmailChange: (
+    command: { staffMemberId: string; email: string },
+    principal: Principal,
+  ) => Promise<StaffMemberRecord>;
+  resendEmailChange: (
+    command: { staffMemberId: string },
+    principal: Principal,
+  ) => Promise<StaffMemberRecord>;
+  cancelEmailChange: (
+    command: { staffMemberId: string },
+    principal: Principal,
+  ) => Promise<StaffMemberRecord>;
 };
 
 const statuses: Record<StaffManagementErrorCode, number> = {
@@ -128,6 +140,8 @@ const statuses: Record<StaffManagementErrorCode, number> = {
   staff_member_not_pending: HttpStatus.CONFLICT,
   email_belongs_to_client: HttpStatus.CONFLICT,
   email_unchanged: HttpStatus.BAD_REQUEST,
+  staff_member_not_active: HttpStatus.CONFLICT,
+  email_change_not_pending: HttpStatus.NOT_FOUND,
 };
 
 const details: Record<StaffManagementErrorCode, string> = {
@@ -144,14 +158,16 @@ const details: Record<StaffManagementErrorCode, string> = {
   staff_member_deactivated: 'The Staff Member is deactivated',
   staff_member_not_pending: 'The Staff Member already activated',
   email_belongs_to_client: 'Email belongs to a Client Account',
-  email_unchanged: 'The invitation already uses this email',
+  email_unchanged: 'The Staff Member already uses this email',
+  staff_member_not_active: 'The Staff Member is not active',
+  email_change_not_pending: 'No email change is waiting for confirmation',
 };
 
-const invalidRequest = (detail: string) =>
+export const invalidRequest = (detail: string) =>
   new BadRequestException({ code: 'invalid_request', detail });
 
 // WEB-012 W6: a limited staff email says when it can be retried (ADR-0029).
-const run = async <Result>(
+export const run = async <Result>(
   work: () => Promise<Result>,
   response?: Response,
 ): Promise<Result> => {
@@ -171,7 +187,7 @@ const run = async <Result>(
   }
 };
 
-const requireStaffMemberId = (value: string): string => {
+export const requireStaffMemberId = (value: string): string => {
   const id = parseStaffMemberId(value);
   if (id === null) throw invalidRequest('Invalid Staff Member identifier');
   return id;

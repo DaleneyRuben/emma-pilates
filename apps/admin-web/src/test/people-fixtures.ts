@@ -124,6 +124,7 @@ export const member = (
   status: "active",
   activationExpiresAt: null,
   photo: null,
+  pendingEmail: null,
   ...extra,
 });
 

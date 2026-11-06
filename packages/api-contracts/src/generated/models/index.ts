@@ -428,6 +428,7 @@ export * from "./staffMemberDto";
 export * from "./staffMemberDtoRole";
 export * from "./staffMemberDtoStatus";
 export * from "./staffMemberPageDto";
+export * from "./staffPendingEmailDto";
 export * from "./staffPhotoDto";
 export * from "./staffPhotoResultDto";
 export * from "./staffProfileDto";

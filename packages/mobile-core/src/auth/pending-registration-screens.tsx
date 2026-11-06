@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Modal, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
@@ -8,10 +8,10 @@ import { PrimaryButton } from "../ui/primary-button";
 import { TextButton } from "../ui/text-button";
 import { colors, radii, spacing, typography } from "../ui/tokens";
 import { AuthenticationScreen, authStyles } from "./auth-layout";
-import { QuietButton, SecondaryButton, WaitNotice } from "./auth-parts";
+import { SecondaryButton, WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
 import { useMountedAt } from "../time/mounted-at";
-import { useCountdown } from "./countdown";
+import { formatCountdown, useCountdown } from "./countdown";
 import { limitKeepsCurrentLink } from "./request-limit-copy";
 
 // ADR-0029: the pending registration is removed after 7 days without a
@@ -53,6 +53,12 @@ function RegistrationLapsed({
   );
 }
 
+// Walkthrough 2026-11-04 n.º 18 (DES-012, proposal A «Lo esencial»): the
+// address, one line of what to do, and two buttons; correcting, cancelling
+// and the deadlines live in the options sheet. The screen reads the same
+// whether or not the address could register (ADR-0029).
+type Sheet = "cancel" | "options" | null;
+
 export function CheckEmailScreen({
   api,
   onBack,
@@ -71,10 +77,10 @@ export function CheckEmailScreen({
   onResent: () => void;
   pending: PendingRegistration;
 }) {
-  const [notice, setNotice] = useState<string | null>(null);
+  const [resent, setResent] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [confirmingCancel, setConfirmingCancel] = useState(false);
+  const [sheet, setSheet] = useState<Sheet>(null);
   const [waitSeconds, startWait] = useCountdown();
   const shownAt = useMountedAt();
 
@@ -84,14 +90,12 @@ export function CheckEmailScreen({
 
   async function resend() {
     setSubmitting(true);
-    setNotice(null);
+    setResent(false);
     setFailure(null);
 
     try {
       await api.resendRegistrationVerification(pending.registrationContinuation);
-      setNotice(
-        "Si el envío está disponible, recibirás un correo nuevo. Solo funciona el enlace más reciente.",
-      );
+      setResent(true);
       onResent();
     } catch (error) {
       const wait = serverWaitSeconds(error);
@@ -111,84 +115,141 @@ export function CheckEmailScreen({
 
     try {
       await api.cancelRegistration(pending.registrationContinuation);
-      setConfirmingCancel(false);
+      setSheet(null);
       onCancelled();
     } catch {
-      setConfirmingCancel(false);
+      setSheet(null);
       setFailure("No pudimos cancelar el registro. Inténtalo de nuevo.");
       setSubmitting(false);
     }
   }
 
+  function correct() {
+    setSheet(null);
+    onCorrect();
+  }
+
+  const waiting = waitSeconds > 0;
+
   return (
-    <AuthenticationScreen brand={false} title="Revisa tu correo">
-      <BodyText>Si el registro puede continuar, enviamos las instrucciones a este correo:</BodyText>
-      <View style={styles.emailLine}>
-        <BodyText style={[authStyles.emphasized, styles.email]}>{pending.email}</BodyText>
-        <TextButton disabled={submitting} label="Cambiar correo" onPress={onCorrect} />
+    <AuthenticationScreen
+      badge={{ icon: "mail", tone: "primary" }}
+      brand={false}
+      title="Revisa tu correo"
+    >
+      <View style={styles.lines}>
+        <BodyText style={[authStyles.muted, authStyles.centered]}>Te enviamos un enlace a</BodyText>
+        <BodyText style={[authStyles.emphasized, authStyles.centered]}>{pending.email}</BodyText>
       </View>
-      <BodyText>
-        Abre el enlace más reciente para verificar tu cuenta y luego inicia sesión aquí. El enlace
-        no inicia sesión por ti.
+      <BodyText style={authStyles.centered}>
+        Ábrelo para activar tu cuenta y después inicia sesión.
       </BodyText>
-      <BodyText style={authStyles.muted}>
-        El enlace vence en 24 horas; el correo indica la fecha y hora exactas.
-      </BodyText>
-      {notice === null ? null : <BodyText>{notice}</BodyText>}
+      {resent && !waiting ? (
+        <View accessibilityLiveRegion="polite" style={styles.resent} testID="resent-notice">
+          <BodyText>Te enviamos otro correo. Usa el enlace más reciente.</BodyText>
+        </View>
+      ) : null}
       {failure === null ? null : (
         <BodyText accessibilityRole="alert" style={styles.failure}>
           {failure}
         </BodyText>
       )}
-      {waitSeconds > 0 ? (
+      {waiting ? (
         <WaitNotice
-          message={limitKeepsCurrentLink}
+          message="Ya te enviamos uno hace poco. El enlace que tienes sigue sirviendo."
           remainingSeconds={waitSeconds}
           waitLabel="Podrás reenviarlo en"
         />
       ) : null}
+      <PrimaryButton disabled={submitting} label="Iniciar sesión" onPress={onBack} />
       <SecondaryButton
-        busy={submitting && !confirmingCancel}
-        disabled={submitting || waitSeconds > 0}
-        label="Reenviar correo"
+        busy={submitting && sheet === null}
+        disabled={submitting || waiting}
+        label={waiting ? `Reenviar en ${formatCountdown(waitSeconds)}` : "Reenviar correo"}
         onPress={resend}
       />
-      <TextButton label="Volver a iniciar sesión" onPress={onBack} />
-      <View style={styles.cleanup}>
-        <BodyText style={[authStyles.muted, styles.centered]}>
-          Si en 7 días no verificas, corriges el correo ni pides otro envío, el registro pendiente
-          se elimina.
-        </BodyText>
-        <QuietButton
-          disabled={submitting}
-          label="Cancelar registro"
-          onPress={() => setConfirmingCancel(true)}
-        />
-      </View>
+      <TextButton
+        disabled={submitting}
+        label="¿Correo equivocado? Ver opciones"
+        onPress={() => setSheet("options")}
+        style={styles.centeredButton}
+      />
       <Modal
         animationType="slide"
-        onRequestClose={() => setConfirmingCancel(false)}
+        onRequestClose={() => {
+          if (!submitting) setSheet(null);
+        }}
         transparent
-        visible={confirmingCancel}
+        visible={sheet !== null}
       >
         <View style={styles.sheetBackdrop}>
-          <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>¿Cancelar tu registro?</Text>
-            <BodyText>
-              Los enlaces enviados dejarán de funcionar y el correo quedará libre. Si quieres,
-              podrás registrarte de nuevo desde cero.
-            </BodyText>
-            <SecondaryButton
-              busy={submitting}
-              label="Sí, cancelar registro"
-              onPress={cancel}
-              tone="error"
-            />
-            <TextButton label="Volver" onPress={() => setConfirmingCancel(false)} />
-          </View>
+          {sheet === "cancel" ? (
+            <View style={styles.sheet}>
+              <Text style={styles.sheetTitle}>¿Cancelar tu registro?</Text>
+              <BodyText style={authStyles.muted}>
+                El enlace deja de funcionar y el correo queda libre para registrarte de nuevo.
+              </BodyText>
+              <SecondaryButton
+                busy={submitting}
+                label="Sí, cancelar registro"
+                onPress={cancel}
+                tone="error"
+              />
+              <TextButton
+                disabled={submitting}
+                label="Volver"
+                onPress={() => setSheet(null)}
+                style={styles.centeredButton}
+              />
+            </View>
+          ) : (
+            <View style={styles.sheet}>
+              <Text style={styles.sheetTitle}>Opciones</Text>
+              <OptionRow hint="Si lo escribiste mal" label="Cambiar correo" onPress={correct} />
+              <OptionRow
+                hint="Libera el correo para empezar de nuevo"
+                label="Cancelar registro"
+                onPress={() => setSheet("cancel")}
+                tone="error"
+              />
+              <BodyText style={[authStyles.muted, authStyles.centered, styles.small]}>
+                El enlace vence en 24 horas. Si no lo abres en 7 días, borramos el registro.
+              </BodyText>
+              <TextButton
+                label="Cerrar"
+                onPress={() => setSheet(null)}
+                style={styles.centeredButton}
+              />
+            </View>
+          )}
         </View>
       </Modal>
     </AuthenticationScreen>
+  );
+}
+
+function OptionRow({
+  hint,
+  label,
+  onPress,
+  tone = "default",
+}: {
+  hint: string;
+  label: string;
+  onPress: () => void;
+  tone?: "default" | "error";
+}) {
+  return (
+    <Pressable
+      accessibilityHint={hint}
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      onPress={onPress}
+      style={styles.option}
+    >
+      <Text style={[styles.optionLabel, tone === "error" && styles.failure]}>{label}</Text>
+      <Text style={styles.optionHint}>{hint}</Text>
+    </Pressable>
   );
 }
 
@@ -240,9 +301,7 @@ export function CorrectEmailScreen({
 
   return (
     <AuthenticationScreen brand={false} topBar={{ onBack, title: "Cambiar correo" }}>
-      <BodyText>
-        {`Escribe el correo correcto. Te enviaremos un enlace nuevo de 24 horas y los enlaces enviados a ${pending.email} dejarán de funcionar.`}
-      </BodyText>
+      <BodyText>Escribe el correo correcto y te enviamos un enlace nuevo.</BodyText>
       <FormField
         autoCapitalize="none"
         error={error}
@@ -266,7 +325,7 @@ export function CorrectEmailScreen({
       <PrimaryButton
         busy={submitting}
         disabled={waitSeconds > 0}
-        label="Guardar correo"
+        label="Enviar enlace"
         onPress={submit}
       />
       <TextButton label="Volver" onPress={onBack} />
@@ -275,24 +334,36 @@ export function CorrectEmailScreen({
 }
 
 const styles = StyleSheet.create({
-  centered: {
-    textAlign: "center",
-  },
-  cleanup: {
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  email: {
-    flexShrink: 1,
-  },
-  emailLine: {
-    alignItems: "center",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
+  centeredButton: {
+    alignSelf: "center",
   },
   failure: {
     color: colors.errorText,
+  },
+  lines: {
+    gap: spacing.xs,
+  },
+  option: {
+    borderBottomColor: colors.border,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: spacing.xs,
+    minHeight: 56,
+    paddingVertical: spacing.sm,
+  },
+  optionHint: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+  },
+  optionLabel: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.bodyMedium,
+  },
+  resent: {
+    backgroundColor: colors.card,
+    borderRadius: radii.card,
+    padding: spacing.md,
   },
   sheet: {
     backgroundColor: colors.card,
@@ -310,5 +381,8 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontFamily: fontFamilies.display,
     fontSize: typography.titleSecondary,
+  },
+  small: {
+    fontSize: typography.note,
   },
 });

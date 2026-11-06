@@ -56,7 +56,10 @@ describe("AW24 Editar miembro", () => {
     queryClient.setQueryData(trainersKey, []);
 
     expect(within(panel).getByLabelText("Nombre")).toHaveValue("Emma Vargas");
-    expect(within(panel).getByText("emma@emmapilates.bo")).toBeVisible();
+    // FIX-039: the login email is a field of its own.
+    expect(
+      within(panel).getByRole("textbox", { name: "Correo electrónico" }),
+    ).toHaveValue("emma@emmapilates.bo");
     expect(
       within(panel).getByRole("radio", { name: "Entrenadora" }),
     ).toBeChecked();

@@ -33,3 +33,10 @@ export function branchNames(
     .sort((a, b) => a.localeCompare(b, "es"))
     .join(", ");
 }
+
+/** FIX-039: «Camila» from «Camila Rojas», as the email change copy names her. */
+export const firstName = (name: string): string => name.split(" ")[0] ?? name;
+
+/** Addresses compare without case or surrounding spaces. */
+export const sameEmail = (a: string, b: string): boolean =>
+  a.trim().toLowerCase() === b.trim().toLowerCase();

@@ -65,7 +65,7 @@ can be found by its design name.
 
 | Client app | Tests |
 | --- | --- |
-| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79, 115 |
+| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79, 115, 142 |
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115, 126 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126 |
@@ -79,7 +79,7 @@ can be found by its design name.
 
 | Staff app | Tests |
 | --- | --- |
-| S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
+| S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71, 142 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109, 110, 115 |
 | S26 Reportar una falla (Entrenadora) | 82 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
@@ -110,7 +110,7 @@ can be found by its design name.
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras (the Fundadora chip on Clientas since WEB-040) | 26, 88 |
 | AW41 Congelamientos | 92 |
-| AW23–AW24 Personal | 26, 31, 72, 79 |
+| AW23–AW24 Personal | 26, 31, 72, 79, 142 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72, 93 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89, 112 |
 | AW38 Comentarios | 80 |
@@ -9221,3 +9221,60 @@ F. **Refusals (API).** `PUT /api/v1/staff/payments/{id}/invoice` answers 409
    is gone (404). The Client's
    `GET /api/v1/clients/current/invoices/{id}/file` of someone else's payment
    is 404 `invoice_not_found`.
+
+## Test 142: «Revisa tu correo» with less text, «Emma Staff», and the studio changing a staff email (FIX-047, FIX-039)
+
+The owner's choices from DES-012 (follow-ups 251 and 252, 2026-11-06). Any
+database copy with an active Staff Member works; the emails land under
+`apps/backend/.data/email-capture/` (Test 34).
+
+A. **«Revisa tu correo» (client app, iPhone, iPad, Android).** Register a
+   new Client. The screen shows only the envelope, «Revisa tu correo», «Te
+   enviamos un enlace a» with the address, «Ábrelo para activar tu cuenta y
+   después inicia sesión.», **Iniciar sesión**, **Reenviar correo** and
+   **¿Correo equivocado? Ver opciones**. The options sheet holds **Cambiar
+   correo** («Si lo escribiste mal»), **Cancelar registro** (asks «¿Cancelar
+   tu registro?» first) and «El enlace vence en 24 horas. Si no lo abres en 7
+   días, borramos el registro.». **Cambiar correo** reads «Escribe el correo
+   correcto y te enviamos un enlace nuevo.» with **Enviar enlace**. A resend
+   says «Te enviamos otro correo. Usa el enlace más reciente.»; a fast second
+   one shows «Ya te enviamos uno hace poco. El enlace que tienes sigue
+   sirviendo.», «Podrás reenviarlo en 0:…» and the button «Reenviar en 0:…».
+B. **«Emma Staff» (staff app build).** Install a development build of the
+   Staff app (Expo Go keeps its own name): the home screen label reads
+   «Emma Staff» on the iPhone and Android, uncut. The permission prompts
+   still say «Emma Pilates Staff».
+C. **Editar miembro at 1440 and 420 px (Administrator).** Open an active
+   member: «Correo electrónico» is a field. Type a new address: «Al guardar,
+   le enviamos un enlace a este correo. Cambia cuando … lo abra.». **Guardar**
+   asks «¿Cambiar el correo de …?»; **Volver** sends nothing. **Enviar
+   enlace** keeps the panel open with «Esperando que … confirme», the new
+   address, «El enlace vence el vie 6 de noviembre a las 11:40.» (La Paz),
+   **Reenviar enlace** («Enviamos otro enlace. Solo sirve el más reciente.»)
+   and **Cancelar cambio** («Cancelamos el cambio. … sigue entrando con …»).
+   Personal shows «Por confirmar: …» under her email. An address another
+   account uses says «Este correo ya pertenece a otra cuenta.» under the
+   field; a second resend within a minute shows the wait notice at the top of
+   the panel. A pending invitation keeps **Cambiar correo**; your own row
+   stays read-only; the Coordinator cannot change it.
+D. **The two emails.** The new address gets «Confirma tu correo nuevo» («El
+   estudio cambió el correo con el que entras a la app del equipo de Emma
+   Pilates Studio por este…») with a `/staff/authentication/confirm-email-change`
+   link; the current one gets «El estudio está cambiando tu correo», no
+   link.
+E. **Confirming.** On a phone the link opens the Staff app: «Correo
+   confirmado · Desde ahora entras con tu correo nuevo. Tu contraseña no
+   cambió.», signed in or not. On a computer, paste the token into
+   `http://localhost:5173/confirmar-correo?token=…`: the same outcome. An old
+   or cancelled link says «El enlace ya no sirve»; an address taken in the
+   meantime says «No pudimos cambiar el correo». After confirming, she signs
+   in with the new address and her sessions stayed open.
+F. **Audit.** `system.audit_records` has `staff_member.email_change_requested`
+   (actor the Administrator, metadata `previousEmail` and `email`), and
+   `account.email_changed` when the link is opened.
+
+Specs: `pending-registration-screens.spec.tsx`, `release-config.spec.ts`
+(staff), `staff-email-change.spec.ts`, `staff-email-change.e2e-spec.ts`,
+`spanish-authentication-email-renderer.spec.ts`, `link-fallback-page.spec.ts`,
+`email-change-link-screen.spec.tsx`, `navigation.spec.tsx` (staff),
+`staff-email-change.spec.tsx` and `confirm-email-page.spec.tsx` (admin web).

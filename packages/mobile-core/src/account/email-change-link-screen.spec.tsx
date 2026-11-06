@@ -42,4 +42,36 @@ describe("EmailChangeLinkScreen", () => {
 
     expect(onDone).toHaveBeenCalledWith(status === "changed");
   });
+
+  // FIX-039 (DES-012): a Staff Member's change was asked by the studio, so
+  // she is sent back to the studio, never to Editar perfil.
+  it.each([
+    [
+      "changed",
+      "Correo confirmado",
+      "Desde ahora entras con tu correo nuevo. Tu contraseña no cambió.",
+    ],
+    [
+      "expired",
+      "El enlace ya no sirve",
+      "Este enlace venció o ya no sirve. Pide en el estudio que te envíen otro; mientras tanto sigues entrando con tu correo anterior.",
+    ],
+    [
+      "email_unavailable",
+      "No pudimos cambiar el correo",
+      "Ese correo ya lo usa otra cuenta, así que no lo cambiamos. Habla con el estudio.",
+    ],
+  ] as const)("words the staff %s outcome for the studio", async (status, title, body) => {
+    const screen = await render(
+      <EmailChangeLinkScreen
+        api={{ completeEmailChange: jest.fn().mockResolvedValue({ status }) }}
+        audience="staff"
+        onDone={jest.fn()}
+        token="change-secret"
+      />,
+    );
+
+    expect(await screen.findByText(title)).toBeOnTheScreen();
+    expect(screen.getByText(body)).toBeOnTheScreen();
+  });
 });

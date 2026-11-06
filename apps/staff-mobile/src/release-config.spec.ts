@@ -14,6 +14,13 @@ describe("staff release configuration", () => {
     expect(appConfig.expo.runtimeVersion).toEqual({ policy: "fingerprint" });
   });
 
+  it("shows a short name under its icon so the home screen does not cut it", () => {
+    // Walkthrough 2026-11-04 n.º 31 (DES-012, owner's choice B): «Emma Pilates
+    // Staff» read «EmmaPilates…» on the iPhone. Expo's `name` is the iOS
+    // display name and the Android label; the stores keep the full name.
+    expect(appConfig.expo.name).toBe("Emma Staff");
+  });
+
   it("is linked to its own EAS project in the studio's Expo organization", () => {
     expect(appConfig.expo).toMatchObject({
       owner: "emma-pilates",
