@@ -1,6 +1,7 @@
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Text } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { loadPdfPage } from "./load-pdf-page";
 import { PdfInvoice } from "./pdf-invoice";
@@ -29,16 +30,24 @@ const pageFetcher = (pageCount: number) =>
     ),
   ) as unknown as typeof globalThis.fetch;
 
+// The viewer's own provider starts from its parent's metrics, as in the app.
+const metrics = {
+  frame: { height: 874, width: 402, x: 0, y: 0 },
+  insets: { bottom: 34, left: 0, right: 0, top: 62 },
+};
+
 const renderInvoice = (fetcher: typeof globalThis.fetch) =>
   render(
-    <QueryClientProvider client={new QueryClient()}>
-      <PdfInvoice
-        cacheKey={["invoice", "payment-1"]}
-        fetcher={fetcher}
-        footer={<Text>Descargar</Text>}
-        pageUrl={(page) => `/invoices/payment-1/file/pages/${page}`}
-      />
-    </QueryClientProvider>,
+    <SafeAreaProvider initialMetrics={metrics}>
+      <QueryClientProvider client={new QueryClient()}>
+        <PdfInvoice
+          cacheKey={["invoice", "payment-1"]}
+          fetcher={fetcher}
+          footer={<Text>Descargar</Text>}
+          pageUrl={(page) => `/invoices/payment-1/file/pages/${page}`}
+        />
+      </QueryClientProvider>
+    </SafeAreaProvider>,
   );
 
 describe("loadPdfPage", () => {
