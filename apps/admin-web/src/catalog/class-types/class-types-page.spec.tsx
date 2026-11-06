@@ -11,6 +11,7 @@ import {
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const classTypesPath = "/api/v1/administrator/class-types";
 
@@ -53,7 +54,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "Tipos de clase" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Cargando tipos de clase…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando tipos de clase…");
     const row = (await screen.findByRole("cell", { name: /Reformer Pilates/ }))
       .parentElement as HTMLElement;
     // A Class Type has no duration (WEB-027, booking ADR-0004).

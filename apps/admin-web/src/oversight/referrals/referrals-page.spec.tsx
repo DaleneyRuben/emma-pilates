@@ -17,6 +17,7 @@ import {
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 const referralTable = (respond: (params: URLSearchParams) => Response) =>
@@ -50,7 +51,7 @@ describe("AW26 Referidos on a desktop browser", () => {
     const { user } = renderAdmin(path);
     await heading();
 
-    expect(screen.getByText("Cargando referidos…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando referidos…");
     const pending = (
       await screen.findByRole("cell", { name: /Valeria Terceros/ })
     ).parentElement as HTMLElement;

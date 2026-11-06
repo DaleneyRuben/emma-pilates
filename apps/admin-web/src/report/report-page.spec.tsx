@@ -34,6 +34,7 @@ import {
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
 import { defaultReportRange } from "./report-range";
+import { expectBrandedLoading } from "../test/branded-loading";
 
 const incomeReads: URLSearchParams[] = [];
 const expenseReads: URLSearchParams[] = [];
@@ -91,7 +92,8 @@ describe("AW16 Reporte on a desktop browser", () => {
     renderAdmin(path);
     await heading();
 
-    expect(screen.getByText("Cargando el reporte…")).toBeInTheDocument();
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+    expectBrandedLoading("Cargando el ingreso devengado…");
     expect(
       await within(
         await screen.findByRole("region", { name: "Ingresos" }),

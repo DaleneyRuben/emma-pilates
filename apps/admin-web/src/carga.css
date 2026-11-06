@@ -49,6 +49,32 @@
     carga-respira 1.4s ease-in-out 300ms infinite alternate;
 }
 
+/* WEB-045: a loading area is centred in the space it replaces. It grows
+   (`flex-1`) inside its flex column, and so does every flex-column child
+   on the way up that holds it (a page under its header, a side panel's
+   tab, a panel section), so the logo sits in the middle of what is left
+   rather than at the top of a short band. */
+.flex-col > :has(.carga-area) {
+  flex-grow: 1;
+}
+
+/* WEB-045, follow-up 94: an in-page read draws nothing for its first
+   400 ms, so a fast answer never flashes the logo. */
+.carga-logo-demora {
+  animation:
+    carga-aparece 300ms ease-out 400ms both,
+    carga-respira 1.4s ease-in-out 700ms infinite alternate;
+}
+
+@keyframes carga-quieto {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @media (min-width: 1024px) {
   .carga-logo {
     width: 300px;
@@ -60,5 +86,10 @@
     animation: none;
     opacity: 1;
     transform: none;
+  }
+
+  /* Still, but after the same 400 ms: one step from hidden to shown. */
+  .carga-logo-demora {
+    animation: carga-quieto 0s step-end 400ms both;
   }
 }

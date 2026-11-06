@@ -57,11 +57,13 @@ export function SessionDetail({
           </p>
         ) : null}
         {roster.isPending ? (
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <LoadingNotice>Cargando quiénes reservaron…</LoadingNotice>
-            </div>
-            {book}
+          // WEB-045: the button where the roster's header puts it, and the
+          // logo centred across the panel under it, not squeezed beside it.
+          <div className="flex flex-col gap-3">
+            {book === null ? null : (
+              <div className="flex min-h-9 justify-end">{book}</div>
+            )}
+            <LoadingNotice>Cargando quiénes reservaron…</LoadingNotice>
           </div>
         ) : roster.isError ? (
           <div role="alert" className="flex items-center gap-3">

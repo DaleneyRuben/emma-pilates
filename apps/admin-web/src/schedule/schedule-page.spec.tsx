@@ -28,6 +28,7 @@ import {
 } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
+import { findBrandedLoading } from "../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 const sessionReads = (respond: (params: URLSearchParams) => Response) =>
@@ -169,7 +170,7 @@ describe("AW02 Horario on a desktop browser", () => {
       ),
     );
 
-    expect(await screen.findByText("Cargando el horario…")).toBeInTheDocument();
+    await findBrandedLoading("Cargando el horario…");
     expect(
       screen.queryByRole("button", { name: /Reformer Pilates, 07:00/ }),
     ).not.toBeInTheDocument();
@@ -184,7 +185,7 @@ describe("AW02 Horario on a desktop browser", () => {
     );
     renderAdmin(`/horario?week=${nextMonday}`);
 
-    expect(await screen.findByText("Cargando el horario…")).toBeInTheDocument();
+    await findBrandedLoading("Cargando el horario…");
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();

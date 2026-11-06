@@ -20,6 +20,7 @@ import {
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 const staffTable = (respond: (params: URLSearchParams) => Response) =>
@@ -51,7 +52,7 @@ describe("AW23 Personal on a desktop browser", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "Personal" }),
     ).toBeVisible();
-    expect(screen.getByText("Cargando al personal…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando al personal…");
 
     const emmaRow = await rowOf("Emma Vargas");
     const role = within(emmaRow).getByRole("cell", { name: "Entrenadora" });
