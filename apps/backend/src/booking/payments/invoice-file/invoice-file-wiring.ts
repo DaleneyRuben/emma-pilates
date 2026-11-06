@@ -19,6 +19,7 @@ import {
   StaffInvoiceController,
   type InvoiceFileOperations,
 } from './invoice-file.controller';
+import { createPdfPageRenderer } from './pdf-page-cache';
 import { renderPdfPage } from './pdf-page-image';
 import { createPrismaInvoiceFile } from './prisma-invoice-file';
 
@@ -37,6 +38,10 @@ export const invoiceFileWiring = {
       ): InvoiceFileOperations => {
         const gateway = createPrismaInvoiceFile(prisma, { recordNotification });
         const now = () => new Date();
+        const renderPage = createPdfPageRenderer({
+          readObject: (objectKey) => storage.get(objectKey),
+          draw: renderPdfPage,
+        });
         return {
           list: (filter, principal) =>
             listStaffInvoices({ filter }, principal, { gateway }),
@@ -52,7 +57,7 @@ export const invoiceFileWiring = {
           clientFile: (paymentId, principal) =>
             readClientInvoiceFile({ paymentId }, principal, { gateway }),
           readObject: (objectKey) => storage.get(objectKey),
-          renderPage: renderPdfPage,
+          renderPage,
         };
       },
     },

@@ -41,7 +41,11 @@ import {
   type StaffInvoiceFilter,
   type StaffInvoiceView,
 } from './invoice-file';
-import { PdfPageNotFoundError, type PdfPageImage } from './pdf-page-image';
+import {
+  PdfPageNotFoundError,
+  PdfPageUnreadableError,
+  type PdfPageImage,
+} from './pdf-page-image';
 import {
   AttachInvoiceDto,
   attachInvoiceSchema,
@@ -70,7 +74,7 @@ export type InvoiceFileOperations = {
   clientList: (p: Principal) => Promise<ClientInvoiceView[]>;
   clientFile: (paymentId: string, p: Principal) => Promise<InvoiceFileObject>;
   readObject: (objectKey: string) => Promise<Buffer>;
-  renderPage: (bytes: Buffer, page: number) => Promise<PdfPageImage>;
+  renderPage: (objectKey: string, page: number) => Promise<PdfPageImage>;
 };
 
 const run = async <Result>(work: () => Promise<Result>): Promise<Result> => {
@@ -147,11 +151,19 @@ const sendPage = async (
       409,
     );
   }
-  const bytes = await operations.readObject(file.objectKey);
   let image: PdfPageImage;
   try {
-    image = await operations.renderPage(bytes, number);
+    image = await operations.renderPage(file.objectKey, number);
   } catch (error) {
+    if (error instanceof PdfPageUnreadableError) {
+      throw new HttpException(
+        {
+          code: 'invoice_page_unreadable',
+          detail: 'The PDF page cannot be drawn',
+        },
+        422,
+      );
+    }
     if (error instanceof PdfPageNotFoundError) {
       throw new HttpException(
         { code: 'invoice_page_not_found', detail: 'The PDF has no such page' },
