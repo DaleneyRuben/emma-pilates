@@ -64,6 +64,10 @@ const flagOwner = (dial: string): PhoneCountry | undefined =>
 export const phoneRequiredMessage =
   "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.";
 
+/** Verification n.º 41: the team fills Nuevo cliente for someone else. */
+export const theirPhoneRequiredMessage =
+  "Escribe su celular. Lo necesitamos para escribirle por WhatsApp.";
+
 // «o» becomes «u» before a word that starts with an o sound: «10 u 11», «7 u 8».
 const alternatives = (values: readonly (string | number)[]): string => {
   const last = String(values[values.length - 1]);
@@ -87,9 +91,18 @@ const nationalDigits = (target: PhoneCountry, typed: string): string => {
   return typedCode ? withoutCode : digits;
 };
 
-/** Null when the number fits the country's mobiles, else the line to show. */
-export const phoneProblem = (target: PhoneCountry, typed: string): string | null => {
-  if (typed.trim() === "") return phoneRequiredMessage;
+/**
+ * Null when the number fits the country's mobiles, else the line to show.
+ * «theirs» when the team types someone else's number.
+ */
+export const phoneProblem = (
+  target: PhoneCountry,
+  typed: string,
+  whose: "own" | "theirs" = "own",
+): string | null => {
+  if (typed.trim() === "") {
+    return whose === "own" ? phoneRequiredMessage : theirPhoneRequiredMessage;
+  }
   const digits = nationalDigits(target, typed);
   const fits =
     target.lengths.includes(digits.length) &&
