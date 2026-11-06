@@ -37,6 +37,7 @@ import {
   requireIdempotencyKey,
   runEvaluationCommand,
 } from './evaluations.controller';
+import { NutritionistAgendaPageDto } from './nutritionist-agenda.dto';
 import {
   AvailabilityBlockDto,
   AvailabilityBlockEndDto,
@@ -44,7 +45,6 @@ import {
   AvailabilityBlockInputDto,
   AvailabilityBlockReplacementDto,
   civilDate,
-  NutritionistAgendaPageDto,
   parseAgendaQuery,
   parseAvailabilityBlockEnd,
   parseAvailabilityBlockInput,
