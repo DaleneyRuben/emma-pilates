@@ -112,15 +112,26 @@ export const normalizeInvoiceFileName = (
   mediaType: InvoiceMediaType,
 ): string => {
   const base = (raw ?? '').split(/[\\/]/).pop() ?? '';
-  // eslint-disable-next-line no-control-regex
-  const cleaned = base.replace(/[\u0000-\u001f\u007f"]/g, '').trim();
+  const cleaned = base
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\u0000-\u001f\u007f"]/g, '')
+    // A lone surrogate cannot be sent in a header (encodeURIComponent throws).
+    .replace(
+      /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g,
+      '',
+    )
+    .trim();
   if (cleaned.length === 0) return `factura.${extensionOf[mediaType]}`;
-  if (cleaned.length <= invoiceFileNameMaxLength) return cleaned;
+  // Counted in code points so a cut never splits an emoji in half.
+  const characters = Array.from(cleaned);
+  if (characters.length <= invoiceFileNameMaxLength) return cleaned;
   const dot = cleaned.lastIndexOf('.');
   const extension =
     dot > 0 && cleaned.length - dot <= 8 ? cleaned.slice(dot) : '';
   return (
-    cleaned.slice(0, invoiceFileNameMaxLength - extension.length) + extension
+    characters
+      .slice(0, invoiceFileNameMaxLength - Array.from(extension).length)
+      .join('') + extension
   );
 };
 

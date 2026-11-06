@@ -126,7 +126,7 @@ export const readStaffInvoice = async (
 const staffListSize = 100;
 
 // E4 «Facturas»: «Por subir» is every confirmed sale whose Client asked an
-// invoice and that is not issued yet, oldest decision first so nothing waits
+// invoice and that has no file yet (an old mark without one included), oldest decision first so nothing waits
 // forever; «Subidas» the latest uploads first.
 export const listStaffInvoices = async (
   reader: Reader,
@@ -137,7 +137,7 @@ export const listStaffInvoices = async (
       where: {
         state: PaymentState.CONFIRMED,
         invoiceTaxId: { not: null },
-        invoiceIssuedAt: null,
+        // A mark set before FIX-044 has no file: it still waits for one.
         invoices: { none: { removedAt: null } },
       },
       orderBy: [{ decidedAt: 'asc' }, { id: 'asc' }],

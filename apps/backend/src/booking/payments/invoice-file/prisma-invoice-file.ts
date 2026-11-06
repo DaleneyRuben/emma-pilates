@@ -224,7 +224,11 @@ export const createPrismaInvoiceFile = (
 
     remove: ({ paymentId, principal, now }) =>
       serializable(async (transaction) => {
-        await lockPayment(transaction, paymentId);
+        const payment = await lockPayment(transaction, paymentId);
+        // Owner, 2026-11-05: a voided sale's invoice stays with the Client.
+        if (payment.state === 'voided') {
+          throw new InvoiceFileError('payment_voided');
+        }
         const current = await currentInvoiceOf(transaction, paymentId);
         if (current === null) throw new InvoiceFileError('invoice_not_found');
 

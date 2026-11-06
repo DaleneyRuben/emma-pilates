@@ -103,14 +103,19 @@ const sendFile = async (
   response: Response,
 ): Promise<StreamableFile> => {
   const bytes = await operations.readObject(file.objectKey);
-  const asciiName = file.fileName.replace(/[^\x20-\x7e]/g, '_');
-  const name = /\.[a-z0-9]{2,5}$/i.test(asciiName)
-    ? asciiName
-    : `${asciiName}.${extensionOf[file.mediaType]}`;
+  // The extension always matches what is served: a PDF named «x.html»
+  // downloads as «x.pdf».
+  const stem = file.fileName.replace(/\.[^.]{1,8}$/, '') || 'factura';
+  const fullName = `${stem}.${extensionOf[file.mediaType]}`;
+  const asciiName = fullName.replace(/[^\x20-\x7e]/g, '_');
+  const encoded = encodeURIComponent(fullName).replace(
+    /['()*]/g,
+    (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
   response.setHeader('Content-Type', file.mediaType);
   response.setHeader(
     'Content-Disposition',
-    `attachment; filename="${name}"; filename*=UTF-8''${encodeURIComponent(file.fileName)}`,
+    `attachment; filename="${asciiName}"; filename*=UTF-8''${encoded}`,
   );
   response.setHeader('Cache-Control', 'no-store');
   response.setHeader('X-Content-Type-Options', 'nosniff');

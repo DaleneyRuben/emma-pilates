@@ -41,13 +41,17 @@ type PaymentRow = {
 const stateCondition = (status: AdministratorPaymentStatusFilter) =>
   status === 'all' ? Prisma.empty : Prisma.sql`AND p.state::text = ${status}`;
 
-// PAY-007's «Sin factura emitida»: the confirmed sales a Client asked an
-// invoice for that the Administrator has not marked yet.
+// «Factura por subir» (FIX-044, formerly PAY-007's «Sin factura emitida»):
+// the confirmed sales a Client asked an invoice for with no file uploaded,
+// a mark set before FIX-044 included.
 const invoiceCondition = (invoice: AdministratorPaymentInvoiceFilter) =>
   invoice === 'all'
     ? Prisma.empty
     : Prisma.sql`AND p.state = 'confirmed' AND p.invoice_tax_id IS NOT NULL
-        AND p.invoice_issued_at IS NULL`;
+        AND NOT EXISTS (
+          SELECT 1 FROM booking.payment_invoices pi
+          WHERE pi.payment_id = p.id AND pi.removed_at IS NULL
+        )`;
 
 // STAFF-004's accent- and case-insensitive match on the Client's name.
 const searchCondition = (query: string | undefined) =>
