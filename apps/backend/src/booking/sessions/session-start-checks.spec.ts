@@ -132,7 +132,7 @@ describe('Session start checks', () => {
     );
   });
 
-  it('says so when no other Session that day has places, naming the day when it is not today', () => {
+  it('says so when no other Session that day has places, naming the day', () => {
     expect(
       minimumNotMetClientNotice({
         accountId: 'client-account',
