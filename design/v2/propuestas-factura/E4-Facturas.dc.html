@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Facturas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+a{color:#7D4F4B;text-decoration:none}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.board{display:flex;flex-direction:column;background:#FAF7F2}
+.scr{width:390px;height:844px;background:#FAF7F2;color:#4A4A4A;font-family:'Work Sans',system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden;position:relative;flex:none}
+.scr.and{width:412px;height:915px}
+.sb{height:36px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:500;color:#4A4A4A;flex:none}
+.gb{height:24px;display:flex;align-items:center;justify-content:center;flex:none}.gb i{width:108px;height:4px;border-radius:999px;background:#4A4A4A;opacity:.55}
+.top{padding:52px 8px 4px;display:flex;align-items:center;gap:4px;flex:none}
+.and .top{padding:4px 4px 4px}
+.back{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;cursor:pointer}
+.bl{font-size:16px;font-weight:500}
+.ttl{font-family:Lora,Georgia,serif;font-size:24px}
+.h1{font-family:Lora,Georgia,serif;font-size:30px}
+.body{flex:1;min-height:0;padding:8px 20px 0;display:flex;flex-direction:column;gap:20px;overflow:hidden}
+.hero{background:#93615D;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px;color:#FFFFFF}
+.hrow{display:flex;align-items:center;justify-content:space-between}
+.heb{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.hpill{padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.18);font-size:12px;font-weight:600}
+.hbig{font-family:Lora,Georgia,serif;font-size:32px;font-variant-numeric:tabular-nums}
+.hsub{font-size:14px;color:rgba(255,255,255,.85)}
+.eb{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.card{background:#F5EFE9;border-radius:16px;display:flex;flex-direction:column}
+.r{min-height:56px;padding:0 16px;display:flex;align-items:center;gap:12px;color:#4A4A4A;border:0;background:transparent;font-family:inherit;text-align:left;width:100%;cursor:pointer}
+.r.tall{min-height:68px;padding-top:8px;padding-bottom:8px}
+.sep{height:1px;background:#E6DBD0;margin-left:64px}
+.sep.full{margin-left:0}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;display:flex;align-items:center;justify-content:center;flex:none}
+.disc.e{background:#F7E5E0}
+.disc.big{width:72px;height:72px}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-family:Lora,Georgia,serif;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none}
+.g{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.t16{font-size:16px}.mut{font-size:13px;color:#6F6662;line-height:1.4}
+.rv{font-size:15px;color:#6F6662;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.rv b{font-weight:400;color:#4A4A4A;font-variant-numeric:tabular-nums}
+.amt{font-family:Lora,Georgia,serif;font-size:18px;font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;flex:none}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.wait{background:rgba(201,154,78,.16);color:#7C5D2A}.none{background:rgba(216,201,187,.34);color:#6F6662}.rose{background:#F2E4E1;color:#7D4F4B}
+.foot{padding:12px 20px 30px;display:flex;flex-direction:column;gap:4px;flex:none}
+.and .foot{padding-bottom:12px}
+.cta{height:52px;border-radius:14px;background:#B78380;color:#FFFFFF;font:600 17px 'Work Sans',sans-serif;border:0;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;cursor:pointer}
+.cta.off{background:#E6DBD0;color:#6F6662;cursor:default}
+.cta.sec{background:#F2E4E1;color:#7D4F4B}
+.cta.red{background:#A04E3E}
+.tb{height:44px;color:#7D4F4B;font:600 15px 'Work Sans',sans-serif;background:transparent;border:0;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;width:100%}
+.tb.red{color:#A04E3E}
+.warn{display:flex;gap:12px;align-items:center;background:#F5EFE9;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.4}
+.note{font-size:13px;color:#6F6662;text-align:center;line-height:1.4}
+.drop{border:1.5px dashed #D8C9BB;border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.file{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:16px;padding:12px 14px}
+.file.e{background:#F7E5E0}
+.thumb{width:44px;height:56px;border-radius:6px;background:#FAF7F2;box-shadow:inset 0 0 0 1px #E6DBD0;display:flex;flex-direction:column;gap:4px;padding:8px 7px;flex:none}
+.thumb i{display:block;height:3px;border-radius:2px;background:#E6DBD0}.thumb i.s{width:60%}.thumb i.t{background:#B78380;width:70%}
+.bar{height:6px;border-radius:999px;background:#E6DBD0;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;width:60%;background:#B78380;border-radius:999px}
+.toast{position:absolute;left:20px;right:20px;bottom:120px;background:#93615D;border-radius:14px;padding:12px 8px 12px 16px;display:flex;align-items:center;gap:12px;color:#FFFFFF;box-shadow:0 8px 24px rgba(74,74,74,.18);z-index:4}
+.toast .g span:first-child{font-size:15px;font-weight:600}.toast .g span+span{font-size:13px;color:rgba(255,255,255,.85)}
+.snack{position:absolute;left:12px;right:12px;bottom:96px;background:#4A4A4A;border-radius:8px;padding:6px 8px 6px 16px;display:flex;align-items:center;gap:12px;color:#FFFFFF;font-size:14px;z-index:4;min-height:48px}
+.snack button{height:40px;border:0;background:transparent;color:#F2E4E1;font:600 14px 'Work Sans',sans-serif;padding:0 8px}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.32);z-index:5}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#FAF7F2;border-radius:20px 20px 0 0;display:flex;flex-direction:column;z-index:6;padding:8px 20px 34px;gap:6px}
+.grab{width:36px;height:5px;border-radius:999px;background:#D8C9BB;margin:0 auto 8px}
+.sheet h2{margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px}
+.sheet p{margin:0 0 12px;font-size:15px;line-height:1.5;color:#6F6662}
+.as{position:absolute;left:8px;right:8px;bottom:30px;display:flex;flex-direction:column;gap:8px;z-index:6}
+.as .grpb{background:rgba(250,247,242,.97);border-radius:14px;overflow:hidden}
+.as button{width:100%;height:56px;border:0;background:transparent;font:400 18px 'Work Sans',sans-serif;color:#7D4F4B;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.as button+button{border-top:1px solid #E6DBD0}
+.as .cn{font-weight:600}
+.seg{display:flex;gap:2px;background:#F5EFE9;border-radius:12px;padding:3px}
+.seg button{flex:1;height:38px;border:0;border-radius:10px;background:transparent;font:500 14px 'Work Sans',sans-serif;color:#6F6662;cursor:pointer}
+.seg button.on{background:#FAF7F2;color:#7D4F4B;font-weight:600}
+.empty{flex:1;padding:0 32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.empty b{font-family:Lora,Georgia,serif;font-weight:400;font-size:24px}
+.empty span{font-size:15px;line-height:1.5;color:#6F6662}
+.tabbar{height:82px;padding-bottom:18px;background:#F5EFE9;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;flex:none}
+.and .tabbar{height:80px;padding-bottom:0}
+.tabbar span{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6F6662;font-size:12px}
+.tabbar span.on{color:#93615D;font-weight:600}
+.preview{align-self:center;width:220px;aspect-ratio:210/297;background:#FFFFFF;border-radius:8px;box-shadow:0 1px 0 #E6DBD0,0 8px 24px rgba(74,58,48,.10);padding:18px 16px;display:flex;flex-direction:column;gap:7px;flex:none}
+.preview i{display:block;height:5px;border-radius:2px;background:#EDE5DD}.preview i.h{height:9px;width:55%;background:#E6DBD0}.preview i.s{width:45%}.preview i.m{width:75%}.preview i.rule{height:1px;background:#E6DBD0;margin:4px 0}
+.preview .pt{font-size:9px;color:#6F6662;font-family:'Work Sans',sans-serif}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;font-size:15px}.kv+.kv{border-top:1px solid #E6DBD0}.kv span:first-child{color:#6F6662}.kv span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.push{position:absolute;left:8px;right:8px;top:48px;background:rgba(250,247,242,.97);border-radius:20px;padding:12px 14px;display:flex;gap:10px;box-shadow:0 10px 30px rgba(74,58,48,.22);z-index:6}
+.push .ic{width:38px;height:38px;border-radius:9px;background:#93615D;color:#fff;font-family:Lora,serif;font-size:20px;display:flex;align-items:center;justify-content:center;flex:none}
+.share{position:absolute;left:0;right:0;bottom:0;height:420px;background:#F2EEEA;border-radius:14px 14px 0 0;z-index:6;padding:16px;display:flex;flex-direction:column;gap:14px}
+.share .apps{display:flex;gap:18px;padding:4px 4px}
+.share .ap{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:#4A4A4A;width:60px}
+.share .ap i{width:56px;height:56px;border-radius:14px;background:#E6DBD0;display:block}
+.share .ac{background:#FFFFFF;border-radius:12px}
+.share .ac div{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:16px}
+.share .ac div+div{border-top:1px solid #E6DBD0}
+.proto{background:#4A4A4A;color:#fff;padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-start;font-family:'Work Sans',sans-serif}
+.proto .pt{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7);width:100%}
+.grp{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.grp>b{font-size:12px;font-weight:600;color:rgba(255,255,255,.85);margin-right:2px}
+.chip{height:30px;padding:0 12px;border:0;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;font:500 12px 'Work Sans',sans-serif;cursor:pointer}
+.chip.on{background:#FFFFFF;color:#4A4A4A;font-weight:600}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{width:16px;height:16px;border-radius:999px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;animation:spin .8s linear infinite;display:inline-block}
+</style>
+</helmet>
+<div class="board" style="width:390px"><div class="proto"><span class="pt">Prototipo · Facturas</span><div class="grp"><button type="button" class="{{cls.por}}" onClick="{{go.por}}">Por subir</button><button type="button" class="{{cls.sub}}" onClick="{{go.sub}}">Subidas</button><button type="button" class="{{cls.vacio}}" onClick="{{go.vacio}}">Nada por subir</button></div></div><div class="scr"><div class="top"><a class="back" href="E2-Pagos.dc.html" aria-label="Volver"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></a><span class="bl">Pagos pendientes</span></div><div class="body" style="gap:16px"><span class="h1">Facturas</span><div class="seg" role="tablist"><button type="button" class="{{seg.por}}" onClick="{{go.por}}">Por subir ·&nbsp;{{count}}</button><button type="button" class="{{seg.sub}}" onClick="{{go.sub}}">Subidas</button></div><sc-if value="{{is.por}}" hint-placeholder-val="{{false}}"><div class="card"><a class="r tall" href="E5-Factura-del-pago.dc.html"><span class="av">MQ</span><span class="g"><span class="t16">Mariana Quiroga</span><span class="mut">NIT 123456 · Paquete de 8 clases</span><span class="mut">Confirmado hoy, 09:30</span></span><span class="amt">Bs 502</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a></div><span class="mut" style="padding:0 4px">Pagos confirmados de clientas que pidieron factura.</span></sc-if><sc-if value="{{is.sub}}" hint-placeholder-val="{{false}}"><div class="card"><a class="r tall" href="E5-Factura-del-pago.dc.html"><span class="av">LF</span><span class="g"><span class="t16">Lucía Fernández</span><span class="mut">NIT 4567890 · Paquete de 8 clases</span><span class="mut">Subida por Ana · 4 nov</span></span><span class="pill ok">Emitida</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a><div class="sep"></div><span class="r tall"><span class="av">IA</span><span class="g"><span class="t16">Isabel Arce</span><span class="mut">NIT 1029384015 · Mensual 16 clases</span><span class="mut">Subida por Carolina · 28 oct</span></span><span class="pill ok">Emitida</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></span></div></sc-if><sc-if value="{{is.vacio}}" hint-placeholder-val="{{false}}"><div class="empty"><span class="disc big"><svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2z"></path><path d="M9 8.5h6M9 12.5h6"></path></svg></span><b>No hay facturas por subir</b><span>Cuando una clienta pida factura y confirmes su pago, aparece aquí.</span></div></sc-if></div><nav class="tabbar" aria-label="Principal"><span class="on"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2z"></path><path d="M9 8.5h6M9 12.5h6"></path></svg>Pagos</span><span class=""><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"></circle><path d="M3 20c.8-3.5 3.2-5.5 6-5.5s5.2 2 6 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5c1.6.7 2.6 2.6 3 5.5"></path></svg>Clientes</span><span class=""><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>Horario</span><span class=""><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"></circle><path d="M5 20c1-3.6 3.8-5.5 7-5.5s6 1.9 7 5.5"></path></svg>Perfil</span></nav></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"estado": {"editor": "enum", "options": ["por", "sub", "vacio"], "default": "por"}, "$preview": {"width": 390, "height": 919}}'>
+var KEYS = ["por", "sub", "vacio"];
+var GROUPS = {};
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var from = this.props.estado ?? "por";
+    var k = st.from === from && st.k ? st.k : from;
+    var is = {}, go = {}, cls = {};
+    KEYS.forEach(function (x) { is[x] = x === k; go[x] = function () { self.setState({ k: x, from: from }); }; cls[x] = x === k ? 'chip on' : 'chip'; });
+    Object.keys(GROUPS).forEach(function (g) { is[g] = GROUPS[g].indexOf(k) >= 0; is['not_' + g] = GROUPS[g].indexOf(k) < 0; });
+    var segOn = k === 'sub' ? 'sub' : 'por';
+    var seg = { por: segOn === 'por' ? 'on' : '', sub: segOn === 'sub' ? 'on' : '' };
+    var count = k === 'vacio' ? '0' : '1';
+
+    return { is: is, go: go, cls: cls, seg: seg, count: count };
+  }
+}
+</script>
+</body>
+</html>

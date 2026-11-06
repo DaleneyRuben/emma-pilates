@@ -1,0 +1,116 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-05T22:32:23Z"
+ },
+ "title": "Emma Pilates Studio · Entregar la factura",
+ "launch": {
+  "view": "focused",
+  "file": "Main.dc.html"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1300,
+   "title": "Entregar la factura · elige y prueba",
+   "is_interactive": true
+  },
+  "E1-Revisar-pago.dc.html": {
+   "x": 0,
+   "y": 1460,
+   "w": 390,
+   "h": 919,
+   "title": "E1 Revisar pago · con y sin factura",
+   "is_interactive": true
+  },
+  "E2-Pagos.dc.html": {
+   "x": 470,
+   "y": 1460,
+   "w": 390,
+   "h": 919,
+   "title": "E2 Pagos · Administración, la entrada a Facturas",
+   "is_interactive": true
+  },
+  "E3-Clientes.dc.html": {
+   "x": 940,
+   "y": 1460,
+   "w": 390,
+   "h": 919,
+   "title": "E3 Clientes · Recepción y Coordinación, la entrada a Facturas",
+   "is_interactive": true
+  },
+  "E4-Facturas.dc.html": {
+   "x": 1410,
+   "y": 1460,
+   "w": 390,
+   "h": 919,
+   "title": "E4 Facturas · por subir y subidas",
+   "is_interactive": true
+  },
+  "E5-Factura-del-pago.dc.html": {
+   "x": 1880,
+   "y": 1460,
+   "w": 390,
+   "h": 1006,
+   "title": "E5 Factura del pago · subir, reemplazar, quitar",
+   "is_interactive": true
+  },
+  "W1-Pagos-web.dc.html": {
+   "x": 0,
+   "y": 2626,
+   "w": 1440,
+   "h": 1075,
+   "title": "W1 Dinero › Pagos · computadora 1440",
+   "is_interactive": true
+  },
+  "W2-Pagos-web-420.dc.html": {
+   "x": 1520,
+   "y": 2626,
+   "w": 420,
+   "h": 1336,
+   "title": "W2 Dinero › Pagos · celular 420",
+   "is_interactive": true
+  },
+  "K1-Perfil.dc.html": {
+   "x": 0,
+   "y": 4122,
+   "w": 390,
+   "h": 844,
+   "title": "K1 Perfil · la entrada a Mis facturas",
+   "is_interactive": true
+  },
+  "K2-Mis-facturas-iPhone.dc.html": {
+   "x": 470,
+   "y": 4122,
+   "w": 390,
+   "h": 993,
+   "title": "K2 Mis facturas · iPhone",
+   "is_interactive": true
+  },
+  "K3-Mis-facturas-Android.dc.html": {
+   "x": 940,
+   "y": 4122,
+   "w": 412,
+   "h": 1064,
+   "title": "K3 Mis facturas · Android",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "E1-Revisar-pago.dc.html",
+  "E2-Pagos.dc.html",
+  "E3-Clientes.dc.html",
+  "E4-Facturas.dc.html",
+  "E5-Factura-del-pago.dc.html",
+  "W1-Pagos-web.dc.html",
+  "W2-Pagos-web-420.dc.html",
+  "K1-Perfil.dc.html",
+  "K2-Mis-facturas-iPhone.dc.html",
+  "K3-Mis-facturas-Android.dc.html"
+ ]
+}

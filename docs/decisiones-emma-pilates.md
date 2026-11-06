@@ -104,7 +104,7 @@ Al final del turno: efectivo esperado según ventas registradas, efectivo contad
 
 ### 4.5 Datos para la factura
 
-En cada venta: NIT o CI, nombre o razón social, y una marca de "factura emitida" (con quién y cuándo la marcó). La factura se emite fuera del sistema. Permitir filtrar ventas sin factura emitida.
+En cada venta: NIT o CI, nombre o razón social, y una marca de "factura emitida" (con quién y cuándo la marcó). La factura se emite fuera del sistema. Permitir filtrar ventas sin factura emitida. Desde el 2026-11-05 (§20, n.º 26) la marca se pone **subiendo la factura emitida** y la clienta la recibe en su app.
 
 ## 5. Promociones
 
@@ -294,3 +294,5 @@ Hallazgos del segundo recorrido a mano (2026-11-04). La dueña dio confianza gen
     - **Editar sesión** sigue la propuesta **A · Lista y acciones abajo**. Arriba, «Reservaron (n)» con un botón chico **+ Reservar** y la lista simple de reservas. Debajo, **Aplicar cambios a** (Solo esta sesión / Esta y las futuras) justo encima de los campos. Abajo, Guardar y **Cancelar esta clase**. Al final, una fila «Serie semanal» con **Pausar la serie** y **Terminar la serie**, visibles en los dos modos.
 
 25. **La coordinadora crea clientas nuevas (§7).** Decidido por la dueña el 2026-11-05: «quiero que la coordinadora pueda agregar nuevos clientes también». En la app del equipo, **Buscar cliente** le muestra **+ Nuevo cliente**, con el mismo formulario y las mismas reglas que la recepcionista: el enlace de activación por correo, el límite de correos por persona del equipo, y la auditoría a su nombre. En la ficha de la clienta que creó sigue la invitación como la recepcionista: **Reenviar enlace**, **Cambiar correo** y **Cancelar invitación**. **Cobrar sigue sin ser suyo:** no registra pagos en efectivo, no ve precios ni montos (§7). La web no tiene una pantalla para crear clientas para nadie; si se agrega, la coordinadora también la tendrá.
+
+26. **La factura se sube y la clienta la recibe en «Mis facturas» (§4.5, DES-011).** Decidido por la dueña el 2026-11-05: sigue sin SIAT. La **administradora, la coordinadora y la asistente** suben la factura emitida (PDF, JPG o PNG, hasta 10 MB) en un pago confirmado, desde la web o desde la app del equipo; subirla deja el pago «Factura emitida» con quién y cuándo, y la clienta recibe el aviso «Tu factura está lista» y la descarga en **Mis facturas** (Perfil). «Reemplazar» y «Quitar factura» no borran el archivo: queda oculto y registrado. Sus tres respuestas: (1) **desaparece «Marcar emitida»**: un pago queda emitido solo subiendo el archivo; las marcas antiguas dicen «Emitida · sin archivo» con «Subir factura»; (2) **no se sube factura a un pago «Sin factura»**, solo a pagos con NIT o CI y nombre; (3) **la factura de un pago anulado sigue visible** para la clienta, con la nota «Pago anulado». «Revisar pago» de la app del equipo muestra si pidió factura y a nombre de quién. Diseño: follow-up 248 (`design/v2/propuestas-factura/`).
