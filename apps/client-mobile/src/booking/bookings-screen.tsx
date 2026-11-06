@@ -61,6 +61,11 @@ export function BookingsScreen({
   const [cancelInFlight, setCancelInFlight] = useState(false);
   const cancelStarted = useRef(false);
   const [failure, setFailure] = useState<string | null>(null);
+  // Walkthrough n.º 29: a cancellation is confirmed like a booking is.
+  const [cancelledShown, setCancelledShown] = useState(false);
+  const cancelledNotice = useStickyNotice(cancelledShown ? true : undefined, () =>
+    setCancelledShown(false),
+  );
   const upcoming = useListUpcomingBookings({
     fetcher,
     query: { refetchOnMount: "always" },
@@ -100,6 +105,7 @@ export function BookingsScreen({
         // «Reserva confirmada · Te quedan N clases» no longer holds once a
         // Booking is cancelled, often the one it confirmed (MOB-074).
         dismissConfirmed();
+        setCancelledShown(true);
       } else {
         setFailure(
           bookingRejectionMessage(problemCode(response.data)) ??
@@ -220,6 +226,19 @@ export function BookingsScreen({
           }
           onClose={dismissConfirmed}
           title="Reserva confirmada"
+        />
+      ) : null}
+      {cancelledNotice !== null && confirmed === null ? (
+        <BrandToast
+          // The API accepts a cancellation only outside the window, and every
+          // accepted one gives the class back (restoreBookedClass).
+          note={
+            remaining === undefined
+              ? "La clase volvió a tu plan"
+              : `La clase volvió a tu plan · Te ${remaining === 1 ? "queda 1 clase" : `quedan ${remaining} clases`}`
+          }
+          onClose={() => setCancelledShown(false)}
+          title="Reserva cancelada"
         />
       ) : null}
     </Screen>

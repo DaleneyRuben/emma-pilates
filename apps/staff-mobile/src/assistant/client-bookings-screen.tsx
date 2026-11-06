@@ -135,6 +135,11 @@ export function ClientBookingsScreen({
   const notice = useStickyNotice(route.params.confirmed, dismissNotice);
   const [cancelling, setCancelling] = useState<AssistantClientBookingDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  // Walkthrough n.º 29: a cancellation is confirmed like a booking is.
+  const [cancelledShown, setCancelledShown] = useState(false);
+  const cancelledNotice = useStickyNotice(cancelledShown ? true : undefined, () =>
+    setCancelledShown(false),
+  );
   const upcoming = useListAssistantClientBookings(clientId, {
     fetcher,
     query: { refetchOnMount: "always" },
@@ -158,6 +163,7 @@ export function ClientBookingsScreen({
       // «Reserva confirmada» no longer holds once a booking is cancelled,
       // often the one it confirmed (MOB-074).
       dismissNotice();
+      setCancelledShown(true);
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
     } finally {
@@ -247,6 +253,14 @@ export function ClientBookingsScreen({
           note={`${notice.classTypeName} · ${formatSessionDate(notice.startsAt)} · ${formatTimeRange(notice.startsAt, notice.endsAt)}`}
           onClose={dismissNotice}
           title="Reserva confirmada"
+        />
+      ) : null}
+      {cancelledNotice !== null && notice === null ? (
+        <BrandToast
+          // Every cancellation the API accepts gives the class back.
+          note="La clase volvió a su plan"
+          onClose={() => setCancelledShown(false)}
+          title="Reserva cancelada"
         />
       ) : null}
     </Screen>
