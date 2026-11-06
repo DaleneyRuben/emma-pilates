@@ -3,7 +3,7 @@ description: Node from .nvmrc, pnpm from the packageManager field, cached pnpm s
 
 inputs:
   playwright-browser:
-    description: Install the admin web's pinned Playwright Chromium (cached under ~/.cache/ms-playwright by Playwright version) and its system packages
+    description: Install the admin web's pinned Playwright Chromium (cached under ~/.cache/ms-playwright by Playwright version); the runner image already has its system libraries
     required: false
     default: "false"
 
@@ -32,7 +32,7 @@ runs:
     - if: inputs.playwright-browser == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
       run: pnpm --filter @pilates/admin-web exec playwright install chromium
       shell: bash
-    # the browser's shared libraries are not part of the cached download
-    - if: inputs.playwright-browser == 'true'
-      run: pnpm --filter @pilates/admin-web exec playwright install-deps chromium
-      shell: bash
+    # no `playwright install-deps`: the ubuntu-24.04 image already has the
+    # shared libraries Chromium needs, and that apt step (mostly CJK and Thai
+    # fonts the Spanish admin web never draws) took over ten minutes whenever
+    # the Ubuntu mirror was slow
