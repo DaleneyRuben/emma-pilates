@@ -141,7 +141,7 @@ export function ClientSearchScreen() {
           </Pressable>
         )}
       </View>
-      {searching || invoiceCount === 0 ? null : (
+      {searching ? null : (
         <IconRowGroup>
           <IconRow
             chevron
@@ -149,7 +149,7 @@ export function ClientSearchScreen() {
             label="Facturas por subir"
             onPress={() => navigation.navigate("Invoices")}
             testID="client-search-invoices"
-            value={String(invoiceCount)}
+            value={invoiceCount > 0 ? String(invoiceCount) : undefined}
           />
         </IconRowGroup>
       )}
