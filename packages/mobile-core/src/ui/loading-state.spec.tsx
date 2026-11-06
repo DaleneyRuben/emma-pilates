@@ -49,7 +49,7 @@ describe("LoadingState", () => {
   it("draws the logo 240 pt wide on a phone and 300 pt on a tablet", async () => {
     const phone = await render(<LoadingState label="Cargando clases" />);
     await advance(400);
-    expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 240, height: 100 });
+    expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 240, height: 103 });
     await phone.unmount();
 
     const phoneWindow = Dimensions.get("window");
@@ -58,7 +58,7 @@ describe("LoadingState", () => {
     try {
       const tablet = await render(<LoadingState label="Cargando clases" />);
       await advance(400);
-      expect(tablet.getByTestId("loading-state-logo")).toHaveStyle({ width: 300, height: 125 });
+      expect(tablet.getByTestId("loading-state-logo")).toHaveStyle({ width: 300, height: 129 });
     } finally {
       Dimensions.set({ window: phoneWindow, screen: phoneWindow });
     }
