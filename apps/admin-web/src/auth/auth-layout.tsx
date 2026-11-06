@@ -10,8 +10,8 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         <img
           src="/emma-logo.png"
           alt="Emma Pilates Studio"
-          width={800}
-          height={333}
+          width={1312}
+          height={565}
           className="h-auto w-[240px] max-w-full min-[900px]:w-[440px]"
         />
       </aside>
