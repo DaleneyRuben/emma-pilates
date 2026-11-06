@@ -478,6 +478,9 @@ En la app de clientas, como Lucía, con el plan ya vigente.
    iniciales), los cupos y la descripción que escribiste. En la lista de
    **Reservar**, en **Mis Reservas** y en el historial su foto chica va antes
    de su nombre.
+   Si Lucía pone su foto en **Editar perfil**, el equipo la ve en lugar de
+   sus iniciales: en la lista de la clase, al buscarla, en su ficha, en
+   Pagos pendientes y en la web (Clientas, Dinero › Pagos, «Reservaron»).
 3. **Reservar**. La clase pasa a **Mis Reservas**, con la fecha, la hora y la
    sede. **Mi plan** baja una clase.
 4. Reserva también el reformer del miércoles, para tener dos reservas y

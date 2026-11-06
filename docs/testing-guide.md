@@ -8908,6 +8908,15 @@ E. **The API.** `PUT /api/v1/staff-members/current/photo`, `PUT` and
    member's Account with the actor who made it.
 F. **At 420 px** the admin web's member panel fills the width and the
    controls wrap without sideways scroll.
+G. **Clients' photos where the staff see them** (walkthrough n.º 30). Give
+   Mariana a photo from the client app's **Editar perfil**. Her initials
+   «MQ» become her photo in the Trainer's class roster, Buscar cliente and
+   her file, Pagos pendientes and Revisar pago, Para contactar and
+   Congelamientos in the Staff app, and in Clientas, her file, Dinero ›
+   Pagos, the class panel's «Reservaron» and Inicio's pending list on the
+   admin web. `GET /api/v1/client-photos/{imageAssetId}` answers any Staff
+   Role (`private, no-cache`, `ETag`, `304`) and `403 booking_access_denied`
+   to a Client.
 
 Specs: `staff-photo.spec.ts`, `staff-photo.e2e-spec.ts`,
 `staff-photo.integration-spec.ts`, `staff-photo.spec.tsx` (mobile-core), and
