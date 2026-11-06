@@ -14,7 +14,7 @@ import {
   surfaces,
   typography,
 } from "@pilates/mobile-core";
-import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { Fragment, useEffect } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -104,7 +104,7 @@ function PlanRow({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
   );
 }
 
-export function PlansScreen() {
+export function PlansScreen({ route }: { route?: { params?: PlansParams } }) {
   const navigation = useNavigation<PlansNavigation>();
   const fetcher = useClientFetcher();
   const plans = useListPlans({
@@ -117,12 +117,11 @@ export function PlansScreen() {
   // A rejected Plan that is no longer sold opens the list anyway (review of
   // FIX-043), and only the focused screen redirects: a Plans screen left under
   // the payment must not replace itself when the payment turns pending.
-  const route = useRoute<{ key: string; name: string; params?: PlansParams }>();
   const focused = useIsFocused();
   const { pending: paymentPending, standing } = usePaymentStanding(fetcher);
   const blocked =
     standing.kind === "in_review" ||
-    (standing.kind === "rejected" && route.params?.rejectedPlanGone !== true);
+    (standing.kind === "rejected" && route?.params?.rejectedPlanGone !== true);
   useEffect(() => {
     if (blocked && focused) navigation.replace("PaymentStatus");
   }, [blocked, focused, navigation]);
