@@ -14,7 +14,7 @@ jest.setTimeout(20_000);
 
 jest.mock("./load-receipt-upload", () => ({
   loadReceiptUpload: async () => ({
-    photographTransferReceipt: async () => ({ imageAssetId: "asset-1" }),
+    chooseTransferReceipt: async () => ({ imageAssetId: "asset-1" }),
   }),
 }));
 
@@ -57,7 +57,7 @@ describe("Registrar pago by QR (S10)", () => {
     expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeDisabled();
 
     await fireEvent.press(screen.getByRole("button", { name: "Fotografiar comprobante" }));
-    await waitFor(() => expect(screen.getByText("Comprobante fotografiado")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("Comprobante listo")).toBeOnTheScreen());
     expect(screen.getByText("Todavía no se envió")).toBeOnTheScreen();
     expect(sent).not.toHaveBeenCalled();
 
