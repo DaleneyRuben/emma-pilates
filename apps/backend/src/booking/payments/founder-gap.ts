@@ -9,6 +9,7 @@ import {
   recordNotification as defaultNotificationRecorder,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
+import { boliviaDate } from '../../time/bolivia-time';
 import { decideFounderGap, type FounderRules } from './founder-membership';
 import { priceFounderSale } from './prisma-founder-membership';
 
@@ -34,9 +35,11 @@ const readRules = async (transaction: Transaction): Promise<FounderRules> => {
 // Pricing asks first, so an abandoned transfer pays list without losing the
 // place. The loss is written when the sale is confirmed. Voided and courtesy
 // Subscriptions are not a real end.
+// soldOn is the day the next Plan was sold (booking ADR-0013); today when
+// the sale is being made now.
 export const founderGapWouldLose = async (
   transaction: Transaction,
-  input: { clientId: string; nextStart: Date; today: Date },
+  input: { clientId: string; nextStart: Date; today: Date; soldOn?: Date },
 ): Promise<boolean> => {
   const held = await transaction.founderMembership.findFirst({
     where: {
@@ -71,6 +74,7 @@ export const founderGapWouldLose = async (
     membership: { status: 'active', lostAt: null },
     latestRealEnd: latestRealEnd === null ? null : civil(latestRealEnd),
     nextStart: civil(input.nextStart),
+    nextSoldOn: civil(input.soldOn ?? input.today),
   });
   return decision.lose;
 };
@@ -107,6 +111,7 @@ export const loseFounderForGap = async (
     clientId: string;
     nextStart: Date;
     today: Date;
+    soldOn?: Date;
     now: Date;
     recordNotification?: NotificationRecorder;
   },
@@ -160,4 +165,29 @@ export const loseFounderForGap = async (
     });
   }
   return true;
+};
+
+// A transfer confirmed later is judged on the day it was sold (booking
+// ADR-0013), read from its Payment.
+export const loseFounderForGapOfSale = async (
+  transaction: Transaction,
+  input: {
+    paymentId: string;
+    clientId: string;
+    nextStart: Date;
+    today: Date;
+    now: Date;
+  },
+): Promise<boolean> => {
+  const sold = await transaction.payment.findUniqueOrThrow({
+    where: { id: input.paymentId },
+    select: { createdAt: true },
+  });
+  return loseFounderForGap(transaction, {
+    clientId: input.clientId,
+    nextStart: input.nextStart,
+    today: input.today,
+    soldOn: boliviaDate(sold.createdAt),
+    now: input.now,
+  });
 };
