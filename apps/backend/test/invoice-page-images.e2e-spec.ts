@@ -52,7 +52,9 @@ const twoPagePdf = (): Buffer => {
   });
   const xref = body.length;
   body += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-  body += offsets.map((o) => `${String(o).padStart(10, '0')} 00000 n \n`).join('');
+  body += offsets
+    .map((o) => `${String(o).padStart(10, '0')} 00000 n \n`)
+    .join('');
   body += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
   return Buffer.from(body, 'latin1');
 };
@@ -85,7 +87,7 @@ describe('Invoice page images (e2e)', () => {
     accountId: 'account-id',
     authenticationSessionId: 'session',
     identity: { kind: 'client', clientId: 'client-id' },
-  } as AuthenticatedPrincipal;
+  };
   const operations = {
     list: operation(),
     read: operation(),
@@ -130,17 +132,20 @@ describe('Invoice page images (e2e)', () => {
   it.each([
     ['client', `/api/v1/clients/current/invoices/${paymentId}/file/pages/2`],
     ['staff', `/api/v1/staff/payments/${paymentId}/invoice/file/pages/2`],
-  ])('serves the %s a page as an uncached PNG with the page count', async (_, path) => {
-    await request(app.getHttpServer())
-      .get(path)
-      .set('authorization', bearer)
-      .expect(200)
-      .expect('Content-Type', 'image/png')
-      .expect('Cache-Control', 'no-store')
-      .expect('X-Page-Count', '2');
-    expect(operations.readObject).toHaveBeenCalledWith(pdfFile.objectKey);
-    expect(operations.renderPage).toHaveBeenCalledWith(expect.any(Buffer), 2);
-  });
+  ])(
+    'serves the %s a page as an uncached PNG with the page count',
+    async (_, path) => {
+      await request(app.getHttpServer())
+        .get(path)
+        .set('authorization', bearer)
+        .expect(200)
+        .expect('Content-Type', 'image/png')
+        .expect('Cache-Control', 'no-store')
+        .expect('X-Page-Count', '2');
+      expect(operations.readObject).toHaveBeenCalledWith(pdfFile.objectKey);
+      expect(operations.renderPage).toHaveBeenCalledWith(expect.any(Buffer), 2);
+    },
+  );
 
   it('answers a missing page as not found', async () => {
     operations.renderPage.mockRejectedValueOnce(new PdfPageNotFoundError(2));
@@ -155,7 +160,10 @@ describe('Invoice page images (e2e)', () => {
   });
 
   it('has no pages for a photo and refuses a page that is not a number', async () => {
-    operations.clientFile.mockResolvedValueOnce({ ...pdfFile, mediaType: 'image/jpeg' });
+    operations.clientFile.mockResolvedValueOnce({
+      ...pdfFile,
+      mediaType: 'image/jpeg',
+    });
 
     await request(app.getHttpServer())
       .get(`/api/v1/clients/current/invoices/${paymentId}/file/pages/1`)
