@@ -114,13 +114,13 @@ export function CancelSessionAction({
         className="self-center text-error hover:text-error-texto"
         onClick={() => setConfirming(true)}
       >
-        Cancelar sesión
+        Cancelar esta clase
       </Button>
       <ConfirmDialog
         open={confirming}
         onOpenChange={setConfirming}
-        title="¿Cancelar esta sesión?"
-        confirmLabel="Cancelar sesión"
+        title="¿Cancelar esta clase?"
+        confirmLabel="Sí, cancelar la clase"
         busy={change.isPending}
         onConfirm={() => void cancel()}
       >
