@@ -18,7 +18,7 @@ const problems: Record<string, Problem> = {
   },
   email_unchanged: {
     field: "email",
-    message: "La invitación ya usa este correo.",
+    message: "Ya usa este correo.",
   },
   invalid_branch_assignment: {
     field: "branchIds",
