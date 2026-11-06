@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Modal, StyleSheet, Text, View } from "react-native";
 
 import { fontFamilies } from "../ui/fonts";
 import { Glyph } from "../ui/glyph";
@@ -38,7 +38,9 @@ export function PhonePromptSheet({
   return (
     <Modal animationType="slide" onRequestClose={onLater} transparent visible={visible}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        // A Modal on Android does not resize with the keyboard, so the
+        // sheet pads itself above it on both platforms.
+        behavior="padding"
         style={styles.backdrop}
       >
         <View style={styles.sheet} testID="phone-prompt-sheet">
