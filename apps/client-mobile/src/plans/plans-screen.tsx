@@ -14,16 +14,21 @@ import {
   surfaces,
   typography,
 } from "@pilates/mobile-core";
-import { useNavigation } from "@react-navigation/native";
-import { Fragment } from "react";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Fragment, useEffect } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { usePaymentStanding } from "../payments/payment-standing";
 import { formatBolivianos } from "./plan-format";
+
+/** Set when «Subir otro comprobante» found the rejected Plan no longer sold. */
+export type PlansParams = { rejectedPlanGone?: true };
 
 type PlansNavigation = {
   goBack: () => void;
   navigate: (screen: "PlanDetail", params: { planId: string }) => void;
+  replace: (screen: "PaymentStatus") => void;
 };
 
 /** C08's terms line: «Válido por 30 días», or «60 días · hasta 3 por semana». */
@@ -99,18 +104,32 @@ function PlanRow({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
   );
 }
 
-export function PlansScreen() {
+export function PlansScreen({ route }: { route?: { params?: PlansParams } }) {
   const navigation = useNavigation<PlansNavigation>();
   const fetcher = useClientFetcher();
   const plans = useListPlans({
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  // Follow-up 246 §5: while a payment is in review or rejected, every way
+  // into Elegir plan opens that payment instead (owner, 2026-11-05: after a
+  // rejection, only another receipt for the same Plan).
+  // A rejected Plan that is no longer sold opens the list anyway (review of
+  // FIX-043), and only the focused screen redirects: a Plans screen left under
+  // the payment must not replace itself when the payment turns pending.
+  const focused = useIsFocused();
+  const { pending: paymentPending, standing } = usePaymentStanding(fetcher);
+  const blocked =
+    standing.kind === "in_review" ||
+    (standing.kind === "rejected" && route?.params?.rejectedPlanGone !== true);
+  useEffect(() => {
+    if (blocked && focused) navigation.replace("PaymentStatus");
+  }, [blocked, focused, navigation]);
 
   return (
     <Screen style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Elige tu plan" />
-      {plans.isPending ? (
+      {plans.isPending || paymentPending || blocked ? (
         <LoadingState label="Cargando planes" />
       ) : plans.isError || plans.data.status !== 200 ? (
         <QueryFailure label="No pudimos cargar los planes." onRetry={() => void plans.refetch()} />

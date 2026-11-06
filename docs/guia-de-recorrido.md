@@ -424,12 +424,18 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    confirmes, canceles el registro o pasen 7 días.
 3. Abre el correo «Confirma tu correo para activar tu cuenta» y pulsa
    **Confirmar mi correo**. Entras a **Inicio**.
-4. **Inicio** saluda `Hola, Lucía`. No hay plan. El atajo grande dice
-   **Comprar un plan**. Debajo están **Reservar una clase**, **Evaluación
-   nutricional** e **Invita a una amiga**. El carrusel de promociones está
-   vacío hasta el paso 14.
-5. **Reservar** muestra la semana, pero al abrir una clase no deja reservar:
-   no hay plan vigente.
+4. **Inicio** saluda `Hola, Lucía`. No hay plan. La tarjeta grande dice
+   «Elige tu plan y empieza a moverte», con **Comprar un plan**. Debajo, en
+   **Accesos rápidos**, **Reservar una clase** está con candado y dice
+   «Necesitas un plan activo»; al lado, **Evaluación nutricional** e
+   **Invita a una amiga**. El carrusel de promociones está vacío hasta el
+   paso 14.
+5. **Reservar** muestra la semana, pero al abrir una clase **Reservar** está
+   apagado y el aviso dice «Necesitas un plan para reservar.», con **Comprar
+   un plan** debajo. La fila del plazo dice el día, en hora de La Paz:
+   «Cancela sin costo hasta hoy a las 05:30», «hasta mañana a las 05:30» o
+   «hasta el sáb 7 a las 05:30». (A quien le quedan 0 clases de su plan le dice, en
+   cambio, «No te quedan clases en tu plan.».)
 6. **Mis Reservas** está vacío, con **Ver historial**. El historial también
    está vacío.
 7. **Perfil** muestra el nombre, el correo y **Editar**. Las filas son **Mi
@@ -452,13 +458,25 @@ Quédate en la app de clientas, como Lucía.
    de lugares.
 2. Abre **8 clases**. La vigencia dice 30 días. Elige la fecha de inicio:
    hoy, o cualquier día de los próximos 14. Más lejos no se puede.
-3. Completa los datos de factura: **NIT o CI** y el nombre o la razón social.
-   La factura se emite fuera del sistema. Esto solo la deja anotada.
+3. En la pantalla de pago, abre **¿Necesitas factura?** y completa **NIT o
+   CI** y el nombre o la razón social. La factura se emite fuera del sistema.
+   Esto solo la deja anotada. Mientras la factura está abierta y le falta un
+   dato, **Enviar comprobante** se apaga y encima dice qué falta: «Completa
+   el NIT o CI, o cierra la factura» (o «Completa el nombre o razón social, o
+   cierra la factura»). Si la cierras, se envía sin factura.
 4. La pantalla de pago muestra el monto y el QR del estudio. No muestra
    número de cuenta ni banco. Transfiere el monto de mentira, o usa cualquier
    imagen como comprobante, y súbela. El estado pasa a **Pago en revisión**.
-5. Mientras está en revisión, **Reservar** no deja tomar un lugar. **Inicio**
-   lo dice.
+5. **Volver al inicio**. **Inicio** ya no ofrece **Comprar un plan**: la
+   tarjeta grande dice «En revisión · Tu pago está en revisión», con
+   «Paquete de 8 clases · Bs 502» y **Ver estado del pago**, que abre
+   **Estado del pago**. El atajo **Reservar una clase** sigue con candado y
+   dice «Tu pago está en revisión».
+6. Mientras está en revisión, **Reservar** no deja tomar un lugar: el detalle
+   de la clase dice «Tu pago está en revisión. Podrás reservar cuando el
+   estudio lo confirme.», con **Ver estado del pago**. Cualquier camino a
+   **Elegir plan** (Mi plan, Evaluación nutricional › **Ver planes**) abre
+   **Estado del pago** en vez de empezar otra compra.
 
 En la app del equipo, Ana (o la dueña desde la web) recibe la novedad.
 
@@ -468,8 +486,13 @@ En la app del equipo, Ana (o la dueña desde la web) recibe la novedad.
 2. Lo mismo se puede hacer en la web, en **Dinero › Pagos**, o desde la fila
    del pago en **Inicio**: abre la fila, mira el
    comprobante y confirma. Si el comprobante no sirve, rechaza y escribe el
-   motivo. Lucía lo ve en la app como **Comprobante rechazado** y puede subir
-   otro.
+   motivo. Lucía lo ve en la app: **Inicio** dice «Pago rechazado · No
+   pudimos confirmar tu pago», con el motivo, el plan y el monto, y **Subir
+   otro comprobante**, que abre de nuevo el pago del mismo plan (no deja
+   elegir otro plan). El atajo dice «Tu pago no se confirmó», el detalle de
+   una clase dice «No pudimos confirmar tu pago.» con **Subir otro
+   comprobante**, y **Elegir plan** lleva a ese pago rechazado. La tarjeta
+   sigue en **Inicio** hasta que envíe otro comprobante.
 
 Cuando el pago queda confirmado:
 
@@ -502,12 +525,16 @@ En la app de clientas, como Lucía, con el plan ya vigente.
    sus iniciales: en la lista de la clase, al buscarla, en su ficha, en
    Pagos pendientes y en la web (Clientas, Dinero › Pagos, «Reservaron»).
 3. **Reservar**. La clase pasa a **Mis Reservas**, con la fecha, la hora y la
-   sede. **Mi plan** baja una clase.
+   sede, y el aviso «Reserva confirmada · Te quedan N clases en tu plan».
+   **Mi plan** baja una clase. Toca la pestaña **Reservar**: vuelve a la
+   tira de días, no al detalle de la clase. Cada pestaña abre siempre su
+   primera pantalla.
 4. Reserva también el reformer del miércoles, para tener dos reservas y
    poder probar la lista de espera con una segunda clienta más adelante.
 5. En la misma clase, **Cancelar** abre la hoja de confirmación. Léela y
    pulsa **Volver**. La reserva sigue. Si cancelas de verdad fuera de las
-   2 h 30, la clase vuelve al plan. Dentro de las 2 h 30 el botón de cancelar
+   2 h 30, la clase vuelve al plan y aparece el aviso «Reserva cancelada ·
+   La clase volvió a tu plan · Te quedan N clases». Dentro de las 2 h 30 el botón de cancelar
    no está, y en su lugar está **Reprogramar**, que solo ofrece otro horario
    del mismo día.
 6. Si la clase está llena, el botón es **Unirme a la lista de espera**.
@@ -516,7 +543,9 @@ En la app de clientas, como Lucía, con el plan ya vigente.
 En la app del equipo, Camila puede hacer lo mismo por una clienta: **Buscar
 cliente**, el nombre de Lucía, **Ver cliente**, **Reservar una clase**. Si
 Lucía ya tiene esa clase, la fila dice **Ya reservada** y el detalle no
-ofrece **Reservar**.
+ofrece **Reservar**. Si Camila cancela una reserva de Lucía, aparece «Reserva
+cancelada · La clase volvió a su plan». Como en la app de clientas, cada
+pestaña de la app del equipo vuelve a su primera pantalla.
 
 Daniela, en **Mi agenda**, abre la clase de mañana. Ahora hay una reserva.
 Después de que la clase terminó, marca asistió o no asistió y pulsa

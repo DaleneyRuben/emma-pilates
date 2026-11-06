@@ -135,6 +135,11 @@ export function ClientBookingsScreen({
   const notice = useStickyNotice(route.params.confirmed, dismissNotice);
   const [cancelling, setCancelling] = useState<AssistantClientBookingDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  // Walkthrough n.º 29: a cancellation is confirmed like a booking is.
+  const [cancelledShown, setCancelledShown] = useState(false);
+  const cancelledNotice = useStickyNotice(cancelledShown ? true : undefined, () =>
+    setCancelledShown(false),
+  );
   const upcoming = useListAssistantClientBookings(clientId, {
     fetcher,
     query: { refetchOnMount: "always" },
@@ -153,22 +158,27 @@ export function ClientBookingsScreen({
   const confirmCancel = async () => {
     if (cancelling === null || cancelling.bookingId === undefined) return;
     setFailure(null);
+    setCancelledShown(false);
+    let accepted = false;
     try {
       await api.cancelBooking(cancelling.bookingId);
       // «Reserva confirmada» no longer holds once a booking is cancelled,
       // often the one it confirmed (MOB-074).
       dismissNotice();
+      accepted = true;
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
     } finally {
       setCancelling(null);
       await refresh();
+      if (accepted) setCancelledShown(true);
     }
   };
 
   const leave = async (item: AssistantClientBookingDto) => {
     if (item.waitlistEntryId === undefined) return;
     setFailure(null);
+    setCancelledShown(false);
     try {
       await api.leaveWaitlist(item.waitlistEntryId);
     } catch {
@@ -247,6 +257,14 @@ export function ClientBookingsScreen({
           note={`${notice.classTypeName} · ${formatSessionDate(notice.startsAt)} · ${formatTimeRange(notice.startsAt, notice.endsAt)}`}
           onClose={dismissNotice}
           title="Reserva confirmada"
+        />
+      ) : null}
+      {cancelledNotice !== null && notice === null ? (
+        <BrandToast
+          // Every cancellation the API accepts gives the class back.
+          note="La clase volvió a su plan"
+          onClose={() => setCancelledShown(false)}
+          title="Reserva cancelada"
         />
       ) : null}
     </Screen>

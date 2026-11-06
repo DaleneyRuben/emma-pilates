@@ -65,5 +65,8 @@ describe("the Assistant's booking toast after a cancellation", () => {
 
     await waitFor(() => expect(screen.getByText("No tiene reservas próximas")).toBeOnTheScreen());
     expect(screen.queryByText("Reserva confirmada")).toBeNull();
+    // Walkthrough n.º 29: the cancellation is confirmed, as a booking is.
+    await waitFor(() => expect(screen.getByText("Reserva cancelada")).toBeOnTheScreen());
+    expect(screen.getByText("La clase volvió a su plan")).toBeOnTheScreen();
   });
 });
