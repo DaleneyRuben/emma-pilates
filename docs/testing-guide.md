@@ -8912,7 +8912,8 @@ E. **Mis facturas (K1–K3).** As Mariana, the notification «Tu factura está
    Open a ready one: the preview (the photo, or a page with the PDF's name),
    compra, NIT o CI, a nombre de, emitida, and **Descargar**: on the iPhone and
    iPad the share sheet (**Guardar en Archivos**); on Android the folder
-   picker, then «Factura guardada». An «En preparación» one says «El estudio
+   picker, opened in Documents (Android 11 and later refuse Download itself),
+   **Use this folder**, **Allow**, then «Factura guardada». An «En preparación» one says «El estudio
    está preparando tu factura» and has no **Descargar**.
 F. **Refusals (API).** `PUT /api/v1/staff/payments/{id}/invoice` answers 409
    `payment_without_invoice_data` on a «Sin factura» sale, `payment_voided` on

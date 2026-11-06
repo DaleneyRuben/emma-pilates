@@ -469,8 +469,8 @@ Emite la factura en el sistema de facturación de siempre y súbela:
   sube desde la web.
 - Lucía recibe el aviso **Tu factura está lista** y la ve en **Perfil › Mis
   facturas**: **Lista**, o **En preparación** mientras no se sube. Al abrirla,
-  **Descargar** abre el menú para guardar o compartir en iPhone y la guarda en
-  la carpeta que elija en Android.
+  **Descargar** abre el menú para guardar o compartir en iPhone y en Android
+  la guarda en la carpeta que elija (se abre en **Documents**).
 
 **Marcar emitida** ya no existe: una factura cuenta como emitida solo cuando
 se sube el archivo. Una marca antigua sin archivo se ve como **Emitida · sin
