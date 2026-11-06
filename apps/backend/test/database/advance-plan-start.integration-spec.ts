@@ -12,6 +12,10 @@ import {
   startPaymentWorld,
 } from './payment-lifecycle-test-support';
 
+const quarterly = fixtures.plans.find(
+  (item) => item.name === 'Trimestral 36 clases',
+)!;
+
 const day = 24 * 60 * 60 * 1_000;
 const civil = (date: Date): string => date.toISOString().slice(0, 10);
 const after = (date: Date, days: number): string =>
@@ -253,5 +257,53 @@ describe('next Plan start window and the Founder place (PostgreSQL)', () => {
     await expect(membershipOf(client.clientId)).resolves.toMatchObject({
       status: 'ACTIVE',
     });
+  });
+
+  // booking ADR-0013 review fix 2: a pending advance transfer caps the
+  // Freeze as a queued Subscription does, or it could not be confirmed.
+  it('refuses a Freeze whose extension would reach a pending next Plan', async () => {
+    const client = await world.newClient('Congelada con QR pendiente');
+    const sale = await world.commands().recordCashPayment(
+      {
+        clientId: client.clientId,
+        planId: quarterly.id,
+        branchId: centro().id,
+      },
+      await assistant(),
+      randomUUID(),
+    );
+    const subscription = await prisma.subscription.findFirstOrThrow({
+      where: { paymentId: sale.id },
+    });
+    const staff = await assistant();
+    const receipt = await world.readyReceipt(staff.accountId);
+    const nextStart = new Date(subscription.endsOn.getTime() + 5 * 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    await world.commands().recordFrontDeskTransfer(
+      {
+        clientId: client.clientId,
+        planId: quarterly.id,
+        branchId: centro().id,
+        imageAssetId: receipt.id,
+        startsOn: nextStart,
+      },
+      staff,
+      randomUUID(),
+    );
+
+    await expect(
+      codeOf(
+        createPrismaPaymentCommands(prisma, { now: () => now }).requestFreeze(
+          {
+            subscriptionId: subscription.id,
+            startsOn: '2026-10-01',
+            endsOn: '2026-10-10',
+            reason: 'Viaje',
+          },
+          client,
+        ),
+      ),
+    ).resolves.toBe('freeze_not_allowed');
   });
 });
