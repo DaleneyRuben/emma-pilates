@@ -32,7 +32,9 @@ export type StaffManagementErrorCode =
   | 'staff_member_deactivated'
   | 'staff_member_not_pending'
   | 'email_belongs_to_client'
-  | 'email_unchanged';
+  | 'email_unchanged'
+  | 'staff_member_not_active'
+  | 'email_change_not_pending';
 
 export class StaffManagementError extends Error {
   constructor(
@@ -56,6 +58,8 @@ export type StaffMemberRecord = {
   status: StaffStatus;
   activationExpiresAt: Date | null;
   photo: StaffPhotoRef;
+  /** FIX-039: the login email the studio asked for, until its link is opened. */
+  pendingEmail: { email: string; expiresAt: Date } | null;
   /** WEB-012 W4: the create reopened this pending invitation. */
   invitationReopened?: boolean;
 };
@@ -70,7 +74,9 @@ export type StaffAudit = {
     | 'staff_member.email_corrected'
     | 'staff_member.invitation_cancelled'
     | 'staff_member.invitation_reopened'
-    | 'staff_member.contact_changed';
+    | 'staff_member.contact_changed'
+    | 'staff_member.email_change_requested'
+    | 'staff_member.email_change_cancelled';
   actorAccountId: string;
   actorRole: AuditActor['role'];
   impersonationId: string | null;
@@ -105,6 +111,23 @@ export interface StaffManagementTransaction {
     email: string;
     now: Date;
   }) => Promise<number>;
+  // FIX-039: seconds until the verification lane of the new address has
+  // room (IDN-008 E7), 0 when it has.
+  emailChangeWaitSeconds: (input: {
+    email: string;
+    now: Date;
+  }) => Promise<number>;
+  // IDN-008 for the studio: stores the pending change with a fresh 24-hour
+  // link, queues the link to the new address and the notice to the current.
+  requestEmailChange: (input: {
+    accountId: string;
+    email: string;
+    now: Date;
+  }) => Promise<void>;
+  // A fresh link to the pending address; the older one stops working.
+  resendEmailChange: (input: { accountId: string; now: Date }) => Promise<void>;
+  // Invalidates the link and removes the pending change.
+  cancelEmailChange: (input: { accountId: string; now: Date }) => Promise<void>;
   setAccountEmail: (input: {
     accountId: string;
     email: string;

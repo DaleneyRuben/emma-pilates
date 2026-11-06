@@ -5,7 +5,7 @@ import type { IssuedAuthenticationToken } from '../security/authentication-token
 
 // IDN-008: an active Account changes its login email only after opening a
 // Verification Link sent to the new address (proposal decisions E1-E14).
-const emailChangeLifetimeMilliseconds = 24 * 60 * 60 * 1_000;
+export const emailChangeLifetimeMilliseconds = 24 * 60 * 60 * 1_000;
 
 export type EmailChangeToken = {
   id: string;
