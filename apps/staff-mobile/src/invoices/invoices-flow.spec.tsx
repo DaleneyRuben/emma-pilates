@@ -4,10 +4,13 @@ import { boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
 
-const mockPickInvoicePhoto = jest.fn();
-jest.mock("./load-invoice-upload", () => ({
-  loadInvoiceUpload: () => Promise.resolve({ pickInvoicePhoto: mockPickInvoicePhoto }),
+const mockPickImage = jest.fn();
+const mockUploadImage = jest.fn();
+jest.mock("../uploads/load-image-upload", () => ({
+  loadImageUpload: () =>
+    Promise.resolve({ pickImage: mockPickImage, uploadImage: mockUploadImage }),
 }));
+const photo = { uri: "file:///factura.jpg", bytes: new Uint8Array([1, 2, 3]) };
 
 jest.setTimeout(20_000);
 
@@ -83,7 +86,8 @@ describe("Invoices in the Staff app (FIX-044)", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
-    mockPickInvoicePhoto.mockReset();
+    mockPickImage.mockReset();
+    mockUploadImage.mockReset();
   });
 
   it.each([
@@ -123,10 +127,8 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     let current: typeof waiting | typeof issued = waiting;
     const attached = jest.fn();
     const removed = jest.fn();
-    mockPickInvoicePhoto.mockResolvedValue({
-      imageAssetId: "asset-9",
-      fileName: "factura-000123.jpg",
-    });
+    mockPickImage.mockResolvedValue(photo);
+    mockUploadImage.mockResolvedValue("asset-9");
     const screen = await render(
       <App
         runtime={createStaffRuntime(
@@ -165,11 +167,9 @@ describe("Invoices in the Staff app (FIX-044)", () => {
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
     expect(screen.getByText("factura-000123.jpg")).toBeOnTheScreen();
-    expect(mockPickInvoicePhoto).toHaveBeenCalledWith(expect.any(Function), "library");
-    expect(attached).toHaveBeenCalledWith({
-      imageAssetId: "asset-9",
-      fileName: "factura-000123.jpg",
-    });
+    expect(mockPickImage).toHaveBeenCalledWith({ camera: false });
+    expect(mockUploadImage).toHaveBeenCalledWith(photo, "invoice", expect.any(Function));
+    expect(attached).toHaveBeenCalledWith({ imageAssetId: "asset-9", fileName: "factura.jpg" });
 
     await fireEvent.press(screen.getByRole("button", { name: "Quitar factura" }));
     expect(await screen.findByText("¿Quitar la factura?")).toBeOnTheScreen();
@@ -180,7 +180,8 @@ describe("Invoices in the Staff app (FIX-044)", () => {
   });
 
   it("says so when the upload fails and offers to retry", async () => {
-    mockPickInvoicePhoto.mockRejectedValueOnce(new Error("upload_failed"));
+    mockPickImage.mockResolvedValue(photo);
+    mockUploadImage.mockRejectedValueOnce(new Error("upload_failed"));
     const screen = await render(
       <App
         runtime={createStaffRuntime(
@@ -247,5 +248,42 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     );
 
     expect(await screen.findByRole("button", { name: "Facturas por subir" })).toBeOnTheScreen();
+  });
+
+  it("retries only the attach when the upload already worked", async () => {
+    mockPickImage.mockResolvedValue(photo);
+    mockUploadImage.mockResolvedValue("asset-9");
+    let attempts = 0;
+    const screen = await render(
+      <App
+        runtime={createStaffRuntime(
+          routeFetcher({
+            "/api/v1/staff-members/current": () => jsonResponse(staffMember("administrator")),
+            "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
+            "/api/v1/administrator/payments/pending": () => jsonResponse([]),
+            "/api/v1/staff/invoices": () => jsonResponse({ items: [waiting] }),
+            [`/api/v1/staff/payments/${paymentId}/invoice`]: () => jsonResponse(waiting),
+            [`PUT /api/v1/staff/payments/${paymentId}/invoice`]: () => {
+              attempts += 1;
+              return attempts === 1 ? jsonResponse({ code: "oops" }, 503) : jsonResponse(issued);
+            },
+          }),
+          "administrator",
+        )}
+      />,
+    );
+
+    await fireEvent.press(await screen.findByRole("button", { name: "Facturas por subir, 1" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
+    );
+    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir de la galería" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Reintentar" }));
+
+    expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
+    expect(attempts).toBe(2);
+    expect(mockPickImage).toHaveBeenCalledTimes(1);
+    expect(mockUploadImage).toHaveBeenCalledTimes(1);
   });
 });

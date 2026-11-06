@@ -31,7 +31,8 @@ import { invoiceStyles as styles } from "./invoice-styles";
 import { InvoiceApiError, createInvoicesApi } from "./invoices-api";
 import { InvoiceDropCard, InvoiceFileCard } from "./invoice-cards";
 import { InvoiceSourceSheet, type InvoiceSource } from "./invoice-source-sheet";
-import { loadInvoiceUpload } from "./load-invoice-upload";
+import type { PickedImage } from "../uploads/image-upload";
+import { loadImageUpload } from "../uploads/load-image-upload";
 
 const conflicts: Record<string, string> = {
   payment_voided: "Este pago fue anulado y ya no recibe factura.",
@@ -40,6 +41,8 @@ const conflicts: Record<string, string> = {
 };
 const uploadFailure = "No pudimos subir la factura. Revisa tu conexión e inténtalo de nuevo.";
 const rejected = "Este archivo no sirve. Sube un PDF, JPG o PNG de hasta 10 MB.";
+
+const isConflict = (code: string | null): boolean => code !== null && conflicts[code] !== undefined;
 
 const failureOf = (error: unknown): string =>
   error instanceof InvoiceApiError && error.code !== null && conflicts[error.code] !== undefined
@@ -62,7 +65,11 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
     query: { refetchOnMount: "always" },
   });
   const [choosing, setChoosing] = useState(false);
-  const [source, setSource] = useState<InvoiceSource | null>(null);
+  // The photo she picked and, once uploaded, its asset: «Reintentar» only
+  // repeats what failed, never the picker (FIX-044 review).
+  const [picked, setPicked] = useState<PickedImage | null>(null);
+  const [uploadedAssetId, setUploadedAssetId] = useState<string | null>(null);
+  const [retryable, setRetryable] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -98,22 +105,48 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
     setNotice(message);
   };
 
-  const upload = async (from: InvoiceSource) => {
-    setChoosing(false);
-    setSource(from);
+  const reset = () => {
+    setPicked(null);
+    setUploadedAssetId(null);
+    setFailure(null);
+    setRetryable(false);
+  };
+
+  const send = async (photo: PickedImage, assetId: string | null) => {
     setBusy(true);
     setFailure(null);
     setNotice(null);
     try {
-      const { pickInvoicePhoto } = await loadInvoiceUpload();
-      const picked = await pickInvoicePhoto(fetcher, from);
-      if (picked !== null) {
-        await settle(await api.attach(paymentId, picked), "Factura subida");
-      }
+      const { uploadImage } = await loadImageUpload();
+      const imageAssetId = assetId ?? (await uploadImage(photo, "invoice", fetcher));
+      setUploadedAssetId(imageAssetId);
+      await settle(
+        await api.attach(paymentId, { imageAssetId, fileName: "factura.jpg" }),
+        "Factura subida",
+      );
+      reset();
     } catch (error) {
+      const conflict = error instanceof InvoiceApiError && isConflict(error.code);
       setFailure(failureOf(error));
+      setRetryable(!conflict);
+      // The payment changed meanwhile (a void, say): show it as it is now.
+      if (conflict) void invoice.refetch();
     } finally {
       setBusy(false);
+    }
+  };
+
+  const upload = async (from: InvoiceSource) => {
+    setChoosing(false);
+    reset();
+    try {
+      const { pickImage } = await loadImageUpload();
+      const photo = await pickImage({ camera: from === "camera" });
+      if (photo === null) return;
+      setPicked(photo);
+      await send(photo, null);
+    } catch (error) {
+      setFailure(failureOf(error));
     }
   };
 
@@ -122,8 +155,13 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
     try {
       await settle(await api.remove(paymentId), "Factura quitada");
       setAsking(false);
-    } catch {
-      setFailure("No pudimos quitar la factura. Inténtalo de nuevo.");
+    } catch (error) {
+      setFailure(
+        error instanceof InvoiceApiError && isConflict(error.code)
+          ? failureOf(error)
+          : "No pudimos quitar la factura. Inténtalo de nuevo.",
+      );
+      setRetryable(false);
       setAsking(false);
     } finally {
       setBusy(false);
@@ -139,10 +177,15 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
           <NoticeRow message={failure} />
         </View>
       )}
-      {failure !== null && source !== null ? (
+      {failure !== null && retryable && picked !== null ? (
         <>
-          <PrimaryButton busy={busy} label="Reintentar" onPress={() => void upload(source)} />
+          <PrimaryButton
+            busy={busy}
+            label="Reintentar"
+            onPress={() => void send(picked, uploadedAssetId)}
+          />
           <TextButton label="Elegir otro archivo" onPress={() => setChoosing(true)} />
+          <TextButton label="Cancelar" onPress={reset} />
         </>
       ) : current.file === null ? (
         <>
