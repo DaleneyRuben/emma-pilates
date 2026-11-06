@@ -251,6 +251,44 @@ describe('staff directory reads', () => {
     ).resolves.toMatchObject({ id: 'staff-1' });
   });
 
+  // FIX-039: the change waiting for a new address is the Administrator's to
+  // see and act on; the Coordinator reads the login email only.
+  it('keeps a pending email change from the Coordinator', async () => {
+    const pendingEmail = {
+      email: 'daniela.nueva@example.com',
+      expiresAt: new Date('2026-09-24T15:00:00.000Z'),
+    };
+    const waiting = {
+      list: jest.fn().mockResolvedValue({
+        items: [record({ pendingEmail })],
+        page: 1,
+        pageSize: 20,
+        totalItems: 1,
+      }),
+      read: jest.fn().mockResolvedValue(record({ pendingEmail })),
+    };
+
+    const page = await listStaffMembers(
+      { page: 1, pageSize: 20 },
+      principal('coordinator'),
+      waiting,
+    );
+    const one = await readStaffMember(
+      { staffMemberId: 'staff-1' },
+      principal('coordinator'),
+      waiting,
+    );
+    const forAdministrator = await readStaffMember(
+      { staffMemberId: 'staff-1' },
+      administrator,
+      waiting,
+    );
+
+    expect(page.items[0]?.pendingEmail).toBeNull();
+    expect(one.pendingEmail).toBeNull();
+    expect(forAdministrator.pendingEmail).toEqual(pendingEmail);
+  });
+
   it('denies other Roles and reports an unknown Staff Member', async () => {
     await rejectsWith(
       listStaffMembers(

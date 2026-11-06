@@ -66,6 +66,15 @@ const staffSelect = {
         take: 1,
         select: { expiresAt: true },
       },
+      // FIX-039: the pending login email while its link is still current.
+      emailChanges: {
+        where: {
+          deletedAt: null,
+          authenticationToken: { usedAt: null, invalidatedAt: null },
+        },
+        select: { newEmail: true, expiresAt: true },
+        take: 1,
+      },
     },
   },
 } satisfies Prisma.StaffMemberSelect;
@@ -77,9 +86,10 @@ const statusOf = (account: NonNullable<StaffRow['account']>): StaffStatus => {
   return account.activatedAt === null ? 'pending' : 'active';
 };
 
-const toRecord = (row: StaffRow): StaffMemberRecord | null => {
+const toRecord = (row: StaffRow, now: Date): StaffMemberRecord | null => {
   if (row.account === null) return null;
   const status = statusOf(row.account);
+  const change = row.account.emailChanges[0];
   return {
     id: row.id,
     accountId: row.account.id,
@@ -94,6 +104,10 @@ const toRecord = (row: StaffRow): StaffMemberRecord | null => {
         ? (row.account.authenticationTokens[0]?.expiresAt ?? null)
         : null,
     photo: staffPhotoOf(row.profileImageAssetId),
+    pendingEmail:
+      status === 'active' && change !== undefined && change.expiresAt > now
+        ? { email: change.newEmail, expiresAt: change.expiresAt }
+        : null,
   };
 };
 
@@ -154,7 +168,7 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
           where: { id: staffMemberId, deletedAt: null },
           select: staffSelect,
         });
-        return row === null ? null : toRecord(row);
+        return row === null ? null : toRecord(row, this.dependencies.now());
       },
       findUsableBranchIds: async (branchIds) =>
         (
@@ -204,6 +218,10 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
       },
       activationEmailWaitSeconds: (input) =>
         accounts.activationEmailWaitSeconds(input),
+      emailChangeWaitSeconds: (input) => accounts.emailChangeWaitSeconds(input),
+      requestEmailChange: (input) => accounts.requestEmailChange(input),
+      resendEmailChange: (input) => accounts.resendEmailChange(input),
+      cancelEmailChange: (input) => accounts.cancelEmailChange(input),
       setAccountEmail: (input) => accounts.setAccountEmail(input),
       removePendingStaffMember: async (input) => {
         await accounts.removePendingStaffMember(input);
@@ -317,6 +335,7 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
 // Administrator reads for the admin-web staff table (ADR-0061 page-and-offset).
 export const createPrismaStaffDirectory = (
   prisma: PrismaClient,
+  now: () => Date = () => new Date(),
 ): StaffDirectory => ({
   list: async (query) => {
     const where: Prisma.StaffMemberWhereInput = {
@@ -345,7 +364,7 @@ export const createPrismaStaffDirectory = (
       prisma.staffMember.count({ where }),
     ]);
     return {
-      items: rows.flatMap((row) => toRecord(row) ?? []),
+      items: rows.flatMap((row) => toRecord(row, now()) ?? []),
       page: query.page,
       pageSize: query.pageSize,
       totalItems,
@@ -356,6 +375,6 @@ export const createPrismaStaffDirectory = (
       where: { id: staffMemberId, deletedAt: null },
       select: staffSelect,
     });
-    return row === null ? null : toRecord(row);
+    return row === null ? null : toRecord(row, now());
   },
 });

@@ -313,6 +313,14 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   // Administrator's; the Coordinator only assigns a Trainer's Branches.
   'PUT /api/v1/administrator/staff-members/{staffMemberId}/contact':
     administratorOnly({ body: { name: 'Nombre', phone: null } }),
+  // FIX-039: changing an active member's login email stays the
+  // Administrator's.
+  'POST /api/v1/administrator/staff-members/{staffMemberId}/email-change':
+    administratorOnly({ body: { email: 'nuevo@example.com' } }),
+  'POST /api/v1/administrator/staff-members/{staffMemberId}/email-change/resends':
+    administratorOnly(),
+  'DELETE /api/v1/administrator/staff-members/{staffMemberId}/email-change':
+    administratorOnly(),
   'POST /api/v1/administrator/staff-members/{staffMemberId}/deactivation':
     administratorOnly(),
 

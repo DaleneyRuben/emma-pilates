@@ -20,6 +20,19 @@ const staffStatuses = [
   'deactivated',
 ] as const satisfies readonly StaffStatus[];
 
+// FIX-039: the login email the studio asked for, until its link is opened.
+export class StaffPendingEmailDto {
+  @ApiProperty({ format: 'email' })
+  email!: string;
+
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    description: 'When the link sent to the new address stops working',
+  })
+  expiresAt!: Date;
+}
+
 export class StaffMemberDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -65,6 +78,14 @@ export class StaffMemberDto {
       'Her profile photo (FIX-041), null while her initials stand in',
   })
   photo!: StaffPhotoDto | null;
+
+  @ApiProperty({
+    type: StaffPendingEmailDto,
+    nullable: true,
+    description:
+      "An active member's email change waiting for the new address to confirm (FIX-039); her login email stays `email` until then",
+  })
+  pendingEmail!: StaffPendingEmailDto | null;
 
   @ApiPropertyOptional({
     description:

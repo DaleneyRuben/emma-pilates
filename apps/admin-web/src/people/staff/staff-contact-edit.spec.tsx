@@ -60,11 +60,10 @@ describe("AW24 Editar miembro contact", () => {
     const phone = within(panel).getByLabelText("Celular");
     expect(name).toHaveValue("Camila Rojas");
     expect(phone).toHaveValue("");
-    // The login email of an active account stays as it is here.
-    expect(within(panel).getByText(camila.email)).toBeVisible();
+    // FIX-039: the login email is a field too; left as it is, nothing is sent.
     expect(
-      within(panel).queryByRole("textbox", { name: /correo/i }),
-    ).not.toBeInTheDocument();
+      within(panel).getByRole("textbox", { name: "Correo electrónico" }),
+    ).toHaveValue(camila.email);
 
     await user.clear(name);
     await user.type(name, "Camila Rojas Vaca");

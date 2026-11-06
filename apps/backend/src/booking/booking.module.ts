@@ -124,6 +124,12 @@ import {
   cancelStaffInvitation,
   correctStaffInvitationEmail,
 } from './staff/staff-invitations';
+import { AdministratorStaffEmailChangeController } from './staff/staff-email-change.controller';
+import {
+  cancelStaffEmailChange,
+  requestStaffEmailChange,
+  resendStaffEmailChange,
+} from './staff/staff-email-change';
 import { changeStaffContact } from './staff/staff-contact';
 import {
   AdministratorStaffMembersController,
@@ -189,6 +195,7 @@ import { invoiceFileWiring } from './payments/invoice-file/invoice-file-wiring';
     WaitlistEntriesController,
     StaffProfileController,
     AdministratorStaffMembersController,
+    AdministratorStaffEmailChangeController,
     ...administrationControllers,
     ...catalogListControllers,
     PurchaseIntentsController,
@@ -340,6 +347,12 @@ import { invoiceFileWiring } from './payments/invoice-file/invoice-file-wiring';
             cancelStaffInvitation(command, principal, dependencies),
           changeContact: (command, principal) =>
             changeStaffContact(command, principal, dependencies),
+          requestEmailChange: (command, principal) =>
+            requestStaffEmailChange(command, principal, dependencies),
+          resendEmailChange: (command, principal) =>
+            resendStaffEmailChange(command, principal, dependencies),
+          cancelEmailChange: (command, principal) =>
+            cancelStaffEmailChange(command, principal, dependencies),
         };
       },
     },

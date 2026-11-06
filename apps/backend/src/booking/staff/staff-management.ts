@@ -298,13 +298,24 @@ export interface StaffDirectory {
   read: (staffMemberId: string) => Promise<StaffMemberRecord | null>;
 }
 
+// FIX-039: only the Administrator sees and acts on a change waiting for a
+// new address; the Coordinator reads the login email alone.
+const shownTo =
+  (principal: AuthenticatedPrincipal) =>
+  (member: StaffMemberRecord): StaffMemberRecord =>
+    principal.identity.kind === 'staff' &&
+    principal.identity.role === 'administrator'
+      ? member
+      : { ...member, pendingEmail: null };
+
 export const listStaffMembers = async (
   query: StaffDirectoryQuery,
   principal: AuthenticatedPrincipal,
   directory: StaffDirectory,
 ): Promise<StaffDirectoryPage> => {
   requireStaffReader(principal);
-  return directory.list(query);
+  const page = await directory.list(query);
+  return { ...page, items: page.items.map(shownTo(principal)) };
 };
 
 export const readStaffMember = async (
@@ -315,5 +326,5 @@ export const readStaffMember = async (
   requireStaffReader(principal);
   const member = await directory.read(command.staffMemberId);
   if (member === null) throw new StaffManagementError('staff_member_not_found');
-  return member;
+  return shownTo(principal)(member);
 };

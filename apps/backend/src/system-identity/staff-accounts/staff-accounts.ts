@@ -8,6 +8,13 @@ import {
 import type { Prisma } from '../../generated/prisma/client';
 import { PrismaClientRegistrationTransaction } from '../registration/prisma-client-registration-unit-of-work';
 import { removePendingAccount } from '../registration/remove-pending-account';
+import {
+  dropPendingEmailChange,
+  livePendingEmailChange,
+  reissuePendingEmailChange,
+  storePendingEmailChange,
+} from '../email-change/email-change-steps';
+import { emailChangeLifetimeMilliseconds } from '../email-change/email-change';
 import type { EncryptedAuthenticationLink } from '../security/authentication-link-cipher';
 import type { IssuedAuthenticationToken } from '../security/authentication-token-service';
 
@@ -67,6 +74,44 @@ export const createStaffAccountOperations = (
     });
   };
 
+  // IDN-008 E2: a 24-hour single-use link to the new address.
+  const issueEmailChangeLink = (now: Date) => {
+    const token = dependencies.tokenIssuer.issue();
+    return {
+      token: {
+        id: dependencies.newId(),
+        digest: token.digest,
+        expiresAt: new Date(now.getTime() + emailChangeLifetimeMilliseconds),
+      },
+      encrypted: dependencies.linkCipher.encrypt(token.secret),
+    };
+  };
+
+  // The link and the notice share the token; one throttle event for both.
+  const sendEmailChange = async (input: {
+    accountId: string;
+    email: string;
+    link: ReturnType<typeof issueEmailChangeLink>;
+    purposes: ('email_change' | 'email_change_notice')[];
+    now: Date;
+  }) => {
+    await registration.recordIssuedAuthenticationEmail({
+      email: input.email,
+      purpose: 'verification',
+      occurredAt: input.now,
+    });
+    for (const purpose of input.purposes) {
+      await registration.scheduleAuthenticationEmail({
+        version: 1,
+        accountId: input.accountId,
+        authenticationTokenId: input.link.token.id,
+        purpose,
+        encryptedLinkSecret: input.link.encrypted.encryptedLinkSecret,
+        encryptionKeyId: input.link.encrypted.encryptionKeyId,
+      });
+    }
+  };
+
   return {
     // WEB-012: whose live Account uses the address, and whether it is pending.
     findAccountByEmail: async (email: string) => {
@@ -100,6 +145,61 @@ export const createStaffAccountOperations = (
         purpose: 'activation',
         now: input.now,
       }),
+
+    // FIX-039: the studio's email change uses IDN-008's verification lane,
+    // keyed by the new address (E7).
+    emailChangeWaitSeconds: (input: { email: string; now: Date }) =>
+      registration.authenticationEmailWaitSeconds({
+        email: input.email,
+        purpose: 'verification',
+        now: input.now,
+      }),
+
+    requestEmailChange: async (input: {
+      accountId: string;
+      email: string;
+      now: Date;
+    }) => {
+      const link = issueEmailChangeLink(input.now);
+      await storePendingEmailChange(transaction, {
+        accountId: input.accountId,
+        newEmail: input.email,
+        token: link.token,
+        now: input.now,
+      });
+      await sendEmailChange({
+        accountId: input.accountId,
+        email: input.email,
+        link,
+        purposes: ['email_change', 'email_change_notice'],
+        now: input.now,
+      });
+    },
+
+    resendEmailChange: async (input: { accountId: string; now: Date }) => {
+      const pending = await livePendingEmailChange(
+        transaction,
+        input.accountId,
+        input.now,
+      );
+      if (pending === null) return;
+      const link = issueEmailChangeLink(input.now);
+      await reissuePendingEmailChange(transaction, {
+        accountId: input.accountId,
+        token: link.token,
+        now: input.now,
+      });
+      await sendEmailChange({
+        accountId: input.accountId,
+        email: pending.newEmail,
+        link,
+        purposes: ['email_change'],
+        now: input.now,
+      });
+    },
+
+    cancelEmailChange: (input: { accountId: string; now: Date }) =>
+      dropPendingEmailChange(transaction, input),
 
     setAccountEmail: async (input: { accountId: string; email: string }) => {
       await transaction.account.update({

@@ -18,7 +18,7 @@ const problems: Record<string, Problem> = {
   },
   email_unchanged: {
     field: "email",
-    message: "La invitación ya usa este correo.",
+    message: "Ya usa este correo.",
   },
   invalid_branch_assignment: {
     field: "branchIds",
@@ -51,6 +51,15 @@ const problems: Record<string, Problem> = {
   },
   staff_access_denied: {
     message: "No tienes permiso para cambiar al personal.",
+  },
+  // FIX-039: the studio's change of an active member's login email.
+  staff_member_not_active: {
+    message:
+      "Esta persona todavía no activó su cuenta; cambia el correo de su invitación.",
+  },
+  email_change_not_pending: {
+    message:
+      "Ya no hay un cambio de correo esperando. Cierra el panel y vuelve a abrirlo.",
   },
   invalid_request: {
     message: "Revisa los datos: hay un valor que no es válido.",

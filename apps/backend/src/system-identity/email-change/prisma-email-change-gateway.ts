@@ -9,6 +9,12 @@ import {
 } from '../../generated/prisma/enums';
 import { PrismaClientRegistrationTransaction } from '../registration/prisma-client-registration-unit-of-work';
 import type { EmailChangeGateway } from './email-change';
+import {
+  dropPendingEmailChange,
+  livePendingEmailChange,
+  reissuePendingEmailChange,
+  storePendingEmailChange,
+} from './email-change-steps';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -56,60 +62,6 @@ export const createPrismaEmailChangeGateway = (
         correlationId: randomUUID(),
         metadata: input.metadata,
         occurredAt: input.now,
-      },
-    });
-
-  // The pending change with its token, or null when the token is no longer
-  // current (used, invalidated, expired) or nothing was requested.
-  const livePending = async (
-    transaction: Pick<PrismaClient, 'accountEmailChange'>,
-    accountId: string,
-    now: Date,
-  ) => {
-    const change = await transaction.accountEmailChange.findFirst({
-      where: { accountId, deletedAt: null },
-      include: { authenticationToken: true },
-    });
-    if (
-      change === null ||
-      change.authenticationToken.usedAt !== null ||
-      change.authenticationToken.invalidatedAt !== null ||
-      change.authenticationToken.expiresAt <= now
-    ) {
-      return null;
-    }
-    return change;
-  };
-
-  const invalidateCurrentLink = (
-    transaction: Transaction,
-    accountId: string,
-    now: Date,
-  ) =>
-    transaction.authenticationToken.updateMany({
-      where: {
-        accountId,
-        purpose: AuthenticationTokenPurpose.EMAIL_CHANGE,
-        usedAt: null,
-        invalidatedAt: null,
-      },
-      data: { invalidatedAt: now },
-    });
-
-  const createLink = (
-    transaction: Transaction,
-    accountId: string,
-    token: { id: string; digest: Uint8Array; expiresAt: Date },
-    now: Date,
-  ) =>
-    transaction.authenticationToken.create({
-      data: {
-        id: token.id,
-        accountId,
-        purpose: AuthenticationTokenPurpose.EMAIL_CHANGE,
-        tokenDigest: toPrismaBytes(token.digest),
-        issuedAt: now,
-        expiresAt: token.expiresAt,
       },
     });
 
@@ -170,28 +122,7 @@ export const createPrismaEmailChangeGateway = (
         }
         if (account.email === input.newEmail) return 'unchanged';
 
-        await invalidateCurrentLink(transaction, input.accountId, input.now);
-        await createLink(transaction, input.accountId, input.token, input.now);
-        const replaced = await transaction.accountEmailChange.updateMany({
-          where: { accountId: input.accountId, deletedAt: null },
-          data: {
-            newEmail: input.newEmail,
-            authenticationTokenId: input.token.id,
-            requestedAt: input.now,
-            expiresAt: input.token.expiresAt,
-          },
-        });
-        if (replaced.count === 0) {
-          await transaction.accountEmailChange.create({
-            data: {
-              accountId: input.accountId,
-              newEmail: input.newEmail,
-              authenticationTokenId: input.token.id,
-              requestedAt: input.now,
-              expiresAt: input.token.expiresAt,
-            },
-          });
-        }
+        await storePendingEmailChange(transaction, input);
         await sendIfAllowed(transaction, {
           newEmail: input.newEmail,
           now: input.now,
@@ -207,7 +138,7 @@ export const createPrismaEmailChangeGateway = (
 
     resend: (input) =>
       prisma.$transaction(async (transaction) => {
-        const pending = await livePending(
+        const pending = await livePendingEmailChange(
           transaction,
           input.accountId,
           input.now,
@@ -229,15 +160,7 @@ export const createPrismaEmailChangeGateway = (
           }));
         // A suppressed resend keeps the current link (ADR-0029).
         if (!allowed) return 'suppressed';
-        await invalidateCurrentLink(transaction, input.accountId, input.now);
-        await createLink(transaction, input.accountId, input.token, input.now);
-        await transaction.accountEmailChange.updateMany({
-          where: { accountId: input.accountId, deletedAt: null },
-          data: {
-            authenticationTokenId: input.token.id,
-            expiresAt: input.token.expiresAt,
-          },
-        });
+        await reissuePendingEmailChange(transaction, input);
         await sendIfAllowed(transaction, {
           newEmail: pending.newEmail,
           now: input.now,
@@ -248,17 +171,13 @@ export const createPrismaEmailChangeGateway = (
 
     cancel: (input) =>
       prisma.$transaction(async (transaction) => {
-        const pending = await livePending(
+        const pending = await livePendingEmailChange(
           transaction,
           input.accountId,
           input.now,
         );
         if (pending === null) return 'none';
-        await invalidateCurrentLink(transaction, input.accountId, input.now);
-        await transaction.accountEmailChange.updateMany({
-          where: { accountId: input.accountId, deletedAt: null },
-          data: { deletedAt: input.now },
-        });
+        await dropPendingEmailChange(transaction, input);
         await recordAudit(transaction, {
           actionCode: 'account.email_change_cancelled',
           accountId: input.accountId,
@@ -268,7 +187,11 @@ export const createPrismaEmailChangeGateway = (
       }),
 
     readPending: async (input) => {
-      const pending = await livePending(prisma, input.accountId, input.now);
+      const pending = await livePendingEmailChange(
+        prisma,
+        input.accountId,
+        input.now,
+      );
       return pending === null
         ? null
         : {

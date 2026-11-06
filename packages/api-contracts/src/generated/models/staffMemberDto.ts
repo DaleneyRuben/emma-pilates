@@ -6,6 +6,7 @@
  */
 import type { StaffMemberDtoRole } from "./staffMemberDtoRole";
 import type { StaffMemberDtoStatus } from "./staffMemberDtoStatus";
+import type { StaffPendingEmailDto } from "./staffPendingEmailDto";
 import type { StaffPhotoDto } from "./staffPhotoDto";
 
 export interface StaffMemberDto {
@@ -29,6 +30,11 @@ export interface StaffMemberDto {
    * @nullable
    */
   photo: StaffPhotoDto | null;
+  /**
+   * An active member's email change waiting for the new address to confirm (FIX-039); her login email stays `email` until then
+   * @nullable
+   */
+  pendingEmail: StaffPendingEmailDto | null;
   /** true when the create reopened a pending invitation with the same email; its Role and Branches did not change */
   invitationReopened?: boolean;
 }

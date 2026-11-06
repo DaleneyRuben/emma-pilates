@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import type { SessionExpiry } from "../api/session-expiry";
 import { loginSearchSchema } from "../auth/auth-search";
+import { ConfirmEmailPage } from "../auth/confirm-email-page";
 import { CreatePasswordPage } from "../auth/create-password-page";
 import { LoginPage } from "../auth/login-page";
 import { RecoverPasswordPage } from "../auth/recover-password-page";
@@ -64,6 +65,19 @@ const createPasswordRoute = createRoute({
   },
 });
 
+// FIX-039: the studio's email change, confirmed from its link on a computer.
+const confirmEmailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/confirmar-correo",
+  validateSearch: z.object({
+    token: z.string().min(1).optional().catch(undefined),
+  }),
+  component: function ConfirmEmailRoute() {
+    const { token } = confirmEmailRoute.useSearch();
+    return <ConfirmEmailPage key={token} token={token} />;
+  },
+});
+
 // Every sidebar page sits behind the session probe; a signed-out visitor
 // goes to Login and comes back to the exact address afterwards. A session
 // the probe finds (Login here, or another tab's) is one whose end must be
@@ -97,4 +111,5 @@ export const publicRoutes = [
   loginRoute,
   recoverPasswordRoute,
   createPasswordRoute,
+  confirmEmailRoute,
 ];

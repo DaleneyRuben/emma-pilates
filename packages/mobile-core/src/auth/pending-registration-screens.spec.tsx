@@ -45,27 +45,42 @@ async function registerAndCheckEmail(api: AuthenticationApi) {
 }
 
 describe("Revisa tu correo (01)", () => {
-  it("names the link lifetime and the 7-day cleanup apart", async () => {
+  // Walkthrough 2026-11-04 n.º 18 (DES-012, proposal A «Lo esencial»): the
+  // address, one line of what to do and two buttons; the rest in a sheet.
+  it("says where the link went and what to do, in two lines", async () => {
     const screen = await registerAndCheckEmail(createApiMock());
 
-    expect(
-      screen.getByText("Si el registro puede continuar, enviamos las instrucciones a este correo:"),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Revisa tu correo")).toBeOnTheScreen();
+    expect(screen.getByText("Te enviamos un enlace a")).toBeOnTheScreen();
     expect(screen.getByText("lucia.mendosa@example.com")).toBeOnTheScreen();
     expect(
-      screen.getByText("El enlace vence en 24 horas; el correo indica la fecha y hora exactas."),
+      screen.getByText("Ábrelo para activar tu cuenta y después inicia sesión."),
     ).toBeOnTheScreen();
-    expect(
-      screen.getByText(
-        "Si en 7 días no verificas, corriges el correo ni pides otro envío, el registro pendiente se elimina.",
-      ),
-    ).toBeOnTheScreen();
+    expect(screen.queryByText(/7 días/)).toBeNull();
+    expect(screen.queryByText(/Si el registro puede continuar/)).toBeNull();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver a iniciar sesión" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Iniciar sesión" }));
     expect(screen.getByRole("button", { name: "Regístrate" })).toBeOnTheScreen();
   });
 
-  it("answers a resend neutrally and names only the newest link", async () => {
+  it("keeps the deadlines, the correction and the cancellation in the options sheet", async () => {
+    const screen = await registerAndCheckEmail(createApiMock());
+
+    await fireEvent.press(screen.getByRole("button", { name: "¿Correo equivocado? Ver opciones" }));
+
+    expect(screen.getByText("Opciones")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cambiar correo" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cancelar registro" })).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "El enlace vence en 24 horas. Si no lo abres en 7 días, borramos el registro.",
+      ),
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar" }));
+    expect(screen.queryByText("Opciones")).toBeNull();
+  });
+
+  it("confirms a resend and names only the newest link", async () => {
     const api = createApiMock();
     const screen = await registerAndCheckEmail(api);
 
@@ -73,9 +88,7 @@ describe("Revisa tu correo (01)", () => {
 
     expect(api.resendRegistrationVerification).toHaveBeenCalledWith("continuation");
     expect(
-      screen.getByText(
-        "Si el envío está disponible, recibirás un correo nuevo. Solo funciona el enlace más reciente.",
-      ),
+      screen.getByText("Te enviamos otro correo. Usa el enlace más reciente."),
     ).toBeOnTheScreen();
   });
 
@@ -91,22 +104,31 @@ describe("Revisa tu correo (01)", () => {
 
     expect(
       screen.getByRole("alert", {
-        name: "Demasiadas solicitudes. Intenta de nuevo en un momento; el enlace que ya tienes sigue sirviendo.",
+        name: "Ya te enviamos uno hace poco. El enlace que tienes sigue sirviendo.",
       }),
     ).toBeOnTheScreen();
     expect(screen.getByText("Podrás reenviarlo en 0:45.")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reenviar correo" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reenviar en 0:45" })).toBeDisabled();
   });
 
   it("asks before cancelling the registration", async () => {
     const api = createApiMock();
     const screen = await registerAndCheckEmail(api);
+    const openOptions = () =>
+      fireEvent.press(screen.getByRole("button", { name: "¿Correo equivocado? Ver opciones" }));
 
+    await openOptions();
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar registro" }));
     expect(screen.getByText("¿Cancelar tu registro?")).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "El enlace deja de funcionar y el correo queda libre para registrarte de nuevo.",
+      ),
+    ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     expect(api.cancelRegistration).not.toHaveBeenCalled();
 
+    await openOptions();
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar registro" }));
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar registro" }));
 
@@ -114,23 +136,26 @@ describe("Revisa tu correo (01)", () => {
     expect(screen.getByRole("button", { name: "Regístrate" })).toBeOnTheScreen();
   });
 
-  it("explains that a correction stops the links sent to the old address", async () => {
+  it("corrects the address from the options sheet", async () => {
     const api = createApiMock();
     const screen = await registerAndCheckEmail(api);
 
+    await fireEvent.press(screen.getByRole("button", { name: "¿Correo equivocado? Ver opciones" }));
     await fireEvent.press(screen.getByRole("button", { name: "Cambiar correo" }));
 
     expect(
-      screen.getByText(
-        "Escribe el correo correcto. Te enviaremos un enlace nuevo de 24 horas y los enlaces enviados a lucia.mendosa@example.com dejarán de funcionar.",
-      ),
+      screen.getByText("Escribe el correo correcto y te enviamos un enlace nuevo."),
     ).toBeOnTheScreen();
     await fireEvent.changeText(
       screen.getByLabelText("Correo electrónico"),
       "lucia.mendoza@example.com",
     );
-    await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace" }));
 
+    expect(api.correctRegistrationEmail).toHaveBeenCalledWith({
+      email: "lucia.mendoza@example.com",
+      registrationContinuation: "continuation",
+    });
     expect(screen.getByText("lucia.mendoza@example.com")).toBeOnTheScreen();
   });
 

@@ -337,10 +337,25 @@ nombre nuevo y `🇧🇴 +591 70000001`, con el aviso «Guardamos los cambios de
 …». El celular es el mismo campo de arriba, con su país; si no lo tocas, el
 que estaba (aunque sea de antes de la regla, o ninguno) se guarda igual. Un
 celular que cambias tiene que ser válido, y no se puede borrar. El correo de una
-persona **activa** se ve pero no se edita: es con el que entra, y cambiarlo
-necesita que el correo nuevo lo confirme (todavía no está). El de una
-**pendiente** se cambia con **Cambiar correo**. Tu propia fila sigue de solo
-lectura, y la coordinadora solo puede cambiar las sucursales de una
+**pendiente** se cambia con **Cambiar correo**.
+
+**Cambiar el correo de una persona activa.** El correo también es un campo.
+Escribe uno nuevo para Camila (por ejemplo `camila.nueva@example.com`):
+debajo aparece «Al guardar, le enviamos un enlace a este correo. Cambia
+cuando Camila lo abra.». **Guardar** pregunta «¿Cambiar el correo de
+Camila?»; **Enviar enlace** deja el panel abierto con la tarjeta «Esperando
+que Camila confirme», el correo nuevo, la fecha y hora en que vence el enlace
+(24 horas), **Reenviar enlace** y **Cancelar cambio**. Hasta que Camila abra
+el enlace sigue entrando con su correo de siempre; en **Personal** su fila
+dice «Por confirmar: camila.nueva@example.com». Le llegan dos correos: al
+nuevo, «Confirma tu correo nuevo» («El estudio cambió el correo con el que
+entras a la app del equipo…»), y al de siempre, «El estudio está cambiando
+tu correo». El enlace abre la app del equipo («Correo confirmado») o, en la
+computadora, la web en `/confirmar-correo` (en local, copia el `token=` del
+enlace a `http://localhost:5173/confirmar-correo?token=…`). Un correo que ya
+usa otra cuenta dice «Este correo ya pertenece a otra cuenta.» en el campo.
+
+Tu propia fila sigue de solo lectura, y la coordinadora solo puede cambiar las sucursales de una
 entrenadora.
 
 **Foto de perfil.** En el mismo panel, arriba, está el círculo de la
@@ -354,7 +369,9 @@ la tuya, arriba a la derecha.
 
 ## Paso 4. El equipo entra a su app
 
-Abre la app del equipo. La pantalla es **Acceso del equipo**. No hay
+Abre la app del equipo: bajo su ícono se llama **Emma Staff** (en las
+tiendas sigue siendo «Emma Pilates Staff»). La pantalla es **Acceso del
+equipo**. No hay
 **Regístrate**: el equipo no se crea solo.
 
 Cada rol tiene su barra de abajo, y todas terminan en **Perfil**. En la
@@ -465,9 +482,16 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    WhatsApp.» y no crea nada. Abre **¿Cómo nos
    conociste?** y elige **Una instructora**. En el código de referido escribe
    el código de Daniela. **Crear cuenta**.
-2. La pantalla pasa a **Revisa tu correo**. El enlace dura 24 horas. Si
-   cierras la app y la vuelves a abrir, sigues en esa pantalla hasta que
-   confirmes, canceles el registro o pasen 7 días.
+2. La pantalla pasa a **Revisa tu correo**: el ícono del sobre, «Te
+   enviamos un enlace a» con tu correo, «Ábrelo para activar tu cuenta y
+   después inicia sesión.», **Iniciar sesión** y **Reenviar correo**. Debajo,
+   **¿Correo equivocado? Ver opciones** abre una hoja con **Cambiar correo**,
+   **Cancelar registro** y los plazos («El enlace vence en 24 horas. Si no lo
+   abres en 7 días, borramos el registro.»). **Reenviar correo** dice «Te
+   enviamos otro correo. Usa el enlace más reciente.»; si lo pulsas muy
+   seguido, el botón dice «Reenviar en 0:53» y espera. Si cierras la app y la
+   vuelves a abrir, sigues en esa pantalla hasta que confirmes, canceles el
+   registro o pasen 7 días.
 3. Abre el correo «Confirma tu correo para activar tu cuenta» y pulsa
    **Confirmar mi correo**. Entras a **Inicio**.
 4. **Inicio** saluda `Hola, Lucía`. No hay plan. La tarjeta grande dice

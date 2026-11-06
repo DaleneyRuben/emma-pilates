@@ -55,7 +55,7 @@ describe("AuthenticationFlow pending registration across launches", () => {
 
     expect(await screen.findByText("Revisa tu correo")).toBeOnTheScreen();
     expect(screen.getByText("ana@example.com")).toBeOnTheScreen();
-    expect(screen.queryByLabelText("Iniciar sesión")).not.toBeOnTheScreen();
+    expect(screen.queryByLabelText("Contraseña")).not.toBeOnTheScreen();
   });
 
   it("says the registration lapsed once, then forgets it", async () => {
@@ -176,6 +176,7 @@ describe("AuthenticationFlow pending registration across launches", () => {
       });
     });
 
+    await fireEvent.press(screen.getByRole("button", { name: "¿Correo equivocado? Ver opciones" }));
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar registro" }));
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar registro" }));
 
@@ -214,7 +215,8 @@ describe("AuthenticationFlow pending registration across launches", () => {
       />,
     );
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Volver a iniciar sesión" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Iniciar sesión" }));
+    await screen.findByLabelText("Contraseña");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "password");
     await fireEvent.press(screen.getByRole("button", { name: "Iniciar sesión" }));

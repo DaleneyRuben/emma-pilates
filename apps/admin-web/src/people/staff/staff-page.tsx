@@ -58,6 +58,11 @@ const staffColumns =
       cell: ({ row }) => (
         <span className="flex flex-col text-nota text-texto-secundario">
           <span>{row.original.email}</span>
+          {row.original.pendingEmail === null ? null : (
+            <span className="text-primario">
+              {`Por confirmar: ${row.original.pendingEmail.email}`}
+            </span>
+          )}
           {row.original.phone === null ? null : (
             <span className="text-texto-muy-tenue tabular">
               {phoneWithFlag(row.original.phone)}

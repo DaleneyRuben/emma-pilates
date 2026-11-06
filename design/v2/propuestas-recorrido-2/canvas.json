@@ -1,0 +1,127 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-05T23:30:00Z"
+ },
+ "title": "Emma Pilates Studio · Segundo recorrido · n.º 18, n.º 31 y FIX-039",
+ "launch": {
+  "view": "focused",
+  "file": "Main.dc.html"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1100,
+   "title": "Segundo recorrido · elige una propuesta por hallazgo",
+   "is_interactive": true
+  },
+  "R-A-Lo-esencial.dc.html": {
+   "x": 0,
+   "y": 1660,
+   "w": 390,
+   "h": 984,
+   "title": "A · Lo esencial · Revisa tu correo",
+   "is_interactive": true
+  },
+  "R-B-Pasos.dc.html": {
+   "x": 470,
+   "y": 1660,
+   "w": 390,
+   "h": 984,
+   "title": "B · Tres pasos · Revisa tu correo",
+   "is_interactive": true
+  },
+  "R-C-Menu.dc.html": {
+   "x": 940,
+   "y": 1660,
+   "w": 390,
+   "h": 984,
+   "title": "C · Menú ⋯ · Revisa tu correo",
+   "is_interactive": true
+  },
+  "N-Nombre-bajo-el-icono.dc.html": {
+   "x": 1500,
+   "y": 1660,
+   "w": 1440,
+   "h": 1400,
+   "title": "n.º 31 · Nombre bajo el ícono · A, B y C",
+   "is_interactive": true
+  },
+  "E-A-Campo-Web.dc.html": {
+   "x": 0,
+   "y": 3200,
+   "w": 1440,
+   "h": 1100,
+   "title": "A · Campo y confirmar al guardar · Web 1440",
+   "is_interactive": true
+  },
+  "E-A-Campo-Web-420.dc.html": {
+   "x": 1520,
+   "y": 3200,
+   "w": 420,
+   "h": 1200,
+   "title": "A · Campo y confirmar al guardar · Web 420",
+   "is_interactive": true
+  },
+  "E-B-Cambiar-Web.dc.html": {
+   "x": 0,
+   "y": 4560,
+   "w": 1440,
+   "h": 1100,
+   "title": "B · Botón Cambiar al lado · Web 1440",
+   "is_interactive": true
+  },
+  "E-B-Cambiar-Web-420.dc.html": {
+   "x": 1520,
+   "y": 4560,
+   "w": 420,
+   "h": 1200,
+   "title": "B · Botón Cambiar al lado · Web 420",
+   "is_interactive": true
+  },
+  "E-C-Ventana-Web.dc.html": {
+   "x": 0,
+   "y": 5920,
+   "w": 1440,
+   "h": 1100,
+   "title": "C · Ventana aparte · Web 1440",
+   "is_interactive": true
+  },
+  "E-C-Ventana-Web-420.dc.html": {
+   "x": 1520,
+   "y": 5920,
+   "w": 420,
+   "h": 1200,
+   "title": "C · Ventana aparte · Web 420",
+   "is_interactive": true
+  },
+  "E-Lo-que-recibe.dc.html": {
+   "x": 2020,
+   "y": 3200,
+   "w": 1440,
+   "h": 1000,
+   "title": "FIX-039 · Lo que recibe la persona (A, B y C)",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "R-A-Lo-esencial.dc.html",
+  "R-B-Pasos.dc.html",
+  "R-C-Menu.dc.html",
+  "N-Nombre-bajo-el-icono.dc.html",
+  "E-A-Campo-Web.dc.html",
+  "E-A-Campo-Web-420.dc.html",
+  "E-B-Cambiar-Web.dc.html",
+  "E-B-Cambiar-Web-420.dc.html",
+  "E-C-Ventana-Web.dc.html",
+  "E-C-Ventana-Web-420.dc.html",
+  "E-Lo-que-recibe.dc.html"
+ ],
+ "notes": {},
+ "designSystems": []
+}

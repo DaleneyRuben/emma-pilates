@@ -1,4 +1,5 @@
 import {
+  cancelStaffMemberEmailChange,
   cancelStaffMemberInvitation,
   changeStaffMemberBranches,
   changeStaffMemberContact,
@@ -8,7 +9,9 @@ import {
   deactivateStaffMember,
   getListStaffMembersQueryKey,
   listStaffMembers,
+  requestStaffMemberEmailChange,
   resendStaffMemberActivation,
+  resendStaffMemberEmailChange,
   type ChangeStaffRoleDto,
   type CreateStaffMemberDto,
   type ListStaffMembersParams,
@@ -52,7 +55,11 @@ type StaffChange =
     }
   | { kind: "deactivate"; staffMemberId: string }
   | { kind: "correctEmail"; staffMemberId: string; email: string }
-  | { kind: "cancelInvitation"; staffMemberId: string };
+  | { kind: "cancelInvitation"; staffMemberId: string }
+  // FIX-039: an active member's login email, confirmed by the new address.
+  | { kind: "requestEmailChange"; staffMemberId: string; email: string }
+  | { kind: "resendEmailChange"; staffMemberId: string }
+  | { kind: "cancelEmailChange"; staffMemberId: string };
 
 const send = async (change: StaffChange) => {
   switch (change.kind) {
@@ -96,6 +103,25 @@ const send = async (change: StaffChange) => {
       );
     case "cancelInvitation":
       return cancelStaffMemberInvitation(
+        change.staffMemberId,
+        undefined,
+        adminFetch,
+      );
+    case "requestEmailChange":
+      return requestStaffMemberEmailChange(
+        change.staffMemberId,
+        { email: change.email },
+        undefined,
+        adminFetch,
+      );
+    case "resendEmailChange":
+      return resendStaffMemberEmailChange(
+        change.staffMemberId,
+        undefined,
+        adminFetch,
+      );
+    case "cancelEmailChange":
+      return cancelStaffMemberEmailChange(
         change.staffMemberId,
         undefined,
         adminFetch,

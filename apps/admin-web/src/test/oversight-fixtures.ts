@@ -25,6 +25,7 @@ const nutritionist = (
   status: "active",
   activationExpiresAt: null,
   photo: null,
+  pendingEmail: null,
   ...extra,
 });
 
