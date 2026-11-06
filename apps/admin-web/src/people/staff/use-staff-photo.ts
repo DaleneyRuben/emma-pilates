@@ -1,16 +1,13 @@
 import {
-  getGetCurrentStaffMemberProfileQueryKey,
-  getListStaffMembersQueryKey,
   removeStaffMemberPhoto,
   setStaffMemberPhoto,
   type StaffMemberDto,
   type StaffPhotoDto,
 } from "@pilates/api-contracts";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { uploadImage } from "../../api/upload-image";
-import { currentSessionQueryOptions } from "../../session/session-queries";
 
 export type StaffPhotoStatus =
   | { kind: "idle" }
@@ -38,7 +35,6 @@ const maxBytes = 5 * 1024 * 1024;
  */
 export function useStaffPhoto(member: StaffMemberDto) {
   const queryClient = useQueryClient();
-  const { data: principal } = useQuery(currentSessionQueryOptions());
   const [photo, setPhoto] = useState<StaffPhotoDto | null>(member.photo);
   const [status, setStatus] = useState<StaffPhotoStatus>({ kind: "idle" });
 
@@ -50,21 +46,9 @@ export function useStaffPhoto(member: StaffMemberDto) {
     [previewUrl],
   );
 
-  const refresh = async () => {
-    const own =
-      principal?.identity.kind === "staff" &&
-      principal.identity.staffMemberId === member.id;
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: getListStaffMembersQueryKey(),
-      }),
-      own
-        ? queryClient.invalidateQueries({
-            queryKey: getGetCurrentStaffMemberProfileQueryKey(),
-          })
-        : undefined,
-    ]);
-  };
+  // Every list may show her (Personal, Horario, the top bar): refetch them
+  // all, so none keeps the asset the change just released (ADR-0076).
+  const refresh = () => queryClient.invalidateQueries();
 
   const choose = async (file: File) => {
     if (!acceptedTypes.includes(file.type) || file.size > maxBytes) {

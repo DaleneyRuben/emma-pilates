@@ -2,7 +2,7 @@ import {
   getGetStaffPhotoUrl,
   type StaffPhotoDto,
 } from "@pilates/api-contracts";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { cn } from "../lib/cn";
 import { initials } from "../lib/initials";
 
@@ -42,6 +42,8 @@ export function StaffPhoto({
 }) {
   const shown =
     src ?? (photo == null ? undefined : staffPhotoUrl(photo, variant));
+  // A photo replaced or removed meanwhile answers 404: show the initials.
+  const [failed, setFailed] = useState<string>();
   return (
     <span
       className={cn(
@@ -50,11 +52,12 @@ export function StaffPhoto({
         className,
       )}
     >
-      {shown === undefined ? (
+      {shown === undefined || shown === failed ? (
         <span aria-hidden="true">{initials(name)}</span>
       ) : (
         <img
           src={shown}
+          onError={() => setFailed(shown)}
           alt={`Foto de ${name}`}
           className="size-full rounded-full object-cover"
         />

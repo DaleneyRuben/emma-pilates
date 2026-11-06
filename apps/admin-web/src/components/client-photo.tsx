@@ -2,6 +2,7 @@ import {
   getGetClientPhotoForStaffUrl,
   type ClientPhotoDto,
 } from "@pilates/api-contracts";
+import { useState } from "react";
 import { cn } from "../lib/cn";
 import { initials } from "../lib/initials";
 
@@ -27,6 +28,14 @@ export function ClientPhoto({
   size?: keyof typeof sizes;
   className?: string;
 }) {
+  const src =
+    photo == null
+      ? undefined
+      : getGetClientPhotoForStaffUrl(photo.imageAssetId, {
+          variant: "thumbnail",
+        });
+  // A photo replaced or removed meanwhile answers 404: show the initials.
+  const [failed, setFailed] = useState<string>();
   return (
     <span
       className={cn(
@@ -35,13 +44,12 @@ export function ClientPhoto({
         className,
       )}
     >
-      {photo == null ? (
+      {src === undefined || src === failed ? (
         <span aria-hidden="true">{initials(name)}</span>
       ) : (
         <img
-          src={getGetClientPhotoForStaffUrl(photo.imageAssetId, {
-            variant: "thumbnail",
-          })}
+          src={src}
+          onError={() => setFailed(src)}
           alt={`Foto de ${name}`}
           className="size-full rounded-full object-cover"
         />
