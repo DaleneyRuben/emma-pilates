@@ -161,8 +161,9 @@ export const createPrismaClientPhoto = (
     readPhotoObject,
 
     readPhotoObjectByAsset: async (input) => {
-      const client = await prisma.client.findUnique({
-        where: { profileImageAssetId: input.imageAssetId },
+      // ADR-0086: a removed Client's photo is no longer shown.
+      const client = await prisma.client.findFirst({
+        where: { profileImageAssetId: input.imageAssetId, deletedAt: null },
         select: { id: true },
       });
       return client === null

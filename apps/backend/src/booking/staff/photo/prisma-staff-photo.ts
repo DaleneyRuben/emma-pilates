@@ -145,8 +145,9 @@ export const createPrismaStaffPhoto = (
     },
 
     readPhotoObject: async (input) => {
-      const member = await prisma.staffMember.findUnique({
-        where: { profileImageAssetId: input.imageAssetId },
+      // ADR-0086: a removed member's photo is no longer anyone's to see.
+      const member = await prisma.staffMember.findFirst({
+        where: { profileImageAssetId: input.imageAssetId, deletedAt: null },
         select: {
           profileImageAsset: {
             select: {
