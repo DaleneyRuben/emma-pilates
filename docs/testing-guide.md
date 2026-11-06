@@ -36,7 +36,7 @@ numbered tests.
 | Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
-| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
+| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, «+ Nuevo cliente» with the invitation card since FIX-040, Bookings, «Cancelar una clase», no sale); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation, class, and Plan reminders (Tests 7 and 105), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
@@ -7016,15 +7016,23 @@ password, holding every Branch.
 ### B. The Staff app
 
 1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. She
-   lands on **Buscar cliente** without «+ Nuevo cliente» and with
-   **Cancelar una clase**, which opens the Administrator's cancellation
-   screens (Test 10 D).
-2. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
+   lands on **Buscar cliente** with «+ Nuevo cliente» (FIX-040), and
+   **Horario** has **Cancelar una clase**, which opens the Administrator's
+   cancellation screens (Test 10 D).
+2. **+ Nuevo cliente** opens the Assistant's form (Test 9 E): create a Client
+   with a fresh email. Her overview shows **Cuenta pendiente de activación**
+   with **Reenviar enlace** and the «Más opciones» menu (**Cambiar correo**,
+   **Cancelar invitación**), «La clienta necesita un plan activo para
+   reservar.», and no «Registrar pago en efectivo». The activation email
+   reaches the local capture, and `audit_log` has `client_invitation.created`
+   with her Account and the Role `COORDINATOR`. A search with no result offers
+   **Nuevo cliente** too.
+3. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
    for the Assistant (Test 11 B and C) at any Branch, but there is no
    «Registrar pago en efectivo». A Client without a Plan reads «La clienta
    necesita un plan activo para reservar.».
-3. Perfil reads «Coordinación» and «Todas las sucursales».
-4. As the Administrator, Perfil → «Ver la app como…» lists her under
+4. Perfil reads «Coordinación» and «Todas las sucursales».
+5. As the Administrator, Perfil → «Ver la app como…» lists her under
    «Coordinación»; seeing the app as her shows the same stack under the
    banner (Test 67).
 
@@ -8447,7 +8455,8 @@ F. **Nutricionista.** Mi agenda (S15): «Nutricionista · …», days as section
    «Aún no publicaste horarios». Nuevo/Editar horario (S17): a fixed Branch
    with one Branch, the turnos as a row, **Guardar** fixed with **Eliminar
    horario** as an Error text button.
-G. **Coordinación.** Buscar cliente has no **Nuevo cliente**; Horario has a
+G. **Coordinación.** Buscar cliente has **Nuevo cliente** like the Assistant's
+   (FIX-040), with no cash sale on the Client's file; Horario has a
    **Cancelar una clase** row and «Solo lectura. Para reservar, abre la ficha
    de una clienta.»; Para contactar (S28) shows each Client with her reasons
    as pills and **Abrir WhatsApp** / **Marcar contactada** as text actions,

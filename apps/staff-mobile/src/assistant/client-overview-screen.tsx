@@ -63,7 +63,8 @@ export function ClientOverviewScreen({
   const { clientId, reopened = false } = route.params;
   const navigation = useNavigation<OverviewNavigation>();
   const fetcher = useStaffFetcher();
-  // ADR-0102: the Coordinator books but never sells or manages invitations.
+  // ADR-0102: the Coordinator books but never sells. She follows up the
+  // invitations of the Clients she registers (FIX-040).
   const sells = useStaffRole() !== "coordinator";
   const overview = useGetAssistantClientOverview(clientId, {
     fetcher,
@@ -129,7 +130,7 @@ export function ClientOverviewScreen({
             <Text style={styles.contact}>{describeContact(client.phone, client.email)}</Text>
           </View>
         </View>
-        {pending && sells ? (
+        {pending ? (
           <PendingInvitationCard
             clientEmail={client.email}
             clientId={client.id}

@@ -1,6 +1,6 @@
 # Critical journey (IDN-009, ADR-0102): the Coordinator finds a Client, sees
 # her overview with booking but no sale, and opens «Cancelar una clase» from
-# her Horario tab (v2).
+# her Horario tab (v2). Since FIX-040 her search offers «Nuevo cliente».
 appId: ${APP_ID}
 env:
   EMAIL: carolina.rivas@example.com
@@ -11,7 +11,7 @@ env:
       id: "tab-profile"
     timeout: 30000
 - runFlow: subflows/park-dev-gear.yaml
-- assertNotVisible:
+- assertVisible:
     id: "client-search-new-client"
 - takeScreenshot: staff-coordinator-search
 - tapOn:
