@@ -51,6 +51,7 @@ export type { PushPlatform } from "./notifications/push-platform";
 export * from "./query/persistence";
 export * from "./query/provider";
 export * from "./time/mounted-at";
+export * from "./plans/next-plan-start-chooser";
 export * from "./plans/start-date-chooser";
 export * from "./plans/start-date-options";
 export * from "./time/session-format";

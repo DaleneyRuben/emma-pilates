@@ -18,7 +18,7 @@ describe("nextPlanStartOptions", () => {
 
 describe("NextPlanStartChooser", () => {
   it("names the current end, the chosen start and the last day", async () => {
-    const screen = render(
+    const screen = await render(
       <NextPlanStartChooser
         currentPlan="El plan actual de Rocío"
         firstDay="2026-12-06"
@@ -40,7 +40,7 @@ describe("NextPlanStartChooser", () => {
 
   it("picks another day", async () => {
     const onSelect = jest.fn();
-    const screen = render(
+    const screen = await render(
       <NextPlanStartChooser
         currentPlan="Tu plan actual"
         firstDay="2026-12-06"

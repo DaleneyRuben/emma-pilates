@@ -25,6 +25,19 @@ export function StartDateChooser({
 }) {
   const options = startDateOptions({ today, startDateLimitDays, openingDate });
 
+  return <StartDateStrip onSelect={onSelect} options={options} selected={selected} />;
+}
+
+/** The «Fecha de inicio» title and its row of day tiles, for any set of days. */
+export function StartDateStrip({
+  options,
+  selected,
+  onSelect,
+}: {
+  options: StartDateOption[];
+  selected: string;
+  onSelect: (date: string) => void;
+}) {
   return (
     <View>
       <SectionTitle>Fecha de inicio</SectionTitle>
