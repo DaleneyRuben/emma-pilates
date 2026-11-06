@@ -29,7 +29,12 @@ falta crearla para entender el resto.
 - Los nombres entre comillas angulares, como **Horario**, son lo que dice el
   botón o el menú.
 - En el teléfono, la barra de abajo de la app de clientas tiene cuatro
-  pestañas: **Inicio**, **Reservar**, **Mis Reservas** y **Perfil**.
+  pestañas: **Inicio**, **Reservar**, **Mis Reservas** y **Perfil**. En las
+  dos apps la barra sigue a la vista mientras navegas (el detalle de una
+  clase, **Mi plan**, **Notificaciones**, la ficha de una clienta, sus
+  reservas) y se oculta solo dentro de una tarea que termina en un botón
+  abajo: comprar un plan, agendar una evaluación, **Editar perfil**,
+  **Registrar pago**, **Reservar para…**, **Nuevo cliente**, **Cerrar caja**.
 - En la web, el menú es un riel de íconos a la izquierda con nueve destinos:
   **Inicio**, **Horario**, **Clientas**, **Promociones**, **Comentarios**,
   **Dinero**, **Estudio**, **Informes** y **Ajustes**. Cada destino tiene
@@ -217,7 +222,9 @@ primero la sede, después el tipo de clase, después el plan.
 Antes de vender, sube el QR de transferencia del estudio en **Ajustes › QR
 del estudio**: es el que la clienta ve al pagar en la app, y la app usa el
 nuevo apenas lo subes. Mientras no subas ninguno, la página dice «Es el QR de
-prueba del servidor».
+prueba del servidor». Para el recorrido sirve cualquier imagen, pero antes de
+abrir el estudio sube el QR real del banco: con otro, las clientas
+transferirían a ninguna cuenta.
 
 ### Sucursales
 
@@ -630,16 +637,16 @@ el título **Buscar cliente**, el campo «Nombre, teléfono o correo» y, debajo
 el botón **Nuevo cliente**. En un iPad la búsqueda queda a la izquierda y la
 ficha se abre a la derecha, sin perder la lista.
 
-1. Escribe `Lucía` en el campo. Con una sola letra dice «Escribe al menos dos
-   letras o números para buscar.». Cada resultado muestra la foto (o las
+1. Con el campo vacío ya dice «Escribe al menos dos letras o números para
+   buscar.», y lo sigue diciendo con una sola letra. Escribe `Lucía`. Cada resultado muestra la foto (o las
    iniciales), el nombre, el teléfono y el correo; una cuenta sin activar
    lleva la marca **Pendiente**. Si nadie coincide, dice «No encontramos a
    nadie», con **Nuevo cliente**. Toca la fila de Lucía (el lector de
    pantalla la anuncia como «Ver cliente Lucía Fernández»).
 2. La ficha muestra su foto, su nombre y su contacto; la tarjeta rosa del
    plan, con el nombre del plan, **Activo**, «N clases restantes de 8» y
-   «Vence el …»; los botones **Reservar clase** y **Registrar pago en
-   efectivo**; y el grupo **Reservas**, con **Próximas reservas** (al lado, el
+   «Vence el …»; los botones **Reservar clase** y **Registrar pago** (que
+   cobra en efectivo o por QR); y el grupo **Reservas**, con **Próximas reservas** (al lado, el
    día y la hora de la próxima, por ejemplo «Lun 9 · 09:00») e **Historial de
    clases**. **Clientes**, arriba a la izquierda, vuelve a la búsqueda.
 3. Vuelve a la búsqueda y pulsa **Nuevo cliente**. Crea a una clienta que
@@ -657,7 +664,7 @@ ficha se abre a la derecha, sin perder la lista.
    ya se registró desde la app y espera verificación.», con **Enviar enlace
    de verificación** (el mismo correo de 24 horas) y **Ver cliente**.
 5. Con una clienta sin plan, la ficha dice **Sin plan activo** y
-   **Registrar pago en efectivo** abre **Elige un plan**, con la franja
+   **Registrar pago** abre **Elige un plan**, con la franja
    «Registrando pago para …». Elige **4 clases**. La pantalla **Registrar
    pago** pregunta **¿Cómo paga?**: **Efectivo** o **QR**. Con **Efectivo**
    ves **A cobrar** (el precio, el **Descuento** si es fundadora y **Total en
@@ -669,31 +676,53 @@ ficha se abre a la derecha, sin perder la lista.
    el efectivo entra en la caja de hoy de esa sede. **Volver a Clientes**.
 6. Si la clienta paga por QR en el mostrador, elige **QR**. La pantalla
    muestra el QR del estudio con el monto exacto, para que ella transfiera.
-   **Fotografiar comprobante** abre la cámara (si no hay permiso de cámara,
-   la galería) y la foto queda como «Comprobante fotografiado · Todavía no se
-   envió». **Enviar comprobante** muestra **Comprobante enviado**, con el
+   La tarjeta **Comprobante** tiene **Fotografiar comprobante**, que abre la
+   cámara, y **Elegir de la galería**, para un comprobante que la clienta
+   mandó por WhatsApp. Elegido, queda «Comprobante listo · Todavía no se
+   envió», con **Cambiar**. **Enviar comprobante** muestra **Comprobante
+   enviado** («Administración lo revisa y activa el plan de …»), con el
    estado **En revisión**: ese pago queda en **Pagos pendientes** hasta que
    Ana lo confirma, y no entra en la caja. Mientras un pago está en
    revisión, el otro camino queda apagado.
 7. Con un plan vigente que todavía tiene clases o una reserva futura,
-   **Registrar pago en efectivo** vende el plan siguiente: **Registrar pago**
-   no deja elegir la fecha y dice «El nuevo plan empieza el …, al terminar el
-   actual.», y al confirmar el plan queda programado. Si ya tiene un plan
-   siguiente, el botón no está y la ficha dice «Ya tiene un plan
+   **Registrar pago** vende el plan siguiente, y también elige su **Fecha de
+   inicio**: la franja va desde el día siguiente al vencimiento hasta 4
+   semanas después, con el día siguiente marcado, y debajo dice «El plan
+   actual de Rocío vence el 5 de diciembre. El nuevo empieza el …; se puede
+   elegir hasta el 2 de enero.». Al confirmar en efectivo el plan queda
+   programado; por QR, **Comprobante enviado** dice «Administración lo revisa
+   y programa el plan siguiente de Rocío, que empieza el …» y muestra
+   **Empieza**. Una fundadora que compra así por adelantado conserva su
+   lugar aunque el nuevo plan empiece más de 7 días después. Si ya tiene un
+   plan siguiente, el botón no está y la ficha dice «Ya tiene un plan
    siguiente.».
 8. **Reservar clase** abre **Reservar una clase**, con la franja
    «Reservando para Lucía», la sede, los días (y **Otra** para una fecha más
    adelante) y los tipos de clase. Una clase que ya tiene dice **Ya
    reservada**. En el detalle, el botón es **Reservar para Lucía**; con la
    clase llena, **Anotarla en la lista de espera**.
-9. **Próximas reservas** lista sus reservas. Cada una tiene un solo botón:
+9. **Próximas reservas** e **Historial de clases** abren la misma pantalla,
+   **Reservas de Lucía**, con las pestañas **Próximas** · **Historial**.
+   Después de **Reservar para Lucía**, la app llega ahí con el aviso
+   «Reserva confirmada». Cada reserva próxima tiene un solo botón:
    **Cancelar reserva** fuera de las 2 h 30, **Reprogramar** dentro, o
    **Salir de la lista** si está en espera. Cancelar abre la hoja
    «¿Cancelar esta reserva de Lucía Fernández?», con **Sí,
    cancelar la reserva** y **No, volver**; al cancelar aparece «Reserva
    cancelada · La clase volvió a su plan». **Reprogramar** solo ofrece otra
-   clase del mismo día. **Historial de clases** lista lo ya pasado, en filas,
-   sin tarjetas.
+   clase del mismo día. **Historial** lista lo ya pasado, en filas, sin
+   tarjetas.
+
+Arriba de **Clientes** y de **Horario** dice lo mismo: «Asistente ·
+Centro» (el rol y la sede, sin la palabra «Sucursal»).
+
+Si una clienta se registró antes de que el celular fuera obligatorio y no
+tiene uno válido (por ejemplo, ninguno, o `7000004`), al abrir su app ve,
+sobre **Inicio**, la hoja **Agrega tu celular** (o **Revisa tu celular**, con
+el número que tenía y el error debajo), con el campo de país y número,
+**Guardar** y **Ahora no**. **Guardar** muestra «Celular guardado». **Ahora
+no** la cierra hasta la próxima vez que abra la app; nunca le impide
+reservar.
 
 En la pestaña **Horario**, Camila ve la semana de la sede, solo para leer:
 cada clase con su hora, la entrenadora (con su foto), las reservas y los
@@ -1081,7 +1110,7 @@ En la app del equipo, su barra es **Clientes** · **Para contactar** ·
 formulario de la recepcionista: crea una clienta con un correo nuevo, y su
 ficha muestra la tarjeta **Cuenta pendiente de activación** con **Reenviar
 enlace** (y, en **⋯**, **Cambiar correo** y **Cancelar invitación**). No tiene
-**Registrar pago en efectivo**: el cobro sigue en recepción, y sin plan la
+**Registrar pago**: el cobro sigue en recepción, y sin plan la
 ficha dice «La clienta necesita un plan activo para reservar.». **Horario**
 es la semana para leer, con **Cancelar una clase** arriba. **Para
 contactar** lista a quien el seguimiento de los primeros 90 días marcó: día
@@ -1217,7 +1246,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
   hay archivo, el worker no está encendido o no usa la misma base.
 - Un botón de guardar se queda pensando: la API del puerto 3100 no está
   respondiendo. Vuelve a la Terminal de `pnpm dev:backend`.
-- La recepcionista no ve **Registrar pago en efectivo**: la clienta ya
+- La recepcionista no ve **Registrar pago**: la clienta ya
   tiene un plan siguiente comprado. Si el cobro se niega con «La clienta
   tiene un pago en revisión.», hay una transferencia esperando a Ana en
   **Pagos pendientes**.
