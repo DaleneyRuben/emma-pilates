@@ -60,10 +60,12 @@ const profileScreens = {
   ReferralCode: StaffReferralCodeScreen,
 };
 
-// A Client's file and everything reached from it (S06–S10, S21, S22). The
-// Coordinator never sells nor registers (ADR-0102), so she drops `sellingScreens`.
+// A Client's file and everything reached from it (S05–S10, S21, S22). The
+// Coordinator registers Clients (FIX-040) but never sells (ADR-0102), so she
+// drops `sellingScreens`.
 const clientScreens = {
   ClientSearch: ClientSearchScreen,
+  NewClient: NewClientScreen,
   ClientOverview: ClientOverviewScreen,
   BrowseSessions: BrowseSessionsScreen,
   SessionDetail: AssistantSessionDetailScreen,
@@ -73,7 +75,6 @@ const clientScreens = {
   Notifications: StaffNotificationsScreen,
 };
 const sellingScreens = {
-  NewClient: NewClientScreen,
   SelectPlan: SelectPlanScreen,
   ConfirmCashPayment: ConfirmCashPaymentScreen,
 };
