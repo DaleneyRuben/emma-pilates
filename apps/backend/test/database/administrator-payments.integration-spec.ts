@@ -7,6 +7,7 @@ import { toPrismaBytes } from '../../src/database/prisma-bytes';
 import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
 import { buildDevelopmentFixtures } from '../../src/development-fixtures/development-fixtures';
 import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
+import { attachClientPhoto } from './client-photo-test-support';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -29,6 +30,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
     createPrismaPaymentCommands(prisma, {
       now: () => clock,
     });
+  let marianaPhoto: string;
   const paymentIds: Record<string, string> = {
     fixtureCash: fixtures.payments[0].id,
   };
@@ -132,6 +134,8 @@ describe('Administrator Payment list (PostgreSQL)', () => {
     );
 
     const mariana = await newClient('Mariana Paz');
+    if (mariana.identity.kind !== 'client') throw new Error('Not a Client');
+    marianaPhoto = await attachClientPhoto(prisma, mariana.identity.clientId);
     const rejected = await submitTransfer(mariana, at('10:00'));
     paymentIds.mariana = rejected.paymentId;
     await commands(at('16:00')).rejectTransfer(
@@ -150,7 +154,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
     await context?.stop();
   });
 
-  it('lists transfers and cash sales, pending ones oldest first and then the decided ones newest first', async () => {
+  it('lists transfers and cash sales with each Client photo, pending ones oldest first and then the decided ones newest first', async () => {
     const page = await ledger().list({
       page: 1,
       pageSize: 20,
@@ -175,6 +179,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       id: paymentIds.sofia,
       clientId: expect.any(String) as string,
       clientName: expect.stringMatching(/^Sofía/) as string,
+      clientPhoto: null,
       planName: 'Paquete de 8 clases',
       kind: 'plan',
       planPriceCentavos: plan.priceCentavos,
@@ -192,6 +197,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
     });
     expect(page.items[2]).toMatchObject({
       clientName: 'Mariana Paz',
+      clientPhoto: { imageAssetId: marianaPhoto },
       state: 'rejected',
       decidedAt: at('16:00'),
       receiptAvailable: false,
