@@ -15,9 +15,9 @@ const profile = {
   referralCode: "REF-LUCIA",
 };
 
-const openHome = async (phone: string | null) => {
+const openHome = async (phone: string | null, id = "client-1") => {
   const saved = jest.fn();
-  let current = { ...profile, phone };
+  let current = { ...profile, id, phone };
   const fetcher = routeFetcher({
     "/api/v1/clients/current": () => jsonResponse(current),
     "PATCH /api/v1/clients/current": (init) => {
@@ -97,5 +97,16 @@ describe("Asking for a missing or invalid phone", () => {
       expect(screen.queryByText("Agrega tu celular")).toBeNull();
     });
     expect(saved).not.toHaveBeenCalled();
+  });
+
+  it("asks again when another Client signs in on the same phone", async () => {
+    const first = await openHome(null);
+    await fireEvent.press(await first.screen.findByRole("button", { name: "Ahora no" }));
+    await cleanup();
+    clearMobileQueryCache();
+
+    const { screen } = await openHome(null, "client-2");
+
+    expect(await screen.findByText("Agrega tu celular")).toBeOnTheScreen();
   });
 });
