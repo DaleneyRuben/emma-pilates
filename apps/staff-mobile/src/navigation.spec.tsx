@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 
 import { StaffNavigation } from "./navigation";
 
@@ -86,4 +86,27 @@ describe("StaffNavigation", () => {
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
     expect(screen.queryByLabelText("Inicio")).not.toBeOnTheScreen();
   });
+
+  // FIX-039: the link the studio's email change sends to the new address
+  // opens here, signed in or not, and completes without a session.
+  it.each([undefined, "trainer"] as const)(
+    "confirms a new email from its link (role %s)",
+    async (role) => {
+      const authenticationApi = createAuthenticationApiMock();
+      authenticationApi.completeEmailChange.mockResolvedValue({ status: "changed" });
+      const screen = await render(
+        <StaffNavigation
+          {...defaultProps}
+          authenticationApi={authenticationApi}
+          authenticationIntent={{ token: "change-secret", type: "confirm-email-change" }}
+          role={role}
+        />,
+      );
+
+      expect(await screen.findByText("Correo confirmado")).toBeOnTheScreen();
+      expect(authenticationApi.completeEmailChange).toHaveBeenCalledWith("change-secret");
+      await fireEvent.press(screen.getByRole("button", { name: "Continuar" }));
+      expect(screen.queryByText("Correo confirmado")).not.toBeOnTheScreen();
+    },
+  );
 });
