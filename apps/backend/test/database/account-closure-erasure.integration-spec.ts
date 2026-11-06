@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import { createPrismaAccountClosure } from '../../src/booking/account-closure/prisma-account-closure';
-import { createPrismaInvoiceData } from '../../src/booking/payments/invoice-data/prisma-invoice-data';
 import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
 import {
   closureNow,
@@ -150,11 +149,12 @@ describe('erasing a closed Client Account (PostgreSQL)', () => {
       world.administrator,
       randomUUID(),
     );
-    await createPrismaInvoiceData(world.prisma).setIssued({
-      paymentId: sale.id,
-      issued: true,
-      principal: world.administrator,
-      now: anHourBefore,
+    await world.prisma.payment.update({
+      where: { id: sale.id },
+      data: {
+        invoiceIssuedAt: anHourBefore,
+        invoiceIssuedByAccountId: world.administrator.accountId,
+      },
     });
 
     await closure().close(

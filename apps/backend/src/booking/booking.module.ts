@@ -165,6 +165,7 @@ import { administratorSessionRosterWiring } from './sessions/administrator-sessi
 import { clientPhotoWiring } from './client/client-photo-wiring';
 import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
 import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
+import { invoiceFileWiring } from './payments/invoice-file/invoice-file-wiring';
 
 @Module({
   imports: [SystemIdentityModule, NotificationsModule],
@@ -210,6 +211,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...clientPhotoWiring.controllers,
     ...first90DaysWiring.controllers,
     ...invoiceDataWiring.controllers,
+    ...invoiceFileWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
     NutritionistEvaluationsController,
@@ -676,6 +678,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
     ...first90DaysWiring.providers(PRISMA_CLIENT),
     ...invoiceDataWiring.providers(PRISMA_CLIENT),
+    ...invoiceFileWiring.providers(PRISMA_CLIENT),
   ],
 })
 export class BookingModule {}

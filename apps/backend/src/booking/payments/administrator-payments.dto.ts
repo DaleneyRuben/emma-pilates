@@ -4,6 +4,7 @@ import {
   InvoiceDataDto,
   InvoiceIssuedMarkDto,
 } from './invoice-data/invoice-data.dto';
+import { StaffInvoiceFileDto } from './invoice-file/invoice-file.dto';
 import type {
   AdministratorPaymentQuery,
   AdministratorPaymentState,
@@ -99,6 +100,14 @@ export class AdminPaymentDto {
     description: 'The «Factura emitida» mark: who and when',
   })
   invoiceIssued!: InvoiceIssuedMarkDto | null;
+
+  @ApiProperty({
+    type: StaffInvoiceFileDto,
+    nullable: true,
+    description:
+      'The uploaded invoice (FIX-044); null with a mark is «Emitida · sin archivo»',
+  })
+  invoiceFile!: StaffInvoiceFileDto | null;
 }
 
 export class AdminPaymentPageDto {

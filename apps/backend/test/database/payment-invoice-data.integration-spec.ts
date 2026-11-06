@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import { createPrismaAdministratorPayments } from '../../src/booking/payments/prisma-administrator-payments';
-import { InvoiceDataError } from '../../src/booking/payments/invoice-data/invoice-data';
 import { createPrismaInvoiceData } from '../../src/booking/payments/invoice-data/prisma-invoice-data';
 import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
 import {
@@ -16,15 +15,6 @@ const day = 24 * hour;
 const centro = fixtures.branches.find((b) => b.name === 'Centro')!;
 const ana = { taxId: '4567891', name: 'Ana Pérez' };
 const company = { taxId: '1020304050', name: 'Estudio Ana SRL' };
-
-const issueError = async (work: Promise<unknown>): Promise<string> => {
-  try {
-    await work;
-    return 'resolved';
-  } catch (error) {
-    return error instanceof InvoiceDataError ? error.code : String(error);
-  }
-};
 
 // PAY-007 (ADR-0012): Invoice Data travels with the sale, prefills the next
 // one, and the Administrator marks the invoice issued outside the system.
@@ -154,106 +144,6 @@ describe('Invoice Data (PostgreSQL)', () => {
     });
   });
 
-  it('marks and unmarks «Factura emitida», recording who and when and auditing both', async () => {
-    const buyer = await world.newClient('Factura emitida');
-    const payment = await cash(buyer.clientId, ana);
-    const markedAt = new Date(now.getTime() + 2 * hour);
-    const unmarkedAt = new Date(now.getTime() + 3 * hour);
-
-    await expect(
-      invoices().setIssued({
-        paymentId: payment.id,
-        issued: true,
-        principal: administrator,
-        now: markedAt,
-      }),
-    ).resolves.toEqual({
-      paymentId: payment.id,
-      invoiceIssued: { issuedAt: markedAt, issuedByName: 'Paola Mendoza' },
-    });
-    await expect(stored(payment.id)).resolves.toMatchObject({
-      invoiceIssuedAt: markedAt,
-      invoiceIssuedByAccountId: administrator.accountId,
-    });
-    // Marking twice changes nothing and writes no second record.
-    await invoices().setIssued({
-      paymentId: payment.id,
-      issued: true,
-      principal: administrator,
-      now: unmarkedAt,
-    });
-    await expect(stored(payment.id)).resolves.toMatchObject({
-      invoiceIssuedAt: markedAt,
-    });
-
-    await expect(
-      invoices().setIssued({
-        paymentId: payment.id,
-        issued: false,
-        principal: administrator,
-        now: unmarkedAt,
-      }),
-    ).resolves.toEqual({ paymentId: payment.id, invoiceIssued: null });
-    await expect(stored(payment.id)).resolves.toMatchObject({
-      invoiceIssuedAt: null,
-      invoiceIssuedByAccountId: null,
-    });
-
-    const records = await world.prisma.auditRecord.findMany({
-      where: {
-        targetId: payment.id,
-        actionCode: { startsWith: 'payment.invoice' },
-      },
-      orderBy: { occurredAt: 'asc' },
-    });
-    expect(records).toEqual([
-      expect.objectContaining({
-        actionCode: 'payment.invoice_issued_marked',
-        actorAccountId: administrator.accountId,
-        actorRole: 'ADMINISTRATOR',
-        targetType: 'payment',
-        occurredAt: markedAt,
-        metadata: { method: 'cash', hasInvoiceData: true },
-      }),
-      expect.objectContaining({
-        actionCode: 'payment.invoice_issued_unmarked',
-        actorAccountId: administrator.accountId,
-        occurredAt: unmarkedAt,
-        metadata: {
-          method: 'cash',
-          hasInvoiceData: true,
-          previousIssuedAt: markedAt.toISOString(),
-        },
-      }),
-    ]);
-  });
-
-  it('marks only a confirmed sale that exists', async () => {
-    const buyer = await world.newClient('Transferencia por revisar');
-    const pending = await transfer(buyer, ana);
-
-    await expect(
-      issueError(
-        invoices().setIssued({
-          paymentId: pending.id,
-          issued: true,
-          principal: administrator,
-          now,
-        }),
-      ),
-    ).resolves.toBe('payment_not_confirmed');
-    await expect(
-      issueError(
-        invoices().setIssued({
-          paymentId: randomUUID(),
-          issued: true,
-          principal: administrator,
-          now,
-        }),
-      ),
-    ).resolves.toBe('payment_not_found');
-  });
-
   it('lists cash sales beside transfers with their Invoice Data, and filters the confirmed sales still unbilled', async () => {
     const billed = await world.newClient('Lista facturada');
     const unbilled = await world.newClient('Lista por facturar');
@@ -261,11 +151,13 @@ describe('Invoice Data (PostgreSQL)', () => {
     const billedPayment = await cash(billed.clientId, company);
     const unbilledPayment = await cash(unbilled.clientId, ana);
     await cash(noInvoice.clientId, null);
-    await invoices().setIssued({
-      paymentId: billedPayment.id,
-      issued: true,
-      principal: administrator,
-      now,
+    // A mark set before FIX-044, the only way left to issue without a file.
+    await world.prisma.payment.update({
+      where: { id: billedPayment.id },
+      data: {
+        invoiceIssuedAt: now,
+        invoiceIssuedByAccountId: administrator.accountId,
+      },
     });
     const ledger = createPrismaAdministratorPayments(world.prisma);
 

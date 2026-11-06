@@ -7,6 +7,7 @@ import type {
   AdministratorPaymentState,
   AdministratorPaymentStatusFilter,
 } from './administrator-payments';
+import type { InvoiceMediaType } from './invoice-file/invoice-file';
 import { saleLabel } from './payment-label';
 
 type PaymentRow = {
@@ -28,6 +29,11 @@ type PaymentRow = {
   invoice_name: string | null;
   invoice_issued_at: Date | null;
   invoice_issued_by_name: string | null;
+  invoice_file_name: string | null;
+  invoice_media_type: string | null;
+  invoice_byte_size: number | null;
+  invoice_uploaded_at: Date | null;
+  invoice_uploaded_by_name: string | null;
 };
 
 const stateCondition = (status: AdministratorPaymentStatusFilter) =>
@@ -83,6 +89,16 @@ const toRow = (row: PaymentRow): AdministratorPaymentRow => ({
           issuedAt: row.invoice_issued_at,
           issuedByName: row.invoice_issued_by_name ?? '',
         },
+  invoiceFile:
+    row.invoice_file_name === null || row.invoice_uploaded_at === null
+      ? null
+      : {
+          fileName: row.invoice_file_name,
+          mediaType: row.invoice_media_type as InvoiceMediaType,
+          byteSize: row.invoice_byte_size ?? 0,
+          uploadedAt: row.invoice_uploaded_at,
+          uploadedByName: row.invoice_uploaded_by_name ?? '',
+        },
 });
 
 // WEB-005 (AW28): every transfer and, since PAY-007, every cash sale of the
@@ -110,7 +126,12 @@ export const createPrismaAdministratorPayments = (
           (receipt.id IS NOT NULL AND receipt.deleted_at IS NULL)
             AS receipt_available,
           p.invoice_tax_id, p.invoice_name, p.invoice_issued_at,
-          issuer.name AS invoice_issued_by_name
+          issuer.name AS invoice_issued_by_name,
+          invoice.file_name AS invoice_file_name,
+          invoice.media_type AS invoice_media_type,
+          invoice.byte_size AS invoice_byte_size,
+          invoice.uploaded_at AS invoice_uploaded_at,
+          invoice.uploaded_by_name AS invoice_uploaded_by_name
         FROM booking.payments p
         JOIN booking.clients c ON c.id = p.client_id
         LEFT JOIN booking.purchase_intents intent
@@ -123,6 +144,21 @@ export const createPrismaAdministratorPayments = (
           ON issuer_account.id = p.invoice_issued_by_account_id
         LEFT JOIN booking.staff_members issuer
           ON issuer.id = issuer_account.staff_member_id
+        LEFT JOIN LATERAL (
+          SELECT pi.file_name, pi.uploaded_at,
+            COALESCE(asset.verified_media_type, asset.declared_media_type)::text
+              AS media_type,
+            COALESCE(asset.verified_byte_size, asset.declared_byte_size)
+              AS byte_size,
+            uploader.name AS uploaded_by_name
+          FROM booking.payment_invoices pi
+          JOIN system.image_assets asset ON asset.id = pi.image_asset_id
+          JOIN system.accounts uploader_account
+            ON uploader_account.id = pi.uploaded_by_account_id
+          LEFT JOIN booking.staff_members uploader
+            ON uploader.id = uploader_account.staff_member_id
+          WHERE pi.payment_id = p.id AND pi.removed_at IS NULL
+        ) invoice ON true
         ${where}
         ORDER BY (p.state = 'pending') DESC,
           CASE WHEN p.state = 'pending' THEN p.submitted_at END ASC,

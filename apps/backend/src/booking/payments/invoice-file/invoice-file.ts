@@ -49,7 +49,8 @@ export type InvoiceFileGateway = {
   attach: (input: {
     paymentId: string;
     imageAssetId: string;
-    fileName: string;
+    /** As the device named it; the gateway makes it safe to show. */
+    fileName?: string;
     principal: AuthenticatedPrincipal;
     now: Date;
   }) => Promise<StaffInvoiceView>;
@@ -140,7 +141,7 @@ const requireInvoiceStaff = (principal: AuthenticatedPrincipal): void => {
 type Dependencies = { gateway: InvoiceFileGateway; now: () => Date };
 
 export const attachPaymentInvoice = async (
-  command: { paymentId: string; imageAssetId: string; fileName: string },
+  command: { paymentId: string; imageAssetId: string; fileName?: string },
   principal: AuthenticatedPrincipal,
   { gateway, now }: Dependencies,
 ): Promise<StaffInvoiceView> => {

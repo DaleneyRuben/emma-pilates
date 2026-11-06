@@ -37,16 +37,11 @@ export class InvoiceIssuedMarkDto {
   @ApiProperty({ format: 'date-time' })
   issuedAt!: Date;
 
-  @ApiProperty({ description: 'The Administrator who marked it' })
+  @ApiProperty({
+    description:
+      'The Staff Member who uploaded the invoice, or marked it before FIX-044',
+  })
   issuedByName!: string;
-}
-
-export class InvoiceIssuedDto {
-  @ApiProperty({ format: 'uuid' })
-  paymentId!: string;
-
-  @ApiProperty({ type: InvoiceIssuedMarkDto, nullable: true })
-  invoiceIssued!: InvoiceIssuedMarkDto | null;
 }
 
 /**
