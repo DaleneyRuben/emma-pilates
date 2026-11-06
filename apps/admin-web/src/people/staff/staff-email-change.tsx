@@ -23,6 +23,7 @@ import {
 import { isApiError } from "../../api/problem";
 import type { StaffFormInput, StaffFormOutput } from "./staff-form-schema";
 import { isAccountEmailLimit, staffProblem } from "./staff-problems";
+import { firstName, sameEmail } from "./staff-format";
 import { useStaffChange } from "./staff-queries";
 import type { EmailLimit } from "./use-email-limit";
 
@@ -30,11 +31,6 @@ import type { EmailLimit } from "./use-email-limit";
 // 2026-11-06): an active member's login email is a field; a new address is
 // confirmed in a dialog on «Guardar», a link goes to it and a notice to the
 // current one, and the login changes only when the link is opened.
-
-export const firstName = (name: string): string => name.split(" ")[0] ?? name;
-
-export const sameEmail = (a: string, b: string): boolean =>
-  a.trim().toLowerCase() === b.trim().toLowerCase();
 
 /** «vie 6 de noviembre a las 11:40», in La Paz. */
 const linkDeadline = (instant: string): string => {

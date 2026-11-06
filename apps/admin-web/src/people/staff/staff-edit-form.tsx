@@ -20,10 +20,9 @@ import { useEmailLimit } from "./use-email-limit";
 import {
   ActiveEmailField,
   EmailChangeDialog,
-  firstName,
   PendingEmailChange,
-  sameEmail,
 } from "./staff-email-change";
+import { firstName, sameEmail } from "./staff-format";
 import { isApiError } from "../../api/problem";
 import {
   CancelInvitationAction,
