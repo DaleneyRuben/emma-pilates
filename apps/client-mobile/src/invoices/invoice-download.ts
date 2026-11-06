@@ -5,7 +5,7 @@ import { Platform, Share } from "react-native";
 
 export type DownloadOutcome = "shared" | "saved" | "cancelled";
 
-const safeName = (fileName: string) => fileName.replace(/[\\/:*?"<>|]/g, "_");
+const safeName = (fileName: string) => fileName.replace(/[\\/:*?"<>|#%]/g, "_");
 
 /**
  * K2/K3 «Descargar» (FIX-044) with what the app already ships: the file is
