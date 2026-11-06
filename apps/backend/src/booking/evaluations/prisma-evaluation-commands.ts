@@ -66,6 +66,11 @@ import {
   type BlockDefinition,
 } from './evaluation-rules';
 import { materializationHorizon } from '../materialization-horizon';
+import {
+  clientNameAndPhoto,
+  clientNameSelect,
+  type ClientPhotoRef,
+} from '../client/client-photo-of';
 
 type Transaction = Prisma.TransactionClient;
 type Database = PrismaClient | Transaction;
@@ -152,6 +157,7 @@ export type ClientEvaluationView = {
 export type NutritionistAgendaEntry = {
   evaluationId: string;
   clientName: string;
+  clientPhoto: ClientPhotoRef;
   startsAt: Date;
   endsAt: Date;
   durationMinutes: number;
@@ -1710,7 +1716,7 @@ export const createPrismaEvaluationCommands = (
       select: {
         id: true,
         clientId: true,
-        client: { select: { name: true } },
+        client: clientNameSelect,
         slot: { select: slotSelect },
       },
     });
@@ -1723,7 +1729,7 @@ export const createPrismaEvaluationCommands = (
     return pageOf(
       rows.map((row) => ({
         evaluationId: row.id,
-        clientName: row.client.name,
+        ...clientNameAndPhoto(row.client),
         startsAt: row.slot.startsAt,
         endsAt: row.slot.endsAt,
         durationMinutes: evaluationSlotMinutes,

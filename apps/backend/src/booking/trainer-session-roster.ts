@@ -1,3 +1,4 @@
+import type { ClientPhotoRef } from './client/client-photo-of';
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from './commands/create-booking';
 
@@ -11,6 +12,7 @@ export type TrainerSessionRoster = {
   bookings: {
     bookingId: string;
     clientName: string;
+    clientPhoto: ClientPhotoRef;
     attendanceOutcome: 'attended' | 'no_show' | null;
   }[];
 };

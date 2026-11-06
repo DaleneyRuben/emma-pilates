@@ -1,4 +1,5 @@
 import type { PrismaClient } from '../generated/prisma/client';
+import { clientNameAndPhoto, clientNameSelect } from './client/client-photo-of';
 import type { TrainerSessionRoster } from './trainer-session-roster';
 
 const outcomes = { ATTENDED: 'attended', NO_SHOW: 'no_show' } as const;
@@ -21,7 +22,7 @@ export const findTrainerSessionRoster =
           where: { state: 'BOOKED' },
           select: {
             id: true,
-            client: { select: { name: true } },
+            client: clientNameSelect,
             attendanceRecord: { select: { outcome: true } },
           },
           orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
@@ -39,7 +40,7 @@ export const findTrainerSessionRoster =
       endsAt: session.endsAt,
       bookings: session.bookings.map((booking) => ({
         bookingId: booking.id,
-        clientName: booking.client.name,
+        ...clientNameAndPhoto(booking.client),
         attendanceOutcome:
           booking.attendanceRecord === null
             ? null

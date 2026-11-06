@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ClientPhotoDto } from '../client/client-discovery.dto';
 
 // The Nutritionist's own agenda of booked Evaluations, page by page.
 export class NutritionistAgendaEntryDto {
@@ -7,6 +8,13 @@ export class NutritionistAgendaEntryDto {
 
   @ApiProperty()
   clientName!: string;
+
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'The Client photo (FIX-041), null while her initials stand in',
+  })
+  clientPhoto!: ClientPhotoDto | null;
 
   @ApiProperty({ format: 'date-time' })
   startsAt!: Date;

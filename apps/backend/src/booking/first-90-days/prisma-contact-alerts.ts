@@ -6,6 +6,7 @@ import {
   BookingState,
   ContactAlertReason as PrismaContactAlertReason,
 } from '../../generated/prisma/enums';
+import { clientPhotoOf } from '../client/client-photo-of';
 import type { ContactAlertReason } from './first-90-days-alerts';
 import type { OpenContactAlert } from './list-contact-alerts';
 import type { MarkContactedStore } from './mark-contacted';
@@ -40,6 +41,7 @@ export const createPrismaContactAlerts = (
             select: {
               name: true,
               phone: true,
+              profileImageAssetId: true,
               subscriptions: {
                 where: {
                   plan: { priceCentavos: { gt: 0 } },
@@ -64,6 +66,7 @@ export const createPrismaContactAlerts = (
             {
               clientId: row.clientId,
               name: row.client.name,
+              photo: clientPhotoOf(row.client.profileImageAssetId),
               phone: row.client.phone,
               startedOn,
               reason: reasonNames[row.reason],
