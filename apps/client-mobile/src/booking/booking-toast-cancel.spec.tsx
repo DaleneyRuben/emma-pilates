@@ -115,5 +115,9 @@ describe("the booking toast after a cancellation", () => {
 
     await waitFor(() => expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen());
     expect(screen.queryByText("Reserva confirmada")).toBeNull();
+    // Walkthrough n.º 29: the cancellation says so, like a booking does; a
+    // cancellation the API accepts always gives the class back.
+    await waitFor(() => expect(screen.getByText("Reserva cancelada")).toBeOnTheScreen());
+    expect(screen.getByText("La clase volvió a tu plan · Te quedan 5 clases")).toBeOnTheScreen();
   });
 });
