@@ -488,12 +488,16 @@ En la app de clientas, como Lucía, con el plan ya vigente.
 2. Abre la clase. Ves el tipo, la hora, la sede, **Daniela Ortiz** con
    **Entrenadora certificada**, los cupos y la descripción que escribiste.
 3. **Reservar**. La clase pasa a **Mis Reservas**, con la fecha, la hora y la
-   sede. **Mi plan** baja una clase.
+   sede, y el aviso «Reserva confirmada · Te quedan N clases en tu plan».
+   **Mi plan** baja una clase. Toca la pestaña **Reservar**: vuelve a la
+   tira de días, no al detalle de la clase. Cada pestaña abre siempre su
+   primera pantalla.
 4. Reserva también el reformer del miércoles, para tener dos reservas y
    poder probar la lista de espera con una segunda clienta más adelante.
 5. En la misma clase, **Cancelar** abre la hoja de confirmación. Léela y
    pulsa **Volver**. La reserva sigue. Si cancelas de verdad fuera de las
-   2 h 30, la clase vuelve al plan. Dentro de las 2 h 30 el botón de cancelar
+   2 h 30, la clase vuelve al plan y aparece el aviso «Reserva cancelada ·
+   La clase volvió a tu plan · Te quedan N clases». Dentro de las 2 h 30 el botón de cancelar
    no está, y en su lugar está **Reprogramar**, que solo ofrece otro horario
    del mismo día.
 6. Si la clase está llena, el botón es **Unirme a la lista de espera**.
@@ -502,7 +506,9 @@ En la app de clientas, como Lucía, con el plan ya vigente.
 En la app del equipo, Camila puede hacer lo mismo por una clienta: **Buscar
 cliente**, el nombre de Lucía, **Ver cliente**, **Reservar una clase**. Si
 Lucía ya tiene esa clase, la fila dice **Ya reservada** y el detalle no
-ofrece **Reservar**.
+ofrece **Reservar**. Si Camila cancela una reserva de Lucía, aparece «Reserva
+cancelada · La clase volvió a su plan». Como en la app de clientas, cada
+pestaña de la app del equipo vuelve a su primera pantalla.
 
 Daniela, en **Mi agenda**, abre la clase de mañana. Ahora hay una reserva.
 Después de que la clase terminó, marca asistió o no asistió y pulsa

@@ -8919,10 +8919,25 @@ G. **The deadline's day (walkthrough n.º 27).** As Lucía, open a class later
    early tomorrow (before the window reaches back past midnight) reads
    «hasta mañana a las HH:MM», and one further out names it: «hasta el sáb 7
    a las 05:30». Days are counted in La Paz time.
+H. **Tabs reopen on their root (walkthrough n.º 28).** As Lucía, book a
+   class: the app lands on **Mis reservas**. Tap **Reservar**: the day strip
+   and its classes show (the day chosen before stays chosen), not the class
+   detail. Tapping any tab of either app opens it on its root screen
+   (`popTabToRootOnPress`): in the Staff app, open a Client's file under
+   **Clientes**, tap **Horario**, then **Clientes**, and the search shows. Only
+   the tap does it: a notification that opens another tab still comes back
+   to Notificaciones with **Volver**.
+I. **A cancellation is confirmed (walkthrough n.º 29).** As Lucía, cancel a
+   booking outside the window: the row goes and the toast reads «Reserva
+   cancelada · La clase volvió a tu plan · Te quedan N clases». As Camila,
+   cancel one of Lucía's bookings from her file: «Reserva cancelada · La
+   clase volvió a su plan». A cancellation inside the window is refused, so
+   no toast says the class was lost.
 
 Specs: `home-payment-standing.spec.tsx`, `session-detail-reasons.spec.tsx`,
 `plans-payment-gate.spec.tsx`, `payment-invoice-data.spec.tsx`,
 `purchase-flow.spec.tsx`, `payment-status-back.spec.tsx`,
 `invoice-data-card.spec.tsx`, `session-format.spec.ts` (the deadline's
-day, near midnight included). Maestro: `purchase-plan-transfer.yaml` now
+day, near midnight included), `tab-root.spec.tsx`, `booking-toast-cancel.spec.tsx`,
+the Staff app's `role-tabs.spec.tsx` and `client-bookings-toast.spec.tsx`. Maestro: `purchase-plan-transfer.yaml` now
 checks Inicio and the class detail after the receipt.
