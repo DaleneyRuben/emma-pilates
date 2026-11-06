@@ -31,6 +31,7 @@ export const paolaProfile = {
   name: "Paola Mendoza",
   email: "paola.mendoza@example.com",
   phone: null,
+  photo: null,
   role: "administrator" as const,
   branches: [],
 };
@@ -80,6 +81,7 @@ export const carolinaProfile = {
   name: "Carolina Rivas",
   email: "carolina.rivas@example.com",
   phone: null,
+  photo: null,
   role: "coordinator" as const,
   branches: [],
 };

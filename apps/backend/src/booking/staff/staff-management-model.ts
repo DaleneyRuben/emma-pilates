@@ -1,3 +1,4 @@
+import type { StaffPhotoRef } from './photo/staff-photo-of';
 import {
   auditActorOf,
   type AuditActor,
@@ -54,6 +55,7 @@ export type StaffMemberRecord = {
   branchIds: string[];
   status: StaffStatus;
   activationExpiresAt: Date | null;
+  photo: StaffPhotoRef;
   /** WEB-012 W4: the create reopened this pending invitation. */
   invitationReopened?: boolean;
 };

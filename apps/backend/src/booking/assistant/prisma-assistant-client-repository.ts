@@ -1,4 +1,5 @@
 import type { PrismaClient } from '../../generated/prisma/client';
+import { clientPhotoOf } from '../client/client-photo-of';
 import { containsPattern } from '../search-pattern';
 import type {
   AssistantClientSummary,
@@ -17,6 +18,7 @@ const clientSelect = {
   id: true,
   name: true,
   phone: true,
+  profileImageAssetId: true,
   account: {
     select: {
       email: true,
@@ -31,6 +33,7 @@ type ClientRow = {
   id: string;
   name: string;
   phone: string | null;
+  profileImageAssetId: string | null;
   account: {
     email: string;
     activatedAt: Date | null;
@@ -59,6 +62,7 @@ const toSummary = (row: ClientRow): AssistantClientSummary | null =>
         email: row.account.email,
         phone: row.phone,
         accountStatus: accountStatus(row.account),
+        photo: clientPhotoOf(row.profileImageAssetId),
       };
 
 const present = <Value>(value: Value | null): value is Value => value !== null;

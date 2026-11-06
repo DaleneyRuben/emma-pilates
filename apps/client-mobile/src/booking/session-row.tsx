@@ -34,7 +34,8 @@ function durationMinutes(startsAt: string, endsAt: string): number {
 
 /**
  * A Session on v2 (follow-up 227, 03 and 06): a Lino row, the start in Lora
- * 20, the class over «Trainer · 50 min», the tag, and a quiet chevron.
+ * 20, the class over «Trainer · 50 min», the tag, and a quiet chevron. On 03
+ * the trainer line leads with her face (FIX-041, follow-up 242), on one line.
  */
 export function SessionRow({
   accessibilityLabel,
@@ -43,6 +44,7 @@ export function SessionRow({
   selected,
   session,
   testID,
+  trainerFace,
 }: {
   accessibilityLabel: string;
   /** What closes the row: the seat pill and the chevron unless told otherwise. */
@@ -57,6 +59,7 @@ export function SessionRow({
     trainerName: string;
   };
   testID?: string;
+  trainerFace?: ReactNode;
 }) {
   return (
     <Pressable
@@ -76,9 +79,12 @@ export function SessionRow({
       </Text>
       <View style={styles.body}>
         <Text style={styles.title}>{session.classTypeName}</Text>
-        <Text style={styles.details}>
-          {`${session.trainerName} · ${durationMinutes(session.startsAt, session.endsAt)} min`}
-        </Text>
+        <View style={styles.trainerLine}>
+          {trainerFace}
+          <Text numberOfLines={1} style={styles.details}>
+            {`${session.trainerName} · ${durationMinutes(session.startsAt, session.endsAt)} min`}
+          </Text>
+        </View>
       </View>
       {end ?? (
         <>
@@ -92,7 +98,12 @@ export function SessionRow({
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
-  details: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  details: {
+    color: colors.textMuted,
+    flexShrink: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+  },
   pill: {
     backgroundColor: colors.primaryTint,
     borderRadius: radii.pill,
@@ -127,6 +138,7 @@ const styles = StyleSheet.create({
     // Android): a fixed width wrapped it, so 56 is only the floor.
     minWidth: 56,
   },
+  trainerLine: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
   title: {
     color: colors.text,
     fontFamily: fontFamilies.bodyMedium,

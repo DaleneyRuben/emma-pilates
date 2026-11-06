@@ -8,15 +8,15 @@ import {
   formatTimeRange,
   IconRow,
   IconRowGroup,
-  initials,
-  radii,
   SectionTitle,
   spacing,
+  StaffFace,
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
+import { useClientFetcher } from "../client-fetcher";
 import { CapacityBlock } from "./capacity-block";
 
 type Detail = {
@@ -28,6 +28,7 @@ type Detail = {
   endsAt: string;
   startsAt: string;
   trainerName: string;
+  trainerPhoto: { imageAssetId: string } | null;
 };
 
 function capitalized(text: string): string {
@@ -54,12 +55,12 @@ export function SessionHero({ detail, full }: { detail: Detail; full: boolean })
   );
 }
 
-function TrainerRow({ name }: { name: string }) {
+/** Her 36 px face (FIX-041, follow-up 242), or her initials while she has none. */
+function TrainerRow({ name, photo }: { name: string; photo: Detail["trainerPhoto"] }) {
+  const fetcher = useClientFetcher();
   return (
     <View style={styles.row}>
-      <View style={styles.initials}>
-        <Text style={styles.initialsText}>{initials(name)}</Text>
-      </View>
+      <StaffFace fetcher={fetcher} name={name} photo={photo} size={36} />
       <Text style={styles.label}>{name}</Text>
       <Text style={styles.value}>Entrenadora</Text>
     </View>
@@ -96,7 +97,7 @@ export function SessionFacts({
     <View>
       <SectionTitle>La clase</SectionTitle>
       <IconRowGroup testID="session-facts">
-        <TrainerRow name={detail.trainerName} />
+        <TrainerRow name={detail.trainerName} photo={detail.trainerPhoto} />
         <IconRow icon="pin" label="Sucursal" value={detail.branch.name} />
         {lastRow === null ? null : <IconRow icon={lastRow.icon} label={lastRow.label} />}
       </IconRowGroup>
@@ -105,15 +106,6 @@ export function SessionFacts({
 }
 
 const styles = StyleSheet.create({
-  initials: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
-  initialsText: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 14 },
   label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: typography.body },
   row: {
     alignItems: "center",

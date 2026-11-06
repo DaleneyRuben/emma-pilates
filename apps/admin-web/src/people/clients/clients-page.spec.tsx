@@ -14,6 +14,11 @@ import {
   lucia,
   sofia,
 } from "../../test/people-fixtures";
+import {
+  expectClientInitials,
+  expectClientPhoto,
+  herPhoto,
+} from "../../test/client-photo-fixtures";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -64,6 +69,23 @@ describe("AW21 Clientes on a desktop browser", () => {
     ).not.toBeInTheDocument();
     expect(reads[0]?.get("page")).toBe("1");
     expect(reads[0]?.has("q")).toBe(false);
+  });
+
+  it("FIX-041 shows a Client's photo, or her initials without one", async () => {
+    server.use(
+      clientTable(() =>
+        jsonResponse(clientPage([{ ...lucia, photo: herPhoto }, sofia])),
+      ),
+    );
+    renderAdmin("/clientas");
+
+    const withPhoto = (
+      await screen.findByRole("cell", { name: /Lucía Fernández/ })
+    ).parentElement as HTMLElement;
+    expectClientPhoto(withPhoto, "Lucía Fernández");
+    const without = screen.getByRole("cell", { name: /Sofía Guzmán/ })
+      .parentElement as HTMLElement;
+    expectClientInitials(without, "Sofía Guzmán Rojas", "SR");
   });
 
   it("marks an expired Plan and a Client who never had one", async () => {

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { ClassHistoryEntryDto } from '../booking.dto';
 import { UpcomingBookingDto } from '../client/client-bookings.controller';
 import {
+  ClientPhotoDto,
   ClientSubscriptionDto,
   ClientSubscriptionSummaryDto,
   PlanDto,
@@ -36,6 +37,13 @@ export class AssistantClientDto {
 
   @ApiProperty()
   name!: string;
+
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'Her photo (FIX-041), null while her initials stand in',
+  })
+  photo!: ClientPhotoDto | null;
 
   @ApiProperty({ format: 'email' })
   email!: string;

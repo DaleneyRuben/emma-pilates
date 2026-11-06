@@ -15,11 +15,32 @@ import {
   isInsideCancellationWindow,
   radii,
   spacing,
+  StaffFace,
   surfaces,
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
+
+import { useClientFetcher } from "../client-fetcher";
+
+/**
+ * «08:00 – 09:00 · Daniela Ortiz · Achumani» with her 20 px face right before
+ * her name (FIX-041, follow-up 242); a wrapped line keeps the face with her name.
+ */
+function TrainerDetails({ item, time }: { item: UpcomingBookingDto; time: string }) {
+  const fetcher = useClientFetcher();
+  return (
+    <View style={styles.detailsLine}>
+      <Text style={styles.details}>{`${time} ·`}</Text>
+      <View style={styles.trainer}>
+        <StaffFace fetcher={fetcher} name={item.trainerName} photo={item.trainerPhoto} size={20} />
+        <Text style={styles.details}>{item.trainerName}</Text>
+      </View>
+      <Text style={styles.details}>{`· ${item.branchName}`}</Text>
+    </View>
+  );
+}
 
 export function DayTile({ startsAt, today }: { startsAt: string; today: string }) {
   const civil = boliviaCivilDate(new Date(startsAt));
@@ -59,9 +80,6 @@ export function BookingCard({
     windowKnown &&
     isInsideCancellationWindow(item.startsAt, new Date(mountedAt), cancellationWindowMinutes);
   const time = formatTimeRange(item.startsAt, item.endsAt);
-  const details = insideWindow
-    ? `${time} · faltan menos de ${formatCancellationWindow(cancellationWindowMinutes)}`
-    : `${time} · ${item.trainerName} · ${item.branchName}`;
 
   const action =
     item.kind === "waitlist" ? (
@@ -91,7 +109,13 @@ export function BookingCard({
         <DayTile startsAt={item.startsAt} today={today} />
         <View style={styles.body}>
           <Text style={styles.title}>{item.classTypeName}</Text>
-          <Text style={styles.details}>{details}</Text>
+          {insideWindow ? (
+            <Text style={styles.details}>
+              {`${time} · faltan menos de ${formatCancellationWindow(cancellationWindowMinutes)}`}
+            </Text>
+          ) : (
+            <TrainerDetails item={item} time={time} />
+          )}
         </View>
         {item.kind === "waitlist" ? (
           <View style={styles.badge}>
@@ -146,6 +170,7 @@ const styles = StyleSheet.create({
   },
   dayNumber: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 20 },
   details: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  detailsLine: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
   factNote: {
     color: colors.textMuted,
     fontFamily: fontFamilies.body,
@@ -157,6 +182,7 @@ const styles = StyleSheet.create({
   factRow: {},
   header: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  trainer: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
   weekday: {
     color: colors.primaryOnTint,
     fontFamily: fontFamilies.bodyStrong,

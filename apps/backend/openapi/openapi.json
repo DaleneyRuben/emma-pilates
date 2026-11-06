@@ -6268,6 +6268,232 @@
         ]
       }
     },
+    "/api/v1/client-photos/{imageAssetId}": {
+      "get": {
+        "operationId": "getClientPhotoForStaff",
+        "parameters": [
+          {
+            "name": "imageAssetId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "display",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientPhotoForStaff"
+        ]
+      }
+    },
+    "/api/v1/staff-members/current/photo": {
+      "put": {
+        "operationId": "setCurrentStaffMemberPhoto",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetStaffPhotoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffPhotoResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffPhoto"
+        ]
+      },
+      "delete": {
+        "operationId": "removeCurrentStaffMemberPhoto",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffPhoto"
+        ]
+      }
+    },
+    "/api/v1/administrator/staff-members/{staffMemberId}/photo": {
+      "put": {
+        "operationId": "setStaffMemberPhoto",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetStaffPhotoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffPhotoResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffPhoto"
+        ]
+      },
+      "delete": {
+        "operationId": "removeStaffMemberPhoto",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffPhoto"
+        ]
+      }
+    },
+    "/api/v1/staff-photos/{imageAssetId}": {
+      "get": {
+        "operationId": "getStaffPhoto",
+        "parameters": [
+          {
+            "name": "imageAssetId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "display",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffPhoto"
+        ]
+      }
+    },
     "/api/v1/administrator/contact-alerts": {
       "get": {
         "operationId": "listContactAlerts",
@@ -10568,6 +10794,18 @@
           "registrationContinuation"
         ]
       },
+      "StaffPhotoDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "imageAssetId"
+        ]
+      },
       "SessionAvailabilityDto": {
         "type": "object",
         "properties": {
@@ -10595,6 +10833,16 @@
           },
           "trainerName": {
             "type": "string"
+          },
+          "trainerPhoto": {
+            "nullable": true,
+            "description": "The Trainer photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffPhotoDto"
+              }
+            ]
           },
           "startsAt": {
             "format": "date-time",
@@ -10635,6 +10883,7 @@
           "trainerStaffMemberId",
           "classTypeName",
           "trainerName",
+          "trainerPhoto",
           "startsAt",
           "endsAt",
           "capacity",
@@ -10681,6 +10930,16 @@
           "trainerName": {
             "type": "string"
           },
+          "trainerPhoto": {
+            "nullable": true,
+            "description": "The Trainer photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffPhotoDto"
+              }
+            ]
+          },
           "branchName": {
             "type": "string"
           },
@@ -10698,6 +10957,7 @@
           "sessionId",
           "classTypeName",
           "trainerName",
+          "trainerPhoto",
           "branchName",
           "startsAt",
           "endsAt"
@@ -10778,6 +11038,18 @@
           "bookedCount"
         ]
       },
+      "ClientPhotoDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "imageAssetId"
+        ]
+      },
       "TrainerRosterBookingDto": {
         "type": "object",
         "properties": {
@@ -10787,6 +11059,16 @@
           },
           "clientName": {
             "type": "string"
+          },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
           },
           "attendanceOutcome": {
             "type": "string",
@@ -10799,7 +11081,8 @@
         },
         "required": [
           "bookingId",
-          "clientName"
+          "clientName",
+          "clientPhoto"
         ]
       },
       "TrainerSessionRosterDto": {
@@ -10837,18 +11120,6 @@
           "startsAt",
           "endsAt",
           "bookings"
-        ]
-      },
-      "ClientPhotoDto": {
-        "type": "object",
-        "properties": {
-          "imageAssetId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "imageAssetId"
         ]
       },
       "ClientProfileDto": {
@@ -11175,6 +11446,16 @@
           "trainerName": {
             "type": "string"
           },
+          "trainerPhoto": {
+            "nullable": true,
+            "description": "The Trainer photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffPhotoDto"
+              }
+            ]
+          },
           "startsAt": {
             "format": "date-time",
             "type": "string"
@@ -11211,6 +11492,7 @@
           "branch",
           "classType",
           "trainerName",
+          "trainerPhoto",
           "startsAt",
           "endsAt",
           "capacity",
@@ -11251,6 +11533,16 @@
           "trainerName": {
             "type": "string"
           },
+          "trainerPhoto": {
+            "nullable": true,
+            "description": "The Trainer photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffPhotoDto"
+              }
+            ]
+          },
           "branchName": {
             "type": "string"
           },
@@ -11269,6 +11561,7 @@
           "branchId",
           "classTypeName",
           "trainerName",
+          "trainerPhoto",
           "branchName",
           "startsAt",
           "endsAt"
@@ -11323,6 +11616,16 @@
             "items": {
               "$ref": "#/components/schemas/StaffBranchDto"
             }
+          },
+          "photo": {
+            "nullable": true,
+            "description": "Her profile photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffPhotoDto"
+              }
+            ]
           }
         },
         "required": [
@@ -11330,7 +11633,8 @@
           "name",
           "email",
           "role",
-          "branches"
+          "branches",
+          "photo"
         ]
       },
       "StaffMemberDto": {
@@ -11387,6 +11691,16 @@
             "nullable": true,
             "description": "Expiry of the current Activation Link while pending"
           },
+          "photo": {
+            "nullable": true,
+            "description": "Her profile photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffPhotoDto"
+              }
+            ]
+          },
           "invitationReopened": {
             "type": "boolean",
             "description": "true when the create reopened a pending invitation with the same email; its Role and Branches did not change"
@@ -11401,7 +11715,8 @@
           "role",
           "branchIds",
           "status",
-          "activationExpiresAt"
+          "activationExpiresAt",
+          "photo"
         ]
       },
       "StaffMemberPageDto": {
@@ -12270,6 +12585,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "nutritionistStaffMemberId": {
             "type": "string",
             "format": "uuid"
@@ -12304,6 +12629,7 @@
         "required": [
           "evaluationId",
           "clientName",
+          "clientPhoto",
           "nutritionistStaffMemberId",
           "nutritionistName",
           "branchId",
@@ -12439,6 +12765,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "since": {
             "format": "date-time",
             "type": "string"
@@ -12455,6 +12791,7 @@
           "membershipId",
           "number",
           "clientName",
+          "clientPhoto",
           "since",
           "status"
         ]
@@ -13191,6 +13528,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "planName": {
             "type": "string"
           },
@@ -13209,6 +13556,7 @@
         "required": [
           "id",
           "clientName",
+          "clientPhoto",
           "planName",
           "amountDueCentavos",
           "submittedAt",
@@ -13331,6 +13679,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "receipt": {
             "nullable": true,
             "type": "object",
@@ -13359,7 +13717,8 @@
           "creditAppliedCentavos",
           "amountDueCentavos",
           "submittedAt",
-          "clientName"
+          "clientName",
+          "clientPhoto"
         ]
       },
       "RejectPaymentDto": {
@@ -13384,6 +13743,16 @@
           },
           "clientName": {
             "type": "string"
+          },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
           },
           "planName": {
             "type": "string"
@@ -13411,6 +13780,7 @@
         "required": [
           "id",
           "clientName",
+          "clientPhoto",
           "planName",
           "startsOn",
           "endsOn",
@@ -13523,6 +13893,16 @@
           "trainerName": {
             "type": "string"
           },
+          "trainerPhoto": {
+            "nullable": true,
+            "description": "The Trainer photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffPhotoDto"
+              }
+            ]
+          },
           "startsAt": {
             "format": "date-time",
             "type": "string"
@@ -13579,6 +13959,7 @@
           "trainerStaffMemberId",
           "classTypeName",
           "trainerName",
+          "trainerPhoto",
           "startsAt",
           "endsAt",
           "capacity",
@@ -13611,6 +13992,16 @@
           "name": {
             "type": "string"
           },
+          "photo": {
+            "nullable": true,
+            "description": "Her photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "email": {
             "type": "string",
             "format": "email"
@@ -13631,6 +14022,7 @@
         "required": [
           "id",
           "name",
+          "photo",
           "email",
           "accountStatus"
         ]
@@ -13705,6 +14097,16 @@
           "trainerName": {
             "type": "string"
           },
+          "trainerPhoto": {
+            "nullable": true,
+            "description": "The Trainer photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffPhotoDto"
+              }
+            ]
+          },
           "branchName": {
             "type": "string"
           },
@@ -13727,6 +14129,7 @@
           "branchId",
           "classTypeName",
           "trainerName",
+          "trainerPhoto",
           "branchName",
           "startsAt",
           "endsAt",
@@ -13927,6 +14330,16 @@
           "name": {
             "type": "string"
           },
+          "photo": {
+            "nullable": true,
+            "description": "Her photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "email": {
             "type": "string",
             "format": "email"
@@ -13990,6 +14403,7 @@
         "required": [
           "id",
           "name",
+          "photo",
           "email",
           "phone",
           "accountStatus",
@@ -14091,6 +14505,16 @@
           "name": {
             "type": "string"
           },
+          "photo": {
+            "nullable": true,
+            "description": "Her photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "email": {
             "type": "string",
             "format": "email"
@@ -14136,6 +14560,7 @@
         "required": [
           "id",
           "name",
+          "photo",
           "email",
           "phone",
           "accountStatus",
@@ -14196,6 +14621,16 @@
           },
           "clientName": {
             "type": "string"
+          },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
           },
           "planName": {
             "type": "string"
@@ -14283,6 +14718,7 @@
           "id",
           "clientId",
           "clientName",
+          "clientPhoto",
           "planName",
           "kind",
           "planPriceCentavos",
@@ -15130,6 +15566,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "attendanceOutcome": {
             "type": "string",
             "enum": [
@@ -15144,6 +15590,7 @@
           "bookingId",
           "clientId",
           "clientName",
+          "clientPhoto",
           "attendanceOutcome"
         ]
       },
@@ -15161,6 +15608,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "position": {
             "type": "number",
             "minimum": 1,
@@ -15171,6 +15628,7 @@
           "waitlistEntryId",
           "clientId",
           "clientName",
+          "clientPhoto",
           "position"
         ]
       },
@@ -15412,6 +15870,40 @@
           "imageAssetId"
         ]
       },
+      "SetStaffPhotoDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "imageAssetId"
+        ]
+      },
+      "StaffPhotoResultDto": {
+        "type": "object",
+        "properties": {
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "photo": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffPhotoDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "staffMemberId",
+          "photo"
+        ]
+      },
       "ContactAlertItemDto": {
         "type": "object",
         "properties": {
@@ -15421,6 +15913,16 @@
           },
           "name": {
             "type": "string"
+          },
+          "photo": {
+            "nullable": true,
+            "description": "Her photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
           },
           "phone": {
             "type": "string",
@@ -15446,6 +15948,7 @@
         "required": [
           "clientId",
           "name",
+          "photo",
           "phone",
           "startedOn",
           "reasons"
@@ -15781,6 +16284,16 @@
           "clientName": {
             "type": "string"
           },
+          "clientPhoto": {
+            "nullable": true,
+            "description": "The Client photo (FIX-041), null while her initials stand in",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
+          },
           "startsAt": {
             "format": "date-time",
             "type": "string"
@@ -15812,6 +16325,7 @@
         "required": [
           "evaluationId",
           "clientName",
+          "clientPhoto",
           "startsAt",
           "endsAt",
           "durationMinutes",

@@ -15,6 +15,11 @@ import {
   reviewOf,
   sofiaPayment,
 } from "../test/payment-fixtures";
+import {
+  expectClientInitials,
+  expectClientPhoto,
+  herPhoto,
+} from "../test/client-photo-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
@@ -53,6 +58,26 @@ describe("AW29 Revisar pago on a desktop browser", () => {
   beforeEach(() => {
     reviewReads.length = 0;
     server.use(...signedInHandlers());
+  });
+
+  it("FIX-041 shows whose transfer it is with her photo", async () => {
+    server.use(
+      ...handlers(() =>
+        jsonResponse(reviewOf({ ...sofiaPayment, clientPhoto: herPhoto })),
+      ),
+    );
+    const { panel } = await open("Sofía Guzmán");
+
+    await within(panel).findByText("Monto a verificar");
+    expectClientPhoto(panel, "Sofía Guzmán");
+  });
+
+  it("FIX-041 shows her initials when she has no photo", async () => {
+    server.use(...answerReviews());
+    const { panel } = await open("Sofía Guzmán");
+
+    await within(panel).findByText("Monto a verificar");
+    expectClientInitials(panel, "Sofía Guzmán", "SG");
   });
 
   it("puts the amount asked, the date, and the method above the receipt", async () => {

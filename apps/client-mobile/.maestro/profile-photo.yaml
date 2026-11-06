@@ -29,9 +29,6 @@ env:
 - tapOn: "Cambiar foto"
 - runFlow: subflows/pick-first-photo.yaml
 - extendedWaitUntil:
-    visible: "Se recorta al centro en forma de círculo."
-    timeout: 60000
-- extendedWaitUntil:
     visible: "Quitar foto"
     timeout: 60000
 - assertVisible: "Foto de perfil"

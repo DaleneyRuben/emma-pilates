@@ -3,6 +3,7 @@ import type {
   AdministratorSessionRosterDto,
 } from "@pilates/api-contracts";
 import { useId } from "react";
+import { ClientPhoto } from "../components/client-photo";
 
 const attendance: Record<string, string> = {
   attended: "Asistió",
@@ -42,6 +43,7 @@ function BookedRow({ booking }: { booking: AdministratorRosterBookingDto }) {
       : attendance[booking.attendanceOutcome];
   return (
     <li className={rowClass}>
+      <ClientPhoto name={booking.clientName} photo={booking.clientPhoto} />
       <span className="flex-1 font-medium">{booking.clientName}</span>
       {outcome === undefined ? null : (
         <span className="text-ayuda text-texto-tenue">{outcome}</span>
@@ -51,9 +53,9 @@ function BookedRow({ booking }: { booking: AdministratorRosterBookingDto }) {
 }
 
 // WEB-039 (board P02, the class panel): who booked, then the Waitlist in
-// queue order. Names only: the panel never shows a plan or an amount.
-// FIX-042 (proposal A): plain lists, with the booking button beside the
-// «Reservaron» title.
+// queue order. Names and faces only (FIX-041): the panel never shows a plan
+// or an amount. FIX-042 (proposal A): plain lists, with the booking button
+// beside the «Reservaron» title.
 export function SessionRoster({
   roster,
   action,
@@ -85,6 +87,10 @@ export function SessionRoster({
                 <span className="w-6 font-serif text-[18px] text-rosa-profundo tabular">
                   {entry.position}
                 </span>
+                <ClientPhoto
+                  name={entry.clientName}
+                  photo={entry.clientPhoto}
+                />
                 <span className="flex flex-1 flex-col">
                   <span className="font-medium">{entry.clientName}</span>
                   <span className="text-ayuda text-texto-tenue">

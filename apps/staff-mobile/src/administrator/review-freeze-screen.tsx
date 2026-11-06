@@ -1,6 +1,7 @@
 import { decideFreeze, useGetFreezeReview } from "@pilates/api-contracts";
 import {
   BrandToast,
+  ClientFace,
   colors,
   fontFamilies,
   IconRow,
@@ -22,7 +23,6 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar, backBarScroll } from "../ui/back-bar";
-import { InitialsDisc } from "../ui/person-row";
 import { freezeDays, freezeRange } from "./freeze-format";
 
 type ReviewNavigation = { goBack: () => void };
@@ -93,7 +93,12 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
       >
         {header}
         <View style={styles.identity}>
-          <InitialsDisc name={freeze.clientName} size={56} />
+          <ClientFace
+            fetcher={fetcher}
+            name={freeze.clientName}
+            photo={freeze.clientPhoto}
+            size={56}
+          />
           <View style={styles.identityBody}>
             <Text style={styles.name}>{freeze.clientName}</Text>
             <Text style={styles.muted}>{freeze.planName}</Text>

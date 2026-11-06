@@ -1,6 +1,7 @@
 import type { AdminClientDto } from "@pilates/api-contracts";
 import { createColumnHelper } from "@tanstack/react-table";
 import { RowOpener } from "../../catalog/catalog-page";
+import { ClientPhoto } from "../../components/client-photo";
 import { StatusPill } from "../../components/ui/status-pill";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { phoneWithFlag } from "../../lib/phone-number";
@@ -22,16 +23,19 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
   columns.accessor("name", {
     header: "Clienta",
     cell: ({ row }) => (
-      <span className="flex flex-col items-start gap-0.5">
-        <RowOpener
-          label={row.original.name}
-          onOpen={() => open(row.original)}
-        />
-        {row.original.founderNumber === null ? null : (
-          <span className="text-ayuda text-rosa-enlace">
-            Fundadora n.º {row.original.founderNumber}
-          </span>
-        )}
+      <span className="flex items-center gap-2.5">
+        <ClientPhoto name={row.original.name} photo={row.original.photo} />
+        <span className="flex flex-col items-start gap-0.5">
+          <RowOpener
+            label={row.original.name}
+            onOpen={() => open(row.original)}
+          />
+          {row.original.founderNumber === null ? null : (
+            <span className="text-ayuda text-rosa-enlace">
+              Fundadora n.º {row.original.founderNumber}
+            </span>
+          )}
+        </span>
       </span>
     ),
   }),

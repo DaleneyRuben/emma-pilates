@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { everyBranchesQueryOptions } from "../../catalog/branches/branch-queries";
 import { CatalogPage, RowOpener } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
+import { StaffPhoto } from "../../components/staff-photo";
 import { ListFilter } from "../../components/table/list-filter";
 import { pageRangeLabel } from "../../components/table/pagination";
 import { StatusPill } from "../../components/ui/status-pill";
@@ -28,11 +29,19 @@ const staffColumns =
   (open: (row: StaffMemberDto) => void) => [
     columns.accessor("name", {
       header: "Nombre",
+      // Follow-up 242: her 40 px photo, or her initials, before the name.
       cell: ({ row }) => (
-        <RowOpener
-          label={row.original.name}
-          onOpen={() => open(row.original)}
-        />
+        <span className="flex items-center gap-3">
+          <StaffPhoto
+            name={row.original.name}
+            photo={row.original.photo}
+            size={40}
+          />
+          <RowOpener
+            label={row.original.name}
+            onOpen={() => open(row.original)}
+          />
+        </span>
       ),
     }),
     columns.accessor("role", {

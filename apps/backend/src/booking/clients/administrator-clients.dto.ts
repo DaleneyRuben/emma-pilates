@@ -2,7 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
 import { clientAccountStatuses } from '../assistant/assistant.dto';
 import type { ClientAccountStatus } from '../assistant/assistant-clients';
-import { ClientSubscriptionDto } from '../client/client-discovery.dto';
+import {
+  ClientPhotoDto,
+  ClientSubscriptionDto,
+} from '../client/client-discovery.dto';
 import type {
   ClientDirectoryFilter,
   ClientDirectoryQuery,
@@ -27,6 +30,13 @@ export class AdminClientDto {
 
   @ApiProperty()
   name!: string;
+
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'Her photo (FIX-041), null while her initials stand in',
+  })
+  photo!: ClientPhotoDto | null;
 
   @ApiProperty({ format: 'email' })
   email!: string;
@@ -148,6 +158,13 @@ export class AdminClientDetailDto {
 
   @ApiProperty()
   name!: string;
+
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'Her photo (FIX-041), null while her initials stand in',
+  })
+  photo!: ClientPhotoDto | null;
 
   @ApiProperty({ format: 'email' })
   email!: string;

@@ -6,6 +6,7 @@ import {
   DatabaseTestContext,
   startDatabaseTestContext,
 } from './database-test-context';
+import { attachClientPhoto } from './client-photo-test-support';
 
 const today = new Date('2026-09-21T00:00:00.000Z');
 
@@ -19,6 +20,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
     ana: randomUUID(),
     noAccount: randomUUID(),
   };
+  let luciaPhoto: string;
 
   const createClient = async (input: {
     id: string;
@@ -125,6 +127,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
       endsOn: '2026-06-30',
       remaining: 0,
     });
+    luciaPhoto = await attachClientPhoto(prisma, ids.lucia);
     await prisma.referral.createMany({
       data: [
         { referrerClientId: ids.lucia, referredClientId: ids.sofia },
@@ -138,7 +141,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
     await context?.stop();
   });
 
-  it('pages every Client with an Account by name with the current Plan and the studio counts', async () => {
+  it('pages every Client with an Account by name with her photo, the current Plan, and the studio counts', async () => {
     const counts = {
       studioClientCount: 3,
       activePlanClientCount: 1,
@@ -152,6 +155,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
         {
           id: ids.ana,
           name: 'Ana Quiroga',
+          photo: null,
           email: 'ana.quiroga@example.com',
           phone: null,
           accountStatus: 'pending',
@@ -167,6 +171,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
         {
           id: ids.lucia,
           name: 'Lucía Fernández',
+          photo: { imageAssetId: luciaPhoto },
           email: 'lucia@example.com',
           phone: '+591 70011001',
           accountStatus: 'active',
@@ -224,10 +229,11 @@ describe('Administrator Client directory (PostgreSQL)', () => {
     });
   });
 
-  it('reads one Client with the Bolivia creation date, referral code, and referral count', async () => {
+  it('reads one Client with her photo, the Bolivia creation date, referral code, and referral count', async () => {
     await expect(directory().read(ids.lucia)).resolves.toEqual({
       id: ids.lucia,
       name: 'Lucía Fernández',
+      photo: { imageAssetId: luciaPhoto },
       email: 'lucia@example.com',
       phone: '+591 70011001',
       accountStatus: 'active',

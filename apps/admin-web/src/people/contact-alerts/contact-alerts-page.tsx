@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
-import { initials } from "../../lib/initials";
+import { ClientPhoto } from "../../components/client-photo";
 import { ContactAlertActions } from "./contact-alert-actions";
 import {
   clientas,
@@ -39,15 +39,16 @@ function EmptyList() {
   );
 }
 
-function ClientCell({ name }: { name: string }) {
+function ClientCell({
+  name,
+  photo,
+}: {
+  name: string;
+  photo: ContactAlertItemDto["photo"];
+}) {
   return (
     <span className="flex items-center gap-2.5">
-      <span
-        aria-hidden="true"
-        className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primario-tinte text-[11px] font-medium text-primario-profundo"
-      >
-        {initials(name)}
-      </span>
+      <ClientPhoto name={name} photo={photo} />
       <span className="font-medium text-texto">{name}</span>
     </span>
   );
@@ -65,7 +66,7 @@ function AlertRow({
   return (
     <TableRow>
       <TableCell data-label="Clienta">
-        <ClientCell name={item.name} />
+        <ClientCell name={item.name} photo={item.photo} />
       </TableCell>
       <TableCell data-label="Teléfono">
         {item.phone === null ? (

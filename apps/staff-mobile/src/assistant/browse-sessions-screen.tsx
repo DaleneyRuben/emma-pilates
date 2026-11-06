@@ -17,6 +17,7 @@ import {
   Screen,
   SectionTitle,
   spacing,
+  StaffFace,
   StateScreen,
   upcomingCivilDates,
   useStudioRules,
@@ -51,7 +52,7 @@ function seatsTag(session: SessionAvailabilityDto): string {
 
 /** S07 Reservar una clase, for the Client named in the banner (v2). */
 export function BrowseSessionsScreen({ route }: { route: { params: ClientContext } }) {
-  const { clientId, clientName } = route.params;
+  const { clientId, clientName, clientPhoto } = route.params;
   const navigation = useNavigation<BrowseNavigation>();
   const fetcher = useStaffFetcher();
   const today = boliviaCivilDate(new Date());
@@ -83,7 +84,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
   const header = (
     <>
       <BackBar onBack={() => navigation.goBack()} title="Reservar una clase" />
-      <ClientBanner action="Reservando para" clientName={clientName} />
+      <ClientBanner action="Reservando para" clientName={clientName} clientPhoto={clientPhoto} />
     </>
   );
 
@@ -203,6 +204,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
                     navigation.navigate("SessionDetail", {
                       clientId,
                       clientName,
+                      clientPhoto,
                       sessionId: session.id,
                     })
                   }
@@ -210,6 +212,14 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
                   // Her own Booking takes the neutral pill, like a full class.
                   pillTone={booked || session.availableSeats === 0 ? "neutral" : "tint"}
                   subtitle={session.trainerName}
+                  subtitleLead={
+                    <StaffFace
+                      fetcher={fetcher}
+                      name={session.trainerName}
+                      photo={session.trainerPhoto}
+                      size={20}
+                    />
+                  }
                   testID={`session-card-${session.id}`}
                   time={startTime(session.startsAt, session.endsAt)}
                   title={session.classTypeName}

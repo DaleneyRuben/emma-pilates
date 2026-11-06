@@ -15,6 +15,7 @@ export const assistant = {
   phone: null,
   role: "assistant",
   branches: [{ id: "branch-centro", name: "Centro" }],
+  photo: null,
 };
 
 export const lucia = {
@@ -23,6 +24,7 @@ export const lucia = {
   email: "lucia@example.com",
   phone: "+591 70011001",
   accountStatus: "active",
+  photo: null,
 };
 
 export const subscription = {
@@ -151,6 +153,7 @@ export const session = {
   trainerStaffMemberId: "trainer-1",
   classTypeName: "Reformer Pilates",
   trainerName: "Emma Vargas",
+  trainerPhoto: null,
   startsAt: sessionStart.toISOString(),
   endsAt: new Date(sessionStart.getTime() + 50 * minute).toISOString(),
   capacity: 12,
@@ -168,6 +171,7 @@ export const sessionDetail = {
     durationMinutes: 50,
   },
   trainerName: "Emma Vargas",
+  trainerPhoto: null,
   startsAt: session.startsAt,
   endsAt: session.endsAt,
   capacity: 12,

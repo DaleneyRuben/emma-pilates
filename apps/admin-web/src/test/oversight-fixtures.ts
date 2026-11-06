@@ -24,6 +24,7 @@ const nutritionist = (
   branchIds: [centro.id],
   status: "active",
   activationExpiresAt: null,
+  photo: null,
   ...extra,
 });
 
@@ -40,6 +41,7 @@ export const evaluationRow = (
 ): AdminEvaluationDto => ({
   evaluationId: `e5000000-0000-5000-8000-0000000000${suffix}`,
   clientName,
+  clientPhoto: null,
   nutritionistStaffMemberId: veronica.id,
   nutritionistName: veronica.name,
   branchId: centro.id,

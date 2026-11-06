@@ -135,6 +135,7 @@ import type {
   FreezeRequestDto,
   FreezeReviewDto,
   GetAdminPromotionImageParams,
+  GetClientPhotoForStaffParams,
   GetCurrentClientPhotoParams,
   GetExpenseReportParams,
   GetIncomeReportParams,
@@ -146,6 +147,7 @@ import type {
   GetReferralCodeAvailabilityParams,
   GetRevenueReportParams,
   GetSalaryPaymentReceiptParams,
+  GetStaffPhotoParams,
   GetTodayCashCloseParams,
   GrantCampaignDto,
   GrantCourtesyAccessDto,
@@ -253,9 +255,11 @@ import type {
   SessionScheduleResumeDto,
   SetClientPhotoDto,
   SetPromotionsConsentDto,
+  SetStaffPhotoDto,
   SetTrainerReferralCodeDto,
   StaffMemberDto,
   StaffMemberPageDto,
+  StaffPhotoResultDto,
   StaffProfileDto,
   StartClientRegistrationDto,
   StartImpersonationDto,
@@ -24442,6 +24446,935 @@ export function useGetCurrentClientPhoto<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetCurrentClientPhotoQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getClientPhotoForStaffResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getClientPhotoForStaffResponseSuccess =
+  getClientPhotoForStaffResponse200 & {
+    headers: Headers;
+  };
+export type getClientPhotoForStaffResponse =
+  getClientPhotoForStaffResponseSuccess;
+
+export const getGetClientPhotoForStaffUrl = (
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/client-photos/${imageAssetId}?${stringifiedParams}`
+    : `/api/v1/client-photos/${imageAssetId}`;
+};
+
+export const getClientPhotoForStaff = async (
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getClientPhotoForStaffResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetClientPhotoForStaffUrl(imageAssetId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getClientPhotoForStaffResponse["data"] =
+    body as getClientPhotoForStaffResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getClientPhotoForStaffResponse;
+};
+
+export const getGetClientPhotoForStaffQueryKey = (
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+) => {
+  return [
+    `/api/v1/client-photos/${imageAssetId}`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetClientPhotoForStaffQueryOptions = <
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetClientPhotoForStaffQueryKey(imageAssetId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getClientPhotoForStaff>>
+  > = ({ signal }) =>
+    getClientPhotoForStaff(
+      imageAssetId,
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: imageAssetId !== null && imageAssetId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetClientPhotoForStaffQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getClientPhotoForStaff>>
+>;
+export type GetClientPhotoForStaffQueryError = unknown;
+
+export function useGetClientPhotoForStaff<
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params: undefined | GetClientPhotoForStaffParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+          TError,
+          Awaited<ReturnType<typeof getClientPhotoForStaff>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientPhotoForStaff<
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+          TError,
+          Awaited<ReturnType<typeof getClientPhotoForStaff>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientPhotoForStaff<
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetClientPhotoForStaff<
+  TData = Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetClientPhotoForStaffParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientPhotoForStaff>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetClientPhotoForStaffQueryOptions(
+    imageAssetId,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type setCurrentStaffMemberPhotoResponse200 = {
+  data: StaffPhotoResultDto;
+  status: 200;
+};
+
+export type setCurrentStaffMemberPhotoResponseSuccess =
+  setCurrentStaffMemberPhotoResponse200 & {
+    headers: Headers;
+  };
+export type setCurrentStaffMemberPhotoResponse =
+  setCurrentStaffMemberPhotoResponseSuccess;
+
+export const getSetCurrentStaffMemberPhotoUrl = () => {
+  return `/api/v1/staff-members/current/photo`;
+};
+
+export const setCurrentStaffMemberPhoto = async (
+  setStaffPhotoDto: SetStaffPhotoDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setCurrentStaffMemberPhotoResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getSetCurrentStaffMemberPhotoUrl(), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(setStaffPhotoDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setCurrentStaffMemberPhotoResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setCurrentStaffMemberPhotoResponse;
+};
+
+export const getSetCurrentStaffMemberPhotoMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setCurrentStaffMemberPhoto>>,
+    TError,
+    SetCurrentStaffMemberPhotoMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setCurrentStaffMemberPhoto>>,
+  TError,
+  SetCurrentStaffMemberPhotoMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["setCurrentStaffMemberPhoto"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setCurrentStaffMemberPhoto>>,
+    SetCurrentStaffMemberPhotoMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return setCurrentStaffMemberPhoto(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetCurrentStaffMemberPhotoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setCurrentStaffMemberPhoto>>
+>;
+export type SetCurrentStaffMemberPhotoMutationBody = SetStaffPhotoDto;
+export type SetCurrentStaffMemberPhotoMutationError = unknown;
+export type SetCurrentStaffMemberPhotoMutationVariables = {
+  data: SetStaffPhotoDto;
+};
+
+export const useSetCurrentStaffMemberPhoto = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setCurrentStaffMemberPhoto>>,
+      TError,
+      SetCurrentStaffMemberPhotoMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setCurrentStaffMemberPhoto>>,
+  TError,
+  SetCurrentStaffMemberPhotoMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getSetCurrentStaffMemberPhotoMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type removeCurrentStaffMemberPhotoResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type removeCurrentStaffMemberPhotoResponseSuccess =
+  removeCurrentStaffMemberPhotoResponse204 & {
+    headers: Headers;
+  };
+export type removeCurrentStaffMemberPhotoResponse =
+  removeCurrentStaffMemberPhotoResponseSuccess;
+
+export const getRemoveCurrentStaffMemberPhotoUrl = () => {
+  return `/api/v1/staff-members/current/photo`;
+};
+
+export const removeCurrentStaffMemberPhoto = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<removeCurrentStaffMemberPhotoResponse> => {
+  const res = await (fetchFn ?? fetch)(getRemoveCurrentStaffMemberPhotoUrl(), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: removeCurrentStaffMemberPhotoResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as removeCurrentStaffMemberPhotoResponse;
+};
+
+export const getRemoveCurrentStaffMemberPhotoMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof removeCurrentStaffMemberPhoto>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof removeCurrentStaffMemberPhoto>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["removeCurrentStaffMemberPhoto"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof removeCurrentStaffMemberPhoto>>,
+    void
+  > = () => {
+    return removeCurrentStaffMemberPhoto(fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RemoveCurrentStaffMemberPhotoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removeCurrentStaffMemberPhoto>>
+>;
+
+export type RemoveCurrentStaffMemberPhotoMutationError = unknown;
+
+export const useRemoveCurrentStaffMemberPhoto = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof removeCurrentStaffMemberPhoto>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof removeCurrentStaffMemberPhoto>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(
+    getRemoveCurrentStaffMemberPhotoMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type setStaffMemberPhotoResponse200 = {
+  data: StaffPhotoResultDto;
+  status: 200;
+};
+
+export type setStaffMemberPhotoResponseSuccess =
+  setStaffMemberPhotoResponse200 & {
+    headers: Headers;
+  };
+export type setStaffMemberPhotoResponse = setStaffMemberPhotoResponseSuccess;
+
+export const getSetStaffMemberPhotoUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/photo`;
+};
+
+export const setStaffMemberPhoto = async (
+  staffMemberId: string,
+  setStaffPhotoDto: SetStaffPhotoDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setStaffMemberPhotoResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getSetStaffMemberPhotoUrl(staffMemberId),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(setStaffPhotoDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setStaffMemberPhotoResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setStaffMemberPhotoResponse;
+};
+
+export const getSetStaffMemberPhotoMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setStaffMemberPhoto>>,
+    TError,
+    SetStaffMemberPhotoMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setStaffMemberPhoto>>,
+  TError,
+  SetStaffMemberPhotoMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["setStaffMemberPhoto"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setStaffMemberPhoto>>,
+    SetStaffMemberPhotoMutationVariables
+  > = (props) => {
+    const { staffMemberId, data } = props ?? {};
+
+    return setStaffMemberPhoto(staffMemberId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetStaffMemberPhotoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setStaffMemberPhoto>>
+>;
+export type SetStaffMemberPhotoMutationBody = SetStaffPhotoDto;
+export type SetStaffMemberPhotoMutationError = unknown;
+export type SetStaffMemberPhotoMutationVariables = {
+  staffMemberId: string;
+  data: SetStaffPhotoDto;
+};
+
+export const useSetStaffMemberPhoto = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setStaffMemberPhoto>>,
+      TError,
+      SetStaffMemberPhotoMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setStaffMemberPhoto>>,
+  TError,
+  SetStaffMemberPhotoMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getSetStaffMemberPhotoMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type removeStaffMemberPhotoResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type removeStaffMemberPhotoResponseSuccess =
+  removeStaffMemberPhotoResponse204 & {
+    headers: Headers;
+  };
+export type removeStaffMemberPhotoResponse =
+  removeStaffMemberPhotoResponseSuccess;
+
+export const getRemoveStaffMemberPhotoUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/photo`;
+};
+
+export const removeStaffMemberPhoto = async (
+  staffMemberId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<removeStaffMemberPhotoResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getRemoveStaffMemberPhotoUrl(staffMemberId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: removeStaffMemberPhotoResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as removeStaffMemberPhotoResponse;
+};
+
+export const getRemoveStaffMemberPhotoMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof removeStaffMemberPhoto>>,
+    TError,
+    RemoveStaffMemberPhotoMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof removeStaffMemberPhoto>>,
+  TError,
+  RemoveStaffMemberPhotoMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["removeStaffMemberPhoto"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof removeStaffMemberPhoto>>,
+    RemoveStaffMemberPhotoMutationVariables
+  > = (props) => {
+    const { staffMemberId } = props ?? {};
+
+    return removeStaffMemberPhoto(staffMemberId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RemoveStaffMemberPhotoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removeStaffMemberPhoto>>
+>;
+
+export type RemoveStaffMemberPhotoMutationError = unknown;
+export type RemoveStaffMemberPhotoMutationVariables = { staffMemberId: string };
+
+export const useRemoveStaffMemberPhoto = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof removeStaffMemberPhoto>>,
+      TError,
+      RemoveStaffMemberPhotoMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof removeStaffMemberPhoto>>,
+  TError,
+  RemoveStaffMemberPhotoMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRemoveStaffMemberPhotoMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getStaffPhotoResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getStaffPhotoResponseSuccess = getStaffPhotoResponse200 & {
+  headers: Headers;
+};
+export type getStaffPhotoResponse = getStaffPhotoResponseSuccess;
+
+export const getGetStaffPhotoUrl = (
+  imageAssetId: string,
+  params?: GetStaffPhotoParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/staff-photos/${imageAssetId}?${stringifiedParams}`
+    : `/api/v1/staff-photos/${imageAssetId}`;
+};
+
+export const getStaffPhoto = async (
+  imageAssetId: string,
+  params?: GetStaffPhotoParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getStaffPhotoResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetStaffPhotoUrl(imageAssetId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getStaffPhotoResponse["data"] =
+    body as getStaffPhotoResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getStaffPhotoResponse;
+};
+
+export const getGetStaffPhotoQueryKey = (
+  imageAssetId: string,
+  params?: GetStaffPhotoParams,
+) => {
+  return [
+    `/api/v1/staff-photos/${imageAssetId}`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetStaffPhotoQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStaffPhoto>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetStaffPhotoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffPhoto>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetStaffPhotoQueryKey(imageAssetId, params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getStaffPhoto>>> = ({
+    signal,
+  }) =>
+    getStaffPhoto(imageAssetId, params, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: imageAssetId !== null && imageAssetId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStaffPhoto>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStaffPhotoQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStaffPhoto>>
+>;
+export type GetStaffPhotoQueryError = unknown;
+
+export function useGetStaffPhoto<
+  TData = Awaited<ReturnType<typeof getStaffPhoto>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params: undefined | GetStaffPhotoParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffPhoto>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffPhoto>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffPhoto>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffPhoto<
+  TData = Awaited<ReturnType<typeof getStaffPhoto>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetStaffPhotoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffPhoto>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffPhoto>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffPhoto>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffPhoto<
+  TData = Awaited<ReturnType<typeof getStaffPhoto>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetStaffPhotoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffPhoto>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetStaffPhoto<
+  TData = Awaited<ReturnType<typeof getStaffPhoto>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  params?: GetStaffPhotoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffPhoto>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetStaffPhotoQueryOptions(
+    imageAssetId,
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

@@ -250,4 +250,44 @@ describe('client profile photo (PostgreSQL)', () => {
       await gateway.readPhotoObject({ clientId, variant: 'thumbnail' }),
     ).toEqual({ objectKey: thumbnail.storageKey, mediaType: 'image/jpeg' });
   });
+
+  it('reads a Client photo by the asset a read model names, only while she shows it', async () => {
+    const { clientId, accountId } = await client();
+    const upload = await photoUpload(accountId);
+    await gateway.replacePhoto({
+      clientId,
+      ownerAccountId: accountId,
+      imageAssetId: upload.id,
+      now,
+    });
+    const thumbnail = upload.variants.find((v) => v.kind === 'THUMBNAIL')!;
+
+    expect(
+      await gateway.readPhotoObjectByAsset({
+        imageAssetId: upload.id,
+        variant: 'thumbnail',
+      }),
+    ).toEqual({ objectKey: thumbnail.storageKey, mediaType: 'image/jpeg' });
+    await prisma.client.update({
+      where: { id: clientId },
+      data: { deletedAt: now },
+    });
+    expect(
+      await gateway.readPhotoObjectByAsset({
+        imageAssetId: upload.id,
+        variant: 'thumbnail',
+      }),
+    ).toBeNull();
+    await prisma.client.update({
+      where: { id: clientId },
+      data: { deletedAt: null },
+    });
+    await gateway.removePhoto({ clientId, now });
+    expect(
+      await gateway.readPhotoObjectByAsset({
+        imageAssetId: upload.id,
+        variant: 'thumbnail',
+      }),
+    ).toBeNull();
+  });
 });
