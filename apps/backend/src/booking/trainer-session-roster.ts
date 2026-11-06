@@ -1,7 +1,7 @@
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from './commands/create-booking';
 
-type TrainerSessionRoster = {
+export type TrainerSessionRoster = {
   sessionId: string;
   trainerStaffMemberId: string;
   classTypeName: string;
