@@ -89,7 +89,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     expect(within(panel).getByText("Escribe un correo válido.")).toBeVisible();
     expect(
       within(panel).getByText(
-        "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+        "Escribe su celular. Lo necesitamos para escribirle por WhatsApp.",
       ),
     ).toBeVisible();
     expect(
