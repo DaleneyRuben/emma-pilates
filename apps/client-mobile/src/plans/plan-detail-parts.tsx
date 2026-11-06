@@ -14,7 +14,6 @@ import {
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDate } from "../home/home-format";
 import { formatBolivianos } from "./plan-format";
 
 /** The whole-percent discount a founder price carries, or null without one. */
@@ -47,11 +46,9 @@ export function PlanHero({ plan }: { plan: PlanDto }) {
 export function PlanIncludes({
   cancellationWindowMinutes,
   plan,
-  renewalStartsOn,
 }: {
   cancellationWindowMinutes: number | undefined;
   plan: PlanDto;
-  renewalStartsOn: string | undefined;
 }) {
   return (
     <View>
@@ -67,12 +64,6 @@ export function PlanIncludes({
         <IconRow icon="sun" label={`${plan.durationDays} días desde la fecha de inicio`} />
         {plan.weeklyClassCap === null ? null : (
           <IconRow icon="clock" label={describeWeeklyCap(plan.weeklyClassCap) ?? ""} />
-        )}
-        {renewalStartsOn === undefined ? null : (
-          <IconRow
-            icon="refresh"
-            label={`Tu nuevo plan empieza el ${formatCivilDate(renewalStartsOn)}, al terminar el actual.`}
-          />
         )}
       </IconRowGroup>
     </View>

@@ -15,6 +15,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  NextPlanStartChooser,
   StartDateChooser,
   typography,
   useStudioRules,
@@ -57,8 +58,9 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  // A renewal while the current Plan still has classes starts the day after
-  // it ends: the API names that date and no Start Date is chosen (FIX-002).
+  // A renewal while the current Plan still has classes starts after it ends:
+  // the API names the day after, and she may pick up to 28 days after the end
+  // (FIX-002, booking ADR-0013).
   const subscription = useGetCurrentClientSubscription({
     fetcher,
     query: { refetchOnMount: "always" },
@@ -67,6 +69,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
   const [error, setError] = useState<string | null>(null);
   const today = boliviaCivilDate(new Date());
   const [startsOn, setStartsOn] = useState(today);
+  const [nextStart, setNextStart] = useState<string | undefined>(undefined);
 
   if (plan.isPending) {
     return (
@@ -99,7 +102,10 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     const headers = { "idempotency-key": randomUUID() };
     try {
       const created = await createPurchaseIntent(
-        renewalStartsOn === undefined ? { planId: detail.id, startsOn } : { planId: detail.id },
+        {
+          planId: detail.id,
+          startsOn: renewalStartsOn === undefined ? startsOn : (nextStart ?? renewalStartsOn),
+        },
         { headers },
         fetcher,
       );
@@ -141,8 +147,15 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
         <PlanIncludes
           cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
           plan={detail}
-          renewalStartsOn={renewalStartsOn}
         />
+        {renewalStartsOn === undefined ? null : (
+          <NextPlanStartChooser
+            currentPlan="Tu plan actual"
+            firstDay={renewalStartsOn}
+            onSelect={setNextStart}
+            selected={nextStart ?? renewalStartsOn}
+          />
+        )}
         {studioRules === undefined ||
         subscription.isPending ||
         renewalStartsOn !== undefined ? null : (
