@@ -78,6 +78,31 @@ const templates: Record<Purpose, Template> = {
   },
 };
 
+// FIX-039 (DES-012): a Staff Member's login email changes only when the
+// studio asks (the Staff app offers no change of its own), so her link and
+// notice say who asked and send her to the studio, not to Editar perfil.
+const staffTemplates: Partial<Record<Purpose, Template>> = {
+  email_change: {
+    ...templates.email_change,
+    intro:
+      'El estudio cambió el correo con el que entras a la app del equipo de Emma Pilates Studio por este. Abre el enlace para confirmarlo.',
+    after: [
+      'Este enlace vence en 24 horas. Hasta que lo confirmes, sigues entrando con tu correo anterior.',
+      'Si no esperabas este cambio, habla con el estudio.',
+    ],
+  },
+  email_change_notice: {
+    ...templates.email_change_notice,
+    subject: 'El estudio está cambiando tu correo',
+    intro:
+      'El estudio pidió que entres a la app del equipo de Emma Pilates Studio con {newEmail}. Nada cambia hasta que ese correo confirme el enlace que le enviamos.',
+    after: [
+      'Si lo hablaste con el estudio, no tienes que hacer nada.',
+      'Si no lo esperabas, habla con el estudio: pueden cancelar el cambio.',
+    ],
+  },
+};
+
 const studio = 'Emma Pilates Studio';
 
 const escapeHtml = (value: string): string =>
@@ -94,7 +119,10 @@ export class SpanishAuthenticationEmailRenderer implements AuthenticationEmailRe
   constructor(private readonly options: { linkBaseUrl: string }) {}
 
   render(input: AuthenticationEmailRenderInput): AuthenticationEmailMessage {
-    const template = templates[input.purpose];
+    const template =
+      (input.identityKind === 'staff'
+        ? staffTemplates[input.purpose]
+        : undefined) ?? templates[input.purpose];
     const link =
       template.path === null || input.linkSecret === null
         ? null

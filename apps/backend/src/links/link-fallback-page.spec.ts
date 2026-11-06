@@ -71,7 +71,6 @@ describe('renderLinkFallbackPage', () => {
   it.each([
     ['client', 'unknown'],
     ['staff', 'verify-email'],
-    ['staff', 'confirm-email-change'],
   ] as const)('has no page for the %s %s link', (identityKind, purpose) => {
     expect(
       renderLinkFallbackPage({
