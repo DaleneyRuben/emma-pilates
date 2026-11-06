@@ -17,6 +17,52 @@ const rules = {
   founderGapDays: 7,
 };
 
+// booking ADR-0013: a next Plan sold before the real end, starting inside
+// the 28-day window, is never a gap.
+describe('founder gap for a Plan bought in advance', () => {
+  const membership = { status: 'active' as const, lostAt: null };
+  const end = civil('2026-12-05');
+
+  it('keeps the place when the advance Plan starts inside the window', () => {
+    expect(
+      decideFounderGap({
+        today: civil('2026-12-20'),
+        rules,
+        membership,
+        latestRealEnd: end,
+        nextStart: civil('2027-01-02'),
+        nextSoldOn: civil('2026-11-06'),
+      }),
+    ).toEqual({ lose: false });
+  });
+
+  it('loses it when the advance Plan starts past the window', () => {
+    expect(
+      decideFounderGap({
+        today: civil('2026-12-20'),
+        rules,
+        membership,
+        latestRealEnd: end,
+        nextStart: civil('2027-01-03'),
+        nextSoldOn: civil('2026-11-06'),
+      }),
+    ).toEqual({ lose: true, reason: 'gap' });
+  });
+
+  it('loses it when the next Plan was sold after the real end', () => {
+    expect(
+      decideFounderGap({
+        today: civil('2026-12-20'),
+        rules,
+        membership,
+        latestRealEnd: end,
+        nextStart: civil('2026-12-20'),
+        nextSoldOn: civil('2026-12-06'),
+      }),
+    ).toEqual({ lose: true, reason: 'gap' });
+  });
+});
+
 describe('founder discount', () => {
   it('takes 15 percent off any Plan except the single class', () => {
     expect(
