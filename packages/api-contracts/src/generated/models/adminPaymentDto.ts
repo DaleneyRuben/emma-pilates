@@ -7,6 +7,7 @@
 import type { AdminPaymentDtoKind } from "./adminPaymentDtoKind";
 import type { AdminPaymentDtoMethod } from "./adminPaymentDtoMethod";
 import type { AdminPaymentDtoState } from "./adminPaymentDtoState";
+import type { ClientPhotoDto } from "./clientPhotoDto";
 import type { InvoiceDataDto } from "./invoiceDataDto";
 import type { InvoiceIssuedMarkDto } from "./invoiceIssuedMarkDto";
 
@@ -14,6 +15,11 @@ export interface AdminPaymentDto {
   id: string;
   clientId: string;
   clientName: string;
+  /**
+   * The Client photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  clientPhoto: ClientPhotoDto | null;
   planName: string;
   /** Plan sale or paid Evaluation */
   kind: AdminPaymentDtoKind;
