@@ -35,7 +35,7 @@ import {
   type StaffFormOutput,
 } from "./staff-form-schema";
 import { StaffPhotoBlock } from "./staff-photo-block";
-import { staffProblem } from "./staff-problems";
+import { isAccountEmailLimit, staffProblem } from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 import { StaffRoleFields } from "./staff-role-fields";
 import { TrainerReferralCodeField } from "./trainer-referral-code-field";
@@ -140,8 +140,21 @@ export function StaffEditForm({
       });
       setPending(updated.pendingEmail);
       form.resetField("email", { defaultValue: member.email });
+      if (contactChanged || roleChanged || branchesChanged) {
+        setEmailNotice(`Guardamos los cambios de ${name}.`);
+      }
     } catch (error) {
       if (othersSaved && emailChanged) {
+        // The other changes landed before the email request failed.
+        if (contactChanged || roleChanged || branchesChanged) {
+          setEmailNotice(
+            "Guardamos el nombre, el teléfono, el rol y las sucursales, pero no el correo.",
+          );
+        }
+        if (isAccountEmailLimit(error)) {
+          limit.start("account", error.problem.retryAfterSeconds ?? 0);
+          return;
+        }
         if (isApiError(error) && error.code === "email_throttled") {
           limit.start("recipient", error.problem.retryAfterSeconds ?? 0);
           return;
