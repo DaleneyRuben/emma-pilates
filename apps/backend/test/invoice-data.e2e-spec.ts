@@ -4,11 +4,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { jest } from '@jest/globals';
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { AdministrationError } from '../src/booking/administration/administration-errors';
 import { BookingAccessDeniedError } from '../src/booking/commands/create-booking';
-import { InvoiceDataError } from '../src/booking/payments/invoice-data/invoice-data';
 import {
-  AdministratorInvoiceIssuedController,
   AssistantInvoiceDataController,
   ClientInvoiceDataController,
   invoiceDataOperations,
@@ -22,7 +19,6 @@ const bearer = `Bearer ${'a'.repeat(43)}`;
 const clientId = '11111111-1111-4111-8111-111111111111';
 const paymentId = '22222222-2222-4222-8222-222222222222';
 const ana = { taxId: '4567891', name: 'Ana Pérez' };
-const issuedAt = new Date('2026-10-23T15:00:00.000Z');
 
 type Operation = jest.Mock<(...args: unknown[]) => Promise<unknown>>;
 
@@ -40,31 +36,20 @@ describe('Invoice Data endpoints (e2e)', () => {
         meaningful: boolean,
       ) => Promise<AuthenticatedPrincipal>
     >();
-  const operations: Record<
-    'readClient' | 'readAssistant' | 'mark' | 'unmark',
-    Operation
-  > = {
+  const operations: Record<'readClient' | 'readAssistant', Operation> = {
     readClient: jest.fn<(...args: unknown[]) => Promise<unknown>>(),
     readAssistant: jest.fn<(...args: unknown[]) => Promise<unknown>>(),
-    mark: jest.fn<(...args: unknown[]) => Promise<unknown>>(),
-    unmark: jest.fn<(...args: unknown[]) => Promise<unknown>>(),
   };
 
   beforeEach(async () => {
     resolvePrincipal.mockResolvedValue(principal);
     operations.readClient.mockResolvedValue(ana);
     operations.readAssistant.mockResolvedValue(null);
-    operations.mark.mockResolvedValue({
-      paymentId,
-      invoiceIssued: { issuedAt, issuedByName: 'Paola Mendoza' },
-    });
-    operations.unmark.mockResolvedValue({ paymentId, invoiceIssued: null });
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [
         ClientInvoiceDataController,
         AssistantInvoiceDataController,
-        AdministratorInvoiceIssuedController,
       ],
       providers: [
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
@@ -125,54 +110,16 @@ describe('Invoice Data endpoints (e2e)', () => {
       .expect(400);
   });
 
-  it('marks and unmarks «Factura emitida»', async () => {
+  // FIX-044 (owner, 2026-11-05): a payment is «Factura emitida» only by
+  // uploading the invoice, so the plain mark is no longer served.
+  it('no longer serves the plain «Factura emitida» mark', async () => {
     await request(app.getHttpServer())
       .post(`/api/v1/administrator/payments/${paymentId}/invoice-issued`)
       .set('authorization', bearer)
-      .expect(200)
-      .expect('Cache-Control', 'no-store')
-      .expect({
-        paymentId,
-        invoiceIssued: {
-          issuedAt: issuedAt.toISOString(),
-          issuedByName: 'Paola Mendoza',
-        },
-      });
-    expect(operations.mark).toHaveBeenCalledWith({ paymentId }, principal);
-
+      .expect(404);
     await request(app.getHttpServer())
       .delete(`/api/v1/administrator/payments/${paymentId}/invoice-issued`)
       .set('authorization', bearer)
-      .expect(200)
-      .expect({ paymentId, invoiceIssued: null });
-    expect(operations.unmark).toHaveBeenCalledWith({ paymentId }, principal);
-  });
-
-  it.each([
-    [new AdministrationError('administration_access_denied'), 403],
-    [new InvoiceDataError('payment_not_found'), 404],
-    [new InvoiceDataError('payment_not_confirmed'), 409],
-  ])('answers %s as a problem', async (error, status) => {
-    operations.mark.mockRejectedValueOnce(error);
-
-    await request(app.getHttpServer())
-      .post(`/api/v1/administrator/payments/${paymentId}/invoice-issued`)
-      .set('authorization', bearer)
-      .expect(status)
-      .expect(({ body }: { body: { code: string } }) =>
-        expect(body.code).toBe(error.code),
-      );
-  });
-
-  it('refuses a malformed Payment identifier and an anonymous caller', async () => {
-    await request(app.getHttpServer())
-      .post('/api/v1/administrator/payments/not-a-uuid/invoice-issued')
-      .set('authorization', bearer)
-      .expect(400);
-    await request(app.getHttpServer())
-      .delete(`/api/v1/administrator/payments/${paymentId}/invoice-issued`)
-      .expect(401);
-    expect(operations.mark).not.toHaveBeenCalled();
-    expect(operations.unmark).not.toHaveBeenCalled();
+      .expect(404);
   });
 });
