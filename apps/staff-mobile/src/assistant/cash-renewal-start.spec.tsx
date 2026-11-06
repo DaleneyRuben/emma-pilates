@@ -34,7 +34,7 @@ describe("Confirming cash for a renewal", () => {
       "/api/v1/studio-rules": () => jsonResponse(studioRules),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
 
     await waitFor(() => {
@@ -58,7 +58,7 @@ describe("Confirming cash for a renewal", () => {
       "/api/v1/studio-rules": () => jsonResponse(studioRules),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
 
     await waitFor(() => {
@@ -86,7 +86,7 @@ describe("Confirming cash for a renewal", () => {
     const readsOnOverview = overviewReads;
     overviewFails = true;
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
 
     expect(await screen.findByText("No pudimos cargar los planes.")).toBeOnTheScreen();
     expect(overviewReads).toBeGreaterThan(readsOnOverview);
@@ -113,7 +113,7 @@ describe("Confirming cash for a renewal", () => {
         jsonResponse({ code: "start_date_before_booked_class" }, 409),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
     await fireEvent.press(
       await screen.findByRole("button", { name: "Confirmar pago en efectivo" }),

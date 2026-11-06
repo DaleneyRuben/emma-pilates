@@ -26,7 +26,7 @@ describe("Assistant plan card labels", () => {
       "/api/v1/assistant/clients/client-lucia/plan-quotes": () => jsonResponse(founderQuotes),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
 
     expect(
       await screen.findByRole("button", { name: "Paquete de 8 clases, Bs 476, antes Bs 560" }),
