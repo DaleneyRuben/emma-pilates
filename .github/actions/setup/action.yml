@@ -33,6 +33,6 @@ runs:
       run: pnpm --filter @pilates/admin-web exec playwright install chromium
       shell: bash
     # no `playwright install-deps`: the ubuntu-24.04 image already has the
-    # shared libraries Chromium needs, and that apt step (mostly CJK and Thai
-    # fonts the Spanish admin web never draws) took over ten minutes whenever
-    # the Ubuntu mirror was slow
+    # shared libraries Chromium needs, so on the runner that apt step fetched
+    # mostly fonts the Spanish admin web never draws, and it took over ten
+    # minutes whenever the Ubuntu mirror was slow
