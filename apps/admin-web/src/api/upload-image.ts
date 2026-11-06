@@ -36,11 +36,14 @@ export class UploadFailure extends Error {
   }
 }
 
-const acceptedMediaTypes: readonly string[] = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-];
+const imageTypes: readonly string[] = ["image/jpeg", "image/png", "image/webp"];
+// FIX-044: an issued invoice may be a PDF; WebP is not offered for it.
+const acceptedMediaTypes: Record<ImagePurpose, readonly string[]> = {
+  transfer_receipt: imageTypes,
+  profile_photo: imageTypes,
+  promotion: imageTypes,
+  invoice: ["application/pdf", "image/jpeg", "image/png"],
+};
 
 // ADR-0072 per purpose, and UPL-002's minimum for a Promotion image.
 const limits: Record<
@@ -50,6 +53,7 @@ const limits: Record<
   transfer_receipt: { maxBytes: 10 * 1024 * 1024, minWidth: 0, minHeight: 0 },
   profile_photo: { maxBytes: 5 * 1024 * 1024, minWidth: 0, minHeight: 0 },
   promotion: { maxBytes: 20 * 1024 * 1024, minWidth: 1200, minHeight: 675 },
+  invoice: { maxBytes: 10 * 1024 * 1024, minWidth: 0, minHeight: 0 },
 };
 
 /** What the backend would refuse, checked before any call is made. */
@@ -63,7 +67,7 @@ export function checkImage(
   },
 ): UploadFailureCode | null {
   const limit = limits[purpose];
-  if (!acceptedMediaTypes.includes(image.mediaType)) {
+  if (!acceptedMediaTypes[purpose].includes(image.mediaType)) {
     return "image_media_type_invalid";
   }
   if (image.byteSize > limit.maxBytes) return "image_too_large";
@@ -107,6 +111,20 @@ const receiptMessages: Partial<Record<UploadFailureCode, string>> = {
     "No pudimos procesar la imagen. Revisa que sea un JPG, PNG o WEBP que no esté animado.",
 };
 
+// FIX-044: one sentence for every file the invoice cannot be (design E5).
+const invoiceMessages: Partial<Record<UploadFailureCode, string>> = {
+  image_media_type_invalid:
+    "Este archivo no sirve. Sube un PDF, JPG o PNG de hasta 10 MB.",
+  image_too_large:
+    "Este archivo no sirve. Sube un PDF, JPG o PNG de hasta 10 MB.",
+  upload_rejected:
+    "Este archivo no sirve. Sube un PDF, JPG o PNG de hasta 10 MB.",
+  upload_failed:
+    "No pudimos subir la factura. Revisa tu conexión e inténtalo de nuevo.",
+  upload_verification_timeout:
+    "La factura está tardando en procesarse. Espera un momento e inténtalo de nuevo.",
+};
+
 const isFailureCode = (code: string): code is UploadFailureCode =>
   code in messages;
 
@@ -121,8 +139,11 @@ export function uploadFailureMessage(
         ? error.code
         : "upload_failed";
   return (
-    (purpose === "transfer_receipt" ? receiptMessages[code] : undefined) ??
-    messages[code]
+    (purpose === "transfer_receipt"
+      ? receiptMessages[code]
+      : purpose === "invoice"
+        ? invoiceMessages[code]
+        : undefined) ?? messages[code]
   );
 }
 

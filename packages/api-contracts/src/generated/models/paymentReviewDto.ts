@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { ClientPhotoDto } from "./clientPhotoDto";
+import type { InvoiceDataDto } from "./invoiceDataDto";
 import type { PaymentReceiptDto } from "./paymentReceiptDto";
 import type { PaymentReviewDtoDurationDays } from "./paymentReviewDtoDurationDays";
 import type { PaymentReviewDtoDurationMonths } from "./paymentReviewDtoDurationMonths";
@@ -46,6 +47,11 @@ export interface PaymentReviewDto {
   /** @nullable */
   subscriptionId?: string | null;
   clientName: string;
+  /**
+   * FIX-044: the NIT or CI and name she asked the invoice for; null is «Sin factura»
+   * @nullable
+   */
+  invoiceData?: InvoiceDataDto | null;
   /**
    * The Client photo (FIX-041), null while her initials stand in
    * @nullable

@@ -12,4 +12,5 @@ export const CreatePendingUploadDtoMediaType = {
   "image/jpeg": "image/jpeg",
   "image/png": "image/png",
   "image/webp": "image/webp",
+  "application/pdf": "application/pdf",
 } as const;

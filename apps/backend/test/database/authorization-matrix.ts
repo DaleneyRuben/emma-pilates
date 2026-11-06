@@ -175,6 +175,8 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/credit-purchases': both('deny'),
   'GET /api/v1/payments/current': both('deny'),
   'GET /api/v1/clients/current/invoice-data': both('deny'),
+  'GET /api/v1/clients/current/invoices': both('deny'),
+  'GET /api/v1/clients/current/invoices/{paymentId}/file': both('deny'),
   'GET /api/v1/clients/current/credit': both('deny'),
   'GET /api/v1/clients/current/referrals': both('deny'),
   // BKM-017: a Client's or a Trainer's own code; no other Role holds one.
@@ -382,11 +384,22 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     body: { reason: 'Registrado por error' },
   }),
   'GET /api/v1/administrator/payments': administratorOnly(),
-  // PAY-007: «Factura emitida» is the Administrator's money work.
-  'POST /api/v1/administrator/payments/{paymentId}/invoice-issued':
-    administratorOnly(),
-  'DELETE /api/v1/administrator/payments/{paymentId}/invoice-issued':
-    administratorOnly(),
+  // FIX-044: the Administrator, the Coordinator and the Assistant upload the
+  // issued invoice; a missing Payment is a 404 after the Role passed.
+  'GET /api/v1/staff/invoices': both('allow', { bearer: true }),
+  'GET /api/v1/staff/payments/{paymentId}/invoice': both('allow', {
+    bearer: true,
+  }),
+  'PUT /api/v1/staff/payments/{paymentId}/invoice': both('allow', {
+    bearer: true,
+    body: { imageAssetId: uuid, fileName: 'factura.pdf' },
+  }),
+  'DELETE /api/v1/staff/payments/{paymentId}/invoice': both('allow', {
+    bearer: true,
+  }),
+  'GET /api/v1/staff/payments/{paymentId}/invoice/file': both('allow', {
+    bearer: true,
+  }),
 
   // The carousel and its contacts carry no amount: the Coordinator runs them
   // (ADR-0108). Campaign classes stay the Administrator's.

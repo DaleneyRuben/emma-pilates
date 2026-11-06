@@ -311,6 +311,14 @@ export class PaymentReviewDto extends PaymentDto {
   @ApiProperty()
   clientName!: string;
 
+  @ApiPropertyOptional({
+    type: InvoiceDataDto,
+    nullable: true,
+    description:
+      'FIX-044: the NIT or CI and name she asked the invoice for; null is «Sin factura»',
+  })
+  invoiceData!: InvoiceDataDto | null;
+
   @ApiProperty({
     type: ClientPhotoDto,
     nullable: true,

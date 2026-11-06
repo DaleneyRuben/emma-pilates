@@ -56,6 +56,7 @@ import type {
   AssistantCashPaymentDto,
   AssistantClientBookingDto,
   AssistantClientDto,
+  AttachInvoiceDto,
   AttachReceiptDto,
   AuthenticationLinkInspectionDto,
   AuthenticationLinkTokenDto,
@@ -87,6 +88,7 @@ import type {
   ClientEvaluationPageDto,
   ClientInvitationDto,
   ClientInvitationResultDto,
+  ClientInvoiceListDto,
   ClientOverviewDto,
   ClientProfileDto,
   ClientSubscriptionDto,
@@ -154,7 +156,6 @@ import type {
   ImpersonationDto,
   IncomeReportDto,
   InviteClientDto,
-  InvoiceIssuedDto,
   LastInvoiceDataDto,
   ListAdminBranchesParams,
   ListAdminCashClosesParams,
@@ -182,6 +183,7 @@ import type {
   ListRecommendationsParams,
   ListSessionAvailabilityParams,
   ListSessionSchedulesParams,
+  ListStaffInvoicesParams,
   ListStaffMembersParams,
   ListTrainerScheduleParams,
   LivenessResponseDto,
@@ -257,6 +259,8 @@ import type {
   SetPromotionsConsentDto,
   SetStaffPhotoDto,
   SetTrainerReferralCodeDto,
+  StaffInvoiceDto,
+  StaffInvoiceListDto,
   StaffMemberDto,
   StaffMemberPageDto,
   StaffPhotoResultDto,
@@ -26065,66 +26069,485 @@ export function useGetAssistantClientInvoiceData<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-export type markPaymentInvoiceIssuedResponse200 = {
-  data: InvoiceIssuedDto;
+export type listStaffInvoicesResponse200 = {
+  data: StaffInvoiceListDto;
   status: 200;
 };
 
-export type markPaymentInvoiceIssuedResponseSuccess =
-  markPaymentInvoiceIssuedResponse200 & {
-    headers: Headers;
-  };
-export type markPaymentInvoiceIssuedResponse =
-  markPaymentInvoiceIssuedResponseSuccess;
+export type listStaffInvoicesResponseSuccess = listStaffInvoicesResponse200 & {
+  headers: Headers;
+};
+export type listStaffInvoicesResponse = listStaffInvoicesResponseSuccess;
 
-export const getMarkPaymentInvoiceIssuedUrl = (paymentId: string) => {
-  return `/api/v1/administrator/payments/${paymentId}/invoice-issued`;
+export const getListStaffInvoicesUrl = (params?: ListStaffInvoicesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/staff/invoices?${stringifiedParams}`
+    : `/api/v1/staff/invoices`;
 };
 
-export const markPaymentInvoiceIssued = async (
+export const listStaffInvoices = async (
+  params?: ListStaffInvoicesParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listStaffInvoicesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListStaffInvoicesUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listStaffInvoicesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listStaffInvoicesResponse;
+};
+
+export const getListStaffInvoicesQueryKey = (
+  params?: ListStaffInvoicesParams,
+) => {
+  return [`/api/v1/staff/invoices`, ...(params ? [params] : [])] as const;
+};
+
+export const getListStaffInvoicesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listStaffInvoices>>,
+  TError = unknown,
+>(
+  params?: ListStaffInvoicesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffInvoices>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListStaffInvoicesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listStaffInvoices>>
+  > = ({ signal }) =>
+    listStaffInvoices(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listStaffInvoices>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListStaffInvoicesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listStaffInvoices>>
+>;
+export type ListStaffInvoicesQueryError = unknown;
+
+export function useListStaffInvoices<
+  TData = Awaited<ReturnType<typeof listStaffInvoices>>,
+  TError = unknown,
+>(
+  params: undefined | ListStaffInvoicesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffInvoices>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStaffInvoices>>,
+          TError,
+          Awaited<ReturnType<typeof listStaffInvoices>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListStaffInvoices<
+  TData = Awaited<ReturnType<typeof listStaffInvoices>>,
+  TError = unknown,
+>(
+  params?: ListStaffInvoicesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffInvoices>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStaffInvoices>>,
+          TError,
+          Awaited<ReturnType<typeof listStaffInvoices>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListStaffInvoices<
+  TData = Awaited<ReturnType<typeof listStaffInvoices>>,
+  TError = unknown,
+>(
+  params?: ListStaffInvoicesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffInvoices>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListStaffInvoices<
+  TData = Awaited<ReturnType<typeof listStaffInvoices>>,
+  TError = unknown,
+>(
+  params?: ListStaffInvoicesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffInvoices>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListStaffInvoicesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getStaffPaymentInvoiceResponse200 = {
+  data: StaffInvoiceDto;
+  status: 200;
+};
+
+export type getStaffPaymentInvoiceResponseSuccess =
+  getStaffPaymentInvoiceResponse200 & {
+    headers: Headers;
+  };
+export type getStaffPaymentInvoiceResponse =
+  getStaffPaymentInvoiceResponseSuccess;
+
+export const getGetStaffPaymentInvoiceUrl = (paymentId: string) => {
+  return `/api/v1/staff/payments/${paymentId}/invoice`;
+};
+
+export const getStaffPaymentInvoice = async (
   paymentId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<markPaymentInvoiceIssuedResponse> => {
+): Promise<getStaffPaymentInvoiceResponse> => {
   const res = await (fetchFn ?? fetch)(
-    getMarkPaymentInvoiceIssuedUrl(paymentId),
+    getGetStaffPaymentInvoiceUrl(paymentId),
     {
       ...options,
-      method: "POST",
+      method: "GET",
     },
   );
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: markPaymentInvoiceIssuedResponse["data"] = body
+  const data: getStaffPaymentInvoiceResponse["data"] = body
     ? JSON.parse(body)
     : {};
   return {
     data,
     status: res.status,
     headers: res.headers,
-  } as markPaymentInvoiceIssuedResponse;
+  } as getStaffPaymentInvoiceResponse;
 };
 
-export const getMarkPaymentInvoiceIssuedMutationOptions = <
+export const getGetStaffPaymentInvoiceQueryKey = (paymentId: string) => {
+  return [`/api/v1/staff/payments/${paymentId}/invoice`] as const;
+};
+
+export const getGetStaffPaymentInvoiceQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetStaffPaymentInvoiceQueryKey(paymentId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getStaffPaymentInvoice>>
+  > = ({ signal }) =>
+    getStaffPaymentInvoice(paymentId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: paymentId !== null && paymentId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStaffPaymentInvoiceQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStaffPaymentInvoice>>
+>;
+export type GetStaffPaymentInvoiceQueryError = unknown;
+
+export function useGetStaffPaymentInvoice<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffPaymentInvoice>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffPaymentInvoice<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffPaymentInvoice>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffPaymentInvoice<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetStaffPaymentInvoice<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoice>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetStaffPaymentInvoiceQueryOptions(
+    paymentId,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type attachStaffPaymentInvoiceResponse200 = {
+  data: StaffInvoiceDto;
+  status: 200;
+};
+
+export type attachStaffPaymentInvoiceResponseSuccess =
+  attachStaffPaymentInvoiceResponse200 & {
+    headers: Headers;
+  };
+export type attachStaffPaymentInvoiceResponse =
+  attachStaffPaymentInvoiceResponseSuccess;
+
+export const getAttachStaffPaymentInvoiceUrl = (paymentId: string) => {
+  return `/api/v1/staff/payments/${paymentId}/invoice`;
+};
+
+export const attachStaffPaymentInvoice = async (
+  paymentId: string,
+  attachInvoiceDto: AttachInvoiceDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<attachStaffPaymentInvoiceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getAttachStaffPaymentInvoiceUrl(paymentId),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(attachInvoiceDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: attachStaffPaymentInvoiceResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as attachStaffPaymentInvoiceResponse;
+};
+
+export const getAttachStaffPaymentInvoiceMutationOptions = <
   TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
+    Awaited<ReturnType<typeof attachStaffPaymentInvoice>>,
     TError,
-    MarkPaymentInvoiceIssuedMutationVariables,
+    AttachStaffPaymentInvoiceMutationVariables,
     TContext
   >;
   fetch?: RequestInit;
   fetcher?: typeof globalThis.fetch;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
+  Awaited<ReturnType<typeof attachStaffPaymentInvoice>>,
   TError,
-  MarkPaymentInvoiceIssuedMutationVariables,
+  AttachStaffPaymentInvoiceMutationVariables,
   TContext
 > => {
-  const mutationKey = ["markPaymentInvoiceIssued"];
+  const mutationKey = ["attachStaffPaymentInvoice"];
   const {
     mutation: mutationOptions,
     fetch: fetchOptions,
@@ -26138,33 +26561,36 @@ export const getMarkPaymentInvoiceIssuedMutationOptions = <
     : { mutation: { mutationKey }, fetch: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
-    MarkPaymentInvoiceIssuedMutationVariables
+    Awaited<ReturnType<typeof attachStaffPaymentInvoice>>,
+    AttachStaffPaymentInvoiceMutationVariables
   > = (props) => {
-    const { paymentId } = props ?? {};
+    const { paymentId, data } = props ?? {};
 
-    return markPaymentInvoiceIssued(paymentId, fetchOptions, fetcherFn);
+    return attachStaffPaymentInvoice(paymentId, data, fetchOptions, fetcherFn);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type MarkPaymentInvoiceIssuedMutationResult = NonNullable<
-  Awaited<ReturnType<typeof markPaymentInvoiceIssued>>
+export type AttachStaffPaymentInvoiceMutationResult = NonNullable<
+  Awaited<ReturnType<typeof attachStaffPaymentInvoice>>
 >;
+export type AttachStaffPaymentInvoiceMutationBody = AttachInvoiceDto;
+export type AttachStaffPaymentInvoiceMutationError = unknown;
+export type AttachStaffPaymentInvoiceMutationVariables = {
+  paymentId: string;
+  data: AttachInvoiceDto;
+};
 
-export type MarkPaymentInvoiceIssuedMutationError = unknown;
-export type MarkPaymentInvoiceIssuedMutationVariables = { paymentId: string };
-
-export const useMarkPaymentInvoiceIssued = <
+export const useAttachStaffPaymentInvoice = <
   TError = unknown,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
+      Awaited<ReturnType<typeof attachStaffPaymentInvoice>>,
       TError,
-      MarkPaymentInvoiceIssuedMutationVariables,
+      AttachStaffPaymentInvoiceMutationVariables,
       TContext
     >;
     fetch?: RequestInit;
@@ -26172,40 +26598,40 @@ export const useMarkPaymentInvoiceIssued = <
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof markPaymentInvoiceIssued>>,
+  Awaited<ReturnType<typeof attachStaffPaymentInvoice>>,
   TError,
-  MarkPaymentInvoiceIssuedMutationVariables,
+  AttachStaffPaymentInvoiceMutationVariables,
   TContext
 > => {
   return useMutation(
-    getMarkPaymentInvoiceIssuedMutationOptions(options),
+    getAttachStaffPaymentInvoiceMutationOptions(options),
     queryClient,
   );
 };
 
-export type unmarkPaymentInvoiceIssuedResponse200 = {
-  data: InvoiceIssuedDto;
+export type removeStaffPaymentInvoiceResponse200 = {
+  data: StaffInvoiceDto;
   status: 200;
 };
 
-export type unmarkPaymentInvoiceIssuedResponseSuccess =
-  unmarkPaymentInvoiceIssuedResponse200 & {
+export type removeStaffPaymentInvoiceResponseSuccess =
+  removeStaffPaymentInvoiceResponse200 & {
     headers: Headers;
   };
-export type unmarkPaymentInvoiceIssuedResponse =
-  unmarkPaymentInvoiceIssuedResponseSuccess;
+export type removeStaffPaymentInvoiceResponse =
+  removeStaffPaymentInvoiceResponseSuccess;
 
-export const getUnmarkPaymentInvoiceIssuedUrl = (paymentId: string) => {
-  return `/api/v1/administrator/payments/${paymentId}/invoice-issued`;
+export const getRemoveStaffPaymentInvoiceUrl = (paymentId: string) => {
+  return `/api/v1/staff/payments/${paymentId}/invoice`;
 };
 
-export const unmarkPaymentInvoiceIssued = async (
+export const removeStaffPaymentInvoice = async (
   paymentId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<unmarkPaymentInvoiceIssuedResponse> => {
+): Promise<removeStaffPaymentInvoiceResponse> => {
   const res = await (fetchFn ?? fetch)(
-    getUnmarkPaymentInvoiceIssuedUrl(paymentId),
+    getRemoveStaffPaymentInvoiceUrl(paymentId),
     {
       ...options,
       method: "DELETE",
@@ -26214,35 +26640,35 @@ export const unmarkPaymentInvoiceIssued = async (
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: unmarkPaymentInvoiceIssuedResponse["data"] = body
+  const data: removeStaffPaymentInvoiceResponse["data"] = body
     ? JSON.parse(body)
     : {};
   return {
     data,
     status: res.status,
     headers: res.headers,
-  } as unmarkPaymentInvoiceIssuedResponse;
+  } as removeStaffPaymentInvoiceResponse;
 };
 
-export const getUnmarkPaymentInvoiceIssuedMutationOptions = <
+export const getRemoveStaffPaymentInvoiceMutationOptions = <
   TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
+    Awaited<ReturnType<typeof removeStaffPaymentInvoice>>,
     TError,
-    UnmarkPaymentInvoiceIssuedMutationVariables,
+    RemoveStaffPaymentInvoiceMutationVariables,
     TContext
   >;
   fetch?: RequestInit;
   fetcher?: typeof globalThis.fetch;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
+  Awaited<ReturnType<typeof removeStaffPaymentInvoice>>,
   TError,
-  UnmarkPaymentInvoiceIssuedMutationVariables,
+  RemoveStaffPaymentInvoiceMutationVariables,
   TContext
 > => {
-  const mutationKey = ["unmarkPaymentInvoiceIssued"];
+  const mutationKey = ["removeStaffPaymentInvoice"];
   const {
     mutation: mutationOptions,
     fetch: fetchOptions,
@@ -26256,33 +26682,33 @@ export const getUnmarkPaymentInvoiceIssuedMutationOptions = <
     : { mutation: { mutationKey }, fetch: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
-    UnmarkPaymentInvoiceIssuedMutationVariables
+    Awaited<ReturnType<typeof removeStaffPaymentInvoice>>,
+    RemoveStaffPaymentInvoiceMutationVariables
   > = (props) => {
     const { paymentId } = props ?? {};
 
-    return unmarkPaymentInvoiceIssued(paymentId, fetchOptions, fetcherFn);
+    return removeStaffPaymentInvoice(paymentId, fetchOptions, fetcherFn);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type UnmarkPaymentInvoiceIssuedMutationResult = NonNullable<
-  Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>
+export type RemoveStaffPaymentInvoiceMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removeStaffPaymentInvoice>>
 >;
 
-export type UnmarkPaymentInvoiceIssuedMutationError = unknown;
-export type UnmarkPaymentInvoiceIssuedMutationVariables = { paymentId: string };
+export type RemoveStaffPaymentInvoiceMutationError = unknown;
+export type RemoveStaffPaymentInvoiceMutationVariables = { paymentId: string };
 
-export const useUnmarkPaymentInvoiceIssued = <
+export const useRemoveStaffPaymentInvoice = <
   TError = unknown,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
+      Awaited<ReturnType<typeof removeStaffPaymentInvoice>>,
       TError,
-      UnmarkPaymentInvoiceIssuedMutationVariables,
+      RemoveStaffPaymentInvoiceMutationVariables,
       TContext
     >;
     fetch?: RequestInit;
@@ -26290,16 +26716,636 @@ export const useUnmarkPaymentInvoiceIssued = <
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof unmarkPaymentInvoiceIssued>>,
+  Awaited<ReturnType<typeof removeStaffPaymentInvoice>>,
   TError,
-  UnmarkPaymentInvoiceIssuedMutationVariables,
+  RemoveStaffPaymentInvoiceMutationVariables,
   TContext
 > => {
   return useMutation(
-    getUnmarkPaymentInvoiceIssuedMutationOptions(options),
+    getRemoveStaffPaymentInvoiceMutationOptions(options),
     queryClient,
   );
 };
+
+export type getStaffPaymentInvoiceFileResponse200ApplicationPdf = {
+  data: Blob;
+  status: 200;
+};
+
+export type getStaffPaymentInvoiceFileResponse200ImageJpeg = {
+  data: Blob;
+  status: 200;
+};
+
+export type getStaffPaymentInvoiceFileResponse200ImagePng = {
+  data: Blob;
+  status: 200;
+};
+
+export type getStaffPaymentInvoiceFileResponseSuccess = (
+  | getStaffPaymentInvoiceFileResponse200ApplicationPdf
+  | getStaffPaymentInvoiceFileResponse200ImageJpeg
+  | getStaffPaymentInvoiceFileResponse200ImagePng
+) & {
+  headers: Headers;
+};
+export type getStaffPaymentInvoiceFileResponse =
+  getStaffPaymentInvoiceFileResponseSuccess;
+
+export const getGetStaffPaymentInvoiceFileUrl = (paymentId: string) => {
+  return `/api/v1/staff/payments/${paymentId}/invoice/file`;
+};
+
+export const getStaffPaymentInvoiceFile = async (
+  paymentId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getStaffPaymentInvoiceFileResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetStaffPaymentInvoiceFileUrl(paymentId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getStaffPaymentInvoiceFileResponse["data"] =
+    body as getStaffPaymentInvoiceFileResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getStaffPaymentInvoiceFileResponse;
+};
+
+export const getGetStaffPaymentInvoiceFileQueryKey = (paymentId: string) => {
+  return [`/api/v1/staff/payments/${paymentId}/invoice/file`] as const;
+};
+
+export const getGetStaffPaymentInvoiceFileQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetStaffPaymentInvoiceFileQueryKey(paymentId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>
+  > = ({ signal }) =>
+    getStaffPaymentInvoiceFile(
+      paymentId,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: paymentId !== null && paymentId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStaffPaymentInvoiceFileQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>
+>;
+export type GetStaffPaymentInvoiceFileQueryError = unknown;
+
+export function useGetStaffPaymentInvoiceFile<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffPaymentInvoiceFile<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffPaymentInvoiceFile<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetStaffPaymentInvoiceFile<
+  TData = Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffPaymentInvoiceFile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetStaffPaymentInvoiceFileQueryOptions(
+    paymentId,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listCurrentClientInvoicesResponse200 = {
+  data: ClientInvoiceListDto;
+  status: 200;
+};
+
+export type listCurrentClientInvoicesResponseSuccess =
+  listCurrentClientInvoicesResponse200 & {
+    headers: Headers;
+  };
+export type listCurrentClientInvoicesResponse =
+  listCurrentClientInvoicesResponseSuccess;
+
+export const getListCurrentClientInvoicesUrl = () => {
+  return `/api/v1/clients/current/invoices`;
+};
+
+export const listCurrentClientInvoices = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listCurrentClientInvoicesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListCurrentClientInvoicesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCurrentClientInvoicesResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listCurrentClientInvoicesResponse;
+};
+
+export const getListCurrentClientInvoicesQueryKey = () => {
+  return [`/api/v1/clients/current/invoices`] as const;
+};
+
+export const getListCurrentClientInvoicesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListCurrentClientInvoicesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listCurrentClientInvoices>>
+  > = ({ signal }) =>
+    listCurrentClientInvoices({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListCurrentClientInvoicesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listCurrentClientInvoices>>
+>;
+export type ListCurrentClientInvoicesQueryError = unknown;
+
+export function useListCurrentClientInvoices<
+  TData = Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentClientInvoices>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCurrentClientInvoices<
+  TData = Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentClientInvoices>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCurrentClientInvoices<
+  TData = Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListCurrentClientInvoices<
+  TData = Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentClientInvoices>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListCurrentClientInvoicesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getCurrentClientInvoiceFileResponse200ApplicationPdf = {
+  data: Blob;
+  status: 200;
+};
+
+export type getCurrentClientInvoiceFileResponse200ImageJpeg = {
+  data: Blob;
+  status: 200;
+};
+
+export type getCurrentClientInvoiceFileResponse200ImagePng = {
+  data: Blob;
+  status: 200;
+};
+
+export type getCurrentClientInvoiceFileResponseSuccess = (
+  | getCurrentClientInvoiceFileResponse200ApplicationPdf
+  | getCurrentClientInvoiceFileResponse200ImageJpeg
+  | getCurrentClientInvoiceFileResponse200ImagePng
+) & {
+  headers: Headers;
+};
+export type getCurrentClientInvoiceFileResponse =
+  getCurrentClientInvoiceFileResponseSuccess;
+
+export const getGetCurrentClientInvoiceFileUrl = (paymentId: string) => {
+  return `/api/v1/clients/current/invoices/${paymentId}/file`;
+};
+
+export const getCurrentClientInvoiceFile = async (
+  paymentId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentClientInvoiceFileResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetCurrentClientInvoiceFileUrl(paymentId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getCurrentClientInvoiceFileResponse["data"] =
+    body as getCurrentClientInvoiceFileResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentClientInvoiceFileResponse;
+};
+
+export const getGetCurrentClientInvoiceFileQueryKey = (paymentId: string) => {
+  return [`/api/v1/clients/current/invoices/${paymentId}/file`] as const;
+};
+
+export const getGetCurrentClientInvoiceFileQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentClientInvoiceFileQueryKey(paymentId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>
+  > = ({ signal }) =>
+    getCurrentClientInvoiceFile(
+      paymentId,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: paymentId !== null && paymentId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentClientInvoiceFileQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>
+>;
+export type GetCurrentClientInvoiceFileQueryError = unknown;
+
+export function useGetCurrentClientInvoiceFile<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientInvoiceFile<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientInvoiceFile<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentClientInvoiceFile<
+  TData = Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+  TError = unknown,
+>(
+  paymentId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientInvoiceFile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentClientInvoiceFileQueryOptions(
+    paymentId,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
 
 export type listEvaluationSlotsResponse200 = {
   data: EvaluationAvailabilityDto;

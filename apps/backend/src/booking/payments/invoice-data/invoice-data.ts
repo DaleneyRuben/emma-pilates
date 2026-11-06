@@ -1,10 +1,10 @@
 import type { AuthenticatedPrincipal } from '../../../system-identity/authentication/resolve-authenticated-principal';
-import { requireAdministrator } from '../../administration/administration-errors';
 import { BookingAccessDeniedError } from '../../commands/create-booking';
 
 // PAY-007 (booking ADR-0012): the tax identity a Client wants on her invoice.
 // Invoices are issued outside the system; a sale carries both fields or
-// neither («Sin factura»), and the Administrator marks «Factura emitida».
+// neither («Sin factura»). Since FIX-044 a payment is «Factura emitida» only by
+// uploading the invoice (invoice-file/); the plain mark is gone.
 export type InvoiceData = { taxId: string; name: string };
 
 export type InvoiceIssuedView = {
@@ -15,12 +15,6 @@ export type InvoiceIssuedView = {
 export type InvoiceDataGateway = {
   /** The Invoice Data of the Client's latest sale that carried any. */
   lastFor: (clientId: string) => Promise<InvoiceData | null>;
-  setIssued: (input: {
-    paymentId: string;
-    issued: boolean;
-    principal: AuthenticatedPrincipal;
-    now: Date;
-  }) => Promise<InvoiceIssuedView>;
 };
 
 export type InvoiceDataErrorCode =
@@ -105,24 +99,3 @@ export const readAssistantLastInvoiceData = async (
   }
   return gateway.lastFor(command.clientId);
 };
-
-type MarkDependencies = { gateway: InvoiceDataGateway; now: () => Date };
-
-const setIssued =
-  (issued: boolean) =>
-  async (
-    command: { paymentId: string },
-    principal: AuthenticatedPrincipal,
-    { gateway, now }: MarkDependencies,
-  ): Promise<InvoiceIssuedView> => {
-    requireAdministrator(principal);
-    return gateway.setIssued({
-      paymentId: command.paymentId,
-      issued,
-      principal,
-      now: now(),
-    });
-  };
-
-export const markInvoiceIssued = setIssued(true);
-export const unmarkInvoiceIssued = setIssued(false);

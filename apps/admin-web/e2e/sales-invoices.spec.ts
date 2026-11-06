@@ -3,10 +3,11 @@ import { expect, test } from "@playwright/test";
 import { sellForCash } from "./support/api";
 import { signIn } from "./support/session";
 
-// PAY-007 (follow-up 147) through the real backend: a cash sale with Invoice
-// Data waits under «Sin factura emitida», the CSV holds exactly what the
-// filter shows, and «Marcar emitida» records who marked it.
-test("exports the unbilled sales and marks a cash sale's invoice issued", async ({
+// PAY-007 (follow-up 147) and FIX-044 (follow-up 248) through the real
+// backend and worker: a cash sale with Invoice Data waits under «Factura por
+// subir», the CSV holds exactly what the filter shows, and uploading the
+// issued PDF marks it «Emitida» with who uploaded it.
+test("exports the unbilled sales and uploads a cash sale's invoice", async ({
   page,
 }) => {
   // Renata holds no Plan and no transfer. A pending Payment or a Plan
@@ -33,8 +34,20 @@ test("exports the unbilled sales and marks a cash sale's invoice issued", async 
   expect(lines[1]).toMatch(/,Confirmado,4567891,Renata Soliz,No,,$/);
 
   await row
-    .getByRole("button", { name: "Marcar emitida: Renata Soliz" })
+    .getByRole("button", { name: "Subir factura: Renata Soliz" })
     .click();
+  const panel = page.getByRole("dialog", { name: "Factura" });
+  await panel.getByLabel("Archivo de la factura").setInputFiles({
+    name: "factura-000123.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("%PDF-1.7\n1 0 obj\n<< >>\nendobj\n%%EOF\n"),
+  });
+  const fileLink = panel.getByRole("link", { name: "Descargar factura" });
+  await expect(fileLink).toBeVisible({ timeout: 30_000 });
+  const pdf = page.waitForEvent("download");
+  await fileLink.click();
+  expect((await pdf).suggestedFilename()).toBe("factura-000123.pdf");
+  await page.keyboard.press("Escape");
   await expect(page.getByText("No hay facturas pendientes.")).toBeVisible();
 
   await page.goto("/dinero/pagos?status=all");

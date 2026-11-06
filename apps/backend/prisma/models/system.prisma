@@ -118,6 +118,8 @@ enum ImageAssetPurpose {
   PROFILE_PHOTO    @map("profile_photo")
   TRANSFER_RECEIPT @map("transfer_receipt")
   PROMOTION        @map("promotion")
+  // FIX-044: an issued invoice, a PDF or a photo, on a confirmed Payment.
+  INVOICE          @map("invoice")
 
   @@schema("system")
 }
@@ -137,6 +139,8 @@ enum ImageMediaType {
   JPEG @map("image/jpeg")
   PNG  @map("image/png")
   WEBP @map("image/webp")
+  // FIX-044: only the invoice purpose accepts a PDF.
+  PDF  @map("application/pdf")
 
   @@schema("system")
 }
@@ -148,6 +152,8 @@ enum ImageVariantKind {
   PROMOTION_480  @map("promotion_480")
   PROMOTION_960  @map("promotion_960")
   PROMOTION_1440 @map("promotion_1440")
+  // FIX-044: a PDF invoice is kept as uploaded, width and height 0.
+  DOCUMENT       @map("document")
 
   @@schema("system")
 }
@@ -202,6 +208,8 @@ model Account {
   decidedFreezes            Freeze[]                @relation("FreezeDecidedBy")
   voidedPayments            Payment[]               @relation("PaymentVoidedBy")
   invoiceIssuedPayments     Payment[]               @relation("PaymentInvoiceIssuedBy")
+  invoicesUploaded          PaymentInvoice[]        @relation("PaymentInvoiceUploadedBy")
+  invoicesRemoved           PaymentInvoice[]        @relation("PaymentInvoiceRemovedBy")
   creditLedgerEntries       CreditLedgerEntry[]     @relation("CreditLedgerActor")
   createdAvailabilityBlocks AvailabilityBlock[]     @relation("AvailabilityBlockCreatedBy")
   endedAvailabilityBlocks   AvailabilityBlock[]     @relation("AvailabilityBlockEndedBy")
@@ -498,6 +506,7 @@ model ImageAsset {
   receiptPurchaseIntent PurchaseIntent? @relation("PurchaseIntentReceipt")
   receiptPayment        Payment?        @relation("PaymentReceipt")
   salaryPaymentReceipt  SalaryPayment?  @relation("SalaryPaymentReceipt")
+  paymentInvoice        PaymentInvoice? @relation("PaymentInvoiceFile")
 
   @@index([ownerAccountId, state])
   @@index([state, expiresAt])

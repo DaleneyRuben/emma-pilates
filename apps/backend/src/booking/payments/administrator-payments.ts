@@ -5,6 +5,7 @@ import type {
   InvoiceData,
   InvoiceIssuedView,
 } from './invoice-data/invoice-data';
+import type { InvoiceFileView } from './invoice-file/invoice-file';
 
 export type AdministratorPaymentState =
   'pending' | 'confirmed' | 'rejected' | 'voided';
@@ -37,6 +38,7 @@ export type AdministratorPaymentRow = {
   voidReason: string | null;
   invoiceData: InvoiceData | null;
   invoiceIssued: InvoiceIssuedView['invoiceIssued'];
+  invoiceFile: InvoiceFileView | null;
 };
 
 export type AdministratorPaymentPage = {

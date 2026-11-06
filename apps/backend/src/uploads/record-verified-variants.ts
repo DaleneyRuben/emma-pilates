@@ -10,6 +10,7 @@ export const mediaTypeToPrisma: Record<string, ImageMediaType> = {
   'image/jpeg': ImageMediaType.JPEG,
   'image/png': ImageMediaType.PNG,
   'image/webp': ImageMediaType.WEBP,
+  'application/pdf': ImageMediaType.PDF,
 };
 
 const variantKindToPrisma: Record<string, ImageVariantKind> = {
@@ -19,6 +20,7 @@ const variantKindToPrisma: Record<string, ImageVariantKind> = {
   promotion_480: ImageVariantKind.PROMOTION_480,
   promotion_960: ImageVariantKind.PROMOTION_960,
   promotion_1440: ImageVariantKind.PROMOTION_1440,
+  document: ImageVariantKind.DOCUMENT,
 };
 
 // A retried job reuses the rows of the keys it writes again and marks the

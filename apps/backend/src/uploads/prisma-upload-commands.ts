@@ -10,10 +10,7 @@ import {
 } from '../generated/prisma/enums';
 import { createPendingUpload } from './create-pending-upload';
 import { finalizeUpload } from './finalize-upload';
-import {
-  validateImageUploadDeclaration,
-  type ImagePurpose,
-} from './image-purpose';
+import type { ImagePurpose } from './image-purpose';
 import { buildImageVariants } from './image-variants';
 import type { ObjectStorage } from './object-storage';
 import { processFinalizeUploadJob } from './process-finalize-upload-job';
@@ -22,10 +19,10 @@ import {
   mediaTypeToPrisma,
   recordVerifiedVariants,
 } from './record-verified-variants';
-import {
-  verifyImageBytes,
-  type VerifiableMediaType,
-} from './verify-image-bytes';
+import type { VerifiableMediaType } from './verify-image-bytes';
+import { verifyUploadBytes } from './verify-upload-bytes';
+
+type UploadMediaType = VerifiableMediaType | 'application/pdf';
 
 const finalizeUploadIdempotencyRetentionMs = 24 * 60 * 60 * 1_000;
 
@@ -33,18 +30,21 @@ const purposeToPrisma: Record<ImagePurpose, ImageAssetPurpose> = {
   profile_photo: ImageAssetPurpose.PROFILE_PHOTO,
   transfer_receipt: ImageAssetPurpose.TRANSFER_RECEIPT,
   promotion: ImageAssetPurpose.PROMOTION,
+  invoice: ImageAssetPurpose.INVOICE,
 };
 
 const purposeFromPrisma: Record<ImageAssetPurpose, ImagePurpose> = {
   PROFILE_PHOTO: 'profile_photo',
   TRANSFER_RECEIPT: 'transfer_receipt',
   PROMOTION: 'promotion',
+  INVOICE: 'invoice',
 };
 
-const mediaTypeFromPrisma: Record<ImageMediaType, VerifiableMediaType> = {
+const mediaTypeFromPrisma: Record<ImageMediaType, UploadMediaType> = {
   JPEG: 'image/jpeg',
   PNG: 'image/png',
   WEBP: 'image/webp',
+  PDF: 'application/pdf',
 };
 
 const stateFromPrisma: Record<
@@ -196,24 +196,8 @@ export function createFinalizeUploadJobCommands(
           };
         },
         readObject: (objectKey) => storage.get(objectKey),
-        verifyBytes: (bytes, declared, purpose) => {
-          const { maxAxisPixels } = validateImageUploadDeclaration({
-            purpose,
-            mediaType: declared.mediaType,
-            byteSize: declared.byteSize,
-            checksum: declared.checksum,
-          });
-
-          return verifyImageBytes(
-            bytes,
-            {
-              mediaType: declared.mediaType as VerifiableMediaType,
-              byteSize: declared.byteSize,
-              checksum: declared.checksum,
-            },
-            maxAxisPixels,
-          );
-        },
+        verifyBytes: (bytes, declared, purpose) =>
+          verifyUploadBytes(bytes, declared, purpose),
         buildVariants: buildImageVariants,
         storeVariant: (storageKey, bytes) => storage.replace(storageKey, bytes),
         deleteObject: (objectKey) => storage.delete(objectKey),

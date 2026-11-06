@@ -57,6 +57,7 @@ describe('foundation migration', () => {
       'booking.freezes',
       'booking.guest_passes',
       'booking.lifecycle_messages',
+      'booking.payment_invoices',
       'booking.payments',
       'booking.plans',
       'booking.promotion_contacts',

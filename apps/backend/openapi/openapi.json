@@ -6615,9 +6615,49 @@
         ]
       }
     },
-    "/api/v1/administrator/payments/{paymentId}/invoice-issued": {
-      "post": {
-        "operationId": "markPaymentInvoiceIssued",
+    "/api/v1/staff/invoices": {
+      "get": {
+        "operationId": "listStaffInvoices",
+        "parameters": [
+          {
+            "name": "filter",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "pending",
+                "uploaded"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffInvoiceListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffInvoice"
+        ]
+      }
+    },
+    "/api/v1/staff/payments/{paymentId}/invoice": {
+      "get": {
+        "operationId": "getStaffPaymentInvoice",
         "parameters": [
           {
             "name": "paymentId",
@@ -6635,7 +6675,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InvoiceIssuedDto"
+                  "$ref": "#/components/schemas/StaffInvoiceDto"
                 }
               }
             }
@@ -6648,11 +6688,56 @@
         ],
         "summary": "",
         "tags": [
-          "AdministratorInvoiceIssued"
+          "StaffInvoice"
+        ]
+      },
+      "put": {
+        "operationId": "attachStaffPaymentInvoice",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachInvoiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffInvoiceDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffInvoice"
         ]
       },
       "delete": {
-        "operationId": "unmarkPaymentInvoiceIssued",
+        "operationId": "removeStaffPaymentInvoice",
         "parameters": [
           {
             "name": "paymentId",
@@ -6670,7 +6755,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InvoiceIssuedDto"
+                  "$ref": "#/components/schemas/StaffInvoiceDto"
                 }
               }
             }
@@ -6683,7 +6768,134 @@
         ],
         "summary": "",
         "tags": [
-          "AdministratorInvoiceIssued"
+          "StaffInvoice"
+        ]
+      }
+    },
+    "/api/v1/staff/payments/{paymentId}/invoice/file": {
+      "get": {
+        "operationId": "getStaffPaymentInvoiceFile",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffInvoice"
+        ]
+      }
+    },
+    "/api/v1/clients/current/invoices": {
+      "get": {
+        "operationId": "listCurrentClientInvoices",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientInvoiceListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientInvoice"
+        ]
+      }
+    },
+    "/api/v1/clients/current/invoices/{paymentId}/file": {
+      "get": {
+        "operationId": "getCurrentClientInvoiceFile",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientInvoice"
         ]
       }
     },
@@ -13679,6 +13891,16 @@
           "clientName": {
             "type": "string"
           },
+          "invoiceData": {
+            "nullable": true,
+            "description": "FIX-044: the NIT or CI and name she asked the invoice for; null is «Sin factura»",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
+          },
           "clientPhoto": {
             "nullable": true,
             "description": "The Client photo (FIX-041), null while her initials stand in",
@@ -14600,12 +14822,48 @@
           },
           "issuedByName": {
             "type": "string",
-            "description": "The Administrator who marked it"
+            "description": "The Staff Member who uploaded the invoice, or marked it before FIX-044"
           }
         },
         "required": [
           "issuedAt",
           "issuedByName"
+        ]
+      },
+      "StaffInvoiceFileDto": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "mediaType": {
+            "type": "string",
+            "enum": [
+              "application/pdf",
+              "image/jpeg",
+              "image/png"
+            ]
+          },
+          "byteSize": {
+            "type": "number",
+            "minimum": 1
+          },
+          "uploadedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "uploadedByName": {
+            "type": "string",
+            "description": "The Staff Member who uploaded it"
+          }
+        },
+        "required": [
+          "fileName",
+          "mediaType",
+          "byteSize",
+          "uploadedAt",
+          "uploadedByName"
         ]
       },
       "AdminPaymentDto": {
@@ -14712,6 +14970,16 @@
                 "$ref": "#/components/schemas/InvoiceIssuedMarkDto"
               }
             ]
+          },
+          "invoiceFile": {
+            "nullable": true,
+            "description": "The uploaded invoice (FIX-044); null with a mark is «Emitida · sin archivo»",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffInvoiceFileDto"
+              }
+            ]
           }
         },
         "required": [
@@ -14731,7 +14999,8 @@
           "voidReason",
           "method",
           "invoiceData",
-          "invoiceIssued"
+          "invoiceIssued",
+          "invoiceFile"
         ]
       },
       "AdminPaymentPageDto": {
@@ -15991,26 +16260,216 @@
           "invoiceData"
         ]
       },
-      "InvoiceIssuedDto": {
+      "StaffInvoiceDto": {
         "type": "object",
         "properties": {
           "paymentId": {
             "type": "string",
             "format": "uuid"
           },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "purchaseLabel": {
+            "type": "string",
+            "description": "What she bought: the Plan or the Evaluation"
+          },
+          "amountDueCentavos": {
+            "type": "number"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "transfer",
+              "cash",
+              "credit_only",
+              "courtesy"
+            ]
+          },
+          "confirmedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "voided": {
+            "type": "boolean",
+            "description": "A voided sale takes no new invoice"
+          },
+          "invoiceData": {
+            "nullable": true,
+            "description": "null is «Sin factura»: no invoice can be uploaded",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDataDto"
+              }
+            ]
+          },
           "invoiceIssued": {
             "nullable": true,
+            "description": "«Factura emitida»; set with no file only by the mark used before FIX-044",
             "type": "object",
             "allOf": [
               {
                 "$ref": "#/components/schemas/InvoiceIssuedMarkDto"
               }
             ]
+          },
+          "file": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StaffInvoiceFileDto"
+              }
+            ]
           }
         },
         "required": [
           "paymentId",
-          "invoiceIssued"
+          "clientId",
+          "clientName",
+          "purchaseLabel",
+          "amountDueCentavos",
+          "method",
+          "confirmedAt",
+          "voided",
+          "invoiceData",
+          "invoiceIssued",
+          "file"
+        ]
+      },
+      "StaffInvoiceListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StaffInvoiceDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "AttachInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A ready upload with the `invoice` purpose"
+          },
+          "fileName": {
+            "type": "string",
+            "description": "The name the file had on the device; shown to the Client"
+          }
+        },
+        "required": [
+          "imageAssetId"
+        ]
+      },
+      "InvoiceFileDto": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "mediaType": {
+            "type": "string",
+            "enum": [
+              "application/pdf",
+              "image/jpeg",
+              "image/png"
+            ]
+          },
+          "byteSize": {
+            "type": "number",
+            "minimum": 1
+          },
+          "uploadedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fileName",
+          "mediaType",
+          "byteSize",
+          "uploadedAt"
+        ]
+      },
+      "ClientInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "purchaseLabel": {
+            "type": "string"
+          },
+          "amountDueCentavos": {
+            "type": "number"
+          },
+          "paidAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "preparing"
+            ],
+            "description": "«Lista» or «En preparación»"
+          },
+          "voided": {
+            "type": "boolean",
+            "description": "«Pago anulado»: the invoice stays visible"
+          },
+          "invoiceData": {
+            "$ref": "#/components/schemas/InvoiceDataDto"
+          },
+          "file": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceFileDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "paymentId",
+          "purchaseLabel",
+          "amountDueCentavos",
+          "paidAt",
+          "state",
+          "voided",
+          "invoiceData",
+          "file"
+        ]
+      },
+      "ClientInvoiceListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientInvoiceDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "EvaluationSlotDto": {
@@ -18278,7 +18737,8 @@
             "enum": [
               "profile_photo",
               "transfer_receipt",
-              "promotion"
+              "promotion",
+              "invoice"
             ]
           },
           "mediaType": {
@@ -18286,7 +18746,8 @@
             "enum": [
               "image/jpeg",
               "image/png",
-              "image/webp"
+              "image/webp",
+              "application/pdf"
             ]
           },
           "byteSize": {

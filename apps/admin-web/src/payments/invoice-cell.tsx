@@ -1,22 +1,28 @@
 import type { AdminPaymentDto } from "@pilates/api-contracts";
-import type { MouseEvent } from "react";
 import { Button } from "../components/ui/button";
 import { StatusPill } from "../components/ui/status-pill";
 import { boliviaParts, formatCivilDate } from "../lib/bolivia-time";
-import { useInvoiceIssuedMark } from "./invoice-queries";
 
 /**
- * PAY-007, follow-up 147 §3: AW28's «Factura» column. The Invoice Data or
- * «Sin factura», and on a confirmed sale the «Factura emitida» mark the
- * Administrator sets and undoes (booking ADR-0012).
+ * PAY-007, follow-up 147 §3, and FIX-044 (follow-up 248, W1): AW28's
+ * «Factura» column. The Invoice Data or «Sin factura», then the state:
+ * «Por emitir» with «Subir factura» on a confirmed sale, «Emitida» with who
+ * uploaded it, or «Emitida · sin archivo» for a mark set before FIX-044.
+ * «Subir factura» opens the payment's panel, like a click on the row.
  */
-export function InvoiceCell({ payment }: { payment: AdminPaymentDto }) {
-  const mark = useInvoiceIssuedMark();
+export function InvoiceCell({
+  payment,
+  onOpen,
+}: {
+  payment: AdminPaymentDto;
+  onOpen: () => void;
+}) {
   const issued = payment.invoiceIssued;
-  const toggle = (event: MouseEvent) => {
-    event.stopPropagation();
-    mark.mutate({ paymentId: payment.id, issued: issued === null });
-  };
+  const file = payment.invoiceFile;
+  const canUpload =
+    payment.state === "confirmed" &&
+    payment.invoiceData !== null &&
+    file === null;
 
   return (
     <span className="flex min-w-0 flex-col gap-1 max-md:items-end max-md:text-right">
@@ -32,40 +38,39 @@ export function InvoiceCell({ payment }: { payment: AdminPaymentDto }) {
           </span>
         </span>
       )}
-      {payment.state !== "confirmed" ? null : issued === null ? (
-        <Button
-          variant="link"
-          size="sm"
-          className="self-start px-0"
-          aria-label={`Marcar emitida: ${payment.clientName}`}
-          busy={mark.isPending}
-          onClick={toggle}
-        >
-          Marcar emitida
-        </Button>
-      ) : (
+      {payment.invoiceData === null || payment.state === "pending" ? null : (
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1 max-md:justify-end">
-          <StatusPill tone="exito">Emitida</StatusPill>
-          <span className="text-ayuda text-texto-tenue">
-            {`por ${issued.issuedByName} · ${formatCivilDate(boliviaParts(issued.issuedAt).date)}`}
-          </span>
-          <Button
-            variant="link"
-            size="sm"
-            className="px-0"
-            aria-label={`Deshacer: ${payment.clientName}`}
-            busy={mark.isPending}
-            onClick={toggle}
-          >
-            Deshacer
-          </Button>
+          {issued === null ? (
+            payment.state === "confirmed" ? (
+              <StatusPill tone="advertencia">Por emitir</StatusPill>
+            ) : null
+          ) : (
+            <>
+              <StatusPill tone="exito">Emitida</StatusPill>
+              <span className="text-ayuda text-texto-tenue">
+                {file === null
+                  ? "sin archivo"
+                  : `por ${file.uploadedByName} · ${formatCivilDate(boliviaParts(file.uploadedAt).date)}`}
+              </span>
+            </>
+          )}
+          {canUpload ? (
+            <Button
+              variant="link"
+              size="sm"
+              className="px-0"
+              aria-label={`Subir factura: ${payment.clientName}`}
+              onClick={(event) => {
+                // The row opens the same panel; open it once.
+                event.stopPropagation();
+                onOpen();
+              }}
+            >
+              Subir factura
+            </Button>
+          ) : null}
         </span>
       )}
-      {mark.isError ? (
-        <span role="alert" className="text-ayuda text-error-texto">
-          No pudimos guardar la marca de factura. Inténtalo de nuevo.
-        </span>
-      ) : null}
     </span>
   );
 }
