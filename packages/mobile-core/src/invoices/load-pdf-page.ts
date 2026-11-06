@@ -1,6 +1,9 @@
 import { encodeBase64 } from "../encoding/base64";
 import { imageSizeFromBytes } from "../images/image-size";
 
+/** The API draws pages 1 to 100 (`invoice-file.controller.ts`). */
+const maxPages = 100;
+
 export type PdfPage = { aspectRatio: number; pageCount: number; uri: string };
 
 /**
@@ -16,7 +19,7 @@ export async function loadPdfPage(fetcher: typeof globalThis.fetch, url: string)
   return {
     // A sheet of paper when the header cannot be read: A4 portrait.
     aspectRatio: size === null || size.height === 0 ? 210 / 297 : size.width / size.height,
-    pageCount: Number.isInteger(pageCount) && pageCount > 0 ? pageCount : 1,
+    pageCount: Number.isInteger(pageCount) && pageCount > 0 ? Math.min(pageCount, maxPages) : 1,
     uri: `data:image/png;base64,${encodeBase64(bytes)}`,
   };
 }

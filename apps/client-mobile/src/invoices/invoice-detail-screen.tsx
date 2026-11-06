@@ -68,6 +68,7 @@ function Preview({ invoice, footer }: { invoice: ClientInvoiceDto; footer: React
       <PdfInvoice
         cacheKey={["client-invoice-pages", invoice.paymentId, invoice.file?.uploadedAt]}
         fetcher={fetcher}
+        fileName={invoice.file?.fileName ?? "Factura.pdf"}
         footer={footer}
         pageUrl={(page) => getGetCurrentClientInvoicePageUrl(invoice.paymentId, page)}
       />

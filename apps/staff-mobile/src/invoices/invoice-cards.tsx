@@ -71,6 +71,7 @@ export function InvoiceFileCard({
             cacheKey={["staff-invoice-pages", paymentId, file.uploadedAt]}
             compact
             fetcher={fetcher}
+            fileName={file.fileName}
             pageUrl={(page) => getGetStaffPaymentInvoicePageUrl(paymentId, page)}
           />
         )}

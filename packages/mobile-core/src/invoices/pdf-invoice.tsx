@@ -16,6 +16,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Line } from "react-native-svg";
 
 import { fontFamilies } from "../ui/fonts";
+import { Glyph } from "../ui/glyph";
 import { LineIcon } from "../ui/line-icon";
 import { colors, radii, spacing, typography } from "../ui/tokens";
 import { loadPdfPage, type PdfPage } from "./load-pdf-page";
@@ -32,12 +33,15 @@ export function PdfInvoice({
   cacheKey,
   compact = false,
   fetcher,
+  fileName,
   footer,
   pageUrl,
 }: {
   cacheKey: readonly unknown[];
   compact?: boolean;
   fetcher: typeof globalThis.fetch;
+  /** Shown with a document glyph when the first page cannot be drawn. */
+  fileName: string;
   footer?: ReactNode;
   pageUrl: (page: number) => string;
 }) {
@@ -45,8 +49,25 @@ export function PdfInvoice({
   const first = useQuery({
     queryKey: [...cacheKey, "pdf-page", 1],
     queryFn: () => loadPdfPage(fetcher, pageUrl(1)),
+    retry: 1,
   });
   const count = first.data?.pageCount ?? 1;
+
+  if (first.isError) {
+    return (
+      <View
+        accessibilityLabel="Factura en PDF"
+        style={[styles.placeholder, compact && styles.compactPage]}
+      >
+        <Glyph name="document" size={compact ? 22 : 40} strokeWidth={1.2} />
+        {compact ? null : (
+          <Text numberOfLines={2} style={styles.fileName}>
+            {fileName}
+          </Text>
+        )}
+      </View>
+    );
+  }
 
   if (first.data === undefined) {
     return (
@@ -84,6 +105,7 @@ export function PdfInvoice({
         fetcher={fetcher}
         first={first.data}
         footer={footer}
+        key={open ? "open" : "closed"}
         onClose={() => setOpen(false)}
         pageUrl={pageUrl}
         visible={open}
@@ -117,6 +139,7 @@ function PdfInvoiceViewer({
       queryKey: [...cacheKey, "pdf-page", index + 2],
       queryFn: () => loadPdfPage(fetcher, pageUrl(index + 2)),
       enabled: visible,
+      retry: 1,
     })),
   });
   const pages: (PdfPage | undefined)[] = [first, ...rest.map((query) => query.data)];
@@ -197,6 +220,12 @@ function PdfInvoiceViewer({
 const styles = StyleSheet.create({
   close: { alignItems: "center", height: 44, justifyContent: "center", width: 44 },
   compactPage: { alignSelf: "auto", width: 56 },
+  fileName: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    textAlign: "center",
+  },
   footer: { paddingBottom: spacing.lg, paddingHorizontal: spacing.xlSm, paddingTop: spacing.md },
   page: { backgroundColor: colors.white, width: "100%" },
   pageFrame: { alignSelf: "center", maxWidth: 720, width: "100%" },
