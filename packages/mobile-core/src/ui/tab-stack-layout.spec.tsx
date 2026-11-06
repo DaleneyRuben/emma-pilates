@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react-native";
 
 import { Screen } from "./screen";
-import { createTabStackScreenLayout, tabStackScreenLayout } from "./tab-stack-layout";
+import { createTabStackScreenLayout, tabBarHidden, tabStackScreenLayout } from "./tab-stack-layout";
 
 const edgesOf = (element: { props: { edges?: Record<string, string> } }) =>
   Object.entries(element.props.edges ?? {})
@@ -66,5 +66,21 @@ describe("createTabStackScreenLayout", () => {
     );
 
     expect(edgesOf(screen.getByTestId("app-screen"))).toEqual(["top", "right", "bottom", "left"]);
+  });
+});
+
+describe("tabBarHidden", () => {
+  const tasks = new Set(["CashClose", "EditProfile"]);
+
+  it("hides the bar inside a task", () => {
+    expect(tabBarHidden(tasks, "EditProfile", "Profile")).toBe(true);
+  });
+
+  it("keeps it on a browsing screen", () => {
+    expect(tabBarHidden(tasks, "Notifications", "Profile")).toBe(false);
+  });
+
+  it("keeps it on a tab root even when another tab pushes it as a task", () => {
+    expect(tabBarHidden(tasks, "CashClose", "CashClose")).toBe(false);
   });
 });
