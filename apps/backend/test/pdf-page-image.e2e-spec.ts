@@ -44,14 +44,19 @@ describe('renderPdfPage', () => {
     expect(height).toBeLessThanOrEqual(4000);
   });
 
-  it.each([
-    [
-      'a page with no width',
-      pdfWithPages([{ text: 'x', mediaBox: '0 0 0 842' }]),
-    ],
-    ['bytes that are not a PDF', Buffer.from('%PDF-1.7\nnot really\n%%EOF\n')],
-  ])('refuses %s as unreadable', async (_, pdf) => {
-    await expect(renderPdfPage(pdf, 1)).rejects.toBeInstanceOf(
+  it('draws a page with an empty MediaBox on the default page', async () => {
+    const pdf = pdfWithPages([{ text: 'x', mediaBox: '0 0 0 842' }]);
+
+    const { width, height } = pngSize((await renderPdfPage(pdf, 1)).png);
+
+    expect(width).toBeLessThanOrEqual(1400);
+    expect(height).toBeLessThanOrEqual(4000);
+  });
+
+  it('refuses bytes that are not a PDF as unreadable', async () => {
+    const notPdf = Buffer.from('%PDF-1.7\nnot really\n%%EOF\n');
+
+    await expect(renderPdfPage(notPdf, 1)).rejects.toBeInstanceOf(
       PdfPageUnreadableError,
     );
   });
