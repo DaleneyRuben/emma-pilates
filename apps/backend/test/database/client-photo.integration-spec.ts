@@ -268,6 +268,20 @@ describe('client profile photo (PostgreSQL)', () => {
         variant: 'thumbnail',
       }),
     ).toEqual({ objectKey: thumbnail.storageKey, mediaType: 'image/jpeg' });
+    await prisma.client.update({
+      where: { id: clientId },
+      data: { deletedAt: now },
+    });
+    expect(
+      await gateway.readPhotoObjectByAsset({
+        imageAssetId: upload.id,
+        variant: 'thumbnail',
+      }),
+    ).toBeNull();
+    await prisma.client.update({
+      where: { id: clientId },
+      data: { deletedAt: null },
+    });
     await gateway.removePhoto({ clientId, now });
     expect(
       await gateway.readPhotoObjectByAsset({

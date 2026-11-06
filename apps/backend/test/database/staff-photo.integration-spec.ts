@@ -269,4 +269,30 @@ describe('staff profile photo (PostgreSQL)', () => {
       expect.objectContaining({ id: session.id, trainerPhoto: photo }),
     ]);
   });
+
+  it('keeps the same photo without a second audit, and serves no photo of a removed member', async () => {
+    const trainer = await staffMember();
+    const upload = await photoUpload(trainer.accountId);
+    const change = {
+      staffMemberId: trainer.staffMemberId,
+      targetAccountId: trainer.accountId,
+      actor: actorOf(trainer.accountId),
+      ownerAccountId: trainer.accountId,
+      imageAssetId: upload.id,
+      now,
+    };
+    await gateway.replacePhoto(change);
+    await gateway.replacePhoto(change);
+    expect(
+      (await audits(trainer.accountId)).map((record) => record.actionCode),
+    ).toEqual(['staff_member.photo_changed']);
+
+    await prisma.staffMember.update({
+      where: { id: trainer.staffMemberId },
+      data: { deletedAt: now },
+    });
+    await expect(
+      gateway.readPhotoObject({ imageAssetId: upload.id, variant: 'display' }),
+    ).resolves.toBeNull();
+  });
 });
