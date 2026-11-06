@@ -36,6 +36,7 @@ export const record = (
   status: 'active',
   activationExpiresAt: null,
   photo: null,
+  pendingEmail: null,
   ...overrides,
 });
 
@@ -52,6 +53,10 @@ export const createTransaction = (
   countActiveAdministrators: jest.fn().mockResolvedValue(2),
   countTrainerCommitments: jest.fn().mockResolvedValue(0),
   activationEmailWaitSeconds: jest.fn().mockResolvedValue(0),
+  emailChangeWaitSeconds: jest.fn().mockResolvedValue(0),
+  requestEmailChange: jest.fn().mockResolvedValue(undefined),
+  resendEmailChange: jest.fn().mockResolvedValue(undefined),
+  cancelEmailChange: jest.fn().mockResolvedValue(undefined),
   setAccountEmail: jest.fn().mockResolvedValue(undefined),
   removePendingStaffMember: jest.fn().mockResolvedValue(undefined),
   createPendingStaffMember: jest.fn().mockResolvedValue(undefined),
