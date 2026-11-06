@@ -135,7 +135,7 @@ describe('studio email change for a Staff Member (PostgreSQL)', () => {
     ]);
     await expect(
       prisma.authenticationThrottleEvent.count({
-        where: { recipientDigest: digestEmail(newEmail) },
+        where: { recipientDigest: new Uint8Array(digestEmail(newEmail)) },
       }),
     ).resolves.toBe(1);
     await expect(
