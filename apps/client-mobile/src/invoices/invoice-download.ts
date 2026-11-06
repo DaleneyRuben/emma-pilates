@@ -11,7 +11,7 @@ const safeName = (fileName: string) => fileName.replace(/[\\/:*?"<>|]/g, "_");
  * K2/K3 «Descargar» (FIX-044) with what the app already ships: the file is
  * fetched with her credential into the cache, then on iOS the system share
  * sheet offers «Guardar en Archivos», Mail or WhatsApp; on Android she picks
- * a folder, starting in Descargas, and the file is written there.
+ * a folder, starting in Documents, and the file is written there.
  */
 export async function downloadInvoice(input: {
   fetcher: typeof globalThis.fetch;
@@ -28,9 +28,10 @@ export async function downloadInvoice(input: {
 
   if (Platform.OS === "android") {
     const access = FileSystem.StorageAccessFramework;
-    // Android refuses the storage root, so the picker opens in Descargas.
+    // Android 11 and later refuse the storage root and Download itself as a
+    // folder an app may write to, so the picker opens in Documents.
     const folder = await access.requestDirectoryPermissionsAsync(
-      access.getUriForDirectoryInRoot("Download"),
+      access.getUriForDirectoryInRoot("Documents"),
     );
     if (!folder.granted) return "cancelled";
     const target = await access.createFileAsync(
