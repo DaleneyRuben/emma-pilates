@@ -78,10 +78,24 @@ const taskRoutes: ReadonlySet<string> = new Set([
   "ViewAs",
 ]);
 
+// Every tab's root. The Assistant's Caja is Cerrar caja itself, a root that
+// keeps its bar although the Administrator opens it as a task from Pagos.
+const tabRoots: ReadonlySet<string> = new Set([
+  "Agenda",
+  "MyPay",
+  "Profile",
+  "ClientSearch",
+  "Schedule",
+  "CashClose",
+  "Availability",
+  "Payments",
+  "ContactList",
+]);
+
 // FIX-023: a screen over the tab bar drops the bottom safe area; a task,
 // which hides the bar, keeps it.
 const stackConfig = {
-  screenLayout: createTabStackScreenLayout(taskRoutes),
+  screenLayout: createTabStackScreenLayout(taskRoutes, tabRoots),
   screenOptions: { headerShown: false },
 } as const;
 

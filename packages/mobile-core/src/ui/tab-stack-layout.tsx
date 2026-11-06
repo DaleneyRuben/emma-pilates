@@ -26,12 +26,18 @@ export function tabStackScreenLayout({ children, navigation, route }: StackLayou
  * only inside a task (a purchase, a booking, a form). A pushed browsing
  * screen sits over the bar like its root; a task keeps the safe area itself.
  */
-export function createTabStackScreenLayout(tasks: ReadonlySet<string>) {
+export function createTabStackScreenLayout(
+  tasks: ReadonlySet<string>,
+  roots: ReadonlySet<string> = new Set(),
+) {
   return function taskAwareScreenLayout({ children, navigation, route }: StackLayoutProps) {
     const content = recoveryScreenLayout({ children });
-    const root = navigation.getState().routes[0]?.key === route.key;
-    const task = route.name !== undefined && tasks.has(route.name);
-    return root || !task ? <InsideTabBar>{content}</InsideTabBar> : content;
+    const first = navigation.getState().routes[0]?.key === route.key;
+    const name = route.name ?? "";
+    // A tab's own root keeps the bar even where another tab treats it as a
+    // task (the Assistant's Caja); a task a link opened first does not.
+    const task = tasks.has(name) && !(first && roots.has(name));
+    return task ? content : <InsideTabBar>{content}</InsideTabBar>;
   };
 }
 

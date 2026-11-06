@@ -67,7 +67,10 @@ const taskRoutes: ReadonlySet<string> = new Set([
 
 // FIX-023: a screen over the tab bar drops the bottom safe area; a task,
 // which hides the bar, keeps it.
-const screenLayout = createTabStackScreenLayout(taskRoutes);
+const screenLayout = createTabStackScreenLayout(
+  taskRoutes,
+  new Set(["Home", "Browse", "MyBookings", "Profile"]),
+);
 
 // Plan and Subscription screens are reachable from Home, Reservar, and Perfil.
 const planScreens = {
