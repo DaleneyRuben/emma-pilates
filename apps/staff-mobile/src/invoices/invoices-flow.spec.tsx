@@ -231,4 +231,21 @@ describe("Invoices in the Staff app (FIX-044)", () => {
       await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
     ).toBeOnTheScreen();
   });
+
+  it("keeps Facturas por subir on Clientes when none is waiting, to reach Subidas", async () => {
+    const screen = await render(
+      <App
+        runtime={createStaffRuntime(
+          routeFetcher({
+            "/api/v1/staff-members/current": () => jsonResponse(staffMember("coordinator")),
+            "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
+            "/api/v1/staff/invoices": () => jsonResponse({ items: [] }),
+          }),
+          "coordinator",
+        )}
+      />,
+    );
+
+    expect(await screen.findByRole("button", { name: "Facturas por subir" })).toBeOnTheScreen();
+  });
 });
