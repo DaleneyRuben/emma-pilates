@@ -222,4 +222,72 @@ describe("AW24 Editar miembro email change", () => {
 
     expect(await screen.findByText(`Por confirmar: ${newEmail}`)).toBeVisible();
   });
+
+  // Review of FIX-039: the name lands before the email request; the panel
+  // says what was saved either way.
+  it("says the name was saved when the new address is refused", async () => {
+    server.use(
+      listOf(camila),
+      http.put(
+        apiUrl(`${memberPath(camila.id)}/contact`),
+        record(() => jsonResponse({ ...camila, name: "Camila Rojas Vaca" })),
+      ),
+      http.post(apiUrl(changePath), () => problemResponse(409, "email_in_use")),
+    );
+    const { panel, user } = await openMember("Camila Rojas");
+
+    const name = within(panel).getByLabelText("Nombre");
+    await user.clear(name);
+    await user.type(name, "Camila Rojas Vaca");
+    const email = within(panel).getByRole("textbox", {
+      name: "Correo electrónico",
+    });
+    await user.clear(email);
+    await user.type(email, "paola@example.com");
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", {
+        name: "Enviar enlace",
+      }),
+    );
+
+    expect(
+      await within(panel).findByText("Este correo ya pertenece a otra cuenta."),
+    ).toBeVisible();
+    expect(
+      within(panel).getByText(
+        "Guardamos el nombre, el teléfono, el rol y las sucursales, pero no el correo.",
+      ),
+    ).toBeVisible();
+  });
+
+  it("shows the Administrator's own email limit on the request", async () => {
+    server.use(
+      listOf(camila),
+      http.post(apiUrl(changePath), () =>
+        problemResponse(429, "staff_email_throttled", {
+          headers: { "Retry-After": "892" },
+        }),
+      ),
+    );
+    const { panel, user } = await openMember("Camila Rojas");
+
+    const email = within(panel).getByRole("textbox", {
+      name: "Correo electrónico",
+    });
+    await user.clear(email);
+    await user.type(email, newEmail);
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", {
+        name: "Enviar enlace",
+      }),
+    );
+
+    expect(
+      await within(panel).findByText(
+        "Enviaste muchos correos en poco tiempo. Espera un momento para enviar otro; los enlaces que ya enviaste siguen sirviendo.",
+      ),
+    ).toBeVisible();
+  });
 });
