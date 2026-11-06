@@ -85,7 +85,7 @@ export function NewClientScreen() {
       : undefined;
 
   // FIX-037: «Celular» is required, with its country (follow-up 236).
-  const phoneMistake = phoneProblem(phone.country, phone.digits);
+  const phoneMistake = phoneProblem(phone.country, phone.digits, "theirs");
   const phoneError = submitted && phoneMistake !== null ? phoneMistake : undefined;
   const channelError = submitted && channel === null ? acquisitionChannelRequired : undefined;
 

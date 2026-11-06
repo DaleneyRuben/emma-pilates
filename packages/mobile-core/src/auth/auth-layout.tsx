@@ -59,7 +59,12 @@ export function AuthenticationScreen({
         style={topBar === undefined ? undefined : styles.inset}
       >
         {brand ? <BrandHeader teamAccess={teamAccess} /> : null}
-        <View style={styles.panel}>
+        {/* Follow-up 256 § 4: a badge screen is short, so its block sits in
+            the middle instead of leaving half the screen empty below it. */}
+        <View
+          style={[styles.panel, badge !== undefined && styles.panelCentred]}
+          testID="authentication-panel"
+        >
           {eyebrow === undefined ? null : <Text style={styles.eyebrow}>{eyebrow}</Text>}
           {badge === undefined ? null : <OutcomeBadge {...badge} />}
           {title === undefined ? null : (
@@ -113,6 +118,10 @@ const styles = StyleSheet.create({
   },
   panel: {
     gap: spacing.lgXl,
+  },
+  panelCentred: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
   screen: {
     backgroundColor: colors.surface,

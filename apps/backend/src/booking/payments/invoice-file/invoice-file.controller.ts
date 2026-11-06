@@ -1,4 +1,5 @@
 import {
+  applyDecorators,
   BadRequestException,
   Body,
   Controller,
@@ -41,6 +42,11 @@ import {
   type StaffInvoiceView,
 } from './invoice-file';
 import {
+  PdfPageNotFoundError,
+  PdfPageUnreadableError,
+  type PdfPageImage,
+} from './pdf-page-image';
+import {
   AttachInvoiceDto,
   attachInvoiceSchema,
   ClientInvoiceListDto,
@@ -68,6 +74,7 @@ export type InvoiceFileOperations = {
   clientList: (p: Principal) => Promise<ClientInvoiceView[]>;
   clientFile: (paymentId: string, p: Principal) => Promise<InvoiceFileObject>;
   readObject: (objectKey: string) => Promise<Buffer>;
+  renderPage: (objectKey: string, page: number) => Promise<PdfPageImage>;
 };
 
 const run = async <Result>(work: () => Promise<Result>): Promise<Result> => {
@@ -121,6 +128,66 @@ const sendFile = async (
   response.setHeader('X-Content-Type-Options', 'nosniff');
   return new StreamableFile(bytes);
 };
+
+// FIX-051 (verification n.º 45): one page of a PDF invoice as a PNG, for the
+// apps' thumbnail and viewer; X-Page-Count tells them how many to ask for.
+const maxPages = 100;
+const sendPage = async (
+  operations: InvoiceFileOperations,
+  file: InvoiceFileObject,
+  page: string,
+  response: Response,
+): Promise<StreamableFile> => {
+  const number = Number(page);
+  if (!Number.isInteger(number) || number < 1 || number > maxPages) {
+    throw new BadRequestException({
+      code: 'invalid_request',
+      detail: 'Invalid page number',
+    });
+  }
+  if (file.mediaType !== 'application/pdf') {
+    throw new HttpException(
+      { code: 'invoice_not_pdf', detail: 'The invoice is not a PDF' },
+      409,
+    );
+  }
+  let image: PdfPageImage;
+  try {
+    image = await operations.renderPage(file.objectKey, number);
+  } catch (error) {
+    if (error instanceof PdfPageUnreadableError) {
+      throw new HttpException(
+        {
+          code: 'invoice_page_unreadable',
+          detail: 'The PDF page cannot be drawn',
+        },
+        422,
+      );
+    }
+    if (error instanceof PdfPageNotFoundError) {
+      throw new HttpException(
+        { code: 'invoice_page_not_found', detail: 'The PDF has no such page' },
+        404,
+      );
+    }
+    throw error;
+  }
+  response.setHeader('Content-Type', 'image/png');
+  response.setHeader('X-Page-Count', String(image.pageCount));
+  response.setHeader('Cache-Control', 'no-store');
+  response.setHeader('X-Content-Type-Options', 'nosniff');
+  return new StreamableFile(image.png);
+};
+
+const pageDocs = [
+  ApiParam({ name: 'paymentId', format: 'uuid' }),
+  ApiParam({ name: 'page', schema: { type: 'integer', minimum: 1 } }),
+  ApiProduces('image/png'),
+  ApiOkResponse({
+    schema: { type: 'string', format: 'binary' },
+    headers: { 'X-Page-Count': { schema: { type: 'integer' } } },
+  }),
+];
 
 abstract class AuthenticatedController {
   constructor(
@@ -236,6 +303,21 @@ export class StaffInvoiceController extends AuthenticatedController {
     const file = await run(() => this.operations.staffFile(id, principal));
     return sendFile(this.operations, file, response);
   }
+
+  @Get('payments/:paymentId/invoice/file/pages/:page')
+  @ApiOperation({ operationId: 'getStaffPaymentInvoicePage' })
+  @applyDecorators(...pageDocs)
+  async page(
+    @Param('paymentId') paymentId: string,
+    @Param('page') page: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<StreamableFile> {
+    const id = requireId(paymentId, 'Invalid Payment identifier');
+    const principal = await this.authenticate(authorization);
+    const file = await run(() => this.operations.staffFile(id, principal));
+    return sendPage(this.operations, file, page, response);
+  }
 }
 
 // FIX-044 (K2, K3): «Mis facturas», the Client's own invoices.
@@ -275,5 +357,20 @@ export class ClientInvoiceController extends AuthenticatedController {
     const principal = await this.authenticate(authorization);
     const file = await run(() => this.operations.clientFile(id, principal));
     return sendFile(this.operations, file, response);
+  }
+
+  @Get(':paymentId/file/pages/:page')
+  @ApiOperation({ operationId: 'getCurrentClientInvoicePage' })
+  @applyDecorators(...pageDocs)
+  async page(
+    @Param('paymentId') paymentId: string,
+    @Param('page') page: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<StreamableFile> {
+    const id = requireId(paymentId, 'Invalid Payment identifier');
+    const principal = await this.authenticate(authorization);
+    const file = await run(() => this.operations.clientFile(id, principal));
+    return sendPage(this.operations, file, page, response);
   }
 }

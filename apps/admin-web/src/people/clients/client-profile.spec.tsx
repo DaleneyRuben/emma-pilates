@@ -75,7 +75,7 @@ describe("AW22 Editar perfil", () => {
     );
     expect(
       await within(panel).findByText(
-        "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+        "Escribe su celular. Lo necesitamos para escribirle por WhatsApp.",
       ),
     ).toBeInTheDocument();
     expect(saved).toEqual([]);

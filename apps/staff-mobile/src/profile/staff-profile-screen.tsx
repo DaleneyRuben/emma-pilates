@@ -144,7 +144,7 @@ export function StaffProfileScreen() {
               onPress={() => navigation.navigate("Feedback")}
             />
             <ProfileRow
-              icon="cross"
+              icon="logout"
               label="Cerrar sesión"
               onPress={() => setConfirmingLogout(true)}
               testID="profile-logout"

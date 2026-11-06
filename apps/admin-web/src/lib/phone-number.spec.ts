@@ -61,7 +61,7 @@ describe("phone numbers with a country code (FIX-037)", () => {
   it("asks for the number when it is blank", () => {
     expect(phoneProblem(bolivia, "  ")).toBe(phoneRequiredMessage);
     expect(phoneRequiredMessage).toBe(
-      "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+      "Escribe su celular. Lo necesitamos para escribirle por WhatsApp.",
     );
   });
 

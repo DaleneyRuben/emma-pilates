@@ -1,4 +1,8 @@
-import { getGetStaffPaymentInvoiceFileUrl, type StaffInvoiceFileDto } from "@pilates/api-contracts";
+import {
+  getGetStaffPaymentInvoiceFileUrl,
+  getGetStaffPaymentInvoicePageUrl,
+  type StaffInvoiceFileDto,
+} from "@pilates/api-contracts";
 import {
   CardActionRow,
   cardWithActionRow,
@@ -7,6 +11,7 @@ import {
   FullScreenImage,
   Glyph,
   loadPrivateImageWithRatio,
+  PdfInvoice,
   radii,
   spacing,
   surfaces,
@@ -36,7 +41,8 @@ export function InvoiceDropCard({ busy }: { busy: boolean }) {
   );
 }
 
-// E5 «Emitida»: the uploaded file and who uploaded it; a photo opens big.
+// E5 «Emitida»: the uploaded file and who uploaded it; a photo opens big,
+// and a PDF shows its first page and opens in the app (follow-up 256 § 3).
 export function InvoiceFileCard({
   file,
   paymentId,
@@ -56,9 +62,19 @@ export function InvoiceFileCard({
   return (
     <View style={[styles.card, photo ? cardWithActionRow : null]}>
       <View style={styles.fileRow}>
-        <View style={styles.thumb}>
-          <Glyph name={photo ? "image" : "document"} size={22} strokeWidth={1.4} />
-        </View>
+        {photo ? (
+          <View style={styles.thumb}>
+            <Glyph name="image" size={22} strokeWidth={1.4} />
+          </View>
+        ) : (
+          <PdfInvoice
+            cacheKey={["staff-invoice-pages", paymentId, file.uploadedAt]}
+            compact
+            fetcher={fetcher}
+            fileName={file.fileName}
+            pageUrl={(page) => getGetStaffPaymentInvoicePageUrl(paymentId, page)}
+          />
+        )}
         <View style={styles.fileText}>
           <Text numberOfLines={1} style={styles.title}>
             {file.fileName}
@@ -66,9 +82,6 @@ export function InvoiceFileCard({
           <Text style={styles.muted}>
             {`Subida por ${file.uploadedByName} · ${formatSubmittedAt(file.uploadedAt)}`}
           </Text>
-          {photo ? null : (
-            <Text style={styles.muted}>El PDF se abre desde la web de administración.</Text>
-          )}
         </View>
       </View>
       {photo ? <CardActionRow label="Ver factura" onPress={() => setOpen(true)} /> : null}

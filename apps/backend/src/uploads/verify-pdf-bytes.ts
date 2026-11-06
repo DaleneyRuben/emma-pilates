@@ -23,7 +23,7 @@ const trailerWindow = 1024;
 // FIX-044: an issued invoice may be a PDF. sharp cannot read PDFs, so the
 // worker checks the declaration (size, SHA-256) and the PDF envelope: the
 // header at byte 0 and an end-of-file marker near the end. The file is then
-// kept as is; it is never rendered on the server.
+// kept as is; its pages are drawn only when an app asks for them (ADR-0110).
 export const verifyPdfBytes = (
   bytes: Buffer,
   declared: DeclaredPdf,
