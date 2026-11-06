@@ -67,20 +67,24 @@ describe("Client unread badges", () => {
     });
   });
 
-  // Follow-up 227: pushed screens (with a back arrow) have no tab bar.
-  it("hides the tab bar on a pushed screen and brings it back on the root", async () => {
+  // Design follow-up 254 § 3: the bar stays on a browsing screen such as
+  // Notificaciones, and hides only inside a task such as Editar perfil.
+  it("keeps the tab bar on a browsing screen and hides it inside a task", async () => {
     const screen = await render(<App runtime={withUnread(2)} />);
 
     await fireEvent.press(
       await screen.findByRole("button", { name: "Notificaciones, 2 sin leer" }),
     );
     await waitFor(() => {
-      expect(screen.queryByRole("button", { name: /^Reservar, tab/ })).toBeNull();
+      expect(screen.getByRole("button", { name: "Volver" })).toBeOnTheScreen();
     });
+    expect(screen.getByRole("button", { name: /^Reservar, tab/ })).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await fireEvent.press(await screen.findByRole("button", { name: /^Perfil, tab/ }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Editar" }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /^Reservar, tab/ })).toBeOnTheScreen();
+      expect(screen.queryByRole("button", { name: /^Reservar, tab/ })).toBeNull();
     });
   });
 

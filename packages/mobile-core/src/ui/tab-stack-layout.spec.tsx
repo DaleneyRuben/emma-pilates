@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react-native";
 
 import { Screen } from "./screen";
-import { tabStackScreenLayout } from "./tab-stack-layout";
+import { createTabStackScreenLayout, tabStackScreenLayout } from "./tab-stack-layout";
 
 const edgesOf = (element: { props: { edges?: Record<string, string> } }) =>
   Object.entries(element.props.edges ?? {})
@@ -32,6 +32,36 @@ describe("tabStackScreenLayout", () => {
         children: <Screen testID="app-screen" />,
         navigation: navigationWithRoot("home"),
         route: { key: "subscription" },
+      }),
+    );
+
+    expect(edgesOf(screen.getByTestId("app-screen"))).toEqual(["top", "right", "bottom", "left"]);
+  });
+});
+
+// Design follow-up 254 § 3: the bar stays on browsing screens and hides only
+// inside a task, so only a task keeps the bottom safe area itself.
+describe("createTabStackScreenLayout", () => {
+  const layout = createTabStackScreenLayout(new Set(["EditProfile"]));
+
+  it("drops the bottom safe area on a pushed browsing screen, which keeps the bar", async () => {
+    const screen = await render(
+      layout({
+        children: <Screen testID="app-screen" />,
+        navigation: navigationWithRoot("home"),
+        route: { key: "notifications", name: "Notifications" },
+      }),
+    );
+
+    expect(edgesOf(screen.getByTestId("app-screen"))).toEqual(["top", "right", "left"]);
+  });
+
+  it("keeps the bottom safe area inside a task, which hides the bar", async () => {
+    const screen = await render(
+      layout({
+        children: <Screen testID="app-screen" />,
+        navigation: navigationWithRoot("home"),
+        route: { key: "edit", name: "EditProfile" },
       }),
     );
 
