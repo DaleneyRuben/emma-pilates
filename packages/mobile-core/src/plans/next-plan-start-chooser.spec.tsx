@@ -53,4 +53,24 @@ describe("NextPlanStartChooser", () => {
 
     expect(onSelect).toHaveBeenCalledWith("2026-12-20");
   });
+
+  // Verification n.º 42, design follow-up 256 § 1: the strip crosses months,
+  // so every day names its month under the number.
+  it("names the month on every day, across the turn of the year", async () => {
+    const screen = await render(
+      <NextPlanStartChooser
+        currentPlan="Tu plan actual"
+        firstDay="2026-12-06"
+        onSelect={jest.fn()}
+        selected="2026-12-06"
+      />,
+    );
+
+    const december = screen.getByTestId("start-date-2026-12-31");
+    const january = screen.getByTestId("start-date-2027-01-01");
+    expect(december).toHaveProp("accessibilityLabel", "jue 31 de diciembre");
+    expect(january).toHaveProp("accessibilityLabel", "vie 1 de enero");
+    expect(screen.getAllByText("dic")).toHaveLength(26);
+    expect(screen.getAllByText("ene")).toHaveLength(2);
+  });
 });
