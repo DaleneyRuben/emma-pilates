@@ -411,18 +411,10 @@ describe('freeze', () => {
       type: 'freeze_refused',
     });
     // Walkthrough n.º 13: the decision settles every operator's request notice.
-    await expect(
-      prisma.notification.count({
-        where: { businessEventKey: `freeze-requested:${requested.id}` },
-      }),
-    ).resolves.toBeGreaterThan(0);
-    await expect(
-      prisma.notification.count({
-        where: {
-          businessEventKey: `freeze-requested:${requested.id}`,
-          readAt: null,
-        },
-      }),
-    ).resolves.toBe(0);
+    const notices = await prisma.notification.findMany({
+      where: { businessEventKey: `freeze-requested:${requested.id}` },
+    });
+    expect(notices.length).toBeGreaterThan(0);
+    expect(notices.filter((notice) => notice.readAt === null)).toEqual([]);
   });
 });

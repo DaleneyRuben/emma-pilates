@@ -284,9 +284,7 @@ describe('Prisma payment lifecycle', () => {
         where: { businessEventKey: `payment-submitted:${pending.id}` },
         select: { readAt: true },
       }),
-    ).resolves.toEqual(
-      expect.arrayContaining([{ readAt: decidedAt }]),
-    );
+    ).resolves.toEqual(expect.arrayContaining([{ readAt: decidedAt }]));
     await expect(
       prisma.notification.count({
         where: {
