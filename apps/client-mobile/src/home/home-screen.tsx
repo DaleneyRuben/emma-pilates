@@ -39,6 +39,7 @@ import { bookingLockNote, PaymentInReviewCard, PaymentRejectedCard } from "./hom
 import { ActivePlanCard, PurchasePlanCard } from "./home-plan-card";
 import { LockedShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
 import { NextClassCard, nextBookedClass } from "./next-class-card";
+import { PhonePrompt } from "./phone-prompt";
 import { PromotionsCarousel } from "./promotions-carousel";
 
 type HomeNavigation = {
@@ -245,6 +246,7 @@ export function HomeScreen() {
           )}
         </ShortcutSection>
       </ScrollView>
+      <PhonePrompt client={loadedProfile.data} />
     </Screen>
   );
 }

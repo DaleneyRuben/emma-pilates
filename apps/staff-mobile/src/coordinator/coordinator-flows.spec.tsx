@@ -91,7 +91,7 @@ describe("the Coordinator's Staff app", () => {
     await openClient(screen, "luc", lucia.name);
 
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Registrar pago en efectivo" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Registrar pago" })).toBeNull();
     expect(screen.getByTestId("client-overview-bookings")).toBeOnTheScreen();
     const reads = fetcher.mock.calls.map(([input]) => String(input));
     expect(reads.some((path) => path.includes("plan-quotes"))).toBe(false);
@@ -142,7 +142,7 @@ describe("the Coordinator's Staff app", () => {
     });
     expect(screen.getByRole("button", { name: "Reenviar enlace" })).toBeOnTheScreen();
     expect(screen.getByText("La clienta necesita un plan activo para reservar.")).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Registrar pago en efectivo" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Registrar pago" })).toBeNull();
     expect(screen.queryByText(/Puede comprar su plan/)).toBeNull();
   });
 

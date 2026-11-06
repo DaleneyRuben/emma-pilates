@@ -1,5 +1,5 @@
 import type { Prisma } from '../../generated/prisma/client';
-import { SubscriptionState } from '../../generated/prisma/client';
+import { PaymentState, SubscriptionState } from '../../generated/prisma/client';
 import {
   countedFreezeRequest,
   decideFreezeRequest,
@@ -20,12 +20,15 @@ export const parseFreezeCivilDate = (value: string): Date => {
   return new Date(`${value}T00:00:00.000Z`);
 };
 
-export const loadQueuedRenewalStart = (
+// The earliest start queued after the current end: a future Subscription, or
+// a transfer still in review for one (booking ADR-0013), which the Freeze
+// must not reach either or it could never be confirmed.
+export const loadQueuedRenewalStart = async (
   transaction: Transaction,
   input: { clientId: string; after: Date },
-): Promise<Date | null> =>
-  transaction.subscription
-    .findFirst({
+): Promise<Date | null> => {
+  const [renewal, pending] = await Promise.all([
+    transaction.subscription.findFirst({
       where: {
         clientId: input.clientId,
         state: SubscriptionState.ACTIVE,
@@ -33,8 +36,24 @@ export const loadQueuedRenewalStart = (
       },
       orderBy: { startsOn: 'asc' },
       select: { startsOn: true },
-    })
-    .then((renewal) => renewal?.startsOn ?? null);
+    }),
+    transaction.payment.findFirst({
+      where: {
+        clientId: input.clientId,
+        state: PaymentState.PENDING,
+        startsOn: { gt: input.after },
+      },
+      orderBy: { startsOn: 'asc' },
+      select: { startsOn: true },
+    }),
+  ]);
+  const starts = [renewal?.startsOn, pending?.startsOn].filter(
+    (start): start is Date => start !== undefined,
+  );
+  return starts.length === 0
+    ? null
+    : new Date(Math.min(...starts.map((start) => start.getTime())));
+};
 
 export const assertFreezeRequestAllowed = async (
   transaction: Transaction,

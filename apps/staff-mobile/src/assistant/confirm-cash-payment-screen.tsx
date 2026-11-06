@@ -13,6 +13,7 @@ import {
   IconRowGroup,
   invoiceChoiceFrom,
   invoiceDataPayload,
+  NextPlanStartChooser,
   type InvoiceChoice,
   NoticeRow,
   PrimaryButton,
@@ -43,6 +44,7 @@ import {
   FrontDeskReceiptCard,
   StudioQrCard,
   type FrontDeskReceipt,
+  type ReceiptSource,
 } from "./front-desk-receipt-card";
 import { InvoiceDisclosure } from "./invoice-disclosure";
 import { loadReceiptUpload } from "./load-receipt-upload";
@@ -98,6 +100,8 @@ export function ConfirmCashPaymentScreen({
   const studioRules = useStudioRules(fetcher);
   const today = boliviaCivilDate(new Date());
   const [startsOn, setStartsOn] = useState(today);
+  // booking ADR-0013: a next Plan picks its day too, the day after by default.
+  const [nextStart, setNextStart] = useState(renewalStartsOn);
   const [receipt, setReceipt] = useState<FrontDeskReceipt | null>(null);
   const [photographing, setPhotographing] = useState(false);
   // PAY-007: prefilled from the Client's last sale; a failed read leaves «Sin factura».
@@ -109,7 +113,7 @@ export function ConfirmCashPaymentScreen({
       lastInvoice.data?.status === 200 ? (lastInvoice.data.data.invoiceData ?? null) : null,
     );
   const invoiceData = invoiceDataPayload(invoice);
-  const start = renewalStartsOn === undefined ? startsOn : undefined;
+  const start = renewalStartsOn === undefined ? startsOn : nextStart;
   const amount = formatBolivianos(quote.priceCentavos);
 
   const refuse = (error: unknown, fallback: string, path: Method) => {
@@ -119,14 +123,14 @@ export function ConfirmCashPaymentScreen({
     setFailure((code !== null ? paymentProblems[code] : undefined) ?? fallback);
   };
 
-  const photograph = async () => {
+  const chooseReceipt = async (source: ReceiptSource) => {
     if (photographing) return;
     setPhotographing(true);
     setFailure(null);
     try {
-      const { photographTransferReceipt } = await loadReceiptUpload();
-      const photographed = await photographTransferReceipt(fetcher);
-      if (photographed !== null) setReceipt(photographed);
+      const { chooseTransferReceipt } = await loadReceiptUpload();
+      const chosen = await chooseTransferReceipt(fetcher, source);
+      if (chosen !== null) setReceipt(chosen);
     } catch {
       setFailure("No pudimos subir la foto. Inténtalo de nuevo.");
     } finally {
@@ -189,6 +193,7 @@ export function ConfirmCashPaymentScreen({
               navigation.popTo("ClientSearch");
             }}
             scheduled={renewalStartsOn !== undefined}
+            startsOn={nextStart === undefined ? undefined : formatCivilDayMonth(nextStart)}
           />
         </CenteredCard>
       </Screen>
@@ -283,13 +288,19 @@ export function ConfirmCashPaymentScreen({
           ) : (
             <>
               <StudioQrCard amount={amount} />
-              <FrontDeskReceiptCard onPhotograph={() => void photograph()} receipt={receipt} />
+              <FrontDeskReceiptCard
+                onChoose={(source) => void chooseReceipt(source)}
+                receipt={receipt}
+              />
             </>
           )}
           {renewalStartsOn !== undefined ? (
-            <Text style={styles.line}>
-              {`El nuevo plan empieza el ${formatCivilDayMonth(renewalStartsOn)}, al terminar el actual.`}
-            </Text>
+            <NextPlanStartChooser
+              currentPlan={`El plan actual de ${firstName(clientName)}`}
+              firstDay={renewalStartsOn}
+              onSelect={setNextStart}
+              selected={nextStart ?? renewalStartsOn}
+            />
           ) : studioRules === undefined ? null : (
             <StartDateChooser
               openingDate={studioRules.openingDate}
@@ -321,7 +332,6 @@ export function ConfirmCashPaymentScreen({
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.xl },
   footer: { gap: spacing.sm, paddingTop: spacing.md },
-  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   note: {
     color: colors.textMuted,
     fontFamily: fontFamilies.body,

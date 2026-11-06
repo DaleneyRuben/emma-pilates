@@ -145,7 +145,7 @@ describe("Assistant flows on a tablet", () => {
         jsonResponse(cashPayment, 201),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
     await waitFor(() => {
       expect(screen.getByTestId("assistant-plan-grid")).toHaveStyle({
         flexDirection: "row",

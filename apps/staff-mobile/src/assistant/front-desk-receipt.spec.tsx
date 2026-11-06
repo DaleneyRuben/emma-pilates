@@ -2,27 +2,34 @@ import { fireEvent, render } from "@testing-library/react-native";
 
 import { FrontDeskReceiptCard } from "./front-desk-receipt-card";
 
-// Walkthrough 21: the photo waits on S10 until «Enviar comprobante».
+// Walkthrough 21: the receipt waits on S10 until «Enviar comprobante».
+// Walkthrough 2 n.º 38 (design follow-up 254 § 2): it can come from the
+// camera or from the gallery, for one the Client sent by WhatsApp.
 describe("front-desk receipt", () => {
-  it("offers the camera until a receipt is photographed", async () => {
-    const onPhotograph = jest.fn();
-    const screen = await render(
-      <FrontDeskReceiptCard onPhotograph={onPhotograph} receipt={null} />,
-    );
+  it("offers the camera and the gallery until a receipt is chosen", async () => {
+    const onChoose = jest.fn();
+    const screen = await render(<FrontDeskReceiptCard onChoose={onChoose} receipt={null} />);
 
+    expect(screen.getByText("Comprobante")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Fotografíalo o elígelo de la galería si llegó por WhatsApp"),
+    ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Fotografiar comprobante" }));
-    expect(onPhotograph).toHaveBeenCalledTimes(1);
+    await fireEvent.press(screen.getByRole("button", { name: "Elegir de la galería" }));
+    expect(onChoose.mock.calls).toEqual([["camera"], ["library"]]);
   });
 
-  it("says the photographed receipt is not sent yet and lets her retake it", async () => {
-    const onPhotograph = jest.fn();
+  it("says the chosen receipt is not sent yet and lets her change it", async () => {
+    const onChoose = jest.fn();
     const screen = await render(
-      <FrontDeskReceiptCard onPhotograph={onPhotograph} receipt={{ imageAssetId: "asset-1" }} />,
+      <FrontDeskReceiptCard onChoose={onChoose} receipt={{ imageAssetId: "asset-1" }} />,
     );
 
-    expect(screen.getByText("Comprobante fotografiado")).toBeOnTheScreen();
+    expect(screen.getByText("Comprobante listo")).toBeOnTheScreen();
     expect(screen.getByText("Todavía no se envió")).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Fotografiar otra vez" }));
-    expect(onPhotograph).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("button", { name: "Elegir de la galería" })).toBeNull();
+    await fireEvent.press(screen.getByRole("button", { name: "Cambiar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Elegir de la galería" }));
+    expect(onChoose).toHaveBeenCalledWith("library");
   });
 });

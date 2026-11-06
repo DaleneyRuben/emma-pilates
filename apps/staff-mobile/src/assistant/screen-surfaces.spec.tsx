@@ -88,7 +88,7 @@ describe("Assistant cards and empty states (MOB-039)", () => {
     expect(
       screen.getByText("Registra un pago para activar un plan y poder reservarle clases."),
     ).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar clase" })).toBeNull();
   });
 

@@ -24,18 +24,43 @@ const addDays = (date: Date, days: number): Date =>
 
 // The real end is the stored end. A Freeze does not count as a gap; BKM-012
 // will pass the frozen days when it exists.
-const earliest = (dates: Date[]): Date | null =>
-  dates.reduce<Date | null>(
-    (soonest, date) =>
-      soonest === null || date.getTime() < soonest.getTime() ? date : soonest,
+type NextStart = { startsOn: Date; soldAt: Date | null };
+
+// The day a next Plan was sold: its Purchase Intent's, else its Payment's.
+const soldAt = (
+  payment: {
+    createdAt: Date;
+    purchaseIntent: { createdAt: Date } | null;
+  } | null,
+): Date | null =>
+  payment?.purchaseIntent?.createdAt ?? payment?.createdAt ?? null;
+
+const earliest = (starts: NextStart[]): NextStart | null =>
+  starts.reduce<NextStart | null>(
+    (soonest, start) =>
+      soonest === null || start.startsOn.getTime() < soonest.startsOn.getTime()
+        ? start
+        : soonest,
     null,
   );
 
 const realEnd = (
-  subscriptions: { endsOn: Date; startsOn: Date; state: string }[],
-  pendingStarts: Date[],
+  subscriptions: {
+    endsOn: Date;
+    startsOn: Date;
+    state: string;
+    payment: {
+      createdAt: Date;
+      purchaseIntent: { createdAt: Date } | null;
+    } | null;
+  }[],
+  pendingStarts: NextStart[],
   today: Date,
-): { latestRealEnd: Date | null; nextStart: Date | null } => {
+): {
+  latestRealEnd: Date | null;
+  nextStart: Date | null;
+  nextSoldOn: Date | null;
+} => {
   const started = subscriptions.filter(
     (subscription) =>
       subscription.startsOn.getTime() <= today.getTime() ||
@@ -48,15 +73,23 @@ const realEnd = (
         : latest,
     null,
   );
-  const nextStart = earliest([
+  const next = earliest([
     ...subscriptions
       .filter(
         (subscription) => subscription.startsOn.getTime() > today.getTime(),
       )
-      .map((subscription) => subscription.startsOn),
+      .map((subscription) => ({
+        startsOn: subscription.startsOn,
+        soldAt: soldAt(subscription.payment),
+      })),
     ...pendingStarts,
   ]);
-  return { latestRealEnd, nextStart };
+  return {
+    latestRealEnd,
+    nextStart: next?.startsOn ?? null,
+    nextSoldOn:
+      next === null || next.soldAt === null ? null : boliviaDate(next.soldAt),
+  };
 };
 
 export const createFounderMembershipJob = (
@@ -100,11 +133,25 @@ export const createFounderMembershipJob = (
                       method: { not: PaymentMethod.COURTESY },
                     },
                   },
-                  select: { startsOn: true, endsOn: true, state: true },
+                  select: {
+                    startsOn: true,
+                    endsOn: true,
+                    state: true,
+                    payment: {
+                      select: {
+                        createdAt: true,
+                        purchaseIntent: { select: { createdAt: true } },
+                      },
+                    },
+                  },
                 },
                 payments: {
                   where: { state: PaymentState.PENDING },
-                  select: { startsOn: true },
+                  select: {
+                    startsOn: true,
+                    createdAt: true,
+                    purchaseIntent: { select: { createdAt: true } },
+                  },
                 },
               },
             },
@@ -113,7 +160,10 @@ export const createFounderMembershipJob = (
         return rows.map((row) => {
           const ends = realEnd(
             row.client.subscriptions,
-            row.client.payments.map((payment) => payment.startsOn),
+            row.client.payments.map((payment) => ({
+              startsOn: payment.startsOn,
+              soldAt: soldAt(payment),
+            })),
             today,
           );
           return {
@@ -124,6 +174,7 @@ export const createFounderMembershipJob = (
             latestRealEnd:
               ends.latestRealEnd === null ? null : civil(ends.latestRealEnd),
             nextStart: ends.nextStart === null ? null : civil(ends.nextStart),
+            nextSoldOn: ends.nextSoldOn,
           };
         });
       },

@@ -96,6 +96,52 @@ describe('decideRenewal', () => {
     });
   });
 
+  // booking ADR-0013: the next Plan chooses a day from the day after the
+  // current end through 28 days after it.
+  it('starts on the chosen day inside the next Plan window', () => {
+    expect(
+      decideRenewal({
+        today,
+        current,
+        futureSubscriptionId: null,
+        requested: civil('2026-11-12'),
+      }),
+    ).toEqual({
+      startsOn: civil('2026-11-12'),
+      chosen: false,
+      subscriptionIdToEndEarly: null,
+    });
+  });
+
+  it('accepts the 28th day after the current end', () => {
+    expect(
+      decideRenewal({
+        today,
+        current,
+        futureSubscriptionId: null,
+        requested: civil('2026-11-22'),
+      }).startsOn,
+    ).toEqual(civil('2026-11-22'));
+  });
+
+  it('refuses a day past the next Plan window', () => {
+    let caught: unknown = null;
+    try {
+      decideRenewal({
+        today,
+        current,
+        futureSubscriptionId: null,
+        requested: civil('2026-11-23'),
+      });
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught instanceof PaymentRuleError ? caught.code : null).toBe(
+      'start_date_out_of_window',
+    );
+  });
+
   it('refuses a second future Subscription', () => {
     let caught: unknown = null;
     try {

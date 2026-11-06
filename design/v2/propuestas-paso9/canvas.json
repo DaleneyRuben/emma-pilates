@@ -1,0 +1,197 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-06T06:20:54Z"
+ },
+ "title": "Emma Pilates Studio · Paso 9: celular, galería y barra",
+ "launch": {
+  "view": "focused",
+  "file": "Main.dc.html"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 2200,
+   "title": "Paso 9 · elige una propuesta por tema",
+   "is_interactive": true
+  },
+  "T-Inicio.dc.html": {
+   "x": 0,
+   "y": 2360,
+   "w": 390,
+   "h": 844,
+   "title": "Inicio (como hoy)",
+   "is_interactive": true
+  },
+  "T-Guardado.dc.html": {
+   "x": 470,
+   "y": 2360,
+   "w": 390,
+   "h": 844,
+   "title": "Inicio · «Celular guardado»",
+   "is_interactive": true
+  },
+  "T-A1-Hoja.dc.html": {
+   "x": 940,
+   "y": 2360,
+   "w": 390,
+   "h": 844,
+   "title": "A · Hoja al abrir · sin celular (toca Guardar o Ahora no)",
+   "is_interactive": true
+  },
+  "T-A2-Hoja-invalido.dc.html": {
+   "x": 1410,
+   "y": 2360,
+   "w": 390,
+   "h": 844,
+   "title": "A · Hoja al abrir · número no válido",
+   "is_interactive": true
+  },
+  "T-B1-Aviso.dc.html": {
+   "x": 1880,
+   "y": 2360,
+   "w": 390,
+   "h": 844,
+   "title": "B · Aviso en Inicio (toca Agregar)",
+   "is_interactive": true
+  },
+  "T-B2-Editar-perfil.dc.html": {
+   "x": 2350,
+   "y": 2360,
+   "w": 390,
+   "h": 844,
+   "title": "B · Editar perfil con el celular marcado",
+   "is_interactive": true
+  },
+  "T-C1-Pantalla.dc.html": {
+   "x": 2820,
+   "y": 2360,
+   "w": 390,
+   "h": 844,
+   "title": "C · Pantalla obligatoria · sin celular (toca Guardar y seguir)",
+   "is_interactive": true
+  },
+  "T-C2-Pantalla-invalido.dc.html": {
+   "x": 3290,
+   "y": 2360,
+   "w": 390,
+   "h": 844,
+   "title": "C · Pantalla obligatoria · número no válido",
+   "is_interactive": true
+  },
+  "G-A1-Dos-botones.dc.html": {
+   "x": 0,
+   "y": 3360,
+   "w": 390,
+   "h": 844,
+   "title": "A · Dos botones en la tarjeta (toca cualquiera)",
+   "is_interactive": true
+  },
+  "G-B1-Un-boton.dc.html": {
+   "x": 470,
+   "y": 3360,
+   "w": 390,
+   "h": 844,
+   "title": "B · Un botón y una hoja (toca Agregar comprobante)",
+   "is_interactive": true
+  },
+  "G-B2-Hoja.dc.html": {
+   "x": 940,
+   "y": 3360,
+   "w": 390,
+   "h": 844,
+   "title": "B · Hoja: Tomar foto o Elegir de la galería",
+   "is_interactive": true
+  },
+  "G-C1-Dos-tarjetas.dc.html": {
+   "x": 1410,
+   "y": 3360,
+   "w": 390,
+   "h": 844,
+   "title": "C · Dos tarjetas: Fotografiar · Desde la galería",
+   "is_interactive": true
+  },
+  "G-Listo.dc.html": {
+   "x": 1880,
+   "y": 3360,
+   "w": 390,
+   "h": 844,
+   "title": "Comprobante listo (igual en las tres)",
+   "is_interactive": true
+  },
+  "R1-Plan-siguiente-equipo.dc.html": {
+   "x": 0,
+   "y": 5360,
+   "w": 390,
+   "h": 844,
+   "title": "Parte común · Equipo: el plan siguiente elige su fecha",
+   "is_interactive": true
+  },
+  "R2-Plan-siguiente-clienta.dc.html": {
+   "x": 470,
+   "y": 5360,
+   "w": 390,
+   "h": 844,
+   "title": "Parte común · Clienta: renovar y elegir la fecha",
+   "is_interactive": true
+  },
+  "R3-Comprobante-enviado.dc.html": {
+   "x": 940,
+   "y": 5360,
+   "w": 390,
+   "h": 844,
+   "title": "Parte común · «Comprobante enviado» con plan programado (n.º 37)",
+   "is_interactive": true
+  },
+  "B-A1-Ficha.dc.html": {
+   "x": 0,
+   "y": 4360,
+   "w": 390,
+   "h": 844,
+   "title": "A · Aprobada: barra al navegar · Ficha de la clienta (con barra)",
+   "is_interactive": true
+  },
+  "B-A2-Reservas.dc.html": {
+   "x": 470,
+   "y": 4360,
+   "w": 390,
+   "h": 844,
+   "title": "A · Aprobada: barra al navegar · Reservas de Lucía (con barra)",
+   "is_interactive": true
+  },
+  "B-A3-Registrar-pago.dc.html": {
+   "x": 940,
+   "y": 4360,
+   "w": 390,
+   "h": 844,
+   "title": "A · Aprobada: barra al navegar · Registrar pago (sin barra)",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "T-Inicio.dc.html",
+  "T-Guardado.dc.html",
+  "T-A1-Hoja.dc.html",
+  "T-A2-Hoja-invalido.dc.html",
+  "T-B1-Aviso.dc.html",
+  "T-B2-Editar-perfil.dc.html",
+  "T-C1-Pantalla.dc.html",
+  "T-C2-Pantalla-invalido.dc.html",
+  "G-A1-Dos-botones.dc.html",
+  "G-B1-Un-boton.dc.html",
+  "G-B2-Hoja.dc.html",
+  "G-C1-Dos-tarjetas.dc.html",
+  "G-Listo.dc.html",
+  "R1-Plan-siguiente-equipo.dc.html",
+  "R2-Plan-siguiente-clienta.dc.html",
+  "R3-Comprobante-enviado.dc.html",
+  "B-A1-Ficha.dc.html",
+  "B-A2-Reservas.dc.html",
+  "B-A3-Registrar-pago.dc.html"
+ ]
+}

@@ -1,8 +1,9 @@
 import {
   colors,
+  createTabStackScreenLayout,
   fontFamilies,
   popTabToRootOnPress,
-  tabStackScreenLayout,
+  tabBarHidden,
 } from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
@@ -51,10 +52,50 @@ import { TrainerRosterScreen } from "../trainer/trainer-roster-screen";
 import { ContactsTabIcon } from "./contacts-tab-icon";
 import { StaffTabIcon, type StaffTabIconName } from "./staff-tab-icon";
 
-// FIX-023: a tab's root sits over the tab bar; a pushed screen keeps the
-// bottom safe area (tabStackScreenLayout).
+// Design follow-up 254 § 3 (owner, 2026-11-06): the bar stays while browsing
+// and hides only inside these tasks, which end on a button at the bottom.
+const taskRoutes: ReadonlySet<string> = new Set([
+  // Registrar pago
+  "SelectPlan",
+  "ConfirmCashPayment",
+  // Reservar para… and Reprogramar
+  "BrowseSessions",
+  "SessionDetail",
+  "Reschedule",
+  "NewClient",
+  // Cerrar caja when the Administrator opens it from Pagos
+  "CashClose",
+  "CancelClass",
+  "CancelSession",
+  "ReviewPayment",
+  "ReviewFreeze",
+  "Invoice",
+  "ChangePassword",
+  "Feedback",
+  "ReferralCode",
+  "ReportFault",
+  "AvailabilityBlockForm",
+  "ViewAs",
+]);
+
+// Every tab's root. The Assistant's Caja is Cerrar caja itself, a root that
+// keeps its bar although the Administrator opens it as a task from Pagos.
+const tabRoots: ReadonlySet<string> = new Set([
+  "Agenda",
+  "MyPay",
+  "Profile",
+  "ClientSearch",
+  "Schedule",
+  "CashClose",
+  "Availability",
+  "Payments",
+  "ContactList",
+]);
+
+// FIX-023: a screen over the tab bar drops the bottom safe area; a task,
+// which hides the bar, keeps it.
 const stackConfig = {
-  screenLayout: tabStackScreenLayout,
+  screenLayout: createTabStackScreenLayout(taskRoutes, tabRoots),
   screenOptions: { headerShown: false },
 } as const;
 
@@ -93,7 +134,6 @@ const cancelClassScreens = { CancelClass: CancelClassScreen, CancelSession: Canc
 
 const tabBarStyle = { backgroundColor: colors.card, borderTopWidth: 0 };
 
-// The bar shows only while the tab's stack is on its root screen.
 const tabOptions =
   (title: string, icon: StaffTabIconName, root: string) =>
   ({ route }: { route: RouteProp<ParamListBase> }) => ({
@@ -104,10 +144,9 @@ const tabOptions =
       ) : (
         <StaffTabIcon color={color} focused={focused} name={icon} />
       ),
-    tabBarStyle:
-      (getFocusedRouteNameFromRoute(route) ?? root) === root
-        ? tabBarStyle
-        : { display: "none" as const },
+    tabBarStyle: tabBarHidden(taskRoutes, getFocusedRouteNameFromRoute(route), root)
+      ? { display: "none" as const }
+      : tabBarStyle,
     title,
   });
 

@@ -1,6 +1,7 @@
 export * from "./acquisition/acquisition-channel-field";
 export * from "./acquisition/own-referral-code";
 export * from "./account/phone-number";
+export * from "./account/phone-prompt-sheet";
 export * from "./account/change-password-screen";
 export * from "./account/email-change-link-screen";
 export * from "./account/feedback-metadata";
@@ -51,6 +52,7 @@ export type { PushPlatform } from "./notifications/push-platform";
 export * from "./query/persistence";
 export * from "./query/provider";
 export * from "./time/mounted-at";
+export * from "./plans/next-plan-start-chooser";
 export * from "./plans/start-date-chooser";
 export * from "./plans/start-date-options";
 export * from "./time/session-format";

@@ -40,7 +40,7 @@ async function openConfirmation(prefill: typeof company | null) {
       return jsonResponse(cashResult, 201);
     },
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
   await waitFor(() => {
     expect(screen.getByRole("button", { name: /^Paquete de 8 clases,/ })).toBeOnTheScreen();
   });

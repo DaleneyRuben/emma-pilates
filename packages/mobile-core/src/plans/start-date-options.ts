@@ -40,3 +40,20 @@ export function startDateOptions(input: {
 export function renewalStartsOn(currentEndsOn: string): string {
   return addDays(currentEndsOn, 1);
 }
+
+// booking ADR-0013: with a Plan in force, the next one starts on a day from
+// the day after the current end through this many days after it.
+export const nextPlanStartWindowDays = 28;
+
+export function nextPlanStartOptions(firstDay: string): StartDateOption[] {
+  return upcomingCivilDates(firstDay, nextPlanStartWindowDays).map((date) => ({
+    date,
+    label: date,
+    weekday: "",
+    day: date.slice(8, 10).replace(/^0/, ""),
+  }));
+}
+
+export function addCivilDays(civilDate: string, days: number): string {
+  return addDays(civilDate, days);
+}

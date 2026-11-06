@@ -4,8 +4,9 @@ import {
   EmailChangeLinkScreen,
   MobileQueryProvider,
   type MobileNavigationProps,
+  createTabStackScreenLayout,
   popTabToRootOnPress,
-  tabStackScreenLayout,
+  tabBarHidden,
   typography,
 } from "@pilates/mobile-core";
 import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
@@ -45,6 +46,32 @@ const unavailableFetcher: typeof globalThis.fetch = async () => {
   throw new Error("The authenticated API fetcher is unavailable");
 };
 
+// Design follow-up 254 § 3 (owner, 2026-11-06): the bar stays on browsing
+// screens (class detail, Mi plan, Mis facturas, Notificaciones, Mis
+// evaluaciones) and hides only inside these tasks.
+const taskRoutes: ReadonlySet<string> = new Set([
+  // Buying a plan: choose, start date and invoice, pay, upload the receipt
+  "Plans",
+  "PlanDetail",
+  "Payment",
+  "PaymentStatus",
+  // Booking an evaluation
+  "EvaluationAvailability",
+  "BookEvaluation",
+  "Reschedule",
+  "EditProfile",
+  "ChangePassword",
+  "Feedback",
+  "CloseAccount",
+]);
+
+// FIX-023: a screen over the tab bar drops the bottom safe area; a task,
+// which hides the bar, keeps it.
+const screenLayout = createTabStackScreenLayout(
+  taskRoutes,
+  new Set(["Home", "Browse", "MyBookings", "Profile"]),
+);
+
 // Plan and Subscription screens are reachable from Home, Reservar, and Perfil.
 const planScreens = {
   Plans: PlansScreen,
@@ -66,7 +93,7 @@ const shortcutScreens = {
 };
 
 const HomeStack = createNativeStackNavigator({
-  screenLayout: tabStackScreenLayout,
+  screenLayout,
   screenOptions: { headerShown: false },
   // Walkthrough n.º 11: the Inicio bell opens Notificaciones over Inicio.
   screens: {
@@ -78,7 +105,7 @@ const HomeStack = createNativeStackNavigator({
 });
 
 const BookingsStack = createNativeStackNavigator({
-  screenLayout: tabStackScreenLayout,
+  screenLayout,
   screenOptions: { headerShown: false },
   screens: {
     MyBookings: BookingsScreen,
@@ -87,7 +114,7 @@ const BookingsStack = createNativeStackNavigator({
 });
 
 const BookingStack = createNativeStackNavigator({
-  screenLayout: tabStackScreenLayout,
+  screenLayout,
   screenOptions: { headerShown: false },
   screens: {
     Browse: BrowseSessionsScreen,
@@ -97,7 +124,7 @@ const BookingStack = createNativeStackNavigator({
 });
 
 const ProfileStack = createNativeStackNavigator({
-  screenLayout: tabStackScreenLayout,
+  screenLayout,
   screenOptions: { headerShown: false },
   screens: {
     Profile: ProfileScreen,
@@ -113,16 +140,14 @@ const ProfileStack = createNativeStackNavigator({
 
 const tabBarStyle = { backgroundColor: colors.card, borderTopColor: colors.borderStrong };
 
-// Follow-up 227: a pushed screen (with a back arrow) has no tab bar, so the
-// bar shows only while the tab's stack is on its root screen.
 const tabOptions =
   (title: string, icon: ClientTabIconName, root: string) =>
   ({ route }: { route: Parameters<typeof getFocusedRouteNameFromRoute>[0] }) => {
-    const focused = getFocusedRouteNameFromRoute(route) ?? root;
+    const hidden = tabBarHidden(taskRoutes, getFocusedRouteNameFromRoute(route), root);
     return {
       tabBarButtonTestID: `tab-${icon}`,
       tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
-      tabBarStyle: focused === root ? tabBarStyle : { display: "none" as const },
+      tabBarStyle: hidden ? { display: "none" as const } : tabBarStyle,
       title,
     };
   };

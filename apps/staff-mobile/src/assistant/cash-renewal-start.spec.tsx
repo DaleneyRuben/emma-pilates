@@ -27,29 +27,48 @@ describe("Confirming cash for a renewal", () => {
     clearMobileQueryCache();
   });
 
-  it("names the fixed start instead of offering dates while classes remain", async () => {
+  // booking ADR-0013: the next Plan picks a day from the day after the
+  // current end through 28 days after it (design follow-up 254 § 4).
+  it("offers the next Plan's days from the day after the current end", async () => {
+    const paid = jest.fn();
     const screen = await openLucia({
       ...assistantRoutes(),
       "/api/v1/assistant/clients/client-lucia": () => jsonResponse(renewalOverview),
       "/api/v1/studio-rules": () => jsonResponse(studioRules),
+      "POST /api/v1/assistant/clients/client-lucia/cash-payments": (init) => {
+        paid(JSON.parse(String(init?.body)));
+        return jsonResponse({ code: "service_unavailable" }, 503);
+      },
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Registrar pago")).toBeOnTheScreen();
+      expect(screen.getByTestId("start-date-2026-10-13")).toHaveProp("accessibilityState", {
+        selected: true,
+      });
     });
-    expect(screen.queryByTestId("start-date-chooser")).toBeNull();
+    expect(screen.getByTestId("start-date-2026-11-09")).toBeOnTheScreen();
+    expect(screen.queryByTestId("start-date-2026-11-10")).toBeNull();
+    expect(screen.queryByText(/al terminar el actual/)).toBeNull();
+    await fireEvent.press(screen.getByTestId("start-date-2026-10-20"));
     expect(
-      screen.getByText("El nuevo plan empieza el 13 de octubre, al terminar el actual."),
+      screen.getByText(
+        "El plan actual de Lucía vence el 12 de octubre. El nuevo empieza el 20 de octubre; se puede elegir hasta el 9 de noviembre.",
+      ),
     ).toBeOnTheScreen();
     expect(
       screen.getByText(
         "Confirma con el efectivo en mano: el plan queda programado para esa fecha.",
       ),
     ).toBeOnTheScreen();
-    expect(screen.queryByText(/el plan se activa al instante/)).toBeNull();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
+
+    await waitFor(() => {
+      expect(paid).toHaveBeenCalledWith(expect.objectContaining({ startsOn: "2026-10-20" }));
+    });
   });
 
   it("keeps the dates and the instant activation when nothing is left to renew", async () => {
@@ -58,7 +77,7 @@ describe("Confirming cash for a renewal", () => {
       "/api/v1/studio-rules": () => jsonResponse(studioRules),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
 
     await waitFor(() => {
@@ -86,7 +105,7 @@ describe("Confirming cash for a renewal", () => {
     const readsOnOverview = overviewReads;
     overviewFails = true;
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
 
     expect(await screen.findByText("No pudimos cargar los planes.")).toBeOnTheScreen();
     expect(overviewReads).toBeGreaterThan(readsOnOverview);
@@ -99,10 +118,7 @@ describe("Confirming cash for a renewal", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Registrar pago")).toBeOnTheScreen();
     });
-    expect(screen.queryByTestId("start-date-chooser")).toBeNull();
-    expect(
-      screen.getByText("El nuevo plan empieza el 13 de octubre, al terminar el actual."),
-    ).toBeOnTheScreen();
+    expect(screen.getByTestId("start-date-2026-10-13")).toBeOnTheScreen();
   });
 
   it("explains a start before her booked guest class (FIX-019)", async () => {
@@ -113,7 +129,7 @@ describe("Confirming cash for a renewal", () => {
         jsonResponse({ code: "start_date_before_booked_class" }, 409),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
     await fireEvent.press(
       await screen.findByRole("button", { name: "Confirmar pago en efectivo" }),

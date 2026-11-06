@@ -21,10 +21,10 @@ describe("Client overview cash action", () => {
     clearMobileQueryCache();
   });
 
-  it("keeps «Registrar pago en efectivo» enabled while the Plan is active", async () => {
+  it("keeps «Registrar pago» enabled while the Plan is active", async () => {
     const screen = await openLucia(assistantRoutes());
 
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
   });
 
@@ -35,7 +35,7 @@ describe("Client overview cash action", () => {
         jsonResponse({ ...overview, subscription: { status: "expiring_soon", subscription } }),
     });
 
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
   });
 
@@ -56,7 +56,7 @@ describe("Client overview cash action", () => {
     await waitFor(() => {
       expect(screen.getByText("clases restantes de 8")).toBeOnTheScreen();
     });
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
   });
 
@@ -77,7 +77,7 @@ describe("Client overview cash action", () => {
     await waitFor(() => {
       expect(screen.getByText("clases restantes de 8")).toBeOnTheScreen();
     });
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
   });
 
@@ -97,7 +97,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => expect(screen.getByText(note)).toBeOnTheScreen());
-    expect(screen.queryByRole("button", { name: "Registrar pago en efectivo" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Registrar pago" })).toBeNull();
   });
 
   it("keeps it enabled without the note once the Plan has expired", async () => {
@@ -116,7 +116,7 @@ describe("Client overview cash action", () => {
     await waitFor(() => {
       expect(screen.getByText("Vencido")).toBeOnTheScreen();
     });
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
   });
 });

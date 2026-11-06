@@ -3,10 +3,12 @@ import {
   useGetCurrentClientSubscription,
 } from "@pilates/api-contracts";
 import {
+  addCivilDays,
   BodyText,
   colors,
   formatBolivianos,
   LoadingState,
+  nextPlanStartWindowDays,
   OutlinedButton,
   PrimaryButton,
   QueryFailure,
@@ -135,7 +137,7 @@ export function SubscriptionScreen() {
             <SectionTitle>Renovación anticipada</SectionTitle>
             <OutlinedButton label="Renovar mi plan" onPress={() => navigation.navigate("Plans")} />
             <BodyText style={styles.note}>
-              {`El nuevo empieza el ${formatCivilDate(renewalStartsOn)}, al día siguiente de que venza este`}
+              {`Eliges cuándo empieza el nuevo: entre el ${formatCivilDate(renewalStartsOn)}, al día siguiente de que venza este, y el ${formatCivilDate(addCivilDays(renewalStartsOn, nextPlanStartWindowDays - 1))}.`}
             </BodyText>
           </View>
         )}

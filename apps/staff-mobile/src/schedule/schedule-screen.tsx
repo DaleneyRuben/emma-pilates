@@ -81,7 +81,7 @@ export function ScheduleScreen() {
   const refreshControl = usePullToRefresh(queryKeys);
   const several = branches.options.length > 1;
   const eyebrow =
-    branch === null || several ? roleLabel(role) : `${roleLabel(role)} · Sucursal ${branch.name}`;
+    branch === null || several ? roleLabel(role) : `${roleLabel(role)} · ${branch.name}`;
 
   const header = <RootHeader eyebrow={eyebrow} title="Horario" />;
   if (branches.isPending) {

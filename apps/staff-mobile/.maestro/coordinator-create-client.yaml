@@ -61,5 +61,5 @@ env:
 # shows it after its flag.
 - assertVisible: ".*\\+591 70012345 · .*"
 - assertVisible: "Reenviar enlace"
-- assertNotVisible: "Registrar pago en efectivo"
+- assertNotVisible: "Registrar pago"
 - takeScreenshot: staff-coordinator-new-client-2-pending

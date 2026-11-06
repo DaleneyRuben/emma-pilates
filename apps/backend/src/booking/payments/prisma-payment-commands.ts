@@ -91,7 +91,11 @@ import {
 
 import { grantGiftClass } from './allowance-adjustments';
 import { createFrontDeskTransfer } from './front-desk-transfer';
-import { loseFounderForGap, priceTransferForGap } from './founder-gap';
+import {
+  loseFounderForGap,
+  loseFounderForGapOfSale,
+  priceTransferForGap,
+} from './founder-gap';
 import {
   confirmFounderPlace,
   priceFounderSale,
@@ -1124,7 +1128,8 @@ export function createPrismaPaymentCommands(
       }
       // The gap is judged on the date she bought for: a late review is the
       // studio's delay, never hers.
-      await loseFounderForGap(transaction, {
+      await loseFounderForGapOfSale(transaction, {
+        paymentId: payment.id,
         clientId: payment.clientId,
         nextStart: payment.startsOn,
         today,

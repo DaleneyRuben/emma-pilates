@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio con aviso</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative">
+  <div style="flex-grow: 1; padding: 60px 20px 24px; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Lunes 2 de noviembre</span>
+        <span style="font-family: Lora, Georgia, serif; font-size: 30px">Hola, Lucía</span>
+      </div>
+      <a href="T-Inicio.dc.html" aria-label="Notificaciones, 2 sin leer" style="position: relative; width: 44px; height: 44px; border-radius: 999px; background: #F5EFE9; display: flex; align-items: center; justify-content: center">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg>
+        <span style="position: absolute; top: 4px; right: 4px; min-width: 18px; height: 18px; border-radius: 999px; background: #93615D; color: #FFFFFF; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">2</span>
+      </a>
+      <a href="T-Inicio.dc.html" aria-label="Tu perfil" style="width: 44px; height: 44px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; font-family: Lora, Georgia, serif; font-size: 16px; display: flex; align-items: center; justify-content: center; text-decoration: none">LF</a>
+    </div>
+
+    <a href="T-B2-Editar-perfil.dc.html" style="background: #F5EFE9; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; color: #4A4A4A; text-decoration: none; border-left: 4px solid #B78380"><div style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center; flex: none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2.5"></rect><path d="M11 17.5h2"></path></svg></div><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">Falta tu celular</span><span style="font-size: 13px; color: #6F6662">Agrégalo para que el estudio pueda escribirte</span></span><span style="font-size: 15px; font-weight: 600; color: #7D4F4B">Agregar</span></a>
+    <div style="background: #93615D; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 12px; color: #FFFFFF">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.75)">Tu plan · 12 clases</span>
+        <span style="padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.18); font-size: 12px; font-weight: 600">Activo</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: Lora, Georgia, serif; font-size: 40px; line-height: 1">8</span><span style="font-size: 15px; color: rgba(255,255,255,0.85)">clases restantes</span></div>
+      <div style="height: 6px; border-radius: 999px; background: rgba(255,255,255,0.25)"><div style="width: 67%; height: 6px; border-radius: 999px; background: #FFFFFF"></div></div>
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <span style="font-size: 14px; color: rgba(255,255,255,0.85)">Vence el 1 de diciembre</span>
+        <a href="T-Inicio.dc.html" style="height: 44px; padding: 0 16px; border-radius: 999px; background: #FFFFFF; color: #93615D; font-size: 14px; font-weight: 600; display: flex; align-items: center; text-decoration: none">Mi plan</a>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Tu próxima clase</span>
+      <a href="T-Inicio.dc.html" style="background: #F5EFE9; border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 12px; color: #4A4A4A; text-decoration: none">
+        <div style="width: 52px; height: 52px; border-radius: 14px; background: #F2E4E1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7D4F4B"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">Mar</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">3</span></div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, Georgia, serif; font-size: 18px">Mat Pilates</span><span style="font-size: 13px; color: #6F6662">08:00 · Daniela Ortiz · Achumani</span></div>
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Accesos rápidos</span>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+        <a href="T-Inicio.dc.html" style="background: #F5EFE9; border-radius: 16px; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; color: #4A4A4A; text-decoration: none">
+          <div style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg></div>
+          <span style="font-size: 14px; font-weight: 500; line-height: 1.3">Reservar una clase</span>
+        </a>
+        <a href="T-Inicio.dc.html" style="background: #F5EFE9; border-radius: 16px; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; color: #4A4A4A; text-decoration: none">
+          <div style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2.5-7-6-7-10a7 7 0 0 1 14 0c0 4-3 7.5-7 10z"></path><path d="M12 8v6M9 11h6"></path></svg></div>
+          <span style="font-size: 14px; font-weight: 500; line-height: 1.3">Evaluación nutricional</span>
+        </a>
+        <a href="T-Inicio.dc.html" style="background: #F5EFE9; border-radius: 16px; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; color: #4A4A4A; text-decoration: none">
+          <div style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"></circle><path d="M3 20c.8-3.5 3.2-5.5 6-5.5s5.2 2 6 5.5M18 8v6M15 11h6"></path></svg></div>
+          <span style="font-size: 14px; font-weight: 500; line-height: 1.3">Invita a una amiga</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <nav aria-label="Principal" style="height: 82px; padding-bottom: 18px; box-sizing: border-box; background: #F5EFE9; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center">
+    <span aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #93615D; font-size: 12px; font-weight: 600"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.6" stroke-linejoin="round"><path d="M4 10.5L12 4l8 6.5V20H4z"></path></svg>Inicio</span>
+    <a href="T-Inicio.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Reservar</a>
+    <a href="T-Inicio.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>Mis Reservas</a>
+    <a href="T-Inicio.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6F6662; font-size: 12px; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6F6662" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"></circle><path d="M5 20c1-3.6 3.8-5.5 7-5.5s6 1.9 7 5.5"></path></svg>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -112,7 +112,7 @@ export function ClientOverviewScreen({
   const canBuy = sells && futurePlan === null;
   const pending = client.accountStatus === "pending";
   const cash = {
-    label: "Registrar pago en efectivo",
+    label: "Registrar pago",
     onPress: () => navigation.navigate("SelectPlan", context),
     testID: "client-overview-cash-payment",
   };

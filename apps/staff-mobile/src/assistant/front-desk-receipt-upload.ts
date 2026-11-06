@@ -1,14 +1,16 @@
 import { pickImage, uploadImage } from "../uploads/image-upload";
-import type { FrontDeskReceipt } from "./front-desk-receipt-card";
+import type { FrontDeskReceipt, ReceiptSource } from "./front-desk-receipt-card";
 
 /**
- * Photographs or picks the Client's receipt and uploads it until READY.
- * Cancelled returns null. The caller submits the pending transfer.
+ * Photographs the Client's receipt, or picks it from the gallery, and uploads
+ * it until READY. Cancelled returns null. The caller submits the pending
+ * transfer.
  */
-export async function photographTransferReceipt(
+export async function chooseTransferReceipt(
   fetcher: typeof globalThis.fetch,
+  source: ReceiptSource,
 ): Promise<FrontDeskReceipt | null> {
-  const picked = await pickImage({ camera: true });
+  const picked = await pickImage({ camera: source === "camera" });
   if (picked === null) return null;
   return { imageAssetId: await uploadImage(picked, "transfer_receipt", fetcher) };
 }

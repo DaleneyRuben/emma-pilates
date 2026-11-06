@@ -8,6 +8,8 @@ export type ActiveFounderFacts = {
   number: number;
   latestRealEnd: Date | null;
   nextStart: Date | null;
+  // The day the next start was sold, in Bolivia time (booking ADR-0013).
+  nextSoldOn?: Date | null;
 };
 
 type EndLapsedFounderMembershipsDependencies = {
@@ -45,6 +47,7 @@ export const endLapsedFounderMemberships = async (
         membership: { status: 'active', lostAt: null },
         latestRealEnd: membership.latestRealEnd,
         nextStart: membership.nextStart,
+        nextSoldOn: membership.nextSoldOn ?? null,
       });
       if (!decision.lose) return;
       const lost = await dependencies.markLost({

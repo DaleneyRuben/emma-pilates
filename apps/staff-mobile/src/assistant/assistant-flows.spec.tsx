@@ -53,7 +53,7 @@ describe("Assistant Client flows", () => {
     expect(screen.getByText("Vence el 12 de octubre de 2026")).toBeOnTheScreen();
     expect(screen.getByText("Activo")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Registrar pago en efectivo" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-bookings")).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-history")).toBeOnTheScreen();
   });
@@ -245,7 +245,7 @@ describe("Assistant Client flows", () => {
       },
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Elige un plan")).toBeOnTheScreen();
     });

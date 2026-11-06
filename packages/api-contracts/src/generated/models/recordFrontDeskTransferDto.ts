@@ -11,6 +11,6 @@ export interface RecordFrontDeskTransferDto {
   branchId: string;
   /** The photographed transfer receipt, already READY */
   imageAssetId: string;
-  /** Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it. */
+  /** Chosen Start Date (booking ADR-0005). Omitted means today, or the day after the current Plan ends while it still has classes; then any day through 28 days after that end may be chosen (booking ADR-0013). Older builds omit it. */
   startsOn?: string;
 }

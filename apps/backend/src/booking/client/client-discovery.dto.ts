@@ -150,7 +150,7 @@ export class ClientSubscriptionDto {
     type: String,
     format: 'date',
     description:
-      'A Plan bought now starts on this date, the day after the current Plan ends, and no Start Date is chosen: the current Plan still has classes. Absent when she chooses the date.',
+      'The current Plan still has classes, so a Plan bought now starts after it ends: this is the day after its end, the default, and any day through 27 days later may be chosen (booking ADR-0013). Absent when she chooses from today.',
   })
   renewalStartsOn?: string;
 }

@@ -1,6 +1,8 @@
 // booking ADR-0008: 15 % off every Plan except the single class, for the
 // first 40 Clients, lost for good after a gap of more than the allowed days.
 
+import { nextPlanStartWindowDays } from './early-renewal';
+
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
 const singleClassAllowance = 1;
 
@@ -77,14 +79,33 @@ export const decideFounderPlace = (input: {
   return { assign: true, number: input.nextNumber };
 };
 
+// booking ADR-0013: a next Plan sold on or before the real end that starts
+// inside the next Plan window keeps the place, however long the wait.
+const boughtInAdvance = (
+  realEnd: Date,
+  nextStart: Date | null,
+  soldOn: Date | null | undefined,
+): boolean =>
+  nextStart !== null &&
+  soldOn !== null &&
+  soldOn !== undefined &&
+  soldOn.getTime() <= realEnd.getTime() &&
+  nextStart.getTime() <=
+    realEnd.getTime() + nextPlanStartWindowDays * dayMilliseconds;
+
 export const decideFounderGap = (input: {
   today: Date;
   rules: FounderRules;
   membership: { status: FounderStatus; lostAt: Date | null };
   latestRealEnd: Date | null;
   nextStart: Date | null;
+  // The day the next Plan was sold, in Bolivia time.
+  nextSoldOn?: Date | null;
 }): { lose: false } | { lose: true; reason: 'gap' } => {
   if (input.membership.status === 'lost' || input.latestRealEnd === null) {
+    return { lose: false };
+  }
+  if (boughtInAdvance(input.latestRealEnd, input.nextStart, input.nextSoldOn)) {
     return { lose: false };
   }
   const coveredUntil = input.nextStart === null ? input.today : input.nextStart;
