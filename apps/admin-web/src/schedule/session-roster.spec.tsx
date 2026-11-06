@@ -13,6 +13,7 @@ import {
   server,
   useMockServer,
 } from "../test/msw";
+import { expectBrandedLoading } from "../test/branded-loading";
 import { renderAdmin } from "../test/render-admin";
 import { clientPage, clientRow, clientsPath } from "../test/people-fixtures";
 import {
@@ -136,6 +137,30 @@ describe("WEB-039 who booked a class and booking a Client from Horario", () => {
     expect(
       within(panel).getByRole("button", { name: "Reservar a una clienta" }),
     ).toBeInTheDocument();
+  });
+
+  it("keeps the booking button above the loading logo, not beside it (WEB-045)", async () => {
+    server.use(
+      http.get(
+        apiUrl(rosterPath(mondayReformer.id)),
+        () => new Promise(() => undefined),
+      ),
+    );
+    const { panel } = await openSession(/Reformer Pilates, 07:00/);
+
+    const loading = await within(panel).findByRole("status", {
+      name: "Cargando quiénes reservaron…",
+    });
+    expectBrandedLoading("Cargando quiénes reservaron…", within(panel));
+    const button = within(panel).getByRole("button", {
+      name: "Reservar a una clienta",
+    });
+    // The logo is centred across the panel: the button's row holds no logo.
+    expect(button.parentElement).not.toContainElement(loading);
+    expect(
+      button.compareDocumentPosition(loading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it("books a picked Client with a fresh idempotency key and says so", async () => {
