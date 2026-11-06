@@ -28,6 +28,13 @@ export const glyphShapes = {
       <Line x1={16} x2={16} y1={3.5} y2={7} />
     </>
   ),
+  // S10 QR receipt card (design follow-up 254 § 2).
+  camera: (
+    <>
+      <Path d="M4 8h3.5l1.5-2.5h6L16.5 8H20v11H4z" />
+      <Circle cx={12} cy={13} r={3.5} />
+    </>
+  ),
   card: (
     <>
       <Rect height={15} rx={2.5} width={17} x={3.5} y={5.5} />

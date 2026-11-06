@@ -46,6 +46,7 @@ describe("Glyph", () => {
 
   it("knows the shapes the client v2 boards add", async () => {
     const names = [
+      "camera",
       "copy",
       "document",
       "flame",
