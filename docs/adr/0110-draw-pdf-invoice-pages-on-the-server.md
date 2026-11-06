@@ -14,12 +14,14 @@ In the walkthrough verification (n.º 45) the owner saw that an invoice uploaded
 
 Option 2, under the blanket approval for technical decisions.
 
-- The backend depends on Mozilla's **pdf.js** (`pdfjs-dist`, Apache-2.0, pinned) and **`@napi-rs/canvas`** (MIT, prebuilt binaries for the Debian image, no build step). `renderPdfPage(bytes, page)` draws one page 1400 px wide on white and reports the page count; pdf.js 6 never evaluates a document's scripts, and the 14 standard fonts come from the package.
+- The backend depends on Mozilla's **pdf.js** (`pdfjs-dist`, Apache-2.0, pinned) and **`@napi-rs/canvas`** (MIT, prebuilt binaries for the Debian image, no build step). `renderPdfPage(bytes, page)` draws one page on white, 1400 px wide and never taller than 4000 px, skips embedded images over 4096 × 4096, and reports the page count; pdf.js 6 has no script or eval path, and the 14 standard fonts come from the package. A document pdf.js cannot open answers `422 invoice_page_unreadable`.
+- Drawing runs on the API's own thread, so pages are drawn **one at a time** and the last 24 pages drawn are **kept in memory** (`pdf-page-cache.ts`); a failure is never kept. The apps ask for page 1 first and the rest only when the viewer opens, with one retry.
 - Two endpoints, beside the existing file downloads and with the same access rules: `GET /v1/clients/current/invoices/{paymentId}/file/pages/{page}` and `GET /v1/staff/payments/{paymentId}/invoice/file/pages/{page}`. They answer `image/png`, `Cache-Control: no-store`, and `X-Page-Count`; `409 invoice_not_pdf` for a photo, `404 invoice_page_not_found` past the last page, `400` for a page outside 1–100.
-- Pages are drawn on each request, nothing is cached or stored: invoices are small, are viewed a few times, and only staff upload them. If drawing becomes slow, option 3's stored thumbnail is the next step.
+- Nothing is stored: invoices are small, are viewed a few times, and only staff upload them. If drawing becomes slow, option 3's stored thumbnail is the next step.
 - No migration.
 
 ## Consequences
 
+- Pinch to zoom in the viewer works on iOS only: React Native's `ScrollView` zoom is iOS-only, as in the existing receipt viewer. Android zoom is a follow-up.
 - The API image grows by pdf.js and the canvas binary (about 30 MB).
 - Unit tests cannot import pdf.js (an ES module); the renderer is tested in the e2e suite, which runs with `--experimental-vm-modules`.
