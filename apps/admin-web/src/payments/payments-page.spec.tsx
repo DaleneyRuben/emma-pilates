@@ -25,6 +25,7 @@ import {
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
+import { expectBrandedLoading } from "../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 // The sidebar badge's one-row read falls through to its own handler.
@@ -74,7 +75,7 @@ describe("AW28 Pagos on a desktop browser", () => {
     renderAdmin("/dinero/pagos");
     await heading();
 
-    expect(screen.getByText("Cargando pagos…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando pagos…");
     const sofia = await rowOf(/Sofía Guzmán/);
     const amount = within(sofia).getByRole("cell", { name: /Bs 500,00/ });
     expect(amount).toHaveAttribute("data-label", "Monto");

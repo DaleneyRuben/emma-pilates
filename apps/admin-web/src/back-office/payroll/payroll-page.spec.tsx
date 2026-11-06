@@ -18,6 +18,7 @@ import { emma, rita } from "../../test/people-fixtures";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 const payrollTable = (respond: (params: URLSearchParams) => Response) =>
@@ -50,7 +51,7 @@ describe("AW11 Nómina on a desktop browser", () => {
     renderAdmin("/dinero/sueldos/pagados");
     await heading();
 
-    expect(screen.getByText("Cargando pagos…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando pagos…");
     const row = await rowOf("Emma Vargas");
     const amount = within(row).getByRole("cell", { name: "Bs 3.500,00" });
     expect(amount).toHaveAttribute("data-label", "Monto");

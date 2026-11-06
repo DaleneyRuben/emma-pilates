@@ -9055,3 +9055,45 @@ G. **Clients' photos where the staff see them** (walkthrough n.º 30). Give
 Specs: `staff-photo.spec.ts`, `staff-photo.e2e-spec.ts`,
 `staff-photo.integration-spec.ts`, `staff-photo.spec.tsx` (mobile-core), and
 the apps' Perfil, Personal, Horario, Reservar and Mis reservas specs.
+
+## Test 140: the Emma logo on every loading page of the admin web (WEB-045)
+
+The owner asked on 2026-11-05 for the logo wherever the web is loading
+something, centred (follow-ups 94, 107 and 250). Any database copy works.
+To see each state long enough, slow the network: in Chrome DevTools open
+Network and pick **Slow 3G**, or put a small delaying proxy between the web
+and the API (`ADMIN_API_PROXY_TARGET` pointing at it).
+
+A. **First load.** Open [http://localhost:5173](http://localhost:5173)
+   signed in. The whole window is cream (Crema) with only the logo in the
+   middle, from the first instant; then the shell appears.
+B. **Pages at 1440 px.** With the network slowed, open each page from the
+   rail: Inicio, Horario (Clases, Nutrición), Clientas (the list, Para
+   contactar, Congelamientos), Promociones (Promociones, Clases de campaña,
+   Referidos, Contactos), Comentarios, Dinero (Pagos, Caja, Sueldos and
+   Pagados, Gastos), Estudio (Personal, Insumos and Retiros, Equipos),
+   Informes (El mes, Dinero, Simulador) and Ajustes (every tab). Each keeps
+   its title, tabs, filters and buttons, and after a short moment shows
+   **only the logo**, breathing, centred in the space under them (not at the
+   top, not in a box, no «Cargando …» text). A fast answer never flashes it.
+   Inicio shows the logo under the greeting and never says «Todo al día»
+   before its counts arrive. Informes › Dinero shows one logo, not two.
+C. **Side panels.** Open a client from Clientas: the file shows the logo in
+   the middle of the panel while it loads, and again on Reservas, Pagos and
+   Evaluaciones the first time each tab opens. Open a class on Horario and a
+   payment on Dinero › Pagos: same. On Estudio › Equipos, switch the
+   «Fallas» chips: the logo shows in the card's place while they load.
+D. **At 420 px.** Narrow the window to 420 px and repeat a few pages and a
+   panel: the logo is 240 px wide and centred under the page's header, with
+   no sideways scroll.
+E. **Reduce Motion.** With the system's Reduce Motion on, the logo appears
+   still (no fade, no breathing), after the same short moment.
+F. **What keeps its own pattern.** A busy button keeps its spinner; a
+   select reading its options («Cargando sucursales…») keeps that text; the
+   Dinero card on Inicio keeps its own short line when it switches Hoy / Mes;
+   «No pudimos cargar …» keeps its card with **Reintentar**.
+
+Specs: `branded-loading.spec.tsx`, `page-pending.spec.tsx`,
+`home-page.spec.tsx`, `campaign-page.spec.tsx`, `studio-rules-page.spec.tsx`,
+and every page spec that asserts its loading state through
+`src/test/branded-loading.ts`.

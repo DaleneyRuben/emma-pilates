@@ -23,6 +23,7 @@ import {
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const detailReads: string[] = [];
 const handlers = (respond: () => Response) => [
@@ -137,7 +138,7 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
     );
     const { panel } = await openLucia();
 
-    expect(within(panel).getByText("Cargando la ficha…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando la ficha…", within(panel));
   });
 
   it("collapses the Plan to the last expiry when none is active", async () => {

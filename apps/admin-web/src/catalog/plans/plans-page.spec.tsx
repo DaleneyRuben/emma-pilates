@@ -11,6 +11,7 @@ import {
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { findBrandedLoading } from "../../test/branded-loading";
 
 const plansPath = "/api/v1/administrator/plans";
 
@@ -63,7 +64,7 @@ describe("AW04 Planes on a desktop browser", () => {
     server.use(planTable(() => jsonResponse(page([mensual, anual]))));
     renderAdmin("/ajustes/planes");
 
-    expect(await screen.findByText("Cargando planes…")).toBeInTheDocument();
+    await findBrandedLoading("Cargando planes…");
     const row = (
       await screen.findByRole("cell", { name: /Paquete de 12 clases/ })
     ).parentElement as HTMLElement;

@@ -16,7 +16,7 @@ import {
 } from "../components/form/form";
 import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
-import { QueryFailure } from "../components/page/query-failure";
+import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { Input } from "../components/ui/input";
@@ -110,7 +110,7 @@ export function CampaignPage() {
         </p>
       )}
       {preview.isPending ? (
-        <p className="text-nota text-texto-tenue">Cargando las clientas…</p>
+        <LoadingNotice>Cargando las clientas…</LoadingNotice>
       ) : preview.isError ? (
         <QueryFailure
           error={preview.error}

@@ -22,6 +22,7 @@ import {
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
+import { expectBrandedLoading } from "../../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 const clientTable = (respond: (params: URLSearchParams) => Response) =>
@@ -48,7 +49,7 @@ describe("AW21 Clientes on a desktop browser", () => {
     renderAdmin("/clientas");
     await heading();
 
-    expect(screen.getByText("Cargando clientas…")).toBeInTheDocument();
+    expectBrandedLoading("Cargando clientas…");
     const row = (await screen.findByRole("cell", { name: /Lucía Fernández/ }))
       .parentElement as HTMLElement;
     expect(
