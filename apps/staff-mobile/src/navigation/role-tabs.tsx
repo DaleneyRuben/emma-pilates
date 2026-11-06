@@ -1,4 +1,9 @@
-import { colors, fontFamilies, tabStackScreenLayout } from "@pilates/mobile-core";
+import {
+  colors,
+  fontFamilies,
+  popTabToRootOnPress,
+  tabStackScreenLayout,
+} from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createStaticNavigation,
@@ -82,12 +87,10 @@ const cancelClassScreens = { CancelClass: CancelClassScreen, CancelSession: Canc
 
 const tabBarStyle = { backgroundColor: colors.card, borderTopWidth: 0 };
 
-// The bar shows only while the tab's stack is on its root screen. Walkthrough
-// n.º 28: leaving a tab pops its stack, so a tab always reopens on its root.
-export const tabOptions =
+// The bar shows only while the tab's stack is on its root screen.
+const tabOptions =
   (title: string, icon: StaffTabIconName, root: string) =>
   ({ route }: { route: RouteProp<ParamListBase> }) => ({
-    popToTopOnBlur: true,
     tabBarButtonTestID: `tab-${icon}`,
     tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) =>
       icon === "contacts" ? (
@@ -109,6 +112,8 @@ const profileTab = {
 
 // Follow-up 225 §8: one tab bar per role, drawn like the client's, on Lino.
 const tabConfig = {
+  // Walkthrough n.º 28: tapping a tab opens it on its root screen.
+  screenListeners: popTabToRootOnPress,
   screenOptions: {
     headerShown: false,
     tabBarActiveTintColor: colors.emphasis,

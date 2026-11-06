@@ -4,6 +4,7 @@ import {
   EmailChangeLinkScreen,
   MobileQueryProvider,
   type MobileNavigationProps,
+  popTabToRootOnPress,
   tabStackScreenLayout,
   typography,
 } from "@pilates/mobile-core";
@@ -108,14 +109,12 @@ const ProfileStack = createNativeStackNavigator({
 const tabBarStyle = { backgroundColor: colors.card, borderTopColor: colors.borderStrong };
 
 // Follow-up 227: a pushed screen (with a back arrow) has no tab bar, so the
-// bar shows only while the tab's stack is on its root screen. Walkthrough
-// n.º 28: leaving a tab pops its stack, so a tab always reopens on its root.
+// bar shows only while the tab's stack is on its root screen.
 const tabOptions =
   (title: string, icon: ClientTabIconName, root: string) =>
   ({ route }: { route: Parameters<typeof getFocusedRouteNameFromRoute>[0] }) => {
     const focused = getFocusedRouteNameFromRoute(route) ?? root;
     return {
-      popToTopOnBlur: true,
       tabBarButtonTestID: `tab-${icon}`,
       tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
       tabBarStyle: focused === root ? tabBarStyle : { display: "none" as const },
@@ -124,6 +123,8 @@ const tabOptions =
   };
 
 const ClientTabs = createBottomTabNavigator({
+  // Walkthrough n.º 28: tapping a tab opens it on its root screen.
+  screenListeners: popTabToRootOnPress,
   // Labels stay under the icons on a tablet too.
   screenOptions: {
     headerShown: false,

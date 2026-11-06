@@ -10,7 +10,11 @@ describe("popTabToRootOnPress", () => {
     const dispatch = jest.fn();
     const listeners = popTabToRootOnPress({
       navigation: { dispatch },
-      route: { state: { index: 1, key: "stack-booking" } },
+      route: {
+        key: "booking",
+        name: "Booking",
+        state: { index: 1, key: "stack-booking" },
+      } as never,
     });
 
     listeners.tabPress();
@@ -23,9 +27,12 @@ describe("popTabToRootOnPress", () => {
 
     popTabToRootOnPress({
       navigation: { dispatch },
-      route: { state: { index: 0, key: "stack-home" } },
+      route: { key: "home", name: "HomeTab", state: { index: 0, key: "stack-home" } } as never,
     }).tabPress();
-    popTabToRootOnPress({ navigation: { dispatch }, route: {} }).tabPress();
+    popTabToRootOnPress({
+      navigation: { dispatch },
+      route: { key: "profile", name: "ProfileTab" },
+    }).tabPress();
 
     expect(dispatch).not.toHaveBeenCalled();
   });
