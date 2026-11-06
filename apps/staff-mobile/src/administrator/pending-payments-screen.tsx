@@ -5,6 +5,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
+  ClientFace,
   formatBolivianos,
   formatNotificationTime,
   IconRow,
@@ -161,6 +162,14 @@ export function PendingPaymentsScreen({
                   accessibilityLabel={`Revisar pago de ${payment.clientName}`}
                   amount={formatBolivianos(payment.amountDueCentavos)}
                   detail={`${payment.planName} · ${formatNotificationTime(payment.submittedAt, now).toLowerCase()}`}
+                  face={
+                    <ClientFace
+                      fetcher={fetcher}
+                      name={payment.clientName}
+                      photo={payment.clientPhoto}
+                      size={36}
+                    />
+                  }
                   key={payment.id}
                   name={payment.clientName}
                   onPress={() => navigation.navigate("ReviewPayment", { paymentId: payment.id })}

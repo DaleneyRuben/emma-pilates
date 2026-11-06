@@ -1,3 +1,4 @@
+import type { ClientPhotoRef } from '../client/client-photo-of';
 import { AdministrationError } from '../administration/administration-errors';
 import { runsOperations } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
@@ -8,12 +9,14 @@ export type AdministratorSessionRoster = {
     bookingId: string;
     clientId: string;
     clientName: string;
+    clientPhoto: ClientPhotoRef;
     attendanceOutcome: 'attended' | 'no_show' | null;
   }[];
   waitlist: {
     waitlistEntryId: string;
     clientId: string;
     clientName: string;
+    clientPhoto: ClientPhotoRef;
     position: number;
   }[];
 };

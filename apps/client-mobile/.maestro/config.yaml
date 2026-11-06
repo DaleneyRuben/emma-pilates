@@ -29,3 +29,4 @@ executionOrder:
     - waitlist-join-and-leave
     - reschedule-booking
     - close-account
+    - trainer-face

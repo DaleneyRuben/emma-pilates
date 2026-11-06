@@ -13,6 +13,11 @@ import {
 } from "../../test/msw";
 import { renderAdmin } from "../../test/render-admin";
 import {
+  expectClientInitials,
+  expectClientPhoto,
+  herPhoto,
+} from "../../test/client-photo-fixtures";
+import {
   coordinatorHandlers,
   signedInHandlers,
 } from "../../test/session-handlers";
@@ -23,6 +28,7 @@ const path = "/api/v1/administrator/contact-alerts";
 const valeria: ContactAlertItemDto = {
   clientId: "c1000000-0000-5000-8000-000000000001",
   name: "Valeria Quiroga",
+  photo: null,
   phone: "+591 70011005",
   startedOn: "2026-10-02",
   reasons: ["no_booking_7_days"],
@@ -31,6 +37,7 @@ const valeria: ContactAlertItemDto = {
 const daniela: ContactAlertItemDto = {
   clientId: "c1000000-0000-5000-8000-000000000002",
   name: "Daniela Rojas",
+  photo: null,
   phone: null,
   startedOn: "2026-10-05",
   reasons: ["fewer_than_2_classes_by_day_15", "no_booking_7_days"],
@@ -39,6 +46,7 @@ const daniela: ContactAlertItemDto = {
 const monica: ContactAlertItemDto = {
   clientId: "c1000000-0000-5000-8000-000000000003",
   name: "Mónica Salvatierra",
+  photo: null,
   phone: "+54 91123456789",
   startedOn: "2026-09-20",
   reasons: ["fewer_than_4_classes_in_first_30_days"],
@@ -99,6 +107,24 @@ describe("AW39 Para contactar", () => {
     expect(
       within(withoutPhone).getByText("Menos de 2 clases a los 15 días"),
     ).toBeInTheDocument();
+  });
+
+  it("FIX-041 shows a Client's photo, or her initials without one", async () => {
+    server.use(
+      http.get(apiUrl(path), () =>
+        jsonResponse(list([{ ...valeria, photo: herPhoto }, daniela])),
+      ),
+    );
+    renderAdmin("/clientas/para-contactar");
+
+    const row = (await screen.findByText("Valeria Quiroga")).closest(
+      "tr",
+    ) as HTMLElement;
+    expectClientPhoto(row, "Valeria Quiroga");
+    const without = screen
+      .getByText("Daniela Rojas")
+      .closest("tr") as HTMLElement;
+    expectClientInitials(without, "Daniela Rojas", "DR");
   });
 
   it("marks a Client contacted without a confirmation", async () => {

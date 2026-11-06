@@ -2,6 +2,7 @@ import { worksAtBranch } from '../staff-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import type { PlanSummary } from '../catalog/catalog-repository';
 import type { ClassHistoryEntry } from '../class-history';
+import type { ClientPhotoRef } from '../client/client-photo-of';
 import type { UpcomingClientBooking } from '../client/client-bookings';
 import {
   describeSubscription,
@@ -29,6 +30,7 @@ export type AssistantClientSummary = {
   email: string;
   phone: string | null;
   accountStatus: ClientAccountStatus;
+  photo: ClientPhotoRef;
 };
 
 export type AssistantClientBooking = UpcomingClientBooking & {

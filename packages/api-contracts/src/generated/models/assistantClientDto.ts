@@ -5,10 +5,16 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { AssistantClientDtoAccountStatus } from "./assistantClientDtoAccountStatus";
+import type { ClientPhotoDto } from "./clientPhotoDto";
 
 export interface AssistantClientDto {
   id: string;
   name: string;
+  /**
+   * Her photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  photo: ClientPhotoDto | null;
   email: string;
   /** @nullable */
   phone?: string | null;

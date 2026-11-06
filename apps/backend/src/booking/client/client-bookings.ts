@@ -1,3 +1,4 @@
+import type { StaffPhotoRef } from '../staff/photo/staff-photo-of';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 
@@ -6,6 +7,7 @@ type UpcomingSessionFacts = {
   branchId: string;
   classTypeName: string;
   trainerName: string;
+  trainerPhoto: StaffPhotoRef;
   branchName: string;
   startsAt: Date;
   endsAt: Date;

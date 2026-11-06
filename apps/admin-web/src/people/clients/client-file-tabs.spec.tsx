@@ -31,6 +31,7 @@ const upcoming: AssistantClientBookingDto[] = [
     branchId: "b1000000-0000-5000-8000-000000000001",
     classTypeName: "Reformer Pilates",
     trainerName: "Daniela Ortiz",
+    trainerPhoto: null,
     branchName: "Centro",
     // Thursday 5 November 2026, 18:30 in Bolivia.
     startsAt: "2026-11-05T22:30:00.000Z",
@@ -44,6 +45,7 @@ const upcoming: AssistantClientBookingDto[] = [
     branchId: "b1000000-0000-5000-8000-000000000001",
     classTypeName: "Mat Pilates",
     trainerName: "Daniela Ortiz",
+    trainerPhoto: null,
     branchName: "Centro",
     startsAt: "2026-11-06T13:00:00.000Z",
     endsAt: "2026-11-06T13:50:00.000Z",
@@ -56,6 +58,7 @@ const history: ClassHistoryEntryDto[] = [
     sessionId: "50000000-0000-5000-8000-000000000009",
     classTypeName: "Barre",
     trainerName: "Carla Rojas",
+    trainerPhoto: null,
     branchName: "Equipetrol",
     startsAt: "2026-10-29T22:30:00.000Z",
     endsAt: "2026-10-29T23:20:00.000Z",

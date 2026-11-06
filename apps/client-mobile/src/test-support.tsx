@@ -73,3 +73,14 @@ export function createClientRuntime(
     ...overrides,
   };
 }
+
+// FIX-041: a Staff Member's photo thumbnail, served by asset as the API does.
+export function staffPhotoRoute(imageAssetId: string): Record<string, Route> {
+  return {
+    [`/api/v1/staff-photos/${imageAssetId}?variant=thumbnail`]: () =>
+      new Response(Uint8Array.from([255, 216, 255, 224]), {
+        headers: { "Content-Type": "image/jpeg" },
+        status: 200,
+      }),
+  };
+}

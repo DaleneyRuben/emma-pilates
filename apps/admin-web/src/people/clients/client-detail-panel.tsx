@@ -16,6 +16,7 @@ import {
   SidePanelFooter,
 } from "../../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
+import { ClientPhoto } from "../../components/client-photo";
 import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
 import { PageNotice } from "../../components/page/page-notice";
@@ -124,9 +125,12 @@ function ClientSummary({
 }) {
   return (
     <>
-      <p className="text-nota text-texto-tenue">
-        Cliente desde {formatCivilDate(client.clientSince)}
-      </p>
+      <div className="flex items-center gap-3">
+        <ClientPhoto name={client.name} photo={client.photo} size={40} />
+        <p className="text-nota text-texto-tenue">
+          Cliente desde {formatCivilDate(client.clientSince)}
+        </p>
+      </div>
       {client.accountStatus === "pending" ? (
         <div className="flex flex-col gap-1 rounded-control border border-advertencia/40 bg-advertencia/10 px-3 py-2">
           <StatusPill tone="advertencia">Pendiente de activación</StatusPill>

@@ -17,6 +17,7 @@ import {
   first90DaysNow,
 } from './first-90-days-test-support';
 import { impersonating, openImpersonation } from './impersonation-test-support';
+import { attachClientPhoto } from './client-photo-test-support';
 
 const startsOn = new Date('2026-10-01T00:00:00.000Z');
 
@@ -65,11 +66,12 @@ describe('Contact alerts (PostgreSQL)', () => {
     await context?.stop();
   });
 
-  it('lists an open alert and drops the Client the moment she books', async () => {
+  it('lists an open alert with her photo and drops the Client the moment she books', async () => {
     const client = await createClientWithPlan(prisma, {
       name: 'Valeria Quiroga',
       startsOn,
     });
+    const photo = await attachClientPhoto(prisma, client.clientId);
     await createFirst90DaysJob(
       prisma,
       () => first90DaysNow,
@@ -82,6 +84,7 @@ describe('Contact alerts (PostgreSQL)', () => {
         expect.objectContaining({
           clientId: client.clientId,
           name: 'Valeria Quiroga',
+          photo: { imageAssetId: photo },
           reasons: ['no_booking_7_days'],
         }),
       ]),

@@ -1,3 +1,4 @@
+import { StaffPhotoDto } from './photo/staff-photo.dto';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 import type {
@@ -56,6 +57,14 @@ export class StaffMemberDto {
     description: 'Expiry of the current Activation Link while pending',
   })
   activationExpiresAt!: Date | null;
+
+  @ApiProperty({
+    type: StaffPhotoDto,
+    nullable: true,
+    description:
+      'Her profile photo (FIX-041), null while her initials stand in',
+  })
+  photo!: StaffPhotoDto | null;
 
   @ApiPropertyOptional({
     description:

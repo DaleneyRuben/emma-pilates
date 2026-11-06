@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import { ClientPhotoDto } from '../client/client-discovery.dto';
 
 // A shape match is not a calendar date: 2026-02-31 rolls into March.
 export const isCivilDate = (value: string): boolean =>
@@ -67,6 +68,13 @@ export class FreezeReviewDto {
 
   @ApiProperty()
   clientName!: string;
+
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'The Client photo (FIX-041), null while her initials stand in',
+  })
+  clientPhoto!: ClientPhotoDto | null;
 
   @ApiProperty()
   planName!: string;

@@ -2,6 +2,10 @@ import type { PrismaClient } from '../../generated/prisma/client';
 import { FreezeState } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { requireOperations } from '../administration/administration-errors';
+import {
+  clientNameAndPhoto,
+  clientNameSelect,
+} from '../client/client-photo-of';
 import { PaymentRuleError } from './payment-errors';
 
 const reviewSelect = {
@@ -10,7 +14,7 @@ const reviewSelect = {
   endsOn: true,
   reason: true,
   state: true,
-  client: { select: { name: true } },
+  client: clientNameSelect,
   subscription: { select: { planNameSnapshot: true } },
 } as const;
 
@@ -20,11 +24,11 @@ const toReview = (row: {
   endsOn: Date;
   reason: string;
   state: FreezeState;
-  client: { name: string };
+  client: { name: string; profileImageAssetId: string | null };
   subscription: { planNameSnapshot: string };
 }) => ({
   id: row.id,
-  clientName: row.client.name,
+  ...clientNameAndPhoto(row.client),
   planName: row.subscription.planNameSnapshot,
   startsOn: row.startsOn.toISOString().slice(0, 10),
   endsOn: row.endsOn.toISOString().slice(0, 10),

@@ -4,11 +4,17 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ClientPhotoDto } from "./clientPhotoDto";
 import type { ContactAlertItemDtoReasonsItem } from "./contactAlertItemDtoReasonsItem";
 
 export interface ContactAlertItemDto {
   clientId: string;
   name: string;
+  /**
+   * Her photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  photo: ClientPhotoDto | null;
   /** @nullable */
   phone: string | null;
   /** Start Date of the first real Plan, Bolivia civil date */

@@ -1,3 +1,4 @@
+import type { ClientPhotoRef } from '../client/client-photo-of';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { requireOperations } from '../administration/administration-errors';
 import {
@@ -9,6 +10,7 @@ import {
 export type OpenContactAlert = {
   clientId: string;
   name: string;
+  photo: ClientPhotoRef;
   phone: string | null;
   startedOn: Date;
   reason: ContactAlertReason;
@@ -19,6 +21,7 @@ export type OpenContactAlert = {
 export type ContactAlertItem = {
   clientId: string;
   name: string;
+  photo: ClientPhotoRef;
   phone: string | null;
   startedOn: Date;
   reasons: ContactAlertReason[];
@@ -48,6 +51,7 @@ export const visibleContactAlerts = (
         {
           clientId: first.clientId,
           name: first.name,
+          photo: first.photo,
           phone: first.phone,
           startedOn: first.startedOn,
           reasons: sorted.map((alert) => alert.reason),
@@ -62,6 +66,7 @@ export const visibleContactAlerts = (
     .map((item) => ({
       clientId: item.clientId,
       name: item.name,
+      photo: item.photo,
       phone: item.phone,
       startedOn: item.startedOn,
       reasons: item.reasons,

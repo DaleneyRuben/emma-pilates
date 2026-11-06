@@ -5,11 +5,17 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { AdministratorRosterBookingDtoAttendanceOutcome } from "./administratorRosterBookingDtoAttendanceOutcome";
+import type { ClientPhotoDto } from "./clientPhotoDto";
 
 export interface AdministratorRosterBookingDto {
   bookingId: string;
   clientId: string;
   clientName: string;
+  /**
+   * The Client photo (FIX-041), null while her initials stand in
+   * @nullable
+   */
+  clientPhoto: ClientPhotoDto | null;
   /**
    * Null until the Trainer records Attendance
    * @nullable

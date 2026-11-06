@@ -16,6 +16,7 @@ import {
   fixtureNow,
   startEvaluationTestWorld,
 } from './evaluation-test-support';
+import { attachClientPhoto } from './client-photo-test-support';
 
 describe('Prisma evaluation booking commands', () => {
   let world: EvaluationTestWorld;
@@ -285,8 +286,12 @@ describe('Prisma evaluation booking commands', () => {
     ).id;
   });
 
-  it('shows the Nutritionist their own agenda with derived first and follow-up kinds', async () => {
+  it('shows the Nutritionist their own agenda with each Client photo and derived first and follow-up kinds', async () => {
     const carla = await world.principalOf('carla@example.com');
+    const isabel = await world.prisma.client.findFirstOrThrow({
+      where: { name: 'Isabel Arce' },
+    });
+    const isabelPhoto = await attachClientPhoto(world.prisma, isabel.id);
 
     const firstPage = await commands().listNutritionistAgenda(
       { limit: 2 },
@@ -296,6 +301,7 @@ describe('Prisma evaluation booking commands', () => {
       expect.objectContaining({
         evaluationId: ids.isabelSeptember,
         clientName: 'Isabel Arce',
+        clientPhoto: { imageAssetId: isabelPhoto },
         startsAt: at('2026-09-28T14:30:00.000Z'),
         durationMinutes: 45,
         branchName: 'Centro',
@@ -304,6 +310,7 @@ describe('Prisma evaluation booking commands', () => {
       expect.objectContaining({
         evaluationId: ids.luciaFollowUp,
         clientName: 'Lucía Fernández',
+        clientPhoto: null,
         kind: 'first',
       }),
     ]);

@@ -17,6 +17,11 @@ import {
   valeriaPayment,
 } from "../test/payment-fixtures";
 import { emptyPageHandlers } from "../test/page-handlers";
+import {
+  expectClientInitials,
+  expectClientPhoto,
+  herPhoto,
+} from "../test/client-photo-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
@@ -41,6 +46,23 @@ describe("AW28 Pagos on a desktop browser", () => {
     reads.length = 0;
     server.use(...signedInHandlers());
     server.use(pendingBadgeHandler(6));
+  });
+
+  it("FIX-041 shows the Client's photo, or her initials without one", async () => {
+    server.use(
+      paymentTable(() =>
+        jsonResponse(
+          paymentPage([
+            { ...luciaPayment, clientPhoto: herPhoto },
+            sofiaPayment,
+          ]),
+        ),
+      ),
+    );
+    renderAdmin("/dinero/pagos");
+
+    expectClientPhoto(await rowOf(/Lucía Fernández/), "Lucía Fernández");
+    expectClientInitials(await rowOf(/Sofía Guzmán/), "Sofía Guzmán", "SG");
   });
 
   it("lists the pending transfers first by default with the studio count", async () => {

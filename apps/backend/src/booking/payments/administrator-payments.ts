@@ -1,3 +1,4 @@
+import type { ClientPhotoRef } from '../client/client-photo-of';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { requireAdministrator } from '../administration/administration-errors';
 import type {
@@ -19,6 +20,7 @@ export type AdministratorPaymentRow = {
   id: string;
   clientId: string;
   clientName: string;
+  clientPhoto: ClientPhotoRef;
   planName: string;
   /** Plan sale or paid Evaluation (booking ADR-0011). */
   kind: 'plan' | 'evaluation';

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
+import { ClientPhotoDto } from '../client/client-discovery.dto';
 
 const uuid = z.uuid();
 
@@ -60,6 +61,12 @@ export const parseIncomeQuery = (value: unknown) =>
 export class AdminEvaluationDto {
   @ApiProperty({ format: 'uuid' }) evaluationId!: string;
   @ApiProperty() clientName!: string;
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'The Client photo (FIX-041), null while her initials stand in',
+  })
+  clientPhoto!: ClientPhotoDto | null;
   @ApiProperty({ format: 'uuid' }) nutritionistStaffMemberId!: string;
   @ApiProperty() nutritionistName!: string;
   @ApiProperty({ format: 'uuid' }) branchId!: string;
@@ -153,6 +160,12 @@ export class FounderMembershipDto {
   @ApiProperty({ format: 'uuid' }) membershipId!: string;
   @ApiProperty({ minimum: 1, maximum: 40 }) number!: number;
   @ApiProperty() clientName!: string;
+  @ApiProperty({
+    type: ClientPhotoDto,
+    nullable: true,
+    description: 'The Client photo (FIX-041), null while her initials stand in',
+  })
+  clientPhoto!: ClientPhotoDto | null;
   @ApiProperty({ format: 'date-time' }) since!: Date;
   @ApiProperty({ enum: ['active', 'lost'] }) status!: 'active' | 'lost';
 }

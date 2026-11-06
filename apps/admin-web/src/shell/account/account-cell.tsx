@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../../lib/cn";
-import { initials } from "../../lib/initials";
+import { StaffPhoto } from "../../components/staff-photo";
 import {
   Popover,
   PopoverContent,
@@ -32,19 +32,15 @@ export function AccountCell() {
   const [panelOpen, setPanelOpen] = useState(false);
   const name = profile?.name ?? "";
 
-  // P01: the avatar in Rosa tinte, then her name over her Role.
+  // P01: her photo or her initials in Rosa tinte (follow-up 241 §1), then
+  // her name over her Role.
   const trigger = (
     <button
       type="button"
       aria-label={name === "" ? "Tu cuenta" : `Tu cuenta: ${name}`}
       className="flex h-11 items-center gap-2.5 rounded-tarjeta pr-2 pl-1 text-left text-texto hover:bg-lino focus-visible:shadow-foco"
     >
-      <span
-        aria-hidden="true"
-        className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-rosa-tinte text-nota font-semibold text-rosa-enlace"
-      >
-        {initials(name)}
-      </span>
+      <StaffPhoto name={name} photo={profile?.photo} size={40} />
       {narrow ? (
         <span className="sr-only">{name}</span>
       ) : (

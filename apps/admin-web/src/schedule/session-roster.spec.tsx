@@ -13,6 +13,11 @@ import {
   server,
   useMockServer,
 } from "../test/msw";
+import {
+  expectClientInitials,
+  expectClientPhoto,
+  herPhoto,
+} from "../test/client-photo-fixtures";
 import { renderAdmin } from "../test/render-admin";
 import { clientPage, clientRow, clientsPath } from "../test/people-fixtures";
 import {
@@ -120,6 +125,31 @@ describe("WEB-039 who booked a class and booking a Client from Horario", () => {
       expect.stringMatching(/^1.*Sofía Guzmán/),
       expect.stringMatching(/^2.*Carla Méndez/),
     ]);
+  });
+
+  it("FIX-041 shows who booked and who waits with her photo or initials", async () => {
+    const base = roster(wednesdayMat.id, ["Ana Quiroga"], ["Sofía Guzmán"]);
+    server.use(
+      http.get(apiUrl(rosterPath(wednesdayMat.id)), () =>
+        jsonResponse({
+          ...base,
+          bookings: base.bookings.map((booking) => ({
+            ...booking,
+            clientPhoto: herPhoto,
+          })),
+        }),
+      ),
+    );
+    const { panel } = await openSession(/Mat Pilates, 16:00/);
+
+    const booked = await within(panel).findByRole("region", {
+      name: "Reservaron (1)",
+    });
+    expectClientPhoto(booked, "Ana Quiroga");
+    const waiting = within(panel).getByRole("region", {
+      name: "Lista de espera (1)",
+    });
+    expectClientInitials(waiting, "Sofía Guzmán", "SG");
   });
 
   it("keeps the booking button when the roster cannot be read (FIX-042 review)", async () => {

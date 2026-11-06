@@ -53,6 +53,7 @@ numbered tests.
 | Second walkthrough fixes | The rail's labels at 12 px, a missed Minimum Bookings check settled when the worker comes back, «Fecha de apertura» as dd/mm/aaaa, and phones without +591 (Test 130) | The phone normalization migration runs once on deploy |
 | The web's sign-in with the logo | Login, «¿Olvidaste tu contraseña?» and «Crea tu contraseña» with the studio's logo beside the form, their notices, errors and the throttled wait, at 1440 and 420 px (Test 131) | Busy buttons last only while a request is in flight |
 | Phones with a country code | «Celular» with a flag prefix and a country list in Regístrate (required), Editar perfil, Nuevo cliente, Invitar a alguien and the client's «Editar perfil» on the web; numbers with their flag in every list; WhatsApp in the number's own country (Test 132) | A store build older than FIX-037 registers without a phone |
+| Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and Horario, and next to the Trainer's name in the client's Reservar, class detail, Mis reservas and Historial (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -1615,8 +1616,8 @@ larger circle with the initials and the link **Cambiar foto**. Tapping it
 opens the photo library; pick an image and it appears inside the circle at
 once, centre-cropped, with "Subiendo foto…" under it while the upload runs
 (declare, upload, finalize, wait for the worker, attach: a few seconds). Then
-"Se recorta al centro en forma de círculo." and a second link, **Quitar
-foto**, appear. **Volver** shows the same photo in the Perfil summary card.
+a second link, **Quitar foto**, appears; no line about cropping shows
+(follow-up 247, FIX-041). **Volver** shows the same photo in the Perfil summary card.
 **Quitar foto** removes it: the initials come back on both screens. HEIC
 photos are converted to JPEG on the phone; the API keeps a 320 px display
 and a 96 px thumbnail variant without metadata and releases them at once when
@@ -8920,3 +8921,64 @@ Specs: `cancelled-sessions.spec.tsx`, `session-cancellation.spec.ts`,
 `agenda-cancelled.spec.tsx` (Staff app); `administrator-sessions` and
 `trainer-schedule` integration specs, `booking.controller.spec.ts` and
 `administrator.e2e-spec.ts` (backend).
+
+## Test 135: the staff profile photo (FIX-041)
+
+The owner chose proposal A of DES-008 on 2026-11-05 (decisiones §20.23;
+design follow-ups 240 to 242 and 247). Use a database copy with the fixtures
+(Test 5A) and run the API **with the worker**: an upload stays processing
+without it. Keep a JPEG of a face in the Simulator's library
+(`xcrun simctl addmedia <udid> photo.jpg`) or `adb push` it on Android.
+
+A. **Her own photo, Staff app.** Log in as Emma Vargas (Trainer) and open
+   **Perfil**. Her 72 px circle shows «EV» on a pale rose disc, and under her
+   name and email sits **Cambiar foto**. Tap it, pick the photo: it shows at
+   once under a light veil with a ring and «Subiendo foto…», then stays.
+   **Quitar foto** now sits beside **Cambiar foto**. The note reads «Tu
+   nombre y tu correo los actualiza administración.»; there is no line about
+   cropping (follow-up 247). **Quitar foto** brings «EV» back at once with
+   «Quitando foto…». With the API stopped, both actions end in a Lino row
+   with a red alert icon: «No pudimos subir la foto. Inténtalo de nuevo.» /
+   «No pudimos quitar la foto. Inténtalo de nuevo.»
+B. **Anyone's photo, admin web.** As Paola (Administrator) open **Estudio ›
+   Personal**: every member shows her photo or her initials in a 40 px
+   circle. **Abrir** on Daniela Ortiz opens the panel with a 96 px circle,
+   **Cambiar foto**, **Quitar foto** when there is one, and «JPG, PNG o WebP,
+   hasta 5 MB.» (ADR-0072). A PDF or a 6 MB image shows «Elige una foto JPG, PNG o
+   WebP de hasta 5 MB.» before anything uploads. The photo saves without
+   **Guardar**. As Carolina (Coordinator) the same panel lets her change the
+   photo too, and her notice reads «Puedes cambiar sus sedes y su foto.
+   Invitar y cambiar roles lo hace Administración.»
+C. **The top bar.** Paola's own photo (set in step A from her Staff app
+   Perfil) replaces «PM» in the account chip at the top right of every page.
+D. **Where the Trainer appears.** With Emma's photo set: the admin web's
+   **Horario** blocks show a 20 px photo before «Emma Vargas»; the Staff
+   app's **Horario** lines and an Assistant's class detail («Entrenadora»
+   row, 36 px) show it too; a client (Lucía) sees it before the Trainer's
+   name in **Reservar**, in the class detail's «La clase», in **Mis
+   reservas** and in **Historial**. A Trainer without a photo shows her
+   initials in the same places.
+E. **The API.** `PUT /api/v1/staff-members/current/photo`, `PUT` and
+   `DELETE /api/v1/administrator/staff-members/{id}/photo` (Administrator and
+   Coordinator; anyone else `403 staff_access_denied`, a deactivated member
+   `409 staff_member_deactivated`), and `GET /api/v1/staff-photos/{imageAssetId}?variant=thumbnail`
+   for any signed-in Account: `Cache-Control: private, no-cache`, an `ETag`,
+   and `304` with `If-None-Match`; an asset no Staff Member shows answers
+   `404 profile_photo_not_found`. Each change writes
+   `staff_member.photo_changed` / `staff_member.photo_removed` on the
+   member's Account with the actor who made it.
+F. **At 420 px** the admin web's member panel fills the width and the
+   controls wrap without sideways scroll.
+G. **Clients' photos where the staff see them** (walkthrough n.º 30). Give
+   Mariana a photo from the client app's **Editar perfil**. Her initials
+   «MQ» become her photo in the Trainer's class roster, Buscar cliente and
+   her file, Pagos pendientes and Revisar pago, Para contactar and
+   Congelamientos in the Staff app, and in Clientas, her file, Dinero ›
+   Pagos, the class panel's «Reservaron» and Inicio's pending list on the
+   admin web. `GET /api/v1/client-photos/{imageAssetId}` answers any Staff
+   Role (`private, no-cache`, `ETag`, `304`) and `403 booking_access_denied`
+   to a Client.
+
+Specs: `staff-photo.spec.ts`, `staff-photo.e2e-spec.ts`,
+`staff-photo.integration-spec.ts`, `staff-photo.spec.tsx` (mobile-core), and
+the apps' Perfil, Personal, Horario, Reservar and Mis reservas specs.
