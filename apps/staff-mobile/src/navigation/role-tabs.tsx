@@ -83,7 +83,7 @@ const cancelClassScreens = { CancelClass: CancelClassScreen, CancelSession: Canc
 const tabBarStyle = { backgroundColor: colors.card, borderTopWidth: 0 };
 
 // The bar shows only while the tab's stack is on its root screen.
-const tabOptions =
+export const tabOptions =
   (title: string, icon: StaffTabIconName, root: string) =>
   ({ route }: { route: RouteProp<ParamListBase> }) => ({
     tabBarButtonTestID: `tab-${icon}`,
