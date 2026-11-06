@@ -12,6 +12,8 @@ import { CancelClassScreen } from "../administrator/cancel-class-screen";
 import { CancelSessionScreen } from "../administrator/cancel-session-screen";
 import { FreezesScreen } from "../administrator/freezes-screen";
 import { PendingPaymentsScreen } from "../administrator/pending-payments-screen";
+import { InvoiceScreen } from "../invoices/invoice-screen";
+import { InvoicesScreen } from "../invoices/invoices-screen";
 import { ReviewFreezeScreen } from "../administrator/review-freeze-screen";
 import { ReviewPaymentScreen } from "../administrator/review-payment-screen";
 import { AssistantRescheduleScreen } from "../assistant/assistant-reschedule-screen";
@@ -71,6 +73,10 @@ const clientScreens = {
   Reschedule: AssistantRescheduleScreen,
   ClientHistory: ClientHistoryScreen,
   Notifications: StaffNotificationsScreen,
+  // FIX-044: «Facturas por subir» opens from Clientes for the Assistant and
+  // the Coordinator, and from Pagos for the Administrator.
+  Invoices: InvoicesScreen,
+  Invoice: InvoiceScreen,
 };
 const sellingScreens = {
   NewClient: NewClientScreen,
@@ -213,6 +219,8 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
               ...cancelClassScreens,
               CashClose: CashCloseScreen,
               Notifications: StaffNotificationsScreen,
+              Invoices: InvoicesScreen,
+              Invoice: InvoiceScreen,
             },
           }),
           options: tabOptions("Pagos", "payments", "Payments"),

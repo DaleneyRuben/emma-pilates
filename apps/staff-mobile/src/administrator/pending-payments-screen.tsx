@@ -22,6 +22,8 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, View } from "react-native";
 
+import { usePendingInvoiceCount } from "../invoices/invoices-screen";
+
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { useStaffFetcher } from "../staff-fetcher";
 import { PersonRow } from "../ui/person-row";
@@ -33,7 +35,7 @@ export type PaymentsNotice = "Pago confirmado" | "Pago rechazado";
 type PendingPaymentsNavigation = {
   navigate: {
     (screen: "ReviewPayment", params: { paymentId: string }): void;
-    (screen: "CancelClass" | "CashClose" | "Freezes"): void;
+    (screen: "CancelClass" | "CashClose" | "Freezes" | "Invoices"): void;
     (screen: "ScheduleTab"): void;
   };
   setParams: (params: { notice?: PaymentsNotice }) => void;
@@ -52,6 +54,7 @@ export function PendingPaymentsScreen({
   });
   const freezes = useListRequestedFreezes({ fetcher });
   const freezeCount = freezes.data?.status === 200 ? freezes.data.data.length : 0;
+  const invoiceCount = usePendingInvoiceCount();
   const queryKeys = [getListPendingPaymentsQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
@@ -82,6 +85,14 @@ export function PendingPaymentsScreen({
     <View>
       <SectionTitle>Accesos</SectionTitle>
       <IconRowGroup>
+        <IconRow
+          chevron
+          icon="receipt"
+          label="Facturas por subir"
+          onPress={() => navigation.navigate("Invoices")}
+          testID="pending-payments-invoices"
+          value={invoiceCount > 0 ? String(invoiceCount) : undefined}
+        />
         <IconRow
           chevron
           icon="calendar"

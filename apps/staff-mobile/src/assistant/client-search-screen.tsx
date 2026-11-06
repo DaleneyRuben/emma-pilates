@@ -6,6 +6,7 @@ import {
   colors,
   fontFamilies,
   Glyph,
+  IconRow,
   IconRowGroup,
   LineIcon,
   QueryFailure,
@@ -23,6 +24,8 @@ import { useEffect, useState } from "react";
 import { Circle, Path } from "react-native-svg";
 import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
+import { usePendingInvoiceCount } from "../invoices/invoices-screen";
+
 import { roleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
@@ -35,7 +38,7 @@ import { ClientDetailPanel } from "./client-panel";
 
 export type ClientSearchNavigation = {
   navigate: {
-    (screen: "NewClient"): void;
+    (screen: "NewClient" | "Invoices"): void;
     (screen: "ClientOverview", params: { clientId: string }): void;
   };
 };
@@ -96,6 +99,9 @@ export function ClientSearchScreen() {
     workspace.show({ view: "overview", clientId });
   };
 
+  // FIX-044: the Assistant and the Coordinator have no Pagos tab, so the
+  // invoices still to upload open from here (design E3).
+  const invoiceCount = usePendingInvoiceCount();
   const profile = useGetCurrentStaffMemberProfile({ fetcher });
   const member = profile.data?.status === 200 ? profile.data.data : undefined;
   const role = useStaffRole();
@@ -135,6 +141,18 @@ export function ClientSearchScreen() {
           </Pressable>
         )}
       </View>
+      {searching || invoiceCount === 0 ? null : (
+        <IconRowGroup>
+          <IconRow
+            chevron
+            icon="receipt"
+            label="Facturas por subir"
+            onPress={() => navigation.navigate("Invoices")}
+            testID="client-search-invoices"
+            value={String(invoiceCount)}
+          />
+        </IconRowGroup>
+      )}
       {coordinator || (searching && clients.length === 0 && results.data?.status === 200) ? null : (
         <NewClientButton onPress={() => navigation.navigate("NewClient")} />
       )}

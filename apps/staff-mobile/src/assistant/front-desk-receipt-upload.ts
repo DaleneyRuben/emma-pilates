@@ -32,7 +32,20 @@ export async function photographTransferReceipt(
   const asset = result.canceled ? undefined : result.assets[0];
   if (asset === undefined) return null;
 
-  const converted = await ImageManipulator.manipulateAsync(asset.uri, [], {
+  return { imageAssetId: await uploadPickedPhoto(asset.uri, "transfer_receipt", fetcher) };
+}
+
+/**
+ * Re-encodes a picked photo as JPEG and runs Test 32's calls until the
+ * worker made it READY: the transfer receipt (PAY-006) and, since FIX-044,
+ * the issued invoice. Returns the upload's id.
+ */
+export async function uploadPickedPhoto(
+  uri: string,
+  purpose: "transfer_receipt" | "invoice",
+  fetcher: typeof globalThis.fetch,
+): Promise<string> {
+  const converted = await ImageManipulator.manipulateAsync(uri, [], {
     compress: 0.8,
     format: ImageManipulator.SaveFormat.JPEG,
   });
@@ -43,7 +56,7 @@ export async function photographTransferReceipt(
   const digest = await Crypto.digest(Crypto.CryptoDigestAlgorithm.SHA256, bytes);
   const declared = await createPendingUpload(
     {
-      purpose: "transfer_receipt",
+      purpose,
       mediaType: "image/jpeg",
       byteSize: bytes.byteLength,
       checksum: encodeBase64(new Uint8Array(digest)),
@@ -70,7 +83,7 @@ export async function photographTransferReceipt(
   for (let attempt = 0; attempt < pollAttempts; attempt += 1) {
     const status = await getUploadStatus(declared.data.id, undefined, fetcher);
     if (status.status === 200 && status.data.state === "ready") {
-      return { imageAssetId: declared.data.id };
+      return declared.data.id;
     }
     if (status.status === 200 && status.data.state === "failed") {
       throw new Error("upload_rejected");
