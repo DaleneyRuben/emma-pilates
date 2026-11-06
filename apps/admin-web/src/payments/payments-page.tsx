@@ -13,6 +13,7 @@ import { initials } from "../lib/initials";
 import { formatBolivianos } from "../lib/money";
 import { saveFile } from "../lib/save-file";
 import { InvoiceCell } from "./invoice-cell";
+import { InvoicePanel } from "./invoice-panel";
 import { fetchAllPayments } from "./invoice-queries";
 import { paymentTableQueryOptions } from "./payment-queries";
 import { PaymentReviewPanel } from "./payment-review-panel";
@@ -25,7 +26,7 @@ type InvoiceFilter = "all" | "unissued";
 
 const invoiceOptions: { value: InvoiceFilter; label: string }[] = [
   { value: "all", label: "Todas" },
-  { value: "unissued", label: "Sin factura emitida" },
+  { value: "unissued", label: "Factura por subir" },
 ];
 
 const statusOptions: { value: PaymentStatusFilter; label: string }[] = [
@@ -89,6 +90,12 @@ function EmptyPayments({ search }: { search: PaymentSearch }) {
 
 const columns = createColumnHelper<AdminPaymentDto>();
 
+// A transfer to review, or (FIX-044) a sale whose invoice is uploaded here.
+const canOpenPayment = (row: AdminPaymentDto) =>
+  row.state === "pending" ||
+  row.invoiceData !== null ||
+  row.invoiceFile !== null;
+
 const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
   columns.accessor("clientName", {
     header: "Cliente",
@@ -100,7 +107,7 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
         >
           {initials(row.original.clientName)}
         </span>
-        {row.original.state === "pending" ? (
+        {canOpenPayment(row.original) ? (
           <RowOpener
             label={row.original.clientName}
             onOpen={() => open(row.original)}
@@ -173,7 +180,9 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
   columns.display({
     id: "invoice",
     header: "Factura",
-    cell: ({ row }) => <InvoiceCell payment={row.original} />,
+    cell: ({ row }) => (
+      <InvoiceCell payment={row.original} onOpen={() => open(row.original)} />
+    ),
   }),
 ];
 
@@ -209,9 +218,12 @@ export function PaymentsPage({
       loadingMessage="Cargando pagos…"
       what="los pagos"
       emptyMessage={<EmptyPayments search={search} />}
-      panelTitles={{ create: "Revisar pago", edit: "Revisar pago" }}
+      panelTitles={{
+        create: "Revisar pago",
+        edit: (row) => (row.state === "pending" ? "Revisar pago" : "Factura"),
+      }}
       panelDescription={(row) => `${row.clientName} · ${row.planName}`}
-      canOpen={(row) => row.state === "pending"}
+      canOpen={canOpenPayment}
       links={
         <Button
           variant="neutral"
@@ -267,8 +279,10 @@ export function PaymentsPage({
       query={query}
       columns={paymentColumns}
       renderForm={(payment, done) =>
-        payment === undefined ? null : (
+        payment === undefined ? null : payment.state === "pending" ? (
           <PaymentReviewPanel payment={payment} onDone={done} />
+        ) : (
+          <InvoicePanel payment={payment} />
         )
       }
     />

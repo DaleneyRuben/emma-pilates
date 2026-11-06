@@ -36,6 +36,31 @@ function PaymentSummary({ review }: { review: PaymentReviewDto }) {
   );
 }
 
+// FIX-044 (follow-up 248): whether she asked for an invoice and in whose
+// name; it is uploaded once the payment is confirmed.
+function InvoiceRequest({ review }: { review: PaymentReviewDto }) {
+  const data = review.invoiceData ?? null;
+  return (
+    <SummaryBlock title="Factura">
+      {data === null ? (
+        <SummaryRow label="Sin factura">No la pidió</SummaryRow>
+      ) : (
+        <>
+          <SummaryRow label="NIT o CI">
+            <span className="tabular">{data.taxId}</span>
+          </SummaryRow>
+          <SummaryRow label="A nombre de">{data.name}</SummaryRow>
+          {review.state === "pending" ? (
+            <SummaryRow label="Estado">
+              Podrás subir la factura cuando confirmes el pago.
+            </SummaryRow>
+          ) : null}
+        </>
+      )}
+    </SummaryBlock>
+  );
+}
+
 function ReviewBody({
   review,
   clientId,
@@ -59,6 +84,7 @@ function ReviewBody({
           </p>
         )}
         <PaymentSummary review={review} />
+        <InvoiceRequest review={review} />
         <ReceiptViewer
           receiptUrl={review.receiptUrl ?? null}
           receiptMissing={review.receipt === null}
