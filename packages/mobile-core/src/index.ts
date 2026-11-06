@@ -7,6 +7,7 @@ export * from "./account/feedback-metadata";
 export * from "./account/feedback-screen";
 export * from "./account/initials";
 export * from "./account/logout-confirmation";
+export * from "./staff-photo/client-face";
 export * from "./staff-photo/person-avatar";
 export * from "./staff-photo/staff-face";
 export * from "./staff-photo/use-staff-photo";
