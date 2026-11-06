@@ -43,12 +43,23 @@ const voided = {
   voided: true,
 };
 
+// FIX-051: the API draws each PDF page as a PNG (a header is enough here).
+const pngPage = () => {
+  const bytes = new Uint8Array(24);
+  bytes.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52]);
+  new DataView(bytes.buffer).setUint32(16, 1400);
+  new DataView(bytes.buffer).setUint32(20, 1980);
+  return new Response(bytes, { headers: { "Content-Type": "image/png", "X-Page-Count": "2" } });
+};
+
 const openInvoices = async (items: unknown[]) => {
   const screen = await openProfile(
     createClientRuntime(
       routeFetcher({
         ...readRoutes,
         "/api/v1/clients/current/invoices": () => jsonResponse({ items }),
+        "/api/v1/clients/current/invoices/payment-1/file/pages/1": pngPage,
+        "/api/v1/clients/current/invoices/payment-1/file/pages/2": pngPage,
       }),
     ),
   );
@@ -112,6 +123,25 @@ describe("Mis facturas", () => {
       fileName: "factura-000123.pdf",
       mediaType: "application/pdf",
     });
+  });
+
+  // Verification n.º 45 (follow-up 256 § 3): a PDF shows its first page and
+  // opens every page in the viewer, which downloads too.
+  it("shows a PDF's first page and opens the whole invoice", async () => {
+    mockDownloadInvoice.mockResolvedValue("shared");
+    const screen = await openInvoices([ready]);
+
+    await fireEvent.press(
+      await screen.findByRole("button", { name: /Paquete de 8 clases, 5 nov 2026/ }),
+    );
+    await fireEvent.press(await screen.findByRole("button", { name: "Ver la factura, 2 páginas" }));
+
+    expect(await screen.findByText("Factura · 1 de 2")).toBeOnTheScreen();
+    expect(await screen.findByLabelText("Página 2 de 2")).toBeOnTheScreen();
+    const downloads = screen.getAllByRole("button", { name: "Descargar" });
+    await fireEvent.press(downloads[downloads.length - 1]);
+
+    await waitFor(() => expect(mockDownloadInvoice).toHaveBeenCalledTimes(1));
   });
 
   it("says so when the download fails", async () => {
