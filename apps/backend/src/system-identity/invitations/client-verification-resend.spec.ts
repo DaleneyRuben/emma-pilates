@@ -98,7 +98,7 @@ describe('sendClientVerification (S05 «Enviar enlace de verificación»)', () =
     expect(transaction.scheduleAuthenticationEmail).not.toHaveBeenCalled();
   });
 
-  it('is open to Assistants and Administrators only', async () => {
+  it('denies Clients', async () => {
     await expect(
       sendClientVerification(
         { clientId: 'client-1' },

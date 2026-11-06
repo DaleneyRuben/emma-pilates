@@ -28,7 +28,15 @@ appId: ${APP_ID}
           direction: DOWN
           timeout: 10000
       - tapOn: "Tools button"
-      - tapOn: "Close"
+      # Newer dev menus have no «Close»: the back key closes them.
+      - tapOn:
+          text: "Close"
+          optional: true
+      - runFlow:
+          when:
+            visible: "Tools button"
+          commands:
+            - back
       - extendedWaitUntil:
           notVisible: "Tools button"
           timeout: 5000
