@@ -158,7 +158,6 @@ export function PendingEmailChange({
 
   return (
     <section
-      role="status"
       aria-label={title}
       className="flex gap-3 rounded-marco bg-rosa-tinte p-4"
     >
@@ -178,7 +177,7 @@ export function PendingEmailChange({
         </p>
         {result === null ? null : (
           <p
-            role={result.ok ? undefined : "alert"}
+            role={result.ok ? "status" : "alert"}
             className={
               result.ok
                 ? "text-ayuda text-primario"

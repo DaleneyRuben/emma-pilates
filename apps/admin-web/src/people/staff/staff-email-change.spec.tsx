@@ -102,7 +102,7 @@ describe("AW24 Editar miembro email change", () => {
         { method: "POST", path: changePath, body: { email: newEmail } },
       ]),
     );
-    const card = await within(panel).findByRole("status", {
+    const card = await within(panel).findByRole("region", {
       name: "Esperando que Camila confirme",
     });
     expect(
@@ -134,7 +134,7 @@ describe("AW24 Editar miembro email change", () => {
       ),
     );
     const { panel, user } = await openMember("Camila Rojas");
-    const card = within(panel).getByRole("status", {
+    const card = within(panel).getByRole("region", {
       name: "Esperando que Camila confirme",
     });
 
@@ -156,7 +156,7 @@ describe("AW24 Editar miembro email change", () => {
       ),
     ).toBeVisible();
     expect(
-      within(panel).queryByRole("status", {
+      within(panel).queryByRole("region", {
         name: "Esperando que Camila confirme",
       }),
     ).not.toBeInTheDocument();
