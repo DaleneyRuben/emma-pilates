@@ -3176,8 +3176,9 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    opens the payment's panel; an uploaded one shows **Emitida** "por <name> ·
    dd/mm/aaaa". «Marcar emitida» and «Deshacer» are gone. The **Factura**
    filter's **Factura por subir** (`?invoice=unissued`) lists only the
-   confirmed sales with invoice data not issued yet, or "No hay facturas
-   pendientes." when there are none.
+   confirmed sales with invoice data and no file yet (an old «Emitida · sin
+   archivo» mark included), or "No hay facturas pendientes." when there are
+   none.
 9. **Exportar CSV** downloads `pagos-aaaa-mm-dd.csv` with every row the
    filters match, every page, not only the one on screen: «Fecha», «Cliente»,
    «Plan», «Método», «Monto (Bs)», «Estado», «NIT o CI», «Nombre o razón
@@ -9157,7 +9158,10 @@ F. **Refusals (API).** `PUT /api/v1/staff/payments/{id}/invoice` answers 409
    `payment_without_invoice_data` on a «Sin factura» sale, `payment_voided` on
    a voided one, `payment_not_confirmed` on a pending one, and
    `invoice_file_not_attachable` for an upload that is not a ready `invoice`
-   of the caller; a Trainer or Nutritionist gets 403. `POST …/invoice-issued`
+   of the caller; a Trainer or Nutritionist gets 403. `DELETE` on a voided
+   payment answers 409 `payment_voided` (its invoice stays with the Client),
+   and the web panel shows neither **Reemplazar** nor **Quitar factura**
+   there. `POST …/invoice-issued`
    is gone (404). The Client's
    `GET /api/v1/clients/current/invoices/{id}/file` of someone else's payment
    is 404 `invoice_not_found`.
