@@ -62,7 +62,9 @@ describe("Mi plan with a Freeze", () => {
       "/api/v1/clients/current/subscription": () => jsonResponse(current),
       "POST /api/v1/freezes/freeze-1/withdrawal": () => {
         withdrawn.push("freeze-1");
-        current = view();
+        current = view({
+          freeze: { id: "freeze-1", state: "withdrawn", startsOn: start, endsOn: end },
+        });
         return jsonResponse({ state: "withdrawn" });
       },
     });
@@ -74,15 +76,25 @@ describe("Mi plan with a Freeze", () => {
     expect(screen.queryByText("Tu solicitud de congelamiento está en revisión.")).toBeNull();
     expect(screen.queryByRole("button", { name: /^Congelar plan/ })).toBeNull();
 
+    // Owner 2026-11-08 («LO APRUEBO»): a discreet link, a sheet like
+    // «¿Cerrar sesión?», then the freeze row again and a toast.
     await fireEvent.press(screen.getByRole("button", { name: "Retirar solicitud" }));
     await waitFor(() => {
       expect(screen.getByText("¿Retirar tu solicitud?")).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Retirar" }));
+    expect(
+      screen.getByText(
+        `Tu plan sigue igual y vence el ${dayMonth(termEndsOn)}. Puedes pedir otro congelamiento después.`,
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Volver" })).toBeOnTheScreen();
+    const confirm = screen.getAllByRole("button", { name: "Retirar solicitud" });
+    await fireEvent.press(confirm[confirm.length - 1]);
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Congelar plan/ })).toBeOnTheScreen();
     });
+    expect(screen.getByText("Retiramos tu solicitud")).toBeOnTheScreen();
     expect(withdrawn).toEqual(["freeze-1"]);
     expect(screen.queryByText("En revisión")).toBeNull();
   });
@@ -176,5 +188,50 @@ describe("Mi plan with a Freeze", () => {
       backgroundColor: "#F2E4E1",
     });
     expect(screen.queryByRole("button", { name: "Reservar una clase" })).toBeNull();
+  });
+
+  it("names a one-day approved Freeze by its day", async () => {
+    const day = addCivilDays(today, 3);
+    const screen = await openMiPlan({
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse(
+          view({
+            freeze: { id: "freeze-1", state: "approved", startsOn: day, endsOn: day },
+            canRequestFreeze: false,
+          }),
+        ),
+    });
+
+    expect(screen.getByText(`Congelado el ${weekdayDayMonth(day)}`)).toBeOnTheScreen();
+  });
+
+  it("re-reads the plan when the request was decided before the withdrawal", async () => {
+    const start = addCivilDays(today, 8);
+    const end = addCivilDays(start, 6);
+    let current: Record<string, unknown> = view({
+      freeze: { id: "freeze-1", state: "requested", startsOn: start, endsOn: end },
+      canRequestFreeze: false,
+    });
+    const screen = await openMiPlan({
+      "/api/v1/clients/current/subscription": () => jsonResponse(current),
+      "POST /api/v1/freezes/freeze-1/withdrawal": () => {
+        current = view({
+          freeze: { id: "freeze-1", state: "approved", startsOn: start, endsOn: end },
+          canRequestFreeze: false,
+        });
+        return jsonResponse({ code: "freeze_already_decided", status: 409 }, 409);
+      },
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Retirar solicitud" }));
+    const confirm = await screen.findAllByRole("button", { name: "Retirar solicitud" });
+    await fireEvent.press(confirm[confirm.length - 1]);
+
+    await waitFor(() => {
+      expect(screen.getByText("Aprobado")).toBeOnTheScreen();
+    });
+    expect(
+      screen.getByText("La administración ya decidió tu solicitud. Mira cómo quedó."),
+    ).toBeOnTheScreen();
   });
 });
