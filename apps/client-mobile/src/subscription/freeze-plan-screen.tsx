@@ -24,7 +24,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { AccessibilityInfo, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { freezeRequestFailure } from "./freeze-refusal-copy";
@@ -81,6 +81,15 @@ export function FreezePlanScreen() {
     queuedPlanStartsOn: data.queuedPlanStartsOn ?? null,
   };
   const window = freezeWindow(term);
+  // Review: reached by a stale back stack or a link, the screen checks what
+  // Mi plan checked before offering the row.
+  const blocked =
+    data.canRequestFreeze === true
+      ? window.unavailableReason
+      : data.freeze?.state === "requested" || data.freeze?.state === "approved"
+        ? "Ya pediste un congelamiento para este plan."
+        : "Solo los planes de 90 días se pueden congelar.";
+  const open = window.available && data.canRequestFreeze === true;
   const choosingEnd = start !== null && end === null;
   const summary =
     start !== null && end !== null ? freezeSummary(subscription.endsOn, start, end) : null;
@@ -98,6 +107,8 @@ export function FreezePlanScreen() {
     setMessage(null);
     if (off !== null) {
       setWhy(off);
+      // The muted day only says «no disponible»: read the reason out too.
+      AccessibilityInfo.announceForAccessibility(off);
       return;
     }
     setWhy(null);
@@ -158,7 +169,7 @@ export function FreezePlanScreen() {
     }
   };
 
-  const ready = summary !== null && reason.trim().length > 0 && window.available;
+  const ready = summary !== null && reason.trim().length > 0 && open;
 
   return (
     <Screen style={styles.screen}>
@@ -167,7 +178,7 @@ export function FreezePlanScreen() {
         <BodyText style={styles.lead}>
           Elige el primer y el último día. Puedes congelar hasta 15 días, una vez por plan.
         </BodyText>
-        {window.available ? (
+        {open ? (
           <>
             <Calendar
               firstMonth={window.firstDay.slice(0, 7)}
@@ -178,11 +189,11 @@ export function FreezePlanScreen() {
               rangeStart={start}
               today={today}
             />
-            {why === null ? null : <Reason text={why} />}
+            {why === null ? null : <Reason live text={why} />}
             {prompt === null ? null : <BodyText style={styles.prompt}>{prompt}</BodyText>}
           </>
         ) : (
-          message === null && <Reason text={window.unavailableReason ?? genericRefusal} />
+          message === null && <Reason text={blocked ?? genericRefusal} />
         )}
         {summary === null ? null : (
           <View style={styles.summary} testID="freeze-summary">
@@ -234,9 +245,22 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Reason({ alert = false, text }: { alert?: boolean; text: string }) {
+function Reason({
+  alert = false,
+  live = false,
+  text,
+}: {
+  alert?: boolean;
+  live?: boolean;
+  text: string;
+}) {
   return (
-    <View accessibilityRole={alert ? "alert" : undefined} accessible={alert} style={styles.reason}>
+    <View
+      accessibilityLiveRegion={live ? "polite" : undefined}
+      accessibilityRole={alert ? "alert" : undefined}
+      accessible={alert}
+      style={styles.reason}
+    >
       <Glyph color={colors.errorText} name="alert" size={16} strokeWidth={1.5} />
       <Text style={styles.reasonText}>{text}</Text>
     </View>
