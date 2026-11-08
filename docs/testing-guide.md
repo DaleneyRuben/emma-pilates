@@ -9384,3 +9384,66 @@ E. **Short screens centred (n.º 46).** **Crear cuenta** until **Revisa tu
    expired activation or password link, and «Tu cuenta está activa»: the
    badge, title, text and buttons sit together in the middle of the screen,
    in both apps, on the phone and the iPad.
+
+
+## Test 146: walkthrough findings 49–54 — founder deadline, one branch, Mi plan and Congelar plan, freeze review and history (FIX-053, DES-015)
+
+Design follow-ups 257–259 (option A). Run the API and the worker on a fresh
+copy of the walkthrough database, the client and staff apps on the iPhone 16
+Pro, the iPad and Android, and the admin web at 1440 and 420 px. Carla needs
+a current quarterly Plan (90 days).
+
+A. **Founder deadline says why (n.º 49).** As Lucía (founder), **Mi plan**:
+   the first notice reads «Renueva antes del 9 de diciembre para mantener tu
+   15 % de descuento.», with no coloured box and no word «fundadora».
+B. **One branch (n.º 50).** With only Achumani active, **Comprar un plan ›
+   Trimestral 24 clases**: «Qué incluye» says «24 clases». Activate a second
+   branch in the admin web and reopen: «24 clases en cualquier sucursal».
+C. **Mi plan, one focus (n.º 54).** As Carla, **Mi plan**: the plan card is
+   the only coloured block; notices (founder, ending soon, next plan) are
+   rows with an icon and no fill; **Tu plan** holds **Renovar mi plan** and
+   **Congelar plan** as rows; there is no **Reservar una clase** button at
+   the bottom (Reservar is on the tab bar).
+D. **Congelar plan (n.º 51).** **Mi plan › Congelar plan** opens a task
+   screen: «Puedes congelar hasta 15 días», a month calendar (Monday
+   first, ‹ › within the plan). Days before today and after the plan's end
+   are struck through; tap one: it explains why. Tap a first day, then a
+   16th day: «Puedes congelar hasta 15 días: el último día posible es el …».
+   Pick 7 days: the summary shows the range, «7 días» and «Tu plan vencerá
+   el …» with «antes, el …». **Enviar solicitud** stays off until **Motivo**
+   has text. Send: back on Mi plan, the **En revisión** card shows the dates,
+   the days and «Tu plan vencería el …».
+E. **Withdraw.** On the **En revisión** card, **Retirar solicitud** asks
+   «¿Retirar tu solicitud?»; **Retirar** removes the card and **Congelar
+   plan** is back. In the admin web the request is gone from **Por
+   revisar**, and Ana's bell notice is read.
+F. **A next plan caps the freeze.** Buy a renewal for Carla starting 10
+   days after her end: the calendar stops at «puedes congelar hasta 9 días».
+   With a renewal starting the day after her end, the **Congelar plan** row
+   is off and says «… ya no se puede congelar.». If the renewal is bought
+   while Congelar plan is open, **Enviar solicitud** answers with that
+   sentence instead of a generic refusal.
+G. **Review in the staff app (n.º 52).** As Ana, **Pagos › Accesos ›
+   Congelamientos**: the header matches the other staff lists; each row
+   shows «9 al 15 nov · 7 días» uncut. **Revisar congelamiento**: the dates
+   on one row, the days on their own row, «Vence el 5 de febrero → 12 de
+   febrero», the reason. Approve: the list moves it to **Decididas**
+   («Aprobada · ahora vence el 12 feb»); opening it says «Aprobada por Ana
+   … el 8 de noviembre a las …» and «Ahora vence el 12 de febrero (antes,
+   el 5 de febrero)».
+H. **Admin web (n.º 52, 53d).** **Clientas › Congelamientos**: **Vista ›
+   Por revisar** has **Días** and **Vence** («5 feb → 12 feb»); **Vista ›
+   Decididas** lists approved and refused requests with the result, the end
+   and «Decidido por … · 8 nov 10:15». Check 1440 and 420 px.
+I. **After approval, the Client (n.º 53).** Carla's notification reads
+   «Aprobamos tu congelamiento del 9 al 15 de noviembre. Tu plan ahora vence
+   el 12 de febrero.» (no ISO date). **Mi plan** before the start: the
+   **Aprobado** card «Congelado del lun 9 al dom 15 de noviembre», «Ahora
+   vence el …»; while it runs: **Congelado**, «Congelado hasta el …»,
+   «Vuelves a reservar …». A refused request shows **No aprobado** and the
+   row **Pedir otro congelamiento**.
+J. **No booking on a frozen day (n.º 53c).** Open a class inside the
+   approved freeze: «Tu plan está congelado ese día (del … al …).» with
+   **Reservar** off and no «Se descuenta 1 clase de tu plan»; a full class
+   on that day offers no waitlist. A class outside the freeze books as
+   usual.

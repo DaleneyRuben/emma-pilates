@@ -847,6 +847,10 @@ mano.
    de un plan y el inicio del siguiente, el beneficio se pierde solo y no
    vuelve. Congelar no lo quita.
 
+En la app de Lucía, **Mi plan** dice «Renueva antes del … para mantener tu 15 %
+de descuento.»: es el plazo para conservar el descuento, aunque el plan nuevo
+empiece más tarde. La clienta nunca ve la palabra «fundadora».
+
 Una fundadora nunca recibe la clase de regalo ni las clases de campaña.
 
 ### Congelamiento
@@ -859,20 +863,40 @@ tiene un plan de 30 días, así que este paso necesita un trimestral.
    ofrece la fecha de inicio en una franja con el mes en cada día: desde el
    día siguiente al fin del plan actual hasta 4 semanas después. Deja el día
    siguiente. Sube el comprobante y Ana lo confirma.
-   **Solicitar congelamiento** solo aparece cuando el trimestral ya está en
-   curso: mientras siga el plan de 30 días, **Mi plan** no lo ofrece. Haz
-   el resto de este paso cuando empiece el trimestral, o con una clienta de
-   prueba cuyo plan vigente ya sea uno de 90 días.
-2. En **Mi plan**, pulsa **Solicitar congelamiento**: fecha de inicio,
-   fecha de fin dentro de los 15 días, y un motivo. Una fecha pasada
-   se niega al enviarla.
-3. Ana lo ve en la app del equipo, en **Pagos** › **Accesos** ›
-   **Congelamientos**, y en la web en **Clientas › Congelamientos** y en
-   **Inicio**. Lo aprueba (la coordinadora también puede, desde la web). El
-   fin del plan se corre exactamente esos días. El aviso de la solicitud,
-   en la campana de Ana y de la coordinadora, queda leído solo al decidirla.
-4. Durante esos días, Lucía no puede reservar. Al aprobar, ella recibe el
-   aviso.
+   **Congelar plan** solo aparece cuando el trimestral ya está en curso:
+   mientras siga el plan de 30 días, **Mi plan** no lo ofrece. Haz el resto
+   de este paso cuando empiece el trimestral, o con una clienta de prueba
+   cuyo plan vigente ya sea uno de 90 días.
+2. **Mi plan** tiene un solo bloque de color, la tarjeta del plan. Los avisos
+   (el plazo de la fundadora, «Tu plan vence…», el plan siguiente) son filas
+   con un ícono, sin fondo. Abajo, en **Tu plan**, están **Renovar mi plan**
+   y **Congelar plan**; no hay botón **Reservar una clase** (está en la
+   barra).
+3. Pulsa **Congelar plan**. Se abre un calendario del mes («Puedes congelar
+   hasta 15 días, una vez por plan»). Toca el primer día y luego el último:
+   el rango se pinta y el resumen dice los días y «Tu plan vencerá el …»
+   («antes, el …»). Los días que no se pueden elegir (ya pasados, después
+   del vencimiento, más allá del día 15 o del inicio de un plan siguiente)
+   están tachados y, al tocarlos, dicen por qué. Escribe el **Motivo** y
+   pulsa **Enviar solicitud**. Mi plan muestra la tarjeta **En revisión** con
+   las fechas, los días y el vencimiento que tendría. **Retirar solicitud**
+   la retira (pide confirmar) y vuelve **Congelar plan**.
+4. Ana lo ve en la app del equipo, en **Pagos** › **Accesos** ›
+   **Congelamientos** («9 al 15 nov · 7 días»), y en la web en **Clientas ›
+   Congelamientos** y en **Inicio**. **Revisar congelamiento** dice las
+   fechas, los días y «Vence el 5 de febrero → 12 de febrero». Lo aprueba
+   (la coordinadora también puede, desde la web). El fin del plan se corre
+   exactamente esos días. Lo decidido queda en **Decididas** (equipo) y en
+   **Vista › Decididas** (web), con quién y cuándo. El aviso de la
+   solicitud, en la campana de Ana y de la coordinadora, queda leído al
+   decidirla o si la clienta la retira.
+5. Lucía recibe «Aprobamos tu congelamiento del 9 al 15 de noviembre. Tu
+   plan ahora vence el 12 de febrero.». En **Mi plan**, la tarjeta dice
+   **Aprobado** («Congelado del … al …») hasta que empieza y **Congelado**
+   («Congelado hasta el …») mientras dura. Esos días no puede reservar: el
+   detalle de una clase dentro del congelamiento dice «Tu plan está congelado
+   ese día» con **Reservar** apagado. Si Ana lo rechaza, la tarjeta dice
+   **No aprobado** y aparece **Pedir otro congelamiento**.
 
 ### Invita a una amiga
 
@@ -1294,5 +1318,6 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
   o la consulta gratis del trimestre ya se usó.
 - El congelamiento no se ofrece: el plan vigente no es de 90 días (un
   trimestral comprado como renovación cuenta recién cuando empieza), o ya
-  tiene un congelamiento pedido o usado. Una fecha de inicio pasada no lo
-  esconde: se niega al enviar.
+  tiene un congelamiento pedido o aprobado (uno rechazado o retirado no
+  cuenta). Si la fila **Congelar plan** aparece apagada, su texto dice por
+  qué: un plan siguiente que empieza al día siguiente no deja lugar.
