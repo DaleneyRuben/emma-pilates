@@ -77,7 +77,7 @@ function DecidedFreezes({
   return (
     <CatalogPage
       {...listProps}
-      subtitle={notice ?? "Solicitudes aprobadas o rechazadas."}
+      subtitle={notice ?? "Solicitudes aprobadas, rechazadas o retiradas."}
       emptyMessage={
         <span className="text-texto-secundario">
           Todavía no hay congelamientos decididos.
