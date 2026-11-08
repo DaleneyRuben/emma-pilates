@@ -84,3 +84,20 @@ describe("freeze format (walkthrough findings 52/53)", () => {
     ).toBeUndefined();
   });
 });
+
+// Owner 2026-11-08: a withdrawal is the Client's, never a refusal.
+describe("a withdrawn freeze", () => {
+  it("reads «Retirado por la clienta» with the unchanged end", () => {
+    const withdrawn: FreezeReviewDto = {
+      ...base,
+      state: "withdrawn",
+      planEndsOnAfter: null,
+      decidedAt: "2026-11-08T14:15:00.000Z",
+      decidedByName: "Valeria Quiroga",
+    };
+    expect(freezeDecidedBy(withdrawn)).toBe(
+      "Retirado por la clienta · 8 nov 10:15",
+    );
+    expect(freezeDecidedPlanEnd(withdrawn)).toBe("5 feb");
+  });
+});

@@ -95,3 +95,21 @@ describe("freeze format", () => {
     expect(freezeDecidedDetail(refused)).toBe("Rechazada");
   });
 });
+
+// Owner 2026-11-08: a request the Client withdrew stays in the history as
+// «Retirada», by her, never as a refusal.
+describe("a withdrawn freeze", () => {
+  const withdrawn: FreezeReviewDto = {
+    ...base,
+    state: "withdrawn",
+    planEndsOnAfter: null,
+    decidedAt: "2026-11-08T14:15:00.000Z",
+    decidedByName: "Lucía Fernández",
+  };
+
+  it("reads «Retirada por la clienta», with its day and time", () => {
+    expect(freezeDecision(withdrawn)).toBe("Retirada por la clienta el 8 de noviembre a las 10:15");
+    expect(freezeDecidedDetail(withdrawn)).toBe("Retirada");
+    expect(freezePlanEnd(withdrawn)).toBe("Vence el 5 de febrero");
+  });
+});
