@@ -227,4 +227,40 @@ describe('Sessions across every Branch', () => {
       ),
     ).toEqual([]);
   });
+
+  it('gives the Staff Horario one Branch day with its cancelled classes only when asked (FIX-052)', async () => {
+    const from = new Date(Date.now() + 16 * day);
+    const until = new Date(from.getTime() + 3 * day);
+    const target = await prisma.session.findFirstOrThrow({
+      where: { state: 'SCHEDULED', startsAt: { gte: from, lt: until } },
+      orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+    });
+    const account = await prisma.account.findFirstOrThrow();
+    const cancelledAt = new Date(from.getTime() - day);
+    await prisma.session.update({
+      where: { id: target.id },
+      data: {
+        state: 'CANCELLED',
+        cancellationCause: 'NO_SUBSTITUTE_TRAINER',
+        cancelledAt,
+        cancelledByAccountId: account.id,
+      },
+    });
+    const query = { branchId: target.branchId, from, until, limit: 100 };
+
+    const withCancelled = await listSessionAvailability(prisma)({
+      ...query,
+      includeCancelled: true,
+    });
+    const plain = await listSessionAvailability(prisma)(query);
+
+    expect(
+      withCancelled.find((session) => session.id === target.id)?.cancellation,
+    ).toEqual({ cause: 'studio', cancelledAt, bookedCount: 0 });
+    expect(
+      withCancelled.find((session) => session.id !== target.id)?.cancellation,
+    ).toBeNull();
+    expect(plain.map((session) => session.id)).not.toContain(target.id);
+    expect(plain.every((session) => !('cancellation' in session))).toBe(true);
+  });
 });

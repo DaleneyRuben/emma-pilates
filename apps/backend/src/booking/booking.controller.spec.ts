@@ -84,6 +84,40 @@ describe('BookingController', () => {
     );
   });
 
+  it('lists cancelled classes for Staff who ask, never for a Client (FIX-052)', async () => {
+    listAvailability.mockResolvedValue([]);
+    const bearer = 'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    const query = {
+      branchId: '11111111-1111-4111-8111-111111111111',
+      from: '2026-09-15T14:00:00.000Z',
+      until: '2026-09-16T14:00:00.000Z',
+    };
+    resolvePrincipal.mockResolvedValue({
+      ...principal,
+      identity: {
+        kind: 'staff',
+        staffMemberId: 'staff-id',
+        role: 'assistant',
+        branchIds: [query.branchId],
+      },
+    });
+
+    await controller.list(bearer, { ...query, includeCancelled: 'true' });
+    expect(listAvailability).toHaveBeenLastCalledWith(
+      expect.objectContaining({ includeCancelled: true }),
+    );
+    await controller.list(bearer, query);
+    expect(listAvailability).toHaveBeenLastCalledWith(
+      expect.not.objectContaining({ includeCancelled: true }),
+    );
+
+    resolvePrincipal.mockResolvedValue(principal);
+    await controller.list(bearer, { ...query, includeCancelled: 'true' });
+    expect(listAvailability).toHaveBeenLastCalledWith(
+      expect.not.objectContaining({ includeCancelled: true }),
+    );
+  });
+
   it('requires a bearer credential for availability', async () => {
     await expect(
       controller.list(undefined, {
