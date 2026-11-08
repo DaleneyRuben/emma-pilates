@@ -19,7 +19,13 @@ const rocio = {
   receiptAvailable: true,
 };
 
-const reviewOf = (extra: { startsOn: string; nextPlan?: boolean }) => ({
+const reviewOf = (extra: {
+  startsOn: string;
+  nextPlan?: boolean;
+  state?: string;
+  kind?: string;
+  planName?: string;
+}) => ({
   id: rocio.id,
   method: "transfer",
   state: "pending",
@@ -124,5 +130,18 @@ describe("Revisar pago names a Plan that starts later", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago" }));
     await waitFor(() => expect(screen.getByText("Pago confirmado")).toBeOnTheScreen());
+  });
+
+  it.each([
+    ["a rejected transfer", { state: "rejected" }],
+    ["a voided sale", { state: "voided" }],
+    ["an Evaluation", { kind: "evaluation", planName: "Evaluación nutricional" }],
+  ])("names no start for %s", async (_name, change) => {
+    const screen = await reviewAndConfirm(
+      reviewOf({ startsOn: civilIn(20), nextPlan: true, ...change }),
+    );
+
+    expect(screen.queryByText("Plan siguiente")).toBeNull();
+    expect(screen.queryByText("Empieza")).toBeNull();
   });
 });

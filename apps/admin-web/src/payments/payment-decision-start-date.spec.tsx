@@ -152,4 +152,25 @@ describe("AW29 names the Plan's real start", () => {
     expect(within(panel).queryByText("Empieza")).toBeNull();
     expect(within(panel).queryByText("Plan siguiente")).toBeNull();
   });
+
+  it.each([
+    ["a rejected transfer", { state: "rejected" as const }],
+    ["a voided sale", { state: "voided" as const }],
+    ["an Evaluation", { kind: "evaluation" as const }],
+  ])("adds no start row for %s", async (_name, change) => {
+    review = {
+      ...reviewOf(sofiaPayment),
+      startsOn: addDays(boliviaToday(), 20),
+      nextPlan: true,
+      ...change,
+    };
+    const { user } = renderAdmin("/dinero/pagos");
+    await user.click(
+      await screen.findByRole("button", { name: "Sofía Guzmán" }),
+    );
+    const panel = await screen.findByRole("dialog", { name: "Revisar pago" });
+    await within(panel).findByText("Monto a verificar");
+    expect(within(panel).queryByText("Empieza")).toBeNull();
+    expect(within(panel).queryByText("Plan siguiente")).toBeNull();
+  });
 });
