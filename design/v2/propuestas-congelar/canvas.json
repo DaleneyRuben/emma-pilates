@@ -1,0 +1,99 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-08T12:00:00Z"
+ },
+ "title": "Emma Pilates Studio · hallazgo 51",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1900,
+   "title": "Hallazgos 51 y 54 · elige una propuesta",
+   "is_interactive": true
+  },
+  "A-Mi-plan.dc.html": {
+   "x": 0,
+   "y": 2060,
+   "w": 390,
+   "h": 844,
+   "title": "A · Mi plan · la tarjeta es el foco",
+   "is_interactive": true
+  },
+  "A-Calendario.dc.html": {
+   "x": 470,
+   "y": 2060,
+   "w": 390,
+   "h": 844,
+   "title": "A · Congelar · calendario del mes",
+   "is_interactive": true
+  },
+  "B-Mi-plan.dc.html": {
+   "x": 0,
+   "y": 3060,
+   "w": 390,
+   "h": 844,
+   "title": "B · Mi plan · tarjeta clara, una acción",
+   "is_interactive": true
+  },
+  "B-Tira-y-dias.dc.html": {
+   "x": 470,
+   "y": 3060,
+   "w": 390,
+   "h": 844,
+   "title": "B · Congelar · tira y días",
+   "is_interactive": true
+  },
+  "C-Mi-plan.dc.html": {
+   "x": 0,
+   "y": 4060,
+   "w": 390,
+   "h": 844,
+   "title": "C · Mi plan · línea de tiempo",
+   "is_interactive": true
+  },
+  "C-Campos-y-hoja.dc.html": {
+   "x": 470,
+   "y": 4060,
+   "w": 390,
+   "h": 844,
+   "title": "C · Congelar · campos y hoja",
+   "is_interactive": true
+  },
+  "M-Hoy.dc.html": {
+   "x": 0,
+   "y": 5060,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · Congelar con campos de texto",
+   "is_interactive": true
+  },
+  "M-Hoy-color.dc.html": {
+   "x": 470,
+   "y": 5060,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · Mi plan con congelamiento aprobado",
+   "is_interactive": true
+  }
+ },
+ "notes": {},
+ "designSystems": [],
+ "order": [
+  "Main.dc.html",
+  "A-Mi-plan.dc.html",
+  "A-Calendario.dc.html",
+  "B-Mi-plan.dc.html",
+  "B-Tira-y-dias.dc.html",
+  "C-Mi-plan.dc.html",
+  "C-Campos-y-hoja.dc.html",
+  "M-Hoy.dc.html",
+  "M-Hoy-color.dc.html"
+ ]
+}
