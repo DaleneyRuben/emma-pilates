@@ -7,14 +7,13 @@ import {
   radii,
   spacing,
   surfaces,
-  TextButton,
   typography,
 } from "@pilates/mobile-core";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { freezeRange, freezeSummary, weekdayDayMonth } from "./freeze-window";
+import { dayMonth, freezeRange, freezeSummary, weekdayDayMonth } from "./freeze-window";
 
 type CardState = "requested" | "approved" | "running" | "refused";
 
@@ -25,10 +24,14 @@ const pills: Record<CardState, { label: string; background: string; color: strin
   refused: { label: "No aprobado", background: colors.errorPill, color: colors.errorText },
 };
 
-/** Which card a Freeze shows today; null once an approved Freeze is over. */
+/**
+ * Which card a Freeze shows today: none once an approved Freeze is over or
+ * after she withdrew it (Mi plan then offers Congelar plan again).
+ */
 export function freezeCardState(freeze: ClientFreezeDto, today: string): CardState | null {
   if (freeze.state === "requested") return "requested";
   if (freeze.state === "refused") return "refused";
+  if (freeze.state !== "approved") return null;
   if (today < freeze.startsOn) return "approved";
   return today <= freeze.endsOn ? "running" : null;
 }
@@ -45,7 +48,8 @@ export function FreezeCard({
   state,
 }: {
   freeze: ClientFreezeDto;
-  onWithdrawn: () => void;
+  /** After a withdrawal (`true`), or when the request was decided first. */
+  onWithdrawn: (withdrawn: boolean) => void;
   /** The plan's stored end: already moved once a Freeze is approved. */
   planEndsOn: string;
   state: CardState;
@@ -64,8 +68,22 @@ export function FreezeCard({
     try {
       const response = await withdrawFreeze(freeze.id, undefined, fetcher);
       setConfirming(false);
-      if (response.status === 200) onWithdrawn();
-      else setError("Ya no se puede retirar: la administración ya la decidió.");
+      if (response.status === 200) {
+        onWithdrawn(true);
+        return;
+      }
+      const code = (response.data as { code?: unknown } | null)?.code;
+      if (response.status === 409) {
+        // Decided, or withdrawn on another phone: show how it stands now.
+        setError(
+          code === "freeze_already_decided"
+            ? "La administración ya decidió tu solicitud. Mira cómo quedó."
+            : "Esta solicitud ya no está en revisión.",
+        );
+        onWithdrawn(false);
+      } else {
+        setError("No pudimos retirar la solicitud. Inténtalo de nuevo.");
+      }
     } catch {
       setConfirming(false);
       setError("No pudimos retirar la solicitud. Inténtalo de nuevo.");
@@ -84,7 +102,10 @@ export function FreezeCard({
       note: "Te avisamos cuando la administración responda.",
     },
     approved: {
-      title: `Congelado d${range.slice(1)}`,
+      title:
+        freeze.startsOn === freeze.endsOn
+          ? `Congelado el ${weekdayDayMonth(freeze.startsOn)}`
+          : `Congelado d${range.slice(1)}`,
       rows: [
         ["Días", summary.days],
         ["Ahora vence el", weekdayDayMonth(planEndsOn)],
@@ -107,25 +128,34 @@ export function FreezeCard({
   }[state];
 
   return (
-    <View style={styles.card} testID="freeze-card">
-      <View style={styles.header}>
-        <Text style={styles.eyebrow}>Congelamiento</Text>
-        <View style={[styles.pill, { backgroundColor: pill.background }]}>
-          <Text style={[styles.pillLabel, { color: pill.color }]}>{pill.label}</Text>
+    <View style={styles.block}>
+      <View style={styles.card} testID="freeze-card">
+        <View style={styles.header}>
+          <Text style={styles.eyebrow}>Congelamiento</Text>
+          <View style={[styles.pill, { backgroundColor: pill.background }]}>
+            <Text style={[styles.pillLabel, { color: pill.color }]}>{pill.label}</Text>
+          </View>
         </View>
+        <Text style={styles.title}>{content.title}</Text>
+        {content.rows.map(([label, value]) => (
+          <View key={label} style={styles.row}>
+            <Text style={styles.rowLabel}>{label}</Text>
+            <Text style={styles.rowValue}>{value}</Text>
+          </View>
+        ))}
+        <Text style={styles.note}>{content.note}</Text>
       </View>
-      <Text style={styles.title}>{content.title}</Text>
-      {content.rows.map(([label, value]) => (
-        <View key={label} style={styles.row}>
-          <Text style={styles.rowLabel}>{label}</Text>
-          <Text style={styles.rowValue}>{value}</Text>
-        </View>
-      ))}
-      <Text style={styles.note}>{content.note}</Text>
+      {/* Owner 2026-11-08: a discreet link under the card, like «Cerrar mi
+          cuenta» on Perfil, not a button. */}
       {state === "requested" ? (
-        <View style={styles.withdraw}>
-          <TextButton label="Retirar solicitud" onPress={() => setConfirming(true)} />
-        </View>
+        <Pressable
+          accessibilityRole="button"
+          hitSlop={spacing.md}
+          onPress={() => setConfirming(true)}
+          style={styles.withdraw}
+        >
+          <Text style={styles.withdrawLabel}>Retirar solicitud</Text>
+        </Pressable>
       ) : null}
       {error === null ? null : (
         <Text accessibilityRole="alert" style={styles.error}>
@@ -134,11 +164,12 @@ export function FreezeCard({
       )}
       <ConfirmationSheet
         busy={busy}
-        confirmLabel="Retirar"
-        note="La administración ya no la verá. Puedes pedir otro congelamiento después."
+        confirmLabel="Retirar solicitud"
+        note={`Tu plan sigue igual y vence el ${dayMonth(planEndsOn)}. Puedes pedir otro congelamiento después.`}
         onConfirm={() => void withdraw()}
         onDismiss={() => setConfirming(false)}
         title="¿Retirar tu solicitud?"
+        tone="primary"
         visible={confirming}
       />
     </View>
@@ -146,6 +177,7 @@ export function FreezeCard({
 }
 
 const styles = StyleSheet.create({
+  block: { gap: spacing.sm },
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   error: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.note },
   eyebrow: {
@@ -174,5 +206,11 @@ const styles = StyleSheet.create({
     fontSize: typography.titleSmall,
     lineHeight: 25,
   },
-  withdraw: { alignItems: "flex-start" },
+  withdraw: { alignSelf: "center", paddingVertical: spacing.xs },
+  withdrawLabel: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.label,
+    textDecorationLine: "underline",
+  },
 });

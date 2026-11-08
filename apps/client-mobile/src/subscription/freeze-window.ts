@@ -132,7 +132,9 @@ export function freezeRange(start: string, end: string): string {
  * it (the caller then says it generically).
  */
 export function freezeRefusal(
-  facts: FreezeTerm & { freezeState: "requested" | "approved" | "refused" | null },
+  facts: FreezeTerm & {
+    freezeState: "requested" | "approved" | "refused" | "withdrawn" | null;
+  },
   start: string,
   end: string,
 ): string | null {

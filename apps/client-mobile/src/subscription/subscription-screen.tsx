@@ -6,6 +6,7 @@ import {
   addCivilDays,
   BodyText,
   boliviaCivilDate,
+  BrandToast,
   colors,
   formatBolivianos,
   LoadingState,
@@ -22,6 +23,7 @@ import {
   useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
+import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -52,6 +54,7 @@ export function SubscriptionScreen() {
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
   const studioRules = useStudioRules(fetcher);
+  const [withdrawnToast, setWithdrawnToast] = useState(false);
 
   const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mi plan" />;
 
@@ -139,7 +142,10 @@ export function SubscriptionScreen() {
         {freeze == null || cardState === null ? null : (
           <FreezeCard
             freeze={freeze}
-            onWithdrawn={() => void view.refetch()}
+            onWithdrawn={(withdrawn) => {
+              if (withdrawn) setWithdrawnToast(true);
+              void view.refetch();
+            }}
             planEndsOn={subscription.endsOn}
             state={cardState}
           />
@@ -182,6 +188,9 @@ export function SubscriptionScreen() {
           </View>
         ) : null}
       </ScrollView>
+      {withdrawnToast ? (
+        <BrandToast onClose={() => setWithdrawnToast(false)} title="Retiramos tu solicitud" />
+      ) : null}
     </Screen>
   );
 }

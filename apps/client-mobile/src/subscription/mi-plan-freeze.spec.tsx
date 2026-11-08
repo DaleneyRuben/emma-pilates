@@ -87,7 +87,8 @@ describe("Mi plan with a Freeze", () => {
         `Tu plan sigue igual y vence el ${dayMonth(termEndsOn)}. Puedes pedir otro congelamiento después.`,
       ),
     ).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Volver" })).toBeOnTheScreen();
+    // The top bar's back arrow is «Volver» too: the sheet adds its own.
+    expect(screen.getAllByRole("button", { name: "Volver" })).toHaveLength(2);
     const confirm = screen.getAllByRole("button", { name: "Retirar solicitud" });
     await fireEvent.press(confirm[confirm.length - 1]);
 
