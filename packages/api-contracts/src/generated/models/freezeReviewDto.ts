@@ -20,4 +20,18 @@ export interface FreezeReviewDto {
   endsOn: string;
   reason: string;
   state: FreezeReviewDtoState;
+  /** The plan's end before this Freeze (walkthrough finding 52) */
+  planEndsOn?: string;
+  /**
+   * The plan's end once this Freeze is approved; null when it was refused
+   * @nullable
+   */
+  planEndsOnAfter?: string | null;
+  /** @nullable */
+  decidedAt?: string | null;
+  /**
+   * The Staff Member who approved or refused it
+   * @nullable
+   */
+  decidedByName?: string | null;
 }

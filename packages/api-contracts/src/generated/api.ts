@@ -16403,6 +16403,186 @@ export function useListRequestedFreezes<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export type listDecidedFreezesResponse200 = {
+  data: FreezeReviewDto[];
+  status: 200;
+};
+
+export type listDecidedFreezesResponseSuccess =
+  listDecidedFreezesResponse200 & {
+    headers: Headers;
+  };
+export type listDecidedFreezesResponse = listDecidedFreezesResponseSuccess;
+
+export const getListDecidedFreezesUrl = () => {
+  return `/api/v1/administrator/freezes/decided`;
+};
+
+export const listDecidedFreezes = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listDecidedFreezesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListDecidedFreezesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listDecidedFreezesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listDecidedFreezesResponse;
+};
+
+export const getListDecidedFreezesQueryKey = () => {
+  return [`/api/v1/administrator/freezes/decided`] as const;
+};
+
+export const getListDecidedFreezesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listDecidedFreezes>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listDecidedFreezes>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListDecidedFreezesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listDecidedFreezes>>
+  > = ({ signal }) =>
+    listDecidedFreezes({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listDecidedFreezes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListDecidedFreezesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listDecidedFreezes>>
+>;
+export type ListDecidedFreezesQueryError = unknown;
+
+export function useListDecidedFreezes<
+  TData = Awaited<ReturnType<typeof listDecidedFreezes>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listDecidedFreezes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDecidedFreezes>>,
+          TError,
+          Awaited<ReturnType<typeof listDecidedFreezes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListDecidedFreezes<
+  TData = Awaited<ReturnType<typeof listDecidedFreezes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listDecidedFreezes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDecidedFreezes>>,
+          TError,
+          Awaited<ReturnType<typeof listDecidedFreezes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListDecidedFreezes<
+  TData = Awaited<ReturnType<typeof listDecidedFreezes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listDecidedFreezes>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListDecidedFreezes<
+  TData = Awaited<ReturnType<typeof listDecidedFreezes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listDecidedFreezes>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListDecidedFreezesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type getFreezeReviewResponse200 = {
   data: FreezeReviewDto;
   status: 200;

@@ -4288,6 +4288,36 @@
         ]
       }
     },
+    "/api/v1/administrator/freezes/decided": {
+      "get": {
+        "operationId": "listDecidedFreezes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FreezeReviewDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFreezes"
+        ]
+      }
+    },
     "/api/v1/administrator/freezes/{freezeId}": {
       "get": {
         "operationId": "getFreezeReview",
@@ -14275,6 +14305,27 @@
               "approved",
               "refused"
             ]
+          },
+          "planEndsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "The plan's end before this Freeze (walkthrough finding 52)"
+          },
+          "planEndsOnAfter": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The plan's end once this Freeze is approved; null when it was refused"
+          },
+          "decidedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "decidedByName": {
+            "type": "string",
+            "nullable": true,
+            "description": "The Staff Member who approved or refused it"
           }
         },
         "required": [
