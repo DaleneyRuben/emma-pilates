@@ -20,7 +20,9 @@ describe("Calendar", () => {
     const screen = await render(<Calendar {...base} />);
 
     expect(screen.getByRole("header", { name: "Noviembre 2026" })).toBeOnTheScreen();
-    expect(screen.getAllByText("M")).toHaveLength(2);
+    // The weekday letters are visual only, hidden from screen readers.
+    expect(screen.getAllByText("M", { includeHiddenElements: true })).toHaveLength(2);
+    expect(screen.queryByText("M")).toBeNull();
     // 1 November 2026 is a Sunday: six blanks before it.
     expect(screen.getAllByTestId("calendar-blank")).toHaveLength(6);
     expect(screen.getByRole("button", { name: "dom 8 de noviembre, hoy" })).toBeOnTheScreen();

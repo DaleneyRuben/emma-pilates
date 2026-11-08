@@ -114,7 +114,12 @@ export function Calendar({
           <Chevron testID="calendar-next" tone="muted" />
         </Pressable>
       </View>
-      <View style={styles.week}>
+      {/* The day buttons name their weekday; the letters are only visual. */}
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={styles.week}
+      >
         {header.map((letter, column) => (
           <Text key={column} style={styles.weekday}>
             {letter}
