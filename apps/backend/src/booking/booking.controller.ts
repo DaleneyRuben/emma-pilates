@@ -77,6 +77,13 @@ export class BookingController {
   @ApiQuery({ name: 'from', required: true, format: 'date-time' })
   @ApiQuery({ name: 'until', required: true, format: 'date-time' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({
+    name: 'includeCancelled',
+    required: false,
+    type: Boolean,
+    description:
+      'FIX-052: Staff also get the cancelled classes, with their cause; ignored for a Client',
+  })
   @ApiOkResponse({ type: SessionAvailabilityDto, isArray: true })
   async list(
     @Headers('authorization') authorization: string | undefined,
@@ -86,8 +93,15 @@ export class BookingController {
     const parsed = parseAvailabilityQuery(query);
     if (parsed === null)
       throw invalidRequest('Invalid Session availability query');
-    const sessions = await this.listAvailability(parsed);
-    if (principal.identity.kind !== 'client') return sessions;
+    if (principal.identity.kind !== 'client') {
+      return this.listAvailability(parsed);
+    }
+    const sessions = await this.listAvailability({
+      branchId: parsed.branchId,
+      from: parsed.from,
+      until: parsed.until,
+      limit: parsed.limit,
+    });
     const left = await this.classesLeft(
       principal.identity.clientId,
       new Date(parsed.from),

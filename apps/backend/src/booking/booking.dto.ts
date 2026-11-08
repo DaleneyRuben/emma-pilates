@@ -63,6 +63,19 @@ export class RecordAttendanceDto {
   outcomes!: AttendanceOutcomeDto[];
 }
 
+// FIX-042: a cancelled Session the Horario or the Trainer's agenda shows in
+// place, with why it was cancelled and how many it had booked by then.
+export class SessionCancellationSummaryDto {
+  @ApiProperty({ enum: sessionCancellationCauses })
+  cause!: (typeof sessionCancellationCauses)[number];
+
+  @ApiProperty({ format: 'date-time' })
+  cancelledAt!: Date;
+
+  @ApiProperty({ minimum: 0 })
+  bookedCount!: number;
+}
+
 export class SessionAvailabilityDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -119,19 +132,14 @@ export class SessionAvailabilityDto {
       'Classes left this week from the base allowance. Absent when the Plan has no cap or the caller is not a Client.',
   })
   classesLeftThisWeek?: number | null;
-}
 
-// FIX-042: a cancelled Session the Horario or the Trainer's agenda shows in
-// place, with why it was cancelled and how many it had booked by then.
-export class SessionCancellationSummaryDto {
-  @ApiProperty({ enum: sessionCancellationCauses })
-  cause!: (typeof sessionCancellationCauses)[number];
-
-  @ApiProperty({ format: 'date-time' })
-  cancelledAt!: Date;
-
-  @ApiProperty({ minimum: 0 })
-  bookedCount!: number;
+  @ApiPropertyOptional({
+    type: () => SessionCancellationSummaryDto,
+    nullable: true,
+    description:
+      'Present only when cancelled classes were asked for (includeCancelled); null for a class that stands',
+  })
+  cancellation?: SessionCancellationSummaryDto | null;
 }
 
 // The Administrator's projection (API-002, WEB-003): the same Session plus
@@ -143,12 +151,6 @@ export class AdministratorSessionAvailabilityDto extends SessionAvailabilityDto 
 
   @ApiProperty()
   isException!: boolean;
-
-  @ApiPropertyOptional({
-    type: () => SessionCancellationSummaryDto,
-    nullable: true,
-  })
-  cancellation?: SessionCancellationSummaryDto | null;
 }
 
 export class TrainerScheduleSessionDto {
@@ -236,6 +238,7 @@ const availabilityQuerySchema = z
     from: z.iso.datetime(),
     until: z.iso.datetime(),
     limit: z.coerce.number().int().min(1).max(100).default(50),
+    includeCancelled: z.enum(['true', 'false']).optional(),
   })
   .refine(({ from, until }) => new Date(from) < new Date(until), {
     message: 'until must be after from',
@@ -260,7 +263,13 @@ export const parseAttendance = (value: unknown): RecordAttendanceDto | null => {
 
 export const parseAvailabilityQuery = (
   value: unknown,
-): { branchId: string; from: Date; until: Date; limit: number } | null => {
+): {
+  branchId: string;
+  from: Date;
+  until: Date;
+  limit: number;
+  includeCancelled?: true;
+} | null => {
   const result = availabilityQuerySchema.safeParse(value);
   if (!result.success) return null;
 
@@ -269,6 +278,9 @@ export const parseAvailabilityQuery = (
     from: new Date(result.data.from),
     until: new Date(result.data.until),
     limit: result.data.limit,
+    ...(result.data.includeCancelled === 'true'
+      ? { includeCancelled: true as const }
+      : {}),
   };
 };
 

@@ -16,6 +16,8 @@ export type SessionAvailabilityHandler = (input: {
   from: Date;
   until: Date;
   limit: number;
+  /** FIX-052: the Staff Horario shows cancelled classes in place. */
+  includeCancelled?: boolean;
 }) => Promise<SessionAvailabilityDto[]>;
 
 const findScheduledSessions = async (
@@ -91,7 +93,10 @@ export const listSessionAvailability =
   (prisma: PrismaClient): SessionAvailabilityHandler =>
   async (input) =>
     (await findScheduledSessions(prisma, input)).map(
-      ({ availability }) => availability,
+      ({ availability, cancellation }) =>
+        input.includeCancelled === true
+          ? { ...availability, cancellation }
+          : availability,
     );
 
 // API-002: every Branch at once, for the Administrator's Session search;
