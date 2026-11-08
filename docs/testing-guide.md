@@ -9198,15 +9198,17 @@ D. **Staff app (E2–E5).** As Paola: **Pagos › Accesos › Facturas por subir
    «Sube la factura emitida». **Subir factura** offers **Tomar foto** and
    **Elegir de la galería**; after the upload the toast «Factura subida» and
    the file card with **Ver factura**. **Quitar factura** asks in a sheet. A
-   PDF uploaded from the web shows «El PDF se abre desde la web de
-   administración.» (the app has no document picker yet, FIX-049).
+   PDF uploaded from the web shows a small first-page thumbnail beside the file
+   name that opens the full-screen viewer (Test 144, FIX-051); picking a PDF from the
+   phone still waits for a document picker (FIX-049).
 E. **Mis facturas (K1–K3).** As Mariana, the notification «Tu factura está
    lista · La factura de tu Paquete de 8 clases ya está en Mis facturas.»
    opens **Mis facturas** (also **Perfil › Mis facturas**). Rows read
    «Paquete de 8 clases · 5 nov 2026 · Bs 502» with **Lista**, **En
    preparación** (asked, not uploaded) or **Pago anulado** (voided after the
    upload; the invoice stays). An empty list says «Aún no tienes facturas».
-   Open a ready one: the preview (the photo, or a page with the PDF's name),
+   Open a ready one: the preview (the photo, or the PDF's first page with
+   «Ver · N páginas» opening the viewer, Test 144),
    compra, NIT o CI, a nombre de, emitida, and **Descargar**: on the iPhone and
    iPad the share sheet (**Guardar en Archivos**); on Android the folder
    picker, opened in Documents (Android 11 and later refuse Download itself),
