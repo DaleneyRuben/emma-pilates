@@ -1,5 +1,4 @@
 import type { PrismaClient } from '../../generated/prisma/client';
-import { SubscriptionState } from '../../generated/prisma/client';
 import { boliviaDate } from '../../time/bolivia-time';
 
 // FIX-052 (walkthrough n.º 47): a Payment is for the Client's next Plan when
@@ -14,7 +13,7 @@ export const isNextPlanPayment = async (
   const current = await prisma.subscription.findFirst({
     where: {
       clientId: payment.clientId,
-      state: SubscriptionState.ACTIVE,
+      state: 'ACTIVE',
       endsOn: { gte: boliviaDate(now), lt: payment.startsOn },
       ...(payment.subscriptionId === null
         ? {}
