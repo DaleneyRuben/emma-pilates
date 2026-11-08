@@ -238,7 +238,12 @@ export const createFreezeCommands = (
     return prisma.$transaction(async (transaction) => {
       const freeze = await transaction.freeze.findFirst({
         where: { id: command.freezeId, clientId, deletedAt: null },
-        select: { id: true, state: true, subscriptionId: true },
+        select: {
+          id: true,
+          state: true,
+          subscriptionId: true,
+          subscription: { select: { endsOn: true } },
+        },
       });
       if (freeze === null) {
         throw new PaymentRuleError(
@@ -267,13 +272,20 @@ export const createFreezeCommands = (
           'Este congelamiento ya fue decidido.',
         );
       }
-      await audit(transaction, {
+      const auditRecordId = await audit(transaction, {
         actionCode: 'freeze.withdrawn',
         freezeId: freeze.id,
         actorAccountId: principal.accountId,
         actorRole: null,
         occurredAt: now,
-        metadata: { subscriptionId: freeze.subscriptionId },
+        metadata: {
+          subscriptionId: freeze.subscriptionId,
+          planEndsOn: freeze.subscription.endsOn.toISOString().slice(0, 10),
+        },
+      });
+      await transaction.freeze.update({
+        where: { id: freeze.id },
+        data: { auditRecordId },
       });
       await settleFreezeRequest(transaction, {
         freezeId: freeze.id,
