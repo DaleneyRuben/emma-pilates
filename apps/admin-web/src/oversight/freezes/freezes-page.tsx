@@ -1,157 +1,105 @@
-import { decideFreeze, type FreezeReviewDto } from "@pilates/api-contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { adminFetch } from "../../api/fetcher";
-import { ApiError } from "../../api/problem";
+import { useState, type ReactNode } from "react";
 import { CatalogPage } from "../../catalog/catalog-page";
-import { ClientPhoto } from "../../components/client-photo";
-import { Button } from "../../components/ui/button";
-import { formatCivilDate } from "../../lib/bolivia-time";
-import { requestedFreezesQueryOptions } from "./freeze-queries";
+import { ListFilter } from "../../components/table/list-filter";
+import { decidedFreezeColumns, pendingFreezeColumns } from "./freeze-columns";
+import {
+  decidedFreezesQueryOptions,
+  requestedFreezesQueryOptions,
+} from "./freeze-queries";
 
-type FreezeRow = FreezeReviewDto;
+type FreezeView = "pending" | "decided";
 
-const columns = createColumnHelper<FreezeRow>();
+const viewOptions: readonly { value: FreezeView; label: string }[] = [
+  { value: "pending", label: "Por revisar" },
+  { value: "decided", label: "Decididas" },
+];
 
-function DecisionCell({
-  freeze,
-  onDone,
+function ViewFilter({
+  view,
+  onChange,
 }: {
-  freeze: FreezeRow;
-  onDone: (message: string) => void;
+  view: FreezeView;
+  onChange: (view: FreezeView) => void;
 }) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: (decision: "approved" | "refused") =>
-      decideFreeze(freeze.id, { decision }, undefined, adminFetch),
-    onSuccess: async (_result, decision) => {
-      await queryClient.invalidateQueries({
-        queryKey: requestedFreezesQueryOptions().queryKey,
-      });
-      onDone(
-        decision === "approved"
-          ? "Congelamiento aprobado"
-          : "Congelamiento rechazado",
-      );
-    },
-  });
-  const problem =
-    mutation.error instanceof ApiError &&
-    mutation.error.code === "freeze_access_denied"
-      ? "No puedes decidir un congelamiento."
-      : mutation.error instanceof ApiError &&
-          mutation.error.code === "freeze_start_in_past"
-        ? "El congelamiento ya empezó. Recházalo y pide uno desde mañana."
-        : mutation.error instanceof ApiError &&
-            mutation.error.code === "freeze_already_decided"
-          ? "Este congelamiento ya fue decidido."
-          : mutation.isError
-            ? "No pudimos guardar la decisión. Inténtalo de nuevo."
-            : null;
-
   return (
-    <span className="flex flex-col items-start gap-2">
-      <span className="flex flex-wrap gap-2">
-        <Button
-          disabled={mutation.isPending}
-          onClick={() => mutation.mutate("approved")}
-          size="sm"
-          type="button"
-        >
-          Aprobar
-        </Button>
-        <Button
-          disabled={mutation.isPending}
-          onClick={() => mutation.mutate("refused")}
-          size="sm"
-          type="button"
-          variant="destructive"
-        >
-          Rechazar
-        </Button>
-      </span>
-      {problem === null ? null : (
-        <span className="text-nota text-error" role="alert">
-          {problem}
-        </span>
-      )}
-    </span>
+    <ListFilter
+      label="Vista"
+      value={view}
+      options={viewOptions}
+      onChange={onChange}
+    />
   );
 }
 
-export function FreezesPage() {
-  const query = useQuery(requestedFreezesQueryOptions());
-  const [notice, setNotice] = useState<string | null>(null);
-  const freezeColumns = () => [
-    columns.accessor("clientName", {
-      header: "Clienta",
-      cell: ({ row }) => (
-        <span className="flex items-center gap-2.5">
-          <ClientPhoto
-            name={row.original.clientName}
-            photo={row.original.clientPhoto}
-          />
-          <span className="font-medium text-texto">
-            {row.original.clientName}
-          </span>
-        </span>
-      ),
-    }),
-    columns.accessor("planName", {
-      header: "Plan",
-      cell: ({ getValue }) => (
-        <span className="text-texto-secundario">{getValue()}</span>
-      ),
-    }),
-    columns.accessor("startsOn", {
-      header: "Desde",
-      cell: ({ getValue }) => (
-        <span className="text-texto-secundario tabular">
-          {formatCivilDate(getValue())}
-        </span>
-      ),
-    }),
-    columns.accessor("endsOn", {
-      header: "Hasta",
-      cell: ({ getValue }) => (
-        <span className="text-texto-secundario tabular">
-          {formatCivilDate(getValue())}
-        </span>
-      ),
-    }),
-    columns.accessor("reason", {
-      header: "Motivo",
-      cell: ({ getValue }) => (
-        <span className="text-texto-secundario">{getValue()}</span>
-      ),
-    }),
-    columns.display({
-      id: "decision",
-      header: "Decisión",
-      cell: ({ row }) => (
-        <DecisionCell freeze={row.original} onDone={setNotice} />
-      ),
-    }),
-  ];
+const listProps = {
+  title: "Congelamientos",
+  loadingMessage: "Cargando congelamientos…",
+  what: "los congelamientos",
+  search: { page: 1, pageSize: 40 },
+  onPageChange: () => undefined,
+};
 
+function PendingFreezes({
+  filter,
+  notice,
+  onNotice,
+}: {
+  filter: ReactNode;
+  notice: string | null;
+  onNotice: (message: string) => void;
+}) {
+  const query = useQuery(requestedFreezesQueryOptions());
   return (
     <CatalogPage
-      title="Congelamientos"
+      {...listProps}
       subtitle={notice ?? "Solicitudes pendientes de una clienta."}
-      loadingMessage="Cargando congelamientos…"
-      what="los congelamientos"
       emptyMessage={
         <span className="text-texto-secundario">
           No hay solicitudes pendientes.
         </span>
       }
-      filter={null}
-      search={{ page: 1, pageSize: 40 }}
-      onPageChange={() => undefined}
+      filter={filter}
       query={query}
-      columns={freezeColumns}
+      columns={() => pendingFreezeColumns(onNotice)}
     />
+  );
+}
+
+function DecidedFreezes({
+  filter,
+  notice,
+}: {
+  filter: ReactNode;
+  notice: string | null;
+}) {
+  const query = useQuery(decidedFreezesQueryOptions());
+  return (
+    <CatalogPage
+      {...listProps}
+      subtitle={notice ?? "Solicitudes aprobadas o rechazadas."}
+      emptyMessage={
+        <span className="text-texto-secundario">
+          Todavía no hay congelamientos decididos.
+        </span>
+      }
+      filter={filter}
+      query={query}
+      columns={decidedFreezeColumns}
+    />
+  );
+}
+
+// Findings 52/53: the pending requests show what approving does to the plan
+// end; «Decididas» keeps the approved and refused ones as history.
+export function FreezesPage() {
+  const [view, setView] = useState<FreezeView>("pending");
+  const [notice, setNotice] = useState<string | null>(null);
+  const filter = <ViewFilter view={view} onChange={setView} />;
+
+  return view === "pending" ? (
+    <PendingFreezes filter={filter} notice={notice} onNotice={setNotice} />
+  ) : (
+    <DecidedFreezes filter={filter} notice={notice} />
   );
 }
