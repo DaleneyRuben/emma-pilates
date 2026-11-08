@@ -167,6 +167,7 @@ export function Calendar({
 }
 
 const cellHeight = 44;
+const dotSize = 40;
 
 const styles = StyleSheet.create({
   arrow: {
@@ -197,12 +198,14 @@ const styles = StyleSheet.create({
     marginVertical: 2,
     width: `${100 / 7}%`,
   },
+  // Half the side, not radii.pill: Android drew the filled end square.
   dot: {
     alignItems: "center",
-    borderRadius: radii.pill,
-    height: 40,
+    borderRadius: dotSize / 2,
+    height: dotSize,
+    overflow: "hidden",
     justifyContent: "center",
-    width: 40,
+    width: dotSize,
   },
   filled: { backgroundColor: colors.primary },
   flip: { transform: [{ rotate: "180deg" }] },
