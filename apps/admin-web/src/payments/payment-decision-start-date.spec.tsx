@@ -82,4 +82,74 @@ describe("AW29 names the Plan's real start", () => {
       ),
     ).toBeInTheDocument();
   });
+
+  // FIX-052 (walkthrough n.º 47): a transfer for her next Plan says so and
+  // when it starts, in the panel, the dialog and the notice.
+  it("names her next Plan and its start, before and after confirming", async () => {
+    const startsOn = addDays(boliviaToday(), 55);
+    review = { ...reviewOf(sofiaPayment), startsOn, nextPlan: true };
+    server.use(
+      http.post(apiUrl(`${paymentsPath}/${sofiaPayment.id}/confirm`), () =>
+        jsonResponse({ ...review, state: "confirmed" }),
+      ),
+    );
+    const { user } = renderAdmin("/dinero/pagos");
+    await user.click(
+      await screen.findByRole("button", { name: "Sofía Guzmán" }),
+    );
+    const panel = await screen.findByRole("dialog", { name: "Revisar pago" });
+    expect(
+      await within(panel).findByText("Plan siguiente"),
+    ).toBeInTheDocument();
+    expect(
+      within(panel).getByText(`Empieza el ${formatLongDay(startsOn)}`),
+    ).toBeInTheDocument();
+
+    await user.click(
+      within(panel).getByRole("button", { name: "Confirmar pago" }),
+    );
+    const dialog = await screen.findByRole("alertdialog", {
+      name: "¿Confirmar el pago de Sofía Guzmán?",
+    });
+    expect(
+      within(dialog).getByText(
+        `Verifica que Bs 500,00 llegó a la cuenta del estudio. Al confirmar, su plan siguiente Paquete de 8 clases empieza el ${formatLongDay(startsOn)} y le avisamos.`,
+      ),
+    ).toBeInTheDocument();
+    await user.click(
+      within(dialog).getByRole("button", { name: "Confirmar pago" }),
+    );
+    expect(
+      await screen.findByText(
+        `Pago de Sofía Guzmán confirmado: plan siguiente programado desde el ${formatLongDay(startsOn)}.`,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a first Plan's later Start Date in the panel", async () => {
+    const startsOn = addDays(boliviaToday(), 3);
+    review = { ...reviewOf(sofiaPayment), startsOn, nextPlan: false };
+    const { user } = renderAdmin("/dinero/pagos");
+    await user.click(
+      await screen.findByRole("button", { name: "Sofía Guzmán" }),
+    );
+    const panel = await screen.findByRole("dialog", { name: "Revisar pago" });
+    expect(await within(panel).findByText("Empieza")).toBeInTheDocument();
+    expect(
+      within(panel).getByText(formatLongDay(startsOn)),
+    ).toBeInTheDocument();
+    expect(within(panel).queryByText("Plan siguiente")).toBeNull();
+  });
+
+  it("adds no start row for a Plan that starts today", async () => {
+    review = { ...reviewOf(sofiaPayment), startsOn: boliviaToday() };
+    const { user } = renderAdmin("/dinero/pagos");
+    await user.click(
+      await screen.findByRole("button", { name: "Sofía Guzmán" }),
+    );
+    const panel = await screen.findByRole("dialog", { name: "Revisar pago" });
+    await within(panel).findByText("Monto a verificar");
+    expect(within(panel).queryByText("Empieza")).toBeNull();
+    expect(within(panel).queryByText("Plan siguiente")).toBeNull();
+  });
 });
