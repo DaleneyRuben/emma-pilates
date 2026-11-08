@@ -1,21 +1,23 @@
-import { useListRequestedFreezes } from "@pilates/api-contracts";
+import { useListDecidedFreezes, useListRequestedFreezes } from "@pilates/api-contracts";
 import {
-  ClientFace,
+  colors,
+  fontFamilies,
   IconRowGroup,
   LoadingState,
   QueryFailure,
   Screen,
   spacing,
   StateScreen,
+  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { BackBar, backBarScroll } from "../ui/back-bar";
-import { PersonRow } from "../ui/person-row";
+import { BackBar } from "../ui/back-bar";
 import { SectionHeader } from "../ui/section-header";
-import { freezeDays, freezeRange } from "./freeze-format";
+import { freezeDecidedDetail } from "./freeze-format";
+import { FreezeRow } from "./freeze-row";
 
 type FreezesNavigation = {
   goBack: () => void;
@@ -23,21 +25,17 @@ type FreezesNavigation = {
 };
 
 /**
- * CON Congelamientos, opened from Pagos (owner, 2026-11-02). The API lists
- * only the requests still to decide, so the board's «Revisados» is not drawn.
+ * CON Congelamientos, opened from Pagos (owner, 2026-11-02): the requests
+ * still to decide, then the decided ones (walkthrough finding 52). The title
+ * sits in the bar as on its Accesos siblings, Facturas and Cancelar una clase.
  */
 export function FreezesScreen() {
   const navigation = useNavigation<FreezesNavigation>();
   const fetcher = useStaffFetcher();
   const requested = useListRequestedFreezes({ fetcher, query: { refetchOnMount: "always" } });
-  const header = (
-    <BackBar
-      back="Pagos"
-      onBack={() => navigation.goBack()}
-      subtitle="Pausan el plan de la clienta. Los días congelados se suman a su vencimiento."
-      title="Congelamientos"
-    />
-  );
+  const decided = useListDecidedFreezes({ fetcher, query: { refetchOnMount: "always" } });
+  const header = <BackBar onBack={() => navigation.goBack()} title="Congelamientos" />;
+  const open = (freezeId: string) => navigation.navigate("ReviewFreeze", { freezeId });
 
   if (requested.isPending) {
     return (
@@ -60,13 +58,12 @@ export function FreezesScreen() {
   }
 
   const freezes = requested.data.data;
+  // An older API has no decided list: the section is simply left out.
+  const decidedFreezes = decided.data?.status === 200 ? decided.data.data : [];
   return (
     <Screen style={styles.screen}>
-      <ScrollView
-        contentContainerStyle={[styles.content, backBarScroll.content]}
-        style={backBarScroll.scroll}
-      >
-        {header}
+      {header}
+      <ScrollView contentContainerStyle={styles.content}>
         {freezes.length === 0 ? (
           <StateScreen
             icon="hourglass"
@@ -79,20 +76,31 @@ export function FreezesScreen() {
             <SectionHeader title={`Por revisar · ${freezes.length}`} />
             <IconRowGroup>
               {freezes.map((freeze) => (
-                <PersonRow
+                <FreezeRow
                   accessibilityLabel={`Revisar congelamiento de ${freeze.clientName}`}
-                  detail={`${freezeRange(freeze.startsOn, freeze.endsOn)} · ${freezeDays(freeze.startsOn, freeze.endsOn)} · ${freeze.reason}`}
-                  face={
-                    <ClientFace
-                      fetcher={fetcher}
-                      name={freeze.clientName}
-                      photo={freeze.clientPhoto}
-                      size={36}
-                    />
-                  }
+                  freeze={freeze}
                   key={freeze.id}
-                  name={freeze.clientName}
-                  onPress={() => navigation.navigate("ReviewFreeze", { freezeId: freeze.id })}
+                  note={freeze.reason}
+                  onPress={() => open(freeze.id)}
+                />
+              ))}
+            </IconRowGroup>
+          </View>
+        )}
+        <Text style={styles.note}>
+          Pausan el plan de la clienta. Los días congelados se suman a su vencimiento.
+        </Text>
+        {decidedFreezes.length === 0 ? null : (
+          <View>
+            <SectionHeader title="Decididas" />
+            <IconRowGroup>
+              {decidedFreezes.map((freeze) => (
+                <FreezeRow
+                  accessibilityLabel={`Ver congelamiento de ${freeze.clientName}`}
+                  freeze={freeze}
+                  key={freeze.id}
+                  note={freezeDecidedDetail(freeze)}
+                  onPress={() => open(freeze.id)}
                 />
               ))}
             </IconRowGroup>
@@ -104,6 +112,7 @@ export function FreezesScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
+  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   screen: { paddingHorizontal: spacing.xlSm },
 });
