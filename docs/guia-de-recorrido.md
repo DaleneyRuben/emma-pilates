@@ -308,7 +308,10 @@ número con su bandera: `🇧🇴 +591 70000001`, `🇦🇷 +54 91123456789`.
 En los tres casos no se guarda nada. El campo es el mismo en **Nuevo
 cliente** de la app del equipo, en **Regístrate** y **Editar perfil** de la
 app de la clienta, y en **Editar perfil** de la ficha de una clienta en la
-web.
+web. Solo cambia el aviso de vacío: en las pantallas de la propia clienta
+(**Regístrate**, **Editar perfil**, la hoja del celular) dice «Escribe tu
+celular. Lo necesitamos para escribirte por WhatsApp.»; en la app del equipo
+y en la web, «Escribe su celular…».
 
 **Guardar** manda el correo de activación. La fila queda **Pendiente**.
 Ábrela y verás **Reenviar enlace**, **Cambiar correo** y **Cancelar
@@ -600,15 +603,16 @@ Emite la factura en el sistema de facturación de siempre y súbela:
   Facturas por subir**. Abre el pago, **Subir factura**, **Tomar foto** o
   **Elegir de la galería**. Desde el teléfono se sube una foto; el PDF se
   sube desde la web. Una factura en PDF ya subida se ve en el teléfono como
-  su primera página, con «Ver · N páginas»; al tocarla se abre a pantalla
-  completa.
+  una miniatura de su primera página junto al nombre del archivo; al tocarla
+  se abre el visor a pantalla completa.
 - Lucía recibe el aviso **Tu factura está lista** y la ve en **Perfil › Mis
   facturas**: **Lista**, o **En preparación** mientras no se sube. Al abrirla,
   una foto se ve tal cual y un PDF muestra su primera página con «Ver · N
   páginas»: al tocarla se abre un visor oscuro a pantalla completa («Factura ·
-  1 de N», las páginas una debajo de otra, se puede ampliar con dos dedos),
-  con **Compartir** y **Descargar**. **Descargar** abre el menú para guardar o compartir en iPhone y en Android
-  la guarda en la carpeta que elija (se abre en **Documents**).
+  1 de N», las páginas una debajo de otra, ✕ para cerrar; en iPhone y iPad
+  se puede ampliar con dos dedos), con **Descargar** abajo. **Descargar**
+  abre el menú para guardar o compartir en iPhone y en Android la guarda en
+  la carpeta que elija (se abre en **Documents**).
 
 **Marcar emitida** ya no existe: una factura cuenta como emitida solo cuando
 se sube el archivo. Una marca antigua sin archivo se ve como **Emitida · sin
@@ -851,9 +855,10 @@ Solo un plan de 90 días se puede congelar, una vez, hasta 15 días. Lucía
 tiene un plan de 30 días, así que este paso necesita un trimestral.
 
 1. En la app de Lucía, compra **Trimestral 24 clases** como renovación
-   anticipada. **Mi plan** › **Renovar mi plan** ofrece la fecha de inicio en
-   una franja con el mes en cada día: desde el día siguiente al fin del plan
-   actual hasta 4 semanas después. Deja el día siguiente. Sube el comprobante y Ana lo confirma.
+   anticipada. **Mi plan** › **Renovar mi plan** › **Trimestral 24 clases**
+   ofrece la fecha de inicio en una franja con el mes en cada día: desde el
+   día siguiente al fin del plan actual hasta 4 semanas después. Deja el día
+   siguiente. Sube el comprobante y Ana lo confirma.
    **Solicitar congelamiento** solo aparece cuando el trimestral ya está en
    curso: mientras siga el plan de 30 días, **Mi plan** no lo ofrece. Haz
    el resto de este paso cuando empiece el trimestral, o con una clienta de

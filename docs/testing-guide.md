@@ -9198,8 +9198,8 @@ D. **Staff app (E2–E5).** As Paola: **Pagos › Accesos › Facturas por subir
    «Sube la factura emitida». **Subir factura** offers **Tomar foto** and
    **Elegir de la galería**; after the upload the toast «Factura subida» and
    the file card with **Ver factura**. **Quitar factura** asks in a sheet. A
-   PDF uploaded from the web shows its first page with «Ver · N páginas» and
-   opens the full-screen viewer (Test 144, FIX-051); picking a PDF from the
+   PDF uploaded from the web shows a small first-page thumbnail beside the file
+   name that opens the full-screen viewer (Test 144, FIX-051); picking a PDF from the
    phone still waits for a document picker (FIX-049).
 E. **Mis facturas (K1–K3).** As Mariana, the notification «Tu factura está
    lista · La factura de tu Paquete de 8 clases ya está en Mis facturas.»
