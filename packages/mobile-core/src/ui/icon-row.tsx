@@ -14,6 +14,8 @@ export type IconRowProps = {
   /** Makes the whole row one button. */
   onPress?: () => void;
   testID?: string;
+  /** «error» for «Cerrar sesión», the Error last row (follow-up 256 § 2). */
+  tone?: "default" | "error";
   /** A Texto tenue value on the right, such as «Activadas». */
   value?: string;
 };
@@ -21,17 +23,36 @@ export type IconRowProps = {
 /**
  * A fact as a row instead of a paragraph (follow-up 225 §3): an 18 pt Palo de
  * rosa line glyph in a 36 pt Rosa tinte disc, the label in Work Sans 16, an
- * optional value and chevron. Put rows in an `IconRowGroup`.
+ * optional value and chevron; «error» draws it in Error. Put rows in an
+ * `IconRowGroup`.
  */
-export function IconRow({ chevron = false, icon, label, onPress, testID, value }: IconRowProps) {
+export function IconRow({
+  chevron = false,
+  icon,
+  label,
+  onPress,
+  testID,
+  tone = "default",
+  value,
+}: IconRowProps) {
+  const error = tone === "error";
   const content = (
     <>
-      <View style={styles.disc} testID="icon-row-disc">
-        <Glyph name={icon} size={18} strokeWidth={1.5} />
+      <View style={[styles.disc, error && styles.errorDisc]} testID="icon-row-disc">
+        <Glyph
+          color={error ? colors.error : colors.primary}
+          name={icon}
+          size={18}
+          strokeWidth={1.5}
+        />
       </View>
-      <Text style={[styles.label, value === undefined && styles.labelAlone]}>{label}</Text>
+      <Text
+        style={[styles.label, value === undefined && styles.labelAlone, error && styles.errorLabel]}
+      >
+        {label}
+      </Text>
       {value === undefined ? null : <Text style={styles.value}>{value}</Text>}
-      {chevron ? <Chevron size={16} strokeWidth={1.5} tone="muted" /> : null}
+      {chevron && !error ? <Chevron size={16} strokeWidth={1.5} tone="muted" /> : null}
     </>
   );
   if (onPress === undefined) {
@@ -86,6 +107,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 36,
   },
+  errorDisc: { backgroundColor: colors.errorSurface },
+  errorLabel: { color: colors.error, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
   group: { backgroundColor: colors.card, borderRadius: radii.card },
   // 16 side padding + 36 disc + 12 gap.
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },

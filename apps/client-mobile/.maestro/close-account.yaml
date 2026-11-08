@@ -13,12 +13,14 @@ env:
 - extendedWaitUntil:
     visible: "Cambiar contraseña"
     timeout: 15000
-# The link sits under «Cerrar sesión», below the fold on a phone.
+# The link sits after the version line (follow-up 256), below the fold on a
+# phone.
 - swipe:
     start: "50%,70%"
     end: "50%,30%"
 - takeScreenshot: client-close-1-perfil
-- tapOn: "Cerrar mi cuenta"
+- tapOn:
+    id: "profile-close-account"
 - extendedWaitUntil:
     visible: ".*Esto es lo que va a pasar.*"
     timeout: 15000

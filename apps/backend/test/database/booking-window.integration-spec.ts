@@ -53,7 +53,7 @@ describe('the Booking Window', () => {
     await context?.stop();
   });
 
-  it('refuses a Session on the seventh day for the Client and the Assistant, until the window grows', async () => {
+  it('refuses a Session from the seventh day on for the Client and the Assistant, until the window grows', async () => {
     const commands = new PrismaBookingCommands(prisma, () => new Date());
     const lucia = await account('lucia@example.com');
     const camila = await account('camila.rojas@example.com');
@@ -72,13 +72,27 @@ describe('the Booking Window', () => {
         branchIds: camila.staffMember!.branchAssignments.map((a) => a.branchId),
       },
     };
+    // The first Session from the seventh day on that a 14-day window still
+    // reaches. The fixtures hold no classes on Sunday, so «exactly the
+    // seventh day» found nothing whenever the spec ran on a Sunday in Bolivia.
     const seventhDay = addCivilDays(today, 7).getTime();
-    const far = fixtures.sessions.find(
-      (session) =>
-        boliviaDate(session.startsAt).getTime() === seventhDay &&
-        assistant.identity.kind === 'staff' &&
-        assistant.identity.branchIds.includes(session.branchId),
-    )!;
+    const fourteenthDay = addCivilDays(today, 14).getTime();
+    const far = fixtures.sessions
+      .filter((session) => {
+        const day = boliviaDate(session.startsAt).getTime();
+        return (
+          day >= seventhDay &&
+          day < fourteenthDay &&
+          assistant.identity.kind === 'staff' &&
+          assistant.identity.branchIds.includes(session.branchId)
+        );
+      })
+      .sort(
+        (left, right) => left.startsAt.getTime() - right.startsAt.getTime(),
+      )[0];
+    if (far === undefined) {
+      throw new Error('The fixtures hold no Session 7 to 13 days ahead');
+    }
     const refusal = 'Session is beyond the Booking Window';
 
     await expect(

@@ -101,4 +101,16 @@ describe("IconRowGroup", () => {
     expect(hairlines).toHaveLength(2);
     expect(hairlines[0]).toHaveStyle({ backgroundColor: "#E6DBD0", height: 1, marginLeft: 64 });
   });
+
+  // Verification n.º 44 (follow-up 256 § 2): «Cerrar sesión» is the Error last
+  // row in both apps, as S23 draws it.
+  it("draws an Error row with an Error disc and label and no chevron", async () => {
+    const screen = await render(
+      <IconRow chevron icon="logout" label="Cerrar sesión" onPress={jest.fn()} tone="error" />,
+    );
+
+    expect(screen.getByTestId("icon-row-disc")).toHaveStyle({ backgroundColor: "#F7E5E0" });
+    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#A04E3E" });
+    expect(screen.queryByTestId("chevron", hidden)).toBeNull();
+  });
 });

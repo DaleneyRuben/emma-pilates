@@ -1,0 +1,314 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-06T12:00:00Z"
+ },
+ "title": "Emma Pilates Studio · hallazgos 42–46",
+ "launch": {
+  "view": "focused",
+  "file": "Main.dc.html"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 2600,
+   "title": "Hallazgos 42–46 · elige una propuesta por tema",
+   "is_interactive": true
+  },
+  "F-Hoy.dc.html": {
+   "x": 0,
+   "y": 2760,
+   "w": 390,
+   "h": 844,
+   "title": "42 · Hoy: sin mes",
+   "is_interactive": true
+  },
+  "F-A1-Diciembre.dc.html": {
+   "x": 470,
+   "y": 2760,
+   "w": 390,
+   "h": 844,
+   "title": "42 · A · Mes en cada día · al abrir",
+   "is_interactive": true
+  },
+  "F-A2-Enero.dc.html": {
+   "x": 940,
+   "y": 2760,
+   "w": 390,
+   "h": 844,
+   "title": "42 · A · Mes en cada día · cruzando a enero",
+   "is_interactive": true
+  },
+  "F-B1-Diciembre.dc.html": {
+   "x": 1410,
+   "y": 2760,
+   "w": 390,
+   "h": 844,
+   "title": "42 · B · Separador de mes · al abrir",
+   "is_interactive": true
+  },
+  "F-B2-Enero.dc.html": {
+   "x": 1880,
+   "y": 2760,
+   "w": 390,
+   "h": 844,
+   "title": "42 · B · Separador de mes · cruzando a enero",
+   "is_interactive": true
+  },
+  "F-C1-Diciembre.dc.html": {
+   "x": 2350,
+   "y": 2760,
+   "w": 390,
+   "h": 844,
+   "title": "42 · C · Mes arriba de la tira · al abrir",
+   "is_interactive": true
+  },
+  "F-C2-Enero.dc.html": {
+   "x": 2820,
+   "y": 2760,
+   "w": 390,
+   "h": 844,
+   "title": "42 · C · Mes arriba de la tira · cruzando a enero",
+   "is_interactive": true
+  },
+  "P-Hoy-Clienta.dc.html": {
+   "x": 0,
+   "y": 3764,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · Hoy · Perfil de la clienta",
+   "is_interactive": true
+  },
+  "P-Hoy-Equipo.dc.html": {
+   "x": 470,
+   "y": 3764,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · Hoy · Perfil del equipo",
+   "is_interactive": true
+  },
+  "P-A1-Clienta.dc.html": {
+   "x": 940,
+   "y": 3764,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · A · Perfil de la clienta",
+   "is_interactive": true
+  },
+  "P-A2-Equipo.dc.html": {
+   "x": 1410,
+   "y": 3764,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · A · Perfil del equipo",
+   "is_interactive": true
+  },
+  "P-A3-Editar-perfil.dc.html": {
+   "x": 1880,
+   "y": 3764,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · A · Editar perfil, al final",
+   "is_interactive": true
+  },
+  "P-B1-Clienta.dc.html": {
+   "x": 2350,
+   "y": 3764,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · B · Perfil de la clienta",
+   "is_interactive": true
+  },
+  "P-B2-Equipo.dc.html": {
+   "x": 2820,
+   "y": 3764,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · B · Perfil del equipo",
+   "is_interactive": true
+  },
+  "P-C1-Clienta.dc.html": {
+   "x": 3290,
+   "y": 3764,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · C · Perfil de la clienta",
+   "is_interactive": true
+  },
+  "P-C2-Equipo.dc.html": {
+   "x": 0,
+   "y": 4768,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · C · Perfil del equipo",
+   "is_interactive": true
+  },
+  "P-Hoja.dc.html": {
+   "x": 470,
+   "y": 4768,
+   "w": 390,
+   "h": 844,
+   "title": "43/44 · «¿Cerrar sesión?» (igual en todas)",
+   "is_interactive": true
+  },
+  "V-Hoy.dc.html": {
+   "x": 0,
+   "y": 5772,
+   "w": 390,
+   "h": 844,
+   "title": "45 · Hoy: PDF sin vista previa",
+   "is_interactive": true
+  },
+  "V-A1-Factura.dc.html": {
+   "x": 470,
+   "y": 5772,
+   "w": 390,
+   "h": 844,
+   "title": "45 · A · Factura con miniatura",
+   "is_interactive": true
+  },
+  "V-A2-Visor.dc.html": {
+   "x": 940,
+   "y": 5772,
+   "w": 390,
+   "h": 844,
+   "title": "45 · A · Visor a pantalla completa",
+   "is_interactive": true
+  },
+  "V-B1-Factura.dc.html": {
+   "x": 1410,
+   "y": 5772,
+   "w": 390,
+   "h": 844,
+   "title": "45 · B · Factura con fila y miniatura chica",
+   "is_interactive": true
+  },
+  "V-B2-Hoja.dc.html": {
+   "x": 1880,
+   "y": 5772,
+   "w": 390,
+   "h": 844,
+   "title": "45 · B · Visor en hoja",
+   "is_interactive": true
+  },
+  "V-C1-Factura.dc.html": {
+   "x": 2350,
+   "y": 5772,
+   "w": 390,
+   "h": 844,
+   "title": "45 · C · La factura entera en la pantalla",
+   "is_interactive": true
+  },
+  "V-A3-Equipo.dc.html": {
+   "x": 2820,
+   "y": 5772,
+   "w": 390,
+   "h": 844,
+   "title": "45 · A · App del equipo, factura del pago",
+   "is_interactive": true
+  },
+  "R-Hoy-Correo.dc.html": {
+   "x": 0,
+   "y": 6776,
+   "w": 390,
+   "h": 844,
+   "title": "46 · Hoy · Revisa tu correo",
+   "is_interactive": true
+  },
+  "R-Hoy-Enlace.dc.html": {
+   "x": 470,
+   "y": 6776,
+   "w": 390,
+   "h": 844,
+   "title": "46 · Hoy · Enlace vencido",
+   "is_interactive": true
+  },
+  "R-A1-Correo.dc.html": {
+   "x": 940,
+   "y": 6776,
+   "w": 390,
+   "h": 844,
+   "title": "46 · A · Centro y botones abajo · Revisa tu correo",
+   "is_interactive": true
+  },
+  "R-A2-Enlace.dc.html": {
+   "x": 1410,
+   "y": 6776,
+   "w": 390,
+   "h": 844,
+   "title": "46 · A · Centro y botones abajo · Enlace vencido",
+   "is_interactive": true
+  },
+  "R-B1-Correo.dc.html": {
+   "x": 1880,
+   "y": 6776,
+   "w": 390,
+   "h": 844,
+   "title": "46 · B · Todo al centro · Revisa tu correo",
+   "is_interactive": true
+  },
+  "R-B2-Enlace.dc.html": {
+   "x": 2350,
+   "y": 6776,
+   "w": 390,
+   "h": 844,
+   "title": "46 · B · Todo al centro · Enlace vencido",
+   "is_interactive": true
+  },
+  "R-C1-Correo.dc.html": {
+   "x": 2820,
+   "y": 6776,
+   "w": 390,
+   "h": 844,
+   "title": "46 · C · Marca arriba · Revisa tu correo",
+   "is_interactive": true
+  },
+  "R-C2-Enlace.dc.html": {
+   "x": 3290,
+   "y": 6776,
+   "w": 390,
+   "h": 844,
+   "title": "46 · C · Marca arriba · Enlace vencido",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "F-Hoy.dc.html",
+  "F-A1-Diciembre.dc.html",
+  "F-A2-Enero.dc.html",
+  "F-B1-Diciembre.dc.html",
+  "F-B2-Enero.dc.html",
+  "F-C1-Diciembre.dc.html",
+  "F-C2-Enero.dc.html",
+  "P-Hoy-Clienta.dc.html",
+  "P-Hoy-Equipo.dc.html",
+  "P-A1-Clienta.dc.html",
+  "P-A2-Equipo.dc.html",
+  "P-A3-Editar-perfil.dc.html",
+  "P-B1-Clienta.dc.html",
+  "P-B2-Equipo.dc.html",
+  "P-C1-Clienta.dc.html",
+  "P-C2-Equipo.dc.html",
+  "P-Hoja.dc.html",
+  "V-Hoy.dc.html",
+  "V-A1-Factura.dc.html",
+  "V-A2-Visor.dc.html",
+  "V-B1-Factura.dc.html",
+  "V-B2-Hoja.dc.html",
+  "V-C1-Factura.dc.html",
+  "V-A3-Equipo.dc.html",
+  "R-Hoy-Correo.dc.html",
+  "R-Hoy-Enlace.dc.html",
+  "R-A1-Correo.dc.html",
+  "R-A2-Enlace.dc.html",
+  "R-B1-Correo.dc.html",
+  "R-B2-Enlace.dc.html",
+  "R-C1-Correo.dc.html",
+  "R-C2-Enlace.dc.html"
+ ]
+}

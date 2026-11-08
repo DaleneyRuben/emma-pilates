@@ -9344,3 +9344,41 @@ H. **Tab bars (follow-up 254 § 3).** Staff: the bar stays on the client
    comentarios and Cerrar mi cuenta. A screen with the bar puts its last
    content above the bar, not under it.
 
+
+## Test 144: verification findings 41–46 — third-person phone prompt, month on the start strip, sign out, PDF invoice, centred short screens (FIX-051, DES-014)
+
+Design follow-ups 255–256 and ADR-0110. Run the API on a fresh copy of the
+walkthrough database and both apps on the iPhone 16 Pro, the iPad and
+Android.
+
+A. **Phone prompt for someone else (n.º 41).** Staff app, **Clientes ›
+   Nuevo cliente**, leave **Celular** empty and tap **Crear cuenta**: «Escribe
+   su celular. Lo necesitamos para escribirle por WhatsApp.» The admin web's
+   client and staff forms say the same. The Client's own forms (Regístrate,
+   Editar perfil, the phone sheet) keep «Escribe tu celular… escribirte…».
+B. **Month on every day (n.º 42).** As Rocío with a Plan ending 5 December,
+   **Registrar pago** (staff) and **Mi plan › Renovar mi plan** (client): every
+   day of **Fecha de inicio** shows the weekday, the number and «dic» or
+   «ene»; VoiceOver reads «vie 1 de enero». A first Plan's strip shows the
+   month too; «Hoy» and «Día de apertura» keep their labels.
+C. **Sign out and close account (n.º 43, 44).** Client app **Perfil**:
+   **Cerrar sesión** is the last row of **Cuenta**, in red with the exit
+   icon, no chevron; it asks «¿Cerrar sesión?». **Cerrar mi cuenta** is a
+   small grey underlined link after «Emma Pilates Studio · versión …» and
+   still opens the screen that asks for the password. Staff app **Perfil**:
+   **Cerrar sesión** is the same red row with the same exit icon (no ✕).
+D. **PDF invoice (n.º 45).** As staff, upload a PDF invoice for a confirmed
+   payment, then as the Client open **Perfil › Mis facturas › Factura**: the
+   first page shows like a photo with «Ver · N páginas»; tapping opens a dark
+   full-screen viewer «Factura · 1 de N» with every page (pinch to zoom),
+   **Descargar** under it, and ✕. In the Staff app the uploaded PDF shows a
+   small first-page thumbnail that opens the same viewer. By API,
+   `GET …/file/pages/1` answers `image/png` with `X-Page-Count`; a photo
+   invoice answers 409 `invoice_not_pdf`, a page past the end 404
+   `invoice_page_not_found`. The admin web still opens the PDF in the
+   browser.
+E. **Short screens centred (n.º 46).** **Crear cuenta** until **Revisa tu
+   correo**, **¿Olvidaste tu contraseña?** until its «Revisa tu correo», an
+   expired activation or password link, and «Tu cuenta está activa»: the
+   badge, title, text and buttons sit together in the middle of the screen,
+   in both apps, on the phone and the iPad.

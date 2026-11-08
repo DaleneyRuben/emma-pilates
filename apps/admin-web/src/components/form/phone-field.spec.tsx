@@ -73,7 +73,7 @@ describe("PhoneFormField", () => {
     await user.click(screen.getByRole("button", { name: "Guardar" }));
     expect(
       await screen.findByText(
-        "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+        "Escribe su celular. Lo necesitamos para escribirle por WhatsApp.",
       ),
     ).toBeVisible();
     expect(screen.getByLabelText("Celular")).toHaveAttribute(

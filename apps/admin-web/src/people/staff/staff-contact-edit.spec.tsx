@@ -95,7 +95,7 @@ describe("AW24 Editar miembro contact", () => {
 
     expect(
       await within(panel).findByText(
-        "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+        "Escribe su celular. Lo necesitamos para escribirle por WhatsApp.",
       ),
     ).toBeVisible();
     expect(sent).toEqual([]);

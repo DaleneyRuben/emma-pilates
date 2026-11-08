@@ -18,7 +18,7 @@ describe("Nuevo cliente phone", () => {
   it.each([
     ["7000004", "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7."],
     ["80000001", "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7."],
-    ["", "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp."],
+    ["", "Escribe su celular. Lo necesitamos para escribirle por WhatsApp."],
   ])("refuses %p and sends nothing", async (typed, message) => {
     const invited = jest.fn();
     const screen = await openClientSearch({

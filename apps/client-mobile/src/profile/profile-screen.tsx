@@ -18,9 +18,9 @@ import {
   QueryFailure,
   Screen,
   SectionTitle,
+  TextButton,
   spacing,
   surfaces,
-  TextButton,
   typography,
   useMobileIdentity,
   useRefetchOnFocus,
@@ -28,7 +28,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { appVersionLabel } from "./app-version";
@@ -180,18 +180,24 @@ export function ProfileScreen() {
               icon="logout"
               label="Cerrar sesión"
               onPress={() => setConfirmingLogout(true)}
+              tone="error"
             />
           </IconRowGroup>
         </View>
+        {/* Follow-up 256 § 2: «Cerrar mi cuenta» is a muted link after the
+            version, away from «Cerrar sesión»; it still opens C24. */}
         <View style={styles.end}>
-          <TextButton
-            label="Cerrar mi cuenta"
-            onPress={() => navigation.navigate("CloseAccount")}
-            tone="error"
-          />
           <BodyText style={styles.footer}>
-            {`Emma Pilates Studio · versión ${appVersionLabel()}`}
+            {`Emma Pilates Studio · versión ${appVersionLabel()} ·`}
           </BodyText>
+          <Pressable
+            accessibilityRole="button"
+            hitSlop={spacing.md}
+            onPress={() => navigation.navigate("CloseAccount")}
+            testID="profile-close-account"
+          >
+            <Text style={[styles.footer, styles.closeAccount]}>Cerrar mi cuenta</Text>
+          </Pressable>
         </View>
       </ScrollView>
       <LogoutConfirmationSheet
@@ -208,7 +214,14 @@ const planPill = { active: "Activo", expiring_soon: "Por vencer", expired: "Venc
 
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  end: { alignItems: "center", gap: spacing.xs },
+  closeAccount: { fontFamily: fontFamilies.body, textDecorationLine: "underline" },
+  end: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.xs,
+    justifyContent: "center",
+  },
   footer: { color: colors.textMuted, fontSize: typography.label, textAlign: "center" },
   group: { ...surfaces.card },
   legal: { color: colors.textMuted, fontSize: typography.note, marginTop: spacing.sm },

@@ -1,5 +1,6 @@
 import {
   getGetCurrentClientInvoiceFileUrl,
+  getGetCurrentClientInvoicePageUrl,
   useListCurrentClientInvoices,
   type ClientInvoiceDto,
 } from "@pilates/api-contracts";
@@ -10,10 +11,10 @@ import {
   fontFamilies,
   formatBolivianos,
   FormScrollView,
-  Glyph,
   LoadingState,
   loadPrivateImageWithRatio,
   NoticeRow,
+  PdfInvoice,
   PrimaryButton,
   QueryFailure,
   Screen,
@@ -24,7 +25,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -51,32 +52,36 @@ function Details({ invoice }: { invoice: ClientInvoiceDto }) {
   );
 }
 
-function Preview({ invoice }: { invoice: ClientInvoiceDto }) {
+// Follow-up 256 § 3 (verification n.º 45): a PDF shows its first page and
+// opens every page in the viewer, whose footer downloads it too.
+function Preview({ invoice, footer }: { invoice: ClientInvoiceDto; footer: ReactNode }) {
   const fetcher = useClientFetcher();
-  const photo = invoice.file !== null && invoice.file.mediaType !== "application/pdf";
+  const pdf = invoice.file?.mediaType === "application/pdf";
   const image = useQuery({
     queryKey: ["client-invoice-preview", invoice.paymentId, invoice.file?.uploadedAt],
     queryFn: () =>
       loadPrivateImageWithRatio(fetcher, getGetCurrentClientInvoiceFileUrl(invoice.paymentId)),
-    enabled: photo,
+    enabled: invoice.file !== null && !pdf,
   });
-  if (photo && image.data != null) {
+  if (pdf) {
     return (
-      <Image
-        accessibilityLabel="Vista previa de la factura"
-        resizeMode="contain"
-        source={{ uri: image.data.uri }}
-        style={[styles.photo, { aspectRatio: image.data.aspectRatio }]}
+      <PdfInvoice
+        cacheKey={["client-invoice-pages", invoice.paymentId, invoice.file?.uploadedAt]}
+        fetcher={fetcher}
+        fileName={invoice.file?.fileName ?? "Factura.pdf"}
+        footer={footer}
+        pageUrl={(page) => getGetCurrentClientInvoicePageUrl(invoice.paymentId, page)}
       />
     );
   }
+  if (image.data == null) return null;
   return (
-    <View accessibilityLabel="Factura en PDF" style={styles.page}>
-      <Glyph name="document" size={40} strokeWidth={1.2} />
-      <Text numberOfLines={2} style={styles.fileName}>
-        {invoice.file?.fileName}
-      </Text>
-    </View>
+    <Image
+      accessibilityLabel="Vista previa de la factura"
+      resizeMode="contain"
+      source={{ uri: image.data.uri }}
+      style={[styles.photo, { aspectRatio: image.data.aspectRatio }]}
+    />
   );
 }
 
@@ -145,6 +150,10 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
     }
   };
 
+  const downloadButton = (
+    <PrimaryButton busy={busy} label="Descargar" onPress={() => void download()} />
+  );
+
   return (
     <Screen style={styles.screen}>
       <FormScrollView
@@ -156,12 +165,12 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
                 <NoticeRow message="No pudimos descargar la factura. Inténtalo de nuevo." />
               </View>
             ) : null}
-            <PrimaryButton busy={busy} label="Descargar" onPress={() => void download()} />
+            {downloadButton}
           </View>
         }
       >
         {header}
-        <Preview invoice={invoice} />
+        <Preview footer={downloadButton} invoice={invoice} />
         <Details invoice={invoice} />
       </FormScrollView>
       {saved ? (
@@ -175,12 +184,6 @@ const styles = StyleSheet.create({
   card: { ...surfaces.card },
   content: { gap: spacing.lg, paddingBottom: spacing.xl },
   divided: { borderTopColor: colors.hairline, borderTopWidth: 1 },
-  fileName: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
   footer: { gap: spacing.xs, paddingTop: spacing.md },
   kv: {
     flexDirection: "row",
@@ -197,19 +200,6 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     fontVariant: ["tabular-nums"],
     textAlign: "right",
-  },
-  page: {
-    alignItems: "center",
-    alignSelf: "center",
-    aspectRatio: 210 / 297,
-    backgroundColor: colors.white,
-    borderColor: colors.hairline,
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: spacing.sm,
-    justifyContent: "center",
-    padding: spacing.lg,
-    width: 200,
   },
   photo: { alignSelf: "center", borderRadius: 8, maxHeight: 320, width: "100%" },
   screen: { paddingHorizontal: spacing.xlSm },

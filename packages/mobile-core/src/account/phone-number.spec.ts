@@ -58,6 +58,16 @@ describe("phone numbers with a country code (FIX-037)", () => {
     );
   });
 
+  // Verification n.º 41: the team fills Nuevo cliente for someone else.
+  it("asks for someone else's number in the third person", () => {
+    expect(phoneProblem(bolivia, "", "theirs")).toBe(
+      "Escribe su celular. Lo necesitamos para escribirle por WhatsApp.",
+    );
+    expect(phoneProblem(bolivia, "7000004", "theirs")).toBe(
+      "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.",
+    );
+  });
+
   it("stores any country as «+<code> <digits>», dropping a typed code", () => {
     expect(storedPhone(bolivia, "7123-4567")).toBe("+591 71234567");
     expect(storedPhone(bolivia, "+591 71234567")).toBe("+591 71234567");

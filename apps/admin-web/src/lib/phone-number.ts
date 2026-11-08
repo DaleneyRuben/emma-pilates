@@ -69,8 +69,10 @@ const flagOwner = (dial: string): PhoneCountry | undefined =>
     ? phoneCountryByIso("US")
     : phoneCountries.find((c) => c.dial === dial);
 
+// Verification n.º 41: every admin form types someone else's number, so the
+// web asks in the third person (the apps' own forms keep «tu celular»).
 export const phoneRequiredMessage =
-  "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.";
+  "Escribe su celular. Lo necesitamos para escribirle por WhatsApp.";
 
 // «o» becomes «u» before a word that starts with an o sound: «10 u 11», «7 u 8».
 const alternatives = (values: readonly (string | number)[]): string => {
