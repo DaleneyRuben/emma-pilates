@@ -9,6 +9,7 @@ import type { InvoiceDataDto } from "./invoiceDataDto";
 import type { PaymentReceiptDto } from "./paymentReceiptDto";
 import type { PaymentReviewDtoDurationDays } from "./paymentReviewDtoDurationDays";
 import type { PaymentReviewDtoDurationMonths } from "./paymentReviewDtoDurationMonths";
+import type { PaymentReviewDtoKind } from "./paymentReviewDtoKind";
 import type { PaymentReviewDtoMethod } from "./paymentReviewDtoMethod";
 import type { PaymentReviewDtoState } from "./paymentReviewDtoState";
 
@@ -49,6 +50,8 @@ export interface PaymentReviewDto {
   clientName: string;
   /** FIX-052: the Payment is for her next Plan, queued after a Plan she still has; startsOn is when it begins. Older builds ignore it. */
   nextPlan?: boolean;
+  /** FIX-052: what was sold; only a Plan names its start. Older builds ignore it. */
+  kind?: PaymentReviewDtoKind;
   /**
    * FIX-044: the NIT or CI and name she asked the invoice for; null is «Sin factura»
    * @nullable

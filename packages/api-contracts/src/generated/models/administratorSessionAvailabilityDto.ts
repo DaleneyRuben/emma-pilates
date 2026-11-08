@@ -37,7 +37,7 @@ export interface AdministratorSessionAvailabilityDto {
    */
   classesLeftThisWeek?: number | null;
   /**
-   * Present only when cancelled classes were asked for (includeCancelled); null for a class that stands
+   * The cancelled class and its cause, null for a class that stands. The Session availability list sends it only when Staff ask for includeCancelled; the Administrator search always does.
    * @nullable
    */
   cancellation?: SessionCancellationSummaryDto | null;
