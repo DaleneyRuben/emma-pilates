@@ -9449,10 +9449,17 @@ D. **Congelar plan (n.º 51).** **Mi plan › Congelar plan** opens a task
    el …» with «antes, el …». **Enviar solicitud** stays off until **Motivo**
    has text. Send: back on Mi plan, the **En revisión** card shows the dates,
    the days and «Tu plan vencería el …».
-E. **Withdraw.** On the **En revisión** card, **Retirar solicitud** asks
-   «¿Retirar tu solicitud?»; **Retirar** removes the card and **Congelar
-   plan** is back. In the admin web the request is gone from **Por
-   revisar**, and Ana's bell notice is read.
+E. **Withdraw.** Under the **En revisión** card, the small grey underlined
+   link **Retirar solicitud** opens «¿Retirar tu solicitud?» with «Tu plan
+   sigue igual y vence el …. Puedes pedir otro congelamiento después.»,
+   **Retirar solicitud** and **Volver**. Confirm: the card goes, **Congelar
+   plan** is back and the toast says «Retiramos tu solicitud». The request
+   leaves **Por revisar**; in the staff app's **Decididas** it reads
+   «Retirada» («Retirada por la clienta el …»), in the admin web's **Vista ›
+   Decididas** «Retirado» and «Retirado por la clienta · …»; Ana's bell
+   notice is read. If Ana decided it first, the withdrawal says «La
+   administración ya decidió tu solicitud. Mira cómo quedó.» and shows the
+   decided card.
 F. **A next plan caps the freeze.** Buy a renewal for Carla starting 10
    days after her end: the calendar stops at «puedes congelar hasta 9 días».
    With a renewal starting the day after her end, the **Congelar plan** row

@@ -888,8 +888,12 @@ tiene un plan de 30 días, así que este paso necesita un trimestral.
    del vencimiento, más allá del día 15 o del inicio de un plan siguiente)
    están tachados y, al tocarlos, dicen por qué. Escribe el **Motivo** y
    pulsa **Enviar solicitud**. Mi plan muestra la tarjeta **En revisión** con
-   las fechas, los días y el vencimiento que tendría. **Retirar solicitud**
-   la retira (pide confirmar) y vuelve **Congelar plan**.
+   las fechas, los días y el vencimiento que tendría. Debajo, el enlace gris
+   **Retirar solicitud** pregunta «¿Retirar tu solicitud?» («Tu plan sigue
+   igual y vence el …»); al confirmar, la tarjeta se va, vuelve **Congelar
+   plan** y sale «Retiramos tu solicitud». Una solicitud retirada no cuenta
+   como el congelamiento del plan, y en el historial del equipo y de la web
+   queda como **Retirada**.
 4. Ana lo ve en la app del equipo, en **Pagos** › **Accesos** ›
    **Congelamientos** («9 al 15 nov · 7 días»), y en la web en **Clientas ›
    Congelamientos** y en **Inicio**. **Revisar congelamiento** dice las
