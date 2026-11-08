@@ -45,7 +45,13 @@ function PaymentSummary({ review }: { review: PaymentReviewDto }) {
 // FIX-052 (walkthrough n.º 47): a Plan that starts later, above all her next
 // Plan queued after the current one, says when, as the Staff app does.
 function StartRow({ review }: { review: PaymentReviewDto }) {
-  if (review.startsOn === undefined || review.startsOn <= boliviaToday()) {
+  // A rejected or voided sale never starts, and an Evaluation is no Plan.
+  if (
+    (review.state !== "pending" && review.state !== "confirmed") ||
+    review.kind === "evaluation" ||
+    review.startsOn === undefined ||
+    review.startsOn <= boliviaToday()
+  ) {
     return null;
   }
   const day = formatLongDay(review.startsOn);

@@ -105,8 +105,12 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
   const trimmedReason = reason.trim();
   // FIX-052 (n.º 47): a Plan that starts later, above all her next Plan
   // queued after the current one, says when, like S10's «Empieza» (FIX-050).
+  // A rejected or voided sale never starts, and an Evaluation is no Plan.
   const startsLater =
-    payment.startsOn !== undefined && payment.startsOn > boliviaCivilDate(new Date())
+    (payment.state === "pending" || payment.state === "confirmed") &&
+    payment.kind !== "evaluation" &&
+    payment.startsOn !== undefined &&
+    payment.startsOn > boliviaCivilDate(new Date())
       ? formatCivilDayMonth(payment.startsOn)
       : null;
   const nextPlan = startsLater !== null && payment.nextPlan === true;
