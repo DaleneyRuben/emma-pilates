@@ -71,6 +71,11 @@ describe("freezes list", () => {
     await waitFor(() => expect(screen.getByText("9 al 15 nov · 7 días")).toBeOnTheScreen());
     expect(screen.getByText("9 al 15 nov · 7 días").props.numberOfLines).toBeUndefined();
     expect(screen.getByText("Viaje de trabajo")).toBeOnTheScreen();
+    // Review: the row's label replaces its text for screen readers, so the
+    // dates, days and reason are its hint.
+    expect(
+      screen.getByRole("button", { name: "Revisar congelamiento de Lucía Fernández" }),
+    ).toHaveProp("accessibilityHint", "9 al 15 nov · 7 días · Viaje de trabajo");
     await fireEvent.press(
       screen.getByRole("button", { name: "Revisar congelamiento de Lucía Fernández" }),
     );
