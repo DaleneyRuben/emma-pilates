@@ -68,7 +68,8 @@ describe("Client Subscription detail", () => {
     expect(screen.getByText("Vence")).toBeOnTheScreen();
     expect(screen.getByText("24 de septiembre")).toBeOnTheScreen();
     expect(screen.getByText("Vence el 24 de septiembre")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeOnTheScreen();
+    // Finding 54 (follow-up 259 A): Reservar lives on the tab bar, not here.
+    expect(screen.queryByRole("button", { name: "Reservar una clase" })).toBeNull();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
     expect(screen.queryByText("Pagado hasta")).toBeNull();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).not.toBeOnTheScreen();
@@ -104,11 +105,12 @@ describe("Refreshed Mi plan (Client 12)", () => {
   });
 
   // The owner flagged «Podrás comprar otro plan cuando este termine» as wrong:
-  // Mi plan offers «Renovación anticipada» (follow-up 227).
+  // Mi plan offers an early renewal (follow-up 227), now a row under «Tu plan»
+  // (follow-up 259 A).
   it("offers an early renewal that starts the day after this Plan ends", async () => {
     const screen = await openSubscription(subscription("active", 5));
 
-    expect(screen.getByText("Renovación anticipada")).toBeOnTheScreen();
+    expect(screen.getByText("Tu plan")).toBeOnTheScreen();
     expect(
       screen.getByText(
         "Eliges cuándo empieza el nuevo: entre el 25 de septiembre, al día siguiente de que venza este, y el 22 de octubre.",

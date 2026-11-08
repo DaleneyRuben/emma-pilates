@@ -147,12 +147,11 @@ describe("Congelar plan", () => {
     await fireEvent.changeText(screen.getByLabelText("Motivo"), "Viaje");
     await fireEvent.press(screen.getByRole("button", { name: "Enviar solicitud" }));
 
+    // Mi plan, under this task, says it too: check the alert on this screen.
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          `Tu plan siguiente empieza el ${dayMonth(addCivilDays(termEndsOn, 1))}, al día siguiente de que vence este: ya no se puede congelar.`,
-        ),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        `Tu plan siguiente empieza el ${dayMonth(addCivilDays(termEndsOn, 1))}, al día siguiente de que vence este: ya no se puede congelar.`,
+      );
     });
   });
 });
