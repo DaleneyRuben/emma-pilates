@@ -40,6 +40,7 @@ import { CloseAccountScreen } from "./profile/close-account-screen";
 import { EditProfileScreen } from "./profile/edit-profile-screen";
 import { ClientNotificationsScreen } from "./profile/notifications-screen";
 import { ProfileScreen } from "./profile/profile-screen";
+import { FreezePlanScreen } from "./subscription/freeze-plan-screen";
 import { SubscriptionScreen } from "./subscription/subscription-screen";
 
 const unavailableFetcher: typeof globalThis.fetch = async () => {
@@ -55,6 +56,8 @@ const taskRoutes: ReadonlySet<string> = new Set([
   "PlanDetail",
   "Payment",
   "PaymentStatus",
+  // Freezing the plan
+  "FreezePlan",
   // Booking an evaluation
   "EvaluationAvailability",
   "BookEvaluation",
@@ -79,6 +82,8 @@ const planScreens = {
   Payment: PaymentScreen,
   PaymentStatus: PaymentStatusScreen,
   Subscription: SubscriptionScreen,
+  // Finding 51: Congelar plan, a task over Mi plan (follow-up 259 A).
+  FreezePlan: FreezePlanScreen,
 };
 
 // Evaluation and Referral screens open from Home's quick actions and Perfil.
