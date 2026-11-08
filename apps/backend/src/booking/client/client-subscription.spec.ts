@@ -195,6 +195,25 @@ describe('loadClientSubscription', () => {
     });
   });
 
+  it('offers another Freeze after she withdrew one', async () => {
+    await expect(
+      loadClientSubscription({
+        principal,
+        today,
+        findActiveSubscription: jest.fn().mockResolvedValue(subscription(60)),
+        findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn().mockResolvedValue(null),
+        readFreeze: jest.fn().mockResolvedValue({
+          id: 'freeze-id',
+          state: 'withdrawn',
+          startsOn: '2026-10-01',
+          endsOn: '2026-10-05',
+        }),
+        readPlanDurationDays: jest.fn().mockResolvedValue(90),
+      }),
+    ).resolves.toMatchObject({ canRequestFreeze: true });
+  });
+
   it('offers no Freeze while one is requested or approved', async () => {
     for (const state of ['requested', 'approved'] as const) {
       await expect(
