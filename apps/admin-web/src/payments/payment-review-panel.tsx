@@ -5,7 +5,11 @@ import { ClientPhoto } from "../components/client-photo";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { SidePanelBody } from "../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../components/panel/summary-rows";
-import { formatCivilMoment } from "../lib/bolivia-time";
+import {
+  boliviaToday,
+  formatCivilMoment,
+  formatLongDay,
+} from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
 import { PaymentDecision } from "./payment-decision";
 import { paymentReviewQueryOptions } from "./payment-queries";
@@ -24,6 +28,7 @@ function PaymentSummary({ review }: { review: PaymentReviewDto }) {
         <span className="tabular">{formatCivilMoment(review.submittedAt)}</span>
       </SummaryRow>
       <SummaryRow label="Método">Transferencia</SummaryRow>
+      <StartRow review={review} />
       {review.state === "pending" ? null : (
         <SummaryRow label="Estado">
           <PaymentStatePill state={review.state} />
@@ -34,6 +39,20 @@ function PaymentSummary({ review }: { review: PaymentReviewDto }) {
         <SummaryRow label="Motivo">{review.rejectionReason}</SummaryRow>
       )}
     </SummaryBlock>
+  );
+}
+
+// FIX-052 (walkthrough n.º 47): a Plan that starts later, above all her next
+// Plan queued after the current one, says when, as the Staff app does.
+function StartRow({ review }: { review: PaymentReviewDto }) {
+  if (review.startsOn === undefined || review.startsOn <= boliviaToday()) {
+    return null;
+  }
+  const day = formatLongDay(review.startsOn);
+  return review.nextPlan === true ? (
+    <SummaryRow label="Plan siguiente">Empieza el {day}</SummaryRow>
+  ) : (
+    <SummaryRow label="Empieza">{day}</SummaryRow>
   );
 }
 
