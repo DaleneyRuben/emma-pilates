@@ -31,7 +31,11 @@ import { PersonRow } from "../ui/person-row";
 import { RootHeader } from "../ui/root-header";
 import { SectionHeader } from "../ui/section-header";
 
-export type PaymentsNotice = "Pago confirmado" | "Pago rechazado";
+export type PaymentsNotice =
+  | "Pago confirmado"
+  | "Pago rechazado"
+  | `Plan siguiente programado desde el ${string}`
+  | `Plan programado desde el ${string}`;
 
 type PendingPaymentsNavigation = {
   navigate: {

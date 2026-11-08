@@ -12,6 +12,7 @@ import {
   FullScreenImage,
   IconRow,
   IconRowGroup,
+  boliviaCivilDate,
   LoadingState,
   NoticeRow,
   PrimaryButton,
@@ -29,6 +30,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { formatCivilDayMonth } from "../assistant/assistant-format";
 import { BackBar } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
 
@@ -101,6 +103,23 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
   // FIX-044: whether she asked for an invoice, and in whose name (n.º 24).
   const invoiceData = payment.invoiceData ?? null;
   const trimmedReason = reason.trim();
+  // FIX-052 (n.º 47): a Plan that starts later, above all her next Plan
+  // queued after the current one, says when, like S10's «Empieza» (FIX-050).
+  // A rejected or voided sale never starts, and an Evaluation is no Plan.
+  const startsLater =
+    (payment.state === "pending" || payment.state === "confirmed") &&
+    payment.kind !== "evaluation" &&
+    payment.startsOn !== undefined &&
+    payment.startsOn > boliviaCivilDate(new Date())
+      ? formatCivilDayMonth(payment.startsOn)
+      : null;
+  const nextPlan = startsLater !== null && payment.nextPlan === true;
+  const confirmedNotice: PaymentsNotice =
+    startsLater === null
+      ? "Pago confirmado"
+      : nextPlan
+        ? `Plan siguiente programado desde el ${startsLater}`
+        : `Plan programado desde el ${startsLater}`;
 
   const decide = async (decision: () => Promise<unknown>, notice: PaymentsNotice) => {
     setSubmitting(true);
@@ -219,7 +238,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
                 busy={submitting}
                 disabled={receiptUri === null}
                 label="Confirmar pago"
-                onPress={() => void decide(() => api.confirmPayment(payment.id), "Pago confirmado")}
+                onPress={() => void decide(() => api.confirmPayment(payment.id), confirmedNotice)}
                 testID="review-confirm"
               />
               <TextButton
@@ -243,6 +262,11 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
         <IconRowGroup>
           <IconRow icon="credit" label="Transferencia" />
           <IconRow icon="clock" label={`Enviado el ${formatSubmittedAt(payment.submittedAt)}`} />
+          {startsLater === null ? null : nextPlan ? (
+            <IconRow icon="calendar" label="Plan siguiente" value={`Empieza el ${startsLater}`} />
+          ) : (
+            <IconRow icon="calendar" label="Empieza" value={startsLater} />
+          )}
           {invoiceData === null ? (
             <IconRow icon="receipt" label="Sin factura" value="No la pidió" />
           ) : (

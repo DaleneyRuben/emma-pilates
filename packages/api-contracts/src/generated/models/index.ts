@@ -321,6 +321,7 @@ export * from "./paymentReceiptDtoMediaType";
 export * from "./paymentReviewDto";
 export * from "./paymentReviewDtoDurationDays";
 export * from "./paymentReviewDtoDurationMonths";
+export * from "./paymentReviewDtoKind";
 export * from "./paymentReviewDtoMethod";
 export * from "./paymentReviewDtoState";
 export * from "./payStatementDraftDto";

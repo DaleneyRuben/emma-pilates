@@ -105,10 +105,16 @@ export function PaymentDecision({
 
   // A confirmation moves a Start Date already reached to today; a later one
   // (a chosen date, a renewal queued after the current Plan) stays.
-  const startsWhen =
+  const startsLater =
     review.startsOn !== undefined && review.startsOn > boliviaToday()
-      ? `el ${formatLongDay(review.startsOn)}`
-      : "hoy";
+      ? formatLongDay(review.startsOn)
+      : null;
+  const startsWhen = startsLater === null ? "hoy" : `el ${startsLater}`;
+  // FIX-052 (n.º 47): her next Plan, queued after the one she still has.
+  const nextPlan = startsLater !== null && review.nextPlan === true;
+  const confirmedNotice = nextPlan
+    ? `Pago de ${review.clientName} confirmado: plan siguiente programado desde el ${startsLater}.`
+    : `Pago de ${review.clientName} confirmado: su plan ${review.planName} empieza ${startsWhen}.`;
 
   const decide = async (decision: Decision) => {
     setFailure(null);
@@ -116,7 +122,7 @@ export function PaymentDecision({
       await mutation.mutateAsync(decision);
       onDone(
         decision.kind === "confirm"
-          ? `Pago de ${review.clientName} confirmado: su plan ${review.planName} empieza ${startsWhen}.`
+          ? confirmedNotice
           : `Pago de ${review.clientName} rechazado: le avisamos el motivo.`,
       );
     } catch (error) {
@@ -230,8 +236,9 @@ export function PaymentDecision({
       >
         <p>
           Verifica que {formatBolivianos(review.amountDueCentavos)} llegó a la
-          cuenta del estudio. Al confirmar, su plan {review.planName} empieza{" "}
-          {startsWhen} y le avisamos.
+          cuenta del estudio. Al confirmar, su plan
+          {nextPlan ? " siguiente" : ""} {review.planName} empieza {startsWhen}{" "}
+          y le avisamos.
         </p>
       </ConfirmDialog>
     </SidePanelFooter>

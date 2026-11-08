@@ -1,7 +1,4 @@
-import type {
-  SessionCancellationSummaryDto,
-  TrainerScheduleSessionDto,
-} from "@pilates/api-contracts";
+import type { SessionCancellationSummaryDto } from "@pilates/api-contracts";
 
 import { countLabel } from "../ui/session-time";
 
@@ -14,10 +11,13 @@ const causes: Record<SessionCancellationSummaryDto["cause"], string> = {
 
 export const causeLabel = (cause: SessionCancellationSummaryDto["cause"]): string => causes[cause];
 
-/** «Hoy · 3 clases · 1 cancelada», or «Hoy · 5 canceladas» when none stands. */
+/**
+ * «Hoy · 3 clases · 1 cancelada», or «Hoy · 5 canceladas» when none stands:
+ * S02 and, since FIX-052, the Staff Horario.
+ */
 export function agendaHeading(
   dayName: string,
-  sessions: readonly TrainerScheduleSessionDto[],
+  sessions: readonly { cancellation?: SessionCancellationSummaryDto | null }[],
 ): string {
   const cancelled = sessions.filter((session) => (session.cancellation ?? null) !== null).length;
   const standing = sessions.length - cancelled;

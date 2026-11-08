@@ -8,7 +8,7 @@ import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support"
 jest.setTimeout(20_000);
 
 const coordinator = { ...assistant, id: "staff-9", name: "Carolina Rivas", role: "coordinator" };
-const daySessions = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
+const daySessions = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`;
 
 function routes(profile: unknown) {
   return {
@@ -120,5 +120,41 @@ describe("Horario (v2 HOR boards)", () => {
     expect(
       within(screen.getByTestId("schedule-session-session-2")).getByText("AS"),
     ).toBeOnTheScreen();
+  });
+
+  // FIX-052 (walkthrough n.º 48): a cancelled class keeps its place, muted,
+  // with its cause, as on the web and the Trainer's agenda (FIX-042).
+  it.each([
+    ["assistant", assistant],
+    ["coordinator", coordinator],
+  ] as const)("shows the %s a cancelled class in place, not bookable", async (role, profile) => {
+    const prenatal = {
+      ...session,
+      id: "session-2",
+      classTypeName: "Pilates Prenatal",
+      bookedCount: 0,
+      availableSeats: 12,
+      cancellation: { cause: "studio", cancelledAt: from, bookedCount: 2 },
+    };
+    const screen = await render(
+      <App
+        runtime={createStaffRuntime(
+          routeFetcher({
+            ...routes(profile),
+            [daySessions]: () => jsonResponse([{ ...session, cancellation: null }, prenatal]),
+          }),
+          role,
+        )}
+      />,
+    );
+    await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByTestId("tab-schedule"));
+
+    const row = await screen.findByTestId("schedule-cancelled-session-2");
+    expect(within(row).getByText("Pilates Prenatal")).toBeOnTheScreen();
+    expect(within(row).getByText("Cancelada por el estudio")).toBeOnTheScreen();
+    expect(screen.getByText(/ · 1 clase · 1 cancelada$/)).toBeOnTheScreen();
+    expect(screen.queryByText("12 cupos")).toBeNull();
+    expect(screen.queryByTestId("schedule-session-session-2")).toBeNull();
   });
 });

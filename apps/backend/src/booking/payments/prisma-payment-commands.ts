@@ -111,6 +111,7 @@ import {
   grantInviteReward,
 } from './grant-invite-reward';
 import { hasEarlierRealPayment } from './gift-class-history';
+import { isNextPlanPayment } from './next-plan-payment';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -1476,9 +1477,17 @@ export function createPrismaPaymentCommands(
     const receipt = evaluationReceiptOf(
       row.receiptImageAsset ?? row.purchaseIntent?.receiptImageAsset,
     );
+    const view = toPaymentView(row);
+    const kind = row.kind === 'EVALUATION' ? 'evaluation' : 'plan';
     return {
-      ...toPaymentView(row),
+      ...view,
       ...clientNameAndPhoto(row.client),
+      kind,
+      nextPlan: await isNextPlanPayment(
+        prisma,
+        { ...view, clientId: row.clientId, startsOn: row.startsOn, kind },
+        dependencies.now(),
+      ),
       // FIX-044: S12 shows whether she asked for an invoice, and in whose name.
       invoiceData:
         row.invoiceTaxId === null || row.invoiceName === null
