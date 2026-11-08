@@ -299,7 +299,7 @@ Para Gabriela, pulsa **🇧🇴 +591**, busca `Argentina` (o `+54`) en la lista 
 elígelo; después escribe sus 11 dígitos. Al guardar, la lista muestra cada
 número con su bandera: `🇧🇴 +591 70000001`, `🇦🇷 +54 91123456789`.
 
-- Vacío: «Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.»
+- Vacío: «Escribe su celular. Lo necesitamos para escribirle por WhatsApp.»
 - Un número de Bolivia de 7 dígitos, o que empieza con otro número: «Un
   celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.»
 - Con otro país, la regla de ese país, por ejemplo «Un celular de Perú tiene
@@ -489,7 +489,9 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    **Cancelar registro** y los plazos («El enlace vence en 24 horas. Si no lo
    abres en 7 días, borramos el registro.»). **Reenviar correo** dice «Te
    enviamos otro correo. Usa el enlace más reciente.»; si lo pulsas muy
-   seguido, el botón dice «Reenviar en 0:53» y espera. Si cierras la app y la
+   seguido, el botón dice «Reenviar en 0:53» y espera. Todo va en un solo
+   bloque centrado en la pantalla, igual que las otras pantallas cortas del
+   acceso (contraseña enviada, cuenta activa, enlace vencido). Si cierras la app y la
    vuelves a abrir, sigues en esa pantalla hasta que confirmes, canceles el
    registro o pasen 7 días.
 3. Abre el correo «Confirma tu correo para activar tu cuenta» y pulsa
@@ -513,8 +515,10 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    **Tu plan y tus clases** (**Mi plan**, **Evaluación nutricional**, **Mis
    evaluaciones**, **Invita a una amiga**), **Preferencias**
    (**Notificaciones** y **Recibir promociones**) y **Cuenta** (**Cambiar
-   contraseña**, **Enviar comentarios** y **Cerrar sesión**). Al final, aparte,
-   **Cerrar mi cuenta**.
+   contraseña**, **Enviar comentarios** y **Cerrar sesión**, la última fila,
+   en rojo y sin flecha, igual que en la app del equipo). Al final, en letra
+   chica y subrayada después de la versión, «Emma Pilates Studio · versión … ·
+   **Cerrar mi cuenta**».
 
 Si el correo tarda, el archivo del buzón local tiene el mismo enlace.
 
@@ -592,13 +596,18 @@ Emite la factura en el sistema de facturación de siempre y súbela:
   confirmación; nada se borra). El filtro **Factura por subir** muestra las
   que faltan.
 - **En la app del equipo**: la dueña entra desde **Pagos › Facturas por
-  subir**; Ana (recepción) y Carolina (coordinación) desde **Clientes ›
+  subir**; Camila (recepción) y la coordinadora desde **Clientes ›
   Facturas por subir**. Abre el pago, **Subir factura**, **Tomar foto** o
   **Elegir de la galería**. Desde el teléfono se sube una foto; el PDF se
-  sube desde la web.
+  sube desde la web. Una factura en PDF ya subida se ve en el teléfono como
+  su primera página, con «Ver · N páginas»; al tocarla se abre a pantalla
+  completa.
 - Lucía recibe el aviso **Tu factura está lista** y la ve en **Perfil › Mis
   facturas**: **Lista**, o **En preparación** mientras no se sube. Al abrirla,
-  **Descargar** abre el menú para guardar o compartir en iPhone y en Android
+  una foto se ve tal cual y un PDF muestra su primera página con «Ver · N
+  páginas»: al tocarla se abre un visor oscuro a pantalla completa («Factura ·
+  1 de N», las páginas una debajo de otra, se puede ampliar con dos dedos),
+  con **Compartir** y **Descargar**. **Descargar** abre el menú para guardar o compartir en iPhone y en Android
   la guarda en la carpeta que elija (se abre en **Documents**).
 
 **Marcar emitida** ya no existe: una factura cuenta como emitida solo cuando
@@ -711,7 +720,8 @@ ficha se abre a la derecha, sin perder la lista.
 7. Con un plan vigente que todavía tiene clases o una reserva futura,
    **Registrar pago** vende el plan siguiente, y también elige su **Fecha de
    inicio**: la franja va desde el día siguiente al vencimiento hasta 4
-   semanas después, con el día siguiente marcado, y debajo dice «El plan
+   semanas después, con el día siguiente marcado. Cada día dice el día de la
+   semana, el número y el mes («dic», «ene»), y debajo dice «El plan
    actual de Rocío vence el 5 de diciembre. El nuevo empieza el …; se puede
    elegir hasta el 2 de enero.». Al confirmar en efectivo el plan queda
    programado; por QR, **Comprobante enviado** dice «Administración lo revisa
@@ -841,8 +851,9 @@ Solo un plan de 90 días se puede congelar, una vez, hasta 15 días. Lucía
 tiene un plan de 30 días, así que este paso necesita un trimestral.
 
 1. En la app de Lucía, compra **Trimestral 24 clases** como renovación
-   anticipada. Elige la fecha de inicio que el sistema ofrece: el día
-   siguiente al fin del plan actual. Sube el comprobante y Ana lo confirma.
+   anticipada. **Mi plan** › **Renovar mi plan** ofrece la fecha de inicio en
+   una franja con el mes en cada día: desde el día siguiente al fin del plan
+   actual hasta 4 semanas después. Deja el día siguiente. Sube el comprobante y Ana lo confirma.
    **Solicitar congelamiento** solo aparece cuando el trimestral ya está en
    curso: mientras siga el plan de 30 días, **Mi plan** no lo ofrece. Haz
    el resto de este paso cuando empiece el trimestral, o con una clienta de
