@@ -50,9 +50,11 @@ const approvalMessage = (freeze: RequestedFreeze): string => {
     ) + 1;
   const newEnd = new Date(freeze.planEndsOn.getTime() + days * dayMilliseconds);
   const range =
-    freeze.startsOn.getUTCMonth() === freeze.endsOn.getUTCMonth()
-      ? `del ${freeze.startsOn.getUTCDate()} al ${dayMonth(freeze.endsOn)}`
-      : `del ${dayMonth(freeze.startsOn)} al ${dayMonth(freeze.endsOn)}`;
+    days === 1
+      ? `del ${dayMonth(freeze.startsOn)}`
+      : freeze.startsOn.getUTCMonth() === freeze.endsOn.getUTCMonth()
+        ? `del ${freeze.startsOn.getUTCDate()} al ${dayMonth(freeze.endsOn)}`
+        : `del ${dayMonth(freeze.startsOn)} al ${dayMonth(freeze.endsOn)}`;
   return `Aprobamos tu congelamiento ${range}. Tu plan ahora vence el ${dayMonth(newEnd)}.`;
 };
 
