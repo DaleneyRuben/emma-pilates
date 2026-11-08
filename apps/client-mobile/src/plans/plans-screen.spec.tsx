@@ -85,7 +85,7 @@ describe("Client Plans", () => {
     expect(
       within(screen.getByTestId("plan-hero")).getByText("Trimestral 36 clases"),
     ).toBeOnTheScreen();
-    expect(screen.getByText("36 clases en cualquier sucursal")).toBeOnTheScreen();
+    expect(screen.getByText("36 clases")).toBeOnTheScreen();
     expect(screen.getByText("Total")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Pagar Bs 2.100" })).toBeOnTheScreen();
     expect(screen.getByText("Pagas por QR y subes tu comprobante")).toBeOnTheScreen();

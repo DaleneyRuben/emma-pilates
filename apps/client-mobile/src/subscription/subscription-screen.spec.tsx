@@ -143,7 +143,11 @@ describe("Refreshed Mi plan (Client 12)", () => {
       founderRenewalDeadline: "2026-10-01",
     });
 
-    expect(screen.getByText("Renueva antes del 1 de octubre de 2026.")).toBeOnTheScreen();
+    // Walkthrough finding 49: the deadline says why, without «fundadora».
+    expect(
+      screen.getByText("Renueva antes del 1 de octubre para mantener tu 15 % de descuento."),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(/fundadora/i)).toBeNull();
   });
 
   it("invites renewal while expiring soon", async () => {
