@@ -90,6 +90,31 @@ export class FreezeReviewDto {
 
   @ApiProperty({ enum: ['requested', 'approved', 'refused'] })
   state!: 'requested' | 'approved' | 'refused';
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description: "The plan's end before this Freeze (walkthrough finding 52)",
+  })
+  planEndsOn?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description:
+      "The plan's end once this Freeze is approved; null when it was refused",
+  })
+  planEndsOnAfter?: string | null;
+
+  @ApiPropertyOptional({ type: String, format: 'date-time', nullable: true })
+  decidedAt?: string | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'The Staff Member who approved or refused it',
+  })
+  decidedByName?: string | null;
 }
 
 export class FreezeSummaryDto {

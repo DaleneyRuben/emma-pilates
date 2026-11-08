@@ -151,6 +151,21 @@ export class AdministratorFreezesController {
     return runFreeze(() => this.commands.listRequestedFreezes(principal));
   }
 
+  // Before ':freezeId', so «decided» is never read as an id.
+  @Get('decided')
+  @ApiOperation({ operationId: 'listDecidedFreezes' })
+  @ApiOkResponse({ type: FreezeReviewDto, isArray: true })
+  @Header('Cache-Control', 'no-store')
+  async decided(
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<FreezeReviewDto[]> {
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    return runFreeze(() => this.commands.listDecidedFreezes(principal));
+  }
+
   @Get(':freezeId')
   @ApiOperation({ operationId: 'getFreezeReview' })
   @ApiParam({ name: 'freezeId', format: 'uuid' })
