@@ -80,9 +80,36 @@ describe('freeze withdrawal', () => {
       commands.withdrawFreeze({ freezeId: requested.id }, client),
     ).resolves.toEqual({ state: 'withdrawn' });
 
+    // Owner 2026-11-08: a withdrawn request stays as «Retirada» in the
+    // decided history; who withdrew it and when are kept.
     await expect(
       prisma.freeze.findUniqueOrThrow({ where: { id: requested.id } }),
-    ).resolves.toMatchObject({ deletedAt: now });
+    ).resolves.toMatchObject({
+      state: 'WITHDRAWN',
+      decidedByAccountId: client.accountId,
+      decidedAt: now,
+      deletedAt: null,
+    });
+    const administrator = await world.staffPrincipal(
+      'paola.mendoza@example.com',
+    );
+    await expect(
+      world.commands().listDecidedFreezes(administrator),
+    ).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: requested.id,
+          state: 'withdrawn',
+          planEndsOnAfter: null,
+          decidedByName: 'Retira',
+        }),
+      ]),
+    );
+    expect(
+      (await world.commands().listRequestedFreezes(administrator)).map(
+        (row) => row.id,
+      ),
+    ).not.toContain(requested.id);
     const notices = await prisma.notification.findMany({
       where: { businessEventKey: `freeze-requested:${requested.id}` },
     });
@@ -95,9 +122,6 @@ describe('freeze withdrawal', () => {
     ).resolves.not.toBeNull();
 
     const again = await request();
-    const administrator = await world.staffPrincipal(
-      'paola.mendoza@example.com',
-    );
     await commands.decideFreeze(
       { freezeId: again.id, decision: 'approved' },
       administrator,
