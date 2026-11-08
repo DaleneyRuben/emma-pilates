@@ -59,7 +59,11 @@ export function freezePlanEnd(freeze: FreezeReviewDto): string | undefined {
 }
 
 const outcome = (freeze: FreezeReviewDto) =>
-  freeze.state === "approved" ? "Aprobada" : "Rechazada";
+  freeze.state === "approved"
+    ? "Aprobada"
+    : freeze.state === "withdrawn"
+      ? "Retirada"
+      : "Rechazada";
 
 /**
  * «Aprobada por Paola Mendoza el 8 de noviembre a las 10:15» in La Paz time,
@@ -67,7 +71,13 @@ const outcome = (freeze: FreezeReviewDto) =>
  */
 export function freezeDecision(freeze: FreezeReviewDto): string | undefined {
   if (freeze.state === "requested") return undefined;
-  const by = freeze.decidedByName ? ` por ${freeze.decidedByName}` : "";
+  // A withdrawal is the Client's own (owner 2026-11-08).
+  const by =
+    freeze.state === "withdrawn"
+      ? " por la clienta"
+      : freeze.decidedByName
+        ? ` por ${freeze.decidedByName}`
+        : "";
   const at = freeze.decidedAt
     ? ` el ${formatCivilDayMonth(boliviaCivilDate(new Date(freeze.decidedAt)))} a las ${formatStartTime(freeze.decidedAt)}`
     : "";

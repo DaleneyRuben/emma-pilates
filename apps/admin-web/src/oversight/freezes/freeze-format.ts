@@ -66,9 +66,16 @@ export function freezeDecidedPlanEnd(
  */
 export function freezeDecidedBy(freeze: FreezeReviewDto): string | undefined {
   const { decidedAt, decidedByName } = freeze;
-  if (!decidedAt && !decidedByName) return undefined;
-  const by = decidedByName ? ` por ${decidedByName}` : "";
-  if (!decidedAt) return `Decidido${by}`;
+  // A withdrawal is the Client's own (owner 2026-11-08), never a refusal.
+  const withdrawn = freeze.state === "withdrawn";
+  if (!decidedAt && !decidedByName && !withdrawn) return undefined;
+  const verb = withdrawn ? "Retirado" : "Decidido";
+  const by = withdrawn
+    ? " por la clienta"
+    : decidedByName
+      ? ` por ${decidedByName}`
+      : "";
+  if (!decidedAt) return `${verb}${by}`;
   const parts = boliviaParts(decidedAt);
-  return `Decidido${by} · ${shortDay(parts.date)} ${parts.time}`;
+  return `${verb}${by} · ${shortDay(parts.date)} ${parts.time}`;
 }

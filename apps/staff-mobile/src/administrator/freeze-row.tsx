@@ -23,8 +23,10 @@ export function FreezeRow({
   onPress: () => void;
 }) {
   const fetcher = useStaffFetcher();
+  const period = `${freezeRange(freeze.startsOn, freeze.endsOn, "short")} · ${freezeDays(freeze.startsOn, freeze.endsOn)}`;
   return (
     <Pressable
+      accessibilityHint={`${period} · ${note}`}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       onPress={onPress}
@@ -33,9 +35,7 @@ export function FreezeRow({
       <ClientFace fetcher={fetcher} name={freeze.clientName} photo={freeze.clientPhoto} size={36} />
       <View style={styles.body}>
         <Text style={styles.name}>{freeze.clientName}</Text>
-        <Text style={styles.detail}>
-          {`${freezeRange(freeze.startsOn, freeze.endsOn, "short")} · ${freezeDays(freeze.startsOn, freeze.endsOn)}`}
-        </Text>
+        <Text style={styles.detail}>{period}</Text>
         <Text ellipsizeMode="tail" numberOfLines={2} style={styles.detail}>
           {note}
         </Text>
