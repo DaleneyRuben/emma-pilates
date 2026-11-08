@@ -84,6 +84,31 @@ describe('payment review next Plan (PostgreSQL)', () => {
     });
   });
 
+  it('does not mark a rejected transfer, which will never start', async () => {
+    const buyer = await world.newClient('Rechazada Siguiente');
+    const centro = fixtures.branches.find((b) => b.name === 'Centro')!;
+    await world
+      .commands()
+      .recordCashPayment(
+        { clientId: buyer.clientId, planId: plan.id, branchId: centro.id },
+        assistant,
+        randomUUID(),
+      );
+    const payment = await transfer(buyer);
+    await world
+      .commands()
+      .rejectTransfer(
+        { paymentId: payment.id, reason: 'El monto no coincide.' },
+        administrator,
+      );
+
+    await expect(review(payment.id)).resolves.toMatchObject({
+      state: 'rejected',
+      kind: 'plan',
+      nextPlan: false,
+    });
+  });
+
   it('does not mark a first Plan, even one bought for a later Start Date', async () => {
     const first = await world.newClient('Primera Compra');
     const later = await world.newClient('Compra Adelantada');
