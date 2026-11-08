@@ -10,6 +10,9 @@ enum FreezeState {
   REQUESTED @map("requested")
   APPROVED  @map("approved")
   REFUSED   @map("refused")
+  // Walkthrough finding 51 (owner 2026-11-08): the Client withdrew it while
+  // it was in review. Like a refusal, it does not spend the plan's Freeze.
+  WITHDRAWN @map("withdrawn")
 
   @@schema("booking")
 }
