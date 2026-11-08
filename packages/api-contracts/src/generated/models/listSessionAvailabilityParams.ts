@@ -6,6 +6,10 @@
  */
 
 export type ListSessionAvailabilityParams = {
+  /**
+   * FIX-052: Staff also get the cancelled classes, with their cause; ignored for a Client
+   */
+  includeCancelled?: boolean;
   limit?: number;
   until: unknown;
   from: unknown;

@@ -36,9 +36,12 @@ export interface AdministratorSessionAvailabilityDto {
    * @nullable
    */
   classesLeftThisWeek?: number | null;
+  /**
+   * Present only when cancelled classes were asked for (includeCancelled); null for a class that stands
+   * @nullable
+   */
+  cancellation?: SessionCancellationSummaryDto | null;
   /** @nullable */
   sessionScheduleId: string | null;
   isException: boolean;
-  /** @nullable */
-  cancellation?: SessionCancellationSummaryDto | null;
 }

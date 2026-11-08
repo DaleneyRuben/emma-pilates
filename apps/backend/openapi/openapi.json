@@ -1107,6 +1107,15 @@
         "operationId": "listSessionAvailability",
         "parameters": [
           {
+            "name": "includeCancelled",
+            "required": false,
+            "in": "query",
+            "description": "FIX-052: Staff also get the cancelled classes, with their cause; ignored for a Client",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "limit",
             "required": false,
             "in": "query",
@@ -11267,6 +11276,32 @@
           "imageAssetId"
         ]
       },
+      "SessionCancellationSummaryDto": {
+        "type": "object",
+        "properties": {
+          "cause": {
+            "type": "string",
+            "enum": [
+              "minimum_not_met",
+              "studio",
+              "schedule_paused"
+            ]
+          },
+          "cancelledAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "bookedCount": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "cause",
+          "cancelledAt",
+          "bookedCount"
+        ]
+      },
       "SessionAvailabilityDto": {
         "type": "object",
         "properties": {
@@ -11334,6 +11369,16 @@
             "minimum": 0,
             "nullable": true,
             "description": "Classes left this week from the base allowance. Absent when the Plan has no cap or the caller is not a Client."
+          },
+          "cancellation": {
+            "nullable": true,
+            "description": "Present only when cancelled classes were asked for (includeCancelled); null for a class that stands",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SessionCancellationSummaryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -11422,32 +11467,6 @@
           "branchName",
           "startsAt",
           "endsAt"
-        ]
-      },
-      "SessionCancellationSummaryDto": {
-        "type": "object",
-        "properties": {
-          "cause": {
-            "type": "string",
-            "enum": [
-              "minimum_not_met",
-              "studio",
-              "schedule_paused"
-            ]
-          },
-          "cancelledAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "bookedCount": {
-            "type": "number",
-            "minimum": 0
-          }
-        },
-        "required": [
-          "cause",
-          "cancelledAt",
-          "bookedCount"
         ]
       },
       "TrainerScheduleSessionDto": {
@@ -14437,6 +14456,16 @@
             "nullable": true,
             "description": "Classes left this week from the base allowance. Absent when the Plan has no cap or the caller is not a Client."
           },
+          "cancellation": {
+            "nullable": true,
+            "description": "Present only when cancelled classes were asked for (includeCancelled); null for a class that stands",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SessionCancellationSummaryDto"
+              }
+            ]
+          },
           "sessionScheduleId": {
             "type": "string",
             "format": "uuid",
@@ -14444,15 +14473,6 @@
           },
           "isException": {
             "type": "boolean"
-          },
-          "cancellation": {
-            "nullable": true,
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SessionCancellationSummaryDto"
-              }
-            ]
           }
         },
         "required": [
