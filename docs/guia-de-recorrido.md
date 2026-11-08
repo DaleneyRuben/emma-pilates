@@ -794,6 +794,12 @@ Entra a la app del equipo como Ana. Su barra es **Pagos** · **Clientes** ·
    día», con **Ver el horario**. Debajo, en **Accesos**, están **Cancelar una
    clase**, **Congelamientos** y **Cerrar caja** (la misma caja de Camila,
    con **Volver** en lugar de **Ir a Clientes**).
+   El comprobante por QR del plan siguiente de Rocío (paso 9) está ahí.
+   **Revisar pago** muestra Transferencia, «Enviado el …», la fila **Plan
+   siguiente** · «Empieza el 2 de enero» (o el día que eligió Camila) y la
+   factura. **Confirmar pago** vuelve a la lista con «Plan siguiente
+   programado desde el 2 de enero». En la web, **Dinero › Pagos** muestra
+   la misma fila en **Resumen**.
 2. **Cancelar una clase** (desde **Accesos** o desde arriba de la pestaña
    **Horario**). Elige la sede (o **Todas las sucursales**), el día (**Otra**
    abre una fecha de los próximos 30 días) y el tipo, y toca la clase de
@@ -806,7 +812,10 @@ Entra a la app del equipo como Ana. Su barra es **Pagos** · **Clientes** ·
    **Volver** la deja como estaba. Confirma solo si quieres perder esa clase.
 3. **Clientes** es la misma búsqueda y la misma ficha de Camila, con el
    cobro en efectivo. **Horario** es la semana para leer, con **Cancelar una
-   clase** arriba.
+   clase** arriba. La prenatal que cancelaste sigue en su lugar ese día,
+   apagada, con borde punteado y «Cancelada por el estudio»; el título dice
+   «5 clases · 1 cancelada». No se abre, no ofrece cupos y **Cancelar una
+   clase** ya no la muestra.
 4. **Ver la app como…** está en el **Perfil** de Ana, en el grupo
    **Ajustes**. El paso 16 lo recorre cuando los otros roles ya tienen algo
    que ver.

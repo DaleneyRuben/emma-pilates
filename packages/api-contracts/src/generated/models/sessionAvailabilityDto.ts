@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { SessionCancellationSummaryDto } from "./sessionCancellationSummaryDto";
 import type { StaffPhotoDto } from "./staffPhotoDto";
 
 export interface SessionAvailabilityDto {
@@ -35,4 +36,9 @@ export interface SessionAvailabilityDto {
    * @nullable
    */
   classesLeftThisWeek?: number | null;
+  /**
+   * The cancelled class and its cause, null for a class that stands. The Session availability list sends it only when Staff ask for includeCancelled; the Administrator search always does.
+   * @nullable
+   */
+  cancellation?: SessionCancellationSummaryDto | null;
 }

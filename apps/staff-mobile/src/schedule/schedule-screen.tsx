@@ -21,6 +21,7 @@ import {
   typography,
   upcomingCivilDates,
   usePullToRefresh,
+  formatTimeRange,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -30,12 +31,14 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { roleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
+import { agendaHeading, causeLabel } from "../trainer/agenda-cancellations";
 import { BranchField } from "../ui/branch-field";
 import { useCashBranches } from "../ui/branch-chips";
+import { CancelledSessionRow } from "../ui/cancelled-session-row";
 import { DayStrip } from "../ui/day-strip";
 import { RootHeader } from "../ui/root-header";
 import { SessionRow } from "../ui/session-row";
-import { countLabel, dayHeading, startTime } from "../ui/session-time";
+import { countLabel, dayHeading, minutesLabel, startTime } from "../ui/session-time";
 
 type ScheduleNavigation = {
   navigate: {
@@ -73,7 +76,8 @@ export function ScheduleScreen() {
   const branch = branches.branch;
   const { from, until } = civilDateRange(selectedDate);
   const sessions = useListSessionAvailability(
-    { branchId: branch?.id ?? "", from, until, limit: 100 },
+    // FIX-052 (n.º 48): cancelled classes keep their place, as on the web.
+    { branchId: branch?.id ?? "", from, until, limit: 100, includeCancelled: true },
     { fetcher, query: { enabled: branch !== null, refetchOnMount: "always" } },
   );
   const queryKeys = [getListSessionAvailabilityQueryKey()];
@@ -148,29 +152,44 @@ export function ScheduleScreen() {
           />
         ) : (
           <View>
-            <SectionTitle>
-              {`${dayHeading(selectedDate)} · ${countLabel(list.length, "clase", "clases")}`}
-            </SectionTitle>
+            <SectionTitle>{agendaHeading(dayHeading(selectedDate), list)}</SectionTitle>
             <View style={styles.list}>
-              {list.map((session) => (
-                <SessionRow
-                  key={session.id}
-                  pill={selling ? seats(session) : undefined}
-                  pillTone={session.availableSeats === 0 ? "neutral" : "tint"}
-                  subtitle={booked(session)}
-                  subtitleLead={
-                    <StaffFace
-                      fetcher={fetcher}
-                      name={session.trainerName}
-                      photo={session.trainerPhoto}
-                      size={20}
+              {list.map((session) => {
+                const cancellation = session.cancellation ?? null;
+                if (cancellation !== null) {
+                  const cause = causeLabel(cancellation.cause);
+                  return (
+                    <CancelledSessionRow
+                      accessibilityLabel={`${session.classTypeName}, ${formatTimeRange(session.startsAt, session.endsAt)}, ${cause}`}
+                      cause={cause}
+                      duration={minutesLabel(session.startsAt, session.endsAt)}
+                      key={session.id}
+                      testID={`schedule-cancelled-${session.id}`}
+                      time={startTime(session.startsAt, session.endsAt)}
+                      title={session.classTypeName}
                     />
-                  }
-                  testID={`schedule-session-${session.id}`}
-                  time={startTime(session.startsAt, session.endsAt)}
-                  title={session.classTypeName}
-                />
-              ))}
+                  );
+                }
+                return (
+                  <SessionRow
+                    key={session.id}
+                    pill={selling ? seats(session) : undefined}
+                    pillTone={session.availableSeats === 0 ? "neutral" : "tint"}
+                    subtitle={booked(session)}
+                    subtitleLead={
+                      <StaffFace
+                        fetcher={fetcher}
+                        name={session.trainerName}
+                        photo={session.trainerPhoto}
+                        size={20}
+                      />
+                    }
+                    testID={`schedule-session-${session.id}`}
+                    time={startTime(session.startsAt, session.endsAt)}
+                    title={session.classTypeName}
+                  />
+                );
+              })}
             </View>
           </View>
         )}

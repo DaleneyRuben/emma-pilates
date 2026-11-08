@@ -84,8 +84,8 @@ can be found by its design name.
 | S26 Reportar una falla (Entrenadora) | 82 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112, 126 |
-| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112, 113 |
-| S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20, 113 |
+| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112, 113, 145 |
+| S13 Cancelar una clase, S14 Cancelar sesión, Horario (HOR) | 10, 19, 20, 113, 145 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93 |
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 95, 106 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
@@ -112,7 +112,7 @@ can be found by its design name.
 | AW41 Congelamientos | 92 |
 | AW23–AW24 Personal | 26, 31, 72, 79, 142 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72, 93 |
-| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89, 112 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89, 112, 145 |
 | AW38 Comentarios | 80 |
 | AW151 Caja | 76, 112 |
 
@@ -1817,7 +1817,8 @@ screen (Test 81); **Rechazar** stays available. **Ampliar** (or tapping the
 image) opens it full screen
 with pinch zoom; close it with the ✕ in the top-right corner, below the status
 bar. Scroll down: **Confirmar pago** returns to the list with a two-second
-"Pago confirmado" notice and the card gone. **Rechazar**, under it, does not
+"Pago confirmado" notice and the card gone (a Plan that starts later names
+its start instead, Test 145). **Rechazar**, under it, does not
 reject yet: it unfolds **Motivo del rechazo** with "La clienta verá
 este mensaje para corregir y volver a enviar."; **Confirmar rechazo** stays
 disabled until you type a reason, then returns to the list with "Pago
@@ -8445,7 +8446,8 @@ D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search fiel
    (**Cancelar reserva** in Error, **Reprogramar** inside the window, **Salir
    de la lista**); the sheet asks «¿Cancelar esta reserva de …?» with **Sí,
    cancelar la reserva** and **No, volver**. Horario (HOR): the week for her
-   Branch, read-only rows «Trainer · N de M reservados» with «N cupos», and
+   Branch, read-only rows «Trainer · N de M reservados» with «N cupos», a
+   cancelled class kept in place, muted, with its cause (Test 145), and
    **Reservar para una clienta** (opens Clientes). Caja (S25): «Cerrar caja»
    with the expected cash on the Rosa profundo card, «Efectivo contado», the
    live difference row («Falta efectivo −Bs 2»), the note with its counter,
@@ -9384,6 +9386,40 @@ E. **Short screens centred (n.º 46).** **Crear cuenta** until **Revisa tu
    expired activation or password link, and «Tu cuenta está activa»: the
    badge, title, text and buttons sit together in the middle of the screen,
    in both apps, on the phone and the iPad.
+
+## Test 145: second walkthrough Paso 10 — Revisar pago names the next Plan, the Staff Horario keeps cancelled classes (FIX-052)
+
+Walkthrough findings n.º 47 and 48. Run the API on a fresh copy of the
+walkthrough database, the Staff app on the iPhone 16 Pro, the iPad and
+Android, and the admin web at 1440 and 420 px.
+
+A. **Revisar pago, next Plan (n.º 47).** As Camila, sell Rocío (Plan ending
+   5 December, classes left) her next Plan by QR from **Registrar pago**, so
+   it starts on 2 January. As Ana, **Pagos › Revisar pago** on it: under
+   «Enviado el …» a calendar row reads **Plan siguiente** · «Empieza el 2 de
+   enero». **Confirmar pago** returns to the list with «Plan siguiente
+   programado desde el 2 de enero». A first Plan bought for a later Start
+   Date shows **Empieza** · «2 de enero» and confirms with «Plan programado
+   desde el …»; a Plan that starts today shows no start row and still says
+   «Pago confirmado».
+B. **The web review (n.º 47).** On the admin web, **Dinero › Pagos**, open
+   the same pending transfer: **Resumen** has **Plan siguiente** · «Empieza
+   el sábado 2 de enero» (a first Plan for a later date: **Empieza** · the
+   day). **Confirmar pago** asks «… Al confirmar, su plan siguiente … empieza
+   el sábado 2 de enero y le avisamos.», and the notice reads «Pago de Rocío
+   … confirmado: plan siguiente programado desde el sábado 2 de enero.». By
+   API, `GET /api/v1/administrator/payments/{id}` returns `nextPlan: true`
+   with `startsOn`.
+C. **Cancelled classes on the Staff Horario (n.º 48).** As Ana, **Accesos ›
+   Cancelar una clase** and cancel a class with no bookings. Open
+   **Horario** on that day: the class keeps its place with a dashed edge, its
+   time and length muted, and «Cancelada por el estudio» («Cancelada ·
+   mínimo no alcanzado» or «Serie en pausa» for the others). The heading
+   counts it apart («Martes 10 de noviembre · 5 clases · 1 cancelada»). It
+   opens nothing and shows no «cupos» for Camila; **Cancelar una clase**
+   does not offer it again. The Coordinator sees the same. By API,
+   `GET /api/v1/sessions?…&includeCancelled=true` as staff returns it with
+   `cancellation`; a Client asking the same gets only standing classes.
 
 
 ## Test 146: walkthrough findings 49–54 — founder deadline, one branch, Mi plan and Congelar plan, freeze review and history (FIX-053, DES-015)
