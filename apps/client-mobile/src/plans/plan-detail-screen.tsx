@@ -4,6 +4,7 @@ import {
   getGetCurrentPurchaseIntentQueryKey,
   useGetCurrentClientSubscription,
   useGetPlan,
+  useListBranches,
 } from "@pilates/api-contracts";
 import {
   BodyText,
@@ -65,6 +66,8 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const branches = useListBranches({ fetcher, query: { staleTime: 60_000 } });
+  const activeBranchCount = branches.data?.status === 200 ? branches.data.data.length : undefined;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const today = boliviaCivilDate(new Date());
@@ -145,6 +148,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
       <ScrollView contentContainerStyle={styles.content}>
         <PlanHero plan={detail} />
         <PlanIncludes
+          activeBranchCount={activeBranchCount}
           cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
           plan={detail}
         />

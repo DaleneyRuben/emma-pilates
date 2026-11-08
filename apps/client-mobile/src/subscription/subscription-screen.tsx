@@ -103,7 +103,9 @@ export function SubscriptionScreen() {
       {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         {founderRenewalDeadline == null ? null : (
-          <Notice>{`Renueva antes del ${formatCivilDateWithYear(founderRenewalDeadline)}.`}</Notice>
+          <Notice>
+            {`Renueva antes del ${formatCivilDate(founderRenewalDeadline)} para mantener tu 15 % de descuento.`}
+          </Notice>
         )}
         {status === "expiring_soon" ? (
           <Notice note="Renueva cuando quieras y elige tu fecha de inicio.">

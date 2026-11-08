@@ -42,19 +42,28 @@ export function PlanHero({ plan }: { plan: PlanDto }) {
   );
 }
 
-/** C09's «Qué incluye» as icon rows instead of paragraphs. */
+/**
+ * C09's «Qué incluye» as icon rows instead of paragraphs. «en cualquier
+ * sucursal» only from the second active Branch (walkthrough finding 50).
+ */
 export function PlanIncludes({
+  activeBranchCount,
   cancellationWindowMinutes,
   plan,
 }: {
+  activeBranchCount: number | undefined;
   cancellationWindowMinutes: number | undefined;
   plan: PlanDto;
 }) {
+  const classes =
+    activeBranchCount !== undefined && activeBranchCount > 1
+      ? `${plan.classAllowance} clases en cualquier sucursal`
+      : `${plan.classAllowance} clases`;
   return (
     <View>
       <SectionTitle>Qué incluye</SectionTitle>
       <IconRowGroup>
-        <IconRow icon="calendar" label={`${plan.classAllowance} clases en cualquier sucursal`} />
+        <IconRow icon="calendar" label={classes} />
         {cancellationWindowMinutes === undefined ? null : (
           <IconRow
             icon="undo"
