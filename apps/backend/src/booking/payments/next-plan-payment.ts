@@ -7,9 +7,20 @@ import { boliviaDate } from '../../time/bolivia-time';
 // the Payment's Plan is simply her Plan.
 export const isNextPlanPayment = async (
   prisma: Pick<PrismaClient, 'subscription'>,
-  payment: { clientId: string; startsOn: Date; subscriptionId: string | null },
+  payment: {
+    clientId: string;
+    startsOn: Date;
+    subscriptionId: string | null;
+    state: 'pending' | 'confirmed' | 'rejected' | 'voided';
+    kind: 'plan' | 'evaluation';
+  },
   now: Date,
 ): Promise<boolean> => {
+  // A rejected or voided sale never starts; an Evaluation is not a Plan.
+  if (payment.kind !== 'plan') return false;
+  if (payment.state !== 'pending' && payment.state !== 'confirmed') {
+    return false;
+  }
   const current = await prisma.subscription.findFirst({
     where: {
       clientId: payment.clientId,
