@@ -170,4 +170,29 @@ describe('decideFreeze', () => {
       }),
     );
   });
+
+  it('names a one-day Freeze by its day', async () => {
+    const record = jest.fn().mockResolvedValue(undefined);
+    await decideFreeze(
+      { freezeId: freeze.id, decision: 'approved' },
+      {
+        principal: staff('administrator'),
+        loadFreeze: jest.fn().mockResolvedValue({
+          ...freeze,
+          startsOn: new Date('2026-11-16T00:00:00.000Z'),
+          endsOn: new Date('2026-11-16T00:00:00.000Z'),
+        }),
+        approve: jest.fn().mockResolvedValue(undefined),
+        refuse: jest.fn(),
+        record,
+        now: () => new Date('2026-10-23T15:00:00.000Z'),
+      },
+    );
+    expect(record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          'Aprobamos tu congelamiento del 16 de noviembre. Tu plan ahora vence el 31 de enero.',
+      }),
+    );
+  });
 });
