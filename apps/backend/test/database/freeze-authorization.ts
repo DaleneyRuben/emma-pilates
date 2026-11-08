@@ -28,6 +28,8 @@ export const freezeAuthorizationRows = (): Record<string, MatrixRow> => ({
   },
   // These handlers read the bearer credential, not the admin-web cookie.
   'GET /api/v1/administrator/freezes': bothAllowed({ bearer: true }),
+  // Walkthrough finding 52: the decided requests, for both Roles.
+  'GET /api/v1/administrator/freezes/decided': bothAllowed({ bearer: true }),
   'GET /api/v1/administrator/freezes/{freezeId}': bothAllowed({
     bearer: true,
     realIds: { freezeId: 'freezeId' },
