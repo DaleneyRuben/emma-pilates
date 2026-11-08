@@ -62,6 +62,11 @@ export class FreezeDecisionDto {
   state!: 'approved' | 'refused';
 }
 
+export class FreezeWithdrawalDto {
+  @ApiProperty({ enum: ['withdrawn'] })
+  state!: 'withdrawn';
+}
+
 export class FreezeReviewDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;

@@ -33,6 +33,7 @@ import {
   DecideFreezeDto,
   FreezeDecisionDto,
   FreezeRequestDto,
+  FreezeWithdrawalDto,
   FreezeReviewDto,
   isCivilDate,
   parseDecideFreeze,
@@ -125,6 +126,27 @@ export class ClientFreezesController {
       authorization,
     );
     return runFreeze(() => this.commands.requestFreeze(parsed, principal));
+  }
+
+  // Walkthrough finding 51: the Client withdraws a request still in review.
+  @Post(':freezeId/withdrawal')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ operationId: 'withdrawFreeze' })
+  @ApiParam({ name: 'freezeId', format: 'uuid' })
+  @ApiOkResponse({ type: FreezeWithdrawalDto })
+  @Header('Cache-Control', 'no-store')
+  async withdraw(
+    @Param('freezeId') freezeId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<FreezeWithdrawalDto> {
+    const id = requireId(freezeId, 'Invalid Freeze identifier');
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    return runFreeze(() =>
+      this.commands.withdrawFreeze({ freezeId: id }, principal),
+    );
   }
 }
 
