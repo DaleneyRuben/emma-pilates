@@ -76,7 +76,7 @@ describe('payment review next Plan (PostgreSQL)', () => {
     });
     await world
       .commands()
-      .confirmTransfer({ paymentId: payment.id }, administrator, randomUUID());
+      .confirmTransfer({ paymentId: payment.id }, administrator);
     await expect(review(payment.id)).resolves.toMatchObject({
       state: 'confirmed',
       startsOn: nextStart,

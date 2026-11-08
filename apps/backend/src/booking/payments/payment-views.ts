@@ -88,6 +88,8 @@ export type PendingPaymentSummary = {
 
 export type PaymentReview = PaymentView & {
   clientName: string;
+  /** FIX-052: queued after a Plan she still has. */
+  nextPlan: boolean;
   invoiceData: { taxId: string; name: string } | null;
   clientPhoto: ClientPhotoRef;
   receipt: { imageAssetId: string; mediaType: string } | null;

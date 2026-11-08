@@ -312,6 +312,12 @@ export class PaymentReviewDto extends PaymentDto {
   clientName!: string;
 
   @ApiPropertyOptional({
+    description:
+      'FIX-052: the Payment is for her next Plan, queued after a Plan she still has; startsOn is when it begins. Older builds ignore it.',
+  })
+  nextPlan?: boolean;
+
+  @ApiPropertyOptional({
     type: InvoiceDataDto,
     nullable: true,
     description:
