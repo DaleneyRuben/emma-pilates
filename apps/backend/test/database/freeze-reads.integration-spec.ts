@@ -139,6 +139,12 @@ describe('requested freezes for review (PostgreSQL)', () => {
         .commands()
         .readFreezeReview({ freezeId: freeze.freezeId }, administrator),
     ).resolves.toMatchObject(decided);
+    // Review: the history keeps the ends of the decision even when the
+    // plan's end moves later (a renewal or a voided sale).
+    await prisma.subscription.updateMany({
+      where: { freezes: { some: { id: freeze.freezeId } } },
+      data: { endsOn: new Date('2026-12-01T00:00:00.000Z') },
+    });
     const listed = await world.commands().listDecidedFreezes(administrator);
     expect(listed).toEqual(
       expect.arrayContaining([expect.objectContaining(decided)]),
