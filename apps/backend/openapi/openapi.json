@@ -11782,7 +11782,8 @@
             "enum": [
               "requested",
               "approved",
-              "refused"
+              "refused",
+              "withdrawn"
             ]
           },
           "startsOn": {
@@ -14376,7 +14377,8 @@
             "enum": [
               "requested",
               "approved",
-              "refused"
+              "refused",
+              "withdrawn"
             ]
           },
           "planEndsOn": {
@@ -14388,7 +14390,7 @@
             "type": "string",
             "format": "date",
             "nullable": true,
-            "description": "The plan's end once this Freeze is approved; null when it was refused"
+            "description": "The plan's end once this Freeze is approved; null when it was refused or withdrawn"
           },
           "decidedAt": {
             "type": "string",
@@ -14398,7 +14400,7 @@
           "decidedByName": {
             "type": "string",
             "nullable": true,
-            "description": "The Staff Member who approved or refused it"
+            "description": "The Staff Member who approved or refused it, or the Client who withdrew it"
           }
         },
         "required": [

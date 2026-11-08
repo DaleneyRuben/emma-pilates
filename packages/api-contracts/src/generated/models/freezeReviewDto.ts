@@ -23,14 +23,14 @@ export interface FreezeReviewDto {
   /** The plan's end before this Freeze (walkthrough finding 52) */
   planEndsOn?: string;
   /**
-   * The plan's end once this Freeze is approved; null when it was refused
+   * The plan's end once this Freeze is approved; null when it was refused or withdrawn
    * @nullable
    */
   planEndsOnAfter?: string | null;
   /** @nullable */
   decidedAt?: string | null;
   /**
-   * The Staff Member who approved or refused it
+   * The Staff Member who approved or refused it, or the Client who withdrew it
    * @nullable
    */
   decidedByName?: string | null;
