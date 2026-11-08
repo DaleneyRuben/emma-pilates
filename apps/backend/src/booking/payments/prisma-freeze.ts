@@ -190,6 +190,7 @@ export const createFreezeCommands = (
                   startsOn: true,
                   endsOn: true,
                   state: true,
+                  subscription: { select: { endsOn: true } },
                   client: { select: { account: { select: { id: true } } } },
                 },
               });
@@ -200,7 +201,9 @@ export const createFreezeCommands = (
                 subscriptionId: row.subscriptionId,
                 state: row.state.toLowerCase() as
                   'requested' | 'approved' | 'refused',
+                startsOn: row.startsOn,
                 endsOn: row.endsOn,
+                planEndsOn: row.subscription.endsOn,
               };
             },
             approve: async (input) => {

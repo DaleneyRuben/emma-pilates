@@ -110,6 +110,7 @@ import { listTrainerSchedule } from './trainer-schedule';
 import { findTrainerScheduleSessions } from './trainer-schedule-sessions';
 import { loadTrainerSessionRoster } from './trainer-session-roster';
 import { findTrainerSessionRoster } from './prisma-trainer-session-roster';
+import { loadQueuedRenewalStart } from './payments/freeze-window';
 
 import {
   changeStaffBranches,
@@ -453,10 +454,17 @@ import { invoiceFileWiring } from './payments/invoice-file/invoice-file-wiring';
               readFounderRenewal(prisma, clientId),
             readRenewalStartsOn: (clientId) =>
               readRenewalStartsOn(prisma, clientId, new Date()),
+            readQueuedPlanStart: (clientId, after) =>
+              loadQueuedRenewalStart(prisma, { clientId, after }).then(
+                (start) =>
+                  start === null ? null : start.toISOString().slice(0, 10),
+              ),
+            // The latest request: after a refusal she may ask again.
             readFreeze: (subscriptionId) =>
               prisma.freeze
                 .findFirst({
                   where: { subscriptionId, deletedAt: null },
+                  orderBy: { createdAt: 'desc' },
                   select: {
                     id: true,
                     state: true,
