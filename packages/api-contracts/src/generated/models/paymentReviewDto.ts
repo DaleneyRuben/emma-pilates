@@ -47,6 +47,8 @@ export interface PaymentReviewDto {
   /** @nullable */
   subscriptionId?: string | null;
   clientName: string;
+  /** FIX-052: the Payment is for her next Plan, queued after a Plan she still has; startsOn is when it begins. Older builds ignore it. */
+  nextPlan?: boolean;
   /**
    * FIX-044: the NIT or CI and name she asked the invoice for; null is «Sin factura»
    * @nullable
