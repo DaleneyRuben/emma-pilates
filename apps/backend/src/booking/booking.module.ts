@@ -478,7 +478,7 @@ import { invoiceFileWiring } from './payments/invoice-file/invoice-file-wiring';
                     : {
                         id: row.id,
                         state: row.state.toLowerCase() as
-                          'requested' | 'approved' | 'refused',
+                          'requested' | 'approved' | 'refused' | 'withdrawn',
                         startsOn: row.startsOn.toISOString().slice(0, 10),
                         endsOn: row.endsOn.toISOString().slice(0, 10),
                       },

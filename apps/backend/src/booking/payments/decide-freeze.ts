@@ -16,7 +16,7 @@ type RequestedFreeze = {
   id: string;
   clientAccountId: string;
   subscriptionId: string;
-  state: 'requested' | 'approved' | 'refused';
+  state: 'requested' | 'approved' | 'refused' | 'withdrawn';
   startsOn: Date;
   endsOn: Date;
   /** The plan's end before this Freeze moves it. */

@@ -204,7 +204,7 @@ export const createFreezeCommands = (
                 clientAccountId: row.client.account.id,
                 subscriptionId: row.subscriptionId,
                 state: row.state.toLowerCase() as
-                  'requested' | 'approved' | 'refused',
+                  'requested' | 'approved' | 'refused' | 'withdrawn',
                 startsOn: row.startsOn,
                 endsOn: row.endsOn,
                 planEndsOn: row.subscription.endsOn,
@@ -227,8 +227,9 @@ export const createFreezeCommands = (
     );
 
   // Walkthrough finding 51 (owner 2026-11-08): the Client withdraws her own
-  // request while it is still in review. Soft delete, so it no longer counts
-  // as the plan's one Freeze; the operators' notices are settled.
+  // request while it is still in review. It becomes «withdrawn», which, like
+  // a refusal, does not spend the plan's one Freeze; she is kept as who
+  // decided it, and the operators' notices are settled.
   const withdrawFreeze = async (
     command: { freezeId: string },
     principal: AuthenticatedPrincipal,
@@ -254,7 +255,11 @@ export const createFreezeCommands = (
       const now = dependencies.now();
       const withdrawn = await transaction.freeze.updateMany({
         where: { id: freeze.id, state: FreezeState.REQUESTED, deletedAt: null },
-        data: { deletedAt: now },
+        data: {
+          state: FreezeState.WITHDRAWN,
+          decidedByAccountId: principal.accountId,
+          decidedAt: now,
+        },
       });
       if (withdrawn.count === 0) {
         throw new PaymentRuleError(

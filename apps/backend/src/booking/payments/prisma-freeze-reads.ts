@@ -48,7 +48,14 @@ const toReview = (row: {
     ? addCivil(row.subscription.endsOn, -days)
     : row.subscription.endsOn;
   const after =
-    row.state === FreezeState.REFUSED ? null : addCivil(before, days);
+    row.state === FreezeState.REFUSED || row.state === FreezeState.WITHDRAWN
+      ? null
+      : addCivil(before, days);
+  // A withdrawn request was decided by the Client herself, not by staff.
+  const decidedByName =
+    row.state === FreezeState.WITHDRAWN
+      ? row.client.name
+      : (row.decidedByAccount?.staffMember?.name ?? null);
   return {
     id: row.id,
     ...clientNameAndPhoto(row.client),
@@ -56,11 +63,12 @@ const toReview = (row: {
     startsOn: civil(row.startsOn),
     endsOn: civil(row.endsOn),
     reason: row.reason,
-    state: row.state.toLowerCase() as 'requested' | 'approved' | 'refused',
+    state: row.state.toLowerCase() as
+      'requested' | 'approved' | 'refused' | 'withdrawn',
     planEndsOn: civil(before),
     planEndsOnAfter: after === null ? null : civil(after),
     decidedAt: row.decidedAt?.toISOString() ?? null,
-    decidedByName: row.decidedByAccount?.staffMember?.name ?? null,
+    decidedByName,
   };
 };
 
@@ -81,7 +89,13 @@ export const createFreezeReads = (prisma: PrismaClient) => ({
     requireOperations(principal);
     const rows = await prisma.freeze.findMany({
       where: {
-        state: { in: [FreezeState.APPROVED, FreezeState.REFUSED] },
+        state: {
+          in: [
+            FreezeState.APPROVED,
+            FreezeState.REFUSED,
+            FreezeState.WITHDRAWN,
+          ],
+        },
         deletedAt: null,
       },
       orderBy: [{ decidedAt: 'desc' }, { createdAt: 'desc' }],

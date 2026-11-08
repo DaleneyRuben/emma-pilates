@@ -35,7 +35,7 @@ export type ClientSubscriptionStatus =
 
 export type ClientFreezeSummary = {
   id: string;
-  state: 'requested' | 'approved' | 'refused';
+  state: 'requested' | 'approved' | 'refused' | 'withdrawn';
   startsOn: string;
   endsOn: string;
 };
@@ -149,9 +149,13 @@ export const describeSubscription = async (
         dependencies,
       ),
       freeze,
-      // booking ADR-0010: a refused Freeze does not count; she may ask again.
+      // booking ADR-0010: a refused or withdrawn Freeze does not count; she
+      // may ask again.
       canRequestFreeze:
-        durationDays >= 90 && (freeze === null || freeze.state === 'refused'),
+        durationDays >= 90 &&
+        (freeze === null ||
+          freeze.state === 'refused' ||
+          freeze.state === 'withdrawn'),
       ...(renewalStartsOn === null ? {} : { renewalStartsOn }),
       ...(queuedPlanStartsOn === null ? {} : { queuedPlanStartsOn }),
     };

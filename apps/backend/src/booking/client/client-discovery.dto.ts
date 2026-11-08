@@ -167,8 +167,8 @@ export class ClientFreezeDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
 
-  @ApiProperty({ enum: ['requested', 'approved', 'refused'] })
-  state!: 'requested' | 'approved' | 'refused';
+  @ApiProperty({ enum: ['requested', 'approved', 'refused', 'withdrawn'] })
+  state!: 'requested' | 'approved' | 'refused' | 'withdrawn';
 
   @ApiProperty({ format: 'date' })
   startsOn!: string;
