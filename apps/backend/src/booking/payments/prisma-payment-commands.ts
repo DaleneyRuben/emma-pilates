@@ -1515,7 +1515,9 @@ export function createPrismaPaymentCommands(
     recordCashPayment,
     requestFreeze: freezes.requestFreeze,
     decideFreeze: freezes.decideFreeze,
+    withdrawFreeze: freezes.withdrawFreeze,
     listRequestedFreezes: freezeReads.listRequestedFreezes,
+    listDecidedFreezes: freezeReads.listDecidedFreezes,
     readFreezeReview: freezeReads.readFreezeReview,
     recordFrontDeskTransfer: (
       command: {

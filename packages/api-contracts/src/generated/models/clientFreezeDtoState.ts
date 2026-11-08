@@ -12,4 +12,5 @@ export const ClientFreezeDtoState = {
   requested: "requested",
   approved: "approved",
   refused: "refused",
+  withdrawn: "withdrawn",
 } as const;

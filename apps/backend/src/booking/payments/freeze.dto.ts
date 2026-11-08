@@ -62,6 +62,11 @@ export class FreezeDecisionDto {
   state!: 'approved' | 'refused';
 }
 
+export class FreezeWithdrawalDto {
+  @ApiProperty({ enum: ['withdrawn'] })
+  state!: 'withdrawn';
+}
+
 export class FreezeReviewDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -88,16 +93,42 @@ export class FreezeReviewDto {
   @ApiProperty()
   reason!: string;
 
-  @ApiProperty({ enum: ['requested', 'approved', 'refused'] })
-  state!: 'requested' | 'approved' | 'refused';
+  @ApiProperty({ enum: ['requested', 'approved', 'refused', 'withdrawn'] })
+  state!: 'requested' | 'approved' | 'refused' | 'withdrawn';
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description: "The plan's end before this Freeze (walkthrough finding 52)",
+  })
+  planEndsOn?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description:
+      "The plan's end once this Freeze is approved; null when it was refused or withdrawn",
+  })
+  planEndsOnAfter?: string | null;
+
+  @ApiPropertyOptional({ type: String, format: 'date-time', nullable: true })
+  decidedAt?: string | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description:
+      'The Staff Member who approved or refused it, or the Client who withdrew it',
+  })
+  decidedByName?: string | null;
 }
 
 export class FreezeSummaryDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
 
-  @ApiProperty({ enum: ['requested', 'approved', 'refused'] })
-  state!: 'requested' | 'approved' | 'refused';
+  @ApiProperty({ enum: ['requested', 'approved', 'refused', 'withdrawn'] })
+  state!: 'requested' | 'approved' | 'refused' | 'withdrawn';
 
   @ApiProperty({ format: 'date' })
   startsOn!: string;

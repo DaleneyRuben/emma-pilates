@@ -33,6 +33,7 @@ import {
   DecideFreezeDto,
   FreezeDecisionDto,
   FreezeRequestDto,
+  FreezeWithdrawalDto,
   FreezeReviewDto,
   isCivilDate,
   parseDecideFreeze,
@@ -126,6 +127,27 @@ export class ClientFreezesController {
     );
     return runFreeze(() => this.commands.requestFreeze(parsed, principal));
   }
+
+  // Walkthrough finding 51: the Client withdraws a request still in review.
+  @Post(':freezeId/withdrawal')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ operationId: 'withdrawFreeze' })
+  @ApiParam({ name: 'freezeId', format: 'uuid' })
+  @ApiOkResponse({ type: FreezeWithdrawalDto })
+  @Header('Cache-Control', 'no-store')
+  async withdraw(
+    @Param('freezeId') freezeId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<FreezeWithdrawalDto> {
+    const id = requireId(freezeId, 'Invalid Freeze identifier');
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    return runFreeze(() =>
+      this.commands.withdrawFreeze({ freezeId: id }, principal),
+    );
+  }
 }
 
 @Controller({ path: 'administrator/freezes', version: '1' })
@@ -149,6 +171,21 @@ export class AdministratorFreezesController {
       authorization,
     );
     return runFreeze(() => this.commands.listRequestedFreezes(principal));
+  }
+
+  // Before ':freezeId', so «decided» is never read as an id.
+  @Get('decided')
+  @ApiOperation({ operationId: 'listDecidedFreezes' })
+  @ApiOkResponse({ type: FreezeReviewDto, isArray: true })
+  @Header('Cache-Control', 'no-store')
+  async decided(
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<FreezeReviewDto[]> {
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    return runFreeze(() => this.commands.listDecidedFreezes(principal));
   }
 
   @Get(':freezeId')

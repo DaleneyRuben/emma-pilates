@@ -4297,6 +4297,36 @@
         ]
       }
     },
+    "/api/v1/administrator/freezes/decided": {
+      "get": {
+        "operationId": "listDecidedFreezes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FreezeReviewDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFreezes"
+        ]
+      }
+    },
     "/api/v1/administrator/freezes/{freezeId}": {
       "get": {
         "operationId": "getFreezeReview",
@@ -4402,6 +4432,43 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FreezeRequestDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientFreezes"
+        ]
+      }
+    },
+    "/api/v1/freezes/{freezeId}/withdrawal": {
+      "post": {
+        "operationId": "withdrawFreeze",
+        "parameters": [
+          {
+            "name": "freezeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeWithdrawalDto"
                 }
               }
             }
@@ -11715,7 +11782,8 @@
             "enum": [
               "requested",
               "approved",
-              "refused"
+              "refused",
+              "withdrawn"
             ]
           },
           "startsOn": {
@@ -11789,6 +11857,11 @@
             "type": "string",
             "format": "date",
             "description": "The current Plan still has classes, so a Plan bought now starts after it ends: this is the day after its end, the default, and any day through 27 days later may be chosen (booking ADR-0013). Absent when she chooses from today."
+          },
+          "queuedPlanStartsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "The start of a next plan already queued (bought, or a transfer in review). A Freeze must end the current plan before it (walkthrough finding 51). Absent when none is queued."
           }
         },
         "required": [
@@ -14304,8 +14377,30 @@
             "enum": [
               "requested",
               "approved",
-              "refused"
+              "refused",
+              "withdrawn"
             ]
+          },
+          "planEndsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "The plan's end before this Freeze (walkthrough finding 52)"
+          },
+          "planEndsOnAfter": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The plan's end once this Freeze is approved; null when it was refused or withdrawn"
+          },
+          "decidedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "decidedByName": {
+            "type": "string",
+            "nullable": true,
+            "description": "The Staff Member who approved or refused it, or the Client who withdrew it"
           }
         },
         "required": [
@@ -14393,6 +14488,20 @@
         },
         "required": [
           "id",
+          "state"
+        ]
+      },
+      "FreezeWithdrawalDto": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "withdrawn"
+            ]
+          }
+        },
+        "required": [
           "state"
         ]
       },

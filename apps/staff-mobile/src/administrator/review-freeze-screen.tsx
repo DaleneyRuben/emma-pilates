@@ -23,7 +23,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar, backBarScroll } from "../ui/back-bar";
-import { freezeDays, freezeRange } from "./freeze-format";
+import { freezeDays, freezeDecision, freezePlanEnd, freezeRange } from "./freeze-format";
 
 type ReviewNavigation = { goBack: () => void };
 
@@ -85,6 +85,8 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
   const freeze = review.data.data;
 
   const requested = freeze.state === "requested";
+  const planEnd = freezePlanEnd(freeze);
+  const decision = freezeDecision(freeze);
   return (
     <Screen style={styles.screen}>
       <ScrollView
@@ -107,11 +109,11 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
         <View>
           <SectionTitle>Solicitud</SectionTitle>
           <IconRowGroup>
-            <IconRow
-              icon="calendar"
-              label={`Del ${freezeRange(freeze.startsOn, freeze.endsOn)}`}
-              value={freezeDays(freeze.startsOn, freeze.endsOn)}
-            />
+            {/* Walkthrough finding 52: the days as the dates' value were
+                crushed into a one-letter column, so each has its own row. */}
+            <IconRow icon="calendar" label={`Del ${freezeRange(freeze.startsOn, freeze.endsOn)}`} />
+            <IconRow icon="hourglass" label={freezeDays(freeze.startsOn, freeze.endsOn)} />
+            {planEnd === undefined ? null : <IconRow icon="clock" label={planEnd} />}
             <IconRow icon="message" label={freeze.reason} />
           </IconRowGroup>
         </View>
@@ -120,7 +122,7 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
             <NoticeRow message={notice.text} />
           </View>
         ) : null}
-        {requested ? null : <Text style={styles.muted}>Esta solicitud ya fue decidida.</Text>}
+        {decision === undefined ? null : <Text style={styles.muted}>{decision}</Text>}
       </ScrollView>
       {requested && notice?.tone !== "success" ? (
         <View style={styles.actions}>

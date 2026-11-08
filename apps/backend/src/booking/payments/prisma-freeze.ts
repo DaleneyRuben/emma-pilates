@@ -31,7 +31,11 @@ const requireClient = (principal: AuthenticatedPrincipal): string => {
 const audit = (
   transaction: Transaction,
   input: {
-    actionCode: 'freeze.requested' | 'freeze.approved' | 'freeze.refused';
+    actionCode:
+      | 'freeze.requested'
+      | 'freeze.approved'
+      | 'freeze.refused'
+      | 'freeze.withdrawn';
     freezeId: string;
     actorAccountId: string;
     actorRole: StaffRole | null;
@@ -190,6 +194,7 @@ export const createFreezeCommands = (
                   startsOn: true,
                   endsOn: true,
                   state: true,
+                  subscription: { select: { endsOn: true } },
                   client: { select: { account: { select: { id: true } } } },
                 },
               });
@@ -199,8 +204,10 @@ export const createFreezeCommands = (
                 clientAccountId: row.client.account.id,
                 subscriptionId: row.subscriptionId,
                 state: row.state.toLowerCase() as
-                  'requested' | 'approved' | 'refused',
+                  'requested' | 'approved' | 'refused' | 'withdrawn',
+                startsOn: row.startsOn,
                 endsOn: row.endsOn,
+                planEndsOn: row.subscription.endsOn,
               };
             },
             approve: async (input) => {
@@ -219,9 +226,79 @@ export const createFreezeCommands = (
       ),
     );
 
+  // Walkthrough finding 51 (owner 2026-11-08): the Client withdraws her own
+  // request while it is still in review. It becomes «withdrawn», which, like
+  // a refusal, does not spend the plan's one Freeze; she is kept as who
+  // decided it, and the operators' notices are settled.
+  const withdrawFreeze = async (
+    command: { freezeId: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<{ state: 'withdrawn' }> => {
+    const clientId = requireClient(principal);
+    return prisma.$transaction(async (transaction) => {
+      const freeze = await transaction.freeze.findFirst({
+        where: { id: command.freezeId, clientId, deletedAt: null },
+        select: {
+          id: true,
+          state: true,
+          subscriptionId: true,
+          subscription: { select: { endsOn: true } },
+        },
+      });
+      if (freeze === null) {
+        throw new PaymentRuleError(
+          'freeze_not_allowed',
+          'Este plan no se puede congelar.',
+        );
+      }
+      if (freeze.state !== FreezeState.REQUESTED) {
+        throw new PaymentRuleError(
+          'freeze_already_decided',
+          'Este congelamiento ya fue decidido.',
+        );
+      }
+      const now = dependencies.now();
+      const withdrawn = await transaction.freeze.updateMany({
+        where: { id: freeze.id, state: FreezeState.REQUESTED, deletedAt: null },
+        data: {
+          state: FreezeState.WITHDRAWN,
+          decidedByAccountId: principal.accountId,
+          decidedAt: now,
+        },
+      });
+      if (withdrawn.count === 0) {
+        throw new PaymentRuleError(
+          'freeze_already_decided',
+          'Este congelamiento ya fue decidido.',
+        );
+      }
+      const auditRecordId = await audit(transaction, {
+        actionCode: 'freeze.withdrawn',
+        freezeId: freeze.id,
+        actorAccountId: principal.accountId,
+        actorRole: null,
+        occurredAt: now,
+        metadata: {
+          subscriptionId: freeze.subscriptionId,
+          planEndsOn: freeze.subscription.endsOn.toISOString().slice(0, 10),
+        },
+      });
+      await transaction.freeze.update({
+        where: { id: freeze.id },
+        data: { auditRecordId },
+      });
+      await settleFreezeRequest(transaction, {
+        freezeId: freeze.id,
+        decidedAt: now,
+      });
+      return { state: 'withdrawn' as const };
+    });
+  };
+
   return {
     requestFreeze,
     decideFreeze: decide,
+    withdrawFreeze,
     FreezeAccessDeniedError,
   };
 };

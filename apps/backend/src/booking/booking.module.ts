@@ -110,6 +110,7 @@ import { listTrainerSchedule } from './trainer-schedule';
 import { findTrainerScheduleSessions } from './trainer-schedule-sessions';
 import { loadTrainerSessionRoster } from './trainer-session-roster';
 import { findTrainerSessionRoster } from './prisma-trainer-session-roster';
+import { clientSubscriptionFreezeReads } from './client/client-subscription-freeze-reads';
 
 import {
   changeStaffBranches,
@@ -453,35 +454,7 @@ import { invoiceFileWiring } from './payments/invoice-file/invoice-file-wiring';
               readFounderRenewal(prisma, clientId),
             readRenewalStartsOn: (clientId) =>
               readRenewalStartsOn(prisma, clientId, new Date()),
-            readFreeze: (subscriptionId) =>
-              prisma.freeze
-                .findFirst({
-                  where: { subscriptionId, deletedAt: null },
-                  select: {
-                    id: true,
-                    state: true,
-                    startsOn: true,
-                    endsOn: true,
-                  },
-                })
-                .then((row) =>
-                  row === null
-                    ? null
-                    : {
-                        id: row.id,
-                        state: row.state.toLowerCase() as
-                          'requested' | 'approved' | 'refused',
-                        startsOn: row.startsOn.toISOString().slice(0, 10),
-                        endsOn: row.endsOn.toISOString().slice(0, 10),
-                      },
-                ),
-            readPlanDurationDays: (subscriptionId) =>
-              prisma.subscription
-                .findUnique({
-                  where: { id: subscriptionId },
-                  select: { durationDaysSnapshot: true },
-                })
-                .then((row) => row?.durationDaysSnapshot ?? null),
+            ...clientSubscriptionFreezeReads(prisma),
           });
         },
     },

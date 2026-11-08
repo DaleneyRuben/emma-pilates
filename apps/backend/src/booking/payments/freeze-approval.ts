@@ -153,6 +153,8 @@ const closureInstant = async (
   return laterOf(input.decidedAt, latest._max.joinedAt);
 };
 
+const civilOf = (date: Date): string => date.toISOString().slice(0, 10);
+
 const laterOf = (decidedAt: Date, writtenAt: Date | null): Date =>
   writtenAt !== null && writtenAt.getTime() > decidedAt.getTime()
     ? writtenAt
@@ -255,6 +257,10 @@ export const approveFreeze = async (
     metadata: {
       subscriptionId: row.subscriptionId,
       frozenDays: decision.frozenDays,
+      // Walkthrough finding 52: the history shows the ends of the decision,
+      // even after the plan's end moves again.
+      planEndsOn: civilOf(row.subscription.endsOn),
+      planEndsOnAfter: civilOf(decision.extendedEndsOn),
       cancelledBookings,
       closedWaitlistEntries,
     },
@@ -296,14 +302,20 @@ export const refuseFreeze = async (
 ): Promise<void> => {
   const row = await transaction.freeze.findUniqueOrThrow({
     where: { id: input.freezeId },
-    select: { subscriptionId: true },
+    select: {
+      subscriptionId: true,
+      subscription: { select: { endsOn: true } },
+    },
   });
   const auditRecordId = await writeAudit(transaction, {
     actionCode: 'freeze.refused',
     freezeId: input.freezeId,
     actorAccountId: input.decidedByAccountId,
     occurredAt: input.decidedAt,
-    metadata: { subscriptionId: row.subscriptionId },
+    metadata: {
+      subscriptionId: row.subscriptionId,
+      planEndsOn: civilOf(row.subscription.endsOn),
+    },
   });
   const claimed = await transaction.freeze.updateMany({
     where: { id: input.freezeId, state: FreezeState.REQUESTED },

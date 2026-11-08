@@ -208,6 +208,8 @@ export * from "./freezeRequestDto";
 export * from "./freezeRequestDtoState";
 export * from "./freezeReviewDto";
 export * from "./freezeReviewDtoState";
+export * from "./freezeWithdrawalDto";
+export * from "./freezeWithdrawalDtoState";
 export * from "./getAdminPromotionImageParams";
 export * from "./getAdminPromotionImageVariant";
 export * from "./getClientPhotoForStaffParams";

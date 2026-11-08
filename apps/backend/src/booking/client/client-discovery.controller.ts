@@ -190,6 +190,9 @@ export class ClientProfileController {
       ...(view.renewalStartsOn === undefined
         ? {}
         : { renewalStartsOn: view.renewalStartsOn }),
+      ...(view.queuedPlanStartsOn === undefined
+        ? {}
+        : { queuedPlanStartsOn: view.queuedPlanStartsOn }),
       subscription:
         view.subscription === null
           ? null

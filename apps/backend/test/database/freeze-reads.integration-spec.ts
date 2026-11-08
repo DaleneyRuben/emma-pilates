@@ -55,7 +55,11 @@ describe('requested freezes for review (PostgreSQL)', () => {
       },
       client,
     );
-    return { clientId: client.clientId, freezeId: requested.id };
+    return {
+      clientId: client.clientId,
+      freezeId: requested.id,
+      endsOn: subscription.endsOn.toISOString().slice(0, 10),
+    };
   };
 
   it('names each requesting Client photo in the list and the review', async () => {
@@ -86,5 +90,93 @@ describe('requested freezes for review (PostgreSQL)', () => {
         .commands()
         .readFreezeReview({ freezeId: withPhoto.freezeId }, administrator),
     ).resolves.toMatchObject({ clientPhoto: { imageAssetId: photo } });
+  });
+
+  const addDays = (civil: string, days: number) => {
+    const date = new Date(`${civil}T00:00:00.000Z`);
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().slice(0, 10);
+  };
+
+  // Walkthrough finding 52: Revisar congelamiento names the plan's end
+  // today and the end approving produces, and once decided, who decided
+  // it, when, and the end it left.
+  it('names the current and the resulting plan end, then the decision', async () => {
+    const freeze = await requestFreeze('Con vencimiento');
+    const administrator = await world.staffPrincipal(
+      'paola.mendoza@example.com',
+    );
+
+    await expect(
+      world
+        .commands()
+        .readFreezeReview({ freezeId: freeze.freezeId }, administrator),
+    ).resolves.toMatchObject({
+      state: 'requested',
+      planEndsOn: freeze.endsOn,
+      planEndsOnAfter: addDays(freeze.endsOn, 10),
+      decidedAt: null,
+      decidedByName: null,
+    });
+
+    await createPrismaPaymentCommands(prisma, {
+      now: () => new Date('2026-09-22T16:00:00.000Z'),
+    }).decideFreeze(
+      { freezeId: freeze.freezeId, decision: 'approved' },
+      administrator,
+    );
+
+    const decided = {
+      id: freeze.freezeId,
+      state: 'approved',
+      planEndsOn: freeze.endsOn,
+      planEndsOnAfter: addDays(freeze.endsOn, 10),
+      decidedAt: '2026-09-22T16:00:00.000Z',
+      decidedByName: 'Paola Mendoza',
+    };
+    await expect(
+      world
+        .commands()
+        .readFreezeReview({ freezeId: freeze.freezeId }, administrator),
+    ).resolves.toMatchObject(decided);
+    // Review: the history keeps the ends of the decision even when the
+    // plan's end moves later (a renewal or a voided sale).
+    await prisma.subscription.updateMany({
+      where: { freezes: { some: { id: freeze.freezeId } } },
+      data: { endsOn: new Date('2026-12-01T00:00:00.000Z') },
+    });
+    const listed = await world.commands().listDecidedFreezes(administrator);
+    expect(listed).toEqual(
+      expect.arrayContaining([expect.objectContaining(decided)]),
+    );
+    expect(
+      (await world.commands().listRequestedFreezes(administrator)).map(
+        (row) => row.id,
+      ),
+    ).not.toContain(freeze.freezeId);
+  });
+
+  it('keeps a refused request on its unchanged end', async () => {
+    const freeze = await requestFreeze('Rechazada');
+    const administrator = await world.staffPrincipal(
+      'paola.mendoza@example.com',
+    );
+    await world
+      .commands()
+      .decideFreeze(
+        { freezeId: freeze.freezeId, decision: 'refused' },
+        administrator,
+      );
+
+    await expect(
+      world
+        .commands()
+        .readFreezeReview({ freezeId: freeze.freezeId }, administrator),
+    ).resolves.toMatchObject({
+      state: 'refused',
+      planEndsOn: freeze.endsOn,
+      planEndsOnAfter: null,
+      decidedByName: 'Paola Mendoza',
+    });
   });
 });

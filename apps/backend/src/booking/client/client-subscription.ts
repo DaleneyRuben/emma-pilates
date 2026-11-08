@@ -35,7 +35,7 @@ export type ClientSubscriptionStatus =
 
 export type ClientFreezeSummary = {
   id: string;
-  state: 'requested' | 'approved' | 'refused';
+  state: 'requested' | 'approved' | 'refused' | 'withdrawn';
   startsOn: string;
   endsOn: string;
 };
@@ -49,6 +49,11 @@ export type ClientSubscriptionView = {
   canRequestFreeze: boolean;
   /** Set while a Plan bought now starts after the current one, unchosen. */
   renewalStartsOn?: string;
+  /**
+   * The start of a next plan already queued (bought, or a transfer in
+   * review). A Freeze must end the current plan before it (finding 51).
+   */
+  queuedPlanStartsOn?: string;
 };
 
 type LoadClientSubscriptionDependencies = {
@@ -69,6 +74,7 @@ type LoadClientSubscriptionDependencies = {
   readFreeze?(subscriptionId: string): Promise<ClientFreezeSummary | null>;
   readPlanDurationDays?(subscriptionId: string): Promise<number | null>;
   readRenewalStartsOn?(clientId: string): Promise<string | null>;
+  readQueuedPlanStart?(clientId: string, after: Date): Promise<string | null>;
 };
 
 // The renewal reminder is sent 3 days before the paid-through date.
@@ -92,6 +98,7 @@ type SubscriptionLookup = {
   readFreeze?(subscriptionId: string): Promise<ClientFreezeSummary | null>;
   readPlanDurationDays?(subscriptionId: string): Promise<number | null>;
   readRenewalStartsOn?(clientId: string): Promise<string | null>;
+  readQueuedPlanStart?(clientId: string, after: Date): Promise<string | null>;
 };
 
 const renewalDeadline = async (
@@ -129,6 +136,9 @@ export const describeSubscription = async (
       (await dependencies.readPlanDurationDays?.(active.id)) ?? 0;
     const renewalStartsOn =
       (await dependencies.readRenewalStartsOn?.(clientId)) ?? null;
+    const queuedPlanStartsOn =
+      (await dependencies.readQueuedPlanStart?.(clientId, active.endsOn)) ??
+      null;
     return {
       status: daysLeft <= renewalReminderDays ? 'expiring_soon' : 'active',
       subscription: active,
@@ -139,8 +149,15 @@ export const describeSubscription = async (
         dependencies,
       ),
       freeze,
-      canRequestFreeze: durationDays >= 90 && freeze === null,
+      // booking ADR-0010: a refused or withdrawn Freeze does not count; she
+      // may ask again.
+      canRequestFreeze:
+        durationDays >= 90 &&
+        (freeze === null ||
+          freeze.state === 'refused' ||
+          freeze.state === 'withdrawn'),
       ...(renewalStartsOn === null ? {} : { renewalStartsOn }),
+      ...(queuedPlanStartsOn === null ? {} : { queuedPlanStartsOn }),
     };
   }
 

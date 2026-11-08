@@ -8,6 +8,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  boliviaCivilDate,
   colors,
   LoadingState,
   PrimaryButton,
@@ -32,6 +33,7 @@ import { useClientFetcher } from "../client-fetcher";
 import { formatCivilDate } from "../home/home-format";
 import { usePaymentStanding } from "../payments/payment-standing";
 import { useResendReceipt } from "../payments/use-resend-receipt";
+import { freezeRange } from "../subscription/freeze-window";
 import { BookingOffFooter, bookingOffReason } from "./booking-off-footer";
 import { SessionFacts, SessionHero } from "./session-facts";
 
@@ -133,6 +135,13 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
     studioRules !== undefined &&
     !isInsideCancellationWindow(detail.startsAt, new Date(), studioRules.cancellationWindowMinutes);
   const classesLeftLine = weeklyClassesLeftLine(detail.classesLeftThisWeek);
+  // Walkthrough finding 53 (owner 2026-11-08): the server refuses a Booking
+  // or a waitlist entry inside an approved Freeze, so say it before the tap.
+  const classDay = boliviaCivilDate(new Date(detail.startsAt));
+  const frozenOnClassDay =
+    view?.freeze?.state === "approved" &&
+    classDay >= view.freeze.startsOn &&
+    classDay <= view.freeze.endsOn;
 
   const book = async () => {
     setSubmitting(true);
@@ -247,7 +256,14 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
             {message}
           </BodyText>
         ) : null}
-        {full ? (
+        {frozenOnClassDay && view?.freeze != null ? (
+          <>
+            <BodyText style={styles.note}>
+              {`Tu plan está congelado ese día (${freezeRange(view.freeze.startsOn, view.freeze.endsOn).toLowerCase()}).`}
+            </BodyText>
+            <PrimaryButton disabled label="Reservar" />
+          </>
+        ) : full ? (
           waitlisted ? (
             <BodyText style={styles.note}>Ya estás en la lista de espera.</BodyText>
           ) : !waitlistOpen ? (

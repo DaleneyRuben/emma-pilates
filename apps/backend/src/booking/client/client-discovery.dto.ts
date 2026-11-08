@@ -153,14 +153,22 @@ export class ClientSubscriptionDto {
       'The current Plan still has classes, so a Plan bought now starts after it ends: this is the day after its end, the default, and any day through 27 days later may be chosen (booking ADR-0013). Absent when she chooses from today.',
   })
   renewalStartsOn?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date',
+    description:
+      'The start of a next plan already queued (bought, or a transfer in review). A Freeze must end the current plan before it (walkthrough finding 51). Absent when none is queued.',
+  })
+  queuedPlanStartsOn?: string;
 }
 
 export class ClientFreezeDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
 
-  @ApiProperty({ enum: ['requested', 'approved', 'refused'] })
-  state!: 'requested' | 'approved' | 'refused';
+  @ApiProperty({ enum: ['requested', 'approved', 'refused', 'withdrawn'] })
+  state!: 'requested' | 'approved' | 'refused' | 'withdrawn';
 
   @ApiProperty({ format: 'date' })
   startsOn!: string;

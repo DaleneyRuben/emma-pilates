@@ -59,6 +59,7 @@ export * from "./time/session-format";
 export * from "./ui/avatar-circle";
 export * from "./ui/back-link";
 export * from "./ui/brand-toast";
+export * from "./ui/calendar";
 export * from "./ui/branch-picker-pill";
 export * from "./ui/card-action-row";
 export * from "./ui/card-footer";

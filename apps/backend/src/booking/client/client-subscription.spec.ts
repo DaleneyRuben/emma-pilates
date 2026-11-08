@@ -165,6 +165,76 @@ describe('loadClientSubscription', () => {
     expect(readRenewalStartsOn).toHaveBeenCalledWith('client-id');
   });
 
+  // Walkthrough finding 51 (booking ADR-0010): a refused Freeze does not
+  // count, so the Client may ask again; the picker also needs the queued
+  // next plan's start, which caps the frozen days.
+  it('offers another Freeze after a refusal and names the queued plan start', async () => {
+    const active = subscription(60);
+    const refused = {
+      id: 'freeze-id',
+      state: 'refused' as const,
+      startsOn: '2026-10-01',
+      endsOn: '2026-10-05',
+    };
+
+    await expect(
+      loadClientSubscription({
+        principal,
+        today,
+        findActiveSubscription: jest.fn().mockResolvedValue(active),
+        findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn().mockResolvedValue(null),
+        readFreeze: jest.fn().mockResolvedValue(refused),
+        readPlanDurationDays: jest.fn().mockResolvedValue(90),
+        readQueuedPlanStart: jest.fn().mockResolvedValue('2026-11-30'),
+      }),
+    ).resolves.toMatchObject({
+      freeze: refused,
+      canRequestFreeze: true,
+      queuedPlanStartsOn: '2026-11-30',
+    });
+  });
+
+  it('offers another Freeze after she withdrew one', async () => {
+    await expect(
+      loadClientSubscription({
+        principal,
+        today,
+        findActiveSubscription: jest.fn().mockResolvedValue(subscription(60)),
+        findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn().mockResolvedValue(null),
+        readFreeze: jest.fn().mockResolvedValue({
+          id: 'freeze-id',
+          state: 'withdrawn',
+          startsOn: '2026-10-01',
+          endsOn: '2026-10-05',
+        }),
+        readPlanDurationDays: jest.fn().mockResolvedValue(90),
+      }),
+    ).resolves.toMatchObject({ canRequestFreeze: true });
+  });
+
+  it('offers no Freeze while one is requested or approved', async () => {
+    for (const state of ['requested', 'approved'] as const) {
+      await expect(
+        loadClientSubscription({
+          principal,
+          today,
+          findActiveSubscription: jest.fn().mockResolvedValue(subscription(60)),
+          findLatestSubscription: jest.fn(),
+          findFutureSubscription: jest.fn().mockResolvedValue(null),
+          readFreeze: jest.fn().mockResolvedValue({
+            id: 'freeze-id',
+            state,
+            startsOn: '2026-10-01',
+            endsOn: '2026-10-05',
+          }),
+          readPlanDurationDays: jest.fn().mockResolvedValue(90),
+        }),
+      ).resolves.toMatchObject({ canRequestFreeze: false });
+    }
+  });
+
   it('denies Staff principals', async () => {
     await expect(
       loadClientSubscription({

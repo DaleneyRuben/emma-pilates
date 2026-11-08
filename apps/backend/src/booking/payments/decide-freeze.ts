@@ -16,8 +16,46 @@ type RequestedFreeze = {
   id: string;
   clientAccountId: string;
   subscriptionId: string;
-  state: 'requested' | 'approved' | 'refused';
+  state: 'requested' | 'approved' | 'refused' | 'withdrawn';
+  startsOn: Date;
   endsOn: Date;
+  /** The plan's end before this Freeze moves it. */
+  planEndsOn: Date;
+};
+
+const months = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+];
+const dayMilliseconds = 86_400_000;
+const dayMonth = (date: Date) =>
+  `${date.getUTCDate()} de ${months[date.getUTCMonth()]}`;
+
+// Walkthrough finding 53: «del 1 al 10 de noviembre», or both months when
+// the Freeze crosses one, and the plan's new end; never an ISO date.
+const approvalMessage = (freeze: RequestedFreeze): string => {
+  const days =
+    Math.round(
+      (freeze.endsOn.getTime() - freeze.startsOn.getTime()) / dayMilliseconds,
+    ) + 1;
+  const newEnd = new Date(freeze.planEndsOn.getTime() + days * dayMilliseconds);
+  const range =
+    days === 1
+      ? `del ${dayMonth(freeze.startsOn)}`
+      : freeze.startsOn.getUTCMonth() === freeze.endsOn.getUTCMonth()
+        ? `del ${freeze.startsOn.getUTCDate()} al ${dayMonth(freeze.endsOn)}`
+        : `del ${dayMonth(freeze.startsOn)} al ${dayMonth(freeze.endsOn)}`;
+  return `Aprobamos tu congelamiento ${range}. Tu plan ahora vence el ${dayMonth(newEnd)}.`;
 };
 
 type DecideFreezeDependencies = {
@@ -73,7 +111,7 @@ export const decideFreeze = async (
     businessEventKey: `freeze-decided:${freeze.id}`,
     title: approved ? 'Congelamiento aprobado' : 'Congelamiento rechazado',
     message: approved
-      ? `Tu plan está congelado hasta el ${freeze.endsOn.toISOString().slice(0, 10)}.`
+      ? approvalMessage(freeze)
       : 'Tu solicitud de congelamiento fue rechazada.',
     destination: { type: 'subscription', id: freeze.subscriptionId },
     occurredAt: decidedAt,
