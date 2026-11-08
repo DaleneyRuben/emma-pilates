@@ -1,9 +1,11 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
+import type { FreezeReviewDto } from "@pilates/api-contracts";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
+import { approvedFreeze, refusedFreeze, requestedFreeze } from "./freeze-fixtures";
 
 jest.setTimeout(30_000);
 
@@ -24,6 +26,31 @@ const profile = {
   phone: null,
   role: "administrator",
   branches: [],
+};
+
+const openReview = async (
+  review: FreezeReviewDto,
+  entry: string,
+  rowLabel = "Revisar congelamiento de",
+) => {
+  const requested = review.state === "requested";
+  const fetcher = routeFetcher({
+    "/api/v1/staff-members/current": () => jsonResponse(profile),
+    "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
+    "/api/v1/administrator/payments/pending": () => jsonResponse([]),
+    "/api/v1/administrator/freezes": () => jsonResponse(requested ? [review] : []),
+    "/api/v1/administrator/freezes/decided": () => jsonResponse(requested ? [] : [review]),
+    [`/api/v1/administrator/freezes/${review.id}`]: () => jsonResponse(review),
+  });
+  const screen = await render(<App runtime={createStaffRuntime(fetcher, "administrator")} />);
+  await waitFor(() => expect(screen.getByRole("button", { name: entry })).toBeOnTheScreen());
+  await fireEvent.press(screen.getByRole("button", { name: entry }));
+  const row = `${rowLabel} ${review.clientName}`;
+  await waitFor(() => expect(screen.getByRole("button", { name: row })).toBeOnTheScreen());
+  await fireEvent.press(screen.getByRole("button", { name: row }));
+  await waitFor(() => expect(screen.getByLabelText("Revisar congelamiento")).toBeOnTheScreen());
+  await waitFor(() => expect(screen.getByText(review.planName)).toBeOnTheScreen());
+  return screen;
 };
 
 describe("freeze review", () => {
@@ -95,34 +122,45 @@ describe("freeze review", () => {
     );
   });
 
-  it("lists the requests from Pagos with their dates and reason", async () => {
-    const fetcher = routeFetcher({
-      "/api/v1/staff-members/current": () => jsonResponse(profile),
-      "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
-      "/api/v1/administrator/payments/pending": () => jsonResponse([]),
-      "/api/v1/administrator/freezes": () => jsonResponse([freeze]),
-      [`/api/v1/administrator/freezes/${freeze.id}`]: () => jsonResponse(freeze),
-    });
-    const screen = await render(<App runtime={createStaffRuntime(fetcher, "administrator")} />);
+  it("shows the dates, the days and where the plan end moves on their own rows", async () => {
+    const screen = await openReview(requestedFreeze, "Congelamientos, 1 por revisar");
 
-    await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Congelamientos, 1 por revisar" }),
-      ).toBeOnTheScreen(),
-    );
-    await fireEvent.press(screen.getByRole("button", { name: "Congelamientos, 1 por revisar" }));
-    await waitFor(() => expect(screen.getByText("Por revisar · 1")).toBeOnTheScreen());
+    // Walkthrough finding 52: the days were the dates row's value, crushed
+    // into a one-letter column; each now has its own row.
+    const dates = screen.getByText("Del 9 al 15 de noviembre");
+    expect(StyleSheet.flatten(dates.props.style)).toMatchObject({ flexShrink: 1 });
+    expect(screen.getByText("7 días")).toBeOnTheScreen();
+    expect(screen.getByText("Vence el 5 de febrero → 12 de febrero")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Aprobar congelamiento" })).toBeOnTheScreen();
+  });
+
+  it("names who approved it and the new plan end", async () => {
+    const screen = await openReview(approvedFreeze, "Congelamientos", "Ver congelamiento de");
+
     expect(
-      screen.getByText(
-        "Pausan el plan de la clienta. Los días congelados se suman a su vencimiento.",
-      ),
+      screen.getByText("Aprobada por Paola Mendoza el 8 de noviembre a las 10:15"),
     ).toBeOnTheScreen();
     expect(
-      screen.getByText("27 de octubre al 3 de noviembre · 8 días · Viaje de trabajo"),
+      screen.getByText("Ahora vence el 15 de enero (antes, el 10 de enero)"),
     ).toBeOnTheScreen();
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Revisar congelamiento de Lucía Fernández" }),
-    );
-    await waitFor(() => expect(screen.getByLabelText("Revisar congelamiento")).toBeOnTheScreen());
+    expect(screen.getByText("Del 30 de noviembre al 4 de diciembre")).toBeOnTheScreen();
+    expect(screen.queryByText("Esta solicitud ya fue decidida.")).toBeNull();
+  });
+
+  it("names who refused it and keeps the plan end", async () => {
+    const screen = await openReview(refusedFreeze, "Congelamientos", "Ver congelamiento de");
+
+    expect(
+      screen.getByText("Rechazada por Paola Mendoza el 7 de noviembre a las 18:40"),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Vence el 1 de marzo")).toBeOnTheScreen();
+  });
+
+  it("leaves out the plan end when an older API does not send it", async () => {
+    const { planEndsOn: _before, planEndsOnAfter: _after, ...older } = requestedFreeze;
+    const screen = await openReview(older, "Congelamientos, 1 por revisar");
+
+    expect(screen.getByText("7 días")).toBeOnTheScreen();
+    expect(screen.queryByText(/vence/i)).toBeNull();
   });
 });
