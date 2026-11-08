@@ -29,7 +29,9 @@ const freeze = {
   clientAccountId: 'client-account',
   subscriptionId: 'subscription-1',
   state: 'requested' as const,
+  startsOn: new Date('2026-11-01T00:00:00.000Z'),
   endsOn: new Date('2026-11-10T00:00:00.000Z'),
+  planEndsOn: new Date('2027-01-30T00:00:00.000Z'),
 };
 
 describe('decideFreeze', () => {
@@ -62,7 +64,10 @@ describe('decideFreeze', () => {
       type: 'freeze_approved',
       businessEventKey: 'freeze-decided:freeze-1',
       title: 'Congelamiento aprobado',
-      message: 'Tu plan está congelado hasta el 2026-11-10.',
+      // Walkthrough finding 53: the dates in words and the new end, never an
+      // ISO date, and no «está congelado» before the Freeze starts.
+      message:
+        'Aprobamos tu congelamiento del 1 al 10 de noviembre. Tu plan ahora vence el 9 de febrero.',
       destination: { type: 'subscription', id: 'subscription-1' },
       occurredAt: new Date('2026-10-23T15:00:00.000Z'),
     });
@@ -137,6 +142,31 @@ describe('decideFreeze', () => {
         type: 'freeze_refused',
         title: 'Congelamiento rechazado',
         message: 'Tu solicitud de congelamiento fue rechazada.',
+      }),
+    );
+  });
+
+  it('names both months when the Freeze crosses one', async () => {
+    const record = jest.fn().mockResolvedValue(undefined);
+    await decideFreeze(
+      { freezeId: freeze.id, decision: 'approved' },
+      {
+        principal: staff('administrator'),
+        loadFreeze: jest.fn().mockResolvedValue({
+          ...freeze,
+          startsOn: new Date('2026-11-30T00:00:00.000Z'),
+          endsOn: new Date('2026-12-04T00:00:00.000Z'),
+        }),
+        approve: jest.fn().mockResolvedValue(undefined),
+        refuse: jest.fn(),
+        record,
+        now: () => new Date('2026-10-23T15:00:00.000Z'),
+      },
+    );
+    expect(record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          'Aprobamos tu congelamiento del 30 de noviembre al 4 de diciembre. Tu plan ahora vence el 4 de febrero.',
       }),
     );
   });

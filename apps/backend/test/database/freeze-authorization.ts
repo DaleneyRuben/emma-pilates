@@ -26,6 +26,11 @@ export const freezeAuthorizationRows = (): Record<string, MatrixRow> => ({
       reason: 'Viaje',
     },
   },
+  // Walkthrough finding 51: only the requesting Client withdraws it.
+  'POST /api/v1/freezes/{freezeId}/withdrawal': {
+    ...bothDenied(),
+    ownerScoped: true,
+  },
   // These handlers read the bearer credential, not the admin-web cookie.
   'GET /api/v1/administrator/freezes': bothAllowed({ bearer: true }),
   // Walkthrough finding 52: the decided requests, for both Roles.
