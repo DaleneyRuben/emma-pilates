@@ -136,6 +136,7 @@ import type {
   FreezeDecisionDto,
   FreezeRequestDto,
   FreezeReviewDto,
+  FreezeWithdrawalDto,
   GetAdminPromotionImageParams,
   GetClientPhotoForStaffParams,
   GetCurrentClientPhotoParams,
@@ -17013,6 +17014,111 @@ export const useRequestFreeze = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getRequestFreezeMutationOptions(options), queryClient);
+};
+
+export type withdrawFreezeResponse200 = {
+  data: FreezeWithdrawalDto;
+  status: 200;
+};
+
+export type withdrawFreezeResponseSuccess = withdrawFreezeResponse200 & {
+  headers: Headers;
+};
+export type withdrawFreezeResponse = withdrawFreezeResponseSuccess;
+
+export const getWithdrawFreezeUrl = (freezeId: string) => {
+  return `/api/v1/freezes/${freezeId}/withdrawal`;
+};
+
+export const withdrawFreeze = async (
+  freezeId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<withdrawFreezeResponse> => {
+  const res = await (fetchFn ?? fetch)(getWithdrawFreezeUrl(freezeId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: withdrawFreezeResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as withdrawFreezeResponse;
+};
+
+export const getWithdrawFreezeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof withdrawFreeze>>,
+    TError,
+    WithdrawFreezeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof withdrawFreeze>>,
+  TError,
+  WithdrawFreezeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["withdrawFreeze"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof withdrawFreeze>>,
+    WithdrawFreezeMutationVariables
+  > = (props) => {
+    const { freezeId } = props ?? {};
+
+    return withdrawFreeze(freezeId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type WithdrawFreezeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof withdrawFreeze>>
+>;
+
+export type WithdrawFreezeMutationError = unknown;
+export type WithdrawFreezeMutationVariables = { freezeId: string };
+
+export const useWithdrawFreeze = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof withdrawFreeze>>,
+      TError,
+      WithdrawFreezeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof withdrawFreeze>>,
+  TError,
+  WithdrawFreezeMutationVariables,
+  TContext
+> => {
+  return useMutation(getWithdrawFreezeMutationOptions(options), queryClient);
 };
 
 export type cancelSessionResponse200 = {

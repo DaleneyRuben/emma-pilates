@@ -4439,6 +4439,43 @@
         ]
       }
     },
+    "/api/v1/freezes/{freezeId}/withdrawal": {
+      "post": {
+        "operationId": "withdrawFreeze",
+        "parameters": [
+          {
+            "name": "freezeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeWithdrawalDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientFreezes"
+        ]
+      }
+    },
     "/api/v1/administrator/sessions/{sessionId}/cancel": {
       "post": {
         "operationId": "cancelSession",
@@ -11800,6 +11837,11 @@
             "type": "string",
             "format": "date",
             "description": "The current Plan still has classes, so a Plan bought now starts after it ends: this is the day after its end, the default, and any day through 27 days later may be chosen (booking ADR-0013). Absent when she chooses from today."
+          },
+          "queuedPlanStartsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "The start of a next plan already queued (bought, or a transfer in review). A Freeze must end the current plan before it (walkthrough finding 51). Absent when none is queued."
           }
         },
         "required": [
@@ -14413,6 +14455,20 @@
         },
         "required": [
           "id",
+          "state"
+        ]
+      },
+      "FreezeWithdrawalDto": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "withdrawn"
+            ]
+          }
+        },
+        "required": [
           "state"
         ]
       },
