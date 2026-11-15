@@ -4,7 +4,7 @@ import { contactsCsvName, promotionContactsCsv } from "./contacts-csv";
 describe("the Promotion Contacts CSV", () => {
   it("writes the table's columns with Bolivia dates, for a spreadsheet", () => {
     expect(promotionContactsCsv([valeria, daniela, paula])).toBe(
-      "\uFEFFNombre,Tipo,Correo,Teléfono,Aceptó el\r\n" +
+      "\uFEFFNombre,Tipo,Correo,Teléfono,Desde\r\n" +
         "Valeria Quiroga,Cuenta cerrada,valeria@example.com,+591 70011005,19/10/2026\r\n" +
         "Daniela Rojas,Cuenta cerrada,daniela@example.com,,16/10/2026\r\n" +
         "Paula Antelo,Activa,paula@example.com,+591 76302118,08/10/2026\r\n",
