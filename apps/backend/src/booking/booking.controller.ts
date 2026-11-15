@@ -34,7 +34,6 @@ import {
   SessionAvailabilityDto,
 } from './booking.dto';
 import {
-  authenticateBearer,
   cancelBookingCommand,
   classHistory,
   createBookingCommand,
@@ -47,9 +46,12 @@ import {
   type CancellationCommandHandler,
   type ClassHistoryHandler,
   type CommandHandler,
-  type PrincipalResolver,
   type RescheduleCommandHandler,
 } from './booking-controller-support';
+import {
+  authenticateBearer,
+  type PrincipalResolver,
+} from '../system-identity/authentication/bearer-principal';
 import type { SessionAvailabilityHandler } from './session-availability';
 
 @Controller({ path: 'sessions', version: '1' })

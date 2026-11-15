@@ -26,17 +26,19 @@ import {
   TrainerSessionRosterDto,
 } from './booking.dto';
 import {
-  authenticateBearer,
   invalidRequest,
   recordAttendanceCommand,
   rethrowAsProblem,
   trainerSchedule,
   trainerSessionRoster,
   type AttendanceHandler,
-  type PrincipalResolver,
   type TrainerScheduleHandler,
   type TrainerSessionRosterHandler,
 } from './booking-controller-support';
+import {
+  authenticateBearer,
+  type PrincipalResolver,
+} from '../system-identity/authentication/bearer-principal';
 
 @Controller({ path: 'sessions', version: '1' })
 @ApiBearerAuth()
