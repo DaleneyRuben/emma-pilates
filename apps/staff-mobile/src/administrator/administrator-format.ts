@@ -1,3 +1,5 @@
+import { boliviaCivilDate, dayChipLabel, formatStartTime } from "@pilates/mobile-core";
+
 const dayMonthFormatter = new Intl.DateTimeFormat("es-BO", {
   day: "numeric",
   month: "long",
@@ -41,4 +43,12 @@ export function describeSessionCancellation({
       ? "También se notificará a la persona en lista de espera."
       : `También se notificará a las ${waitlistCount} en lista de espera.`;
   return `${bookings} ${waitlist}`;
+}
+
+// Walkthrough n.º 65: what is being paid. An Evaluation names its slot,
+// «Evaluación nutricional · lun 16, 09:00», in La Paz time.
+export function describeSale(sale: { planName: string; evaluationStartsAt?: string }): string {
+  if (sale.evaluationStartsAt === undefined) return sale.planName;
+  const { weekday, day } = dayChipLabel(boliviaCivilDate(new Date(sale.evaluationStartsAt)));
+  return `${sale.planName} · ${weekday} ${day}, ${formatStartTime(sale.evaluationStartsAt)}`;
 }

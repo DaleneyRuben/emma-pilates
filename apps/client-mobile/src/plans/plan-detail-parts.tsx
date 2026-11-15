@@ -2,6 +2,7 @@ import type { PlanDto } from "@pilates/api-contracts";
 import {
   colors,
   describeWeeklyCap,
+  discountPercent,
   EmphasisCard,
   fontFamilies,
   formatCancellationWindow,
@@ -15,12 +16,6 @@ import {
 import { StyleSheet, Text, View } from "react-native";
 
 import { formatBolivianos } from "./plan-format";
-
-/** The whole-percent discount a founder price carries, or null without one. */
-export function discountPercent(plan: Pick<PlanDto, "listPriceCentavos" | "priceCentavos">) {
-  if (plan.listPriceCentavos === undefined || plan.listPriceCentavos === 0) return null;
-  return Math.round((1 - plan.priceCentavos / plan.listPriceCentavos) * 100);
-}
 
 /** C09's hero: the Plan, its validity, the price in Lora 32, and the struck list price. */
 export function PlanHero({ plan }: { plan: PlanDto }) {
