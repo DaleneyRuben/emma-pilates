@@ -26,6 +26,11 @@ export interface ClientSubscriptionSummaryDto {
    * @nullable
    */
   classesLeftThisWeek?: number | null;
+  /**
+   * Live extra classes (gifts, invitations, courtesies) on top of remainingClassAllowance (walkthrough finding 61).
+   * @minimum 0
+   */
+  extraClasses?: number;
   /** Set when this is a Guest Pass (one free class for an invited friend), not a Plan. Absent on a Plan (walkthrough finding 56). */
   guestPass?: ClientGuestPassDto;
 }

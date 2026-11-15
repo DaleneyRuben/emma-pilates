@@ -11774,6 +11774,11 @@
             "nullable": true,
             "description": "Classes left this week from the base allowance. Absent without a cap."
           },
+          "extraClasses": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Live extra classes (gifts, invitations, courtesies) on top of remainingClassAllowance (walkthrough finding 61)."
+          },
           "guestPass": {
             "description": "Set when this is a Guest Pass (one free class for an invited friend), not a Plan. Absent on a Plan (walkthrough finding 56).",
             "allOf": [
@@ -15044,6 +15049,18 @@
             "nullable": true,
             "minimum": 0,
             "description": "Classes the active Subscription granted, null without one"
+          },
+          "extraClasses": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Live extra classes on top of remainingClassAllowance, null without a Plan (walkthrough finding 61)"
+          },
+          "planStartsOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Set when the row describes the Plan bought after a spent Guest Pass, which starts on this day (walkthrough finding 60)"
           },
           "planEndsOn": {
             "type": "string",
