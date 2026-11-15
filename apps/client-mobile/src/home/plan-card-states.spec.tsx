@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
 import { openDetail } from "../booking/session-detail-test-support";
@@ -135,5 +135,21 @@ describe("Inicio and Mi plan plan cards", () => {
 
     expect(screen.getByText("No te quedan clases en tu plan.")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar" })).toBeDisabled();
+  });
+
+  // Independent review: the Plan she bought covers a class on or after its
+  // start, so the class detail books against it.
+  it("books a class the Plan bought after a spent Guest Pass covers", async () => {
+    const { screen } = await openDetail({
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse({
+          status: "active",
+          subscription: spentGuestPass,
+          nextSubscription: { ...twelveClasses, startsOn: boliviaCivilDate(new Date()) },
+        }),
+    });
+
+    expect(screen.getByText("Se descuenta 1 clase de tu plan")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Reservar" })).toBeEnabled();
   });
 });
