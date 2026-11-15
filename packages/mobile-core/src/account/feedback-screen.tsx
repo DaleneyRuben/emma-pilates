@@ -83,7 +83,8 @@ export function FeedbackScreen({
   const [text, setText] = useState("");
   const feedback = useSendFeedback({ fetcher, metadata, newIdempotencyKey });
   const length = text.trim().length;
-  const ready = type !== null && length >= textLength.min && length <= textLength.max;
+  const ready =
+    !feedback.limitReached && type !== null && length >= textLength.min && length <= textLength.max;
 
   return (
     <Screen style={styles.screen}>
@@ -94,7 +95,14 @@ export function FeedbackScreen({
         <FormScrollView
           contentContainerStyle={styles.form}
           footer={
-            <View style={styles.footer}>
+            // Walkthrough n.º 76: the failure sits above the pinned button, so
+            // the keyboard never hides part of it under the footer.
+            <View style={styles.footer} testID="feedback-footer">
+              {feedback.failure === null ? null : (
+                <BodyText accessibilityRole="alert" style={styles.failure}>
+                  {feedback.failure}
+                </BodyText>
+              )}
               <PrimaryButton
                 busy={feedback.sending}
                 disabled={!ready}
@@ -128,11 +136,6 @@ export function FeedbackScreen({
               <Text style={styles.hint}>{`${text.length} / ${textLength.max}`}</Text>
             </View>
           </View>
-          {feedback.failure === null ? null : (
-            <BodyText accessibilityRole="alert" style={styles.failure}>
-              {feedback.failure}
-            </BodyText>
-          )}
         </FormScrollView>
       )}
     </Screen>
@@ -161,7 +164,7 @@ const styles = StyleSheet.create({
   counterRow: { flexDirection: "row", justifyContent: "space-between" },
   failure: { color: colors.errorText },
   field: { gap: spacing.sm },
-  footer: { ...column, paddingTop: spacing.md },
+  footer: { ...column, gap: spacing.md, paddingTop: spacing.md },
   form: { ...column, gap: spacing.lg, paddingBottom: spacing.lg },
   hint: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.note },
   label: {
