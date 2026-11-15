@@ -11723,6 +11723,20 @@
           "name"
         ]
       },
+      "ClientGuestPassDto": {
+        "type": "object",
+        "properties": {
+          "usedClassStartsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The start of the class the Guest Pass was used for; null while it is unused."
+          }
+        },
+        "required": [
+          "usedClassStartsAt"
+        ]
+      },
       "ClientSubscriptionSummaryDto": {
         "type": "object",
         "properties": {
@@ -11759,6 +11773,14 @@
             "minimum": 0,
             "nullable": true,
             "description": "Classes left this week from the base allowance. Absent without a cap."
+          },
+          "guestPass": {
+            "description": "Set when this is a Guest Pass (one free class for an invited friend), not a Plan. Absent on a Plan (walkthrough finding 56).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientGuestPassDto"
+              }
+            ]
           }
         },
         "required": [

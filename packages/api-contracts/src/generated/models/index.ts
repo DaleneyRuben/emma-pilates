@@ -122,6 +122,7 @@ export * from "./clientEvaluationDtoState";
 export * from "./clientEvaluationPageDto";
 export * from "./clientFreezeDto";
 export * from "./clientFreezeDtoState";
+export * from "./clientGuestPassDto";
 export * from "./clientInvitationDto";
 export * from "./clientInvitationResultDto";
 export * from "./clientInvitationResultDtoStatus";

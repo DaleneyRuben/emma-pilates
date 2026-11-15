@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ClientGuestPassDto } from "./clientGuestPassDto";
 
 export interface ClientSubscriptionSummaryDto {
   id: string;
@@ -25,4 +26,6 @@ export interface ClientSubscriptionSummaryDto {
    * @nullable
    */
   classesLeftThisWeek?: number | null;
+  /** Set when this is a Guest Pass (one free class for an invited friend), not a Plan. Absent on a Plan (walkthrough finding 56). */
+  guestPass?: ClientGuestPassDto;
 }
