@@ -23,9 +23,9 @@ import {
   fetchAllPromotionContacts,
 } from "./contact-queries";
 import {
-  consentDate,
   contactsCsvName,
   promotionContactsCsv,
+  sinceDate,
 } from "./contacts-csv";
 import { KindPill } from "./kind-pill";
 import { WithdrawContactAction } from "./withdraw-contact-action";
@@ -66,11 +66,11 @@ const contactColumns = (onWithdrawn: (notice: string) => void) => [
       );
     },
   }),
-  columns.accessor("consentedAt", {
-    header: "Aceptó el",
+  columns.accessor("since", {
+    header: "Desde",
     cell: ({ row }) => (
       <span className="text-texto-secundario tabular">
-        {consentDate(row.original)}
+        {sinceDate(row.original)}
       </span>
     ),
   }),
@@ -78,9 +78,15 @@ const contactColumns = (onWithdrawn: (notice: string) => void) => [
     id: "withdraw",
     header: "",
     meta: { align: "right" },
-    cell: ({ row }) => (
-      <WithdrawContactAction contact={row.original} onWithdrawn={onWithdrawn} />
-    ),
+    // FIX-060: a live Client is always listed, so only a former Client's
+    // contact can be erased.
+    cell: ({ row }) =>
+      row.original.kind === "former_client" ? (
+        <WithdrawContactAction
+          contact={row.original}
+          onWithdrawn={onWithdrawn}
+        />
+      ) : null,
   }),
 ];
 
@@ -98,16 +104,16 @@ function EmptyContacts({ searching }: { searching: boolean }) {
     <span className="flex flex-col items-center gap-1">
       <span className="text-texto-secundario">Todavía no hay contactos.</span>
       <span className="text-nota text-texto-tenue">
-        Aparecen aquí cuando una clienta acepta recibir promociones en su perfil
-        o al cerrar su cuenta.
+        Aparecen aquí todas tus clientas activas y las que, al cerrar su cuenta,
+        pidieron seguir recibiendo promociones.
       </span>
     </span>
   );
 }
 
 // AW35 (BE-022): the Promotion Contacts ADR-0097 keeps for former Clients
-// who asked for promotions and, since BE-023, the live Clients who agreed in
-// Perfil (ADR-0098); reached from AW17, studio-wide.
+// who asked for promotions and, since FIX-060 (walkthrough finding 85), every
+// active Client whether or not she agreed; reached from AW17, studio-wide.
 export function ContactsPage({
   search,
   onSearchChange,
@@ -156,7 +162,7 @@ export function ContactsPage({
         subtitle={
           query.data === undefined
             ? undefined
-            : `${contactos(query.data.totalItems)} · clientas que aceptaron recibir promociones, activas o con la cuenta cerrada`
+            : `${contactos(query.data.totalItems)} · todas tus clientas activas y las que pidieron seguir recibiendo promociones al cerrar su cuenta`
         }
         actions={
           isForbidden(query.error) ? undefined : (

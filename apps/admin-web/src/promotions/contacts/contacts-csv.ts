@@ -10,22 +10,25 @@ import { csvDocument } from "../../lib/csv";
 export const kindLabel = (contact: AdminPromotionContactDto): string =>
   contact.kind === "client" ? "Activa" : "Cuenta cerrada";
 
-/** The day a contact agreed, `dd/mm/aaaa` in Bolivia (AW35). */
-export const consentDate = (contact: AdminPromotionContactDto): string =>
-  formatCivilDate(boliviaParts(contact.consentedAt).date);
+/**
+ * AW35's «Desde», `dd/mm/aaaa` in Bolivia: the day a live Client joined, or
+ * the day a former Client asked to keep hearing from the studio (FIX-060).
+ */
+export const sinceDate = (contact: AdminPromotionContactDto): string =>
+  formatCivilDate(boliviaParts(contact.since).date);
 
 /** AW35's «Exportar CSV»: the table's columns. */
 export const promotionContactsCsv = (
   contacts: readonly AdminPromotionContactDto[],
 ): string =>
   csvDocument([
-    ["Nombre", "Tipo", "Correo", "Teléfono", "Aceptó el"],
+    ["Nombre", "Tipo", "Correo", "Teléfono", "Desde"],
     ...contacts.map((contact) => [
       contact.name,
       kindLabel(contact),
       contact.email,
       contact.phone ?? "",
-      consentDate(contact),
+      sinceDate(contact),
     ]),
   ]);
 
