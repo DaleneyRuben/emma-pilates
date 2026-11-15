@@ -517,7 +517,7 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
 7. **Perfil** muestra el nombre, el correo y **Editar**, en tres grupos:
    **Tu plan y tus clases** (**Mi plan**, **Evaluación nutricional**, **Mis
    evaluaciones**, **Invita a una amiga**), **Preferencias**
-   (**Notificaciones** y **Recibir promociones**) y **Cuenta** (**Cambiar
+   (**Notificaciones**) y **Cuenta** (**Cambiar
    contraseña**, **Enviar comentarios** y **Cerrar sesión**, la última fila,
    en rojo y sin flecha, igual que en la app del equipo). Al final, en letra
    chica y subrayada después de la versión, «Emma Pilates Studio · versión … ·
@@ -1000,7 +1000,9 @@ Con Lucía todavía en la app, recorre lo que no es comprar ni reservar.
    teléfono y la foto, y que el historial queda anónimo. Confírmalo solo
    cuando ya no necesites a Lucía. Después de cerrarla no puede entrar, y su
    correo queda libre para un registro nuevo. El historial de clases no se
-   borra.
+   borra. La casilla **Quiero seguir recibiendo promociones…**
+   es lo único que guarda su nombre, correo y teléfono para **Promociones ›
+   Contactos**.
 
 **Cerrar sesión** abre la hoja **¿Cerrar sesión?**. **Cancelar** se queda.
 **Cerrar sesión** vuelve al acceso.
@@ -1019,9 +1021,14 @@ En la web, como Ana.
    Lucía la ve en el carrusel de **Inicio**. El orden de las tarjetas en la
    web es el orden del carrusel.
 4. Finalízala. Desaparece de la app y queda **Finalizada** en la lista.
-5. **Promociones › Contactos**: las clientas que aceptaron
-   recibir promociones. Lucía tiene ese interruptor en su **Perfil**.
-   Apágalo y vuelve a la web: su fila deja de estar disponible para un envío.
+5. **Promociones › Contactos**: todas las clientas activas, hayan aceptado o
+   no, con **Nombre**, **Tipo** («Activa»), **Correo**, **Teléfono** y
+   **Desde**, el día en que se registró. La app ya no tiene el interruptor
+   **Recibir promociones** en **Perfil**. También están las que cerraron su
+   cuenta y marcaron **Quiero seguir recibiendo promociones…**, como
+   «Cuenta cerrada» y con el día en que la cerraron. Solo esas filas tienen
+   **Dejar de enviar**, que borra el contacto. **Exportar CSV** descarga la
+   lista entera.
 
 ### Referidos
 
@@ -1269,7 +1276,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Promociones › Carrusel | Borrador, publicar, finalizar | 14 |
 | Promociones › Clases de campaña | Clases extra para las clientas con plan | 14 |
 | Promociones › Referidos | Quién invitó a quién | 14 |
-| Promociones › Contactos | Quién acepta recibir promociones | 14 |
+| Promociones › Contactos | Todas las clientas activas y las cuentas cerradas que pidieron promociones | 14 |
 | Comentarios | Lo que llega de las apps | 14 |
 | Dinero › Pagos | Confirmar, rechazar, anular, subir la factura | 7 |
 | Dinero › Caja | Historial del cierre diario por sede | 9 |
