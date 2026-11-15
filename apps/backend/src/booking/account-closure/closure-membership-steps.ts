@@ -60,17 +60,19 @@ export const createMembershipSteps = (
   },
 
   // No refund and no class returned: the remaining allowance stays on the
-  // row as history.
+  // row as history. A Plan already paid that has not started ends too
+  // (walkthrough n.º 78); the forfeited count stays the current Plan's.
   endSubscription: async ({ clientId, occurredAt }) => {
-    const active = await transaction.subscription.findFirst({
+    const active = await transaction.subscription.findMany({
       where: { clientId, state: SubscriptionState.ACTIVE },
+      orderBy: [{ startsOn: 'asc' }, { id: 'asc' }],
       select: { id: true, remainingClassAllowance: true },
     });
-    if (active === null) return null;
-    await transaction.subscription.update({
-      where: { id: active.id },
+    if (active.length === 0) return null;
+    await transaction.subscription.updateMany({
+      where: { id: { in: active.map(({ id }) => id) } },
       data: { state: SubscriptionState.EXPIRED, expiredAt: occurredAt },
     });
-    return { forfeitedClasses: active.remainingClassAllowance };
+    return { forfeitedClasses: active[0].remainingClassAllowance };
   },
 });
