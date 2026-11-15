@@ -81,7 +81,13 @@ const toDetailDto = (
     clientSince: civil(client.clientSince),
     subscription: {
       status: client.subscription.status,
-      nextSubscription: null,
+      // Walkthrough n.º 60: the Plan bought after a Guest Pass.
+      nextSubscription:
+        client.subscription.nextSubscription == null
+          ? null
+          : toSubscriptionSummaryTransport(
+              client.subscription.nextSubscription,
+            ),
       founderRenewalDeadline: client.subscription.founderRenewalDeadline,
       freeze: client.subscription.freeze ?? null,
       canRequestFreeze: client.subscription.canRequestFreeze ?? false,

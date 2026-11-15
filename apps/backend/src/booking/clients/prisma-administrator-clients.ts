@@ -242,6 +242,10 @@ export const createPrismaAdministratorClients = (
         .then(toSubscriptionSummary),
     findLatestSubscription: (clientId) =>
       catalog.findLatestSubscription(clientId).then(toSubscriptionSummary),
+    findFutureSubscription: (clientId, after) =>
+      catalog
+        .findFutureSubscription(clientId, after)
+        .then(toSubscriptionSummary),
     readClosureOutlook: async (clientId, now) => {
       const [bookings, waitlist, evaluations, pending] = await Promise.all([
         prisma.booking.count({

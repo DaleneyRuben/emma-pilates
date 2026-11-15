@@ -106,6 +106,10 @@ export interface AdministratorClientDirectory {
   findLatestSubscription: (
     clientId: string,
   ) => Promise<ClientSubscriptionSummary | null>;
+  findFutureSubscription: (
+    clientId: string,
+    after: Date,
+  ) => Promise<ClientSubscriptionSummary | null>;
   readClosureOutlook: (
     clientId: string,
     now: Date,
@@ -172,7 +176,8 @@ export const readAdministratorClient = async (
         directory.findActiveSubscription(clientId, onDate),
       findLatestSubscription: (clientId) =>
         directory.findLatestSubscription(clientId),
-      findFutureSubscription: () => Promise.resolve(null),
+      findFutureSubscription: (clientId, after) =>
+        directory.findFutureSubscription(clientId, after),
     }),
     directory.readClosureOutlook(client.id, instant),
   ]);
