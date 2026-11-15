@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
@@ -107,5 +107,67 @@ describe("The studio QR on a paid Evaluation", () => {
 
     expect(screen.queryByTestId("evaluation-receipt-sheet")).toBeNull();
     expect(jest.mocked(ImagePicker.launchImageLibraryAsync)).not.toHaveBeenCalled();
+  });
+  it("keeps another Evaluation's sheet open when an earlier upload finishes", async () => {
+    let releasePicker: () => void = () => {};
+    const pickerHeld = new Promise<void>((resolve) => {
+      releasePicker = resolve;
+    });
+    chooseReceipt();
+    const chosen = await ImagePicker.launchImageLibraryAsync();
+    jest.mocked(ImagePicker.launchImageLibraryAsync).mockImplementation(async () => {
+      await pickerHeld;
+      return chosen;
+    });
+    const attached: string[] = [];
+    const second = upcomingEvaluation("evaluation-later", boliviaInstant(firstDay, "10:30"), {
+      ...paid,
+      paymentId: "payment-2",
+      receiptAttached: false,
+      receiptUploadable: true,
+    });
+    const fetcher = routeFetcher(
+      baseRoutes({
+        ...qrRoute,
+        ...uploadRoutes(),
+        "/api/v1/evaluations?scope=upcoming": () => jsonResponse(page([pendingReceipt(), second])),
+        "POST /api/v1/evaluations/evaluation-paid/receipt": (init) => {
+          attached.push(String(init?.body));
+          return new Response(null, { status: 204 });
+        },
+      }),
+    );
+    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const cardButtons = await screen.findAllByRole("button", {
+      name: "Sube tu comprobante de transferencia",
+    });
+    await fireEvent.press(cardButtons[0]!);
+    await act(async () => {
+      fireEvent.press(
+        within(screen.getByTestId("evaluation-receipt-sheet")).getByTestId(
+          "evaluation-receipt-sheet-row",
+        ),
+      );
+    });
+    await fireEvent.press(
+      within(screen.getByTestId("evaluation-receipt-sheet")).getByRole("button", {
+        name: "Volver",
+      }),
+    );
+    await fireEvent.press(
+      screen.getAllByRole("button", { name: "Sube tu comprobante de transferencia" })[1]!,
+    );
+    // The second sheet waits for the first upload instead of looking ready.
+    expect(
+      within(screen.getByTestId("evaluation-receipt-sheet")).getByTestId(
+        "evaluation-receipt-sheet-row",
+      ),
+    ).toBeDisabled();
+
+    releasePicker();
+    await waitFor(() => {
+      expect(attached).toEqual([JSON.stringify({ imageAssetId: "asset-1" })]);
+    });
+    expect(screen.getByTestId("evaluation-receipt-sheet")).toBeOnTheScreen();
   });
 });

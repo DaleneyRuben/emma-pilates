@@ -153,4 +153,25 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
 
     expect(screen.getByRole("button", { name: "Hora de fin: Elegir" })).toBeOnTheScreen();
   });
+  it("follows a slow drag that stops without momentum, skipping faint rows", async () => {
+    const screen = await openForm();
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: Elegir" }));
+    const sheet = within(screen.getByTestId("time-wheel-sheet"));
+
+    // iOS sends no momentum end when the finger lifts without speed.
+    await fireEvent(sheet.getByTestId("time-wheel-hours"), "scrollEndDrag", {
+      nativeEvent: { contentOffset: { x: 0, y: 5 * 44 }, velocity: { x: 0, y: 0 } },
+    });
+    expect(sheet.getByText("11:00")).toBeOnTheScreen();
+    expect(sheet.getByRole("button", { name: "Hora 11" })).toBeSelected();
+
+    await fireEvent.press(sheet.getByRole("button", { name: "Listo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de fin: Elegir" }));
+    const end = within(screen.getByTestId("time-wheel-sheet"));
+    // Landing on 7, before the 11:45 limit, settles on the first hour that works.
+    await fireEvent(end.getByTestId("time-wheel-hours"), "momentumScrollEnd", {
+      nativeEvent: { contentOffset: { x: 0, y: 1 * 44 }, velocity: { x: 0, y: 0 } },
+    });
+    expect(end.getByText("11:45")).toBeOnTheScreen();
+  });
 });
