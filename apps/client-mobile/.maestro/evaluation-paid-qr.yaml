@@ -32,12 +32,12 @@ env:
 - extendedWaitUntil:
     visible: "Código QR del estudio.*"
     timeout: 10000
-- assertVisible: "Escanéalo con tu app bancaria y transfiere Bs 70."
 - assertVisible: "Adjunta tu comprobante para continuar"
 - takeScreenshot: client-evaluation-qr-1-pasos
 - swipe:
     start: 50%,70%
     end: 50%,30%
+- assertVisible: "Escanéalo con tu app bancaria y transfiere Bs 70."
 - assertVisible: "2 · Sube tu comprobante"
 - tapOn: "Sube tu comprobante de transferencia"
 - runFlow: subflows/pick-first-photo.yaml
