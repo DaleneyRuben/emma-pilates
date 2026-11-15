@@ -48,6 +48,17 @@ describe('a paid evaluation under review', () => {
     });
   });
 
+  it('tells the client the payment is still under review', async () => {
+    const page = await commands().listClientEvaluations(
+      { scope: 'upcoming' },
+      await world.principalOf('lucia@example.com'),
+    );
+
+    expect(page.items.find((item) => item.id === booked.id)).toMatchObject({
+      paymentState: 'pending',
+    });
+  });
+
   it('moves the evaluation to another slot and keeps the payment under review', async () => {
     const next = await slotIdAt(
       world.prisma,
