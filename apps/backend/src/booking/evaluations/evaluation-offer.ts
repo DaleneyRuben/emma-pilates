@@ -23,3 +23,26 @@ export const evaluationOffer = (input: {
       : input.priceCentavos + input.founderDiscountPercent * 0,
   };
 };
+
+// Walkthrough finding 69: what today's Plan gives, for the booking header.
+export type PlanEvaluationOffer = {
+  includedEvaluation: 'available' | 'used' | 'none';
+  priceCentavos: number;
+};
+
+export const planEvaluationOffer = (
+  subscription: {
+    durationDaysSnapshot: number;
+    evaluations: readonly unknown[];
+  } | null,
+  priceCentavos: number,
+): PlanEvaluationOffer => ({
+  includedEvaluation:
+    subscription === null ||
+    subscription.durationDaysSnapshot < includedEvaluationDays
+      ? 'none'
+      : subscription.evaluations.length > 0
+        ? 'used'
+        : 'available',
+  priceCentavos,
+});
