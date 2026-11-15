@@ -1,0 +1,48 @@
+# Critical journey: a paid Evaluation shows the studio QR before the receipt
+# (verification finding 63, design follow-up 262, C14b). Lucía's 8-class Plan
+# pays Bs 70 for the consult. Needs the studio QR set in the admin web
+# (Configuración › QR de transferencia), the worker, and one image in the
+# device's photo library (Test 19). Attaches a receipt but does not confirm,
+# so it leaves no booking behind.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-profile"
+    timeout: 30000
+- tapOn:
+    id: "tab-profile"
+- extendedWaitUntil:
+    visible: "Evaluación nutricional"
+    timeout: 15000
+- tapOn: "Evaluación nutricional"
+- extendedWaitUntil:
+    visible: "Días disponibles"
+    timeout: 15000
+- tapOn:
+    text: "Turno .*"
+    index: 0
+- extendedWaitUntil:
+    visible: "Cuesta Bs 70 · se paga por transferencia"
+    timeout: 10000
+- assertVisible: "1 · Paga con el QR del estudio"
+- extendedWaitUntil:
+    visible: "Código QR del estudio.*"
+    timeout: 10000
+- assertVisible: "Escanéalo con tu app bancaria y transfiere Bs 70."
+- assertVisible: "Adjunta tu comprobante para continuar"
+- takeScreenshot: client-evaluation-qr-1-pasos
+- swipe:
+    start: 50%,70%
+    end: 50%,30%
+- assertVisible: "2 · Sube tu comprobante"
+- tapOn: "Sube tu comprobante de transferencia"
+- runFlow: subflows/pick-first-photo.yaml
+- extendedWaitUntil:
+    visible: "El estudio revisa tu pago y te avisa por la app"
+    timeout: 60000
+- assertVisible: "Comprobante adjunto.*"
+- takeScreenshot: client-evaluation-qr-2-comprobante
