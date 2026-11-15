@@ -64,13 +64,10 @@ function Intro({
   availability: EvaluationAvailabilityDto;
   rescheduling: boolean;
 }) {
-  return (
-    <BodyText>
-      {rescheduling
-        ? "Tu evaluación ya está pagada. Elige el nuevo horario: el pago se mantiene."
-        : planOfferLine(availability)}
-    </BodyText>
-  );
+  const line = rescheduling
+    ? "Tu evaluación ya está pagada. Elige el nuevo horario: el pago se mantiene."
+    : planOfferLine(availability);
+  return line === null ? null : <BodyText>{line}</BodyText>;
 }
 
 function NutritionistCard({ branchName, name }: { branchName: string; name: string }) {

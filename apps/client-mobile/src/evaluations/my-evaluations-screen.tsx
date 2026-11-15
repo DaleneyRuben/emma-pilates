@@ -172,7 +172,7 @@ export function MyEvaluationsScreen({
               pastItems.some((evaluation) => boliviaMonth(evaluation.startsAt) === boliviaMonth())
                 ? `Ya usaste tu evaluación de este mes. Puedes reservar la de ${monthName(followingMonth(boliviaMonth()))}.`
                 : slots.data?.status === 200
-                  ? planOfferLine(slots.data.data)
+                  ? (planOfferLine(slots.data.data) ?? undefined)
                   : undefined
             }
             primaryAction={{
