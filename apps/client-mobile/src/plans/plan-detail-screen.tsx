@@ -54,9 +54,11 @@ const bookedClassRule = purchaseErrorCopy.start_date_before_booked_class;
 const firstStartAfterGuestClass = (
   subscription: ClientSubscriptionDto | undefined,
   today: string,
+  now: Date,
 ): string | null => {
   const classStartsAt = subscription?.subscription?.guestPass?.usedClassStartsAt;
-  if (classStartsAt == null) return null;
+  // Only a class still ahead holds the start back, as on the server.
+  if (classStartsAt == null || new Date(classStartsAt).getTime() <= now.getTime()) return null;
   const classDay = boliviaCivilDate(new Date(classStartsAt));
   return classDay < today ? null : addCivilDays(classDay, 1);
 };
@@ -112,7 +114,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
   const price = formatBolivianos(detail.priceCentavos);
   const view = subscription.data?.status === 200 ? subscription.data.data : undefined;
   const renewalStartsOn = view?.renewalStartsOn;
-  const firstStart = firstStartAfterGuestClass(view, today);
+  const firstStart = firstStartAfterGuestClass(view, today, new Date());
   const startsOn = chosenStart ?? firstStart ?? today;
   const beforeGuestClass = firstStart !== null && startsOn < firstStart;
 

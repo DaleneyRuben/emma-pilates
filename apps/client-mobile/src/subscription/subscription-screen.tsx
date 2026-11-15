@@ -92,8 +92,8 @@ export function SubscriptionScreen() {
   }
 
   const expired = status === "expired";
-  // Walkthrough n.º 56: a Guest Pass is one free class, never renewed.
-  const guestPass = guestPassCopy(subscription);
+  // Walkthrough n.º 56 and 60: a Guest Pass is one free class, never renewed.
+  const guestPass = guestPassCopy(data);
   const today = boliviaCivilDate(new Date());
   const renewalStartsOn = data.renewalStartsOn ?? addCivilDays(subscription.endsOn, 1);
   const details: [string, string][] = [
@@ -112,7 +112,7 @@ export function SubscriptionScreen() {
       note: "Tu plan nuevo puede empezar más tarde: lo que cuenta es la fecha de compra.",
     });
   }
-  if (status === "expiring_soon") {
+  if (status === "expiring_soon" && guestPass === null) {
     notices.push({
       icon: "clock",
       text: `Tu plan vence el ${formatCivilDate(subscription.endsOn)}.`,
@@ -145,7 +145,11 @@ export function SubscriptionScreen() {
           <SubscriptionHero status={status} subscription={subscription} />
         ) : (
           <View testID="subscription-guest-pass">
-            <EmphasisCard note={guestPass.note} title={guestPass.title} />
+            <EmphasisCard
+              eyebrow={guestPass.eyebrow}
+              note={guestPass.note}
+              title={guestPass.title}
+            />
           </View>
         )}
         {notices.length === 0 ? null : <NoticeList notices={notices} />}
@@ -164,7 +168,7 @@ export function SubscriptionScreen() {
         {subscription.extraClassesLine && guestPass === null ? (
           <BodyText style={styles.note}>{subscription.extraClassesLine}</BodyText>
         ) : null}
-        {expired || guestPass !== null ? (
+        {expired || (guestPass !== null && nextSubscription == null) ? (
           <View style={styles.section}>
             <SectionTitle>Elige tu próximo plan</SectionTitle>
             <BodyText style={styles.note}>
@@ -172,7 +176,7 @@ export function SubscriptionScreen() {
             </BodyText>
             <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
           </View>
-        ) : nextSubscription == null || canFreeze ? (
+        ) : guestPass !== null ? null : nextSubscription == null || canFreeze ? (
           <View>
             <SectionTitle>Tu plan</SectionTitle>
             <ActionRows>

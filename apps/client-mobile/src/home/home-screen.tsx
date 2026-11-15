@@ -191,7 +191,7 @@ export function HomeScreen() {
           <GuestPassCard
             onDetail={() => navigation.navigate("Subscription")}
             onPurchase={() => navigation.navigate("Plans")}
-            subscription={view.subscription!}
+            view={view}
           />
         ) : hasActivePlan ? (
           <ActivePlanCard

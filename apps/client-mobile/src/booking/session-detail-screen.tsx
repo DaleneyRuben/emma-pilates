@@ -124,8 +124,11 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
     (view.status === "active" || view.status === "expiring_soon") &&
     view.subscription !== null &&
     view.subscription !== undefined;
+  // A spent Guest Pass covers no other class (walkthrough n.º 57).
+  const spentGuestPass = (view?.subscription?.guestPass?.usedClassStartsAt ?? null) !== null;
   const hasAllowance =
     hasPlan &&
+    !spentGuestPass &&
     ((view.subscription?.remainingClassAllowance ?? 0) > 0 ||
       (view.subscription?.extraClassesLine ?? null) !== null);
   const full = forcedFull || detail.availableSeats === 0;
