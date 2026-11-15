@@ -22210,6 +22210,10 @@ export const getGetCurrentClientPromotionsConsentUrl = () => {
   return `/api/v1/clients/current/promotions-consent`;
 };
 
+/**
+ * Kept for app builds before FIX-060; AW35 no longer reads it
+ * @deprecated
+ */
 export const getCurrentClientPromotionsConsent = async (
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -22351,6 +22355,9 @@ export function useGetCurrentClientPromotionsConsent<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
+/**
+ * @deprecated
+ */
 
 export function useGetCurrentClientPromotionsConsent<
   TData = Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
@@ -22398,6 +22405,10 @@ export const getSetCurrentClientPromotionsConsentUrl = () => {
   return `/api/v1/clients/current/promotions-consent`;
 };
 
+/**
+ * Kept for app builds before FIX-060; AW35 no longer reads it
+ * @deprecated
+ */
 export const setCurrentClientPromotionsConsent = async (
   setPromotionsConsentDto: SetPromotionsConsentDto,
   options?: RequestInit,
@@ -22489,6 +22500,9 @@ export type SetCurrentClientPromotionsConsentMutationVariables = {
   data: SetPromotionsConsentDto;
 };
 
+/**
+ * @deprecated
+ */
 export const useSetCurrentClientPromotionsConsent = <
   TError = unknown,
   TContext = unknown,

@@ -5873,6 +5873,8 @@
     },
     "/api/v1/clients/current/promotions-consent": {
       "get": {
+        "deprecated": true,
+        "description": "Kept for app builds before FIX-060; AW35 no longer reads it",
         "operationId": "getCurrentClientPromotionsConsent",
         "parameters": [],
         "responses": {
@@ -5898,6 +5900,8 @@
         ]
       },
       "put": {
+        "deprecated": true,
+        "description": "Kept for app builds before FIX-060; AW35 no longer reads it",
         "operationId": "setCurrentClientPromotionsConsent",
         "parameters": [],
         "requestBody": {
