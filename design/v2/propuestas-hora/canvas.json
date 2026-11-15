@@ -1,0 +1,62 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-15T12:26:17Z"
+ },
+ "title": "Emma Pilates Studio · hallazgo 62",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Hallazgo 62 · elige una propuesta",
+   "is_interactive": true
+  },
+  "A-Rueda.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 390,
+   "h": 844,
+   "title": "A · Rueda (recomendada)",
+   "is_interactive": true
+  },
+  "B-Hora-y-cuartos.dc.html": {
+   "x": 470,
+   "y": 1020,
+   "w": 390,
+   "h": 844,
+   "title": "B · Hora y cuartos",
+   "is_interactive": true
+  },
+  "C-Lista-corta.dc.html": {
+   "x": 940,
+   "y": 1020,
+   "w": 390,
+   "h": 844,
+   "title": "C · Lista corta",
+   "is_interactive": true
+  },
+  "Hoy.dc.html": {
+   "x": 1410,
+   "y": 1020,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · grilla de botones"
+  }
+ },
+ "notes": {},
+ "designSystems": [],
+ "order": [
+  "Main.dc.html",
+  "A-Rueda.dc.html",
+  "B-Hora-y-cuartos.dc.html",
+  "C-Lista-corta.dc.html",
+  "Hoy.dc.html"
+ ]
+}
