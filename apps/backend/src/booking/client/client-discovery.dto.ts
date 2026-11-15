@@ -71,6 +71,17 @@ export const parseSetClientPhoto = (
   return result.success ? result.data : null;
 };
 
+export class ClientGuestPassDto {
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    description:
+      'The start of the class the Guest Pass was used for; null while it is unused.',
+  })
+  usedClassStartsAt!: string | null;
+}
+
 export class ClientSubscriptionSummaryDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -106,6 +117,13 @@ export class ClientSubscriptionSummaryDto {
       'Classes left this week from the base allowance. Absent without a cap.',
   })
   classesLeftThisWeek?: number | null;
+
+  @ApiPropertyOptional({
+    type: ClientGuestPassDto,
+    description:
+      'Set when this is a Guest Pass (one free class for an invited friend), not a Plan. Absent on a Plan (walkthrough finding 56).',
+  })
+  guestPass?: ClientGuestPassDto;
 }
 
 export class ClientSubscriptionDto {

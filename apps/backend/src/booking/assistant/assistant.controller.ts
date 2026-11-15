@@ -31,7 +31,10 @@ import {
 } from '../../system-identity/authentication/bearer-principal';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { ClassHistoryEntryDto, parseUuid } from '../booking.dto';
-import type { ClientSubscriptionSummary } from '../client/client-subscription';
+import {
+  type ClientSubscriptionSummary,
+  toSubscriptionSummaryTransport,
+} from '../client/client-subscription';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import type { InvoiceData } from '../payments/invoice-data/invoice-data';
 import { PaymentDto } from '../payments/payments.dto';
@@ -121,16 +124,8 @@ const requireIdempotencyKey = (value: string | undefined): string => {
   return parsed;
 };
 
-const civilDate = (date: Date): string => date.toISOString().slice(0, 10);
-
 const toSubscriptionDto = (subscription: ClientSubscriptionSummary | null) =>
-  subscription === null
-    ? null
-    : {
-        ...subscription,
-        startsOn: civilDate(subscription.startsOn),
-        endsOn: civilDate(subscription.endsOn),
-      };
+  subscription === null ? null : toSubscriptionSummaryTransport(subscription);
 
 // Payment rules keep their own statuses; the two Assistant-specific outcomes
 // are mapped here and everything else stays an unexpected error.

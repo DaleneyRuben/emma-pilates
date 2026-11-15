@@ -39,6 +39,7 @@ import {
   parseUpdateAdminClientProfile,
   UpdateAdminClientProfileDto,
 } from './administrator-clients.dto';
+import { toSubscriptionSummaryTransport } from '../client/client-subscription';
 
 export const administratorClientOperations = Symbol(
   'administratorClientOperations',
@@ -84,13 +85,7 @@ const toDetailDto = (
       freeze: client.subscription.freeze ?? null,
       canRequestFreeze: client.subscription.canRequestFreeze ?? false,
       subscription:
-        current === null
-          ? null
-          : {
-              ...current,
-              startsOn: civil(current.startsOn),
-              endsOn: civil(current.endsOn),
-            },
+        current === null ? null : toSubscriptionSummaryTransport(current),
     },
   };
 };

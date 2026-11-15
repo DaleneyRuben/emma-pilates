@@ -31,7 +31,10 @@ import type {
 } from '../catalog/catalog-repository';
 import { deprecatedDurationMonths } from '../catalog/plan-validity';
 import type { ClientProfile } from './client-profile';
-import type { ClientSubscriptionView } from './client-subscription';
+import {
+  type ClientSubscriptionView,
+  guestPassField,
+} from './client-subscription';
 import {
   BranchDto,
   ClassTypeDto,
@@ -206,6 +209,7 @@ export class ClientProfileController {
               endsOn: civilDate(view.subscription.endsOn),
               extraClassesLine: view.subscription.extraClassesLine,
               classesLeftThisWeek: view.subscription.classesLeftThisWeek,
+              ...guestPassField(view.subscription.guestPass),
             },
     };
   }

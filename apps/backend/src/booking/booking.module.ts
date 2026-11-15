@@ -425,6 +425,7 @@ import { invoiceFileWiring } from './payments/invoice-file/invoice-file-wiring';
             startsOn: subscription.startsOn,
             endsOn: subscription.endsOn,
             extraClassesLine: subscription.extraClassesLine,
+            guestPass: subscription.guestPass,
             classesLeftThisWeek:
               principal.identity.kind === 'client'
                 ? await classesLeftThisWeek(
