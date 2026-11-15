@@ -62,4 +62,20 @@ describe("AW25 subtitle when the week is empty", () => {
       await screen.findByText("Sucursal Centro · ninguna evaluación agendada"),
     ).toBeVisible();
   });
+
+  it("says only that the week is empty when the next one cannot be read", async () => {
+    server.use(
+      http.get(apiUrl(evaluationsPath), ({ request }) => {
+        const params = new URL(request.url).searchParams;
+        return params.get("from") === weekFrom
+          ? jsonResponse(evaluationPage([]))
+          : new Response(null, { status: 500 });
+      }),
+    );
+    renderAdmin("/horario/nutricion?week=2026-09-21");
+
+    expect(
+      await screen.findByText("Sucursal Centro · ninguna en la semana"),
+    ).toBeVisible();
+  });
 });
