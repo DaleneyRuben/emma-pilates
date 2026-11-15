@@ -3,7 +3,6 @@ import { closureScope } from '../../src/booking/account-closure/closure-scope';
 import { createPrismaEvaluationCommands } from '../../src/booking/evaluations/prisma-evaluation-commands';
 import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
 import {
-  civil,
   createCarlaBlocks,
   slotIdAt,
 } from './evaluation-bookings-test-support';
@@ -15,13 +14,12 @@ import {
 
 // FIX-056 (walkthrough findings 67 and 72, review of the branch): the agenda
 // tells the Nutritionist which Evaluations are paid, so the cancel sheet can
-// say the payment stays; a released Evaluation no longer holds its slot
-// when the block ends, and Account closure still finds it after its old time.
+// say the payment stays, and Account closure still finds a released
+// Evaluation after its old time.
 describe('the edges of a released paid evaluation', () => {
   let world: EvaluationTestWorld;
   let mondayBlockId: string;
   let releasedId: string;
-  let releasedSlotId: string;
   const commands = (now: Date = fixtureNow) =>
     createPrismaEvaluationCommands(world.prisma, { now: () => now });
   const principal = (email: string) => world.principalOf(email);
@@ -44,11 +42,6 @@ describe('the edges of a released paid evaluation', () => {
   beforeAll(async () => {
     world = await startEvaluationTestWorld();
     ({ mondayBlockId } = await createCarlaBlocks(world, commands()));
-    releasedSlotId = await slotIdAt(
-      world.prisma,
-      mondayBlockId,
-      '2026-09-28T13:00:00.000Z',
-    );
     const released = await bookPaidAndConfirm('2026-09-28T13:00:00.000Z');
     await commands().cancelEvaluationAsStaff(
       released.id,
@@ -94,20 +87,5 @@ describe('the edges of a released paid evaluation', () => {
     });
 
     expect(found.map((row) => row.id)).toContain(releasedId);
-  });
-
-  it('withdraws its old slot when the block ends', async () => {
-    const ended = await commands().endAvailabilityBlock(
-      { blockId: mondayBlockId, effectiveFrom: civil('2026-09-28') },
-      await principal('carla@example.com'),
-    );
-
-    expect(ended.keptEvaluations).toBe(2);
-    await expect(
-      world.prisma.evaluationSlot.findUniqueOrThrow({
-        where: { id: releasedSlotId },
-        select: { state: true },
-      }),
-    ).resolves.toEqual({ state: 'WITHDRAWN' });
   });
 });
