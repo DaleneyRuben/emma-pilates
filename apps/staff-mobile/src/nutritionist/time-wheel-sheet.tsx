@@ -10,6 +10,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import {
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -45,10 +46,12 @@ function WheelColumn({
   options,
   selected,
   onSelect,
+  testID,
 }: {
   options: WheelOption[];
   selected: number;
   onSelect: (value: number) => void;
+  testID: string;
 }) {
   const scroller = useRef<ScrollView>(null);
   const index = Math.max(
@@ -81,9 +84,16 @@ function WheelColumn({
         contentOffset={{ x: 0, y: index * row }}
         decelerationRate="fast"
         onMomentumScrollEnd={settle}
+        // iOS sends no momentum end when the finger lifts without speed.
+        onScrollEndDrag={(event) => {
+          if (Platform.OS === "ios" && Math.abs(event.nativeEvent.velocity?.y ?? 0) < 0.05) {
+            settle(event);
+          }
+        }}
         ref={scroller}
         showsVerticalScrollIndicator={false}
         snapToInterval={row}
+        testID={testID}
       >
         {options.map((option) => {
           const chosen = option.value === selected;
@@ -131,7 +141,8 @@ export function TimeWheelSheet({
   onPick: (time: string) => void;
   onClose: () => void;
 }) {
-  const field = picking ?? "start";
+  // Mounted afresh for each opening, it keeps that field while it slides out.
+  const [field] = useState<TimeField>(picking ?? "start");
   const bounds = wheelBounds(field, start);
   const [draft, setDraft] = useState(() => openingMinute(field, value, start));
   const choose = (target: number | null) => {
@@ -163,7 +174,9 @@ export function TimeWheelSheet({
           <View style={styles.grab} />
           <View style={styles.readout}>
             <Text style={styles.title}>{field === "start" ? "Hora de inicio" : "Hora de fin"}</Text>
-            <Text style={styles.time}>{displayTime(localTimeOf(draft))}</Text>
+            <Text accessibilityLiveRegion="polite" style={styles.time}>
+              {displayTime(localTimeOf(draft))}
+            </Text>
             <Text style={styles.note}>{note}</Text>
           </View>
           <View style={styles.wheel}>
@@ -171,11 +184,13 @@ export function TimeWheelSheet({
               onSelect={(hour) => choose(hourTarget(hour, draft, bounds))}
               options={hours}
               selected={Math.floor(draft / 60)}
+              testID="time-wheel-hours"
             />
             <WheelColumn
               onSelect={(minute) => choose(minuteTarget(minute, draft, bounds))}
               options={minutes}
               selected={draft % 60}
+              testID="time-wheel-minutes"
             />
           </View>
           <View style={styles.actions}>

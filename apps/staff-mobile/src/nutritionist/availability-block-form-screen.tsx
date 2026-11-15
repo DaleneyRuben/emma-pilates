@@ -76,6 +76,8 @@ export function AvailabilityBlockFormScreen({
   const [endsAtLocal, setEndsAtLocal] = useState<string | null>(block?.endsAtLocal ?? null);
   const [effectiveFrom, setEffectiveFrom] = useState(today);
   const [picking, setPicking] = useState<TimeField | null>(null);
+  // Each opening starts the wheel afresh; closing keeps it mounted so it slides out.
+  const [openings, setOpenings] = useState(0);
   const [confirming, setConfirming] = useState<Confirmation | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -150,7 +152,10 @@ export function AvailabilityBlockFormScreen({
       <Pressable
         accessibilityLabel={`${label}: ${shown}`}
         accessibilityRole="button"
-        onPress={() => setPicking(field)}
+        onPress={() => {
+          setOpenings((count) => count + 1);
+          setPicking(field);
+        }}
         style={styles.timeField}
       >
         <Text style={styles.timeLabel}>{label}</Text>
@@ -259,7 +264,7 @@ export function AvailabilityBlockFormScreen({
         ) : null}
       </View>
       <TimeWheelSheet
-        key={picking ?? "closed"}
+        key={openings}
         onClose={() => setPicking(null)}
         onPick={(time) => {
           if (picking === "start") {
