@@ -105,6 +105,15 @@ export class ClientEvaluationDto {
   paymentId!: string | null;
 
   @ApiProperty({
+    type: String,
+    enum: ['pending', 'confirmed', 'rejected', 'voided'],
+    nullable: true,
+    description:
+      'The Paid Evaluation payment state; null when included. Older builds ignore it.',
+  })
+  paymentState!: 'pending' | 'confirmed' | 'rejected' | 'voided' | null;
+
+  @ApiProperty({
     description:
       'A paid Evaluation still needs its transfer receipt. Older builds ignore it.',
   })

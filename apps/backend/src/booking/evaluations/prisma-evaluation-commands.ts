@@ -140,6 +140,7 @@ export type ClientEvaluationView = {
   included: boolean;
   priceCentavos: number;
   paymentId: string | null;
+  paymentState: 'pending' | 'confirmed' | 'rejected' | 'voided' | null;
   receiptAttached: boolean;
   receiptUploadable: boolean;
   state: 'booked' | 'cancelled' | 'no_show';

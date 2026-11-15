@@ -23,6 +23,10 @@ export const toClientEvaluationView = (
       ? row.payment.amountDueCentavos
       : 0,
   paymentId: row.paymentId,
+  paymentState:
+    row.payment === null
+      ? null
+      : (row.payment.state.toLowerCase() as ClientEvaluationView['paymentState']),
   receiptAttached: row.payment?.receiptImageAssetId != null,
   receiptUploadable: receiptUploadable(row.payment),
   state:
