@@ -20,7 +20,7 @@ executionOrder:
     - evaluation-book-and-cancel
     - home-plan-and-notifications
     - profile-photo
-    - promotions-consent
+    - profile-without-promotions
     - send-feedback
     - referral-code-edit
     - launch-banner

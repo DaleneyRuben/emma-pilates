@@ -1,0 +1,31 @@
+# Critical journey: Perfil has no «Recibir promociones» switch nor its note
+# (FIX-060, walkthrough finding 85): the owner lists every active Client as a
+# promotions contact, so the app no longer asks. «Cerrar mi cuenta» keeps its
+# own box, the only way a closed Account's contact is kept.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    id: "tab-profile"
+- extendedWaitUntil:
+    visible: "Notificaciones"
+    timeout: 15000
+- assertNotVisible:
+    id: "profile-promotions-switch"
+- assertNotVisible: "Recibir promociones.*"
+- takeScreenshot: fix060-perfil-1-preferencias
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- extendedWaitUntil:
+    visible: "Cerrar sesión"
+    timeout: 15000
+- assertNotVisible: "Usamos tu nombre, correo y teléfono.*"
+- takeScreenshot: fix060-perfil-2-cuenta
+- tapOn: "Cerrar mi cuenta"
+- extendedWaitUntil:
+    visible: "Quiero seguir recibiendo promociones.*"
+    timeout: 15000
+- takeScreenshot: fix060-perfil-3-cerrar-cuenta

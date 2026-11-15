@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -173,7 +173,8 @@ describe("Client Profile", () => {
     );
 
     expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    // Lets a promotions consent read settle, as the switch once waited for it.
+    await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
     expect(screen.queryByRole("switch")).toBeNull();
     expect(screen.queryByText(/Recibir promociones/)).toBeNull();
     expect(screen.queryByText(/enviarte ofertas del estudio/)).toBeNull();
