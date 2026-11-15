@@ -4,6 +4,7 @@ import {
   useGetUnreadNotificationCount,
 } from "@pilates/api-contracts";
 import {
+  BrandToast,
   colors,
   fontFamilies,
   IconRow,
@@ -16,6 +17,7 @@ import {
   spacing,
   typography,
   useMobileIdentity,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -32,11 +34,17 @@ type ProfileNavigation = {
   navigate: (
     screen: "Notifications" | "PayTab" | "ChangePassword" | "Feedback" | "ReferralCode" | "ViewAs",
   ) => void;
+  setParams: (params: StaffProfileParams) => void;
 };
 
+/** What a task that returns to Perfil carries back: «Contraseña actualizada». */
+export type StaffProfileParams = { passwordChanged?: true };
+
 /** S23 Perfil, the last tab of every role (follow-up 225 §8). */
-export function StaffProfileScreen() {
+export function StaffProfileScreen({ route }: { route: { params?: StaffProfileParams } }) {
   const navigation = useNavigation<ProfileNavigation>();
+  const dismissPasswordChanged = () => navigation.setParams({ passwordChanged: undefined });
+  const passwordChanged = useStickyNotice(route.params?.passwordChanged, dismissPasswordChanged);
   const identity = useMobileIdentity();
   const fetcher = useStaffFetcher();
   const [confirmingLogout, setConfirmingLogout] = useState(false);
@@ -156,6 +164,9 @@ export function StaffProfileScreen() {
           </Text>
         </View>
       </ScrollView>
+      {passwordChanged === null ? null : (
+        <BrandToast onClose={dismissPasswordChanged} title="Contraseña actualizada" />
+      )}
       <LogoutConfirmationSheet
         logout={identity.logout}
         onDismiss={() => setConfirmingLogout(false)}

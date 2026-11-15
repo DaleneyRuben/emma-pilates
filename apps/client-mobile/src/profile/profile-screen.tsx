@@ -8,6 +8,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  BrandToast,
   colors,
   fontFamilies,
   Heading,
@@ -24,6 +25,7 @@ import {
   typography,
   useMobileIdentity,
   useRefetchOnFocus,
+  useStickyNotice,
   phoneWithFlag,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -50,10 +52,16 @@ type ProfileNavigation = {
       | "MyEvaluations"
       | "MyInvoices",
   ) => void;
+  setParams: (params: ProfileParams) => void;
 };
 
-export function ProfileScreen() {
+/** What a task that returns to Perfil carries back: «Contraseña actualizada». */
+export type ProfileParams = { passwordChanged?: true };
+
+export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) {
   const navigation = useNavigation<ProfileNavigation>();
+  const dismissPasswordChanged = () => navigation.setParams({ passwordChanged: undefined });
+  const passwordChanged = useStickyNotice(route.params?.passwordChanged, dismissPasswordChanged);
   const identity = useMobileIdentity();
   const fetcher = useClientFetcher();
   const [confirmingLogout, setConfirmingLogout] = useState(false);
@@ -200,6 +208,9 @@ export function ProfileScreen() {
           </Pressable>
         </View>
       </ScrollView>
+      {passwordChanged === null ? null : (
+        <BrandToast onClose={dismissPasswordChanged} title="Contraseña actualizada" />
+      )}
       <LogoutConfirmationSheet
         logout={identity.logout}
         onDismiss={() => setConfirmingLogout(false)}
