@@ -51,7 +51,8 @@ const releasedRoutes = () => {
       return jsonResponse(moved);
     },
     "PUT /api/v1/notifications/devices/current": () => new Response(null, { status: 204 }),
-    "POST /api/v1/notifications/notification-1/read": () => new Response(null, { status: 204 }),
+    "POST /api/v1/notifications/11111111-1111-4111-8111-111111111111/read": () =>
+      new Response(null, { status: 204 }),
   });
 };
 
@@ -100,10 +101,10 @@ describe("A paid Evaluation whose slot the studio released", () => {
 
     await act(async () =>
       device.tap({
-        notificationId: "notification-1",
+        notificationId: "11111111-1111-4111-8111-111111111111",
         type: "evaluation_reschedule_required",
         destinationType: "evaluation",
-        destinationId: "evaluation-paid",
+        destinationId: "22222222-2222-4222-8222-222222222222",
       }),
     );
 
