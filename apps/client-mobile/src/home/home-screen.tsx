@@ -36,7 +36,7 @@ import { useResendReceipt } from "../payments/use-resend-receipt";
 import { HomeHeader } from "./home-header";
 import { evaluationShortcut, referralShortcut } from "./home-format";
 import { bookingLockNote, PaymentInReviewCard, PaymentRejectedCard } from "./home-payment-card";
-import { ActivePlanCard, PurchasePlanCard } from "./home-plan-card";
+import { ActivePlanCard, GuestPassCard, PurchasePlanCard } from "./home-plan-card";
 import { LockedShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
 import { NextClassCard, nextBookedClass } from "./next-class-card";
 import { PhonePrompt } from "./phone-prompt";
@@ -187,7 +187,13 @@ export function HomeScreen() {
           onImageMissing={() => void promotions.refetch()}
           promotions={promotions.data?.status === 200 ? promotions.data.data : []}
         />
-        {hasActivePlan ? (
+        {hasActivePlan && view.subscription?.guestPass !== undefined ? (
+          <GuestPassCard
+            onDetail={() => navigation.navigate("Subscription")}
+            onPurchase={() => navigation.navigate("Plans")}
+            subscription={view.subscription!}
+          />
+        ) : hasActivePlan ? (
           <ActivePlanCard
             onDetail={() => navigation.navigate("Subscription")}
             status={view.status as "active" | "expiring_soon"}

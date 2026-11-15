@@ -13,6 +13,7 @@ import {
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 
+import { guestPassCopy } from "./guest-pass-copy";
 import { formatCivilDate } from "./home-format";
 import { promotionCardMaxWidth } from "./promotion-image";
 
@@ -71,6 +72,33 @@ export function ActivePlanCard({
         <Text style={styles.note}>{`Vence el ${formatCivilDate(subscription.endsOn)}`}</Text>
         <OnEmphasisButton label="Mi plan" onPress={onDetail} testID="home-plan-detail" />
       </View>
+    </View>
+  );
+}
+
+/** The hero for a Guest Pass (walkthrough n.º 56): its free class, then a Plan. */
+export function GuestPassCard({
+  onDetail,
+  onPurchase,
+  subscription,
+}: {
+  onDetail: () => void;
+  onPurchase: () => void;
+  subscription: ActiveSubscription;
+}) {
+  const copy = guestPassCopy(subscription);
+  if (copy === null) return null;
+  return (
+    <View style={styles.capped} testID="home-guest-pass-card">
+      <EmphasisCard
+        action={
+          copy.used
+            ? { label: "Comprar un plan", onPress: onPurchase, testID: "home-buy-plan" }
+            : { label: "Mi plan", onPress: onDetail, testID: "home-plan-detail" }
+        }
+        note={copy.note}
+        title={copy.title}
+      />
     </View>
   );
 }

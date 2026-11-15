@@ -283,7 +283,11 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           )
         ) : hasAllowance ? (
           <>
-            <BodyText style={styles.note}>Se descuenta 1 clase de tu plan</BodyText>
+            <BodyText style={styles.note}>
+              {view?.subscription?.guestPass?.usedClassStartsAt === null
+                ? "Es tu clase gratis de invitada"
+                : "Se descuenta 1 clase de tu plan"}
+            </BodyText>
             <PrimaryButton
               busy={submitting}
               label="Reservar"
