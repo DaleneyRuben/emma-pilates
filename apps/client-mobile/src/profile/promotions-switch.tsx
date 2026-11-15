@@ -18,7 +18,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 
-const label = "Recibir promociones de Emma Pilates";
+const label = "Recibir promociones de Emma Pilates Studio";
 const saveFailed = "No pudimos guardar tu preferencia. Inténtalo de nuevo.";
 
 // Follow-up 103 (ADR-0098): a live Client agrees to promotions, or stops,
