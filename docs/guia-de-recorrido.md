@@ -965,8 +965,9 @@ En la app de Lucía:
 4. Gabriela ve la reserva en su **Agenda**, con el nombre de Lucía.
    **Cancelar evaluación** abre «¿Cancelar esta evaluación?», con «Le
    avisamos y el horario queda libre», y al confirmar aparece «Evaluación
-   cancelada». La tarjeta sale de la Agenda. Si la consulta ya estaba pagada, el
-   pago sigue: Lucía recibe «Elige otro turno» y en **Mis evaluaciones** ve
+   cancelada». La tarjeta sale de la Agenda. Si la consulta ya estaba pagada,
+   la hoja agrega «El pago de Lucía sigue vigente; ella elige otro turno.»: el
+   pago sigue, y Lucía recibe «Elige otro turno» y en **Mis evaluaciones** ve
    «El estudio liberó este turno · el pago sigue vigente» con **Elegir
    turno**.
 

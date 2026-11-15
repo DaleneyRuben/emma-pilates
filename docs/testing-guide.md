@@ -9494,7 +9494,7 @@ J. **No booking on a frozen day (n.º 53c).** Open a class inside the
    on that day offers no waitlist. A class outside the freeze books as
    usual.
 
-## Test 149: walkthrough findings 66–69 — the next evaluation on the web, a released paid evaluation, the plan's evaluation offer (FIX-056)
+## Test 149: walkthrough findings 66–69 and 72 — the next evaluation on the web, a released paid evaluation, the plan's evaluation offer (FIX-056)
 
 Run the API and the worker on a fresh database copy, the client and staff
 apps on the iPhone 16 Pro, the iPad and Android, and the admin web at 1440
@@ -9511,8 +9511,11 @@ B. **The web names the next one (n.º 66).** As Ana, **Horario › Nutrición**
    en la semana · próxima: lun 16/11 · 09:00». With nothing ahead it still
    reads «ninguna evaluación agendada». **Horario › Clases** already counts
    «N sesiones esta semana» and needs no change.
-C. **Gabriela cancels the paid one (n.º 67).** In the staff app, **Agenda ›
-   Cancelar evaluación › Sí, cancelar evaluación**: the toast «Evaluación
+C. **Gabriela cancels the paid one (n.º 67, 72).** In the staff app,
+   **Agenda › Cancelar evaluación**: the sheet adds «El pago de Lucía sigue
+   vigente; ella elige otro turno.» under «Le avisamos y el horario queda
+   libre» (an included or unpaid one shows only the latter). **Sí, cancelar
+   evaluación**: the toast «Evaluación
    cancelada» shows and the card leaves the Agenda; **Disponibilidad** no
    longer counts it as reserved. The web's **Horario › Nutrición** drops it
    too. Lucía's client file still lists it. No reminder arrives for that time.
