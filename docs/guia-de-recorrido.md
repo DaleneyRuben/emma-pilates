@@ -1018,7 +1018,12 @@ En la web, como Ana.
 3. Publícala, o prográmala con una fecha de inicio. Cuando está **Activa**,
    Lucía la ve en el carrusel de **Inicio**. El orden de las tarjetas en la
    web es el orden del carrusel.
-4. Finalízala. Desaparece de la app y queda **Finalizada** en la lista.
+4. Ábrela y pulsa **Dejar de publicar**. Desaparece de la app al instante y
+   vuelve a **Borrador** en la lista; publícala de nuevo cuando quieras. No
+   hay botón para finalizarla: una promoción publicada pasa sola a
+   **Finalizada** cuando ya pasó su **Fecha de fin**. **Eliminar promoción**
+   (el enlace bajo los botones) pide confirmación, la archiva y la quita de
+   la lista.
 5. **Promociones › Contactos**: las clientas que aceptaron
    recibir promociones. Lucía tiene ese interruptor en su **Perfil**.
    Apágalo y vuelve a la web: su fila deja de estar disponible para un envío.
@@ -1266,7 +1271,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Clientas › Todas | Ficha con pestañas, filtro Fundadora, «Invitada por», cortesía, acceso de prueba | 10, 11 |
 | Clientas › Para contactar | Seguimiento de los primeros 90 días | 16 |
 | Clientas › Congelamientos | Aprobar el congelamiento de un trimestral | 11 |
-| Promociones › Carrusel | Borrador, publicar, finalizar | 14 |
+| Promociones › Carrusel | Borrador, publicar, dejar de publicar, eliminar | 14 |
 | Promociones › Clases de campaña | Clases extra para las clientas con plan | 14 |
 | Promociones › Referidos | Quién invitó a quién | 14 |
 | Promociones › Contactos | Quién acepta recibir promociones | 14 |
