@@ -111,7 +111,6 @@ import {
 import { hasEarlierRealPayment } from './gift-class-history';
 import { isNextPlanPayment } from './next-plan-payment';
 import { listPendingTransfers } from './prisma-pending-payments';
-import { saleLabel } from './payment-label';
 import { evaluationSaleSelect, evaluationStartsAtOf } from './evaluation-sale';
 import {
   notifyPaymentSubmitted,
@@ -1423,8 +1422,6 @@ export function createPrismaPaymentCommands(
     const kind = row.kind === 'EVALUATION' ? 'evaluation' : 'plan';
     return {
       ...view,
-      // Walkthrough n.º 65: staff read the sale, not the Plan she holds.
-      planName: saleLabel({ kind, planNameSnapshot: view.planName }),
       ...clientNameAndPhoto(row.client),
       kind,
       ...evaluationStartsAtOf(row),
