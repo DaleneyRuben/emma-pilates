@@ -17218,6 +17218,10 @@
               "follow_up"
             ],
             "description": "first unless the Client has an earlier booked Evaluation"
+          },
+          "paymentConfirmed": {
+            "type": "boolean",
+            "description": "A paid Evaluation whose Payment is confirmed: cancelling it keeps the Payment and the Client picks another slot. Older builds ignore it."
           }
         },
         "required": [
@@ -17229,7 +17233,8 @@
           "durationMinutes",
           "branchId",
           "branchName",
-          "kind"
+          "kind",
+          "paymentConfirmed"
         ]
       },
       "NutritionistAgendaPageDto": {
