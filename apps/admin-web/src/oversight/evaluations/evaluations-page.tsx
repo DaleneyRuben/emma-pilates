@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useState } from "react";
 import { staffOptionLabel } from "../../back-office/payroll/payroll-format";
 import { CatalogPage } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
@@ -18,6 +19,7 @@ import { useBranchSelection } from "../../shell/branch/use-branch-selection";
 import {
   branchNutritionistsQueryOptions,
   evaluationTableQueryOptions,
+  nextEvaluationQueryOptions,
   type EvaluationRow,
 } from "./evaluation-queries";
 import type { EvaluationSearch } from "./evaluation-search";
@@ -28,10 +30,12 @@ const kindLabels = {
   follow_up: "Seguimiento",
 } as const;
 
-const booked = (count: number) =>
-  count === 0
-    ? "ninguna evaluación agendada"
-    : `${countFormat.format(count)} ${count === 1 ? "evaluación agendada" : "evaluaciones agendadas"}`;
+const booked = (count: number, next: string | null | undefined) =>
+  count > 0
+    ? `${countFormat.format(count)} ${count === 1 ? "evaluación agendada" : "evaluaciones agendadas"}`
+    : next == null
+      ? "ninguna evaluación agendada"
+      : `ninguna en la semana · próxima: ${formatWeekdayMoment(next)}`;
 
 const columns = createColumnHelper<EvaluationRow>();
 
@@ -100,6 +104,18 @@ function BranchEvaluations({
   const query = useQuery(
     evaluationTableQueryOptions(branch.id, monday, search),
   );
+  // Walkthrough finding 66: an empty week names the next Evaluation, so a
+  // Sunday's view of this week does not read as «none at all».
+  const [now] = useState(() => new Date().toISOString());
+  const weekEmpty = query.data?.totalItems === 0;
+  const next = useQuery({
+    ...nextEvaluationQueryOptions(
+      branch.id,
+      now,
+      search.nutritionistStaffMemberId,
+    ),
+    enabled: weekEmpty,
+  });
   const nutritionists = useQuery(branchNutritionistsQueryOptions(branch.id));
   useKnownOption(search.nutritionistStaffMemberId, nutritionists.data, () =>
     onSearchChange({ nutritionistStaffMemberId: undefined, page: 1 }),
@@ -109,9 +125,9 @@ function BranchEvaluations({
     <CatalogPage
       title="Evaluaciones nutricionales"
       subtitle={
-        query.data === undefined
+        query.data === undefined || (weekEmpty && next.isPending)
           ? `Sucursal ${branch.name}`
-          : `Sucursal ${branch.name} · ${booked(query.data.totalItems)}`
+          : `Sucursal ${branch.name} · ${booked(query.data.totalItems, next.data?.startsAt)}`
       }
       loadingMessage="Cargando evaluaciones…"
       what="las evaluaciones"
