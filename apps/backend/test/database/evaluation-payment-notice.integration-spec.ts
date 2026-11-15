@@ -155,4 +155,26 @@ describe('the evaluation payment notice on the Administrator bell', () => {
     expect(settled.length).toBeGreaterThan(0);
     expect(settled.every((notice) => notice.readAt !== null)).toBe(true);
   });
+  // Walkthrough n.º 65: the queue and «Revisar pago» name the sale and its
+  // time, not the Plan she holds.
+  it('names the evaluation and when it is in the queue and the review', async () => {
+    const { paymentId } = await paidHoldWithReceipt(
+      'Lucia Etiqueta',
+      '2026-10-19T15:15:00.000Z',
+    );
+    const administrator = await admin();
+
+    const queue = await payments().listPendingPayments(administrator);
+    expect(queue.find((row) => row.id === paymentId)).toMatchObject({
+      planName: 'Evaluación nutricional',
+      kind: 'evaluation',
+      evaluationStartsAt: new Date('2026-10-19T15:15:00.000Z'),
+    });
+    await expect(
+      payments().readPaymentReview({ paymentId }, administrator),
+    ).resolves.toMatchObject({
+      planName: 'Evaluación nutricional',
+      evaluationStartsAt: new Date('2026-10-19T15:15:00.000Z'),
+    });
+  });
 });
