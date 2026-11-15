@@ -193,7 +193,7 @@ export function EvaluationAvailabilityScreen({
         {header}
         <StateScreen
           icon="lock"
-          note="La evaluación es gratuita con cualquier plan."
+          note="Con el plan trimestral, la primera evaluación del trimestre es gratis."
           primaryAction={{ label: "Ver planes", onPress: () => navigation.navigate("Plans") }}
           title="Necesitas un plan activo"
         />
