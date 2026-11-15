@@ -51,6 +51,13 @@ describe("The payment state of a paid Evaluation", () => {
     expect(screen.queryByText(/^Pagada/)).toBeNull();
   });
 
+  it("offers both Reprogramar and Cancelar evaluación while the transfer is pending", async () => {
+    const screen = await openWith([paid("pending", { reschedulable: true })]);
+
+    expect(await screen.findByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cancelar evaluación" })).toBeOnTheScreen();
+  });
+
   it("says «Pago rechazado» once the transfer is rejected", async () => {
     const screen = await openWith([paid("rejected")]);
 
