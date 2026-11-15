@@ -126,11 +126,19 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
     view.subscription !== undefined;
   // A spent Guest Pass covers no other class (walkthrough n.º 57).
   const spentGuestPass = (view?.subscription?.guestPass?.usedClassStartsAt ?? null) !== null;
+  // The Plan bought after it covers a class from its start, as the server
+  // books against the Subscription that covers the class's day.
+  const next = view?.nextSubscription;
+  const nextCovers =
+    next != null &&
+    next.remainingClassAllowance > 0 &&
+    boliviaCivilDate(new Date(detail.startsAt)) >= next.startsOn;
   const hasAllowance =
     hasPlan &&
-    !spentGuestPass &&
-    ((view.subscription?.remainingClassAllowance ?? 0) > 0 ||
-      (view.subscription?.extraClassesLine ?? null) !== null);
+    (nextCovers ||
+      (!spentGuestPass &&
+        ((view.subscription?.remainingClassAllowance ?? 0) > 0 ||
+          (view.subscription?.extraClassesLine ?? null) !== null)));
   const full = forcedFull || detail.availableSeats === 0;
   // Joining inside the window is refused (the server answers 403), so the
   // offer stays hidden until the window length is known and still open.
