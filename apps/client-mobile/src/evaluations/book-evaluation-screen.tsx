@@ -19,8 +19,10 @@ import {
   PrimaryButton,
   Screen,
   ScreenTopBar,
+  SectionTitle,
   spacing,
   surfaces,
+  typography,
   usePushNotifications,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -32,6 +34,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import { ReceiptRow } from "../payments/receipt-row";
 import { pickReceipt, type AttachedReceipt } from "../payments/receipt-upload";
+import { TransferQrCard } from "../payments/transfer-qr-card";
 import { idempotency, uploadImage } from "../uploads/image-upload";
 import { clockTime, evaluationDate } from "./evaluation-format";
 
@@ -163,22 +166,32 @@ export function BookEvaluationScreen({
             label={
               slot.included
                 ? "Es gratis: no usa clases de tu plan"
-                : `Cuesta ${formatBolivianos(slot.priceCentavos)}: transfiere y sube tu comprobante`
+                : `Cuesta ${formatBolivianos(slot.priceCentavos)} · se paga por transferencia`
             }
           />
           <IconRow icon="bell" label="Te avisamos un día y una hora antes" />
           <IconRow icon="undo" label="Cancela hasta 3 horas antes" />
         </IconRowGroup>
         {slot.included ? null : (
-          <View style={styles.group}>
-            <ReceiptRow
-              onAttach={() => void attach()}
-              onRemove={() => setReceipt(null)}
-              receipt={receipt}
-              testID="evaluation-receipt"
-              uploading={uploading}
-            />
-          </View>
+          // C14b: C10's two steps, the studio QR then the receipt (follow-up 262).
+          <>
+            <View>
+              <SectionTitle>1 · Paga con el QR del estudio</SectionTitle>
+              <TransferQrCard amount={formatBolivianos(slot.priceCentavos)} fetcher={fetcher} />
+            </View>
+            <View>
+              <SectionTitle>2 · Sube tu comprobante</SectionTitle>
+              <View style={styles.group}>
+                <ReceiptRow
+                  onAttach={() => void attach()}
+                  onRemove={() => setReceipt(null)}
+                  receipt={receipt}
+                  testID="evaluation-receipt"
+                  uploading={uploading}
+                />
+              </View>
+            </View>
+          </>
         )}
         {message !== null ? (
           <BodyText accessibilityRole="alert" style={styles.failure}>
@@ -187,6 +200,13 @@ export function BookEvaluationScreen({
         ) : null}
       </ScrollView>
       <View style={styles.footer}>
+        {slot.included ? null : (
+          <BodyText style={styles.note}>
+            {receipt === null
+              ? "Adjunta tu comprobante para continuar"
+              : "El estudio revisa tu pago y te avisa por la app"}
+          </BodyText>
+        )}
         <PrimaryButton
           busy={submitting}
           disabled={!slot.included && (receipt === null || uploading)}
@@ -205,8 +225,9 @@ function capitalized(text: string): string {
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.lg },
   failure: { color: colors.errorText },
-  footer: { paddingBottom: spacing.sm, paddingTop: spacing.sm },
+  footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
   group: { ...surfaces.card },
+  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   screen: { gap: spacing.lg },
   time: {
     color: colors.white,

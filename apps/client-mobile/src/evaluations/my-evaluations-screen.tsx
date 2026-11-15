@@ -31,6 +31,7 @@ import { useClientFetcher } from "../client-fetcher";
 import { pickReceipt } from "../payments/receipt-upload";
 import { idempotency, uploadImage } from "../uploads/image-upload";
 import { PastEvaluations, UpcomingEvaluationCard } from "./evaluation-card";
+import { EvaluationReceiptSheet } from "./evaluation-receipt-sheet";
 import {
   boliviaMonth,
   clockTime,
@@ -64,6 +65,8 @@ export function MyEvaluationsScreen({
   const [failure, setFailure] = useState<string | null>(null);
   const [receiptReady, setReceiptReady] = useState<Record<string, true>>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  // C15c: the paid Evaluation whose QR and receipt sheet is open (follow-up 262).
+  const [receiptFor, setReceiptFor] = useState<ClientEvaluationDto | null>(null);
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const upcoming = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const past = useListEvaluations({ scope: "past" }, queryOptions);
@@ -85,6 +88,7 @@ export function MyEvaluationsScreen({
         idempotency(),
         fetcher,
       );
+      setReceiptFor(null);
       if (attached.status !== 204) {
         setFailure("No pudimos adjuntar el comprobante. Inténtalo de nuevo.");
         return;
@@ -94,6 +98,7 @@ export function MyEvaluationsScreen({
         queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
       });
     } catch {
+      setReceiptFor(null);
       setFailure("No pudimos adjuntar el comprobante. Inténtalo de nuevo.");
     } finally {
       setUploadingId(null);
@@ -187,7 +192,7 @@ export function MyEvaluationsScreen({
                       receiptReady[evaluation.id] === true || evaluation.receiptAttached === true,
                   }}
                   key={evaluation.id}
-                  onAttachReceipt={() => void attachReceipt(evaluation)}
+                  onAttachReceipt={() => setReceiptFor(evaluation)}
                   onCancel={() => setCancelling(evaluation)}
                   onReschedule={() =>
                     navigation.navigate("EvaluationAvailability", {
@@ -209,6 +214,15 @@ export function MyEvaluationsScreen({
           </View>
         ) : null}
       </ScrollView>
+      <EvaluationReceiptSheet
+        evaluation={receiptFor}
+        fetcher={fetcher}
+        onAttach={() => {
+          if (receiptFor !== null) void attachReceipt(receiptFor);
+        }}
+        onClose={() => setReceiptFor(null)}
+        uploading={receiptFor !== null && uploadingId === receiptFor.id}
+      />
       <ConfirmationSheet
         confirmLabel="Sí, cancelar evaluación"
         note="El horario queda libre y otras clientas podrán reservarlo."
