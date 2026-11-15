@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>B · Turnos a la vista</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}*{box-sizing:border-box}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+.eb{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.mu{font-size:14px;line-height:1.45;color:#6F6662}
+.tb{padding:52px 8px 4px;display:flex;align-items:center;gap:4px;flex:none}
+.ib{width:44px;height:44px;border:0;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.body{flex:1;min-height:0;overflow-y:auto;padding:8px 20px 96px;display:flex;flex-direction:column;gap:24px;scrollbar-width:none}
+.sec{display:flex;flex-direction:column;gap:12px}
+.hero{background:#93615D;border-radius:20px;padding:18px 20px;display:flex;flex-direction:column;gap:6px;color:#fff}
+.hero.rel{background:#F5EFE9;color:#4A4A4A}
+.hero .he{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.78)}
+.hero.rel .he{color:#6F6662}
+.hero .ht{font-family:Lora,Georgia,serif;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.hero.rel .ht{text-decoration:line-through;text-decoration-thickness:1px;color:#6F6662}
+.hero .hs{font-size:15px;color:rgba(255,255,255,.88)}
+.hero.rel .hs{color:#6F6662}
+.chip{align-self:flex-start;margin-top:6px;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:600;background:rgba(255,255,255,.16);color:#fff}
+.hero.rel .chip{background:#F3E7D3;color:#4A4A4A}
+.dot{width:8px;height:8px;border-radius:999px;flex:none}
+.acts{display:flex;gap:8px}
+.btn{height:48px;border:0;border-radius:14px;font:600 16px 'Work Sans',sans-serif;display:flex;align-items:center;justify-content:center;flex:1;cursor:pointer;padding:0 12px}
+.btn.p{background:#B78380;color:#fff}.btn.s{background:#F2E4E1;color:#7D4F4B}
+.btn.e{background:transparent;color:#A04E3E;box-shadow:inset 0 0 0 1px #E6DBD0}
+.btn.d{background:#A04E3E;color:#fff}.btn.q{background:transparent;color:#7D4F4B}
+.btn.off{background:#E6DBD0;color:#6F6662;cursor:default}
+.nut{background:#F5EFE9;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.av{width:44px;height:44px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-family:Lora,Georgia,serif;font-size:16px;display:flex;align-items:center;justify-content:center;flex:none}
+.days{display:flex;gap:8px}
+.day{width:52px;height:60px;border:0;border-radius:14px;background:#F5EFE9;color:#4A4A4A;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:0}
+.day .w{font-size:11px;color:#6F6662}.day .n{font-family:Lora,Georgia,serif;font-size:18px}
+.day.on{background:#B78380;color:#fff}.day.on .w{color:#fff;font-weight:600}
+.slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.slot{height:52px;border:0;border-radius:14px;background:#F5EFE9;color:#4A4A4A;font:400 16px 'Work Sans',sans-serif;font-variant-numeric:tabular-nums;cursor:pointer}
+.band{background:#F2E4E1;border-radius:14px;padding:10px 8px 10px 16px;display:flex;align-items:center;gap:8px;font-size:14px;line-height:1.4;color:#5E3B38}
+.grp{background:#F5EFE9;border-radius:16px;display:flex;flex-direction:column}
+.hrow{min-height:56px;padding:0 16px;display:flex;align-items:center;gap:12px;font-size:15px}
+.tag{padding:4px 10px;border-radius:999px;background:#E6DBD0;font-size:12px;font-weight:600}
+.hr{height:1px;background:#E6DBD0;margin-left:16px}
+.row{min-height:52px;padding:0 16px;display:flex;align-items:center;gap:12px;font-size:15px}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;display:flex;align-items:center;justify-content:center;flex:none}
+.hr64{height:1px;background:#E6DBD0;margin-left:64px}
+.qrc{background:#F5EFE9;border-radius:16px;padding:16px;display:flex;gap:16px;align-items:center}
+.qa{height:36px;border:0;background:transparent;color:#8A5D59;font:500 14px 'Work Sans',sans-serif;display:flex;align-items:center;gap:6px;padding:0;cursor:pointer}
+.pick{min-height:64px;padding:0 12px 0 16px;display:flex;align-items:center;gap:12px;border:0;background:transparent;width:100%;font-family:'Work Sans',sans-serif;color:#4A4A4A;text-align:left;cursor:pointer}
+.thumb{width:36px;height:36px;border-radius:8px;background:#D8C9BB;flex:none}
+.rm{height:44px;border:0;background:transparent;color:#7D4F4B;font:500 15px 'Work Sans',sans-serif;cursor:pointer}
+.toast{position:absolute;left:20px;right:20px;bottom:32px;background:#93615D;border-radius:14px;padding:12px 8px 12px 16px;display:flex;align-items:center;gap:12px;color:#fff;box-shadow:0 8px 24px rgba(74,74,74,.18)}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.32);display:flex;flex-direction:column;justify-content:flex-end}
+.sheet{background:#FAF7F2;border-radius:20px 20px 0 0;padding:8px 20px 30px;display:flex;flex-direction:column;gap:16px}
+.grab{width:36px;height:5px;border-radius:999px;background:#D8C9BB;margin:0 auto 4px}
+.tile{width:52px;height:52px;border-radius:14px;background:#F2E4E1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#7D4F4B;flex:none}
+.pill{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;background:#FAF7F2;font-size:12px;font-weight:600;color:#4A4A4A}
+.lk{height:44px;padding:0 12px;border:0;background:transparent;color:#7D4F4B;font:600 15px 'Work Sans',sans-serif;cursor:pointer}
+.lk.err{color:#A04E3E}
+.side{width:210px;display:flex;flex-direction:column;gap:8px;padding-top:56px}
+.case{border:0;border-radius:12px;background:transparent;text-align:left;padding:10px 12px;font-family:'Work Sans',sans-serif;color:#4A4A4A;display:flex;flex-direction:column;gap:2px;cursor:pointer}
+.case .ct{font-size:14px;font-weight:600}.case .cd{font-size:12px;color:#6F6662}
+.case.on{background:#F2E4E1}.case.on .ct{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 640px; height: 844px; display: flex; gap: 40px; background: #EFE7DE; font-family: 'Work Sans', system-ui, sans-serif; color: #4A4A4A">
+  <div style="position: relative; width: 390px; height: 844px; flex: none; background: #FAF7F2; display: flex; flex-direction: column; overflow: hidden">
+    <sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
+      <div class="tb">
+        <a href="C18-Perfil.dc.html" class="ib" aria-label="Volver"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+        <span style="font-size: 16px; font-weight: 500">Perfil</span>
+      </div>
+      <div class="body">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-family: Lora, Georgia, serif; font-size: 30px">Evaluación nutricional</span>
+          <span style="font-size: 15px; line-height: 1.5; color: #6F6662">{{intro}}</span>
+        </div>
+        <sc-if value="{{hasNext}}" hint-placeholder-val="{{ false }}">
+          <div class="sec">
+            <span class="eb">Tu próxima evaluación</span>
+            <div class="grp" style="padding: 16px 16px 4px; gap: 10px">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div class="tile"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">{{nextW}}</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">{{nextN}}</span></div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+                  <span style="font-family: Lora, Georgia, serif; font-size: 20px">{{nextTime}} · Gabriela</span>
+                  <span class="pill"><span class="dot" style="background: {{dotColor}}"></span>{{chip}}</span>
+                </div>
+              </div>
+              <span class="mu">{{nextLine}}</span>
+              <div style="height: 1px; background: #E6DBD0"></div>
+              <div style="display: flex; justify-content: flex-end; gap: 4px">
+                <sc-if value="{{showPick}}" hint-placeholder-val="{{ false }}"><button class="lk" onClick="{{startMove}}">Elegir turno</button></sc-if>
+                <sc-if value="{{showResched}}" hint-placeholder-val="{{ false }}"><button class="lk" onClick="{{startMove}}">Reprogramar</button></sc-if>
+                <sc-if value="{{showCancel}}" hint-placeholder-val="{{ false }}"><button class="lk err" onClick="{{askCancel}}">Cancelar evaluación</button></sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <div class="sec">
+          <span class="eb">{{bookTitle}}</span>
+          <sc-if value="{{moving}}" hint-placeholder-val="{{ false }}">
+            <div class="band"><span style="flex: 1">Cambias tu cita del {{nextShort}}. Elige el nuevo horario.</span><button class="btn q" style="flex: none; height: 40px" onClick="{{stopMove}}">Volver</button></div>
+          </sc-if>
+          <sc-if value="{{showIntroBelow}}" hint-placeholder-val="{{ false }}"><span class="mu">{{intro}}</span></sc-if>
+          <div class="nut"><div class="av">GF</div><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 500">Gabriela Flores</span><span style="font-size: 13px; color: #6F6662">Nutricionista · 45 min · Achumani</span></div></div>
+          <div class="days">
+            <sc-for list="{{days}}" as="d" hint-placeholder-count="5"><button class="day {{d.cls}}" onClick="{{d.pick}}" aria-pressed="{{d.on}}"><span class="w">{{d.w}}</span><span class="n">{{d.n}}</span></button></sc-for>
+          </div>
+          <div style="display: flex; justify-content: space-between"><span class="eb">{{dayLong}}</span><span style="font-size: 13px; color: #6F6662">{{slotCount}}</span></div>
+          <div class="slots">
+            <sc-for list="{{slots}}" as="t" hint-placeholder-count="6"><button class="slot" onClick="{{t.pick}}">{{t.time}}</button></sc-for>
+          </div>
+          <span style="font-size: 13px; color: #6F6662">Puedes reservar hasta 3 horas antes.</span>
+        </div>
+        <div class="sec">
+          <span class="eb">Anteriores</span>
+          <div class="grp">
+            <div class="hrow"><span style="flex: 1">19 de octubre, 10:30 · Gabriela</span><span class="tag">Realizada</span></div>
+            <div class="hr"></div>
+            <div class="hrow"><span style="flex: 1">14 de agosto, 16:00 · Gabriela</span><span class="tag">Realizada</span></div>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+        <div class="toast" role="status">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">{{toast}}</span><span style="font-size: 13px; color: rgba(255,255,255,0.88)">{{toastSub}}</span></div>
+          <button class="ib" aria-label="Cerrar aviso" onClick="{{closeToast}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+      </sc-if>
+    </sc-if>
+    <sc-if value="{{isConfirm}}" hint-placeholder-val="{{ false }}">
+      <div class="tb">
+        <button class="ib" aria-label="Volver" onClick="{{backHome}}"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <span style="font-size: 16px; font-weight: 500">Evaluación nutricional</span>
+      </div>
+      <div class="body" style="padding-bottom: 16px; gap: 20px">
+        <span style="font-family: Lora, Georgia, serif; font-size: 30px">Confirma tu cita</span>
+        <div class="hero"><span class="he">{{dayLong}}</span><span class="ht">{{pickedTime}}</span><span class="hs">45 minutos · Gabriela · Achumani</span></div>
+        <div class="grp">
+          <div class="row"><div class="disc"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="12" rx="2"></rect><path d="M3.5 10h17"></path></svg></div><span>{{costLine}}</span></div>
+          <div class="hr64"></div>
+          <div class="row"><div class="disc"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg></div><span>Te avisamos un día y una hora antes</span></div>
+          <div class="hr64"></div>
+          <div class="row"><div class="disc"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></div><span>{{ruleLine}}</span></div>
+        </div>
+        <sc-if value="{{bookPaid}}" hint-placeholder-val="{{ false }}">
+          <div class="sec">
+            <span class="eb">1 · Paga con el QR del estudio</span>
+            <div class="qrc">
+              <div style="flex: none; background: #FFFFFF; border-radius: 8px; padding: 6px"><svg role="img" aria-label="Código QR del estudio" width="92" height="92" viewBox="0 0 28 28"><g fill="#4A4A4A"><rect x="1" y="1" width="7" height="7"></rect><rect x="20" y="1" width="7" height="7"></rect><rect x="1" y="20" width="7" height="7"></rect></g><g fill="#FFFFFF"><rect x="2" y="2" width="5" height="5"></rect><rect x="21" y="2" width="5" height="5"></rect><rect x="2" y="21" width="5" height="5"></rect></g><g fill="#4A4A4A"><rect x="3" y="3" width="3" height="3"></rect><rect x="22" y="3" width="3" height="3"></rect><rect x="3" y="22" width="3" height="3"></rect><rect x="10" y="2" width="2" height="2"></rect><rect x="13" y="4" width="3" height="2"></rect><rect x="10" y="7" width="2" height="3"></rect><rect x="14" y="9" width="2" height="2"></rect><rect x="2" y="11" width="3" height="2"></rect><rect x="7" y="13" width="2" height="3"></rect><rect x="11" y="12" width="4" height="2"></rect><rect x="17" y="11" width="3" height="2"></rect><rect x="22" y="12" width="2" height="3"></rect><rect x="10" y="16" width="2" height="2"></rect><rect x="14" y="17" width="3" height="3"></rect><rect x="19" y="16" width="2" height="2"></rect><rect x="23" y="18" width="3" height="2"></rect><rect x="11" y="21" width="2" height="4"></rect><rect x="15" y="23" width="3" height="2"></rect><rect x="20" y="21" width="2" height="2"></rect><rect x="23" y="23" width="2" height="3"></rect></g></svg></div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+                <span style="font-size: 14px; line-height: 1.4; color: #6F6662">Escanéalo con tu app bancaria y transfiere <strong style="color: #4A4A4A; font-weight: 600">Bs 70</strong>.</span>
+                <button class="qa">Ampliar</button>
+                <button class="qa">Guardar QR</button>
+              </div>
+            </div>
+          </div>
+          <div class="sec">
+            <span class="eb">2 · Sube tu comprobante</span>
+            <div class="grp">
+              <sc-if value="{{noReceipt}}" hint-placeholder-val="{{ true }}">
+                <button class="pick" onClick="{{attach}}"><div class="disc"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M4.5 15v3.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5V15"></path></svg></div><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px">Elegir comprobante</span><span style="font-size: 13px; color: #6F6662">JPG o PNG · hasta 5 MB</span></span></button>
+              </sc-if>
+              <sc-if value="{{hasReceipt}}" hint-placeholder-val="{{ false }}">
+                <div class="pick" style="cursor: default"><div class="thumb"></div><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px">Comprobante adjunto</span><span style="font-size: 13px; color: #6F6662">comprobante-bs70.jpg</span></span><button class="rm" onClick="{{removeReceipt}}">Quitar</button></div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="padding: 12px 20px 30px; display: flex; flex-direction: column; gap: 8px; flex: none">
+        <sc-if value="{{bookPaid}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #6F6662; text-align: center">{{footNote}}</span></sc-if>
+        <button class="btn {{goCls}}" style="flex: none; height: 52px; font-size: 17px" onClick="{{confirmBook}}">Confirmar evaluación</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{sheetMove}}" hint-placeholder-val="{{ false }}">
+      <div class="scrim">
+        <div class="sheet" role="dialog" aria-label="Cambiar tu cita">
+          <div class="grab"></div>
+          <span style="font-family: Lora, Georgia, serif; font-size: 24px">¿Cambiar tu cita?</span>
+          <div class="grp"><div class="row" style="justify-content: space-between"><span style="color: #6F6662">Antes</span><span>{{nextShort}}</span></div><div class="hr"></div><div class="row" style="justify-content: space-between"><span style="color: #6F6662">Ahora</span><span style="font-weight: 600">{{pickedShort}}</span></div></div>
+          <span class="mu">Tu pago de Bs 70 sigue con la cita. Puedes cambiarla hasta 3 horas antes.</span>
+          <button class="btn p" style="flex: none; height: 52px" onClick="{{confirmMove}}">Cambiar cita</button>
+          <button class="btn q" style="flex: none" onClick="{{closeSheet}}">Volver</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{sheetCancel}}" hint-placeholder-val="{{ false }}">
+      <div class="scrim">
+        <div class="sheet" role="dialog" aria-label="Cancelar tu evaluación">
+          <div class="grab"></div>
+          <span style="font-family: Lora, Georgia, serif; font-size: 24px">¿Cancelar tu evaluación?</span>
+          <span class="mu">{{nextShort}} con Gabriela. Tu evaluación gratis vuelve a quedar disponible para reservar otro día.</span>
+          <button class="btn d" style="flex: none; height: 52px" onClick="{{confirmCancel}}">Cancelar evaluación</button>
+          <button class="btn q" style="flex: none" onClick="{{closeSheet}}">Volver</button>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  <div class="side">
+    <span class="eb" style="padding: 0 12px 4px">Ver el caso</span>
+    <sc-for list="{{cases}}" as="c" hint-placeholder-count="7"><button class="case {{c.cls}}" onClick="{{c.pick}}" aria-pressed="{{c.on}}"><span class="ct">{{c.t}}</span><span class="cd">{{c.d}}</span></button></sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":640,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var self = this, st = this.state || {};
+    var s = st.s || 'free', view = st.view || 'home', sheet = st.sheet || '';
+    var DAYS = [
+      { w: 'lun', n: '16', long: 'Lunes 16 de noviembre', short: 'lunes 16', times: ['9:00', '9:45', '10:30', '15:00', '15:45', '16:30'] },
+      { w: 'mar', n: '17', long: 'Martes 17 de noviembre', short: 'martes 17', times: ['9:00', '10:30', '15:00', '16:30'] },
+      { w: 'mié', n: '18', long: 'Miércoles 18 de noviembre', short: 'miércoles 18', times: ['9:45', '10:30', '15:45'] },
+      { w: 'jue', n: '19', long: 'Jueves 19 de noviembre', short: 'jueves 19', times: ['9:00', '9:45', '15:00', '15:45', '16:30'] },
+      { w: 'lun', n: '23', long: 'Lunes 23 de noviembre', short: 'lunes 23', times: ['9:00', '9:45', '10:30', '15:00'] }
+    ];
+    var CASES = [
+      { k: 'free', t: 'Sin reservar · gratis', d: 'Plan trimestral, la primera del trimestre' },
+      { k: 'paid', t: 'Sin reservar · Bs 70', d: 'Plan de 12 clases' },
+      { k: 'used', t: 'Sin reservar · gratis usada', d: 'Plan trimestral, ya la usó' },
+      { k: 'freeBooked', t: 'Reservada gratis', d: 'Se puede cancelar' },
+      { k: 'review', t: 'Pago en revisión', d: 'Subió su comprobante' },
+      { k: 'paidOk', t: 'Pagada', d: 'El estudio confirmó el pago' },
+      { k: 'released', t: 'Turno liberado', d: 'El estudio canceló su turno' }
+    ];
+    var INTRO = {
+      free: 'Tu primera evaluación del trimestre es gratis.',
+      paid: 'Cuesta Bs 70 con tu plan de 12 clases.',
+      used: 'Ya usaste la gratis de este trimestre: Bs 70.',
+      freeBooked: 'Ya reservaste la gratis de este trimestre. Otra cuesta Bs 70.',
+      review: 'Otra evaluación cuesta Bs 70 con tu plan de 12 clases.',
+      paidOk: 'Otra evaluación cuesta Bs 70 con tu plan de 12 clases.',
+      released: 'Otra evaluación cuesta Bs 70 con tu plan de 12 clases.'
+    };
+    var NEXT = {
+      freeBooked: { chip: 'Gratis con tu plan', dot: '#D8BDB8', line: 'Puedes cancelarla hasta 3 horas antes.' },
+      review: { chip: 'Pago en revisión', dot: '#C99A4E', line: 'El estudio revisa tu comprobante de Bs 70 y te avisa por la app.' },
+      paidOk: { chip: 'Pagada', dot: '#9DB592', line: 'Puedes reprogramarla hasta 3 horas antes. El pago sigue con ella.' },
+      released: { chip: 'El estudio liberó tu turno', dot: '#C99A4E', line: 'Tu pago de Bs 70 sigue vigente: elige otro turno y no pagas de nuevo.' }
+    };
+    var hasNext = !!NEXT[s];
+    var nd = st.nextDay == null ? 0 : st.nextDay, nt = st.nextTime || '9:00';
+    var day = st.day == null ? 0 : st.day, D = DAYS[day];
+    var moving = !!st.moving && hasNext;
+    var bookPaid = s !== 'free';
+    var receipt = !!st.receipt;
+    var picked = st.picked || '';
+    var nextShort = DAYS[nd].short + ', ' + nt;
+    var times = D.times.filter(function (t) { return !(hasNext && s !== 'released' && nd === day && t === nt); });
+    var info = NEXT[s] || { chip: '', dot: '', line: '' };
+    function reset(k) { return { s: k, view: 'home', sheet: '', moving: false, receipt: false, toast: '', nextDay: 0, nextTime: '9:00', day: 0 }; }
+    return {
+      isHome: view === 'home', isConfirm: view === 'confirm',
+      hasNext: hasNext, noNext: !hasNext,
+      intro: INTRO[s], showIntroBelow: false,
+      nextW: DAYS[nd].w, nextN: DAYS[nd].n,
+      heroCls: s === 'released' ? 'rel' : '',
+      nextDay: DAYS[nd].long, nextTime: nt, nextShort: nextShort,
+      chip: info.chip, dotColor: info.dot, nextLine: info.line,
+      showPick: s === 'released' && !moving, showResched: (s === 'review' || s === 'paidOk') && !moving, showCancel: s === 'freeBooked',
+      moving: moving,
+      bookTitle: moving ? 'Elige el nuevo horario' : hasNext ? 'Reserva otra evaluación' : 'Reserva tu evaluación',
+      days: DAYS.map(function (x, i) { return { w: x.w, n: x.n, on: i === day, cls: i === day ? 'on' : '', pick: function () { self.setState({ day: i }); } }; }),
+      dayLong: D.long, slotCount: times.length + ' horarios',
+      slots: times.map(function (t) { return { time: t, pick: function () {
+        if (moving) self.setState({ sheet: 'move', picked: t });
+        else self.setState({ view: 'confirm', picked: t, receipt: false });
+      } }; }),
+      pickedTime: picked, pickedShort: D.short + ', ' + picked,
+      bookPaid: bookPaid,
+      costLine: bookPaid ? 'Cuesta Bs 70 · se paga por transferencia' : 'Es gratis: no usa clases de tu plan',
+      ruleLine: bookPaid ? 'Reprograma hasta 3 horas antes' : 'Cancela hasta 3 horas antes',
+      noReceipt: !receipt, hasReceipt: receipt,
+      footNote: receipt ? 'El estudio revisa tu pago y te avisa por la app' : 'Adjunta tu comprobante para continuar',
+      goCls: bookPaid && !receipt ? 'off' : 'p',
+      hasToast: !!st.toast, toast: st.toast || '', toastSub: st.toastSub || '',
+      sheetMove: sheet === 'move', sheetCancel: sheet === 'cancel',
+      cases: CASES.map(function (c) { return { t: c.t, d: c.d, on: c.k === s, cls: c.k === s ? 'on' : '', pick: function () { self.setState(reset(c.k)); } }; }),
+      attach: function () { self.setState({ receipt: true }); },
+      removeReceipt: function () { self.setState({ receipt: false }); },
+      backHome: function () { self.setState({ view: 'home' }); },
+      startMove: function () { self.setState({ moving: true }); },
+      stopMove: function () { self.setState({ moving: false }); },
+      askCancel: function () { self.setState({ sheet: 'cancel' }); },
+      closeSheet: function () { self.setState({ sheet: '' }); },
+      closeToast: function () { self.setState({ toast: '' }); },
+      confirmBook: function () {
+        if (bookPaid && !receipt) return;
+        self.setState({ s: bookPaid ? 'review' : 'freeBooked', view: 'home', nextDay: day, nextTime: picked, moving: false,
+          toast: bookPaid ? 'Comprobante enviado' : 'Evaluación confirmada', toastSub: D.long + ', ' + picked });
+      },
+      confirmMove: function () {
+        self.setState({ s: s === 'released' ? 'paidOk' : s, sheet: '', moving: false, nextDay: day, nextTime: picked,
+          toast: 'Cita cambiada', toastSub: D.long + ', ' + picked });
+      },
+      confirmCancel: function () {
+        self.setState({ s: 'free', sheet: '', toast: 'Evaluación cancelada', toastSub: 'Tu evaluación gratis vuelve a estar disponible' });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
