@@ -935,8 +935,10 @@ Entra a la app del equipo como Gabriela.
    vacía dice «Aún no publicaste horarios». Pulsa **Nuevo horario**.
 2. Elige el **Día**, la **Sucursal** (si tiene más de una), la **Hora de
    inicio** y la **Hora de fin**, y **A partir del** (hoy o un día
-   siguiente). Cada turno que la clienta ve dura 45 minutos, recortados de
-   ese bloque: el bloque dura al menos 45 minutos, en tramos de 15.
+   siguiente). Cada hora se elige en una rueda de horas y minutos (00, 15,
+   30, 45) y se confirma con **Listo**; la del fin solo deja elegir horas
+   45 minutos o más después del inicio y dice cuántos turnos salen. Cada
+   turno que la clienta ve dura 45 minutos, recortados de ese bloque.
    **Guardar**.
 3. El bloque aparece en **Horarios semanales** con el día abreviado,
    `9:00 – 13:00` (o la hora que hayas puesto) y «N cupos · sin reservas» o
@@ -952,8 +954,11 @@ En la app de Lucía:
 1. **Perfil**, **Evaluación nutricional**. Solo aparecen días con un turno
    todavía abierto. Un turno desaparece 3 horas antes de empezar. Elige uno
    y pulsa **Confirmar evaluación**.
-2. Con el plan de 30 días, la consulta se paga: Bs 70, por QR en la app,
-   transfiriendo y subiendo el comprobante, que Ana confirma. No hay cobro
+2. Con el plan de 30 días, la consulta se paga: Bs 70, por QR en la app.
+   **Confirma tu cita** muestra **1 · Paga con el QR del estudio** (el QR,
+   con **Ampliar** y **Guardar QR**) y **2 · Sube tu comprobante**, que Ana
+   confirma. Si el comprobante se sube después, desde **Mis evaluaciones**,
+   se abre una hoja con los mismos dos pasos. No hay cobro
    en efectivo de la consulta. Con el trimestral ya confirmado, la primera
    consulta del trimestre es gratis. La segunda, en el mismo trimestre, se
    paga.
