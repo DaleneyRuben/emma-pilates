@@ -75,3 +75,40 @@ describe("session expiry through the QueryClient", () => {
     expect(onExpired).not.toHaveBeenCalled();
   });
 });
+
+// FIX-058: a 401 from one endpoint is not proof the session ended; the
+// backend's current-session read decides before anyone leaves the page.
+describe("session expiry confirmed with the backend", () => {
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+  const refused = new ApiError({
+    status: 401,
+    code: "authentication_required",
+  });
+
+  it("stays when the backend still knows the session, and reports again later", async () => {
+    const onExpired = jest.fn();
+    const isSignedIn = jest.fn(() => Promise.resolve(true));
+    const sessionExpiry = createSessionExpiry(onExpired, { isSignedIn });
+
+    sessionExpiry.report(refused);
+    await settle();
+    sessionExpiry.report(refused);
+    await settle();
+
+    expect(isSignedIn).toHaveBeenCalledTimes(2);
+    expect(onExpired).not.toHaveBeenCalled();
+  });
+
+  it("returns to Login once when the backend no longer knows it", async () => {
+    const onExpired = jest.fn();
+    const isSignedIn = jest.fn(() => Promise.resolve(false));
+    const sessionExpiry = createSessionExpiry(onExpired, { isSignedIn });
+
+    sessionExpiry.report(refused);
+    sessionExpiry.report(refused);
+    await settle();
+
+    expect(isSignedIn).toHaveBeenCalledTimes(1);
+    expect(onExpired).toHaveBeenCalledTimes(1);
+  });
+});
