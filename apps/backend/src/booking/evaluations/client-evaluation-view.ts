@@ -8,6 +8,7 @@ import {
   evaluationSlotMinutes,
   isEvaluationBookable,
 } from './evaluation-rules';
+import { isReschedulablePaidEvaluation } from './paid-evaluation-reschedule';
 import { receiptUploadable } from './receipt-uploadable';
 
 export const toClientEvaluationView = (
@@ -43,7 +44,7 @@ export const toClientEvaluationView = (
     isEvaluationBookable(row.slot.startsAt, now),
   reschedulable:
     row.state === EvaluationState.BOOKED &&
-    row.payment?.state === 'CONFIRMED' &&
+    isReschedulablePaidEvaluation(row) &&
     row.slotReleasedAt === null &&
     isEvaluationBookable(row.slot.startsAt, now),
 });

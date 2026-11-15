@@ -148,7 +148,7 @@ export class ClientEvaluationDto {
 
   @ApiProperty({
     description:
-      'A confirmed Paid Evaluation can move to another slot until 3 hours before the original start',
+      'A Paid Evaluation, confirmed or under review, can move to another slot until 3 hours before the original start',
   })
   reschedulable!: boolean;
 }
