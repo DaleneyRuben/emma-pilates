@@ -7,6 +7,7 @@ import {
   FullScreenImage,
   LineIcon,
   PrimaryButton,
+  QueryFailure,
   radii,
   spacing,
   surfaces,
@@ -24,27 +25,44 @@ const qrBox = 190;
 // The studio QR is a backend-owned, authenticated image; it is loaded through
 // the API fetcher and rendered inline instead of exposing a bucket URL. Its
 // proportions come from its own header: Android does not measure a data URI.
-function useQrImage(fetcher: typeof globalThis.fetch): { ratio: number; uri: string } | null {
+function useQrImage(fetcher: typeof globalThis.fetch): {
+  failed: boolean;
+  qr: { ratio: number; uri: string } | null;
+  retry: () => void;
+} {
   const [qr, setQr] = useState<{ ratio: number; uri: string } | null>(null);
+  // Walkthrough n.º 71: a QR that cannot load says so and offers Reintentar.
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let active = true;
-    void fetcher(getGetTransferQrImageUrl())
+    void Promise.resolve()
+      .then(() => fetcher(getGetTransferQrImageUrl()))
       .then(async (response) => {
-        if (!response.ok) return;
+        if (!response.ok) throw new Error(`QR ${response.status}`);
         const bytes = new Uint8Array(await response.arrayBuffer());
         const type = response.headers.get("Content-Type") ?? "image/png";
         const size = imageSizeFromBytes(bytes);
         const ratio = size === null || size.height === 0 ? 1 : size.width / size.height;
         if (active) setQr({ ratio, uri: `data:${type};base64,${encodeBase64(bytes)}` });
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (active) setFailed(true);
+      });
     return () => {
       active = false;
     };
-  }, [fetcher]);
+  }, [attempt, fetcher]);
 
-  return qr;
+  return {
+    failed,
+    qr,
+    retry: () => {
+      setFailed(false);
+      setAttempt((count) => count + 1);
+    },
+  };
 }
 
 /** «Ampliar» and «Guardar QR»: quiet text actions with a line icon (follow-up 95). */
@@ -79,7 +97,7 @@ function QrAction({
  * the QR and in the view, adds it to the photo library (MOB-063).
  */
 export function TransferQrCard({ fetcher }: { fetcher: typeof globalThis.fetch }) {
-  const qr = useQrImage(fetcher);
+  const { failed, qr, retry } = useQrImage(fetcher);
   const uri = qr?.uri ?? null;
   const ratio = qr?.ratio ?? 1;
   const [enlarged, setEnlarged] = useState(false);
@@ -89,7 +107,9 @@ export function TransferQrCard({ fetcher }: { fetcher: typeof globalThis.fetch }
 
   return (
     <View style={styles.card}>
-      {uri === null ? (
+      {uri === null && failed ? (
+        <QueryFailure label="No pudimos cargar el QR del estudio." onRetry={retry} />
+      ) : uri === null ? (
         <View style={styles.placeholder} />
       ) : (
         <>

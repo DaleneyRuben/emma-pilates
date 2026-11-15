@@ -1,7 +1,7 @@
 import NetInfo from "@react-native-community/netinfo";
 import { QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { type PropsWithChildren, useEffect, useMemo } from "react";
+import { createContext, type PropsWithChildren, useContext, useEffect, useMemo } from "react";
 import { AppState } from "react-native";
 
 import { OfflineBanner } from "../ui/offline-banner";
@@ -14,6 +14,10 @@ import {
 } from "./persistence";
 
 const queryClient = createMobileQueryClient();
+
+// Walkthrough n.º 71: the signed-in provider sits inside the app-wide one,
+// and only the outermost draws the offline banner.
+const OfflineBannerShown = createContext(false);
 
 export function clearMobileQueryCache(): void {
   queryClient.clear();
@@ -60,11 +64,12 @@ export function MobileQueryProvider({ accountId, children }: MobileQueryProvider
     [accountId],
   );
 
+  const bannerShown = useContext(OfflineBannerShown);
   const content = (
-    <>
-      <OfflineBanner />
+    <OfflineBannerShown.Provider value>
+      {bannerShown ? null : <OfflineBanner />}
       {children}
-    </>
+    </OfflineBannerShown.Provider>
   );
 
   if (persistOptions === null) {
