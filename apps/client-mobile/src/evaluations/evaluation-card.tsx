@@ -79,9 +79,8 @@ export function UpcomingEvaluationCard({
         </Pressable>
       </View>
     ) : null,
-    reschedulable ? (
-      <CardActionRow label="Reprogramar" onPress={onReschedule} />
-    ) : cancellable ? (
+    reschedulable ? <CardActionRow label="Reprogramar" onPress={onReschedule} /> : null,
+    cancellable ? (
       <CardActionRow label="Cancelar evaluación" onPress={onCancel} tone="error" />
     ) : null,
   ].filter((action) => action !== null);
