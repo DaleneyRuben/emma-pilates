@@ -16,7 +16,11 @@ type TabListenerProps = {
 type TabRoute = {
   name: string;
   params?: { screen?: unknown };
-  state?: Readonly<{ index?: number; key?: string }>;
+  state?: Readonly<{
+    index?: number;
+    key?: string;
+    routes?: readonly Readonly<{ name: string }>[];
+  }>;
 };
 
 function tabPressListeners({ navigation, route }: TabListenerProps, root: string | undefined) {
@@ -41,7 +45,18 @@ function tabPressListeners({ navigation, route }: TabListenerProps, root: string
         );
         return;
       }
-      if (stack.key === undefined || (stack.index ?? 0) === 0) return;
+      if (stack.key === undefined) return;
+      // The same stack, once she moved on inside it: its bottom screen is
+      // still the notification's, so popping stops there.
+      const bottom = stack.routes?.[0]?.name;
+      if (root !== undefined && bottom !== undefined && bottom !== root) {
+        navigation.dispatch({
+          ...CommonActions.reset({ index: 0, routes: [{ name: root }] }),
+          target: stack.key,
+        });
+        return;
+      }
+      if ((stack.index ?? 0) === 0) return;
       navigation.dispatch({ ...StackActions.popToTop(), target: stack.key });
     },
   };
