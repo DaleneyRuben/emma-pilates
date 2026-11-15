@@ -10,6 +10,7 @@ import {
   openApp,
   openAvailability,
   page,
+  pickTime,
   profile,
   routes,
   today,
@@ -185,9 +186,9 @@ describe("Nutritionist agenda and availability", () => {
     expect(screen.getByRole("button", { name: "Guardar" })).toBeDisabled();
     await fireEvent.press(screen.getByRole("button", { name: "Martes" }));
     await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: Elegir" }));
-    await fireEvent.press(screen.getByRole("button", { name: "10:00" }));
+    await pickTime(screen, "10:00");
     await fireEvent.press(screen.getByRole("button", { name: "Hora de fin: Elegir" }));
-    await fireEvent.press(screen.getByRole("button", { name: "12:15" }));
+    await pickTime(screen, "12:15");
     expect(screen.getByText("3 turnos de 45 min")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Guardar" }));
 
@@ -226,9 +227,9 @@ describe("Nutritionist agenda and availability", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: "Lunes" }));
     await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: Elegir" }));
-    await fireEvent.press(screen.getByRole("button", { name: "10:00" }));
+    await pickTime(screen, "10:00");
     await fireEvent.press(screen.getByRole("button", { name: "Hora de fin: Elegir" }));
-    await fireEvent.press(screen.getByRole("button", { name: "11:00" }));
+    await pickTime(screen, "11:00");
     expect(screen.getByRole("button", { name: "Guardar" })).toBeDisabled();
     await fireEvent.press(screen.getByRole("button", { name: "Sucursal Urubó" }));
     await fireEvent.press(screen.getByRole("button", { name: "Guardar" }));
@@ -275,7 +276,7 @@ describe("Nutritionist agenda and availability", () => {
     });
     expect(screen.getByText("5 turnos de 45 min · 2 ya reservados")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Hora de fin: 13:00" }));
-    await fireEvent.press(screen.getByRole("button", { name: "12:00" }));
+    await pickTime(screen, "12:00");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar" }));
 
     const sheet = within(screen.getByTestId("block-change-sheet"));
