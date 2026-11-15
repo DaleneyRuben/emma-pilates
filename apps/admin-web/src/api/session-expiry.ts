@@ -22,6 +22,9 @@ export function createSessionExpiry(
   options: { isSignedIn?: () => Promise<boolean> } = {},
 ): SessionExpiry {
   let reported = false;
+  // reset() and silence() start a new generation: a probe sent before them
+  // answers for a session that no longer matters, so its answer is dropped.
+  let generation = 0;
 
   return {
     report(error, meta) {
@@ -38,20 +41,24 @@ export function createSessionExpiry(
         onExpired();
         return;
       }
+      const asked = generation;
       void options.isSignedIn().then(
         (signedIn) => {
+          if (asked !== generation) return;
           if (signedIn) reported = false;
           else onExpired();
         },
         () => {
-          reported = false;
+          if (asked === generation) reported = false;
         },
       );
     },
     reset() {
+      generation += 1;
       reported = false;
     },
     silence() {
+      generation += 1;
       reported = true;
     },
   };
