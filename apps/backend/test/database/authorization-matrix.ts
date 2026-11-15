@@ -1,3 +1,4 @@
+import { bookingOnBehalfAuthorizationRows } from './booking-on-behalf-authorization';
 import { campaignAuthorizationRows } from './campaign-authorization';
 import { catalogAuthorizationRows } from './catalog-authorization';
 import { evaluationAuthorizationRows } from './evaluation-authorization';
@@ -204,26 +205,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/trainer/sessions': both('deny'),
   'GET /api/v1/trainer/sessions/{sessionId}/roster': both('deny'),
 
-  // Bookings on a Client's behalf: the Coordinator like the Assistant, and
-  // the Administrator from Horario, both at every Branch (ADR-0108).
-  'GET /api/v1/sessions': both('allow'),
-  'GET /api/v1/sessions/{sessionId}': both('allow'),
-  'POST /api/v1/sessions/{sessionId}/bookings': both('allow', {
-    realIds: true,
-    body: (ids) => ({ clientId: ids.clientId }),
-  }),
-  'POST /api/v1/sessions/{sessionId}/waitlist-entries': both('allow', {
-    realIds: true,
-    body: (ids) => ({ clientId: ids.clientId }),
-  }),
-  'DELETE /api/v1/bookings/{bookingId}': both('allow', { realIds: true }),
-  'POST /api/v1/bookings/{bookingId}/reschedule': both('allow', {
-    realIds: { bookingId: 'rescheduleBookingId' },
-    body: (ids) => ({ targetSessionId: ids.otherSessionId }),
-  }),
-  'DELETE /api/v1/waitlist-entries/{waitlistEntryId}': both('allow', {
-    realIds: true,
-  }),
+  ...bookingOnBehalfAuthorizationRows(),
   'GET /api/v1/assistant/clients': both('allow', { query: '?q=lu' }),
   'GET /api/v1/assistant/clients/{clientId}': both('allow'),
   'GET /api/v1/assistant/clients/{clientId}/bookings': both('allow'),
