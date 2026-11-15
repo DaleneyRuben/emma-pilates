@@ -14,7 +14,12 @@ import {
 import { Fragment } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { clockTime, evaluationBadge, evaluationDayAndTime } from "./evaluation-format";
+import {
+  clockTime,
+  evaluationBadge,
+  evaluationDayAndTime,
+  paidEvaluationLabel,
+} from "./evaluation-format";
 
 function DateTile({ instant }: { instant: string }) {
   const badge = evaluationBadge(instant);
@@ -49,7 +54,9 @@ export function UpcomingEvaluationCard({
   const open = new Date(evaluation.cancellableUntil).getTime() > shownAt;
   const cancellable = evaluation.cancellable && open;
   const reschedulable = evaluation.reschedulable === true && open;
-  const lead = evaluation.included ? `${evaluation.durationMinutes} min` : "Pagada";
+  const lead = evaluation.included
+    ? `${evaluation.durationMinutes} min`
+    : paidEvaluationLabel(evaluation.paymentState);
   const limit = reschedulable
     ? "reprograma hasta 3 h antes"
     : cancellable
