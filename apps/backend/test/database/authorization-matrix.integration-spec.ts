@@ -83,9 +83,10 @@ describe('authorization matrix: Administrator and Coordinator', () => {
       row?.realIds === true ? {} : row?.realIds,
     )}${row?.query ?? sample.query}`;
     const browser =
-      !row?.bearer &&
-      (path.startsWith('/api/v1/administrator/') ||
-        path.startsWith('/api/v1/admin-web/'));
+      row?.cookie === true ||
+      (!row?.bearer &&
+        (path.startsWith('/api/v1/administrator/') ||
+          path.startsWith('/api/v1/admin-web/')));
     const credential = await credentialFor(
       role,
       browser ? 'ADMIN_WEB' : 'MOBILE',

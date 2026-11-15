@@ -1,6 +1,7 @@
 import type { RouterHistory } from "@tanstack/react-router";
 import { createAdminQueryClient } from "../api/query-client";
 import { createSessionExpiry } from "../api/session-expiry";
+import { isSignedIn } from "../session/session-queries";
 import { createAdminRouter, type AdminRouter } from "./router";
 
 /**
@@ -10,18 +11,21 @@ import { createAdminRouter, type AdminRouter } from "./router";
  */
 export function createAdminApp(options: { history?: RouterHistory } = {}) {
   const routerRef: { current?: AdminRouter } = {};
-  const sessionExpiry = createSessionExpiry(() => {
-    const router = routerRef.current;
-    queryClient.clear();
-    if (router === undefined) return;
-    void router.navigate({
-      to: "/iniciar-sesion",
-      search: {
-        redirect: router.state.location.href,
-        notice: "session-ended",
-      },
-    });
-  });
+  const sessionExpiry = createSessionExpiry(
+    () => {
+      const router = routerRef.current;
+      queryClient.clear();
+      if (router === undefined) return;
+      void router.navigate({
+        to: "/iniciar-sesion",
+        search: {
+          redirect: router.state.location.href,
+          notice: "session-ended",
+        },
+      });
+    },
+    { isSignedIn },
+  );
   const queryClient = createAdminQueryClient({ sessionExpiry });
   const router = createAdminRouter({
     history: options.history,
