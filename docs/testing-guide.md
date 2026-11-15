@@ -3537,7 +3537,7 @@ take about a minute:
 `session.spec.ts` is the three parts of item 1. `authorization.spec.ts` is
 the two parts of item 5. `laptop.spec.ts` is the two widths of item 15.
 `date-fields.spec.ts` runs item 16 at both widths, and `simulator.spec.ts`
-runs item 20 at both widths; `book-client.spec.ts` is item 21. With the
+runs item 20 at both widths; `horario-booking.spec.ts` is item 21. With the
 files the items above do not name, twenty-two files make twenty-nine
 journeys.
 

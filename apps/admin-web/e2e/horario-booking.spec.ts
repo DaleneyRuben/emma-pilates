@@ -3,8 +3,10 @@ import { createEmptySessionTomorrow } from "./support/api";
 import { boliviaDateTime, weekStartOf } from "./support/bolivia";
 import { signIn } from "./support/session";
 
-// Valeria: `promotion-contacts.spec.ts` closes her Account, and Playwright
-// runs the files in name order, so this journey books her first.
+// Playwright runs the files in name order, and this one's name keeps it
+// between two that need Valeria as the fixtures left her:
+// `coordinator.spec.ts` counts her among the Clients to contact (no Booking
+// yet), and `promotion-contacts.spec.ts` closes her Account afterwards.
 // FIX-058 (walkthrough finding 77): Horario › a class › «Reservar a una
 // clienta» books her through the admin web's cookie, and the class says so.
 test("books a Client into a class from Horario", async ({ page }) => {
