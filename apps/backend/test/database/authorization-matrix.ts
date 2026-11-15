@@ -52,6 +52,8 @@ export type MatrixRow = {
    * an assistant path never becomes a session.
    */
   bearer?: true;
+  /** The admin web calls this outside `/administrator/` with its cookie. */
+  cookie?: true;
   /**
    * A 403 with this problem code is a data rule after the Role passed
    * (a receipt the caller does not own), so the probe counts it as allow.
