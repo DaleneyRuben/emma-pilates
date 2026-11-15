@@ -957,9 +957,13 @@ En la app de Lucía:
    en efectivo de la consulta. Con el trimestral ya confirmado, la primera
    consulta del trimestre es gratis. La segunda, en el mismo trimestre, se
    paga.
-3. Reserva un turno. **Mis evaluaciones** lo muestra, con **Reprogramar** y
-   **Cancelar evaluación**. Cancelarlo abre la hoja de confirmación. Si faltan menos de 3 horas, cancelar o no asistir consume
-   la consulta igual.
+3. Reserva un turno. **Mis evaluaciones** lo muestra. Una consulta gratis
+   tiene **Cancelar evaluación**. Una pagada dice «Pago en revisión»
+   mientras Ana no confirma la transferencia, y tiene **Reprogramar** y
+   **Cancelar evaluación**. Ya confirmada dice «Pagada» y solo tiene
+   **Reprogramar**: el pago se mantiene. Cancelar abre la hoja de
+   confirmación. Desde 3 horas antes ya no se puede cancelar ni
+   reprogramar, y no asistir consume la consulta igual.
 4. Gabriela ve la reserva en su **Agenda**, con el nombre de Lucía.
    **Cancelar evaluación** abre «¿Cancelar esta evaluación?», con «Le
    avisamos y el horario queda libre», y al confirmar aparece «Evaluación
