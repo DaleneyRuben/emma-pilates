@@ -13,9 +13,14 @@ export type SessionExpiry = {
  * Many requests can discover a revoked or idle-expired session at once;
  * only the first `authentication_required` sends the Administrator back to
  * Login. The startup probe owns its own redirect, and a rejected Login
- * (`authentication_failed`) is an answer, not an expiry.
+ * (`authentication_failed`) is an answer, not an expiry. With `isSignedIn`,
+ * the backend confirms first (FIX-058): a 401 from one endpoint while the
+ * session lives is that request's failure, shown where it happened.
  */
-export function createSessionExpiry(onExpired: () => void): SessionExpiry {
+export function createSessionExpiry(
+  onExpired: () => void,
+  options: { isSignedIn?: () => Promise<boolean> } = {},
+): SessionExpiry {
   let reported = false;
 
   return {
@@ -29,7 +34,19 @@ export function createSessionExpiry(onExpired: () => void): SessionExpiry {
         return;
       }
       reported = true;
-      onExpired();
+      if (options.isSignedIn === undefined) {
+        onExpired();
+        return;
+      }
+      void options.isSignedIn().then(
+        (signedIn) => {
+          if (signedIn) reported = false;
+          else onExpired();
+        },
+        () => {
+          reported = false;
+        },
+      );
     },
     reset() {
       reported = false;
