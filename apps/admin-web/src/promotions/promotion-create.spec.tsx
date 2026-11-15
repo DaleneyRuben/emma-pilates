@@ -105,7 +105,7 @@ describe("AW18 Nueva promoción (follow-up 39)", () => {
     ).toBeEnabled();
   });
 
-  it("marks every empty field and an end date before the start", async () => {
+  it("marks the empty copy, leaves the dates optional on a draft, and refuses an end date before the start", async () => {
     const { panel, user } = await openCreate();
 
     await user.click(
@@ -120,11 +120,13 @@ describe("AW18 Nueva promoción (follow-up 39)", () => {
     ).toHaveAccessibleDescription("Escribe la descripción.");
     expect(
       within(panel).getByLabelText("Fecha de inicio"),
-    ).toHaveAccessibleDescription("Elige la fecha de inicio.");
+    ).not.toHaveAccessibleDescription(
+      expect.stringContaining("Elige la fecha"),
+    );
     expect(
       within(panel).getByLabelText("Fecha de fin"),
-    ).toHaveAccessibleDescription(
-      expect.stringContaining("Elige la fecha de fin."),
+    ).not.toHaveAccessibleDescription(
+      expect.stringContaining("Elige la fecha"),
     );
 
     await fillCopy(user, panel);
