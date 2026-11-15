@@ -58,6 +58,7 @@ export function EvaluationReceiptSheet({
                   onAttach={onAttach}
                   onRemove={() => undefined}
                   receipt={null}
+                  testID="evaluation-receipt-sheet-row"
                   uploading={uploading}
                 />
               </View>
