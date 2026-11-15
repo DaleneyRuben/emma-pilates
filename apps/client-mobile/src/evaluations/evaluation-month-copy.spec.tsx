@@ -68,7 +68,7 @@ describe("Evaluation month copy (13, 14, 15)", () => {
 
     expect(
       await screen.findByText(
-        `Ya usaste tu evaluación de este mes. Puedes reservar la de ${spanishMonth(monthOfToday(1))}, también gratuita.`,
+        `Ya usaste tu evaluación de este mes. Puedes reservar la de ${spanishMonth(monthOfToday(1))}.`,
       ),
     ).toBeOnTheScreen();
   });

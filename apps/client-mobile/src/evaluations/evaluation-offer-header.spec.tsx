@@ -65,4 +65,12 @@ describe("The Evaluación nutricional header", () => {
       await screen.findByText("Ya usaste la gratis de este trimestre · Bs 70."),
     ).toBeOnTheScreen();
   });
+
+  it("gives the same line on an empty Mis evaluaciones", async () => {
+    const screen = await openProfileRow(offered("none"), "Mis evaluaciones");
+
+    expect(await screen.findByText("No tienes evaluaciones próximas")).toBeOnTheScreen();
+    expect(await screen.findByText("Cuesta Bs 70 con tu plan.")).toBeOnTheScreen();
+    expect(screen.queryByText(/gratis/)).toBeNull();
+  });
 });
