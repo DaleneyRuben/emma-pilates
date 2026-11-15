@@ -14,9 +14,21 @@ export const statePills: Record<
   ended: { tone: "error", label: "Finalizada" },
 };
 
-/** "Del 01/10/2026 al 31/10/2026": the inclusive display window (AW17). */
-export const formatDisplayWindow = (startsOn: string, endsOn: string) =>
-  `Del ${formatCivilDate(startsOn)} al ${formatCivilDate(endsOn)}`;
+/**
+ * "Del 01/10/2026 al 31/10/2026": the inclusive display window (AW17). A
+ * draft may still lack either date (finding 82).
+ */
+export const formatDisplayWindow = (
+  startsOn: string | null,
+  endsOn: string | null,
+): string => {
+  if (startsOn !== null && endsOn !== null) {
+    return `Del ${formatCivilDate(startsOn)} al ${formatCivilDate(endsOn)}`;
+  }
+  if (startsOn !== null) return `Desde el ${formatCivilDate(startsOn)}`;
+  if (endsOn !== null) return `Hasta el ${formatCivilDate(endsOn)}`;
+  return "Sin fechas todavía";
+};
 
 export const carouselSubtitle = (count: number): string =>
   count === 0
