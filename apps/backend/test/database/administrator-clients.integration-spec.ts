@@ -163,6 +163,8 @@ describe('Administrator Client directory (PostgreSQL)', () => {
           subscriptionStatus: 'none',
           remainingClassAllowance: null,
           originalClassAllowance: null,
+          extraClasses: null,
+          planStartsOn: null,
           planEndsOn: null,
           founderNumber: null,
           // Registered before the acquisition question: the Referral names her.
@@ -179,6 +181,8 @@ describe('Administrator Client directory (PostgreSQL)', () => {
           subscriptionStatus: 'active',
           remainingClassAllowance: 5,
           originalClassAllowance: 8,
+          extraClasses: 0,
+          planStartsOn: null,
           planEndsOn: new Date('2026-09-30T00:00:00.000Z'),
           founderNumber: null,
           invitedByName: null,

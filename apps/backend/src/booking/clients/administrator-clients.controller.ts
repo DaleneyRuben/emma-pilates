@@ -68,6 +68,7 @@ const toPageDto = (page: AdministratorClientPage): AdminClientPageDto => ({
   items: page.items.map((item) => ({
     ...item,
     planEndsOn: item.planEndsOn === null ? null : civil(item.planEndsOn),
+    planStartsOn: item.planStartsOn === null ? null : civil(item.planStartsOn),
   })),
 });
 

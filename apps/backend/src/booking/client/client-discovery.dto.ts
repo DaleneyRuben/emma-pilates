@@ -119,6 +119,13 @@ export class ClientSubscriptionSummaryDto {
   classesLeftThisWeek?: number | null;
 
   @ApiPropertyOptional({
+    minimum: 0,
+    description:
+      'Live extra classes (gifts, invitations, courtesies) on top of remainingClassAllowance (walkthrough finding 61).',
+  })
+  extraClasses?: number;
+
+  @ApiPropertyOptional({
     type: ClientGuestPassDto,
     description:
       'Set when this is a Guest Pass (one free class for an invited friend), not a Plan. Absent on a Plan (walkthrough finding 56).',

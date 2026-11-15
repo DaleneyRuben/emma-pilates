@@ -33,6 +33,13 @@ export type AdministratorClientRow = {
   /** «Le quedan»: the active Subscription's classes, null without one. */
   remainingClassAllowance: number | null;
   originalClassAllowance: number | null;
+  /** Live extra classes on top of «Le quedan» (walkthrough n.º 61). */
+  extraClasses: number | null;
+  /**
+   * Set when the row describes the Plan bought after a spent Guest Pass,
+   * which starts later (walkthrough n.º 60).
+   */
+  planStartsOn: Date | null;
   /** «Vence»: the active Plan's last day, or when the last one ended. */
   planEndsOn: Date | null;
   /** The live Fundadora place's number (WEB-040). */

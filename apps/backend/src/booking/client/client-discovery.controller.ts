@@ -209,6 +209,9 @@ export class ClientProfileController {
               endsOn: civilDate(view.subscription.endsOn),
               extraClassesLine: view.subscription.extraClassesLine,
               classesLeftThisWeek: view.subscription.classesLeftThisWeek,
+              ...(view.subscription.extraClasses === undefined
+                ? {}
+                : { extraClasses: view.subscription.extraClasses }),
               ...guestPassField(view.subscription.guestPass),
             },
     };

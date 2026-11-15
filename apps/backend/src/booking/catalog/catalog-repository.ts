@@ -54,6 +54,8 @@ export type SubscriptionSummary = {
   startsOn: Date;
   endsOn: Date;
   extraClassesLine: string | null;
+  /** Live extra classes on top of the allowance (walkthrough n.º 61). */
+  extraClasses: number;
   /**
    * Set on a Guest Pass's hidden Subscription (walkthrough n.º 56): the start
    * of the class it was used for, or null while it is unused.

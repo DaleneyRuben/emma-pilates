@@ -6,6 +6,7 @@ import {
   type GuestPassRow,
   toGuestPass,
 } from './subscription-guest-pass';
+import { liveExtraClasses } from '../clients/directory-plan';
 import { findStaffProfile } from '../staff/prisma-staff-profile';
 import type { CatalogRepository } from './catalog-repository';
 
@@ -83,6 +84,7 @@ const toSubscription = <
         reason: reasonLabels[adjustment.reason],
       })),
     ),
+    extraClasses: liveExtraClasses(row.allowanceAdjustments),
     guestPass: toGuestPass(guestPasses),
   };
 };

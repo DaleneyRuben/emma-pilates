@@ -13,6 +13,8 @@ export type ClientSubscriptionSummary = {
   extraClassesLine: string | null;
   /** Classes left this week. Null when the Plan has no cap. */
   classesLeftThisWeek?: number | null;
+  /** Live extra classes on top of the allowance (walkthrough n.º 61). */
+  extraClasses?: number;
   /** Set on a Guest Pass (walkthrough n.º 56); its class, once used. */
   guestPass?: { usedClassStartsAt: Date | null } | null;
 };
@@ -56,6 +58,7 @@ export const toSubscriptionSummary = (
         startsOn: subscription.startsOn,
         endsOn: subscription.endsOn,
         extraClassesLine: subscription.extraClassesLine,
+        extraClasses: subscription.extraClasses,
       };
 
 export type ClientSubscriptionStatus =
