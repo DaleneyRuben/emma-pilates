@@ -6,7 +6,7 @@ import { openProfile, readRoutes } from "./profile-test-support";
 
 jest.setTimeout(20_000);
 
-const label = "Recibir promociones de Emma Pilates";
+const label = "Recibir promociones de Emma Pilates Studio";
 const consentPath = "/api/v1/clients/current/promotions-consent";
 
 const consent = (consented: boolean) => ({
