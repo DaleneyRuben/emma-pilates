@@ -8259,9 +8259,12 @@ B. **A late confirmation over the cap (FIX-013).** Paola confirms that
    `founder-place-release.integration-spec.ts`,
    `founder-unreviewed-transfer.integration-spec.ts`.
 C. **A booked guest class comes first (FIX-019).** A friend whose Guest Pass
-   class is booked for today buys a Plan with «Hoy»: the app shows «Tienes
-   una clase reservada con tu acceso actual. Elige un inicio después de esa
-   clase.» (Client 09) and Staff S10 shows «La clienta tiene una clase
+   class is booked opens **Elige tu plan**: since FIX-054 the start strip
+   preselects the day after the class and shows «Tienes una clase reservada
+   con tu acceso actual. Elige un inicio después de esa clase.» as grey help
+   text; picking the class day or earlier turns it into the red error, and
+   so does the API answer if she pays anyway (Client 09, Test 147 D). Staff
+   S10 shows «La clienta tiene una clase
    reservada con su acceso actual. Elige un inicio después de esa clase.»
    (`409` `start_date_before_booked_class`). The same applies to Courtesy
    Access. Starting the day after the class works: the pass ends on the
@@ -8954,7 +8957,9 @@ H. **Tabs reopen on their root (walkthrough n.º 28).** As Lucía, book a
    (`popTabToRootOnPress`): in the Staff app, open a Client's file under
    **Clientes**, tap **Horario**, then **Clientes**, and the search shows. Only
    the tap does it: a notification that opens another tab still comes back
-   to Notificaciones with **Volver**.
+   to Notificaciones with **Volver**. A notification that opened a tab not
+   yet visited (Mi plan in Perfil) also returns to the root on tap (Test 147
+   A).
 I. **A cancellation is confirmed (walkthrough n.º 29).** As Lucía, cancel a
    booking outside the window: the row goes and the toast reads «Reserva
    cancelada · La clase volvió a tu plan · Te quedan N clases». As Camila,
@@ -9490,3 +9495,37 @@ J. **No booking on a frozen day (n.º 53c).** Open a class inside the
    **Reservar** off and no «Se descuenta 1 clase de tu plan»; a full class
    on that day offers no waitlist. A class outside the freeze books as
    usual.
+
+## Test 147: walkthrough findings 55–58 — Perfil after a notification's Mi plan, the Guest Pass copy, the plan start after a guest class (FIX-054)
+
+Run the API and the worker on a copy of the walkthrough database, the client
+app on the iPhone 16 Pro, the iPad and Android. For the Guest Pass, register
+a new Client with a host's referral code (one invitation per host a month)
+and confirm the email from `apps/backend/.data/email-capture/` (Test 34).
+
+A. **Perfil after a notification (n.º 55).** As Carla, without opening
+   Perfil first, tap the Inicio bell and a «Tu pago fue confirmado» notice:
+   **Mi plan** opens. Tap **Perfil**: Perfil shows, with **Cerrar sesión**.
+   Back on Inicio, open another Mi plan notice, tap **Inicio** and then
+   **Perfil**: Perfil again. **Volver** from a notice's screen still returns
+   to Notificaciones. A push notification behaves the same.
+B. **The unused Guest Pass (n.º 56).** As the new friend, Inicio's card
+   reads «Tu clase gratis de invitada» and «Úsala antes del …» with
+   **Mi plan**; no «0 clases restantes» and no bar. **Mi plan** shows the
+   same card, **Detalles** (Empezó, Vence), no «Clases extra», no **Renovar
+   mi plan**, and «Elige tu próximo plan» with **Comprar un plan**.
+C. **The guest class (n.º 57).** Open a class: the footer reads «Es tu clase
+   gratis de invitada» over **Reservar** (not «Se descuenta 1 clase de tu
+   plan»). Book it: Inicio's card reads «Clase de invitada usada» with the
+   class's day and time («Lun 16, 16:00») and **Comprar un plan**; Mi plan
+   says the same. Another class now shows «No te quedan clases en tu plan.»,
+   **Reservar** off and **Comprar un plan**. Cancel the guest class: the
+   pass is free again and the cards go back to B. By API,
+   `GET /api/v1/clients/current/subscription` carries
+   `subscription.guestPass.usedClassStartsAt` (null while unused); a Plan
+   has no `guestPass`.
+D. **The plan start after the guest class (n.º 58).** With the guest class
+   booked, **Comprar un plan › 12 clases**: «Fecha de inicio» has the day
+   after the class selected and the rule in grey under the strip. Tap the
+   class day: the same sentence turns red. Pay with the preselected day:
+   the transfer screen opens.
