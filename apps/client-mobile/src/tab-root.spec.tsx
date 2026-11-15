@@ -124,4 +124,18 @@ describe("tapping a Client tab after Mi plan", () => {
 
     await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
   });
+
+  it("opens Perfil after moving on from a notification's Mi plan and back", async () => {
+    const { device, screen } = await renderSignedIn();
+
+    await act(async () => device.tap(subscriptionPush));
+    await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
+    await fireEvent.press(await screen.findByRole("button", { name: /^Renovar mi plan/ }));
+    await waitFor(() => expect(screen.queryByRole("header", { name: "Mi plan" })).toBeNull());
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
+    await tab(screen, "Perfil");
+
+    await expectProfileRoot(screen);
+  });
 });

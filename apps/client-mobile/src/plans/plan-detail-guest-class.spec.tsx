@@ -71,4 +71,24 @@ describe("Elige tu plan with a booked guest class", () => {
 
     expect(screen.getByRole("alert")).toHaveTextContent(rule);
   });
+
+  // The rule counts only a class still ahead (prisma-start-date-allocation).
+  it("lets a plan start today once the guest class is over", async () => {
+    const over = {
+      ...guestPassWithClass,
+      subscription: {
+        ...guestPassWithClass.subscription,
+        guestPass: { usedClassStartsAt: new Date(Date.now() - 60 * 60 * 1_000).toISOString() },
+      },
+    };
+    const screen = await openPlanDetail(
+      routeFetcher({
+        ...baseRoutes(0),
+        "/api/v1/clients/current/subscription": () => jsonResponse(over),
+      }),
+    );
+
+    await waitFor(() => expect(screen.getByTestId(`start-date-${today}`)).toBeSelected());
+    expect(screen.queryByText(rule)).toBeNull();
+  });
 });
