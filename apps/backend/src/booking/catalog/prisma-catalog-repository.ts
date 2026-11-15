@@ -1,6 +1,11 @@
 import { staffPhotoOf } from '../staff/photo/staff-photo-of';
 import type { Prisma } from '../../generated/prisma/client';
 import { extraClassesLine } from '../payments/allowance-adjustment-copy';
+import {
+  guestPassSelect,
+  type GuestPassRow,
+  toGuestPass,
+} from './subscription-guest-pass';
 import { findStaffProfile } from '../staff/prisma-staff-profile';
 import type { CatalogRepository } from './catalog-repository';
 
@@ -36,6 +41,7 @@ const subscriptionSelect = {
     orderBy: { createdAt: 'asc' as const },
     select: { classes: true, reason: true },
   },
+  guestPasses: guestPassSelect,
 } as const;
 
 const clientProfileSelect = {
@@ -62,21 +68,24 @@ const toSubscription = <
       classes: number;
       reason: keyof typeof reasonLabels;
     }[];
+    guestPasses: GuestPassRow[];
   },
 >(
   row: Row | null,
-) =>
-  row === null
-    ? null
-    : {
-        ...row,
-        extraClassesLine: extraClassesLine(
-          row.allowanceAdjustments.map((adjustment) => ({
-            classes: adjustment.classes,
-            reason: reasonLabels[adjustment.reason],
-          })),
-        ),
-      };
+) => {
+  if (row === null) return null;
+  const { guestPasses, ...subscription } = row;
+  return {
+    ...subscription,
+    extraClassesLine: extraClassesLine(
+      row.allowanceAdjustments.map((adjustment) => ({
+        classes: adjustment.classes,
+        reason: reasonLabels[adjustment.reason],
+      })),
+    ),
+    guestPass: toGuestPass(guestPasses),
+  };
+};
 
 const toClientProfile = (
   client: {

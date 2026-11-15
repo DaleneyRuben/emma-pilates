@@ -222,6 +222,7 @@ describe('Booking catalog repository', () => {
         ...data,
         allowanceAdjustments: [],
         extraClassesLine: null,
+        guestPass: null,
       };
       expect(
         await repository.findActiveSubscription(client.id, data.startsOn),
