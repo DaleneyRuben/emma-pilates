@@ -30,12 +30,16 @@ const kindLabels = {
   follow_up: "Seguimiento",
 } as const;
 
+// `next` is undefined when the read of the next one failed: then only the
+// week is known to be empty.
 const booked = (count: number, next: string | null | undefined) =>
   count > 0
     ? `${countFormat.format(count)} ${count === 1 ? "evaluación agendada" : "evaluaciones agendadas"}`
-    : next == null
-      ? "ninguna evaluación agendada"
-      : `ninguna en la semana · próxima: ${formatWeekdayMoment(next)}`;
+    : next === undefined
+      ? "ninguna en la semana"
+      : next === null
+        ? "ninguna evaluación agendada"
+        : `ninguna en la semana · próxima: ${formatWeekdayMoment(next)}`;
 
 const columns = createColumnHelper<EvaluationRow>();
 
@@ -127,7 +131,7 @@ function BranchEvaluations({
       subtitle={
         query.data === undefined || (weekEmpty && next.isPending)
           ? `Sucursal ${branch.name}`
-          : `Sucursal ${branch.name} · ${booked(query.data.totalItems, next.data?.startsAt)}`
+          : `Sucursal ${branch.name} · ${booked(query.data.totalItems, next.data === undefined ? undefined : (next.data?.startsAt ?? null))}`
       }
       loadingMessage="Cargando evaluaciones…"
       what="las evaluaciones"
