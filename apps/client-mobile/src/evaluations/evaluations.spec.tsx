@@ -45,7 +45,7 @@ describe("Client Evaluations", () => {
 
     await waitFor(() => {
       // C13: one line of copy, then the Nutritionist with the Branch.
-      expect(screen.getByText("Una evaluación gratis por mes con tu plan.")).toBeOnTheScreen();
+      expect(screen.getByText("Tu primera evaluación del trimestre es gratis.")).toBeOnTheScreen();
     });
     expect(screen.getByText("Gabriela Rojas")).toBeOnTheScreen();
     expect(screen.getByText("Nutricionista · 45 min · Centro")).toBeOnTheScreen();

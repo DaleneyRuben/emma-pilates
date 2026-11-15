@@ -79,6 +79,8 @@ export const availability = {
     },
   ],
   months: [{ month: `${firstDay.slice(0, 7)}-01`, status: "available", evaluation: null }],
+  includedEvaluation: "available",
+  priceCentavos: 7_000,
 };
 
 export const upcomingEvaluation = (
