@@ -52,6 +52,13 @@ export interface PaymentReviewDto {
   nextPlan?: boolean;
   /** FIX-052: what was sold; only a Plan names its start. Older builds ignore it. */
   kind?: PaymentReviewDtoKind;
+  /** Walkthrough n.º 65: when the paid Evaluation is; absent on a Plan sale. */
+  evaluationStartsAt?: string;
+  /**
+   * Walkthrough n.º 73: the discount taken off planPriceCentavos, in BOB centavos. Older builds ignore it.
+   * @minimum 0
+   */
+  discountCentavos?: number;
   /**
    * FIX-044: the NIT or CI and name she asked the invoice for; null is «Sin factura»
    * @nullable

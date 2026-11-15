@@ -14148,7 +14148,21 @@
             ]
           },
           "planName": {
-            "type": "string"
+            "type": "string",
+            "description": "What is sold: the Plan name, or «Evaluación nutricional»"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "plan",
+              "evaluation"
+            ],
+            "description": "Walkthrough n.º 65: a Plan sale or a paid Evaluation. Older builds ignore it."
+          },
+          "evaluationStartsAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Walkthrough n.º 65: when the paid Evaluation is; absent on a Plan sale."
           },
           "amountDueCentavos": {
             "type": "number",
@@ -14299,6 +14313,16 @@
               "evaluation"
             ],
             "description": "FIX-052: what was sold; only a Plan names its start. Older builds ignore it."
+          },
+          "evaluationStartsAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Walkthrough n.º 65: when the paid Evaluation is; absent on a Plan sale."
+          },
+          "discountCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Walkthrough n.º 73: the discount taken off planPriceCentavos, in BOB centavos. Older builds ignore it."
           },
           "invoiceData": {
             "nullable": true,
@@ -17097,6 +17121,17 @@
             "format": "uuid",
             "nullable": true
           },
+          "paymentState": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed",
+              "rejected",
+              "voided"
+            ],
+            "nullable": true,
+            "description": "The Paid Evaluation payment state; null when included. Older builds ignore it."
+          },
           "receiptAttached": {
             "type": "boolean",
             "description": "A paid Evaluation still needs its transfer receipt. Older builds ignore it."
@@ -17145,7 +17180,7 @@
           },
           "reschedulable": {
             "type": "boolean",
-            "description": "A confirmed Paid Evaluation can move to another slot until 3 hours before the original start"
+            "description": "A Paid Evaluation, confirmed or under review, can move to another slot until 3 hours before the original start"
           }
         },
         "required": [
@@ -17154,6 +17189,7 @@
           "included",
           "priceCentavos",
           "paymentId",
+          "paymentState",
           "receiptAttached",
           "receiptUploadable",
           "state",
