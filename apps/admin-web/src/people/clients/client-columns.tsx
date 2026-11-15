@@ -10,6 +10,14 @@ const columns = createColumnHelper<AdminClientDto>();
 
 const none = <span className="text-texto-muy-tenue">—</span>;
 
+// Walkthrough n.º 61: «5 de 8 + 1» when extra classes are live.
+export const classesLeft = (
+  remaining: number,
+  original: number | null | undefined,
+  extra: number | null | undefined,
+): string =>
+  `${remaining} de ${original ?? remaining}${extra ? ` + ${extra}` : ""}`;
+
 // P03's «Vence»: the active Plan's last day, or when the last one ended.
 const endsLabel = (client: AdminClientDto): string | null => {
   if (client.planEndsOn === null) return null;
@@ -56,8 +64,19 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
     header: "Plan",
     cell: ({ row }) => {
       const plan = row.original.planName;
+      const startsOn = row.original.planStartsOn;
       if (plan !== null) {
-        return <span className="text-texto-secundario">{plan}</span>;
+        return (
+          <span className="flex flex-col text-texto-secundario">
+            <span>{plan}</span>
+            {/* Walkthrough n.º 60: the Plan bought after a spent Guest Pass. */}
+            {startsOn == null ? null : (
+              <span className="text-ayuda text-texto-tenue tabular">
+                Empieza el {formatCivilDate(startsOn)}
+              </span>
+            )}
+          </span>
+        );
       }
       // expired had a Plan; none never bought one (AdminClientDto.subscriptionStatus).
       return (
@@ -76,8 +95,11 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
         none
       ) : (
         <span className="text-texto tabular">
-          {row.original.remainingClassAllowance} de{" "}
-          {row.original.originalClassAllowance}
+          {classesLeft(
+            row.original.remainingClassAllowance,
+            row.original.originalClassAllowance,
+            row.original.extraClasses,
+          )}
         </span>
       ),
   }),
