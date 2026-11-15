@@ -1,10 +1,18 @@
+import { formatCivilDate } from "../home/home-format";
+import { planClasses } from "../home/plan-classes";
+
 export type ClosureInputs = {
   bookings: { kind: "booking" | "waitlist" }[];
   evaluations: { state: "booked" | "cancelled" | "no_show" }[];
   latestPayment: { method: string; state: string } | null;
   subscription: {
     status: "active" | "expiring_soon" | "expired" | "none";
-    subscription?: { planName: string; remainingClassAllowance: number } | null;
+    subscription?: {
+      planName: string;
+      remainingClassAllowance: number;
+      extraClasses?: number;
+    } | null;
+    nextSubscription?: { planName: string; startsOn: string } | null;
   };
 };
 
@@ -39,14 +47,21 @@ const planLine = (subscription: ClosureInputs["subscription"]): string[] => {
   ) {
     return [];
   }
-  const left = current.remainingClassAllowance;
+  // Walkthrough n.º 61 and 78: her live extras are lost too, and so is a
+  // Plan already paid that has not started.
+  const { left } = planClasses(current);
+  const next = subscription.nextSubscription;
+  const queued =
+    next == null
+      ? ""
+      : `, y también tu ${next.planName}, que empezaba el ${formatCivilDate(next.startsOn)}`;
   const forfeited =
     left === 0
       ? ""
       : left === 1
         ? " y pierdes la clase que te queda"
         : ` y pierdes las ${left} clases que te quedan`;
-  return [`Tu plan ${current.planName} termina hoy. No se devuelve dinero${forfeited}.`];
+  return [`Tu plan ${current.planName} termina hoy${queued}. No se devuelve dinero${forfeited}.`];
 };
 
 // What BE-007 G3–G6 do to this Client, drawn from data the app already loads
