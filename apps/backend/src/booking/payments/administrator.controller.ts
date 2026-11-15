@@ -42,12 +42,11 @@ import type { AdministratorSessionQuery } from '../sessions/administrator-sessio
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import {
   PaymentDto,
-  PaymentReviewDto,
   parseRejectPayment,
-  PendingPaymentDto,
   RejectPaymentDto,
   SessionCancellationDto,
 } from './payments.dto';
+import { PaymentReviewDto, PendingPaymentDto } from './payment-review.dto';
 import { paymentCommands, runPaymentCommand } from './payments.controller';
 import type { PaymentCommands } from './prisma-payment-commands';
 

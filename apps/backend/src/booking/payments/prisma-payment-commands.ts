@@ -6,7 +6,6 @@ import {
   CreditLedgerActorKind,
   ImageAssetPurpose,
   ImageAssetState,
-  ImageMediaType,
   PaymentKind,
   PaymentMethod,
   PaymentState,
@@ -111,19 +110,15 @@ import {
 } from './grant-invite-reward';
 import { hasEarlierRealPayment } from './gift-class-history';
 import { isNextPlanPayment } from './next-plan-payment';
+import { listPendingTransfers } from './prisma-pending-payments';
+import { saleLabel } from './payment-label';
+import { evaluationSaleSelect, evaluationStartsAtOf } from './evaluation-sale';
 import {
   notifyPaymentSubmitted,
   paymentSubmittedKey,
 } from './payment-submitted-notice';
 
 type Transaction = Prisma.TransactionClient;
-
-const mediaTypes: Record<ImageMediaType, string> = {
-  [ImageMediaType.JPEG]: 'image/jpeg',
-  [ImageMediaType.PNG]: 'image/png',
-  [ImageMediaType.WEBP]: 'image/webp',
-  [ImageMediaType.PDF]: 'application/pdf',
-};
 
 const abbreviateName = (name: string): string => {
   const [first, ...rest] = name.trim().split(/\s+/);
@@ -1388,45 +1383,12 @@ export function createPrismaPaymentCommands(
     declaredMediaType: true,
     verifiedMediaType: true,
   } as const;
-  type ReceiptRow = Prisma.ImageAssetGetPayload<{
-    select: typeof receiptSelect;
-  }>;
-  const receiptOf = (asset: ReceiptRow | null | undefined) =>
-    asset && asset.deletedAt === null
-      ? {
-          imageAssetId: asset.id,
-          mediaType:
-            mediaTypes[asset.verifiedMediaType ?? asset.declaredMediaType],
-        }
-      : null;
 
   const listPendingPayments = async (
     principal: AuthenticatedPrincipal,
   ): Promise<PendingPaymentSummary[]> => {
     requireAdministrator(principal);
-    const rows = await prisma.payment.findMany({
-      where: { state: PaymentState.PENDING, method: PaymentMethod.TRANSFER },
-      orderBy: [{ submittedAt: 'asc' }, { id: 'asc' }],
-      select: {
-        id: true,
-        planNameSnapshot: true,
-        amountDueCentavos: true,
-        submittedAt: true,
-        client: clientNameSelect,
-        purchaseIntent: {
-          select: { receiptImageAsset: { select: receiptSelect } },
-        },
-      },
-    });
-    return rows.map((row) => ({
-      id: row.id,
-      ...clientNameAndPhoto(row.client),
-      planName: row.planNameSnapshot,
-      amountDueCentavos: row.amountDueCentavos,
-      submittedAt: row.submittedAt,
-      receiptAvailable:
-        receiptOf(row.purchaseIntent?.receiptImageAsset) !== null,
-    }));
+    return listPendingTransfers(prisma);
   };
 
   const loadReview = async (paymentId: string) => {
@@ -1441,6 +1403,7 @@ export function createPrismaPaymentCommands(
           select: { receiptImageAsset: { select: receiptSelect } },
         },
         receiptImageAsset: { select: receiptSelect },
+        ...evaluationSaleSelect,
       },
     });
     if (row === null) throw rule('payment_not_found', 'Payment not found');
@@ -1460,8 +1423,11 @@ export function createPrismaPaymentCommands(
     const kind = row.kind === 'EVALUATION' ? 'evaluation' : 'plan';
     return {
       ...view,
+      // Walkthrough n.º 65: staff read the sale, not the Plan she holds.
+      planName: saleLabel({ kind, planNameSnapshot: view.planName }),
       ...clientNameAndPhoto(row.client),
       kind,
+      ...evaluationStartsAtOf(row),
       nextPlan: await isNextPlanPayment(
         prisma,
         { ...view, clientId: row.clientId, startsOn: row.startsOn, kind },
