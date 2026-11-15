@@ -22088,7 +22088,7 @@ export const getWithdrawAdminPromotionContactUrl = (contactId: string) => {
 };
 
 /**
- * Records a «stop» request and erases the contact’s details
+ * Records a former Client’s «stop» request and erases her details; a live Client is not a withdrawable contact
  */
 export const withdrawAdminPromotionContact = async (
   contactId: string,

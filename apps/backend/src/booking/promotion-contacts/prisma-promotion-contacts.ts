@@ -26,22 +26,20 @@ const searchCondition = (query: string | undefined): Prisma.Sql => {
     OR phone ILIKE ${pattern})`;
 };
 
-// BE-023 (ADR-0098): former Clients' Promotion Contacts and live Clients'
-// open Promotions Consents, read with the Client's current name, email, and
-// phone, as one list.
+// FIX-060 (walkthrough finding 85): former Clients' Promotion Contacts and
+// every live Client of the directory, whatever her Promotions Consent says,
+// read with her current name, email, and phone, as one list.
 const contacts = Prisma.sql`(
-  SELECT id, 'former_client' AS kind, name, email, phone, consented_at
+  SELECT id, 'former_client' AS kind, name, email, phone, consented_at AS since
   FROM booking.promotion_contacts
   WHERE deleted_at IS NULL AND withdrawn_at IS NULL
   UNION ALL
-  SELECT consent.id, 'client', client.name, account.email, client.phone,
-    consent.consented_at
-  FROM booking.client_promotions_consents consent
-  JOIN booking.clients client
-    ON client.id = consent.client_id AND client.deleted_at IS NULL
+  SELECT client.id, 'client', client.name, account.email, client.phone,
+    client.created_at
+  FROM booking.clients client
   JOIN system.accounts account
     ON account.client_id = client.id AND account.deleted_at IS NULL
-  WHERE consent.withdrawn_at IS NULL AND consent.deleted_at IS NULL
+  WHERE client.deleted_at IS NULL
 ) AS contacts`;
 
 type ContactRecord = {
@@ -50,7 +48,7 @@ type ContactRecord = {
   name: string;
   email: string;
   phone: string | null;
-  consented_at: Date;
+  since: Date;
 };
 
 const toRow = (record: ContactRecord): PromotionContactRow => ({
@@ -59,17 +57,14 @@ const toRow = (record: ContactRecord): PromotionContactRow => ({
   name: record.name,
   email: record.email,
   phone: record.phone,
-  consentedAt: record.consented_at,
+  since: record.since,
 });
 
 const audit = (
   actor: AdministratorActor,
   input: {
-    actionCode:
-      | 'promotion_contact.exported'
-      | 'promotion_contact.withdrawn'
-      | 'promotions_consent.withdrawn';
-    targetType: 'promotion_contact' | 'client_promotions_consent';
+    actionCode: 'promotion_contact.exported' | 'promotion_contact.withdrawn';
+    targetType: 'promotion_contact';
     targetId: string | null;
     metadata: Prisma.InputJsonObject;
     occurredAt: Date;
@@ -88,7 +83,7 @@ const audit = (
   occurredAt: input.occurredAt,
 });
 
-// BE-022: the Promotion Contacts of ADR-0097, newest consent first.
+// BE-022: the Promotion Contacts of ADR-0097, newest first.
 export const createPrismaPromotionContacts = (
   prisma: PrismaClient,
 ): PromotionContactStore => ({
@@ -96,10 +91,10 @@ export const createPrismaPromotionContacts = (
     const search = searchCondition(query);
     const [records, [counted]] = await Promise.all([
       prisma.$queryRaw<ContactRecord[]>`
-        SELECT id, kind, name, email, phone, consented_at
+        SELECT id, kind, name, email, phone, since
         FROM ${contacts}
         WHERE TRUE ${search}
-        ORDER BY consented_at DESC, id
+        ORDER BY since DESC, id
         LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`,
       prisma.$queryRaw<{ total: bigint }[]>`
         SELECT count(*) AS total
@@ -116,9 +111,9 @@ export const createPrismaPromotionContacts = (
 
   listAll: async () => {
     const records = await prisma.$queryRaw<ContactRecord[]>`
-      SELECT id, kind, name, email, phone, consented_at
+      SELECT id, kind, name, email, phone, since
       FROM ${contacts}
-      ORDER BY consented_at DESC, id`;
+      ORDER BY since DESC, id`;
     return records.map(toRow);
   },
 
@@ -134,28 +129,10 @@ export const createPrismaPromotionContacts = (
     });
   },
 
-  // A Promotion Contact keeps its row but loses its personal data (ADR-0086);
-  // a live Client's consent only closes, and their Account stays as it is.
+  // A Promotion Contact keeps its row but loses its personal data (ADR-0086).
+  // A live Client is never withdrawn (FIX-060): her id finds nothing here.
   withdraw: ({ contactId, actor, occurredAt }) =>
     prisma.$transaction(async (transaction) => {
-      const [consent] = await transaction.$queryRaw<{ client_id: string }[]>`
-        UPDATE booking.client_promotions_consents
-        SET withdrawn_at = ${occurredAt}
-        WHERE id = ${contactId}::uuid
-          AND withdrawn_at IS NULL AND deleted_at IS NULL
-        RETURNING client_id`;
-      if (consent !== undefined) {
-        await transaction.auditRecord.create({
-          data: audit(actor, {
-            actionCode: 'promotions_consent.withdrawn',
-            targetType: 'client_promotions_consent',
-            targetId: contactId,
-            metadata: { clientId: consent.client_id },
-            occurredAt,
-          }),
-        });
-        return true;
-      }
       const { count } = await transaction.promotionContact.updateMany({
         where: { id: contactId, deletedAt: null, withdrawnAt: null },
         data: {
