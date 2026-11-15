@@ -172,6 +172,7 @@ export type NutritionistAgendaEntry = {
   branchId: string;
   branchName: string;
   kind: 'first' | 'follow_up';
+  paymentConfirmed: boolean;
 };
 
 export type Page<Item> = {
@@ -1733,6 +1734,7 @@ export const createPrismaEvaluationCommands = (
         clientId: true,
         client: clientNameSelect,
         slot: { select: slotSelect },
+        payment: { select: { state: true } },
       },
     });
 
@@ -1751,6 +1753,7 @@ export const createPrismaEvaluationCommands = (
         branchId: row.slot.branchId,
         branchName: row.slot.branch.name,
         kind: kindOf(row.clientId, row.slot.startsAt),
+        paymentConfirmed: isConfirmedPaidEvaluation(row),
       })),
       limit,
       (item) => ({ startsAt: item.startsAt, id: item.evaluationId }),
@@ -1786,6 +1789,7 @@ export const createPrismaEvaluationCommands = (
           select: {
             id: true,
             state: true,
+            slotReleasedAt: true,
             createdAt: true,
             dayReminderRecordedAt: true,
             hourReminderRecordedAt: true,
@@ -1793,7 +1797,13 @@ export const createPrismaEvaluationCommands = (
             slot: { select: { startsAt: true } },
           },
         });
-        if (evaluation.state !== EvaluationState.BOOKED) return 0;
+        // The slot may have been released after the candidate read.
+        if (
+          evaluation.state !== EvaluationState.BOOKED ||
+          evaluation.slotReleasedAt !== null
+        ) {
+          return 0;
+        }
         const [kind] = dueReminders(
           {
             createdAt: evaluation.createdAt,

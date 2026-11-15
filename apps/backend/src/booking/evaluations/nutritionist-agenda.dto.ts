@@ -36,6 +36,12 @@ export class NutritionistAgendaEntryDto {
     description: 'first unless the Client has an earlier booked Evaluation',
   })
   kind!: 'first' | 'follow_up';
+
+  @ApiProperty({
+    description:
+      'A paid Evaluation whose Payment is confirmed: cancelling it keeps the Payment and the Client picks another slot. Older builds ignore it.',
+  })
+  paymentConfirmed!: boolean;
 }
 
 export class NutritionistAgendaPageDto {
