@@ -35,7 +35,7 @@ numbered tests.
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
 | Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
-| Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
+| Promotions Consent           | Turn «Recibir promociones de Emma Pilates Studio» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, «Nuevo cliente» with the invitation card since FIX-040, Bookings, «Cancelar una clase», no sale); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
@@ -5479,7 +5479,7 @@ Clients («Cuenta cerrada»), and closing her Account ends the consent.
    --dev-client`), and the admin web (`ADMIN_API_PROXY_TARGET`; a dev server on
    another port needs that origin in `ADMIN_WEB_TRUSTED_ORIGINS`).
 2. Log in to the Client app as `lucia@example.com` and open Perfil. Expected:
-   a «Recibir promociones de Emma Pilates» card between the menu and «Cerrar
+   a «Recibir promociones de Emma Pilates Studio» card between the menu and «Cerrar
    sesión», with its helper and the switch off. The Maestro flow
    `.maestro/promotions-consent.yaml` turns it on and off again.
 3. Turn it on. Expected: the switch turns Palo de rosa, and `GET
@@ -5498,7 +5498,7 @@ Clients («Cuenta cerrada»), and closing her Account ends the consent.
    and a `promotions_consent.withdrawn` audit record carries her `clientId`. In
    the app her switch is off again.
 6. Turn the switch on for `sofia@example.com`, then close her Account from the
-   app with «Quiero seguir recibiendo promociones de Emma Pilates» ticked (Test
+   app with «Quiero seguir recibiendo promociones de Emma Pilates Studio» ticked (Test
    35). Expected: the new Promotion Contact keeps the time she turned the switch
    on, her consent row has `withdrawn_at` and `deleted_at` set to the closure
    time, and `account.closed` records `endedPromotionsConsent: true`. Without
@@ -9496,7 +9496,7 @@ J. **No booking on a frozen day (n.º 53c).** Open a class inside the
    on that day offers no waitlist. A class outside the freeze books as
    usual.
 
-## Test 147: walkthrough findings 55–58 — Perfil after a notification's Mi plan, the Guest Pass copy, the plan start after a guest class (FIX-054)
+## Test 147: walkthrough findings 55–79 — Perfil after a notification, the Guest Pass and extra classes, the offline banner, evaluations, staff payments, account screens (FIX-054)
 
 Run the API and the worker on a copy of the walkthrough database, the client
 app on the iPhone 16 Pro, the iPad and Android. For the Guest Pass, register
@@ -9529,3 +9529,32 @@ D. **The plan start after the guest class (n.º 58).** With the guest class
    after the class selected and the rule in grey under the strip. Tap the
    class day: the same sentence turns red. Pay with the preselected day:
    the transfer screen opens.
+E. **The Plan after a spent Guest Pass (n.º 60).** Once the friend's guest
+   class is booked and Ana confirms her first Plan (it starts the day after
+   the class), Inicio's card reads «Tu plan · 12 clases», «Empieza el 17 de
+   noviembre» with **Mi plan**; nothing offers **Comprar un plan**. Mi plan
+   shows «Tu plan siguiente empieza el 17 de noviembre.» and no ending
+   notice for the pass. In the admin web, **Clientas** lists her with
+   «12 clases», «Empieza el 17/11/2026» and «12 de 12»; her file shows
+   **Plan siguiente** «12 clases · empieza el 17/11/2026». By API, the
+   Clientas row carries `planStartsOn`.
+F. **Extra classes count (n.º 61).** As Lucía, after a friend she invited
+   pays her first Plan: Inicio reads «13 clases restantes» and «12 del plan
+   + 1 de regalo»; Mi plan the same. **Clientas** shows «12 de 12 + 1» under
+   **Le quedan**, and her file's **Clases disponibles** the same. By API,
+   the subscription summary and the Clientas row carry `extraClasses`.
+G. **One offline banner (n.º 71).** Turn the Mac's network off with the app
+   open: one ochre «Sin conexión. Mostrando la última información
+   guardada.» strip shows, below the clock and the island, never two. On
+   **Pago por transferencia** without network, the QR box reads «No
+   pudimos cargar el QR del estudio.» with **Reintentar**; turn the network
+   back on and tap it: the QR appears.
+H. **Cerrar mi cuenta (n.º 78, 79).** As Lucía with a renewal already paid,
+   **Perfil › Cerrar mi cuenta**: «Tu plan 12 clases termina hoy, y también
+   tu Trimestral 24 clases, que empezaba el 2 de diciembre. No se devuelve
+   dinero y pierdes las 12 clases que te quedan.» (11 + 1 extra). Closing
+   ends both Plans. The box reads «Quiero seguir recibiendo promociones de
+   Emma Pilates Studio» and Perfil's switch «Recibir promociones de Emma
+   Pilates Studio». Texts that name the installed app (the photo-library
+   hint, the link fallback page, a lock-screen push) keep «Emma Pilates»,
+   which is the app's name on the phone.
