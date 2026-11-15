@@ -8,7 +8,9 @@ import {
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { PaymentRuleError } from '../payments/payment-errors';
+import { notifyPaymentSubmitted } from '../payments/payment-submitted-notice';
 import { netAllowanceClasses } from '../commands/net-allowance';
 import { isSubscriptionEffective } from '../payments/purchase-eligibility';
 
@@ -25,6 +27,7 @@ const receiptSelect = {
 // Payment and uses the same image asset a Plan receipt uses (ADR-0011).
 export const attachEvaluationReceipt = async (
   transaction: Transaction,
+  recordNotification: NotificationRecorder,
   input: {
     paymentId?: string;
     evaluationId?: string;
@@ -109,6 +112,11 @@ export const attachEvaluationReceipt = async (
       attachedAt: input.now,
       deletionDueAt: null,
     },
+  });
+  // Walkthrough n.º 65: the same «Comprobante por revisar» a Plan raises.
+  await notifyPaymentSubmitted(transaction, recordNotification, {
+    paymentId: payment.id,
+    now: input.now,
   });
 };
 

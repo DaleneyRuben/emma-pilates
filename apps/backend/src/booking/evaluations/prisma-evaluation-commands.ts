@@ -1377,7 +1377,7 @@ export const createPrismaEvaluationCommands = (
     principal: AuthenticatedPrincipal,
   ): Promise<void> => {
     await transact((transaction) =>
-      attachPaidEvaluationReceipt(transaction, {
+      attachPaidEvaluationReceipt(transaction, recordNotification, {
         paymentId: command.paymentId,
         evaluationId: command.evaluationId,
         imageAssetId: command.imageAssetId,
