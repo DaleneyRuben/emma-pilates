@@ -36,12 +36,7 @@ import {
   saveFailureMessage,
   SectionLabel,
 } from "./availability-block-form-parts";
-import {
-  BlockChangeSheet,
-  TimePickerSheet,
-  type Confirmation,
-  type TimeField,
-} from "./availability-block-sheets";
+import { BlockChangeSheet, type Confirmation } from "./availability-block-sheets";
 import {
   addCivilDays,
   boliviaToday,
@@ -54,6 +49,8 @@ import {
   weekdayNames,
   weekdayTag,
 } from "./nutritionist-format";
+import type { TimeField } from "./time-wheel";
+import { TimeWheelSheet } from "./time-wheel-sheet";
 
 type FormNavigation = { goBack: () => void };
 
@@ -261,14 +258,21 @@ export function AvailabilityBlockFormScreen({
           <TextButton label="Eliminar horario" onPress={() => setConfirming("end")} tone="error" />
         ) : null}
       </View>
-      <TimePickerSheet
+      <TimeWheelSheet
+        key={picking ?? "closed"}
         onClose={() => setPicking(null)}
         onPick={(time) => {
-          if (picking === "start") setStartsAtLocal(time);
-          else setEndsAtLocal(time);
+          if (picking === "start") {
+            setStartsAtLocal(time);
+            // A start that leaves the end under one turno sends the end back to «Elegir».
+            if (endsAtLocal !== null && minutesOf(endsAtLocal) - minutesOf(time) < slotMinutes) {
+              setEndsAtLocal(null);
+            }
+          } else setEndsAtLocal(time);
           setPicking(null);
         }}
         picking={picking}
+        start={startsAtLocal}
         value={picking === "start" ? startsAtLocal : endsAtLocal}
       />
       <BlockChangeSheet
