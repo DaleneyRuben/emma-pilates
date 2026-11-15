@@ -4,6 +4,7 @@ export type PromotionErrorCode =
   | 'promotion_image_not_ready'
   | 'promotion_image_required'
   | 'promotion_order_incomplete'
+  | 'promotion_dates_required'
   | 'invalid_promotion_value'
   | 'idempotency_key_reused';
 
@@ -13,6 +14,7 @@ const statuses: Record<PromotionErrorCode, number> = {
   promotion_image_not_ready: 409,
   promotion_image_required: 409,
   promotion_order_incomplete: 409,
+  promotion_dates_required: 409,
   invalid_promotion_value: 400,
   idempotency_key_reused: 409,
 };
@@ -39,11 +41,14 @@ export const promotionStates: readonly PromotionState[] = [
   'archived',
 ];
 
-type PromotionWindow = {
+type DisplayWindow = {
+  displayStartsOn: Date | null;
+  displayEndsOn: Date | null;
+};
+
+type PromotionWindow = DisplayWindow & {
   publishedAt: Date | null;
   archivedAt: Date | null;
-  displayStartsOn: Date;
-  displayEndsOn: Date;
 };
 
 // `today` is a Bolivia civil date at UTC midnight (ADR-0057), like the window.
@@ -52,17 +57,23 @@ export const promotionState = (
   today: Date,
 ): PromotionState => {
   if (promotion.archivedAt !== null) return 'archived';
-  if (promotion.publishedAt === null) return 'draft';
-  if (today.getTime() < promotion.displayStartsOn.getTime()) return 'scheduled';
-  if (today.getTime() > promotion.displayEndsOn.getTime()) return 'ended';
+  const { displayStartsOn, displayEndsOn } = promotion;
+  if (
+    promotion.publishedAt === null ||
+    displayStartsOn === null ||
+    displayEndsOn === null
+  ) {
+    return 'draft';
+  }
+  if (today.getTime() < displayStartsOn.getTime()) return 'scheduled';
+  if (today.getTime() > displayEndsOn.getTime()) return 'ended';
   return 'active';
 };
 
-export type PromotionValues = {
+// Finding 82: a draft may leave either date empty until it is published.
+export type PromotionValues = DisplayWindow & {
   headline: string;
   description: string;
-  displayStartsOn: Date;
-  displayEndsOn: Date;
 };
 
 export const promotionCopyLimits = { headline: 80, description: 280 } as const;
@@ -77,7 +88,9 @@ export const requirePromotionValues = (
     headline.length > promotionCopyLimits.headline ||
     description.length === 0 ||
     description.length > promotionCopyLimits.description ||
-    input.displayEndsOn.getTime() < input.displayStartsOn.getTime()
+    (input.displayStartsOn !== null &&
+      input.displayEndsOn !== null &&
+      input.displayEndsOn.getTime() < input.displayStartsOn.getTime())
   ) {
     throw new PromotionError('invalid_promotion_value');
   }
@@ -87,6 +100,13 @@ export const requirePromotionValues = (
     displayStartsOn: input.displayStartsOn,
     displayEndsOn: input.displayEndsOn,
   };
+};
+
+// Publishing (or keeping published) needs both ends of the window.
+export const requirePublishableWindow = (window: DisplayWindow): void => {
+  if (window.displayStartsOn === null || window.displayEndsOn === null) {
+    throw new PromotionError('promotion_dates_required');
+  }
 };
 
 // AW17 drag order: the request must name every live Promotion exactly once.
