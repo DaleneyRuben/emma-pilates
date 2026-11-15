@@ -15,4 +15,14 @@ describe("clientNotificationDestination", () => {
   it.each([null, "trainer_schedule", "unknown"])("opens nothing for %s", (destinationType) => {
     expect(clientNotificationDestination(destinationType)).toBeNull();
   });
+
+  // Walkthrough n.º 55: React Navigation applies a params object once, so a
+  // second notification to the same screen needs params of its own.
+  it("gives each notification its own params", () => {
+    const [, first] = clientNotificationDestination("subscription")!;
+    const [, second] = clientNotificationDestination("subscription")!;
+
+    expect(second).toEqual(first);
+    expect(second).not.toBe(first);
+  });
 });

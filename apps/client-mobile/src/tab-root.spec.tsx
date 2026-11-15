@@ -111,4 +111,17 @@ describe("tapping a Client tab after Mi plan", () => {
 
     await expectProfileRoot(screen);
   });
+
+  it("still opens a notification's Mi plan after Perfil was tapped back to its root", async () => {
+    const { device, screen } = await renderSignedIn();
+
+    await act(async () => device.tap(subscriptionPush));
+    await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
+    await tab(screen, "Perfil");
+    await expectProfileRoot(screen);
+    await tab(screen, "Inicio");
+    await act(async () => device.tap(subscriptionPush));
+
+    await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
+  });
 });
