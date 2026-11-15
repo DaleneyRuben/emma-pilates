@@ -32,6 +32,7 @@ import { AccessibilityInfo, Pressable, ScrollView, StyleSheet, Text, View } from
 import { useClientFetcher } from "../client-fetcher";
 import { moveEvaluation, rescheduleFailure } from "./reschedule-evaluation";
 import { clockTime, evaluationDate } from "./evaluation-format";
+import { planOfferLine } from "./evaluation-offer-copy";
 import { UsedMonth, usedMonthStyles } from "./evaluation-used-month";
 import { RescheduleConfirmSheet } from "./reschedule-confirm-sheet";
 
@@ -56,12 +57,18 @@ const openDays = (availability: EvaluationAvailabilityDto, currentSlotId?: strin
     }))
     .filter((day) => day.slots.length > 0);
 
-function Intro({ rescheduling }: { rescheduling: boolean }) {
+function Intro({
+  availability,
+  rescheduling,
+}: {
+  availability: EvaluationAvailabilityDto;
+  rescheduling: boolean;
+}) {
   return (
     <BodyText>
       {rescheduling
         ? "Tu evaluación ya está pagada. Elige el nuevo horario: el pago se mantiene."
-        : "Una evaluación gratis por mes con tu plan."}
+        : planOfferLine(availability)}
     </BodyText>
   );
 }
@@ -203,7 +210,7 @@ export function EvaluationAvailabilityScreen({
           <UsedMonth availability={availability} />
         ) : (
           <>
-            <Intro rescheduling={rescheduling} />
+            <Intro availability={availability} rescheduling={rescheduling} />
             {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
             <View style={usedMonthStyles.used}>
               <Text style={usedMonthStyles.usedTitle}>No hay horarios disponibles por ahora.</Text>
@@ -230,7 +237,7 @@ export function EvaluationAvailabilityScreen({
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
-        <Intro rescheduling={rescheduling} />
+        <Intro availability={availability} rescheduling={rescheduling} />
         {nutritionists.size === 1 ? (
           <NutritionistCard
             branchName={openSlots[0]?.branchName ?? ""}
