@@ -33,3 +33,18 @@ export async function readSignedInSession(
     throw error;
   }
 }
+
+/**
+ * Asks the backend directly, past the cache, whether the cookie still opens
+ * a session: a refused request elsewhere is not proof it ended (FIX-058).
+ * Anything but a 401 (a network failure, a 5xx) rejects, which keeps her.
+ */
+export async function isSignedIn(): Promise<boolean> {
+  try {
+    await getCurrentAdminWebAuthenticationSession(undefined, adminFetch);
+    return true;
+  } catch (error) {
+    if (isApiError(error) && error.status === 401) return false;
+    throw error;
+  }
+}

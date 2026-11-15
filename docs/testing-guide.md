@@ -1516,7 +1516,7 @@ chains are:
   measured time (`scripts/print-integration-shard.mjs`), so a slow file
   does not land with the others;
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
-  **web-unit** (the admin-web Jest suite). **web-e2e** (the twenty-six
+  **web-unit** (the admin-web Jest suite). **web-e2e** (the twenty-nine
   Playwright journeys of Test 31 through the built backend and the built
   admin web, on a `postgres:18-alpine` service container with a
   `pilates_test_ci` admin database, WEB-017) starts from the path filter
@@ -2924,7 +2924,14 @@ Bolivia time, whatever time zone your computer uses.
    en la lista de espera.") with her name in the list. A refusal stays on
    the confirmation with the reason by its code: for example "… ya usó sus
    clases de esta semana.", "… no tiene un plan activo con clases para esta
-   fecha.", or "… ya está reservada en esta clase.". **Volver a la clase**
+   fecha.", or "… ya está reservada en esta clase.". The booking goes
+   through the admin web's own session cookie (FIX-058, walkthrough finding
+   77): signed in as Paola, `POST /api/v1/sessions/{sessionId}/bookings`
+   and `…/waitlist-entries` answer `201`, and the Client sees the class in
+   Mis reservas in the Client app. A request the API answers `401` while
+   your session is still open shows "No pudimos reservar. Inténtalo de
+   nuevo." on the confirmation and keeps you on Horario; only a session
+   that really ended goes to Login with "Tu sesión terminó.". **Volver a la clase**
    goes back without booking. A class that has started shows "Clase pasada:
    solo lectura." with its list and no booking button or form. Signed in as
    `carolina.rivas@example.com`, the Coordinator sees and books the same way.
@@ -3522,11 +3529,16 @@ take about a minute:
     shows «Informe del mes», and a question on that report gets an answer.
 20. **The simulator (STU-005, Test 101).** Simulador shows the three horizons
     (3, 6, and 12 months) at 1440 and at 420.
+21. **Booking a Client from Horario (FIX-058, Test 25).** A Reformer class
+    created tomorrow evening at Centro, «Reservar a una clienta», Valeria
+    Quiroga, **Confirmar la reserva**: the page stays on Horario, says
+    "Valeria Quiroga quedó reservada." and lists her under «Reservaron (1)».
 
 `session.spec.ts` is the three parts of item 1. `authorization.spec.ts` is
 the two parts of item 5. `laptop.spec.ts` is the two widths of item 15.
 `date-fields.spec.ts` runs item 16 at both widths, and `simulator.spec.ts`
-runs item 20 at both widths. That is how twenty files make twenty-six
+runs item 20 at both widths; `horario-booking.spec.ts` is item 21. With the
+files the items above do not name, twenty-two files make twenty-nine
 journeys.
 
 To run one file or watch the browser, use Playwright directly from
