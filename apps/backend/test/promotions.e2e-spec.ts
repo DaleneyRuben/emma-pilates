@@ -264,6 +264,60 @@ describe('promotions (e2e)', () => {
       .expect(401);
   });
 
+  // Finding 82: «Guardar borrador» sends no dates; «Publicar» needs both.
+  it('creates a draft without dates and refuses to publish it until both are set', async () => {
+    const undated = {
+      headline: input.headline,
+      description: input.description,
+      imageAssetId,
+    };
+    operations.createPromotion.mockResolvedValue({
+      ...view,
+      displayStartsOn: null,
+      displayEndsOn: null,
+      publishedAt: null,
+      state: 'draft',
+    });
+    await request(app.getHttpServer())
+      .post('/api/v1/administrator/promotions')
+      .set('authorization', bearer)
+      .set('idempotency-key', key)
+      .send(undated)
+      .expect(201)
+      .expect(({ body }) =>
+        expect(body).toMatchObject({
+          displayStartsOn: null,
+          displayEndsOn: null,
+          state: 'draft',
+        }),
+      );
+    expect(operations.createPromotion.mock.calls[0]?.[0]).toMatchObject({
+      displayStartsOn: null,
+      displayEndsOn: null,
+    });
+
+    await request(app.getHttpServer())
+      .put(`/api/v1/administrator/promotions/${promotionId}`)
+      .set('authorization', bearer)
+      .send({ ...undated, displayStartsOn: null, displayEndsOn: '2026-10-31' })
+      .expect(200);
+    expect(operations.updatePromotion.mock.calls[0]?.[0]).toMatchObject({
+      displayStartsOn: null,
+      displayEndsOn: new Date('2026-10-31T00:00:00.000Z'),
+    });
+
+    operations.publishPromotion.mockRejectedValue(
+      new PromotionError('promotion_dates_required'),
+    );
+    await request(app.getHttpServer())
+      .post(`/api/v1/administrator/promotions/${promotionId}/publish`)
+      .set('authorization', bearer)
+      .expect(409)
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'promotion_dates_required' }),
+      );
+  });
+
   it('streams a private promotion variant to the Administrator without caching', async () => {
     await request(app.getHttpServer())
       .get(`/api/v1/administrator/promotions/${promotionId}/image`)

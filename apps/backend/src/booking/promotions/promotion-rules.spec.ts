@@ -3,6 +3,7 @@ import {
   PromotionError,
   promotionState,
   requirePromotionValues,
+  requirePublishableWindow,
 } from './promotion-rules';
 
 const day = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
@@ -69,6 +70,36 @@ describe('requirePromotionValues', () => {
     failing({ description: 'x'.repeat(281) });
     failing({ displayEndsOn: day('2026-09-30') });
   });
+
+  // Finding 82: a draft may be saved before its window is chosen.
+  it('keeps a draft without either date, or with only one of them', () => {
+    const undated = { ...input, displayStartsOn: null, displayEndsOn: null };
+    expect(requirePromotionValues(undated)).toMatchObject({
+      displayStartsOn: null,
+      displayEndsOn: null,
+    });
+    expect(
+      requirePromotionValues({ ...input, displayEndsOn: null }),
+    ).toMatchObject({ displayStartsOn: input.displayStartsOn });
+  });
+});
+
+describe('requirePublishableWindow', () => {
+  it('passes a Promotion with both dates and refuses one missing either', () => {
+    const window = {
+      displayStartsOn: day('2026-10-01'),
+      displayEndsOn: day('2026-10-31'),
+    };
+    expect(() => requirePublishableWindow(window)).not.toThrow();
+    for (const missing of [
+      { ...window, displayStartsOn: null },
+      { ...window, displayEndsOn: null },
+    ]) {
+      expect(() => requirePublishableWindow(missing)).toThrow(
+        new PromotionError('promotion_dates_required'),
+      );
+    }
+  });
 });
 
 describe('orderedPromotionIds', () => {
@@ -100,5 +131,6 @@ describe('PromotionError', () => {
     expect(new PromotionError('promotion_order_incomplete').status).toBe(409);
     expect(new PromotionError('invalid_promotion_value').status).toBe(400);
     expect(new PromotionError('idempotency_key_reused').status).toBe(409);
+    expect(new PromotionError('promotion_dates_required').status).toBe(409);
   });
 });
