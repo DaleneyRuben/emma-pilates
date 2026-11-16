@@ -188,12 +188,12 @@ describe("CivilDateInput calendar (finding 83)", () => {
     expect(day("viernes, 20 de noviembre de 2026")).toHaveFocus();
 
     await user.keyboard("{ArrowRight}{ArrowDown}");
-    expect(day("viernes, 27 de noviembre de 2026")).toHaveFocus();
+    expect(day("sábado, 28 de noviembre de 2026")).toHaveFocus();
     await user.keyboard("{ArrowDown}");
     expect(within(calendar()).getByText("Diciembre 2026")).toBeVisible();
-    expect(day("viernes, 4 de diciembre de 2026")).toHaveFocus();
+    expect(day("sábado, 5 de diciembre de 2026")).toHaveFocus();
 
     await user.keyboard("{Enter}");
-    expect(field).toHaveValue("04/12/2026");
+    expect(field).toHaveValue("05/12/2026");
   });
 });
