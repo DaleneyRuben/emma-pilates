@@ -9560,7 +9560,10 @@ G. **One offline banner (n.º 71).** Turn the Mac's network off with the app
    guardada.» strip shows, below the clock and the island, never two. On
    **Pago por transferencia** without network, the QR box reads «No
    pudimos cargar el QR del estudio.» with **Reintentar**; turn the network
-   back on and tap it: the QR appears.
+   back on and tap it: the QR appears. Stop the API for a minute with the
+   app open: when it answers again, the app leaves «Sin conexión» on its
+   own (it asks again every 10 seconds and on returning to the
+   foreground) and refreshes, with no relaunch.
 H. **Cerrar mi cuenta (n.º 78, 79).** As Lucía with a renewal already paid,
    **Perfil › Cerrar mi cuenta**: «Tu plan 12 clases termina hoy, y también
    tu Trimestral 24 clases, que empezaba el 2 de diciembre. No se devuelve
@@ -9570,3 +9573,6 @@ H. **Cerrar mi cuenta (n.º 78, 79).** As Lucía with a renewal already paid,
    Pilates Studio». Texts that name the installed app (the photo-library
    hint, the link fallback page, a lock-screen push) keep «Emma Pilates»,
    which is the app's name on the phone.
+I. **A Plan bought after a spent Guest Pass covers its classes.** As the
+   friend in E, open a class on or after the Plan's first day: «Se
+   descuenta 1 clase de tu plan» over **Reservar**, and it books.
