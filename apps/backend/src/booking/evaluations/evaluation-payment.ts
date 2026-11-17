@@ -87,8 +87,8 @@ export const startEvaluationTransfer = async (
       'Ya tienes un pago de evaluación pendiente.',
     );
   }
-  // The slot index still counts a released Evaluation: its old slot cannot
-  // take another one yet (FIX-062 leftover).
+  // Another Client took the slot in the meantime: the one-live-per-slot
+  // index answers, not a 500.
   const evaluation = await transaction.evaluation
     .create({
       data: {
