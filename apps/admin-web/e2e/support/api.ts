@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
+import { addDays, boliviaToday } from "./bolivia";
 import { apiOrigin, fixtures } from "./environment";
 import { receiptPng } from "./receipt-png";
 
@@ -187,4 +188,58 @@ export async function closeOwnAccount(
     token,
     body: { password: fixtures.password, ...options },
   });
+}
+
+/**
+ * FIX-058: a Reformer class at Centro tomorrow evening, with nobody booked,
+ * created as the Administrator would. Steps 15 minutes at a time past any
+ * slot a fixture Session or another journey already holds.
+ */
+export async function createEmptySessionTomorrow(): Promise<{
+  startsAt: Date;
+}> {
+  const token = await loginClient(fixtures.administrator.email);
+  const named = (list: unknown, name: string) => {
+    const found = (list as { id: string; name: string }[]).find(
+      (item) => item.name === name,
+    );
+    if (found === undefined) throw new Error(`The fixtures lost ${name}`);
+    return found.id;
+  };
+  const branchId = named(await call("GET", "/branches", { token }), "Centro");
+  const classTypeId = named(
+    await call("GET", "/class-types", { token }),
+    "Reformer Pilates",
+  );
+  const staff = (await call("GET", "/administrator/staff-members", {
+    token,
+  })) as { items: unknown };
+  const trainerStaffMemberId = named(staff.items, "Emma Vargas");
+  const tomorrow = addDays(boliviaToday(), 1);
+  const evening = Date.parse(`${tomorrow}T19:00:00-04:00`);
+  for (let step = 0; step < 8; step += 1) {
+    const startsAt = new Date(evening + step * 15 * 60_000);
+    try {
+      await call("POST", "/administrator/sessions", {
+        token,
+        body: {
+          branchId,
+          classTypeId,
+          trainerStaffMemberId,
+          startsAt: startsAt.toISOString(),
+          durationMinutes: 50,
+          capacity: 6,
+        },
+      });
+      return { startsAt };
+    } catch (error) {
+      const taken =
+        error instanceof ApiCallError &&
+        error.status === 409 &&
+        // The overlap problem names itself in `detail`, not `code`.
+        error.message.includes("session_overlap");
+      if (!taken) throw error;
+    }
+  }
+  throw new Error("No free Centro slot tomorrow evening");
 }

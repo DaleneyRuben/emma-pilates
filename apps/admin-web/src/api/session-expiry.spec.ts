@@ -75,3 +75,94 @@ describe("session expiry through the QueryClient", () => {
     expect(onExpired).not.toHaveBeenCalled();
   });
 });
+
+// FIX-058: a 401 from one endpoint is not proof the session ended; the
+// backend's current-session read decides before anyone leaves the page.
+describe("session expiry confirmed with the backend", () => {
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+  const refused = new ApiError({
+    status: 401,
+    code: "authentication_required",
+  });
+
+  it("stays when the backend still knows the session, and reports again later", async () => {
+    const onExpired = jest.fn();
+    const isSignedIn = jest.fn(() => Promise.resolve(true));
+    const sessionExpiry = createSessionExpiry(onExpired, { isSignedIn });
+
+    sessionExpiry.report(refused);
+    await settle();
+    sessionExpiry.report(refused);
+    await settle();
+
+    expect(isSignedIn).toHaveBeenCalledTimes(2);
+    expect(onExpired).not.toHaveBeenCalled();
+  });
+
+  it("returns to Login once when the backend no longer knows it", async () => {
+    const onExpired = jest.fn();
+    const isSignedIn = jest.fn(() => Promise.resolve(false));
+    const sessionExpiry = createSessionExpiry(onExpired, { isSignedIn });
+
+    sessionExpiry.report(refused);
+    sessionExpiry.report(refused);
+    await settle();
+
+    expect(isSignedIn).toHaveBeenCalledTimes(1);
+    expect(onExpired).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps her when the backend cannot be asked, and reports again later", async () => {
+    const onExpired = jest.fn();
+    const isSignedIn = jest.fn(() => Promise.reject(new Error("offline")));
+    const sessionExpiry = createSessionExpiry(onExpired, { isSignedIn });
+
+    sessionExpiry.report(refused);
+    await settle();
+    sessionExpiry.report(refused);
+    await settle();
+
+    expect(isSignedIn).toHaveBeenCalledTimes(2);
+    expect(onExpired).not.toHaveBeenCalled();
+  });
+
+  const pendingProbe = () => {
+    let answer: (signedIn: boolean) => void = () => undefined;
+    const isSignedIn = jest.fn(
+      () =>
+        new Promise<boolean>((resolve) => {
+          answer = resolve;
+        }),
+    );
+    return { isSignedIn, answer: (signedIn: boolean) => answer(signedIn) };
+  };
+
+  it("ignores a probe that answers after logout, and stays silent", async () => {
+    const onExpired = jest.fn();
+    const probe = pendingProbe();
+    const sessionExpiry = createSessionExpiry(onExpired, probe);
+
+    sessionExpiry.report(refused);
+    sessionExpiry.silence();
+    probe.answer(true);
+    await settle();
+    sessionExpiry.report(refused);
+    await settle();
+
+    expect(probe.isSignedIn).toHaveBeenCalledTimes(1);
+    expect(onExpired).not.toHaveBeenCalled();
+  });
+
+  it("ignores an old session's probe once a new session starts", async () => {
+    const onExpired = jest.fn();
+    const probe = pendingProbe();
+    const sessionExpiry = createSessionExpiry(onExpired, probe);
+
+    sessionExpiry.report(refused);
+    sessionExpiry.reset();
+    probe.answer(false);
+    await settle();
+
+    expect(onExpired).not.toHaveBeenCalled();
+  });
+});

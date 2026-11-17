@@ -1,6 +1,5 @@
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
-import { AuthenticationRequiredError } from '../system-identity/authentication/resolve-authenticated-principal';
 import type { ClassHistoryEntryDto } from './booking.dto';
 import type { TrainerScheduleSession } from './trainer-schedule';
 import type { TrainerSessionRosterResult } from './trainer-session-roster';
@@ -22,10 +21,6 @@ export type CommandHandler = (
   principal: AuthenticatedPrincipal,
   idempotencyKey: string,
 ) => Promise<{ id: string }>;
-export type PrincipalResolver = (
-  credential: string,
-  meaningfulActivity: boolean,
-) => Promise<AuthenticatedPrincipal>;
 export type CancellationCommandHandler = (
   command: { bookingId: string },
   principal: AuthenticatedPrincipal,
@@ -53,36 +48,8 @@ export type TrainerSessionRosterHandler = (
   principal: AuthenticatedPrincipal,
 ) => Promise<TrainerSessionRosterResult>;
 
-export const parseBearerCredential = (
-  authorization: string | undefined,
-): string => {
-  const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
-  if (match?.[1] === undefined) {
-    throw new UnauthorizedException('Authentication is required');
-  }
-  return match[1];
-};
-
 export const invalidRequest = (detail: string): BadRequestException =>
   new BadRequestException({ code: 'invalid_request', detail });
-
-// A missing, malformed, or rejected Bearer credential answers 401 alike.
-export const authenticateBearer = async (
-  principalResolver: PrincipalResolver,
-  authorization: string | undefined,
-): Promise<AuthenticatedPrincipal> => {
-  try {
-    return await principalResolver(parseBearerCredential(authorization), true);
-  } catch (error) {
-    if (
-      error instanceof AuthenticationRequiredError ||
-      error instanceof UnauthorizedException
-    ) {
-      throw new UnauthorizedException('Authentication is required');
-    }
-    throw error;
-  }
-};
 
 // A rule the caller can break answers its stable problem code (BE-024).
 export const rethrowAsProblem = (error: unknown): never => {
