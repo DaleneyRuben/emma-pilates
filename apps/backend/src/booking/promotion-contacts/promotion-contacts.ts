@@ -6,19 +6,20 @@ import {
 } from '../administration/administration-errors';
 
 // BE-022: the Promotion Contacts ADR-0097 keeps for former Clients who agreed
-// to promotions, and since BE-023 the live Clients with an open Promotions
-// Consent (ADR-0098), for the Administrator and the Coordinator (their
-// personal data, ADR-0054; ADR-0108).
+// to promotions and, since FIX-060 (walkthrough finding 85, the owner's
+// decision), every live Client whether or not she agreed, for the
+// Administrator and the Coordinator (their personal data, ADR-0054; ADR-0108).
 export type PromotionContactKind = 'client' | 'former_client';
 
 export type PromotionContactRow = {
-  // The Promotion Contact's id, or the open Promotions Consent's.
+  // The Promotion Contact's id, or the live Client's.
   id: string;
   kind: PromotionContactKind;
   name: string;
   email: string;
   phone: string | null;
-  consentedAt: Date;
+  // When a former Client agreed while closing, or when a live Client joined.
+  since: Date;
 };
 
 export type PromotionContactPage = {
@@ -84,8 +85,9 @@ export const exportPromotionContacts = async (
   return contacts;
 };
 
-// A «stop» request: the privacy page promises «borramos tu contacto», so the
-// store erases the name, email, and phone while the row stays (ADR-0086).
+// A «stop» request for a former Client: the privacy page promises «borramos tu
+// contacto», so the store erases the name, email, and phone while the row
+// stays (ADR-0086). A live Client is not withdrawn: she stays listed.
 export const withdrawPromotionContact = async (
   command: { contactId: string },
   principal: AuthenticatedPrincipal,

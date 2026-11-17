@@ -105,7 +105,6 @@ beyond what the table below names.
 | `promotion.archived` | Booking & Membership | An Administrator deletes a Promotion (the row is archived, never removed; its image is released, ADR-0076) | Administrator | `promotion` | — | `wasPublished` |
 | `promotion_contact.exported` | Booking & Membership | An Administrator exports the Promotion Contacts (BE-022, ADR-0097), handing their names, emails, and phones out of the system | Administrator | `promotion_contact` | — | `contactCount` |
 | `promotion_contact.withdrawn` | Booking & Membership | An Administrator records a former Client's «stop» request: the contact's name, email, and phone are erased and `withdrawn_at` is set (BE-022) | Administrator | `promotion_contact` | — | — |
-| `promotions_consent.withdrawn` | Booking & Membership | An Administrator records a live Client's «stop» request on AW35: their open Promotions Consent gets `withdrawn_at`, and the Account stays as it is (BE-023, ADR-0098). The Client's own switch in Perfil is not audited; the consent rows are its record | Administrator | `client_promotions_consent` | — | `clientId` |
 | `studio_settings.updated` | Booking & Membership | An Administrator changes the configurable Studio Settings on «Reglas del estudio» (BKM-004, ADR-0101); the change is a new version row | Administrator | `studio_settings` | — | `version`, previous and new `minimumBookings`, `taxRatePercent`, `renewalTargetMonths1To6Percent`, `renewalTargetMonths7To12Percent`, `renewalTargetFromMonth13Percent`, `openingDate` (only those changed) |
 | `studio_transfer_qr.replaced` | Booking & Membership | An Administrator uploads a new studio transfer QR on «Ajustes › QR del estudio» (WEB-038); it replaces the object `studio/transfer-qr` the apps read at checkout, and the latest record's time is the page's «Actualizado el» | Administrator | `studio_transfer_qr` (no target id: the studio has one QR) | — | `byteSize`, `width`, `height`, `sha256` (hex) of the stored PNG |
 | `pay_statement.approved` | Back Office | An Administrator approves a Trainer's Pay Statement, which creates its Salary Payment (BKO-006) | Administrator | `pay_statement` | — | `salaryPaymentId`, `amountCentavos`, `paidOn` |
@@ -128,6 +127,7 @@ window.
 
 ## Retired codes
 
+- `promotions_consent.withdrawn` was written when an Administrator recorded a live Client's «stop» request on AW35 (BE-023). Since FIX-060 (walkthrough finding 85) AW35 lists every active Client whatever her consent and offers «Dejar de enviar» only on closed Accounts' contacts, so nothing writes it any more; the records written before stay.
 - `payment.credit_only_confirmed` was written when a Client paid a whole Plan with Credit. PAY-005 retired Credit (booking ADR-0009), so nothing writes it any more; the records written before stay.
 
 ## Considered and not audited

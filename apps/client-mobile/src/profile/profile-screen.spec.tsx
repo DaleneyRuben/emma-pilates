@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -146,9 +146,6 @@ describe("Client Profile", () => {
       expect(screen.getByRole("button", { name: row })).toBeOnTheScreen();
     }
     expect(screen.getAllByTestId("icon-row-disc").length).toBeGreaterThanOrEqual(8);
-    expect(
-      screen.getByText("Usamos tu nombre, correo y teléfono para enviarte ofertas del estudio."),
-    ).toBeOnTheScreen();
     // Follow-up 256 § 2 (verification n.º 43, 44): «Cerrar sesión» is the Error
     // last row, as in the Staff app, and «Cerrar mi cuenta» a muted link after
     // the version, far from it.
@@ -160,6 +157,27 @@ describe("Client Profile", () => {
     expect(screen.getByText(/^Emma Pilates Studio · versión .+ ·$/)).toBeOnTheScreen();
     // PAY-005 retired Credit: Perfil has no «Mi crédito» row.
     expect(screen.queryByRole("button", { name: /Mi crédito/ })).toBeNull();
+  });
+
+  // FIX-060 (walkthrough finding 85): the owner lists every active Client as
+  // a contact, so Perfil no longer asks, even where the API still answers.
+  it("has no «Recibir promociones» switch nor its note", async () => {
+    const screen = await openProfile(
+      createClientRuntime(
+        routeFetcher({
+          ...readRoutes,
+          "/api/v1/clients/current/promotions-consent": () =>
+            jsonResponse({ consented: false, consentedAt: null }),
+        }),
+      ),
+    );
+
+    expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
+    // Lets a promotions consent read settle, as the switch once waited for it.
+    await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
+    expect(screen.queryByRole("switch")).toBeNull();
+    expect(screen.queryByText(/Recibir promociones/)).toBeNull();
+    expect(screen.queryByText(/enviarte ofertas del estudio/)).toBeNull();
   });
 
   it("shows the account summary and the Plan status row", async () => {

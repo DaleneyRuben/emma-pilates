@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { AdminReferralDtoInviteReward } from "./adminReferralDtoInviteReward";
 import type { AdminReferralDtoState } from "./adminReferralDtoState";
 
 export interface AdminReferralDto {
@@ -24,4 +25,16 @@ export interface AdminReferralDto {
    * @deprecated
    */
   state: AdminReferralDtoState;
+  /**
+   * When the referred Client’s first Plan purchase was confirmed (a guest pass is none), or null
+   * @nullable
+   */
+  firstPurchaseAt: string | null;
+  /** The host’s extra class for the invite (BKM-014): granted, owed to her next Plan, or none yet */
+  inviteReward: AdminReferralDtoInviteReward;
+  /**
+   * When the extra class was granted, or null
+   * @nullable
+   */
+  inviteRewardGrantedAt: string | null;
 }

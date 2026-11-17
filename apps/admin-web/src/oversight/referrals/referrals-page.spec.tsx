@@ -81,6 +81,56 @@ describe("AW26 Referidos on a desktop browser", () => {
     });
   });
 
+  // FIX-060 (walkthrough finding 86): whether the friend bought, and whether
+  // her host got the extra class.
+  it("says when the friend first bought and where the extra class stands", async () => {
+    server.use(
+      referralTable(() =>
+        jsonResponse(
+          referralPage([
+            andreaReferredCamila,
+            andreaReferredValeria,
+            referralRow("03", "Lucía Fernández", "Elena Prueba", {
+              firstPurchaseAt: "2026-11-15T23:30:00.000Z",
+              inviteReward: "owed",
+              inviteRewardGrantedAt: null,
+            }),
+          ]),
+        ),
+      ),
+    );
+    renderAdmin(path);
+
+    const bought = (await screen.findByRole("cell", { name: /Camila Vargas/ }))
+      .parentElement as HTMLElement;
+    expect(
+      within(bought).getByRole("cell", { name: "04/08/2026" }),
+    ).toHaveAttribute("data-label", "Compró");
+    expect(
+      within(bought).getByRole("cell", { name: "Sumada el 04/08/2026" }),
+    ).toHaveAttribute("data-label", "Clase de premio");
+    const waiting = screen.getByRole("cell", { name: /Valeria Terceros/ })
+      .parentElement as HTMLElement;
+    expect(
+      within(waiting).getByRole("cell", { name: "Aún no" }),
+    ).toHaveAttribute("data-label", "Compró");
+    expect(within(waiting).getByRole("cell", { name: "—" })).toHaveAttribute(
+      "data-label",
+      "Clase de premio",
+    );
+    const owed = screen.getByRole("cell", { name: /Elena Prueba/ })
+      .parentElement as HTMLElement;
+    // 19:30 on 15 November in Bolivia.
+    expect(
+      within(owed).getByRole("cell", { name: "15/11/2026" }),
+    ).toBeVisible();
+    expect(
+      within(owed).getByRole("cell", {
+        name: "Se suma con su próximo plan",
+      }),
+    ).toBeVisible();
+  });
+
   it("names a referrer's single Referral in the singular", async () => {
     server.use(
       referralTable(() =>

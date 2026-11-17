@@ -50,7 +50,7 @@ describe("AW35 Contactos para promociones", () => {
     server.use(...signedInHandlers());
   });
 
-  it("lists the contacts with their consent date, under Promociones", async () => {
+  it("lists the contacts with the day each one is listed from, under Promociones", async () => {
     server.use(
       contactList(() => jsonResponse(contactPage([valeria, daniela]))),
     );
@@ -62,13 +62,15 @@ describe("AW35 Contactos para promociones", () => {
       within(row).getByRole("cell", { name: "valeria@example.com" }),
     ).toHaveAttribute("data-label", "Correo");
     expect(within(row).getByText("🇧🇴 +591 70011005")).toBeInTheDocument();
-    expect(within(row).getByText("19/10/2026")).toBeInTheDocument();
+    expect(
+      within(row).getByRole("cell", { name: "19/10/2026" }),
+    ).toHaveAttribute("data-label", "Desde");
     const noPhone = await rowOf("Daniela Rojas");
     expect(within(noPhone).getByText("—")).toBeInTheDocument();
     expect(within(noPhone).getByText("16/10/2026")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "2 contactos · clientas que aceptaron recibir promociones, activas o con la cuenta cerrada",
+        "2 contactos · todas tus clientas activas y las que pidieron seguir recibiendo promociones al cerrar su cuenta",
       ),
     ).toBeVisible();
     expect(screen.getByText("Mostrando 2 de 2 contactos")).toBeVisible();
@@ -99,45 +101,17 @@ describe("AW35 Contactos para promociones", () => {
     );
   });
 
-  it("stops promotions to a live Client without erasing her", async () => {
-    let withdrawn: string | undefined;
-    server.use(
-      contactList(() => jsonResponse(contactPage(withdrawn ? [] : [paula]))),
-      http.post(
-        apiUrl(`${promotionContactsPath}/:contactId/withdrawal`),
-        ({ params }) => {
-          withdrawn = String(params.contactId);
-          return new HttpResponse(null, { status: 204 });
-        },
-      ),
-    );
-    const { user } = renderAdmin("/promociones/contactos");
-    const row = await rowOf("Paula Antelo");
+  it("offers no «Dejar de enviar» for a live Client", async () => {
+    server.use(contactList(() => jsonResponse(contactPage([valeria, paula]))));
+    renderAdmin("/promociones/contactos");
 
-    await user.click(
-      within(row).getByRole("button", {
-        name: "Dejar de enviar a Paula Antelo",
+    const live = await rowOf("Paula Antelo");
+    expect(within(live).queryByRole("button")).not.toBeInTheDocument();
+    expect(
+      within(await rowOf("Valeria Quiroga")).getByRole("button", {
+        name: "Dejar de enviar a Valeria Quiroga",
       }),
-    );
-    const dialog = await screen.findByRole("alertdialog", {
-      name: "¿Dejar de enviar promociones a Paula Antelo?",
-    });
-    expect(
-      within(dialog).getByText(
-        "Su cuenta no cambia: solo sale de esta lista. Puede volver a aceptar las promociones desde su perfil en la app.",
-      ),
-    ).toBeInTheDocument();
-    expect(
-      within(dialog).queryByText("Esta acción no se puede deshacer."),
-    ).not.toBeInTheDocument();
-    await user.click(
-      within(dialog).getByRole("button", { name: "Dejar de enviar" }),
-    );
-
-    expect(
-      await screen.findByText("Paula Antelo ya no recibirá promociones."),
     ).toBeVisible();
-    expect(withdrawn).toBe(paula.id);
   });
 
   it("keeps the search in the address and sends it to the backend", async () => {
@@ -169,7 +143,7 @@ describe("AW35 Contactos para promociones", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Aparecen aquí cuando una clienta acepta recibir promociones en su perfil o al cerrar su cuenta.",
+        "Aparecen aquí todas tus clientas activas y las que, al cerrar su cuenta, pidieron seguir recibiendo promociones.",
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Exportar CSV" })).toBeDisabled();

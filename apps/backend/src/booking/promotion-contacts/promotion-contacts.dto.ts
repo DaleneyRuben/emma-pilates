@@ -4,15 +4,14 @@ import { z } from 'zod';
 export class AdminPromotionContactDto {
   @ApiProperty({
     format: 'uuid',
-    description:
-      'The Promotion Contact, or the live Client’s open Promotions Consent',
+    description: 'The Promotion Contact, or the live Client',
   })
   id!: string;
 
   @ApiProperty({
     enum: ['client', 'former_client'],
     description:
-      'A live Client who agreed in Perfil, or a former Client who ticked the box when closing',
+      'A live Client (listed whether or not she agreed to promotions), or a former Client who ticked the box when closing',
   })
   kind!: 'client' | 'former_client';
 
@@ -27,7 +26,16 @@ export class AdminPromotionContactDto {
 
   @ApiProperty({
     format: 'date-time',
-    description: 'When the Client agreed to promotions',
+    description:
+      'When a live Client joined, or when a former Client agreed while closing her Account',
+  })
+  since!: string;
+
+  @ApiProperty({
+    format: 'date-time',
+    deprecated: true,
+    description:
+      'The same instant as since, kept for admin web builds before FIX-060',
   })
   consentedAt!: string;
 }
@@ -50,7 +58,7 @@ export class AdminPromotionContactExportDto {
   @ApiProperty({
     type: AdminPromotionContactDto,
     isArray: true,
-    description: 'Every contact not withdrawn, newest consent first',
+    description: 'Every contact not withdrawn, newest first',
   })
   items!: AdminPromotionContactDto[];
 }

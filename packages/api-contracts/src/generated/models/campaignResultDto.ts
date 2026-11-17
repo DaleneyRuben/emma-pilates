@@ -5,10 +5,11 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { CampaignClientDto } from "./campaignClientDto";
+import type { CampaignSkippedClientDto } from "./campaignSkippedClientDto";
 
 export interface CampaignResultDto {
   name: string;
   classes: number;
   granted: CampaignClientDto[];
-  skipped: CampaignClientDto[];
+  skipped: CampaignSkippedClientDto[];
 }

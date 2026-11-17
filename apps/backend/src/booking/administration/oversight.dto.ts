@@ -111,6 +111,27 @@ export class AdminReferralDto {
     description: 'Deprecated (PAY-005): no Referral is awarded any more',
   })
   state!: 'pending' | 'awarded';
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    description:
+      'When the referred Client’s first Plan purchase was confirmed (a guest pass is none), or null',
+  })
+  firstPurchaseAt!: Date | null;
+  @ApiProperty({
+    enum: ['none', 'owed', 'granted'],
+    description:
+      'The host’s extra class for the invite (BKM-014): granted, owed to her next Plan, or none yet',
+  })
+  inviteReward!: 'none' | 'owed' | 'granted';
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    description: 'When the extra class was granted, or null',
+  })
+  inviteRewardGrantedAt!: Date | null;
 }
 
 export class AdminReferralPageDto {

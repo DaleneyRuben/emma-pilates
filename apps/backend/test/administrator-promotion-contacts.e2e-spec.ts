@@ -22,9 +22,14 @@ const valeria = {
   name: 'Valeria Quiroga',
   email: 'valeria@example.com',
   phone: '+591 70011005',
-  consentedAt: new Date('2026-10-19T20:00:00.000Z'),
+  since: new Date('2026-10-19T20:00:00.000Z'),
 };
-const serialized = { ...valeria, consentedAt: '2026-10-19T20:00:00.000Z' };
+// FIX-060: «consentedAt» stays, deprecated, for admin web builds before it.
+const serialized = {
+  ...valeria,
+  since: '2026-10-19T20:00:00.000Z',
+  consentedAt: '2026-10-19T20:00:00.000Z',
+};
 
 type Operation = jest.Mock<(...args: unknown[]) => Promise<unknown>>;
 const operation = (): Operation =>
