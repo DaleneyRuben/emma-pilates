@@ -11,7 +11,7 @@ describe("isCompletePhone", () => {
     expect(isCompletePhone(stored)).toBe(true);
   });
 
-  it.each([
+  it.each<[string | null, string]>([
     [null, "none"],
     ["", "an empty one"],
     ["7000004", "digits without a country code"],
