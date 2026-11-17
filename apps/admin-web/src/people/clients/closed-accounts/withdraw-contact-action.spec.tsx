@@ -1,16 +1,17 @@
 import type { AdminPromotionContactDto } from "@pilates/api-contracts";
 import { screen, waitFor, within } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
-import { apiUrl, jsonResponse, server, useMockServer } from "../../test/msw";
+import { apiUrl, jsonResponse, server, useMockServer } from "../../../test/msw";
 import {
   contactPage,
   daniela,
   paula,
   promotionContactsPath,
   valeria,
-} from "../../test/promotion-contact-fixtures";
-import { renderAdmin } from "../../test/render-admin";
-import { signedInHandlers } from "../../test/session-handlers";
+} from "../../../test/promotion-contact-fixtures";
+import { clientPage, clientsPath } from "../../../test/people-fixtures";
+import { renderAdmin } from "../../../test/render-admin";
+import { signedInHandlers } from "../../../test/session-handlers";
 
 const withdrawal = () => {
   const withdrawn: string[] = [];
@@ -52,9 +53,15 @@ const rowOf = async (name: string) =>
 const searchOf = (router: ReturnType<typeof renderAdmin>["router"]) =>
   router.state.matches.at(-1)?.search;
 
-describe("AW35 «Dejar de enviar»", () => {
+// FIX-065: moved from AW35 to Clientas › Cuenta cerrada.
+describe("Clientas › Cuenta cerrada «Dejar de enviar»", () => {
   useMockServer();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() =>
+    server.use(
+      ...signedInHandlers(),
+      http.get(apiUrl(clientsPath), () => jsonResponse(clientPage([]))),
+    ),
+  );
 
   it("names each former Client's button after her", async () => {
     server.use(
@@ -62,7 +69,7 @@ describe("AW35 «Dejar de enviar»", () => {
         jsonResponse(contactPage([valeria, daniela])),
       ),
     );
-    renderAdmin("/promociones/contactos");
+    renderAdmin("/clientas?filter=closed");
 
     const former = await rowOf("Valeria Quiroga");
     expect(
@@ -82,7 +89,7 @@ describe("AW35 «Dejar de enviar»", () => {
     const { withdrawn, handler } = withdrawal();
     server.use(contactList([daniela, valeria], withdrawn), handler);
     const { user, router } = renderAdmin(
-      "/promociones/contactos?page=2&pageSize=1",
+      "/clientas?filter=closed&page=2&pageSize=1",
     );
     const row = await rowOf("Valeria Quiroga");
 
@@ -103,15 +110,19 @@ describe("AW35 «Dejar de enviar»", () => {
       screen.getByText("Borramos el contacto de Valeria Quiroga."),
     ).toBeVisible();
     expect(
-      screen.queryByText("No se encontró ningún contacto."),
+      screen.queryByText("No se encontró ninguna exclienta."),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText("Todavía no hay contactos.")).toBeNull();
+    expect(
+      screen.queryByText(
+        "Nadie cerró su cuenta pidiendo seguir recibiendo promociones.",
+      ),
+    ).toBeNull();
   });
 
   it("clears the success line on a new search", async () => {
     const { withdrawn, handler } = withdrawal();
     server.use(contactList([valeria, daniela], withdrawn, 20), handler);
-    const { user } = renderAdmin("/promociones/contactos");
+    const { user } = renderAdmin("/clientas?filter=closed");
     const row = await rowOf("Valeria Quiroga");
 
     await user.click(
@@ -140,7 +151,7 @@ describe("AW35 «Dejar de enviar»", () => {
   it("clears the success line on a new page", async () => {
     const { withdrawn, handler } = withdrawal();
     server.use(contactList([valeria, daniela, paula], withdrawn), handler);
-    const { user, router } = renderAdmin("/promociones/contactos?pageSize=1");
+    const { user, router } = renderAdmin("/clientas?filter=closed&pageSize=1");
     const row = await rowOf("Valeria Quiroga");
 
     await user.click(

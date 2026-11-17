@@ -25,13 +25,17 @@ describe("AW17 Promociones", () => {
   useMockServer();
   beforeEach(() => server.use(...signedInHandlers()));
 
-  it("opens the Promotion Contacts from the title row (follow-up 102)", async () => {
+  // FIX-065 (walkthrough finding 91): the contacts live in Clientas now.
+  it("no longer offers «Contactos para promociones»", async () => {
     server.use(promotionList([]));
     renderAdmin("/promociones");
 
     expect(
-      await screen.findByRole("link", { name: "Contactos para promociones" }),
-    ).toHaveAttribute("href", "/promociones/contactos");
+      await screen.findByRole("button", { name: "Nueva promoción" }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole("link", { name: "Contactos para promociones" }),
+    ).not.toBeInTheDocument();
   });
 
   it("lists every live Promotion as a card in carousel order with its thumbnail, window, state, and position", async () => {

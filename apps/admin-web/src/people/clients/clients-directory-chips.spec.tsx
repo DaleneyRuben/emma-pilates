@@ -75,10 +75,15 @@ describe("Clientas › Todas chips and columns", () => {
     await screen.findByRole("cell", { name: /Mariana Peña/ });
 
     expect(
-      ["Todas", "Con plan", "Sin plan", "Expirado", "Fundadora"].map((name) =>
-        chip(name).getAttribute("aria-pressed"),
-      ),
-    ).toEqual(["true", "false", "false", "false", "false"]);
+      [
+        "Todas",
+        "Con plan",
+        "Sin plan",
+        "Expirado",
+        "Fundadora",
+        "Cuenta cerrada",
+      ].map((name) => chip(name).getAttribute("aria-pressed")),
+    ).toEqual(["true", "false", "false", "false", "false", "false"]);
     expect(reads.at(-1)?.has("filter")).toBe(false);
 
     await user.click(chip("Fundadora"));
