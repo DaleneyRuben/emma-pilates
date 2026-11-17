@@ -10,8 +10,13 @@ export interface PromotionInputDto {
   headline: string;
   /** @maxLength 280 */
   description: string;
-  displayStartsOn: string;
-  displayEndsOn: string;
+  /**
+   * Optional on a draft; publishing needs both dates
+   * @nullable
+   */
+  displayStartsOn?: string | null;
+  /** @nullable */
+  displayEndsOn?: string | null;
   /**
    * A finalized `promotion` upload owned by the Administrator
    * @nullable

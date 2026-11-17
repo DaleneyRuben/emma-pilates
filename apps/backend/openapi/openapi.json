@@ -15853,11 +15853,14 @@
           },
           "displayStartsOn": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "nullable": true,
+            "description": "Empty on a draft whose window is not chosen yet"
           },
           "displayEndsOn": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "nullable": true
           },
           "displayOrder": {
             "type": "number"
@@ -15916,11 +15919,14 @@
           },
           "displayStartsOn": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "nullable": true,
+            "description": "Optional on a draft; publishing needs both dates"
           },
           "displayEndsOn": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "nullable": true
           },
           "imageAssetId": {
             "type": "string",
@@ -15931,9 +15937,7 @@
         },
         "required": [
           "headline",
-          "description",
-          "displayStartsOn",
-          "displayEndsOn"
+          "description"
         ]
       },
       "PromotionOrderDto": {

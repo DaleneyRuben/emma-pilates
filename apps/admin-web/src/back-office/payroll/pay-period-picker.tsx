@@ -134,6 +134,7 @@ export function PayPeriodPicker({
               id="pay-period-from"
               className="w-[150px]"
               value={shown.from}
+              rangeEnd={shown.to}
               onChange={(value) => setRange("from", value)}
             />
           </div>
@@ -143,6 +144,8 @@ export function PayPeriodPicker({
               id="pay-period-to"
               className="w-[150px]"
               value={shown.to}
+              rangeStart={shown.from}
+              align="end"
               onChange={(value) => setRange("to", value)}
             />
           </div>

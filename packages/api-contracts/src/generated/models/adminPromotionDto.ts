@@ -11,8 +11,13 @@ export interface AdminPromotionDto {
   id: string;
   headline: string;
   description: string;
-  displayStartsOn: string;
-  displayEndsOn: string;
+  /**
+   * Empty on a draft whose window is not chosen yet
+   * @nullable
+   */
+  displayStartsOn: string | null;
+  /** @nullable */
+  displayEndsOn: string | null;
   displayOrder: number;
   /** @nullable */
   publishedAt: string | null;

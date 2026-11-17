@@ -20,8 +20,15 @@ export class AdminPromotionDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() headline!: string;
   @ApiProperty() description!: string;
-  @ApiProperty({ format: 'date' }) displayStartsOn!: string;
-  @ApiProperty({ format: 'date' }) displayEndsOn!: string;
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description: 'Empty on a draft whose window is not chosen yet',
+  })
+  displayStartsOn!: string | null;
+  @ApiProperty({ type: String, format: 'date', nullable: true })
+  displayEndsOn!: string | null;
   @ApiProperty() displayOrder!: number;
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   publishedAt!: string | null;
@@ -35,8 +42,15 @@ export class PromotionInputDto {
   @ApiProperty({ maxLength: promotionCopyLimits.headline }) headline!: string;
   @ApiProperty({ maxLength: promotionCopyLimits.description })
   description!: string;
-  @ApiProperty({ format: 'date' }) displayStartsOn!: string;
-  @ApiProperty({ format: 'date' }) displayEndsOn!: string;
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description: 'Optional on a draft; publishing needs both dates',
+  })
+  displayStartsOn?: string | null;
+  @ApiPropertyOptional({ type: String, format: 'date', nullable: true })
+  displayEndsOn?: string | null;
   @ApiPropertyOptional({
     type: String,
     format: 'uuid',
@@ -80,7 +94,11 @@ export class PromotionDto {
 
 const civilDate = z.iso
   .date()
-  .transform((value) => new Date(`${value}T00:00:00.000Z`));
+  .nullable()
+  .optional()
+  .transform((value) =>
+    value == null ? null : new Date(`${value}T00:00:00.000Z`),
+  );
 
 const promotionInputSchema = z
   .object({

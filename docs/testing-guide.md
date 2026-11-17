@@ -3680,12 +3680,13 @@ crop).
    its discarded edges dimmed and says which ones are lost. A file smaller
    than 1200 × 675, another format, or one over 20 MB is refused under the
    target before anything is uploaded. Fill **Título** (80 characters),
-   **Descripción** (280), **Fecha de inicio**, and **Fecha de fin** (both
-   typed as `dd/mm/aaaa`, Test 111);
+   **Descripción** (280), **Fecha de inicio**, and **Fecha de fin** (typed
+   as `dd/mm/aaaa` or picked from the calendar, Tests 111 and 150);
    **Publicar** stays disabled until all of them and the image exist, while
-   **Guardar borrador** saves a private draft at any time (an empty submit
-   marks each missing field; an end date before the start is refused on its
-   field).
+   **Guardar borrador** saves a private draft with only its title and
+   description (an empty submit marks the empty copy, not the dates; an end
+   date before the start is refused on its field). A draft without dates
+   reads "Sin fechas todavía" on its card.
 3. **States.** A draft card reads **Borrador** and, without an image, shows
    "Sin imagen" in place of the thumbnail. **Publicar** makes it **Activa**
    when today falls inside the window, **Programada** before it, and
@@ -6514,7 +6515,8 @@ these fields, beside text that always reads `dd/mm/aaaa`.
    fin**), and Reporte (**Desde** and **Hasta**) use the same date field. A
    stored date opens as `20/09/2026`, not `2026-09-20`. What is saved is still
    a Bolivia date: the payroll row, the expense row, and the report subtitle
-   keep reading `dd/mm/aaaa`.
+   keep reading `dd/mm/aaaa`. Every one of these fields also opens a
+   calendar (Test 150); typing still works with it open.
 3. **Narrow browser.** At 420 px the sidebar is behind **Abrir menú**. Open
    Horario from the drawer and repeat step 1: the same placeholders, the same
    `21/10/2026`, and the same `09:00`. The panel fills the screen; the fields
@@ -9668,22 +9670,49 @@ F. **The class panel counts the new booking (n.º 81).** In the admin web,
    **Editar sesión** the header reads «… · 1 de 8 lugares reservados» (one
    more than before) at once, matching «Reservaron (1)» and the grid.
 
-## Test 150: ending a block withdraws a released evaluation's old slot (FIX-062)
+## Test 150: a calendar on every admin web date and a promotion draft without dates (FIX-059, DES-018)
 
-Migration `20261117090000_released_slot_withdrawable`. Run the API on a fresh
-database copy with the migration applied.
+Walkthrough findings 82 and 83, follow-ups 265 and 266 (the owner chose
+option A, «Calendario bajo el campo»). Start the backend and the admin web as
+Test 24 describes and log in as `paola.mendoza@example.com` /
+`emma-local-2026`. The backend needs the migration
+`20261115163710_promotion_draft_without_dates`.
 
-1. As Lucía, book a paid evaluation on Gabriela's block and have Ana confirm
-   the transfer. As Gabriela, **Agenda › Cancelar evaluación › Sí, cancelar
-   evaluación**: the slot is released and Lucía keeps her payment.
-2. As Gabriela, **Disponibilidad**, open that block and **Eliminar horario**
-   from a date on or before the released slot. The block ends without the
-   error «evaluation slot has a booked evaluation», and the released time is
-   withdrawn with the other free slots; a slot another client still holds is
-   kept.
-3. As Lucía (or another client), **Evaluación nutricional** no longer offers
-   the released time after the block's end. Lucía's card still reads «El
-   estudio liberó este turno · el pago sigue vigente» with **Elegir turno**.
+1. **The calendar opens under the field.** Promociones › **Nueva
+   promoción**. Click **Fecha de inicio**: a small month calendar opens right
+   under it, Monday first, with «‹ Noviembre 2026 ›», today ringed, and
+   **Hoy** / **Borrar** at its foot. The cursor stays in the field: type
+   `20112026` and the calendar marks the 20th. Click a day: the field reads
+   it as `dd/mm/aaaa` and the calendar closes. The calendar button at the
+   right of the field («Elegir en el calendario») opens and closes it too;
+   opened from the button, the arrow keys move between days (into the next
+   month when you pass its end), **Enter** picks one and **Esc** closes
+   without a change.
+2. **A range.** With **Fecha de inicio** on 20/11/2026, click **Fecha de
+   fin**: its calendar sits under the right field, opens on November, and
+   draws the 20th as the start; the 19th and earlier are struck through.
+   Click the 19th: «La fecha de fin no puede ser anterior a la de inicio.»
+   under the grid, and the field does not change. Pick 06/12/2026 and open it
+   again: the band runs from the 20th to the 6th. Reporte (**Desde** /
+   **Hasta**) and Nómina › periodo **Rango** draw the same band.
+3. **Past-only dates.** Nómina › **Registrar pago** and Gastos › **Nuevo
+   gasto**: in **Fecha**'s calendar every day after today is struck through,
+   and clicking one says «La fecha no puede ser posterior a hoy.».
+4. **Invalid text.** Type `31022026`: the field keeps `31/02/2026`, saving
+   says «Elige una fecha válida.» (or the field's own required message), and
+   the calendar opens on today's month with nothing marked.
+5. **A draft without dates (n.º 82).** **Nueva promoción**, write only
+   **Título** and **Descripción**, **Guardar borrador**: «Promoción «…»
+   guardada como borrador.», and its card reads **Borrador** with «Sin
+   fechas todavía». Open it: both dates are empty and **Publicar** is off
+   until the image and both dates are there. `POST
+   /api/v1/administrator/promotions/{id}/publish` on it answers **409**
+   `promotion_dates_required`. On a published Promotion, clearing
+   **Fecha de fin** and **Guardar cambios** marks «Elige la fecha de fin.»
+   and sends nothing.
+6. **Narrow browser.** At 420 px open the same panels from **Abrir menú**:
+   the dates stack, each calendar opens under its field at the panel's width
+   and never covers the footer buttons.
 
 ## Test 155: every active Client is a promotions contact (FIX-060)
 
@@ -9740,3 +9769,20 @@ rows, now unread by AW35).
    **Dar las clases** is disabled. There is no picker: the grant goes to
    every eligible Client.
 9. Check both pages at 1440 px and 420 px.
+
+## Test 156: ending a block withdraws a released evaluation's old slot (FIX-062)
+
+Migration `20261117090000_released_slot_withdrawable`. Run the API on a fresh
+database copy with the migration applied.
+
+1. As Lucía, book a paid evaluation on Gabriela's block and have Ana confirm
+   the transfer. As Gabriela, **Agenda › Cancelar evaluación › Sí, cancelar
+   evaluación**: the slot is released and Lucía keeps her payment.
+2. As Gabriela, **Disponibilidad**, open that block and **Eliminar horario**
+   from a date on or before the released slot. The block ends without the
+   error «evaluation slot has a booked evaluation», and the released time is
+   withdrawn with the other free slots; a slot another client still holds is
+   kept.
+3. As Lucía (or another client), **Evaluación nutricional** no longer offers
+   the released time after the block's end. Lucía's card still reads «El
+   estudio liberó este turno · el pago sigue vigente» with **Elegir turno**.

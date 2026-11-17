@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mes del calendario</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: {{m.width}}; box-sizing: border-box; font-family: 'Work Sans', sans-serif; color: #4A4A4A; display: flex; flex-direction: column; gap: 6px">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+    <button type="button" aria-label="Mes anterior" onClick="{{m.prev}}" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: transparent; color: #93615D; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+    </button>
+    <div aria-live="polite" style="font-family: Lora, serif; font-size: 18px; color: #4A4A4A">{{m.title}}</div>
+    <button type="button" aria-label="Mes siguiente" onClick="{{m.next}}" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: transparent; color: #93615D; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+    </button>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
+    <sc-for list="{{m.heads}}" as="h" hint-placeholder-count="7">
+      <div style="text-align: center; font-size: 11px; font-weight: 500; color: #6F6662; letter-spacing: 0.06em; padding: 4px 0">{{h}}</div>
+    </sc-for>
+  </div>
+  <div role="grid" aria-label="{{m.title}}" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: 2px">
+    <sc-for list="{{m.cells}}" as="c" hint-placeholder-count="35">
+      <div style="height: {{m.cellH}}; display: flex; align-items: center; justify-content: center; background: {{c.band}}">
+        <sc-if value="{{c.real}}" hint-placeholder-val="{{true}}">
+          <button type="button" aria-label="{{c.aria}}" aria-disabled="{{c.offAttr}}" aria-pressed="{{c.selAttr}}" onClick="{{c.pick}}" style="width: {{m.dot}}; height: {{m.dot}}; padding: 0; border-radius: 999px; border: {{c.ring}}; background: {{c.fill}}; color: {{c.ink}}; text-decoration: {{c.strike}}; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: {{c.weight}}; cursor: {{c.cursor}}; display: flex; align-items: center; justify-content: center">{{c.n}}</button>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+  <sc-if value="{{m.hasMsg}}" hint-placeholder-val="{{false}}">
+    <p role="status" style="margin: 2px 4px 0; font-size: 13px; line-height: 1.4; color: #94493A">{{m.msg}}</p>
+  </sc-if>
+  <sc-if value="{{m.foot}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid #E6DBD0; padding-top: 8px; margin-top: 2px">
+      <button type="button" onClick="{{m.hoy}}" style="height: 36px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; color: #7D4F4B; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer">Hoy</button>
+      <button type="button" onClick="{{m.borrar}}" style="height: 36px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; color: #6F6662; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer">Borrar</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"m":{"editor":null,"tsType":"object"},"$preview":{"width":320,"height":420}}'>
+class Component extends DCLogic {
+  sample() {
+    var cells = [];
+    var noop = function () {};
+    for (var i = 0; i < 6; i++) cells.push({ real: false, band: 'transparent' });
+    for (var d = 1; d <= 30; d++) {
+      var picked = d === 20 || d === 30;
+      var band = d === 20 ? 'linear-gradient(to right, transparent 50%, #F2E4E1 50%)' : d === 30 ? 'linear-gradient(to right, #F2E4E1 50%, transparent 50%)' : d > 20 && d < 30 ? '#F2E4E1' : 'transparent';
+      cells.push({
+        real: true, n: d, band: band, pick: noop,
+        aria: d + ' de noviembre de 2026', offAttr: 'false', selAttr: picked ? 'true' : 'false',
+        ring: d === 15 && !picked ? '1.5px solid #93615D' : '1.5px solid transparent',
+        fill: picked ? '#93615D' : 'transparent', ink: picked ? '#FFFFFF' : '#4A4A4A',
+        strike: 'none', weight: picked || d === 15 ? '600' : '400', cursor: 'pointer'
+      });
+    }
+    return {
+      width: '320px', cellH: '42px', dot: '38px', title: 'Noviembre 2026',
+      heads: ['L', 'M', 'M', 'J', 'V', 'S', 'D'], cells: cells,
+      prev: noop, next: noop, hoy: noop, borrar: noop, hasMsg: false, msg: '', foot: true
+    };
+  }
+  renderVals() {
+    return { m: this.props.m || this.sample() };
+  }
+}
+</script>
+</body>
+</html>

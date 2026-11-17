@@ -43,8 +43,8 @@ export type AdminPromotionView = {
   id: string;
   headline: string;
   description: string;
-  displayStartsOn: string;
-  displayEndsOn: string;
+  displayStartsOn: string | null;
+  displayEndsOn: string | null;
   displayOrder: number;
   publishedAt: string | null;
   state: PromotionState;
@@ -66,7 +66,8 @@ export const promotionImageKinds = [
 ] as const;
 export type PromotionImageKind = (typeof promotionImageKinds)[number];
 
-const civil = (date: Date): string => date.toISOString().slice(0, 10);
+const civil = (date: Date | null): string | null =>
+  date === null ? null : date.toISOString().slice(0, 10);
 
 const mediaTypes: Record<ImageMediaType, string> = {
   [ImageMediaType.JPEG]: 'image/jpeg',

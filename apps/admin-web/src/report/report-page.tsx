@@ -35,10 +35,14 @@ function DateField({
   label,
   value,
   onChange,
+  rangeStart,
+  rangeEnd,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  rangeStart?: string;
+  rangeEnd?: string;
 }) {
   const id = useId();
   return (
@@ -53,7 +57,11 @@ function DateField({
         id={id}
         value={value}
         onChange={onChange}
-        className="h-[34px] w-auto text-nota"
+        rangeStart={rangeStart}
+        rangeEnd={rangeEnd}
+        align={rangeStart === undefined ? "start" : "end"}
+        className="w-auto"
+        inputClassName="h-[34px] text-nota"
       />
     </div>
   );
@@ -93,11 +101,13 @@ function RangeFields({
           label="Desde"
           value={draft.from}
           onChange={(from) => change({ ...draft, from })}
+          rangeEnd={draft.to}
         />
         <DateField
           label="Hasta"
           value={draft.to}
           onChange={(to) => change({ ...draft, to })}
+          rangeStart={draft.from}
         />
       </div>
       {backwards ? (
