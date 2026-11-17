@@ -57,6 +57,10 @@ env:
     timeout: 10000
 - assertVisible: "Cambias tu cita del .*"
 - takeScreenshot: fix057-4-elige-nuevo-horario
+# On a phone the turnos sit below the card: bring them up before tapping.
+- swipe:
+    start: 50%,70%
+    end: 50%,30%
 - tapOn:
     text: "Turno .*"
     index: 0
