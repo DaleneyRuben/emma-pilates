@@ -96,6 +96,7 @@ describe('a confirmed paid evaluation', () => {
 
     expect(moved.slotId).toBe(next);
     expect(moved.paymentId).toBe(paymentId);
+    expect(moved).toMatchObject({ paymentState: 'confirmed' });
     const row = await world.prisma.evaluation.findUniqueOrThrow({
       where: { id: booked.id },
       select: {

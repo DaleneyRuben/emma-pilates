@@ -24,6 +24,22 @@ import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
 
+const planView = {
+  status: 'active',
+  founderRenewalDeadline: null,
+  freeze: null,
+  canRequestFreeze: false,
+  subscription: {
+    id: 'subscription-id',
+    planName: 'Paquete de 8 clases',
+    originalClassAllowance: 8,
+    remainingClassAllowance: 5,
+    startsOn: new Date('2026-09-11T00:00:00.000Z'),
+    endsOn: new Date('2026-10-11T00:00:00.000Z'),
+  },
+};
+const subscriptionView = jest.fn(() => Promise.resolve<unknown>(planView));
+
 describe('client discovery (e2e)', () => {
   let app: INestApplication<App>;
   const bearer = `Bearer ${'a'.repeat(43)}`;
@@ -84,21 +100,7 @@ describe('client discovery (e2e)', () => {
         },
         {
           provide: clientSubscription,
-          useValue: () =>
-            Promise.resolve({
-              status: 'active',
-              founderRenewalDeadline: null,
-              freeze: null,
-              canRequestFreeze: false,
-              subscription: {
-                id: 'subscription-id',
-                planName: 'Paquete de 8 clases',
-                originalClassAllowance: 8,
-                remainingClassAllowance: 5,
-                startsOn: new Date('2026-09-11T00:00:00.000Z'),
-                endsOn: new Date('2026-10-11T00:00:00.000Z'),
-              },
-            }),
+          useValue: subscriptionView,
         },
         {
           provide: planCatalog,
@@ -218,6 +220,39 @@ describe('client discovery (e2e)', () => {
           endsOn: '2026-10-11',
         },
       });
+  });
+
+  // Walkthrough n.º 56: the app tells a Guest Pass from a Plan with no
+  // classes left, and shows when its class was used.
+  it('serves a Guest Pass with the start of the class it was used for', async () => {
+    const guestPass = (usedClassStartsAt: Date | null) => ({
+      ...planView,
+      subscription: {
+        ...planView.subscription,
+        planName: 'Pase de invitada',
+        originalClassAllowance: 1,
+        remainingClassAllowance: 0,
+        guestPass: { usedClassStartsAt },
+      },
+    });
+    subscriptionView
+      .mockResolvedValueOnce(guestPass(null))
+      .mockResolvedValueOnce(guestPass(new Date('2026-11-16T20:00:00.000Z')));
+
+    for (const usedClassStartsAt of [null, '2026-11-16T20:00:00.000Z']) {
+      await request(app.getHttpServer())
+        .get('/api/v1/clients/current/subscription')
+        .set('authorization', bearer)
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toMatchObject({
+            subscription: {
+              planName: 'Pase de invitada',
+              guestPass: { usedClassStartsAt },
+            },
+          });
+        });
+    }
   });
 
   it('serves the Plan, Branch, and Class Type catalogs', async () => {

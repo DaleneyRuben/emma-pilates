@@ -162,7 +162,7 @@ describe("Cerrar mi cuenta", () => {
       closureRoutes({ "POST /api/v1/accounts/current/closure": closure }),
     );
     const box = screen.getByRole("checkbox", {
-      name: "Quiero seguir recibiendo promociones de Emma Pilates",
+      name: "Quiero seguir recibiendo promociones de Emma Pilates Studio",
     });
 
     expect(

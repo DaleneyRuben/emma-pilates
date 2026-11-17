@@ -81,6 +81,9 @@ export type PendingPaymentSummary = {
   clientName: string;
   clientPhoto: ClientPhotoRef;
   planName: string;
+  /** Walkthrough n.º 65: what is sold, and when an Evaluation is. */
+  kind: 'plan' | 'evaluation';
+  evaluationStartsAt?: Date;
   amountDueCentavos: number;
   submittedAt: Date;
   receiptAvailable: boolean;
@@ -92,6 +95,8 @@ export type PaymentReview = PaymentView & {
   kind: 'plan' | 'evaluation';
   /** FIX-052: queued after a Plan she still has. */
   nextPlan: boolean;
+  /** Walkthrough n.º 65: when the paid Evaluation is. */
+  evaluationStartsAt?: Date;
   invoiceData: { taxId: string; name: string } | null;
   clientPhoto: ClientPhotoRef;
   receipt: { imageAssetId: string; mediaType: string } | null;

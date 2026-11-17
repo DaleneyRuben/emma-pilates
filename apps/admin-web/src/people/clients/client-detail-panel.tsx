@@ -1,3 +1,4 @@
+import { classesLeft } from "./client-columns";
 import {
   getAdminClient,
   getGetAdminClientQueryKey,
@@ -94,8 +95,18 @@ function PlanBlock({
       </SummaryRow>
       {/* Every Plan grants a fixed number of classes (follow-up 11). */}
       <SummaryRow label="Clases disponibles" figure>
-        {current.remainingClassAllowance} de {current.originalClassAllowance}
+        {classesLeft(
+          current.remainingClassAllowance,
+          current.originalClassAllowance,
+          current.extraClasses,
+        )}
       </SummaryRow>
+      {/* Walkthrough n.º 60: the Plan she already bought. */}
+      {view.nextSubscription == null ? null : (
+        <SummaryRow label="Plan siguiente">
+          {`${view.nextSubscription.planName} · empieza el ${formatCivilDate(view.nextSubscription.startsOn)}`}
+        </SummaryRow>
+      )}
       {current.extraClassesLine ? (
         <p className="px-3 py-2 text-nota text-texto">
           {current.extraClassesLine}

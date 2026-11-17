@@ -8,11 +8,15 @@ import {
   PaymentState,
   type StaffRole,
 } from '../../generated/prisma/client';
-import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
+import {
+  settleReviewNotices,
+  type NotificationRecorder,
+} from '../../notifications/prisma-notification-store';
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { PaymentRuleError } from '../payments/payment-errors';
+import { paymentSubmittedKey } from '../payments/payment-submitted-notice';
 import { scheduleReceiptDeletion } from '../payments/purchase-intent-settlement';
 import { releaseSlot } from './evaluation-slot-release';
 
@@ -210,6 +214,10 @@ export const rejectPaymentOfCancelledEvaluation = async (
       decidedByAccountId: input.actor?.accountId ?? null,
       rejectionReason: input.reason ?? cancellationReason,
     },
+  });
+  await settleReviewNotices(transaction, {
+    businessEventKey: paymentSubmittedKey(payment.id),
+    settledAt: input.now,
   });
   await transaction.auditRecord.create({
     data: {

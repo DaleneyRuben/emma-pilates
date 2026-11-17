@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { ClientPhotoDto } from "./clientPhotoDto";
+import type { PendingPaymentDtoKind } from "./pendingPaymentDtoKind";
 
 export interface PendingPaymentDto {
   id: string;
@@ -14,7 +15,12 @@ export interface PendingPaymentDto {
    * @nullable
    */
   clientPhoto: ClientPhotoDto | null;
+  /** What is sold: the Plan name, or «Evaluación nutricional» */
   planName: string;
+  /** Walkthrough n.º 65: a Plan sale or a paid Evaluation. Older builds ignore it. */
+  kind?: PendingPaymentDtoKind;
+  /** Walkthrough n.º 65: when the paid Evaluation is; absent on a Plan sale. */
+  evaluationStartsAt?: string;
   /** @minimum 1 */
   amountDueCentavos: number;
   submittedAt: string;

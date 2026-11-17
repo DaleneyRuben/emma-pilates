@@ -147,6 +147,7 @@ export type ClientEvaluationView = {
   included: boolean;
   priceCentavos: number;
   paymentId: string | null;
+  paymentState: 'pending' | 'confirmed' | 'rejected' | 'voided' | null;
   receiptAttached: boolean;
   receiptUploadable: boolean;
   state: 'booked' | 'cancelled' | 'no_show';
@@ -1391,7 +1392,7 @@ export const createPrismaEvaluationCommands = (
     principal: AuthenticatedPrincipal,
   ): Promise<void> => {
     await transact((transaction) =>
-      attachPaidEvaluationReceipt(transaction, {
+      attachPaidEvaluationReceipt(transaction, recordNotification, {
         paymentId: command.paymentId,
         evaluationId: command.evaluationId,
         imageAssetId: command.imageAssetId,

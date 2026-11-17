@@ -13,7 +13,37 @@ export type ClientSubscriptionSummary = {
   extraClassesLine: string | null;
   /** Classes left this week. Null when the Plan has no cap. */
   classesLeftThisWeek?: number | null;
+  /** Live extra classes on top of the allowance (walkthrough n.º 61). */
+  extraClasses?: number;
+  /** Set on a Guest Pass (walkthrough n.º 56); its class, once used. */
+  guestPass?: { usedClassStartsAt: Date | null } | null;
 };
+
+// The transport shape of a Guest Pass: absent on a Plan.
+export const guestPassField = (
+  guestPass: ClientSubscriptionSummary['guestPass'],
+): { guestPass?: { usedClassStartsAt: string | null } } =>
+  guestPass == null
+    ? {}
+    : {
+        guestPass: {
+          usedClassStartsAt: guestPass.usedClassStartsAt?.toISOString() ?? null,
+        },
+      };
+
+const civil = (date: Date): string => date.toISOString().slice(0, 10);
+
+// One Subscription summary in its transport shape: civil dates, and the Guest
+// Pass only when it is one.
+export const toSubscriptionSummaryTransport = ({
+  guestPass,
+  ...summary
+}: ClientSubscriptionSummary) => ({
+  ...summary,
+  startsOn: civil(summary.startsOn),
+  endsOn: civil(summary.endsOn),
+  ...guestPassField(guestPass),
+});
 
 export const toSubscriptionSummary = (
   subscription: SubscriptionSummary | null,
@@ -28,6 +58,7 @@ export const toSubscriptionSummary = (
         startsOn: subscription.startsOn,
         endsOn: subscription.endsOn,
         extraClassesLine: subscription.extraClassesLine,
+        extraClasses: subscription.extraClasses,
       };
 
 export type ClientSubscriptionStatus =

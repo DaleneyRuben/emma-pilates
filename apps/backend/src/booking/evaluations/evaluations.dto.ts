@@ -117,6 +117,15 @@ export class ClientEvaluationDto {
   paymentId!: string | null;
 
   @ApiProperty({
+    type: String,
+    enum: ['pending', 'confirmed', 'rejected', 'voided'],
+    nullable: true,
+    description:
+      'The Paid Evaluation payment state; null when included. Older builds ignore it.',
+  })
+  paymentState!: 'pending' | 'confirmed' | 'rejected' | 'voided' | null;
+
+  @ApiProperty({
     description:
       'A paid Evaluation still needs its transfer receipt. Older builds ignore it.',
   })
@@ -160,7 +169,7 @@ export class ClientEvaluationDto {
 
   @ApiProperty({
     description:
-      'A confirmed Paid Evaluation can move to another slot until 3 hours before the original start',
+      'A Paid Evaluation, confirmed or under review, can move to another slot until 3 hours before the original start',
   })
   reschedulable!: boolean;
 

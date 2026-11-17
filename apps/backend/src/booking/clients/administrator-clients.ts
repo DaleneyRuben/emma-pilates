@@ -33,6 +33,13 @@ export type AdministratorClientRow = {
   /** «Le quedan»: the active Subscription's classes, null without one. */
   remainingClassAllowance: number | null;
   originalClassAllowance: number | null;
+  /** Live extra classes on top of «Le quedan» (walkthrough n.º 61). */
+  extraClasses: number | null;
+  /**
+   * Set when the row describes the Plan bought after a spent Guest Pass,
+   * which starts later (walkthrough n.º 60).
+   */
+  planStartsOn: Date | null;
   /** «Vence»: the active Plan's last day, or when the last one ended. */
   planEndsOn: Date | null;
   /** The live Fundadora place's number (WEB-040). */
@@ -98,6 +105,10 @@ export interface AdministratorClientDirectory {
   ) => Promise<ClientSubscriptionSummary | null>;
   findLatestSubscription: (
     clientId: string,
+  ) => Promise<ClientSubscriptionSummary | null>;
+  findFutureSubscription: (
+    clientId: string,
+    after: Date,
   ) => Promise<ClientSubscriptionSummary | null>;
   readClosureOutlook: (
     clientId: string,
@@ -165,7 +176,8 @@ export const readAdministratorClient = async (
         directory.findActiveSubscription(clientId, onDate),
       findLatestSubscription: (clientId) =>
         directory.findLatestSubscription(clientId),
-      findFutureSubscription: () => Promise.resolve(null),
+      findFutureSubscription: (clientId, after) =>
+        directory.findFutureSubscription(clientId, after),
     }),
     directory.readClosureOutlook(client.id, instant),
   ]);

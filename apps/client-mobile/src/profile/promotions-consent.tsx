@@ -2,7 +2,7 @@ import { BodyText, colors, LineIcon, spacing, typography } from "@pilates/mobile
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Polyline } from "react-native-svg";
 
-const label = "Quiero seguir recibiendo promociones de Emma Pilates";
+const label = "Quiero seguir recibiendo promociones de Emma Pilates Studio";
 
 // Follow-up 100 (ADR-0097): the Client may keep their contact for promotions
 // when closing; the whole row toggles the box and it always starts unticked.

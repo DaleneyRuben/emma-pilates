@@ -5501,7 +5501,7 @@ now read as Test 155 says. Step 6 still holds for those builds.
    --dev-client`), and the admin web (`ADMIN_API_PROXY_TARGET`; a dev server on
    another port needs that origin in `ADMIN_WEB_TRUSTED_ORIGINS`).
 2. Log in to the Client app as `lucia@example.com` and open Perfil. Expected:
-   a «Recibir promociones de Emma Pilates» card between the menu and «Cerrar
+   a «Recibir promociones de Emma Pilates Studio» card between the menu and «Cerrar
    sesión», with its helper and the switch off. The Maestro flow
    `.maestro/promotions-consent.yaml` turns it on and off again.
 3. Turn it on. Expected: the switch turns Palo de rosa, and `GET
@@ -5520,7 +5520,7 @@ now read as Test 155 says. Step 6 still holds for those builds.
    and a `promotions_consent.withdrawn` audit record carries her `clientId`. In
    the app her switch is off again.
 6. Turn the switch on for `sofia@example.com`, then close her Account from the
-   app with «Quiero seguir recibiendo promociones de Emma Pilates» ticked (Test
+   app with «Quiero seguir recibiendo promociones de Emma Pilates Studio» ticked (Test
    35). Expected: the new Promotion Contact keeps the time she turned the switch
    on, her consent row has `withdrawn_at` and `deleted_at` set to the closure
    time, and `account.closed` records `endedPromotionsConsent: true`. Without
@@ -8281,9 +8281,12 @@ B. **A late confirmation over the cap (FIX-013).** Paola confirms that
    `founder-place-release.integration-spec.ts`,
    `founder-unreviewed-transfer.integration-spec.ts`.
 C. **A booked guest class comes first (FIX-019).** A friend whose Guest Pass
-   class is booked for today buys a Plan with «Hoy»: the app shows «Tienes
-   una clase reservada con tu acceso actual. Elige un inicio después de esa
-   clase.» (Client 09) and Staff S10 shows «La clienta tiene una clase
+   class is booked opens **Elige tu plan**: since FIX-054 the start strip
+   preselects the day after the class and shows «Tienes una clase reservada
+   con tu acceso actual. Elige un inicio después de esa clase.» as grey help
+   text; picking the class day or earlier turns it into the red error, and
+   so does the API answer if she pays anyway (Client 09, Test 147 D). Staff
+   S10 shows «La clienta tiene una clase
    reservada con su acceso actual. Elige un inicio después de esa clase.»
    (`409` `start_date_before_booked_class`). The same applies to Courtesy
    Access. Starting the day after the class works: the pass ends on the
@@ -8976,7 +8979,9 @@ H. **Tabs reopen on their root (walkthrough n.º 28).** As Lucía, book a
    (`popTabToRootOnPress`): in the Staff app, open a Client's file under
    **Clientes**, tap **Horario**, then **Clientes**, and the search shows. Only
    the tap does it: a notification that opens another tab still comes back
-   to Notificaciones with **Volver**.
+   to Notificaciones with **Volver**. A notification that opened a tab not
+   yet visited (Mi plan in Perfil) also returns to the root on tap (Test 147
+   A).
 I. **A cancellation is confirmed (walkthrough n.º 29).** As Lucía, cancel a
    booking outside the window: the row goes and the toast reads «Reserva
    cancelada · La clase volvió a tu plan · Te quedan N clases». As Camila,
@@ -9513,6 +9518,73 @@ J. **No booking on a frozen day (n.º 53c).** Open a class inside the
    on that day offers no waitlist. A class outside the freeze books as
    usual.
 
+## Test 147: walkthrough findings 55–79 — Perfil after a notification, the Guest Pass and extra classes, the offline banner, evaluations, staff payments, account screens (FIX-054)
+
+Run the API and the worker on a copy of the walkthrough database, the client
+app on the iPhone 16 Pro, the iPad and Android. For the Guest Pass, register
+a new Client with a host's referral code (one invitation per host a month)
+and confirm the email from `apps/backend/.data/email-capture/` (Test 34).
+
+A. **Perfil after a notification (n.º 55).** As Carla, without opening
+   Perfil first, tap the Inicio bell and a «Tu pago fue confirmado» notice:
+   **Mi plan** opens. Tap **Perfil**: Perfil shows, with **Cerrar sesión**.
+   Back on Inicio, open another Mi plan notice, tap **Inicio** and then
+   **Perfil**: Perfil again. **Volver** from a notice's screen still returns
+   to Notificaciones. A push notification behaves the same.
+B. **The unused Guest Pass (n.º 56).** As the new friend, Inicio's card
+   reads «Tu clase gratis de invitada» and «Úsala antes del …» with
+   **Mi plan**; no «0 clases restantes» and no bar. **Mi plan** shows the
+   same card, **Detalles** (Empezó, Vence), no «Clases extra», no **Renovar
+   mi plan**, and «Elige tu próximo plan» with **Comprar un plan**.
+C. **The guest class (n.º 57).** Open a class: the footer reads «Es tu clase
+   gratis de invitada» over **Reservar** (not «Se descuenta 1 clase de tu
+   plan»). Book it: Inicio's card reads «Clase de invitada usada» with the
+   class's day and time («Lun 16, 16:00») and **Comprar un plan**; Mi plan
+   says the same. Another class now shows «No te quedan clases en tu plan.»,
+   **Reservar** off and **Comprar un plan**. Cancel the guest class: the
+   pass is free again and the cards go back to B. By API,
+   `GET /api/v1/clients/current/subscription` carries
+   `subscription.guestPass.usedClassStartsAt` (null while unused); a Plan
+   has no `guestPass`.
+D. **The plan start after the guest class (n.º 58).** With the guest class
+   booked, **Comprar un plan › 12 clases**: «Fecha de inicio» has the day
+   after the class selected and the rule in grey under the strip. Tap the
+   class day: the same sentence turns red. Pay with the preselected day:
+   the transfer screen opens.
+E. **The Plan after a spent Guest Pass (n.º 60).** Once the friend's guest
+   class is booked and Ana confirms her first Plan (it starts the day after
+   the class), Inicio's card reads «Tu plan · 12 clases», «Empieza el 17 de
+   noviembre» with **Mi plan**; nothing offers **Comprar un plan**. Mi plan
+   shows «Tu plan siguiente empieza el 17 de noviembre.» and no ending
+   notice for the pass. In the admin web, **Clientas** lists her with
+   «12 clases», «Empieza el 17/11/2026» and «12 de 12»; her file shows
+   **Plan siguiente** «12 clases · empieza el 17/11/2026». By API, the
+   Clientas row carries `planStartsOn`.
+F. **Extra classes count (n.º 61).** As Lucía, after a friend she invited
+   pays her first Plan: Inicio reads «13 clases restantes» and «12 del plan
+   + 1 de regalo»; Mi plan the same. **Clientas** shows «12 de 12 + 1» under
+   **Le quedan**, and her file's **Clases disponibles** the same. By API,
+   the subscription summary and the Clientas row carry `extraClasses`.
+G. **One offline banner (n.º 71).** Turn the Mac's network off with the app
+   open: one ochre «Sin conexión. Mostrando la última información
+   guardada.» strip shows, below the clock and the island, never two. On
+   **Pago por transferencia** without network, the QR box reads «No
+   pudimos cargar el QR del estudio.» with **Reintentar**; turn the network
+   back on and tap it: the QR appears. Stop the API for a minute with the
+   app open: when it answers again, the app leaves «Sin conexión» on its
+   own (it asks again every 10 seconds and on returning to the
+   foreground) and refreshes, with no relaunch.
+H. **Cerrar mi cuenta (n.º 78, 79).** As Lucía with a renewal already paid,
+   **Perfil › Cerrar mi cuenta**: «Tu plan 12 clases termina hoy, y también
+   tu Trimestral 24 clases, que empezaba el 2 de diciembre. No se devuelve
+   dinero y pierdes las 12 clases que te quedan.» (11 + 1 extra). Closing
+   ends both Plans. The box reads «Quiero seguir recibiendo promociones de
+   Emma Pilates Studio». Texts that name the installed app (the photo-library
+   hint, the link fallback page, a lock-screen push) keep «Emma Pilates»,
+   which is the app's name on the phone.
+I. **A Plan bought after a spent Guest Pass covers its classes.** As the
+   friend in E, open a class on or after the Plan's first day: «Se
+   descuenta 1 clase de tu plan» over **Reservar**, and it books.
 ## Test 148: verification findings 62 and 63 — the availability time wheel, the studio QR on a paid evaluation (FIX-055, DES-016)
 
 Design follow-ups 260–262 (option A for both). Run the API on a copy of the

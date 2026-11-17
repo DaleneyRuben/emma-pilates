@@ -49,6 +49,7 @@ const directory = (
   read: jest.fn().mockResolvedValue(lucia),
   findActiveSubscription: jest.fn().mockResolvedValue(null),
   findLatestSubscription: jest.fn().mockResolvedValue(null),
+  findFutureSubscription: jest.fn().mockResolvedValue(null),
   readClosureOutlook: jest.fn().mockResolvedValue(outlook),
   saveProfile: jest
     .fn()

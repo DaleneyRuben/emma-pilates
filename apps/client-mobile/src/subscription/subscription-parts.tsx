@@ -12,6 +12,7 @@ import { Fragment } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { formatCivilDate } from "../home/home-format";
+import { planClasses } from "../home/plan-classes";
 
 const pills = { active: "Activo", expiring_soon: "Por vencer", expired: "Vencido" } as const;
 
@@ -26,7 +27,9 @@ export function SubscriptionHero({
   const expired = status === "expired";
   const remaining = expired ? 0 : subscription.remainingClassAllowance;
   const original = subscription.originalClassAllowance;
-  const progress = original === 0 ? 0 : remaining / original;
+  const progress = original === 0 ? 0 : Math.min(1, remaining / original);
+  // Walkthrough n.º 61: live extra classes count with the Plan's own.
+  const { left, breakdown } = expired ? { left: 0, breakdown: null } : planClasses(subscription);
   return (
     <View style={styles.hero} testID="subscription-hero">
       <View style={styles.between}>
@@ -38,11 +41,16 @@ export function SubscriptionHero({
         </View>
       </View>
       <View style={styles.count}>
-        <Text style={styles.number}>{String(remaining)}</Text>
+        <Text style={styles.number}>{String(left)}</Text>
         <Text style={styles.countLabel}>
-          {expired ? "clases disponibles" : `de ${original} clases restantes`}
+          {expired
+            ? "clases disponibles"
+            : breakdown === null
+              ? `de ${original} clases restantes`
+              : "clases restantes"}
         </Text>
       </View>
+      {breakdown === null ? null : <Text style={styles.note}>{breakdown}</Text>}
       {expired ? null : (
         <View
           accessibilityRole="progressbar"

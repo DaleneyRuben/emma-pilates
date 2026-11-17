@@ -259,6 +259,35 @@ describe("Client Profile", () => {
     expect(screen.getByRole("button", { name: "Guardar contraseña" })).toBeOnTheScreen();
   });
 
+  // Walkthrough n.º 75: saving returns to Perfil with the confirmation toast.
+  it("returns to Perfil with «Contraseña actualizada» after saving", async () => {
+    const screen = await openProfile(
+      createClientRuntime(
+        routeFetcher({
+          ...readRoutes,
+          "PATCH /api/v1/accounts/current/password": () => new Response(null, { status: 204 }),
+        }),
+      ),
+    );
+
+    await fireEvent.press(screen.getByRole("button", { name: "Cambiar contraseña" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Contraseña actual")).toBeOnTheScreen();
+    });
+    await fireEvent.changeText(screen.getByLabelText("Contraseña actual"), "Emma2026lucia");
+    await fireEvent.changeText(screen.getByLabelText("Contraseña nueva"), "Reformer2026lm");
+    await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "Reformer2026lm");
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar contraseña" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Contraseña actualizada")).toBeOnTheScreen();
+    });
+    expect(screen.getByRole("button", { name: "Cambiar contraseña" })).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar aviso" }));
+    expect(screen.queryByText("Contraseña actualizada")).toBeNull();
+  });
+
   it("opens «Enviar comentarios» from Perfil (REL-012)", async () => {
     const screen = await openProfile();
 

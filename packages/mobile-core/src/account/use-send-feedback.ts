@@ -29,6 +29,7 @@ export function useSendFeedback({
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  const [limitReached, setLimitReached] = useState(false);
 
   const send = async (type: FeedbackType, text: string) => {
     const message = { type, text: text.trim(), ...metadata };
@@ -49,6 +50,7 @@ export function useSendFeedback({
         return;
       }
       const code = (response.data as { code?: string } | null)?.code;
+      if (code === "feedback_limit_reached") setLimitReached(true);
       setFailure((code === undefined ? undefined : failures[code]) ?? genericFailure);
     } catch {
       setFailure(genericFailure);
@@ -57,5 +59,5 @@ export function useSendFeedback({
     }
   };
 
-  return { send, sending, sent, failure };
+  return { send, sending, sent, failure, limitReached };
 }

@@ -11,7 +11,6 @@ import {
   PaymentMethod,
   PaymentState,
   PurchaseIntentState,
-  StaffRole,
 } from '../../generated/prisma/client';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import { retrySerializable } from '../../database/retry-serializable';
@@ -22,6 +21,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { PaymentRuleError } from './payment-errors';
 import { createPendingPayment } from './pending-payment';
+import { notifyPaymentSubmitted } from './payment-submitted-notice';
 import { summarizeCredit } from './credit-summary';
 import {
   allocateStartDate,
@@ -287,26 +287,10 @@ export const createFrontDeskTransfer = (
               paymentId: payment.id,
             });
           }
-          const administrators = await transaction.account.findMany({
-            where: {
-              activatedAt: { not: null },
-              disabledAt: null,
-              staffMember: { role: StaffRole.ADMINISTRATOR },
-            },
-            select: { id: true },
+          await notifyPaymentSubmitted(transaction, recordNotification, {
+            paymentId: payment.id,
+            now,
           });
-          for (const administrator of administrators) {
-            await recordNotification(transaction, {
-              accountId: administrator.id,
-              category: 'subscription_payment',
-              type: 'payment_submitted',
-              businessEventKey: `payment-submitted:${payment.id}`,
-              title: 'Comprobante por revisar',
-              message: 'Tienes un comprobante de pago pendiente de revisión.',
-              destination: { type: 'payment', id: payment.id },
-              occurredAt: now,
-            });
-          }
           await transaction.auditRecord.create({
             data: {
               actionCode: 'payment.front_desk_transfer_submitted',
