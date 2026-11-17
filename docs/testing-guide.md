@@ -9506,7 +9506,7 @@ J. **No booking on a frozen day (n.º 53c).** Open a class inside the
    on that day offers no waitlist. A class outside the freeze books as
    usual.
 
-## Test 149: walkthrough findings 66–69 and 72 — the next evaluation on the web, a released paid evaluation, the plan's evaluation offer (FIX-056)
+## Test 149: walkthrough findings 66–69, 72, 80 and 81 — the next evaluation on the web, a released paid evaluation, the plan's evaluation offer, worker errors in the local log, the session panel count (FIX-056)
 
 Run the API and the worker on a fresh database copy, the client and staff
 apps on the iPhone 16 Pro, the iPad and Android, and the admin web at 1440
@@ -9540,3 +9540,12 @@ D. **Lucía picks another turno (n.º 68).** The notice «El estudio canceló el
    evaluación**: «Evaluación reprogramada», and the card shows the new time
    with **Reprogramar**. Gabriela's Agenda and the web list it again at the
    new time.
+E. **No reminder for a released slot; failures say why (n.º 80).** With
+   Lucía's released evaluation inside the next 24 hours, the worker sends
+   her no «Recordatorio» for it. Without `ERROR_REPORTING_DSN`, a failing
+   sweep now writes a `{"level":50,"event":"error_report","job":…,"error":…,
+   "stack":…}` line to the worker's stderr next to its `…_failed` event.
+F. **The class panel counts the new booking (n.º 81).** In the admin web,
+   **Horario › a class › Reservar a una clienta**, book someone: back on
+   **Editar sesión** the header reads «… · 1 de 8 lugares reservados» (one
+   more than before) at once, matching «Reservaron (1)» and the grid.
