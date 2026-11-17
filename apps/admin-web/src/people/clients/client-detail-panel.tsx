@@ -29,10 +29,10 @@ import { ClientBookingsTab } from "./client-bookings-tab";
 import { ClientEvaluationsTab } from "./client-evaluations-tab";
 import { ClientFileTabs, type ClientFileTab } from "./client-file-tabs";
 import { ClientPaymentsTab } from "./client-payments-tab";
+import { ClientPhone } from "./client-phone";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
 import { CourtesyAccessAction } from "./courtesy-access-action";
-import { phoneWithFlag } from "../../lib/phone-number";
 
 const clientDetailQueryOptions = (clientId: string) =>
   queryOptions({
@@ -179,11 +179,7 @@ function ContactBlock({ client }: { client: AdminClientDetailDto }) {
     <SummaryBlock title="Contacto">
       <SummaryRow label="Correo">{client.email}</SummaryRow>
       <SummaryRow label="Teléfono">
-        {client.phone === null ? (
-          <span className="text-texto-muy-tenue">Sin teléfono</span>
-        ) : (
-          <span className="tabular">{phoneWithFlag(client.phone)}</span>
-        )}
+        <ClientPhone phone={client.phone} />
       </SummaryRow>
     </SummaryBlock>
   );

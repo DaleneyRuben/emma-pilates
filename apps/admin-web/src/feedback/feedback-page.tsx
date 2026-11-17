@@ -17,6 +17,7 @@ import {
   typeLabels,
 } from "./feedback-format";
 import { FeedbackPanel } from "./feedback-panel";
+import { FeedbackSender } from "./feedback-sender";
 import {
   feedbackTableQueryOptions,
   fetchAllFeedback,
@@ -72,6 +73,14 @@ const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
     cell: ({ getValue }) => (
       <span className="whitespace-nowrap text-texto-secundario tabular">
         {formatCivilMoment(getValue())}
+      </span>
+    ),
+  }),
+  columns.accessor("senderName", {
+    header: "Enviado por",
+    cell: ({ row }) => (
+      <span className="whitespace-nowrap text-texto-secundario">
+        <FeedbackSender feedback={row.original} />
       </span>
     ),
   }),

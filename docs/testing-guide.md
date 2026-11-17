@@ -56,6 +56,7 @@ numbered tests.
 | Phones with a country code | «Celular» with a flag prefix and a country list in Regístrate (required), Editar perfil, Nuevo cliente, Invitar a alguien and the client's «Editar perfil» on the web; numbers with their flag in every list; WhatsApp in the number's own country (Test 132) | A store build older than FIX-037 registers without a phone |
 | Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and Horario, and next to the Trainer's name in the client's Reservar, class detail, Mis reservas and Historial (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
 | Settled review notices | A confirmed or rejected receipt and a decided Freeze mark every Administrator's «… por revisar» notice read; a Minimum Bookings cancellation notice names its day (Test 141) | Notices already stale before FIX-046 stay unread |
+| Walkthrough 59, 74, 88 | «Hace un momento» under a minute in both apps' Notificaciones and Pagos pendientes; «Celular incompleto» on Clientes and the client file for a missing or unusable phone; Comentarios names who sent each one, linked to the Client's file (Test 157) | A phone saved before the rule can only be fixed by the Client or from «Editar perfil»; nothing rewrites it |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -107,14 +108,14 @@ can be found by its design name.
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111, 155 |
-| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras (the Fundadora chip on Clientas since WEB-040) | 26, 88 |
 | AW41 Congelamientos | 92 |
 | AW23–AW24 Personal | 26, 31, 72, 79, 142 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72, 93, 149 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89, 112, 145 |
-| AW38 Comentarios | 80 |
+| AW38 Comentarios | 80, 157 |
 | AW151 Caja | 76, 112 |
 
 ## Before you begin
@@ -1652,7 +1653,8 @@ from system.accounts a where a.email = 'sofia@example.com';
 
 Pull the Perfil tab again: the badge shows `1`, and **Notificaciones** lists the
 row under **Sin leer** with a dot and a relative time such as "Hace 40 minutos"
-(yesterday's rows read "Ayer, 18:05", older ones "Hace 2 días"). Tap **Marcar
+(under a minute it reads "Hace un momento", never "Hace 0 minutos"; yesterday's
+rows read "Ayer, 18:05", older ones "Hace 2 días"). Tap **Marcar
 leídas**: the action disappears, everything moves under **Anteriores**, and the
 row and tab badges are gone when you go back. Tapping a single row also marks
 it read.
@@ -1804,7 +1806,7 @@ count and "Bs 560 en total", then one card per transfer, oldest first: the
 Client's first letter in a tinted circle, her name in Lora over the Plan, a
 Palo de rosa chevron on the right, and under a thin rule the amount in Lora
 and an amber clock with how long ago it was sent ("Hace 3 minutos", "Ayer,
-19:40") (MOB-042). With nothing to review the screen reads "No hay
+19:40"; "hace un momento" under a minute, FIX-063) (MOB-042). With nothing to review the screen reads "No hay
 pagos pendientes." and "Todo al día. Te avisaremos cuando llegue una
 transferencia nueva.".
 
@@ -5428,7 +5430,10 @@ folder (ADR-0096):
 4. Promotions (WEB-033): on `/privacidad/`, «Con quién compartimos tus datos»
    lists WhatsApp (Meta) and says the administration may export the
    promotions contacts to a spreadsheet; `/soporte/` answers «Quiero dejar de
-   recibir promociones» (the Perfil switch, or an email to `soporte@`).
+   recibir promociones»: the studio may write by WhatsApp and email to every
+   Client, she asks the studio (or `soporte@`) to stop, and a closed Account
+   keeps her contact only if she ticked the box (FIX-063, after FIX-060).
+   Neither page mentions a Perfil switch.
 
 ### On production
 
@@ -7263,12 +7268,13 @@ The Maestro journeys `send-feedback.yaml` in both apps' `.maestro` run steps
 
 1. Log in to the admin web as `paola.mendoza@example.com` and open
    **Comentarios**. The subtitle counts the «Nuevo» ones; the table shows
-   Fecha, Tipo, Comentario, App, Versión («1.0.1 (3) · Android 14»), and the
-   Estado pill. Filter by Estado (Todos, Nuevo, Revisado, Resuelto) and App
+   Fecha, Enviado por (a Client's name links to her file; a Staff Member's
+   is plain, FIX-063), Tipo, Comentario, App, Versión («1.0.1 (3) · Android
+   14»), and the Estado pill. Filter by Estado (Todos, Nuevo, Revisado, Resuelto) and App
    (Las dos, App de clientas, App del personal); the filters live in the
    address.
-2. Open a row: the panel shows the whole text, Fecha, App, Rol, Correo,
-   Versión, and Sistema. Choose **Resuelto**, write «Qué cambiamos», and
+2. Open a row: the panel shows the whole text, Fecha, App, Enviado por, Rol,
+   Correo, Versión, and Sistema. Choose **Resuelto**, write «Qué cambiamos», and
    **Guardar**: «Guardamos el comentario.» and the pill turns Resuelto.
 3. **Exportar CSV** downloads `comentarios-aaaa-mm-dd.csv` with every comment:
    Fecha, App, Tipo, Comentario, Versión, Estado, Qué cambiamos (what Google's
@@ -9840,3 +9846,54 @@ database copy with the migration applied.
 4. As Lucía (or another client), **Evaluación nutricional** no longer offers
    the released time after the block's end. Lucía's card still reads «El
    estudio liberó este turno · el pago sigue vigente» with **Elegir turno**.
+
+## Test 157: «Hace un momento», «Celular incompleto» and who sent a comment (FIX-063, walkthrough 59, 74, 88)
+
+No migration. Run the API, the worker and the admin web on a fresh fixtures
+copy.
+
+### A. «Hace un momento» (n.º 59)
+
+1. As the Administrator in the Staff app, have a Client send a transfer
+   receipt (Test 19's `seed.mjs` sends two). Within a minute **Pagos
+   pendientes** reads «Paquete de 8 clases · hace un momento», never «hace 0
+   minutos». After a minute it reads «hace 1 minuto».
+2. Have a Client send «Enviar comentarios»: the Administrator's
+   **Notificaciones** shows «Llegó una sugerencia…» with «Hace un momento».
+3. In the Client app, cancel a class she booked from the admin web or the
+   Staff app: her **Perfil › Notificaciones** shows «Tu clase de … fue
+   cancelada» with «Hace un momento». On the iPhone width Pagos pendientes
+   cuts the line («hac…»), as it already did for «hace 20 minutos»; the
+   iPad and Android show it whole.
+
+### B. «Celular incompleto» (n.º 74)
+
+Every development fixture Client is stored with `+591 7001100x`, and the apps
+and the API refuse a new number that is not a full mobile. A phone saved
+before the rule (none, or `7000004` without a country code) stays as it was.
+To see one, on your own copy only:
+
+```sql
+update booking.clients set phone = '7000004' where name = 'Sofía Guzmán';
+update booking.clients set phone = null where name = 'Mariana Peña';
+```
+
+1. Admin web **Clientas › Todas**: both rows show «Celular incompleto» in
+   amber under the email, instead of the raw number; every other row keeps
+   «🇧🇴 +591 …» (a foreign number such as `+51 912345678` shows its flag).
+2. Open each: **Contacto › Teléfono** reads «Celular incompleto» (it used to
+   say «Sin teléfono» for none). «Editar perfil» still opens with what is
+   stored, and a valid number saved there replaces it.
+
+### C. Who sent a comment (n.º 88)
+
+1. Send «Enviar comentarios» from the Client app (Lucía) and from the Staff
+   app (Camila).
+2. Admin web **Comentarios**: the new column **Enviado por** shows «Lucía
+   Fernández» as a link and «Camila Rojas» as plain text. At 420 px the
+   cards show the same «Enviado por» row.
+3. Open Lucía's comment: the panel has **Enviado por** with the link, above
+   Rol and Correo. Follow the link: **Clientas** opens filtered by her email
+   with her file open; closing it leaves the filtered list.
+4. API: `GET /api/v1/administrator/feedback` items carry `senderName` and
+   `senderClientId` (null for Staff).

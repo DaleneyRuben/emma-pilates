@@ -19561,6 +19561,16 @@
             "format": "email",
             "description": "The sender’s login email"
           },
+          "senderName": {
+            "type": "string",
+            "description": "The sender’s name: the Client’s, or the Staff Member’s (walkthrough finding 88)"
+          },
+          "senderClientId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The Client who sent it, for a link to her file; null for Staff"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -19584,6 +19594,8 @@
           "status",
           "changeNote",
           "senderEmail",
+          "senderName",
+          "senderClientId",
           "createdAt",
           "triagedAt"
         ]

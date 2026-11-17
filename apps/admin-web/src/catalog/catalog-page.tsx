@@ -1,7 +1,7 @@
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { isForbidden } from "../components/page/is-forbidden";
 import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
@@ -47,6 +47,13 @@ type CatalogPageProps<Row extends { id: string }> = {
   actions?: ReactNode;
   /** A summary under a loaded table (AW27's studio total). */
   footer?: ReactNode;
+  /** A row to open once the page lists it (a link from another page). */
+  openRowId?: string;
+  /**
+   * Called once `openRowId` opened, or the loaded page does not list it, so
+   * the address can forget it (replacing the history entry, not pushing).
+   */
+  onLinkSettled?: () => void;
 };
 
 export type PanelAction = {
@@ -88,6 +95,8 @@ export function CatalogPage<Row extends { id: string }>({
   links,
   actions,
   footer,
+  openRowId,
+  onLinkSettled,
 }: CatalogPageProps<Row>) {
   const [panel, setPanel] = useState<PanelState<Row>>({ kind: "closed" });
   const [notice, setNotice] = useState<string | null>(null);
@@ -102,6 +111,24 @@ export function CatalogPage<Row extends { id: string }>({
     close();
     setNotice(message ?? null);
   };
+  // A linked row opens once, while rendering (no effect-driven setState).
+  const linked = query.data?.items.find((row) => row.id === openRowId);
+  const [openedLink, setOpenedLink] = useState<string | undefined>();
+  if (linked !== undefined && openedLink !== linked.id) {
+    setOpenedLink(linked.id);
+    setNotice(null);
+    setPanel({ kind: "record", row: linked });
+  } else if (openRowId === undefined && openedLink !== undefined) {
+    setOpenedLink(undefined);
+  }
+  const linkMissing =
+    openRowId !== undefined &&
+    query.isSuccess &&
+    !query.isPlaceholderData &&
+    linked === undefined;
+  useEffect(() => {
+    if (openedLink !== undefined || linkMissing) onLinkSettled?.();
+  }, [openedLink, linkMissing, onLinkSettled]);
 
   return (
     <article className="flex flex-col gap-5">

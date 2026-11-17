@@ -19,6 +19,7 @@ import {
   versionLabel,
 } from "./feedback-format";
 import { useTriageFeedback } from "./feedback-queries";
+import { FeedbackSender } from "./feedback-sender";
 
 const statusOptions = (
   [
@@ -84,6 +85,9 @@ export function FeedbackPanel({
             </span>
           </SummaryRow>
           <SummaryRow label="App">{appLabels[feedback.app]}</SummaryRow>
+          <SummaryRow label="Enviado por">
+            <FeedbackSender feedback={feedback} />
+          </SummaryRow>
           <SummaryRow label="Rol">{roleLabels[feedback.role]}</SummaryRow>
           <SummaryRow label="Correo">
             <span className="break-all">{feedback.senderEmail}</span>

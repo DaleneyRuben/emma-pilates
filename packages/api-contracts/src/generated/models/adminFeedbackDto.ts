@@ -29,6 +29,13 @@ export interface AdminFeedbackDto {
   changeNote: string | null;
   /** The sender’s login email */
   senderEmail: string;
+  /** The sender’s name: the Client’s, or the Staff Member’s (walkthrough finding 88) */
+  senderName: string;
+  /**
+   * The Client who sent it, for a link to her file; null for Staff
+   * @nullable
+   */
+  senderClientId: string | null;
   createdAt: string;
   /** @nullable */
   triagedAt: string | null;

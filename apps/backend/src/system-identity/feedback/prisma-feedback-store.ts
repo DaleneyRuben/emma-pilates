@@ -61,7 +61,14 @@ const feedbackSelect = {
   changeNote: true,
   createdAt: true,
   triagedAt: true,
-  account: { select: { email: true } },
+  account: {
+    select: {
+      email: true,
+      deletedAt: true,
+      client: { select: { id: true, name: true, deletedAt: true } },
+      staffMember: { select: { name: true } },
+    },
+  },
 } as const satisfies Prisma.FeedbackSelect;
 
 type FeedbackRecord = Prisma.FeedbackGetPayload<{
@@ -81,6 +88,17 @@ const toRow = (record: FeedbackRecord): FeedbackRow => ({
   status: lower<FeedbackStatus>(record.status),
   changeNote: record.changeNote,
   senderEmail: record.account.email,
+  senderName:
+    record.account.client?.name ??
+    record.account.staffMember?.name ??
+    record.account.email,
+  // A closed Account's Client is out of the directory: no link to follow.
+  senderClientId:
+    record.account.deletedAt === null &&
+    record.account.client !== null &&
+    record.account.client.deletedAt === null
+      ? record.account.client.id
+      : null,
   createdAt: record.createdAt,
   triagedAt: record.triagedAt,
 });
