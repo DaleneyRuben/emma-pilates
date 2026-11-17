@@ -1,6 +1,6 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { AdministrationError } from '../administration/administration-errors';
-import { grantCampaign } from './grant-campaign';
+import { grantCampaign, previewCampaign } from './grant-campaign';
 
 const staff = (
   role: 'assistant' | 'administrator' | 'trainer' | 'nutritionist',
@@ -36,7 +36,8 @@ const dependencies = (
   now: new Date('2026-10-23T15:00:00.000Z'),
   today: new Date('2026-10-23T00:00:00.000Z'),
   findRecipients: jest.fn().mockResolvedValue(recipients),
-  findSkipped: jest.fn().mockResolvedValue([]),
+  findWithoutPlan: jest.fn().mockResolvedValue([]),
+  owe: jest.fn().mockResolvedValue(undefined),
   record: jest.fn().mockImplementation((input: { clientId: string }) =>
     Promise.resolve({
       id: `adjustment-${input.clientId}`,
@@ -47,7 +48,7 @@ const dependencies = (
 });
 
 describe('grantCampaign', () => {
-  it('grants one campaign class to every Client with a live Subscription and names who was skipped', async () => {
+  it('grants the classes to every Client with a current Plan and owes them to every Client without one', async () => {
     const deps = dependencies(staff('administrator'), [
       {
         clientId: 'live-client',
@@ -55,37 +56,39 @@ describe('grantCampaign', () => {
         subscriptionId: 'live-subscription',
       },
     ]);
-    deps.findSkipped.mockResolvedValue([
-      { clientId: 'waiting-client', name: 'Sofía', reason: 'no_current_plan' },
+    deps.findWithoutPlan.mockResolvedValue([
+      { clientId: 'waiting-client', name: 'Sofía' },
     ]);
 
     await expect(
       grantCampaign(
-        { name: 'Inicio de año', classes: 1, idempotencyKey: 'key' },
+        { name: 'Inicio de año', classes: 2, idempotencyKey: 'key' },
         deps,
       ),
     ).resolves.toEqual({
       name: 'Inicio de año',
-      classes: 1,
+      classes: 2,
       granted: [{ clientId: 'live-client', name: 'Lucía' }],
-      skipped: [
-        {
-          clientId: 'waiting-client',
-          name: 'Sofía',
-          reason: 'no_current_plan',
-        },
-      ],
+      owed: [{ clientId: 'waiting-client', name: 'Sofía' }],
+      skipped: [],
     });
     expect(deps.record).toHaveBeenCalledWith(
       expect.objectContaining({
         clientId: 'live-client',
         subscriptionId: 'live-subscription',
-        classes: 1,
+        classes: 2,
         reason: 'campaign',
         authorAccountId: 'administrator-account',
         campaignName: 'Inicio de año',
       }),
     );
+    expect(deps.owe).toHaveBeenCalledWith({
+      clientId: 'waiting-client',
+      classes: 2,
+      authorAccountId: 'administrator-account',
+      campaignName: 'Inicio de año',
+      now: deps.now,
+    });
   });
 
   it.each(['assistant', 'trainer', 'nutritionist'] as const)(
@@ -106,6 +109,7 @@ describe('grantCampaign', () => {
         ),
       ).rejects.toBeInstanceOf(AdministrationError);
       expect(deps.record).not.toHaveBeenCalled();
+      expect(deps.owe).not.toHaveBeenCalled();
       expect(deps.findRecipients).not.toHaveBeenCalled();
     },
   );
@@ -163,5 +167,20 @@ describe('grantCampaign', () => {
       ),
     ).rejects.toMatchObject({ code: 'invalid_campaign' });
     expect(deps.record).not.toHaveBeenCalled();
+  });
+
+  it('counts every active Client in the preview and names the ones owed', async () => {
+    await expect(
+      previewCampaign({
+        principal: staff('administrator'),
+        countWithPlan: () => Promise.resolve(6),
+        findWithoutPlan: () =>
+          Promise.resolve([{ clientId: 'waiting-client', name: 'Sofía' }]),
+      }),
+    ).resolves.toEqual({
+      recipientCount: 7,
+      owed: [{ clientId: 'waiting-client', name: 'Sofía' }],
+      skipped: [],
+    });
   });
 });
