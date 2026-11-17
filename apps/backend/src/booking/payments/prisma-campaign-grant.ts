@@ -16,43 +16,67 @@ import { oweCampaignClasses } from './owed-campaign-classes';
 
 type Transaction = Prisma.TransactionClient;
 
-const withAccount = { deletedAt: null, account: { isNot: null } };
+// An active Client: neither she nor her Account is closed, removed, or
+// disabled. Closing an Account removes the Client too.
+const withAccount = {
+  deletedAt: null,
+  account: { is: { deletedAt: null, disabledAt: null } },
+};
 
-// FIX-064 (walkthrough finding 90): every active Client with a current
-// Subscription, founders included, whatever its Plan or price: ACTIVE, and
-// its date range covers today in America/La_Paz. Subscription has no
-// deleted_at. A Guest Pass is not her Plan, so the class never lands on it.
-const currentOn = (today: Date): Prisma.SubscriptionWhereInput => ({
+// FIX-064 (walkthrough finding 90): every active Client, founders included,
+// whatever her Plan or price. Her current Subscription takes the classes:
+// ACTIVE, its range covering today in America/La_Paz, the most recently
+// activated if two overlap. Without one, a Plan already activated to start
+// later takes them, the earliest first. A Guest Pass is not her Plan, so the
+// classes never land on one. Subscription has no deleted_at.
+const liveOrNextOn = (today: Date): Prisma.SubscriptionWhereInput => ({
   state: 'ACTIVE',
-  startsOn: { lte: today },
   endsOn: { gte: today },
   guestPasses: { none: { deletedAt: null } },
 });
+
+const chosen = (
+  today: Date,
+  subscriptions: readonly {
+    id: string;
+    startsOn: Date;
+    activatedAt: Date | null;
+  }[],
+): string | undefined => {
+  const current = subscriptions
+    .filter((subscription) => subscription.startsOn <= today)
+    .sort(
+      (a, b) =>
+        (b.activatedAt?.getTime() ?? 0) - (a.activatedAt?.getTime() ?? 0) ||
+        b.id.localeCompare(a.id),
+    );
+  if (current.length > 0) return current[0].id;
+  return [...subscriptions].sort(
+    (a, b) =>
+      a.startsOn.getTime() - b.startsOn.getTime() || a.id.localeCompare(b.id),
+  )[0]?.id;
+};
 
 const findRecipients = async (
   transaction: Transaction,
   today: Date,
 ): Promise<LiveRecipient[]> => {
   const rows = await transaction.client.findMany({
-    where: { ...withAccount, subscriptions: { some: currentOn(today) } },
+    where: { ...withAccount, subscriptions: { some: liveOrNextOn(today) } },
     orderBy: [{ name: 'asc' }, { id: 'asc' }],
     select: {
       id: true,
       name: true,
       subscriptions: {
-        where: currentOn(today),
-        orderBy: [{ activatedAt: 'desc' }, { id: 'desc' }],
-        take: 1,
-        select: { id: true },
+        where: liveOrNextOn(today),
+        select: { id: true, startsOn: true, activatedAt: true },
       },
     },
   });
   return rows.flatMap((row) => {
-    const subscription = row.subscriptions[0];
-    if (subscription === undefined) return [];
-    return [
-      { clientId: row.id, name: row.name, subscriptionId: subscription.id },
-    ];
+    const subscriptionId = chosen(today, row.subscriptions);
+    if (subscriptionId === undefined) return [];
+    return [{ clientId: row.id, name: row.name, subscriptionId }];
   });
 };
 
@@ -63,7 +87,7 @@ const findWithoutPlan = async (
 ): Promise<CampaignRecipient[]> =>
   transaction.client
     .findMany({
-      where: { ...withAccount, subscriptions: { none: currentOn(today) } },
+      where: { ...withAccount, subscriptions: { none: liveOrNextOn(today) } },
       orderBy: [{ name: 'asc' }, { id: 'asc' }],
       select: { id: true, name: true },
     })
@@ -81,7 +105,10 @@ export const createPrismaCampaignGrant = (
       principal,
       countWithPlan: () =>
         prisma.client.count({
-          where: { ...withAccount, subscriptions: { some: currentOn(today) } },
+          where: {
+            ...withAccount,
+            subscriptions: { some: liveOrNextOn(today) },
+          },
         }),
       findWithoutPlan: () => findWithoutPlan(prisma, today),
     });
@@ -100,6 +127,8 @@ export const createPrismaCampaignGrant = (
         request: { name: command.name.trim(), classes: command.classes },
         now,
         onKeyReused: () => new Error('idempotency_key_reused'),
+        // One write or two per active Client: more than the default 5 s.
+        timeoutMilliseconds: 60_000,
       },
       (transaction) =>
         grantCampaign(command, {
