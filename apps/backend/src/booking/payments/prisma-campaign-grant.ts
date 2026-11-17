@@ -9,9 +9,10 @@ import {
   type CampaignCommand,
   type CampaignGrant,
   type CampaignPreview,
+  type CampaignRecipient,
   type LiveRecipient,
-  type SkippedClient,
 } from './grant-campaign';
+import { oweCampaignClasses } from './owed-campaign-classes';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -55,21 +56,18 @@ const findRecipients = async (
   });
 };
 
-const findSkipped = async (
+// Every other active Client: her next Subscription collects the classes.
+const findWithoutPlan = async (
   transaction: Transaction,
   today: Date,
-): Promise<SkippedClient[]> => {
-  const rows = await transaction.client.findMany({
-    where: { ...withAccount, subscriptions: { none: currentOn(today) } },
-    orderBy: [{ name: 'asc' }, { id: 'asc' }],
-    select: { id: true, name: true },
-  });
-  return rows.map((row) => ({
-    clientId: row.id,
-    name: row.name,
-    reason: 'no_current_plan',
-  }));
-};
+): Promise<CampaignRecipient[]> =>
+  transaction.client
+    .findMany({
+      where: { ...withAccount, subscriptions: { none: currentOn(today) } },
+      orderBy: [{ name: 'asc' }, { id: 'asc' }],
+      select: { id: true, name: true },
+    })
+    .then((rows) => rows.map((row) => ({ clientId: row.id, name: row.name })));
 
 export const createPrismaCampaignGrant = (
   prisma: PrismaClient,
@@ -81,11 +79,11 @@ export const createPrismaCampaignGrant = (
     const today = boliviaDate(now());
     return previewCampaign({
       principal,
-      countRecipients: () =>
+      countWithPlan: () =>
         prisma.client.count({
           where: { ...withAccount, subscriptions: { some: currentOn(today) } },
         }),
-      findSkipped: () => findSkipped(prisma, today),
+      findWithoutPlan: () => findWithoutPlan(prisma, today),
     });
   },
   grant: async (
@@ -109,7 +107,7 @@ export const createPrismaCampaignGrant = (
           now: now(),
           today,
           findRecipients: () => findRecipients(transaction, today),
-          findSkipped: () => findSkipped(transaction, today),
+          findWithoutPlan: () => findWithoutPlan(transaction, today),
           record: (input) =>
             recordAllowanceAdjustment(transaction, {
               subscriptionId: input.subscriptionId,
@@ -123,6 +121,15 @@ export const createPrismaCampaignGrant = (
               now: input.now,
               correlationId: command.idempotencyKey,
               campaignName: input.campaignName,
+            }),
+          owe: (input) =>
+            oweCampaignClasses(transaction, {
+              clientId: input.clientId,
+              classes: input.classes,
+              campaignName: input.campaignName,
+              authorAccountId: input.authorAccountId,
+              correlationId: command.idempotencyKey,
+              now: input.now,
             }),
         }),
     );

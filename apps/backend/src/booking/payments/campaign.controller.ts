@@ -46,22 +46,28 @@ export class CampaignClientDto {
   name!: string;
 }
 
-// FIX-060 (walkthrough finding 87): added beside the name, so an older
-// admin web still reads the list.
+// FIX-060 (walkthrough finding 87) added the reason. FIX-064 (walkthrough
+// finding 90) skips nobody: the list is always empty, kept so an older admin
+// web still reads the answer.
 export class CampaignSkippedClientDto extends CampaignClientDto {
   @ApiProperty({
     enum: ['founder', 'no_current_plan'],
-    description:
-      'A founder is never in a campaign; anyone else has no live paid Plan',
+    description: 'Deprecated: a campaign skips nobody since FIX-064',
   })
   reason!: 'founder' | 'no_current_plan';
 }
 
+const owedDescription =
+  'Active Clients without a current Plan: their next activated Plan collects the classes';
+
 export class CampaignPreviewDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'Every active Client, with a Plan or owed' })
   recipientCount!: number;
 
-  @ApiProperty({ type: [CampaignSkippedClientDto] })
+  @ApiProperty({ type: [CampaignClientDto], description: owedDescription })
+  owed!: CampaignClientDto[];
+
+  @ApiProperty({ type: [CampaignSkippedClientDto], deprecated: true })
   skipped!: CampaignSkippedClientDto[];
 }
 
@@ -84,10 +90,16 @@ export class CampaignResultDto {
   @ApiProperty()
   classes!: number;
 
-  @ApiProperty({ type: [CampaignClientDto] })
+  @ApiProperty({
+    type: [CampaignClientDto],
+    description: 'Active Clients whose current Plan received the classes',
+  })
   granted!: CampaignClientDto[];
 
-  @ApiProperty({ type: [CampaignSkippedClientDto] })
+  @ApiProperty({ type: [CampaignClientDto], description: owedDescription })
+  owed!: CampaignClientDto[];
+
+  @ApiProperty({ type: [CampaignSkippedClientDto], deprecated: true })
   skipped!: CampaignSkippedClientDto[];
 }
 
@@ -102,7 +114,7 @@ const invalid = (detail: string) =>
   new BadRequestException({ code: 'invalid_request', detail });
 
 // Decisions §5.4: only the Administrator grants a campaign, and it never
-// discounts a price. A Client without a live Subscription is skipped.
+// discounts a price. Every active Client gets it (booking ADR-0014).
 @Controller({ path: 'administrator/campaigns', version: '1' })
 @ApiBearerAuth()
 export class CampaignController {

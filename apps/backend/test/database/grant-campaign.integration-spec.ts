@@ -35,7 +35,7 @@ describe('campaign extra classes', () => {
     await context?.stop();
   });
 
-  it('grants one campaign class to every live Subscription, skips a Client without one, and a retry writes nothing more', async () => {
+  it('grants one campaign class to every live Subscription, owes it to a Client without one, and a retry writes nothing more', async () => {
     const live = await createFixture(prisma, { now: today });
     const planId = (
       await prisma.subscription.findUniqueOrThrow({
@@ -99,9 +99,8 @@ describe('campaign extra classes', () => {
 
     expect(first).toEqual(retry);
     expect(first.granted).toEqual([{ clientId: live.clientId, name: 'Lucía' }]);
-    expect(first.skipped).toEqual([
-      { clientId: waiting.id, name: 'Sofía', reason: 'no_current_plan' },
-    ]);
+    expect(first.owed).toEqual([{ clientId: waiting.id, name: 'Sofía' }]);
+    expect(first.skipped).toEqual([]);
     await expect(prisma.allowanceAdjustment.count()).resolves.toBe(1);
     await expect(
       prisma.allowanceAdjustment.findFirstOrThrow({
@@ -136,10 +135,9 @@ describe('campaign extra classes', () => {
     });
     await expect(grant.preview(administrator(live.accountId))).resolves.toEqual(
       {
-        recipientCount: 1,
-        skipped: [
-          { clientId: waiting.id, name: 'Sofía', reason: 'no_current_plan' },
-        ],
+        recipientCount: 2,
+        owed: [{ clientId: waiting.id, name: 'Sofía' }],
+        skipped: [],
       },
     );
   });

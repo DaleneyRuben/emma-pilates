@@ -108,6 +108,7 @@ import {
   collectOwedInviteReward,
   grantInviteReward,
 } from './grant-invite-reward';
+import { collectOwedCampaignClasses } from './owed-campaign-classes';
 import { hasEarlierRealPayment } from './gift-class-history';
 import { isNextPlanPayment } from './next-plan-payment';
 import { listPendingTransfers } from './prisma-pending-payments';
@@ -449,6 +450,13 @@ export function createPrismaPaymentCommands(
     };
     await collectOwedInviteReward(transaction, {
       hostClientId: payment.clientId,
+      subscriptionId: subscription.id,
+      author,
+      now,
+      correlationId: payment.id,
+    });
+    await collectOwedCampaignClasses(transaction, {
+      clientId: payment.clientId,
       subscriptionId: subscription.id,
       author,
       now,
