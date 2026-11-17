@@ -6,6 +6,8 @@
 //   (inside the 2 h 30 cancellation window, so 05 offers «Reprogramar») and
 //   a later Session the same day booked by Valeria (a booked Session survives
 //   the worker's empty-class check) to move it to.
+// - "campaign": a one-class campaign «Inicio de año» for every active Client
+//   (FIX-064), so Mi plan shows «Clases extra: … · …».
 // Writes output.sessionId, output.targetId, output.targetTime (HH:MM) and
 // output.date (YYYY-MM-DD), both in Bolivia, for the flow's selectors.
 
@@ -126,6 +128,17 @@ if (SEED === "full-session") {
     .toISOString()
     .slice(11, 16);
   output.date = boliviaDate(new Date(source.startsAt));
+} else if (SEED === "campaign") {
+  must(
+    request(
+      "POST",
+      "/administrator/campaigns",
+      admin,
+      { name: "Inicio de año", classes: 1 },
+      { "Idempotency-Key": uuid() },
+    ),
+    "campaign",
+  );
 } else {
   throw new Error("unknown SEED " + SEED);
 }
