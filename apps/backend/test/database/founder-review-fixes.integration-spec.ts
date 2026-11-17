@@ -279,7 +279,8 @@ describe('founder review fixes', () => {
     ).resolves.toBe(1);
   });
 
-  it('grants a campaign only to an ordinary live Client', async () => {
+  // FIX-064 (walkthrough finding 90) reverses FIX-001: «TODAS las clientas».
+  it('grants a campaign to a founder and to a courtesy, hidden, or Bs 0 Plan too', async () => {
     await releasePlaces();
     const ordinary = await world.newClient('Campaña viva');
     const founder = await world.newClient('Campaña fundadora');
@@ -386,24 +387,14 @@ describe('founder review fixes', () => {
     const granted = result.granted
       .map((client) => client.clientId)
       .filter((clientId) => watched.includes(clientId));
-    expect(granted).toEqual([ordinary.clientId]);
-    for (const clientId of [
-      founder.clientId,
-      courtesy.clientId,
-      hidden.clientId,
-      free.clientId,
-    ]) {
+    expect([...granted].sort()).toEqual([...watched].sort());
+    for (const clientId of watched) {
       await expect(
         prisma.allowanceAdjustment.count({
           where: { clientId, reason: 'CAMPAIGN' },
         }),
-      ).resolves.toBe(0);
+      ).resolves.toBe(1);
     }
-    await expect(
-      prisma.allowanceAdjustment.count({
-        where: { clientId: ordinary.clientId, reason: 'CAMPAIGN' },
-      }),
-    ).resolves.toBe(1);
   });
 
   it('numbers the next place from the highest number, including a removed row', async () => {
