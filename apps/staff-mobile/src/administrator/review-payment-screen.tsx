@@ -36,7 +36,8 @@ import { PersonRow } from "../ui/person-row";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAdministratorApi } from "./administrator-api";
-import { formatSubmittedAt } from "./administrator-format";
+import { describeSale, formatSubmittedAt } from "./administrator-format";
+import { PaymentBreakdown } from "./payment-breakdown";
 import type { PaymentsNotice } from "./pending-payments-screen";
 
 type ReviewNavigation = {
@@ -194,7 +195,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
           <IconRowGroup>
             <PersonRow
               amount={formatBolivianos(payment.amountDueCentavos)}
-              detail={payment.planName}
+              detail={describeSale(payment)}
               face={
                 <ClientFace
                   fetcher={fetcher}
@@ -254,11 +255,12 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
         {header}
         <EmphasisCard
           eyebrow="Monto a verificar"
-          note={`${payment.clientName} · ${payment.planName}`}
+          note={`${payment.clientName} · ${describeSale(payment)}`}
           pill={stateLabels[payment.state]}
         >
           <Text style={styles.amount}>{formatBolivianos(payment.amountDueCentavos)}</Text>
         </EmphasisCard>
+        <PaymentBreakdown payment={payment} />
         <IconRowGroup>
           <IconRow icon="credit" label="Transferencia" />
           <IconRow icon="clock" label={`Enviado el ${formatSubmittedAt(payment.submittedAt)}`} />

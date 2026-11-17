@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 import { clientAccountStatuses } from '../assistant/assistant.dto';
 import type { ClientAccountStatus } from '../assistant/assistant-clients';
@@ -75,6 +75,24 @@ export class AdminClientDto {
     description: 'Classes the active Subscription granted, null without one',
   })
   originalClassAllowance!: number | null;
+
+  @ApiPropertyOptional({
+    type: Number,
+    nullable: true,
+    minimum: 0,
+    description:
+      'Live extra classes on top of remainingClassAllowance, null without a Plan (walkthrough finding 61)',
+  })
+  extraClasses?: number | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date',
+    nullable: true,
+    description:
+      'Set when the row describes the Plan bought after a spent Guest Pass, which starts on this day (walkthrough finding 60)',
+  })
+  planStartsOn?: string | null;
 
   @ApiProperty({
     type: String,

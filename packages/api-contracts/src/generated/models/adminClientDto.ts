@@ -40,6 +40,17 @@ export interface AdminClientDto {
    */
   originalClassAllowance: number | null;
   /**
+   * Live extra classes on top of remainingClassAllowance, null without a Plan (walkthrough finding 61)
+   * @minimum 0
+   * @nullable
+   */
+  extraClasses?: number | null;
+  /**
+   * Set when the row describes the Plan bought after a spent Guest Pass, which starts on this day (walkthrough finding 60)
+   * @nullable
+   */
+  planStartsOn?: string | null;
+  /**
    * The active Plan’s last day, or the last Plan’s when it expired; null if never
    * @nullable
    */

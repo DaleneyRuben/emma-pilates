@@ -13,6 +13,8 @@ import {
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 
+import { guestPassCopy } from "./guest-pass-copy";
+import { planClasses } from "./plan-classes";
 import { formatCivilDate } from "./home-format";
 import { promotionCardMaxWidth } from "./promotion-image";
 
@@ -44,7 +46,8 @@ export function ActivePlanCard({
 }) {
   const remaining = subscription.remainingClassAllowance;
   const original = subscription.originalClassAllowance;
-  const progress = original === 0 ? 0 : remaining / original;
+  const progress = original === 0 ? 0 : Math.min(1, remaining / original);
+  const { left, breakdown } = planClasses(subscription);
 
   return (
     <View style={[styles.card, styles.capped]} testID="home-plan-card">
@@ -53,11 +56,10 @@ export function ActivePlanCard({
         <Pill>{statusPill[status]}</Pill>
       </View>
       <View style={styles.count}>
-        <Text style={styles.bigNumber}>{String(remaining)}</Text>
-        <Text style={styles.countLabel}>
-          {remaining === 1 ? "clase restante" : "clases restantes"}
-        </Text>
+        <Text style={styles.bigNumber}>{String(left)}</Text>
+        <Text style={styles.countLabel}>{left === 1 ? "clase restante" : "clases restantes"}</Text>
       </View>
+      {breakdown === null ? null : <Text style={styles.note}>{breakdown}</Text>}
       <View
         accessibilityLabel={`${remaining} de ${original} clases`}
         accessibilityRole="progressbar"
@@ -71,6 +73,34 @@ export function ActivePlanCard({
         <Text style={styles.note}>{`Vence el ${formatCivilDate(subscription.endsOn)}`}</Text>
         <OnEmphasisButton label="Mi plan" onPress={onDetail} testID="home-plan-detail" />
       </View>
+    </View>
+  );
+}
+
+/** The hero for a Guest Pass (walkthrough n.º 56, 60): its free class, then a Plan. */
+export function GuestPassCard({
+  onDetail,
+  onPurchase,
+  view,
+}: {
+  onDetail: () => void;
+  onPurchase: () => void;
+  view: Pick<ClientSubscriptionDto, "status" | "subscription" | "nextSubscription">;
+}) {
+  const copy = guestPassCopy(view);
+  if (copy === null) return null;
+  return (
+    <View style={styles.capped} testID="home-guest-pass-card">
+      <EmphasisCard
+        action={
+          copy.next === "purchase"
+            ? { label: "Comprar un plan", onPress: onPurchase, testID: "home-buy-plan" }
+            : { label: "Mi plan", onPress: onDetail, testID: "home-plan-detail" }
+        }
+        eyebrow={copy.eyebrow}
+        note={copy.note}
+        title={copy.title}
+      />
     </View>
   );
 }

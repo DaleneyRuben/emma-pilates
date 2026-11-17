@@ -9,6 +9,7 @@ import {
   evaluationSlotMinutes,
   isEvaluationBookable,
 } from './evaluation-rules';
+import { isReschedulablePaidEvaluation } from './paid-evaluation-reschedule';
 import { receiptUploadable } from './receipt-uploadable';
 
 export const toClientEvaluationView = (
@@ -23,6 +24,10 @@ export const toClientEvaluationView = (
       ? row.payment.amountDueCentavos
       : 0,
   paymentId: row.paymentId,
+  paymentState:
+    row.payment === null
+      ? null
+      : (row.payment.state.toLowerCase() as ClientEvaluationView['paymentState']),
   receiptAttached: row.payment?.receiptImageAssetId != null,
   receiptUploadable: receiptUploadable(row.payment),
   state:
@@ -44,7 +49,7 @@ export const toClientEvaluationView = (
     isEvaluationBookable(row.slot.startsAt, now),
   reschedulable:
     row.state === EvaluationState.BOOKED &&
-    row.payment?.state === 'CONFIRMED' &&
+    isReschedulablePaidEvaluation(row) &&
     row.slotReleasedAt === null &&
     isEvaluationBookable(row.slot.startsAt, now),
   slotReleased: row.slotReleasedAt !== null,

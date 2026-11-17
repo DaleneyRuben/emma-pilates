@@ -26,6 +26,9 @@ const row = {
   subscriptionStatus: 'active',
   remainingClassAllowance: 5,
   originalClassAllowance: 8,
+  // Walkthrough n.º 61: live extra classes ride along with «Le quedan».
+  extraClasses: 1,
+  planStartsOn: null,
   planEndsOn: new Date('2026-09-30T00:00:00.000Z'),
   founderNumber: 3,
   invitedByName: 'Sofía Guzmán',

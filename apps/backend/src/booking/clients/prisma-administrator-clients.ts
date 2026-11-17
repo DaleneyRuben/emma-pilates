@@ -8,6 +8,7 @@ import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { clientPhotoOf } from '../client/client-photo-of';
 import { toSubscriptionSummary } from '../client/client-subscription';
 import { containsPattern } from '../search-pattern';
+import { directoryPlan, directoryPlanSelect } from './directory-plan';
 import type {
   AdministratorClientDirectory,
   AdministratorClientRow,
@@ -93,7 +94,7 @@ export const createPrismaAdministratorClients = (
         }),
       ]);
       const pageIds = matches.map(({ id }) => id);
-      const [rows, lastEnds] = await Promise.all([
+      const [rows, lastEnds, nextPlans] = await Promise.all([
         prisma.client.findMany({
           where: { id: { in: pageIds } },
           select: {
@@ -104,14 +105,10 @@ export const createPrismaAdministratorClients = (
             account: accountSelect,
             subscriptions: {
               where: activeOn(today),
-              select: {
-                planNameSnapshot: true,
-                remainingClassAllowance: true,
-                originalClassAllowance: true,
-                endsOn: true,
-              },
+              select: directoryPlanSelect,
               take: 1,
             },
+
             founderMembership: {
               select: { number: true, status: true, deletedAt: true },
             },
@@ -133,14 +130,30 @@ export const createPrismaAdministratorClients = (
           where: { clientId: { in: pageIds } },
           _max: { endsOn: true },
         }),
+        prisma.subscription.findMany({
+          where: {
+            clientId: { in: pageIds },
+            state: 'ACTIVE',
+            startsOn: { gt: today },
+          },
+          orderBy: [{ startsOn: 'desc' }, { id: 'desc' }],
+          select: { clientId: true, ...directoryPlanSelect },
+        }),
       ]);
+      // The earliest later Plan wins: rows come latest first.
+      const nextPlanOf = new Map(
+        nextPlans.map((plan) => [plan.clientId, plan]),
+      );
       const lastEndOf = new Map(
         lastEnds.map((group) => [group.clientId, group._max.endsOn]),
       );
       const byId = new Map(
         rows.flatMap((row): [string, AdministratorClientRow][] => {
           if (row.account === null) return [];
-          const active = row.subscriptions[0];
+          const plan = directoryPlan(
+            row.subscriptions[0],
+            nextPlanOf.get(row.id),
+          );
           const lastEnd = lastEndOf.get(row.id) ?? null;
           const founder = row.founderMembership;
           const acquisition = row.acquisitions[0];
@@ -154,17 +167,18 @@ export const createPrismaAdministratorClients = (
                 email: row.account.email,
                 phone: row.phone,
                 accountStatus: accountStatus(row.account),
-                planName: active?.planNameSnapshot ?? null,
+                planName: plan?.planName ?? null,
                 subscriptionStatus:
-                  active !== undefined
+                  plan !== null
                     ? 'active'
                     : lastEnd !== null
                       ? 'expired'
                       : 'none',
-                remainingClassAllowance:
-                  active?.remainingClassAllowance ?? null,
-                originalClassAllowance: active?.originalClassAllowance ?? null,
-                planEndsOn: active?.endsOn ?? lastEnd,
+                remainingClassAllowance: plan?.remainingClassAllowance ?? null,
+                originalClassAllowance: plan?.originalClassAllowance ?? null,
+                extraClasses: plan?.extraClasses ?? null,
+                planStartsOn: plan?.planStartsOn ?? null,
+                planEndsOn: plan?.planEndsOn ?? lastEnd,
                 founderNumber:
                   founder !== null &&
                   founder.status === 'ACTIVE' &&
@@ -228,6 +242,10 @@ export const createPrismaAdministratorClients = (
         .then(toSubscriptionSummary),
     findLatestSubscription: (clientId) =>
       catalog.findLatestSubscription(clientId).then(toSubscriptionSummary),
+    findFutureSubscription: (clientId, after) =>
+      catalog
+        .findFutureSubscription(clientId, after)
+        .then(toSubscriptionSummary),
     readClosureOutlook: async (clientId, now) => {
       const [bookings, waitlist, evaluations, pending] = await Promise.all([
         prisma.booking.count({

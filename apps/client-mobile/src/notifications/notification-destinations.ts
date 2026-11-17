@@ -21,7 +21,9 @@ const routes: Readonly<Record<string, ClientNotificationRoute>> = {
 export function clientNotificationDestination(
   destinationType: string | null,
 ): ClientNotificationRoute | null {
-  return destinationType !== null && Object.hasOwn(routes, destinationType)
-    ? routes[destinationType]
-    : null;
+  if (destinationType === null || !Object.hasOwn(routes, destinationType)) return null;
+  // Walkthrough n.º 55: React Navigation applies a params object only once,
+  // so each notification gets its own copy.
+  const [tab, params] = routes[destinationType];
+  return [tab, { ...params }] as ClientNotificationRoute;
 }

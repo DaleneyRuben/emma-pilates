@@ -99,4 +99,26 @@ describe("describeAccountClosure", () => {
       }).blocked,
     ).toBe(false);
   });
+
+  // Walkthrough n.º 78: closing also loses a Plan already paid that has not
+  // started, and the classes she loses include her live extras (n.º 61).
+  it("names the queued Plan and counts extra classes", () => {
+    expect(
+      describeAccountClosure({
+        ...nothing,
+        subscription: {
+          status: "expiring_soon",
+          subscription: {
+            planName: "12 clases",
+            remainingClassAllowance: 11,
+            extraClasses: 1,
+          },
+          nextSubscription: { planName: "Trimestral 24 clases", startsOn: "2026-12-02" },
+        },
+      }).lines,
+    ).toEqual([
+      "Tu plan 12 clases termina hoy, y también tu Trimestral 24 clases, que empezaba el 2 de diciembre. No se devuelve dinero y pierdes las 12 clases que te quedan.",
+      ...always,
+    ]);
+  });
 });

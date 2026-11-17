@@ -1,6 +1,7 @@
 import { onlineManager } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors, spacing, typography } from "./tokens";
 
@@ -17,17 +18,22 @@ export function OfflineBanner() {
 
   if (online) return null;
 
+  // Walkthrough n.º 71: the banner sits above the screens, so it keeps the
+  // clock and the island clear itself; the screens below then measure no
+  // top inset of their own.
   return (
-    <View accessibilityRole="alert" style={styles.banner}>
-      <Text style={styles.text}>Sin conexión. Mostrando la última información guardada.</Text>
-    </View>
+    <SafeAreaView edges={["top"]} style={styles.area}>
+      <View accessibilityRole="alert" style={styles.banner}>
+        <Text style={styles.text}>Sin conexión. Mostrando la última información guardada.</Text>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  area: { backgroundColor: colors.warning },
   banner: {
     alignItems: "center",
-    backgroundColor: colors.warning,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },

@@ -1,4 +1,5 @@
 import {
+  type ClientSubscriptionDto,
   createPurchaseIntent,
   getCurrentPurchaseIntent,
   getGetCurrentPurchaseIntentQueryKey,
@@ -7,6 +8,7 @@ import {
   useListBranches,
 } from "@pilates/api-contracts";
 import {
+  addCivilDays,
   BodyText,
   colors,
   LoadingState,
@@ -45,6 +47,22 @@ const purchaseErrorCopy: Record<string, string> = {
     "Tienes una clase reservada con tu acceso actual. Elige un inicio después de esa clase.",
 };
 
+const bookedClassRule = purchaseErrorCopy.start_date_before_booked_class;
+
+// Walkthrough n.º 58: a plan starts after the guest class she booked, so the
+// first day it can start is the day after that class.
+const firstStartAfterGuestClass = (
+  subscription: ClientSubscriptionDto | undefined,
+  today: string,
+  now: Date,
+): string | null => {
+  const classStartsAt = subscription?.subscription?.guestPass?.usedClassStartsAt;
+  // Only a class still ahead holds the start back, as on the server.
+  if (classStartsAt == null || new Date(classStartsAt).getTime() <= now.getTime()) return null;
+  const classDay = boliviaCivilDate(new Date(classStartsAt));
+  return classDay < today ? null : addCivilDays(classDay, 1);
+};
+
 const problemCode = (data: unknown): string | null =>
   typeof data === "object" && data !== null && "code" in data
     ? String((data as { code: unknown }).code)
@@ -71,7 +89,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const today = boliviaCivilDate(new Date());
-  const [startsOn, setStartsOn] = useState(today);
+  const [chosenStart, setChosenStart] = useState<string | undefined>(undefined);
   const [nextStart, setNextStart] = useState<string | undefined>(undefined);
 
   if (plan.isPending) {
@@ -94,8 +112,11 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
 
   const detail = plan.data.data;
   const price = formatBolivianos(detail.priceCentavos);
-  const renewalStartsOn =
-    subscription.data?.status === 200 ? subscription.data.data.renewalStartsOn : undefined;
+  const view = subscription.data?.status === 200 ? subscription.data.data : undefined;
+  const renewalStartsOn = view?.renewalStartsOn;
+  const firstStart = firstStartAfterGuestClass(view, today, new Date());
+  const startsOn = chosenStart ?? firstStart ?? today;
+  const beforeGuestClass = firstStart !== null && startsOn < firstStart;
 
   // A Purchase Intent freezes the amount to transfer: the Plan's full price,
   // since Credit is retired (PAY-005).
@@ -168,8 +189,15 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
             selected={startsOn}
             startDateLimitDays={studioRules.startDateLimitDays}
             today={today}
-            onSelect={setStartsOn}
+            onSelect={setChosenStart}
           />
+        )}
+        {firstStart === null || renewalStartsOn !== undefined ? null : beforeGuestClass ? (
+          <BodyText accessibilityRole="alert" style={styles.error}>
+            {bookedClassRule}
+          </BodyText>
+        ) : (
+          <BodyText style={styles.help}>{bookedClassRule}</BodyText>
         )}
         <PlanBreakdown plan={detail} />
         {error === null ? null : (
@@ -194,6 +222,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.lg },
   error: { color: colors.errorText },
+  help: { color: colors.textMuted, fontSize: typography.note },
   footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
   note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   screen: { gap: spacing.lg },

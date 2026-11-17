@@ -14,7 +14,12 @@ import {
 import { Fragment } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { clockTime, evaluationBadge, evaluationDayAndTime } from "./evaluation-format";
+import {
+  clockTime,
+  evaluationBadge,
+  evaluationDayAndTime,
+  paidEvaluationLabel,
+} from "./evaluation-format";
 
 function DateTile({ instant }: { instant: string }) {
   const badge = evaluationBadge(instant);
@@ -51,7 +56,9 @@ export function UpcomingEvaluationCard({
   const reschedulable = evaluation.reschedulable === true && open;
   // Walkthrough finding 68: the studio released her slot; she picks another.
   const released = evaluation.slotReleased === true;
-  const lead = evaluation.included ? `${evaluation.durationMinutes} min` : "Pagada";
+  const lead = evaluation.included
+    ? `${evaluation.durationMinutes} min`
+    : paidEvaluationLabel(evaluation.paymentState);
   const limit = reschedulable
     ? "reprograma hasta 3 h antes"
     : cancellable
@@ -78,7 +85,8 @@ export function UpcomingEvaluationCard({
       <CardActionRow label="Elegir turno" onPress={onReschedule} />
     ) : reschedulable ? (
       <CardActionRow label="Reprogramar" onPress={onReschedule} />
-    ) : cancellable ? (
+    ) : null,
+    cancellable ? (
       <CardActionRow label="Cancelar evaluación" onPress={onCancel} tone="error" />
     ) : null,
   ].filter((action) => action !== null);

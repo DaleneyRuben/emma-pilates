@@ -145,6 +145,35 @@ describe("Staff Perfil", () => {
     });
   });
 
+  // Walkthrough n.º 75: saving returns to Perfil with the confirmation toast.
+  it("returns to Perfil with «Contraseña actualizada» after saving", async () => {
+    const screen = await openProfile(
+      createStaffRuntime(
+        routeFetcher({
+          ...staffRoutes(trainerProfile),
+          "PATCH /api/v1/accounts/current/password": () => new Response(null, { status: 204 }),
+        }),
+      ),
+    );
+
+    await fireEvent.press(screen.getByRole("button", { name: "Cambiar contraseña" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Contraseña actual")).toBeOnTheScreen();
+    });
+    await fireEvent.changeText(screen.getByLabelText("Contraseña actual"), "Emma2026vargas");
+    await fireEvent.changeText(screen.getByLabelText("Contraseña nueva"), "Reformer2026ev");
+    await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "Reformer2026ev");
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar contraseña" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Contraseña actualizada")).toBeOnTheScreen();
+    });
+    expect(screen.getByRole("button", { name: "Cambiar contraseña" })).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar aviso" }));
+    expect(screen.queryByText("Contraseña actualizada")).toBeNull();
+  });
+
   it("asks for confirmation in the sheet before logging out", async () => {
     const runtime = createStaffRuntime(routeFetcher(staffRoutes(trainerProfile, 1)));
     const screen = await openProfile(runtime);

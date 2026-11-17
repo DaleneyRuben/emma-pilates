@@ -26,6 +26,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 
 import { useImpersonation } from "../impersonation/impersonation-context";
+import { describeSale } from "./administrator-format";
 import { useStaffFetcher } from "../staff-fetcher";
 import { PersonRow } from "../ui/person-row";
 import { RootHeader } from "../ui/root-header";
@@ -176,7 +177,7 @@ export function PendingPaymentsScreen({
                 <PersonRow
                   accessibilityLabel={`Revisar pago de ${payment.clientName}`}
                   amount={formatBolivianos(payment.amountDueCentavos)}
-                  detail={`${payment.planName} · ${formatNotificationTime(payment.submittedAt, now).toLowerCase()}`}
+                  detail={`${describeSale(payment)} · ${formatNotificationTime(payment.submittedAt, now).toLowerCase()}`}
                   face={
                     <ClientFace
                       fetcher={fetcher}

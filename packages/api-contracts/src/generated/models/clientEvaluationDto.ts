@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ClientEvaluationDtoPaymentState } from "./clientEvaluationDtoPaymentState";
 import type { ClientEvaluationDtoState } from "./clientEvaluationDtoState";
 
 export interface ClientEvaluationDto {
@@ -14,6 +15,11 @@ export interface ClientEvaluationDto {
   priceCentavos: number;
   /** @nullable */
   paymentId: string | null;
+  /**
+   * The Paid Evaluation payment state; null when included. Older builds ignore it.
+   * @nullable
+   */
+  paymentState: ClientEvaluationDtoPaymentState;
   /** A paid Evaluation still needs its transfer receipt. Older builds ignore it. */
   receiptAttached: boolean;
   /** True only while the payment is pending and has no receipt. Older builds ignore it. */
@@ -28,7 +34,7 @@ export interface ClientEvaluationDto {
   /** Start minus 3 hours; the Client cannot cancel after it */
   cancellableUntil: string;
   cancellable: boolean;
-  /** A confirmed Paid Evaluation can move to another slot until 3 hours before the original start */
+  /** A Paid Evaluation, confirmed or under review, can move to another slot until 3 hours before the original start */
   reschedulable: boolean;
   /** The studio released the slot of this confirmed Paid Evaluation; the Client picks another one. Older builds ignore it. */
   slotReleased: boolean;

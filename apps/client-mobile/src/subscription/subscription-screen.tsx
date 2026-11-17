@@ -8,6 +8,7 @@ import {
   boliviaCivilDate,
   BrandToast,
   colors,
+  EmphasisCard,
   formatBolivianos,
   LoadingState,
   nextPlanStartWindowDays,
@@ -27,6 +28,7 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { guestPassCopy } from "../home/guest-pass-copy";
 import { formatCivilDate } from "../home/home-format";
 import { FreezeCard, freezeCardState } from "./freeze-card";
 import { freezeWindow } from "./freeze-window";
@@ -90,6 +92,8 @@ export function SubscriptionScreen() {
   }
 
   const expired = status === "expired";
+  // Walkthrough n.º 56 and 60: a Guest Pass is one free class, never renewed.
+  const guestPass = guestPassCopy(data);
   const today = boliviaCivilDate(new Date());
   const renewalStartsOn = data.renewalStartsOn ?? addCivilDays(subscription.endsOn, 1);
   const details: [string, string][] = [
@@ -108,7 +112,7 @@ export function SubscriptionScreen() {
       note: "Tu plan nuevo puede empezar más tarde: lo que cuenta es la fecha de compra.",
     });
   }
-  if (status === "expiring_soon") {
+  if (status === "expiring_soon" && guestPass === null) {
     notices.push({
       icon: "clock",
       text: `Tu plan vence el ${formatCivilDate(subscription.endsOn)}.`,
@@ -137,7 +141,17 @@ export function SubscriptionScreen() {
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-        <SubscriptionHero status={status} subscription={subscription} />
+        {guestPass === null ? (
+          <SubscriptionHero status={status} subscription={subscription} />
+        ) : (
+          <View testID="subscription-guest-pass">
+            <EmphasisCard
+              eyebrow={guestPass.eyebrow}
+              note={guestPass.note}
+              title={guestPass.title}
+            />
+          </View>
+        )}
         {notices.length === 0 ? null : <NoticeList notices={notices} />}
         {freeze == null || cardState === null ? null : (
           <FreezeCard
@@ -151,10 +165,10 @@ export function SubscriptionScreen() {
           />
         )}
         <DetailRows rows={details} title="Detalles" />
-        {subscription.extraClassesLine ? (
+        {subscription.extraClassesLine && guestPass === null ? (
           <BodyText style={styles.note}>{subscription.extraClassesLine}</BodyText>
         ) : null}
-        {expired ? (
+        {expired || (guestPass !== null && nextSubscription == null) ? (
           <View style={styles.section}>
             <SectionTitle>Elige tu próximo plan</SectionTitle>
             <BodyText style={styles.note}>
@@ -162,7 +176,7 @@ export function SubscriptionScreen() {
             </BodyText>
             <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
           </View>
-        ) : nextSubscription == null || canFreeze ? (
+        ) : guestPass !== null ? null : nextSubscription == null || canFreeze ? (
           <View>
             <SectionTitle>Tu plan</SectionTitle>
             <ActionRows>

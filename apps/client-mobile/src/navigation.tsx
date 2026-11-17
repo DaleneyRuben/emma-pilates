@@ -5,7 +5,7 @@ import {
   MobileQueryProvider,
   type MobileNavigationProps,
   createTabStackScreenLayout,
-  popTabToRootOnPress,
+  returnTabsToRoot,
   tabBarHidden,
   typography,
 } from "@pilates/mobile-core";
@@ -157,9 +157,18 @@ const tabOptions =
     };
   };
 
+// Each tab's root screen, the first of its stack.
+const tabRoots = {
+  HomeTab: "Home",
+  Booking: "Browse",
+  Bookings: "MyBookings",
+  ProfileTab: "Profile",
+} as const;
+
 const ClientTabs = createBottomTabNavigator({
-  // Walkthrough n.º 28: tapping a tab opens it on its root screen.
-  screenListeners: popTabToRootOnPress,
+  // Walkthrough n.º 28 and 55: tapping a tab opens it on its root screen,
+  // even when a notification opened it on another screen.
+  screenListeners: returnTabsToRoot(tabRoots),
   // Labels stay under the icons on a tablet too.
   screenOptions: {
     headerShown: false,
@@ -169,14 +178,17 @@ const ClientTabs = createBottomTabNavigator({
     tabBarLabelStyle: { fontSize: typography.tabLabel },
   },
   screens: {
-    HomeTab: { screen: HomeStack, options: tabOptions("Inicio", "home", "Home") },
-    Booking: { screen: BookingStack, options: tabOptions("Reservar", "booking", "Browse") },
+    HomeTab: { screen: HomeStack, options: tabOptions("Inicio", "home", tabRoots.HomeTab) },
+    Booking: { screen: BookingStack, options: tabOptions("Reservar", "booking", tabRoots.Booking) },
     Bookings: {
       screen: BookingsStack,
-      options: tabOptions("Mis Reservas", "bookings", "MyBookings"),
+      options: tabOptions("Mis Reservas", "bookings", tabRoots.Bookings),
     },
     // The owner removed the Perfil tab's unread pill (2026-11-02): it is on the Inicio bell.
-    ProfileTab: { screen: ProfileStack, options: tabOptions("Perfil", "profile", "Profile") },
+    ProfileTab: {
+      screen: ProfileStack,
+      options: tabOptions("Perfil", "profile", tabRoots.ProfileTab),
+    },
   },
 });
 

@@ -6,4 +6,7 @@ export const saleLabel = (row: {
   kind: string;
   planNameSnapshot: string;
 }): string =>
-  row.kind === 'evaluation' ? evaluationSaleLabel : row.planNameSnapshot;
+  // Rows carry Prisma's EVALUATION; views carry evaluation (walkthrough n.º 65).
+  row.kind.toLowerCase() === 'evaluation'
+    ? evaluationSaleLabel
+    : row.planNameSnapshot;

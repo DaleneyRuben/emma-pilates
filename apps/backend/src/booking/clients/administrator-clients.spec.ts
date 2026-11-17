@@ -69,6 +69,7 @@ const directory = (
   read: jest.fn().mockResolvedValue(lucia),
   findActiveSubscription: jest.fn().mockResolvedValue(subscription),
   findLatestSubscription: jest.fn().mockResolvedValue(subscription),
+  findFutureSubscription: jest.fn().mockResolvedValue(null),
   readClosureOutlook: jest.fn().mockResolvedValue(outlook),
   saveProfile: jest.fn(),
   ...overrides,
@@ -205,6 +206,33 @@ describe('Administrator Client detail', () => {
       },
       creditAvailableCentavos: 0,
     });
+  });
+
+  // Walkthrough n.º 60: AW22 shows the Plan a Guest Pass friend bought.
+  it('reads the Plan that starts after the current one', async () => {
+    const next = {
+      ...subscription,
+      id: 'subscription-2',
+      planName: '12 clases',
+      startsOn: new Date('2026-10-01T00:00:00.000Z'),
+      endsOn: new Date('2026-10-30T00:00:00.000Z'),
+    };
+    const clients = directory({
+      findFutureSubscription: jest.fn().mockResolvedValue(next),
+    });
+
+    await expect(
+      readAdministratorClient({ clientId: 'client-id' }, administrator, {
+        directory: clients,
+        now: () => now,
+      }),
+    ).resolves.toMatchObject({
+      subscription: { subscription, nextSubscription: next },
+    });
+    expect(clients.findFutureSubscription).toHaveBeenCalledWith(
+      'client-id',
+      today,
+    );
   });
 
   it('answers client_not_found for an unknown Client', async () => {

@@ -83,9 +83,21 @@ export function monthPhrase(month: string): string {
   return month === boliviaMonth() ? "este mes" : monthName(month);
 }
 
+// Finding 64: «Pagada» only once the transfer is confirmed. A server that
+// does not send the payment state keeps the old «Pagada».
+export function paidEvaluationLabel(paymentState: string | null | undefined): string {
+  if (paymentState === "pending") return "Pago en revisión";
+  if (paymentState === "rejected") return "Pago rechazado";
+  return "Pagada";
+}
+
 // NUT-003: a past Evaluation is not always «Realizada». The label is derived.
-export function evaluationHistoryLabel(evaluation: { state: string; included: boolean }): string {
+export function evaluationHistoryLabel(evaluation: {
+  state: string;
+  included: boolean;
+  paymentState?: string | null;
+}): string {
   if (evaluation.state === "cancelled") return "Cancelada";
   if (evaluation.state === "no_show") return "No asistió";
-  return evaluation.included ? "Incluida" : "Pagada";
+  return evaluation.included ? "Incluida" : paidEvaluationLabel(evaluation.paymentState);
 }

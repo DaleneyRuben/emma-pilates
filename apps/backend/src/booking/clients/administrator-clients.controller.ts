@@ -39,6 +39,7 @@ import {
   parseUpdateAdminClientProfile,
   UpdateAdminClientProfileDto,
 } from './administrator-clients.dto';
+import { toSubscriptionSummaryTransport } from '../client/client-subscription';
 
 export const administratorClientOperations = Symbol(
   'administratorClientOperations',
@@ -67,6 +68,7 @@ const toPageDto = (page: AdministratorClientPage): AdminClientPageDto => ({
   items: page.items.map((item) => ({
     ...item,
     planEndsOn: item.planEndsOn === null ? null : civil(item.planEndsOn),
+    planStartsOn: item.planStartsOn === null ? null : civil(item.planStartsOn),
   })),
 });
 
@@ -79,18 +81,18 @@ const toDetailDto = (
     clientSince: civil(client.clientSince),
     subscription: {
       status: client.subscription.status,
-      nextSubscription: null,
+      // Walkthrough n.º 60: the Plan bought after a Guest Pass.
+      nextSubscription:
+        client.subscription.nextSubscription == null
+          ? null
+          : toSubscriptionSummaryTransport(
+              client.subscription.nextSubscription,
+            ),
       founderRenewalDeadline: client.subscription.founderRenewalDeadline,
       freeze: client.subscription.freeze ?? null,
       canRequestFreeze: client.subscription.canRequestFreeze ?? false,
       subscription:
-        current === null
-          ? null
-          : {
-              ...current,
-              startsOn: civil(current.startsOn),
-              endsOn: civil(current.endsOn),
-            },
+        current === null ? null : toSubscriptionSummaryTransport(current),
     },
   };
 };

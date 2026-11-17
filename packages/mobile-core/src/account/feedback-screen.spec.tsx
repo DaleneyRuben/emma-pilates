@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import { fireEvent, render, waitFor, within } from "@testing-library/react-native";
 
 import { FeedbackScreen } from "./feedback-screen";
 import { readFeedbackMetadata } from "./feedback-metadata";
@@ -90,7 +90,9 @@ describe("FeedbackScreen (REL-012)", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
-  it("explains the daily limit", async () => {
+  // Walkthrough n.º 76: the message sits above the pinned button, so the
+  // keyboard never hides its second line, and the limit stops further sends.
+  it("explains the daily limit above the button and stops sending", async () => {
     const fetcher = jest
       .fn()
       .mockResolvedValue(jsonResponse({ code: "feedback_limit_reached", status: 429 }, 429));
@@ -102,9 +104,16 @@ describe("FeedbackScreen (REL-012)", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Ya enviaste 10 comentarios hoy. Puedes enviar otro mañana."),
+        within(screen.getByTestId("feedback-footer")).getByText(
+          "Ya enviaste 10 comentarios hoy. Puedes enviar otro mañana.",
+        ),
       ).toBeOnTheScreen();
     });
+    expect(sendButton(screen)).toBeDisabled();
+
+    await fireEvent.changeText(screen.getByLabelText("Comentario"), `${comment} Otra vez.`);
+    expect(sendButton(screen)).toBeDisabled();
+    expect(fetcher).toHaveBeenCalledTimes(1);
   });
 
   it("keeps the key for a retry of the same comment and takes a new one after an edit", async () => {

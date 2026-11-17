@@ -38,6 +38,14 @@ export const isConfirmedPaidEvaluation = (evaluation: {
   payment: { state: PaymentState } | null;
 }): boolean => evaluation.payment?.state === PaymentState.CONFIRMED;
 
+// The owner also lets a Client move a Paid Evaluation while its transfer is
+// still under review (walkthrough finding 64). The Payment stays pending.
+export const isReschedulablePaidEvaluation = (evaluation: {
+  payment: { state: PaymentState } | null;
+}): boolean =>
+  evaluation.payment?.state === PaymentState.CONFIRMED ||
+  evaluation.payment?.state === PaymentState.PENDING;
+
 export const movePaidEvaluation = async (
   transaction: Transaction,
   recordNotification: NotificationRecorder,
@@ -84,10 +92,10 @@ export const movePaidEvaluation = async (
       'The Evaluation is not booked',
     );
   }
-  if (!isConfirmedPaidEvaluation(found)) {
+  if (!isReschedulablePaidEvaluation(found)) {
     throw new EvaluationRuleError(
       'evaluation_payment_required',
-      'Only a confirmed Paid Evaluation can be rescheduled',
+      'Only a Paid Evaluation can be rescheduled',
     );
   }
   if (
