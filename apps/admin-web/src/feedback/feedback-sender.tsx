@@ -7,7 +7,8 @@ import { Link } from "@tanstack/react-router";
  * Member's name is plain text.
  */
 export function FeedbackSender({ feedback }: { feedback: AdminFeedbackDto }) {
-  if (feedback.senderClientId === null) {
+  // `== null`: an API older than this field sends none.
+  if (feedback.senderClientId == null) {
     return <span>{feedback.senderName}</span>;
   }
   return (
