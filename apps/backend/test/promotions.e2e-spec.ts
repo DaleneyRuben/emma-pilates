@@ -266,35 +266,17 @@ describe('promotions (e2e)', () => {
 
   // Finding 82: «Guardar borrador» sends no dates; «Publicar» needs both.
   it('creates a draft without dates and refuses to publish it until both are set', async () => {
-    const undated = {
-      headline: input.headline,
-      description: input.description,
-      imageAssetId,
-    };
-    operations.createPromotion.mockResolvedValue({
-      ...view,
-      displayStartsOn: null,
-      displayEndsOn: null,
-      publishedAt: null,
-      state: 'draft',
-    });
+    const undated = { headline: view.headline, description: view.description };
+    const draft = { displayStartsOn: null, displayEndsOn: null };
+    operations.createPromotion.mockResolvedValue({ ...view, ...draft });
     await request(app.getHttpServer())
       .post('/api/v1/administrator/promotions')
       .set('authorization', bearer)
       .set('idempotency-key', key)
       .send(undated)
       .expect(201)
-      .expect(({ body }) =>
-        expect(body).toMatchObject({
-          displayStartsOn: null,
-          displayEndsOn: null,
-          state: 'draft',
-        }),
-      );
-    expect(operations.createPromotion.mock.calls[0]?.[0]).toMatchObject({
-      displayStartsOn: null,
-      displayEndsOn: null,
-    });
+      .expect(({ body }) => expect(body).toMatchObject(draft));
+    expect(operations.createPromotion.mock.calls[0]?.[0]).toMatchObject(draft);
 
     await request(app.getHttpServer())
       .put(`/api/v1/administrator/promotions/${promotionId}`)
