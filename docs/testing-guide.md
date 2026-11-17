@@ -9513,6 +9513,45 @@ J. **No booking on a frozen day (n.º 53c).** Open a class inside the
    on that day offers no waitlist. A class outside the freeze books as
    usual.
 
+## Test 148: verification findings 62 and 63 — the availability time wheel, the studio QR on a paid evaluation (FIX-055, DES-016)
+
+Design follow-ups 260–262 (option A for both). Run the API on a copy of the
+walkthrough database, the staff app on the iPhone 16 Pro, the iPad and
+Android as Gabriela, and the client app on the same devices as Lucía (a
+30-day Plan, so her evaluation is paid). The admin web types `hh:mm` and is
+not part of this test.
+
+A. **The wheel (n.º 62).** **Disponibilidad › Nuevo horario › Hora de
+   inicio**: a white sheet, not a grid. It reads «Hora de inicio», «9:00»
+   large, «Cada 15 minutos, de 6:00 a 22:00», two wheels (hours 6–21;
+   minutes 00, 15, 30, 45) with the chosen row on a beige band, **Listo**
+   and **Volver**. Scroll the hours or tap a row: it snaps and the large
+   time follows. Pick 14:30 and **Listo**: the field reads 14:30.
+B. **Only valid ends.** **Hora de fin** opens one hour after the start
+   («15:30», «1 h · 1 turno de 45 min»). Hours before 15 are faint and do
+   nothing; at 15, «:00» is faint (14:30 + 45 min = 15:15). Pick 17:30: the
+   line says «3 h · 4 turnos de 45 min»; **Listo**, the form shows «4 turnos
+   de 45 min». With a 21:00 start, 22 is the last hour and only «:00» works.
+C. **A later start clears the end.** With 10:00 – 11:30, change the start to
+   11:00: the end goes back to «Elegir»; **Guardar** stays off until a new
+   end. **Volver** and tapping above the sheet close it without changing.
+D. **Editar horario** opens the wheel on the block's own times.
+E. **Paid Confirma tu cita (n.º 63).** As Lucía, **Perfil › Evaluación
+   nutricional**, pick a turno. Under the hero: «Cuesta Bs 70 · se paga por
+   transferencia», the reminder and cancellation rows, then **1 · Paga con
+   el QR del estudio** (the studio QR, «Escanéalo con tu app bancaria y
+   transfiere Bs 70.», **Ampliar**, **Guardar QR**) and **2 · Sube tu
+   comprobante**. Above the button: «Adjunta tu comprobante para
+   continuar»; attach a receipt: «El estudio revisa tu pago y te avisa por
+   la app» and **Confirmar evaluación** turns on. A free evaluation (a
+   quarterly Plan's first) shows no QR and no receipt.
+F. **Receipt later, from Mis evaluaciones.** Book a paid evaluation whose
+   receipt failed to attach (or seed one with a pending payment and no
+   receipt). **Sube tu comprobante de transferencia** on its card opens
+   «Sube tu comprobante» with the same two steps. **Volver** closes it;
+   choosing a receipt uploads it, the sheet closes and the card reads
+   «Comprobante listo.».
+
 ## Test 149: walkthrough findings 66–69, 72, 80 and 81 — the next evaluation on the web, a released paid evaluation, the plan's evaluation offer, worker errors in the local log, the session panel count (FIX-056)
 
 Run the API and the worker on a fresh database copy, the client and staff
