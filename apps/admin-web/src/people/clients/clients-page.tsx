@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { CatalogPage } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { countFormat } from "../../components/table/pagination";
@@ -65,6 +66,10 @@ export function ClientsPage({
   const query = useQuery(clientTableQueryOptions(search));
   const studio = query.data?.studioClientCount;
   const role = useAdminRole();
+  const forgetLinkedClient = useCallback(
+    () => onSearchChange({ cliente: undefined }),
+    [onSearchChange],
+  );
 
   return (
     <CatalogPage
@@ -102,6 +107,8 @@ export function ClientsPage({
         `Mostrando ${countFormat.format(shown)} de ${clientas(studio ?? 0)}`
       }
       query={query}
+      openRowId={search.cliente}
+      onRowOpened={forgetLinkedClient}
       columns={clientColumns}
       renderForm={(client, done) =>
         client === undefined ? null : (
