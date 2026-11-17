@@ -9932,8 +9932,12 @@ Pass never receives them, and a closed Account receives nothing. One migration,
    database, her
    `booking.owed_campaign_classes` row has `collected_at` and the
    `allowance_adjustment_id` of a `CAMPAIGN` adjustment whose audit names
-   «Inicio de año». A second Plan does not collect it again.
+   «Inicio de año». A second Plan does not collect it again. Voiding that
+   sale (Test 89) while the class is unspent owes it again, and a Courtesy
+   Access collects it too. A Client whose only Plan starts later gets the
+   class on that Plan straight away.
 6. Close an Account from the Client app (Test 35) and open the page again:
-   she is no longer counted. On an empty database **Dar las clases** is
+   she is no longer counted. With more than ten Clients without a Plan, the
+   line names ten and ends «y N más». On an empty database **Dar las clases** is
    disabled («0 clientas la recibirán.»).
 7. Check the admin web at 1440 px and 420 px, then drop the copy.
