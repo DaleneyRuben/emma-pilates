@@ -3,8 +3,9 @@ import { clearMobileQueryCache } from "@pilates/mobile-core";
 import * as ImagePicker from "expo-image-picker";
 
 import { jsonResponse, routeFetcher } from "../test-support";
-import { paid, qrRoute } from "./evaluation-receipt-test-support";
+import { chooseReceipt, paid, qrRoute, uploadRoutes } from "./evaluation-receipt-test-support";
 import {
+  availability,
   baseRoutes,
   boliviaInstant,
   dayName,
@@ -142,5 +143,44 @@ describe("One Evaluación nutricional across commands", () => {
     await fireEvent(refreshControl as Parameters<typeof fireEvent>[0], "refresh");
 
     await waitFor(() => expect(slotReads).toBeGreaterThan(before));
+  });
+  // Android walk: the booking's toast stayed over the turnos she then had to
+  // tap to move the Evaluation.
+  it("puts the booking's toast away when she starts to move it", async () => {
+    chooseReceipt();
+    let booked = false;
+    const paidSlots = {
+      ...availability,
+      days: availability.days.map((d) => ({
+        ...d,
+        slots: d.slots.map((entry) => ({ ...entry, ...paid })),
+      })),
+    };
+    const fetcher = routeFetcher({
+      ...baseRoutes({ ...qrRoute, ...uploadRoutes() }),
+      "/api/v1/evaluation-slots": () => jsonResponse(paidSlots),
+      "POST /api/v1/evaluation-slots/slot-2/evaluation-payments": () => {
+        booked = true;
+        return jsonResponse(at("slot-2", firstDay, "09:45"), 201);
+      },
+      "POST /api/v1/evaluations/evaluation-paid/receipt": () => new Response(null, { status: 204 }),
+      "/api/v1/evaluations?scope=upcoming": () =>
+        jsonResponse(page(booked ? [at("slot-2", firstDay, "09:45")] : [])),
+    });
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
+    await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:45" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
+    );
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeEnabled();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
+    expect(await screen.findByText("Comprobante enviado")).toBeOnTheScreen();
+
+    await fireEvent.press(await screen.findByRole("button", { name: "Reprogramar" }));
+
+    expect(await screen.findByText("Elige el nuevo horario")).toBeOnTheScreen();
+    expect(screen.queryByText("Comprobante enviado")).toBeNull();
   });
 });
