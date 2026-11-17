@@ -45,7 +45,7 @@ describe("Client Evaluations", () => {
 
     await waitFor(() => {
       // C13: one line of copy, then the Nutritionist with the Branch.
-      expect(screen.getByText("Una evaluación gratis por mes con tu plan.")).toBeOnTheScreen();
+      expect(screen.getByText("Tu primera evaluación del trimestre es gratis.")).toBeOnTheScreen();
     });
     expect(screen.getByText("Gabriela Rojas")).toBeOnTheScreen();
     expect(screen.getByText("Nutricionista · 45 min · Centro")).toBeOnTheScreen();
@@ -245,7 +245,9 @@ describe("Client Evaluations", () => {
       // C13b: the centred v2 state block.
       expect(screen.getByRole("header", { name: "Necesitas un plan activo" })).toBeOnTheScreen();
     });
-    expect(screen.getByText("La evaluación es gratuita con cualquier plan.")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Con el plan trimestral, la primera evaluación del trimestre es gratis."),
+    ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Ver planes" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: /^Turno/ })).toBeNull();
   });
@@ -333,7 +335,7 @@ describe("Client Evaluations", () => {
       expect(screen.getByText("No tienes evaluaciones próximas")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText("Tu evaluación de este mes sigue disponible y es gratis."),
+      await screen.findByText("Tu primera evaluación del trimestre es gratis."),
     ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Reservar evaluación" }));
 

@@ -1,4 +1,7 @@
-import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
+import type {
+  AdministratorSessionAvailabilityDto,
+  AdministratorSessionRosterDto,
+} from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
@@ -22,14 +25,19 @@ export type SessionPanelState =
   | { mode: "edit"; session: Session };
 
 // AW03: "8 de 10 lugares reservados · 3 en lista de espera" (invariant 4).
-const occupancyLine = (session: Session) =>
-  [
+// The roster refreshes after a booking while the panel keeps the Session it
+// opened with, so its counts win (finding 81).
+const occupancyLine = (
+  session: Session,
+  roster: AdministratorSessionRosterDto | undefined,
+) => {
+  const waiting = Math.max(session.waitlistCount, roster?.waitlist.length ?? 0);
+  return [
     formatSessionMoment(session.startsAt),
-    `${session.bookedCount} de ${session.capacity} lugares reservados`,
-    ...(session.waitlistCount > 0
-      ? [`${session.waitlistCount} en lista de espera`]
-      : []),
+    `${seatsTaken(session, roster?.bookings.length)} de ${session.capacity} lugares reservados`,
+    ...(waiting > 0 ? [`${waiting} en lista de espera`] : []),
   ].join(" · ");
+};
 
 // WEB-039: «Reservar a una clienta» replaces the class detail inside the
 // panel, with a way back; the success notice then shows on the detail.
@@ -89,6 +97,10 @@ export function SessionPanel({
   const session = state.mode === "edit" ? state.session : null;
   const cancellation = session === null ? null : cancellationOf(session);
   const booking = session !== null && bookingFor === session.id;
+  const roster = useQuery({
+    ...sessionRosterQueryOptions(session?.id ?? ""),
+    enabled: session !== null && cancellation === null,
+  });
 
   const close = () => {
     setBookingFor(null);
@@ -116,7 +128,7 @@ export function SessionPanel({
           ? `Sucursal ${branch.name} · sala única`
           : booking || cancellation !== null
             ? `${session.classTypeName} · ${formatSessionMoment(session.startsAt)}`
-            : occupancyLine(session)
+            : occupancyLine(session, roster.data)
       }
     >
       {state.mode === "create" ? (

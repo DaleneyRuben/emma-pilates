@@ -22,4 +22,6 @@ export interface NutritionistAgendaEntryDto {
   branchName: string;
   /** first unless the Client has an earlier booked Evaluation */
   kind: NutritionistAgendaEntryDtoKind;
+  /** A paid Evaluation whose Payment is confirmed: cancelling it keeps the Payment and the Client picks another slot. Older builds ignore it. */
+  paymentConfirmed: boolean;
 }

@@ -70,7 +70,7 @@ can be found by its design name.
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
-| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93, 112 |
+| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93, 112, 149 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
@@ -86,7 +86,7 @@ can be found by its design name.
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112, 126 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112, 113, 145 |
 | S13 Cancelar una clase, S14 Cancelar sesión, Horario (HOR) | 10, 19, 20, 113, 145 |
-| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93 |
+| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93, 149 |
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 95, 106 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
@@ -111,7 +111,7 @@ can be found by its design name.
 | AW40 Fundadoras (the Fundadora chip on Clientas since WEB-040) | 26, 88 |
 | AW41 Congelamientos | 92 |
 | AW23–AW24 Personal | 26, 31, 72, 79, 142 |
-| AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72, 93 |
+| AW25 Evaluaciones nutricionales, AW26 Referidos (AW27 Créditos retired by PAY-005) | 29, 72, 93, 149 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 89, 112, 145 |
 | AW38 Comentarios | 80 |
 | AW151 Caja | 76, 112 |
@@ -2179,8 +2179,10 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
 
 **In the Client app** as `lucia@example.com`:
 
-1. Open **Perfil → Evaluación nutricional** (`C13`): «Una evaluación gratis
-   por mes con tu plan.», the Nutritionist with «Nutricionista · 45 min ·
+1. Open **Perfil → Evaluación nutricional** (`C13`): a line that says what
+   her plan gives (Lucía's 30-day plan: «Cuesta Bs 70 con tu plan.»; a
+   trimestral: «Tu primera evaluación del trimestre es gratis.», then «Ya
+   usaste la gratis de este trimestre · Bs 70.»), the Nutritionist with «Nutricionista · 45 min ·
    Branch», then the day chips (48 × 60 Lino tiles, as in Reservar). Only
    days with an open turno appear; each turno is 45 minutes and disappears 3
    hours before it starts. With more than one Branch, each turno names its
@@ -2198,14 +2200,15 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
    reservar otra evaluación para este mes." (or "para noviembre" when the
    Evaluation is next month's). Inside 3 hours of the start the card shows
    "… · ya no se puede cancelar" instead. With nothing upcoming the list
-   shows «No tienes evaluaciones próximas» with «Tu evaluación de este mes
-   sigue disponible y es gratis.» and **Reservar evaluación**, or, once it took place, "Ya usaste tu
-   evaluación de este mes. Puedes reservar la de noviembre, también gratuita."
+   shows «No tienes evaluaciones próximas» with the same plan line as `C13`
+   and **Reservar evaluación**, or, once it took place, "Ya usaste tu
+   evaluación de este mes. Puedes reservar la de noviembre."
 4. Book one again and open **Evaluación nutricional**: days in that month
    disappear. When no unused month has open turnos, the screen shows "Ya usaste
    tu evaluación de este mes." (naming the month when the used one is a later
    month). A Client without an active plan sees the centred «Necesitas un plan
-   activo» with «La evaluación es gratuita con cualquier plan.» and **Ver
+   activo» with «Con el plan trimestral, la primera evaluación del trimestre
+   es gratis.» and **Ver
    planes**. A studio cancellation reaches the inbox as "…Ya puedes
    reservar otra este mes." (or "…otra para octubre.").
 
@@ -9504,6 +9507,50 @@ J. **No booking on a frozen day (n.º 53c).** Open a class inside the
    **Reservar** off and no «Se descuenta 1 clase de tu plan»; a full class
    on that day offers no waitlist. A class outside the freeze books as
    usual.
+
+## Test 149: walkthrough findings 66–69, 72, 80 and 81 — the next evaluation on the web, a released paid evaluation, the plan's evaluation offer, worker errors in the local log, the session panel count (FIX-056)
+
+Run the API and the worker on a fresh database copy, the client and staff
+apps on the iPhone 16 Pro, the iPad and Android, and the admin web at 1440
+and 420 px. Gabriela publishes a block; Lucía (30-day plan) books a turno
+next week, pays Bs 70 and Ana confirms the transfer.
+
+A. **The plan's offer (n.º 69).** As Lucía, **Perfil › Evaluación
+   nutricional** says «Cuesta Bs 70 con tu plan.». A client with a confirmed
+   trimestral sees «Tu primera evaluación del trimestre es gratis.»; once she
+   booked it, «Ya usaste la gratis de este trimestre · Bs 70.». An empty
+   **Mis evaluaciones** repeats the same line.
+B. **The web names the next one (n.º 66).** As Ana, **Horario › Nutrición**
+   on a week without evaluations: the subtitle reads «Sucursal … · ninguna
+   en la semana · próxima: lun 16/11 · 09:00». With nothing ahead it still
+   reads «ninguna evaluación agendada». **Horario › Clases** already counts
+   «N sesiones esta semana» and needs no change.
+C. **Gabriela cancels the paid one (n.º 67, 72).** In the staff app,
+   **Agenda › Cancelar evaluación**: the sheet adds «El pago de Lucía sigue
+   vigente; ella elige otro turno.» under «Le avisamos y el horario queda
+   libre» (an included or unpaid one shows only the latter). **Sí, cancelar
+   evaluación**: the toast «Evaluación
+   cancelada» shows and the card leaves the Agenda; **Disponibilidad** no
+   longer counts it as reserved. The web's **Horario › Nutrición** drops it
+   too. Lucía's client file still lists it. No reminder arrives for that time.
+D. **Lucía picks another turno (n.º 68).** The notice «El estudio canceló el
+   turno de tu evaluación del …. El pago sigue vigente. Elige otro turno.»
+   opens **Mis evaluaciones**, where the card says «El estudio liberó este
+   turno · el pago sigue vigente» with **Elegir turno** (no «ya no se puede
+   cancelar»). It stays there even after the old time passes. **Elegir
+   turno** opens «Elige otro turno»; pick one and confirm **Sí, mover
+   evaluación**: «Evaluación reprogramada», and the card shows the new time
+   with **Reprogramar**. Gabriela's Agenda and the web list it again at the
+   new time.
+E. **No reminder for a released slot; failures say why (n.º 80).** With
+   Lucía's released evaluation inside the next 24 hours, the worker sends
+   her no «Recordatorio» for it. Without `ERROR_REPORTING_DSN`, a failing
+   sweep now writes a `{"level":50,"event":"error_report","job":…,"error":…,
+   "stack":…}` line to the worker's stderr next to its `…_failed` event.
+F. **The class panel counts the new booking (n.º 81).** In the admin web,
+   **Horario › a class › Reservar a una clienta**, book someone: back on
+   **Editar sesión** the header reads «… · 1 de 8 lugares reservados» (one
+   more than before) at once, matching «Reservaron (1)» and the grid.
 
 ## Test 150: a calendar on every admin web date and a promotion draft without dates (FIX-059, DES-018)
 
