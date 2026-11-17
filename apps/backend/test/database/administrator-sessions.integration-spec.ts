@@ -231,19 +231,10 @@ describe('Sessions across every Branch', () => {
   it('gives the Staff Horario one Branch day with its cancelled classes only when asked (FIX-052)', async () => {
     const from = new Date(Date.now() + 16 * day);
     const until = new Date(from.getTime() + 3 * day);
-    // A class whose Branch has another one in the window: which Branch's
-    // class comes first depends on the hour the spec runs.
-    const scheduled = await prisma.session.findMany({
+    const target = await prisma.session.findFirstOrThrow({
       where: { state: 'SCHEDULED', startsAt: { gte: from, lt: until } },
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
     });
-    const target = scheduled.find((session) =>
-      scheduled.some(
-        (other) =>
-          other.branchId === session.branchId && other.id !== session.id,
-      ),
-    );
-    if (target === undefined) throw new Error('no Branch with two classes');
     const account = await prisma.account.findFirstOrThrow();
     const cancelledAt = new Date(from.getTime() - day);
     await prisma.session.update({
