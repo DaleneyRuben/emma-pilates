@@ -247,6 +247,8 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
 
   // Clients: the directory, the detail without amounts, and corrections.
   'GET /api/v1/administrator/clients': both('allow'),
+  // FIX-065: Clientas › «Exportar CSV», the same people as the list.
+  'GET /api/v1/administrator/clients/export': both('allow'),
   'GET /api/v1/administrator/clients/{clientId}': both('allow'),
   'PATCH /api/v1/administrator/clients/{clientId}': both('allow'),
   'POST /api/v1/administrator/clients/{clientId}/closure': administratorOnly(),
