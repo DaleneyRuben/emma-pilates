@@ -17,48 +17,30 @@ type Transaction = Prisma.TransactionClient;
 
 const withAccount = { deletedAt: null, account: { isNot: null } };
 
-// The same live Subscription as the Client directory: ACTIVE, and its date
-// range covers today in America/La_Paz. Subscription has no deleted_at.
-// A founder, Courtesy Access, a hidden Plan, and a Bs 0 Plan are not a
-// campaign (FIX-001). A guest pass is a hidden courtesy Subscription.
-const liveOn = (today: Date): Prisma.SubscriptionWhereInput => ({
+// FIX-064 (walkthrough finding 90): every active Client with a current
+// Subscription, founders included, whatever its Plan or price: ACTIVE, and
+// its date range covers today in America/La_Paz. Subscription has no
+// deleted_at. A Guest Pass is not her Plan, so the class never lands on it.
+const currentOn = (today: Date): Prisma.SubscriptionWhereInput => ({
   state: 'ACTIVE',
   startsOn: { lte: today },
   endsOn: { gte: today },
-  plan: { hiddenAt: null, priceCentavos: { gt: 0 } },
-  payment: {
-    method: { not: 'COURTESY' },
-    planPriceCentavos: { gt: 0 },
-    plan: { hiddenAt: null, priceCentavos: { gt: 0 } },
-  },
+  guestPasses: { none: { deletedAt: null } },
 });
-
-const activeFounderIds = async (transaction: Transaction) =>
-  (
-    await transaction.founderMembership.findMany({
-      where: { deletedAt: null, status: 'ACTIVE' },
-      select: { clientId: true },
-    })
-  ).map((founder) => founder.clientId);
 
 const findRecipients = async (
   transaction: Transaction,
   today: Date,
 ): Promise<LiveRecipient[]> => {
-  const founders = await activeFounderIds(transaction);
   const rows = await transaction.client.findMany({
-    where: {
-      ...withAccount,
-      id: { notIn: founders },
-      subscriptions: { some: liveOn(today) },
-    },
+    where: { ...withAccount, subscriptions: { some: currentOn(today) } },
     orderBy: [{ name: 'asc' }, { id: 'asc' }],
     select: {
       id: true,
       name: true,
       subscriptions: {
-        where: liveOn(today),
-        orderBy: { activatedAt: 'desc' },
+        where: currentOn(today),
+        orderBy: [{ activatedAt: 'desc' }, { id: 'desc' }],
         take: 1,
         select: { id: true },
       },
@@ -77,22 +59,15 @@ const findSkipped = async (
   transaction: Transaction,
   today: Date,
 ): Promise<SkippedClient[]> => {
-  const [recipients, founders] = await Promise.all([
-    findRecipients(transaction, today),
-    activeFounderIds(transaction),
-  ]);
   const rows = await transaction.client.findMany({
-    where: {
-      ...withAccount,
-      id: { notIn: recipients.map((recipient) => recipient.clientId) },
-    },
+    where: { ...withAccount, subscriptions: { none: currentOn(today) } },
     orderBy: [{ name: 'asc' }, { id: 'asc' }],
     select: { id: true, name: true },
   });
   return rows.map((row) => ({
     clientId: row.id,
     name: row.name,
-    reason: founders.includes(row.id) ? 'founder' : 'no_current_plan',
+    reason: 'no_current_plan',
   }));
 };
 
@@ -107,20 +82,9 @@ export const createPrismaCampaignGrant = (
     return previewCampaign({
       principal,
       countRecipients: () =>
-        prisma.founderMembership
-          .findMany({
-            where: { deletedAt: null, status: 'ACTIVE' },
-            select: { clientId: true },
-          })
-          .then((founders) =>
-            prisma.client.count({
-              where: {
-                ...withAccount,
-                id: { notIn: founders.map((founder) => founder.clientId) },
-                subscriptions: { some: liveOn(today) },
-              },
-            }),
-          ),
+        prisma.client.count({
+          where: { ...withAccount, subscriptions: { some: currentOn(today) } },
+        }),
       findSkipped: () => findSkipped(prisma, today),
     });
   },
