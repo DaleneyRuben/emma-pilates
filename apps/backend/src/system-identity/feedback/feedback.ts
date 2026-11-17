@@ -69,6 +69,10 @@ export type FeedbackRow = FeedbackMessage & {
   status: FeedbackStatus;
   changeNote: string | null;
   senderEmail: string;
+  /** The Client's or Staff Member's name (walkthrough finding 88). */
+  senderName: string;
+  /** Her Client id when a Client sent it, for the link to her file. */
+  senderClientId: string | null;
   createdAt: Date;
   triagedAt: Date | null;
 };

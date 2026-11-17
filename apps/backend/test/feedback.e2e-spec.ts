@@ -41,6 +41,8 @@ const row: FeedbackRow = {
   status: 'resolved',
   changeNote: 'Arreglamos la lista de reservas en la 1.0.2.',
   senderEmail: 'valeria@example.com',
+  senderName: 'Valeria Quiroga',
+  senderClientId: 'c1000000-0000-4000-8000-000000000001',
   createdAt,
   triagedAt: new Date('2026-10-23T16:00:00.000Z'),
 };

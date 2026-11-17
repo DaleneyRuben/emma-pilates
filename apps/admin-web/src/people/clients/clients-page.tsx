@@ -58,9 +58,12 @@ function EmptyDirectory({ searching }: { searching: boolean }) {
 export function ClientsPage({
   search,
   onSearchChange,
+  onLinkedClientSettled,
 }: {
   search: ClientSearch;
   onSearchChange: SearchChange<ClientSearch>;
+  /** Drops `cliente` from the address without a new history entry. */
+  onLinkedClientSettled?: () => void;
 }) {
   const query = useQuery(clientTableQueryOptions(search));
   const studio = query.data?.studioClientCount;
@@ -102,6 +105,8 @@ export function ClientsPage({
         `Mostrando ${countFormat.format(shown)} de ${clientas(studio ?? 0)}`
       }
       query={query}
+      openRowId={search.cliente}
+      onLinkSettled={onLinkedClientSettled}
       columns={clientColumns}
       renderForm={(client, done) =>
         client === undefined ? null : (

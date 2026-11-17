@@ -11,6 +11,9 @@ export type ClientFilter = (typeof clientFilters)[number];
 export const clientSearchSchema = listSearchSchema.extend({
   q: z.string().trim().min(1).max(100).optional().catch(undefined),
   filter: z.enum(clientFilters).optional().catch(undefined),
+  // Walkthrough finding 88: a link from another page (Comentarios) opens her
+  // file once the search lists her.
+  cliente: z.uuid().optional().catch(undefined),
 });
 export type ClientSearch = z.infer<typeof clientSearchSchema>;
 

@@ -23,6 +23,7 @@ describe('Feedback (PostgreSQL)', () => {
     administratorStaff: randomUUID(),
     disabledAdministrator: randomUUID(),
   };
+  let clientId: string;
   const actor = {
     accountId: ids.administrator,
     staffMemberId: ids.administratorStaff,
@@ -79,7 +80,7 @@ describe('Feedback (PostgreSQL)', () => {
     prisma = new PrismaClient({
       adapter: createPrismaAdapter(context.databaseUrl),
     });
-    await clientAccount(ids.client, 'valeria@example.com');
+    clientId = (await clientAccount(ids.client, 'valeria@example.com')).id;
     await prisma.staffMember.create({
       data: {
         name: 'Camila Rojas',
@@ -244,6 +245,8 @@ describe('Feedback (PostgreSQL)', () => {
       status: 'new',
       changeNote: null,
       senderEmail: expect.any(String) as string,
+      senderName: expect.any(String) as string,
+      senderClientId: expect.any(String) as string,
       createdAt: sentAt,
       triagedAt: null,
     });
@@ -337,6 +340,52 @@ describe('Feedback (PostgreSQL)', () => {
       targetType: 'feedback',
       targetId: null,
       metadata: { feedbackCount: 15 },
+    });
+  });
+
+  // Walkthrough finding 88 (FIX-063): Comentarios names who sent it.
+  it('names the sender: the Client with her id, or the Staff Member', async () => {
+    const fromClient = message();
+    const fromTrainer = message({
+      accountId: ids.trainer,
+      app: 'staff',
+      role: 'trainer',
+    });
+    await store().send(fromClient);
+    await store().send(fromTrainer);
+
+    const rows = await store().listAll();
+    expect(rows.find((row) => row.id === fromClient.id)).toMatchObject({
+      senderName: 'Valeria Quiroga',
+      senderClientId: clientId,
+      senderEmail: 'valeria@example.com',
+    });
+    expect(rows.find((row) => row.id === fromTrainer.id)).toMatchObject({
+      senderName: 'Camila Rojas',
+      senderClientId: null,
+      senderEmail: 'camila@example.com',
+    });
+  });
+
+  // FIX-063 review: a closed Account keeps her row but links nowhere.
+  it('names a closed Client «Cliente eliminado» without a link', async () => {
+    const accountId = randomUUID();
+    const closed = await clientAccount(accountId, `${accountId}@example.com`);
+    const input = message({ accountId });
+    await store().send(input);
+    await prisma.client.update({
+      where: { id: closed.id },
+      data: { name: 'Cliente eliminado', deletedAt: sentAt },
+    });
+    await prisma.account.update({
+      where: { id: accountId },
+      data: { deletedAt: sentAt },
+    });
+
+    const rows = await store().listAll();
+    expect(rows.find((row) => row.id === input.id)).toMatchObject({
+      senderName: 'Cliente eliminado',
+      senderClientId: null,
     });
   });
 });
