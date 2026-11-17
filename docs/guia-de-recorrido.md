@@ -951,24 +951,32 @@ Entra a la app del equipo como Gabriela.
 
 En la app de Lucía:
 
-1. **Perfil**, **Evaluación nutricional**. Solo aparecen días con un turno
-   todavía abierto. Un turno desaparece 3 horas antes de empezar. Elige uno
-   y pulsa **Confirmar evaluación**.
+1. **Perfil**, **Evaluación nutricional**: es la única fila de evaluaciones
+   (ya no hay **Mis evaluaciones**). Arriba va la próxima evaluación si hay
+   una, debajo **Reserva tu evaluación** con los días y turnos, y al pie
+   **Anteriores**. Solo aparecen días con un turno todavía abierto. Un turno
+   desaparece 3 horas antes de empezar. Elige uno y pulsa **Confirmar
+   evaluación**: la app vuelve a la misma pantalla con la cita arriba y el
+   aviso «Evaluación confirmada» (o «Comprobante enviado» si es pagada).
 2. Con el plan de 30 días, la consulta se paga: Bs 70, por QR en la app.
    **Confirma tu cita** muestra **1 · Paga con el QR del estudio** (el QR,
    con **Ampliar** y **Guardar QR**) y **2 · Sube tu comprobante**, que Ana
-   confirma. Si el comprobante se sube después, desde **Mis evaluaciones**,
-   se abre una hoja con los mismos dos pasos. No hay cobro
+   confirma. Si el comprobante se sube después, desde la tarjeta de la
+   próxima evaluación, se abre una hoja con los mismos dos pasos. No hay cobro
    en efectivo de la consulta. Con el trimestral ya confirmado, la primera
    consulta del trimestre es gratis. La segunda, en el mismo trimestre, se
    paga. El encabezado de **Evaluación nutricional** lo dice: «Cuesta Bs
    70 con tu plan.», «Tu primera evaluación del trimestre es gratis.» o «Ya
    usaste la gratis de este trimestre · Bs 70.».
-3. Reserva un turno. **Mis evaluaciones** lo muestra. Una consulta gratis
-   tiene **Cancelar evaluación**. Una pagada dice «Pago en revisión»
-   mientras Ana no confirma la transferencia, y tiene **Reprogramar** y
-   **Cancelar evaluación**. Ya confirmada dice «Pagada» y solo tiene
-   **Reprogramar**: el pago se mantiene. Cancelar abre la hoja de
+3. Reserva un turno. Queda arriba, en **Tu próxima evaluación**: la tarjeta
+   rosa con la fecha, la hora grande y una etiqueta con su estado. Una
+   consulta gratis dice «Gratis con tu plan» y tiene **Cancelar
+   evaluación**. Una pagada dice «Pago en revisión» mientras Ana no confirma
+   la transferencia, y tiene **Reprogramar** y **Cancelar evaluación**. Ya
+   confirmada dice «Pagada» y solo tiene **Reprogramar**: el pago se
+   mantiene. **Reprogramar** se hace en la misma pantalla: los turnos pasan a
+   **Elige el nuevo horario**, con «Cambias tu cita del …» y **Volver**; al
+   elegir uno, «¿Mover tu evaluación?» lo confirma. Cancelar abre la hoja de
    confirmación. Desde 3 horas antes ya no se puede cancelar ni
    reprogramar, y no asistir consume la consulta igual.
 4. Gabriela ve la reserva en su **Agenda**, con el nombre de Lucía.
@@ -976,9 +984,10 @@ En la app de Lucía:
    avisamos y el horario queda libre», y al confirmar aparece «Evaluación
    cancelada». La tarjeta sale de la Agenda. Si la consulta ya estaba pagada,
    la hoja agrega «El pago de Lucía sigue vigente; ella elige otro turno.»: el
-   pago sigue, y Lucía recibe «Elige otro turno» y en **Mis evaluaciones** ve
-   «El estudio liberó este turno · el pago sigue vigente» con **Elegir
-   turno**.
+   pago sigue, y Lucía recibe «Elige otro turno»; el aviso abre
+   **Evaluación nutricional**, donde la tarjeta dice «El estudio liberó tu
+   turno» y «Tu pago de Bs 70 sigue vigente: elige otro turno y no pagas de
+   nuevo.», con **Elegir turno**.
 
 En la web, **Horario › Nutrición** lista las mismas reservas. Es una
 lectura. Si la semana a la vista no tiene ninguna, el subtítulo nombra la
