@@ -87,3 +87,11 @@ export async function openAvailability(fetcher: typeof globalThis.fetch) {
   });
   return screen;
 }
+
+// S17b's time wheel: the hour, the quarter hour, then «Listo» (follow-up 262).
+export async function pickTime(screen: Awaited<ReturnType<typeof render>>, time: string) {
+  const [hours = "", minutes = ""] = time.split(":");
+  await fireEvent.press(screen.getByRole("button", { name: `Hora ${Number(hours)}` }));
+  await fireEvent.press(screen.getByRole("button", { name: `Minuto ${minutes}` }));
+  await fireEvent.press(screen.getByRole("button", { name: "Listo" }));
+}

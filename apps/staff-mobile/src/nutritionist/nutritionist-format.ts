@@ -40,11 +40,6 @@ export function turnosIn(startsAtLocal: string, endsAtLocal: string): number {
   return Math.max(0, Math.floor((minutesOf(endsAtLocal) - minutesOf(startsAtLocal)) / slotMinutes));
 }
 
-// The 15-minute grid a block's start and end sit on (NUT-001 D2).
-export const quarterHours: string[] = Array.from({ length: (22 - 6) * 4 + 1 }, (_, index) =>
-  localTimeOf(6 * 60 + index * 15),
-);
-
 const civilDateFormatter = new Intl.DateTimeFormat("en-CA", {
   day: "2-digit",
   month: "2-digit",

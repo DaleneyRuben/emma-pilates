@@ -25,13 +25,14 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { pickReceipt } from "../payments/receipt-upload";
 import { idempotency, uploadImage } from "../uploads/image-upload";
 import { PastEvaluations, UpcomingEvaluationCard } from "./evaluation-card";
+import { EvaluationReceiptSheet } from "./evaluation-receipt-sheet";
 import {
   boliviaMonth,
   clockTime,
@@ -66,6 +67,10 @@ export function MyEvaluationsScreen({
   const [failure, setFailure] = useState<string | null>(null);
   const [receiptReady, setReceiptReady] = useState<Record<string, true>>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  // C15c: the paid Evaluation whose QR and receipt sheet is open (follow-up 262).
+  const [receiptFor, setReceiptFor] = useState<ClientEvaluationDto | null>(null);
+  // One upload at a time, even for two taps before the next render.
+  const uploadBusy = useRef(false);
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const upcoming = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const past = useListEvaluations({ scope: "past" }, queryOptions);
@@ -76,7 +81,11 @@ export function MyEvaluationsScreen({
   const refreshControl = usePullToRefresh(queryKeys);
 
   const attachReceipt = async (evaluation: ClientEvaluationDto) => {
-    if (uploadingId !== null) return;
+    if (uploadBusy.current) return;
+    uploadBusy.current = true;
+    // Closes only this Evaluation's sheet: another may be open by the time it finishes.
+    const closeSheet = () =>
+      setReceiptFor((current) => (current?.id === evaluation.id ? null : current));
     setFailure(null);
     setUploadingId(evaluation.id);
     try {
@@ -89,6 +98,7 @@ export function MyEvaluationsScreen({
         idempotency(),
         fetcher,
       );
+      closeSheet();
       if (attached.status !== 204) {
         setFailure("No pudimos adjuntar el comprobante. Inténtalo de nuevo.");
         return;
@@ -98,8 +108,10 @@ export function MyEvaluationsScreen({
         queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
       });
     } catch {
+      closeSheet();
       setFailure("No pudimos adjuntar el comprobante. Inténtalo de nuevo.");
     } finally {
+      uploadBusy.current = false;
       setUploadingId(null);
     }
   };
@@ -193,7 +205,7 @@ export function MyEvaluationsScreen({
                       receiptReady[evaluation.id] === true || evaluation.receiptAttached === true,
                   }}
                   key={evaluation.id}
-                  onAttachReceipt={() => void attachReceipt(evaluation)}
+                  onAttachReceipt={() => setReceiptFor(evaluation)}
                   onCancel={() => setCancelling(evaluation)}
                   onReschedule={() =>
                     navigation.navigate("EvaluationAvailability", {
@@ -215,6 +227,15 @@ export function MyEvaluationsScreen({
           </View>
         ) : null}
       </ScrollView>
+      <EvaluationReceiptSheet
+        evaluation={receiptFor}
+        fetcher={fetcher}
+        onAttach={() => {
+          if (receiptFor !== null) void attachReceipt(receiptFor);
+        }}
+        onClose={() => setReceiptFor(null)}
+        uploading={uploadingId !== null}
+      />
       <ConfirmationSheet
         confirmLabel="Sí, cancelar evaluación"
         note="El horario queda libre y otras clientas podrán reservarlo."

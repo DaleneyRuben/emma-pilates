@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache, encodeBase64 } from "@pilates/mobile-core";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -6,6 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 
 import { jsonResponse, routeFetcher } from "../test-support";
 import { receiptBytes } from "../payments/purchase-test-support";
+import { chooseReceipt, paid, uploadRoutes } from "./evaluation-receipt-test-support";
 import {
   availability,
   baseRoutes,
@@ -18,7 +19,6 @@ import {
 
 jest.setTimeout(30_000);
 
-const paid = { included: false, priceCentavos: 7_000 };
 const bookedStart = () => boliviaInstant(firstDay, "09:45");
 
 const paidAvailability = () => ({
@@ -28,51 +28,6 @@ const paidAvailability = () => ({
     slots: day.slots.map((entry) => ({ ...entry, ...paid })),
   })),
 });
-
-function chooseReceipt() {
-  jest.mocked(ImagePicker.launchImageLibraryAsync).mockResolvedValue({
-    canceled: false,
-    assets: [
-      {
-        uri: "file:///receipt.png",
-        mimeType: "image/png",
-        fileSize: receiptBytes.byteLength,
-        width: 10,
-        height: 10,
-      },
-    ],
-  } as never);
-  jest
-    .mocked(ImageManipulator.manipulateAsync)
-    .mockResolvedValue({ uri: "file:///receipt.jpg", width: 10, height: 10 });
-  jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(encodeBase64(receiptBytes));
-}
-
-function uploadRoutes() {
-  let statusReads = 0;
-  return {
-    "POST /api/v1/uploads": () =>
-      jsonResponse(
-        {
-          id: "asset-1",
-          uploadUrl: "/api/v1/uploads/asset-1/object",
-          expiresAt: "2026-09-21T15:15:00.000Z",
-        },
-        201,
-      ),
-    "PUT /api/v1/uploads/asset-1/object": () => new Response(null, { status: 204 }),
-    "POST /api/v1/uploads/asset-1/finalize": () =>
-      jsonResponse({ id: "asset-1", state: "processing" }, 202),
-    "/api/v1/uploads/asset-1": () => {
-      statusReads += 1;
-      return jsonResponse({
-        id: "asset-1",
-        state: statusReads < 2 ? "processing" : "ready",
-        mediaType: "image/jpeg",
-      });
-    },
-  };
-}
 
 describe("Paid Evaluation receipt", () => {
   afterEach(async () => {
@@ -237,6 +192,11 @@ describe("Paid Evaluation receipt", () => {
     await fireEvent.press(
       await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
     );
+    await fireEvent.press(
+      within(screen.getByTestId("evaluation-receipt-sheet")).getByRole("button", {
+        name: "Sube tu comprobante de transferencia",
+      }),
+    );
 
     await waitFor(() => {
       expect(
@@ -293,14 +253,17 @@ describe("Paid Evaluation receipt", () => {
       }),
     );
     const screen = await openProfileRow(fetcher, "Mis evaluaciones");
-    const upload = await screen.findByRole("button", {
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
+    );
+    const upload = within(screen.getByTestId("evaluation-receipt-sheet")).getByRole("button", {
       name: "Sube tu comprobante de transferencia",
     });
 
     await act(async () => {
       fireEvent.press(upload);
     });
-    expect(await screen.findByText("Subiendo comprobante…")).toBeOnTheScreen();
+    expect((await screen.findAllByText("Subiendo comprobante…")).length).toBeGreaterThan(0);
 
     await act(async () => {
       fireEvent.press(upload);

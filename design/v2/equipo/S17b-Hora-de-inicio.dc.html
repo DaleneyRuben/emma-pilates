@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>S17b Hora de inicio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}*{box-sizing:border-box}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+.eb{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.day{height:44px;border:0;border-radius:12px;background:#F5EFE9;color:#4A4A4A;font:400 14px 'Work Sans',sans-serif}
+.day.on{background:#B78380;color:#fff;font-weight:600}
+.tf{height:72px;border:0;border-radius:14px;background:#F5EFE9;padding:10px 16px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;font-family:'Work Sans',sans-serif;color:#4A4A4A;text-align:left;cursor:pointer}
+.tf .l{font-size:13px;color:#6F6662}.tf .v{font-size:18px;font-weight:500;font-variant-numeric:tabular-nums}.tf .v.ph{color:#7A716D;font-weight:400}
+.tile{height:60px;border:0;border-radius:14px;background:#F5EFE9;color:#4A4A4A;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:'Work Sans',sans-serif}
+.tile.on{background:#B78380;color:#fff}
+.save{height:52px;border:0;border-radius:14px;background:#B78380;color:#fff;font:600 17px 'Work Sans',sans-serif;width:100%}
+.save.off{background:#E6DBD0;color:#7A716D}
+.scrim{position:absolute;inset:0;background:rgba(74,74,74,.36)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#FFFFFF;border-radius:24px 24px 0 0;padding:10px 20px 30px;display:flex;flex-direction:column;gap:16px}
+.grab{width:36px;height:5px;border-radius:999px;background:#E6DBD0;align-self:center}
+.wheel{position:relative;height:220px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;overflow:hidden}
+.band{position:absolute;left:0;right:0;top:88px;height:44px;border-radius:12px;background:#F5EFE9}
+.col{position:relative;height:220px;overflow:hidden}
+.col .in{display:flex;flex-direction:column;transition:transform .25s ease}
+.wi{height:44px;flex:none;border:0;background:transparent;font:400 22px 'Work Sans',sans-serif;color:#6F6662;font-variant-numeric:tabular-nums;cursor:pointer}
+.wi.sel{color:#4A4A4A;font-weight:600}
+.wi.off{color:#D8C9BB;cursor:default}
+.fade{position:absolute;left:0;right:0;height:88px;pointer-events:none}
+.fade.t{top:0;background:linear-gradient(#fff,rgba(255,255,255,0))}.fade.b{bottom:0;background:linear-gradient(rgba(255,255,255,0),#fff)}
+.back{height:44px;border:0;background:transparent;color:#7D4F4B;font:500 15px 'Work Sans',sans-serif}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="S16-Mi-disponibilidad.dc.html" aria-label="Volver a Mi disponibilidad" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-family: Lora, Georgia, serif; font-size: 24px">Nuevo horario</span>
+  </div>
+  <div style="flex-grow: 1; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span class="eb">Día</span>
+      <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px">
+        <button class="day">Lun</button><button class="day">Mar</button><button class="day">Mié</button><button class="day on">Jue</button><button class="day">Vie</button><button class="day">Sáb</button>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6F6662">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.3"></circle></svg>
+      <span>Sucursal <strong style="color: #4A4A4A; font-weight: 600">Achumani</strong></span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span class="eb">Horario</span>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <button class="tf" onClick="{{openStart}}" aria-label="Hora de inicio: {{startText}}"><span class="l">Hora de inicio</span><span class="v {{startPh}}">{{startText}}</span></button>
+        <button class="tf" onClick="{{openEnd}}" aria-label="Hora de fin: {{endText}}"><span class="l">Hora de fin</span><span class="v {{endPh}}">{{endText}}</span></button>
+      </div>
+      <sc-if value="{{hasTurnos}}" hint-placeholder-val="{{ false }}">
+        <div style="background: #F5EFE9; border-radius: 14px; padding: 8px 16px; display: flex; align-items: center; gap: 12px">
+          <div style="width: 36px; height: 36px; border-radius: 999px; background: #F2E4E1; display: flex; align-items: center; justify-content: center; flex: none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></div>
+          <span style="font-size: 15px">{{turnosText}}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{noTurnos}}" hint-placeholder-val="{{ true }}">
+        <span style="font-size: 14px; line-height: 1.5; color: #6F6662">El sistema generará turnos de evaluación individuales dentro de este horario.</span>
+      </sc-if>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span class="eb">A partir del</span>
+      <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px">
+        <button class="tile on"><span style="font-size: 11px; font-weight: 600">Hoy</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">15</span></button>
+        <button class="tile"><span style="font-size: 11px; color: #6F6662">lun</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">16</span></button>
+        <button class="tile"><span style="font-size: 11px; color: #6F6662">mar</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">17</span></button>
+        <button class="tile"><span style="font-size: 11px; color: #6F6662">mié</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">18</span></button>
+        <button class="tile"><span style="font-size: 11px; color: #6F6662">jue</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">19</span></button>
+        <button class="tile"><span style="font-size: 11px; color: #6F6662">vie</span><span style="font-family: Lora, Georgia, serif; font-size: 18px">20</span></button>
+      </div>
+    </div>
+  </div>
+  <div style="padding: 12px 20px 30px">
+    <button class="save {{saveCls}}">Guardar</button>
+  </div>
+  <sc-if value="{{open}}" hint-placeholder-val="{{ true }}">
+    <div class="scrim" onClick="{{close}}"></div>
+    <div class="sheet" role="dialog" aria-label="{{title}}">
+      <div class="grab"></div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+        <span style="font-size: 15px; font-weight: 500; color: #6F6662">{{title}}</span>
+        <span style="font-family: Lora, Georgia, serif; font-size: 40px; font-variant-numeric: tabular-nums">{{draftText}}</span>
+        <span style="font-size: 14px; color: #6F6662">{{draftNote}}</span>
+      </div>
+      <div class="wheel">
+        <div class="band"></div>
+        <div class="col">
+          <div class="in" style="transform: translateY({{hourY}}px)">
+            <sc-for list="{{hours}}" as="item" hint-placeholder-count="17">
+              <button class="wi {{item.cls}}" onClick="{{item.tap}}" aria-label="{{item.label}}">{{item.text}}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div class="col">
+          <div class="in" style="transform: translateY({{minY}}px)">
+            <sc-for list="{{mins}}" as="item" hint-placeholder-count="4">
+              <button class="wi {{item.cls}}" onClick="{{item.tap}}" aria-label="{{item.label}}">{{item.text}}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div class="fade t"></div>
+        <div class="fade b"></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <button class="save" onClick="{{confirm}}">Listo</button>
+        <button class="back" onClick="{{close}}">Volver</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var ROW = 44;
+function fmt(m) { var r = m % 60; return Math.floor(m / 60) + ':' + (r < 10 ? '0' : '') + r; }
+function dur(m) { var h = Math.floor(m / 60), r = m % 60; return h === 0 ? r + ' min' : r === 0 ? h + ' h' : h + ' h ' + r + ' min'; }
+function turnos(m) { var n = Math.floor(m / 45); return n === 1 ? '1 turno de 45 min' : n + ' turnos de 45 min'; }
+function bounds(field, start) { return field === 'start' ? [360, 1275] : [start === null ? 405 : Math.max(start + 45, 405), 1320]; }
+function clamp(v, b) { return Math.min(Math.max(v, b[0]), b[1]); }
+
+class Component extends DCLogic {
+  renderVals() {
+    var self = this, st = this.state || {};
+    var start = st.start === undefined ? null : st.start;
+    var end = st.end === undefined ? null : st.end;
+    var picking = st.picking === undefined ? 'start' : st.picking;
+    var draft = st.draft === undefined ? 540 : st.draft;
+    function openField(f) {
+      return function () {
+        var d = f === 'start' ? (start === null ? 540 : start) : (end === null ? (start === null ? 600 : start + 60) : end);
+        self.setState({ picking: f, draft: clamp(d, bounds(f, start)) });
+      };
+    }
+    var b = bounds(picking, start);
+    var hourList = [], lastHour = picking === 'start' ? 21 : 22;
+    for (var h = 6; h <= lastHour; h++) {
+      (function (h) {
+        var lo = Math.max(h * 60, b[0]), hi = Math.min(h * 60 + 45, b[1]);
+        var ok = lo <= hi;
+        hourList.push({ text: String(h), label: h + ' horas', cls: Math.floor(draft / 60) === h ? 'sel' : ok ? '' : 'off', tap: function () {
+          if (!ok) return;
+          self.setState({ draft: Math.min(Math.max(h * 60 + (draft % 60), lo), hi) });
+        } });
+      })(h);
+    }
+    var minList = [0, 15, 30, 45].map(function (m) {
+      var v = Math.floor(draft / 60) * 60 + m, ok = v >= b[0] && v <= b[1];
+      return { text: m < 10 ? '0' + m : String(m), label: m + ' minutos', cls: draft % 60 === m ? 'sel' : ok ? '' : 'off', tap: function () { if (ok) self.setState({ draft: v }); } };
+    });
+    var span = start !== null && end !== null ? end - start : 0;
+    return {
+      startText: start === null ? 'Elegir' : fmt(start), startPh: start === null ? 'ph' : '',
+      endText: end === null ? 'Elegir' : fmt(end), endPh: end === null ? 'ph' : '',
+      hasTurnos: span >= 45, noTurnos: span < 45, turnosText: turnos(span),
+      saveCls: span >= 45 ? '' : 'off',
+      openStart: openField('start'), openEnd: openField('end'),
+      open: picking !== null,
+      title: picking === 'end' ? 'Hora de fin' : 'Hora de inicio',
+      draftText: fmt(draft),
+      draftNote: picking === 'end' && start !== null ? dur(draft - start) + ' · ' + turnos(draft - start) : 'Cada 15 minutos, de 6:00 a 22:00',
+      hours: hourList, mins: minList,
+      hourY: (2 - (Math.floor(draft / 60) - 6)) * ROW,
+      minY: (2 - (draft % 60) / 15) * ROW,
+      close: function () { self.setState({ picking: null }); },
+      confirm: function () {
+        if (picking === 'start') self.setState({ start: draft, end: end !== null && end - draft >= 45 ? end : null, picking: null });
+        else self.setState({ end: draft, picking: null });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
