@@ -30,4 +30,6 @@ export interface ClientEvaluationDto {
   cancellable: boolean;
   /** A confirmed Paid Evaluation can move to another slot until 3 hours before the original start */
   reschedulable: boolean;
+  /** The studio released the slot of this confirmed Paid Evaluation; the Client picks another one. Older builds ignore it. */
+  slotReleased: boolean;
 }

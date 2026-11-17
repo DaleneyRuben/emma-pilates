@@ -58,7 +58,9 @@ export const createPrismaOversight = (
     const forClient = query.clientId !== undefined;
     const where: Prisma.EvaluationWhereInput = {
       state: EvaluationState.BOOKED,
-      ...(forClient ? { clientId: query.clientId } : {}),
+      // A released slot is no appointment (walkthrough finding 67); her
+      // file still lists the Evaluation she paid for.
+      ...(forClient ? { clientId: query.clientId } : { slotReleasedAt: null }),
       slot: {
         startsAt: { gte: query.from, lt: query.until },
         ...(query.branchId === undefined ? {} : { branchId: query.branchId }),

@@ -219,6 +219,12 @@ export function NutritionistAgendaScreen() {
               label={`${agendaDayLabel(civilDateOf(cancelling.startsAt), today).split(" · ")[0]}, ${clockTime(cancelling.startsAt)} · ${cancelling.clientName}`}
             />
             <IconRow icon="bell" label="Le avisamos y el horario queda libre" />
+            {cancelling.paymentConfirmed === true ? (
+              <IconRow
+                icon="receipt"
+                label={`El pago de ${cancelling.clientName.split(" ")[0]} sigue vigente; ella elige otro turno.`}
+              />
+            ) : null}
           </IconRowGroup>
         ) : null}
       </ConfirmationSheet>
