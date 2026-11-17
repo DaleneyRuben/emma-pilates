@@ -24,6 +24,32 @@ describe('error reporting', () => {
     expect(sdk.captureException).not.toHaveBeenCalled();
   });
 
+  // Walkthrough finding 80 (FIX-056): a local worker logged only
+  // «evaluation_reminders_failed»; without a DSN the cause goes to the log.
+  it('writes the failure and its job to the local log without a DSN', () => {
+    const sdk = fakeSdk();
+    const write = jest.fn();
+    const reporter = createErrorReporter(
+      { ...settings, dsn: null, service: 'worker' },
+      sdk,
+      write,
+    );
+    const failure = new TypeError('slot is undefined');
+
+    reporter.report(failure, { job: 'evaluation_reminders' });
+
+    expect(write).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(String(write.mock.calls[0][0]))).toEqual({
+      level: 50,
+      event: 'error_report',
+      service: 'worker',
+      job: 'evaluation_reminders',
+      error: 'TypeError: slot is undefined',
+      stack: failure.stack,
+    });
+    expect(sdk.captureException).not.toHaveBeenCalled();
+  });
+
   it('initializes the SDK without automatic capture and tags the service', () => {
     const sdk = fakeSdk();
 
