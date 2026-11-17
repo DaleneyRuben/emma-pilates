@@ -40,6 +40,7 @@ describe('soft delete schema', () => {
       'booking.freezes',
       'booking.guest_passes',
       'booking.lifecycle_messages',
+      'booking.owed_campaign_classes',
       'booking.promotion_contacts',
       'booking.staff_branch_assignments',
       'booking.staff_members',
