@@ -28,7 +28,7 @@ describe('error reporting', () => {
   // «evaluation_reminders_failed»; without a DSN the cause goes to the log.
   it('writes the failure and its job to the local log without a DSN', () => {
     const sdk = fakeSdk();
-    const write = jest.fn();
+    const write = jest.fn<void, [string]>();
     const reporter = createErrorReporter(
       { ...settings, dsn: null, service: 'worker' },
       sdk,
@@ -39,7 +39,7 @@ describe('error reporting', () => {
     reporter.report(failure, { job: 'evaluation_reminders' });
 
     expect(write).toHaveBeenCalledTimes(1);
-    expect(JSON.parse(String(write.mock.calls[0][0]))).toEqual({
+    expect(JSON.parse(write.mock.calls[0][0])).toEqual({
       level: 50,
       event: 'error_report',
       service: 'worker',

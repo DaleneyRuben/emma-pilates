@@ -80,14 +80,46 @@ export function sanitizeErrorEvent(event: ErrorEvent): ErrorEvent {
   };
 }
 
+const writeStderr = (line: string) => {
+  process.stderr.write(`${line}\n`);
+};
+
+// Without a DSN nothing leaves the machine, but the cause still reaches the
+// local log: a sweep that only emitted «…_failed» hid it (finding 80).
+const localErrorReporting = (
+  service: ErrorReportingSettings['service'],
+  write: (line: string) => void,
+): ErrorReporter => ({
+  report: (error, context) => {
+    write(
+      JSON.stringify({
+        level: 50,
+        event: 'error_report',
+        service,
+        ...(context?.job === undefined ? {} : { job: context.job }),
+        ...(context?.requestId === undefined
+          ? {}
+          : { requestId: context.requestId }),
+        error:
+          error instanceof Error
+            ? `${error.name}: ${error.message}`
+            : String(error),
+        ...(error instanceof Error ? { stack: error.stack } : {}),
+      }),
+    );
+  },
+});
+
 // Provider initialization stays at the application shell (ADR-0081); without
-// a DSN nothing is initialized, so local runs and tests send nothing.
+// a DSN nothing is initialized, so local runs and tests send nothing and log
+// the failure instead.
 export function createErrorReporter(
   settings: ErrorReportingSettings,
   sdk: ErrorReportingSdk = Sentry,
+  writeLocal: (line: string) => void = writeStderr,
 ): ErrorReporter {
   if (settings.dsn === null) {
-    return noErrorReporting;
+    return localErrorReporting(settings.service, writeLocal);
   }
   sdk.initWithoutDefaultIntegrations({
     dsn: settings.dsn,
