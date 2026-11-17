@@ -335,6 +335,7 @@ const endBlockFrom = async (
            EXISTS (
              SELECT 1 FROM booking.evaluations e
              WHERE e.evaluation_slot_id = s.id AND e.state = 'booked'
+               AND e.slot_released_at IS NULL
            ) AS booked
     FROM booking.evaluation_slots s
     WHERE s.availability_block_id = ${block.id}::uuid
@@ -778,7 +779,7 @@ export const createPrismaEvaluationCommands = (
       ) {
         const kept = await transaction.evaluation.count({
           where: {
-            state: EvaluationState.BOOKED,
+            ...occupyingEvaluation,
             slot: {
               availabilityBlockId: block.id,
               startsAt: { gte: boliviaInstant(target, 0), gt: now },
