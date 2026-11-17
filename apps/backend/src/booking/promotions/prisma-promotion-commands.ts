@@ -27,6 +27,7 @@ import {
   orderedPromotionIds,
   PromotionError,
   requirePromotionValues,
+  requirePublishableWindow,
   type PromotionValues,
 } from './promotion-rules';
 
@@ -35,7 +36,8 @@ type PromotionInput = PromotionValues & { imageAssetId: string | null };
 type PromotionStorage = Pick<ObjectStorage, 'get' | 'replace'>;
 
 const serializable = { isolationLevel: 'Serializable' } as const;
-const civil = (date: Date): string => date.toISOString().slice(0, 10);
+const civil = (date: Date | null): string | null =>
+  date === null ? null : date.toISOString().slice(0, 10);
 
 // Booking & Membership: Administrator-only Promotion management (AW17, AW18,
 // follow-up 39) over the schema BKM-001 approved.
@@ -181,6 +183,9 @@ export const createPrismaPromotionCommands = (
         const previousImageId = previous.imageAsset?.id ?? null;
         const imageChanged = input.imageAssetId !== previousImageId;
         const unpublished = imageChanged && previous.publishedAt !== null;
+        if (previous.publishedAt !== null && !unpublished) {
+          requirePublishableWindow(values);
+        }
         if (imageChanged && input.imageAssetId !== null) {
           await attach(transaction, input.imageAssetId, actor);
         }
@@ -221,6 +226,7 @@ export const createPrismaPromotionCommands = (
         if (previous.imageAsset === null) {
           throw new PromotionError('promotion_image_required');
         }
+        requirePublishableWindow(previous);
         await publishImageVariants(transaction, storage, {
           imageAssetId: previous.imageAsset.id,
           now: dependencies.now(),

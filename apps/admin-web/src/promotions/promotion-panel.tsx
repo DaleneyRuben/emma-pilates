@@ -3,7 +3,7 @@ import {
   getGetAdminPromotionImageUrl,
   type AdminPromotionDto,
 } from "@pilates/api-contracts";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useIdempotencyKey } from "../api/idempotency-key";
 import { CivilDateInput } from "../components/form/civil-date-input";
@@ -23,8 +23,9 @@ import { Textarea } from "../components/ui/textarea";
 import { boliviaToday } from "../lib/bolivia-time";
 import {
   imageChangeWarning,
-  promotionSchema,
+  promotionSchemaFor,
   windowStatus,
+  type PromotionSaveMode,
   type PromotionInput,
   type PromotionOutput,
 } from "./promotion-form-schema";
@@ -89,8 +90,11 @@ export function PromotionPanelForm({
   const [failure, setFailure] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [sending, setSending] = useState<FooterAction | null>(null);
+  // A draft saves without dates; publishing or a published save needs both.
+  const mode = useRef<PromotionSaveMode>("draft");
   const form = useForm<PromotionInput, unknown, PromotionOutput>({
-    resolver: zodResolver(promotionSchema),
+    resolver: (values, context, options) =>
+      zodResolver(promotionSchemaFor(mode.current))(values, context, options),
     defaultValues: {
       headline: promotion?.headline ?? "",
       description: promotion?.description ?? "",
@@ -145,8 +149,9 @@ export function PromotionPanelForm({
     return row;
   };
 
-  const save = (outcome: Outcome) =>
-    form.handleSubmit((values) => {
+  const save = (outcome: Outcome) => {
+    mode.current = outcome === "draft" ? "draft" : "publish";
+    return form.handleSubmit((values) => {
       setSending(outcome);
       return run(async () => {
         const row = await persist(values);
@@ -156,6 +161,7 @@ export function PromotionPanelForm({
         return `Promoción «${row.headline}» ${notices[outcome]}`;
       });
     })();
+  };
 
   const unpublish = () => {
     setSending("unpublish");
@@ -225,7 +231,10 @@ export function PromotionPanelForm({
                 <FormItem>
                   <FormLabel>Fecha de inicio</FormLabel>
                   <FormControl>
-                    <CivilDateInput {...field} />
+                    <CivilDateInput
+                      {...field}
+                      rangeEnd={typed.displayEndsOn ?? undefined}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -238,7 +247,13 @@ export function PromotionPanelForm({
                 <FormItem>
                   <FormLabel>Fecha de fin</FormLabel>
                   <FormControl>
-                    <CivilDateInput {...field} />
+                    <CivilDateInput
+                      {...field}
+                      align="end"
+                      rangeStart={typed.displayStartsOn ?? undefined}
+                      min={typed.displayStartsOn ?? undefined}
+                      minReason="La fecha de fin no puede ser anterior a la de inicio."
+                    />
                   </FormControl>
                   <FormDescription>
                     Entre esas dos fechas la promoción aparece en el inicio de

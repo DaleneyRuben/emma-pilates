@@ -108,10 +108,10 @@ describe("AW18 Editar promoción (follow-up 39)", () => {
       showing.description,
     );
     expect(within(panel).getByLabelText("Fecha de inicio")).toHaveValue(
-      formatCivilDate(showing.displayStartsOn),
+      formatCivilDate(showing.displayStartsOn ?? ""),
     );
     expect(within(panel).getByLabelText("Fecha de fin")).toHaveValue(
-      formatCivilDate(showing.displayEndsOn),
+      formatCivilDate(showing.displayEndsOn ?? ""),
     );
     expect(
       within(panel).getByRole("img", { name: "Vista previa de la imagen" }),

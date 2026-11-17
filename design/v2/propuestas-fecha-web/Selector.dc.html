@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Fechas con calendario</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: {{W}}; height: {{H}}; box-sizing: border-box; display: flex; flex-direction: column; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', sans-serif; font-size: 15px; overflow: hidden">
+
+  <div style="flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 16px; background: #3A3330">
+    <span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #D8BDB8; font-weight: 600; margin-right: 6px">Prototipo · {{opLabel}}</span>
+    <sc-for list="{{chips}}" as="c" hint-placeholder-count="4">
+      <button type="button" aria-pressed="{{c.pressed}}" onClick="{{c.go}}" style="height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid {{c.bd}}; background: {{c.bg}}; color: {{c.ink}}; font-family: 'Work Sans', sans-serif; font-size: 13px; cursor: pointer">{{c.label}}</button>
+    </sc-for>
+  </div>
+
+  <div style="flex: 1 1 auto; min-height: 0; position: relative">
+
+    <sc-if value="{{wideScreen}}" hint-placeholder-val="{{true}}">
+      <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex">
+        <div style="width: 96px; flex: none; background: #F5EFE9; padding: 20px 8px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 18px">
+          <div style="font-family: Lora, serif; font-size: 24px; color: #93615D">E</div>
+          <div style="width: 56px; height: 32px; border-radius: 999px; background: #F2E4E1"></div>
+          <div style="width: 56px; height: 32px; border-radius: 999px; background: #93615D"></div>
+          <div style="width: 56px; height: 32px; border-radius: 999px; background: #F2E4E1"></div>
+          <div style="width: 56px; height: 32px; border-radius: 999px; background: #F2E4E1"></div>
+        </div>
+        <div style="flex: 1 1 auto; padding: 24px 40px; display: flex; flex-direction: column; gap: 20px">
+          <div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: Lora, serif; font-size: 22px">Emma</span><span style="font-family: Lora, serif; font-size: 15px; color: #93615D">Pilates Studio</span></div>
+          <h1 style="margin: 0; font-family: Lora, serif; font-weight: 400; font-size: 32px">{{pageTitle}}</h1>
+          <div style="display: flex; gap: 4px; border-bottom: 1px solid #E6DBD0">
+            <span style="padding: 12px 14px; color: #7D4F4B; font-weight: 600; border-bottom: 2px solid #93615D; margin-bottom: -1px">{{tab1}}</span>
+            <span style="padding: 12px 14px; color: #6F6662">{{tab2}}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; max-width: 760px">
+            <div style="height: 180px; border-radius: 16px; background: #F5EFE9"></div>
+            <div style="height: 180px; border-radius: 16px; background: #F5EFE9"></div>
+            <div style="height: 180px; border-radius: 16px; background: #F5EFE9"></div>
+          </div>
+        </div>
+      </div>
+      <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(74, 58, 48, 0.22)"></div>
+    </sc-if>
+
+    <div role="dialog" aria-label="{{drawerTitle}}" style="position: absolute; top: 0; right: 0; bottom: 0; width: {{drawerW}}; background: #FAF7F2; display: flex; flex-direction: column; box-shadow: -12px 0 32px rgba(74, 58, 48, 0.12)">
+      <div style="flex: none; padding: 24px {{padX}} 12px; display: flex; align-items: flex-start; gap: 12px">
+        <div style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px">
+          <h2 style="margin: 0; font-family: Lora, serif; font-weight: 400; font-size: 24px">{{drawerTitle}}</h2>
+          <span style="font-size: 13px; color: #6F6662">{{drawerSub}}</span>
+        </div>
+        <button type="button" aria-label="Cerrar" style="width: 44px; height: 44px; border: 0; border-radius: 12px; background: #F5EFE9; color: #6F6662; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+
+      <div style="flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 8px {{padX}} 24px; display: flex; flex-direction: column; gap: 18px">
+
+        <sc-if value="{{isPromo}}" hint-placeholder-val="{{true}}">
+          <div style="height: 104px; border: 1.5px dashed #D8BDB8; border-radius: 14px; background: #F6EDEB; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px">
+            <span style="font-weight: 500">Imagen de la promoción</span>
+            <span style="font-size: 13px; color: #6F6662">Arrastra una imagen o haz clic para elegirla</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="titulo-{{uid}}" style="font-size: 13px; font-weight: 500; color: #6F6662">Título</label>
+            <input id="titulo-{{uid}}" readOnly value="Noviembre con 15 % en tu plan" style="height: 44px; padding: 0 14px; border: 1px solid #E6DBD0; border-radius: 12px; background: #F5EFE9; font-family: 'Work Sans', sans-serif; font-size: 15px; color: #4A4A4A; box-sizing: border-box; width: 100%">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="desc-{{uid}}" style="font-size: 13px; font-weight: 500; color: #6F6662">Descripción</label>
+            <textarea id="desc-{{uid}}" readOnly rows="2" style="padding: 10px 14px; border: 1px solid #E6DBD0; border-radius: 12px; background: #F5EFE9; font-family: 'Work Sans', sans-serif; font-size: 15px; color: #4A4A4A; resize: none; box-sizing: border-box; width: 100%">Precio de lanzamiento para las primeras 50 clientas.</textarea>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isGasto}}" hint-placeholder-val="{{false}}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label for="monto-{{uid}}" style="font-size: 13px; font-weight: 500; color: #6F6662">Monto (Bs)</label>
+              <input id="monto-{{uid}}" readOnly value="120" style="height: 44px; padding: 0 14px; border: 1px solid #E6DBD0; border-radius: 12px; background: #F5EFE9; font-family: 'Work Sans', sans-serif; font-size: 15px; color: #4A4A4A; box-sizing: border-box; width: 100%">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label for="cat-{{uid}}" style="font-size: 13px; font-weight: 500; color: #6F6662">Categoría</label>
+              <input id="cat-{{uid}}" readOnly value="Limpieza" style="height: 44px; padding: 0 14px; border: 1px solid #E6DBD0; border-radius: 12px; background: #F5EFE9; font-family: 'Work Sans', sans-serif; font-size: 15px; color: #4A4A4A; box-sizing: border-box; width: 100%">
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showLoop}}" hint-placeholder-val="{{true}}">
+          <div style="display: grid; grid-template-columns: {{cols}}; gap: 12px">
+            <sc-for list="{{fields}}" as="f" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+                <label for="{{f.id}}" style="font-size: 13px; font-weight: 500; color: #6F6662">{{f.label}}</label>
+                <div style="position: relative">
+                  <input id="{{f.id}}" value="{{f.text}}" onChange="{{f.type}}" onClick="{{f.openIt}}" placeholder="dd/mm/aaaa" inputMode="numeric" autoComplete="off" aria-invalid="{{f.invalid}}" style="width: 100%; height: 44px; padding: 0 48px 0 14px; border: 1px solid {{f.border}}; border-radius: 12px; background: #F5EFE9; font-family: 'Work Sans', sans-serif; font-size: 15px; color: #4A4A4A; box-sizing: border-box; outline: none">
+                  <button type="button" aria-label="{{f.btnLabel}}" aria-expanded="{{f.expanded}}" onClick="{{f.toggle}}" style="position: absolute; top: 2px; right: 2px; width: 40px; height: 40px; border: 0; border-radius: 10px; background: transparent; color: #93615D; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>
+                  </button>
+                  <sc-if value="{{f.isPop}}" hint-placeholder-val="{{false}}">
+                    <div style="position: absolute; top: 52px; {{f.side}}; z-index: 20; width: 304px; box-sizing: border-box; padding: 12px; background: #FFFFFF; border: 1px solid #E6DBD0; border-radius: 16px; box-shadow: 0 16px 40px rgba(74, 58, 48, 0.18)">
+                      <dc-import name="Mes" m="{{f.cal}}" hint-size="280px,360px"></dc-import>
+                    </div>
+                  </sc-if>
+                </div>
+                <sc-if value="{{f.hasErr}}" hint-placeholder-val="{{false}}">
+                  <p style="margin: 0; font-size: 13px; line-height: 1.4; color: #94493A">{{f.err}}</p>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{cOpen}}" hint-placeholder-val="{{false}}">
+          <div style="background: #FFFFFF; border: 1px solid #E6DBD0; border-radius: 16px; padding: 12px 16px 12px; display: flex; flex-direction: column; gap: 4px">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+              <span style="font-size: 13px; font-weight: 500; color: #6F6662">{{cLabel}}</span>
+              <button type="button" onClick="{{cDone}}" style="height: 36px; padding: 0 14px; border: 0; border-radius: 10px; background: #F2E4E1; color: #7A4F4B; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer">Listo</button>
+            </div>
+            <dc-import name="Mes" m="{{cCal}}" hint-size="100%,400px" style="display: block; width: 100%"></dc-import>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showB}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 6px; position: relative">
+            <span id="fechas-{{uid}}" style="font-size: 13px; font-weight: 500; color: #6F6662">Fechas</span>
+            <button type="button" aria-labelledby="fechas-{{uid}}" aria-expanded="{{bExpanded}}" onClick="{{bToggle}}" style="height: 48px; padding: 0 14px; border: 1px solid {{bBorder}}; border-radius: 12px; background: #F5EFE9; display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: 'Work Sans', sans-serif; font-size: 15px; color: {{bInk}}; text-align: left; width: 100%">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>
+              <span style="flex: 1 1 auto">{{bSummary}}</span>
+            </button>
+            <sc-if value="{{bHasErr}}" hint-placeholder-val="{{false}}">
+              <p style="margin: 0; font-size: 13px; line-height: 1.4; color: #94493A">{{bErr}}</p>
+            </sc-if>
+            <sc-if value="{{bOpen}}" hint-placeholder-val="{{false}}">
+              <div style="position: absolute; top: 80px; left: 0; right: 0; z-index: 20; padding: 16px; background: #FFFFFF; border: 1px solid #E6DBD0; border-radius: 16px; box-shadow: 0 16px 40px rgba(74, 58, 48, 0.18); display: flex; flex-direction: column; gap: 10px">
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+                  <div style="display: flex; flex-direction: column; gap: 4px">
+                    <label for="desde-{{uid}}" style="font-size: 12px; font-weight: 500; color: #6F6662">Desde</label>
+                    <input id="desde-{{uid}}" value="{{bStart}}" onChange="{{bTypeStart}}" placeholder="dd/mm/aaaa" inputMode="numeric" autoComplete="off" style="height: 40px; padding: 0 12px; border: 1px solid {{bStartBorder}}; border-radius: 10px; background: #F5EFE9; font-family: 'Work Sans', sans-serif; font-size: 14px; color: #4A4A4A; box-sizing: border-box; width: 100%; outline: none">
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 4px">
+                    <label for="hasta-{{uid}}" style="font-size: 12px; font-weight: 500; color: #6F6662">Hasta</label>
+                    <input id="hasta-{{uid}}" value="{{bEnd}}" onChange="{{bTypeEnd}}" placeholder="dd/mm/aaaa" inputMode="numeric" autoComplete="off" style="height: 40px; padding: 0 12px; border: 1px solid {{bEndBorder}}; border-radius: 10px; background: #F5EFE9; font-family: 'Work Sans', sans-serif; font-size: 14px; color: #4A4A4A; box-sizing: border-box; width: 100%; outline: none">
+                  </div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px">
+                  <button type="button" onClick="{{bSemana}}" style="height: 32px; padding: 0 12px; border: 1px solid #E6DBD0; border-radius: 999px; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', sans-serif; font-size: 13px; cursor: pointer">Esta semana</button>
+                  <button type="button" onClick="{{bMes}}" style="height: 32px; padding: 0 12px; border: 1px solid #E6DBD0; border-radius: 999px; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', sans-serif; font-size: 13px; cursor: pointer">Este mes</button>
+                  <button type="button" onClick="{{bTreinta}}" style="height: 32px; padding: 0 12px; border: 1px solid #E6DBD0; border-radius: 999px; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', sans-serif; font-size: 13px; cursor: pointer">30 días</button>
+                </div>
+                <span style="font-size: 13px; color: #6F6662">{{bHint}}</span>
+                <dc-import name="Mes" m="{{bCal}}" hint-size="100%,330px" style="display: block; width: 100%"></dc-import>
+                <div style="display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid #E6DBD0; padding-top: 10px">
+                  <button type="button" onClick="{{bClear}}" style="height: 40px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: #6F6662; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer">Borrar</button>
+                  <button type="button" onClick="{{bDone}}" style="height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: #93615D; color: #FFFFFF; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer">Listo</button>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isPromo}}" hint-placeholder-val="{{true}}">
+          <p style="margin: 0; font-size: 13px; color: #6F6662">Se muestra en la app entre estas dos fechas, ambas incluidas.</p>
+        </sc-if>
+        <sc-if value="{{isGasto}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="gdesc-{{uid}}" style="font-size: 13px; font-weight: 500; color: #6F6662">Descripción</label>
+            <input id="gdesc-{{uid}}" readOnly value="Detergente y paños para las colchonetas" style="height: 44px; padding: 0 14px; border: 1px solid #E6DBD0; border-radius: 12px; background: #F5EFE9; font-family: 'Work Sans', sans-serif; font-size: 15px; color: #4A4A4A; box-sizing: border-box; width: 100%">
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="flex: none; border-top: 1px solid #E6DBD0; padding: 16px {{padX}}; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; background: #FAF7F2">
+        <button type="button" style="height: 44px; padding: 0 18px; border: 0; border-radius: 12px; background: #F2E4E1; color: #7A4F4B; font-family: 'Work Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer">{{secondary}}</button>
+        <button type="button" style="height: 44px; padding: 0 18px; border: 0; border-radius: 12px; background: #93615D; color: #FFFFFF; font-family: 'Work Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer">{{primary}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"opcion":{"editor":"enum","options":["A","B","C"],"default":"A"},"estrecho":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  T() { return '2026-11-15'; }
+  pad(n) { return (n < 10 ? '0' : '') + n; }
+  iso(y, m, d) { return y + '-' + this.pad(m) + '-' + this.pad(d); }
+  parts(v) { return { y: +v.slice(0, 4), m: +v.slice(5, 7), d: +v.slice(8, 10) }; }
+  parse(t) {
+    var r = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t || '');
+    if (!r) return null;
+    var d = +r[1], m = +r[2], y = +r[3];
+    var x = new Date(Date.UTC(y, m - 1, d));
+    if (m < 1 || m > 12 || d < 1 || x.getUTCFullYear() !== y || x.getUTCMonth() !== m - 1 || x.getUTCDate() !== d) return null;
+    return this.iso(y, m, d);
+  }
+  show(v) { var p = this.parts(v); return this.pad(p.d) + '/' + this.pad(p.m) + '/' + p.y; }
+  mask(t) {
+    var g = (t || '').replace(/\D/g, '').slice(0, 8);
+    var o = g.slice(0, 2);
+    if (g.length > 2) o += '/' + g.slice(2, 4);
+    if (g.length > 4) o += '/' + g.slice(4);
+    return o;
+  }
+  shortD(v) { var p = this.parts(v); return p.d + ' ' + ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][p.m - 1]; }
+  add(v, n) { var p = this.parts(v); var x = new Date(Date.UTC(p.y, p.m - 1, p.d + n)); return this.iso(x.getUTCFullYear(), x.getUTCMonth() + 1, x.getUTCDate()); }
+  days(a, b) { var x = this.parts(a), y = this.parts(b); return Math.round((Date.UTC(y.y, y.m - 1, y.d) - Date.UTC(x.y, x.m - 1, x.d)) / 86400000); }
+  op() { return this.props.opcion || 'A'; }
+  initial(caso) {
+    var C = {
+      rango: { start: '20/11/2026', end: '06/12/2026', una: '', open: 'end' },
+      una: { start: '', end: '', una: '12/11/2026', open: 'una' },
+      invalido: { start: '31/02/2026', end: '', una: '', open: 'start' },
+      fin: { start: '20/11/2026', end: '10/11/2026', una: '', open: 'end' }
+    }[caso];
+    var open = this.op() === 'B' && caso !== 'una' ? 'rango' : C.open;
+    var p = this.parts(this.parse(C.start) || this.parse(C.una) || this.T());
+    return { caso: caso, start: C.start, end: C.end, una: C.una, open: open, vy: p.y, vm: p.m, msg: '' };
+  }
+  st() { return this.state && this.state.caso ? this.state : this.initial('rango'); }
+  put(patch) { this.setState(Object.assign({}, this.st(), patch)); }
+  viewOf(f, s) {
+    var v = this.parse(s[f]) || (f !== 'una' ? this.parse(s.start) : null) || this.T();
+    var p = this.parts(v);
+    return { vy: p.y, vm: p.m };
+  }
+  openIt(f) { var s = this.st(); this.put(Object.assign({ open: f, msg: '' }, this.viewOf(f === 'rango' ? 'start' : f, s))); }
+  toggle(f) { var s = this.st(); if (s.open === f) this.put({ open: null, msg: '' }); else this.openIt(f); }
+  type(f, e) {
+    var t = this.mask(e.target.value);
+    var patch = { msg: '' };
+    patch[f] = t;
+    var v = this.parse(t);
+    if (v) { var p = this.parts(v); patch.vy = p.y; patch.vm = p.m; }
+    this.put(patch);
+  }
+  nav(d) {
+    var s = this.st();
+    var m = s.vm + d, y = s.vy;
+    if (m < 1) { m = 12; y--; }
+    if (m > 12) { m = 1; y++; }
+    this.put({ vy: y, vm: m, msg: '' });
+  }
+  why(f, day, s) {
+    if (f === 'una' && day > this.T()) return 'La fecha no puede ser posterior a hoy.';
+    var rs = this.parse(s.start);
+    if (f === 'end' && rs && day < rs) return 'La fecha de fin no puede ser anterior a la de inicio.';
+    return '';
+  }
+  err(f, s) {
+    var t = s[f] || '';
+    var v = this.parse(t);
+    if (t.length === 10 && !v) return 'Elige una fecha válida.';
+    if (f === 'una' && v && v > this.T()) return 'La fecha no puede ser posterior a hoy.';
+    var rs = this.parse(s.start);
+    if (f === 'end' && v && rs && v < rs) return 'La fecha de fin no puede ser anterior a la de inicio.';
+    return '';
+  }
+  pick(f, day) {
+    var s = this.st();
+    var w = this.why(f, day, s);
+    if (w) return this.put({ msg: w });
+    var t = this.show(day);
+    if (f === 'rango') {
+      var rs = this.parse(s.start), re = this.parse(s.end);
+      if (!rs || re || day < rs) return this.put({ start: t, end: '', msg: '' });
+      return this.put({ end: t, msg: '' });
+    }
+    var patch = { msg: '', open: null };
+    patch[f] = t;
+    this.put(patch);
+  }
+  clear(f) {
+    if (f === 'rango') return this.put({ start: '', end: '', msg: '' });
+    var patch = { msg: '' };
+    patch[f] = '';
+    this.put(patch);
+  }
+  quick(k) {
+    var a, b;
+    if (k === 'semana') { a = '2026-11-16'; b = '2026-11-22'; }
+    else if (k === 'mes') { a = '2026-11-01'; b = '2026-11-30'; }
+    else { a = this.parse(this.st().start) || this.T(); b = this.add(a, 29); }
+    var p = this.parts(a);
+    this.put({ start: this.show(a), end: this.show(b), vy: p.y, vm: p.m, msg: '' });
+  }
+  cal(f, s, size) {
+    var self = this, T = this.T();
+    var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    var DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    var off = (new Date(Date.UTC(s.vy, s.vm - 1, 1)).getUTCDay() + 6) % 7;
+    var dim = new Date(Date.UTC(s.vy, s.vm, 0)).getUTCDate();
+    var one = null, rs = null, re = null;
+    if (f === 'una') one = this.parse(s.una);
+    else { rs = this.parse(s.start); re = this.parse(s.end); if (rs && re && re < rs) re = null; }
+    var cells = [];
+    for (var i = 0; i < off; i++) cells.push({ real: false, band: 'transparent' });
+    for (var d = 1; d <= dim; d++) {
+      (function (d) {
+        var day = self.iso(s.vy, s.vm, d);
+        var sel = day === one || day === rs || day === re;
+        var why = self.why(f, day, s);
+        var band = 'transparent';
+        if (rs && re && rs !== re) {
+          if (day === rs) band = 'linear-gradient(to right, transparent 50%, #F2E4E1 50%)';
+          else if (day === re) band = 'linear-gradient(to right, #F2E4E1 50%, transparent 50%)';
+          else if (day > rs && day < re) band = '#F2E4E1';
+        }
+        var wd = (off + d - 1) % 7;
+        cells.push({
+          real: true, n: d, band: band,
+          aria: DIAS[(wd + 1) % 7] + ', ' + d + ' de ' + MESES[s.vm - 1] + ' de ' + s.vy + (day === T ? ', hoy' : '') + (why ? ', no disponible' : ''),
+          offAttr: why ? 'true' : 'false', selAttr: sel ? 'true' : 'false',
+          ring: day === T && !sel ? '1.5px solid #93615D' : '1.5px solid transparent',
+          fill: sel ? '#93615D' : 'transparent',
+          ink: sel ? '#FFFFFF' : why ? '#B3A9A5' : '#4A4A4A',
+          strike: why ? 'line-through' : 'none',
+          weight: sel || day === T ? '600' : '400',
+          cursor: why ? 'not-allowed' : 'pointer',
+          pick: function () { self.pick(f, day); }
+        });
+      })(d);
+    }
+    while (cells.length % 7) cells.push({ real: false, band: 'transparent' });
+    var name = MESES[s.vm - 1];
+    return {
+      width: size.w, cellH: size.h, dot: size.dot,
+      title: name.charAt(0).toUpperCase() + name.slice(1) + ' ' + s.vy,
+      heads: ['L', 'M', 'M', 'J', 'V', 'S', 'D'], cells: cells,
+      prev: function () { self.nav(-1); }, next: function () { self.nav(1); },
+      hasMsg: !!s.msg, msg: s.msg, foot: size.foot,
+      hoy: function () { self.pick(f, T); }, borrar: function () { self.clear(f); }
+    };
+  }
+  renderVals() {
+    var self = this, s = this.st(), op = this.op(), narrow = !!this.props.estrecho;
+    var caso = s.caso, promo = caso !== 'una';
+    var chips = [['rango', 'Rango · Promoción'], ['una', 'Una fecha · Gasto (hasta hoy)'], ['invalido', 'Texto inválido'], ['fin', 'Fin antes del inicio']].map(function (c) {
+      var on = c[0] === caso;
+      return {
+        label: c[1], pressed: on ? 'true' : 'false',
+        bg: on ? '#F2E4E1' : 'transparent', ink: on ? '#4A4A4A' : '#F5EFE9', bd: on ? '#F2E4E1' : '#8C817C',
+        go: function () { self.setState(self.initial(c[0])); }
+      };
+    });
+    var labels = { start: 'Fecha de inicio', end: 'Fecha de fin', una: 'Fecha' };
+    var names = promo ? ['start', 'end'] : ['una'];
+    var uid = op + (narrow ? 'n' : 'w');
+    var fields = names.map(function (f, i) {
+      var e = self.err(f, s), isOpen = s.open === f;
+      return {
+        id: 'fecha-' + f + '-' + uid, label: labels[f], text: s[f],
+        type: function (ev) { self.type(f, ev); },
+        openIt: function () { if (self.st().open !== f) self.openIt(f); },
+        toggle: function () { self.toggle(f); },
+        border: e ? '#A04E3E' : isOpen ? '#93615D' : '#E6DBD0',
+        hasErr: !!e, err: e, invalid: e ? 'true' : 'false', expanded: isOpen ? 'true' : 'false',
+        isPop: isOpen && op !== 'C', side: i === 1 ? 'right: 0' : 'left: 0',
+        cal: isOpen && op !== 'C' ? self.cal(f, s, { w: '280px', h: '40px', dot: '36px', foot: true }) : null,
+        btnLabel: 'Abrir el calendario de ' + labels[f].toLowerCase()
+      };
+    });
+    var showB = op === 'B' && promo;
+    var rs = this.parse(s.start), re = this.parse(s.end);
+    var summary = 'Elige el inicio y el fin';
+    if (rs && re) summary = this.shortD(rs) + ' – ' + this.shortD(re) + ' ' + this.parts(re).y + (re >= rs ? ' · ' + (this.days(rs, re) + 1) + ' días' : '');
+    else if (rs) summary = 'Desde el ' + this.shortD(rs) + ' · falta el fin';
+    var bErr = this.err('start', s) || this.err('end', s);
+    var cOpen = op === 'C' && !!s.open;
+    return {
+      W: narrow ? '420px' : '1440px', H: narrow ? '900px' : '1000px',
+      drawerW: narrow ? '100%' : '480px', padX: narrow ? '20px' : '28px',
+      wideScreen: !narrow, uid: uid,
+      opLabel: { A: 'A · Calendario bajo el campo', B: 'B · Un calendario para el rango', C: 'C · Calendario dentro del cajón' }[op],
+      chips: chips,
+      isPromo: promo, isGasto: !promo,
+      pageTitle: promo ? 'Promociones' : 'Gastos', tab1: promo ? 'Carrusel' : 'Gastos', tab2: promo ? 'Contactos' : 'Categorías',
+      drawerTitle: promo ? 'Nueva promoción' : 'Nuevo gasto',
+      drawerSub: promo ? 'Se guarda como borrador hasta que la publiques.' : 'Un gasto no puede tener una fecha posterior a hoy.',
+      secondary: promo ? 'Guardar borrador' : 'Cancelar', primary: promo ? 'Publicar' : 'Guardar gasto',
+      showLoop: !showB, fields: fields,
+      cols: names.length === 2 ? 'repeat(2, minmax(0, 1fr))' : 'repeat(1, minmax(0, 1fr))',
+      cOpen: cOpen, cLabel: cOpen ? 'Eligiendo: ' + labels[s.open].toLowerCase() : '',
+      cCal: cOpen ? this.cal(s.open, s, { w: '100%', h: '44px', dot: '40px', foot: true }) : null,
+      cDone: function () { self.put({ open: null, msg: '' }); },
+      showB: showB, bOpen: showB && s.open === 'rango', bExpanded: s.open === 'rango' ? 'true' : 'false',
+      bSummary: summary, bInk: rs ? '#4A4A4A' : '#6F6662',
+      bBorder: bErr ? '#A04E3E' : s.open === 'rango' ? '#93615D' : '#E6DBD0',
+      bHasErr: !!bErr, bErr: bErr,
+      bToggle: function () { self.toggle('rango'); },
+      bStart: s.start, bEnd: s.end,
+      bStartBorder: this.err('start', s) ? '#A04E3E' : '#E6DBD0', bEndBorder: this.err('end', s) ? '#A04E3E' : '#E6DBD0',
+      bTypeStart: function (ev) { self.type('start', ev); }, bTypeEnd: function (ev) { self.type('end', ev); },
+      bSemana: function () { self.quick('semana'); }, bMes: function () { self.quick('mes'); }, bTreinta: function () { self.quick('treinta'); },
+      bHint: !rs || re ? 'Haz clic en el primer día.' : 'Ahora haz clic en el último día.',
+      bCal: showB && s.open === 'rango' ? this.cal('rango', s, { w: '100%', h: '42px', dot: '38px', foot: false }) : null,
+      bClear: function () { self.clear('rango'); }, bDone: function () { self.put({ open: null, msg: '' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

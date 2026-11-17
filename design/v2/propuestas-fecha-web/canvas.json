@@ -1,0 +1,88 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-15T16:16:17Z"
+ },
+ "title": "Propuestas fecha web",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Hallazgo 83 · Calendario para las fechas de la web (léeme)"
+  },
+  "Selector.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 1000,
+   "title": "A · Calendario bajo el campo · 1440 (recomendada)",
+   "is_interactive": true
+  },
+  "OpcionA420.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 420,
+   "h": 900,
+   "title": "A · Calendario bajo el campo · 420",
+   "is_interactive": true
+  },
+  "OpcionB.dc.html": {
+   "x": 0,
+   "y": 2140,
+   "w": 1440,
+   "h": 1000,
+   "title": "B · Un calendario para el rango · 1440",
+   "is_interactive": true
+  },
+  "OpcionB420.dc.html": {
+   "x": 1520,
+   "y": 2140,
+   "w": 420,
+   "h": 900,
+   "title": "B · Un calendario para el rango · 420",
+   "is_interactive": true
+  },
+  "OpcionC.dc.html": {
+   "x": 0,
+   "y": 3260,
+   "w": 1440,
+   "h": 1000,
+   "title": "C · Calendario dentro del cajón · 1440",
+   "is_interactive": true
+  },
+  "OpcionC420.dc.html": {
+   "x": 1520,
+   "y": 3260,
+   "w": 420,
+   "h": 900,
+   "title": "C · Calendario dentro del cajón · 420",
+   "is_interactive": true
+  },
+  "Mes.dc.html": {
+   "x": 0,
+   "y": 4380,
+   "w": 320,
+   "h": 420,
+   "title": "Pieza común · el mes (como el Calendar de la app)"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Selector.dc.html",
+  "OpcionA420.dc.html",
+  "OpcionB.dc.html",
+  "OpcionB420.dc.html",
+  "OpcionC.dc.html",
+  "OpcionC420.dc.html",
+  "Mes.dc.html"
+ ],
+ "notes": {},
+ "designSystems": []
+}

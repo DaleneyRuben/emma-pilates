@@ -216,8 +216,8 @@ model Promotion {
   headline        String
   description     String
   imageAssetId    String?     @map("image_asset_id") @db.Uuid
-  displayStartsOn DateTime    @map("display_starts_on") @db.Date
-  displayEndsOn   DateTime    @map("display_ends_on") @db.Date
+  displayStartsOn DateTime?   @map("display_starts_on") @db.Date
+  displayEndsOn   DateTime?   @map("display_ends_on") @db.Date
   displayOrder    Int         @map("display_order")
   publishedAt     DateTime?   @map("published_at") @db.Timestamptz(3)
   archivedAt      DateTime?   @map("archived_at") @db.Timestamptz(3)

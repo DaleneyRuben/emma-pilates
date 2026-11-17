@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Calendario para las fechas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}
+a{color:#7D4F4B}a:hover{color:#93615D}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 64px 80px; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', sans-serif; display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #93615D; font-weight: 500">Hallazgo 83 · Administración web · Seguimiento 265</div>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 400; font-size: 44px">Un calendario al hacer clic en una fecha</h1>
+    <p style="margin: 0; max-width: 900px; font-size: 17px; line-height: 1.6; color: #6E6663">Hoy cada fecha de la web se escribe a mano como «dd/mm/aaaa». El campo es uno solo y aparece en unas doce pantallas: Horario, series, Promociones, Gastos, Sueldos, Reglas, Informes y el acceso de cortesía. Lo que elijas aquí cambia todas a la vez. Se puede seguir escribiendo la fecha; el calendario se ve como el de la app de clientas.</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <a href="Selector.dc.html" style="text-decoration: none; color: #4A4A4A; background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #7D4F4B; font-weight: 600">Opción A · recomendada</span>
+      <span style="font-family: Lora, serif; font-size: 24px">Calendario bajo el campo</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #6E6663">Cada fecha lleva un ícono de calendario. Al hacer clic se abre un mes pequeño justo debajo; eliges el día y se cierra. Es lo que la gente ya conoce de otras páginas.</span>
+    </a>
+    <a href="OpcionB.dc.html" style="text-decoration: none; color: #4A4A4A; background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #7D4F4B; font-weight: 600">Opción B</span>
+      <span style="font-family: Lora, serif; font-size: 24px">Un calendario para el rango</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #6E6663">Inicio y fin se juntan en un campo «Fechas». Un solo calendario: el primer clic es el inicio, el segundo el fin. Atajos «Esta semana», «Este mes» y «30 días».</span>
+    </a>
+    <a href="OpcionC.dc.html" style="text-decoration: none; color: #4A4A4A; background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #7D4F4B; font-weight: 600">Opción C</span>
+      <span style="font-family: Lora, serif; font-size: 24px">Calendario dentro del cajón</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #6E6663">El mes se despliega dentro del panel, debajo de las fechas, y empuja lo demás hacia abajo. Nada flota encima. Pensado para el panel y para pantallas angostas.</span>
+    </a>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662; font-weight: 500">Lo mismo en las tres</h2>
+      <ul style="margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.7">
+        <li>Se puede seguir escribiendo «dd/mm/aaaa»; lo escrito mueve el calendario.</li>
+        <li>Lunes primero, el día elegido en Rosa, el rango con una banda, hoy con un anillo.</li>
+        <li>Los días que no se pueden elegir aparecen tachados y, al tocarlos, se dice por qué.</li>
+        <li>Teclado: flechas para moverse, Enter elige, Esc cierra.</li>
+        <li>El calendario nunca sale del panel ni tapa sus botones.</li>
+      </ul>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662; font-weight: 500">Cómo probar el prototipo</h2>
+      <p style="margin: 0; font-size: 15px; line-height: 1.6">La franja oscura de arriba de cada tablero no es parte del diseño. Sus botones cambian el caso:</p>
+      <ul style="margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.7">
+        <li><b style="font-weight: 600">Rango · Promoción</b>: Fecha de inicio y Fecha de fin.</li>
+        <li><b style="font-weight: 600">Una fecha · Gasto</b>: no puede ser posterior a hoy (15 de noviembre de 2026).</li>
+        <li><b style="font-weight: 600">Texto inválido</b>: «31/02/2026» escrito a mano.</li>
+        <li><b style="font-weight: 600">Fin antes del inicio</b>: el fin queda antes del inicio.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
