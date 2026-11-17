@@ -153,6 +153,8 @@ export class EvaluationSlotsController {
         ...month,
         month: civilDate(month.month),
       })),
+      includedEvaluation: availability.includedEvaluation,
+      priceCentavos: availability.priceCentavos,
     };
   }
 
