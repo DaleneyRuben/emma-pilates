@@ -34,7 +34,10 @@ Clientas › Todas is 267's option A, as `Selector.dc.html` (1440) and
   Correo, Teléfono, Desde), named `clientas-<chip>-<aaaa-mm-dd>.csv`, and
   the page says «Descargamos clientas-con-plan-2026-11-17.csv con 3
   clientas.» It is disabled while the list is empty.
-- At 420 the chips scroll sideways and the export sits under the title.
+- At 420 the chips wrap onto two lines, as Clientas' chips already do, and
+  the export sits under the title.
+- The «Dejar de enviar» dialog keeps AW35's buttons as built: «Volver» and
+  «Borrar contacto» (267 wrote «Cancelar»).
 
 ## Promociones
 

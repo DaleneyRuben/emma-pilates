@@ -9993,5 +9993,5 @@ The owner chose «Filtro + CSV en Clientas» and design option A (follow-ups
    pidiendo seguir recibiendo promociones.».
 7. As Carolina (Coordinación) the chip, the export and **Dejar de enviar**
    work the same.
-8. Check at 1440 px and 420 px (the chips scroll sideways at 420), then drop
-   the copy.
+8. Check at 1440 px and 420 px (the chips wrap onto two lines at 420), then
+   drop the copy.
