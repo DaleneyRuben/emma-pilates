@@ -112,4 +112,24 @@ describe("AW38 Comentarios names the sender", () => {
       screen.queryByRole("dialog", { name: "Comentario" }),
     ).not.toBeInTheDocument();
   });
+
+  it("names a sender without a client id, closed or from an older API, without a link", async () => {
+    const olderApi: Partial<typeof problem> = { ...problem };
+    delete olderApi.senderClientId;
+    server.use(
+      http.get(apiUrl(feedbackPath), () =>
+        jsonResponse(
+          feedbackPage([
+            olderApi as typeof problem,
+            { ...suggestion, senderName: "Cliente eliminado" },
+          ]),
+        ),
+      ),
+    );
+    renderAdmin("/comentarios");
+
+    const row = await rowOf(/No puedo ver mis reservas/);
+    expect(within(row).getByText("Valeria Quiroga")).toBeInTheDocument();
+    expect(within(row).queryByRole("link")).not.toBeInTheDocument();
+  });
 });

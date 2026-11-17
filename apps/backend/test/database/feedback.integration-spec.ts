@@ -366,4 +366,26 @@ describe('Feedback (PostgreSQL)', () => {
       senderEmail: 'camila@example.com',
     });
   });
+
+  // FIX-063 review: a closed Account keeps her row but links nowhere.
+  it('names a closed Client «Cliente eliminado» without a link', async () => {
+    const accountId = randomUUID();
+    const closed = await clientAccount(accountId, `${accountId}@example.com`);
+    const input = message({ accountId });
+    await store().send(input);
+    await prisma.client.update({
+      where: { id: closed.id },
+      data: { name: 'Cliente eliminado', deletedAt: sentAt },
+    });
+    await prisma.account.update({
+      where: { id: accountId },
+      data: { deletedAt: sentAt },
+    });
+
+    const rows = await store().listAll();
+    expect(rows.find((row) => row.id === input.id)).toMatchObject({
+      senderName: 'Cliente eliminado',
+      senderClientId: null,
+    });
+  });
 });
