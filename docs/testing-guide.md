@@ -9546,3 +9546,22 @@ rows, now unread by AW35).
    box. `.maestro/profile-without-promotions.yaml` walks this on the iPhone,
    the iPad, and Android.
 6. Check the admin web at 1440 px and 420 px, then drop the copy.
+
+### Referidos and Clases de campaña (FIX-060, walkthrough findings 86 and 87)
+
+7. **Promociones › Referidos** (AW26). Expected: after **Fecha de registro**,
+   **Compró** shows the Bolivia day of the referred Client's first confirmed
+   Plan purchase (a guest pass's courtesy is none) or «Aún no», and **Clase de
+   premio** shows «Sumada el …» once the host got her extra class, «Se suma
+   con su próximo plan» while it is owed, or «—». `GET
+   /api/v1/administrator/referrals` adds `firstPurchaseAt`, `inviteReward`
+   (`none`, `owed`, `granted`), and `inviteRewardGrantedAt`. On the fixtures,
+   Sofía → Valeria has a purchase date and Sofía → Mariana «Aún no».
+8. **Promociones › Clases de campaña** (AW21). Make a Client with a live Plan
+   a founder (Test 88), then open the page. Expected: «N son fundadoras y no
+   entran en campañas: …» apart from «N clientas no tienen un plan vigente:
+   …»; `GET /api/v1/administrator/campaigns/preview` gives each skipped
+   Client a `reason` (`founder` or `no_current_plan`). With 0 recipients,
+   **Dar las clases** is disabled. There is no picker: the grant goes to
+   every eligible Client.
+9. Check both pages at 1440 px and 420 px.
