@@ -4,7 +4,7 @@ import { RowOpener } from "../../catalog/catalog-page";
 import { ClientPhoto } from "../../components/client-photo";
 import { StatusPill } from "../../components/ui/status-pill";
 import { formatCivilDate } from "../../lib/bolivia-time";
-import { phoneWithFlag } from "../../lib/phone-number";
+import { ClientPhone } from "./client-phone";
 
 const columns = createColumnHelper<AdminClientDto>();
 
@@ -52,11 +52,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
     cell: ({ row }) => (
       <span className="flex flex-col text-nota text-texto-secundario">
         <span>{row.original.email}</span>
-        {row.original.phone === null ? null : (
-          <span className="text-texto-muy-tenue tabular">
-            {phoneWithFlag(row.original.phone)}
-          </span>
-        )}
+        <ClientPhone phone={row.original.phone} tone="text-texto-muy-tenue" />
       </span>
     ),
   }),
