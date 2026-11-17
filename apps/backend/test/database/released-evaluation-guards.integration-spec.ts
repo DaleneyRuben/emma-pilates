@@ -13,10 +13,10 @@ import {
   type EvaluationTestWorld,
 } from './evaluation-test-support';
 
-// FIX-062, review of the branch: a released Evaluation waits for a new slot.
-// Booking its old slot fails with a problem code instead of a 500 (the
-// one-live-per-slot index still counts it), it cannot be marked a no-show,
-// and releasing it again repeats nothing.
+// FIX-062: a released Evaluation waits for a new slot. Another Client can
+// book its old slot (owner approval of the index swap, 2026-11-17), a second
+// booking of that slot answers a problem code instead of a 500, it cannot be
+// marked a no-show, and releasing it again repeats nothing.
 describe('guards around a released paid evaluation', () => {
   let world: EvaluationTestWorld;
   let mondayBlockId: string;
@@ -54,16 +54,14 @@ describe('guards around a released paid evaluation', () => {
     await world?.stop();
   });
 
-  it('answers a booking of the old slot with evaluation_slot_unavailable', async () => {
-    await expect(
-      codeOf(
-        commands().bookEvaluation(
-          await slotAt(releasedAt),
-          await principal('ana@example.com'),
-          randomUUID(),
-        ),
-      ),
-    ).resolves.toBe('evaluation_slot_unavailable');
+  it('lets another Client book the old slot, which then holds one Evaluation', async () => {
+    const booked = await commands().bookEvaluation(
+      await slotAt(releasedAt),
+      await principal('ana@example.com'),
+      randomUUID(),
+    );
+    expect(booked.state).toBe('booked');
+
     await expect(
       codeOf(
         commands().bookPaidEvaluation(
