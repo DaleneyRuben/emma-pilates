@@ -231,7 +231,10 @@ export function PromotionPanelForm({
                 <FormItem>
                   <FormLabel>Fecha de inicio</FormLabel>
                   <FormControl>
-                    <CivilDateInput {...field} />
+                    <CivilDateInput
+                      {...field}
+                      rangeEnd={typed.displayEndsOn ?? undefined}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -244,7 +247,13 @@ export function PromotionPanelForm({
                 <FormItem>
                   <FormLabel>Fecha de fin</FormLabel>
                   <FormControl>
-                    <CivilDateInput {...field} />
+                    <CivilDateInput
+                      {...field}
+                      align="end"
+                      rangeStart={typed.displayStartsOn ?? undefined}
+                      min={typed.displayStartsOn ?? undefined}
+                      minReason="La fecha de fin no puede ser anterior a la de inicio."
+                    />
                   </FormControl>
                   <FormDescription>
                     Entre esas dos fechas la promoción aparece en el inicio de

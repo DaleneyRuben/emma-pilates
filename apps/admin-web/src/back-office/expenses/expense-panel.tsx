@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useIdempotencyKey } from "../../api/idempotency-key";
 import { CivilDateInput } from "../../components/form/civil-date-input";
+import { boliviaToday } from "../../lib/bolivia-time";
 import { pastCivilDateField } from "../../components/form/date-field";
 import {
   Form,
@@ -205,7 +206,11 @@ export function ExpensePanelForm({
               <FormItem>
                 <FormLabel>Fecha</FormLabel>
                 <FormControl>
-                  <CivilDateInput {...field} />
+                  <CivilDateInput
+                    {...field}
+                    max={boliviaToday()}
+                    maxReason="La fecha no puede ser posterior a hoy."
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
