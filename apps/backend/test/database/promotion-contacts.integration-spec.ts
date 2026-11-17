@@ -111,7 +111,7 @@ describe('Promotion Contacts (PostgreSQL)', () => {
           name: 'Valeria Quiroga',
           email: 'valeria@example.com',
           phone: '+591 70011005',
-          consentedAt: new Date('2026-10-19T20:00:00.000Z'),
+          since: new Date('2026-10-19T20:00:00.000Z'),
         },
         {
           id: ids.sofia,
@@ -119,7 +119,7 @@ describe('Promotion Contacts (PostgreSQL)', () => {
           name: 'Sofía Guzmán',
           email: 'sofia@example.com',
           phone: null,
-          consentedAt: new Date('2026-10-18T20:00:00.000Z'),
+          since: new Date('2026-10-18T20:00:00.000Z'),
         },
       ],
       page: 1,

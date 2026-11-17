@@ -99,7 +99,9 @@ describe('campaign extra classes', () => {
 
     expect(first).toEqual(retry);
     expect(first.granted).toEqual([{ clientId: live.clientId, name: 'Lucía' }]);
-    expect(first.skipped).toEqual([{ clientId: waiting.id, name: 'Sofía' }]);
+    expect(first.skipped).toEqual([
+      { clientId: waiting.id, name: 'Sofía', reason: 'no_current_plan' },
+    ]);
     await expect(prisma.allowanceAdjustment.count()).resolves.toBe(1);
     await expect(
       prisma.allowanceAdjustment.findFirstOrThrow({
@@ -127,5 +129,20 @@ describe('campaign extra classes', () => {
         select: { id: true, amountDueCentavos: true, planPriceCentavos: true },
       }),
     ).resolves.toEqual(paymentsBefore);
+
+    // FIX-060 (walkthrough finding 87): a founder with a live Plan is skipped
+    // for being a founder, not for lacking a Plan.
+    await prisma.founderMembership.create({
+      data: { clientId: live.clientId, number: 1, since: today },
+    });
+    await expect(grant.preview(administrator(live.accountId))).resolves.toEqual(
+      {
+        recipientCount: 0,
+        skipped: [
+          { clientId: live.clientId, name: 'Lucía', reason: 'founder' },
+          { clientId: waiting.id, name: 'Sofía', reason: 'no_current_plan' },
+        ],
+      },
+    );
   });
 });

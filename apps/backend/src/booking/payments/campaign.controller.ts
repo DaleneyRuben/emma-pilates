@@ -46,12 +46,23 @@ export class CampaignClientDto {
   name!: string;
 }
 
+// FIX-060 (walkthrough finding 87): added beside the name, so an older
+// admin web still reads the list.
+export class CampaignSkippedClientDto extends CampaignClientDto {
+  @ApiProperty({
+    enum: ['founder', 'no_current_plan'],
+    description:
+      'A founder is never in a campaign; anyone else has no live paid Plan',
+  })
+  reason!: 'founder' | 'no_current_plan';
+}
+
 export class CampaignPreviewDto {
   @ApiProperty()
   recipientCount!: number;
 
-  @ApiProperty({ type: [CampaignClientDto] })
-  skipped!: CampaignClientDto[];
+  @ApiProperty({ type: [CampaignSkippedClientDto] })
+  skipped!: CampaignSkippedClientDto[];
 }
 
 export type CampaignPreview = (
@@ -76,8 +87,8 @@ export class CampaignResultDto {
   @ApiProperty({ type: [CampaignClientDto] })
   granted!: CampaignClientDto[];
 
-  @ApiProperty({ type: [CampaignClientDto] })
-  skipped!: CampaignClientDto[];
+  @ApiProperty({ type: [CampaignSkippedClientDto] })
+  skipped!: CampaignSkippedClientDto[];
 }
 
 const bodySchema = z

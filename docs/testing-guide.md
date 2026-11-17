@@ -35,7 +35,7 @@ numbered tests.
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
 | Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
-| Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
+| Promotion Contacts           | AW35 lists every active Client as «Activa» whether or not she agreed, Perfil has no «Recibir promociones» switch, and closing the Account with the box ticked keeps a «Cuenta cerrada» contact (Test 155, FIX-060; Test 60 for app builds before it) | The owner's decision on walkthrough finding 85; the closure part is permanent, so use a copy of the fixtures |
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, «Nuevo cliente» with the invitation card since FIX-040, Bookings, «Cancelar una clase», no sale); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
@@ -105,7 +105,7 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114 |
 | AW42 Simulador | 97, 101 |
-| AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111 |
+| AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111, 155 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras (the Fundadora chip on Clientas since WEB-040) | 26, 88 |
@@ -1599,9 +1599,9 @@ Log in as `sofia@example.com` and open the **Perfil** tab (`C18`). Below the
 summary card come three sections of v2 icon rows (a Rosa tinte disc, the
 label, a quiet chevron): «Tu plan y tus clases» (**Mi plan** with its state,
 **Evaluación nutricional**, **Mis evaluaciones**, **Invita a una amiga**),
-«Preferencias» (**Notificaciones** with «N sin leer» on the right, and the
-**Recibir promociones** switch, with «Usamos tu nombre, correo y teléfono
-para enviarte ofertas del estudio.» under the group), and «Cuenta»
+«Preferencias» (**Notificaciones** with «N sin leer» on the right; since
+FIX-060 there is no **Recibir promociones** switch nor its note, Test 155),
+and «Cuenta»
 (**Cambiar contraseña**, **Enviar comentarios**, and **Cerrar sesión** as the
 last row, which opens the «¿Cerrar sesión?» sheet). Then the discreet
 **Cerrar mi cuenta** text button in Error and "Emma Pilates Studio · versión
@@ -2462,7 +2462,7 @@ Plan is expired, so she cannot book), `email-change` (Lucía asks, resends, and 
 change; the captured link of Test 34 is not read), `evaluation-book-and-cancel`
 (Lucía), `home-plan-and-notifications` (Lucía; the Promotions and
 notifications above), `profile-photo` (Lucía; the worker and the library
-photo above), `promotions-consent`, `purchase-plan-transfer` (Mariana buys
+photo above), `profile-without-promotions` (Lucía; Test 155), `purchase-plan-transfer` (Mariana buys
 the first Plan from Home: 08 → 09 → 10 with the studio QR → a receipt from
 the library → 11 «Pago en revisión»; the worker and the library photo
 again), `waitlist-join-and-leave` (the flow seeds a one-seat class tomorrow at
@@ -5455,16 +5455,17 @@ ADR-0097). An Administrator sees, exports, and erases them on AW35.
    `psql`.
 3. Log in as `paola.mendoza@example.com`, open Promociones, and press
    «Contactos para promociones». Expected: AW35 with «← Promociones», the
-   sidebar still marking Promociones, newest consent first, «—» for a contact
-   without a phone, and «Aceptó el» as the Bolivia date (a consent at 23:30 in
-   Bolivia keeps that day).
+   sidebar still marking Promociones, newest first, «—» for a contact
+   without a phone, and «Desde» as the Bolivia date (a consent at 23:30 in
+   Bolivia keeps that day). Since FIX-060 every active Client is listed too
+   (Test 155).
 4. Search by a name without its accent, an email fragment, or phone digits.
    Expected: only the matching rows, and «No se encontró ningún contacto.»
    when none match (`GET /api/v1/administrator/promotion-contacts?q=…`;
    the export below is `GET …/promotion-contacts/export`, a CSV body).
 5. Press «Exportar CSV». Expected: `contactos-promociones-aaaa-mm-dd.csv` with
    every contact (not only the page), columns Nombre, Tipo, Correo, Teléfono,
-   Aceptó el (Tipo since BE-023), accents intact in a spreadsheet, and a
+   Desde (Tipo since BE-023, «Desde» since FIX-060), accents intact in a spreadsheet, and a
    `promotion_contact.exported` audit record with `contactCount`.
 6. Press «Dejar de enviar» on a row, then «Borrar contacto». Expected:
    «Borramos el contacto de …», the row gone, and in `psql` the row kept with
@@ -5487,6 +5488,12 @@ ADR-0097). An Administrator sees, exports, and erases them on AW35.
 A Client with an open Account agrees to promotions, or stops, from Perfil
 (follow-up 103, ADR-0098). AW35 lists her as «Activa» beside the former
 Clients («Cuenta cerrada»), and closing her Account ends the consent.
+
+**Since FIX-060 (Test 155)** the current app has no switch and AW35 lists
+every active Client whatever her consent, with no «Dejar de enviar» on her
+row. Steps 2, 3, and 5 below apply only to app builds before FIX-060 (the
+`…/promotions-consent` endpoints still answer them, deprecated); steps 4 and 5
+now read as Test 155 says. Step 6 still holds for those builds.
 
 1. Use a copy of the fixtures as in Test 59 (`createdb pilates_test_be023`,
    `db:migrate:deploy`, `db:fixtures`), run the API on it, the Client app
@@ -9605,3 +9612,59 @@ database copy with the migration applied.
 3. As Lucía (or another client), **Evaluación nutricional** no longer offers
    the released time after the block's end. Lucía's card still reads «El
    estudio liberó este turno · el pago sigue vigente» with **Elegir turno**.
+
+## Test 155: every active Client is a promotions contact (FIX-060)
+
+Walkthrough finding 85: the owner decided that **Promociones › Contactos**
+(AW35) lists every active Client, whether or not she agreed, and that Perfil
+no longer asks. The «Quiero seguir recibiendo promociones…» box of «Cerrar mi
+cuenta» stays: it is the only way a closed Account's contact is kept. No
+migration; no data is dropped (`booking.client_promotions_consents` keeps its
+rows, now unread by AW35).
+
+1. Use a copy of the fixtures (`createdb -T pilates_golden
+   pilates_fix060_dev`), and run the API, the worker, the Client app, and the
+   admin web on your own ports (surface-verification skill).
+2. Log in to the admin web as Paola, open **Promociones**, press **Contactos
+   para promociones**. Expected: the subtitle «N contactos · todas tus
+   clientas activas y las que pidieron seguir recibiendo promociones al cerrar
+   su cuenta», every fixture Client (Lucía, Valeria, Isabel, Sofía, Mariana,
+   …) as «Activa» with her email, phone, and **Desde** as the day she
+   registered, newest first, and no «Dejar de enviar» on those rows. `GET
+   /api/v1/administrator/promotion-contacts` answers each with the Client's
+   id, `since`, and the deprecated `consentedAt` (the same instant).
+3. Close an Account from the Client app with the box ticked (Test 35).
+   Expected: she leaves the «Activa» rows and comes back as «Cuenta cerrada»
+   with the closure day, the only kind of row with **Dejar de enviar**, which
+   erases her as in Test 59 step 6. `POST …/promotion-contacts/{clientId}/
+   withdrawal` with a live Client's id answers `404`
+   `promotion_contact_not_found`.
+4. **Exportar CSV** downloads every row with the columns Nombre, Tipo, Correo,
+   Teléfono, Desde. On an empty database the empty state reads «Todavía no hay
+   contactos.» and «Aparecen aquí todas tus clientas activas y las que, al
+   cerrar su cuenta, pidieron seguir recibiendo promociones.»
+5. In the Client app, as Lucía, open **Perfil**. Expected: **Preferencias**
+   holds only **Notificaciones**; no «Recibir promociones» switch and no «Usamos
+   tu nombre, correo y teléfono…» note. **Cerrar mi cuenta** still shows the
+   box. `.maestro/profile-without-promotions.yaml` walks this on the iPhone,
+   the iPad, and Android.
+6. Check the admin web at 1440 px and 420 px, then drop the copy.
+
+### Referidos and Clases de campaña (FIX-060, walkthrough findings 86 and 87)
+
+7. **Promociones › Referidos** (AW26). Expected: after **Fecha de registro**,
+   **Compró** shows the Bolivia day of the referred Client's first confirmed
+   Plan purchase (a guest pass's courtesy is none) or «Aún no», and **Clase de
+   premio** shows «Sumada el …» once the host got her extra class, «Se suma
+   con su próximo plan» while it is owed, or «—». `GET
+   /api/v1/administrator/referrals` adds `firstPurchaseAt`, `inviteReward`
+   (`none`, `owed`, `granted`), and `inviteRewardGrantedAt`. On the fixtures,
+   Sofía → Valeria has a purchase date and Sofía → Mariana «Aún no».
+8. **Promociones › Clases de campaña** (AW21). Make a Client with a live Plan
+   a founder (Test 88), then open the page. Expected: «N son fundadoras y no
+   entran en campañas: …» apart from «N clientas no tienen un plan vigente:
+   …»; `GET /api/v1/administrator/campaigns/preview` gives each skipped
+   Client a `reason` (`founder` or `no_current_plan`). With 0 recipients,
+   **Dar las clases** is disabled. There is no picker: the grant goes to
+   every eligible Client.
+9. Check both pages at 1440 px and 420 px.

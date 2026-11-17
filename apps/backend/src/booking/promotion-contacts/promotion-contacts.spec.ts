@@ -32,7 +32,7 @@ const valeria = {
   name: 'Valeria Quiroga',
   email: 'valeria@example.com',
   phone: '+591 70011005',
-  consentedAt: new Date('2026-10-19T20:00:00.000Z'),
+  since: new Date('2026-10-19T20:00:00.000Z'),
 };
 const page = { items: [valeria], page: 1, pageSize: 20, totalItems: 1 };
 

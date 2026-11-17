@@ -7,6 +7,6 @@
 import type { AdminPromotionContactDto } from "./adminPromotionContactDto";
 
 export interface AdminPromotionContactExportDto {
-  /** Every contact not withdrawn, newest consent first */
+  /** Every contact not withdrawn, newest first */
   items: AdminPromotionContactDto[];
 }
