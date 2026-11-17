@@ -6,7 +6,6 @@ import {
   useListEvaluations,
   useListEvaluationSlots,
   type ClientEvaluationDto,
-  type EvaluationAvailabilityDto,
   type EvaluationSlotDto,
 } from "@pilates/api-contracts";
 import {
@@ -14,10 +13,8 @@ import {
   BrandToast,
   colors,
   ConfirmationSheet,
-  fontFamilies,
   LoadingState,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
   SectionTitle,
@@ -31,7 +28,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { PastEvaluations } from "./evaluation-card";
@@ -45,7 +42,7 @@ import {
 import { planOfferLine } from "./evaluation-offer-copy";
 import { EvaluationReceiptSheet } from "./evaluation-receipt-sheet";
 import { EvaluationSlotPicker, openDays } from "./evaluation-slot-picker";
-import { UsedMonth, usedMonthStyles } from "./evaluation-used-month";
+import { MovingBand, NoSlots } from "./evaluation-screen-parts";
 import { NextEvaluationCard } from "./next-evaluation-card";
 import { RescheduleConfirmSheet } from "./reschedule-confirm-sheet";
 import { useEvaluationCommands } from "./use-evaluation-commands";
@@ -61,58 +58,12 @@ type EvaluationNavigation = {
   setParams: (params: { confirmed?: ClientEvaluationDto }) => void;
 };
 
-// "jueves 3 de septiembre, 16:00", read mid-sentence.
-const turno = (instant: string) => {
-  const date = evaluationDate(instant);
-  return `${date.charAt(0).toLowerCase()}${date.slice(1)}, ${clockTime(instant)}`;
-};
-
 const toastTitle = (notice: Notice) =>
   notice.moved === true
     ? "Evaluación reprogramada"
     : notice.evaluation.included
       ? "Evaluación confirmada"
       : "Comprobante enviado";
-
-function MovingBand({
-  evaluation,
-  onBack,
-}: {
-  evaluation: ClientEvaluationDto;
-  onBack: () => void;
-}) {
-  return (
-    <View style={styles.band}>
-      <Text style={styles.bandText}>
-        {`Cambias tu cita del ${turno(evaluation.startsAt)}. Elige el nuevo horario.`}
-      </Text>
-      <Pressable
-        accessibilityLabel="Volver a tu cita"
-        accessibilityRole="button"
-        onPress={onBack}
-        style={styles.bandButton}
-      >
-        <Text style={styles.bandButtonLabel}>Volver</Text>
-      </Pressable>
-    </View>
-  );
-}
-
-function NoSlots({
-  availability,
-  showUsed,
-}: {
-  availability: EvaluationAvailabilityDto;
-  showUsed: boolean;
-}) {
-  if (showUsed) return <UsedMonth availability={availability} />;
-  return (
-    <View style={usedMonthStyles.used}>
-      <Text style={usedMonthStyles.usedTitle}>No hay horarios disponibles por ahora.</Text>
-      <BodyText>Vuelve a revisar en unos días.</BodyText>
-    </View>
-  );
-}
 
 /**
  * C13, walkthrough finding 70 (follow-up 264, option A): one «Evaluación
@@ -251,6 +202,9 @@ export function EvaluationAvailabilityScreen({
                   onAttachReceipt={() => setReceiptFor(evaluation)}
                   onCancel={() => setCancelling(evaluation)}
                   onMove={() => {
+                    // The toast would sit over the turnos she now has to tap.
+                    setMovedNotice(null);
+                    dismissConfirmed();
                     commands.clearFailure();
                     setMoving(evaluation);
                   }}
@@ -372,23 +326,6 @@ export function EvaluationAvailabilityScreen({
 }
 
 const styles = StyleSheet.create({
-  band: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.button,
-    flexDirection: "row",
-    gap: spacing.sm,
-    paddingLeft: spacing.lg,
-    paddingVertical: spacing.xs,
-  },
-  bandButton: { justifyContent: "center", minHeight: 44, paddingHorizontal: spacing.md },
-  bandButtonLabel: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
-  bandText: { color: colors.primaryOnTint, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
   cards: { gap: spacing.xl },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   failure: { color: colors.errorText },
