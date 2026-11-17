@@ -49,8 +49,11 @@ type CatalogPageProps<Row extends { id: string }> = {
   footer?: ReactNode;
   /** A row to open once the page lists it (a link from another page). */
   openRowId?: string;
-  /** Called after `openRowId` opened, so the address can forget it. */
-  onRowOpened?: () => void;
+  /**
+   * Called once `openRowId` opened, or the loaded page does not list it, so
+   * the address can forget it (replacing the history entry, not pushing).
+   */
+  onLinkSettled?: () => void;
 };
 
 export type PanelAction = {
@@ -93,7 +96,7 @@ export function CatalogPage<Row extends { id: string }>({
   actions,
   footer,
   openRowId,
-  onRowOpened,
+  onLinkSettled,
 }: CatalogPageProps<Row>) {
   const [panel, setPanel] = useState<PanelState<Row>>({ kind: "closed" });
   const [notice, setNotice] = useState<string | null>(null);
@@ -118,9 +121,14 @@ export function CatalogPage<Row extends { id: string }>({
   } else if (openRowId === undefined && openedLink !== undefined) {
     setOpenedLink(undefined);
   }
+  const linkMissing =
+    openRowId !== undefined &&
+    query.isSuccess &&
+    !query.isPlaceholderData &&
+    linked === undefined;
   useEffect(() => {
-    if (openedLink !== undefined) onRowOpened?.();
-  }, [openedLink, onRowOpened]);
+    if (openedLink !== undefined || linkMissing) onLinkSettled?.();
+  }, [openedLink, linkMissing, onLinkSettled]);
 
   return (
     <article className="flex flex-col gap-5">

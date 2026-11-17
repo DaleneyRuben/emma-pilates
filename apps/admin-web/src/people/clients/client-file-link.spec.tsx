@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { act, screen, waitFor } from "@testing-library/react";
 import { http } from "msw";
 import {
   feedbackPage,
@@ -48,7 +48,7 @@ describe("AW21 a link to a Client's file", () => {
       expect(router.state.location.search).not.toHaveProperty("cliente"),
     );
 
-    router.history.back();
+    act(() => router.history.back());
 
     await screen.findByRole("heading", { level: 1, name: "Comentarios" });
     expect(router.state.location.pathname).toBe("/comentarios");

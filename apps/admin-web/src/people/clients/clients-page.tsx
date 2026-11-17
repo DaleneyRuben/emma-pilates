@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback } from "react";
 import { CatalogPage } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { countFormat } from "../../components/table/pagination";
@@ -59,17 +58,16 @@ function EmptyDirectory({ searching }: { searching: boolean }) {
 export function ClientsPage({
   search,
   onSearchChange,
+  onLinkedClientSettled,
 }: {
   search: ClientSearch;
   onSearchChange: SearchChange<ClientSearch>;
+  /** Drops `cliente` from the address without a new history entry. */
+  onLinkedClientSettled?: () => void;
 }) {
   const query = useQuery(clientTableQueryOptions(search));
   const studio = query.data?.studioClientCount;
   const role = useAdminRole();
-  const forgetLinkedClient = useCallback(
-    () => onSearchChange({ cliente: undefined }),
-    [onSearchChange],
-  );
 
   return (
     <CatalogPage
@@ -108,7 +106,7 @@ export function ClientsPage({
       }
       query={query}
       openRowId={search.cliente}
-      onRowOpened={forgetLinkedClient}
+      onLinkSettled={onLinkedClientSettled}
       columns={clientColumns}
       renderForm={(client, done) =>
         client === undefined ? null : (
