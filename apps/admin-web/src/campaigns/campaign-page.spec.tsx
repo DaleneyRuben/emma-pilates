@@ -14,13 +14,10 @@ const campaignHandlers = () => [
   http.get(apiUrl(previewPath), () =>
     jsonResponse({
       recipientCount: 12,
-      skipped: [
-        {
-          clientId: "22222222-2222-4222-8222-222222222222",
-          name: "Sofía",
-          reason: "no_current_plan",
-        },
+      owed: [
+        { clientId: "22222222-2222-4222-8222-222222222222", name: "Sofía" },
       ],
+      skipped: [],
     }),
   ),
   http.post(apiUrl(campaignPath), async ({ request }) => {
@@ -32,13 +29,10 @@ const campaignHandlers = () => [
         granted: [
           { clientId: "11111111-1111-4111-8111-111111111111", name: "Lucía" },
         ],
-        skipped: [
-          {
-            clientId: "22222222-2222-4222-8222-222222222222",
-            name: "Sofía",
-            reason: "no_current_plan",
-          },
+        owed: [
+          { clientId: "22222222-2222-4222-8222-222222222222", name: "Sofía" },
         ],
+        skipped: [],
       },
       201,
     );
@@ -68,7 +62,9 @@ describe("AW21 Campaña", () => {
       await screen.findByRole("heading", { level: 1, name: "Campaña" }),
     ).toBeVisible();
     expect(await screen.findByText("12 clientas la recibirán.")).toBeVisible();
-    expect(screen.getByText("Sofía no tiene un plan vigente.")).toBeVisible();
+    expect(
+      screen.getByText("1 sin plan: se le suma en su próximo plan (Sofía)."),
+    ).toBeVisible();
   });
 
   it("shows the branded loading state while the Clients load (WEB-045)", async () => {
@@ -80,7 +76,7 @@ describe("AW21 Campaña", () => {
     await findBrandedLoading("Cargando las clientas…");
   });
 
-  it("submits the campaign and shows the granted and skipped counts", async () => {
+  it("submits the campaign and counts every Client it reached", async () => {
     const { user } = renderAdmin("/promociones/clases-de-campana");
 
     await user.type(
@@ -98,43 +94,42 @@ describe("AW21 Campaña", () => {
     expect(submitted[0]).toEqual({ name: "Inicio de año", classes: 1 });
     expect(
       await screen.findByText(
-        "1 clienta recibió 1 clase extra. 1 clienta no tiene un plan vigente: Sofía.",
+        "2 clientas recibieron 1 clase extra. 1 sin plan: se le suma en su próximo plan (Sofía).",
       ),
     ).toBeVisible();
   });
 
-  // FIX-060 (walkthrough finding 87): every Client left out is a founder.
-  it("says the founders are left out and offers no grant to nobody", async () => {
+  // FIX-064 (walkthrough finding 90): founders are in; only an empty studio
+  // has nobody to give the classes to.
+  it("offers no grant only when there is no active Client", async () => {
     server.use(
       http.get(apiUrl(previewPath), () =>
-        jsonResponse({
-          recipientCount: 0,
-          skipped: [
-            {
-              clientId: "33333333-3333-4333-8333-333333333333",
-              name: "Carla",
-              reason: "founder",
-            },
-            {
-              clientId: "44444444-4444-4444-8444-444444444444",
-              name: "Lucía",
-              reason: "founder",
-            },
-          ],
-        }),
+        jsonResponse({ recipientCount: 0, owed: [], skipped: [] }),
       ),
     );
     renderAdmin("/promociones/clases-de-campana");
 
     expect(await screen.findByText("0 clientas la recibirán.")).toBeVisible();
-    expect(
-      screen.getByText(
-        "2 son fundadoras y no entran en campañas: Carla, Lucía.",
-      ),
-    ).toBeVisible();
-    expect(screen.queryByText(/plan vigente/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/fundadora/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/sin plan/)).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Dar las clases" }),
     ).toBeDisabled();
+  });
+
+  it("confirms that every active Client receives the classes", async () => {
+    const { user } = renderAdmin("/promociones/clases-de-campana");
+
+    await user.type(
+      await screen.findByLabelText("Nombre de la campaña"),
+      "Inicio de año",
+    );
+    await user.click(screen.getByRole("button", { name: "Dar las clases" }));
+
+    expect(
+      await screen.findByText(
+        "Cada clienta activa recibe las clases: en su plan vigente o, si no tiene uno, en su próximo plan. Ningún precio cambia.",
+      ),
+    ).toBeVisible();
   });
 });

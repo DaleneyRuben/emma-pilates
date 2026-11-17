@@ -35,7 +35,7 @@ describe('campaign extra classes', () => {
     await context?.stop();
   });
 
-  it('grants one campaign class to every live Subscription, skips a Client without one, and a retry writes nothing more', async () => {
+  it('grants one campaign class to every live Subscription, owes it to a Client without one, and a retry writes nothing more', async () => {
     const live = await createFixture(prisma, { now: today });
     const planId = (
       await prisma.subscription.findUniqueOrThrow({
@@ -99,9 +99,8 @@ describe('campaign extra classes', () => {
 
     expect(first).toEqual(retry);
     expect(first.granted).toEqual([{ clientId: live.clientId, name: 'Lucía' }]);
-    expect(first.skipped).toEqual([
-      { clientId: waiting.id, name: 'Sofía', reason: 'no_current_plan' },
-    ]);
+    expect(first.owed).toEqual([{ clientId: waiting.id, name: 'Sofía' }]);
+    expect(first.skipped).toEqual([]);
     await expect(prisma.allowanceAdjustment.count()).resolves.toBe(1);
     await expect(
       prisma.allowanceAdjustment.findFirstOrThrow({
@@ -130,18 +129,15 @@ describe('campaign extra classes', () => {
       }),
     ).resolves.toEqual(paymentsBefore);
 
-    // FIX-060 (walkthrough finding 87): a founder with a live Plan is skipped
-    // for being a founder, not for lacking a Plan.
+    // FIX-064 (walkthrough finding 90): a founder is in the campaign too.
     await prisma.founderMembership.create({
       data: { clientId: live.clientId, number: 1, since: today },
     });
     await expect(grant.preview(administrator(live.accountId))).resolves.toEqual(
       {
-        recipientCount: 0,
-        skipped: [
-          { clientId: live.clientId, name: 'Lucía', reason: 'founder' },
-          { clientId: waiting.id, name: 'Sofía', reason: 'no_current_plan' },
-        ],
+        recipientCount: 2,
+        owed: [{ clientId: waiting.id, name: 'Sofía' }],
+        skipped: [],
       },
     );
   });

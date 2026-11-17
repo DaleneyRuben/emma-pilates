@@ -9,92 +9,89 @@ import {
   type CampaignCommand,
   type CampaignGrant,
   type CampaignPreview,
+  type CampaignRecipient,
   type LiveRecipient,
-  type SkippedClient,
 } from './grant-campaign';
+import { oweCampaignClasses } from './owed-campaign-classes';
 
 type Transaction = Prisma.TransactionClient;
 
-const withAccount = { deletedAt: null, account: { isNot: null } };
+// An active Client: neither she nor her Account is closed, removed, or
+// disabled. Closing an Account removes the Client too.
+const withAccount = {
+  deletedAt: null,
+  account: { is: { deletedAt: null, disabledAt: null } },
+};
 
-// The same live Subscription as the Client directory: ACTIVE, and its date
-// range covers today in America/La_Paz. Subscription has no deleted_at.
-// A founder, Courtesy Access, a hidden Plan, and a Bs 0 Plan are not a
-// campaign (FIX-001). A guest pass is a hidden courtesy Subscription.
-const liveOn = (today: Date): Prisma.SubscriptionWhereInput => ({
+// FIX-064 (walkthrough finding 90): every active Client, founders included,
+// whatever her Plan or price. Her current Subscription takes the classes:
+// ACTIVE, its range covering today in America/La_Paz, the most recently
+// activated if two overlap. Without one, a Plan already activated to start
+// later takes them, the earliest first. A Guest Pass is not her Plan, so the
+// classes never land on one. Subscription has no deleted_at.
+const liveOrNextOn = (today: Date): Prisma.SubscriptionWhereInput => ({
   state: 'ACTIVE',
-  startsOn: { lte: today },
   endsOn: { gte: today },
-  plan: { hiddenAt: null, priceCentavos: { gt: 0 } },
-  payment: {
-    method: { not: 'COURTESY' },
-    planPriceCentavos: { gt: 0 },
-    plan: { hiddenAt: null, priceCentavos: { gt: 0 } },
-  },
+  guestPasses: { none: { deletedAt: null } },
 });
 
-const activeFounderIds = async (transaction: Transaction) =>
-  (
-    await transaction.founderMembership.findMany({
-      where: { deletedAt: null, status: 'ACTIVE' },
-      select: { clientId: true },
-    })
-  ).map((founder) => founder.clientId);
+const chosen = (
+  today: Date,
+  subscriptions: readonly {
+    id: string;
+    startsOn: Date;
+    activatedAt: Date | null;
+  }[],
+): string | undefined => {
+  const current = subscriptions
+    .filter((subscription) => subscription.startsOn <= today)
+    .sort(
+      (a, b) =>
+        (b.activatedAt?.getTime() ?? 0) - (a.activatedAt?.getTime() ?? 0) ||
+        b.id.localeCompare(a.id),
+    );
+  if (current.length > 0) return current[0].id;
+  return [...subscriptions].sort(
+    (a, b) =>
+      a.startsOn.getTime() - b.startsOn.getTime() || a.id.localeCompare(b.id),
+  )[0]?.id;
+};
 
 const findRecipients = async (
   transaction: Transaction,
   today: Date,
 ): Promise<LiveRecipient[]> => {
-  const founders = await activeFounderIds(transaction);
   const rows = await transaction.client.findMany({
-    where: {
-      ...withAccount,
-      id: { notIn: founders },
-      subscriptions: { some: liveOn(today) },
-    },
+    where: { ...withAccount, subscriptions: { some: liveOrNextOn(today) } },
     orderBy: [{ name: 'asc' }, { id: 'asc' }],
     select: {
       id: true,
       name: true,
       subscriptions: {
-        where: liveOn(today),
-        orderBy: { activatedAt: 'desc' },
-        take: 1,
-        select: { id: true },
+        where: liveOrNextOn(today),
+        select: { id: true, startsOn: true, activatedAt: true },
       },
     },
   });
   return rows.flatMap((row) => {
-    const subscription = row.subscriptions[0];
-    if (subscription === undefined) return [];
-    return [
-      { clientId: row.id, name: row.name, subscriptionId: subscription.id },
-    ];
+    const subscriptionId = chosen(today, row.subscriptions);
+    if (subscriptionId === undefined) return [];
+    return [{ clientId: row.id, name: row.name, subscriptionId }];
   });
 };
 
-const findSkipped = async (
+// Every other active Client: her next Subscription collects the classes.
+const findWithoutPlan = async (
   transaction: Transaction,
   today: Date,
-): Promise<SkippedClient[]> => {
-  const [recipients, founders] = await Promise.all([
-    findRecipients(transaction, today),
-    activeFounderIds(transaction),
-  ]);
-  const rows = await transaction.client.findMany({
-    where: {
-      ...withAccount,
-      id: { notIn: recipients.map((recipient) => recipient.clientId) },
-    },
-    orderBy: [{ name: 'asc' }, { id: 'asc' }],
-    select: { id: true, name: true },
-  });
-  return rows.map((row) => ({
-    clientId: row.id,
-    name: row.name,
-    reason: founders.includes(row.id) ? 'founder' : 'no_current_plan',
-  }));
-};
+): Promise<CampaignRecipient[]> =>
+  transaction.client
+    .findMany({
+      where: { ...withAccount, subscriptions: { none: liveOrNextOn(today) } },
+      orderBy: [{ name: 'asc' }, { id: 'asc' }],
+      select: { id: true, name: true },
+    })
+    .then((rows) => rows.map((row) => ({ clientId: row.id, name: row.name })));
 
 export const createPrismaCampaignGrant = (
   prisma: PrismaClient,
@@ -106,22 +103,14 @@ export const createPrismaCampaignGrant = (
     const today = boliviaDate(now());
     return previewCampaign({
       principal,
-      countRecipients: () =>
-        prisma.founderMembership
-          .findMany({
-            where: { deletedAt: null, status: 'ACTIVE' },
-            select: { clientId: true },
-          })
-          .then((founders) =>
-            prisma.client.count({
-              where: {
-                ...withAccount,
-                id: { notIn: founders.map((founder) => founder.clientId) },
-                subscriptions: { some: liveOn(today) },
-              },
-            }),
-          ),
-      findSkipped: () => findSkipped(prisma, today),
+      countWithPlan: () =>
+        prisma.client.count({
+          where: {
+            ...withAccount,
+            subscriptions: { some: liveOrNextOn(today) },
+          },
+        }),
+      findWithoutPlan: () => findWithoutPlan(prisma, today),
     });
   },
   grant: async (
@@ -138,6 +127,8 @@ export const createPrismaCampaignGrant = (
         request: { name: command.name.trim(), classes: command.classes },
         now,
         onKeyReused: () => new Error('idempotency_key_reused'),
+        // One write or two per active Client: more than the default 5 s.
+        timeoutMilliseconds: 60_000,
       },
       (transaction) =>
         grantCampaign(command, {
@@ -145,7 +136,7 @@ export const createPrismaCampaignGrant = (
           now: now(),
           today,
           findRecipients: () => findRecipients(transaction, today),
-          findSkipped: () => findSkipped(transaction, today),
+          findWithoutPlan: () => findWithoutPlan(transaction, today),
           record: (input) =>
             recordAllowanceAdjustment(transaction, {
               subscriptionId: input.subscriptionId,
@@ -159,6 +150,15 @@ export const createPrismaCampaignGrant = (
               now: input.now,
               correlationId: command.idempotencyKey,
               campaignName: input.campaignName,
+            }),
+          owe: (input) =>
+            oweCampaignClasses(transaction, {
+              clientId: input.clientId,
+              classes: input.classes,
+              campaignName: input.campaignName,
+              authorAccountId: input.authorAccountId,
+              correlationId: command.idempotencyKey,
+              now: input.now,
             }),
         }),
     );

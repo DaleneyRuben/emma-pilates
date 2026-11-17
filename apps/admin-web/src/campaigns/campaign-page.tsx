@@ -20,12 +20,7 @@ import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { Input } from "../components/ui/input";
-import {
-  grantedLine,
-  recipientLine,
-  skippedLine,
-  skippedPreview,
-} from "./campaign-copy";
+import { grantedLine, owedLine, recipientLine } from "./campaign-copy";
 import {
   campaignPreviewQueryOptions,
   useCampaignGrant,
@@ -52,8 +47,9 @@ const failureMessage = (error: unknown): string => {
 const cardClass = "flex flex-col gap-4 rounded-marco bg-lino p-6 max-md:p-4";
 
 // AW21 (BKM-015): the Administrator grants extra classes for a campaign, a
-// start of year or a holiday, to every Client with a live Plan. A Client
-// without one, or a founder, is named and skipped. Never a discount.
+// start of year or a holiday, to every active Client, founders included
+// (FIX-064). A Client without a current Plan is named: her next Plan collects
+// the classes. Never a discount.
 export function CampaignPage() {
   const preview = useQuery(campaignPreviewQueryOptions());
   const grant = useCampaignGrant();
@@ -62,7 +58,7 @@ export function CampaignPage() {
   const [result, setResult] = useState<{
     granted: number;
     classes: number;
-    skipped: string | null;
+    owed: string | null;
   } | null>(null);
   const form = useForm<CampaignInput, unknown, CampaignOutput>({
     resolver: zodResolver(campaignSchema),
@@ -78,10 +74,12 @@ export function CampaignPage() {
     const values = campaignSchema.parse(form.getValues());
     try {
       const granted = await grant.mutateAsync(values);
+      // An older backend answers without `owed`.
+      const owed = granted.owed ?? [];
       setResult({
-        granted: granted.granted.length,
+        granted: granted.granted.length + owed.length,
         classes: granted.classes,
-        skipped: skippedLine(granted.skipped),
+        owed: owedLine(owed),
       });
       setConfirming(false);
     } catch (error) {
@@ -90,8 +88,8 @@ export function CampaignPage() {
     }
   };
 
-  const skipped =
-    preview.data === undefined ? null : skippedPreview(preview.data.skipped);
+  const owed =
+    preview.data === undefined ? null : owedLine(preview.data.owed ?? []);
 
   return (
     <div className="flex flex-col gap-5">
@@ -101,7 +99,7 @@ export function CampaignPage() {
       />
       {result === null ? null : (
         <PageNotice>
-          {`${grantedLine(result.granted, result.classes)} ${result.skipped ?? ""}`.trim()}
+          {`${grantedLine(result.granted, result.classes)} ${result.owed ?? ""}`.trim()}
         </PageNotice>
       )}
       {failure === null ? null : (
@@ -122,8 +120,8 @@ export function CampaignPage() {
           <p className="text-nota text-texto-secundario">
             {recipientLine(preview.data.recipientCount)}
           </p>
-          {skipped === null ? null : (
-            <p className="text-nota text-texto-tenue">{skipped}</p>
+          {owed === null ? null : (
+            <p className="text-nota text-texto-tenue">{owed}</p>
           )}
           <Form {...form}>
             <form onSubmit={submit} noValidate className="flex flex-col gap-4">
@@ -154,7 +152,7 @@ export function CampaignPage() {
                   </FormItem>
                 )}
               />
-              {/* FIX-060 (finding 87): nobody would receive anything. */}
+              {/* FIX-064 (finding 90): only when there is no active Client. */}
               <Button
                 type="submit"
                 size="lg"
@@ -177,8 +175,8 @@ export function CampaignPage() {
         onConfirm={() => void confirm()}
       >
         <p>
-          Cada clienta con un plan vigente recibe las clases. Las fundadoras y
-          las clientas sin plan vigente no reciben nada, y ningún precio cambia.
+          Cada clienta activa recibe las clases: en su plan vigente o, si no
+          tiene uno, en su próximo plan. Ningún precio cambia.
         </p>
       </ConfirmDialog>
     </div>

@@ -1,31 +1,29 @@
-import { skippedLine, skippedPreview } from "./campaign-copy";
+import { grantedLine, owedLine } from "./campaign-copy";
 
-describe("campaign result copy", () => {
-  it("agrees the verb with several skipped Clients", () => {
-    expect(
-      skippedLine([
-        { name: "Mariana Peña", reason: "no_current_plan" },
-        { name: "Sofía Guzmán", reason: "no_current_plan" },
-      ]),
-    ).toBe("2 clientas no tienen un plan vigente: Mariana Peña, Sofía Guzmán.");
+describe("campaign copy", () => {
+  // FIX-064 (walkthrough finding 90): nobody is left out any more. A Client
+  // without a current Plan gets the classes with her next one.
+  it("says the Clients without a Plan get the classes with their next one", () => {
+    expect(owedLine([])).toBeNull();
+    expect(owedLine([{ name: "Sofía Guzmán" }])).toBe(
+      "1 sin plan: se le suma en su próximo plan (Sofía Guzmán).",
+    );
+    expect(owedLine([{ name: "Mariana Peña" }, { name: "Sofía Guzmán" }])).toBe(
+      "2 sin plan: se les suma en su próximo plan (Mariana Peña, Sofía Guzmán).",
+    );
   });
 
-  // FIX-060 (walkthrough finding 87): founders are left out for being
-  // founders, not for lacking a Plan.
-  it("names founders apart from Clients without a Plan", () => {
-    const skipped = [
-      { name: "Carla Rivas", reason: "founder" as const },
-      { name: "Elena Prueba", reason: "founder" as const },
-      { name: "Sofía Guzmán", reason: "no_current_plan" as const },
-    ];
-    expect(skippedPreview(skipped)).toBe(
-      "2 son fundadoras y no entran en campañas: Carla Rivas, Elena Prueba. Sofía Guzmán no tiene un plan vigente.",
-    );
-    expect(skippedLine(skipped)).toBe(
-      "2 fundadoras no entran en campañas: Carla Rivas, Elena Prueba. 1 clienta no tiene un plan vigente: Sofía Guzmán.",
-    );
-    expect(skippedPreview([{ name: "Lucía", reason: "founder" }])).toBe(
-      "Lucía es fundadora y no entra en campañas.",
+  it("agrees the result with one or several Clients", () => {
+    expect(grantedLine(1, 1)).toBe("1 clienta recibió 1 clase extra.");
+    expect(grantedLine(7, 2)).toBe("7 clientas recibieron 2 clases extra.");
+  });
+
+  it("names at most ten Clients and counts the rest", () => {
+    const owed = Array.from({ length: 13 }, (_, index) => ({
+      name: `Clienta ${index + 1}`,
+    }));
+    expect(owedLine(owed)).toBe(
+      "13 sin plan: se les suma en su próximo plan (Clienta 1, Clienta 2, Clienta 3, Clienta 4, Clienta 5, Clienta 6, Clienta 7, Clienta 8, Clienta 9, Clienta 10 y 3 más).",
     );
   });
 });

@@ -66,29 +66,29 @@ describe('campaign endpoint', () => {
                     subscriptionId: 'subscription',
                   },
                 ]),
-              findSkipped: () =>
+              findWithoutPlan: () =>
                 Promise.resolve([
                   {
                     clientId: '22222222-2222-4222-8222-222222222222',
                     name: 'Sofía',
-                    reason: 'no_current_plan' as const,
                   },
                 ]),
               record,
+              owe: () => Promise.resolve(),
             }),
         },
         {
           provide: campaignPreview,
           useValue: () =>
             Promise.resolve({
-              recipientCount: 1,
-              skipped: [
+              recipientCount: 2,
+              owed: [
                 {
                   clientId: '22222222-2222-4222-8222-222222222222',
                   name: 'Sofía',
-                  reason: 'no_current_plan' as const,
                 },
               ],
+              skipped: [],
             }),
         },
         {
@@ -124,21 +124,19 @@ describe('campaign endpoint', () => {
         ({
           body,
         }: {
-          body: { recipientCount: number; skipped: unknown[] };
+          body: { recipientCount: number; owed: unknown[]; skipped: [] };
         }) => {
-          expect(body.recipientCount).toBe(1);
-          expect(body.skipped).toEqual([
-            expect.objectContaining({
-              name: 'Sofía',
-              reason: 'no_current_plan',
-            }),
+          expect(body.recipientCount).toBe(2);
+          expect(body.owed).toEqual([
+            expect.objectContaining({ name: 'Sofía' }),
           ]);
+          expect(body.skipped).toEqual([]);
         },
       );
     expect(record).not.toHaveBeenCalled();
   });
 
-  it('answers 201 with the granted and skipped Clients', async () => {
+  it('answers 201 with the granted and owed Clients', async () => {
     signedIn = principal('administrator');
 
     await request(app.getHttpServer())
@@ -151,15 +149,15 @@ describe('campaign endpoint', () => {
         ({
           body,
         }: {
-          body: { granted: { name: string }[]; skipped: unknown[] };
+          body: {
+            granted: { name: string }[];
+            owed: { name: string }[];
+            skipped: [];
+          };
         }) => {
           expect(body.granted.map((client) => client.name)).toEqual(['Lucía']);
-          expect(body.skipped).toEqual([
-            expect.objectContaining({
-              name: 'Sofía',
-              reason: 'no_current_plan',
-            }),
-          ]);
+          expect(body.owed.map((client) => client.name)).toEqual(['Sofía']);
+          expect(body.skipped).toEqual([]);
         },
       );
     expect(record).toHaveBeenCalledTimes(1);

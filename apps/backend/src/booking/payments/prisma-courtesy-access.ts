@@ -41,6 +41,7 @@ import {
   loadActiveSubscription,
   notifyPaymentConfirmed,
 } from './subscription-allocation';
+import { collectOwedCampaignClasses } from './owed-campaign-classes';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -229,6 +230,17 @@ export const createPrismaCourtesyAccess = (
       paymentId: payment.id,
       now,
       courtesy: true,
+    });
+    // FIX-064: a campaign reaches her whatever her Plan (booking ADR-0014).
+    await collectOwedCampaignClasses(transaction, {
+      clientId: command.clientId,
+      subscriptionId: subscription.id,
+      author: {
+        accountId: principal.accountId,
+        role: auditActorOf(principal).role,
+      },
+      now,
+      correlationId: payment.id,
     });
     // Courtesy Access is never a first Plan, so the gift decision declines it.
     await grantGiftClass(transaction, {

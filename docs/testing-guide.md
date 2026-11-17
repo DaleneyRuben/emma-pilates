@@ -71,7 +71,7 @@ can be found by its design name.
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115, 126 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126 |
-| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
+| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89, 158 |
 | 13 Evaluación nutricional (with the booked ones since FIX-057), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151 |
@@ -108,7 +108,7 @@ can be found by its design name.
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111, 155 |
-| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157, 158 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras (the Fundadora chip on Clientas since WEB-040) | 26, 88 |
 | AW41 Congelamientos | 92 |
@@ -7942,18 +7942,20 @@ first Plan.
 
 ## Test 90: campaign extra classes (BKM-015)
 
-A campaign grants extra classes with reason `campaign` to every Client whose
-live Subscription covers today in Bolivia. A Client without one is skipped
-and named. It never changes a price. It composes with the gift class
+A campaign grants extra classes with reason `campaign` to every active
+Client, founders included (FIX-064, Test 158): on the Subscription that covers
+today in Bolivia, or, without one, with her next Plan. It never changes a
+price. It composes with the gift class
 (Test 85); it does not replace it.
 
 A. **The page (AW21).** Log in as `paola.mendoza@example.com` /
    `emma-local-2026`. On **Clientes**, at 1440 px and at 420 px (open the
    menu with «Abrir menú»), press **Dar clases de campaña**. The page says
-   how many clientas will receive it and names who has no live Plan. Write
-   «Inicio de año», leave **Clases extra** at 1, press **Dar las clases**,
-   then **Confirmar campaña**. The result names how many received a class
-   and who was skipped. Open one recipient's detail: «Clases extra: 1 ·
+   how many clientas will receive it and names who has no live Plan («N sin
+   plan: se les suma en su próximo plan (…)»). Write «Inicio de año», leave
+   **Clases extra** at 1, press **Dar las clases**, then **Confirmar
+   campaña**. The result names how many received a class and who gets it
+   with her next Plan. Open one recipient's detail: «Clases extra: 1 ·
    Campaña» when the campaign is her first grant.
 B. **The denial.** The same `POST /api/v1/administrator/campaigns` as Camila
    answers `403` and writes nothing. The header `Idempotency-Key` is a UUID;
@@ -9817,13 +9819,9 @@ rows, now unread by AW35).
    /api/v1/administrator/referrals` adds `firstPurchaseAt`, `inviteReward`
    (`none`, `owed`, `granted`), and `inviteRewardGrantedAt`. On the fixtures,
    Sofía → Valeria has a purchase date and Sofía → Mariana «Aún no».
-8. **Promociones › Clases de campaña** (AW21). Make a Client with a live Plan
-   a founder (Test 88), then open the page. Expected: «N son fundadoras y no
-   entran en campañas: …» apart from «N clientas no tienen un plan vigente:
-   …»; `GET /api/v1/administrator/campaigns/preview` gives each skipped
-   Client a `reason` (`founder` or `no_current_plan`). With 0 recipients,
-   **Dar las clases** is disabled. There is no picker: the grant goes to
-   every eligible Client.
+8. **Promociones › Clases de campaña** (AW21). Superseded by Test 158
+   (FIX-064): founders are no longer left out, and nobody is skipped. There
+   is no picker: the grant goes to every active Client.
 9. Check both pages at 1440 px and 420 px.
 
 ## Test 156: a released evaluation's old slot can be booked by another client, and ending its block withdraws it (FIX-062)
@@ -9897,3 +9895,49 @@ update booking.clients set phone = null where name = 'Mariana Peña';
    with her file open; closing it leaves the filtered list.
 4. API: `GET /api/v1/administrator/feedback` items carry `senderName` and
    `senderClientId` (null for Staff).
+
+## Test 158: a campaign reaches every active Client, founders included (FIX-064)
+
+Walkthrough finding 90: the owner decided «TODAS las clientas no matter what»
+(booking ADR-0014). **Promociones › Clases de campaña** gives the classes to
+every active Client: on her current Plan, whatever it is (a founder's, Courtesy
+Access, a hidden or Bs 0 Plan), or, without one, owed to her next Plan. A Guest
+Pass never receives them, and a closed Account receives nothing. One migration,
+`20261117120000_owed_campaign_classes`, adds `booking.owed_campaign_classes`.
+
+1. Use a copy of the fixtures (`createdb -T pilates_golden pilates_fix064_dev`,
+   then `prisma migrate deploy` on it), and run the API, the worker, the Client
+   app, and the admin web on your own ports (surface-verification skill). As
+   Camila, sell Mariana (never paid) a cash Plan (Test 27): she becomes a
+   founder with a current Plan (Test 88). Sofía's Plan has ended, so she has
+   none.
+2. Log in to the admin web as Paola and open **Promociones › Clases de
+   campaña**. Expected: «N clientas la recibirán.» counts every active Client,
+   with or without a Plan, and a quieter line «M sin plan: se les suma en su
+   próximo plan (Sofía Guzmán)» names the ones without a current Plan. No line
+   mentions founders. `GET /api/v1/administrator/campaigns/preview` answers
+   `recipientCount`, `owed` (id and name), and an empty, deprecated `skipped`.
+3. Write «Inicio de año», **Clases extra** 1, **Dar las clases**. The dialog
+   reads «Cada clienta activa recibe las clases: en su plan vigente o, si no
+   tiene uno, en su próximo plan. Ningún precio cambia.» **Confirmar
+   campaña**. Expected: «N clientas recibieron 1 clase extra. M sin plan: se
+   les suma en su próximo plan (…).» No price or Payment changes.
+4. In the Client app, as Mariana (a founder with a Plan), **Mi plan** shows
+   «Clases extra: 1 · Campaña». On the iPhone, the iPad, and Android;
+   `.maestro/campaign-extra-class.yaml` seeds a campaign and checks Lucía's
+   line the same way.
+5. As Camila, sell Sofía (no Plan) a cash Plan. Expected: as Sofía, **Mi
+   plan** shows «Clases extra: … · …» with the owed campaign
+   class added to her new Plan («Clases extra: 1 · Campaña»); in the
+   database, her
+   `booking.owed_campaign_classes` row has `collected_at` and the
+   `allowance_adjustment_id` of a `CAMPAIGN` adjustment whose audit names
+   «Inicio de año». A second Plan does not collect it again. Voiding that
+   sale (Test 89) while the class is unspent owes it again, and a Courtesy
+   Access collects it too. A Client whose only Plan starts later gets the
+   class on that Plan straight away.
+6. Close an Account from the Client app (Test 35) and open the page again:
+   she is no longer counted. With more than ten Clients without a Plan, the
+   line names ten and ends «y N más». On an empty database **Dar las clases** is
+   disabled («0 clientas la recibirán.»).
+7. Check the admin web at 1440 px and 420 px, then drop the copy.

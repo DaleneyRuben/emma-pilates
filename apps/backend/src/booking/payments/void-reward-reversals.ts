@@ -230,6 +230,63 @@ const reowe = async (
   }
 };
 
+// FIX-064: campaign classes the voided Plan collected while owed are owed
+// to her next Plan again, if not yet used. A campaign granted straight onto
+// the voided Plan has no owed row and stays with it, like a courtesy.
+const reoweCampaignClasses = async (
+  transaction: Transaction,
+  context: VoidContext,
+  audit: VoidAudit,
+) => {
+  const collected = await transaction.owedCampaignClass.findMany({
+    where: {
+      clientId: context.clientId,
+      deletedAt: null,
+      allowanceAdjustment: {
+        subscriptionId: context.subscriptionId,
+        deletedAt: null,
+      },
+    },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    select: {
+      id: true,
+      allowanceAdjustment: {
+        select: {
+          id: true,
+          subscriptionId: true,
+          clientId: true,
+          classes: true,
+          reason: true,
+        },
+      },
+    },
+  });
+  for (const row of collected) {
+    const adjustment = row.allowanceAdjustment;
+    if (
+      adjustment === null ||
+      !(await unspentOn(
+        transaction,
+        adjustment.subscriptionId,
+        adjustment.classes,
+      ))
+    ) {
+      continue;
+    }
+    await removeAdjustment(transaction, context, audit, adjustment);
+    await transaction.owedCampaignClass.update({
+      where: { id: row.id },
+      data: { collectedAt: null, allowanceAdjustmentId: null },
+    });
+    await audit({
+      actionCode: 'campaign_class.owed_again',
+      targetType: 'owed_campaign_class',
+      targetId: row.id,
+      metadata: { clientId: context.clientId },
+    });
+  }
+};
+
 // Owner decision 3: the gift class and the invite reward the sale earned,
 // if not yet used.
 export const reverseRewards = async (
@@ -241,4 +298,5 @@ export const reverseRewards = async (
   await reverseGift(transaction, context, audit, other);
   await reverseFriendReward(transaction, context, audit, other);
   await reowe(transaction, context, audit);
+  await reoweCampaignClasses(transaction, context, audit);
 };

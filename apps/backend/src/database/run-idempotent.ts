@@ -23,44 +23,53 @@ export const runIdempotent = async <Response extends Prisma.InputJsonObject>(
     request: unknown;
     now: () => Date;
     onKeyReused: () => Error;
+    /** Prisma's interactive transaction timeout, 5 s by default. */
+    timeoutMilliseconds?: number;
   },
   work: (transaction: Transaction) => Promise<Response>,
 ): Promise<Response> => {
   const requestHash = hashRequest(record.request);
   const lockKey = `${record.accountId}:${record.command}:${record.idempotencyKey}`;
-  return prisma.$transaction(async (transaction) => {
-    await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`;
-    const existing = await transaction.idempotencyRecord.findFirst({
-      where: {
-        accountId: record.accountId,
-        command: record.command,
-        idempotencyKey: record.idempotencyKey,
-        deletedAt: null,
-      },
-      select: { requestHash: true, responseBody: true },
-    });
-    if (existing !== null) {
-      if (!Buffer.from(existing.requestHash).equals(Buffer.from(requestHash))) {
-        throw record.onKeyReused();
+  return prisma.$transaction(
+    async (transaction) => {
+      await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`;
+      const existing = await transaction.idempotencyRecord.findFirst({
+        where: {
+          accountId: record.accountId,
+          command: record.command,
+          idempotencyKey: record.idempotencyKey,
+          deletedAt: null,
+        },
+        select: { requestHash: true, responseBody: true },
+      });
+      if (existing !== null) {
+        if (
+          !Buffer.from(existing.requestHash).equals(Buffer.from(requestHash))
+        ) {
+          throw record.onKeyReused();
+        }
+        return existing.responseBody as Response;
       }
-      return existing.responseBody as Response;
-    }
-    const response = await work(transaction);
-    const createdAt = record.now();
-    await transaction.idempotencyRecord.create({
-      data: {
-        accountId: record.accountId,
-        command: record.command,
-        idempotencyKey: record.idempotencyKey,
-        requestHash,
-        responseStatus: 201,
-        responseBody: response,
-        createdAt,
-        expiresAt: new Date(
-          createdAt.getTime() + idempotencyRetentionMilliseconds,
-        ),
-      },
-    });
-    return response;
-  });
+      const response = await work(transaction);
+      const createdAt = record.now();
+      await transaction.idempotencyRecord.create({
+        data: {
+          accountId: record.accountId,
+          command: record.command,
+          idempotencyKey: record.idempotencyKey,
+          requestHash,
+          responseStatus: 201,
+          responseBody: response,
+          createdAt,
+          expiresAt: new Date(
+            createdAt.getTime() + idempotencyRetentionMilliseconds,
+          ),
+        },
+      });
+      return response;
+    },
+    record.timeoutMilliseconds === undefined
+      ? undefined
+      : { timeout: record.timeoutMilliseconds },
+  );
 };

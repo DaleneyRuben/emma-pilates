@@ -10,6 +10,10 @@ import type { CampaignSkippedClientDto } from "./campaignSkippedClientDto";
 export interface CampaignResultDto {
   name: string;
   classes: number;
+  /** Active Clients whose current Plan received the classes */
   granted: CampaignClientDto[];
+  /** Active Clients without a current Plan: their next activated Plan collects the classes */
+  owed: CampaignClientDto[];
+  /** @deprecated */
   skipped: CampaignSkippedClientDto[];
 }

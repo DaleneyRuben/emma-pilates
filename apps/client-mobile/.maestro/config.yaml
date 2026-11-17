@@ -29,5 +29,6 @@ executionOrder:
     - fix227-expired-qr
     - waitlist-join-and-leave
     - reschedule-booking
+    - campaign-extra-class
     - close-account
     - trainer-face

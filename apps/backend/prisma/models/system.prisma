@@ -223,6 +223,7 @@ model Account {
   approvedPayStatements     PayStatement[]          @relation("PayStatementApprovedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
   allowanceAdjustments      AllowanceAdjustment[]   @relation("AllowanceAdjustmentAuthor")
+  owedCampaignClasses       OwedCampaignClass[]     @relation("OwedCampaignClassAuthor")
   contactedAlerts           ContactAlert[]          @relation("ContactAlertContactedBy")
   createdEquipment          Equipment[]             @relation("EquipmentCreatedBy")
   reportedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueReportedBy")

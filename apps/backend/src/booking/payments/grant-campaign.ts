@@ -12,17 +12,16 @@ export type CampaignRecipient = {
   name: string;
 };
 
-// FIX-060 (walkthrough finding 87): why a Client gets nothing. A founder is
-// never in a campaign, whatever her Plan; anyone else lacks a live one.
-export type CampaignSkipReason = 'founder' | 'no_current_plan';
-
-export type SkippedClient = CampaignRecipient & { reason: CampaignSkipReason };
-
+// FIX-064 (walkthrough finding 90): «TODAS las clientas». Every active
+// Client gets the classes: on her current Plan, or owed to the next Plan she
+// activates. Nobody is skipped any more; `skipped` stays empty so an older
+// admin web still reads the answer.
 export type CampaignGrant = {
   name: string;
   classes: number;
   granted: CampaignRecipient[];
-  skipped: SkippedClient[];
+  owed: CampaignRecipient[];
+  skipped: never[];
 };
 
 export class CampaignError extends Error {
@@ -35,21 +34,27 @@ export class CampaignError extends Error {
 }
 
 export type CampaignPreview = {
+  /** Every active Client: with a current Plan, or owed. */
   recipientCount: number;
-  skipped: SkippedClient[];
+  owed: CampaignRecipient[];
+  skipped: never[];
 };
 
 export const previewCampaign = async (dependencies: {
   principal: AuthenticatedPrincipal;
-  countRecipients: () => Promise<number>;
-  findSkipped: () => Promise<readonly SkippedClient[]>;
+  countWithPlan: () => Promise<number>;
+  findWithoutPlan: () => Promise<readonly CampaignRecipient[]>;
 }): Promise<CampaignPreview> => {
   requireAdministrator(dependencies.principal);
-  const [recipientCount, skipped] = await Promise.all([
-    dependencies.countRecipients(),
-    dependencies.findSkipped(),
+  const [withPlan, owed] = await Promise.all([
+    dependencies.countWithPlan(),
+    dependencies.findWithoutPlan(),
   ]);
-  return { recipientCount, skipped: [...skipped] };
+  return {
+    recipientCount: withPlan + owed.length,
+    owed: [...owed],
+    skipped: [],
+  };
 };
 
 export type CampaignCommand = {
@@ -65,7 +70,7 @@ type Dependencies = {
   now: Date;
   today: Date;
   findRecipients: () => Promise<readonly LiveRecipient[]>;
-  findSkipped: () => Promise<readonly SkippedClient[]>;
+  findWithoutPlan: () => Promise<readonly CampaignRecipient[]>;
   record: (input: {
     subscriptionId: string;
     clientId: string;
@@ -75,6 +80,13 @@ type Dependencies = {
     campaignName: string;
     now: Date;
   }) => Promise<{ id: string }>;
+  owe: (input: {
+    clientId: string;
+    classes: number;
+    authorAccountId: string;
+    campaignName: string;
+    now: Date;
+  }) => Promise<void>;
 };
 
 const campaignName = (name: string): string => {
@@ -98,9 +110,9 @@ export const grantCampaign = async (
   ) {
     throw new CampaignError('invalid_campaign');
   }
-  const [recipients, skipped] = await Promise.all([
+  const [recipients, withoutPlan] = await Promise.all([
     dependencies.findRecipients(),
-    dependencies.findSkipped(),
+    dependencies.findWithoutPlan(),
   ]);
   const granted: CampaignRecipient[] = [];
   for (const recipient of recipients) {
@@ -115,5 +127,16 @@ export const grantCampaign = async (
     });
     granted.push({ clientId: recipient.clientId, name: recipient.name });
   }
-  return { name, classes: command.classes, granted, skipped: [...skipped] };
+  const owed: CampaignRecipient[] = [];
+  for (const client of withoutPlan) {
+    await dependencies.owe({
+      clientId: client.clientId,
+      classes: command.classes,
+      authorAccountId: actor.accountId,
+      campaignName: name,
+      now: dependencies.now,
+    });
+    owed.push({ clientId: client.clientId, name: client.name });
+  }
+  return { name, classes: command.classes, granted, owed, skipped: [] };
 };

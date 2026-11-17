@@ -860,7 +860,8 @@ En la app de Lucía, **Mi plan** dice «Renueva antes del … para mantener tu 1
 de descuento.»: es el plazo para conservar el descuento, aunque el plan nuevo
 empiece más tarde. La clienta nunca ve la palabra «fundadora».
 
-Una fundadora nunca recibe la clase de regalo ni las clases de campaña.
+Una fundadora nunca recibe la clase de regalo. Las clases de campaña sí le
+llegan, como a todas (paso 14).
 
 ### Congelamiento
 
@@ -1073,13 +1074,15 @@ de Valeria dice Lucía. El premio, la clase extra, ya se sumó sola en el paso 1
 
 **Promociones › Clases de campaña**. Escribe el **Nombre de la campaña**, por
 ejemplo `Inicio de año`, y **Clases extra** `1`. No se elige a nadie: la
-campaña va a todas las clientas con plan vigente, y la pantalla dice cuántas
-la recibirán. Debajo nombra a las que quedan fuera y por qué: las fundadoras
-(«… son fundadoras y no entran en campañas»; su beneficio es el descuento,
-así que Lucía queda fuera) y las que no tienen un plan vigente. **Dar las
-clases** suma la clase a cada una, con ese nombre, sin cambiar ningún
-precio; si nadie la recibiría, el botón queda apagado. El sistema no deja
-usar la campaña como un descuento.
+campaña va a todas las clientas activas, fundadoras incluidas, y la pantalla
+dice cuántas la recibirán. Si alguna no tiene un plan vigente, debajo dice
+«N sin plan: se les suma en su próximo plan.» con sus nombres. **Dar las
+clases** suma la clase al plan vigente de cada una, con ese nombre, sin
+cambiar ningún precio; a las que no tienen plan se les suma sola cuando se
+activa su próximo plan. Lucía, fundadora, también la recibe: en su app, **Mi
+plan** la cuenta en «Clases extra: …». Una cuenta cerrada no recibe
+nada. El botón queda apagado solo si no hay ninguna clienta activa. El
+sistema no deja usar la campaña como un descuento.
 
 ### Comentarios
 
@@ -1309,7 +1312,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Clientas › Para contactar | Seguimiento de los primeros 90 días | 16 |
 | Clientas › Congelamientos | Aprobar el congelamiento de un trimestral | 11 |
 | Promociones › Carrusel | Borrador, publicar, dejar de publicar, eliminar | 14 |
-| Promociones › Clases de campaña | Clases extra para las clientas con plan | 14 |
+| Promociones › Clases de campaña | Clases extra para todas las clientas activas | 14 |
 | Promociones › Referidos | Quién invitó a quién, si la invitada compró y la clase de premio | 14 |
 | Promociones › Contactos | Todas las clientas activas y las cuentas cerradas que pidieron promociones | 14 |
 | Comentarios | Lo que llega de las apps | 14 |

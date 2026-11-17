@@ -6,7 +6,7 @@
  */
 
 /**
- * A founder is never in a campaign; anyone else has no live paid Plan
+ * Deprecated: a campaign skips nobody since FIX-064
  */
 export type CampaignSkippedClientDtoReason =
   (typeof CampaignSkippedClientDtoReason)[keyof typeof CampaignSkippedClientDtoReason];

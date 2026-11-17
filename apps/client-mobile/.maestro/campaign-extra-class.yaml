@@ -1,0 +1,23 @@
+# Critical journey (FIX-064, Test 158): a campaign reaches every active
+# Client, and Mi plan counts its class among the extra classes. Seeds the
+# campaign through the API; run with -e API_URL. Lucía has a current Plan in
+# the fixtures; a founder or an owed Client reads the same line.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runScript:
+    file: scripts/seed.js
+    env:
+      SEED: campaign
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "home-plan-detail"
+    timeout: 30000
+- tapOn:
+    id: "home-plan-detail"
+- extendedWaitUntil:
+    visible: "Clases extra: .*"
+    timeout: 15000
+- takeScreenshot: fix064-mi-plan-clases-extra
