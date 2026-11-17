@@ -1033,18 +1033,23 @@ En la web, como Ana.
 ### Referidos
 
 **Promociones › Referidos**. Cuando Valeria se registró con el código de
-Lucía, la fila aparece aquí: quién invitó a quién, y si la invitada ya
-compró. Es una lectura. En **Clientas › Todas**, la columna **Invitada por**
+Lucía, la fila aparece aquí: quién invitó a quién, la **Fecha de registro**,
+**Compró** (el día de su primera compra confirmada, o «Aún no») y la **Clase
+de premio** de quien invitó («Sumada el …», «Se suma con su próximo plan» si
+no tenía plan vigente, o «—» mientras la invitada no compra). Es una lectura. En **Clientas › Todas**, la columna **Invitada por**
 de Valeria dice Lucía. El premio, la clase extra, ya se sumó sola en el paso 11.
 
 ### Campaña
 
 **Promociones › Clases de campaña**. Escribe el **Nombre de la campaña**, por
-ejemplo `Inicio de año`, y **Clases extra** `1`. Elige a las clientas con
-plan vigente. Guardar suma la clase a cada una, con ese nombre, sin cambiar
-ningún precio. Las fundadoras no entran en la campaña: su beneficio es el
-descuento, así que Lucía no aparece en la lista. El sistema no deja usar la
-campaña como un descuento.
+ejemplo `Inicio de año`, y **Clases extra** `1`. No se elige a nadie: la
+campaña va a todas las clientas con plan vigente, y la pantalla dice cuántas
+la recibirán. Debajo nombra a las que quedan fuera y por qué: las fundadoras
+(«… son fundadoras y no entran en campañas»; su beneficio es el descuento,
+así que Lucía queda fuera) y las que no tienen un plan vigente. **Dar las
+clases** suma la clase a cada una, con ese nombre, sin cambiar ningún
+precio; si nadie la recibiría, el botón queda apagado. El sistema no deja
+usar la campaña como un descuento.
 
 ### Comentarios
 
@@ -1275,7 +1280,7 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Clientas › Congelamientos | Aprobar el congelamiento de un trimestral | 11 |
 | Promociones › Carrusel | Borrador, publicar, finalizar | 14 |
 | Promociones › Clases de campaña | Clases extra para las clientas con plan | 14 |
-| Promociones › Referidos | Quién invitó a quién | 14 |
+| Promociones › Referidos | Quién invitó a quién, si la invitada compró y la clase de premio | 14 |
 | Promociones › Contactos | Todas las clientas activas y las cuentas cerradas que pidieron promociones | 14 |
 | Comentarios | Lo que llega de las apps | 14 |
 | Dinero › Pagos | Confirmar, rechazar, anular, subir la factura | 7 |
