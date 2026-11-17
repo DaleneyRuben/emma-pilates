@@ -43,11 +43,16 @@ export const collectOwedCampaignClasses = async (
     correlationId: string;
   },
 ): Promise<void> => {
-  const owed = await transaction.owedCampaignClass.findMany({
-    where: { clientId: input.clientId, collectedAt: null, deletedAt: null },
-    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-    select: { id: true, classes: true, campaignName: true },
-  });
+  // Locks her uncollected rows: a second activation racing this one waits,
+  // then finds them collected and adds nothing.
+  const owed = await transaction.$queryRaw<
+    { id: string; classes: number; campaignName: string }[]
+  >`SELECT id, classes, campaign_name AS "campaignName"
+    FROM booking.owed_campaign_classes
+    WHERE client_id = ${input.clientId}::uuid
+      AND collected_at IS NULL AND deleted_at IS NULL
+    ORDER BY created_at, id
+    FOR UPDATE`;
   if (owed.length === 0) return;
   const landsOnGuestPass = await transaction.guestPass.findFirst({
     where: { courtesySubscriptionId: input.subscriptionId, deletedAt: null },
@@ -65,8 +70,8 @@ export const collectOwedCampaignClasses = async (
       correlationId: input.correlationId,
       campaignName: row.campaignName,
     });
-    await transaction.owedCampaignClass.updateMany({
-      where: { id: row.id, collectedAt: null, deletedAt: null },
+    await transaction.owedCampaignClass.update({
+      where: { id: row.id },
       data: { allowanceAdjustmentId: adjustment.id, collectedAt: input.now },
     });
   }
