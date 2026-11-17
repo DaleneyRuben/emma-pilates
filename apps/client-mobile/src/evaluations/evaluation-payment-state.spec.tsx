@@ -1,4 +1,4 @@
-import { cleanup } from "@testing-library/react-native";
+import { cleanup, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse, routeFetcher } from "../test-support";
@@ -35,7 +35,7 @@ const openWith = (upcoming: unknown[], past: unknown[] = []) =>
       "/api/v1/evaluations?scope=upcoming": () => jsonResponse(page(upcoming)),
       "/api/v1/evaluations?scope=past": () => jsonResponse(page(past)),
     }),
-    "Mis evaluaciones",
+    "Evaluación nutricional",
   );
 
 describe("The payment state of a paid Evaluation", () => {
@@ -47,7 +47,11 @@ describe("The payment state of a paid Evaluation", () => {
   it("says «Pago en revisión» while the transfer is pending", async () => {
     const screen = await openWith([paid("pending")]);
 
-    expect(await screen.findByText("Pago en revisión · cancela hasta 3 h antes")).toBeOnTheScreen();
+    const card = await screen.findByTestId("next-evaluation");
+    expect(within(card).getByText("Pago en revisión")).toBeOnTheScreen();
+    expect(
+      screen.getByText("El estudio revisa tu comprobante de Bs 70 y te avisa por la app."),
+    ).toBeOnTheScreen();
     expect(screen.queryByText(/^Pagada/)).toBeNull();
   });
 
@@ -61,19 +65,28 @@ describe("The payment state of a paid Evaluation", () => {
   it("says «Pago rechazado» once the transfer is rejected", async () => {
     const screen = await openWith([paid("rejected")]);
 
-    expect(await screen.findByText("Pago rechazado · cancela hasta 3 h antes")).toBeOnTheScreen();
+    const card = await screen.findByTestId("next-evaluation");
+    expect(within(card).getByText("Pago rechazado")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cancelar evaluación" })).toBeOnTheScreen();
   });
 
   it("says «Pagada» once the transfer is confirmed", async () => {
     const screen = await openWith([paid("confirmed", { cancellable: false, reschedulable: true })]);
 
-    expect(await screen.findByText("Pagada · reprograma hasta 3 h antes")).toBeOnTheScreen();
+    const card = await screen.findByTestId("next-evaluation");
+    expect(within(card).getByText("Pagada")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Puedes reprogramarla hasta 3 horas antes. El pago sigue con ella."),
+    ).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
   });
 
   it("keeps «Pagada» for a server that does not send the payment state", async () => {
     const screen = await openWith([paid(undefined)]);
 
-    expect(await screen.findByText("Pagada · cancela hasta 3 h antes")).toBeOnTheScreen();
+    const card = await screen.findByTestId("next-evaluation");
+    expect(within(card).getByText("Pagada")).toBeOnTheScreen();
+    expect(screen.getByText("Puedes cancelarla hasta 3 horas antes.")).toBeOnTheScreen();
   });
 
   it("labels a past paid Evaluation whose transfer is still pending", async () => {

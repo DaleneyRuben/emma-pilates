@@ -78,7 +78,8 @@ describe("Client Evaluations", () => {
         method: "POST",
       }),
     );
-    expect(screen.getByText("Mis evaluaciones")).toBeOnTheScreen();
+    // Follow-up 264: back on the one Evaluación nutricional, the new one on top.
+    expect(screen.getByText("Tu próxima evaluación")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cancelar evaluación" })).toBeOnTheScreen();
   });
 
@@ -95,7 +96,7 @@ describe("Client Evaluations", () => {
         ...baseRoutes(),
         "/api/v1/evaluations?scope=upcoming": () => jsonResponse(page([paid])),
       }),
-      "Mis evaluaciones",
+      "Evaluación nutricional",
     );
 
     expect(await screen.findByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
@@ -297,13 +298,14 @@ describe("Client Evaluations", () => {
         },
       }),
     );
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     await waitFor(() => {
-      // C15: the limit is on each card's line, the action a text button.
-      expect(screen.getByText(/ · ya no se puede cancelar$/)).toBeOnTheScreen();
+      // Follow-up 264: the limit on the line under each card.
+      expect(screen.getByText("Ya no se puede cancelar.")).toBeOnTheScreen();
     });
-    expect(screen.getByText(/ · cancela hasta 3 h antes$/)).toBeOnTheScreen();
+    expect(screen.getByText("Tus próximas evaluaciones")).toBeOnTheScreen();
+    expect(screen.getByText("Puedes cancelarla hasta 3 horas antes.")).toBeOnTheScreen();
     expect(await screen.findByText("Anteriores")).toBeOnTheScreen();
     expect(screen.getByText("Incluida")).toBeOnTheScreen();
 
@@ -325,20 +327,13 @@ describe("Client Evaluations", () => {
     );
   });
 
-  it("offers booking from the empty list", async () => {
+  it("shows the slots at once when nothing is booked", async () => {
     const fetcher = routeFetcher(baseRoutes());
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
-    await waitFor(() => {
-      expect(screen.getByText("No tienes evaluaciones próximas")).toBeOnTheScreen();
-    });
-    expect(
-      await screen.findByText("Tu primera evaluación del trimestre es gratis."),
-    ).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar evaluación" }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Turno 09:00" })).toBeOnTheScreen();
-    });
+    expect(await screen.findByText("Reserva tu evaluación")).toBeOnTheScreen();
+    expect(screen.getByText("Tu primera evaluación del trimestre es gratis.")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Turno 09:00" })).toBeOnTheScreen();
+    expect(screen.queryByText("No tienes evaluaciones próximas")).toBeNull();
   });
 });

@@ -3,7 +3,7 @@ import { clientNotificationDestination } from "./notification-destinations";
 describe("clientNotificationDestination", () => {
   it.each([
     ["subscription", ["ProfileTab", { screen: "Subscription" }]],
-    ["evaluation", ["ProfileTab", { screen: "MyEvaluations" }]],
+    ["evaluation", ["ProfileTab", { screen: "EvaluationAvailability" }]],
     ["payment", ["ProfileTab", { screen: "PaymentStatus" }]],
     ["booking", ["Bookings", { screen: "MyBookings" }]],
     // A cancelled Session has no detail to open; its Bookings do.

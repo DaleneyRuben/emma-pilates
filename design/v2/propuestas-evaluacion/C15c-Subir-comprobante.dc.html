@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>C15c Subir comprobante</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+*{box-sizing:border-box}
+.eb{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.hero{background:#93615D;border-radius:20px;padding:18px 20px;display:flex;flex-direction:column;gap:6px;color:#fff}
+.grp{background:#F5EFE9;border-radius:16px;display:flex;flex-direction:column}
+.row{min-height:52px;padding:0 16px;display:flex;align-items:center;gap:12px;font-size:15px}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;display:flex;align-items:center;justify-content:center;flex:none}
+.hr{height:1px;background:#E6DBD0;margin-left:64px}
+.qrc{background:#F5EFE9;border-radius:16px;padding:16px;display:flex;gap:16px;align-items:center}
+.qr{flex:none;background:#fff;border-radius:8px;padding:6px;border:0;cursor:pointer}
+.qa{height:36px;border:0;background:transparent;color:#8A5D59;font:500 14px 'Work Sans',sans-serif;display:flex;align-items:center;gap:6px;padding:0;cursor:pointer}
+.pick{min-height:64px;padding:0 12px 0 16px;display:flex;align-items:center;gap:12px;border:0;background:transparent;width:100%;font-family:'Work Sans',sans-serif;color:#4A4A4A;text-align:left;cursor:pointer}
+.thumb{width:36px;height:36px;border-radius:8px;background:#D8C9BB;flex:none}
+.rm{height:44px;border:0;background:transparent;color:#7D4F4B;font:500 15px 'Work Sans',sans-serif;cursor:pointer}
+.go{height:52px;border:0;border-radius:14px;background:#B78380;color:#fff;font:600 17px 'Work Sans',sans-serif;width:100%;cursor:pointer}
+.go.off{background:#E6DBD0;color:#6F6662;cursor:default}
+
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="C18-Perfil.dc.html" aria-label="Volver" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-size: 16px; font-weight: 500">Perfil</span>
+  </div>
+  <div style="flex-grow: 1; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <span style="font-family: Lora, Georgia, serif; font-size: 30px">Mis evaluaciones</span>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Próximas</span>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: #F2E4E1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7D4F4B; flex: none"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">Mar</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">3</span></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, Georgia, serif; font-size: 20px">09:30 · Carla Peña</span><span style="font-size: 13px; color: #6F6662">45 min · cancela hasta 3 h antes</span></div>
+        </div>
+        <div style="height: 1px; background: #E6DBD0"></div>
+        <div style="display: flex; justify-content: flex-end"><a href="C15b-Mis-evaluaciones-vacio.dc.html" style="height: 44px; padding: 0 12px; color: #A04E3E; font-size: 15px; font-weight: 600; display: flex; align-items: center; text-decoration: none">Cancelar evaluación</a></div>
+      </div>
+      <div style="background: #F5EFE9; border-radius: 16px; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: #F2E4E1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7D4F4B; flex: none"><span style="font-size: 11px; font-weight: 600; text-transform: uppercase">Dic</span><span style="font-family: Lora, Georgia, serif; font-size: 20px; line-height: 1">3</span></div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, Georgia, serif; font-size: 20px">16:00 · Carla Peña</span><span style="font-size: 13px; color: #6F6662">Pagada · cancela hasta 3 h antes</span><sc-if value="{{done}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #6F6662">Comprobante listo.</span></sc-if></div>
+        </div>
+        <div style="height: 1px; background: #E6DBD0"></div>
+        <sc-if value="{{notDone}}" hint-placeholder-val="{{ true }}"><div style="display: flex; justify-content: flex-end"><button onClick="{{open}}" style="height: 44px; padding: 0 12px; border: 0; background: transparent; color: #7D4F4B; font: 600 15px 'Work Sans', sans-serif; cursor: pointer">Sube tu comprobante de transferencia</button></div></sc-if>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Anteriores</span>
+      <div style="background: #F5EFE9; border-radius: 16px; display: flex; flex-direction: column">
+        <div style="min-height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 12px">
+          <span style="flex-grow: 1; font-size: 15px">6 de octubre, 09:30 · Carla Peña</span>
+          <span style="padding: 4px 10px; border-radius: 999px; background: #E6DBD0; font-size: 12px; font-weight: 600">Realizada</span>
+        </div>
+        <div style="height: 1px; background: #E6DBD0; margin-left: 16px"></div>
+        <div style="min-height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 12px">
+          <span style="flex-grow: 1; font-size: 15px">4 de septiembre, 16:00 · Carla Peña</span>
+          <span style="padding: 4px 10px; border-radius: 999px; background: #E6DBD0; font-size: 12px; font-weight: 600">Realizada</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <sc-if value="{{sheet}}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; inset: 0; background: rgba(74,74,74,0.36)" onClick="{{close}}"></div>
+    <div role="dialog" aria-label="Sube tu comprobante" style="position: absolute; left: 0; right: 0; bottom: 0; background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 10px 20px 30px; display: flex; flex-direction: column; gap: 16px">
+      <div style="width: 36px; height: 5px; border-radius: 999px; background: #E6DBD0; align-self: center"></div>
+      <span style="font-size: 20px; font-weight: 500">Sube tu comprobante</span>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+      <span class="eb">1 · Paga con el QR del estudio</span>
+      <div class="qrc">
+        <button class="qr" onClick="{{enlarge}}" aria-label="Código QR del estudio. Toca para ampliarlo."><svg aria-hidden="true" width="100" height="100" viewBox="0 0 28 28"><g fill="#4A4A4A"><rect x="1" y="1" width="7" height="7"></rect><rect x="20" y="1" width="7" height="7"></rect><rect x="1" y="20" width="7" height="7"></rect></g><g fill="#FFFFFF"><rect x="2" y="2" width="5" height="5"></rect><rect x="21" y="2" width="5" height="5"></rect><rect x="2" y="21" width="5" height="5"></rect></g><g fill="#4A4A4A"><rect x="3" y="3" width="3" height="3"></rect><rect x="22" y="3" width="3" height="3"></rect><rect x="3" y="22" width="3" height="3"></rect><rect x="10" y="2" width="2" height="2"></rect><rect x="13" y="4" width="3" height="2"></rect><rect x="10" y="7" width="2" height="3"></rect><rect x="14" y="9" width="2" height="2"></rect><rect x="2" y="11" width="3" height="2"></rect><rect x="7" y="13" width="2" height="3"></rect><rect x="11" y="12" width="4" height="2"></rect><rect x="17" y="11" width="3" height="2"></rect><rect x="22" y="12" width="2" height="3"></rect><rect x="10" y="16" width="2" height="2"></rect><rect x="14" y="17" width="3" height="3"></rect><rect x="19" y="16" width="2" height="2"></rect><rect x="23" y="18" width="3" height="2"></rect><rect x="11" y="21" width="2" height="4"></rect><rect x="15" y="23" width="3" height="2"></rect><rect x="20" y="21" width="2" height="2"></rect><rect x="23" y="23" width="2" height="3"></rect></g></svg></button>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 14px; line-height: 1.4; color: #6F6662">Escanéalo con tu app bancaria y transfiere <strong style="color: #4A4A4A; font-weight: 600">Bs 70</strong>.</span>
+          <button class="qa" onClick="{{enlarge}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A5D59" stroke-width="1.3" stroke-linecap="round"><polyline points="4,9 4,4 9,4"></polyline><polyline points="15,4 20,4 20,9"></polyline><polyline points="20,15 20,20 15,20"></polyline><polyline points="9,20 4,20 4,15"></polyline></svg>Ampliar</button>
+          <button class="qa"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A5D59" stroke-width="1.3" stroke-linecap="round"><path d="M12 4v11"></path><polyline points="7.5,10.5 12,15 16.5,10.5"></polyline><path d="M4.5 15v3.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V15"></path></svg>Guardar QR</button>
+        </div>
+      </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+      <span class="eb">2 · Sube tu comprobante</span>
+      <div class="grp">
+          <button class="pick" onClick="{{attach}}">
+            <div class="disc"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M4.5 15v3.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5V15"></path></svg></div>
+            <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px">Elegir comprobante</span><span style="font-size: 13px; color: #6F6662">JPG o PNG · hasta 5 MB</span></span>
+          </button>
+      </div>
+      </div>
+      <button class="rm" onClick="{{close}}">Volver</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var self = this, st = this.state || {};
+    var sheet = st.sheet === undefined ? true : st.sheet;
+    return {
+      sheet: sheet, done: !!st.done, notDone: !st.done,
+      open: function () { self.setState({ sheet: true }); },
+      close: function () { self.setState({ sheet: false }); },
+      attach: function () { self.setState({ sheet: false, done: true }); },
+      enlarge: function () {}
+    };
+  }
+}
+</script>
+</body>
+</html>

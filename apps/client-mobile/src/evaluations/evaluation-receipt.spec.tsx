@@ -78,8 +78,10 @@ describe("Paid Evaluation receipt", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
 
+    // Follow-up 264: a paid booking returns to Evaluación nutricional saying
+    // the receipt went to the studio.
     await waitFor(() => {
-      expect(screen.getByText("Evaluación confirmada")).toBeOnTheScreen();
+      expect(screen.getByText("Comprobante enviado")).toBeOnTheScreen();
     });
     expect(attached).toEqual([JSON.stringify({ imageAssetId: "asset-1" })]);
   });
@@ -177,6 +179,7 @@ describe("Paid Evaluation receipt", () => {
                 paymentId: "payment-1",
                 receiptAttached: uploaded,
                 receiptUploadable: !uploaded,
+                paymentState: uploaded ? "pending" : null,
               }),
             ]),
           );
@@ -187,7 +190,7 @@ describe("Paid Evaluation receipt", () => {
         },
       }),
     );
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     await fireEvent.press(
       await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
@@ -204,7 +207,9 @@ describe("Paid Evaluation receipt", () => {
       ).toBeNull();
     });
     expect(attached).toEqual([JSON.stringify({ imageAssetId: "asset-1" })]);
-    expect(screen.getByText("Comprobante listo.")).toBeOnTheScreen();
+    expect(
+      await screen.findByText("El estudio revisa tu comprobante de Bs 70 y te avisa por la app."),
+    ).toBeOnTheScreen();
   });
 
   it("shows Subiendo and ignores a second tap while the receipt uploads", async () => {
@@ -252,7 +257,7 @@ describe("Paid Evaluation receipt", () => {
         },
       }),
     );
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
     await fireEvent.press(
       await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
     );
@@ -291,7 +296,7 @@ describe("Paid Evaluation receipt", () => {
           ),
       }),
     );
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     expect(
       screen.queryByRole("button", { name: "Sube tu comprobante de transferencia" }),

@@ -1,190 +1,149 @@
 import {
+  getGetCurrentClientSubscriptionQueryKey,
   getListEvaluationSlotsQueryKey,
   getListEvaluationsQueryKey,
   useGetCurrentClientSubscription,
+  useListEvaluations,
   useListEvaluationSlots,
   type ClientEvaluationDto,
-  type EvaluationAvailabilityDto,
   type EvaluationSlotDto,
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  BrandToast,
   colors,
-  dayChipLabel,
-  initials,
+  ConfirmationSheet,
   LoadingState,
-  fontFamilies,
-  StateScreen,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
+  SectionTitle,
   spacing,
-  surfaces,
+  StateScreen,
+  TextButton,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
+  useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { useQueryClient } from "@tanstack/react-query";
-import { randomUUID } from "expo-crypto";
-import { useMemo, useRef, useState } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { moveEvaluation, rescheduleFailure } from "./reschedule-evaluation";
-import { clockTime, evaluationDate } from "./evaluation-format";
+import { PastEvaluations } from "./evaluation-card";
+import {
+  boliviaMonth,
+  clockTime,
+  evaluationDate,
+  evaluationHistoryLabel,
+  monthPhrase,
+} from "./evaluation-format";
 import { planOfferLine } from "./evaluation-offer-copy";
-import { UsedMonth, usedMonthStyles } from "./evaluation-used-month";
+import { EvaluationReceiptSheet } from "./evaluation-receipt-sheet";
+import { EvaluationSlotPicker, openDays } from "./evaluation-slot-picker";
+import { MovingBand, NoSlots } from "./evaluation-screen-parts";
+import { NextEvaluationCard } from "./next-evaluation-card";
 import { RescheduleConfirmSheet } from "./reschedule-confirm-sheet";
+import { useEvaluationCommands } from "./use-evaluation-commands";
 
-type AvailabilityNavigation = {
+type Notice = { evaluation: ClientEvaluationDto; moved?: boolean };
+
+type EvaluationNavigation = {
   goBack: () => void;
   navigate: {
     (screen: "Plans"): void;
     (screen: "BookEvaluation", params: { slot: EvaluationSlotDto }): void;
   };
-  // Back to the Mis evaluaciones the picker was opened from, so Back cannot
-  // land on a picker whose Evaluation has already moved.
-  popTo: (screen: "MyEvaluations", params: { confirmed: ClientEvaluationDto; moved: true }) => void;
+  setParams: (params: { confirmed?: ClientEvaluationDto }) => void;
 };
 
-type OpenDay = { date: string; slots: EvaluationSlotDto[] };
+const toastTitle = (notice: Notice) =>
+  notice.moved === true
+    ? "Evaluación reprogramada"
+    : notice.evaluation.included
+      ? "Evaluación confirmada"
+      : "Comprobante enviado";
 
-const openDays = (availability: EvaluationAvailabilityDto, currentSlotId?: string): OpenDay[] =>
-  availability.days
-    .map((day) => ({
-      date: day.date,
-      slots: day.slots.filter((slot) => slot.bookable && slot.id !== currentSlotId),
-    }))
-    .filter((day) => day.slots.length > 0);
-
-function Intro({
-  availability,
-  rescheduling,
-}: {
-  availability: EvaluationAvailabilityDto;
-  rescheduling: boolean;
-}) {
-  const line = rescheduling
-    ? "Tu evaluación ya está pagada. Elige el nuevo horario: el pago se mantiene."
-    : planOfferLine(availability);
-  return line === null ? null : <BodyText>{line}</BodyText>;
-}
-
-function NutritionistCard({ branchName, name }: { branchName: string; name: string }) {
-  return (
-    <View style={styles.nutritionist}>
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{initials(name)}</Text>
-      </View>
-      <View>
-        <Text style={styles.nutritionistName}>{name}</Text>
-        <BodyText style={styles.muted}>{`Nutricionista · 45 min · ${branchName}`}</BodyText>
-      </View>
-    </View>
-  );
-}
-
+/**
+ * C13, walkthrough finding 70 (follow-up 264, option A): one «Evaluación
+ * nutricional» with the next Evaluation and its actions on top, the slots
+ * to book (or to move it to) below, and «Anteriores» at the foot.
+ */
 export function EvaluationAvailabilityScreen({
   route,
 }: {
-  route?: { params?: { evaluationId?: string; slotId?: string; startsAt?: string } };
+  route?: { params?: { confirmed?: ClientEvaluationDto } };
 }) {
-  const navigation = useNavigation<AvailabilityNavigation>();
-  const evaluationId = route?.params?.evaluationId;
-  const currentSlotId = route?.params?.slotId;
-  const rescheduling = evaluationId !== undefined;
+  const navigation = useNavigation<EvaluationNavigation>();
   const fetcher = useClientFetcher();
-  const queryClient = useQueryClient();
-  // One key per target slot: a retry of the same slot replays, another slot
-  // after an unclear failure is a new command (the backend refuses a reused
-  // key with another body).
-  const keys = useRef(new Map<string, string>());
-  const keyFor = (slotId: string): string => {
-    const known = keys.current.get(slotId);
-    if (known !== undefined) return known;
-    const created = randomUUID();
-    keys.current.set(slotId, created);
-    return created;
-  };
+  const commands = useEvaluationCommands(fetcher);
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const subscription = useGetCurrentClientSubscription(queryOptions);
   const slots = useListEvaluationSlots(undefined, queryOptions);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [moving, setMoving] = useState(false);
-  const [failure, setFailure] = useState<string | null>(null);
-  const [target, setTarget] = useState<EvaluationSlotDto | null>(null);
-
-  const fail = (message: string) => {
-    setTarget(null);
-    setFailure(message);
-    AccessibilityInfo.announceForAccessibility(message);
-    // The move may have landed, or the slot may be gone: show what is true now.
-    void queryClient.invalidateQueries({ queryKey: getListEvaluationSlotsQueryKey() });
-    void queryClient.invalidateQueries({
-      queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
-    });
-  };
-
-  const move = async (slot: EvaluationSlotDto) => {
-    if (evaluationId === undefined || moving) return;
-    setMoving(true);
-    setFailure(null);
-    try {
-      const response = await moveEvaluation(evaluationId, slot, keyFor(slot.id), fetcher);
-      if (response.status === 200) {
-        await queryClient.invalidateQueries({
-          queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
-        });
-        setTarget(null);
-        navigation.popTo("MyEvaluations", { confirmed: response.data, moved: true });
-        return;
-      }
-      fail(rescheduleFailure(response.data));
-    } catch {
-      fail("No pudimos reprogramar la evaluación. Inténtalo de nuevo.");
-    } finally {
-      setMoving(false);
-    }
-  };
-
-  const availability = slots.data?.status === 200 ? slots.data.data : null;
-  const days = useMemo(
-    () => (availability === null ? [] : openDays(availability, currentSlotId)),
-    [availability, currentSlotId],
-  );
+  const upcoming = useListEvaluations({ scope: "upcoming" }, queryOptions);
+  const past = useListEvaluations({ scope: "past" }, queryOptions);
+  // She stays on this screen and comes back to it: a pull or a return also
+  // refreshes the turnos and her Plan, not only her Evaluations.
+  const queryKeys = [
+    getListEvaluationsQueryKey(),
+    getListEvaluationSlotsQueryKey(),
+    getGetCurrentClientSubscriptionQueryKey(),
+  ];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
+  const [moving, setMoving] = useState<ClientEvaluationDto | null>(null);
+  // The turno she picked and the one she is leaving, kept apart from the list
+  // that refreshes under the sheet once the move lands.
+  const [target, setTarget] = useState<{ slot: EvaluationSlotDto; from: string } | null>(null);
+  const [cancelling, setCancelling] = useState<ClientEvaluationDto | null>(null);
+  const [receiptFor, setReceiptFor] = useState<ClientEvaluationDto | null>(null);
+  const [movedNotice, setMovedNotice] = useState<Notice | null>(null);
+  const dismissConfirmed = () => navigation.setParams({ confirmed: undefined });
+  const confirmed = useStickyNotice(route?.params?.confirmed, dismissConfirmed);
+  const notice: Notice | null =
+    movedNotice ?? (confirmed === null ? null : { evaluation: confirmed });
 
   const header = (
-    <ScreenTopBar
-      fullBleed
-      onBack={() => navigation.goBack()}
-      title={rescheduling ? "Elige otro turno" : "Evaluación nutricional"}
-    />
+    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Evaluación nutricional" />
   );
 
-  if (subscription.isPending || slots.isPending) {
+  if (subscription.isPending || slots.isPending || upcoming.isPending) {
     return (
       <Screen style={styles.screen}>
         {header}
-        <LoadingState label="Cargando disponibilidad" />
+        <LoadingState label="Cargando evaluaciones" />
       </Screen>
     );
   }
 
-  if (slots.isError || availability === null) {
+  // A turnos failure only empties the booking section: her booked ones stay.
+  const availability = slots.data?.status === 200 ? slots.data.data : null;
+  if (upcoming.isError || upcoming.data.status !== 200) {
     return (
       <Screen style={styles.screen}>
         {header}
         <QueryFailure
-          label="No pudimos cargar los horarios de evaluación."
-          onRetry={() => void slots.refetch()}
+          label="No pudimos cargar tus evaluaciones."
+          onRetry={() => void upcoming.refetch()}
         />
       </Screen>
     );
   }
 
+  const items = upcoming.data.data.items.map((evaluation) => ({
+    ...evaluation,
+    receiptAttached:
+      commands.receiptReady[evaluation.id] === true || evaluation.receiptAttached === true,
+    receiptUploadable:
+      commands.receiptReady[evaluation.id] === true ? false : evaluation.receiptUploadable,
+  }));
+  const pastItems = past.data?.status === 200 ? past.data.data.items : [];
   const status = subscription.data?.status === 200 ? subscription.data.data.status : "none";
-  // A paid Evaluation moves without a plan: the payment is hers already.
-  if (!rescheduling && status !== "active" && status !== "expiring_soon") {
+  const hasPlan = status === "active" || status === "expiring_soon";
+  const movingNow = moving === null ? null : (items.find((item) => item.id === moving.id) ?? null);
+
+  if (items.length === 0 && pastItems.length === 0 && !hasPlan) {
     return (
       <Screen style={styles.screen}>
         {header}
@@ -198,199 +157,179 @@ export function EvaluationAvailabilityScreen({
     );
   }
 
-  if (days.length === 0) {
-    const anyUsed = availability.months.some((month) => month.status === "used");
-    return (
-      <Screen style={styles.screen}>
-        {header}
-        {anyUsed && !rescheduling ? (
-          <UsedMonth availability={availability} />
-        ) : (
-          <>
-            <Intro availability={availability} rescheduling={rescheduling} />
-            {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
-            <View style={usedMonthStyles.used}>
-              <Text style={usedMonthStyles.usedTitle}>No hay horarios disponibles por ahora.</Text>
-              <BodyText>Vuelve a revisar en unos días.</BodyText>
-            </View>
-          </>
-        )}
-      </Screen>
+  const days = availability === null ? [] : openDays(availability, movingNow?.slotId);
+  const offer = availability === null ? null : planOfferLine(availability);
+  const pick = (slot: EvaluationSlotDto) =>
+    movingNow === null
+      ? navigation.navigate("BookEvaluation", { slot })
+      : setTarget({ slot, from: movingNow.startsAt });
+  const failure =
+    commands.failure === null ? null : (
+      <BodyText accessibilityRole="alert" style={styles.failure}>
+        {commands.failure}
+      </BodyText>
     );
-  }
-
-  const selected = days.find((day) => day.date === selectedDate) ?? days[0];
-  const openSlots = days.flatMap((day) => day.slots);
-  const nutritionists = new Set(openSlots.map((slot) => slot.nutritionistName));
-  const branches = new Set(openSlots.map((slot) => slot.branchId));
-  const slotLabel = (slot: EvaluationSlotDto) =>
-    [
-      clockTime(slot.startsAt),
-      ...(branches.size > 1 ? [slot.branchName] : []),
-      ...(nutritionists.size > 1 ? [slot.nutritionistName] : []),
-    ].join(" · ");
+  const confirmMove = async () => {
+    if (movingNow === null || target === null) return;
+    const moved = await commands.move(movingNow, target.slot);
+    setTarget(null);
+    if (moved === null) return;
+    setMoving(null);
+    setMovedNotice({ evaluation: moved, moved: true });
+  };
 
   return (
     <Screen style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={styles.content}>
-        <Intro availability={availability} rescheduling={rescheduling} />
-        {nutritionists.size === 1 ? (
-          <NutritionistCard
-            branchName={openSlots[0]?.branchName ?? ""}
-            name={openSlots[0]?.nutritionistName ?? ""}
-          />
-        ) : null}
-        <Text style={usedMonthStyles.label}>Días disponibles</Text>
-        <ScrollView
-          contentContainerStyle={styles.days}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.dayStrip}
-        >
-          {days.map((day) => {
-            const chip = dayChipLabel(day.date);
-            const isSelected = day.date === selected?.date;
-            return (
-              <Pressable
-                accessibilityLabel={`${chip.weekday} ${chip.day}`}
-                accessibilityRole="button"
-                accessibilityState={{ selected: isSelected }}
-                key={day.date}
-                onPress={() => setSelectedDate(day.date)}
-                style={[styles.day, isSelected && styles.daySelected]}
-              >
-                <Text style={[styles.dayWeekday, isSelected && styles.daySelectedText]}>
-                  {chip.weekday}
-                </Text>
-                <Text style={[styles.dayNumber, isSelected && styles.daySelectedText]}>
-                  {chip.day}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-        {selected !== undefined ? (
-          <>
-            <View style={styles.dayHeader}>
-              <Text style={styles.dayTitle}>
-                {evaluationDate(selected.slots[0]?.startsAt ?? "")}
-              </Text>
-              <BodyText style={styles.muted}>
-                {selected.slots.length === 1 ? "1 horario" : `${selected.slots.length} horarios`}
-              </BodyText>
-            </View>
-            <View style={styles.grid}>
-              {selected.slots.map((slot) => (
-                <Pressable
-                  accessibilityLabel={`Turno ${slotLabel(slot)}`}
-                  accessibilityRole="button"
-                  key={slot.id}
-                  onPress={() =>
-                    rescheduling ? setTarget(slot) : navigation.navigate("BookEvaluation", { slot })
-                  }
-                  style={styles.slot}
-                >
-                  <Text style={styles.slotTime}>{clockTime(slot.startsAt)}</Text>
-                  {branches.size > 1 ? (
-                    <Text style={styles.slotCaption}>{slot.branchName}</Text>
-                  ) : null}
-                  {nutritionists.size > 1 ? (
-                    <Text style={styles.slotCaption}>{slot.nutritionistName}</Text>
-                  ) : null}
-                </Pressable>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={refreshControl}
+        testID="evaluation-scroll"
+      >
+        {items.length === 0 && offer !== null ? <BodyText>{offer}</BodyText> : null}
+        {movingNow === null ? failure : null}
+        {items.length > 0 ? (
+          <View>
+            <SectionTitle>
+              {items.length === 1 ? "Tu próxima evaluación" : "Tus próximas evaluaciones"}
+            </SectionTitle>
+            <View style={styles.cards}>
+              {items.map((evaluation) => (
+                <NextEvaluationCard
+                  evaluation={evaluation}
+                  key={evaluation.id}
+                  moving={movingNow !== null}
+                  onAttachReceipt={() => setReceiptFor(evaluation)}
+                  onCancel={() => setCancelling(evaluation)}
+                  onMove={() => {
+                    // The toast would sit over the turnos she now has to tap.
+                    setMovedNotice(null);
+                    dismissConfirmed();
+                    commands.clearFailure();
+                    setMoving(evaluation);
+                  }}
+                  uploading={commands.uploadingId === evaluation.id}
+                />
               ))}
             </View>
-          </>
+          </View>
         ) : null}
-        {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
-        {rescheduling ? (
-          <BodyText style={styles.muted}>
-            Al elegir un horario te pediremos confirmar el cambio.
-          </BodyText>
+        <View style={styles.section}>
+          <SectionTitle>
+            {movingNow !== null
+              ? "Elige el nuevo horario"
+              : items.length > 0
+                ? "Reserva otra evaluación"
+                : "Reserva tu evaluación"}
+          </SectionTitle>
+          {movingNow !== null ? (
+            <>
+              <MovingBand evaluation={movingNow} onBack={() => setMoving(null)} />
+              {failure}
+            </>
+          ) : items.length > 0 && offer !== null ? (
+            <BodyText style={styles.muted}>{offer}</BodyText>
+          ) : null}
+          {availability === null ? (
+            <QueryFailure
+              label="No pudimos cargar los horarios de evaluación."
+              onRetry={() => void slots.refetch()}
+            />
+          ) : movingNow === null && !hasPlan ? (
+            <>
+              <BodyText>Necesitas un plan activo para reservar.</BodyText>
+              <TextButton label="Ver planes" onPress={() => navigation.navigate("Plans")} />
+            </>
+          ) : days.length === 0 ? (
+            <NoSlots
+              availability={availability}
+              showUsed={movingNow === null && availability.months.some((m) => m.status === "used")}
+            />
+          ) : (
+            <>
+              <EvaluationSlotPicker days={days} onPick={pick} />
+              <BodyText style={styles.muted}>
+                {movingNow === null
+                  ? "Puedes reservar hasta 3 horas antes."
+                  : "Puedes reprogramarla hasta 3 horas antes."}
+              </BodyText>
+            </>
+          )}
+        </View>
+        {pastItems.length > 0 ? (
+          <View>
+            <SectionTitle>Anteriores</SectionTitle>
+            <PastEvaluations evaluations={pastItems} label={evaluationHistoryLabel} />
+          </View>
         ) : null}
-        <BodyText style={styles.muted}>
-          {rescheduling
-            ? "Puedes reprogramarla hasta 3 horas antes."
-            : "Puedes reservar hasta 3 horas antes."}
-        </BodyText>
       </ScrollView>
       <RescheduleConfirmSheet
-        busy={moving}
-        currentStartsAt={route?.params?.startsAt}
-        onConfirm={() => (target === null ? undefined : void move(target))}
+        busy={commands.movingBusy}
+        currentStartsAt={target?.from}
+        onConfirm={() => void confirmMove()}
         onDismiss={() => setTarget(null)}
-        target={target}
+        target={target?.slot ?? null}
       />
+      <EvaluationReceiptSheet
+        evaluation={receiptFor}
+        fetcher={fetcher}
+        onAttach={() => {
+          if (receiptFor === null) return;
+          const evaluation = receiptFor;
+          void commands.attachReceipt(evaluation).then((outcome) => {
+            // A closed picker or a busy upload leaves the sheet as it is.
+            if (outcome === "skipped") return;
+            // Closes only this Evaluation's sheet: another may be open by now.
+            setReceiptFor((current) => (current?.id === evaluation.id ? null : current));
+          });
+        }}
+        onClose={() => setReceiptFor(null)}
+        uploading={commands.uploadingId !== null}
+      />
+      <ConfirmationSheet
+        confirmLabel="Sí, cancelar evaluación"
+        note="El horario queda libre y otras clientas podrán reservarlo."
+        onConfirm={() => {
+          if (cancelling === null) return;
+          const evaluation = cancelling;
+          setCancelling(null);
+          void commands.cancel(evaluation);
+        }}
+        onDismiss={() => setCancelling(null)}
+        testID="cancel-evaluation-sheet"
+        title="¿Cancelar esta evaluación?"
+        visible={cancelling !== null}
+      >
+        {cancelling !== null ? (
+          <>
+            <BodyText>
+              {`${evaluationDate(cancelling.startsAt)}, ${clockTime(cancelling.startsAt)} · ${cancelling.durationMinutes} min · ${cancelling.nutritionistName}`}
+            </BodyText>
+            <BodyText>
+              {`Podrás reservar otra evaluación para ${monthPhrase(boliviaMonth(cancelling.startsAt))}.`}
+            </BodyText>
+          </>
+        ) : null}
+      </ConfirmationSheet>
+      {notice !== null ? (
+        <BrandToast
+          note={`${evaluationDate(notice.evaluation.startsAt)}, ${clockTime(notice.evaluation.startsAt)}`}
+          onClose={() => {
+            setMovedNotice(null);
+            dismissConfirmed();
+          }}
+          title={toastTitle(notice)}
+        />
+      ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  avatar: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 44,
-    justifyContent: "center",
-    width: 44,
-  },
-  avatarText: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 16 },
-  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  // C13's day chips match Reservar's: 48 × 60 on Lino, the chosen one Palo de rosa.
-  day: {
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: radii.button,
-    gap: spacing.xxs,
-    height: 60,
-    justifyContent: "center",
-    width: 48,
-  },
-  dayHeader: {
-    alignItems: "baseline",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
-  daySelected: { backgroundColor: colors.primary },
-  daySelectedText: { color: colors.white },
-  dayStrip: { flexGrow: 0, flexShrink: 0 },
-  dayTitle: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
-  },
-  dayWeekday: { color: colors.textMuted, fontSize: typography.tabLabel },
-  days: { gap: spacing.sm },
-  grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  cards: { gap: spacing.xl },
+  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  failure: { color: colors.errorText },
   muted: { color: colors.textMuted, fontSize: typography.note },
-  nutritionist: {
-    ...surfaces.flatCard,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  nutritionistName: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   screen: { gap: spacing.lg },
-  slot: {
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: radii.button,
-    justifyContent: "center",
-    minHeight: 52,
-    paddingVertical: spacing.xs,
-    width: "31%",
-  },
-  slotCaption: { color: colors.textMuted, fontSize: typography.label },
-  slotTime: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 18,
-    fontVariant: ["tabular-nums"],
-  },
+  section: { gap: spacing.md },
 });

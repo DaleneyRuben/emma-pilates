@@ -51,7 +51,6 @@ type HomeNavigation = {
       | "PaymentStatus"
       | "Subscription"
       | "EvaluationAvailability"
-      | "MyEvaluations"
       | "Notifications"
       | "ProfileTab"
       | "Referrals",
@@ -157,10 +156,7 @@ export function HomeScreen() {
     hint: evaluationShortcut(nextEvaluation?.startsAt),
     icon: "health",
     label: "Evaluación nutricional",
-    onPress: () =>
-      navigation.navigate(
-        nextEvaluation === undefined ? "EvaluationAvailability" : "MyEvaluations",
-      ),
+    onPress: () => navigation.navigate("EvaluationAvailability"),
   } as const;
   const referralTile = {
     hint: referralShortcut(referralCount),

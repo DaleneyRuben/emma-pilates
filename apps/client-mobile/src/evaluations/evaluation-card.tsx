@@ -1,122 +1,11 @@
 import type { ClientEvaluationDto } from "@pilates/api-contracts";
-import {
-  BodyText,
-  CardActionRow,
-  cardWithActionRow,
-  colors,
-  fontFamilies,
-  radii,
-  spacing,
-  surfaces,
-  typography,
-  useMountedAt,
-} from "@pilates/mobile-core";
+import { colors, fontFamilies, spacing, surfaces, typography } from "@pilates/mobile-core";
 import { Fragment } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import {
-  clockTime,
-  evaluationBadge,
-  evaluationDayAndTime,
-  paidEvaluationLabel,
-} from "./evaluation-format";
+import { evaluationDayAndTime } from "./evaluation-format";
 
-function DateTile({ instant }: { instant: string }) {
-  const badge = evaluationBadge(instant);
-  return (
-    <View style={styles.tile}>
-      <Text style={styles.tileMonth}>{badge.month}</Text>
-      <Text style={styles.tileDay}>{badge.day}</Text>
-    </View>
-  );
-}
-
-/**
- * C15's upcoming Evaluation (follow-up 226): the date tile, «09:30 ·
- * Nutritionist» in Lora 20, one line with the limit, and the action as a
- * text button under a hairline.
- */
-export function UpcomingEvaluationCard({
-  evaluation,
-  onAttachReceipt,
-  onCancel,
-  onReschedule,
-  uploading,
-}: {
-  evaluation: ClientEvaluationDto;
-  onAttachReceipt: () => void;
-  onCancel: () => void;
-  onReschedule: () => void;
-  uploading: boolean;
-}) {
-  // The server's flag is a snapshot; the 3-hour limit is judged again when the card appears.
-  const shownAt = useMountedAt();
-  const open = new Date(evaluation.cancellableUntil).getTime() > shownAt;
-  const cancellable = evaluation.cancellable && open;
-  const reschedulable = evaluation.reschedulable === true && open;
-  // Walkthrough finding 68: the studio released her slot; she picks another.
-  const released = evaluation.slotReleased === true;
-  const lead = evaluation.included
-    ? `${evaluation.durationMinutes} min`
-    : paidEvaluationLabel(evaluation.paymentState);
-  const limit = reschedulable
-    ? "reprograma hasta 3 h antes"
-    : cancellable
-      ? "cancela hasta 3 h antes"
-      : "ya no se puede cancelar";
-  const actions = [
-    evaluation.receiptUploadable === true ? (
-      <View style={styles.actionRow}>
-        <Pressable
-          accessibilityLabel="Sube tu comprobante de transferencia"
-          accessibilityRole="button"
-          accessibilityState={{ busy: uploading, disabled: uploading }}
-          disabled={uploading}
-          onPress={onAttachReceipt}
-          style={styles.action}
-        >
-          <Text style={styles.actionLabel}>
-            {uploading ? "Subiendo comprobante…" : "Sube tu comprobante de transferencia"}
-          </Text>
-        </Pressable>
-      </View>
-    ) : null,
-    released ? (
-      <CardActionRow label="Elegir turno" onPress={onReschedule} />
-    ) : reschedulable ? (
-      <CardActionRow label="Reprogramar" onPress={onReschedule} />
-    ) : null,
-    cancellable ? (
-      <CardActionRow label="Cancelar evaluación" onPress={onCancel} tone="error" />
-    ) : null,
-  ].filter((action) => action !== null);
-
-  return (
-    <View style={[styles.card, actions.length > 0 && cardWithActionRow]}>
-      <View style={styles.header}>
-        <DateTile instant={evaluation.startsAt} />
-        <View style={styles.body}>
-          <Text style={styles.title}>
-            {`${clockTime(evaluation.startsAt)} · ${evaluation.nutritionistName}`}
-          </Text>
-          <Text style={styles.details}>
-            {released
-              ? "El estudio liberó este turno · el pago sigue vigente"
-              : `${lead} · ${limit}`}
-          </Text>
-          {!evaluation.included && evaluation.receiptAttached === true ? (
-            <BodyText style={styles.details}>Comprobante listo.</BodyText>
-          ) : null}
-        </View>
-      </View>
-      {actions.map((action, index) => (
-        <Fragment key={index}>{action}</Fragment>
-      ))}
-    </View>
-  );
-}
-
-/** C15's «Anteriores» as one Lino group of rows. */
+/** «Anteriores» as one Lino group of rows, at the foot of C13 (follow-up 264). */
 export function PastEvaluations({
   evaluations,
   label,
@@ -142,26 +31,8 @@ export function PastEvaluations({
 }
 
 const styles = StyleSheet.create({
-  // The receipt action keeps one accessible name while its text says «Subiendo».
-  action: { justifyContent: "center", minHeight: 44, paddingHorizontal: spacing.md },
-  actionLabel: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
-  actionRow: {
-    borderTopColor: colors.hairline,
-    borderTopWidth: 1,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  body: { flex: 1, gap: spacing.xxs },
-  card: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
-  details: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
-  header: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -177,21 +48,4 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
   },
   rowValue: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
-  tile: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.button,
-    height: 52,
-    justifyContent: "center",
-    width: 52,
-  },
-  tileDay: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 20 },
-  tileMonth: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.tabLabel,
-    fontWeight: "600",
-    textTransform: "uppercase",
-  },
-  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
 });

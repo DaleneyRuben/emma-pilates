@@ -40,7 +40,9 @@ import { clockTime, evaluationDate } from "./evaluation-format";
 
 type BookNavigation = {
   goBack: () => void;
-  navigate: (screen: "MyEvaluations", params: { confirmed: ClientEvaluationDto }) => void;
+  // Back to the one «Evaluación nutricional» (follow-up 264): the new
+  // Evaluation shows on top with the toast.
+  popTo: (screen: "EvaluationAvailability", params: { confirmed: ClientEvaluationDto }) => void;
 };
 
 const bookingProblems: Record<string, string> = {
@@ -128,7 +130,7 @@ export function BookEvaluationScreen({
       }
       if (response.status === 201) {
         offerPushPermission();
-        navigation.navigate("MyEvaluations", { confirmed: response.data });
+        navigation.popTo("EvaluationAvailability", { confirmed: response.data });
         return;
       }
       setMessage(problemMessage(response.data));

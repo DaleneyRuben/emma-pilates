@@ -24,7 +24,6 @@ import { ClientApiBaseUrlContext, ClientFetcherContext } from "./client-fetcher"
 import { ClientTabIcon, type ClientTabIconName } from "./client-tab-icon";
 import { BookEvaluationScreen } from "./evaluations/book-evaluation-screen";
 import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availability-screen";
-import { MyEvaluationsScreen } from "./evaluations/my-evaluations-screen";
 import { InvoiceDetailScreen } from "./invoices/invoice-detail-screen";
 import { MyInvoicesScreen } from "./invoices/my-invoices-screen";
 import { HomeScreen } from "./home/home-screen";
@@ -48,8 +47,9 @@ const unavailableFetcher: typeof globalThis.fetch = async () => {
 };
 
 // Design follow-up 254 § 3 (owner, 2026-11-06): the bar stays on browsing
-// screens (class detail, Mi plan, Mis facturas, Notificaciones, Mis
-// evaluaciones) and hides only inside these tasks.
+// screens (class detail, Mi plan, Mis facturas, Notificaciones, Evaluación
+// nutricional, which holds the booked Evaluations since finding 70) and hides
+// only inside these tasks.
 const taskRoutes: ReadonlySet<string> = new Set([
   // Buying a plan: choose, start date and invoice, pay, upload the receipt
   "Plans",
@@ -59,7 +59,6 @@ const taskRoutes: ReadonlySet<string> = new Set([
   // Freezing the plan
   "FreezePlan",
   // Booking an evaluation
-  "EvaluationAvailability",
   "BookEvaluation",
   "Reschedule",
   "EditProfile",
@@ -90,7 +89,6 @@ const planScreens = {
 const shortcutScreens = {
   EvaluationAvailability: EvaluationAvailabilityScreen,
   BookEvaluation: BookEvaluationScreen,
-  MyEvaluations: MyEvaluationsScreen,
   Referrals: ReferralsScreen,
   // FIX-044: «Mis facturas» opens from Perfil and from its notification.
   MyInvoices: MyInvoicesScreen,

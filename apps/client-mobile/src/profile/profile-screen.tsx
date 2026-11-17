@@ -48,7 +48,6 @@ type ProfileNavigation = {
       | "CloseAccount"
       | "Referrals"
       | "EvaluationAvailability"
-      | "MyEvaluations"
       | "MyInvoices",
   ) => void;
   setParams: (params: ProfileParams) => void;
@@ -129,12 +128,6 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
               icon="health"
               label="Evaluación nutricional"
               onPress={() => navigation.navigate("EvaluationAvailability")}
-            />
-            <IconRow
-              chevron
-              icon="document"
-              label="Mis evaluaciones"
-              onPress={() => navigation.navigate("MyEvaluations")}
             />
             <IconRow
               chevron

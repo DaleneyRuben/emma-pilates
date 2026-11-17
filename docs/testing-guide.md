@@ -32,6 +32,7 @@ numbered tests.
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the nine-destination rail and its tabs, the old addresses that still work, the global search, the Branch cell, and the narrow-browser menu (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation, who booked a class and its waitlist, booking a Client into it) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients with the plan and Fundadora chips, «Le quedan», «Vence» and «Invitada por», open the Client file's Resumen, Reservas, Pagos, and Evaluaciones tabs, and create, change (name, phone, Role, Branches), and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111); tell an expired Plan from a Client who never bought one on Clientes (Test 113); read Horario and the report at 1024 px (Test 114) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
+| One Evaluación nutricional   | Perfil has one evaluation row; the screen puts the next Evaluation on top with its state (gratis, pago en revisión, pagada, turno liberado) and actions, the turnos below, «Anteriores» at the foot, and reschedules on the same screen (Test 151, FIX-057) | Walkthrough finding 70, the owner's option A (design follow-up 264) |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
 | Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
@@ -70,9 +71,9 @@ can be found by its design name.
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89 |
-| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54, 93, 112, 149 |
+| 13 Evaluación nutricional (with the booked ones since FIX-057), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
-| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 104 |
 | 25 Enviar comentarios | 19, 80 |
@@ -1598,7 +1599,8 @@ Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
 Log in as `sofia@example.com` and open the **Perfil** tab (`C18`). Below the
 summary card come three sections of v2 icon rows (a Rosa tinte disc, the
 label, a quiet chevron): «Tu plan y tus clases» (**Mi plan** with its state,
-**Evaluación nutricional**, **Mis evaluaciones**, **Invita a una amiga**),
+**Evaluación nutricional**, **Mis facturas**, **Invita a una amiga**; since
+FIX-057 no **Mis evaluaciones**, Test 151),
 «Preferencias» (**Notificaciones** with «N sin leer» on the right; since
 FIX-060 there is no **Recibir promociones** switch nor its note, Test 155),
 and «Cuenta»
@@ -2191,18 +2193,20 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
    with the date, the time in large Lora, and «45 minutos · Nutricionista ·
    Branch», then three rows («Es gratis: no usa clases de tu plan», «Te
    avisamos un día y una hora antes», «Cancela hasta 3 horas antes»). Tap
-   **Confirmar evaluación**. You land on **Mis evaluaciones** (`C15`) with the
-   «Evaluación confirmada» toast.
-3. Each upcoming card shows a date tile, «HH:MM · Nutricionista» in Lora,
-   «45 min · cancela hasta 3 h antes», and the text button **Cancelar
-   evaluación** in Error («Anteriores» are rows with «Realizada» or
-   «Incluida»). Tap **Cancelar evaluación** and confirm: the sheet says the turno is freed and "Podrás
-   reservar otra evaluación para este mes." (or "para noviembre" when the
-   Evaluation is next month's). Inside 3 hours of the start the card shows
-   "… · ya no se puede cancelar" instead. With nothing upcoming the list
-   shows «No tienes evaluaciones próximas» with the same plan line as `C13`
-   and **Reservar evaluación**, or, once it took place, "Ya usaste tu
-   evaluación de este mes. Puedes reservar la de noviembre."
+   **Confirmar evaluación**. You land back on **Evaluación nutricional** with
+   the «Evaluación confirmada» toast (a paid one says «Comprobante enviado»);
+   since FIX-057 there is no separate Mis evaluaciones (Test 151).
+3. The booked one sits on top under «Tu próxima evaluación»: the Rosa
+   profundo hero with the date, the time in Lora 40, «45 minutos ·
+   Nutricionista · Branch» and the chip «Gratis con tu plan», then «Puedes
+   cancelarla hasta 3 horas antes.» and **Cancelar evaluación** (outlined,
+   Error). Below come «Reserva otra evaluación» with the plan line and the
+   turnos, and «Anteriores» at the foot (rows with «Realizada» or
+   «Incluida»). Tap **Cancelar evaluación** and confirm: the sheet says the
+   turno is freed and "Podrás reservar otra evaluación para este mes." (or
+   "para noviembre" when the Evaluation is next month's), and the screen goes
+   back to «Reserva tu evaluación». Inside 3 hours of the start the line reads
+   «Ya no se puede cancelar.» and the button is gone.
 4. Book one again and open **Evaluación nutricional**: days in that month
    disappear. When no unused month has open turnos, the screen shows "Ya usaste
    tu evaluación de este mes." (naming the month when the used one is a later
@@ -2308,8 +2312,9 @@ In the Client app as `lucia@example.com`:
    next one peeks on the right.
 1. **Inicio** shows the shortcuts under «Accesos rápidos» (`C02`): three
    Lino tiles with a Rosa tinte icon disc each, **Reservar una clase**,
-   **Evaluación nutricional** (it opens Mis evaluaciones when one is booked,
-   otherwise the availability; VoiceOver reads «Próxima: …» as its hint) and
+   **Evaluación nutricional** (it opens the one evaluation screen, with the
+   booked one on top when there is one; VoiceOver reads «Próxima: …» as its
+   hint) and
    **Invita a una amiga**. Without an active Plan the booking shortcut is a
    full-width row at 60 % with «Necesitas un plan activo» and a lock, over
    two tiles with «Agenda tu cita» and «Su primera clase es gratis».
@@ -5265,7 +5270,7 @@ already fetched (Perfil and Mis referidos after Inicio) shows its content at onc
    under «Notificaciones» with the tab bar below, its opacity changing
    between two screenshots a second apart, then «No tienes notificaciones.»
    in its place.
-2. Client: Perfil → Mis evaluaciones (first visit). Expected: the same.
+2. Client: Perfil → Evaluación nutricional (first visit). Expected: the same.
 3. Staff, as Camila (Assistant): search «Lucia», open her. Expected: the
    logo under the back arrow; on the iPad, in the detail panel beside the
    search. Then «Ver historial completo»: the logo under «Historial de
@@ -6056,7 +6061,7 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
 1. **A load failure.** Sign in as `lucia@example.com`, then stop the API
    (Ctrl+C in its Terminal) and open a screen you have not visited: Perfil
    → **Notificaciones** reads «No pudimos cargar tus notificaciones.»,
-   **Mis evaluaciones** «No pudimos cargar tus evaluaciones.», **Mis
+   **Evaluación nutricional** «No pudimos cargar tus evaluaciones.», **Mis
    referidos** «No pudimos cargar tu código.», the **Reservar** tab «No
    pudimos cargar las clases.», a Plan «No pudimos cargar el plan.». A tab you
    had already opened shows the same line once its refresh fails. Start the
@@ -6102,7 +6107,7 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    plan (Test 5 B and Test 18), the Client's history and inbox (Tests 5 B
    and 9 B), the Assistant's reservations and history and «Sin plan
    activo» (Test 11 B), Pagos pendientes (Test 10 C), the roster (Test 12),
-   Mis evaluaciones (Test 15), the referral code (Test 10 A), and «Ver
+   Evaluación nutricional (Test 15), the referral code (Test 10 A), and «Ver
    la app como…» (Test 67 A).
 
 ## Test 72: the admin web's empty, failed, refused, and lost states
@@ -7668,8 +7673,8 @@ B. **QR.** As Lucía, the slot shows Bs 70 and confirming starts a
    not on this branch.
 C. **Cost and income.** Three held Evaluations in a month record Bs 150
    owed to the Nutritionist. On **Reporte** (AW16), under the method line,
-   Plan income and Evaluation income are separate. Mis evaluaciones labels
-   a past row «Incluida», «Pagada», «No asistió», or «Cancelada».
+   Plan income and Evaluation income are separate. «Anteriores» on
+   Evaluación nutricional labels a past row «Incluida», «Pagada», «No asistió», or «Cancelada».
 
 The migrations `20261023210000_evaluation_payments` and
 `20261023210100_evaluation_payment_constraints` need owner approval before
@@ -8061,8 +8066,8 @@ C. **Cancel and confirm.** Cancelling the pending Evaluation rejects its
    `409` `payment_confirmation_conflict` and leaves the Payment rejected, with
    no Nutritionist cost. A cancelled Evaluation does not add the Bs 50. A
    no-show, or a booked Evaluation whose slot has already started, keeps the
-   Payment pending so it can still be confirmed. Mis evaluaciones offers
-   **Sube tu comprobante** only while that Payment is still pending. Revisar
+   Payment pending so it can still be confirmed. The next-evaluation card
+   on Evaluación nutricional offers **Sube tu comprobante** only while that Payment is still pending. Revisar
    pago says **Todavía no hay comprobante.** when none was attached, and
    **El comprobante ya no está disponible.** once it was dropped.
 D. **The Plan stays buyable.** `GET /api/v1/payments/current` does not return
@@ -8071,20 +8076,20 @@ D. **The Plan stays buyable.** `GET /api/v1/payments/current` does not return
    no future booking cannot book the paid Evaluation
    (`no_eligible_subscription`).
 E. **Move a confirmed paid Evaluation (FIX-014, FIX-016, design follow-up
-   218).** Once its Payment is confirmed, the card in Mis evaluaciones reads
-   «Puedes reprogramarla hasta 3 horas antes.» and offers **Reprogramar**,
+   218).** Once its Payment is confirmed, the card under «Tu próxima
+   evaluación» reads «Puedes reprogramarla hasta 3 horas antes. El pago sigue
+   con ella.» and offers **Reprogramar**,
    not **Cancelar**; `DELETE /api/v1/evaluations/{id}` answers `409`
-   `evaluation_paid_not_cancellable`. **Reprogramar** opens **Elige otro
-   turno**: «Tu evaluación ya está pagada. Elige el nuevo horario: el pago se
-   mantiene.», no «gratuita», no price or receipt, and her current turno is
-   not listed. Tapping a time opens **¿Mover tu evaluación?** with «Antes:»
+   `evaluation_paid_not_cancellable`. **Reprogramar** turns the same
+   screen's turnos into «Elige el nuevo horario» with the band «Cambias tu
+   cita del …. Elige el nuevo horario.» and **Volver** (FIX-057, Test 151):
+   no «gratuita», no price or receipt, and her current turno is not listed. Tapping a time opens **¿Mover tu evaluación?** with «Antes:»
    and «Ahora:», «El pago se mantiene: no pagas de nuevo.» and «El horario
    anterior queda libre para otras clientas.». **Volver** sends nothing;
    **Sí, mover evaluación** sends `POST /api/v1/evaluations/{id}/reschedule`
-   (`200`, the same Evaluation and Payment on the new slot) and lands on Mis
-   evaluaciones with **Evaluación reprogramada**.
-   Back from there returns to where Mis evaluaciones was opened (Perfil or
-   Inicio), never to the picker. A refused move (the
+   (`200`, the same Evaluation and Payment on the new slot) and stays on
+   Evaluación nutricional with **Evaluación reprogramada** and the new time
+   on top. A refused move (the
    slot was just taken) closes the sheet, says why, and refreshes the
    slots; picking another time sends a new idempotency key. A Client whose
    Plan ended can still move her paid Evaluation (no «Necesitas un plan
@@ -9619,12 +9624,13 @@ E. **Paid Confirma tu cita (n.º 63).** As Lucía, **Perfil › Evaluación
    continuar»; attach a receipt: «El estudio revisa tu pago y te avisa por
    la app» and **Confirmar evaluación** turns on. A free evaluation (a
    quarterly Plan's first) shows no QR and no receipt.
-F. **Receipt later, from Mis evaluaciones.** Book a paid evaluation whose
+F. **Receipt later, from the next evaluation's card.** Book a paid evaluation whose
    receipt failed to attach (or seed one with a pending payment and no
    receipt). **Sube tu comprobante de transferencia** on its card opens
    «Sube tu comprobante» with the same two steps. **Volver** closes it;
-   choosing a receipt uploads it, the sheet closes and the card reads
-   «Comprobante listo.».
+   choosing a receipt uploads it, the sheet closes and the line under the
+   card reads «El estudio revisa tu comprobante de Bs 70 y te avisa por la
+   app.».
 
 ## Test 149: walkthrough findings 66–69, 72, 80 and 81 — the next evaluation on the web, a released paid evaluation, the plan's evaluation offer, worker errors in the local log, the session panel count (FIX-056)
 
@@ -9636,8 +9642,7 @@ next week, pays Bs 70 and Ana confirms the transfer.
 A. **The plan's offer (n.º 69).** As Lucía, **Perfil › Evaluación
    nutricional** says «Cuesta Bs 70 con tu plan.». A client with a confirmed
    trimestral sees «Tu primera evaluación del trimestre es gratis.»; once she
-   booked it, «Ya usaste la gratis de este trimestre · Bs 70.». An empty
-   **Mis evaluaciones** repeats the same line.
+   booked it, «Ya usaste la gratis de este trimestre · Bs 70.».
 B. **The web names the next one (n.º 66).** As Ana, **Horario › Nutrición**
    on a week without evaluations: the subtitle reads «Sucursal … · ninguna
    en la semana · próxima: lun 16/11 · 09:00». With nothing ahead it still
@@ -9653,10 +9658,11 @@ C. **Gabriela cancels the paid one (n.º 67, 72).** In the staff app,
    too. Lucía's client file still lists it. No reminder arrives for that time.
 D. **Lucía picks another turno (n.º 68).** The notice «El estudio canceló el
    turno de tu evaluación del …. El pago sigue vigente. Elige otro turno.»
-   opens **Mis evaluaciones**, where the card says «El estudio liberó este
-   turno · el pago sigue vigente» with **Elegir turno** (no «ya no se puede
-   cancelar»). It stays there even after the old time passes. **Elegir
-   turno** opens «Elige otro turno»; pick one and confirm **Sí, mover
+   opens **Evaluación nutricional**, where the card's chip says «El estudio
+   liberó tu turno», the line «Tu pago de Bs 70 sigue vigente: elige otro
+   turno y no pagas de nuevo.», with **Elegir turno** (no «Ya no se puede
+   cancelar»; FIX-057, Test 151). It stays there even after the old time
+   passes. **Elegir turno** turns the turnos into «Elige el nuevo horario»; pick one and confirm **Sí, mover
    evaluación**: «Evaluación reprogramada», and the card shows the new time
    with **Reprogramar**. Gabriela's Agenda and the web list it again at the
    new time.
@@ -9713,6 +9719,50 @@ Test 24 describes and log in as `paola.mendoza@example.com` /
 6. **Narrow browser.** At 420 px open the same panels from **Abrir menú**:
    the dates stack, each calendar opens under its field at the panel's width
    and never covers the footer buttons.
+
+## Test 151: walkthrough finding 70 — one Evaluación nutricional with the next evaluation, the turnos and the history (FIX-057, DES-017)
+
+Run the API and the worker on a fresh database copy and the client app on the
+iPhone 16 Pro, the iPad and Android. Lucía (8-class Plan) pays Bs 70 for an
+evaluation; the studio QR is set (Test 148) and the device has one photo. The
+Maestro flow `evaluation-book-and-cancel` walks A–E.
+
+A. **One row (n.º 70).** **Perfil › Tu plan y tus clases** lists **Mi plan**,
+   **Evaluación nutricional**, **Mis facturas** and **Invita a una amiga**;
+   there is no **Mis evaluaciones**. The Inicio tile and the evaluation
+   notices open the same screen.
+B. **Nothing booked.** **Evaluación nutricional** says what her Plan gives
+   («Cuesta Bs 70 con tu plan.»), then «Reserva tu evaluación» with the
+   Nutritionist, «Días disponibles», the turnos and «Puedes reservar hasta 3
+   horas antes.», and «Anteriores» at the foot when she has past ones. The
+   tab bar stays (as on every browsing screen) and hides on **Confirma tu
+   cita**.
+C. **Book and come back.** Tap a turno, pay with the QR, attach the receipt
+   and **Confirmar evaluación**: the app returns to the same screen with the
+   toast «Comprobante enviado» (an included one says «Evaluación
+   confirmada»). On top, «Tu próxima evaluación»: the Rosa profundo hero with
+   the date, the time in Lora 40, «45 minutos · Nutricionista · Branch» and
+   the chip «Pago en revisión», then «El estudio revisa tu comprobante de Bs
+   70 y te avisa por la app.», **Reprogramar** and **Cancelar evaluación**
+   (finding 64: both while the transfer is in review). Below: «Reserva otra
+   evaluación» with the plan line. Once Ana confirms the transfer the chip
+   reads «Pagada», the line «Puedes reprogramarla hasta 3 horas antes. El
+   pago sigue con ella.» and only **Reprogramar** remains. An included one
+   reads «Gratis con tu plan», «Puedes cancelarla hasta 3 horas antes.» and
+   **Cancelar evaluación**.
+D. **Reschedule in place.** **Reprogramar** hides the card's buttons and
+   turns the section into «Elige el nuevo horario» with the band «Cambias tu
+   cita del …. Elige el nuevo horario.» and **Volver** (back to the booking
+   section, nothing sent). Her current turno is not listed. A turno opens
+   «¿Mover tu evaluación?»; **Sí, mover evaluación** stays on the screen with
+   «Evaluación reprogramada» and the new time on top.
+E. **Cancel.** **Cancelar evaluación** asks «¿Cancelar esta evaluación?»;
+   confirming brings back «Reserva tu evaluación».
+F. **Released slot (n.º 68).** When Gabriela cancels a paid one (Test 149
+   C), the hero turns Lino with the time struck through, the chip «El
+   estudio liberó tu turno», «Tu pago de Bs 70 sigue vigente: elige otro
+   turno y no pagas de nuevo.» and **Elegir turno**, which opens the same
+   «Elige el nuevo horario».
 
 ## Test 155: every active Client is a promotions contact (FIX-060)
 

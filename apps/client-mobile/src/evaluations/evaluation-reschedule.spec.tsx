@@ -58,9 +58,9 @@ const rescheduleCalled = (fetcher: typeof globalThis.fetch) =>
     .mock.calls.some(([url]) => String(url).endsWith("/evaluation-paid/reschedule"));
 
 const openPicker = async (fetcher: typeof globalThis.fetch) => {
-  const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+  const screen = await openProfileRow(fetcher, "Evaluación nutricional");
   await fireEvent.press(await screen.findByRole("button", { name: "Reprogramar" }));
-  expect(await screen.findByText("Elige otro turno")).toBeOnTheScreen();
+  expect(await screen.findByText("Elige el nuevo horario")).toBeOnTheScreen();
   return screen;
 };
 
@@ -71,18 +71,14 @@ describe("Rescheduling a paid Evaluation", () => {
   });
 
   it("speaks of a paid move, not a free booking, and hides the current turno", async () => {
-    const { fetcher } = setUp();
+    const { before, fetcher } = setUp();
     const screen = await openPicker(fetcher);
 
     expect(
-      screen.getByText(
-        "Tu evaluación ya está pagada. Elige el nuevo horario: el pago se mantiene.",
-      ),
+      screen.getByText(`Cambias tu cita del ${turno(before)}, 09:45. Elige el nuevo horario.`),
     ).toBeOnTheScreen();
     expect(screen.queryByText(/evaluación gratuita/)).toBeNull();
-    expect(
-      screen.getByText("Al elegir un horario te pediremos confirmar el cambio."),
-    ).toBeOnTheScreen();
+    expect(screen.queryByText("Reserva otra evaluación")).toBeNull();
     expect(screen.getByText("Puedes reprogramarla hasta 3 horas antes.")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Turno 09:45" })).toBeNull();
   });
@@ -111,7 +107,7 @@ describe("Rescheduling a paid Evaluation", () => {
       expect(screen.queryByText("¿Mover tu evaluación?")).toBeNull();
     });
     expect(rescheduleCalled(fetcher)).toBe(false);
-    expect(screen.getByText("Elige otro turno")).toBeOnTheScreen();
+    expect(screen.getByText("Elige el nuevo horario")).toBeOnTheScreen();
   });
 
   it("moves the paid Evaluation once confirmed, books nothing new and says so", async () => {

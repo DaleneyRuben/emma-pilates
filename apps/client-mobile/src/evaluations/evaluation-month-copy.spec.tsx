@@ -55,24 +55,6 @@ describe("Evaluation month copy (13, 14, 15)", () => {
     expect(await screen.findByText("Cancela hasta 3 horas antes")).toBeOnTheScreen();
   });
 
-  it("does not call this month's Evaluation available on 15 once it took place", async () => {
-    // Early on the 1st, «two hours ago» is still last month.
-    const earlier = boliviaInstant(monthOfToday(0), "00:01");
-    const fetcher = routeFetcher(
-      baseRoutes({
-        "/api/v1/evaluations?scope=past": () =>
-          jsonResponse(page([upcomingEvaluation("evaluation-past", earlier)])),
-      }),
-    );
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
-
-    expect(
-      await screen.findByText(
-        `Ya usaste tu evaluación de este mes. Puedes reservar la de ${spanishMonth(monthOfToday(1))}.`,
-      ),
-    ).toBeOnTheScreen();
-  });
-
   it("names the freed month when the cancelled Evaluation is next month's", async () => {
     const nextMonth = monthOfToday(1);
     const startsAt = boliviaInstant(nextMonth, "10:00");
@@ -82,7 +64,7 @@ describe("Evaluation month copy (13, 14, 15)", () => {
           jsonResponse(page([upcomingEvaluation("evaluation-next", startsAt)])),
       }),
     );
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     await fireEvent.press(await screen.findByRole("button", { name: "Cancelar evaluación" }));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));

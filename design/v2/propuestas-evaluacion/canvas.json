@@ -1,0 +1,111 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-15T15:00:00Z"
+ },
+ "title": "Emma Pilates Studio · hallazgo 70",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1500,
+   "title": "Hallazgo 70 · elige una propuesta",
+   "is_interactive": true
+  },
+  "A-Tu-cita-arriba.dc.html": {
+   "x": 0,
+   "y": 1620,
+   "w": 640,
+   "h": 844,
+   "title": "A · Tu cita arriba, en grande (recomendada)",
+   "is_interactive": true
+  },
+  "B-Turnos-a-la-vista.dc.html": {
+   "x": 720,
+   "y": 1620,
+   "w": 640,
+   "h": 844,
+   "title": "B · Tarjeta compacta y turnos a la vista",
+   "is_interactive": true
+  },
+  "C-Una-cosa-a-la-vez.dc.html": {
+   "x": 1440,
+   "y": 1620,
+   "w": 640,
+   "h": 844,
+   "title": "C · Una cosa a la vez",
+   "is_interactive": true
+  },
+  "C18-Perfil.dc.html": {
+   "x": 0,
+   "y": 2584,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · C18 Perfil (dos filas)"
+  },
+  "C13-Evaluacion-nutricional.dc.html": {
+   "x": 470,
+   "y": 2584,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · C13 Evaluación nutricional"
+  },
+  "C13b-Evaluacion-sin-plan.dc.html": {
+   "x": 940,
+   "y": 2584,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · C13b Sin plan"
+  },
+  "C14b-Confirmar-evaluacion-pagada.dc.html": {
+   "x": 1410,
+   "y": 2584,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · C14b Pagada (hallazgo 63, opción A)",
+   "is_interactive": true
+  },
+  "C15-Mis-evaluaciones.dc.html": {
+   "x": 1880,
+   "y": 2584,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · C15 Mis evaluaciones"
+  },
+  "C15b-Mis-evaluaciones-vacio.dc.html": {
+   "x": 2350,
+   "y": 2584,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · C15b Sin evaluaciones"
+  },
+  "C15c-Subir-comprobante.dc.html": {
+   "x": 2820,
+   "y": 2584,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · C15c Subir comprobante"
+  }
+ },
+ "notes": {},
+ "designSystems": [],
+ "order": [
+  "Main.dc.html",
+  "A-Tu-cita-arriba.dc.html",
+  "B-Turnos-a-la-vista.dc.html",
+  "C-Una-cosa-a-la-vez.dc.html",
+  "C18-Perfil.dc.html",
+  "C13-Evaluacion-nutricional.dc.html",
+  "C13b-Evaluacion-sin-plan.dc.html",
+  "C14b-Confirmar-evaluacion-pagada.dc.html",
+  "C15-Mis-evaluaciones.dc.html",
+  "C15b-Mis-evaluaciones-vacio.dc.html",
+  "C15c-Subir-comprobante.dc.html"
+ ]
+}

@@ -55,7 +55,7 @@ env:
 - tapOn:
     text: "Evaluación nutricional"
 - extendedWaitUntil:
-    visible: "Días disponibles|Mis evaluaciones"
+    visible: "Reserva tu evaluación|Tu próxima evaluación"
     timeout: 15000
 - takeScreenshot: client-home-4-evaluacion
 - tapOn:
@@ -73,10 +73,11 @@ env:
 - takeScreenshot: client-home-5-inbox
 - tapOn:
     text: ".*canceló tu evaluación nutricional.*"
+# Finding 70: the evaluation notice opens the one «Evaluación nutricional».
 - extendedWaitUntil:
-    visible: "Mis evaluaciones"
+    visible: "Reserva tu evaluación|Tu próxima evaluación"
     timeout: 10000
-- takeScreenshot: client-home-6-mis-evaluaciones
+- takeScreenshot: client-home-6-evaluacion
 - tapOn: "Volver"
 - extendedWaitUntil:
     visible:

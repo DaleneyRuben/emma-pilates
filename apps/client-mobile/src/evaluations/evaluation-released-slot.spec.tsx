@@ -63,16 +63,17 @@ describe("A paid Evaluation whose slot the studio released", () => {
   });
 
   it("says the studio released her slot and moves it through Elegir turno", async () => {
-    const screen = await openProfileRow(releasedRoutes(), "Mis evaluaciones");
+    const screen = await openProfileRow(releasedRoutes(), "Evaluación nutricional");
 
+    expect(await screen.findByText("El estudio liberó tu turno")).toBeOnTheScreen();
     expect(
-      await screen.findByText("El estudio liberó este turno · el pago sigue vigente"),
+      screen.getByText("Tu pago de Bs 70 sigue vigente: elige otro turno y no pagas de nuevo."),
     ).toBeOnTheScreen();
-    expect(screen.queryByText(/ya no se puede cancelar/)).toBeNull();
+    expect(screen.queryByText(/Ya no se puede/)).toBeNull();
     expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Elegir turno" }));
-    expect(await screen.findByText("Elige otro turno")).toBeOnTheScreen();
+    expect(await screen.findByText("Elige el nuevo horario")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: dayName(secondDay) }));
     await fireEvent.press(screen.getByRole("button", { name: "Turno 15:00" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Sí, mover evaluación" }));
@@ -81,7 +82,7 @@ describe("A paid Evaluation whose slot the studio released", () => {
     expect(screen.queryByRole("button", { name: "Elegir turno" })).toBeNull();
   });
 
-  it("opens Mis evaluaciones with Elegir turno from the studio's notice", async () => {
+  it("opens Evaluación nutricional with Elegir turno from the studio's notice", async () => {
     const device = createMemoryPushPlatform();
     const screen = await render(
       <App

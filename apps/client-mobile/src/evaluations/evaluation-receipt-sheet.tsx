@@ -15,9 +15,9 @@ import { ReceiptRow } from "../payments/receipt-row";
 import { TransferQrCard } from "../payments/transfer-qr-card";
 
 /**
- * C15c: «Sube tu comprobante» from Mis evaluaciones, with C14b's two steps,
- * the studio QR and then the receipt (follow-up 262). Choosing a receipt
- * uploads it; the screen closes the sheet once it is attached.
+ * C15c: «Sube tu comprobante» from C13's next Evaluation (follow-up 264),
+ * with C14b's two steps, the studio QR and then the receipt (follow-up 262).
+ * Choosing a receipt uploads it; the screen closes the sheet once attached.
  */
 export function EvaluationReceiptSheet({
   evaluation,

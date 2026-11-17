@@ -136,7 +136,6 @@ describe("Client Profile", () => {
     }
     for (const row of [
       "Evaluación nutricional",
-      "Mis evaluaciones",
       "Invita a una amiga",
       "Notificaciones",
       "Cambiar contraseña",
@@ -145,7 +144,9 @@ describe("Client Profile", () => {
     ]) {
       expect(screen.getByRole("button", { name: row })).toBeOnTheScreen();
     }
-    expect(screen.getAllByTestId("icon-row-disc").length).toBeGreaterThanOrEqual(8);
+    // Finding 70: one evaluation row; «Mis evaluaciones» lives inside it.
+    expect(screen.queryByRole("button", { name: "Mis evaluaciones" })).toBeNull();
+    expect(screen.getAllByTestId("icon-row-disc").length).toBeGreaterThanOrEqual(7);
     // Follow-up 256 § 2 (verification n.º 43, 44): «Cerrar sesión» is the Error
     // last row, as in the Staff app, and «Cerrar mi cuenta» a muted link after
     // the version, far from it.
