@@ -49,6 +49,37 @@ export const evaluationTableQueryOptions = (
   });
 };
 
+// Walkthrough finding 66: the first Evaluation from `from` on, for a week on
+// screen that has none. The window is the Nutritionists' publishing horizon
+// with room to spare.
+const upcomingWindowDays = 90;
+
+export const nextEvaluationQueryOptions = (
+  branchId: string,
+  from: string,
+  nutritionistStaffMemberId: string | undefined,
+) => {
+  const params: ListAdminEvaluationsParams = {
+    branchId,
+    from,
+    until: new Date(
+      new Date(from).getTime() + upcomingWindowDays * 24 * 60 * 60 * 1000,
+    ).toISOString(),
+    page: 1,
+    pageSize: 1,
+    ...(nutritionistStaffMemberId === undefined
+      ? {}
+      : { nutritionistStaffMemberId }),
+  };
+  return queryOptions({
+    queryKey: getListAdminEvaluationsQueryKey(params),
+    queryFn: async ({ signal }) =>
+      (await listAdminEvaluations(params, { signal }, adminFetch))
+        .data as AdminEvaluationPageDto,
+    select: (page) => page.items[0] ?? null,
+  });
+};
+
 // The Nutritionists assigned to the Branch, deactivated ones too: their
 // past Evaluations stay in the list. It shares the staff lists' key prefix,
 // so a Personal change refreshes it.

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Hallazgos 62 y 63</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}*{box-sizing:border-box}
+a{color:#7D4F4B}a:hover{color:#5E3B38}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1900px; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; padding: 72px 80px; display: flex; flex-direction: column; gap: 40px">
+  <div style="display: flex; flex-direction: column; gap: 12px; max-width: 900px">
+    <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">App del equipo · Nutrición · hallazgo 62</span>
+    <h1 style="margin: 0; font-family: Lora, Georgia, serif; font-size: 44px; font-weight: 400">Elige cómo se marca la hora de un horario</h1>
+    <p style="margin: 0; font-size: 18px; line-height: 1.5; color: #6F6662">Hoy, «Hora de inicio» y «Hora de fin» abren una grilla de 65 botones con borde. Estas tres opciones muestran lo mismo con menos ruido. Cada prototipo se puede tocar: elige el inicio, después el fin, y mira cuántos turnos salen.</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <div style="background: #F5EFE9; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; gap: 12px"><span style="width: 40px; height: 40px; border-radius: 999px; background: #93615D; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600">A</span><span style="font-family: Lora, Georgia, serif; font-size: 26px">Rueda</span><span style="margin-left: auto; font-size: 13px; font-weight: 600; color: #7D4F4B; background: #F2E4E1; border-radius: 999px; padding: 4px 10px">Recomendada</span></div>
+      <p style="margin: 0; font-size: 16px; line-height: 1.5">Dos ruedas, horas y minutos (00, 15, 30, 45), como el reloj del teléfono. La hora elegida se lee grande y, para el fin, cuántos turnos salen. Confirmas con «Listo».</p>
+      <a href="A-Rueda.dc.html" style="margin-top: auto; height: 48px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Abrir prototipo A</a>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; gap: 12px"><span style="width: 40px; height: 40px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; display: flex; align-items: center; justify-content: center; font-weight: 600">B</span><span style="font-family: Lora, Georgia, serif; font-size: 26px">Hora y cuartos</span></div>
+      <p style="margin: 0; font-size: 16px; line-height: 1.5">Una fila de horas que se desliza de lado, como las fechas de «A partir del», y debajo cuatro botones :00, :15, :30, :45. Confirmas con «Listo».</p>
+      <a href="B-Hora-y-cuartos.dc.html" style="margin-top: auto; height: 48px; border-radius: 14px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Abrir prototipo B</a>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; gap: 12px"><span style="width: 40px; height: 40px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; display: flex; align-items: center; justify-content: center; font-weight: 600">C</span><span style="font-family: Lora, Georgia, serif; font-size: 26px">Lista corta</span></div>
+      <p style="margin: 0; font-size: 16px; line-height: 1.5">Una lista simple por mañana, tarde y noche, como la de sucursales, que abre en la hora elegida. Para el fin solo muestra horas válidas, con la duración y los turnos. Un toque y se cierra.</p>
+      <a href="C-Lista-corta.dc.html" style="margin-top: auto; height: 48px; border-radius: 14px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Abrir prototipo C</a>
+    </div>
+  </div>
+  <div style="display: flex; gap: 24px; align-items: flex-start">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">Las tres cumplen</span>
+      <ul style="margin: 0; padding-left: 20px; font-size: 16px; line-height: 1.7">
+        <li>Pasos de 15 minutos, de 6:00 a 22:00.</li>
+        <li>Un horario dura al menos 45 minutos (un turno): el fin nunca queda antes del inicio.</li>
+        <li>Si cambias el inicio y el fin queda a menos de 45 minutos, el fin vuelve a «Elegir».</li>
+        <li>Nuevo horario y Editar horario usan el mismo selector. La web y la app de clientas no cambian.</li>
+      </ul>
+    </div>
+    <a href="Hoy.dc.html" style="flex: none; font-size: 15px; font-weight: 500">Ver cómo se ve hoy</a>
+  </div>
+  <div style="height: 1px; background: #E6DBD0; margin: 16px 0"></div>
+  <div style="display: flex; flex-direction: column; gap: 12px; max-width: 900px">
+    <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">App de clientas · Evaluación nutricional · hallazgo 63</span>
+    <h2 style="margin: 0; font-family: Lora, Georgia, serif; font-size: 40px; font-weight: 400">Elige dónde va el QR en la evaluación pagada</h2>
+    <p style="margin: 0; font-size: 18px; line-height: 1.5; color: #6F6662">Hoy «Confirma tu cita» dice «Cuesta Bs 70: transfiere y sube tu comprobante», pero no muestra el QR del estudio. Las tres opciones usan la misma tarjeta del QR que la compra de un plan, con «Ampliar» y «Guardar QR». Ejemplo: Lucía, con Gabriela, lunes 16 a las 9:00.</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <div style="background: #F5EFE9; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; gap: 12px"><span style="width: 40px; height: 40px; border-radius: 999px; background: #93615D; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600">A</span><span style="font-family: Lora, Georgia, serif; font-size: 26px">Pasos como en la compra</span></div>
+      <span style="align-self: flex-start; font-size: 13px; font-weight: 600; color: #7D4F4B; background: #F2E4E1; border-radius: 999px; padding: 4px 10px">Recomendada</span>
+      <p style="margin: 0; font-size: 16px; line-height: 1.5">Debajo de la cita, los mismos dos pasos que al comprar un plan: «1 · Paga con el QR del estudio» y «2 · Sube tu comprobante». Todo en una pantalla.</p>
+      <a href="Q-A-Pasos.dc.html" style="margin-top: auto; height: 48px; border-radius: 14px; background: #B78380; color: #FFFFFF; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Abrir prototipo A</a>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; gap: 12px"><span style="width: 40px; height: 40px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; display: flex; align-items: center; justify-content: center; font-weight: 600">B</span><span style="font-family: Lora, Georgia, serif; font-size: 26px">QR en una hoja</span></div>
+      <p style="margin: 0; font-size: 16px; line-height: 1.5">La pantalla queda corta como hoy. Una tarjeta «Paga Bs 70 con el QR del estudio» con el botón «Ver QR» abre el QR en una hoja desde abajo; el comprobante se sube debajo.</p>
+      <a href="Q-B-Hoja.dc.html" style="margin-top: auto; height: 48px; border-radius: 14px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Abrir prototipo B</a>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; gap: 12px"><span style="width: 40px; height: 40px; border-radius: 999px; background: #F2E4E1; color: #7D4F4B; display: flex; align-items: center; justify-content: center; font-weight: 600">C</span><span style="font-family: Lora, Georgia, serif; font-size: 26px">Pago en un segundo paso</span></div>
+      <p style="margin: 0; font-size: 16px; line-height: 1.5">«Confirma tu cita» queda como la gratis, con «Continuar al pago». Ese botón abre «Pago de la evaluación», igual a la pantalla de pago de un plan: monto, QR, comprobante y «Confirmar evaluación».</p>
+      <a href="Q-C-Segundo-paso.dc.html" style="margin-top: auto; height: 48px; border-radius: 14px; background: #F2E4E1; color: #7D4F4B; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">Abrir prototipo C</a>
+    </div>
+  </div>
+  <div style="display: flex; gap: 24px; align-items: flex-start">
+    <ul style="flex: 1; margin: 0; padding-left: 20px; font-size: 16px; line-height: 1.7">
+      <li>La evaluación gratis (planes que la incluyen) no cambia: sin QR ni comprobante.</li>
+      <li>«Confirmar evaluación» se activa recién con el comprobante adjunto, como hoy.</li>
+      <li>Mis evaluaciones también deja subir el comprobante después y tampoco muestra el QR: la opción elegida puede llevarlo ahí.</li>
+    </ul>
+    <a href="Hoy-evaluacion.dc.html" style="flex: none; font-size: 15px; font-weight: 500">Ver cómo se ve hoy</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

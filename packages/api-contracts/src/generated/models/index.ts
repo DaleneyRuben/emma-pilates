@@ -187,6 +187,7 @@ export * from "./equipmentIssueInputDto";
 export * from "./equipmentIssuePageDto";
 export * from "./equipmentListDto";
 export * from "./evaluationAvailabilityDto";
+export * from "./evaluationAvailabilityDtoIncludedEvaluation";
 export * from "./evaluationDayDto";
 export * from "./evaluationMonthDto";
 export * from "./evaluationMonthDtoStatus";

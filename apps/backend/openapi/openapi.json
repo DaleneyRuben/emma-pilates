@@ -17091,11 +17091,26 @@
             "items": {
               "$ref": "#/components/schemas/EvaluationMonthDto"
             }
+          },
+          "includedEvaluation": {
+            "type": "string",
+            "enum": [
+              "available",
+              "used",
+              "none"
+            ],
+            "description": "What today’s Plan gives: its included Evaluation still available, already used, or none (under 90 days or no Plan). Older builds ignore it."
+          },
+          "priceCentavos": {
+            "type": "number",
+            "description": "The studio price of an Evaluation in centavos"
           }
         },
         "required": [
           "days",
-          "months"
+          "months",
+          "includedEvaluation",
+          "priceCentavos"
         ]
       },
       "ClientEvaluationDto": {
@@ -17181,6 +17196,10 @@
           "reschedulable": {
             "type": "boolean",
             "description": "A Paid Evaluation, confirmed or under review, can move to another slot until 3 hours before the original start"
+          },
+          "slotReleased": {
+            "type": "boolean",
+            "description": "The studio released the slot of this confirmed Paid Evaluation; the Client picks another one. Older builds ignore it."
           }
         },
         "required": [
@@ -17201,7 +17220,8 @@
           "nutritionistName",
           "cancellableUntil",
           "cancellable",
-          "reschedulable"
+          "reschedulable",
+          "slotReleased"
         ]
       },
       "ClientEvaluationPageDto": {
@@ -17273,6 +17293,10 @@
               "follow_up"
             ],
             "description": "first unless the Client has an earlier booked Evaluation"
+          },
+          "paymentConfirmed": {
+            "type": "boolean",
+            "description": "A paid Evaluation whose Payment is confirmed: cancelling it keeps the Payment and the Client picks another slot. Older builds ignore it."
           }
         },
         "required": [
@@ -17284,7 +17308,8 @@
           "durationMinutes",
           "branchId",
           "branchName",
-          "kind"
+          "kind",
+          "paymentConfirmed"
         ]
       },
       "NutritionistAgendaPageDto": {

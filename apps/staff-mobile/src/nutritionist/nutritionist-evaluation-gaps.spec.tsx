@@ -8,6 +8,7 @@ import {
   openApp,
   openAvailability,
   page,
+  pickTime,
   routes,
 } from "./nutritionist-test-support";
 
@@ -25,6 +26,15 @@ const startedAgo = () => {
   return { date: boliviaCivilDate(started), time };
 };
 
+async function openForm() {
+  const screen = await openAvailability(routeFetcher(routes()));
+  await fireEvent.press(screen.getAllByRole("button", { name: "Nuevo horario" })[0]!);
+  await waitFor(() => {
+    expect(screen.getByRole("button", { name: "Martes" })).toBeOnTheScreen();
+  });
+  return screen;
+}
+
 describe("Nutritionist Evaluation gaps (S15, S17)", () => {
   afterEach(async () => {
     await cleanup();
@@ -38,9 +48,9 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
       expect(screen.getByRole("button", { name: "Martes" })).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: Elegir" }));
-    await fireEvent.press(screen.getByRole("button", { name: "10:00" }));
+    await pickTime(screen, "10:00");
     await fireEvent.press(screen.getByRole("button", { name: "Hora de fin: Elegir" }));
-    await fireEvent.press(screen.getByRole("button", { name: "10:45" }));
+    await pickTime(screen, "10:45");
 
     expect(screen.getByText("1 turno de 45 min")).toBeOnTheScreen();
   });
@@ -86,23 +96,82 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
     await waitFor(() => expect(screen.queryByText("Evaluación cancelada")).not.toBeOnTheScreen());
   });
 
-  it("marks the field's current time in the S17 time sheet (follow-up 74)", async () => {
-    const screen = await openAvailability(routeFetcher(routes()));
-    await fireEvent.press(screen.getAllByRole("button", { name: "Nuevo horario" })[0]!);
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Martes" })).toBeOnTheScreen();
-    });
+  it("opens S17b's wheel on 9:00 and confirms a start with Listo (follow-up 262)", async () => {
+    const screen = await openForm();
     await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: Elegir" }));
-    await fireEvent.press(screen.getByRole("button", { name: "10:00" }));
-    await fireEvent.press(screen.getByRole("button", { name: /^Hora de inicio: 10:00/ }));
 
-    expect(screen.getByRole("button", { name: "10:00" })).toBeSelected();
-    expect(screen.getByRole("button", { name: "10:15" })).not.toBeSelected();
-    expect(within(screen.getByRole("button", { name: "10:00" })).getByText("10:00")).toHaveStyle({
-      color: "#8A5D59",
-    });
+    const sheet = within(screen.getByTestId("time-wheel-sheet"));
+    expect(sheet.getByText("9:00")).toBeOnTheScreen();
+    expect(sheet.getByText("Cada 15 minutos, de 6:00 a 22:00")).toBeOnTheScreen();
+    expect(sheet.getByRole("button", { name: "Hora 9" })).toBeSelected();
+    expect(sheet.getByRole("button", { name: "Minuto 00" })).toBeSelected();
+    expect(sheet.queryByRole("button", { name: "Hora 22" })).toBeNull();
+    await fireEvent.press(sheet.getByRole("button", { name: "Hora 14" }));
+    await fireEvent.press(sheet.getByRole("button", { name: "Minuto 30" }));
+    expect(sheet.getByText("14:30")).toBeOnTheScreen();
+    await fireEvent.press(sheet.getByRole("button", { name: "Listo" }));
+
+    expect(screen.getByRole("button", { name: "Hora de inicio: 14:30" })).toBeOnTheScreen();
+    expect(screen.queryByTestId("time-wheel-sheet")).toBeNull();
+  });
+
+  it("offers only ends at least 45 minutes after the start, with their turnos", async () => {
+    const screen = await openForm();
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: Elegir" }));
+    await pickTime(screen, "21:00");
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de fin: Elegir" }));
+
+    const sheet = within(screen.getByTestId("time-wheel-sheet"));
+    expect(sheet.getByText("22:00")).toBeOnTheScreen();
+    expect(sheet.getByText("1 h · 1 turno de 45 min")).toBeOnTheScreen();
+    expect(sheet.getByRole("button", { name: "Hora 20" })).toBeDisabled();
+    expect(sheet.getByRole("button", { name: "Minuto 15" })).toBeDisabled();
+    await fireEvent.press(sheet.getByRole("button", { name: "Hora 20" }));
+    expect(sheet.getByText("22:00")).toBeOnTheScreen();
+    await fireEvent.press(sheet.getByRole("button", { name: "Hora 21" }));
+    expect(sheet.getByText("21:45")).toBeOnTheScreen();
+    expect(sheet.getByText("45 min · 1 turno de 45 min")).toBeOnTheScreen();
+    expect(sheet.getByRole("button", { name: "Minuto 30" })).toBeDisabled();
+    await fireEvent.press(sheet.getByRole("button", { name: "Volver" }));
+
+    expect(screen.getByRole("button", { name: "Hora de fin: Elegir" })).toBeOnTheScreen();
+  });
+
+  it("sends the end back to Elegir when a later start leaves it under 45 minutes", async () => {
+    const screen = await openForm();
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: Elegir" }));
+    await pickTime(screen, "10:00");
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de fin: Elegir" }));
+    await pickTime(screen, "11:30");
+    expect(screen.getByText("2 turnos de 45 min")).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: 10:00" }));
     expect(
-      screen.getByTestId("picker-check-10:00", { includeHiddenElements: true }),
-    ).toBeOnTheScreen();
+      within(screen.getByTestId("time-wheel-sheet")).getByRole("button", { name: "Hora 10" }),
+    ).toBeSelected();
+    await pickTime(screen, "11:00");
+
+    expect(screen.getByRole("button", { name: "Hora de fin: Elegir" })).toBeOnTheScreen();
+  });
+  it("follows a slow drag that stops without momentum, skipping faint rows", async () => {
+    const screen = await openForm();
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: Elegir" }));
+    const sheet = within(screen.getByTestId("time-wheel-sheet"));
+
+    // iOS sends no momentum end when the finger lifts without speed.
+    await fireEvent(sheet.getByTestId("time-wheel-hours"), "scrollEndDrag", {
+      nativeEvent: { contentOffset: { x: 0, y: 5 * 44 }, velocity: { x: 0, y: 0 } },
+    });
+    expect(sheet.getByText("11:00")).toBeOnTheScreen();
+    expect(sheet.getByRole("button", { name: "Hora 11" })).toBeSelected();
+
+    await fireEvent.press(sheet.getByRole("button", { name: "Listo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de fin: Elegir" }));
+    const end = within(screen.getByTestId("time-wheel-sheet"));
+    // Landing on 7, before the 11:45 limit, settles on the first hour that works.
+    await fireEvent(end.getByTestId("time-wheel-hours"), "momentumScrollEnd", {
+      nativeEvent: { contentOffset: { x: 0, y: 1 * 44 }, velocity: { x: 0, y: 0 } },
+    });
+    expect(end.getByText("11:45")).toBeOnTheScreen();
   });
 });

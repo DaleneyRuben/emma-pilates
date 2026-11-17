@@ -23,9 +23,14 @@ env:
     timeout: 10000
 - tapOn: "Viernes"
 - tapOn: "Hora de inicio: Elegir"
-- tapOn: "10:00"
+- tapOn: "Hora 10"
+- tapOn: "Minuto 00"
+- tapOn: "Listo"
 - tapOn: "Hora de fin: Elegir"
-- tapOn: "11:30"
+- tapOn: "Hora 11"
+- tapOn: "Minuto 30"
+- assertVisible: "1 h 30 min · 2 turnos de 45 min"
+- tapOn: "Listo"
 - assertVisible: "2 turnos de 45 min"
 - tapOn: "Guardar"
 - extendedWaitUntil:

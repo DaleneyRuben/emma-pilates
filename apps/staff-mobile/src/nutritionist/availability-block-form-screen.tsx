@@ -36,12 +36,7 @@ import {
   saveFailureMessage,
   SectionLabel,
 } from "./availability-block-form-parts";
-import {
-  BlockChangeSheet,
-  TimePickerSheet,
-  type Confirmation,
-  type TimeField,
-} from "./availability-block-sheets";
+import { BlockChangeSheet, type Confirmation } from "./availability-block-sheets";
 import {
   addCivilDays,
   boliviaToday,
@@ -54,6 +49,8 @@ import {
   weekdayNames,
   weekdayTag,
 } from "./nutritionist-format";
+import type { TimeField } from "./time-wheel";
+import { TimeWheelSheet } from "./time-wheel-sheet";
 
 type FormNavigation = { goBack: () => void };
 
@@ -79,6 +76,8 @@ export function AvailabilityBlockFormScreen({
   const [endsAtLocal, setEndsAtLocal] = useState<string | null>(block?.endsAtLocal ?? null);
   const [effectiveFrom, setEffectiveFrom] = useState(today);
   const [picking, setPicking] = useState<TimeField | null>(null);
+  // Each opening starts the wheel afresh; closing keeps it mounted so it slides out.
+  const [openings, setOpenings] = useState(0);
   const [confirming, setConfirming] = useState<Confirmation | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -153,7 +152,10 @@ export function AvailabilityBlockFormScreen({
       <Pressable
         accessibilityLabel={`${label}: ${shown}`}
         accessibilityRole="button"
-        onPress={() => setPicking(field)}
+        onPress={() => {
+          setOpenings((count) => count + 1);
+          setPicking(field);
+        }}
         style={styles.timeField}
       >
         <Text style={styles.timeLabel}>{label}</Text>
@@ -261,14 +263,21 @@ export function AvailabilityBlockFormScreen({
           <TextButton label="Eliminar horario" onPress={() => setConfirming("end")} tone="error" />
         ) : null}
       </View>
-      <TimePickerSheet
+      <TimeWheelSheet
+        key={openings}
         onClose={() => setPicking(null)}
         onPick={(time) => {
-          if (picking === "start") setStartsAtLocal(time);
-          else setEndsAtLocal(time);
+          if (picking === "start") {
+            setStartsAtLocal(time);
+            // A start that leaves the end under one turno sends the end back to «Elegir».
+            if (endsAtLocal !== null && minutesOf(endsAtLocal) - minutesOf(time) < slotMinutes) {
+              setEndsAtLocal(null);
+            }
+          } else setEndsAtLocal(time);
           setPicking(null);
         }}
         picking={picking}
+        start={startsAtLocal}
         value={picking === "start" ? startsAtLocal : endsAtLocal}
       />
       <BlockChangeSheet

@@ -21,7 +21,11 @@ export const closureScope = {
     ({
       clientId,
       state: EvaluationState.BOOKED,
-      slot: { startsAt: { gt: now } },
+      // A released paid Evaluation waits for a new slot whatever its old time.
+      OR: [
+        { slot: { startsAt: { gt: now } } },
+        { slotReleasedAt: { not: null } },
+      ],
     }) satisfies Prisma.EvaluationWhereInput,
   pendingPayments: (clientId: string) =>
     ({

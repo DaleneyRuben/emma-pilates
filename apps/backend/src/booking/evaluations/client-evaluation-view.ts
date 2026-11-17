@@ -1,3 +1,4 @@
+import type { Prisma } from '../../generated/prisma/client';
 import { EvaluationState } from '../../generated/prisma/client';
 import type {
   ClientEvaluationRow,
@@ -51,4 +52,20 @@ export const toClientEvaluationView = (
     isReschedulablePaidEvaluation(row) &&
     row.slotReleasedAt === null &&
     isEvaluationBookable(row.slot.startsAt, now),
+  slotReleased: row.slotReleasedAt !== null,
 });
+
+// A released paid Evaluation waits among the upcoming ones until the Client
+// picks another slot, whatever its old time (walkthrough finding 68).
+export const clientEvaluationScope = (
+  scope: 'upcoming' | 'past',
+  now: Date,
+): Prisma.EvaluationWhereInput =>
+  scope === 'upcoming'
+    ? {
+        OR: [
+          { slot: { endsAt: { gt: now } } },
+          { slotReleasedAt: { not: null } },
+        ],
+      }
+    : { slot: { endsAt: { lte: now } }, slotReleasedAt: null };

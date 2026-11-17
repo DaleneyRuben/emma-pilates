@@ -54,6 +54,8 @@ export function UpcomingEvaluationCard({
   const open = new Date(evaluation.cancellableUntil).getTime() > shownAt;
   const cancellable = evaluation.cancellable && open;
   const reschedulable = evaluation.reschedulable === true && open;
+  // Walkthrough finding 68: the studio released her slot; she picks another.
+  const released = evaluation.slotReleased === true;
   const lead = evaluation.included
     ? `${evaluation.durationMinutes} min`
     : paidEvaluationLabel(evaluation.paymentState);
@@ -79,7 +81,11 @@ export function UpcomingEvaluationCard({
         </Pressable>
       </View>
     ) : null,
-    reschedulable ? <CardActionRow label="Reprogramar" onPress={onReschedule} /> : null,
+    released ? (
+      <CardActionRow label="Elegir turno" onPress={onReschedule} />
+    ) : reschedulable ? (
+      <CardActionRow label="Reprogramar" onPress={onReschedule} />
+    ) : null,
     cancellable ? (
       <CardActionRow label="Cancelar evaluación" onPress={onCancel} tone="error" />
     ) : null,
@@ -93,7 +99,11 @@ export function UpcomingEvaluationCard({
           <Text style={styles.title}>
             {`${clockTime(evaluation.startsAt)} · ${evaluation.nutritionistName}`}
           </Text>
-          <Text style={styles.details}>{`${lead} · ${limit}`}</Text>
+          <Text style={styles.details}>
+            {released
+              ? "El estudio liberó este turno · el pago sigue vigente"
+              : `${lead} · ${limit}`}
+          </Text>
           {!evaluation.included && evaluation.receiptAttached === true ? (
             <BodyText style={styles.details}>Comprobante listo.</BodyText>
           ) : null}

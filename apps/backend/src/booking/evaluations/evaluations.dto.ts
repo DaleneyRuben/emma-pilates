@@ -86,6 +86,18 @@ export class EvaluationAvailabilityDto {
 
   @ApiProperty({ type: EvaluationMonthDto, isArray: true })
   months!: EvaluationMonthDto[];
+
+  @ApiProperty({
+    enum: ['available', 'used', 'none'],
+    description:
+      'What today’s Plan gives: its included Evaluation still available, already used, or none (under 90 days or no Plan). Older builds ignore it.',
+  })
+  includedEvaluation!: 'available' | 'used' | 'none';
+
+  @ApiProperty({
+    description: 'The studio price of an Evaluation in centavos',
+  })
+  priceCentavos!: number;
 }
 
 export class ClientEvaluationDto {
@@ -160,6 +172,12 @@ export class ClientEvaluationDto {
       'A Paid Evaluation, confirmed or under review, can move to another slot until 3 hours before the original start',
   })
   reschedulable!: boolean;
+
+  @ApiProperty({
+    description:
+      'The studio released the slot of this confirmed Paid Evaluation; the Client picks another one. Older builds ignore it.',
+  })
+  slotReleased!: boolean;
 }
 
 export class ClientEvaluationPageDto {

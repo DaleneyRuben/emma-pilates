@@ -96,7 +96,14 @@ function QrAction({
  * light full-screen view from the QR itself or «Ampliar». «Guardar QR», under
  * the QR and in the view, adds it to the photo library (MOB-063).
  */
-export function TransferQrCard({ fetcher }: { fetcher: typeof globalThis.fetch }) {
+export function TransferQrCard({
+  amount,
+  fetcher,
+}: {
+  /** «Bs 70» when the screen names a fixed amount (follow-up 262). */
+  amount?: string;
+  fetcher: typeof globalThis.fetch;
+}) {
   const { failed, qr, retry } = useQrImage(fetcher);
   const uri = qr?.uri ?? null;
   const ratio = qr?.ratio ?? 1;
@@ -143,7 +150,7 @@ export function TransferQrCard({ fetcher }: { fetcher: typeof globalThis.fetch }
         </>
       )}
       <BodyText style={styles.centered}>
-        Escanéalo con tu app bancaria y transfiere el monto exacto.
+        {`Escanéalo con tu app bancaria y transfiere ${amount ?? "el monto exacto"}.`}
       </BodyText>
       <FullScreenImage
         aspectRatio={ratio}

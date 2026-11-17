@@ -4,10 +4,15 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { EvaluationAvailabilityDtoIncludedEvaluation } from "./evaluationAvailabilityDtoIncludedEvaluation";
 import type { EvaluationDayDto } from "./evaluationDayDto";
 import type { EvaluationMonthDto } from "./evaluationMonthDto";
 
 export interface EvaluationAvailabilityDto {
   days: EvaluationDayDto[];
   months: EvaluationMonthDto[];
+  /** What today’s Plan gives: its included Evaluation still available, already used, or none (under 90 days or no Plan). Older builds ignore it. */
+  includedEvaluation: EvaluationAvailabilityDtoIncludedEvaluation;
+  /** The studio price of an Evaluation in centavos */
+  priceCentavos: number;
 }

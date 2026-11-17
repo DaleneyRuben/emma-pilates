@@ -62,7 +62,7 @@ export const createScheduleSteps = (
   cancelFutureEvaluations: async ({ clientId, accountId, occurredAt }) => {
     const future = await transaction.evaluation.findMany({
       where: closureScope.upcomingEvaluations(clientId, occurredAt),
-      select: { id: true, evaluationSlotId: true },
+      select: { id: true, evaluationSlotId: true, slotReleasedAt: true },
     });
     for (const evaluation of future) {
       await transaction.evaluation.update({
@@ -74,7 +74,10 @@ export const createScheduleSteps = (
           cancellationCause: EvaluationCancellationCause.ACCOUNT_CLOSED,
         },
       });
-      await releaseSlot(transaction, evaluation.evaluationSlotId, occurredAt);
+      // A released slot is no longer hers; it may hold another Evaluation.
+      if (evaluation.slotReleasedAt === null) {
+        await releaseSlot(transaction, evaluation.evaluationSlotId, occurredAt);
+      }
     }
     return future.length;
   },

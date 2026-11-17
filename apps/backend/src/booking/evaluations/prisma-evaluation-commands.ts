@@ -49,8 +49,15 @@ import {
   evaluationCancelledNotice,
   evaluationReminderNotice,
 } from './evaluation-notifications';
-import { toClientEvaluationView } from './client-evaluation-view';
-import { evaluationOffer } from './evaluation-offer';
+import {
+  clientEvaluationScope,
+  toClientEvaluationView,
+} from './client-evaluation-view';
+import {
+  evaluationOffer,
+  planEvaluationOffer,
+  type PlanEvaluationOffer,
+} from './evaluation-offer';
 import {
   releaseExpiredEvaluationHolds as releaseHolds,
   startEvaluationTransfer,
@@ -129,7 +136,7 @@ export type EvaluationMonthSummary = {
   evaluation: { id: string; startsAt: Date } | null;
 };
 
-export type BookableSlots = {
+export type BookableSlots = PlanEvaluationOffer & {
   days: { date: Date; slots: EvaluationSlotView[] }[];
   months: EvaluationMonthSummary[];
 };
@@ -153,6 +160,7 @@ export type ClientEvaluationView = {
   cancellableUntil: Date;
   cancellable: boolean;
   reschedulable: boolean;
+  slotReleased: boolean;
 };
 
 export type NutritionistAgendaEntry = {
@@ -165,6 +173,7 @@ export type NutritionistAgendaEntry = {
   branchId: string;
   branchName: string;
   kind: 'first' | 'follow_up';
+  paymentConfirmed: boolean;
 };
 
 export type Page<Item> = {
@@ -478,7 +487,7 @@ export const createPrismaEvaluationCommands = (
     slotsPerWeek: slotsPerWeek(definitionOf(block)),
     upcomingBookedCount: await database.evaluation.count({
       where: {
-        state: EvaluationState.BOOKED,
+        ...occupyingEvaluation,
         slot: { availabilityBlockId: block.id, endsAt: { gt: now } },
       },
     }),
@@ -1022,8 +1031,13 @@ export const createPrismaEvaluationCommands = (
       days.set(date.getTime(), day);
     }
 
+    const today = await evaluationQuote(prisma, clientId, boliviaDate(now));
     return {
       days: [...days.values()],
+      ...planEvaluationOffer(
+        today?.subscription ?? null,
+        (await studioPrice(prisma)).evaluationPriceCentavos,
+      ),
       months: months.map((month) => {
         const evaluation = used.find(
           (row) => row.eligibilityMonth.getTime() === month.getTime(),
@@ -1466,18 +1480,20 @@ export const createPrismaEvaluationCommands = (
       where: {
         clientId,
         state: EvaluationState.BOOKED,
-        slot: { endsAt: upcoming ? { gt: now } : { lte: now } },
-        ...(after === null
-          ? {}
-          : {
-              OR: [
-                { slot: { startsAt: { [beyond]: after.startsAt } } },
-                {
-                  slot: { startsAt: after.startsAt },
-                  id: { [beyond]: after.id },
-                },
-              ],
-            }),
+        AND: [
+          clientEvaluationScope(query.scope, now),
+          after === null
+            ? {}
+            : {
+                OR: [
+                  { slot: { startsAt: { [beyond]: after.startsAt } } },
+                  {
+                    slot: { startsAt: after.startsAt },
+                    id: { [beyond]: after.id },
+                  },
+                ],
+              },
+        ],
       },
       orderBy: [{ slot: { startsAt: direction } }, { id: direction }],
       take: limit + 1,
@@ -1695,7 +1711,7 @@ export const createPrismaEvaluationCommands = (
 
     const rows = await prisma.evaluation.findMany({
       where: {
-        state: EvaluationState.BOOKED,
+        ...occupyingEvaluation,
         slot: {
           nutritionistStaffMemberId: staffMemberId,
           endsAt: { gt: now },
@@ -1719,6 +1735,7 @@ export const createPrismaEvaluationCommands = (
         clientId: true,
         client: clientNameSelect,
         slot: { select: slotSelect },
+        payment: { select: { state: true } },
       },
     });
 
@@ -1737,6 +1754,7 @@ export const createPrismaEvaluationCommands = (
         branchId: row.slot.branchId,
         branchName: row.slot.branch.name,
         kind: kindOf(row.clientId, row.slot.startsAt),
+        paymentConfirmed: isConfirmedPaidEvaluation(row),
       })),
       limit,
       (item) => ({ startsAt: item.startsAt, id: item.evaluationId }),
@@ -1749,7 +1767,7 @@ export const createPrismaEvaluationCommands = (
     const now = dependencies.now();
     const candidates = await prisma.evaluation.findMany({
       where: {
-        state: EvaluationState.BOOKED,
+        ...occupyingEvaluation,
         hourReminderRecordedAt: null,
         slot: {
           startsAt: {
@@ -1772,6 +1790,7 @@ export const createPrismaEvaluationCommands = (
           select: {
             id: true,
             state: true,
+            slotReleasedAt: true,
             createdAt: true,
             dayReminderRecordedAt: true,
             hourReminderRecordedAt: true,
@@ -1779,7 +1798,13 @@ export const createPrismaEvaluationCommands = (
             slot: { select: { startsAt: true } },
           },
         });
-        if (evaluation.state !== EvaluationState.BOOKED) return 0;
+        // The slot may have been released after the candidate read.
+        if (
+          evaluation.state !== EvaluationState.BOOKED ||
+          evaluation.slotReleasedAt !== null
+        ) {
+          return 0;
+        }
         const [kind] = dueReminders(
           {
             createdAt: evaluation.createdAt,
