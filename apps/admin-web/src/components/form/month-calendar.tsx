@@ -106,12 +106,15 @@ export function MonthCalendar({
   const [focused, setFocused] = useState(opening);
   const [reason, setReason] = useState<string | null>(null);
   const grid = useRef<HTMLDivElement>(null);
-  const moved = useRef(focusOnMount);
+  // Focus follows the focused day only while the keyboard drives the grid.
+  const [moving, setMoving] = useState(focusOnMount);
 
   // A typed date moves the calendar to its month.
   const [seen, setSeen] = useState(selected);
   if (selected !== seen) {
     setSeen(selected);
+    // The date came from the field: the cursor stays there.
+    setMoving(false);
     if (selected !== null) {
       setMonth(selected.slice(0, 7));
       setFocused(selected);
@@ -119,11 +122,11 @@ export function MonthCalendar({
   }
 
   useEffect(() => {
-    if (!moved.current) return;
+    if (!moving) return;
     grid.current
       ?.querySelector<HTMLButtonElement>(`[data-date="${focused}"]`)
       ?.focus();
-  }, [focused, month]);
+  }, [focused, month, moving]);
 
   const why = (date: string): string | null => {
     if (limits.min !== undefined && date < limits.min) return limits.minReason;
@@ -146,7 +149,7 @@ export function MonthCalendar({
     const step = arrows[event.key];
     if (step === undefined) return;
     event.preventDefault();
-    moved.current = true;
+    setMoving(true);
     const next = addDays(focused, step);
     setFocused(next);
     setMonth(next.slice(0, 7));
@@ -167,7 +170,10 @@ export function MonthCalendar({
         >
           <ChevronLeft aria-hidden className="size-5" />
         </button>
-        <span aria-live="polite" className="font-serif text-[18px] text-texto">
+        <span
+          aria-live="polite"
+          className="font-serif text-cuerpo-grande text-texto"
+        >
           {monthTitle(month)}
         </span>
         <button
@@ -183,7 +189,7 @@ export function MonthCalendar({
         {heads.map((head, index) => (
           <span
             key={index}
-            className="py-1 text-center text-[11px] font-medium tracking-[0.06em] text-texto-tenue"
+            className="py-1 text-center text-etiqueta font-medium tracking-[0.06em] text-texto-tenue"
           >
             {head}
           </span>
@@ -222,7 +228,7 @@ export function MonthCalendar({
                 aria-disabled={refused || undefined}
                 onClick={() => pick(date)}
                 className={cn(
-                  "flex size-9 items-center justify-center rounded-full border-[1.5px] border-transparent text-[14px] tabular focus-visible:shadow-foco",
+                  "flex size-9 items-center justify-center rounded-full border-[1.5px] border-transparent text-celda tabular focus-visible:shadow-foco",
                   picked
                     ? "bg-rosa-profundo font-semibold text-blanco"
                     : "text-texto hover:bg-primario-tinte",

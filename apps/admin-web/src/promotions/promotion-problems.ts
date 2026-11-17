@@ -8,6 +8,8 @@ const messages: Record<string, string> = {
   promotion_image_not_ready:
     "La imagen todavía se está procesando. Espera un momento y vuelve a intentarlo.",
   promotion_image_required: "Sube una imagen antes de publicar.",
+  promotion_dates_required:
+    "Elige la fecha de inicio y la de fin antes de publicar.",
   idempotency_key_reused:
     "Ya guardamos esta promoción con otros datos. Cierra el panel y vuelve a abrir la lista.",
   invalid_request: "Revisa los datos: hay un valor que no es válido.",
