@@ -1,6 +1,7 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { AdministrationError } from '../administration/administration-errors';
 import {
+  exportAdministratorClients,
   listAdministratorClients,
   readAdministratorClient,
   type AdministratorClientDirectory,
@@ -72,6 +73,7 @@ const directory = (
   findFutureSubscription: jest.fn().mockResolvedValue(null),
   readClosureOutlook: jest.fn().mockResolvedValue(outlook),
   saveProfile: jest.fn(),
+  recordExport: jest.fn().mockResolvedValue(undefined),
   ...overrides,
 });
 
@@ -244,5 +246,68 @@ describe('Administrator Client detail', () => {
         now: () => now,
       }),
     ).rejects.toEqual(new AdministrationError('client_not_found'));
+  });
+});
+
+// FIX-065 (walkthrough finding 91): Clientas › «Exportar CSV» downloads what
+// the chip and the search show, every page of it, and the export is audited.
+describe('exportAdministratorClients', () => {
+  const row = (name: string) => ({ id: name, name });
+  const pageOf = (names: string[], pageNumber: number, total: number) => ({
+    ...emptyPage,
+    items: names.map(row),
+    page: pageNumber,
+    pageSize: 100,
+    totalItems: total,
+  });
+
+  it('reads every page of the chip and search and audits the count', async () => {
+    const first = Array.from({ length: 100 }, (_, i) => `Clienta ${i}`);
+    const list = jest
+      .fn()
+      .mockResolvedValueOnce(pageOf(first, 1, 101))
+      .mockResolvedValueOnce(pageOf(['Valeria Quiroga'], 2, 101));
+    const clients = directory({ list });
+
+    const rows = await exportAdministratorClients(
+      { query: '  vale ', filter: 'active' },
+      administrator,
+      { directory: clients, now: () => now },
+    );
+
+    expect(rows).toHaveLength(101);
+    expect(list).toHaveBeenNthCalledWith(2, {
+      page: 2,
+      pageSize: 100,
+      query: 'vale',
+      filter: 'active',
+      today,
+    });
+    expect(clients.recordExport).toHaveBeenCalledWith({
+      actor: {
+        accountId: 'staff-account',
+        staffMemberId: 'staff-id',
+        audit: {
+          accountId: 'staff-account',
+          role: 'ADMINISTRATOR',
+          impersonationId: null,
+        },
+      },
+      clientCount: 101,
+      filter: 'active',
+      occurredAt: now,
+    });
+  });
+
+  it('refuses an Assistant without reading or auditing', async () => {
+    const clients = directory();
+    await expect(
+      exportAdministratorClients({}, staff('assistant'), {
+        directory: clients,
+        now: () => now,
+      }),
+    ).rejects.toEqual(new AdministrationError('administration_access_denied'));
+    expect(clients.list).not.toHaveBeenCalled();
+    expect(clients.recordExport).not.toHaveBeenCalled();
   });
 });

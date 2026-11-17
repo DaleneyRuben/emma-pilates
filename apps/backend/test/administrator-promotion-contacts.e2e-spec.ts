@@ -128,7 +128,42 @@ describe('administrator Promotion Contact endpoints (e2e)', () => {
       .expect(200)
       .expect('Cache-Control', 'no-store')
       .expect(({ body }) => expect(body).toEqual({ items: [serialized] }));
-    expect(operations.export).toHaveBeenCalledWith(principal);
+    expect(operations.export).toHaveBeenCalledWith({}, principal);
+  });
+
+  // FIX-065 (walkthrough finding 91): Clientas › Cuenta cerrada.
+  it('lists and exports only former Clients with the search when asked', async () => {
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/promotion-contacts?kind=former_client')
+      .set('authorization', bearer)
+      .expect(200);
+    expect(operations.list).toHaveBeenCalledWith(
+      { page: 1, pageSize: 20, kind: 'former_client' },
+      principal,
+    );
+    await request(app.getHttpServer())
+      .get(
+        '/api/v1/administrator/promotion-contacts/export?kind=former_client&q=and',
+      )
+      .set('authorization', bearer)
+      .expect(200);
+    expect(operations.export).toHaveBeenCalledWith(
+      { kind: 'former_client', query: 'and' },
+      principal,
+    );
+  });
+
+  it('refuses an unknown kind or export filter', async () => {
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/promotion-contacts?kind=staff')
+      .set('authorization', bearer)
+      .expect(400);
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/promotion-contacts/export?page=2')
+      .set('authorization', bearer)
+      .expect(400);
+    expect(operations.list).not.toHaveBeenCalled();
+    expect(operations.export).not.toHaveBeenCalled();
   });
 
   it('records a withdrawal with no content', async () => {

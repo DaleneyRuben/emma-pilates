@@ -69,6 +69,22 @@ describe('listPromotionContacts', () => {
     });
   });
 
+  // FIX-065 (walkthrough finding 91): Clientas › Cuenta cerrada lists only
+  // former Clients.
+  it('passes the kind to the store', async () => {
+    const store = storeWith();
+    await listPromotionContacts(
+      { page: 1, pageSize: 20, kind: 'former_client' },
+      administrator,
+      { store, now: () => now },
+    );
+    expect(store.list).toHaveBeenCalledWith({
+      page: 1,
+      pageSize: 20,
+      kind: 'former_client',
+    });
+  });
+
   it('drops a blank search', async () => {
     const store = storeWith();
     await listPromotionContacts(
@@ -98,8 +114,9 @@ describe('exportPromotionContacts', () => {
   it('returns every live contact and audits the export', async () => {
     const store = storeWith();
     await expect(
-      exportPromotionContacts(administrator, { store, now: () => now }),
+      exportPromotionContacts({}, administrator, { store, now: () => now }),
     ).resolves.toEqual([valeria]);
+    expect(store.listAll).toHaveBeenCalledWith({});
     expect(store.recordExport).toHaveBeenCalledWith({
       actor: {
         accountId: 'staff-account',
@@ -115,10 +132,30 @@ describe('exportPromotionContacts', () => {
     });
   });
 
+  // FIX-065: Clientas exports what «Cuenta cerrada» and its search show.
+  it('exports only the kind and search asked for and audits them', async () => {
+    const store = storeWith();
+    await exportPromotionContacts(
+      { kind: 'former_client', query: '  vale ' },
+      administrator,
+      { store, now: () => now },
+    );
+    expect(store.listAll).toHaveBeenCalledWith({
+      kind: 'former_client',
+      query: 'vale',
+    });
+    expect(store.recordExport).toHaveBeenCalledWith(
+      expect.objectContaining({ contactCount: 1, kind: 'former_client' }),
+    );
+  });
+
   it('refuses an Assistant without reading or auditing', async () => {
     const store = storeWith();
     await refusedFor(() =>
-      exportPromotionContacts(staff('assistant'), { store, now: () => now }),
+      exportPromotionContacts({}, staff('assistant'), {
+        store,
+        now: () => now,
+      }),
     );
     expect(store.listAll).not.toHaveBeenCalled();
     expect(store.recordExport).not.toHaveBeenCalled();
@@ -185,7 +222,7 @@ describe('the Coordinator on Contactos', () => {
       ),
     ).resolves.toEqual(page);
     await expect(
-      exportPromotionContacts(coordinator, dependencies),
+      exportPromotionContacts({}, coordinator, dependencies),
     ).resolves.toEqual([valeria]);
     await withdrawPromotionContact(
       { contactId: valeria.id },

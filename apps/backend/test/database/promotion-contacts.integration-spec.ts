@@ -169,6 +169,57 @@ describe('Promotion Contacts (PostgreSQL)', () => {
     });
   });
 
+  // FIX-065 (walkthrough finding 91): Clientas › Cuenta cerrada reads only
+  // former Clients, and its export keeps the search.
+  it('lists and exports one kind with the search, and audits the kind', async () => {
+    const lucia = randomUUID();
+    await prisma.client.create({
+      data: {
+        id: lucia,
+        name: 'Lucía Fernández',
+        referralCode: 'LUCIA-091',
+        account: { create: { email: 'lucia-091@example.com' } },
+      },
+    });
+    try {
+      const kinds = async (kind: 'client' | 'former_client') =>
+        (await store().list({ page: 1, pageSize: 20, kind })).items.map(
+          (row) => row.name,
+        );
+      await expect(kinds('former_client')).resolves.toEqual([
+        'Valeria Quiroga',
+        'Sofía Guzmán',
+        'Ana Rojas',
+      ]);
+      await expect(kinds('client')).resolves.toEqual(['Lucía Fernández']);
+      const exported = await store().listAll({
+        kind: 'former_client',
+        query: 'sofia',
+      });
+      expect(exported.map((row) => row.name)).toEqual(['Sofía Guzmán']);
+      await store().recordExport({
+        actor,
+        contactCount: 1,
+        kind: 'former_client',
+        occurredAt,
+      });
+      await expect(
+        prisma.auditRecord.findFirst({
+          where: {
+            actionCode: 'promotion_contact.exported',
+            metadata: { path: ['kind'], equals: 'former_client' },
+          },
+          select: { metadata: true },
+        }),
+      ).resolves.toEqual({
+        metadata: { contactCount: 1, kind: 'former_client' },
+      });
+    } finally {
+      await prisma.account.deleteMany({ where: { clientId: lucia } });
+      await prisma.client.delete({ where: { id: lucia } });
+    }
+  });
+
   it('withdraws a contact by erasing its details, once', async () => {
     await expect(
       store().withdraw({ contactId: ids.ana, actor, occurredAt }),
