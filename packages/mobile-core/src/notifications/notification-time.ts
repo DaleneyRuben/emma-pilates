@@ -26,6 +26,7 @@ export function formatNotificationTime(createdAt: string, now: Date): string {
   const created = new Date(createdAt);
   const elapsedMinutes = Math.max(0, Math.floor((now.getTime() - created.getTime()) / 60_000));
 
+  if (elapsedMinutes < 1) return "Hace un momento";
   if (elapsedMinutes < 60) return plural(elapsedMinutes, "minuto", "minutos");
 
   const yesterday = new Date(now.getTime() - 24 * 60 * 60_000);
