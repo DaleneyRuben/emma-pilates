@@ -336,6 +336,7 @@ const endBlockFrom = async (
            EXISTS (
              SELECT 1 FROM booking.evaluations e
              WHERE e.evaluation_slot_id = s.id AND e.state = 'booked'
+               AND e.slot_released_at IS NULL
            ) AS booked
     FROM booking.evaluation_slots s
     WHERE s.availability_block_id = ${block.id}::uuid
@@ -779,7 +780,7 @@ export const createPrismaEvaluationCommands = (
       ) {
         const kept = await transaction.evaluation.count({
           where: {
-            state: EvaluationState.BOOKED,
+            ...occupyingEvaluation,
             slot: {
               availabilityBlockId: block.id,
               startsAt: { gte: boliviaInstant(target, 0), gt: now },
@@ -1250,7 +1251,7 @@ export const createPrismaEvaluationCommands = (
               );
             }
             if (
-              cause.includes('evaluations_one_booked_per_slot_key') ||
+              cause.includes('evaluations_one_live_per_slot_key') ||
               cause.includes('evaluation slot is not published')
             ) {
               throw rule(
@@ -1422,6 +1423,7 @@ export const createPrismaEvaluationCommands = (
         select: {
           id: true,
           state: true,
+          slotReleasedAt: true,
           slot: {
             select: { startsAt: true, nutritionistStaffMemberId: true },
           },
@@ -1429,6 +1431,10 @@ export const createPrismaEvaluationCommands = (
       });
       if (evaluation === null) {
         throw rule('evaluation_not_found', 'Evaluation not found');
+      }
+      // A released Evaluation waits for another slot; it had no time to miss.
+      if (evaluation.slotReleasedAt !== null) {
+        throw rule('evaluation_not_booked', 'The Evaluation has no slot');
       }
       if (
         identity.role === 'nutritionist' &&

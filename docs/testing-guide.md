@@ -9769,3 +9769,24 @@ rows, now unread by AW35).
    **Dar las clases** is disabled. There is no picker: the grant goes to
    every eligible Client.
 9. Check both pages at 1440 px and 420 px.
+
+## Test 156: a released evaluation's old slot can be booked by another client, and ending its block withdraws it (FIX-062)
+
+Migration `20261117090000_released_slot_withdrawable`. Run the API on a fresh
+database copy with the migration applied.
+
+1. As Lucía, book a paid evaluation on Gabriela's block and have Ana confirm
+   the transfer. As Gabriela, **Agenda › Cancelar evaluación › Sí, cancelar
+   evaluación**: the slot is released and Lucía keeps her payment.
+2. As another client with an active plan (Valeria), **Evaluación
+   nutricional** offers the released time; booking it works like any other
+   turno. A second client who picks the same time afterwards gets «turno no
+   disponible», not an error. Lucía's card is unchanged.
+3. With a released time still free, as Gabriela, **Disponibilidad**, open that block and **Eliminar horario**
+   from a date on or before the released slot. The block ends without the
+   error «evaluation slot has a booked evaluation», and the released time is
+   withdrawn with the other free slots; a slot another client still holds is
+   kept.
+4. As Lucía (or another client), **Evaluación nutricional** no longer offers
+   the released time after the block's end. Lucía's card still reads «El
+   estudio liberó este turno · el pago sigue vigente» with **Elegir turno**.

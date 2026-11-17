@@ -87,17 +87,27 @@ export const startEvaluationTransfer = async (
       'Ya tienes un pago de evaluación pendiente.',
     );
   }
-  const evaluation = await transaction.evaluation.create({
-    data: {
-      clientId: input.clientId,
-      evaluationSlotId: input.slotId,
-      eligibilityMonth: input.eligibilityMonth,
-      paymentId: payment.id,
-      createdByAccountId: input.principal.accountId,
-      createdAt: input.now,
-    },
-    select: { id: true },
-  });
+  // Another Client took the slot in the meantime: the one-live-per-slot
+  // index answers, not a 500.
+  const evaluation = await transaction.evaluation
+    .create({
+      data: {
+        clientId: input.clientId,
+        evaluationSlotId: input.slotId,
+        eligibilityMonth: input.eligibilityMonth,
+        paymentId: payment.id,
+        createdByAccountId: input.principal.accountId,
+        createdAt: input.now,
+      },
+      select: { id: true },
+    })
+    .catch((error: unknown) => {
+      if (!isUniqueViolation(error)) throw error;
+      throw new EvaluationRuleError(
+        'evaluation_slot_unavailable',
+        'The Evaluation slot is no longer available',
+      );
+    });
   return { paymentId: payment.id, evaluationId: evaluation.id };
 };
 

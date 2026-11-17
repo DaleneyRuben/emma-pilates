@@ -201,6 +201,7 @@ export const releaseConfirmedPaidEvaluation = async (
     select: {
       id: true,
       evaluationSlotId: true,
+      slotReleasedAt: true,
       payment: { select: { state: true } },
       slot: { select: { startsAt: true } },
       client: { select: { account: { select: { id: true } } } },
@@ -209,6 +210,8 @@ export const releaseConfirmedPaidEvaluation = async (
   if (evaluation === null || !isConfirmedPaidEvaluation(evaluation)) {
     return false;
   }
+  // Released already: the Client was told once and keeps waiting.
+  if (evaluation.slotReleasedAt !== null) return true;
   await transaction.evaluation.update({
     where: { id: evaluation.id },
     data: { slotReleasedAt: input.now },
