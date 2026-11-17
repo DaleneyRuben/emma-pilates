@@ -15,7 +15,11 @@ export const kindLabel = (contact: AdminPromotionContactDto): string =>
  * the day a former Client asked to keep hearing from the studio (FIX-060).
  */
 export const sinceDate = (contact: AdminPromotionContactDto): string =>
-  formatCivilDate(boliviaParts(contact.since).date);
+  formatCivilDate(
+    // A backend before FIX-060 (a rollback) sends only «consentedAt».
+    boliviaParts((contact.since as string | undefined) ?? contact.consentedAt)
+      .date,
+  );
 
 /** AW35's «Exportar CSV»: the table's columns. */
 export const promotionContactsCsv = (

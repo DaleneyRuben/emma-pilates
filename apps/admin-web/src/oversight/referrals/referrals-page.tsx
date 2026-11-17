@@ -64,8 +64,9 @@ const referralColumns = () => [
   columns.accessor("firstPurchaseAt", {
     header: "Compró",
     cell: ({ getValue }) => {
-      const boughtAt = getValue();
-      return boughtAt === null ? (
+      // A backend before FIX-060 (a rollback) sends no «firstPurchaseAt».
+      const boughtAt = getValue() as string | null | undefined;
+      return boughtAt === null || boughtAt === undefined ? (
         <span className="text-texto-tenue">Aún no</span>
       ) : (
         <span className="text-texto-secundario tabular">
