@@ -33,11 +33,11 @@ One extra class added automatically to the first real Subscription of a Client's
 _Avoid_: Free trial, welcome credit
 
 **Campaign**:
-Extra classes an Administrator grants in bulk at given times of year (start of year, holidays), recorded as Allowance Adjustments. Never a price discount, and never combined with a Founder Membership.
+Extra classes an Administrator grants in bulk at given times of year (start of year, holidays) to every active Client, founders included, recorded as Allowance Adjustments. A Client without a current Subscription is owed them, and her next Subscription collects them. Never a price discount ([ADR-0014](./docs/adr/0014-a-campaign-reaches-every-active-client.md)).
 _Avoid_: Promotion (a Promotion is carousel content), sale
 
 **Founder Membership**:
-A discount of 15 % on every Plan except the single class, from the founder's first Plan, held by one of the first 40 distinct Clients whose first real Payment is confirmed. The place is decided under lock when the sale is priced, while places remain, and becomes final at confirmation. It belongs to the person, not the Plan, and is lost automatically and for good when more than 7 days pass between one Subscription's real end and the next one's Start Date (gap = next start − (end + 1); a Freeze is not a gap). A next Plan sold before the previous one's real end, starting inside the Early Renewal window, is never a gap ([ADR-0013](./docs/adr/0013-next-plan-chooses-its-start-within-four-weeks.md)). The check reads every non-voided Subscription and also runs when the sale is confirmed. Not combined with a Gift Class or a Campaign; it does take part in Guest Passes. Voiding the granting sale frees the place ([ADR-0008](./docs/adr/0008-founder-membership.md)).
+A discount of 15 % on every Plan except the single class, from the founder's first Plan, held by one of the first 40 distinct Clients whose first real Payment is confirmed. The place is decided under lock when the sale is priced, while places remain, and becomes final at confirmation. It belongs to the person, not the Plan, and is lost automatically and for good when more than 7 days pass between one Subscription's real end and the next one's Start Date (gap = next start − (end + 1); a Freeze is not a gap). A next Plan sold before the previous one's real end, starting inside the Early Renewal window, is never a gap ([ADR-0013](./docs/adr/0013-next-plan-chooses-its-start-within-four-weeks.md)). The check reads every non-voided Subscription and also runs when the sale is confirmed. Not combined with a Gift Class; it does take part in Guest Passes and Campaigns. Voiding the granting sale frees the place ([ADR-0008](./docs/adr/0008-founder-membership.md)).
 _Avoid_: VIP, loyalty discount
 
 **Freeze**:

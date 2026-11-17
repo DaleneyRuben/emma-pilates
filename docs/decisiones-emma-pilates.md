@@ -114,7 +114,7 @@ En cada venta: NIT o CI, nombre o razón social, y una marca de "factura emitida
 - **15 % de descuento en cualquier plan**, excepto la clase suelta.
 - Ligada a la persona, no al plan: si cambia de plan, el descuento sigue.
 - Se pierde de forma **automática y definitiva** si pasan más de **7 días** entre el fin de un plan y el inicio del siguiente.
-- No se acumula con la clase de regalo ni con campañas. Sí participa en "invita a una amiga".
+- No se acumula con la clase de regalo. Sí participa en "invita a una amiga" y en las campañas (17-11-2026: «TODAS las clientas»).
 - Guardar el descuento en el pago (`discountCentavos`, `discountReason`).
 
 ### 5.2 Clase de regalo para clientas nuevas
@@ -133,6 +133,8 @@ En cada venta: NIT o CI, nombre o razón social, y una marca de "factura emitida
 ### 5.4 Campañas
 
 Inicio de año y vacaciones: clases extra con motivo "campaña". Solo la administradora las crea. Nunca descuentos en el precio.
+
+La campaña llega a **todas las clientas activas**, también a las fundadoras (decisión de la dueña, 17-11-2026: «TODAS las clientas no matter what»). A la que no tiene un plan vigente se le suman con su próximo plan. Una cuenta cerrada no recibe nada.
 
 ### 5.5 Catering
 
