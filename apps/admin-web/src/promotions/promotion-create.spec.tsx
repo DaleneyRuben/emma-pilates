@@ -72,12 +72,17 @@ describe("AW18 Nueva promoción (follow-up 39)", () => {
     ).toBeVisible();
     const controls = within(panel)
       .getAllByRole("button")
-      .map((button) => button.textContent?.trim() ?? "");
+      .map(
+        (button) =>
+          button.getAttribute("aria-label") ?? button.textContent?.trim() ?? "",
+      );
     expect(controls).toEqual([
       "Sube una imagen",
+      "Elegir en el calendario",
+      "Elegir en el calendario",
       "Guardar borrador",
       "Publicar",
-      "", // the panel's close icon
+      "Cerrar",
     ]);
     expect(
       within(panel).getByRole("button", { name: "Sube una imagen" }),

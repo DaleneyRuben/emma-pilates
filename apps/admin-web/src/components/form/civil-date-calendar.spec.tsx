@@ -95,18 +95,18 @@ describe("CivilDateInput calendar (finding 83)", () => {
 
   it("strikes the days after its last allowed day and says why when one is clicked", async () => {
     const { user, field } = setup({
-      initial: "2026-11-12",
-      max: "2026-11-15",
+      initial: "2030-03-12",
+      max: "2030-03-15",
       maxReason: "La fecha no puede ser posterior a hoy.",
     });
     await user.click(field);
 
-    const late = day("lunes, 16 de noviembre de 2026");
+    const late = day("sábado, 16 de marzo de 2030");
     expect(late).toHaveAttribute("aria-disabled", "true");
     expect(late).toHaveAccessibleName(
-      "lunes, 16 de noviembre de 2026, no disponible",
+      "sábado, 16 de marzo de 2030, no disponible",
     );
-    expect(day("domingo, 15 de noviembre de 2026")).not.toHaveAttribute(
+    expect(day("viernes, 15 de marzo de 2030")).not.toHaveAttribute(
       "aria-disabled",
       "true",
     );
@@ -116,7 +116,7 @@ describe("CivilDateInput calendar (finding 83)", () => {
     expect(
       within(calendar()).getByText("La fecha no puede ser posterior a hoy."),
     ).toBeVisible();
-    expect(field).toHaveValue("12/11/2026");
+    expect(field).toHaveValue("12/03/2030");
   });
 
   it("opens an end date on the start's month with the range drawn and earlier days off", async () => {
