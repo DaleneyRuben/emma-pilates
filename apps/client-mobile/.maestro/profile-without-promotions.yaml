@@ -7,10 +7,21 @@ env:
   EMAIL: lucia@example.com
 ---
 - runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-profile"
+    timeout: 15000
 - tapOn:
     id: "tab-profile"
+# iOS swallows the first tap after «Save Password? › Not Now».
+- runFlow:
+    when:
+      notVisible: "Notificaciones.*"
+    commands:
+      - tapOn:
+          id: "tab-profile"
 - extendedWaitUntil:
-    visible: "Notificaciones"
+    visible: "Notificaciones.*"
     timeout: 15000
 - assertNotVisible:
     id: "profile-promotions-switch"
