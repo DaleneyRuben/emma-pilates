@@ -4,6 +4,7 @@ import {
   getListEvaluationSlotsQueryKey,
   getListEvaluationsQueryKey,
   useListEvaluations,
+  useListEvaluationSlots,
   type ClientEvaluationDto,
 } from "@pilates/api-contracts";
 import {
@@ -41,6 +42,7 @@ import {
   monthName,
   monthPhrase,
 } from "./evaluation-format";
+import { planOfferLine } from "./evaluation-offer-copy";
 
 type EvaluationsNavigation = {
   goBack: () => void;
@@ -72,6 +74,8 @@ export function MyEvaluationsScreen({
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const upcoming = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const past = useListEvaluations({ scope: "past" }, queryOptions);
+  // The empty state says what her Plan gives, as the picker does.
+  const slots = useListEvaluationSlots(undefined, queryOptions);
   const queryKeys = [getListEvaluationsQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
@@ -178,8 +182,10 @@ export function MyEvaluationsScreen({
             layout="inList"
             note={
               pastItems.some((evaluation) => boliviaMonth(evaluation.startsAt) === boliviaMonth())
-                ? `Ya usaste tu evaluación de este mes. Puedes reservar la de ${monthName(followingMonth(boliviaMonth()))}, también gratuita.`
-                : "Tu evaluación de este mes sigue disponible y es gratis."
+                ? `Ya usaste tu evaluación de este mes. Puedes reservar la de ${monthName(followingMonth(boliviaMonth()))}.`
+                : slots.data?.status === 200
+                  ? (planOfferLine(slots.data.data) ?? undefined)
+                  : undefined
             }
             primaryAction={{
               label: "Reservar evaluación",

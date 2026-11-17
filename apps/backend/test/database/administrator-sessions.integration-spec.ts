@@ -230,7 +230,8 @@ describe('Sessions across every Branch', () => {
 
   it('gives the Staff Horario one Branch day with its cancelled classes only when asked (FIX-052)', async () => {
     const from = new Date(Date.now() + 16 * day);
-    const until = new Date(from.getTime() + 3 * day);
+    // A full week always holds more than one class, whatever today is.
+    const until = new Date(from.getTime() + 7 * day);
     const target = await prisma.session.findFirstOrThrow({
       where: { state: 'SCHEDULED', startsAt: { gte: from, lt: until } },
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],

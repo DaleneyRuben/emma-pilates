@@ -961,17 +961,24 @@ En la app de Lucía:
    se abre una hoja con los mismos dos pasos. No hay cobro
    en efectivo de la consulta. Con el trimestral ya confirmado, la primera
    consulta del trimestre es gratis. La segunda, en el mismo trimestre, se
-   paga.
+   paga. El encabezado de **Evaluación nutricional** lo dice: «Cuesta Bs
+   70 con tu plan.», «Tu primera evaluación del trimestre es gratis.» o «Ya
+   usaste la gratis de este trimestre · Bs 70.».
 3. Reserva un turno. **Mis evaluaciones** lo muestra, con **Reprogramar** y
    **Cancelar evaluación**. Cancelarlo abre la hoja de confirmación. Si faltan menos de 3 horas, cancelar o no asistir consume
    la consulta igual.
 4. Gabriela ve la reserva en su **Agenda**, con el nombre de Lucía.
    **Cancelar evaluación** abre «¿Cancelar esta evaluación?», con «Le
    avisamos y el horario queda libre», y al confirmar aparece «Evaluación
-   cancelada».
+   cancelada». La tarjeta sale de la Agenda. Si la consulta ya estaba pagada,
+   la hoja agrega «El pago de Lucía sigue vigente; ella elige otro turno.»: el
+   pago sigue, y Lucía recibe «Elige otro turno» y en **Mis evaluaciones** ve
+   «El estudio liberó este turno · el pago sigue vigente» con **Elegir
+   turno**.
 
 En la web, **Horario › Nutrición** lista las mismas reservas. Es una
-lectura. El costo de Bs 50 por consulta entra al resultado del mes como costo
+lectura. Si la semana a la vista no tiene ninguna, el subtítulo nombra la
+próxima («ninguna en la semana · próxima: lun 16/11 · 09:00»). El costo de Bs 50 por consulta entra al resultado del mes como costo
 de la nutricionista, no como un gasto que tengas que tipear.
 
 ## Paso 13. El día a día de la clienta
