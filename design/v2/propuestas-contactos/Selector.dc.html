@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Clientas con Cuenta cerrada</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.root{position:relative;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;overflow:hidden}
+.proto{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px;background:#2E2724;color:#F5EFE9;font-size:13px}
+.proto b{font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:11px;margin-right:6px}
+.pc{height:30px;padding:0 12px;border:0;border-radius:999px;background:rgba(245,239,233,.12);color:#F5EFE9;font:500 13px 'Work Sans',sans-serif;cursor:pointer}
+.app{display:flex;flex-wrap:wrap;min-height:960px}
+.rail{flex:0 0 96px;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rl{font-size:12px;font-weight:500}
+.col{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:16px;padding:20px 40px}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+main{padding:8px 40px 40px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+.sub{color:#6F6662}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}.hl{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #E6DBD0;overflow-x:auto}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent;display:inline-flex;align-items:center;white-space:nowrap}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.cnt{margin-left:6px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:999px;background:#93615D;color:#fff}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+.f{height:36px;padding:0 14px;border-radius:999px;background:#F5EFE9;font:400 14px 'Work Sans',sans-serif;display:inline-flex;align-items:center;gap:6px;border:0;color:#4A4A4A;cursor:pointer;white-space:nowrap;flex:none}.f.on{background:#F2E4E1;color:#7D4F4B;font-weight:600}
+.f .k{font-size:12px;font-weight:600;padding:1px 7px;border-radius:999px;background:rgba(216,201,187,.6);color:#4A4A4A}
+.hair{width:1px;height:24px;background:#D8C9BB;flex:none}
+.find{flex:0 1 360px;min-width:220px;height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;border-radius:12px;background:#F5EFE9;color:#6F6662}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:860px}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;white-space:nowrap}
+td{padding:12px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
+tr.click{cursor:pointer}tr.click:hover td{background:#FDF7F2}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.av{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}.av.g{background:rgba(216,201,187,.45);color:#6F6662}
+.note{font-size:13px;color:#6F6662}
+.strong{font-weight:600}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.btn:disabled{opacity:.45;cursor:default}
+.p{background:#93615D;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}.dd{background:#A04E3E;color:#fff}.td{background:transparent;color:#A04E3E;padding:0 10px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.bad{background:#F7E5E0;color:#A04E3E}.none{background:rgba(216,201,187,.34);color:#6F6662}
+.card{background:#F5EFE9;border-radius:16px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:64px}.row+.row{border-top:1px solid #E6DBD0}
+.grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.notice{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;font-size:14px}
+.explain{display:flex;gap:12px;align-items:flex-start;padding:16px 20px;border-radius:16px;background:#F2E4E1;color:#4A4A4A;font-size:14px;line-height:1.5}
+.empty{padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.28);display:flex;align-items:center;justify-content:center;z-index:5;padding:24px}
+.scrim.sheet{align-items:flex-end;padding:0}
+.dlg{width:480px;max-width:100%;background:#FAF7F2;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 24px rgba(74,58,48,.16)}
+.scrim.sheet .dlg{width:100%;border-radius:20px 20px 0 0;padding:24px 20px 28px}
+.dlg h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:22px}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 12px;font-size:14px}.kv span:nth-child(odd){color:#6F6662}
+.ntop{height:64px;display:flex;align-items:center;gap:8px;padding:0 12px}
+.ib{width:44px;height:44px;border:0;border-radius:12px;background:#F5EFE9;color:#B78380;display:flex;align-items:center;justify-content:center}
+.nmain{padding:8px 20px 24px;display:flex;flex-direction:column;gap:14px}
+.nrow{display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:68px}.nrow+.nrow{border-top:1px solid #E6DBD0}
+</style>
+</helmet>
+<div class="root" style="{{rootStyle}}">
+  <div class="proto" aria-label="Prototipo">
+    <b>Prototipo</b>
+    <sc-for list="{{proto}}" as="p" hint-placeholder-count="5"><button type="button" class="pc" onClick="{{p.go}}">{{p.label}}</button></sc-for>
+  </div>
+
+  <sc-if value="{{wide}}" hint-placeholder-val="{{true}}">
+  <div class="app">
+    <nav class="rail" aria-label="Menú principal">
+      <span class="mark">E</span>
+      <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><span class="{{r.cls}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span></span><span class="rl">{{r.label}}</span></span></sc-for>
+    </nav>
+    <div class="col">
+      <header class="top"><span class="wm"><b>Emma</b><i>Pilates Studio</i></span><span style="flex: 1"></span><span class="av">PM</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Paola Mendoza</span><span style="font-size: 12px; color: #6F6662">Administración</span></span></header>
+      <main>
+        <div class="head">
+          <div class="hl"><h1>Clientas</h1><span class="sub">5 clientas · 3 con plan activo · 2 fundadoras</span></div>
+          <sc-if value="{{exportInHead}}" hint-placeholder-val="{{true}}"><button type="button" class="btn s" disabled="{{noRows}}" onClick="{{exportNow}}"><span class="ms">download</span>Exportar CSV</button></sc-if>
+        </div>
+        <div class="tabs"><span class="tab on">Todas</span><span class="tab">Para contactar<span class="cnt">3</span></span><span class="tab">Congelamientos<span class="cnt">1</span></span></div>
+        <div class="filters">
+          <label class="find"><span class="ms" style="color: #B78380">search</span><input aria-label="Buscar clienta" placeholder="Nombre, correo o teléfono" style="flex: 1; min-width: 0; border: 0; background: transparent; font: 400 15px 'Work Sans', sans-serif; outline: none"></label>
+          <sc-for list="{{chips}}" as="f" hint-placeholder-count="6"><button type="button" class="{{f.cls}}" aria-pressed="{{f.on}}" onClick="{{f.go}}">{{f.label}}</button></sc-for>
+          <sc-if value="{{isB}}" hint-placeholder-val="{{false}}">
+            <span class="hair" aria-hidden="true"></span>
+            <button type="button" class="{{closedChip.cls}}" aria-pressed="{{closedChip.on}}" onClick="{{closedChip.go}}">Cuenta cerrada<span class="k">{{closedCount}}</span></button>
+            <span style="flex: 1"></span>
+            <button type="button" class="btn sm t" disabled="{{noRows}}" onClick="{{exportNow}}"><span class="ms">download</span>Exportar CSV · {{rowsCount}}</button>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{explainLine}}" hint-placeholder-val="{{false}}"><span class="note" style="margin-top: -8px">Exclientas que cerraron su cuenta y pidieron seguir recibiendo promociones. No tienen ficha.</span></sc-if>
+        <sc-if value="{{explainCard}}" hint-placeholder-val="{{false}}"><div class="explain"><span class="ms" style="color: #93615D">mail</span><span>Cerraron su cuenta y marcaron «Quiero seguir recibiendo promociones». Ya no son clientas: no tienen ficha ni plan. Si alguna te pide que paren, usa «Dejar de enviar».</span></div></sc-if>
+        <sc-if value="{{hasNotice}}" hint-placeholder-val="{{false}}"><div class="notice" role="status"><span class="ms" style="color: #4F6347">check_circle</span>{{notice}}</div></sc-if>
+
+        <sc-if value="{{liveView}}" hint-placeholder-val="{{true}}">
+          <div class="tw"><table>
+            <thead><tr><th>Clienta</th><th>Contacto</th><th>Plan</th><th>Le quedan</th><th>Vence</th><th>Invitada por</th><th>Estado</th></tr></thead>
+            <tbody><sc-for list="{{live}}" as="c" hint-placeholder-count="5"><tr class="click">
+              <td><span style="display: flex; align-items: center; gap: 12px"><span class="av">{{c.ini}}</span><span style="display: flex; flex-direction: column; gap: 2px"><span class="strong">{{c.n}}</span><sc-if value="{{c.founder}}" hint-placeholder-val="{{false}}"><span class="note">Fundadora n.º {{c.founder}}</span></sc-if></span></span></td>
+              <td><span style="display: flex; flex-direction: column; gap: 2px"><span>{{c.mail}}</span><span class="note">{{c.tel}}</span></span></td>
+              <td>{{c.plan}}</td><td class="num">{{c.leftLabel}}</td><td>{{c.ends}}</td><td>{{c.by}}</td>
+              <td><span class="{{c.pillCls}}">{{c.estado}}</span></td>
+            </tr></sc-for></tbody>
+          </table></div>
+        </sc-if>
+
+        <sc-if value="{{closedTableA}}" hint-placeholder-val="{{false}}">
+          <div class="tw"><table>
+            <thead><tr><th>Nombre</th><th>Contacto</th><th>Recibe promociones desde</th><th>Estado</th><th></th></tr></thead>
+            <tbody><sc-for list="{{closed}}" as="c" hint-placeholder-count="2"><tr>
+              <td><span style="display: flex; align-items: center; gap: 12px"><span class="av g">{{c.ini}}</span><span class="strong">{{c.n}}</span></span></td>
+              <td><span style="display: flex; flex-direction: column; gap: 2px"><span>{{c.mail}}</span><span class="note">{{c.tel}}</span></span></td>
+              <td>{{c.since}}</td>
+              <td><span class="pill none">Cuenta cerrada</span></td>
+              <td style="text-align: right"><button type="button" class="btn sm td" aria-label="Dejar de enviar a {{c.n}}" onClick="{{c.ask}}">Dejar de enviar</button></td>
+            </tr></sc-for></tbody>
+          </table></div>
+        </sc-if>
+
+        <sc-if value="{{closedTableB}}" hint-placeholder-val="{{false}}">
+          <div class="tw"><table>
+            <thead><tr><th>Clienta</th><th>Contacto</th><th>Plan</th><th>Le quedan</th><th>Vence</th><th>Invitada por</th><th>Estado</th><th></th></tr></thead>
+            <tbody><sc-for list="{{closed}}" as="c" hint-placeholder-count="2"><tr>
+              <td><span style="display: flex; align-items: center; gap: 12px"><span class="av g">{{c.ini}}</span><span style="display: flex; flex-direction: column; gap: 2px"><span class="strong">{{c.n}}</span><span class="note">Desde el {{c.since}}</span></span></span></td>
+              <td><span style="display: flex; flex-direction: column; gap: 2px"><span>{{c.mail}}</span><span class="note">{{c.tel}}</span></span></td>
+              <td class="note">—</td><td class="num note">—</td><td class="note">—</td><td class="note">—</td>
+              <td><span class="pill none">Cuenta cerrada</span></td>
+              <td style="text-align: right"><button type="button" class="btn sm td" aria-label="Dejar de enviar a {{c.n}}" onClick="{{c.ask}}">Dejar de enviar</button></td>
+            </tr></sc-for></tbody>
+          </table></div>
+        </sc-if>
+
+        <sc-if value="{{closedListC}}" hint-placeholder-val="{{false}}">
+          <div class="card"><sc-for list="{{closed}}" as="c" hint-placeholder-count="2">
+            <div class="row" style="padding: 12px 20px"><span class="av g">{{c.ini}}</span><span class="grow"><span class="strong">{{c.n}}</span><span class="note">{{c.mail}} · {{c.tel}} · recibe promociones desde el {{c.since}}</span></span><button type="button" class="btn sm td" aria-label="Dejar de enviar a {{c.n}}" onClick="{{c.ask}}">Dejar de enviar</button></div>
+          </sc-for></div>
+        </sc-if>
+
+        <sc-if value="{{closedEmpty}}" hint-placeholder-val="{{false}}">
+          <div class="card empty"><span class="ms" style="font-size: 32px; color: #B78380">mail</span><span class="sub">Nadie cerró su cuenta pidiendo seguir recibiendo promociones.</span></div>
+        </sc-if>
+
+        <span class="note">{{footer}}</span>
+      </main>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{narrow}}" hint-placeholder-val="{{false}}">
+  <div style="min-height: 960px">
+    <header class="ntop"><span class="ib"><span class="ms" style="font-size: 24px">menu</span></span><span class="wm" style="flex: 1; padding-left: 4px"><b style="font-size: 20px">Emma</b><i style="font-size: 14px">Pilates Studio</i></span><span class="ib"><span class="ms" style="font-size: 22px">search</span></span></header>
+    <div class="nmain">
+      <h1 style="font-size: 30px">Clientas</h1>
+      <span class="sub" style="margin-top: -8px; font-size: 14px">5 clientas · 3 con plan activo · 2 fundadoras</span>
+      <sc-if value="{{exportInHead}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm s" style="align-self: flex-start" disabled="{{noRows}}" onClick="{{exportNow}}"><span class="ms">download</span>Exportar CSV</button></sc-if>
+      <div class="tabs"><span class="tab on">Todas</span><span class="tab">Para contactar<span class="cnt">3</span></span><span class="tab">Congelamientos<span class="cnt">1</span></span></div>
+      <label class="find" style="flex: none; min-width: 0"><span class="ms" style="color: #B78380">search</span><input aria-label="Buscar clienta" placeholder="Nombre, correo o teléfono" style="flex: 1; min-width: 0; border: 0; background: transparent; font: 400 15px 'Work Sans', sans-serif; outline: none"></label>
+      <div class="filters scroll">
+        <sc-for list="{{chips}}" as="f" hint-placeholder-count="6"><button type="button" class="{{f.cls}}" aria-pressed="{{f.on}}" onClick="{{f.go}}">{{f.label}}</button></sc-for>
+        <sc-if value="{{isB}}" hint-placeholder-val="{{false}}"><span class="hair" aria-hidden="true"></span><button type="button" class="{{closedChip.cls}}" aria-pressed="{{closedChip.on}}" onClick="{{closedChip.go}}">Cuenta cerrada<span class="k">{{closedCount}}</span></button></sc-if>
+      </div>
+      <sc-if value="{{explainLine}}" hint-placeholder-val="{{false}}"><span class="note">Exclientas que cerraron su cuenta y pidieron seguir recibiendo promociones. No tienen ficha.</span></sc-if>
+      <sc-if value="{{explainCard}}" hint-placeholder-val="{{false}}"><div class="explain"><span class="ms" style="color: #93615D">mail</span><span>Cerraron su cuenta y marcaron «Quiero seguir recibiendo promociones». No tienen ficha ni plan. Si alguna te pide que paren, usa «Dejar de enviar».</span></div></sc-if>
+      <sc-if value="{{hasNotice}}" hint-placeholder-val="{{false}}"><div class="notice" role="status"><span class="ms" style="color: #4F6347">check_circle</span>{{notice}}</div></sc-if>
+      <sc-if value="{{liveView}}" hint-placeholder-val="{{true}}">
+        <div class="card"><sc-for list="{{live}}" as="c" hint-placeholder-count="5">
+          <div class="nrow"><span class="av" style="width: 40px; height: 40px">{{c.ini}}</span><span class="grow"><span class="strong">{{c.n}}</span><span class="note">{{c.plan}}</span></span><span class="{{c.pillCls}}">{{c.estado}}</span></div>
+        </sc-for></div>
+      </sc-if>
+      <sc-if value="{{closedNarrow}}" hint-placeholder-val="{{false}}">
+        <div class="card"><sc-for list="{{closed}}" as="c" hint-placeholder-count="2">
+          <div class="nrow" style="align-items: flex-start"><span class="av g" style="width: 40px; height: 40px">{{c.ini}}</span><span class="grow"><span class="strong">{{c.n}}</span><span class="note">{{c.mail}}</span><span class="note">{{c.tel}} · desde el {{c.since}}</span><span><button type="button" class="btn sm td" style="padding: 0; height: 32px" aria-label="Dejar de enviar a {{c.n}}" onClick="{{c.ask}}">Dejar de enviar</button></span></span><span class="pill none">Cuenta cerrada</span></div>
+        </sc-for></div>
+      </sc-if>
+      <sc-if value="{{closedEmpty}}" hint-placeholder-val="{{false}}">
+        <div class="card empty"><span class="ms" style="font-size: 32px; color: #B78380">mail</span><span class="sub">Nadie cerró su cuenta pidiendo seguir recibiendo promociones.</span></div>
+      </sc-if>
+      <span class="note">{{footer}}</span>
+      <sc-if value="{{isB}}" hint-placeholder-val="{{false}}"><button type="button" class="btn s" disabled="{{noRows}}" onClick="{{exportNow}}"><span class="ms">download</span>Exportar CSV · {{rowsCount}}</button></sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{confirmOpen}}" hint-placeholder-val="{{false}}">
+    <div class="{{scrimCls}}">
+      <div class="dlg" role="dialog" aria-label="Dejar de enviar promociones">
+        <h2>¿Dejar de enviar promociones a {{conf.n}}?</h2>
+        <p style="margin: 0">Borramos su nombre, correo y teléfono de esta lista. Usa esto cuando la persona te pida que paremos.</p>
+        <p style="margin: 0; font-weight: 600">Esta acción no se puede deshacer.</p>
+        <div class="actions"><button type="button" class="btn t" onClick="{{closeAll}}">Cancelar</button><button type="button" class="btn dd" onClick="{{withdraw}}">Borrar contacto</button></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{exportOpen}}" hint-placeholder-val="{{false}}">
+    <div class="{{scrimCls}}">
+      <div class="dlg" role="dialog" aria-label="Exportar CSV">
+        <h2>Exportar {{rowsWord}}</h2>
+        <div class="kv"><span>Filtro</span><span>{{filterLabel}}</span><span>Búsqueda</span><span>Ninguna</span><span>Columnas</span><span>Nombre, Estado, Correo, Teléfono, Desde</span><span>Archivo</span><span style="word-break: break-all">{{fileName}}</span></div>
+        <span class="note">Queda registrado quién lo descargó.</span>
+        <div class="actions"><button type="button" class="btn t" onClick="{{closeAll}}">Cancelar</button><button type="button" class="btn p" onClick="{{download}}"><span class="ms">download</span>Descargar CSV</button></div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"opcion":{"editor":"enum","options":["A","B","C"],"default":"A"},"estrecho":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1000}}'>
+var RAIL = [['ini','home','Inicio'],['hor','calendar_month','Horario'],['cli','group','Clientas'],['pro','campaign','Promociones'],['com','forum','Comentarios'],['din','payments','Dinero'],['est','storefront','Estudio'],['inf','bar_chart','Informes'],['aj','settings','Ajustes']];
+var CLIENTS = [
+  { n: 'Isabel Arce', ini: 'IA', mail: 'isabel@example.com', tel: '🇧🇴 +591 70011003', plan: 'Mensual 16 clases', left: 9, total: 16, ends: '26 de noviembre', by: '—', k: 'ok', estado: 'Activo', founder: '2', f: 'con' },
+  { n: 'Lucía Fernández', ini: 'LF', mail: 'lucia@example.com', tel: '🇧🇴 +591 70011001', plan: 'Paquete de 8 clases', left: 5, total: 8, ends: '28 de noviembre', by: '—', k: 'ok', estado: 'Activo', founder: '1', f: 'con' },
+  { n: 'Mariana Peña', ini: 'MP', mail: 'mariana@example.com', tel: '🇧🇴 +591 70011005', plan: 'Sin plan', left: null, ends: '—', by: 'Sofía Guzmán', k: 'none', estado: 'Sin plan', founder: '', f: 'sin' },
+  { n: 'Sofía Guzmán', ini: 'SG', mail: 'sofia@example.com', tel: '🇧🇴 +591 70011004', plan: 'Paquete de 8 clases', left: null, ends: 'Venció el 30 de octubre', by: '—', k: 'bad', estado: 'Expirado', founder: '', f: 'exp' },
+  { n: 'Valeria Quiroga', ini: 'VQ', mail: 'valeria@example.com', tel: '🇧🇴 +591 70011002', plan: 'Paquete de 8 clases', left: 2, total: 8, ends: '6 de noviembre', by: 'Sofía Guzmán', k: 'ok', estado: 'Activo', founder: '', f: 'con' }
+];
+var CLOSED = [
+  { id: 'as', n: 'Andrea Salinas', ini: 'AS', mail: 'andrea@example.com', tel: '🇧🇴 +591 70011021', since: '3 de noviembre' },
+  { id: 'cm', n: 'Carla Méndez', ini: 'CM', mail: 'carla@example.com', tel: 'Sin celular', since: '12 de octubre' }
+];
+var FL = [['todas', 'Todas', 'todas'], ['con', 'Con plan', 'con-plan'], ['sin', 'Sin plan', 'sin-plan'], ['exp', 'Expirado', 'expirado'], ['fun', 'Fundadora', 'fundadora'], ['cerr', 'Cuenta cerrada', 'cuenta-cerrada']];
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var op = this.props.opcion ?? 'A';
+    var narrow = !!(this.props.estrecho ?? false);
+    var flt = st.flt || 'todas';
+    var gone = st.gone || [];
+    function set(o) { return function () { self.setState(o); }; }
+    var reset = { notice: '', confirm: null, exportOpen: false };
+    function pick(id) { return set(Object.assign({}, reset, { flt: id })); }
+    var closedAll = st.empty ? [] : CLOSED.filter(function (c) { return gone.indexOf(c.id) < 0; });
+    var isClosed = flt === 'cerr';
+    var live = CLIENTS.filter(function (c) { return flt === 'todas' || (flt === 'fun' ? !!c.founder : c.f === flt); }).map(function (c) {
+      return Object.assign({}, c, { leftLabel: c.left === null ? '—' : c.left + ' de ' + c.total, pillCls: 'pill ' + c.k });
+    });
+    var closed = closedAll.map(function (c) { return Object.assign({}, c, { ask: set({ confirm: c.id, notice: '' }) }); });
+    var rowsCount = isClosed ? closed.length : live.length;
+    var rowsWord = isClosed ? rowsCount + (rowsCount === 1 ? ' exclienta' : ' exclientas') : rowsCount + (rowsCount === 1 ? ' clienta' : ' clientas');
+    var fl = FL.filter(function (f) { return f[0] === flt; })[0];
+    var fileName = 'clientas-' + fl[2] + '-2026-11-17.csv';
+    var chipOf = function (f) { return { label: f[1], on: f[0] === flt, cls: 'f' + (f[0] === flt ? ' on' : ''), go: pick(f[0]) }; };
+    var chips = FL.slice(0, op === 'B' ? 5 : 6).map(chipOf);
+    var conf = CLOSED.filter(function (c) { return c.id === st.confirm; })[0] || CLOSED[0];
+    var withdraw = function () { self.setState({ gone: gone.concat([conf.id]), confirm: null, notice: 'Borramos el contacto de ' + conf.n + '.' }); };
+    var exported = set({ exportOpen: false, notice: 'Descargamos ' + fileName + ' con ' + rowsWord + '.' });
+    var exportNow = op === 'C' ? set({ exportOpen: true, notice: '', confirm: null }) : exported;
+    var footer = isClosed
+      ? (rowsCount === 0 ? '' : 'Mostrando ' + rowsWord + ' · no tienen ficha')
+      : 'Mostrando ' + rowsCount + ' de 5 clientas · toca una fila para abrir su ficha';
+    var proto = [
+      ['Todas', { flt: 'todas', gone: [], empty: false }],
+      ['Cuenta cerrada', { flt: 'cerr', gone: [], empty: false }],
+      ['Dejar de enviar', { flt: 'cerr', gone: [], empty: false, confirm: 'as' }],
+      ['Exportar', op === 'C' ? { flt: 'con', gone: [], empty: false, exportOpen: true } : { flt: 'con', gone: [], empty: false, notice: 'Descargamos clientas-con-plan-2026-11-17.csv con 3 clientas.' }],
+      ['Cuenta cerrada vacía', { flt: 'cerr', gone: [], empty: true }]
+    ].map(function (p) { return { label: p[1].flt === undefined ? p[0] : p[0], go: set(Object.assign({}, reset, p[1])) }; });
+    return {
+      rootStyle: narrow ? 'width: 420px; min-height: 1000px' : 'width: 1440px; min-height: 1000px',
+      proto: proto,
+      wide: !narrow, narrow: narrow,
+      rail: RAIL.map(function (r) { return { icon: r[1], label: r[2], cls: 'ri' + (r[0] === 'cli' ? ' on' : '') }; }),
+      isB: op === 'B',
+      exportInHead: op !== 'B',
+      chips: chips,
+      closedChip: chipOf(FL[5]),
+      closedCount: closedAll.length,
+      rowsCount: rowsCount, rowsWord: rowsWord, noRows: rowsCount === 0,
+      exportNow: exportNow, download: exported,
+      explainLine: isClosed && op === 'A',
+      explainCard: isClosed && op === 'C',
+      hasNotice: !!st.notice, notice: st.notice || '',
+      liveView: !isClosed,
+      live: live, closed: closed,
+      closedTableA: isClosed && rowsCount > 0 && !narrow && op === 'A',
+      closedTableB: isClosed && rowsCount > 0 && !narrow && op === 'B',
+      closedListC: isClosed && rowsCount > 0 && !narrow && op === 'C',
+      closedNarrow: isClosed && rowsCount > 0 && narrow,
+      closedEmpty: isClosed && rowsCount === 0,
+      footer: footer,
+      confirmOpen: !!st.confirm, conf: conf, withdraw: withdraw,
+      exportOpen: !!st.exportOpen, filterLabel: fl[1], fileName: fileName,
+      closeAll: set({ confirm: null, exportOpen: false }),
+      scrimCls: narrow ? 'scrim sheet' : 'scrim'
+    };
+  }
+}
+</script>
+</body>
+</html>

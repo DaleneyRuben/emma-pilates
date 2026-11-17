@@ -1,0 +1,80 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-17T15:00:00Z"
+ },
+ "title": "Propuestas contactos en Clientas",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Hallazgo 91 · Contactos dentro de Clientas (léeme)"
+  },
+  "Selector.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 1000,
+   "title": "A · Un filtro más · 1440 (recomendada)",
+   "is_interactive": true
+  },
+  "OpcionA420.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 420,
+   "h": 1000,
+   "title": "A · Un filtro más · 420",
+   "is_interactive": true
+  },
+  "OpcionB.dc.html": {
+   "x": 0,
+   "y": 2140,
+   "w": 1440,
+   "h": 1000,
+   "title": "B · Aparte, al final · 1440",
+   "is_interactive": true
+  },
+  "OpcionB420.dc.html": {
+   "x": 1520,
+   "y": 2140,
+   "w": 420,
+   "h": 1000,
+   "title": "B · Aparte, al final · 420",
+   "is_interactive": true
+  },
+  "OpcionC.dc.html": {
+   "x": 0,
+   "y": 3260,
+   "w": 1440,
+   "h": 1000,
+   "title": "C · Con resumen antes de exportar · 1440",
+   "is_interactive": true
+  },
+  "OpcionC420.dc.html": {
+   "x": 1520,
+   "y": 3260,
+   "w": 420,
+   "h": 1000,
+   "title": "C · Con resumen antes de exportar · 420",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Selector.dc.html",
+  "OpcionA420.dc.html",
+  "OpcionB.dc.html",
+  "OpcionB420.dc.html",
+  "OpcionC.dc.html",
+  "OpcionC420.dc.html"
+ ],
+ "notes": {},
+ "designSystems": []
+}

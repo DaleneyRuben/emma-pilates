@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Contactos dentro de Clientas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 64px 80px; background: #FAF7F2; font-family: 'Work Sans', sans-serif; color: #4A4A4A; display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #93615D; font-weight: 500">Hallazgo 91 · Administración web · Seguimiento 267</div>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 400; font-size: 44px">Los contactos pasan a Clientas</h1>
+    <p style="margin: 0; max-width: 940px; font-size: 17px; line-height: 1.6; color: #6E6663">Elegiste «Filtro + CSV en Clientas». La página Promociones › Contactos desaparece (la pestaña y el botón «Contactos para promociones»). Clientas suma el filtro «Cuenta cerrada», con las exclientas que pidieron seguir recibiendo promociones y su «Dejar de enviar», y un «Exportar CSV» que descarga lo que estás viendo. Las tres opciones hacen lo mismo; cambia cómo se ve.</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #93615D; color: #fff">Recomendada</span>
+      <span style="font-family: Lora, serif; font-size: 24px">A · Un filtro más</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #6E6663">«Cuenta cerrada» es el sexto filtro, igual a los otros. «Exportar CSV» va junto al título. Con «Cuenta cerrada» la tabla muestra solo lo que tiene una exclienta: contacto, desde cuándo recibe promociones y «Dejar de enviar».</span>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-family: Lora, serif; font-size: 24px">B · Aparte, al final</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #6E6663">«Cuenta cerrada» va separado por una línea, con cuántas hay. La tabla es la misma para todos los filtros, con «—» donde una exclienta no tiene plan. «Exportar CSV · 5» queda al final de los filtros y dice cuántas filas descarga.</span>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-family: Lora, serif; font-size: 24px">C · Con resumen antes de exportar</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #6E6663">Filtros como A. «Cuenta cerrada» explica la lista en una tarjeta y muestra filas como «Para contactar». «Exportar CSV» abre un resumen de lo que vas a descargar antes de bajarlo.</span>
+    </div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.55">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: #6F6662">En las tres</span>
+      <span>Una cuenta cerrada nunca aparece en Todas, Con plan, Sin plan, Expirado ni Fundadora, y no cuenta en «5 clientas».</span>
+      <span>Una exclienta no tiene ficha: su fila no abre nada. «Dejar de enviar» pide confirmar y borra su nombre, correo y teléfono, como hoy.</span>
+      <span>Administración y Coordinación ven el filtro, la acción y el CSV, como veían Contactos.</span>
+      <span>Si alguien abre la dirección vieja de Contactos, llega a Clientas › Cuenta cerrada.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.55">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: #6F6662">El CSV</span>
+      <span>Columnas: Nombre, Estado, Correo, Teléfono, Desde. Estado es la etiqueta de la fila (Activo, Expirado, Sin plan, Cuenta cerrada). Desde es cuándo se registró, o cuándo una exclienta pidió seguir recibiendo promociones.</span>
+      <span>Respeta el filtro y la búsqueda. El nombre dice el filtro: clientas-con-plan-2026-11-17.csv.</span>
+      <span style="color: #6E6663">Cada tablero tiene arriba una franja oscura «Prototipo» que no es parte del diseño: sus botones saltan a cada caso. Los filtros y botones de la página también funcionan.</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
