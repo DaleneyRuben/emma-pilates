@@ -99,7 +99,8 @@ export function ClientsPage({
   // Under «Cuenta cerrada» the directory is read only for the studio counts.
   const query = useQuery(
     clientTableQueryOptions(
-      closed ? { page: 1, pageSize: 1, filter: undefined } : search,
+      // Todas' first page, so leaving the chip shows it from the cache.
+      closed ? { page: 1, pageSize: search.pageSize } : search,
     ),
   );
   const closedQuery = useQuery({
@@ -132,7 +133,11 @@ export function ClientsPage({
     <Button
       variant="neutral"
       busy={exportClients.isPending}
-      disabled={shown === undefined || shown.totalItems === 0}
+      disabled={
+        shown === undefined ||
+        shown.totalItems === 0 ||
+        (closed ? closedQuery.isPlaceholderData : query.isPlaceholderData)
+      }
       onClick={() => {
         setNotice(null);
         exportClients.mutate(undefined, { onSuccess: setNotice });
