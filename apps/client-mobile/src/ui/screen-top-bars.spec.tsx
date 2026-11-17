@@ -7,7 +7,6 @@ import { SessionDetailScreen } from "../booking/session-detail-screen";
 import { ClientFetcherContext } from "../client-fetcher";
 import { BookEvaluationScreen } from "../evaluations/book-evaluation-screen";
 import { EvaluationAvailabilityScreen } from "../evaluations/evaluation-availability-screen";
-import { MyEvaluationsScreen } from "../evaluations/my-evaluations-screen";
 import { PaymentScreen } from "../payments/payment-screen";
 import { ReferralsScreen } from "../payments/referrals-screen";
 import { PlanDetailScreen } from "../plans/plan-detail-screen";
@@ -71,7 +70,6 @@ const screens: [string, ComponentType<never>, object, string, ("title" | "contex
     "Evaluación nutricional",
     "context",
   ],
-  ["15", MyEvaluationsScreen as ComponentType<never>, {}, "Mis evaluaciones"],
   ["16", ReferralsScreen as ComponentType<never>, {}, "Invita a una amiga"],
   ["22", EditProfileScreen as ComponentType<never>, {}, "Editar perfil"],
   ["24", CloseAccountScreen as ComponentType<never>, {}, "Cerrar mi cuenta"],

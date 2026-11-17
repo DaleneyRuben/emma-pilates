@@ -37,9 +37,9 @@ const moved = upcomingEvaluation("evaluation-paid", boliviaInstant(secondDay, "1
 type Sent = { slotId: string; key: string | null };
 
 const openPicker = async (fetcher: typeof globalThis.fetch) => {
-  const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+  const screen = await openProfileRow(fetcher, "Evaluación nutricional");
   await fireEvent.press(await screen.findByRole("button", { name: "Reprogramar" }));
-  expect(await screen.findByText("Elige otro turno")).toBeOnTheScreen();
+  expect(await screen.findByText("Elige el nuevo horario")).toBeOnTheScreen();
   return screen;
 };
 
@@ -91,8 +91,9 @@ describe("Around a paid Evaluation move", () => {
     const screen = await openPicker(fetcher);
     await pick(screen, secondDay, "15:00");
     expect(await screen.findByText("Evaluación reprogramada")).toBeOnTheScreen();
-    // popTo removed the picker from the stack: nothing is left to go Back to.
-    expect(screen.queryByText("Elige otro turno")).toBeNull();
+    // The same screen leaves the slot choice and shows the booking section again.
+    expect(screen.queryByText("Elige el nuevo horario")).toBeNull();
+    expect(screen.getByText("Reserva otra evaluación")).toBeOnTheScreen();
   });
 
   it("retries the same slot under the same key after a lost response", async () => {
@@ -155,12 +156,8 @@ describe("Around a paid Evaluation move", () => {
     });
     const screen = await openPicker(fetcher);
 
-    expect(
-      await screen.findByText(
-        "Tu evaluación ya está pagada. Elige el nuevo horario: el pago se mantiene.",
-      ),
-    ).toBeOnTheScreen();
-    expect(screen.queryByText("Necesitas un plan activo")).toBeNull();
+    expect(await screen.findByText(/^Cambias tu cita del /)).toBeOnTheScreen();
+    expect(screen.queryByText(/Necesitas un plan activo/)).toBeNull();
     expect(screen.getByRole("button", { name: "Turno 09:00" })).toBeOnTheScreen();
   });
 

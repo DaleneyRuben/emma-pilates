@@ -115,7 +115,7 @@ describe("Client Home quick actions and notification destinations", () => {
     clearMobileQueryCache();
   });
 
-  it("opens Mis evaluaciones from the Evaluation tile when one is booked", async () => {
+  it("opens Evaluación nutricional with the booked one from the Evaluation tile", async () => {
     const screen = await openApp(routeFetcher(routes()));
 
     // The tiles carry no note with a Plan (follow-up 227); the summary is the hint.
@@ -126,7 +126,7 @@ describe("Client Home quick actions and notification destinations", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Evaluación nutricional" }));
     await waitFor(() => {
-      expect(screen.getByText("Mis evaluaciones")).toBeOnTheScreen();
+      expect(screen.getByText("Tu próxima evaluación")).toBeOnTheScreen();
     });
   });
 
@@ -151,7 +151,7 @@ describe("Client Home quick actions and notification destinations", () => {
     });
   });
 
-  it("opens Notificaciones from the Inicio bell, then Mis evaluaciones and Mis reservas", async () => {
+  it("opens Notificaciones from the Inicio bell, then Evaluación nutricional and Mis reservas", async () => {
     const screen = await openApp(routeFetcher(routes()));
     // The walkthrough (n.º 11): the bell carries the unread count, not the Perfil tab.
     await waitFor(() => {
@@ -164,7 +164,7 @@ describe("Client Home quick actions and notification destinations", () => {
 
     await fireEvent.press(screen.getByText("El estudio canceló tu evaluación nutricional."));
     await waitFor(() => {
-      expect(screen.getByText("Mis evaluaciones")).toBeOnTheScreen();
+      expect(screen.getByText("Tu próxima evaluación")).toBeOnTheScreen();
     });
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));

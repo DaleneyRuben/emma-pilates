@@ -19,14 +19,6 @@ const dayMonthFormatter = new Intl.DateTimeFormat("es-BO", {
   month: "long",
   timeZone,
 });
-const shortMonthFormatter = new Intl.DateTimeFormat("es-BO", {
-  month: "short",
-  timeZone,
-});
-const dayNumberFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "2-digit",
-  timeZone,
-});
 // Months are first-day civil dates; format them at UTC noon so no zone
 // shifts them into the previous month.
 const monthNameFormatter = new Intl.DateTimeFormat("es-BO", {
@@ -49,15 +41,6 @@ export function evaluationDate(instant: string): string {
 // "6 de agosto, 09:30".
 export function evaluationDayAndTime(instant: string): string {
   return `${dayMonthFormatter.format(new Date(instant))}, ${clockTime(instant)}`;
-}
-
-// Calendar badge parts: "24" and "Ago".
-export function evaluationBadge(instant: string): { day: string; month: string } {
-  const month = shortMonthFormatter.format(new Date(instant)).replace(".", "");
-  return {
-    day: dayNumberFormatter.format(new Date(instant)),
-    month: capitalized(month),
-  };
 }
 
 // "octubre" for "2026-10-01".

@@ -1,13 +1,16 @@
 export type ClientNotificationRoute =
   | readonly [
       "ProfileTab",
-      { screen: "Subscription" | "MyEvaluations" | "PaymentStatus" | "MyInvoices" },
+      {
+        screen: "Subscription" | "EvaluationAvailability" | "PaymentStatus" | "MyInvoices";
+      },
     ]
   | readonly ["Bookings", { screen: "MyBookings" }];
 
 const routes: Readonly<Record<string, ClientNotificationRoute>> = {
   subscription: ["ProfileTab", { screen: "Subscription" }],
-  evaluation: ["ProfileTab", { screen: "MyEvaluations" }],
+  // Finding 70: one «Evaluación nutricional» holds the booked ones too.
+  evaluation: ["ProfileTab", { screen: "EvaluationAvailability" }],
   payment: ["ProfileTab", { screen: "PaymentStatus" }],
   // FIX-044: «Tu factura está lista».
   invoice: ["ProfileTab", { screen: "MyInvoices" }],

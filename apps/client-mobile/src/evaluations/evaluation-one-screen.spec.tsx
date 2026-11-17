@@ -61,6 +61,20 @@ describe("One Evaluación nutricional screen", () => {
     expect(screen.queryByRole("button", { name: "Mis evaluaciones" })).toBeNull();
   });
 
+  // It absorbed Mis evaluaciones, a browsing screen (follow-up 254 § 3): the
+  // bar stays, and hides only inside Confirma tu cita.
+  it("keeps the tab bar here and hides it on Confirma tu cita", async () => {
+    const screen = await openProfileRow(fetcherWith([]), "Evaluación nutricional");
+
+    expect(await screen.findByText("Reserva tu evaluación")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^Reservar, tab/ })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Turno 09:00" }));
+    expect(await screen.findByText("Confirma tu cita")).toBeOnTheScreen();
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: /^Reservar, tab/ })).toBeNull();
+    });
+  });
+
   it("shows the slots and the past Evaluations when nothing is booked", async () => {
     const screen = await openProfileRow(fetcherWith([]), "Evaluación nutricional");
 

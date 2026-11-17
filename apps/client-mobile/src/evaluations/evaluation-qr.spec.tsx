@@ -84,14 +84,14 @@ describe("The studio QR on a paid Evaluation", () => {
     expect(screen.queryByLabelText("Código QR del estudio")).toBeNull();
   });
 
-  it("opens the QR and the receipt in a sheet from Mis evaluaciones", async () => {
+  it("opens the QR and the receipt in a sheet from the next Evaluation", async () => {
     const fetcher = routeFetcher(
       baseRoutes({
         ...qrRoute,
         "/api/v1/evaluations?scope=upcoming": () => jsonResponse(page([pendingReceipt()])),
       }),
     );
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     await fireEvent.press(
       await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
@@ -137,7 +137,7 @@ describe("The studio QR on a paid Evaluation", () => {
         },
       }),
     );
-    const screen = await openProfileRow(fetcher, "Mis evaluaciones");
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
     const cardButtons = await screen.findAllByRole("button", {
       name: "Sube tu comprobante de transferencia",
     });
