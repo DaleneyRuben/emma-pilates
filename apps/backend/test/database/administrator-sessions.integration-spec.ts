@@ -231,8 +231,15 @@ describe('Sessions across every Branch', () => {
   it('gives the Staff Horario one Branch day with its cancelled classes only when asked (FIX-052)', async () => {
     const from = new Date(Date.now() + 16 * day);
     const until = new Date(from.getTime() + 3 * day);
+    // FIX-061: Centro, whose fixtures hold at least two classes every
+    // weekday, so the window always has another class beside the target
+    // whatever day the suite runs (Equipetrol or Urubó may hold just one).
     const target = await prisma.session.findFirstOrThrow({
-      where: { state: 'SCHEDULED', startsAt: { gte: from, lt: until } },
+      where: {
+        branchId: deterministicId('branch:centro'),
+        state: 'SCHEDULED',
+        startsAt: { gte: from, lt: until },
+      },
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
     });
     const account = await prisma.account.findFirstOrThrow();
