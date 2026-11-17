@@ -38,7 +38,7 @@ export const fetchAllPromotionContacts = async (): Promise<
   AdminPromotionContactDto[]
 > =>
   (
-    (await exportAdminPromotionContacts(undefined, adminFetch))
+    (await exportAdminPromotionContacts(undefined, undefined, adminFetch))
       .data as AdminPromotionContactExportDto
   ).items;
 

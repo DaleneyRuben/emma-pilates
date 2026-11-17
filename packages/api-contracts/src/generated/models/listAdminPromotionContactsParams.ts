@@ -4,8 +4,13 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ListAdminPromotionContactsKind } from "./listAdminPromotionContactsKind";
 
 export type ListAdminPromotionContactsParams = {
+  /**
+   * Only live Clients or only former Clients; both when absent (FIX-065: Clientas › Cuenta cerrada asks for former_client)
+   */
+  kind?: ListAdminPromotionContactsKind;
   /**
    * Name, email, or phone fragment, accents and case ignored
    */

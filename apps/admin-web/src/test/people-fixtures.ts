@@ -36,6 +36,7 @@ export const clientRow = (
   planEndsOn: "2026-09-30",
   founderNumber: null,
   invitedByName: null,
+  clientSince: "2026-09-01",
   ...extra,
 });
 
