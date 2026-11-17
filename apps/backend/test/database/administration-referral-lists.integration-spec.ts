@@ -145,7 +145,17 @@ describe('Prisma administration Referral list for AW26', () => {
     const grantedAt = new Date('2026-09-20T14:00:00.000Z');
     await world.prisma.guestPass.update({
       where: { id: passId },
-      data: { rewardedAt: grantedAt, rewardOwed: false },
+      data: {
+        rewardedAt: grantedAt,
+        rewardOwed: false,
+        // The class lands on one of Sofía's Subscriptions (BKM-014).
+        rewardSubscriptionId: (
+          await world.prisma.subscription.findFirstOrThrow({
+            where: { clientId: sofia.id },
+            select: { id: true },
+          })
+        ).id,
+      },
     });
     expect((await rowsByName())['Mariana Peña']).toMatchObject({
       inviteReward: 'granted',

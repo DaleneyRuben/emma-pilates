@@ -146,6 +146,7 @@ export const createPrismaOversight = (
           createdAt: true,
           awardedAt: true,
           referrerClientId: true,
+          referredClientId: true,
           referrer: { select: { name: true } },
           referred: { select: { name: true } },
         },
@@ -165,6 +166,39 @@ export const createPrismaOversight = (
       },
       _count: { _all: true },
     });
+    // FIX-060 (walkthrough finding 86): the friend's first confirmed Plan
+    // purchase (a guest pass's courtesy is none) and her guest pass, which
+    // records the host's extra class (BKM-014).
+    const referredIds = rows.map((row) => row.referredClientId);
+    const [purchases, passes] = await Promise.all([
+      prisma.payment.groupBy({
+        by: ['clientId'],
+        where: {
+          clientId: { in: referredIds },
+          kind: 'PLAN',
+          state: 'CONFIRMED',
+          method: { not: 'COURTESY' },
+        },
+        _min: { decidedAt: true },
+      }),
+      prisma.guestPass.findMany({
+        where: { friendClientId: { in: referredIds }, deletedAt: null },
+        select: { friendClientId: true, rewardedAt: true, rewardOwed: true },
+      }),
+    ]);
+    const inviteRewardOf = (friendClientId: string) => {
+      const pass = passes.find((row) => row.friendClientId === friendClientId);
+      if (pass?.rewardedAt) {
+        return {
+          inviteReward: 'granted' as const,
+          inviteRewardGrantedAt: pass.rewardedAt,
+        };
+      }
+      return {
+        inviteReward: pass?.rewardOwed ? ('owed' as const) : ('none' as const),
+        inviteRewardGrantedAt: null,
+      };
+    };
     const countOf = (state: ReferralState) =>
       byState.find((group) => group.state === state)?._count._all ?? 0;
     return {
@@ -180,6 +214,10 @@ export const createPrismaOversight = (
         awardedAt: row.awardedAt,
         state:
           row.state === 'AWARDED' ? ('awarded' as const) : ('pending' as const),
+        firstPurchaseAt:
+          purchases.find((group) => group.clientId === row.referredClientId)
+            ?._min.decidedAt ?? null,
+        ...inviteRewardOf(row.referredClientId),
       })),
       page: query.page,
       pageSize: query.pageSize,
