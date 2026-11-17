@@ -12,11 +12,17 @@ export type CampaignRecipient = {
   name: string;
 };
 
+// FIX-060 (walkthrough finding 87): why a Client gets nothing. A founder is
+// never in a campaign, whatever her Plan; anyone else lacks a live one.
+export type CampaignSkipReason = 'founder' | 'no_current_plan';
+
+export type SkippedClient = CampaignRecipient & { reason: CampaignSkipReason };
+
 export type CampaignGrant = {
   name: string;
   classes: number;
   granted: CampaignRecipient[];
-  skipped: CampaignRecipient[];
+  skipped: SkippedClient[];
 };
 
 export class CampaignError extends Error {
@@ -30,13 +36,13 @@ export class CampaignError extends Error {
 
 export type CampaignPreview = {
   recipientCount: number;
-  skipped: CampaignRecipient[];
+  skipped: SkippedClient[];
 };
 
 export const previewCampaign = async (dependencies: {
   principal: AuthenticatedPrincipal;
   countRecipients: () => Promise<number>;
-  findSkipped: () => Promise<readonly CampaignRecipient[]>;
+  findSkipped: () => Promise<readonly SkippedClient[]>;
 }): Promise<CampaignPreview> => {
   requireAdministrator(dependencies.principal);
   const [recipientCount, skipped] = await Promise.all([
@@ -59,7 +65,7 @@ type Dependencies = {
   now: Date;
   today: Date;
   findRecipients: () => Promise<readonly LiveRecipient[]>;
-  findSkipped: () => Promise<readonly CampaignRecipient[]>;
+  findSkipped: () => Promise<readonly SkippedClient[]>;
   record: (input: {
     subscriptionId: string;
     clientId: string;

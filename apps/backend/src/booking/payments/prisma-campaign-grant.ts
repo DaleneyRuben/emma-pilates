@@ -9,8 +9,8 @@ import {
   type CampaignCommand,
   type CampaignGrant,
   type CampaignPreview,
-  type CampaignRecipient,
   type LiveRecipient,
+  type SkippedClient,
 } from './grant-campaign';
 
 type Transaction = Prisma.TransactionClient;
@@ -33,18 +33,23 @@ const liveOn = (today: Date): Prisma.SubscriptionWhereInput => ({
   },
 });
 
+const activeFounderIds = async (transaction: Transaction) =>
+  (
+    await transaction.founderMembership.findMany({
+      where: { deletedAt: null, status: 'ACTIVE' },
+      select: { clientId: true },
+    })
+  ).map((founder) => founder.clientId);
+
 const findRecipients = async (
   transaction: Transaction,
   today: Date,
 ): Promise<LiveRecipient[]> => {
-  const founders = await transaction.founderMembership.findMany({
-    where: { deletedAt: null, status: 'ACTIVE' },
-    select: { clientId: true },
-  });
+  const founders = await activeFounderIds(transaction);
   const rows = await transaction.client.findMany({
     where: {
       ...withAccount,
-      id: { notIn: founders.map((founder) => founder.clientId) },
+      id: { notIn: founders },
       subscriptions: { some: liveOn(today) },
     },
     orderBy: [{ name: 'asc' }, { id: 'asc' }],
@@ -71,8 +76,11 @@ const findRecipients = async (
 const findSkipped = async (
   transaction: Transaction,
   today: Date,
-): Promise<CampaignRecipient[]> => {
-  const recipients = await findRecipients(transaction, today);
+): Promise<SkippedClient[]> => {
+  const [recipients, founders] = await Promise.all([
+    findRecipients(transaction, today),
+    activeFounderIds(transaction),
+  ]);
   const rows = await transaction.client.findMany({
     where: {
       ...withAccount,
@@ -81,7 +89,11 @@ const findSkipped = async (
     orderBy: [{ name: 'asc' }, { id: 'asc' }],
     select: { id: true, name: true },
   });
-  return rows.map((row) => ({ clientId: row.id, name: row.name }));
+  return rows.map((row) => ({
+    clientId: row.id,
+    name: row.name,
+    reason: founders.includes(row.id) ? 'founder' : 'no_current_plan',
+  }));
 };
 
 export const createPrismaCampaignGrant = (
