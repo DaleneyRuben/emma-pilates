@@ -15612,6 +15612,22 @@
           "reason"
         ]
       },
+      "CampaignClientDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientId",
+          "name"
+        ]
+      },
       "CampaignSkippedClientDto": {
         "type": "object",
         "properties": {
@@ -15628,7 +15644,7 @@
               "founder",
               "no_current_plan"
             ],
-            "description": "A founder is never in a campaign; anyone else has no live paid Plan"
+            "description": "Deprecated: a campaign skips nobody since FIX-064"
           }
         },
         "required": [
@@ -15641,9 +15657,18 @@
         "type": "object",
         "properties": {
           "recipientCount": {
-            "type": "number"
+            "type": "number",
+            "description": "Every active Client, with a Plan or owed"
+          },
+          "owed": {
+            "description": "Active Clients without a current Plan: their next activated Plan collects the classes",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignClientDto"
+            }
           },
           "skipped": {
+            "deprecated": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CampaignSkippedClientDto"
@@ -15652,6 +15677,7 @@
         },
         "required": [
           "recipientCount",
+          "owed",
           "skipped"
         ]
       },
@@ -15673,22 +15699,6 @@
           "classes"
         ]
       },
-      "CampaignClientDto": {
-        "type": "object",
-        "properties": {
-          "clientId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "clientId",
-          "name"
-        ]
-      },
       "CampaignResultDto": {
         "type": "object",
         "properties": {
@@ -15699,12 +15709,21 @@
             "type": "number"
           },
           "granted": {
+            "description": "Active Clients whose current Plan received the classes",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignClientDto"
+            }
+          },
+          "owed": {
+            "description": "Active Clients without a current Plan: their next activated Plan collects the classes",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CampaignClientDto"
             }
           },
           "skipped": {
+            "deprecated": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CampaignSkippedClientDto"
@@ -15715,6 +15734,7 @@
           "name",
           "classes",
           "granted",
+          "owed",
           "skipped"
         ]
       },

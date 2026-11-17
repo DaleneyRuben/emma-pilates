@@ -9,6 +9,6 @@ import type { CampaignSkippedClientDtoReason } from "./campaignSkippedClientDtoR
 export interface CampaignSkippedClientDto {
   clientId: string;
   name: string;
-  /** A founder is never in a campaign; anyone else has no live paid Plan */
+  /** Deprecated: a campaign skips nobody since FIX-064 */
   reason: CampaignSkippedClientDtoReason;
 }

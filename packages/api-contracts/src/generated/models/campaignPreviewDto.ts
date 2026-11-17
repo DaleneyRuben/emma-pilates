@@ -4,9 +4,14 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { CampaignClientDto } from "./campaignClientDto";
 import type { CampaignSkippedClientDto } from "./campaignSkippedClientDto";
 
 export interface CampaignPreviewDto {
+  /** Every active Client, with a Plan or owed */
   recipientCount: number;
+  /** Active Clients without a current Plan: their next activated Plan collects the classes */
+  owed: CampaignClientDto[];
+  /** @deprecated */
   skipped: CampaignSkippedClientDto[];
 }
