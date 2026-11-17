@@ -1,6 +1,7 @@
 import type { Provider } from '@nestjs/common';
 import type { PrismaClient } from '../../generated/prisma/client';
 import {
+  exportAdministratorClients,
   listAdministratorClients,
   readAdministratorClient,
   updateAdministratorClientProfile,
@@ -25,6 +26,8 @@ export const administratorClientProvider = (prismaToken: symbol): Provider => ({
         listAdministratorClients(query, principal, dependencies),
       read: (command, principal) =>
         readAdministratorClient(command, principal, dependencies),
+      export: (query, principal) =>
+        exportAdministratorClients(query, principal, dependencies),
       updateProfile: async (command, principal) => {
         await updateAdministratorClientProfile(
           command,

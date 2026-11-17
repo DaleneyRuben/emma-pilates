@@ -100,6 +100,7 @@ export const createPrismaAdministratorClients = (
           select: {
             id: true,
             name: true,
+            createdAt: true,
             profileImageAssetId: true,
             phone: true,
             account: accountSelect,
@@ -192,6 +193,7 @@ export const createPrismaAdministratorClients = (
                   acquisition?.referrerClient?.name ??
                   row.referralReceived?.referrer.name ??
                   null,
+                clientSince: boliviaDate(row.createdAt),
               },
             ],
           ];
@@ -297,6 +299,27 @@ export const createPrismaAdministratorClients = (
       const saved = await directory.read(input.clientId);
       if (saved === null) throw new Error('Client vanished after its update');
       return saved;
+    },
+
+    // FIX-065: Clientas › «Exportar CSV» hands names, emails, and phones out
+    // of the system, as AW35's export did.
+    recordExport: async ({ actor, clientCount, filter, occurredAt }) => {
+      await prisma.auditRecord.create({
+        data: {
+          actionCode: 'client.exported',
+          outcome: AuditOutcome.SUCCEEDED,
+          actorKind: AuditActorKind.ACCOUNT,
+          actorAccountId: actor.audit.accountId,
+          actorRole: actor.audit.role,
+          impersonationId: actor.audit.impersonationId,
+          targetType: 'client',
+          targetId: null,
+          correlationId: randomUUID(),
+          occurredAt,
+          metadata:
+            filter === undefined ? { clientCount } : { clientCount, filter },
+        },
+      });
     },
   };
   return directory;

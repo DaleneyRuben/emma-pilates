@@ -28,8 +28,8 @@ export const promotionContactsWiring = {
         return {
           list: (query, principal) =>
             listPromotionContacts(query, principal, dependencies),
-          export: (principal) =>
-            exportPromotionContacts(principal, dependencies),
+          export: (filter, principal) =>
+            exportPromotionContacts(filter, principal, dependencies),
           withdraw: (command, principal) =>
             withdrawPromotionContact(command, principal, dependencies),
         };

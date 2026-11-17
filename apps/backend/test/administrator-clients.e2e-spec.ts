@@ -32,6 +32,7 @@ const row = {
   planEndsOn: new Date('2026-09-30T00:00:00.000Z'),
   founderNumber: 3,
   invitedByName: 'Sofía Guzmán',
+  clientSince: new Date('2025-07-02T00:00:00.000Z'),
 };
 const directoryPage = {
   items: [row],
@@ -107,9 +108,7 @@ describe('administrator Client endpoints (e2e)', () => {
     });
     operations.list.mockResolvedValue(directoryPage);
     operations.read.mockResolvedValue(detail);
-    operations.export.mockResolvedValue([
-      { ...row, clientSince: new Date('2025-07-02T00:00:00.000Z') },
-    ]);
+    operations.export.mockResolvedValue([row]);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [AdministratorClientsController],
@@ -139,7 +138,9 @@ describe('administrator Client endpoints (e2e)', () => {
       .expect(({ body }) =>
         expect(body).toEqual({
           ...directoryPage,
-          items: [{ ...row, planEndsOn: '2026-09-30' }],
+          items: [
+            { ...row, planEndsOn: '2026-09-30', clientSince: '2025-07-02' },
+          ],
         }),
       );
     expect(operations.list).toHaveBeenCalledWith(

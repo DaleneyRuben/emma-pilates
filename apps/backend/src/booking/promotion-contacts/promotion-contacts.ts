@@ -29,16 +29,22 @@ export type PromotionContactPage = {
   totalItems: number;
 };
 
+// FIX-065 (walkthrough finding 91): Clientas › Cuenta cerrada reads only
+// former Clients; no kind reads both, as AW35 did.
+export type PromotionContactFilter = {
+  kind?: PromotionContactKind;
+  query?: string;
+};
+
 export interface PromotionContactStore {
-  list: (input: {
-    page: number;
-    pageSize: number;
-    query?: string;
-  }) => Promise<PromotionContactPage>;
-  listAll: () => Promise<PromotionContactRow[]>;
+  list: (
+    input: { page: number; pageSize: number } & PromotionContactFilter,
+  ) => Promise<PromotionContactPage>;
+  listAll: (filter?: PromotionContactFilter) => Promise<PromotionContactRow[]>;
   recordExport: (input: {
     actor: AdministratorActor;
     contactCount: number;
+    kind?: PromotionContactKind;
     occurredAt: Date;
   }) => Promise<void>;
   withdraw: (input: {
@@ -56,30 +62,41 @@ const actorOf = (principal: AuthenticatedPrincipal): AdministratorActor => {
   return { accountId, staffMemberId, audit };
 };
 
+// A blank search is no search; no kind is both kinds.
+const filterOf = (command: PromotionContactFilter): PromotionContactFilter => {
+  const query = command.query?.trim() ?? '';
+  return {
+    ...(command.kind === undefined ? {} : { kind: command.kind }),
+    ...(query === '' ? {} : { query }),
+  };
+};
+
 export const listPromotionContacts = async (
-  command: { page: number; pageSize: number; query?: string },
+  command: { page: number; pageSize: number } & PromotionContactFilter,
   principal: AuthenticatedPrincipal,
   { store }: Dependencies,
 ): Promise<PromotionContactPage> => {
   requireOperations(principal);
-  const query = command.query?.trim() ?? '';
   return store.list({
     page: command.page,
     pageSize: command.pageSize,
-    ...(query === '' ? {} : { query }),
+    ...filterOf(command),
   });
 };
 
 // Exporting hands personal data out of the system, so it is audited.
 export const exportPromotionContacts = async (
+  command: PromotionContactFilter,
   principal: AuthenticatedPrincipal,
   { store, now }: Dependencies,
 ): Promise<PromotionContactRow[]> => {
   const actor = actorOf(principal);
-  const contacts = await store.listAll();
+  const filter = filterOf(command);
+  const contacts = await store.listAll(filter);
   await store.recordExport({
     actor,
     contactCount: contacts.length,
+    ...(filter.kind === undefined ? {} : { kind: filter.kind }),
     occurredAt: now(),
   });
   return contacts;

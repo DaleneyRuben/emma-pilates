@@ -117,6 +117,12 @@ export class AdminClientDto {
     description: 'The Client or Trainer whose Referral Code she used',
   })
   invitedByName!: string | null;
+
+  @ApiProperty({
+    format: 'date',
+    description: 'Bolivia civil date she joined (FIX-065: the CSV’s «Desde»)',
+  })
+  clientSince!: string;
 }
 
 export class AdminClientPageDto {
@@ -234,6 +240,51 @@ export const parseClientDirectoryQuery = (value: unknown) =>
       ...(q === undefined || q === '' ? {} : { query: q }),
       ...(filter === 'all' ? {} : { filter }),
     }))
+    .safeParse(value);
+
+// FIX-065 (walkthrough finding 91): one row of Clientas › «Exportar CSV».
+export class AdminClientExportRowDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty({ enum: directorySubscriptionStatuses })
+  subscriptionStatus!: DirectorySubscriptionStatus;
+
+  @ApiProperty({ format: 'email' })
+  email!: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  phone!: string | null;
+
+  @ApiProperty({ format: 'date', description: 'Bolivia civil date she joined' })
+  clientSince!: string;
+}
+
+export class AdminClientExportDto {
+  @ApiProperty({
+    type: AdminClientExportRowDto,
+    isArray: true,
+    description: 'Every Client the chip and search match, in the table order',
+  })
+  items!: AdminClientExportRowDto[];
+}
+
+// The export takes the directory's search and chip, never its paging.
+export const parseClientDirectoryExportQuery = (value: unknown) =>
+  z
+    .strictObject({
+      q: z.string().trim().max(100).optional(),
+      filter: z.enum(clientDirectoryFilters).default('all'),
+    })
+    .transform(
+      ({ q, filter }): Omit<ClientDirectoryQuery, 'page' | 'pageSize'> => ({
+        ...(q === undefined || q === '' ? {} : { query: q }),
+        ...(filter === 'all' ? {} : { filter }),
+      }),
+    )
     .safeParse(value);
 
 // IDN-009 (AW22 «Editar perfil»): the name and phone; the login email stays

@@ -29,12 +29,15 @@ import { parseUuid } from '../booking.dto';
 import type {
   AdministratorClientDetail,
   AdministratorClientPage,
+  AdministratorClientRow,
   ClientDirectoryQuery,
 } from './administrator-clients';
 import {
   AdminClientDetailDto,
+  AdminClientExportDto,
   AdminClientPageDto,
   clientDirectoryFilters,
+  parseClientDirectoryExportQuery,
   parseClientDirectoryQuery,
   parseUpdateAdminClientProfile,
   UpdateAdminClientProfileDto,
@@ -54,6 +57,11 @@ export type AdministratorClientOperations = {
     command: { clientId: string },
     principal: AuthenticatedPrincipal,
   ) => Promise<AdministratorClientDetail>;
+  /** Every row the chip and search match; audited (FIX-065). */
+  export: (
+    query: Omit<ClientDirectoryQuery, 'page' | 'pageSize'>,
+    principal: AuthenticatedPrincipal,
+  ) => Promise<AdministratorClientRow[]>;
   /** Saves the correction and answers the refreshed detail. */
   updateProfile: (
     command: { clientId: string; name: string; phone: string | null },
@@ -69,6 +77,7 @@ const toPageDto = (page: AdministratorClientPage): AdminClientPageDto => ({
     ...item,
     planEndsOn: item.planEndsOn === null ? null : civil(item.planEndsOn),
     planStartsOn: item.planStartsOn === null ? null : civil(item.planStartsOn),
+    clientSince: civil(item.clientSince),
   })),
 });
 
@@ -150,6 +159,48 @@ export class AdministratorClientsController {
     const input = parsed(parseClientDirectoryQuery(query), 'Invalid filters');
     const principal = await this.authenticate(authorization);
     return toPageDto(await run(() => this.operations.list(input, principal)));
+  }
+
+  // FIX-065 (walkthrough finding 91): Clientas › «Exportar CSV». Declared
+  // before `:clientId` so the word is never read as an identifier.
+  @Get('export')
+  @ApiOperation({
+    operationId: 'exportAdminClients',
+    description: 'Every Client the chip and search match; audited',
+  })
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    description: 'Name, email, or phone fragment, accents and case ignored',
+  })
+  @ApiQuery({
+    name: 'filter',
+    required: false,
+    enum: clientDirectoryFilters,
+    description: 'One chip of Clientas › Todas, as the list takes it',
+  })
+  @ApiOkResponse({ type: AdminClientExportDto })
+  @Header('Cache-Control', 'no-store')
+  async export(
+    @Headers('authorization') authorization: string | undefined,
+    @Query() query: unknown,
+  ): Promise<AdminClientExportDto> {
+    const input = parsed(
+      parseClientDirectoryExportQuery(query),
+      'Invalid filters',
+    );
+    const principal = await this.authenticate(authorization);
+    const rows = await run(() => this.operations.export(input, principal));
+    return {
+      items: rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        subscriptionStatus: row.subscriptionStatus,
+        email: row.email,
+        phone: row.phone,
+        clientSince: civil(row.clientSince),
+      })),
+    };
   }
 
   @Get(':clientId')

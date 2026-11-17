@@ -8,6 +8,7 @@ import {
 import type { AdministratorActor } from '../administration/administration-errors';
 import { containsPattern } from '../search-pattern';
 import type {
+  PromotionContactFilter,
   PromotionContactKind,
   PromotionContactRow,
   PromotionContactStore,
@@ -17,11 +18,17 @@ export const withdrawnContactName = 'Contacto retirado';
 export const withdrawnContactEmail = (contactId: string): string =>
   `retirado-${contactId}@contactos-retirados.invalid`;
 
-// The same accent- and case-insensitive match as the Client directory.
-const searchCondition = (query: string | undefined): Prisma.Sql => {
-  if (query === undefined) return Prisma.empty;
+// The same accent- and case-insensitive match as the Client directory, and
+// one kind when asked (FIX-065).
+const filterCondition = ({
+  query,
+  kind,
+}: PromotionContactFilter): Prisma.Sql => {
+  const ofKind =
+    kind === undefined ? Prisma.empty : Prisma.sql`AND kind = ${kind}`;
+  if (query === undefined) return ofKind;
   const pattern = containsPattern(query);
-  return Prisma.sql`AND (booking.search_text(name) LIKE booking.search_text(${pattern})
+  return Prisma.sql`${ofKind} AND (booking.search_text(name) LIKE booking.search_text(${pattern})
     OR booking.search_text(email) LIKE booking.search_text(${pattern})
     OR phone ILIKE ${pattern})`;
 };
@@ -87,8 +94,8 @@ const audit = (
 export const createPrismaPromotionContacts = (
   prisma: PrismaClient,
 ): PromotionContactStore => ({
-  list: async ({ page, pageSize, query }) => {
-    const search = searchCondition(query);
+  list: async ({ page, pageSize, ...filter }) => {
+    const search = filterCondition(filter);
     const [records, [counted]] = await Promise.all([
       prisma.$queryRaw<ContactRecord[]>`
         SELECT id, kind, name, email, phone, since
@@ -109,21 +116,23 @@ export const createPrismaPromotionContacts = (
     };
   },
 
-  listAll: async () => {
+  listAll: async (filter = {}) => {
     const records = await prisma.$queryRaw<ContactRecord[]>`
       SELECT id, kind, name, email, phone, since
       FROM ${contacts}
+      WHERE TRUE ${filterCondition(filter)}
       ORDER BY since DESC, id`;
     return records.map(toRow);
   },
 
-  recordExport: async ({ actor, contactCount, occurredAt }) => {
+  recordExport: async ({ actor, contactCount, kind, occurredAt }) => {
     await prisma.auditRecord.create({
       data: audit(actor, {
         actionCode: 'promotion_contact.exported',
         targetType: 'promotion_contact',
         targetId: null,
-        metadata: { contactCount },
+        metadata:
+          kind === undefined ? { contactCount } : { contactCount, kind },
         occurredAt,
       }),
     });

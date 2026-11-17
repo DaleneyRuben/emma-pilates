@@ -56,6 +56,7 @@ const directory = (
     .mockImplementation((input: { name: string; phone: string | null }) =>
       Promise.resolve({ ...lucia, name: input.name, phone: input.phone }),
     ),
+  recordExport: jest.fn(),
   ...overrides,
 });
 

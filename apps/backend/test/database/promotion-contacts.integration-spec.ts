@@ -215,8 +215,11 @@ describe('Promotion Contacts (PostgreSQL)', () => {
         metadata: { contactCount: 1, kind: 'former_client' },
       });
     } finally {
-      await prisma.account.deleteMany({ where: { clientId: lucia } });
-      await prisma.client.delete({ where: { id: lucia } });
+      // Soft delete only: a removed Client is no contact.
+      await prisma.client.update({
+        where: { id: lucia },
+        data: { deletedAt: occurredAt },
+      });
     }
   });
 

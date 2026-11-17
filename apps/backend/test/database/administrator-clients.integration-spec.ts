@@ -169,6 +169,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
           founderNumber: null,
           // Registered before the acquisition question: the Referral names her.
           invitedByName: 'Lucía Fernández',
+          clientSince: expect.any(Date) as Date,
         },
         {
           id: ids.lucia,
@@ -186,6 +187,8 @@ describe('Administrator Client directory (PostgreSQL)', () => {
           planEndsOn: new Date('2026-09-30T00:00:00.000Z'),
           founderNumber: null,
           invitedByName: null,
+          // 2025-07-02 23:00 in Bolivia (FIX-065's CSV «Desde»).
+          clientSince: new Date('2025-07-02T00:00:00.000Z'),
         },
       ],
       page: 1,
