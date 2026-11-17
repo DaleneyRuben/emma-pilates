@@ -168,7 +168,7 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
     ).toBeInTheDocument();
     expect(within(panel).queryByText(/de 8/)).not.toBeInTheDocument();
     expect(within(panel).getByText("Ninguna todavía")).toBeInTheDocument();
-    expect(within(panel).getByText("Sin teléfono")).toBeInTheDocument();
+    expect(within(panel).getByText("Celular incompleto")).toBeInTheDocument();
   });
 
   it("says plainly when the Client never had a Plan", async () => {
