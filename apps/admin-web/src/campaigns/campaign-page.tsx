@@ -53,7 +53,7 @@ const cardClass = "flex flex-col gap-4 rounded-marco bg-lino p-6 max-md:p-4";
 
 // AW21 (BKM-015): the Administrator grants extra classes for a campaign, a
 // start of year or a holiday, to every Client with a live Plan. A Client
-// without one is named and skipped. Never a discount.
+// without one, or a founder, is named and skipped. Never a discount.
 export function CampaignPage() {
   const preview = useQuery(campaignPreviewQueryOptions());
   const grant = useCampaignGrant();
@@ -154,7 +154,13 @@ export function CampaignPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="lg" className="self-start">
+              {/* FIX-060 (finding 87): nobody would receive anything. */}
+              <Button
+                type="submit"
+                size="lg"
+                className="self-start"
+                disabled={preview.data.recipientCount === 0}
+              >
                 Dar las clases
               </Button>
             </form>
@@ -171,8 +177,8 @@ export function CampaignPage() {
         onConfirm={() => void confirm()}
       >
         <p>
-          Cada clienta con un plan vigente recibe las clases. Una clienta sin
-          plan vigente no recibe nada, y ningún precio cambia.
+          Cada clienta con un plan vigente recibe las clases. Las fundadoras y
+          las clientas sin plan vigente no reciben nada, y ningún precio cambia.
         </p>
       </ConfirmDialog>
     </div>
