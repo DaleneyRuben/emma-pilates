@@ -6,7 +6,7 @@
  */
 
 /**
- * A live Client who agreed in Perfil, or a former Client who ticked the box when closing
+ * A live Client (listed whether or not she agreed to promotions), or a former Client who ticked the box when closing
  */
 export type AdminPromotionContactDtoKind =
   (typeof AdminPromotionContactDtoKind)[keyof typeof AdminPromotionContactDtoKind];

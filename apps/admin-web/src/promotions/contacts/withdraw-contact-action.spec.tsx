@@ -56,10 +56,10 @@ describe("AW35 «Dejar de enviar»", () => {
   useMockServer();
   beforeEach(() => server.use(...signedInHandlers()));
 
-  it("names each row's button after its contact", async () => {
+  it("names each former Client's button after her", async () => {
     server.use(
       http.get(apiUrl(promotionContactsPath), () =>
-        jsonResponse(contactPage([valeria, paula])),
+        jsonResponse(contactPage([valeria, daniela])),
       ),
     );
     renderAdmin("/promociones/contactos");
@@ -70,10 +70,10 @@ describe("AW35 «Dejar de enviar»", () => {
         name: "Dejar de enviar a Valeria Quiroga",
       }),
     ).toHaveTextContent("Dejar de enviar");
-    const live = await rowOf("Paula Antelo");
+    const other = await rowOf("Daniela Rojas");
     expect(
-      within(live).getByRole("button", {
-        name: "Dejar de enviar a Paula Antelo",
+      within(other).getByRole("button", {
+        name: "Dejar de enviar a Daniela Rojas",
       }),
     ).toHaveTextContent("Dejar de enviar");
   });
@@ -110,22 +110,22 @@ describe("AW35 «Dejar de enviar»", () => {
 
   it("clears the success line on a new search", async () => {
     const { withdrawn, handler } = withdrawal();
-    server.use(contactList([paula, daniela], withdrawn, 20), handler);
+    server.use(contactList([valeria, daniela], withdrawn, 20), handler);
     const { user } = renderAdmin("/promociones/contactos");
-    const row = await rowOf("Paula Antelo");
+    const row = await rowOf("Valeria Quiroga");
 
     await user.click(
       within(row).getByRole("button", {
-        name: "Dejar de enviar a Paula Antelo",
+        name: "Dejar de enviar a Valeria Quiroga",
       }),
     );
     await user.click(
       within(await screen.findByRole("alertdialog")).getByRole("button", {
-        name: "Dejar de enviar",
+        name: "Borrar contacto",
       }),
     );
     const notice = await screen.findByText(
-      "Paula Antelo ya no recibirá promociones.",
+      "Borramos el contacto de Valeria Quiroga.",
     );
     await user.type(
       screen.getByRole("searchbox", {
@@ -139,28 +139,28 @@ describe("AW35 «Dejar de enviar»", () => {
 
   it("clears the success line on a new page", async () => {
     const { withdrawn, handler } = withdrawal();
-    server.use(contactList([paula, daniela, valeria], withdrawn), handler);
+    server.use(contactList([valeria, daniela, paula], withdrawn), handler);
     const { user, router } = renderAdmin("/promociones/contactos?pageSize=1");
-    const row = await rowOf("Paula Antelo");
+    const row = await rowOf("Valeria Quiroga");
 
     await user.click(
       within(row).getByRole("button", {
-        name: "Dejar de enviar a Paula Antelo",
+        name: "Dejar de enviar a Valeria Quiroga",
       }),
     );
     await user.click(
       within(await screen.findByRole("alertdialog")).getByRole("button", {
-        name: "Dejar de enviar",
+        name: "Borrar contacto",
       }),
     );
     const notice = await screen.findByText(
-      "Paula Antelo ya no recibirá promociones.",
+      "Borramos el contacto de Valeria Quiroga.",
     );
     await rowOf("Daniela Rojas");
     await user.click(screen.getByRole("button", { name: "Siguiente" }));
 
     await waitFor(() => expect(searchOf(router)).toMatchObject({ page: 2 }));
-    expect(await rowOf("Valeria Quiroga")).toBeVisible();
+    expect(await rowOf("Paula Antelo")).toBeVisible();
     expect(notice).not.toBeInTheDocument();
   });
 });

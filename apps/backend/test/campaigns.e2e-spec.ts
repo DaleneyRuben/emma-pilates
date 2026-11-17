@@ -71,6 +71,7 @@ describe('campaign endpoint', () => {
                   {
                     clientId: '22222222-2222-4222-8222-222222222222',
                     name: 'Sofía',
+                    reason: 'no_current_plan' as const,
                   },
                 ]),
               record,
@@ -85,6 +86,7 @@ describe('campaign endpoint', () => {
                 {
                   clientId: '22222222-2222-4222-8222-222222222222',
                   name: 'Sofía',
+                  reason: 'no_current_plan' as const,
                 },
               ],
             }),
@@ -122,10 +124,15 @@ describe('campaign endpoint', () => {
         ({
           body,
         }: {
-          body: { recipientCount: number; skipped: { name: string }[] };
+          body: { recipientCount: number; skipped: unknown[] };
         }) => {
           expect(body.recipientCount).toBe(1);
-          expect(body.skipped.map((client) => client.name)).toEqual(['Sofía']);
+          expect(body.skipped).toEqual([
+            expect.objectContaining({
+              name: 'Sofía',
+              reason: 'no_current_plan',
+            }),
+          ]);
         },
       );
     expect(record).not.toHaveBeenCalled();
@@ -144,10 +151,15 @@ describe('campaign endpoint', () => {
         ({
           body,
         }: {
-          body: { granted: { name: string }[]; skipped: { name: string }[] };
+          body: { granted: { name: string }[]; skipped: unknown[] };
         }) => {
           expect(body.granted.map((client) => client.name)).toEqual(['Lucía']);
-          expect(body.skipped.map((client) => client.name)).toEqual(['Sofía']);
+          expect(body.skipped).toEqual([
+            expect.objectContaining({
+              name: 'Sofía',
+              reason: 'no_current_plan',
+            }),
+          ]);
         },
       );
     expect(record).toHaveBeenCalledTimes(1);

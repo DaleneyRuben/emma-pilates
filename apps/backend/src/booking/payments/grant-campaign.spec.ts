@@ -56,7 +56,7 @@ describe('grantCampaign', () => {
       },
     ]);
     deps.findSkipped.mockResolvedValue([
-      { clientId: 'waiting-client', name: 'Sofía' },
+      { clientId: 'waiting-client', name: 'Sofía', reason: 'no_current_plan' },
     ]);
 
     await expect(
@@ -68,7 +68,13 @@ describe('grantCampaign', () => {
       name: 'Inicio de año',
       classes: 1,
       granted: [{ clientId: 'live-client', name: 'Lucía' }],
-      skipped: [{ clientId: 'waiting-client', name: 'Sofía' }],
+      skipped: [
+        {
+          clientId: 'waiting-client',
+          name: 'Sofía',
+          reason: 'no_current_plan',
+        },
+      ],
     });
     expect(deps.record).toHaveBeenCalledWith(
       expect.objectContaining({
