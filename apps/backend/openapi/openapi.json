@@ -5842,7 +5842,7 @@
     },
     "/api/v1/administrator/promotion-contacts/{contactId}/withdrawal": {
       "post": {
-        "description": "Records a «stop» request and erases the contact’s details",
+        "description": "Records a former Client’s «stop» request and erases her details; a live Client is not a withdrawable contact",
         "operationId": "withdrawAdminPromotionContact",
         "parameters": [
           {
@@ -5873,6 +5873,8 @@
     },
     "/api/v1/clients/current/promotions-consent": {
       "get": {
+        "deprecated": true,
+        "description": "Kept for app builds before FIX-060; AW35 no longer reads it",
         "operationId": "getCurrentClientPromotionsConsent",
         "parameters": [],
         "responses": {
@@ -5898,6 +5900,8 @@
         ]
       },
       "put": {
+        "deprecated": true,
+        "description": "Kept for app builds before FIX-060; AW35 no longer reads it",
         "operationId": "setCurrentClientPromotionsConsent",
         "parameters": [],
         "requestBody": {
@@ -13283,6 +13287,27 @@
             ],
             "deprecated": true,
             "description": "Deprecated (PAY-005): no Referral is awarded any more"
+          },
+          "firstPurchaseAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the referred Client’s first Plan purchase was confirmed (a guest pass is none), or null"
+          },
+          "inviteReward": {
+            "type": "string",
+            "enum": [
+              "none",
+              "owed",
+              "granted"
+            ],
+            "description": "The host’s extra class for the invite (BKM-014): granted, owed to her next Plan, or none yet"
+          },
+          "inviteRewardGrantedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the extra class was granted, or null"
           }
         },
         "required": [
@@ -13292,7 +13317,10 @@
           "referredName",
           "registeredAt",
           "awardedAt",
-          "state"
+          "state",
+          "firstPurchaseAt",
+          "inviteReward",
+          "inviteRewardGrantedAt"
         ]
       },
       "AdminReferralPageDto": {
@@ -15521,7 +15549,7 @@
           "reason"
         ]
       },
-      "CampaignClientDto": {
+      "CampaignSkippedClientDto": {
         "type": "object",
         "properties": {
           "clientId": {
@@ -15530,11 +15558,20 @@
           },
           "name": {
             "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "founder",
+              "no_current_plan"
+            ],
+            "description": "A founder is never in a campaign; anyone else has no live paid Plan"
           }
         },
         "required": [
           "clientId",
-          "name"
+          "name",
+          "reason"
         ]
       },
       "CampaignPreviewDto": {
@@ -15546,7 +15583,7 @@
           "skipped": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CampaignClientDto"
+              "$ref": "#/components/schemas/CampaignSkippedClientDto"
             }
           }
         },
@@ -15573,6 +15610,22 @@
           "classes"
         ]
       },
+      "CampaignClientDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientId",
+          "name"
+        ]
+      },
       "CampaignResultDto": {
         "type": "object",
         "properties": {
@@ -15591,7 +15644,7 @@
           "skipped": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CampaignClientDto"
+              "$ref": "#/components/schemas/CampaignSkippedClientDto"
             }
           }
         },
@@ -15907,7 +15960,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "description": "The Promotion Contact, or the live Client’s open Promotions Consent"
+            "description": "The Promotion Contact, or the live Client"
           },
           "kind": {
             "type": "string",
@@ -15915,7 +15968,7 @@
               "client",
               "former_client"
             ],
-            "description": "A live Client who agreed in Perfil, or a former Client who ticked the box when closing"
+            "description": "A live Client (listed whether or not she agreed to promotions), or a former Client who ticked the box when closing"
           },
           "name": {
             "type": "string"
@@ -15928,10 +15981,16 @@
             "type": "string",
             "nullable": true
           },
+          "since": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When a live Client joined, or when a former Client agreed while closing her Account"
+          },
           "consentedAt": {
             "type": "string",
             "format": "date-time",
-            "description": "When the Client agreed to promotions"
+            "deprecated": true,
+            "description": "The same instant as since, kept for admin web builds before FIX-060"
           }
         },
         "required": [
@@ -15940,6 +15999,7 @@
           "name",
           "email",
           "phone",
+          "since",
           "consentedAt"
         ]
       },
@@ -15978,7 +16038,7 @@
         "type": "object",
         "properties": {
           "items": {
-            "description": "Every contact not withdrawn, newest consent first",
+            "description": "Every contact not withdrawn, newest first",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AdminPromotionContactDto"

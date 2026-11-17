@@ -33,7 +33,6 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import { appVersionLabel } from "./app-version";
 import { ClientAvatar } from "./client-avatar";
-import { PromotionsSwitch, promotionsLegalLine } from "./promotions-switch";
 import { useClientPhoto } from "./use-client-photo";
 
 type ProfileNavigation = {
@@ -145,7 +144,7 @@ export function ProfileScreen() {
         </View>
         <View>
           <SectionTitle>Preferencias</SectionTitle>
-          <View style={styles.group}>
+          <IconRowGroup>
             <IconRow
               chevron
               icon="bell"
@@ -157,9 +156,7 @@ export function ProfileScreen() {
                   : `${unreadCount} sin leer`
               }
             />
-            <PromotionsSwitch />
-          </View>
-          <BodyText style={styles.legal}>{promotionsLegalLine}</BodyText>
+          </IconRowGroup>
         </View>
         <View>
           <SectionTitle>Cuenta</SectionTitle>
@@ -223,8 +220,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   footer: { color: colors.textMuted, fontSize: typography.label, textAlign: "center" },
-  group: { ...surfaces.card },
-  legal: { color: colors.textMuted, fontSize: typography.note, marginTop: spacing.sm },
   name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.titleCard },
   screen: { gap: spacing.lg },
   summary: {

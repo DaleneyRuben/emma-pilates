@@ -517,7 +517,7 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
 7. **Perfil** muestra el nombre, el correo y **Editar**, en tres grupos:
    **Tu plan y tus clases** (**Mi plan**, **Evaluación nutricional**, **Mis
    evaluaciones**, **Invita a una amiga**), **Preferencias**
-   (**Notificaciones** y **Recibir promociones**) y **Cuenta** (**Cambiar
+   (**Notificaciones**) y **Cuenta** (**Cambiar
    contraseña**, **Enviar comentarios** y **Cerrar sesión**, la última fila,
    en rojo y sin flecha, igual que en la app del equipo). Al final, en letra
    chica y subrayada después de la versión, «Emma Pilates Studio · versión … ·
@@ -935,8 +935,10 @@ Entra a la app del equipo como Gabriela.
    vacía dice «Aún no publicaste horarios». Pulsa **Nuevo horario**.
 2. Elige el **Día**, la **Sucursal** (si tiene más de una), la **Hora de
    inicio** y la **Hora de fin**, y **A partir del** (hoy o un día
-   siguiente). Cada turno que la clienta ve dura 45 minutos, recortados de
-   ese bloque: el bloque dura al menos 45 minutos, en tramos de 15.
+   siguiente). Cada hora se elige en una rueda de horas y minutos (00, 15,
+   30, 45) y se confirma con **Listo**; la del fin solo deja elegir horas
+   45 minutos o más después del inicio y dice cuántos turnos salen. Cada
+   turno que la clienta ve dura 45 minutos, recortados de ese bloque.
    **Guardar**.
 3. El bloque aparece en **Horarios semanales** con el día abreviado,
    `9:00 – 13:00` (o la hora que hayas puesto) y «N cupos · sin reservas» o
@@ -952,8 +954,11 @@ En la app de Lucía:
 1. **Perfil**, **Evaluación nutricional**. Solo aparecen días con un turno
    todavía abierto. Un turno desaparece 3 horas antes de empezar. Elige uno
    y pulsa **Confirmar evaluación**.
-2. Con el plan de 30 días, la consulta se paga: Bs 70, por QR en la app,
-   transfiriendo y subiendo el comprobante, que Ana confirma. No hay cobro
+2. Con el plan de 30 días, la consulta se paga: Bs 70, por QR en la app.
+   **Confirma tu cita** muestra **1 · Paga con el QR del estudio** (el QR,
+   con **Ampliar** y **Guardar QR**) y **2 · Sube tu comprobante**, que Ana
+   confirma. Si el comprobante se sube después, desde **Mis evaluaciones**,
+   se abre una hoja con los mismos dos pasos. No hay cobro
    en efectivo de la consulta. Con el trimestral ya confirmado, la primera
    consulta del trimestre es gratis. La segunda, en el mismo trimestre, se
    paga. El encabezado de **Evaluación nutricional** lo dice: «Cuesta Bs
@@ -1007,7 +1012,9 @@ Con Lucía todavía en la app, recorre lo que no es comprar ni reservar.
    teléfono y la foto, y que el historial queda anónimo. Confírmalo solo
    cuando ya no necesites a Lucía. Después de cerrarla no puede entrar, y su
    correo queda libre para un registro nuevo. El historial de clases no se
-   borra.
+   borra. La casilla **Quiero seguir recibiendo promociones…**
+   es lo único que guarda su nombre, correo y teléfono para **Promociones ›
+   Contactos**.
 
 **Cerrar sesión** abre la hoja **¿Cerrar sesión?**. **Cancelar** se queda.
 **Cerrar sesión** vuelve al acceso.
@@ -1031,25 +1038,35 @@ En la web, como Ana.
    **Finalizada** cuando ya pasó su **Fecha de fin**. **Eliminar promoción**
    (el enlace bajo los botones) pide confirmación, la archiva y la quita de
    la lista.
-5. **Promociones › Contactos**: las clientas que aceptaron
-   recibir promociones. Lucía tiene ese interruptor en su **Perfil**.
-   Apágalo y vuelve a la web: su fila deja de estar disponible para un envío.
+5. **Promociones › Contactos**: todas las clientas activas, hayan aceptado o
+   no, con **Nombre**, **Tipo** («Activa»), **Correo**, **Teléfono** y
+   **Desde**, el día en que se registró. La app ya no tiene el interruptor
+   **Recibir promociones** en **Perfil**. También están las que cerraron su
+   cuenta y marcaron **Quiero seguir recibiendo promociones…**, como
+   «Cuenta cerrada» y con el día en que la cerraron. Solo esas filas tienen
+   **Dejar de enviar**, que borra el contacto. **Exportar CSV** descarga la
+   lista entera.
 
 ### Referidos
 
 **Promociones › Referidos**. Cuando Valeria se registró con el código de
-Lucía, la fila aparece aquí: quién invitó a quién, y si la invitada ya
-compró. Es una lectura. En **Clientas › Todas**, la columna **Invitada por**
+Lucía, la fila aparece aquí: quién invitó a quién, la **Fecha de registro**,
+**Compró** (el día de su primera compra confirmada, o «Aún no») y la **Clase
+de premio** de quien invitó («Sumada el …», «Se suma con su próximo plan» si
+no tenía plan vigente, o «—» mientras la invitada no compra). Es una lectura. En **Clientas › Todas**, la columna **Invitada por**
 de Valeria dice Lucía. El premio, la clase extra, ya se sumó sola en el paso 11.
 
 ### Campaña
 
 **Promociones › Clases de campaña**. Escribe el **Nombre de la campaña**, por
-ejemplo `Inicio de año`, y **Clases extra** `1`. Elige a las clientas con
-plan vigente. Guardar suma la clase a cada una, con ese nombre, sin cambiar
-ningún precio. Las fundadoras no entran en la campaña: su beneficio es el
-descuento, así que Lucía no aparece en la lista. El sistema no deja usar la
-campaña como un descuento.
+ejemplo `Inicio de año`, y **Clases extra** `1`. No se elige a nadie: la
+campaña va a todas las clientas con plan vigente, y la pantalla dice cuántas
+la recibirán. Debajo nombra a las que quedan fuera y por qué: las fundadoras
+(«… son fundadoras y no entran en campañas»; su beneficio es el descuento,
+así que Lucía queda fuera) y las que no tienen un plan vigente. **Dar las
+clases** suma la clase a cada una, con ese nombre, sin cambiar ningún
+precio; si nadie la recibiría, el botón queda apagado. El sistema no deja
+usar la campaña como un descuento.
 
 ### Comentarios
 
@@ -1280,8 +1297,8 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Clientas › Congelamientos | Aprobar el congelamiento de un trimestral | 11 |
 | Promociones › Carrusel | Borrador, publicar, dejar de publicar, eliminar | 14 |
 | Promociones › Clases de campaña | Clases extra para las clientas con plan | 14 |
-| Promociones › Referidos | Quién invitó a quién | 14 |
-| Promociones › Contactos | Quién acepta recibir promociones | 14 |
+| Promociones › Referidos | Quién invitó a quién, si la invitada compró y la clase de premio | 14 |
+| Promociones › Contactos | Todas las clientas activas y las cuentas cerradas que pidieron promociones | 14 |
 | Comentarios | Lo que llega de las apps | 14 |
 | Dinero › Pagos | Confirmar, rechazar, anular, subir la factura | 7 |
 | Dinero › Caja | Historial del cierre diario por sede | 9 |

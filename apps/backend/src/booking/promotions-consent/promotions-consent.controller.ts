@@ -46,7 +46,8 @@ const toDto = (view: PromotionsConsentView): PromotionsConsentDto => ({
 });
 
 // BE-023 (ADR-0098): Perfil's promotions switch. Personal data, so nothing is
-// cached (ADR-0063).
+// cached (ADR-0063). FIX-060 removed the switch and AW35 no longer reads the
+// consent; both operations stay, deprecated, for app builds before it.
 @Controller({ path: 'clients/current/promotions-consent', version: '1' })
 @ApiBearerAuth()
 export class PromotionsConsentController {
@@ -62,7 +63,11 @@ export class PromotionsConsentController {
   }
 
   @Get()
-  @ApiOperation({ operationId: 'getCurrentClientPromotionsConsent' })
+  @ApiOperation({
+    operationId: 'getCurrentClientPromotionsConsent',
+    deprecated: true,
+    description: 'Kept for app builds before FIX-060; AW35 no longer reads it',
+  })
   @ApiOkResponse({ type: PromotionsConsentDto })
   @Header('Cache-Control', 'no-store')
   async read(
@@ -73,7 +78,11 @@ export class PromotionsConsentController {
   }
 
   @Put()
-  @ApiOperation({ operationId: 'setCurrentClientPromotionsConsent' })
+  @ApiOperation({
+    operationId: 'setCurrentClientPromotionsConsent',
+    deprecated: true,
+    description: 'Kept for app builds before FIX-060; AW35 no longer reads it',
+  })
   @ApiBody({ type: SetPromotionsConsentDto })
   @ApiOkResponse({ type: PromotionsConsentDto })
   @Header('Cache-Control', 'no-store')

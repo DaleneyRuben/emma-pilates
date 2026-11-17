@@ -7,14 +7,19 @@
 import type { AdminPromotionContactDtoKind } from "./adminPromotionContactDtoKind";
 
 export interface AdminPromotionContactDto {
-  /** The Promotion Contact, or the live Client’s open Promotions Consent */
+  /** The Promotion Contact, or the live Client */
   id: string;
-  /** A live Client who agreed in Perfil, or a former Client who ticked the box when closing */
+  /** A live Client (listed whether or not she agreed to promotions), or a former Client who ticked the box when closing */
   kind: AdminPromotionContactDtoKind;
   name: string;
   email: string;
   /** @nullable */
   phone: string | null;
-  /** When the Client agreed to promotions */
+  /** When a live Client joined, or when a former Client agreed while closing her Account */
+  since: string;
+  /**
+   * The same instant as since, kept for admin web builds before FIX-060
+   * @deprecated
+   */
   consentedAt: string;
 }

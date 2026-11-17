@@ -18,9 +18,10 @@ executionOrder:
     - email-change
     - profile-phone
     - evaluation-book-and-cancel
+    - evaluation-paid-qr
     - home-plan-and-notifications
     - profile-photo
-    - promotions-consent
+    - profile-without-promotions
     - send-feedback
     - referral-code-edit
     - launch-banner

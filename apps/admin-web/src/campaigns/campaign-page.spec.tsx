@@ -15,7 +15,11 @@ const campaignHandlers = () => [
     jsonResponse({
       recipientCount: 12,
       skipped: [
-        { clientId: "22222222-2222-4222-8222-222222222222", name: "Sofía" },
+        {
+          clientId: "22222222-2222-4222-8222-222222222222",
+          name: "Sofía",
+          reason: "no_current_plan",
+        },
       ],
     }),
   ),
@@ -29,7 +33,11 @@ const campaignHandlers = () => [
           { clientId: "11111111-1111-4111-8111-111111111111", name: "Lucía" },
         ],
         skipped: [
-          { clientId: "22222222-2222-4222-8222-222222222222", name: "Sofía" },
+          {
+            clientId: "22222222-2222-4222-8222-222222222222",
+            name: "Sofía",
+            reason: "no_current_plan",
+          },
         ],
       },
       201,
@@ -93,5 +101,40 @@ describe("AW21 Campaña", () => {
         "1 clienta recibió 1 clase extra. 1 clienta no tiene un plan vigente: Sofía.",
       ),
     ).toBeVisible();
+  });
+
+  // FIX-060 (walkthrough finding 87): every Client left out is a founder.
+  it("says the founders are left out and offers no grant to nobody", async () => {
+    server.use(
+      http.get(apiUrl(previewPath), () =>
+        jsonResponse({
+          recipientCount: 0,
+          skipped: [
+            {
+              clientId: "33333333-3333-4333-8333-333333333333",
+              name: "Carla",
+              reason: "founder",
+            },
+            {
+              clientId: "44444444-4444-4444-8444-444444444444",
+              name: "Lucía",
+              reason: "founder",
+            },
+          ],
+        }),
+      ),
+    );
+    renderAdmin("/promociones/clases-de-campana");
+
+    expect(await screen.findByText("0 clientas la recibirán.")).toBeVisible();
+    expect(
+      screen.getByText(
+        "2 son fundadoras y no entran en campañas: Carla, Lucía.",
+      ),
+    ).toBeVisible();
+    expect(screen.queryByText(/plan vigente/)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Dar las clases" }),
+    ).toBeDisabled();
   });
 });

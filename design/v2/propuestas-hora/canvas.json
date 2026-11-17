@@ -1,0 +1,98 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-15T12:26:17Z"
+ },
+ "title": "Emma Pilates Studio · hallazgos 62 y 63",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1900,
+   "title": "Hallazgos 62 y 63 · elige una propuesta",
+   "is_interactive": true
+  },
+  "A-Rueda.dc.html": {
+   "x": 0,
+   "y": 2020,
+   "w": 390,
+   "h": 844,
+   "title": "A · Rueda (recomendada)",
+   "is_interactive": true
+  },
+  "B-Hora-y-cuartos.dc.html": {
+   "x": 470,
+   "y": 2020,
+   "w": 390,
+   "h": 844,
+   "title": "B · Hora y cuartos",
+   "is_interactive": true
+  },
+  "C-Lista-corta.dc.html": {
+   "x": 940,
+   "y": 2020,
+   "w": 390,
+   "h": 844,
+   "title": "C · Lista corta",
+   "is_interactive": true
+  },
+  "Hoy.dc.html": {
+   "x": 1410,
+   "y": 2020,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · grilla de botones"
+  },
+  "Q-A-Pasos.dc.html": {
+   "x": 0,
+   "y": 2984,
+   "w": 390,
+   "h": 844,
+   "title": "QR A · Pasos como en la compra (recomendada)",
+   "is_interactive": true
+  },
+  "Q-B-Hoja.dc.html": {
+   "x": 470,
+   "y": 2984,
+   "w": 390,
+   "h": 844,
+   "title": "QR B · QR en una hoja",
+   "is_interactive": true
+  },
+  "Q-C-Segundo-paso.dc.html": {
+   "x": 940,
+   "y": 2984,
+   "w": 390,
+   "h": 844,
+   "title": "QR C · Pago en un segundo paso",
+   "is_interactive": true
+  },
+  "Hoy-evaluacion.dc.html": {
+   "x": 1410,
+   "y": 2984,
+   "w": 390,
+   "h": 844,
+   "title": "Hoy · Confirma tu cita pagada",
+   "is_interactive": true
+  }
+ },
+ "notes": {},
+ "designSystems": [],
+ "order": [
+  "Main.dc.html",
+  "A-Rueda.dc.html",
+  "B-Hora-y-cuartos.dc.html",
+  "C-Lista-corta.dc.html",
+  "Hoy.dc.html",
+  "Q-A-Pasos.dc.html",
+  "Q-B-Hoja.dc.html",
+  "Q-C-Segundo-paso.dc.html",
+  "Hoy-evaluacion.dc.html"
+ ]
+}

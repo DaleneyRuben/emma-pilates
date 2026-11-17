@@ -94,6 +94,9 @@ export const referralRow = (
   registeredAt: "2026-08-02T14:00:00.000Z",
   awardedAt: "2026-08-05T15:00:00.000Z",
   state: "awarded",
+  firstPurchaseAt: "2026-08-04T15:00:00.000Z",
+  inviteReward: "granted",
+  inviteRewardGrantedAt: "2026-08-04T15:00:00.000Z",
   ...extra,
 });
 
@@ -112,6 +115,9 @@ export const andreaReferredValeria = referralRow(
     registeredAt: "2026-08-11T22:30:00.000Z",
     awardedAt: null,
     state: "pending",
+    firstPurchaseAt: null,
+    inviteReward: "none",
+    inviteRewardGrantedAt: null,
   },
 );
 

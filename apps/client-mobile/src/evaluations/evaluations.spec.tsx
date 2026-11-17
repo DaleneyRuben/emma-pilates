@@ -129,9 +129,7 @@ describe("Client Evaluations", () => {
     );
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
     await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:45" }));
-    expect(
-      await screen.findByText("Cuesta Bs 70: transfiere y sube tu comprobante"),
-    ).toBeOnTheScreen();
+    expect(await screen.findByText("Cuesta Bs 70 · se paga por transferencia")).toBeOnTheScreen();
     expect(
       screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
     ).toBeOnTheScreen();

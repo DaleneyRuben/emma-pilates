@@ -52,7 +52,8 @@ export type PromotionContactOperations = {
 
 const toDto = (row: PromotionContactRow): AdminPromotionContactDto => ({
   ...row,
-  consentedAt: row.consentedAt.toISOString(),
+  since: row.since.toISOString(),
+  consentedAt: row.since.toISOString(),
 });
 
 // BE-022: the Promotion Contacts of ADR-0097. Personal data, so nothing is
@@ -111,7 +112,8 @@ export class AdministratorPromotionContactsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     operationId: 'withdrawAdminPromotionContact',
-    description: 'Records a «stop» request and erases the contact’s details',
+    description:
+      'Records a former Client’s «stop» request and erases her details; a live Client is not a withdrawable contact',
   })
   @ApiParam({ name: 'contactId', format: 'uuid' })
   @ApiNoContentResponse()

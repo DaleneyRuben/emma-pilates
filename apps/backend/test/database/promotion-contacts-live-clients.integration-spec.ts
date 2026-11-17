@@ -10,8 +10,8 @@ import {
 const occurredAt = new Date('2026-10-20T14:00:00.000Z');
 const at = (instant: string) => new Date(instant);
 
-// BE-023 (ADR-0098): AW35 lists live Clients with an open Promotions Consent
-// beside the former Clients' Promotion Contacts.
+// FIX-060 (walkthrough finding 85): AW35 lists every live Client, whether or
+// not she agreed in Perfil, beside the former Clients' Promotion Contacts.
 describe('Promotion Contacts with live Clients (PostgreSQL)', () => {
   let context: DatabaseTestContext;
   let prisma: PrismaClient;
@@ -35,6 +35,7 @@ describe('Promotion Contacts with live Clients (PostgreSQL)', () => {
     name: string;
     email: string;
     phone?: string;
+    createdAt: Date;
     deletedAt?: Date;
   }) =>
     prisma.client.create({
@@ -43,6 +44,7 @@ describe('Promotion Contacts with live Clients (PostgreSQL)', () => {
         name: input.name,
         phone: input.phone ?? null,
         referralCode: `REF-${input.id.slice(0, 8)}`,
+        createdAt: input.createdAt,
         deletedAt: input.deletedAt ?? null,
         account: {
           create: {
@@ -71,6 +73,7 @@ describe('Promotion Contacts with live Clients (PostgreSQL)', () => {
       name: 'Lucía Fernández',
       email: 'lucia@example.com',
       phone: '+591 70033003',
+      createdAt: at('2026-09-01T12:00:00Z'),
     });
     await prisma.clientPromotionsConsent.create({
       data: {
@@ -83,6 +86,7 @@ describe('Promotion Contacts with live Clients (PostgreSQL)', () => {
       id: ids.marta,
       name: 'Marta Rojas',
       email: 'marta@example.com',
+      createdAt: at('2026-08-01T12:00:00Z'),
     });
     await prisma.clientPromotionsConsent.create({
       data: {
@@ -95,6 +99,7 @@ describe('Promotion Contacts with live Clients (PostgreSQL)', () => {
       id: ids.closed,
       name: 'Cliente eliminado',
       email: `cerrada-${ids.closed}@cuentas-cerradas.invalid`,
+      createdAt: at('2026-10-01T12:00:00Z'),
       deletedAt: at('2026-10-15T12:00:00Z'),
     });
     await prisma.clientPromotionsConsent.create({
@@ -120,31 +125,37 @@ describe('Promotion Contacts with live Clients (PostgreSQL)', () => {
     await context?.stop();
   });
 
+  const valeria = {
+    id: ids.valeria,
+    kind: 'former_client',
+    name: 'Valeria Quiroga',
+    email: 'valeria@example.com',
+    phone: null,
+    since: at('2026-10-19T20:00:00Z'),
+  };
   const lucia = {
-    id: ids.luciaConsent,
+    id: ids.lucia,
     kind: 'client',
     name: 'Lucía Fernández',
     email: 'lucia@example.com',
     phone: '+591 70033003',
-    consentedAt: at('2026-10-18T12:00:00Z'),
+    since: at('2026-09-01T12:00:00Z'),
+  };
+  const marta = {
+    id: ids.marta,
+    kind: 'client',
+    name: 'Marta Rojas',
+    email: 'marta@example.com',
+    phone: null,
+    since: at('2026-08-01T12:00:00Z'),
   };
 
-  it('lists open consents of live Clients beside former Clients, newest first', async () => {
+  it('lists every live Client, consent or not, beside former Clients, newest first', async () => {
     await expect(store().list({ page: 1, pageSize: 20 })).resolves.toEqual({
-      items: [
-        {
-          id: ids.valeria,
-          kind: 'former_client',
-          name: 'Valeria Quiroga',
-          email: 'valeria@example.com',
-          phone: null,
-          consentedAt: at('2026-10-19T20:00:00Z'),
-        },
-        lucia,
-      ],
+      items: [valeria, lucia, marta],
       page: 1,
       pageSize: 20,
-      totalItems: 2,
+      totalItems: 3,
     });
   });
 
@@ -154,64 +165,34 @@ describe('Promotion Contacts with live Clients (PostgreSQL)', () => {
     await expect(found('LUCIA')).resolves.toEqual([lucia]);
     await expect(found('lucia@exa')).resolves.toEqual([lucia]);
     await expect(found('70033003')).resolves.toEqual([lucia]);
-    await expect(found('marta')).resolves.toEqual([]);
+    await expect(found('marta')).resolves.toEqual([marta]);
+    await expect(found('eliminado')).resolves.toEqual([]);
   });
 
   it('exports both kinds', async () => {
     const all = await store().listAll();
     expect(all.map((row) => [row.kind, row.id])).toEqual([
       ['former_client', ids.valeria],
-      ['client', ids.luciaConsent],
+      ['client', ids.lucia],
+      ['client', ids.marta],
     ]);
   });
 
-  it('withdraws a live Client consent without touching the Account, once', async () => {
+  it('leaves a live Client and her consent alone when asked to withdraw her', async () => {
+    await expect(
+      store().withdraw({ contactId: ids.lucia, actor, occurredAt }),
+    ).resolves.toBe(false);
     await expect(
       store().withdraw({ contactId: ids.luciaConsent, actor, occurredAt }),
-    ).resolves.toBe(true);
+    ).resolves.toBe(false);
     await expect(
       prisma.clientPromotionsConsent.findUniqueOrThrow({
         where: { id: ids.luciaConsent },
         select: { withdrawnAt: true, deletedAt: true },
       }),
-    ).resolves.toEqual({ withdrawnAt: occurredAt, deletedAt: null });
-    await expect(
-      prisma.client.findUniqueOrThrow({
-        where: { id: ids.lucia },
-        select: {
-          name: true,
-          phone: true,
-          account: { select: { email: true } },
-        },
-      }),
-    ).resolves.toEqual({
-      name: 'Lucía Fernández',
-      phone: '+591 70033003',
-      account: { email: 'lucia@example.com' },
-    });
-    await expect(
-      prisma.auditRecord.findFirst({
-        where: { actionCode: 'promotions_consent.withdrawn' },
-        select: {
-          actorAccountId: true,
-          actorRole: true,
-          targetType: true,
-          targetId: true,
-          metadata: true,
-        },
-      }),
-    ).resolves.toEqual({
-      actorAccountId: actor.accountId,
-      actorRole: 'ADMINISTRATOR',
-      targetType: 'client_promotions_consent',
-      targetId: ids.luciaConsent,
-      metadata: { clientId: ids.lucia },
-    });
-    await expect(
-      store().withdraw({ contactId: ids.luciaConsent, actor, occurredAt }),
-    ).resolves.toBe(false);
+    ).resolves.toEqual({ withdrawnAt: null, deletedAt: null });
     await expect(
       store().list({ page: 1, pageSize: 20 }),
-    ).resolves.toMatchObject({ totalItems: 1 });
+    ).resolves.toMatchObject({ totalItems: 3 });
   });
 });
