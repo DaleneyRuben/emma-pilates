@@ -33,10 +33,8 @@ describe("the Promotion Contacts CSV", () => {
 
   // A backend before FIX-060 sends only «consentedAt» (a rollback).
   it("dates a contact from an older backend by its consent", () => {
-    const { since: _since, ...older } = valeria;
-    expect(
-      promotionContactsCsv([older as typeof valeria]).split("\r\n")[1],
-    ).toBe(
+    const older = { ...valeria, since: undefined } as unknown as typeof valeria;
+    expect(promotionContactsCsv([older]).split("\r\n")[1]).toBe(
       "Valeria Quiroga,Cuenta cerrada,valeria@example.com,+591 70011005,19/10/2026",
     );
   });
