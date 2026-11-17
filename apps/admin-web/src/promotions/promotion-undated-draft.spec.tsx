@@ -1,6 +1,12 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
+import {
+  apiUrl,
+  jsonResponse,
+  problemResponse,
+  server,
+  useMockServer,
+} from "../test/msw";
 import {
   promotionList,
   promotionRow,
@@ -116,5 +122,28 @@ describe("AW18 a Promotion draft without dates (finding 82)", () => {
       expect.stringContaining("Elige la fecha de fin."),
     );
     expect(calls).toEqual([]);
+  });
+
+  it("explains a refusal for missing dates from the server", async () => {
+    server.use(
+      http.put(apiUrl(`${promotionsPath}/:id`), () =>
+        problemResponse(409, "promotion_dates_required"),
+      ),
+    );
+    const { user } = renderAdmin("/promociones");
+    await user.click(
+      await screen.findByRole("button", { name: reformer.headline }),
+    );
+    const panel = await screen.findByRole("dialog", {
+      name: "Editar promoción",
+    });
+
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
+
+    expect(await within(panel).findByRole("alert")).toHaveTextContent(
+      "Elige la fecha de inicio y la de fin antes de publicar.",
+    );
   });
 });

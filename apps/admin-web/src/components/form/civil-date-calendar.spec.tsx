@@ -196,4 +196,21 @@ describe("CivilDateInput calendar (finding 83)", () => {
     await user.keyboard("{Enter}");
     expect(field).toHaveValue("05/12/2026");
   });
+
+  it("keeps the cursor in the field when a date is typed after the calendar had the focus", async () => {
+    const { user, field } = setup({ initial: "2030-03-12" });
+
+    await user.click(
+      screen.getByRole("button", { name: "Elegir en el calendario" }),
+    );
+    await user.keyboard("{ArrowRight}");
+    await user.click(field);
+    await user.clear(field);
+    await user.type(field, "15042030");
+
+    expect(field).toHaveFocus();
+    expect(field).toHaveValue("15/04/2030");
+    await user.keyboard("{Backspace}");
+    expect(field).toHaveValue("15/04/203");
+  });
 });
