@@ -5430,7 +5430,10 @@ folder (ADR-0096):
 4. Promotions (WEB-033): on `/privacidad/`, «Con quién compartimos tus datos»
    lists WhatsApp (Meta) and says the administration may export the
    promotions contacts to a spreadsheet; `/soporte/` answers «Quiero dejar de
-   recibir promociones» (the Perfil switch, or an email to `soporte@`).
+   recibir promociones»: the studio may write by WhatsApp and email to every
+   Client, she asks the studio (or `soporte@`) to stop, and a closed Account
+   keeps her contact only if she ticked the box (FIX-063, after FIX-060).
+   Neither page mentions a Perfil switch.
 
 ### On production
 
