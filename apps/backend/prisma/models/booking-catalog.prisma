@@ -204,10 +204,36 @@ model AllowanceAdjustment {
   client            Client                    @relation(fields: [clientId], references: [id], onDelete: Restrict)
   authorAccount     Account                   @relation("AllowanceAdjustmentAuthor", fields: [authorAccountId], references: [id], onDelete: Restrict)
   booking           Booking?                  @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  owedCampaignClass OwedCampaignClass?
 
   @@index([subscriptionId, createdAt])
   @@index([authorAccountId])
   @@map("allowance_adjustments")
+  @@schema("booking")
+}
+
+// FIX-064 (walkthrough finding 90, booking ADR-0014): a campaign's classes
+// owed to an active Client with no current Subscription. The next one she
+// activates collects them as a `campaign` Allowance Adjustment, set here with
+// the collection time, both or neither. Uncollected rows are a partial index;
+// a removed row is never collected (ADR-0086).
+model OwedCampaignClass {
+  id                    String               @id @default(uuid()) @db.Uuid
+  clientId              String               @map("client_id") @db.Uuid
+  classes               Int                  @db.SmallInt
+  campaignName          String               @map("campaign_name")
+  authorAccountId       String               @map("author_account_id") @db.Uuid
+  correlationId         String               @map("correlation_id") @db.Uuid
+  allowanceAdjustmentId String?              @unique @map("allowance_adjustment_id") @db.Uuid
+  collectedAt           DateTime?            @map("collected_at") @db.Timestamptz(3)
+  createdAt             DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt             DateTime?            @map("deleted_at") @db.Timestamptz(3)
+  client                Client               @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  authorAccount         Account              @relation("OwedCampaignClassAuthor", fields: [authorAccountId], references: [id], onDelete: Restrict)
+  allowanceAdjustment   AllowanceAdjustment? @relation(fields: [allowanceAdjustmentId], references: [id], onDelete: Restrict)
+
+  @@index([authorAccountId])
+  @@map("owed_campaign_classes")
   @@schema("booking")
 }
 

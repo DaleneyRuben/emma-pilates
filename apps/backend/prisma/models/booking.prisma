@@ -41,6 +41,7 @@ model Client {
   account             Account?
   subscriptions       Subscription[]
   allowanceAdjustments AllowanceAdjustment[]
+  owedCampaignClasses OwedCampaignClass[]
   bookings            Booking[]
   waitlistEntries     WaitlistEntry[]
   profileImageAsset   ImageAsset?     @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
