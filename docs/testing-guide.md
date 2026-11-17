@@ -9549,3 +9549,20 @@ F. **The class panel counts the new booking (n.º 81).** In the admin web,
    **Horario › a class › Reservar a una clienta**, book someone: back on
    **Editar sesión** the header reads «… · 1 de 8 lugares reservados» (one
    more than before) at once, matching «Reservaron (1)» and the grid.
+
+## Test 150: ending a block withdraws a released evaluation's old slot (FIX-062)
+
+Migration `20261117090000_released_slot_withdrawable`. Run the API on a fresh
+database copy with the migration applied.
+
+1. As Lucía, book a paid evaluation on Gabriela's block and have Ana confirm
+   the transfer. As Gabriela, **Agenda › Cancelar evaluación › Sí, cancelar
+   evaluación**: the slot is released and Lucía keeps her payment.
+2. As Gabriela, **Disponibilidad**, open that block and **Eliminar horario**
+   from a date on or before the released slot. The block ends without the
+   error «evaluation slot has a booked evaluation», and the released time is
+   withdrawn with the other free slots; a slot another client still holds is
+   kept.
+3. As Lucía (or another client), **Evaluación nutricional** no longer offers
+   the released time after the block's end. Lucía's card still reads «El
+   estudio liberó este turno · el pago sigue vigente» with **Elegir turno**.
