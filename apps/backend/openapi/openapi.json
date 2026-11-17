@@ -13287,6 +13287,27 @@
             ],
             "deprecated": true,
             "description": "Deprecated (PAY-005): no Referral is awarded any more"
+          },
+          "firstPurchaseAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the referred Client’s first Plan purchase was confirmed (a guest pass is none), or null"
+          },
+          "inviteReward": {
+            "type": "string",
+            "enum": [
+              "none",
+              "owed",
+              "granted"
+            ],
+            "description": "The host’s extra class for the invite (BKM-014): granted, owed to her next Plan, or none yet"
+          },
+          "inviteRewardGrantedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the extra class was granted, or null"
           }
         },
         "required": [
@@ -13296,7 +13317,10 @@
           "referredName",
           "registeredAt",
           "awardedAt",
-          "state"
+          "state",
+          "firstPurchaseAt",
+          "inviteReward",
+          "inviteRewardGrantedAt"
         ]
       },
       "AdminReferralPageDto": {
@@ -15525,7 +15549,7 @@
           "reason"
         ]
       },
-      "CampaignClientDto": {
+      "CampaignSkippedClientDto": {
         "type": "object",
         "properties": {
           "clientId": {
@@ -15534,11 +15558,20 @@
           },
           "name": {
             "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "founder",
+              "no_current_plan"
+            ],
+            "description": "A founder is never in a campaign; anyone else has no live paid Plan"
           }
         },
         "required": [
           "clientId",
-          "name"
+          "name",
+          "reason"
         ]
       },
       "CampaignPreviewDto": {
@@ -15550,7 +15583,7 @@
           "skipped": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CampaignClientDto"
+              "$ref": "#/components/schemas/CampaignSkippedClientDto"
             }
           }
         },
@@ -15577,6 +15610,22 @@
           "classes"
         ]
       },
+      "CampaignClientDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientId",
+          "name"
+        ]
+      },
       "CampaignResultDto": {
         "type": "object",
         "properties": {
@@ -15595,7 +15644,7 @@
           "skipped": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CampaignClientDto"
+              "$ref": "#/components/schemas/CampaignSkippedClientDto"
             }
           }
         },
