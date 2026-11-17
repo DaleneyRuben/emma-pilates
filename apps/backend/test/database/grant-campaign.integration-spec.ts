@@ -130,16 +130,14 @@ describe('campaign extra classes', () => {
       }),
     ).resolves.toEqual(paymentsBefore);
 
-    // FIX-060 (walkthrough finding 87): a founder with a live Plan is skipped
-    // for being a founder, not for lacking a Plan.
+    // FIX-064 (walkthrough finding 90): a founder is in the campaign too.
     await prisma.founderMembership.create({
       data: { clientId: live.clientId, number: 1, since: today },
     });
     await expect(grant.preview(administrator(live.accountId))).resolves.toEqual(
       {
-        recipientCount: 0,
+        recipientCount: 1,
         skipped: [
-          { clientId: live.clientId, name: 'Lucía', reason: 'founder' },
           { clientId: waiting.id, name: 'Sofía', reason: 'no_current_plan' },
         ],
       },
