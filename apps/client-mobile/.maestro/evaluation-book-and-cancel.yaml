@@ -1,4 +1,9 @@
-# Critical journey: book an Evaluation from Perfil, see it confirmed, cancel it.
+# Critical journey (walkthrough finding 70, design follow-up 264): one
+# «Evaluación nutricional» in Perfil. Lucía's 8-class Plan pays Bs 70: she
+# books with the studio QR and a receipt, lands back on the same screen with
+# her Evaluation on top «Pago en revisión», moves it, and cancels it, which
+# a transfer still in review allows (finding 64). Leaves no booking behind.
+# Needs the studio QR, the worker and one image in the photo library (Test 19).
 appId: ${APP_ID}
 env:
   EMAIL: lucia@example.com
@@ -13,50 +18,64 @@ env:
 - extendedWaitUntil:
     visible: "Evaluación nutricional"
     timeout: 15000
-- assertVisible: "Mis evaluaciones"
-- takeScreenshot: client-evaluation-1-perfil
+- assertNotVisible: "Mis evaluaciones"
+- takeScreenshot: fix057-1-perfil
 - tapOn: "Evaluación nutricional"
 - extendedWaitUntil:
-    visible: "Días disponibles"
+    visible: "Reserva tu evaluación"
     timeout: 15000
-- assertVisible: "Nutricionista · 45 min · .*"
+- assertVisible: "Días disponibles"
 - assertVisible: "Puedes reservar hasta 3 horas antes."
-- takeScreenshot: client-evaluation-2-disponibilidad
+- takeScreenshot: fix057-2-sin-reservar
 - tapOn:
     text: "Turno .*"
     index: 0
 - extendedWaitUntil:
-    visible: "Es gratuita — no usa clases de tu plan."
+    visible: "Cuesta Bs 70 · se paga por transferencia"
     timeout: 10000
-- assertVisible: "Te avisamos un día y una hora antes"
-- assertVisible: "Si necesitas cambiarla, puedes cancelarla desde Mis evaluaciones hasta 3 horas antes."
-- takeScreenshot: client-evaluation-3-confirmar
+- swipe:
+    start: 50%,70%
+    end: 50%,30%
+- tapOn: "Sube tu comprobante de transferencia"
+- runFlow: subflows/pick-first-photo.yaml
+- extendedWaitUntil:
+    visible: "El estudio revisa tu pago y te avisa por la app"
+    timeout: 60000
 - tapOn: "Confirmar evaluación"
 - runFlow: subflows/dismiss-push-permission.yaml
-# «Evaluación confirmada» lasts eight seconds and the notification sheet can
-# outlast it on a slow emulator; the booked card's cancellation line is the
-# lasting proof.
+# The toast lasts eight seconds; the card on top is the lasting proof.
 - extendedWaitUntil:
-    visible: "Evaluación confirmada|.* · cancela hasta 3 h antes"
+    visible: "Tu próxima evaluación"
     timeout: 15000
-- assertVisible: ".* · cancela hasta 3 h antes"
-- takeScreenshot: client-evaluation-4-confirmada
+- assertVisible: "Pago en revisión"
+- assertVisible: "El estudio revisa tu comprobante de Bs 70 y te avisa por la app."
+- assertVisible: "Reserva otra evaluación"
+- takeScreenshot: fix057-3-pago-en-revision
+- tapOn: "Reprogramar"
+- extendedWaitUntil:
+    visible: "Elige el nuevo horario"
+    timeout: 10000
+- assertVisible: "Cambias tu cita del .*"
+- takeScreenshot: fix057-4-elige-nuevo-horario
+- tapOn:
+    text: "Turno .*"
+    index: 0
+- extendedWaitUntil:
+    visible: "Sí, mover evaluación"
+    timeout: 10000
+- tapOn: "Sí, mover evaluación"
+- extendedWaitUntil:
+    visible: "Reserva otra evaluación"
+    timeout: 15000
+- assertNotVisible: "Elige el nuevo horario"
+- takeScreenshot: fix057-5-reprogramada
 - tapOn: "Cancelar evaluación"
 - extendedWaitUntil:
     visible: "¿Cancelar esta evaluación?"
     timeout: 10000
-# «este mes», or the month's name for next month's Evaluation (MOB-022).
-- assertVisible: "Podrás reservar otra evaluación para .*"
-- takeScreenshot: client-evaluation-5-cancelar
 - tapOn: "Sí, cancelar evaluación"
 - extendedWaitUntil:
-    visible: "No tienes evaluaciones próximas"
+    visible: "Reserva tu evaluación"
     timeout: 15000
-- takeScreenshot: client-evaluation-6-vacio
-- extendedWaitUntil:
-    notVisible: "¿Cancelar esta evaluación?"
-    timeout: 10000
-- tapOn: "Reservar evaluación"
-- extendedWaitUntil:
-    visible: "Días disponibles"
-    timeout: 15000
+- assertNotVisible: "Tu próxima evaluación"
+- takeScreenshot: fix057-6-cancelada
