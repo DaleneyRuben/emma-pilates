@@ -1,8 +1,17 @@
 import { z } from "zod";
 import { listSearchSchema } from "../components/table/pagination";
 
-/** Clientas › Todas's chips after «Todas» (follow-up 232, WEB-040). */
-export const clientFilters = ["active", "none", "expired", "founder"] as const;
+/**
+ * Clientas › Todas's chips after «Todas» (follow-up 232, WEB-040); «closed»
+ * lists the former Clients who asked for promotions (FIX-065).
+ */
+export const clientFilters = [
+  "active",
+  "none",
+  "expired",
+  "founder",
+  "closed",
+] as const;
 export type ClientFilter = (typeof clientFilters)[number];
 
 // AW21: a search (Clients have no Branch) and one chip; «Todas» leaves the

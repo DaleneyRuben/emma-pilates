@@ -14,14 +14,16 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { adminFetch } from "../../api/fetcher";
-import type { ClientSearch } from "../../people/people-search";
+import { adminFetch } from "../../../api/fetcher";
+import type { ClientSearch } from "../../people-search";
 
-// Studio-wide like AW21: the key never names the selected Branch.
-export const contactTableQueryOptions = (search: ClientSearch) => {
+// FIX-065 (walkthrough finding 91): Clientas › Cuenta cerrada reads the
+// former Clients' Promotion Contacts (ADR-0097) only, studio-wide.
+export const closedAccountTableQueryOptions = (search: ClientSearch) => {
   const params: ListAdminPromotionContactsParams = {
     page: search.page,
     pageSize: search.pageSize,
+    kind: "former_client",
     ...(search.q === undefined ? {} : { q: search.q }),
   };
   return queryOptions({
@@ -33,13 +35,18 @@ export const contactTableQueryOptions = (search: ClientSearch) => {
   });
 };
 
-/** Every contact, not just the page on screen; the backend audits it. */
-export const fetchAllPromotionContacts = async (): Promise<
-  AdminPromotionContactDto[]
-> =>
+/** Every closed account the search matches; the backend audits it. */
+export const fetchAllClosedAccounts = async (
+  q: string | undefined,
+): Promise<AdminPromotionContactDto[]> =>
   (
-    (await exportAdminPromotionContacts(undefined, undefined, adminFetch))
-      .data as AdminPromotionContactExportDto
+    (
+      await exportAdminPromotionContacts(
+        { kind: "former_client", ...(q === undefined ? {} : { q }) },
+        undefined,
+        adminFetch,
+      )
+    ).data as AdminPromotionContactExportDto
   ).items;
 
 export function useWithdrawPromotionContact() {

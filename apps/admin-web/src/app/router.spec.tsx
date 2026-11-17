@@ -141,6 +141,8 @@ describe("admin navigation", () => {
       // WEB-040: Fundadora is a chip on Todas, no longer a page.
       "/back-office/fundadoras": "/clientas?filter=founder",
       "/clientas/fundadoras": "/clientas?filter=founder",
+      // FIX-065: AW35 is Clientas' «Cuenta cerrada» chip.
+      "/promociones/contactos": "/clientas?filter=closed",
       "/back-office/congelamientos": "/clientas/congelamientos",
       "/back-office/pagos": "/dinero/pagos",
       "/back-office/caja": "/dinero/caja",
