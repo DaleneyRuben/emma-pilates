@@ -1,4 +1,6 @@
 import {
+  getGetCurrentClientSubscriptionQueryKey,
+  getListEvaluationSlotsQueryKey,
   getListEvaluationsQueryKey,
   useGetCurrentClientSubscription,
   useListEvaluations,
@@ -130,11 +132,19 @@ export function EvaluationAvailabilityScreen({
   const slots = useListEvaluationSlots(undefined, queryOptions);
   const upcoming = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const past = useListEvaluations({ scope: "past" }, queryOptions);
-  const queryKeys = [getListEvaluationsQueryKey()];
+  // She stays on this screen and comes back to it: a pull or a return also
+  // refreshes the turnos and her Plan, not only her Evaluations.
+  const queryKeys = [
+    getListEvaluationsQueryKey(),
+    getListEvaluationSlotsQueryKey(),
+    getGetCurrentClientSubscriptionQueryKey(),
+  ];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
   const [moving, setMoving] = useState<ClientEvaluationDto | null>(null);
-  const [target, setTarget] = useState<EvaluationSlotDto | null>(null);
+  // The turno she picked and the one she is leaving, kept apart from the list
+  // that refreshes under the sheet once the move lands.
+  const [target, setTarget] = useState<{ slot: EvaluationSlotDto; from: string } | null>(null);
   const [cancelling, setCancelling] = useState<ClientEvaluationDto | null>(null);
   const [receiptFor, setReceiptFor] = useState<ClientEvaluationDto | null>(null);
   const [movedNotice, setMovedNotice] = useState<Notice | null>(null);
@@ -156,14 +166,15 @@ export function EvaluationAvailabilityScreen({
     );
   }
 
+  // A turnos failure only empties the booking section: her booked ones stay.
   const availability = slots.data?.status === 200 ? slots.data.data : null;
-  if (availability === null || upcoming.isError || upcoming.data.status !== 200) {
+  if (upcoming.isError || upcoming.data.status !== 200) {
     return (
       <Screen style={styles.screen}>
         {header}
         <QueryFailure
           label="No pudimos cargar tus evaluaciones."
-          onRetry={() => void Promise.all([slots.refetch(), upcoming.refetch()])}
+          onRetry={() => void upcoming.refetch()}
         />
       </Screen>
     );
@@ -195,13 +206,21 @@ export function EvaluationAvailabilityScreen({
     );
   }
 
-  const days = openDays(availability, movingNow?.slotId);
-  const offer = planOfferLine(availability);
+  const days = availability === null ? [] : openDays(availability, movingNow?.slotId);
+  const offer = availability === null ? null : planOfferLine(availability);
   const pick = (slot: EvaluationSlotDto) =>
-    movingNow === null ? navigation.navigate("BookEvaluation", { slot }) : setTarget(slot);
+    movingNow === null
+      ? navigation.navigate("BookEvaluation", { slot })
+      : setTarget({ slot, from: movingNow.startsAt });
+  const failure =
+    commands.failure === null ? null : (
+      <BodyText accessibilityRole="alert" style={styles.failure}>
+        {commands.failure}
+      </BodyText>
+    );
   const confirmMove = async () => {
     if (movingNow === null || target === null) return;
-    const moved = await commands.move(movingNow, target);
+    const moved = await commands.move(movingNow, target.slot);
     setTarget(null);
     if (moved === null) return;
     setMoving(null);
@@ -211,13 +230,13 @@ export function EvaluationAvailabilityScreen({
   return (
     <Screen style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={refreshControl}
+        testID="evaluation-scroll"
+      >
         {items.length === 0 && offer !== null ? <BodyText>{offer}</BodyText> : null}
-        {commands.failure !== null ? (
-          <BodyText accessibilityRole="alert" style={styles.failure}>
-            {commands.failure}
-          </BodyText>
-        ) : null}
+        {movingNow === null ? failure : null}
         {items.length > 0 ? (
           <View>
             <SectionTitle>
@@ -250,11 +269,19 @@ export function EvaluationAvailabilityScreen({
                 : "Reserva tu evaluación"}
           </SectionTitle>
           {movingNow !== null ? (
-            <MovingBand evaluation={movingNow} onBack={() => setMoving(null)} />
+            <>
+              <MovingBand evaluation={movingNow} onBack={() => setMoving(null)} />
+              {failure}
+            </>
           ) : items.length > 0 && offer !== null ? (
             <BodyText style={styles.muted}>{offer}</BodyText>
           ) : null}
-          {movingNow === null && !hasPlan ? (
+          {availability === null ? (
+            <QueryFailure
+              label="No pudimos cargar los horarios de evaluación."
+              onRetry={() => void slots.refetch()}
+            />
+          ) : movingNow === null && !hasPlan ? (
             <>
               <BodyText>Necesitas un plan activo para reservar.</BodyText>
               <TextButton label="Ver planes" onPress={() => navigation.navigate("Plans")} />
@@ -284,10 +311,10 @@ export function EvaluationAvailabilityScreen({
       </ScrollView>
       <RescheduleConfirmSheet
         busy={commands.movingBusy}
-        currentStartsAt={movingNow?.startsAt}
+        currentStartsAt={target?.from}
         onConfirm={() => void confirmMove()}
         onDismiss={() => setTarget(null)}
-        target={target}
+        target={target?.slot ?? null}
       />
       <EvaluationReceiptSheet
         evaluation={receiptFor}
@@ -295,10 +322,12 @@ export function EvaluationAvailabilityScreen({
         onAttach={() => {
           if (receiptFor === null) return;
           const evaluation = receiptFor;
-          void commands.attachReceipt(evaluation).then(() =>
+          void commands.attachReceipt(evaluation).then((outcome) => {
+            // A closed picker or a busy upload leaves the sheet as it is.
+            if (outcome === "skipped") return;
             // Closes only this Evaluation's sheet: another may be open by now.
-            setReceiptFor((current) => (current?.id === evaluation.id ? null : current)),
-          );
+            setReceiptFor((current) => (current?.id === evaluation.id ? null : current));
+          });
         }}
         onClose={() => setReceiptFor(null)}
         uploading={commands.uploadingId !== null}
