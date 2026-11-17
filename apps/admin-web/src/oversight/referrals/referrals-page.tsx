@@ -22,6 +22,9 @@ const studioSummary = (total: number) =>
     ? "Todavía no hay referidos en el estudio"
     : count(total, "referido", "referidos");
 
+const civilDate = (instant: string) =>
+  formatCivilDate(boliviaParts(instant).date);
+
 const columns = createColumnHelper<ReferralRow>();
 
 // The row is the whole record (AW26): no panel, no link.
@@ -53,9 +56,44 @@ const referralColumns = () => [
     header: "Fecha de registro",
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">
-        {formatCivilDate(boliviaParts(getValue()).date)}
+        {civilDate(getValue())}
       </span>
     ),
+  }),
+  // FIX-060 (walkthrough finding 86): her first confirmed Plan purchase.
+  columns.accessor("firstPurchaseAt", {
+    header: "Compró",
+    cell: ({ getValue }) => {
+      const boughtAt = getValue();
+      return boughtAt === null ? (
+        <span className="text-texto-tenue">Aún no</span>
+      ) : (
+        <span className="text-texto-secundario tabular">
+          {civilDate(boughtAt)}
+        </span>
+      );
+    },
+  }),
+  // The host's extra class for the invite (BKM-014).
+  columns.accessor("inviteReward", {
+    header: "Clase de premio",
+    cell: ({ row }) => {
+      const { inviteReward, inviteRewardGrantedAt } = row.original;
+      if (inviteReward === "granted" && inviteRewardGrantedAt !== null) {
+        return (
+          <span className="text-texto-secundario tabular">
+            {`Sumada el ${civilDate(inviteRewardGrantedAt)}`}
+          </span>
+        );
+      }
+      return inviteReward === "owed" ? (
+        <span className="text-texto-secundario">
+          Se suma con su próximo plan
+        </span>
+      ) : (
+        <span className="text-texto-muy-tenue">—</span>
+      );
+    },
   }),
 ];
 
