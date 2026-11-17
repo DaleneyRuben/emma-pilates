@@ -61,7 +61,13 @@ const feedbackSelect = {
   changeNote: true,
   createdAt: true,
   triagedAt: true,
-  account: { select: { email: true } },
+  account: {
+    select: {
+      email: true,
+      client: { select: { id: true, name: true } },
+      staffMember: { select: { name: true } },
+    },
+  },
 } as const satisfies Prisma.FeedbackSelect;
 
 type FeedbackRecord = Prisma.FeedbackGetPayload<{
@@ -81,6 +87,11 @@ const toRow = (record: FeedbackRecord): FeedbackRow => ({
   status: lower<FeedbackStatus>(record.status),
   changeNote: record.changeNote,
   senderEmail: record.account.email,
+  senderName:
+    record.account.client?.name ??
+    record.account.staffMember?.name ??
+    record.account.email,
+  senderClientId: record.account.client?.id ?? null,
   createdAt: record.createdAt,
   triagedAt: record.triagedAt,
 });

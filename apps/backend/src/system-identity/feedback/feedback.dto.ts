@@ -100,6 +100,21 @@ export class AdminFeedbackDto {
   @ApiProperty({ format: 'email', description: 'The sender’s login email' })
   senderEmail!: string;
 
+  @ApiProperty({
+    description:
+      'The sender’s name: the Client’s, or the Staff Member’s (walkthrough finding 88)',
+  })
+  senderName!: string;
+
+  @ApiProperty({
+    type: String,
+    format: 'uuid',
+    nullable: true,
+    description:
+      'The Client who sent it, for a link to her file; null for Staff',
+  })
+  senderClientId!: string | null;
+
   @ApiProperty({ format: 'date-time' })
   createdAt!: string;
 
