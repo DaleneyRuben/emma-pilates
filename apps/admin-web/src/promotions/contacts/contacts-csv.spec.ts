@@ -31,6 +31,16 @@ describe("the Promotion Contacts CSV", () => {
     );
   });
 
+  // A backend before FIX-060 sends only «consentedAt» (a rollback).
+  it("dates a contact from an older backend by its consent", () => {
+    const { since: _since, ...older } = valeria;
+    expect(
+      promotionContactsCsv([older as typeof valeria]).split("\r\n")[1],
+    ).toBe(
+      "Valeria Quiroga,Cuenta cerrada,valeria@example.com,+591 70011005,19/10/2026",
+    );
+  });
+
   it("names the file after the Bolivia date of the export", () => {
     expect(contactsCsvName(new Date("2026-10-21T02:00:00.000Z"))).toBe(
       "contactos-promociones-2026-10-20.csv",
