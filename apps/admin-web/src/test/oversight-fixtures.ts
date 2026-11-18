@@ -21,6 +21,7 @@ const nutritionist = (
   email: `nutricion${suffix}@emmapilates.bo`,
   phone: null,
   role: "nutritionist",
+  gender: "female",
   branchIds: [centro.id],
   status: "active",
   activationExpiresAt: null,

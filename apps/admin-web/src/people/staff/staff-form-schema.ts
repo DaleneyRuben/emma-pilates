@@ -1,3 +1,4 @@
+import type { StaffGenderCode } from "@pilates/api-contracts";
 import { z } from "zod";
 import {
   keptOrRequiredPhone,
@@ -26,6 +27,8 @@ const staffSchema = (phone: z.ZodType<string | null, PhoneValue>) =>
       email: z.string().trim().pipe(z.email("Escribe un correo válido.")),
       phone,
       role: z.enum(staffRoles, "Elige un rol."),
+      // FIX-081 (finding 118): how her Role reads; chosen, never assumed.
+      gender: z.enum(["female", "male"], "Elige el género."),
       branchIds: z.array(z.string()),
     })
     .refine(
@@ -58,5 +61,6 @@ export const emptyStaffForm = (): StaffFormInput => ({
   email: "",
   phone: phoneValue(),
   role: "" as StaffRole,
+  gender: "" as StaffGenderCode,
   branchIds: [],
 });

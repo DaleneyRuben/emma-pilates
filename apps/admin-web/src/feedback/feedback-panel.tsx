@@ -13,7 +13,7 @@ import { Textarea } from "../components/ui/textarea";
 import { formatCivilMoment } from "../lib/bolivia-time";
 import {
   appLabels,
-  roleLabels,
+  roleLabelOf,
   statusLabels,
   systemLabel,
   versionLabel,
@@ -88,7 +88,7 @@ export function FeedbackPanel({
           <SummaryRow label="Enviado por">
             <FeedbackSender feedback={feedback} />
           </SummaryRow>
-          <SummaryRow label="Rol">{roleLabels[feedback.role]}</SummaryRow>
+          <SummaryRow label="Rol">{roleLabelOf(feedback)}</SummaryRow>
           <SummaryRow label="Correo">
             <span className="break-all">{feedback.senderEmail}</span>
           </SummaryRow>

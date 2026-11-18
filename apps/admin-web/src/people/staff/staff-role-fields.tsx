@@ -1,3 +1,8 @@
+import {
+  staffGenderOptions,
+  staffRoleLabel,
+  type StaffGenderCode,
+} from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import type { Control } from "react-hook-form";
 import {
@@ -13,9 +18,12 @@ import {
 import { activeBranchesQueryOptions } from "../../shell/branch/branch-queries";
 import { holdsEveryBranch, staffRoles, type StaffRole } from "../people-search";
 import type { StaffFormInput, StaffFormOutput } from "./staff-form-schema";
-import { roleLabels } from "./staff-format";
 
-const roleOptions = staffRoles.map((role) => [role, roleLabels[role]] as const);
+// FIX-081: the Roles read in the chosen gender, feminine until one is.
+const roleOptions = (gender: StaffGenderCode | "") =>
+  staffRoles.map(
+    (role) => [role, staffRoleLabel(role, gender || undefined)] as const,
+  );
 
 function FieldTitle({ children }: { children: string }) {
   return (
@@ -42,10 +50,12 @@ function ReadOnlyRow({ children }: { children: string }) {
 export function StaffRoleFields({
   control,
   role,
+  gender,
   branchNote,
 }: {
   control: Control<StaffFormInput, unknown, StaffFormOutput>;
   role: StaffRole | "";
+  gender: StaffGenderCode | "";
   /** Extra warning under the Branches (editing). */
   branchNote?: string;
 }) {
@@ -53,6 +63,27 @@ export function StaffRoleFields({
 
   return (
     <>
+      <FormField
+        control={control}
+        name="gender"
+        render={({ field }) => (
+          <FormItem>
+            <FieldTitle>Género</FieldTitle>
+            <ChoiceChips
+              legend="Género"
+              name={field.name}
+              value={field.value}
+              options={staffGenderOptions}
+              onChange={field.onChange}
+              className="grid grid-cols-2"
+            />
+            <FormDescription>
+              Para nombrar su rol: Coordinadora o Coordinador.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       <FormField
         control={control}
         name="role"
@@ -63,7 +94,7 @@ export function StaffRoleFields({
               legend="Rol"
               name={field.name}
               value={field.value}
-              options={roleOptions}
+              options={roleOptions(gender)}
               onChange={field.onChange}
               className="grid grid-cols-3"
             />

@@ -1,14 +1,5 @@
 import type { StaffMemberDto } from "@pilates/api-contracts";
-import { holdsEveryBranch, type StaffRole } from "../people-search";
-
-// AW23's labels: a Role is a fixed category, drawn as a neutral label.
-export const roleLabels: Record<StaffRole, string> = {
-  trainer: "Entrenadora",
-  assistant: "Asistente",
-  administrator: "Administración",
-  nutritionist: "Nutricionista",
-  coordinator: "Coordinador",
-};
+import { holdsEveryBranch } from "../people-search";
 
 type Status = StaffMemberDto["status"];
 

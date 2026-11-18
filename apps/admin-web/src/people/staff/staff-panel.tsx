@@ -62,6 +62,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
     defaultValues: emptyStaffForm(),
   });
   const role = useWatch({ control: form.control, name: "role" });
+  const gender = useWatch({ control: form.control, name: "gender" });
 
   const submit = form.handleSubmit(async (values) => {
     setFailure(null);
@@ -125,7 +126,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
             name="phone"
             description="La recepción lo usa para escribirle por WhatsApp."
           />
-          <StaffRoleFields control={form.control} role={role} />
+          <StaffRoleFields control={form.control} role={role} gender={gender} />
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
               {failure}

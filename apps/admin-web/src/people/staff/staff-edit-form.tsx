@@ -64,10 +64,12 @@ export function StaffEditForm({
       email: member.email,
       phone: phoneValue(member.phone),
       role: member.role as StaffRole,
+      gender: member.gender,
       branchIds: member.branchIds,
     },
   });
   const role = useWatch({ control: form.control, name: "role" });
+  const gender = useWatch({ control: form.control, name: "gender" });
   const typedEmail = useWatch({ control: form.control, name: "email" });
   // FIX-039: the change waiting for the new address, kept from each answer.
   const [pending, setPending] = useState(member.pendingEmail);
@@ -88,13 +90,17 @@ export function StaffEditForm({
     email,
     phone,
     role: next,
+    gender: nextGender,
     branchIds: chosen,
   }: StaffFormOutput) => {
     setFailure(null);
     setEmailNotice(null);
     const emailChanged = active && !sameEmail(email, member.email);
     const branchIds = shown(chosen);
-    const contactChanged = name !== member.name || phone !== member.phone;
+    // FIX-081: the gender travels with the contact, only when it changed.
+    const genderChanged = nextGender !== member.gender;
+    const contactChanged =
+      name !== member.name || phone !== member.phone || genderChanged;
     const roleChanged = next !== member.role;
     const branchesChanged =
       !holdsEveryBranch(next) && !sameSet(branchIds, shown(member.branchIds));
@@ -111,6 +117,7 @@ export function StaffEditForm({
           staffMemberId: member.id,
           name,
           phone,
+          ...(genderChanged ? { gender: nextGender } : {}),
         });
         contactSaved = true;
       }
@@ -239,6 +246,7 @@ export function StaffEditForm({
           <StaffRoleFields
             control={form.control}
             role={role}
+            gender={gender}
             branchNote={`Si sacas una sucursal, sus sesiones ya asignadas no se reasignan solas.${
               member.role === "trainer"
                 ? " Cámbialas de entrenadora en Horario antes de guardar."
