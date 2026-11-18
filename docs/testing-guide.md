@@ -10439,6 +10439,28 @@ recommendation reads that count.
    Booking she cancelled keeps the card.
 
 
+## Test 169: «Reportar una falla» says which unit and what is missing (FIX-076)
+
+Walkthrough finding 110, option A of follow-ups 278/279. Staff app only; no
+migration, no API change.
+
+1. Log in to the staff app as a Trainer (Daniela Ortiz, `daniela@example.com`)
+   and open **Agenda › a class › Reportar una falla** at a Branch with a
+   single Reformer (Achumani in the walkthrough database). Expected: under
+   the chips, the label «NÚMERO DEL EQUIPO» and one small tile «N.º 1»
+   already selected (with «fuera de servicio» under it if it is), the line
+   «Es el único de esta sucursal.», and above the disabled **Enviar
+   reporte** «Para enviarlo, cuenta qué pasó.».
+2. Type in **¿Qué pasó?**. Expected: the line goes away and the button is
+   enabled; sending reports that unit.
+3. At a Branch with several units of a type, open the screen again.
+   Expected: no tile selected and «Para enviarlo, elige el número y cuenta
+   qué pasó.»; after typing, «Para enviarlo, elige el número del Reformer.»;
+   after choosing a tile the line goes away.
+4. Choose a quantity type (Balones). Expected: the stepper card as before,
+   and «Para enviarlo, cuenta qué pasó.» above the button; when none is
+   usable, «No hay ninguno que se pueda usar.».
+
 ## Test 171: every staff payment carries its receipt (FIX-078)
 
 Walkthrough finding 112. No migration. The API refuses a Salary Payment
