@@ -24,9 +24,7 @@ describe("ImpersonationFrame", () => {
   it("pushes the screens under the banner once and leaves them no top inset", async () => {
     const screen = await render(
       <SafeAreaProvider initialMetrics={metrics}>
-        <ImpersonationFrame
-          banner={<Text testID="banner">Viendo como Camila Rojas</Text>}
-        >
+        <ImpersonationFrame banner={<Text testID="banner">Viendo como Camila Rojas</Text>}>
           <InsetsProbe />
         </ImpersonationFrame>
       </SafeAreaProvider>,

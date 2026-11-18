@@ -4,19 +4,13 @@ import {
   type MobileNavigationProps,
   MobileQueryProvider,
 } from "@pilates/mobile-core";
-import { type ReactNode, useCallback, useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import {
-  initialWindowMetrics,
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useCallback, useMemo, useState } from "react";
+import { StyleSheet } from "react-native";
+import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 
-import {
-  ImpersonationBanner,
-  impersonationBannerHeight,
-} from "./impersonation/impersonation-banner";
+import { ImpersonationBanner } from "./impersonation/impersonation-banner";
 import { createImpersonationApi } from "./impersonation/impersonation-api";
+import { ImpersonationFrame } from "./impersonation/impersonation-frame";
 import {
   ImpersonationContext,
   type ImpersonationNotice,
@@ -32,16 +26,6 @@ const windowMetrics = initialWindowMetrics ?? {
   frame: { x: 0, y: 0, width: 0, height: 0 },
   insets: { top: 0, right: 0, bottom: 0, left: 0 },
 };
-
-// FUT-001: the screens start under the strip, which covers the top inset.
-function UnderBanner({ children }: { children: ReactNode }) {
-  const insets = useSafeAreaInsets();
-  return (
-    <View style={[styles.pushedDown, { paddingTop: insets.top + impersonationBannerHeight }]}>
-      {children}
-    </View>
-  );
-}
 
 export function StaffNavigation({
   accountId,
@@ -90,8 +74,14 @@ export function StaffNavigation({
   );
   const clearNotice = useCallback(() => setNotice(null), []);
   const impersonationState = useMemo(
-    () => ({ impersonation: impersonation ?? null, notice, clearNotice, refreshSession: refresh }),
-    [clearNotice, impersonation, notice, refresh],
+    () => ({
+      impersonation: impersonation ?? null,
+      notice,
+      clearNotice,
+      exit: onExit,
+      refreshSession: refresh,
+    }),
+    [clearNotice, impersonation, notice, onExit, refresh],
   );
 
   if (emailChangeToken !== null) {
@@ -128,12 +118,17 @@ export function StaffNavigation({
                   navigator
                 ) : (
                   <SafeAreaProvider initialMetrics={windowMetrics} style={styles.underBanner}>
-                    <UnderBanner>{navigator}</UnderBanner>
-                    <ImpersonationBanner
-                      impersonation={impersonation}
-                      onExit={onExit}
-                      onExpire={onExpire}
-                    />
+                    <ImpersonationFrame
+                      banner={
+                        <ImpersonationBanner
+                          impersonation={impersonation}
+                          onExit={onExit}
+                          onExpire={onExpire}
+                        />
+                      }
+                    >
+                      {navigator}
+                    </ImpersonationFrame>
                   </SafeAreaProvider>
                 )}
               </ImpersonationContext.Provider>
@@ -160,6 +155,5 @@ export function StaffNavigation({
   );
 }
 const styles = StyleSheet.create({
-  pushedDown: { flex: 1 },
   underBanner: { flex: 1 },
 });
