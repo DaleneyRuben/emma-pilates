@@ -144,6 +144,23 @@ describe("Mis facturas", () => {
     await waitFor(() => expect(mockDownloadInvoice).toHaveBeenCalledTimes(1));
   });
 
+  // FIX-049: on Android the PDF goes straight to Descargas (K3 «Guardada en
+  // Descargas»); the folder picker's fallback keeps «Factura guardada».
+  it.each([
+    ["downloads", "Guardada en Descargas"],
+    ["saved", "Factura guardada"],
+  ])("tells her where a %s invoice went", async (outcome, title) => {
+    mockDownloadInvoice.mockResolvedValue(outcome);
+    const screen = await openInvoices([ready]);
+
+    await fireEvent.press(
+      await screen.findByRole("button", { name: /Paquete de 8 clases, 5 nov 2026/ }),
+    );
+    await fireEvent.press(await screen.findByRole("button", { name: "Descargar" }));
+
+    expect(await screen.findByText(title)).toBeOnTheScreen();
+  });
+
   it("says so when the download fails", async () => {
     mockDownloadInvoice.mockRejectedValue(new Error("offline"));
     const screen = await openInvoices([ready]);

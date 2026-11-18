@@ -2,11 +2,16 @@ import * as FileSystem from "expo-file-system/legacy";
 import { Platform } from "react-native";
 
 import { downloadInvoice } from "./invoice-download";
+import { loadDownloadsFolder } from "./downloads-folder";
+
+jest.mock("./downloads-folder", () => ({ loadDownloadsFolder: jest.fn(() => null) }));
+const downloadsFolder = loadDownloadsFolder as jest.Mock;
 
 jest.mock("expo-file-system/legacy", () => ({
   cacheDirectory: "file:///cache/",
   EncodingType: { Base64: "base64" },
   writeAsStringAsync: jest.fn().mockResolvedValue(undefined),
+  deleteAsync: jest.fn().mockResolvedValue(undefined),
   StorageAccessFramework: {
     getUriForDirectoryInRoot: jest.fn((folder: string) => `content://root/${folder}`),
     requestDirectoryPermissionsAsync: jest.fn(),
@@ -30,7 +35,57 @@ describe("downloadInvoice on Android", () => {
     Object.defineProperty(Platform, "OS", { value: original, configurable: true });
   });
 
-  it("opens the folder picker in Documentos and saves the PDF there", async () => {
+  // FIX-049: no folder picker. The app's own native module (a build made
+  // after FIX-049) writes into Descargas through MediaStore.
+  it("saves the PDF straight to Descargas, without the folder picker", async () => {
+    const saveAsync = jest.fn().mockResolvedValue(true);
+    downloadsFolder.mockReturnValueOnce({ saveAsync });
+    access.requestDirectoryPermissionsAsync.mockClear();
+
+    await expect(
+      downloadInvoice({
+        fetcher: pdf(),
+        paymentId: "payment-1",
+        fileName: "factura 000123.pdf",
+        mediaType: "application/pdf",
+      }),
+    ).resolves.toBe("downloads");
+
+    expect(saveAsync).toHaveBeenCalledWith(
+      "file:///cache/factura 000123.pdf",
+      "factura 000123.pdf",
+      "application/pdf",
+    );
+    expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
+      "file:///cache/factura 000123.pdf",
+      "JVBERg==",
+      { encoding: "base64" },
+    );
+    expect(FileSystem.deleteAsync).toHaveBeenCalledWith("file:///cache/factura 000123.pdf", {
+      idempotent: true,
+    });
+    expect(access.requestDirectoryPermissionsAsync).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the folder picker on Android 9 and older", async () => {
+    downloadsFolder.mockReturnValueOnce({ saveAsync: jest.fn().mockResolvedValue(false) });
+    access.requestDirectoryPermissionsAsync.mockResolvedValue({
+      granted: true,
+      directoryUri: "content://root/Documents",
+    });
+
+    await expect(
+      downloadInvoice({
+        fetcher: pdf(),
+        paymentId: "payment-1",
+        fileName: "factura-000123.pdf",
+        mediaType: "application/pdf",
+      }),
+    ).resolves.toBe("saved");
+    expect(access.requestDirectoryPermissionsAsync).toHaveBeenCalled();
+  });
+
+  it("opens the folder picker in Documentos in a build without the module", async () => {
     access.requestDirectoryPermissionsAsync.mockResolvedValue({
       granted: true,
       directoryUri: "content://root/Documents",
