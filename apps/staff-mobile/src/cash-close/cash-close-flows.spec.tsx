@@ -32,7 +32,7 @@ async function openCashClose(routes: Parameters<typeof routeFetcher>[0]) {
   const screen = await openClientSearch(routes);
   await fireEvent.press(screen.getByTestId("tab-cash"));
   await waitFor(() => {
-    expect(screen.getByText("Efectivo esperado")).toBeOnTheScreen();
+    expect(screen.getByText("¿Cuánto efectivo hay en la caja?")).toBeOnTheScreen();
   });
   return screen;
 }
@@ -57,26 +57,36 @@ describe("Cerrar caja (S25)", () => {
       },
     });
 
-    expect(screen.getByText("Bs 520,00")).toBeOnTheScreen();
+    // FIX-083 (Cerrar caja pick A): count first, the expected cash quietly below.
+    expect(screen.getByLabelText("¿Cuánto efectivo hay en la caja?")).toHaveStyle({ fontSize: 30 });
+    expect(
+      screen.getByText("Cuenta los billetes antes de mirar el total esperado."),
+    ).toBeOnTheScreen();
+    expect(screen.getByLabelText("Esperado según los pagos, Bs 520,00")).toBeOnTheScreen();
     expect(screen.getByText("3 ventas en efectivo hoy en Centro")).toBeOnTheScreen();
     expect(screen.getByText("Viernes 23 de octubre · Centro")).toBeOnTheScreen();
-    // v2 S25: the Caja tab root, with the expected cash as the hero.
     expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
-    expect(screen.getByText("Bs 520,00")).toHaveStyle({ fontSize: 32 });
     expect(
-      screen.getByText("Hay un solo cierre por día y no se corrige después."),
+      screen.getByText("Te pediremos confirmar: un cierre no se puede deshacer."),
     ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cerrar caja" })).toBeDisabled();
+    expect(screen.queryByLabelText("Nota (opcional)")).toBeNull();
 
-    await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "520");
+    await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "520");
     expect(screen.getByLabelText("Diferencia · Bs 0,00 · Cuadra")).toBeOnTheScreen();
-    await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "525,50");
+    expect(screen.getByText("Cuadra")).toHaveStyle({ color: "#5F7457" });
+    expect(screen.queryByLabelText("Nota (opcional)")).toBeNull();
+    await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "525,50");
     expect(screen.getByLabelText("Diferencia · +Bs 5,50 · Sobra efectivo")).toBeOnTheScreen();
-    await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "510");
+    await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "510");
     expect(screen.getByLabelText("Diferencia · −Bs 10,00 · Falta efectivo")).toBeOnTheScreen();
+    expect(screen.getByText("Falta Bs 10,00")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Nota (opcional)"), "Faltó cambio");
 
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar caja" }));
+    await waitFor(() => expect(screen.getByText("¿Cerrar la caja de hoy?")).toBeOnTheScreen());
+    expect(posted).toEqual([]);
+    await fireEvent.press(screen.getByTestId("cash-close-confirm"));
 
     await waitFor(() => {
       expect(screen.getByLabelText("Caja cerrada")).toBeOnTheScreen();
@@ -99,8 +109,10 @@ describe("Cerrar caja (S25)", () => {
       [centroToday]: () => jsonResponse({ ...today, voidedCashCentavos: 29_000 }),
     });
 
-    expect(screen.getByText("Bs 520,00")).toBeOnTheScreen();
-    expect(screen.getByText("Ventas anuladas (efectivo en caja): Bs 290,00")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Esperado según los pagos, Bs 520,00")).toBeOnTheScreen();
+    expect(
+      screen.getByLabelText("Ventas anuladas (efectivo en caja), Bs 290,00"),
+    ).toBeOnTheScreen();
   });
 
   it("shows no voided line when nothing was voided", async () => {
@@ -122,7 +134,7 @@ describe("Cerrar caja (S25)", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Caja cerrada")).toBeOnTheScreen();
     });
-    expect(screen.queryByLabelText("Efectivo contado")).toBeNull();
+    expect(screen.queryByLabelText("¿Cuánto efectivo hay en la caja?")).toBeNull();
   });
 
   it("says when someone else closed the day meanwhile and shows that close", async () => {
@@ -136,8 +148,9 @@ describe("Cerrar caja (S25)", () => {
       },
     });
 
-    await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "520");
+    await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "520");
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar caja" }));
+    await fireEvent.press(await screen.findByTestId("cash-close-confirm"));
 
     await waitFor(() => {
       expect(screen.getByText("La caja de hoy ya se cerró en esta sucursal.")).toBeOnTheScreen();
@@ -150,13 +163,53 @@ describe("Cerrar caja (S25)", () => {
   it("keeps the button off for a count it cannot read", async () => {
     const screen = await openCashClose({
       ...assistantRoutes(),
-      [centroToday]: () => jsonResponse({ ...today, expectedCentavos: 0, cashPaymentCount: 0 }),
+      [centroToday]: () => jsonResponse(today),
     });
 
-    expect(screen.getByText("Todavía no hay ventas en efectivo hoy.")).toBeOnTheScreen();
-    await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "12,345");
+    await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "12,345");
     expect(screen.getByRole("button", { name: "Cerrar caja" })).toBeDisabled();
-    expect(screen.queryByLabelText(/^Diferencia/)).toBeNull();
+    expect(screen.queryByLabelText(/^Diferencia ·/)).toBeNull();
+  });
+
+  // FIX-083 (Cerrar caja pick C): a day without cash closes in zero, calmly.
+  it("offers to close in zero on a day without cash payments", async () => {
+    const posted: unknown[] = [];
+    const screen = await openClientSearch({
+      ...assistantRoutes(),
+      [centroToday]: () => jsonResponse({ ...today, expectedCentavos: 0, cashPaymentCount: 0 }),
+      "POST /api/v1/cash-closes": (init) => {
+        posted.push(JSON.parse(String(init?.body)));
+        return jsonResponse({ ...close, expectedCentavos: 0, countedCentavos: 0 }, 201);
+      },
+    });
+    await fireEvent.press(screen.getByTestId("tab-cash"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Hoy no hubo pagos en efectivo")).toBeOnTheScreen();
+    });
+    expect(screen.queryByLabelText("¿Cuánto efectivo hay en la caja?")).toBeNull();
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar caja sin efectivo" }));
+    await fireEvent.press(await screen.findByTestId("cash-close-confirm"));
+
+    await waitFor(() => expect(screen.getByLabelText("Caja cerrada")).toBeOnTheScreen());
+    expect(posted).toEqual([{ branchId: "branch-centro", countedCentavos: 0, note: null }]);
+  });
+
+  it("still lets her count cash on a day without cash payments", async () => {
+    const screen = await openClientSearch({
+      ...assistantRoutes(),
+      [centroToday]: () => jsonResponse({ ...today, expectedCentavos: 0, cashPaymentCount: 0 }),
+    });
+    await fireEvent.press(screen.getByTestId("tab-cash"));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Sí hay efectivo en la caja" }),
+    );
+
+    await waitFor(() =>
+      expect(screen.getByLabelText("¿Cuánto efectivo hay en la caja?")).toBeOnTheScreen(),
+    );
+    await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "50");
+    expect(screen.getByLabelText("Diferencia · +Bs 50,00 · Sobra efectivo")).toBeOnTheScreen();
   });
 
   it("lets the Administrator close any Branch from Pagos pendientes", async () => {
@@ -219,7 +272,7 @@ describe("Cerrar caja (S25)", () => {
     profileDown = true;
     await fireEvent.press(await screen.findByTestId("tab-cash"));
 
-    expect(await screen.findByText("Efectivo esperado")).toBeOnTheScreen();
+    expect(await screen.findByText("¿Cuánto efectivo hay en la caja?")).toBeOnTheScreen();
     expect(screen.queryByText("No pudimos cargar la caja de hoy.")).toBeNull();
   });
 
