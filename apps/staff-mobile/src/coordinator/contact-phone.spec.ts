@@ -17,4 +17,13 @@ describe("phones with a country code in the Staff app", () => {
     );
     expect(describeContact(null, "ana@example.com")).toBe("ana@example.com");
   });
+
+  // Walkthrough finding 109: the search results and other staff lists say a
+  // stored phone is unusable, as the client file header does (finding 95).
+  it("says the phone is incomplete instead of showing unusable digits", () => {
+    expect(describeContact("7000004", "sofia@example.com")).toBe(
+      "Celular incompleto · sofia@example.com",
+    );
+    expect(describeContact("  ", "sofia@example.com")).toBe("sofia@example.com");
+  });
 });
