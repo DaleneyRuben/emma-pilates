@@ -20,10 +20,13 @@ const statusDots = {
   expired: { label: "Vencido", dot: colors.iconQuiet, text: colors.textMuted },
 } as const;
 
-/** «Clases extra: 1 · Campaña» → «campaña», the extra classes' origin. */
+/**
+ * «Clases extra: 1 · Campaña» → «campaña»; «Clases extra: 2 · 1 de invitación
+ * · 1 de campaña» → «1 de invitación, 1 de campaña»: where they come from.
+ */
 function extraOrigin(line: string | null | undefined): string | null {
-  const origin = line?.split(" · ")[1];
-  return origin === undefined ? null : origin.toLowerCase();
+  const origins = line?.split(" · ").slice(1) ?? [];
+  return origins.length === 0 ? null : origins.join(", ").toLowerCase();
 }
 
 /**
