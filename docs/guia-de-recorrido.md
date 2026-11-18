@@ -1289,8 +1289,10 @@ verlos, deja la semana creada y espera, o acepta leerlos al día siguiente.
 - La lista de espera corre cuando se libera un cupo, hasta que cierra la
   ventana de 2 h 30. La primera de la fila que todavía puede reservar recibe
   el lugar y el aviso.
-- Un pago en revisión que nadie confirma ni rechaza vence solo. Lucía ve el
-  rechazo y puede subir otro comprobante.
+- Un pago en revisión no vence solo: queda «Pendiente» hasta que alguien lo
+  confirme o lo rechace en **Dinero › Pagos**. Si es un plan de fundadora,
+  a los 3 días sin revisar se libera su cupo para la siguiente compradora;
+  si después se confirma, igual respeta el precio de fundadora que pagó.
 - Una cuenta que nunca activó el correo se retira a los 30 días. Un registro
   de clienta sin confirmar se retira a los 7 días.
 - Los recordatorios de una clase salen 24 horas antes y 2 horas antes. El
