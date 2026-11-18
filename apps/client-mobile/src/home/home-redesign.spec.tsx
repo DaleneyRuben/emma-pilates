@@ -80,6 +80,21 @@ describe("Client Inicio, option A", () => {
     ).toBeOnTheScreen();
   });
 
+  // The tablet carousel stops at 720 pt from the left edge (UX-012), so the
+  // button and the row under it line up with it instead of centring.
+  it("lines the button and the Plan row up with the promotion on a tablet", async () => {
+    const screen = await openHome({ status: "active", subscription: trimestral });
+
+    expect(screen.getByTestId("home-book-frame")).toHaveStyle({
+      alignSelf: "flex-start",
+      maxWidth: 720,
+    });
+    expect(screen.getByTestId("home-plan-card")).toHaveStyle({
+      alignSelf: "flex-start",
+      maxWidth: 720,
+    });
+  });
+
   it("opens Mi plan from anywhere on the Plan row", async () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
