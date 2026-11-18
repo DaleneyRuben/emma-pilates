@@ -1,4 +1,4 @@
-import { cleanup, waitFor } from "@testing-library/react-native";
+import { cleanup, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
@@ -15,7 +15,7 @@ jest.setTimeout(20_000);
 // BKM-006: an effective Plan no longer blocks cash. Only a future Plan does,
 // and walkthrough finding 117 says which one and until when.
 const note =
-  "Su próximo plan ya está pagado (Paquete de 8 clases, desde el 13 de octubre). Podrás registrar otro pago cuando empiece.";
+  "Próximo plan ya pagado: Paquete de 8 clases, desde el 13 de octubre. Podrás registrar otro pago cuando empiece.";
 
 describe("Client overview cash action", () => {
   afterEach(async () => {
@@ -28,6 +28,18 @@ describe("Client overview cash action", () => {
 
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
+  });
+
+  // FIX-083 (Ficha pick A): «Reservar clase» is the one solid button; selling
+  // and her records follow as plain rows.
+  it("lists Registrar pago among the plain rows under «Reservar clase»", async () => {
+    const screen = await openLucia(assistantRoutes());
+    const rows = screen.getByTestId("client-overview-rows");
+
+    expect(within(rows).getByRole("button", { name: /^Reservas, / })).toBeOnTheScreen();
+    expect(within(rows).getByRole("button", { name: "Historial de clases" })).toBeOnTheScreen();
+    expect(within(rows).getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
+    expect(within(rows).queryByTestId("icon-row-disc")).toBeNull();
   });
 
   it("keeps it enabled while the Plan is about to expire", async () => {
@@ -56,7 +68,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("clases restantes de 8")).toBeOnTheScreen();
+      expect(screen.getByText("0 de 8 del plan · vence el 12 de octubre")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
@@ -77,7 +89,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("clases restantes de 8")).toBeOnTheScreen();
+      expect(screen.getByText("0 de 8 del plan · vence el 12 de octubre")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
