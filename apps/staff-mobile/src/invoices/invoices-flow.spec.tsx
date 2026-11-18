@@ -11,6 +11,17 @@ jest.mock("../uploads/load-image-upload", () => ({
     Promise.resolve({ pickImage: mockPickImage, uploadImage: mockUploadImage }),
 }));
 const photo = { uri: "file:///factura.jpg", bytes: new Uint8Array([1, 2, 3]) };
+const mockPickPdf = jest.fn();
+const mockLoadDocumentUpload = jest.fn(() => Promise.resolve({ pickPdf: mockPickPdf }));
+jest.mock("../uploads/load-document-upload", () => ({
+  loadDocumentUpload: () => mockLoadDocumentUpload(),
+}));
+const pdf = {
+  uri: "file:///cache/factura-000123.pdf",
+  bytes: new Uint8Array([37, 80, 68, 70]),
+  mediaType: "application/pdf",
+  fileName: "factura-000123.pdf",
+};
 
 jest.setTimeout(20_000);
 
@@ -88,6 +99,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     clearMobileQueryCache();
     mockPickImage.mockReset();
     mockUploadImage.mockReset();
+    mockPickPdf.mockReset();
   });
 
   it.each([
@@ -177,6 +189,73 @@ describe("Invoices in the Staff app (FIX-044)", () => {
 
     await waitFor(() => expect(removed).toHaveBeenCalledTimes(1));
     expect(await screen.findByText("Sube la factura emitida")).toBeOnTheScreen();
+  });
+
+  // FIX-049: E5's third choice, «Elegir un PDF», from the phone's files.
+  const openUpload = async (fetcher: Parameters<typeof createStaffRuntime>[0]) => {
+    const screen = await render(<App runtime={createStaffRuntime(fetcher, "administrator")} />);
+    await fireEvent.press(await screen.findByRole("button", { name: "Facturas por subir, 1" }));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
+    );
+    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir un PDF" }));
+    return screen;
+  };
+  const uploadRoutes = (attached: jest.Mock) =>
+    routeFetcher({
+      "/api/v1/staff-members/current": () => jsonResponse(staffMember("administrator")),
+      "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
+      "/api/v1/administrator/payments/pending": () => jsonResponse([]),
+      "/api/v1/staff/invoices": () => jsonResponse({ items: [waiting] }),
+      [`/api/v1/staff/payments/${paymentId}/invoice`]: () => jsonResponse(waiting),
+      [`PUT /api/v1/staff/payments/${paymentId}/invoice`]: (init) => {
+        attached(JSON.parse(String(init?.body)));
+        return jsonResponse({
+          ...issued,
+          file: { ...issued.file, fileName: "factura-000123.pdf", mediaType: "application/pdf" },
+        });
+      },
+    });
+
+  it("uploads a PDF of the invoice picked from the phone, with its name", async () => {
+    const attached = jest.fn();
+    mockPickPdf.mockResolvedValue(pdf);
+    mockUploadImage.mockResolvedValue("asset-10");
+
+    const screen = await openUpload(uploadRoutes(attached));
+
+    expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
+    expect(mockPickImage).not.toHaveBeenCalled();
+    expect(mockUploadImage).toHaveBeenCalledWith(pdf, "invoice", expect.any(Function));
+    expect(attached).toHaveBeenCalledWith({
+      imageAssetId: "asset-10",
+      fileName: "factura-000123.pdf",
+    });
+  });
+
+  it("refuses a PDF the studio cannot take, with what it does take", async () => {
+    mockPickPdf.mockRejectedValue(new Error("upload_rejected"));
+
+    const screen = await openUpload(uploadRoutes(jest.fn()));
+
+    expect(
+      await screen.findByText("Este archivo no sirve. Sube un PDF, JPG o PNG de hasta 10 MB."),
+    ).toBeOnTheScreen();
+    expect(mockUploadImage).not.toHaveBeenCalled();
+  });
+
+  it("asks to update the app when this build has no file picker yet", async () => {
+    mockLoadDocumentUpload.mockRejectedValueOnce(new Error("Cannot find native module"));
+
+    const screen = await openUpload(uploadRoutes(jest.fn()));
+
+    expect(
+      await screen.findByText(
+        "Para subir un PDF, actualiza la app. Mientras tanto puedes subir una foto.",
+      ),
+    ).toBeOnTheScreen();
+    expect(mockUploadImage).not.toHaveBeenCalled();
   });
 
   it("says so when the upload fails and offers to retry", async () => {
