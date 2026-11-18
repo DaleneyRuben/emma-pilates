@@ -104,3 +104,15 @@ describe("StateScreen", () => {
     });
   });
 });
+
+// FIX-082: the same state with its glyph alone, no Rosa tinte disc.
+describe("StateScreen with a plain icon", () => {
+  it("draws the glyph in Texto tenue without the disc", async () => {
+    const screen = await render(
+      <StateScreen icon="receipt" plainIcon title="Aún no tienes facturas" />,
+    );
+
+    expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
+    expect(screen.getByTestId("state-screen-icon-receipt", hidden)).toHaveProp("stroke", "#6F6662");
+  });
+});
