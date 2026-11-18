@@ -45,6 +45,10 @@ import {
   parseIssueInput,
   parseIssueQuery,
 } from './equipment.dto';
+import {
+  AdministratorEquipmentStocksController,
+  AdministratorEquipmentTypesController,
+} from './equipment-types.controller';
 import { TrainerSessionEquipmentController } from './trainer-equipment.controller';
 
 abstract class EquipmentController extends BackOfficeController {
@@ -170,6 +174,24 @@ export class AdministratorEquipmentIssuesController extends EquipmentController 
       this.operations.equipment.resolveIssue({ issueId: id }, principal),
     );
   }
+
+  // FIX-067 «Dar de baja»: stock damage only.
+  @Post(':issueId/write-off')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ operationId: 'writeOffEquipmentIssue' })
+  @ApiParam({ name: 'issueId', format: 'uuid' })
+  @ApiOkResponse({ type: EquipmentIssueDto })
+  @Header('Cache-Control', 'no-store')
+  async writeOff(
+    @Param('issueId') issueId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<EquipmentIssueDto> {
+    const id = requireId(issueId, 'Invalid fault identifier');
+    const principal = await this.authenticate(authorization);
+    return run(() =>
+      this.operations.equipmentStocks.writeOffIssue({ issueId: id }, principal),
+    );
+  }
 }
 
 // AW02: the future Sessions with more places than working Equipment.
@@ -199,5 +221,7 @@ export const equipmentControllers = [
   AdministratorEquipmentController,
   AdministratorEquipmentIssuesController,
   AdministratorEquipmentFlagsController,
+  AdministratorEquipmentTypesController,
+  AdministratorEquipmentStocksController,
   TrainerSessionEquipmentController,
 ];
