@@ -163,7 +163,6 @@ function QuantityCard({
       <span className="flex gap-4 max-md:w-full">
         <Button
           variant="link"
-          size="sm"
           disabled={stock.usable <= 0}
           onClick={() => onAction({ mode: "damage", stock })}
         >
@@ -171,7 +170,6 @@ function QuantityCard({
         </Button>
         <Button
           variant="link"
-          size="sm"
           onClick={() => onAction({ mode: "quantity", stock })}
         >
           Cambiar cantidad
@@ -212,7 +210,6 @@ function TypeSection({
         {holding.tracking === "unit" ? (
           <Button
             variant="link"
-            size="sm"
             onClick={() => onAction({ mode: "add", holding })}
           >
             <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
@@ -222,7 +219,6 @@ function TypeSection({
         {canEditTypes ? (
           <Button
             variant="link"
-            size="sm"
             onClick={() => onAction({ mode: "edit", holding })}
           >
             {narrow ? "Editar" : "Editar tipo"}
