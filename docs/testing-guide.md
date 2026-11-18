@@ -104,8 +104,8 @@ can be found by its design name.
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81, 112 |
 | AW08–AW10 Insumos, AW31 Movimientos de insumos (was Retiros e insumos consumidos) | 28, 72, 162 |
 | AW37 Equipos | 82 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112 |
-| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112, 163 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114, 163 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones (Clientas › Cuenta cerrada since FIX-065) | 31, 33, 59, 60, 72, 111, 155, 159 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157, 158 |
@@ -2619,7 +2619,10 @@ recording twice, and the same key with a different body answers
    (`409 expense_category_in_use`). `POST expenses` with a Branch, category,
    `amountCentavos`, and `incurredOn`; `PUT expenses/{id}` corrects the
    category, amount, or date (never the Branch); `GET expenses?branchId=…`
-   lists them.
+   lists them, eliminated ones included with `voidedAt`, `voidedByName`, and
+   `voidReason`. `POST expenses/{id}/void` with an optional `reason` (1–300
+   characters) eliminates one (FIX-069, Test 163): `409 expense_voided` the
+   second time, and a `PUT` on it answers the same.
 5. **Report**: `GET reports/expenses?from=…&until=…` (the same instants as
    `reports/income`) totals Expenses by category and by month plus every
    Salary Payment. Add `&branchId=…` and only that Branch's Expenses count:
@@ -3284,14 +3287,17 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    recorded in ("Se registra en la sucursal Centro."), and **+ Nueva
    categoría** opens a row to add a category without leaving the form; the
    date is typed as `dd/mm/aaaa` (Test 111). The
-   new one is chosen at once. A correction changes the category, amount, or
-   date, never the Branch. A pasted address naming a category (or, in
+   new one is chosen at once. Each row shows **Editar** on its right, which
+   opens «Editar gasto» like the category name does. A correction changes the
+   category, amount, or date, never the Branch; **Eliminar gasto** under
+   **Guardar** marks it eliminated after a confirmation (Test 163). A pasted address naming a category (or, in
    Nómina, a Staff Member) the studio does not have falls back to **Todas**
    / **Todos** once the list loads.
 9. **Categorías de gasto.** The studio's categories, the same for every
    Branch (the selector says the page is not filtered by Branch). A category
    an Expense uses shows "En uso" and its delete icon is disabled; an unused
-   one is deleted after "¿Eliminar «…»?". The row at the bottom adds one; a
+   one is deleted after "¿Eliminar «…»?"; an eliminated Expense does not
+   count as a use (Test 163). The row at the bottom adds one; a
    name that already exists (ignoring capitals) is refused.
 10. **Narrow browser.** At a phone width every table becomes one card per row
     (a Supply without the amber pill shows no Estado line), the four Insumos
@@ -3299,7 +3305,8 @@ time zone your computer uses; money is written `Bs 1.050,00`.
     drawer keeps the Insumos count.
 
 Supplies, Withdrawals, Restocks, Salary Payments, and Expenses are never
-deleted (Withdrawals and Restocks cannot even be edited), so what you create
+deleted (Withdrawals and Restocks cannot even be edited; an eliminated
+Expense stays listed and counts for nothing, Test 163), so what you create
 here stays in `pilates_dev_sim`; only an unused category can be deleted. Date
 pickers follow the browser's language, as Test 25 notes.
 
@@ -10030,3 +10037,38 @@ default older admin builds get, `restock` or `all`) and every row carries
    rango.» under Retiros, «Sin movimientos en este rango.» under Todos.
 6. Check at 1440 px and 420 px (at 420 each movement is a card with
    Movimiento, Cantidad, Registró and Fecha labelled), then drop the copy.
+
+## Test 163: eliminate an Expense, and the row's «Editar» (FIX-069)
+
+Walkthrough finding 104: the owner wants to «eliminar» an Expense without it
+ever leaving the database, and the Gastos row did not look clickable.
+Migration `20261118043255_expense_void` adds `voided_at`,
+`voided_by_account_id`, and `void_reason` to `back_office.expenses`.
+
+1. Use a copy of the fixtures, run the API and the admin web on your own
+   ports (surface-verification skill), and log in as Paola. In **Dinero ›
+   Gastos** record «Luz» Bs 350,00 dated yesterday. Expected: the row shows
+   **Editar** with a pencil on its right; the pointer turns into a hand over
+   the row, and Tab reaches the category name and **Editar**. Enter on
+   **Editar** opens «Editar gasto».
+2. In «Editar gasto» press **Eliminar gasto** (under **Guardar**).
+   Expected: «¿Eliminar este gasto?», «Deja de contar en los totales y en
+   Informes › Dinero. Sigue en la lista de Gastos, marcado como eliminado,
+   con quién y cuándo, y ya no se puede editar.», an optional **Motivo
+   (opcional)**, **Volver** and **Eliminar**. **Volver** changes nothing.
+3. Write «Cargado dos veces» and press **Eliminar**. Expected: the panel
+   closes with «Eliminamos el gasto de Bs 350,00 en Luz.»; the row stays,
+   muted, with the pill **Eliminado**, the amount struck through, the line
+   «Eliminado por Paola Mendoza · dd/mm/aaaa · hh:mm · Cargado dos veces»,
+   no **Editar**, and clicking it opens nothing. Without a reason the line
+   ends at the time. An audit record `expense.voided` keeps the amount and
+   the reason.
+4. **Informes › Dinero** for that month and Branch (and Todas las
+   sucursales). Expected: Gastos, Neto, Gastos por categoría, and Totales
+   por mes leave the eliminated Expense out; **Finanzas** does not count it
+   in that category's actual cost.
+6. **Editar categorías.** A category only eliminated Expenses use is no
+   longer «En uso» and can be deleted; the eliminated rows keep its name.
+5. At 420 px the active card ends with **Editar**, and the eliminated card
+   shows the pill and the who-and-when line right-aligned like the other
+   values; the confirmation fits the screen.
