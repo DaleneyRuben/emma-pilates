@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reportar una falla</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chip{flex:none;height:40px;padding:0 16px;border:0;border-radius:999px;background:#F5EFE9;color:#7D4F4B;font:600 15px 'Work Sans',sans-serif;cursor:pointer}
+.chip.on{background:#F2E4E1;box-shadow:inset 0 0 0 1.5px #B78380}
+.tile{height:48px;border:0;border-radius:12px;background:#F5EFE9;color:#4A4A4A;font:400 15px 'Work Sans',sans-serif;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.tile.on{background:#B78380;color:#fff;font-weight:600}
+.sb{width:48px;height:48px;border:0;border-radius:12px;background:#F2E4E1;color:#7D4F4B;font:600 24px 'Work Sans',sans-serif;cursor:pointer}
+.sb:disabled{opacity:.4}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FAF7F2; color: #4A4A4A; font-family: 'Work Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <div style="padding: 52px 8px 4px; display: flex; align-items: center; gap: 4px">
+    <a href="#" aria-label="Volver a la lista" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <span style="font-size: 16px; font-weight: 500">Reformer Intermedio · 07:00</span>
+  </div>
+  <div style="flex-grow: 1; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 22px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: Lora, Georgia, serif; font-size: 30px">Reportar una falla</span>
+      <span style="font-size: 14px; color: #6F6662">Equipos de la sucursal Achumani</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662">¿Qué equipo?</span>
+      <div class="chips" role="tablist" aria-label="Tipo de equipo">
+        <sc-for list="{{chips}}" as="c" hint-placeholder-count="6"><button type="button" role="tab" aria-selected="{{c.on}}" class="{{c.cls}}" onClick="{{c.go}}">{{c.name}}</button></sc-for>
+      </div>
+      <sc-if value="{{isUnit}}" hint-placeholder-val="{{true}}">
+        <div role="radiogroup" aria-label="{{typeName}}" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{tiles}}" as="u" hint-placeholder-count="4"><button type="button" role="radio" aria-checked="{{u.on}}" aria-label="{{u.label}}" class="{{u.cls}}" onClick="{{u.go}}"><span>{{u.n}}</span><sc-if value="{{u.out}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; color: #A04E3E">fuera de servicio</span></sc-if></button></sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{isQty}}" hint-placeholder-val="{{false}}">
+        <div style="background: #F5EFE9; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+          <span style="font-size: 14px; color: #6F6662">Hay {{usable}} que se pueden usar</span>
+          <span style="font-size: 16px; font-weight: 500">¿Cuántos se dañaron?</span>
+          <div style="display: flex; align-items: center; gap: 16px"><button type="button" class="sb" aria-label="Uno menos" disabled="{{atMin}}" onClick="{{down}}">−</button><span aria-live="polite" style="min-width: 40px; text-align: center; font-family: Lora, serif; font-size: 30px">{{count}}</span><button type="button" class="sb" aria-label="Uno más" disabled="{{atMax}}" onClick="{{up}}">+</button></div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="s26-que" style="font-size: 14px; font-weight: 500">¿Qué pasó?</label>
+      <textarea id="s26-que" placeholder="{{placeholder}}" style="height: 96px; box-sizing: border-box; padding: 14px 16px; border: 1px solid #E6DBD0; border-radius: 14px; background: #F5EFE9; color: #4A4A4A; font-family: inherit; font-size: 16px; line-height: 1.5; resize: none"></textarea>
+    </div>
+    <sc-if value="{{isUnit}}" hint-placeholder-val="{{true}}">
+      <label style="background: #F5EFE9; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px">No se puede usar</span><span style="font-size: 13px; color: #6F6662">Nadie debería usarlo hasta que lo arreglen.</span></span>
+        <input type="checkbox" role="switch" style="width: 44px; height: 26px; accent-color: #B78380">
+      </label>
+    </sc-if>
+  </div>
+  <div style="padding: 12px 20px 30px">
+    <button type="button" style="width: 100%; height: 52px; border: 0; border-radius: 14px; background: #B78380; color: #FFFFFF; font: 600 17px 'Work Sans', sans-serif">Enviar reporte</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var TYPES = [
+  { id: 'ref', name: 'Reformer', units: [[1], [2], [3, 'out'], [4]] },
+  { id: 'cad', name: 'Cadillac', units: [[1]] },
+  { id: 'mat', name: 'Mat', units: [[1], [2], [3], [4], [5], [6]] },
+  { id: 'bal', name: 'Balones', usable: 11 },
+  { id: 'aro', name: 'Aros', usable: 8 },
+  { id: 'ban', name: 'Bandas elásticas', usable: 13 }
+];
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var kind = st.kind || 'ref';
+    var piece = st.piece ?? 3;
+    var count = st.count || 1;
+    var t = TYPES.filter(function (x) { return x.id === kind; })[0];
+    var isQty = !t.units;
+    return {
+      chips: TYPES.map(function (x) { return { name: x.name, on: x.id === kind, cls: 'chip' + (x.id === kind ? ' on' : ''), go: function () { self.setState({ kind: x.id, piece: null, count: 1 }); } }; }),
+      isUnit: !isQty, isQty: isQty, typeName: t.name,
+      tiles: (t.units || []).map(function (u) { var on = u[0] === piece; return { n: String(u[0]), out: u[1] === 'out', on: on, label: t.name + ' ' + u[0] + (u[1] === 'out' ? ', fuera de servicio' : ''), cls: 'tile' + (on ? ' on' : ''), go: function () { self.setState({ piece: u[0] }); } }; }),
+      usable: String(t.usable || 0), count: String(count),
+      atMin: count <= 1, atMax: count >= (t.usable || 1),
+      down: function () { self.setState({ count: Math.max(1, count - 1) }); },
+      up: function () { self.setState({ count: Math.min(t.usable || 1, count + 1) }); },
+      placeholder: isQty ? 'Ej.: uno se pinchó' : 'Ej.: el resorte rojo se soltó'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-18T16:00:00Z"
+ },
+ "title": "Propuestas equipos con tipos propios",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Hallazgo 101 · Equipos con tipos propios (léeme)"
+  },
+  "Selector.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 2100,
+   "title": "A · Una sección por tipo · 1440 (recomendada)",
+   "is_interactive": true
+  },
+  "OpcionA420.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 420,
+   "h": 1000,
+   "title": "A · Una sección por tipo · 420",
+   "is_interactive": true
+  },
+  "Reportar.dc.html": {
+   "x": 2020,
+   "y": 1020,
+   "w": 390,
+   "h": 844,
+   "title": "App del equipo · Reportar una falla (igual en A, B y C)",
+   "is_interactive": true
+  },
+  "OpcionB.dc.html": {
+   "x": 0,
+   "y": 3240,
+   "w": 1440,
+   "h": 1000,
+   "title": "B · Tarjetas de tipo · 1440",
+   "is_interactive": true
+  },
+  "OpcionB420.dc.html": {
+   "x": 1520,
+   "y": 3240,
+   "w": 420,
+   "h": 1000,
+   "title": "B · Tarjetas de tipo · 420",
+   "is_interactive": true
+  },
+  "OpcionC.dc.html": {
+   "x": 0,
+   "y": 4360,
+   "w": 1440,
+   "h": 1000,
+   "title": "C · Lista y detalle · 1440",
+   "is_interactive": true
+  },
+  "OpcionC420.dc.html": {
+   "x": 1520,
+   "y": 4360,
+   "w": 420,
+   "h": 1000,
+   "title": "C · Lista y detalle · 420",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Selector.dc.html",
+  "OpcionA420.dc.html",
+  "Reportar.dc.html",
+  "OpcionB.dc.html",
+  "OpcionB420.dc.html",
+  "OpcionC.dc.html",
+  "OpcionC420.dc.html"
+ ],
+ "notes": {},
+ "designSystems": []
+}

@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Equipos por tipo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.root{position:relative;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;overflow:hidden}
+.proto{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px;background:#2E2724;color:#F5EFE9;font-size:13px}
+.proto b{font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:11px;margin-right:6px}
+.pc{height:30px;padding:0 12px;border:0;border-radius:999px;background:rgba(245,239,233,.12);color:#F5EFE9;font:500 13px 'Work Sans',sans-serif;cursor:pointer}
+.app{display:flex;flex-wrap:wrap;min-height:960px}
+.rail{flex:0 0 96px;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rl{font-size:12px;font-weight:500}
+.col{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:16px;padding:20px 40px}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+main{padding:8px 40px 40px;display:flex;flex-direction:column;gap:20px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}
+h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:21px}
+h3{margin:0;font-family:Lora,serif;font-weight:400;font-size:19px}
+.sub{color:#6F6662}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}.hl{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #E6DBD0;overflow-x:auto}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent;display:inline-flex;align-items:center;white-space:nowrap}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.cnt{margin-left:6px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:999px;background:#93615D;color:#fff}
+.tw{background:#F5EFE9;border-radius:16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px;table-layout:fixed}
+th:first-child{width:38%}th:nth-child(2){width:24%}
+th{text-align:left;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;white-space:nowrap}
+td{padding:10px 20px;border-top:1px solid #E6DBD0;vertical-align:middle}
+.note{font-size:13px;color:#6F6662}
+.strong{font-weight:600}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.btn:disabled{opacity:.45;cursor:default}
+.p{background:#93615D;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}.dd{background:#A04E3E;color:#fff}.td{background:transparent;color:#A04E3E;padding:0 10px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.bad{background:#F7E5E0;color:#A04E3E}.warn{background:#F6EBD9;color:#7A5418}.none{background:rgba(216,201,187,.34);color:#6F6662}
+.card{background:#F5EFE9;border-radius:16px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:64px;flex-wrap:wrap}.row+.row{border-top:1px solid #E6DBD0}
+.grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.disc{width:36px;height:36px;border-radius:999px;background:#F2E4E1;color:#93615D;display:flex;align-items:center;justify-content:center;flex:none}
+.notice{display:flex;align-items:center;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;font-size:14px}
+.blk{display:flex;flex-direction:column;gap:10px}
+.bh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qty{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 20px}
+.big{display:flex;align-items:baseline;gap:8px;margin-right:8px}.big b{font-family:Lora,serif;font-weight:400;font-size:36px;font-variant-numeric:tabular-nums}
+.emptyline{margin:0;border-radius:16px;background:#F5EFE9;padding:12px 16px;font-size:14px;color:#6F6662}
+.cards{display:grid;gap:12px}
+.tc{border:0;text-align:left;background:#F5EFE9;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px;font-family:'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer;min-height:132px}
+.tc.on{background:#F2E4E1;box-shadow:inset 0 0 0 1.5px #B78380}
+.tc.new{background:transparent;border:1.5px dashed #D8C9BB;align-items:center;justify-content:center;color:#7D4F4B;font-weight:600;font-size:15px}
+.tcn{font-family:Lora,serif;font-size:19px}
+.tcc{font-family:Lora,serif;font-size:30px;font-variant-numeric:tabular-nums}
+.wt{font-size:13px;font-weight:600;color:#7A5418}.gt{font-size:13px;color:#4F6347}
+.li{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;font-family:'Work Sans',sans-serif;color:#4A4A4A;text-align:left;cursor:pointer;min-height:56px}
+.li.on{background:#F2E4E1;color:#7D4F4B}
+.gl{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;padding:12px 14px 4px}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.28);display:flex;justify-content:flex-end;z-index:5}
+.scrim.mid{align-items:center;justify-content:center;padding:24px}
+.scrim.sheet{align-items:flex-end;justify-content:stretch}
+.side{width:460px;max-width:100%;height:100%;background:#FAF7F2;padding:28px;display:flex;flex-direction:column;gap:18px;box-shadow:-8px 0 24px rgba(74,58,48,.12)}
+.scrim.sheet .side{width:100%;height:auto;border-radius:20px 20px 0 0;padding:24px 20px 28px}
+.dlg{width:480px;max-width:100%;background:#FAF7F2;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 24px rgba(74,58,48,.16)}
+.side h2,.dlg h2{font-size:24px}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:auto}
+.scrim.sheet .actions{margin-top:8px}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld label,.lg{font-size:14px;font-weight:500}
+.inp{height:48px;padding:0 14px;border:1px solid #E6DBD0;border-radius:12px;background:#F5EFE9;font:400 16px 'Work Sans',sans-serif;color:#4A4A4A}
+textarea.inp{height:96px;padding:12px 14px;resize:none;line-height:1.5}
+.help{font-size:13px;color:#6F6662}
+.choice{border:0;text-align:left;background:#F5EFE9;border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;font-family:'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer}
+.choice.on{background:#F2E4E1;box-shadow:inset 0 0 0 1.5px #B78380}
+.dot{width:20px;height:20px;border-radius:999px;border:1.5px solid #B78380;flex:none;margin-top:2px;display:flex;align-items:center;justify-content:center}
+.choice.on .dot::after{content:'';width:10px;height:10px;border-radius:999px;background:#93615D}
+.step{display:flex;align-items:center;gap:12px}
+.sb{width:44px;height:44px;border:0;border-radius:12px;background:#F2E4E1;color:#7D4F4B;font:600 22px 'Work Sans',sans-serif;cursor:pointer}
+.sb:disabled{opacity:.4}
+.sv{min-width:40px;text-align:center;font-family:Lora,serif;font-size:28px;font-variant-numeric:tabular-nums}
+.ntop{height:64px;display:flex;align-items:center;gap:8px;padding:0 12px}
+.ib{width:44px;height:44px;border:0;border-radius:12px;background:#F5EFE9;color:#B78380;display:flex;align-items:center;justify-content:center}
+.nmain{padding:8px 20px 24px;display:flex;flex-direction:column;gap:16px}
+.nrow{display:flex;align-items:flex-start;gap:12px;padding:12px 16px}.nrow+.nrow{border-top:1px solid #E6DBD0}
+.back{align-self:flex-start;display:inline-flex;align-items:center;gap:4px;height:44px;border:0;background:transparent;color:#7D4F4B;font:600 15px 'Work Sans',sans-serif;padding:0 4px 0 0;cursor:pointer}
+</style>
+</helmet>
+<div class="root" style="{{rootStyle}}">
+  <div class="proto" aria-label="Prototipo">
+    <b>Prototipo</b>
+    <sc-for list="{{proto}}" as="p" hint-placeholder-count="6"><button type="button" class="pc" onClick="{{p.go}}">{{p.label}}</button></sc-for>
+  </div>
+
+  <sc-if value="{{wide}}" hint-placeholder-val="{{true}}">
+  <div class="app">
+    <nav class="rail" aria-label="Menú principal">
+      <span class="mark">E</span>
+      <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><span class="{{r.cls}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span></span><span class="rl">{{r.label}}</span></span></sc-for>
+    </nav>
+    <div class="col">
+      <header class="top"><span class="wm"><b>Emma</b><i>Pilates Studio</i></span><span style="flex: 1"></span><span class="disc" style="font-size: 13px; font-weight: 600; color: #7D4F4B">PM</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Paola Mendoza</span><span style="font-size: 12px; color: #6F6662">Administración</span></span></header>
+      <main>
+        <div class="head">
+          <div class="hl"><h1>Estudio</h1><span class="sub">{{subtitle}}</span></div>
+          <sc-if value="{{headButton}}" hint-placeholder-val="{{true}}"><button type="button" class="btn p" onClick="{{newType}}"><span class="ms">add</span>Nuevo tipo</button></sc-if>
+        </div>
+        <div class="tabs"><span class="tab">Personal</span><span class="tab">Insumos<span class="cnt">1</span></span><span class="tab on">Equipos<sc-if value="{{hasIssues}}" hint-placeholder-val="{{true}}"><span class="cnt">{{issueCount}}</span></sc-if></span></div>
+        <sc-if value="{{hasNotice}}" hint-placeholder-val="{{false}}"><div class="notice" role="status"><span class="ms" style="color: #4F6347">check_circle</span>{{notice}}</div></sc-if>
+        <div style="{{bodyStyle}}">
+          <sc-if value="{{isC}}" hint-placeholder-val="{{false}}">
+            <nav class="card" aria-label="Tipos de equipo" style="padding: 6px; align-self: flex-start">
+              <div class="gl">Con número</div>
+              <sc-for list="{{unitTypes}}" as="t" hint-placeholder-count="3"><button type="button" class="{{t.liCls}}" aria-current="{{t.selected}}" onClick="{{t.pick}}"><span class="grow"><span class="strong">{{t.name}}</span><span class="note">{{t.countLabel}}</span></span><sc-if value="{{t.warn}}" hint-placeholder-val="{{false}}"><span class="wt">{{t.problem}}</span></sc-if><span class="ms" style="color: #B78380">chevron_right</span></button></sc-for>
+              <div class="gl">Por cantidad</div>
+              <sc-for list="{{qtyTypes}}" as="t" hint-placeholder-count="3"><button type="button" class="{{t.liCls}}" aria-current="{{t.selected}}" onClick="{{t.pick}}"><span class="grow"><span class="strong">{{t.name}}</span><span class="note">{{t.countLabel}}</span></span><sc-if value="{{t.warn}}" hint-placeholder-val="{{false}}"><span class="wt">{{t.problem}}</span></sc-if><span class="ms" style="color: #B78380">chevron_right</span></button></sc-for>
+              <div style="padding: 8px 6px 6px; border-top: 1px solid #E6DBD0; margin-top: 6px"><button type="button" class="btn sm t" onClick="{{newType}}"><span class="ms">add</span>Nuevo tipo</button></div>
+            </nav>
+          </sc-if>
+          <div style="display: flex; flex-direction: column; gap: 24px; min-width: 0">
+            <sc-if value="{{showFallas}}" hint-placeholder-val="{{true}}">
+              <section class="card" aria-label="Fallas abiertas">
+                <div style="padding: 16px 16px 8px"><h3>Fallas abiertas · {{issueCount}}</h3></div>
+                <sc-for list="{{issues}}" as="i" hint-placeholder-count="4"><div class="row"><span class="disc"><span class="ms">build</span></span><span class="grow"><span class="strong">{{i.title}}</span><span class="note">{{i.line}}</span></span><sc-if value="{{i.out}}" hint-placeholder-val="{{false}}"><span class="pill bad">Fuera de servicio</span></sc-if><sc-if value="{{i.qty}}" hint-placeholder-val="{{false}}"><button type="button" class="btn sm td" onClick="{{i.writeOff}}">Dar de baja</button></sc-if><button type="button" class="btn sm s" onClick="{{i.resolve}}">Marcar resuelta</button></div></sc-for>
+              </section>
+            </sc-if>
+            <sc-if value="{{isB}}" hint-placeholder-val="{{false}}">
+              <div class="cards" style="grid-template-columns: repeat(4, minmax(0, 1fr))">
+                <sc-for list="{{types}}" as="t" hint-placeholder-count="6"><button type="button" class="{{t.cardCls}}" aria-pressed="{{t.selected}}" onClick="{{t.pick}}"><span class="tcn">{{t.name}}</span><span class="note">{{t.modeLabel}}</span><span class="tcc">{{t.bigCount}}</span><sc-if value="{{t.warn}}" hint-placeholder-val="{{false}}"><span class="wt">{{t.problem}}</span></sc-if><sc-if value="{{t.fine}}" hint-placeholder-val="{{true}}"><span class="gt">{{t.problem}}</span></sc-if></button></sc-for>
+                <button type="button" class="tc new" onClick="{{newType}}"><span class="ms" style="font-size: 28px">add</span>Nuevo tipo</button>
+              </div>
+            </sc-if>
+            <sc-for list="{{blocks}}" as="t" hint-placeholder-count="3">
+              <section class="blk" aria-label="{{t.name}}">
+                <div class="bh"><h2>{{t.name}} <span style="color: #6F6662; font-size: 17px">· {{t.countLabel}}</span></h2><span class="pill none">{{t.modeLabel}}</span><span style="flex: 1"></span><sc-if value="{{t.unit}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm s" onClick="{{t.add}}"><span class="ms">add</span>Agregar</button></sc-if><button type="button" class="btn sm t" onClick="{{t.edit}}">Editar tipo</button></div>
+                <sc-if value="{{t.showTable}}" hint-placeholder-val="{{true}}">
+                  <div class="tw"><table>
+                    <thead><tr><th>Equipo</th><th>Estado</th><th><span style="position: absolute; left: -9999px">Acciones</span></th></tr></thead>
+                    <tbody><sc-for list="{{t.rows}}" as="u" hint-placeholder-count="4"><tr><td><span style="display: flex; flex-direction: column; gap: 2px"><span class="strong">{{u.name}}</span><sc-if value="{{u.hasNote}}" hint-placeholder-val="{{false}}"><span class="note">{{u.note}}</span></sc-if></span></td><td><span class="{{u.pillCls}}">{{u.pill}}</span></td><td style="text-align: right"><button type="button" class="btn sm t" onClick="{{u.report}}">Registrar falla</button><button type="button" class="btn sm td" onClick="{{u.archive}}">Dar de baja</button></td></tr></sc-for></tbody>
+                  </table></div>
+                </sc-if>
+                <sc-if value="{{t.showCards}}" hint-placeholder-val="{{false}}">
+                  <div class="card"><sc-for list="{{t.rows}}" as="u" hint-placeholder-count="4"><div class="nrow"><span class="grow"><span class="strong">{{u.name}}</span><sc-if value="{{u.hasNote}}" hint-placeholder-val="{{false}}"><span class="note">{{u.note}}</span></sc-if><span style="display: flex; gap: 8px; margin-top: 4px"><button type="button" class="btn sm t" style="padding: 0" onClick="{{u.report}}">Registrar falla</button><button type="button" class="btn sm td" onClick="{{u.archive}}">Dar de baja</button></span></span><span class="{{u.pillCls}}">{{u.pill}}</span></div></sc-for></div>
+                </sc-if>
+                <sc-if value="{{t.emptyUnits}}" hint-placeholder-val="{{false}}"><p class="emptyline">Sin unidades en esta sucursal.</p></sc-if>
+                <sc-if value="{{t.qty}}" hint-placeholder-val="{{false}}">
+                  <div class="card qty"><span class="big"><b>{{t.total}}</b><span class="note">en esta sucursal</span></span><span class="pill ok">{{t.usableLabel}}</span><sc-if value="{{t.hasDmg}}" hint-placeholder-val="{{false}}"><span class="pill warn">{{t.dmgLabel}}</span></sc-if><span style="flex: 1"></span><button type="button" class="btn sm s" disabled="{{t.noUsable}}" onClick="{{t.damage}}">Registrar daño</button><button type="button" class="btn sm t" onClick="{{t.changeQty}}">Cambiar cantidad</button></div>
+                </sc-if>
+                <sc-if value="{{t.showIssues}}" hint-placeholder-val="{{false}}">
+                  <div class="card"><div style="padding: 14px 16px 4px" class="lg">Fallas abiertas de {{t.name}}</div><sc-for list="{{t.issues}}" as="i" hint-placeholder-count="1"><div class="row"><span class="disc"><span class="ms">build</span></span><span class="grow"><span class="strong">{{i.title}}</span><span class="note">{{i.line}}</span></span><sc-if value="{{i.qty}}" hint-placeholder-val="{{false}}"><button type="button" class="btn sm td" onClick="{{i.writeOff}}">Dar de baja</button></sc-if><button type="button" class="btn sm s" onClick="{{i.resolve}}">Marcar resuelta</button></div></sc-for></div>
+                </sc-if>
+              </section>
+            </sc-for>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{narrow}}" hint-placeholder-val="{{false}}">
+  <div style="min-height: 960px">
+    <header class="ntop"><span class="ib"><span class="ms" style="font-size: 24px">menu</span></span><span class="wm" style="flex: 1; padding-left: 4px"><b style="font-size: 20px">Emma</b><i style="font-size: 14px">Pilates Studio</i></span></header>
+    <div class="nmain">
+      <h1 style="font-size: 30px">Estudio</h1>
+      <span class="sub" style="margin-top: -10px; font-size: 14px">{{subtitle}}</span>
+      <div class="tabs"><span class="tab">Personal</span><span class="tab">Insumos<span class="cnt">1</span></span><span class="tab on">Equipos<sc-if value="{{hasIssues}}" hint-placeholder-val="{{true}}"><span class="cnt">{{issueCount}}</span></sc-if></span></div>
+      <sc-if value="{{headButton}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm p" style="align-self: flex-start" onClick="{{newType}}"><span class="ms">add</span>Nuevo tipo</button></sc-if>
+      <sc-if value="{{hasNotice}}" hint-placeholder-val="{{false}}"><div class="notice" role="status"><span class="ms" style="color: #4F6347">check_circle</span>{{notice}}</div></sc-if>
+      <sc-if value="{{cBack}}" hint-placeholder-val="{{false}}"><button type="button" class="back" onClick="{{closeType}}"><span class="ms">chevron_left</span>Volver a los tipos</button></sc-if>
+      <sc-if value="{{cList}}" hint-placeholder-val="{{false}}">
+        <nav class="card" aria-label="Tipos de equipo" style="padding: 6px">
+          <div class="gl">Con número</div>
+          <sc-for list="{{unitTypes}}" as="t" hint-placeholder-count="3"><button type="button" class="li" onClick="{{t.pick}}"><span class="grow"><span class="strong">{{t.name}}</span><span class="note">{{t.countLabel}}</span></span><sc-if value="{{t.warn}}" hint-placeholder-val="{{false}}"><span class="wt">{{t.problem}}</span></sc-if><span class="ms" style="color: #B78380">chevron_right</span></button></sc-for>
+          <div class="gl">Por cantidad</div>
+          <sc-for list="{{qtyTypes}}" as="t" hint-placeholder-count="3"><button type="button" class="li" onClick="{{t.pick}}"><span class="grow"><span class="strong">{{t.name}}</span><span class="note">{{t.countLabel}}</span></span><sc-if value="{{t.warn}}" hint-placeholder-val="{{false}}"><span class="wt">{{t.problem}}</span></sc-if><span class="ms" style="color: #B78380">chevron_right</span></button></sc-for>
+          <div style="padding: 8px 6px 6px; border-top: 1px solid #E6DBD0; margin-top: 6px"><button type="button" class="btn sm t" onClick="{{newType}}"><span class="ms">add</span>Nuevo tipo</button></div>
+        </nav>
+      </sc-if>
+      <sc-if value="{{showFallas}}" hint-placeholder-val="{{true}}">
+        <section class="card" aria-label="Fallas abiertas">
+          <div style="padding: 14px 16px 4px"><h3>Fallas abiertas · {{issueCount}}</h3></div>
+          <sc-for list="{{issues}}" as="i" hint-placeholder-count="4"><div class="nrow"><span class="grow"><span class="strong">{{i.title}}</span><span class="note">{{i.line}}</span><span style="display: flex; gap: 8px; margin-top: 6px"><button type="button" class="btn sm s" onClick="{{i.resolve}}">Marcar resuelta</button><sc-if value="{{i.qty}}" hint-placeholder-val="{{false}}"><button type="button" class="btn sm td" onClick="{{i.writeOff}}">Dar de baja</button></sc-if></span></span></div></sc-for>
+        </section>
+      </sc-if>
+      <sc-if value="{{isB}}" hint-placeholder-val="{{false}}">
+        <div class="cards" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
+          <sc-for list="{{types}}" as="t" hint-placeholder-count="6"><button type="button" class="{{t.cardCls}}" style="min-height: 120px" aria-pressed="{{t.selected}}" onClick="{{t.pick}}"><span class="tcn" style="font-size: 17px">{{t.name}}</span><span class="tcc" style="font-size: 26px">{{t.bigCount}}</span><sc-if value="{{t.warn}}" hint-placeholder-val="{{false}}"><span class="wt">{{t.problem}}</span></sc-if><sc-if value="{{t.fine}}" hint-placeholder-val="{{true}}"><span class="gt">{{t.problem}}</span></sc-if></button></sc-for>
+          <button type="button" class="tc new" style="min-height: 120px" onClick="{{newType}}"><span class="ms" style="font-size: 26px">add</span>Nuevo tipo</button>
+        </div>
+      </sc-if>
+      <sc-for list="{{blocks}}" as="t" hint-placeholder-count="3">
+        <section class="blk" aria-label="{{t.name}}">
+          <div class="bh"><h2>{{t.name}} <span style="color: #6F6662; font-size: 16px">· {{t.countLabel}}</span></h2><span style="flex: 1"></span><sc-if value="{{t.unit}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm s" onClick="{{t.add}}"><span class="ms">add</span>Agregar</button></sc-if><button type="button" class="btn sm t" onClick="{{t.edit}}">Editar</button></div>
+          <span class="note" style="margin-top: -6px">{{t.modeLong}}</span>
+          <sc-if value="{{t.showCards}}" hint-placeholder-val="{{true}}">
+            <div class="card"><sc-for list="{{t.rows}}" as="u" hint-placeholder-count="4"><div class="nrow"><span class="grow"><span class="strong">{{u.name}}</span><sc-if value="{{u.hasNote}}" hint-placeholder-val="{{false}}"><span class="note">{{u.note}}</span></sc-if><span style="display: flex; gap: 8px; margin-top: 4px"><button type="button" class="btn sm t" style="padding: 0" onClick="{{u.report}}">Registrar falla</button><button type="button" class="btn sm td" onClick="{{u.archive}}">Dar de baja</button></span></span><span class="{{u.pillCls}}">{{u.pill}}</span></div></sc-for></div>
+          </sc-if>
+          <sc-if value="{{t.emptyUnits}}" hint-placeholder-val="{{false}}"><p class="emptyline">Sin unidades en esta sucursal.</p></sc-if>
+          <sc-if value="{{t.qty}}" hint-placeholder-val="{{false}}">
+            <div class="card qty" style="padding: 16px"><span class="big" style="width: 100%"><b>{{t.total}}</b><span class="note">en esta sucursal</span></span><span class="pill ok">{{t.usableLabel}}</span><sc-if value="{{t.hasDmg}}" hint-placeholder-val="{{false}}"><span class="pill warn">{{t.dmgLabel}}</span></sc-if><span style="display: flex; gap: 8px; width: 100%; margin-top: 4px"><button type="button" class="btn sm s" disabled="{{t.noUsable}}" onClick="{{t.damage}}">Registrar daño</button><button type="button" class="btn sm t" onClick="{{t.changeQty}}">Cambiar cantidad</button></span></div>
+          </sc-if>
+          <sc-if value="{{t.showIssues}}" hint-placeholder-val="{{false}}">
+            <div class="card"><div style="padding: 14px 16px 4px" class="lg">Fallas abiertas de {{t.name}}</div><sc-for list="{{t.issues}}" as="i" hint-placeholder-count="1"><div class="nrow"><span class="grow"><span class="strong">{{i.title}}</span><span class="note">{{i.line}}</span><span style="display: flex; gap: 8px; margin-top: 6px"><button type="button" class="btn sm s" onClick="{{i.resolve}}">Marcar resuelta</button><sc-if value="{{i.qty}}" hint-placeholder-val="{{false}}"><button type="button" class="btn sm td" onClick="{{i.writeOff}}">Dar de baja</button></sc-if></span></span></div></sc-for></div>
+          </sc-if>
+        </section>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{panelOpen}}" hint-placeholder-val="{{false}}">
+    <div class="{{scrimCls}}">
+      <div class="side" role="dialog" aria-label="{{panelTitle}}">
+        <h2>{{panelTitle}}</h2>
+        <sc-if value="{{pTipo}}" hint-placeholder-val="{{false}}">
+          <div class="fld"><label for="eq-nombre">Nombre</label><input id="eq-nombre" class="inp" value="Rodillos"></div>
+          <div class="fld" role="radiogroup" aria-label="¿Cómo lo llevas?"><span class="lg">¿Cómo lo llevas?</span>
+            <button type="button" class="{{choiceUnitCls}}" role="radio" aria-checked="{{modeUnit}}" onClick="{{pickUnit}}"><span class="dot"></span><span class="grow"><span class="strong">Por unidad, con número</span><span class="note">Cada una tiene su número y sus fallas: Reformer 1, Reformer 2…</span></span></button>
+            <button type="button" class="{{choiceQtyCls}}" role="radio" aria-checked="{{modeQty}}" onClick="{{pickQty}}"><span class="dot"></span><span class="grow"><span class="strong">Por cantidad</span><span class="note">Cuentas cuántas hay y cuántas están dañadas: Balones 12, 1 dañado.</span></span></button>
+          </div>
+          <sc-if value="{{modeQty}}" hint-placeholder-val="{{true}}"><div class="fld"><label for="eq-cant">Cantidad en Sucursal Achumani</label><input id="eq-cant" class="inp" inputmode="numeric" value="6" style="width: 140px"></div></sc-if>
+          <span class="help">El tipo es para todo el estudio. Cómo se lleva no se puede cambiar después.</span>
+          <div class="actions"><button type="button" class="btn t" onClick="{{closeAll}}">Cancelar</button><button type="button" class="btn p" onClick="{{createType}}">Crear tipo</button></div>
+        </sc-if>
+        <sc-if value="{{pUnidad}}" hint-placeholder-val="{{false}}">
+          <div class="fld"><label for="eq-num">Número</label><input id="eq-num" class="inp" inputmode="numeric" value="{{nextNumber}}" style="width: 140px"><span class="help">Del 1 al 99, único por tipo en esta sucursal.</span></div>
+          <div class="actions"><button type="button" class="btn t" onClick="{{closeAll}}">Cancelar</button><button type="button" class="btn p" onClick="{{addUnit}}">Agregar</button></div>
+        </sc-if>
+        <sc-if value="{{pFalla}}" hint-placeholder-val="{{false}}">
+          <div class="fld"><label for="eq-que">¿Qué pasó?</label><textarea id="eq-que" class="inp" placeholder="Ej.: el resorte rojo se soltó"></textarea></div>
+          <label style="display: flex; gap: 12px; align-items: flex-start"><input type="checkbox" style="width: 18px; height: 18px; accent-color: #93615D; margin-top: 2px"><span style="display: flex; flex-direction: column; gap: 2px"><span>No se puede usar</span><span class="help">Márcalo si nadie debería usarlo hasta que lo arreglen.</span></span></label>
+          <div class="actions"><button type="button" class="btn t" onClick="{{closeAll}}">Cancelar</button><button type="button" class="btn p" onClick="{{sendFault}}">Registrar falla</button></div>
+        </sc-if>
+        <sc-if value="{{pDano}}" hint-placeholder-val="{{false}}">
+          <div class="fld"><span class="lg">¿Cuántos?</span><div class="step"><button type="button" class="sb" aria-label="Uno menos" disabled="{{cntMin}}" onClick="{{cntDown}}">−</button><span class="sv" aria-live="polite">{{cnt}}</span><button type="button" class="sb" aria-label="Uno más" disabled="{{cntMax}}" onClick="{{cntUp}}">+</button></div><span class="help">De {{pUsable}} que se pueden usar.</span></div>
+          <div class="fld"><label for="eq-dano">¿Qué pasó?</label><textarea id="eq-dano" class="inp" placeholder="Ej.: uno se pinchó"></textarea></div>
+          <div class="actions"><button type="button" class="btn t" onClick="{{closeAll}}">Cancelar</button><button type="button" class="btn p" onClick="{{addDamage}}">Registrar daño</button></div>
+        </sc-if>
+        <sc-if value="{{pCantidad}}" hint-placeholder-val="{{false}}">
+          <div class="fld"><label for="eq-total">Cantidad en Sucursal Achumani</label><input id="eq-total" class="inp" inputmode="numeric" value="{{newTotal}}" style="width: 140px"><span class="help">Cuenta también los dañados. Si se perdieron o se botaron, baja el número.</span></div>
+          <div class="actions"><button type="button" class="btn t" onClick="{{closeAll}}">Cancelar</button><button type="button" class="btn p" onClick="{{saveQty}}">Guardar</button></div>
+        </sc-if>
+        <sc-if value="{{pEditar}}" hint-placeholder-val="{{false}}">
+          <div class="fld"><label for="eq-ren">Nombre</label><input id="eq-ren" class="inp" value="{{ptName}}"></div>
+          <span class="help">{{pModeLong}}</span>
+          <div style="border-top: 1px solid #E6DBD0; padding-top: 16px; display: flex; flex-direction: column; gap: 6px; align-items: flex-start"><button type="button" class="btn sm td" style="padding: 0" disabled="{{cantRemove}}" onClick="{{removeType}}">Quitar tipo</button><span class="help">{{removeHelp}}</span></div>
+          <div class="actions"><button type="button" class="btn t" onClick="{{closeAll}}">Cancelar</button><button type="button" class="btn p" onClick="{{rename}}">Guardar</button></div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{confirmOpen}}" hint-placeholder-val="{{false}}">
+    <div class="scrim mid">
+      <div class="dlg" role="dialog" aria-label="Dar de baja">
+        <h2>¿Dar de baja {{pName}}?</h2>
+        <p style="margin: 0">Deja de aparecer en la lista y de contar para las clases. Sus fallas quedan en el historial.</p>
+        <div class="actions"><button type="button" class="btn t" onClick="{{closeAll}}">Cancelar</button><button type="button" class="btn dd" onClick="{{archiveUnit}}">Dar de baja</button></div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"opcion":{"editor":"enum","options":["A","B","C"],"default":"A"},"estrecho":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":2100}}'>
+var RAIL = [['ini','home','Inicio'],['hor','calendar_month','Horario'],['cli','group','Clientas'],['pro','campaign','Promociones'],['com','forum','Comentarios'],['din','payments','Dinero'],['est','storefront','Estudio'],['inf','bar_chart','Informes'],['aj','settings','Ajustes']];
+var BASE = [
+  { id: 'ref', name: 'Reformer', unit: true, units: [[1, 'ok'], [2, 'ok'], [3, 'out', 'El resorte izquierdo no engancha', '1 de noviembre', 'Daniela Ortiz'], [4, 'ok']] },
+  { id: 'cad', name: 'Cadillac', unit: true, units: [[1, 'ok']] },
+  { id: 'mat', name: 'Mat', unit: true, units: [[1, 'ok'], [2, 'ok'], [3, 'ok'], [4, 'ok'], [5, 'faulty', 'La cubierta se está pelando', '12 de noviembre', 'Emma Vargas'], [6, 'ok']] },
+  { id: 'bal', name: 'Balones', unit: false, total: 12, dmg: [['bal1', 1, 'Uno se pinchó', '16 de noviembre', 'Daniela Ortiz']] },
+  { id: 'aro', name: 'Aros', unit: false, total: 8, dmg: [] },
+  { id: 'ban', name: 'Bandas elásticas', unit: false, total: 15, dmg: [['ban1', 2, 'Dos se cortaron', '17 de noviembre', 'Emma Vargas']] }
+];
+var PILL = { ok: ['pill ok', 'Funciona'], faulty: ['pill warn', 'Con falla'], out: ['pill bad', 'Fuera de servicio'] };
+function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var op = this.props.opcion ?? 'A';
+    var narrow = !!(this.props.estrecho ?? false);
+    var isA = op === 'A', isB = op === 'B', isC = op === 'C';
+    function set(o) { return function () { self.setState(o); }; }
+    var fixed = st.fixed || [], gone = st.gone || [], added = st.added || {}, qtyOf = st.qtyOf || {}, newDmg = st.newDmg || {}, offs = st.offs || {};
+    var empty = !!st.empty;
+    var base = BASE.concat(st.extra ? [{ id: 'rod', name: 'Rodillos', unit: st.extra === 'unit', units: [], total: st.extra === 'unit' ? 0 : 6, dmg: [] }] : []);
+    var sel = st.sel || 'ref';
+    var allIssues = [];
+    var types = base.map(function (b) {
+      var t = { id: b.id, name: b.name, unit: b.unit, qty: !b.unit };
+      t.modeLabel = b.unit ? 'Con número' : 'Por cantidad';
+      t.modeLong = b.unit ? 'Se lleva por unidad, con número.' : 'Se lleva por cantidad.';
+      t.selected = b.id === sel;
+      if (b.unit) {
+        var units = empty ? [] : b.units.concat((added[b.id] || []).map(function (n) { return [n, 'ok']; }));
+        units = units.filter(function (u) { return gone.indexOf(b.id + u[0]) < 0; });
+        t.rows = units.map(function (u) {
+          var key = b.id + u[0];
+          var status = fixed.indexOf(key) >= 0 ? 'ok' : u[1];
+          var nm = b.name + ' ' + u[0];
+          if (status !== 'ok') allIssues.push({ id: key, type: b.id, title: nm, line: '«' + u[2] + '» · ' + u[3] + ' · ' + u[4], out: status === 'out', qty: false, nm: nm });
+          return { name: nm, pill: PILL[status][1], pillCls: PILL[status][0], hasNote: status !== 'ok', note: u[2], report: set({ panel: 'falla', pName: nm, notice: '' }), archive: set({ confirm: key, pName: nm, notice: '' }) };
+        });
+        var outN = t.rows.filter(function (r) { return r.pill === 'Fuera de servicio'; }).length;
+        var faultN = t.rows.filter(function (r) { return r.pill === 'Con falla'; }).length;
+        t.countLabel = plural(t.rows.length, 'unidad', 'unidades');
+        t.bigCount = String(t.rows.length);
+        t.problem = outN ? plural(outN, 'fuera de servicio', 'fuera de servicio') : faultN ? plural(faultN, 'con falla', 'con falla') : (t.rows.length ? 'Todo funciona' : 'Sin unidades');
+        t.warn = outN + faultN > 0;
+        t.emptyUnits = t.rows.length === 0;
+        t.next = t.rows.length ? Math.max.apply(null, t.rows.map(function (r) { return Number(r.name.split(' ').pop()); })) + 1 : 1;
+        t.removable = t.rows.length === 0;
+      } else {
+        var total = empty ? 0 : (qtyOf[b.id] ?? b.total) - (offs[b.id] || 0);
+        var dmg = empty ? [] : b.dmg.concat(newDmg[b.id] ? [[b.id + 'n', newDmg[b.id], 'Registrado recién', 'hoy', 'Paola Mendoza']] : []).filter(function (d) { return fixed.indexOf(d[0]) < 0; });
+        var dn = dmg.reduce(function (s, d) { return s + d[1]; }, 0);
+        dmg.forEach(function (d) { allIssues.push({ id: d[0], type: b.id, n: d[1], title: b.name + ' · ' + plural(d[1], 'dañado', 'dañados'), line: '«' + d[2] + '» · ' + d[3] + ' · ' + d[4], out: false, qty: true, nm: b.name }); });
+        t.total = total; t.usable = total - dn;
+        t.usableLabel = t.usable + ' se pueden usar';
+        t.dmgLabel = plural(dn, 'dañado', 'dañados');
+        t.hasDmg = dn > 0; t.noUsable = t.usable <= 0;
+        t.countLabel = total + ' en total';
+        t.bigCount = String(total);
+        t.problem = dn ? plural(dn, 'dañado', 'dañados') : (total ? 'Todo bien' : 'Ninguno todavía');
+        t.warn = dn > 0;
+        t.removable = total === 0;
+      }
+      t.fine = !t.warn;
+      t.showTable = t.unit && !narrow && t.rows.length > 0;
+      t.showCards = t.unit && narrow && t.rows.length > 0;
+      t.cardCls = 'tc' + (t.selected ? ' on' : '');
+      t.liCls = 'li' + (t.selected ? ' on' : '');
+      t.add = set({ panel: 'unidad', pType: b.id, notice: '' });
+      t.edit = set({ panel: 'editar', pType: b.id, notice: '' });
+      t.damage = set({ panel: 'dano', pType: b.id, cnt: 1, notice: '' });
+      t.changeQty = set({ panel: 'cantidad', pType: b.id, notice: '' });
+      t.pick = set({ sel: b.id, cOpen: true, notice: '' });
+      return t;
+    });
+    var issues = allIssues.map(function (i) {
+      return Object.assign({}, i, {
+        resolve: function () { self.setState({ fixed: fixed.concat([i.id]), notice: 'Marcamos resuelta la falla de ' + i.nm + '.' }); },
+        writeOff: function () { var o = Object.assign({}, offs); o[i.type] = (o[i.type] || 0) + i.n; self.setState({ fixed: fixed.concat([i.id]), offs: o, notice: 'Dimos de baja ' + plural(i.n, 'dañado', 'dañados') + ' de ' + i.nm + '.' }); }
+      });
+    });
+    types.forEach(function (t) { t.issues = issues.filter(function (i) { return i.type === t.id; }); t.showIssues = isC && t.issues.length > 0; });
+    var pt = types.filter(function (t) { return t.id === st.pType; })[0] || types[0];
+    var picked = types.filter(function (t) { return t.id === sel; })[0] || types[0];
+    var cOpen = isC && narrow ? !!st.cOpen : true;
+    var blocks = isA ? types : (isC && narrow && !cOpen ? [] : [picked]);
+    var titles = { tipo: 'Nuevo tipo', unidad: 'Agregar ' + pt.name, falla: 'Registrar falla · ' + (st.pName || ''), dano: 'Registrar daño · ' + pt.name, cantidad: 'Cambiar cantidad · ' + pt.name, editar: 'Editar tipo · ' + pt.name };
+    var mode = st.mode || 'qty';
+    var cnt = st.cnt || 1;
+    var panelOpen = !!st.panel;
+    var tall = panelOpen || !!st.confirm;
+    var done = function (o) { return function () { self.setState(Object.assign({ panel: null, confirm: null }, o)); }; };
+    var reset = { panel: null, confirm: null, notice: '', cOpen: false };
+    var proto = [
+      ['Equipos', { fixed: [], gone: [], added: {}, qtyOf: {}, newDmg: {}, offs: {}, extra: null, empty: false, sel: 'ref' }],
+      ['Nuevo tipo', { panel: 'tipo', mode: 'qty' }],
+      ['Registrar daño', { panel: 'dano', pType: 'bal', cnt: 1, sel: 'bal' }],
+      ['Cambiar cantidad', { panel: 'cantidad', pType: 'bal', sel: 'bal' }],
+      ['Fallas de Balones', { sel: 'bal', cOpen: true }],
+      ['Sucursal sin equipos', { empty: true, sel: 'ref' }]
+    ].map(function (p) { return { label: p[0], go: set(Object.assign({}, reset, p[1])) }; });
+    var issueCount = empty ? 0 : issues.length;
+    return {
+      rootStyle: (narrow ? 'width: 420px; ' : 'width: 1440px; ') + (tall ? 'height: 1000px' : 'min-height: 1000px'),
+      proto: proto,
+      wide: !narrow, narrow: narrow,
+      rail: RAIL.map(function (r) { return { icon: r[1], label: r[2], cls: 'ri' + (r[0] === 'est' ? ' on' : '') }; }),
+      subtitle: 'Sucursal Achumani · ' + types.length + ' tipos de equipo · ' + plural(issueCount, 'falla abierta', 'fallas abiertas'),
+      headButton: !isB && !isC,
+      isB: isB, isC: isC,
+      hasIssues: issueCount > 0, issueCount: issueCount, issues: issues,
+      showFallas: !isC && issueCount > 0,
+      hasNotice: !!st.notice, notice: st.notice || '',
+      bodyStyle: isC && !narrow ? 'display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start' : 'display: flex; flex-direction: column; gap: 24px',
+      types: types,
+      unitTypes: types.filter(function (t) { return t.unit; }),
+      qtyTypes: types.filter(function (t) { return t.qty; }),
+      blocks: blocks,
+      cList: isC && narrow && !cOpen,
+      cBack: isC && narrow && cOpen,
+      closeType: set({ cOpen: false, notice: '' }),
+      newType: set({ panel: 'tipo', mode: 'qty', notice: '' }),
+      panelOpen: panelOpen, panelTitle: titles[st.panel] || '',
+      scrimCls: narrow ? 'scrim sheet' : 'scrim',
+      pTipo: st.panel === 'tipo', pUnidad: st.panel === 'unidad', pFalla: st.panel === 'falla', pDano: st.panel === 'dano', pCantidad: st.panel === 'cantidad', pEditar: st.panel === 'editar',
+      modeUnit: mode === 'unit', modeQty: mode === 'qty',
+      choiceUnitCls: 'choice' + (mode === 'unit' ? ' on' : ''), choiceQtyCls: 'choice' + (mode === 'qty' ? ' on' : ''),
+      pickUnit: set({ mode: 'unit' }), pickQty: set({ mode: 'qty' }),
+      createType: done({ extra: mode, sel: 'rod', notice: 'Creamos el tipo Rodillos.' }),
+      nextNumber: String(pt.next || 1),
+      addUnit: function () { var a = Object.assign({}, added); a[pt.id] = (a[pt.id] || []).concat([pt.next]); self.setState({ added: a, panel: null, notice: 'Agregamos ' + pt.name + ' ' + pt.next + '.' }); },
+      sendFault: done({ notice: 'Registramos la falla de ' + (st.pName || '') + '.' }),
+      cnt: String(cnt), cntMin: cnt <= 1, cntMax: cnt >= (pt.usable || 1), pUsable: String(pt.usable || 0),
+      cntDown: set({ cnt: Math.max(1, cnt - 1) }), cntUp: set({ cnt: Math.min(pt.usable || 1, cnt + 1) }),
+      addDamage: function () { var d = Object.assign({}, newDmg); d[pt.id] = (d[pt.id] || 0) + cnt; self.setState({ newDmg: d, panel: null, notice: 'Registramos ' + plural(cnt, 'dañado', 'dañados') + ' en ' + pt.name + '.' }); },
+      newTotal: String((pt.total || 0) + 2),
+      saveQty: function () { var q = Object.assign({}, qtyOf); q[pt.id] = (pt.total || 0) + 2 + (offs[pt.id] || 0); self.setState({ qtyOf: q, panel: null, notice: pt.name + ': ahora son ' + ((pt.total || 0) + 2) + '.' }); },
+      pName: st.pName || pt.name, ptName: pt.name, pModeLong: pt.modeLong + ' No se puede cambiar.',
+      cantRemove: !pt.removable,
+      removeHelp: pt.removable ? 'Deja de aparecer en todas las sucursales. Su historial queda.' : 'Primero da de baja sus unidades en todas las sucursales.',
+      removeType: done({ notice: 'Quitamos el tipo ' + pt.name + '.' }),
+      rename: done({ notice: 'Guardamos el tipo ' + pt.name + '.' }),
+      confirmOpen: !!st.confirm,
+      archiveUnit: function () { self.setState({ gone: gone.concat([st.confirm]), confirm: null, notice: 'Dimos de baja ' + st.pName + '.' }); },
+      closeAll: set({ panel: null, confirm: null })
+    };
+  }
+}
+</script>
+</body>
+</html>

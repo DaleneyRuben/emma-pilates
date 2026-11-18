@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Equipos con tipos propios</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 64px 80px; background: #FAF7F2; font-family: 'Work Sans', sans-serif; color: #4A4A4A; display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #93615D; font-weight: 500">Hallazgo 101 · Administración web y app del equipo · Seguimiento 269</div>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 400; font-size: 44px">Equipos con tipos propios</h1>
+    <p style="margin: 0; max-width: 960px; font-size: 17px; line-height: 1.6; color: #6E6663">Elegiste «tipos propios». El estudio crea sus tipos con «Nuevo tipo» y, para cada uno, elige si lo lleva por unidad con número (como hoy: Reformer 1, 2…, con fallas por máquina) o por cantidad («Balones: 12, 1 dañado»). Reformer, Cadillac y Mat quedan creados, con todas las máquinas que ya registraste. Las tres opciones hacen lo mismo; cambia cómo se ve.</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #93615D; color: #fff">Recomendada</span>
+      <span style="font-family: Lora, serif; font-size: 24px">A · Una sección por tipo</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #6E6663">La página de hoy, con una sección por tipo. Los que van por unidad mantienen su tabla; los que van por cantidad son una tarjeta con el número y sus dos acciones. «Fallas abiertas» sigue arriba, para todos los tipos.</span>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-family: Lora, serif; font-size: 24px">B · Tarjetas de tipo</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #6E6663">Una tarjeta por tipo con cuántos hay y qué anda mal, y una tarjeta punteada «Nuevo tipo». Tocas una tarjeta y su detalle se abre debajo: la tabla de unidades o la cantidad.</span>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-family: Lora, serif; font-size: 24px">C · Lista y detalle</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #6E6663">A la izquierda la lista de tipos, en dos grupos: «Con número» y «Por cantidad». A la derecha el tipo elegido, con sus propias fallas abiertas. En el celular, la lista primero y cada tipo en su pantalla.</span>
+    </div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.55">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: #6F6662">En las tres</span>
+      <span>Un tipo es de todo el estudio y aparece en cada sucursal; cada sucursal lleva sus propias unidades o su propia cantidad. Cómo se lleva un tipo no se cambia después de crearlo.</span>
+      <span>Por cantidad: «Registrar daño» (cuántos y qué pasó) abre una falla; se cierra con «Marcar resuelta» (vuelven a usarse) o «Dar de baja» (salen del total). «Cambiar cantidad» ajusta el total.</span>
+      <span>«Editar tipo» cambia el nombre. «Quitar tipo» solo cuando ninguna sucursal tiene unidades ni cantidad; nada se borra, el historial queda.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.55">
+      <span style="font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: #6F6662">App del equipo y Horario</span>
+      <span>«Reportar una falla» muestra los tipos como chips que se deslizan, el de la clase primero. Por cantidad: «¿Cuántos se dañaron?» con − y +, en lugar de los números.</span>
+      <span>El aviso «Faltan equipos» del Horario sigue comparando la clase con el tipo por unidad que lleva su nombre («Reformer Intermedio» → Reformer).</span>
+      <span style="color: #6E6663">Cada tablero tiene arriba una franja oscura «Prototipo» que no es parte del diseño: sus botones saltan a cada caso. Los botones de la página también funcionan.</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
