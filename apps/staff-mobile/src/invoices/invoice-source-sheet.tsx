@@ -1,14 +1,20 @@
 import { colors, fontFamilies, Glyph, spacing, surfaces } from "@pilates/mobile-core";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
-export type InvoiceSource = "camera" | "library";
+export type InvoiceSource = "camera" | "library" | "document";
 
-const choices: readonly { source: InvoiceSource; label: string; icon: "image" | "upload" }[] = [
+const choices: readonly {
+  source: InvoiceSource;
+  label: string;
+  icon: "image" | "upload" | "document";
+}[] = [
   { source: "camera", label: "Tomar foto", icon: "image" },
   { source: "library", label: "Elegir de la galería", icon: "upload" },
+  // FIX-049: the issued PDF from the phone's files.
+  { source: "document", label: "Elegir un PDF", icon: "document" },
 ];
 
-// E5 «Elegir archivo»: where the photo of the invoice comes from.
+// E5 «Elegir archivo»: where the invoice comes from, a photo or a PDF.
 export function InvoiceSourceSheet({
   onChoose,
   onDismiss,

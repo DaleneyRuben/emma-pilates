@@ -32,6 +32,7 @@ import { InvoiceApiError, createInvoicesApi } from "./invoices-api";
 import { InvoiceDropCard, InvoiceFileCard } from "./invoice-cards";
 import { InvoiceSourceSheet, type InvoiceSource } from "./invoice-source-sheet";
 import type { PickedImage } from "../uploads/image-upload";
+import { loadDocumentUpload } from "../uploads/load-document-upload";
 import { loadImageUpload } from "../uploads/load-image-upload";
 
 const conflicts: Record<string, string> = {
@@ -41,6 +42,8 @@ const conflicts: Record<string, string> = {
 };
 const uploadFailure = "No pudimos subir la factura. Revisa tu conexión e inténtalo de nuevo.";
 const rejected = "Este archivo no sirve. Sube un PDF, JPG o PNG de hasta 10 MB.";
+// FIX-049: a build made before expo-document-picker has no file picker.
+const pdfNeedsUpdate = "Para subir un PDF, actualiza la app. Mientras tanto puedes subir una foto.";
 
 const isConflict = (code: string | null): boolean => code !== null && conflicts[code] !== undefined;
 
@@ -51,9 +54,9 @@ const failureOf = (error: unknown): string =>
       ? rejected
       : uploadFailure;
 
-// FIX-044 (follow-up 248, E5): the payment's invoice, uploaded as a photo,
-// replaced, or removed after asking. Every change is recorded with who and
-// when; nothing is deleted.
+// FIX-044 (follow-up 248, E5): the payment's invoice, uploaded as a photo or
+// (FIX-049) a PDF from the phone's files, replaced, or removed after asking.
+// Every change is recorded with who and when; nothing is deleted.
 export function InvoiceScreen({ route }: { route: { params: { paymentId: string } } }) {
   const { paymentId } = route.params;
   const navigation = useNavigation<{ goBack: () => void }>();
@@ -121,7 +124,7 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
       const imageAssetId = assetId ?? (await uploadImage(photo, "invoice", fetcher));
       setUploadedAssetId(imageAssetId);
       await settle(
-        await api.attach(paymentId, { imageAssetId, fileName: "factura.jpg" }),
+        await api.attach(paymentId, { imageAssetId, fileName: photo.fileName ?? "factura.jpg" }),
         "Factura subida",
       );
       reset();
@@ -139,9 +142,20 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
   const upload = async (from: InvoiceSource) => {
     setChoosing(false);
     reset();
+    let pickPdf: (() => Promise<PickedImage | null>) | undefined;
+    if (from === "document") {
+      try {
+        ({ pickPdf } = await loadDocumentUpload());
+      } catch {
+        setFailure(pdfNeedsUpdate);
+        return;
+      }
+    }
     try {
-      const { pickImage } = await loadImageUpload();
-      const photo = await pickImage({ camera: from === "camera" });
+      const photo =
+        pickPdf !== undefined
+          ? await pickPdf()
+          : await (await loadImageUpload()).pickImage({ camera: from === "camera" });
       if (photo === null) return;
       setPicked(photo);
       await send(photo, null);
