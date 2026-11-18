@@ -9413,6 +9413,53 @@
         ]
       }
     },
+    "/api/v1/administrator/expenses/{expenseId}/void": {
+      "post": {
+        "operationId": "voidExpense",
+        "parameters": [
+          {
+            "name": "expenseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpenseVoidDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminExpenseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorExpenses"
+        ]
+      }
+    },
     "/api/v1/administrator/reports/expenses": {
       "get": {
         "operationId": "getExpenseReport",
@@ -18532,6 +18579,20 @@
             "type": "string",
             "format": "date",
             "description": "Bolivia civil date"
+          },
+          "voidedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Set once the Expense is eliminated; it then counts for nothing"
+          },
+          "voidedByName": {
+            "type": "string",
+            "nullable": true
+          },
+          "voidReason": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -18540,7 +18601,10 @@
           "expenseCategoryId",
           "expenseCategoryName",
           "amountCentavos",
-          "incurredOn"
+          "incurredOn",
+          "voidedAt",
+          "voidedByName",
+          "voidReason"
         ]
       },
       "AdminExpensePageDto": {
@@ -18621,6 +18685,15 @@
           "amountCentavos",
           "incurredOn"
         ]
+      },
+      "ExpenseVoidDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
       },
       "ExpenseCategoryTotalDto": {
         "type": "object",
