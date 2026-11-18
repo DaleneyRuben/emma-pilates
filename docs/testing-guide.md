@@ -13,7 +13,7 @@ numbered tests.
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment with the invoice data, Mi plan, the referral code, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18); the Trainer credential, the tablet no-plan card, and the cancel-sheet sentence (Test 113) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
-| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); read her statements and payments in «Mis pagos» (Test 95); report an equipment fault from a Session as a Trainer (Test 82); the bare Branch on S13, the S14 commas, and the receipt's own ratio (Test 113); the calmer Notificaciones, Client file, Cerrar caja and Horario (Test 176) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
+| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); read her statements and payments in «Mis pagos» (Test 95); report an equipment fault from a Session as a Trainer (Test 82); the bare Branch on S13, the S14 commas, and the receipt's own ratio (Test 113); the calmer Notificaciones, Client file, Cerrar caja and Horario (Test 177) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
@@ -48,7 +48,7 @@ numbered tests.
 | Weekly cap                   | Book up to the cap snapshotted on a Plan, see `classesLeftThisWeek` count down, and get `409 weekly_cap_reached` on the next Booking or Waitlist join unless an extra class remains (Test 91) | The «Te quedan N clases esta semana» line on Reservar is follow-up 203 and is still pending; the mobile screens were not walked on a device |
 | Money format                 | Whole bolivianos in both apps («Bs 560») and centavos on the admin web («Bs 560,00») (Test 112) | A leftover fraction of a boliviano is not in the fixtures; the unit tests cover the rounding. Credit is retired (PAY-005), so no screen shows a credit line |
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 83) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
-| Trainer pay periods          | Calculate and approve a Trainer's pay by Día, Semana, Rango or Mes in Sueldos › Por aprobar, see an approved day keep the month from paying it again, and read the period in «Mis pagos» (Test 127) | The Coordinator stays monthly; the worker drafts whole months only, so a Trainer already paid by day or week that month is drafted by hand |
+| Trainer pay periods          | Calculate and approve a Trainer's pay by month or by «Otro período» (a range of days; a day or a week by its address) in Sueldos › Por aprobar, see an approved day keep the month from paying it again, and read the period in «Mis pagos» (Test 127) | The Coordinator stays monthly; the worker drafts whole months only, so a Trainer already paid by day or week that month is drafted by hand |
 | Studio transfer QR           | Upload the studio's transfer QR in Ajustes › QR del estudio, see it and its date, and read the same image on the apps' QR route; the Coordinator does not see the tab (Test 128) | Until the first upload the server's `TRANSFER_QR_IMAGE_PATH` file is served; a storage outage fails the route instead of falling back |
 | Weekly series and booking window | Edit the booking window in Reglas del estudio, cancel an empty class from Horario, give a weekly series a «Vigente hasta», pause and resume it, and reach a wider window's later days through «Otra» in both apps (Test 129) | A pause holds one range at a time; resuming early brings back only the classes the pause withdrew that have not started |
 | Second walkthrough fixes | The rail's labels at 12 px, a missed Minimum Bookings check settled when the worker comes back, «Fecha de apertura» as dd/mm/aaaa, and phones without +591 (Test 130) | The phone normalization migration runs once on deploy |
@@ -57,8 +57,9 @@ numbered tests.
 | Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and Horario, and next to the Trainer's name in the client's Reservar, class detail, Mis reservas and Historial (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
 | Settled review notices | A confirmed or rejected receipt and a decided Freeze mark every Administrator's «… por revisar» notice read; a Minimum Bookings cancellation notice names its day (Test 141) | Notices already stale before FIX-046 stay unread |
 | Walkthrough 59, 74, 88 | «Hace un momento» under a minute in both apps' Notificaciones and Pagos pendientes; «Celular incompleto» on Clientes and the client file for a missing or unusable phone; Comentarios names who sent each one, linked to the Client's file (Test 157) | A phone saved before the rule can only be fixed by the Client or from «Editar perfil»; nothing rewrites it |
-| Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Mi QR de cobro», Sueldos' «Aprobar pago» and Pagados › Registrar pago show it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; «Subir comprobante» opens Pagados on the person, not her payment's panel |
+| Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Mi QR de cobro», Sueldos' «Aprobar Bs …» and Pagados › Registrar pago show it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; «Subir comprobante» opens Pagados on the person, not her payment's panel |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
+| Calmer admin web pages | Horario's white blocks with one amber dot for a class short of Equipment and faint dashed cancelled classes, Inicio's «Por resolver» list first with grouped recommendations, and Sueldos' one card per person with its own «Aprobar Bs …» (Test 178) | Recommendations are grouped on the web only; the API still lists one per weekday and per Client |
 
 ## Where each designed screen is tested
 
@@ -204,7 +205,7 @@ under the same top bar, the chevron (read as "Volver") and the screen's title
 over a thin rule. A Plan's bar shows the Plan's name, a class opened from
 Reservar shows a small grey "Reservar una clase" instead of a title, and
 Notificaciones keeps **Marcar leídas** at the end of the bar (**Marcar todo
-leído** in the Staff app, Test 176). In the Staff
+leído** in the Staff app, Test 177). In the Staff
 app, the Assistant's client overview, the class list, the class detail, the
 plan picker, the cash payment, and the Trainer's attendance list keep their
 large title under a chevron; the other pushed screens (Notificaciones,
@@ -1809,7 +1810,7 @@ Client's first letter in a tinted circle, her name in Lora over the Plan, a
 Palo de rosa chevron on the right, and under a thin rule the amount in Lora
 and an amber clock with how long ago it was sent ("Hace 3 minutos", "Ayer,
 19:40"; "hace un momento" under a minute, FIX-063) (MOB-042). With nothing to review the screen shows one small
-card: a green check, «Todo al día» and «No hay pagos por confirmar» (Test 176
+card: a green check, «Todo al día» and «No hay pagos por confirmar» (Test 177
 E).
 
 Tap Sofía's card. **Revisar pago** shows name and Plan, **Monto a verificar**
@@ -1896,7 +1897,7 @@ reads «No encontramos a nadie» with «Revisa cómo lo escribiste o crea una
 ficha nueva.» and **Nuevo cliente** as the next step. Screen titles stay «cliente» («Buscar cliente», «Nuevo
 cliente», «Ver cliente», «Selecciona un cliente…»); prose
 about the person says «clienta» (UX-005). Tap Lucía: the overview shows her
-Plan card (Test 176 B), **Reservar clase** and one plain group of rows:
+Plan card (Test 177 B), **Reservar clase** and one plain group of rows:
 **Reservas** (her next class on the right), **Historial de clases** and, only
 when she can buy, **Registrar pago**. A Client without a
 Plan reads «Sin plan activo» under a card icon, with «Registra un pago para
@@ -2670,18 +2671,18 @@ check load first, and each page's code arrives the first time you open it
 tools (Network) you can see one small `*-route-*.js` file per page.
 
 1. **The rail.** On a desktop-width window the session opens on **Inicio**
-   («Buenos días, Paola», the day and the Branch). Inicio (WEB-043) shows
-   three cards side by side: **Por resolver** in Rosa profundo («N
-   pendientes» with what they are, or «Todo al día»), **Hoy en Centro**
-   (classes, bookings and occupancy, the next classes with «Llena» or «N de
-   M», **Ver horario**) and **Dinero** for the whole studio with **Hoy ·
-   Mes** (collected, Efectivo, QR confirmados, QR por revisar). Below them,
-   **Pendientes**: one row per waiting thing (transfers to review, freezes
-   to decide, clients to contact, new comments, low stock, salaries to
-   approve), each with **Revisar** opening its tab, or «Nada por resolver.»;
-   then **Recomendaciones del mes**. Carolina sees **Clientas** (active,
-   new this month, renewal) instead of Dinero and the freezes, contacts,
-   comments and low-stock rows, never transfers or salaries (ADR-0108). At 420 px the cards stack in one column. On the left, a narrow
+   («Buenos días, Paola», the day and the Branch). Inicio (WEB-043, laid
+   out as FIX-084's «Pendientes primero», Test 178) opens with **Por
+   resolver**: one white list, a row per waiting thing (salaries to approve
+   first, then transfers to review, freezes to decide, clients to contact,
+   new comments, low stock), each with **Revisar** opening its tab, or «Todo
+   al día: nada espera tu respuesta.». Below it two quiet cards, **Hoy**
+   (classes · bookings · occupancy, each of today's classes, **Ver
+   horario**) and **Cobrado hoy** for the whole studio (Efectivo, QR, how
+   many wait for review, **Ver pagos**), then **Recomendaciones** grouped by
+   person. Carolina sees **Clientas** (active, new this month, renewal)
+   instead of Cobrado hoy and the freezes, contacts, comments and low-stock
+   rows, never transfers or salaries (ADR-0108). At 420 px the cards stack in one column. On the left, a narrow
    Lino rail carries the brand mark «E» and nine destinations, each an icon
    over its name: **Inicio, Horario, Clientas, Promociones, Comentarios,
    Dinero, Estudio, Informes, Ajustes** (follow-up 232). The current one is
@@ -6999,7 +7000,7 @@ Branch, up to the moment of the close.
    and 23).
 2. Log in to the Staff app as `camila.rojas@example.com` and sell a Plan in
    cash at Centro to a Client without one (Mariana or Sofía, Test 19).
-3. Open the **Caja** tab (S25, Test 176 C). Expected: «Viernes 23 de octubre · Centro»
+3. Open the **Caja** tab (S25, Test 177 C). Expected: «Viernes 23 de octubre · Centro»
    (today) over the title **Cerrar caja**, «¿Cuánto efectivo hay en la
    caja?» over one large «Bs» field, «Cuenta los billetes antes de mirar el
    total esperado.», then a Lino group «Esperado según los pagos» with the
@@ -7007,7 +7008,7 @@ Branch, up to the moment of the close.
    «1 venta en efectivo hoy en Centro», and **Cerrar caja** disabled until an
    amount is typed, with «Te pediremos confirmar: un cierre no se puede
    deshacer.» under it. A day without cash sales opens on «Hoy no hubo pagos
-   en efectivo» instead (Test 176 C). If the profile
+   en efectivo» instead (Test 177 C). If the profile
    or Branch list fails to load, the screen shows «No pudimos cargar la caja
    de hoy.» with **Reintentar**, not an endless «Cargando la caja de hoy»
    (FIX-011).
@@ -7120,7 +7121,7 @@ password, holding every Branch.
 1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. Her
    tabs are **Clientes · Para contactar · Horario · Perfil**; **Clientes**
    opens on **Buscar cliente** with the «¿No está? Crear cliente nuevo» link
-   under the results (FIX-040, Test 176 F), and **Horario** has the **Cancelar una clase**
+   under the results (FIX-040, Test 177 F), and **Horario** has the **Cancelar una clase**
    row, which opens the Administrator's cancellation screens (Test 10 D).
 2. **Nuevo cliente** opens the Assistant's form (Test 11 E, with the required
    «Celular» of Test 132): create a Client with a fresh email. Her file
@@ -7555,12 +7556,14 @@ a capacity.
    «Fuera de servicio» in its section, and «1 fuera de servicio» in the
    subtitle. A fault without the tick shows «Se puede usar» and the piece
    «Con falla»; it changes no flag.
-5. Open **Horario** on next week again. Expected: every future Reformer
-   Pilates Session with 12 places carries the warning triangle, an amber left
-   border, and «Faltan equipos · 11 de 12», its accessible name ends «faltan
-   equipos: 11 reformers funcionando para 12 lugares», and above the week
-   «N sesiones de esta semana tienen más lugares que reformers funcionando.
-   Baja su capacidad o revisa Equipos.» links to AW37. Mat and Prenatal
+5. Open **Horario** on next week again. Expected (as FIX-084 draws it, Test 178):
+   every future Reformer Pilates Session with 12 places carries a small amber
+   dot before its name on a white block, its accessible name ends «faltan
+   equipos: 11 equipos Reformer funcionando para 12 lugares», and beside the
+   week one quiet line «N clases con más lugares que equipos · Revisar»
+   links to AW37. Opening the class shows «Faltan equipos: 11 equipos
+   Reformer funcionando para 12 lugares. Baja su capacidad o revisa Equipos.»
+   in its panel. Mat and Prenatal
    Sessions, cancelled Sessions, and Sessions already started are never
    flagged. Lower one Session's capacity to 11 in AW03: its flag goes away.
    (`GET /api/v1/administrator/equipment-flags?branchId&from&until`, at most
@@ -7595,7 +7598,7 @@ a capacity.
    `archived_at`; nothing is ever deleted (`back_office.equipment`,
    `back_office.equipment_issues`).
 10. Check AW37 and Horario at 1440 px and 420 px (stacked cards, the fault
-    rows stacked, the day list's cards with «Faltan equipos»), and S26 on the
+    rows stacked, the day list's cards with the amber dot), and S26 on the
     iPhone, the iPad, and the Android emulator.
 
 
@@ -7855,11 +7858,10 @@ and cannot list the statements. Log in as Test 24 describes.
    Por aprobar**. The picker opens on **Mes**; its stepper cannot go past
    the current month. Press **Volver a calcular**. Each Trainer with a line
    appears as a card: her name, the period («Octubre de 2026») and
-   «Borrador», the total (`Bs 322,00`, never centavos), and one row per
-   concept with its subtotal (Test 164 has the layout). Día, Semana, and
-   Rango are Test 127.
-2. **Approve once.** Press **Aprobar pago** on one card and confirm. It
-   reads «Aprobado» and Nómina gains one Salary Payment for that total.
+   the total (`Bs 322,00`, never centavos), and one row per concept with its
+   subtotal (Test 178 has the layout). Otro período is Test 127.
+2. **Approve once.** Press **Aprobar Bs …** on one card and confirm. The
+   card leaves Por aprobar and Nómina gains one Salary Payment for that total.
    Calculating the month again does not add a second payment.
 3. **The figures.** A class of 3 students is Bs 65,00. A class of 6 is
    Bs 81,00. A no-show counts in the snapshot. A Session cancelled for the
@@ -7944,9 +7946,9 @@ it. Carolina, the Coordinator, does not, not even her own. Log in as Test
    «Aprobado», the total (`Bs 4.030,00`, never centavos), and a table of
    Concepto, Detalle, and Monto. An empty month says «Este mes no tiene un
    pago calculado.» There is no Calcular mes: the worker drafts it.
-2. **Approve once.** Press **Aprobar pago** (from the 8th of the next
-   month) and confirm. The card reads «Aprobado» and Nómina gains one Salary
-   Payment for that total. It is not offered again.
+2. **Approve once.** Press **Aprobar Bs …** (from the 8th of the next
+   month) and confirm. The card leaves Por aprobar and Nómina gains one
+   Salary Payment for that total. It is not offered again.
 3. **The figures.** A new Client on a 30-day Plan is Bs 50,00. One on a
    60- or 90-day Plan is Bs 80,00. A single class, a gift class, and a
    Client a Trainer brought do not appear. The bonus of Bs 400,00 appears
@@ -8522,14 +8524,14 @@ D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search fiel
    with a clear ×, results as person
    rows (a **Pendiente** pill for a pending Account). No result reads «No
    encontramos a nadie» with **Nuevo cliente**; otherwise the quiet link
-   «¿No está? Crear cliente nuevo» sits under the results (Test 176 F).
+   «¿No está? Crear cliente nuevo» sits under the results (Test 177 F).
    Nuevo cliente (S05): «Datos»
    as one Lino group, «¿Cómo nos conoció?» as a two-column grid, the referral
    field only for «Una instructora» («Código de la instructora») or
    «Recomendación de una amiga» («Código de la amiga»), and **Crear cuenta**
    fixed at the bottom under «Le enviaremos un enlace de activación al correo.
    Vence en 7 días.» The Client file (S06): initials, name, contact; the Plan
-   as one Lino card (Test 176 B: the plan name and a small «● Activo», the
+   as one Lino card (Test 177 B: the plan name and a small «● Activo», the
    classes she can book in Lora 40, «N de M del plan · vence el …», and
    «Próximo plan ya pagado: <plan>, desde el <día>. Podrás registrar otro
    pago cuando empiece.» when one is queued); one primary **Reservar clase**;
@@ -8564,11 +8566,11 @@ D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search fiel
    day tile and the action as a right-aligned text button under a hairline
    (**Cancelar reserva** in Error, **Reprogramar** inside the window, **Salir
    de la lista**); the sheet asks «¿Cancelar esta reserva de …?» with **Sí,
-   cancelar la reserva** and **No, volver**. Horario (HOR, Test 176 D): the
+   cancelar la reserva** and **No, volver**. Horario (HOR, Test 177 D): the
    week for her Branch, «N clases hoy», one plain card per class («08:00»,
    «4 de 6 lugares» in grey, «Reformer · Daniela», «50 min»), the cancelled
    classes folded at the end («2 canceladas por mínimo · Ver»), and
-   **Reservar para una clienta** (opens Clientes). Caja (S25, Test 176 C):
+   **Reservar para una clienta** (opens Clientes). Caja (S25, Test 177 C):
    «¿Cuánto efectivo hay en la caja?» first, the expected cash and
    «Cuadra»/«Falta Bs …» quietly under it, a confirmation before closing;
    once closed, «Caja
@@ -8578,7 +8580,7 @@ E. **Administración.** Pagos pendientes (S11): «Por confirmar · N» with the
    without icons: **Facturas por subir** (count), **Cancelar una clase**,
    **Congelamientos** («N por revisar») and **Cerrar caja**. With no
    payments, one small card «Todo al día · No hay pagos por confirmar»
-   (Test 176 E). Revisar pago (S12): the
+   (Test 177 E). Revisar pago (S12): the
    amount on the Rosa profundo card, Transferencia and «Enviado el …» rows,
    the receipt with **Ampliar**, **Confirmar pago** and **Rechazar** in Error;
    rejecting shows the person row, «Motivo del rechazo», the warning row «El
@@ -8739,18 +8741,19 @@ applied (owner approval 2026-11-04). Use a copy of `pilates_dev_sim`, never
 the database itself, since approving creates Salary Payments. Log in as Paola
 (Test 24) and open **Dinero › Sueldos › Por aprobar**.
 
-1. **The picker.** **Día · Semana · Rango · Mes** sit above the cards, Mes
-   chosen. The address stays `/dinero/sueldos?month=AAAA-MM`. Choose
-   **Día**: the address gains `period=day&date=…`, the stepper reads
-   «Martes 3 de noviembre de 2026», and **Día siguiente** stops at today.
-   **Semana** reads «Semana del 2 – 8 de noviembre de 2026» and steps a
-   week. **Rango** shows **Desde** and **Hasta** as `dd/mm/aaaa`, both days
-   included; a Hasta before Desde says «La fecha final no puede ser anterior
-   a la inicial.» and disables **Volver a calcular**. Reloading keeps the period.
-2. **A day.** On **Día**, pick a past day Emma taught and press
-   **Volver a calcular**. Her card names that day (`03/11/2026`) with only that day's
+1. **The picker.** Since FIX-084 (Test 178) one control sits above the
+   cards: «‹ Noviembre de 2026 ›» and **Otro período**. The address stays
+   `/dinero/sueldos?month=AAAA-MM`. **Otro período** shows **Desde** and
+   **Hasta** as `dd/mm/aaaa`, both days included, and **Volver al mes**; a
+   Hasta before Desde says «La fecha final no puede ser anterior a la
+   inicial.» and disables **Volver a calcular**. Reloading keeps the period.
+   A day or a week still opens by its address (`period=day&date=…` reads
+   «Martes 3 de noviembre de 2026» and **Día siguiente** stops at today;
+   `period=week` reads «Semana del 2 – 8 de noviembre de 2026»).
+2. **A day.** With **Otro período**, set Desde and Hasta to a past day Emma
+   taught and press **Volver a calcular**. Her card names that day (`03/11/2026`) with only that day's
    classes. Carolina's card is not there: she shows only on **Mes**.
-3. **Approve the day.** Press **Aprobar pago** and confirm; it is offered
+3. **Approve the day.** Press **Aprobar Bs …** and confirm; it is offered
    only once the day is over in Bolivia (the card says «Se aprueba desde el
    …» until then, and the API answers `409` `pay_statement_month_open`). Nómina
    gains one Salary Payment.
@@ -9109,9 +9112,9 @@ A. **Seed through the API** as Paola (`paola.mendoza@example.com`): cancel a
    `pausedUntil`).
 B. **The week at 1440 px.** **Horario › Clases**: the rail starts at
    **Inicio** with no «E» above it. Today's cancelled classes stay in their
-   slot with a dashed left edge and no fill: class, time and trainer, then
-   **Cancelada · mínimo**. The subtitle reads «N sesiones esta semana · M
-   canceladas». Next week shows **Cancelada · estudio** and **Serie en
+   slot as a faint grey dashed outline with no fill (FIX-084): the class,
+   then its time with **cancelada · mínimo**. The subtitle reads «N sesiones esta semana · M
+   canceladas». Next week shows **cancelada · estudio** and **serie en
    pausa** on the class you cancelled and the paused series. A series you
    changed or ended leaves nothing behind.
 C. **Read-only panel.** Click a cancelled class: the panel is titled **Clase
@@ -10283,30 +10286,29 @@ migration: each new line stores its own detail, and the statement gains
 1. Use a copy of the database (surface-verification skill) and run the API
    and the admin web on your own ports. Log in as Paola and open **Dinero ›
    Sueldos** on the current month.
-2. **The month is open.** Expected: a card «Noviembre todavía no terminó:
-   cierra el 30. Desde el 1 de diciembre puedes aprobar a las instructoras,
-   y a la coordinadora siete días después…» with **Pagar por Rango** (not on
-   the 1st of a month). No card offers **Aprobar pago**; each says «Se
+2. **The month is open.** Expected (FIX-084, Test 178): one line
+   «Noviembre cierra el 30. Para pagarle antes a una instructora, elige
+   «Otro período».». No card offers **Aprobar**; each shows a grey «Se
    aprueba desde el 1 de diciembre» (a Trainer) or «… el 8 de diciembre»
-   (the Coordinator). `GET /api/v1/administrator/pay-statements` returns
+   with «Su bono espera las renovaciones» (the Coordinator). `GET /api/v1/administrator/pay-statements` returns
    `approvableOn` for each.
-3. **Pagar por Rango.** Expected: Rango from the 1st to yesterday, still
+3. **Otro período.** Expected: a range from the 1st to yesterday, still
    showing the month draft (it touches the range) until **Volver a
    calcular**, which replaces it with the range's own draft; a Trainer with
-   work in it then shows **Aprobar pago**; the Coordinator is not listed.
+   work in it then shows **Aprobar Bs …**; the Coordinator is not listed.
 4. **Concepts.** Each card lists, in this order and only when present,
    «Clases dictadas», «Canceladas por mínimo», «Comisiones de primer plan»,
-   «Base», «Clientas nuevas», «Bono de renovación», each with its rate
-   («54 × Bs 25,00», «2 comisiones», «4 × Bs 50,00 · 1 × Bs 80,00») and
-   subtotal, then «Total». **Ver las 54** opens the lines in place, in a box
-   that scrolls: «lun 2 nov · 07:00 · Sopocachi · Reformer» for a class
-   cancelled for the minimum, «… · Reformer · 1 alumna» for a class (never
-   «1 alumnas»), «Lucía Mendoza · Paquete de 8 clases · 10 % de Bs 480» for a
-   commission, «Camila Rojas · Mensual 8 clases · 30 días» for a new Client
-   of the Coordinator. **Ocultar** folds it. Base and the bonus do not open.
-   A statement approved before FIX-070 shows its old lines
-   («Mínimo no alcanzado») grouped the same way.
-5. **Approve.** **Aprobar pago** (a small button by the total) opens
+   «Base mensual», «Clientas nuevas», «Bono de renovación», each with its
+   rate in brackets («(54 × Bs 25,00)», «(2)», «(4 × Bs 50,00 · 1 × Bs
+   80,00)») and subtotal; the total sits large at the top (FIX-084). **Ver
+   las N líneas** opens every line under them, in a box that scrolls: «lun 2
+   nov · 07:00 · Sopocachi · Reformer» for a class cancelled for the minimum,
+   «… · Reformer · 1 alumna» for a class (never «1 alumnas»), «Lucía Mendoza
+   · Paquete de 8 clases · 10 % de Bs 480» for a commission, «Camila Rojas ·
+   Mensual 8 clases · 30 días» for a new Client of the Coordinator. **Ocultar
+   las líneas** folds it. A statement approved before FIX-070 shows its old
+   lines («Mínimo no alcanzado») grouped the same way.
+5. **Approve.** **Aprobar Bs …** (since FIX-084 the card's solid button) opens
    «¿Aprobar Bs 1.534,90 a Daniela Ortiz del 01/11/2026 al 17/11/2026?» with
    the period, the number of lines and «Pago de sueldo con fecha de hoy».
    **Volver** approves nothing; **Aprobar Bs 1.534,90** approves once and
@@ -10385,7 +10387,7 @@ one. Design option A (follow-ups 275 and 276). The migration
    Administrator's only (the Coordinator gets 403), with `imageUrl: null`
    once expired.
 10. **Sueldos › Por aprobar.** In a period that can be approved (Rango up to
-    yesterday, or a closed month), press **Aprobar pago** on Emma's card.
+    yesterday, or a closed month), press **Aprobar Bs …** on Emma's card.
     Expected: the confirmation, wider, with her QR (or «Sin QR de cobro», or
     «QR vencido · pídele uno nuevo») on the left at 1440 and above the
     details at 420. Approve. Expected: «Aprobamos Bs … a Emma Vargas. Quedó
@@ -10520,7 +10522,7 @@ recorded before (Daniela's Bs 1.534,90 of 18/11) are kept as they are.
    hasta 10 MB.», and **Guardar** stays grey even with Empleado, Monto and
    Fecha filled. Upload a photo: «Comprobante adjunto», the hint becomes «La
    entrenadora lo ve en su app.» and **Guardar** records the payment.
-3. **Aprobar pago.** In **Sueldos › Por aprobar**, press **Aprobar pago** on a
+3. **Aprobar.** In **Sueldos › Por aprobar**, press **Aprobar Bs …** on a
    statement that can be paid. Expected: under the details, the same
    «Comprobante» field with «Sin comprobante no se puede aprobar el pago. JPG,
    PNG o WebP, hasta 10 MB.»; **Aprobar Bs …** stays grey until the photo is
@@ -10675,7 +10677,7 @@ C. **Client app, Android.** As Mariana: **Perfil › Mis facturas** → a ready
    and older still open the folder picker. On iPhone and iPad **Descargar**
    still opens the share sheet.
 
-## Test 176: a calmer Staff app (FIX-083)
+## Test 177: a calmer Staff app (FIX-083)
 
 The 2026-11-18 design audit's picks for the Staff app
 (`DECISIONES-DISENO-2026-11-18.md`, «App del equipo»): Notificaciones A,
@@ -10754,3 +10756,67 @@ F. **Buscar cliente (Ronda 2 pick A, new as a link).** As Camila (or the
    Crear cliente nuevo» opens **Nuevo cliente**. No match still reads «No
    encontramos a nadie» with **Nuevo cliente** as the next step.
 G. Check on the iPhone 16 Pro and the Android emulator.
+
+## Test 178: calmer Horario, Inicio and Sueldos on the admin web (FIX-084)
+
+The owner's picks from the 2026-11-18 design audit: Horario A (neutral blocks
+with one dot), Inicio A (pendientes primero) and Sueldos B (one card per
+person with Aprobar). Nothing changed in the API. Use a copy of the database
+(surface-verification skill), run the API with the worker and the admin web
+on your own ports, and log in as Paola. Check each step at 1440 px and at
+420 px (the drawer opens from **Abrir menú**).
+
+A. **Horario, standing classes.** **Horario** on a week with classes. Every
+   class is a white block with a thin border: the class type, «07:00 –
+   08:00», the trainer's full name on her own line (with her photo when she
+   has one), then «4/10» or «Llena · 3 en espera» (a class shorter than an
+   hour puts it on the time line, «16:00 – 16:45 · Llena · 3 en espera»). No pink fill, no amber
+   border, nothing cut off at 1440 px.
+B. **Short of Equipment.** Mark a Reformer as out of service (Test 82) so
+   the week's 12-place Reformer classes have more places than working
+   machines. Expected: a small amber dot before «Reformer Pilates» on each,
+   and beside the week arrows one quiet line «N clases con más lugares que
+   equipos · Revisar» (singular «1 clase …»); **Revisar** opens Estudio ›
+   Equipos. Click a flagged class: its panel says «Faltan equipos: 11
+   equipos Reformer funcionando para 12 lugares. Baja su capacidad o revisa
+   Equipos.». At 420 px the day list's cards carry the same dot.
+C. **Cancelled classes.** A class cancelled for the minimum stays in its
+   place as a faint grey dashed outline: the class type, then «16:00 ·
+   cancelada · mínimo» («cancelada · estudio», «serie en pausa»). Clicking it
+   still opens «Clase cancelada» (Test 134).
+D. **Inicio.** No brown «N pendientes» block. **Por resolver** is one white
+   list: «1 sueldo por aprobar» first with the only solid **Revisar**, then
+   transfers, freezes, clients to contact, comments and low stock with
+   outline **Revisar**. With nothing waiting: «Todo al día: nada espera tu
+   respuesta.». Below, two quiet cards: **Hoy** («2 clases · 1 reserva · 6 %
+   ocupación» and each class, «18:00 Reformer Pilates · Daniela Ortiz (1 de
+   8)», **Ver horario**) and **Cobrado hoy** («Bs 0», «Efectivo Bs 0 · QR Bs 0
+   · ninguno por revisar», or «2 QR por revisar, aún no cuentan», **Ver
+   pagos**). Carolina sees **Clientas** instead
+   of Cobrado hoy and no Descartar.
+E. **Recomendaciones.** In **Informes**, press **Recalcular** so the month
+   has findings. Back on Inicio: one row per trainer, «Revisa el horario de
+   Daniela Ortiz» with «6 días de la semana: lunes, martes, …», and one row
+   for every client, «Contacta a 3 clientas con plan vigente que no
+   reservaron» with their names. Resolved and discarded findings are not
+   shown, at most three rows, and **Ver las N** (N the open findings) opens
+   Informes (with nothing to show, «Ir a Informes»). **Descartar** on a
+   trainer's row discards every weekday of hers at once; Informes then lists
+   them as «Descartada». If some fail: «No pudimos descartar 1 de las 2
+   recomendaciones.».
+F. **Sueldos.** **Dinero › Sueldos › Por aprobar** on the current month.
+   One control «‹ Noviembre de 2026 ›» with **Otro período**, and one line
+   «Noviembre cierra el 30. Para pagarle antes a una instructora, elige
+   «Otro período».» (on the 1st only «Noviembre cierra el 30.»; **Otro
+   período** then opens the whole month). Each person still to approve has a white card: name,
+   «Entrenadora · Noviembre de 2026» (her Role in her gender), the total
+   large, one line per concept, **Ver las N líneas**, and a solid **Aprobar
+   Bs …**. Until it can be approved the button is grey: «Se aprueba desde el
+   1 de diciembre», and the Coordinator's card («Coordinadora · …») adds
+   «Su bono espera las renovaciones» with «… el 8 de diciembre». At 1440 px the cards sit two
+   per row, at 420 px one.
+G. **Approved people leave Por aprobar.** Approve one person (with the
+   receipt photo, Test 171). Her card goes away, the notice says
+   «Aprobamos …», and she is in **Pagados**. When everyone in the period is
+   approved the page says «Noviembre de 2026: todos los sueldos están
+   aprobados. Están en Pagados.»; no card ever reads «Aprobado» here.

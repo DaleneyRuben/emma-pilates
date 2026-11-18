@@ -46,7 +46,7 @@ const withReceipt = {
 const openApproval = async () => {
   const rendered = renderAdmin("/dinero/sueldos?month=2026-09");
   await rendered.user.click(
-    await screen.findByRole("button", { name: "Aprobar pago" }),
+    await screen.findByRole("button", { name: /^Aprobar Bs/ }),
   );
   const dialog = await screen.findByRole("alertdialog");
   const confirm = within(dialog).getByRole("button", {
@@ -60,7 +60,11 @@ const openApproval = async () => {
 describe("the receipt Sueldos waits for", () => {
   useMockServer();
   beforeEach(() => {
-    server.use(...signedInHandlers(), ...salaryReceiptHandlers());
+    server.use(
+      ...signedInHandlers(),
+      payrollStaffHandler(),
+      ...salaryReceiptHandlers(),
+    );
   });
 
   it("says why approving is grey and forgets the photo when she goes back", async () => {

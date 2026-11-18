@@ -8,7 +8,8 @@ import { dayItems, hourLabel, sessionSpan } from "./week-slots";
 
 type Session = AdministratorSessionAvailabilityDto;
 
-const hourHeight = 64;
+// FIX-084: tall enough for four short lines (type, time, trainer, places).
+const hourHeight = 80;
 
 /** The hours the grid spans: 06:00–22:00, widened to fit every Session. */
 function hourRange(sessions: readonly Session[]) {
@@ -136,6 +137,7 @@ export function WeekGrid({
                   session={session}
                   onOpen={onOpen}
                   className="absolute inset-x-1"
+                  short={(minutes / 60) * hourHeight - 2 < 76}
                   style={{
                     top: ((item.minutes - first * 60) / 60) * hourHeight + 1,
                     height: Math.max((minutes / 60) * hourHeight - 2, 44),
