@@ -83,6 +83,8 @@ describe("Trainer fault report", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Reformer 3" }));
     await fireEvent.changeText(screen.getByLabelText("¿Qué pasó?"), "Se soltó.");
     await fireEvent.press(screen.getByRole("button", { name: "Mat" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reformer" }));
+    expect(screen.getByRole("button", { name: "Reformer 3" })).not.toBeSelected();
     expect(screen.getByRole("button", { name: "Enviar reporte" })).toBeDisabled();
   });
 

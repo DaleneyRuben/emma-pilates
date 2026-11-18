@@ -28,7 +28,14 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { FilterChips } from "../ui/filter-chips";
 import { useIsTablet } from "../ui/use-is-tablet";
-import { DamageCounter, OutOfServiceSwitch, UnitTiles, unitName } from "./report-fault-pieces";
+import {
+  DamageCounter,
+  MissingStep,
+  missingStep,
+  OutOfServiceSwitch,
+  UnitTiles,
+  unitName,
+} from "./report-fault-pieces";
 
 type SessionType = SessionEquipmentTypeDto;
 
@@ -123,7 +130,17 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
 
   const byQuantity = shown.tracking === "quantity";
   const damaged = Math.max(1, Math.min(count, shown.usable));
-  const ready = description.trim() !== "" && (byQuantity ? shown.usable > 0 : chosen !== null);
+  // FIX-076: a type with a single unit comes with it chosen.
+  const only = shown.units.length === 1 ? shown.units[0] : undefined;
+  const piece = chosen ?? only ?? null;
+  const described = description.trim() !== "";
+  const missing = missingStep({
+    described,
+    hasUnit: byQuantity ? null : piece !== null,
+    typeName: shown.name,
+    usable: shown.usable,
+  });
+  const ready = missing === null;
   const choose = (id: string) => {
     setTypeId(id);
     setChosen(null);
@@ -134,9 +151,9 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
   const send = async () => {
     const input: SessionEquipmentIssueInputDto | null = byQuantity
       ? { typeId: shown.id, quantity: damaged, description: description.trim() }
-      : chosen === null
+      : piece === null
         ? null
-        : { equipmentId: chosen.id, description: description.trim(), outOfService };
+        : { equipmentId: piece.id, description: description.trim(), outOfService };
     if (input === null) return;
     setBusy(true);
     setProblem(null);
@@ -149,9 +166,9 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
       }
       if (response.status !== 201) throw new Error("The fault report was refused");
       setSent(
-        byQuantity || chosen === null
+        byQuantity || piece === null
           ? `el daño de ${shown.name} (${damaged})`
-          : `la falla del ${unitName(chosen)}`,
+          : `la falla del ${unitName(piece)}`,
       );
     } catch {
       setProblem("failed");
@@ -172,6 +189,7 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
             {problem === "conflict" ? (
               <NoticeRow message={`Solo hay ${shown.usable} que se pueden usar.`} />
             ) : null}
+            {busy ? null : <MissingStep message={missing} />}
             <PrimaryButton
               busy={busy}
               disabled={!ready}
@@ -195,7 +213,7 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
             <DamageCounter count={damaged} onChange={setCount} usable={shown.usable} />
           ) : (
             <UnitTiles
-              chosenId={chosen?.id ?? null}
+              chosenId={piece?.id ?? null}
               label={shown.name}
               onChoose={setChosen}
               units={shown.units}
