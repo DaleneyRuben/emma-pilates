@@ -48,7 +48,7 @@ const september21 = `${path}?week=2026-09-21`;
 const heading = () =>
   screen.findByRole("heading", {
     level: 1,
-    name: "Evaluaciones nutricionales",
+    name: "Nutrición",
   });
 
 describe("AW25 Evaluaciones nutricionales on a desktop browser", () => {

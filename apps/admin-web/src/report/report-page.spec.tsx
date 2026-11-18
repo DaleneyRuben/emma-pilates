@@ -75,7 +75,7 @@ const path = "/informes/dinero?from=2026-08-01&to=2026-09-30";
 const heading = () =>
   screen.findByRole("heading", {
     level: 1,
-    name: "Reporte de ingresos y gastos",
+    name: "Dinero",
   });
 const tile = (name: string) => screen.getByRole("region", { name });
 

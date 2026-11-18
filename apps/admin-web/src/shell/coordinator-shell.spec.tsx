@@ -106,7 +106,7 @@ describe("the admin web for the Coordinator", () => {
     );
     renderAdmin("/informes");
 
-    await heading("Indicadores");
+    await heading("Informes");
     expect(
       await screen.findByRole("region", { name: "Ocupación" }),
     ).toBeInTheDocument();

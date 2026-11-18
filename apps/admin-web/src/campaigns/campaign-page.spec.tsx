@@ -65,7 +65,7 @@ describe("AW21 Campaña", () => {
     );
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Campaña" }),
+      await screen.findByRole("heading", { level: 1, name: "Clases de campaña" }),
     ).toBeVisible();
     expect(await screen.findByText("12 clientas la recibirán.")).toBeVisible();
     expect(
