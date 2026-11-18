@@ -250,6 +250,8 @@ describe("Assistant invitations (S05, S06)", () => {
     await fireEvent.press(
       await screen.findByRole("button", { name: "Más opciones de la invitación" }),
     );
+    // Walkthrough finding 117: nothing is erased (soft delete only).
+    expect(screen.getByText("Libera el correo y anula la cuenta pendiente")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: /^Cambiar correo/ }));
     await fireEvent.changeText(screen.getByLabelText("Nuevo correo"), "ana.nueva@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));

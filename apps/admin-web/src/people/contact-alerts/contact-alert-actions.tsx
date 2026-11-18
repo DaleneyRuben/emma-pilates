@@ -1,6 +1,7 @@
 import type { ContactAlertItemDto } from "@pilates/api-contracts";
 import { MessageSquare } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import { isCompletePhone } from "../../lib/complete-phone";
 import { useMarkClientContacted } from "./contact-alert-queries";
 import { whatsAppHref } from "./contact-alert-copy";
 
@@ -14,7 +15,15 @@ export function ContactAlertActions({
   onFailed: (name: string) => void;
 }) {
   const mark = useMarkClientContacted();
-  const href = item.phone === null ? null : whatsAppHref(item.phone);
+  // Walkthrough finding 114: WhatsApp opens only to a usable mobile.
+  const href =
+    item.phone !== null && isCompletePhone(item.phone)
+      ? whatsAppHref(item.phone)
+      : null;
+  const missing =
+    item.phone === null || item.phone.trim() === ""
+      ? "Sin teléfono"
+      : "Celular incompleto";
 
   return (
     <span className="flex justify-end gap-2 max-md:w-full">
@@ -23,7 +32,7 @@ export function ContactAlertActions({
           variant="neutral"
           size="sm"
           disabled
-          title="Sin teléfono"
+          title={missing}
           className="max-md:flex-1"
         >
           <MessageSquare size={14} strokeWidth={1.8} aria-hidden="true" />

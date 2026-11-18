@@ -12,8 +12,10 @@ import {
 
 jest.setTimeout(20_000);
 
-// BKM-006: an effective Plan no longer blocks cash. Only a future Plan does.
-const note = "Ya tiene un plan siguiente.";
+// BKM-006: an effective Plan no longer blocks cash. Only a future Plan does,
+// and walkthrough finding 117 says which one and until when.
+const note =
+  "Su próximo plan ya está pagado (Paquete de 8 clases, desde el 13 de octubre). Podrás registrar otro pago cuando empiece.";
 
 describe("Client overview cash action", () => {
   afterEach(async () => {

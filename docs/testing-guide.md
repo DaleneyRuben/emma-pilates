@@ -1988,7 +1988,7 @@ delivers it to the local capture), and opens her overview with the card
 enlace**, and a ⋯ button («Más opciones de la invitación») that opens the
 sheet «Invitación de Ana» with **Cambiar correo** («Anula los enlaces al
 correo anterior»; **Nuevo correo**, **Guardar correo**, **Cancelar**),
-**Cancelar invitación** («Libera el correo y borra la cuenta pendiente»;
+**Cancelar invitación** («Libera el correo y anula la cuenta pendiente»;
 confirmed with «¿Cancelar la invitación de …?» and **Sí, cancelar
 invitación**, then back to **Buscar cliente**) and **Cerrar**. A second
 send within a minute shows, inside the card, a white box with a clock: "Ya
@@ -7605,9 +7605,10 @@ on day 90, and she appears on **Para contactar** when she stops booking.
 
 Log in as `carolina.rivas@example.com` (Test 9 E). **Para contactar** is
 her second tab, with the count of Clients waiting on it. It opens the same
-list: the Client with her photo or initials, her phone with its flag, the
-reasons as pills, **Abrir WhatsApp** and **Marcar contactada**; marking one
-shows the toast «…, contactada · Sale de la lista y queda registrado a tu
+list as quiet rows (Test 172 since FIX-079): the Client with her photo
+or initials, her reasons as one line, a WhatsApp ring when her phone works;
+the row opens a sheet with **Escribir por WhatsApp** and **Marcar
+contactada**; marking one shows the toast «…, contactada · Sale de la lista y queda registrado a tu
 nombre». With nobody to write to it reads «Nadie para contactar» with
 **Buscar una clienta** (Test 124 G).
 
@@ -7854,27 +7855,46 @@ and cannot list the statements. Log in as Test 24 describes.
    only Emma's statements. As Daniela it does not include Emma's. As Camila
    it answers `403` `back_office_access_denied`, and so does approval.
 
-6. **«Mis pagos» in the Staff app (MOB-073).** Log in as Emma (Test 12) and
-   open **Tu cuenta**. Perfil shows **Mis pagos** above «Notificaciones»;
-   Camila, Paola, Gabriela, and Carolina do not have the row. It opens one
-   card per statement, newest first: its period («Octubre 2026» for a whole
-   month, «20 de octubre de 2026» for a day, «26 de octubre – 1 de
-   noviembre de 2026» for a week or a range), «Aprobado» or «Borrador», the
-   total with centavos (`Bs 322,00`), and one row per concept: «Clases
-   dictadas · 3», «Canceladas por mínimo · 1», «Comisiones · 1». A draft
-   says «Puede cambiar hasta que administración lo apruebe.» **Ver cada
-   clase** lists each line («Clase», «lun 5 oct · 10:00 · Centro · Reformer
-   Pilates · 6 alumnas, 2 extra», `Bs 81,00`; a statement approved before
-   FIX-070 keeps «6 alumnas, 2 extra»);
-   **Ocultar detalle** folds it. Under **Pagos recibidos** each Salary
-   Payment of hers from Nómina shows its amount and date («1 de octubre de
-   2026»). A payment with a receipt (Test 28 step 7) shows its thumbnail
-   and **Ver**; tapping it opens the photo full screen under «Pago del 1 de
-   noviembre de 2026», closed with the X. One without reads «Sin
-   comprobante» and does nothing. If the photo cannot load, the screen says
-   «No pudimos mostrar el comprobante.» With nothing calculated or paid the
-   screen says «Todavía no tienes pagos.» Pull down to reload. On the iPad
-   the cards sit in one centred column.
+6. **«Mis pagos» in the Staff app (MOB-073, finding 111).** Log in as Emma
+   (Test 12); **Mis pagos** is her second tab. Camila, Paola, Gabriela, and
+   Carolina do not have it. On top sits one Rosa profundo summary, the first
+   that applies: **Por cobrar** with the sum of every approved statement not
+   yet paid («Liquidación de octubre 2026, ya aprobada. Falta el pago.», or
+   «2 liquidaciones aprobadas. Falta el pago.»); else **En curso · Noviembre
+   2026** with the open draft's total and «1 clase dictada hasta hoy · puede
+   cambiar hasta que administración lo apruebe.»; else **Último pago · 18 de
+   noviembre** with that payment's amount, the statement it paid («Liquidación
+   del 1 – 17 de noviembre de 2026.») and «Sin comprobante adjunto.», or a
+   **Ver comprobante** button when it has a receipt. Under **Historial** each
+   statement is one row, newest first: its period («Octubre 2026» for a whole
+   month, «20 de octubre de 2026» for a day, «26 de octubre – 1 de noviembre
+   de 2026» for a week or a range), a status line («Pagado el 18 de
+   noviembre» in green with a check, «Aprobado · por pagar» in amber with a
+   clock, «En curso · puede cambiar» with an hourglass), the total with
+   centavos (`Bs 1.534,90`) and a chevron. There is no «Pagos recibidos» list
+   any more: a payment shows on the statement it paid. A Salary Payment with
+   no statement (recorded by hand) appears under **Otros pagos** with its
+   amount, date («15 de octubre de 2026 · sin comprobante») and a payment icon
+   or its receipt thumbnail.
+   Tapping a row opens the statement's screen: «‹ Mis pagos», «Liquidación»
+   (or «Periodo en curso»), the period as title, then one card with «Total»
+   and a pill («Pagado», «Por pagar», «En curso»), the total in large type,
+   and a payment strip: «Pagado el 18 de noviembre · Sin comprobante
+   adjunto», or the receipt thumbnail with «Ver comprobante» (it opens the
+   photo full screen under «Pago del 18 de noviembre de 2026», closed with
+   the X), «Aprobado · falta el pago», or «Todavía sin aprobar · Puede cambiar
+   hasta que administración lo apruebe.». A coloured bar shows each concept's
+   share of the total, over one row per concept with its dot: «Clases
+   dictadas · 1 Bs 65,00», «Canceladas por mínimo · 54 Bs 1.350,00»,
+   «Comisiones · 2 Bs 119,90». **Ver cada clase** lists each line («Clase»,
+   «lun 5 oct · 10:00 · Centro · Reformer Pilates · 6 alumnas, 2 extra»,
+   `Bs 81,00`; a statement approved before FIX-070 keeps «6 alumnas, 2
+   extra»); **Ocultar detalle** folds it. If a receipt cannot load, the
+   screen says «No pudimos mostrar el comprobante.» With nothing calculated
+   or paid the screen says «Todavía no tienes pagos.» Pull down to reload on
+   either screen. On the iPad both screens sit in one centred column.
+   Daniela (`daniela@example.com` on `emma_vacia`) shows «Último pago · 18 de
+   noviembre», Bs 1.534,90, and one «1 – 17 de noviembre de 2026» row.
 7. **Her own payments only.** `GET /api/v1/trainer/salary-payments` as Emma
    returns only Emma's Salary Payments, newest first, as
    `{ id, amountCentavos, paidOn, receiptUrl }`. As Camila, Paola, or
@@ -8494,7 +8514,8 @@ D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search fiel
    as the Rosa profundo card (classes left in large Lora, a white bar, «Vence
    el …», **Activo**/**Vencido**); one primary **Reservar clase**;
    **Registrar pago** only when she can buy (never with a Plan
-   already queued, which shows «Ya tiene un plan siguiente.»); «Reservas» rows
+   already queued, which shows «Su próximo plan ya está pagado (<plan>, desde
+   el <día>). Podrás registrar otro pago cuando empiece.»); «Reservas» rows
    **Próximas reservas** and **Historial de clases**. Without a Plan, a Lino
    card «Sin plan activo» with **Registrar pago** and no
    **Reservar clase**. A pending Account (Sofía) shows one Lino line «Cuenta
@@ -10439,6 +10460,28 @@ recommendation reads that count.
    Booking she cancelled keeps the card.
 
 
+## Test 169: «Reportar una falla» says which unit and what is missing (FIX-076)
+
+Walkthrough finding 110, option A of follow-ups 278/279. Staff app only; no
+migration, no API change.
+
+1. Log in to the staff app as a Trainer (Daniela Ortiz, `daniela@example.com`)
+   and open **Agenda › a class › Reportar una falla** at a Branch with a
+   single Reformer (Achumani in the walkthrough database). Expected: under
+   the chips, the label «NÚMERO DEL EQUIPO» and one small tile «N.º 1»
+   already selected (with «fuera de servicio» under it if it is), the line
+   «Es el único de esta sucursal.», and above the disabled **Enviar
+   reporte** «Para enviarlo, cuenta qué pasó.».
+2. Type in **¿Qué pasó?**. Expected: the line goes away and the button is
+   enabled; sending reports that unit.
+3. At a Branch with several units of a type, open the screen again.
+   Expected: no tile selected and «Para enviarlo, elige el número y cuenta
+   qué pasó.»; after typing, «Para enviarlo, elige el número del Reformer.»;
+   after choosing a tile the line goes away.
+4. Choose a quantity type (Balones). Expected: the stepper card as before,
+   and «Para enviarlo, cuenta qué pasó.» above the button; when none is
+   usable, «No hay ninguno que se pueda usar.».
+
 ## Test 171: every staff payment carries its receipt (FIX-078)
 
 Walkthrough finding 112. No migration. The API refuses a Salary Payment
@@ -10475,6 +10518,72 @@ recorded before (Daniela's Bs 1.534,90 of 18/11) are kept as they are.
    `amountCentavos` and `paidOn` answers 400 with code
    `salary_receipt_required`, and no payment is recorded.
 6. Check at 1440 px and 420 px.
+
+## Test 172: a calm «Para contactar» in the Staff app (FIX-079)
+
+Walkthrough finding 113, proposal A of the «Para contactar» canvas. No
+migration; no API change. Log in to the Staff app as the Coordinator
+(`paula@example.com` on the walkthrough database, `carolina.rivas@example.com`
+on the fixtures) and open **Para contactar**.
+
+1. **One quiet list.** Under the title and «Clientas nuevas que conviene
+   escribir. Salen solas de la lista cuando reservan.» comes «N clientas»
+   and one Lino group with a row per Client: her photo or her initials on a
+   neutral (not pink) circle, her name, her reasons as one line («7 días sin
+   reservar · menos de 2 clases a los 15 días») and her start («Empezó el 2
+   de noviembre»). No pink chips, no tinted cards, no coloured links.
+2. **Order.** Clients with more reasons come first, then whoever started
+   earliest, then by name.
+3. **Phone.** A Client whose phone works has a ringed WhatsApp icon on her
+   row; it opens WhatsApp to her number. A short phone reads «Celular
+   incompleto · empezó el …» and no phone «Sin teléfono · empezó el …», with
+   no WhatsApp icon.
+4. **Sheet.** Tapping a row opens a sheet: her name, her phone with its flag
+   (or what is wrong with it) and start, «Por qué está aquí» with each
+   reason, then **Escribir por WhatsApp**, **Marcar contactada** and
+   **Volver**. Without a usable phone the sheet says «Su celular está
+   incompleto (7000004), así que no se puede abrir WhatsApp. Háblale en el
+   estudio o revisa su ficha.» (or «No tiene teléfono registrado, …») and
+   the main button is **Abrir su ficha**, which opens her file in
+   **Clientes** (back returns to the search).
+5. **Marcar contactada.** The sheet closes, the toast «Rocío, contactada ·
+   Sale de la lista y queda registrado a tu nombre» shows, her row leaves
+   and the count drops. If the request fails the sheet stays open with «No
+   pudimos marcar a … Inténtalo de nuevo.» (before, a failed request showed
+   the success toast).
+6. **Empty.** With nobody left it reads «Nadie para contactar» with
+   **Buscar una clienta**, as before.
+7. Check on the iPhone 16 Pro, then the iPad and the Android emulator.
+
+## Test 173: phones, «Ver la app como…», and copy from walkthrough findings 114, 115, 117 (FIX-080)
+
+No migration; no API change.
+
+1. Admin web, **Clientas › Para contactar** (`/clientas/para-contactar`), with
+   a Client in the list whose stored phone fits no mobile (Sofía, «7000004»).
+   Expected: her **Teléfono** reads «Celular incompleto» (amber), not the
+   digits, and **Abrir WhatsApp** is a disabled button whose tooltip says
+   «Celular incompleto». A Client without a phone reads «Sin teléfono» with
+   the tooltip «Sin teléfono»; a complete phone keeps its flag and its
+   `wa.me` link.
+2. **Clientas › Todas**: a Client with no phone stored (Mariana) reads «Sin
+   teléfono» (muted) in the list and in her file; an unusable one (Sofía)
+   still reads «Celular incompleto».
+3. Staff app, as an Administrator, **Perfil › Ver la app como…**, pick a
+   Staff Member. Expected: every screen starts right under the «Viendo como …»
+   banner, with no blank band between them (the status bar counts once), on
+   iPhone, iPad, and Android.
+4. While viewing, **Perfil**: no **Cambiar foto** / **Quitar foto**, **Cambiar
+   contraseña**, **Enviar comentarios**, or **Cerrar sesión**; the note under
+   her name reads «Mientras ves la app como <nombre>, su foto, su contraseña,
+   sus comentarios y su sesión son solo suyos.», and the last row **Dejar de
+   ver como <nombre>** ends the viewing like the banner's **Salir** («Dejaste
+   de ver la app como …» on Pagos pendientes), without logging out.
+5. Staff app, a Client file with a next Plan already paid (Lucía): instead of
+   **Registrar pago**, «Su próximo plan ya está pagado (<plan>, desde el
+   <día>). Podrás registrar otro pago cuando empiece.»
+6. A pending Client's ⋯ sheet: **Cancelar invitación** reads «Libera el
+   correo y anula la cuenta pendiente».
 
 ## Test 174: each Role reads in the person's gender (FIX-081)
 

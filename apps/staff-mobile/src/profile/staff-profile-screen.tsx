@@ -26,6 +26,7 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import appConfig from "../../app.json";
+import { useImpersonation } from "../impersonation/impersonation-context";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import { payoutQrRowValue } from "./payout-qr/payout-qr-copy";
@@ -56,6 +57,11 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
   const dismissPasswordChanged = () => navigation.setParams({ passwordChanged: undefined });
   const passwordChanged = useStickyNotice(route.params?.passwordChanged, dismissPasswordChanged);
   const identity = useMobileIdentity();
+  const { exit, impersonation } = useImpersonation();
+  // Walkthrough finding 115: her photo, password, comments, and session stay
+  // hers (ADR-0100), so an Administrator seeing the app as her is not offered
+  // them, and leaves from here as from the banner.
+  const viewingAs = impersonation?.staffMemberName.split(" ")[0] ?? null;
   const fetcher = useStaffFetcher();
   const [confirmingLogout, setConfirmingLogout] = useState(false);
   const profile = useGetCurrentStaffMemberProfile({
@@ -106,11 +112,14 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
       <ScrollView contentContainerStyle={styles.content}>
         {header}
         <StaffPhotoSummary
+          editable={viewingAs === null}
           member={member}
           note={
-            administrator
-              ? "Tus datos se editan en la web de administración."
-              : "Tu nombre y tu correo los actualiza administración."
+            viewingAs !== null
+              ? `Mientras ves la app como ${viewingAs}, su foto, su contraseña, sus comentarios y su sesión son solo suyos.`
+              : administrator
+                ? "Tus datos se editan en la web de administración."
+                : "Tu nombre y tu correo los actualiza administración."
           }
         />
         <View>
@@ -163,23 +172,34 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
               label="Notificaciones"
               onPress={() => navigation.navigate("Notifications")}
             />
-            <ProfileRow
-              icon="lock"
-              label="Cambiar contraseña"
-              onPress={() => navigation.navigate("ChangePassword")}
-            />
-            <ProfileRow
-              icon="message"
-              label="Enviar comentarios"
-              onPress={() => navigation.navigate("Feedback")}
-            />
-            <ProfileRow
-              icon="logout"
-              label="Cerrar sesión"
-              onPress={() => setConfirmingLogout(true)}
-              testID="profile-logout"
-              tone="error"
-            />
+            {viewingAs === null ? (
+              <>
+                <ProfileRow
+                  icon="lock"
+                  label="Cambiar contraseña"
+                  onPress={() => navigation.navigate("ChangePassword")}
+                />
+                <ProfileRow
+                  icon="message"
+                  label="Enviar comentarios"
+                  onPress={() => navigation.navigate("Feedback")}
+                />
+                <ProfileRow
+                  icon="logout"
+                  label="Cerrar sesión"
+                  onPress={() => setConfirmingLogout(true)}
+                  testID="profile-logout"
+                  tone="error"
+                />
+              </>
+            ) : (
+              <ProfileRow
+                icon="logout"
+                label={`Dejar de ver como ${viewingAs}`}
+                onPress={exit}
+                testID="profile-stop-viewing"
+              />
+            )}
           </IconRowGroup>
           <Text style={styles.footer}>
             {`Emma Pilates Studio · versión ${appConfig.expo.version}`}

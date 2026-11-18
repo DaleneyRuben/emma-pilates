@@ -150,7 +150,7 @@ describe("Client faces on the staff screens", () => {
     await fireEvent.press(screen.getByTestId("tab-contacts"));
 
     await waitFor(() =>
-      expect(screen.getByLabelText("Foto de Ana Pérez")).toHaveStyle({ width: 36 }),
+      expect(screen.getByLabelText("Foto de Ana Pérez")).toHaveStyle({ width: 40 }),
     );
     expect(fetcher).toHaveBeenCalledWith("/api/v1/client-photos/asset-ana?variant=thumbnail");
     expect(screen.getByText("LF")).toBeOnTheScreen();

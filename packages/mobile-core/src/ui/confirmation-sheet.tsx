@@ -3,6 +3,7 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "./body-text";
 import { fontFamilies } from "./fonts";
+import { OutlinedButton } from "./outlined-button";
 import { PrimaryButton } from "./primary-button";
 import { TextButton } from "./text-button";
 import { colors, radii, spacing, typography } from "./tokens";
@@ -23,6 +24,8 @@ type ConfirmationSheetProps = PropsWithChildren<{
   busy?: boolean;
   /** «destructive» fills the action in Error (follow-up 226); «primary» in Palo de rosa (S24). */
   tone?: "destructive" | "primary";
+  /** An outlined second action under the main one (S28's «Marcar contactada»). */
+  secondaryAction?: { label: string; onPress: () => void; busy?: boolean };
   testID?: string;
 }>;
 
@@ -40,13 +43,16 @@ export function ConfirmationSheet({
   note,
   onConfirm,
   onDismiss,
+  secondaryAction,
   testID,
   title,
   tone = "destructive",
   visible,
 }: ConfirmationSheetProps) {
+  // Either action in flight locks the rest of the sheet, the way back included.
+  const locked = busy || secondaryAction?.busy === true;
   const dismiss = () => {
-    if (!busy) onDismiss();
+    if (!locked) onDismiss();
   };
   return (
     <Modal
@@ -63,13 +69,22 @@ export function ConfirmationSheet({
           {note === undefined ? null : <BodyText>{note}</BodyText>}
           <PrimaryButton
             busy={busy}
+            disabled={locked && !busy}
             label={confirmLabel}
             onPress={onConfirm}
             size="compact"
             testID={confirmTestID}
             tone={tone === "primary" ? "primary" : "error"}
           />
-          <TextButton disabled={busy} label={dismissLabel} onPress={dismiss} />
+          {secondaryAction === undefined ? null : (
+            <OutlinedButton
+              busy={secondaryAction.busy}
+              disabled={busy}
+              label={secondaryAction.label}
+              onPress={secondaryAction.onPress}
+            />
+          )}
+          <TextButton disabled={locked} label={dismissLabel} onPress={dismiss} />
         </View>
       </View>
     </Modal>

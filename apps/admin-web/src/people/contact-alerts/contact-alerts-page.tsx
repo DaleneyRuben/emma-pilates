@@ -23,7 +23,7 @@ import {
   startedOnLabel,
 } from "./contact-alert-copy";
 import { contactAlertListQueryOptions } from "./contact-alert-queries";
-import { phoneWithFlag } from "../../lib/phone-number";
+import { ClientPhone } from "../clients/client-phone";
 
 function EmptyList() {
   return (
@@ -69,13 +69,7 @@ function AlertRow({
         <ClientCell name={item.name} photo={item.photo} />
       </TableCell>
       <TableCell data-label="Teléfono">
-        {item.phone === null ? (
-          <span className="text-texto-tenue">Sin teléfono</span>
-        ) : (
-          <span className="text-texto-secundario tabular">
-            {phoneWithFlag(item.phone)}
-          </span>
-        )}
+        <ClientPhone phone={item.phone} tone="text-texto-secundario" />
       </TableCell>
       <TableCell data-label="Motivo">
         <span className="flex flex-col text-[13px] text-texto-secundario">

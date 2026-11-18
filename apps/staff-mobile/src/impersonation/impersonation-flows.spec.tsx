@@ -194,6 +194,47 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     expect(calls).toEqual([]);
   });
 
+  // Walkthrough finding 115 (FIX-080): her photo, password, comments, and
+  // session stay hers (ADR-0100), so Perfil does not offer them, and the row
+  // in place of «Cerrar sesión» ends the viewing as the banner's «Salir» does.
+  it("keeps Perfil's account actions hers and leaves from Perfil", async () => {
+    const calls: { method: string; path: string }[] = [];
+    const runtime = createStaffRuntime(
+      routeFetcher(routes(() => trainerProfile, calls)),
+      "trainer",
+    );
+    runtime.sessionManager.restore = jest.fn().mockResolvedValue({
+      accountId: "trainer-account",
+      role: "trainer",
+      impersonation: impersonationOf(new Date(Date.now() + 28 * 60_000 + 5_000)),
+    });
+    runtime.sessionManager.refresh = jest
+      .fn()
+      .mockResolvedValue({ accountId: "account-1", role: "administrator" });
+    const screen = await render(<App runtime={runtime} />);
+
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+      timeout: 10_000,
+    });
+    await fireEvent.press(screen.getByTestId("tab-profile"));
+    await waitFor(() => expect(screen.getByText("Tu cuenta")).toBeOnTheScreen());
+
+    expect(
+      screen.getByText(
+        "Mientras ves la app como Diego, su foto, su contraseña, sus comentarios y su sesión son solo suyos.",
+      ),
+    ).toBeOnTheScreen();
+    for (const action of ["Cambiar foto", "Cambiar contraseña", "Enviar comentarios"]) {
+      expect(screen.queryByRole("button", { name: action })).not.toBeOnTheScreen();
+    }
+    expect(screen.queryByText("Cerrar sesión")).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Dejar de ver como Diego" }));
+    await waitFor(() => expect(screen.getByLabelText("Pagos pendientes")).toBeOnTheScreen());
+    expect(calls).toEqual([{ method: "DELETE", path: "/api/v1/impersonations/current" }]);
+    expect(screen.getByText("Dejaste de ver la app como Diego Rojas.")).toBeOnTheScreen();
+  });
+
   it("offers «Ver la app como…» only to an Administrator who is not already seeing the app as someone", async () => {
     const runtime = createStaffRuntime(routeFetcher(routes(() => trainerProfile, [])), "trainer");
     const screen = await render(<App runtime={runtime} />);
