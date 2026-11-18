@@ -7,8 +7,6 @@ import {
   civilDateRange,
   colors,
   fontFamilies,
-  IconRow,
-  IconRowGroup,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -31,6 +29,7 @@ import { useStaffRole } from "../staff-role";
 import { BranchField } from "../ui/branch-field";
 import { useCashBranches } from "../ui/branch-chips";
 import { DayStrip } from "../ui/day-strip";
+import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
 import { countLabel, dayHeading } from "../ui/session-time";
 import { CancelledFold, ScheduleClassCard } from "./schedule-class-card";
@@ -107,15 +106,13 @@ export function ScheduleScreen() {
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         {header}
         {selling ? null : (
-          <IconRowGroup>
-            <IconRow
-              chevron
-              icon="calendar"
+          <PlainRowGroup>
+            <PlainRow
               label="Cancelar una clase"
               onPress={() => navigation.navigate("CancelClass")}
               testID="schedule-cancel-class"
             />
-          </IconRowGroup>
+          </PlainRowGroup>
         )}
         {several ? (
           <BranchField
