@@ -4,6 +4,8 @@ export type FactBooking = {
   clientId: string;
   state: 'booked' | 'cancelled';
   outcome: 'attended' | 'no_show' | null;
+  // Cancelled because its Session was cancelled, not by the Client.
+  cancelledWithSession?: boolean;
 };
 
 export type FactSession = {
@@ -15,6 +17,7 @@ export type FactSession = {
   endsAt: Date;
   capacity: number;
   state: 'scheduled' | 'cancelled';
+  cancellationCause?: string | null;
   // Live Bookings when the Cancellation Window closed (BKM-009), null until
   // the worker snapshots it.
   bookingsAtWindowClose: number | null;
@@ -54,10 +57,26 @@ export type ClientMonthFact = {
   renewed: boolean;
 };
 
+export type CancelledSessionFact = {
+  sessionId: string;
+  sessionDate: Date;
+  branchId: string;
+  classTypeId: string;
+  trainerStaffMemberId: string;
+  cause: 'minimum_not_met' | 'zero_bookings';
+  bookingsHeld: number;
+};
+
 export type RecomputedFacts = {
   sessions: SessionFact[];
   clientMonths: ClientMonthFact[];
+  cancelledSessions: CancelledSessionFact[];
 };
+
+const lowDemandCause = (
+  cause: string | null | undefined,
+): CancelledSessionFact['cause'] | null =>
+  cause === 'minimum_not_met' || cause === 'zero_bookings' ? cause : null;
 
 // REL-016's store-review flag is not on this branch. Callers pass the flag
 // they have; until that column exists they pass false and nothing is excluded.
@@ -99,7 +118,37 @@ export const recomputeFacts = (
         booking.state === 'booked' && !excluded.has(booking.clientId),
     );
 
+  // Finding 107: a class the worker cancelled for low demand is kept apart,
+  // with the Bookings it held, so it counts toward a weak schedule.
+  const cancelledSessions = source.sessions.flatMap((session) => {
+    const cause = lowDemandCause(session.cancellationCause);
+    if (
+      session.state !== 'cancelled' ||
+      cause === null ||
+      !inMonth(session.startsAt, month)
+    ) {
+      return [];
+    }
+    const held = session.bookings.filter(
+      (booking) =>
+        booking.cancelledWithSession === true &&
+        !excluded.has(booking.clientId),
+    ).length;
+    return [
+      {
+        sessionId: session.id,
+        sessionDate: boliviaDate(session.startsAt),
+        branchId: session.branchId,
+        classTypeId: session.classTypeId,
+        trainerStaffMemberId: session.trainerStaffMemberId,
+        cause,
+        bookingsHeld: session.bookingsAtWindowClose ?? held,
+      },
+    ];
+  });
+
   return {
+    cancelledSessions,
     sessions: monthSessions
       .filter((session) => taught(session, now))
       .map((session) => {
