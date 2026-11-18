@@ -15801,6 +15801,23 @@
           "reason"
         ]
       },
+      "PastCampaignDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "grantedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Its latest grant"
+          }
+        },
+        "required": [
+          "name",
+          "grantedAt"
+        ]
+      },
       "CampaignPreviewDto": {
         "type": "object",
         "properties": {
@@ -15821,12 +15838,20 @@
             "items": {
               "$ref": "#/components/schemas/CampaignSkippedClientDto"
             }
+          },
+          "pastCampaigns": {
+            "description": "Each campaign name already given, latest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PastCampaignDto"
+            }
           }
         },
         "required": [
           "recipientCount",
           "owed",
-          "skipped"
+          "skipped",
+          "pastCampaigns"
         ]
       },
       "GrantCampaignDto": {
