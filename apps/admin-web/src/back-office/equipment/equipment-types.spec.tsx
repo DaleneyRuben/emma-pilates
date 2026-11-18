@@ -179,6 +179,42 @@ describe("AW37 equipment types", () => {
     ).toBeInTheDocument();
   });
 
+  it("asks to empty a quantity type's count before removing it", async () => {
+    server.use(...equipmentHandlers());
+    const { panel } = await openEdit(/^Balones ·/, "Editar tipo · Balones");
+    expect(
+      within(panel).getByRole("button", { name: "Quitar tipo" }),
+    ).toBeDisabled();
+    expect(
+      within(panel).getByText(
+        "Primero deja su cantidad en 0 en todas las sucursales.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("explains the refusal for a quantity type another Branch still counts", async () => {
+    server.use(
+      ...equipmentHandlers(),
+      recordPost(`${equipmentTypesPath}/${ringsType.id}/archive`, () =>
+        problemResponse(409, "equipment_type_in_use"),
+      ),
+    );
+    const { user, panel } = await openEdit(/^Aros ·/, "Editar tipo · Aros");
+    await user.click(
+      within(panel).getByRole("button", { name: "Quitar tipo" }),
+    );
+    await user.click(
+      within(
+        await screen.findByRole("alertdialog", {
+          name: "¿Quitar el tipo Aros?",
+        }),
+      ).getByRole("button", { name: "Quitar tipo" }),
+    );
+    expect(await within(panel).findByRole("alert")).toHaveTextContent(
+      "Primero deja su cantidad en 0 en todas las sucursales.",
+    );
+  });
+
   it("removes an unused type", async () => {
     server.use(
       ...equipmentHandlers(),
