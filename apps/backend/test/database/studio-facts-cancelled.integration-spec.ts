@@ -6,7 +6,10 @@ import {
   startDatabaseTestContext,
 } from './database-test-context';
 import {
+  insertBooking,
+  insertClient,
   insertSession,
+  insertSoldSubscription,
   seedStudioWorld,
   type StudioWorld,
 } from './studio-facts-test-support';
@@ -83,5 +86,51 @@ describe('cancelled session facts', () => {
     expect(await live()).toEqual([
       { session_id: minimum, cause: 'minimum_not_met', bookings_held: 1 },
     ]);
+  });
+
+  // Walkthrough finding 108: her Booking released by a minimum cancellation
+  // still counts in her month, so she is not an inactive Client.
+  it('counts a booking the studio released in the client month', async () => {
+    const clientId = await insertClient(context);
+    const subscriptionId = await insertSoldSubscription(context, world, {
+      clientId,
+      startsOn: '2026-12-01',
+      endsOn: '2026-12-30',
+      method: 'cash',
+      paymentState: 'confirmed',
+    });
+    const sessionId = await insertSession(context, world, {
+      startsAt: '2026-12-03T20:00:00.000Z',
+    });
+    await insertBooking(context, world, {
+      sessionId,
+      clientId,
+      subscriptionId,
+    });
+    await context.pool.query(
+      `UPDATE booking.sessions
+       SET state = 'cancelled', cancellation_cause = 'minimum_not_met',
+           cancelled_at = starts_at - interval '3 hours'
+       WHERE id = $1`,
+      [sessionId],
+    );
+    await context.pool.query(
+      `UPDATE booking.bookings
+       SET state = 'cancelled', cancellation_cause = 'session_cancelled',
+           cancelled_at = CURRENT_TIMESTAMP
+       WHERE session_id = $1`,
+      [sessionId],
+    );
+
+    await recomputeStudioFacts(prisma, {
+      month: new Date('2026-12-01T00:00:00.000Z'),
+      now: () => new Date('2026-12-10T15:00:00.000Z'),
+    });
+    const facts = await context.pool.query<{ classes_booked: number }>(
+      `SELECT classes_booked FROM studio.client_month_facts
+       WHERE deleted_at IS NULL AND client_id = $1 AND month = '2026-12-01'`,
+      [clientId],
+    );
+    expect(facts.rows).toEqual([{ classes_booked: 1 }]);
   });
 });
