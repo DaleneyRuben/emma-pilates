@@ -57,6 +57,7 @@ numbered tests.
 | Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and Horario, and next to the Trainer's name in the client's Reservar, class detail, Mis reservas and Historial (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
 | Settled review notices | A confirmed or rejected receipt and a decided Freeze mark every Administrator's «… por revisar» notice read; a Minimum Bookings cancellation notice names its day (Test 141) | Notices already stale before FIX-046 stay unread |
 | Walkthrough 59, 74, 88 | «Hace un momento» under a minute in both apps' Notificaciones and Pagos pendientes; «Celular incompleto» on Clientes and the client file for a missing or unusable phone; Comentarios names who sent each one, linked to the Client's file (Test 157) | A phone saved before the rule can only be fixed by the Client or from «Editar perfil»; nothing rewrites it |
+| Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Mi QR de cobro», Pagados › Registrar pago shows it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; the QR inside «Aprobar pago» comes with FIX-070 |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -1690,7 +1691,7 @@ root's bell and on the **Notificaciones** row. Perfil shows her photo or
 initials with **Cambiar foto** (Test 135 A), her name and email, and «Tu
 nombre y tu correo los actualiza administración.»; «Tu cuenta» with **Rol**
 (`Entrenadora`) and **Sucursales** (`Centro, Equipetrol, Urubó`); «Ajustes»
-with **Mis pagos**, **Tu código de referido**, **Notificaciones** (with the
+with **Mi QR de cobro** (Test 166), **Mis pagos**, **Tu código de referido**, **Notificaciones** (with the
 unread count), **Cambiar contraseña**, **Enviar comentarios** and **Cerrar
 sesión** as the last row in Error; then the version footer «Emma Pilates
 Studio · versión 1.0.1» (the value in the Staff app's `app.json`, Test 81).
@@ -10030,3 +10031,74 @@ default older admin builds get, `restock` or `all`) and every row carries
    rango.» under Retiros, «Sin movimientos en este rango.» under Todos.
 6. Check at 1440 px and 420 px (at 420 each movement is a card with
    Movimiento, Cantidad, Registró and Fecha labelled), then drop the copy.
+
+## Test 166: the staff payout QR and its expiry (FIX-072)
+
+Walkthrough finding 106: each member of the team uploads the QR of her bank
+and its last valid day; Administration pays by it and never sees an expired
+one. Design option A (follow-ups 275 and 276). The migration
+`20261118120000_staff_payout_qrs` adds `back_office.staff_payout_qrs` and the
+`payout_qr` upload purpose; nothing existing changes.
+
+1. Use a copy of the fixtures (`createdb -T pilates_golden
+   pilates_fix072_dev`, then `prisma migrate deploy`), and run the API, the
+   **worker** (uploads stay processing without it), the admin web and Staff
+   Metro on your own ports (surface-verification skill).
+2. **Staff app, Perfil.** Log in as Emma (Test 12). Expected: «Ajustes»
+   starts with **Mi QR de cobro** and «Sin subir» at the right. Every role
+   has the row (try Camila and Carolina too).
+3. Open it. Expected: «Mi QR de cobro», the note «Administración lo usa para
+   pagarte tu sueldo. Los QR del banco vencen: …», the empty card «Todavía
+   no subiste tu QR de cobro» and **Subir mi QR**.
+4. **Subir mi QR** → «Elegir de la galería» (any QR image; JPG, PNG or WebP
+   up to 10 MB) → «¿Hasta cuándo vale?». Expected: today and earlier days
+   cannot be chosen; pick a day in January; the line «Vale hasta el
+   15/01/2027. Te avisaremos 7 días antes y cuando venza.»; **Guardar QR**.
+   Expected: «Guardamos tu QR. Vale hasta el 15/01/2027.», the QR whole in a
+   white card, «Vale hasta el 15/01/2027», **Cambiar QR**; tapping the QR
+   opens it full screen. Back in Perfil the row says «Vale hasta 15/1».
+5. **Cambiar QR** with another image and day. Expected: the new QR and day;
+   `back_office.staff_payout_qrs` keeps the old row with `replaced_at` set
+   and one row with `replaced_at` null; the audit record
+   `staff_member.payout_qr_changed` names the QR and day.
+6. **Admin web, Pagados › Registrar pago.** Log in as Paola, open Dinero ›
+   Sueldos › Pagados › **Registrar pago** and choose Emma. Expected: under
+   Empleado, her QR (190 px, whole) with **Ampliar** (full screen on a light
+   background with **Guardar QR**), **Guardar QR** (downloads
+   `qr-cobro-emma-vargas.jpg`), «QR de cobro de Emma Vargas» and «Vale hasta
+   el …». Choose someone without a QR. Expected: «Sin QR de cobro» / «Camila
+   todavía no subió su QR de cobro. Pídele que lo suba en la app, en Perfil ›
+   Mi QR de cobro.». Save the payment with a receipt as before (Test 95): Emma
+   sees it in «Mis pagos».
+7. **Expiring and expired.** On the copy only, move Emma's last day:
+   `UPDATE back_office.staff_payout_qrs SET valid_until = current_date + 3
+   WHERE replaced_at IS NULL AND staff_member_id = '<Emma>'`. Expected: the
+   row «Vence el d/m» in amber, the amber banner «Tu QR vence el d/m. Sube
+   uno nuevo antes para que no se atrase tu pago.» and «Vence el d/m · sube
+   uno nuevo»; on the web the same QR with «Vence pronto». Then `SET
+   valid_until = current_date - 1`. Expected: Perfil «Vencido» in red, the
+   red banner «Tu QR venció el d/m. Administración no puede usarlo para
+   pagarte: sube uno nuevo.»; on the web **no image**, only «QR vencido ·
+   pídele uno nuevo» / «El QR de Emma venció el dd/mm/aaaa. No lo mostramos
+   para que no le transfieras a una cuenta que ya no sirve.», and `GET
+   /api/v1/administrator/payout-qrs/<id>/image` answers 409
+   `payout_qr_expired`.
+8. **Reminders.** With the worker running after 09:00 La Paz: a last day
+   seven days ahead or fewer sends one push and inbox entry «Tu QR de cobro
+   vence pronto» / «Tu QR de cobro vence el d/m, sube uno nuevo.»; the first
+   day after it, «Tu QR de cobro venció» / «Tu QR de cobro venció el d/m,
+   sube uno nuevo para que podamos pagarte.». Each goes out once per QR
+   (`payout-qr-expiring:<id>`, `payout-qr-expired:<id>`); tapping it opens
+   «Mi QR de cobro». A new QR starts its own reminders.
+9. **API.** `GET /api/v1/staff-members/current/payout-qr` (any Staff Role)
+   answers `{ payoutQr: null }` or the QR with `standing`; `PUT` with a day
+   that is not after today answers 400 `payout_qr_valid_until_invalid`;
+   `GET /api/v1/administrator/staff-members/{id}/payout-qr` is the
+   Administrator's only (the Coordinator gets 403), with `imageUrl: null`
+   once expired.
+10. Check the admin web at 1440 px and 420 px and the Staff app on the
+    iPhone 16 Pro, the iPad and the Android emulator, then drop the copy.
+
+The QR inside Sueldos › Por aprobar's «Aprobar pago» confirmation arrives
+with FIX-070's dialog (follow-up 274): until both are merged, step 6 is
+where the web shows it.
