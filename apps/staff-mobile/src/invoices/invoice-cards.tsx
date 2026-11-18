@@ -36,7 +36,7 @@ export function InvoiceDropCard({ busy }: { busy: boolean }) {
         )}
       </View>
       <Text style={styles.title}>{busy ? "Subiendo la factura…" : "Sube la factura emitida"}</Text>
-      <Text style={styles.muted}>Foto de la factura, hasta 10 MB</Text>
+      <Text style={styles.muted}>PDF o foto, hasta 10 MB</Text>
     </View>
   );
 }

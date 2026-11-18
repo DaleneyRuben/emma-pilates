@@ -37,11 +37,12 @@ export async function downloadInvoice(input: {
       await FileSystem.writeAsStringAsync(local, base64, {
         encoding: FileSystem.EncodingType.Base64,
       });
-      try {
-        if (await downloads.saveAsync(local, name, input.mediaType)) return "downloads";
-      } finally {
-        await FileSystem.deleteAsync(local, { idempotent: true });
-      }
+      // A MediaStore failure (FIX-049 review) still leaves her the picker.
+      const inDownloads = await downloads
+        .saveAsync(local, name, input.mediaType)
+        .catch(() => false);
+      await FileSystem.deleteAsync(local, { idempotent: true }).catch(() => undefined);
+      if (inDownloads) return "downloads";
     }
     const access = FileSystem.StorageAccessFramework;
     // Android 11 and later refuse the storage root and Download itself as a

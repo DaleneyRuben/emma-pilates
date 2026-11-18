@@ -1,3 +1,4 @@
+import { encodeBase64 } from "@pilates/mobile-core";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 
@@ -78,9 +79,7 @@ describe("pickPdf (FIX-049)", () => {
     getDocument.mockResolvedValue(asset({ size: undefined }));
     const big = new Uint8Array(10 * 1024 * 1024 + 3);
     big.set([37, 80, 68, 70, 45]);
-    (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValueOnce(
-      Buffer.from(big).toString("base64"),
-    );
+    (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValueOnce(encodeBase64(big));
 
     await expect(pickPdf()).rejects.toThrow("upload_rejected");
   });
