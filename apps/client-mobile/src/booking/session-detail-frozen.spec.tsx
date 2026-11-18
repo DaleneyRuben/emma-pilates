@@ -49,6 +49,8 @@ describe("Client Session detail on a frozen day", () => {
     expect(screen.getByTestId("session-hero")).toHaveStyle({ backgroundColor: "#F5EFE9" });
     expect(screen.getByText("3 de 12 cupos libres")).toBeOnTheScreen();
     expect(screen.queryByText(/^Cancela sin costo/)).toBeNull();
+    // FIX-082: the facts' icons stand alone, no tinted disc.
+    expect(screen.queryByTestId("icon-row-disc", { includeHiddenElements: true })).toBeNull();
   });
 
   it("leaves out the classes left this week, which a frozen day cannot use", async () => {

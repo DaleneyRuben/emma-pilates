@@ -79,6 +79,8 @@ describe("Mis facturas", () => {
     const screen = await openInvoices([]);
 
     expect(await screen.findByText("Aún no tienes facturas")).toBeOnTheScreen();
+    // FIX-082: the receipt glyph alone, no Rosa tinte disc behind it.
+    expect(screen.queryByTestId("empty-state-disc", { includeHiddenElements: true })).toBeNull();
     expect(
       screen.getByText("Cuando pidas factura al pagar, el estudio la sube aquí y te avisamos."),
     ).toBeOnTheScreen();
@@ -86,6 +88,8 @@ describe("Mis facturas", () => {
 
   it("lists ready, in-preparation and voided invoices", async () => {
     const screen = await openInvoices([ready, preparing, voided]);
+    await screen.findAllByTestId("invoice-row-glyph", { includeHiddenElements: true });
+    expect(screen.queryByTestId("invoice-row-disc", { includeHiddenElements: true })).toBeNull();
 
     expect(
       await screen.findByRole("button", { name: /Paquete de 8 clases, 5 nov 2026, Bs 502, Lista/ }),
