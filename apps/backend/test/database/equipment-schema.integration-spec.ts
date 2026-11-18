@@ -32,6 +32,35 @@ describe('equipment migration', () => {
     ]);
   });
 
+  it('gives a unit the old API inserts by kind its seeded type', async () => {
+    const client = await context.pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query(`
+        INSERT INTO booking.branches (id, name, address, updated_at) VALUES
+         ('00000000-0000-0000-0000-000000000001', 'Centro', 'Test address', now());
+        INSERT INTO booking.staff_members (id, name, role, updated_at) VALUES
+         ('00000000-0000-0000-0000-000000000001', 'Paola', 'administrator', now());
+        INSERT INTO system.accounts (id, email, staff_member_id, updated_at) VALUES
+         ('00000000-0000-0000-0000-000000000001', 'paola@example.com',
+          '00000000-0000-0000-0000-000000000001', now());
+      `);
+      const { rows } = await client.query<{ kind: string; type: string }>(
+        `INSERT INTO back_office.equipment
+           (id, branch_id, kind, number, created_by_account_id, updated_at)
+         VALUES (gen_random_uuid(), '00000000-0000-0000-0000-000000000001',
+           'cadillac', 1, '00000000-0000-0000-0000-000000000001', now())
+         RETURNING kind,
+           (SELECT legacy_kind::text FROM back_office.equipment_types
+            WHERE id = type_id) AS type`,
+      );
+      expect(rows).toEqual([{ kind: 'cadillac', type: 'cadillac' }]);
+    } finally {
+      await client.query('ROLLBACK');
+      client.release();
+    }
+  });
+
   it('protects equipment numbers, types, stocks, and the issue history', async () => {
     const client = await context.pool.connect();
     try {
