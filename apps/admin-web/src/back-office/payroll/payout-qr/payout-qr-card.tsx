@@ -24,7 +24,7 @@ const fileName = (name: string) =>
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")}`;
+    .replace(/^-|-$/g, "")}.jpg`;
 
 const actionClass =
   "inline-flex h-[44px] items-center gap-1.5 text-celda font-medium text-primario-profundo hover:text-primario-presionado";
