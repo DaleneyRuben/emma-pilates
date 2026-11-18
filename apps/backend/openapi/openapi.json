@@ -18879,6 +18879,11 @@
             "format": "date",
             "description": "BKO-009: the day after the last day paid (exclusive)"
           },
+          "approvableOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Finding 105: the first Bolivia day the statement can be approved (a Trainer the day after the period, the Coordinator seven days later)"
+          },
           "state": {
             "type": "string",
             "enum": [
@@ -18909,6 +18914,7 @@
           "month",
           "periodStart",
           "periodEnd",
+          "approvableOn",
           "state",
           "totalCentavos",
           "salaryPaymentId",
