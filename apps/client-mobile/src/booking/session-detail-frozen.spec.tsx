@@ -37,8 +37,19 @@ describe("Client Session detail on a frozen day", () => {
     expect(button).toHaveStyle({ backgroundColor: "#E7DCD8" });
     expect(screen.queryByRole("button", { name: "Reservar" })).toBeNull();
     expect(screen.getByText(/^Tu plan está congelado del /)).toHaveStyle({ fontWeight: "600" });
+    // Review of FIX-082: the whole weekday in a sentence, «lunes 23».
+    const reopens = weekdayDayMonth(addCivilDays(endsOn, 1)).split(" ");
+    const longDay = {
+      dom: "domingo",
+      lun: "lunes",
+      mar: "martes",
+      mié: "miércoles",
+      jue: "jueves",
+      vie: "viernes",
+      sáb: "sábado",
+    }[reopens[0]!];
     expect(
-      screen.getByText(`Podrás reservar desde el ${weekdayDayMonth(addCivilDays(endsOn, 1))}.`),
+      screen.getByText(`Podrás reservar desde el ${longDay} ${reopens.slice(1).join(" ")}.`),
     ).toBeOnTheScreen();
     expect(screen.queryByText("Se descuenta 1 clase de tu plan")).toBeNull();
   });

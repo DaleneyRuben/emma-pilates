@@ -115,6 +115,40 @@ describe("Client Inicio, option A", () => {
     expect(screen.queryByText(/esta semana/i)).toBeNull();
   });
 
+  // Review of FIX-082: Inicio and Reservar say a used-up week the same way.
+  it("says a used-up week like Reservar does", async () => {
+    const screen = await openHome({
+      status: "active",
+      subscription: { ...trimestral, classesLeftThisWeek: 0 },
+    });
+
+    expect(
+      within(screen.getByTestId("home-plan-card")).getByText(
+        "Ya usaste tus clases de esta semana · vence el 5 de febrero",
+      ),
+    ).toBeOnTheScreen();
+  });
+
+  // Review of FIX-082: the Guest Pass card keeps its own action, so no second
+  // solid button, and it lines up with the promotion on a tablet.
+  it("leaves the solid button to the Guest Pass card", async () => {
+    const screen = await openHome({
+      status: "active",
+      subscription: {
+        ...trimestral,
+        planName: "Pase de invitada",
+        originalClassAllowance: 1,
+        remainingClassAllowance: 1,
+        classesLeftThisWeek: null,
+        guestPass: { usedClassStartsAt: null },
+      },
+    });
+
+    await waitFor(() => expect(screen.getByTestId("home-guest-pass-card")).toBeOnTheScreen());
+    expect(screen.queryByTestId("home-book")).toBeNull();
+    expect(screen.getByTestId("home-guest-pass-card")).toHaveStyle({ alignSelf: "flex-start" });
+  });
+
   it("keeps «Por vencer» as the one exception on the row", async () => {
     const screen = await openHome({
       status: "expiring_soon",

@@ -7,6 +7,7 @@ import {
 } from "@pilates/mobile-core";
 
 import App from "../../App";
+import { weekNoticeLine } from "./browse-week-notice";
 import { createClientRuntime, jsonResponse, routeFetcher, studioRules } from "../test-support";
 
 jest.setTimeout(20_000);
@@ -117,6 +118,17 @@ describe("Client Reservar, option A", () => {
     ).toBeOnTheScreen();
   });
 
+  // Review of FIX-082: the count is for the chosen day's week, so a later
+  // week never reads as this one.
+  it("names a later week as «esa semana»", () => {
+    const monday = "2026-11-23";
+    expect(weekNoticeLine(3, monday, "2026-11-18")).toBe("Esa semana te quedan 3 clases");
+    expect(weekNoticeLine(1, monday, "2026-11-18")).toBe("Esa semana te queda 1 clase");
+    expect(weekNoticeLine(0, monday, "2026-11-18")).toBe("Ya usaste tus clases de esa semana");
+    expect(weekNoticeLine(3, "2026-11-22", "2026-11-18")).toBe("Te quedan 3 clases esta semana");
+    expect(weekNoticeLine(null, monday, "2026-11-18")).toBeNull();
+  });
+
   it("leaves the notice out without a weekly cap", async () => {
     const screen = await openBrowse([session("s-1", 1, 7, null)]);
 
@@ -139,7 +151,7 @@ describe("Client Reservar, option A", () => {
       .map((row) => within(row));
     expect(screen.queryByTestId("seat-pill")).toBeNull();
     expect(rows[0].getByText("7 cupos")).toHaveStyle({ color: "#6F6662" });
-    expect(rows[1].getByText("Quedan 2")).toHaveStyle({ color: "#9A7434" });
+    expect(rows[1].getByText("Quedan 2 cupos")).toHaveStyle({ color: "#9A7434" });
     expect(rows[2].getByText("Lleno")).toHaveStyle({ color: "#6F6662" });
     expect(rows[0].queryByTestId("chevron", hidden)).toBeNull();
     expect(screen.getAllByRole("button", { name: /^Reformer Pilates \d/ })[0]).not.toHaveStyle({
