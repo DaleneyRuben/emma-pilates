@@ -1,5 +1,5 @@
 import { act, fireEvent, render } from "@testing-library/react-native";
-import { DeviceEventEmitter, Platform, Text } from "react-native";
+import { DeviceEventEmitter, Platform, ScrollView, Text } from "react-native";
 
 import { FormScrollView } from "./form-scroll-view";
 
@@ -52,5 +52,36 @@ describe.each(["ios", "android"] as const)("FormScrollView on %s", (os) => {
     });
 
     expect(screen.getByTestId("form")).toHaveStyle({ paddingBottom: 0 });
+  });
+
+  // Walkthrough finding 96: Enviar comentarios ends with its text field; the
+  // system keeps the caret in view, not the counter row under the field.
+  describe("revealing the end of the form with the keyboard", () => {
+    const renderRevealing = async () => {
+      const scrollToEnd = jest
+        .spyOn(ScrollView.prototype as { scrollToEnd: () => void }, "scrollToEnd")
+        .mockImplementation(() => undefined);
+      await render(
+        <FormScrollView revealEndWithKeyboard testID="form">
+          <Text>Comentario</Text>
+        </FormScrollView>,
+      );
+      return scrollToEnd;
+    };
+
+    const keyboardShown = () =>
+      act(async () => {
+        DeviceEventEmitter.emit("keyboardDidShow", {
+          endCoordinates: { height: 300, screenX: 0, screenY: 500, width: 400 },
+        });
+      });
+
+    it("scrolls to the end once the keyboard is up", async () => {
+      const scrollToEnd = await renderRevealing();
+
+      await keyboardShown();
+
+      expect(scrollToEnd).toHaveBeenCalledWith({ animated: true });
+    });
   });
 });

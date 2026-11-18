@@ -157,6 +157,11 @@ export function EvaluationAvailabilityScreen({
     );
   }
 
+  // Walkthrough finding 97: a paid Evaluation whose slot the studio released
+  // still holds her payment. Until she picks its new time through Elegir
+  // turno, the screen offers no other Evaluation to pay for.
+  const awaitingNewSlot =
+    movingNow === null && items.some((evaluation) => evaluation.slotReleased === true);
   const days = availability === null ? [] : openDays(availability, movingNow?.slotId);
   const offer = availability === null ? null : planOfferLine(availability);
   const pick = (slot: EvaluationSlotDto) =>
@@ -214,48 +219,52 @@ export function EvaluationAvailabilityScreen({
             </View>
           </View>
         ) : null}
-        <View style={styles.section}>
-          <SectionTitle>
-            {movingNow !== null
-              ? "Elige el nuevo horario"
-              : items.length > 0
-                ? "Reserva otra evaluación"
-                : "Reserva tu evaluación"}
-          </SectionTitle>
-          {movingNow !== null ? (
-            <>
-              <MovingBand evaluation={movingNow} onBack={() => setMoving(null)} />
-              {failure}
-            </>
-          ) : items.length > 0 && offer !== null ? (
-            <BodyText style={styles.muted}>{offer}</BodyText>
-          ) : null}
-          {availability === null ? (
-            <QueryFailure
-              label="No pudimos cargar los horarios de evaluación."
-              onRetry={() => void slots.refetch()}
-            />
-          ) : movingNow === null && !hasPlan ? (
-            <>
-              <BodyText>Necesitas un plan activo para reservar.</BodyText>
-              <TextButton label="Ver planes" onPress={() => navigation.navigate("Plans")} />
-            </>
-          ) : days.length === 0 ? (
-            <NoSlots
-              availability={availability}
-              showUsed={movingNow === null && availability.months.some((m) => m.status === "used")}
-            />
-          ) : (
-            <>
-              <EvaluationSlotPicker days={days} onPick={pick} />
-              <BodyText style={styles.muted}>
-                {movingNow === null
-                  ? "Puedes reservar hasta 3 horas antes."
-                  : "Puedes reprogramarla hasta 3 horas antes."}
-              </BodyText>
-            </>
-          )}
-        </View>
+        {awaitingNewSlot ? null : (
+          <View style={styles.section}>
+            <SectionTitle>
+              {movingNow !== null
+                ? "Elige el nuevo horario"
+                : items.length > 0
+                  ? "Reserva otra evaluación"
+                  : "Reserva tu evaluación"}
+            </SectionTitle>
+            {movingNow !== null ? (
+              <>
+                <MovingBand evaluation={movingNow} onBack={() => setMoving(null)} />
+                {failure}
+              </>
+            ) : items.length > 0 && offer !== null ? (
+              <BodyText style={styles.muted}>{offer}</BodyText>
+            ) : null}
+            {availability === null ? (
+              <QueryFailure
+                label="No pudimos cargar los horarios de evaluación."
+                onRetry={() => void slots.refetch()}
+              />
+            ) : movingNow === null && !hasPlan ? (
+              <>
+                <BodyText>Necesitas un plan activo para reservar.</BodyText>
+                <TextButton label="Ver planes" onPress={() => navigation.navigate("Plans")} />
+              </>
+            ) : days.length === 0 ? (
+              <NoSlots
+                availability={availability}
+                showUsed={
+                  movingNow === null && availability.months.some((m) => m.status === "used")
+                }
+              />
+            ) : (
+              <>
+                <EvaluationSlotPicker days={days} onPick={pick} />
+                <BodyText style={styles.muted}>
+                  {movingNow === null
+                    ? "Puedes reservar hasta 3 horas antes."
+                    : "Puedes reprogramarla hasta 3 horas antes."}
+                </BodyText>
+              </>
+            )}
+          </View>
+        )}
         {pastItems.length > 0 ? (
           <View>
             <SectionTitle>Anteriores</SectionTitle>

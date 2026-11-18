@@ -1,17 +1,14 @@
 import { useListDecidedFreezes, useListRequestedFreezes } from "@pilates/api-contracts";
 import {
-  colors,
-  fontFamilies,
   IconRowGroup,
   LoadingState,
   QueryFailure,
   Screen,
   spacing,
   StateScreen,
-  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
@@ -34,7 +31,15 @@ export function FreezesScreen() {
   const fetcher = useStaffFetcher();
   const requested = useListRequestedFreezes({ fetcher, query: { refetchOnMount: "always" } });
   const decided = useListDecidedFreezes({ fetcher, query: { refetchOnMount: "always" } });
-  const header = <BackBar onBack={() => navigation.goBack()} title="Congelamientos" />;
+  // Walkthrough finding 94: the note is the title's quiet line, not a line
+  // floating between the two sections.
+  const header = (
+    <BackBar
+      onBack={() => navigation.goBack()}
+      subtitle="Pausan el plan de la clienta. Los días congelados se suman a su vencimiento."
+      title="Congelamientos"
+    />
+  );
   const open = (freezeId: string) => navigation.navigate("ReviewFreeze", { freezeId });
 
   if (requested.isPending) {
@@ -87,9 +92,6 @@ export function FreezesScreen() {
             </IconRowGroup>
           </View>
         )}
-        <Text style={styles.note}>
-          Pausan el plan de la clienta. Los días congelados se suman a su vencimiento.
-        </Text>
         {decidedFreezes.length === 0 ? null : (
           <View>
             <SectionHeader title="Decididas" />
@@ -113,6 +115,5 @@ export function FreezesScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   screen: { paddingHorizontal: spacing.xlSm },
 });

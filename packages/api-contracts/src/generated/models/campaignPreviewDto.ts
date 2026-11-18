@@ -6,6 +6,7 @@
  */
 import type { CampaignClientDto } from "./campaignClientDto";
 import type { CampaignSkippedClientDto } from "./campaignSkippedClientDto";
+import type { PastCampaignDto } from "./pastCampaignDto";
 
 export interface CampaignPreviewDto {
   /** Every active Client, with a Plan or owed */
@@ -14,4 +15,6 @@ export interface CampaignPreviewDto {
   owed: CampaignClientDto[];
   /** @deprecated */
   skipped: CampaignSkippedClientDto[];
+  /** Each campaign name already given, latest first */
+  pastCampaigns: PastCampaignDto[];
 }

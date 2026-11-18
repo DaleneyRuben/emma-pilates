@@ -1,5 +1,5 @@
 import type { FreezeReviewDto } from "@pilates/api-contracts";
-import { clearMobileQueryCache, typography } from "@pilates/mobile-core";
+import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
@@ -51,7 +51,7 @@ describe("freezes list", () => {
     clearMobileQueryCache();
   });
 
-  it("heads the list like Facturas and explains freezes in a roomy note", async () => {
+  it("heads the list like Facturas and explains freezes in its quiet line", async () => {
     const screen = await openFreezes([requestedFreeze], [], "Congelamientos, 1 por revisar");
 
     await waitFor(() => expect(screen.getByText("Por revisar · 1")).toBeOnTheScreen());
@@ -60,9 +60,25 @@ describe("freezes list", () => {
     expect(
       StyleSheet.flatten(screen.getByRole("header", { name: "Congelamientos" }).props.style),
     ).toMatchObject({ fontSize: 24 });
+    // Walkthrough finding 94: BackBar's quiet line, as on the headed screens.
     expect(StyleSheet.flatten(screen.getByText(explanation).props.style)).toMatchObject({
-      fontSize: typography.note,
+      fontSize: 14,
     });
+  });
+
+  // Walkthrough finding 94: the note floated between the empty state and
+  // Decididas; it belongs under the title, before anything the list shows.
+  it("explains freezes under the title, above the empty state", async () => {
+    const screen = await openFreezes([], [approvedFreeze], "Congelamientos");
+
+    await waitFor(() =>
+      expect(screen.getByText("No hay solicitudes por revisar")).toBeOnTheScreen(),
+    );
+    const texts = screen.getAllByText(/.+/).map((node) => String(node.props.children));
+    expect(texts.indexOf(explanation)).toBe(texts.indexOf("Congelamientos") + 1);
+    expect(texts.indexOf(explanation)).toBeLessThan(
+      texts.indexOf("No hay solicitudes por revisar"),
+    );
   });
 
   it("shows the dates and days whole, with the reason on its own line", async () => {

@@ -38,6 +38,11 @@ export function evaluationDate(instant: string): string {
   return capitalized(longDateFormatter.format(new Date(instant)).replace(",", ""));
 }
 
+// "2 de diciembre".
+export function evaluationDayMonth(instant: string): string {
+  return dayMonthFormatter.format(new Date(instant));
+}
+
 // "6 de agosto, 09:30".
 export function evaluationDayAndTime(instant: string): string {
   return `${dayMonthFormatter.format(new Date(instant))}, ${clockTime(instant)}`;

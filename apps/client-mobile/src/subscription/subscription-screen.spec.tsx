@@ -139,6 +139,25 @@ describe("Refreshed Mi plan (Client 12)", () => {
     expect(screen.getByText("25 de septiembre")).toBeOnTheScreen();
   });
 
+  // Walkthrough finding 98: she already renewed, so the discount is kept.
+  it("drops the founder renewal deadline once the next Plan is paid", async () => {
+    const screen = await openSubscription({
+      ...subscription("active", 5),
+      founderRenewalDeadline: "2026-10-01",
+      nextSubscription: {
+        id: "subscription-2",
+        planName: "Paquete de 8 clases",
+        originalClassAllowance: 8,
+        remainingClassAllowance: 8,
+        startsOn: "2026-09-25",
+        endsOn: "2026-10-24",
+      },
+    });
+
+    expect(screen.queryByText(/Renueva antes del/)).toBeNull();
+    expect(screen.getByText("Tu plan siguiente empieza el 25 de septiembre.")).toBeOnTheScreen();
+  });
+
   it("names the founder renewal deadline from the current Subscription", async () => {
     const screen = await openSubscription({
       ...subscription("active", 5),

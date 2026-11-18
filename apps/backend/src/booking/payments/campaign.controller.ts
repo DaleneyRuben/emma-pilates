@@ -60,6 +60,15 @@ export class CampaignSkippedClientDto extends CampaignClientDto {
 const owedDescription =
   'Active Clients without a current Plan: their next activated Plan collects the classes';
 
+// Walkthrough finding 92: the page warns before giving a campaign again.
+export class PastCampaignDto {
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty({ format: 'date-time', description: 'Its latest grant' })
+  grantedAt!: Date;
+}
+
 export class CampaignPreviewDto {
   @ApiProperty({ description: 'Every active Client, with a Plan or owed' })
   recipientCount!: number;
@@ -69,6 +78,12 @@ export class CampaignPreviewDto {
 
   @ApiProperty({ type: [CampaignSkippedClientDto], deprecated: true })
   skipped!: CampaignSkippedClientDto[];
+
+  @ApiProperty({
+    type: [PastCampaignDto],
+    description: 'Each campaign name already given, latest first',
+  })
+  pastCampaigns!: PastCampaignDto[];
 }
 
 export type CampaignPreview = (

@@ -114,6 +114,7 @@ export function FeedbackScreen({
             </View>
           }
           keyboardVerticalOffset={spacing.xxl}
+          revealEndWithKeyboard
         >
           <BodyText>
             Cuéntanos qué falló o qué mejorarías. Lo lee el equipo de Emma Pilates Studio.
@@ -175,5 +176,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   screen: { gap: spacing.lg },
-  textArea: { minHeight: 160, paddingBottom: spacing.md, paddingTop: spacing.md },
+  // Walkthrough finding 96: past 240 pt the field scrolls inside, so the row
+  // under it stays above the keyboard.
+  textArea: { maxHeight: 240, minHeight: 160, paddingBottom: spacing.md, paddingTop: spacing.md },
 });

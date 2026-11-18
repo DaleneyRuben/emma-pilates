@@ -82,6 +82,17 @@ describe("A paid Evaluation whose slot the studio released", () => {
     expect(screen.queryByRole("button", { name: "Elegir turno" })).toBeNull();
   });
 
+  // Walkthrough finding 97: while her paid slot waits for a new time, the
+  // screen offers no new Evaluation to pay for; Elegir turno is the way.
+  it("offers no other Evaluation to pay for while the released one waits", async () => {
+    const screen = await openProfileRow(releasedRoutes(), "Evaluación nutricional");
+
+    expect(await screen.findByText("El estudio liberó tu turno")).toBeOnTheScreen();
+    expect(screen.queryByText("Reserva otra evaluación")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Turno 15:00" })).toBeNull();
+    expect(screen.queryByText(/Cuesta Bs 70/)).toBeNull();
+  });
+
   it("opens Evaluación nutricional with Elegir turno from the studio's notice", async () => {
     const device = createMemoryPushPlatform();
     const screen = await render(
