@@ -11,6 +11,7 @@ import {
   type CampaignPreview,
   type CampaignRecipient,
   type LiveRecipient,
+  type PastCampaign,
 } from './grant-campaign';
 import { oweCampaignClasses } from './owed-campaign-classes';
 
@@ -93,6 +94,55 @@ const findWithoutPlan = async (
     })
     .then((rows) => rows.map((row) => ({ clientId: row.id, name: row.name })));
 
+// There is no campaign table: a campaign's name lives in the audit of each
+// class it gave and on each class it owed (booking ADR-0014). One row per
+// grant is enough, so each is read once per correlation id, the grant's
+// idempotency key.
+const findPastCampaigns = async (
+  prisma: PrismaClient,
+): Promise<PastCampaign[]> => {
+  // A Plan that later collects an owed class records another campaign
+  // adjustment; that is not a grant, so its day must not count.
+  const collected = await prisma.owedCampaignClass.findMany({
+    where: { allowanceAdjustmentId: { not: null } },
+    select: { allowanceAdjustmentId: true },
+  });
+  const collectedIds = collected.flatMap(({ allowanceAdjustmentId }) =>
+    allowanceAdjustmentId === null ? [] : [allowanceAdjustmentId],
+  );
+  const [granted, owed] = await Promise.all([
+    prisma.auditRecord.findMany({
+      where: {
+        actionCode: 'allowance_adjustment.recorded',
+        metadata: { path: ['reason'], equals: 'campaign' },
+        targetId: { notIn: collectedIds },
+      },
+      distinct: ['correlationId'],
+      select: { metadata: true, occurredAt: true },
+    }),
+    prisma.owedCampaignClass.findMany({
+      where: { deletedAt: null },
+      distinct: ['correlationId'],
+      select: { campaignName: true, createdAt: true },
+    }),
+  ]);
+  return [
+    ...granted.flatMap(({ metadata, occurredAt }) => {
+      const name =
+        typeof metadata === 'object' &&
+        metadata !== null &&
+        'campaignName' in metadata
+          ? metadata.campaignName
+          : undefined;
+      return typeof name === 'string' ? [{ name, grantedAt: occurredAt }] : [];
+    }),
+    ...owed.map(({ campaignName, createdAt }) => ({
+      name: campaignName,
+      grantedAt: createdAt,
+    })),
+  ];
+};
+
 export const createPrismaCampaignGrant = (
   prisma: PrismaClient,
   now: () => Date,
@@ -111,6 +161,7 @@ export const createPrismaCampaignGrant = (
           },
         }),
       findWithoutPlan: () => findWithoutPlan(prisma, today),
+      findPastCampaigns: () => findPastCampaigns(prisma),
     });
   },
   grant: async (

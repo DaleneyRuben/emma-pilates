@@ -133,11 +133,68 @@ describe('campaign extra classes', () => {
     await prisma.founderMembership.create({
       data: { clientId: live.clientId, number: 1, since: today },
     });
+    // Walkthrough finding 92: a campaign only owed counts as given too.
+    const earlier = new Date('2026-01-05T14:00:00.000Z');
+    await prisma.owedCampaignClass.create({
+      data: {
+        clientId: waiting.id,
+        classes: 1,
+        campaignName: 'Vacaciones',
+        authorAccountId: live.accountId,
+        correlationId: randomUUID(),
+        createdAt: earlier,
+      },
+    });
+    // Collecting an owed class later records another campaign adjustment; it
+    // is not a new grant, so the campaign keeps the day it was given.
+    const collected = await prisma.allowanceAdjustment.create({
+      data: {
+        subscriptionId: live.subscriptionId,
+        clientId: live.clientId,
+        classes: 1,
+        reason: 'CAMPAIGN',
+        authorAccountId: live.accountId,
+        createdAt: new Date('2026-12-20T14:00:00.000Z'),
+      },
+    });
+    await prisma.owedCampaignClass.create({
+      data: {
+        clientId: live.clientId,
+        classes: 1,
+        campaignName: 'Vacaciones',
+        authorAccountId: live.accountId,
+        correlationId: randomUUID(),
+        allowanceAdjustmentId: collected.id,
+        collectedAt: new Date('2026-12-20T14:00:00.000Z'),
+        createdAt: earlier,
+      },
+    });
+    await prisma.auditRecord.create({
+      data: {
+        actionCode: 'allowance_adjustment.recorded',
+        outcome: 'SUCCEEDED',
+        actorKind: 'ACCOUNT',
+        actorAccountId: live.accountId,
+        targetType: 'allowance_adjustment',
+        targetId: collected.id,
+        correlationId: randomUUID(),
+        occurredAt: new Date('2026-12-20T14:00:00.000Z'),
+        metadata: {
+          reason: 'campaign',
+          campaignName: 'Vacaciones',
+          classes: 1,
+        },
+      },
+    });
     await expect(grant.preview(administrator(live.accountId))).resolves.toEqual(
       {
         recipientCount: 2,
         owed: [{ clientId: waiting.id, name: 'Sofía' }],
         skipped: [],
+        pastCampaigns: [
+          { name: 'Inicio de año', grantedAt: today },
+          { name: 'Vacaciones', grantedAt: earlier },
+        ],
       },
     );
   });
