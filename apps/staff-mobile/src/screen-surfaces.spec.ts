@@ -26,6 +26,8 @@ describe("screen surfaces", () => {
     const onOtherSurfaces = [
       "assistant/front-desk-receipt-card.tsx",
       "assistant/invitation-menu.tsx",
+      // Finding 111: the payment strip inside the statement's Lino card.
+      "profile/pay-statement-card.tsx",
       "trainer/trainer-roster-screen.tsx",
     ];
     const offenders = sourceFiles(__dirname)
