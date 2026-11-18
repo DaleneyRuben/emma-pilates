@@ -2,7 +2,7 @@ import { isoWeekday } from '../time/bolivia-time';
 
 // STU-006 rules the fact tables can support. Session facts have a date and
 // no start hour, so a weak schedule is trainer plus weekday, not a clock
-// time. Client no-shows and plan expiry are not on client_month_facts, so
+// time. Since finding 107 a class cancelled for low demand counts in it. Client no-shows and plan expiry are not on client_month_facts, so
 // those rules are not computed here. Inactive means the current month, a
 // live plan, and no booking: the 7-day window needs a booking query this
 // item does not add.
@@ -20,6 +20,8 @@ export type RecommendationSession = {
   trainerStaffMemberId: string;
   sessionDate: Date;
   bookingsAtWindowClose: number;
+  // Finding 107: cancelled for low demand; bookings are those it held.
+  cancelledForMinimum?: boolean;
 };
 
 export type RecommendationClientMonth = {
@@ -61,7 +63,12 @@ const weakSchedules = (
 ): RecommendationFinding[] => {
   const groups = new Map<
     string,
-    { trainerId: string; weekday: number; bookings: number[] }
+    {
+      trainerId: string;
+      weekday: number;
+      bookings: number[];
+      cancelled: number;
+    }
   >();
   for (const session of sessions) {
     const weekday = isoWeekday(session.sessionDate);
@@ -70,8 +77,10 @@ const weakSchedules = (
       trainerId: session.trainerStaffMemberId,
       weekday,
       bookings: [],
+      cancelled: 0,
     };
     group.bookings.push(session.bookingsAtWindowClose);
+    if (session.cancelledForMinimum === true) group.cancelled += 1;
     groups.set(key, group);
   }
   return [...groups.values()]
@@ -93,11 +102,20 @@ const weakSchedules = (
         group.bookings.length,
       );
       const students = average === '1' ? 'alumna' : 'alumnas';
+      const day = weekdayNames[group.weekday % 7];
+      const total = group.bookings.length;
+      const cancelled =
+        group.cancelled === 1
+          ? '1 se canceló'
+          : `${group.cancelled} se cancelaron`;
       return {
         rule: 'weak_schedule' as const,
         subject: `${group.trainerId}:${group.weekday}`,
         period,
-        detail: `Revisa el horario del ${weekdayNames[group.weekday % 7]}: promedia ${average} ${students} en ${group.bookings.length} clases.`,
+        detail:
+          group.cancelled === 0
+            ? `Revisa el horario del ${day}: promedia ${average} ${students} en ${total} clases.`
+            : `Revisa el horario del ${day}: de ${total} clases, ${cancelled} por mínimo; promedia ${average} ${students}.`,
       };
     });
 };

@@ -171,4 +171,53 @@ describe('recommend from facts', () => {
     );
     expect(findings).toEqual([]);
   });
+
+  // Walkthrough finding 107: Daniela's Tuesdays had 1 taught class and 14
+  // cancelled for the minimum; the cancelled ones count.
+  it('counts classes cancelled for the minimum toward a weak schedule', () => {
+    const cancelled = (day: string, held: number) => ({
+      ...session('trainer-daniela', day, held),
+      cancelledForMinimum: true,
+    });
+    const findings = recommendFromFacts({
+      sessions: [
+        session('trainer-daniela', '2026-10-13', 1),
+        cancelled('2026-10-06', 0),
+        cancelled('2026-10-20', 1),
+      ],
+      clientMonths: [],
+      month,
+      today,
+    });
+
+    expect(findings).toEqual([
+      {
+        rule: 'weak_schedule',
+        subject: 'trainer-daniela:2',
+        period: '2026-10-01',
+        detail:
+          'Revisa el horario del martes: de 3 clases, 2 se cancelaron por mínimo; promedia 0,7 alumnas.',
+      },
+    ]);
+  });
+
+  it('says one cancellation in the singular', () => {
+    const findings = recommendFromFacts({
+      sessions: [
+        session('trainer-ana', '2026-10-05', 1),
+        session('trainer-ana', '2026-10-12', 1),
+        {
+          ...session('trainer-ana', '2026-10-19', 1),
+          cancelledForMinimum: true,
+        },
+      ],
+      clientMonths: [],
+      month,
+      today,
+    });
+
+    expect(findings[0]?.detail).toBe(
+      'Revisa el horario del lunes: de 3 clases, 1 se canceló por mínimo; promedia 1 alumna.',
+    );
+  });
 });
