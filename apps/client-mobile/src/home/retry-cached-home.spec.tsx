@@ -30,8 +30,14 @@ describe("useRetryCachedHome", () => {
     await renderHook(() => useRetryCachedHome(true, keys, retryMilliseconds), { wrapper });
 
     await waitFor(() => expect(refetch.mock.calls.length).toBeGreaterThanOrEqual(2 * keys.length));
-    expect(refetch).toHaveBeenCalledWith({ queryKey: ["profile"], type: "active" });
-    expect(refetch).toHaveBeenCalledWith({ queryKey: ["subscription"], type: "active" });
+    expect(refetch).toHaveBeenCalledWith(
+      { queryKey: ["profile"], type: "active" },
+      { cancelRefetch: false },
+    );
+    expect(refetch).toHaveBeenCalledWith(
+      { queryKey: ["subscription"], type: "active" },
+      { cancelRefetch: false },
+    );
   });
 
   it("asks again when the app comes back to the foreground", async () => {
@@ -46,7 +52,10 @@ describe("useRetryCachedHome", () => {
     expect(refetch).not.toHaveBeenCalled();
     await act(async () => onChange?.("active"));
 
-    expect(refetch).toHaveBeenCalledWith({ queryKey: ["profile"], type: "active" });
+    expect(refetch).toHaveBeenCalledWith(
+      { queryKey: ["profile"], type: "active" },
+      { cancelRefetch: false },
+    );
   });
 
   it("stays quiet while Inicio shows fresh data", async () => {
