@@ -1,96 +1,96 @@
 import type { PayStatementDto } from "@pilates/api-contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Check, Clock } from "lucide-react";
+import { useId, useState } from "react";
 import { Button } from "../../components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../components/ui/table";
+import { StatusPill } from "../../components/ui/status-pill";
+import { boliviaToday, formatDayMonth } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
+import { ApproveStatementDialog } from "./approve-statement-dialog";
 import { formatPayPeriod, type PayPeriodQuery } from "./pay-period-search";
-import {
-  approvePayStatementRequest,
-  payStatementsQueryOptions,
-} from "./pay-statement-queries";
+import { StatementConcepts } from "./statement-concepts";
 
-const lineKind = (kind: PayStatementDto["lines"][number]["kind"]) => {
-  if (kind === "class") return "Clase";
-  if (kind === "minimum_not_met") return "Mínimo no alcanzado";
-  if (kind === "base") return "Base";
-  if (kind === "new_client") return "Clienta nueva";
-  if (kind === "bonus") return "Bono";
-  return "Comisión";
-};
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toLocaleUpperCase("es"))
+    .join("");
 
+// Follow-up 274 (option A): a full-width card with the total and a small
+// «Aprobar pago» at the right, or when the statement opens for approval.
 export function StatementCard({
   statement,
   period,
+  onApproved,
+  today = boliviaToday(),
 }: {
   statement: PayStatementDto;
   period: PayPeriodQuery;
+  onApproved: (message: string) => void;
+  today?: string;
 }) {
-  const queryClient = useQueryClient();
-  const approve = useMutation({
-    mutationFn: () => approvePayStatementRequest(statement.id),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: payStatementsQueryOptions(period).queryKey,
-      }),
-  });
+  const headingId = useId();
+  const [confirming, setConfirming] = useState(false);
+  const approved = statement.state === "approved";
+  const waits = !approved && statement.approvableOn > today;
+  const lines = statement.lines.length;
   return (
-    <article className="flex flex-col gap-3 rounded-marco bg-lino p-4">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h2 className="text-titulo-panel text-texto">
+    <article
+      aria-labelledby={headingId}
+      className="overflow-hidden rounded-marco bg-lino"
+    >
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-4 md:px-5">
+        <span
+          aria-hidden="true"
+          className="flex size-10 flex-none items-center justify-center rounded-full bg-primario-tinte text-nota font-semibold text-primario-profundo"
+        >
+          {initials(statement.staffMemberName)}
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <h2 id={headingId} className="font-semibold text-texto">
             {statement.staffMemberName}
           </h2>
           <p className="text-nota text-texto-tenue">
             <span>
               {formatPayPeriod(statement.periodStart, statement.periodEnd)}
             </span>
-            {" · "}
-            <span>
-              {statement.state === "approved" ? "Aprobado" : "Borrador"}
-            </span>
+            {` · ${lines} ${lines === 1 ? "línea" : "líneas"}`}
           </p>
         </div>
-        <p className="font-serif text-[28px] text-texto tabular">
+        <StatusPill tone={approved ? "exito" : "neutral"}>
+          {approved ? "Aprobado" : "Borrador"}
+        </StatusPill>
+        <p className="font-serif text-[26px] whitespace-nowrap text-texto tabular">
           {formatBolivianos(statement.totalCentavos)}
         </p>
+        {waits ? (
+          <p className="inline-flex items-center gap-1.5 text-nota text-advertencia-texto">
+            <Clock size={16} aria-hidden="true" />
+            {`Se aprueba desde el ${formatDayMonth(statement.approvableOn)}`}
+          </p>
+        ) : null}
+        {!approved && !waits ? (
+          <Button size="sm" onClick={() => setConfirming(true)}>
+            <Check size={16} aria-hidden="true" />
+            Aprobar pago
+          </Button>
+        ) : null}
       </div>
-      <Table aria-label={`Líneas de ${statement.staffMemberName}`}>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead>Concepto</TableHead>
-            <TableHead>Detalle</TableHead>
-            <TableHead className="text-right">Monto</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {statement.lines.map((line, index) => (
-            <TableRow key={`${line.kind}-${index}`}>
-              <TableCell data-label="Concepto">{lineKind(line.kind)}</TableCell>
-              <TableCell data-label="Detalle">{line.detail}</TableCell>
-              <TableCell data-label="Monto" className="tabular md:text-right">
-                {formatBolivianos(line.amountCentavos)}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      {statement.state === "draft" ? (
-        <Button busy={approve.isPending} onClick={() => approve.mutate()}>
-          Aprobar
-        </Button>
-      ) : null}
-      {approve.isError ? (
-        <p role="alert" className="text-ayuda text-error-texto">
-          No pudimos aprobar el pago.
-        </p>
-      ) : null}
+      <StatementConcepts
+        name={statement.staffMemberName}
+        lines={statement.lines}
+        totalCentavos={statement.totalCentavos}
+      />
+      {approved ? null : (
+        <ApproveStatementDialog
+          statement={statement}
+          period={period}
+          open={confirming}
+          onOpenChange={setConfirming}
+          onApproved={onApproved}
+        />
+      )}
     </article>
   );
 }
