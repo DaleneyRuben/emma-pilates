@@ -77,3 +77,11 @@ export async function openMyPay(pay: PayRoutes = {}) {
   await fireEvent.press(screen.getByTestId("tab-pay"));
   return screen;
 }
+
+// Finding 111: a statement's row in «Historial» opens its own screen.
+export async function openStatement(label: string, pay: PayRoutes = {}) {
+  const screen = await openMyPay(pay);
+  await fireEvent.press(await waitFor(() => screen.getByRole("button", { name: label })));
+  await waitFor(() => expect(screen.getByTestId("pay-statement")).toBeOnTheScreen());
+  return screen;
+}
