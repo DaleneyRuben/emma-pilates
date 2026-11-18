@@ -24,12 +24,12 @@ import {
   Screen,
   spacing,
   StaffFace,
+  surfaces,
   typography,
   upcomingCivilDates,
   usePullToRefresh,
   useRefetchOnFocus,
   useStudioRules,
-  weeklyClassesLeftLine,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
@@ -39,6 +39,7 @@ import { useClientFetcher } from "../client-fetcher";
 import { BrowseEmptyState } from "./browse-empty-state";
 import { BranchLine, ClassTypeStrip, DayStrip, DayStripOther } from "./browse-filters";
 import { SessionRow, seatsTag } from "./session-row";
+import { WeekNotice } from "./browse-week-notice";
 
 type BrowseNavigation = {
   navigate: (screen: "SessionDetail", params: { sessionId: string }) => void;
@@ -101,6 +102,9 @@ export function BrowseSessionsScreen() {
     sessions.isError ||
     (sessions.data !== undefined && sessions.data.status !== 200);
   const loading = branches.isPending || (branchId !== undefined && sessions.isPending);
+  // Every Session of one day falls in the same week, so the first says it.
+  const classesLeftThisWeek =
+    sessions.data?.status === 200 ? sessions.data.data[0]?.classesLeftThisWeek : undefined;
 
   return (
     <Screen style={styles.screen}>
@@ -141,6 +145,7 @@ export function BrowseSessionsScreen() {
           ))}
         </View>
       ) : null}
+      <WeekNotice classesLeftThisWeek={classesLeftThisWeek} />
       <DayStrip
         dates={strip}
         onSelect={setSelectedDate}
@@ -202,28 +207,26 @@ export function BrowseSessionsScreen() {
               {visibleSessions.length === 1 ? "1 clase" : `${visibleSessions.length} clases`}
             </Text>
           </View>
-          {visibleSessions.map((session) => {
-            const left = weeklyClassesLeftLine(session.classesLeftThisWeek);
-            return (
-              <View key={session.id} style={styles.item}>
-                <SessionRow
-                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.trainerName}, ${seatsTag(session.availableSeats)}`}
-                  onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
-                  session={session}
-                  testID={`session-card-${session.id}`}
-                  trainerFace={
-                    <StaffFace
-                      fetcher={fetcher}
-                      name={session.trainerName}
-                      photo={session.trainerPhoto}
-                      size={20}
-                    />
-                  }
-                />
-                {left === null ? null : <BodyText style={styles.left}>{left}</BodyText>}
-              </View>
-            );
-          })}
+          <View style={styles.group} testID="browse-session-group">
+            {visibleSessions.map((session, position) => (
+              <SessionRow
+                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.trainerName}, ${seatsTag(session.availableSeats)}`}
+                divided={position > 0}
+                key={session.id}
+                onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
+                session={session}
+                testID={`session-card-${session.id}`}
+                trainerFace={
+                  <StaffFace
+                    fetcher={fetcher}
+                    name={session.trainerName}
+                    photo={session.trainerPhoto}
+                    size={20}
+                  />
+                }
+              />
+            ))}
+          </View>
         </ScrollView>
       )}
       <OtherDateSheet
@@ -275,8 +278,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   empty: { flexGrow: 1 },
-  item: { gap: spacing.xs },
-  left: { color: colors.textMuted, fontSize: typography.note, paddingHorizontal: spacing.lg },
+  group: { ...surfaces.card, overflow: "hidden" },
   list: { gap: spacing.sm, paddingBottom: spacing.xxl, paddingTop: spacing.sm },
   screen: { gap: spacing.lg },
   sheetTitle: { color: colors.textMuted, fontSize: typography.label },

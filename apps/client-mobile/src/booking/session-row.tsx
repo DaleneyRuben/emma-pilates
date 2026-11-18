@@ -1,13 +1,4 @@
-import {
-  Chevron,
-  colors,
-  fontFamilies,
-  formatStartTime,
-  radii,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
+import { colors, fontFamilies, formatStartTime, spacing, typography } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -16,16 +7,21 @@ export function seatsTag(availableSeats: number): string {
   return availableSeats === 1 ? "1 cupo" : `${availableSeats} cupos`;
 }
 
-/** 03's seat pill on v2: seats on Rosa tinte in Rosa enlace, a full class on Arena. */
-export function SeatTag({ availableSeats }: { availableSeats: number }) {
-  const full = availableSeats === 0;
-  return (
-    <View style={[styles.pill, full && styles.pillFull]} testID="seat-pill">
-      <Text style={[styles.pillLabel, full && styles.pillLabelFull]}>
-        {seatsTag(availableSeats)}
-      </Text>
-    </View>
-  );
+/** At or under this many free seats, the row warns (FIX-082). */
+const fewSeats = 2;
+
+/**
+ * Reservar option A (FIX-082, design audit 2026-11-18): seats as grey text,
+ * and a warning colour, never a pill, only when few are left.
+ */
+export function SeatsText({ availableSeats }: { availableSeats: number }) {
+  const few = availableSeats > 0 && availableSeats <= fewSeats;
+  const label = !few
+    ? seatsTag(availableSeats)
+    : availableSeats === 1
+      ? "Queda 1"
+      : `Quedan ${availableSeats}`;
+  return <Text style={[styles.seats, few && styles.seatsFew]}>{label}</Text>;
 }
 
 function durationMinutes(startsAt: string, endsAt: string): number {
@@ -33,13 +29,14 @@ function durationMinutes(startsAt: string, endsAt: string): number {
 }
 
 /**
- * A Session on v2 (follow-up 227, 03 and 06): a Lino row, the start in Lora
- * 20, the class over «Trainer · 50 min», the tag, and a quiet chevron. On 03
- * the trainer line leads with her face (FIX-041, follow-up 242), on one line.
+ * A Session on 03 (follow-up 227): the start in Lora 20, the class over
+ * «Trainer · 50 min» and the seats. The trainer line leads with her face
+ * (FIX-041, follow-up 242), on one line. FIX-082 (Reservar option A): the
+ * rows share one Lino card, split by a hairline, without a chevron.
  */
 export function SessionRow({
   accessibilityLabel,
-  end,
+  divided = false,
   onPress,
   selected,
   session,
@@ -47,8 +44,8 @@ export function SessionRow({
   trainerFace,
 }: {
   accessibilityLabel: string;
-  /** What closes the row: the seat pill and the chevron unless told otherwise. */
-  end?: ReactNode;
+  /** A hairline above every row of the card but the first. */
+  divided?: boolean;
   onPress: () => void;
   selected?: boolean;
   session: {
@@ -69,6 +66,7 @@ export function SessionRow({
       onPress={onPress}
       style={({ pressed }) => [
         styles.row,
+        divided && styles.divided,
         selected === true && styles.selected,
         pressed && styles.pressed,
       ]}
@@ -86,12 +84,7 @@ export function SessionRow({
           </Text>
         </View>
       </View>
-      {end ?? (
-        <>
-          <SeatTag availableSeats={session.availableSeats} />
-          <Chevron size={16} strokeWidth={1.5} tone="muted" />
-        </>
-      )}
+      <SeatsText availableSeats={session.availableSeats} />
     </Pressable>
   );
 }
@@ -104,23 +97,9 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
   },
-  pill: {
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
-  pillFull: { backgroundColor: colors.hairline },
-  pillLabel: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "600",
-  },
-  pillLabelFull: { color: colors.text },
+  divided: { borderTopColor: colors.hairline, borderTopWidth: StyleSheet.hairlineWidth },
   pressed: { opacity: 0.7 },
   row: {
-    ...surfaces.card,
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
@@ -128,6 +107,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
+  seats: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  seatsFew: { color: colors.warningText, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
   selected: { borderColor: colors.primary, borderWidth: 1.5 },
   time: {
     color: colors.text,

@@ -120,7 +120,11 @@ export function DayStripOther({
   );
 }
 
-/** 03's Class Type chips: 36 high pills on Lino, the chosen one in Rosa profundo. */
+/**
+ * 03's Class Type filter. FIX-082 (Reservar option A): tabs over a hairline,
+ * the chosen one in text colour over a Palo de rosa underline, so the chosen
+ * day stays the screen's one filled accent.
+ */
 export function ClassTypeStrip({
   onSelect,
   options,
@@ -132,7 +136,7 @@ export function ClassTypeStrip({
 }) {
   return (
     <ScrollView
-      contentContainerStyle={styles.chipRow}
+      contentContainerStyle={styles.tabRow}
       horizontal
       showsHorizontalScrollIndicator={false}
       style={styles.strip}
@@ -147,9 +151,9 @@ export function ClassTypeStrip({
             accessibilityState={{ selected: isSelected }}
             key={option.id}
             onPress={() => onSelect(option.id)}
-            style={[styles.chip, isSelected && styles.chipSelected]}
+            style={[styles.tab, isSelected && styles.tabSelected]}
           >
-            <Text style={[styles.chipLabel, isSelected && styles.chipLabelSelected]}>
+            <Text style={[styles.tabLabel, isSelected && styles.tabLabelSelected]}>
               {option.label}
             </Text>
           </Pressable>
@@ -163,21 +167,6 @@ const styles = StyleSheet.create({
   branch: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
   branchLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
   branchName: { color: colors.text, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
-  chip: {
-    backgroundColor: colors.card,
-    borderRadius: radii.pill,
-    height: 36,
-    justifyContent: "center",
-    paddingHorizontal: spacing.mdLg,
-  },
-  chipLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
-  chipLabelSelected: {
-    color: colors.white,
-    fontFamily: fontFamilies.bodyStrong,
-    fontWeight: "600",
-  },
-  chipRow: { gap: spacing.sm },
-  chipSelected: { backgroundColor: colors.emphasis },
   dayChip: {
     alignItems: "center",
     backgroundColor: colors.card,
@@ -197,9 +186,10 @@ const styles = StyleSheet.create({
     fontSize: typography.tabLabel,
   },
   onSelected: { color: colors.white },
-  otherChip: { backgroundColor: colors.primaryTint },
+  // FIX-082: «Otra» is a plain day, not a second pink.
+  otherChip: { backgroundColor: colors.card },
   otherLabel: {
-    color: colors.primaryOnTint,
+    color: colors.textMuted,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: 12,
     fontWeight: "600",
@@ -207,5 +197,20 @@ const styles = StyleSheet.create({
   // Horizontal strips keep their natural height: spare tablet height would
   // stretch them and an open Branch list would squash them.
   strip: { flexGrow: 0, flexShrink: 0 },
+  tab: {
+    borderBottomColor: "transparent",
+    borderBottomWidth: 2,
+    justifyContent: "center",
+    minHeight: 44,
+  },
+  tabLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  tabLabelSelected: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
+  tabRow: {
+    borderBottomColor: colors.hairline,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    flexGrow: 1,
+    gap: spacing.lg,
+  },
+  tabSelected: { borderBottomColor: colors.primary },
   weekdaySelected: { color: colors.white, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
 });
