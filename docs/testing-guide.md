@@ -3292,7 +3292,8 @@ time zone your computer uses; money is written `Bs 1.050,00`.
 9. **Categorías de gasto.** The studio's categories, the same for every
    Branch (the selector says the page is not filtered by Branch). A category
    an Expense uses shows "En uso" and its delete icon is disabled; an unused
-   one is deleted after "¿Eliminar «…»?". The row at the bottom adds one; a
+   one is deleted after "¿Eliminar «…»?"; an eliminated Expense does not
+   count as a use (Test 163). The row at the bottom adds one; a
    name that already exists (ignoring capitals) is refused.
 10. **Narrow browser.** At a phone width every table becomes one card per row
     (a Supply without the amber pill shows no Estado line), the four Insumos
@@ -10031,6 +10032,8 @@ Migration `20261118043255_expense_void` adds `voided_at`,
    sucursales). Expected: Gastos, Neto, Gastos por categoría, and Totales
    por mes leave the eliminated Expense out; **Finanzas** does not count it
    in that category's actual cost.
+6. **Editar categorías.** A category only eliminated Expenses use is no
+   longer «En uso» and can be deleted; the eliminated rows keep its name.
 5. At 420 px the active card ends with **Editar**, and the eliminated card
    shows the pill and the who-and-when line right-aligned like the other
    values; the confirmation fits the screen.
