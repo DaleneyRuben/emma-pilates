@@ -87,6 +87,11 @@ describe('payout QRs', () => {
       accountId: 'account-trainer',
       imageAssetId: 'asset-1',
       validUntil: civil('2027-01-15'),
+      actor: {
+        accountId: 'account-trainer',
+        role: 'TRAINER',
+        impersonationId: null,
+      },
       now,
     });
   });

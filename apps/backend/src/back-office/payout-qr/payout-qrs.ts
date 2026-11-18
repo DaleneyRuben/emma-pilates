@@ -1,5 +1,9 @@
 import { ImageAssetNotAttachableError } from '../../uploads/image-asset-attachments';
 import type { ReceiptVariant } from '../../uploads/private-image-object';
+import {
+  auditActorOf,
+  type AuditActor,
+} from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import { BackOfficeError, requireAdministrator } from '../back-office-errors';
@@ -27,6 +31,7 @@ export type PayoutQrGateway = {
     accountId: string;
     imageAssetId: string;
     validUntil: Date;
+    actor: AuditActor;
     now: Date;
   }) => Promise<{ id: string; validUntil: Date }>;
   // Only a current QR; `staffMemberId` limits it to that person's.
@@ -80,6 +85,7 @@ export const createPayoutQrs = (dependencies: {
           accountId: principal.accountId,
           imageAssetId: command.imageAssetId,
           validUntil,
+          actor: auditActorOf(principal),
           now: dependencies.now(),
         });
         return withStanding(qr) as PayoutQr;
