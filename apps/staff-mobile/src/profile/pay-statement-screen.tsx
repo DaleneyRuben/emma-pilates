@@ -8,6 +8,7 @@ import {
   Screen,
   SectionTitle,
   spacing,
+  StateScreen,
   surfaces,
   typography,
 } from "@pilates/mobile-core";
@@ -49,11 +50,25 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
   const statement = pay.loaded?.statements.find(
     (candidate) => candidate.id === route.params.statementId,
   );
-  if (pay.loaded === null || statement === undefined) {
+  if (pay.loaded === null) {
     return (
       <Screen style={styles.screen}>
         {header}
         <QueryFailure label="No pudimos cargar la liquidación." onRetry={pay.retry} />
+      </Screen>
+    );
+  }
+
+  if (statement === undefined) {
+    return (
+      <Screen style={styles.screen}>
+        {header}
+        <StateScreen
+          icon="card"
+          note="Puede que administración la haya vuelto a calcular."
+          primaryAction={{ label: "Volver a Mis pagos", onPress: () => navigation.goBack() }}
+          title="Esta liquidación ya no está"
+        />
       </Screen>
     );
   }
