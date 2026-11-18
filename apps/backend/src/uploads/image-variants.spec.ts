@@ -167,6 +167,10 @@ describe('buildImageVariants', () => {
     ]);
   });
 
+  it('keeps a payout QR as readable as a receipt (FIX-072)', () => {
+    expect(variantPlans.payout_qr).toEqual(variantPlans.transfer_receipt);
+  });
+
   it('keeps an invoice PDF as uploaded, as one document variant', async () => {
     const pdf = Buffer.from('%PDF-1.7\n1 0 obj\n<< >>\nendobj\n%%EOF\n');
 
