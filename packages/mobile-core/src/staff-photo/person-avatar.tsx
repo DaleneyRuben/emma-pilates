@@ -12,10 +12,13 @@ export function PersonAvatar({
   name,
   photoUri,
   size,
+  tone = "brand",
 }: {
   name: string;
   photoUri: string | null;
   size: number;
+  /** Walkthrough finding 113: «neutral» puts the initials on the neutral wash. */
+  tone?: "brand" | "neutral";
 }) {
   const frame = { borderRadius: size / 2, height: size, width: size };
   if (photoUri !== null) {
@@ -29,10 +32,14 @@ export function PersonAvatar({
     );
   }
   return (
-    <View style={[styles.initials, frame]}>
+    <View style={[styles.initials, tone === "neutral" && styles.neutral, frame]}>
       <Text
         allowFontScaling={false}
-        style={[styles.initialsText, { fontSize: Math.max(9, Math.round(size * 0.36)) }]}
+        style={[
+          styles.initialsText,
+          tone === "neutral" && styles.neutralText,
+          { fontSize: Math.max(9, Math.round(size * 0.36)) },
+        ]}
       >
         {initials(name)}
       </Text>
@@ -47,5 +54,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   initialsText: { color: colors.primaryOnTint, fontFamily: fontFamilies.display },
+  neutral: { backgroundColor: colors.neutralPill },
+  neutralText: { color: colors.textMuted },
   photo: { backgroundColor: colors.primaryTint },
 });

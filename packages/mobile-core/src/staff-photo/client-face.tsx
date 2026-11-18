@@ -16,6 +16,7 @@ export function ClientFace({
   name,
   photo,
   size,
+  tone = "brand",
   variant = size >= 56 ? "display" : "thumbnail",
 }: {
   /** Walkthrough finding 113: «neutral» draws initials without Rosa tinte. */
@@ -35,5 +36,5 @@ export function ClientFace({
     staleTime: Infinity,
   });
   const photoUri = imageAssetId === null ? null : (query.data ?? null);
-  return <PersonAvatar name={name} photoUri={photoUri} size={size} />;
+  return <PersonAvatar name={name} photoUri={photoUri} size={size} tone={tone} />;
 }

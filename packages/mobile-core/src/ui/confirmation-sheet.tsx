@@ -3,6 +3,7 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "./body-text";
 import { fontFamilies } from "./fonts";
+import { OutlinedButton } from "./outlined-button";
 import { PrimaryButton } from "./primary-button";
 import { TextButton } from "./text-button";
 import { colors, radii, spacing, typography } from "./tokens";
@@ -23,6 +24,8 @@ type ConfirmationSheetProps = PropsWithChildren<{
   busy?: boolean;
   /** «destructive» fills the action in Error (follow-up 226); «primary» in Palo de rosa (S24). */
   tone?: "destructive" | "primary";
+  /** An outlined second action under the main one (S28's «Marcar contactada»). */
+  secondaryAction?: { label: string; onPress: () => void; busy?: boolean };
   testID?: string;
 }>;
 
@@ -40,6 +43,7 @@ export function ConfirmationSheet({
   note,
   onConfirm,
   onDismiss,
+  secondaryAction,
   testID,
   title,
   tone = "destructive",
@@ -69,6 +73,14 @@ export function ConfirmationSheet({
             testID={confirmTestID}
             tone={tone === "primary" ? "primary" : "error"}
           />
+          {secondaryAction === undefined ? null : (
+            <OutlinedButton
+              busy={secondaryAction.busy}
+              disabled={busy}
+              label={secondaryAction.label}
+              onPress={secondaryAction.onPress}
+            />
+          )}
           <TextButton disabled={busy} label={dismissLabel} onPress={dismiss} />
         </View>
       </View>

@@ -101,4 +101,22 @@ describe("ConfirmationSheet", () => {
 
     expect(screen.getByRole("button", { name: "Volver" })).toBeOnTheScreen();
   });
+
+  // Walkthrough finding 113: S28's sheet adds «Marcar contactada» under its action.
+  it("draws an outlined second action under the main one", async () => {
+    const onSecondary = jest.fn();
+    const screen = await renderSheet({
+      secondaryAction: { label: "Marcar contactada", onPress: onSecondary },
+    });
+
+    const second = screen.getByRole("button", { name: "Marcar contactada" });
+    await fireEvent.press(second);
+    expect(onSecondary).toHaveBeenCalledTimes(1);
+  });
+
+  it("leaves the second action out unless given", async () => {
+    const screen = await renderSheet();
+
+    expect(screen.queryByRole("button", { name: "Marcar contactada" })).toBeNull();
+  });
 });

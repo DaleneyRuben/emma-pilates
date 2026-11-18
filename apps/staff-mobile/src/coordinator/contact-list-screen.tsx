@@ -6,78 +6,42 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
-  ClientFace,
   colors,
-  fontFamilies,
   LoadingState,
-  NoticeRow,
   QueryFailure,
   Screen,
+  SectionTitle,
   spacing,
   StateScreen,
   surfaces,
-  TextButton,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
-import { StatusPill } from "../ui/session-row";
 import { useIsTablet } from "../ui/use-is-tablet";
-import {
-  contactAlertReasons,
-  contactPhoneLabel,
-  contactWhatsAppHref,
-  startedOnLabel,
-} from "./contact-list-copy";
+import { sortContactAlerts } from "./contact-list-copy";
+import { ContactRow, ContactSheet } from "./contact-list-parts";
 
 type Notice = { kind: "success" | "error"; name: string };
 
-function ContactCard({
-  item,
-  busy,
-  onContacted,
-}: {
-  item: ContactAlertItemDto;
-  busy: boolean;
-  onContacted: (item: ContactAlertItemDto) => void;
-}) {
-  const fetcher = useStaffFetcher();
-  const href = contactWhatsAppHref(item.phone);
-  const started = startedOnLabel(item.startedOn);
-  return (
-    <View style={styles.card}>
-      <View style={styles.identity}>
-        <ClientFace fetcher={fetcher} name={item.name} photo={item.photo} size={36} />
-        <View style={styles.identityBody}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.quiet}>
-            {`${contactPhoneLabel(item.phone)} · ${started.charAt(0).toLowerCase()}${started.slice(1)}`}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.reasons}>
-        {item.reasons.map((reason) => (
-          <StatusPill key={reason} label={contactAlertReasons[reason]} />
-        ))}
-      </View>
-      <View style={styles.actions}>
-        {href === null ? null : (
-          <TextButton label="Abrir WhatsApp" onPress={() => void Linking.openURL(href)} />
-        )}
-        <TextButton disabled={busy} label="Marcar contactada" onPress={() => onContacted(item)} />
-      </View>
-    </View>
-  );
-}
+type ContactNavigation = {
+  navigate: (
+    tab: "ClientsTab",
+    nested?: { screen: "ClientOverview"; params: { clientId: string }; initial: false },
+  ) => void;
+};
 
-/** S28 Para contactar, the Coordinator's second tab (BKM-013, v2). */
+/**
+ * S28 Para contactar, the Coordinator's second tab (BKM-013, v2), as the calm
+ * list of walkthrough finding 113 (proposal A): rows open her sheet.
+ */
 export function ContactListScreen() {
-  const navigation = useNavigation<{ navigate: (tab: "ClientsTab") => void }>();
+  const navigation = useNavigation<ContactNavigation>();
   const fetcher = useStaffFetcher();
   const tablet = useIsTablet();
   const list = useListContactAlerts({ fetcher, query: { refetchOnMount: "always" } });
@@ -86,14 +50,21 @@ export function ContactListScreen() {
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
   const [notice, setNotice] = useState<Notice | null>(null);
-  const items = list.data?.status === 200 ? list.data.data.items : [];
-  const markingId = mark.isPending ? mark.variables?.clientId : undefined;
+  const [open, setOpen] = useState<ContactAlertItemDto | null>(null);
+  const items = list.data?.status === 200 ? sortContactAlerts(list.data.data.items) : [];
 
   const onContacted = (item: ContactAlertItemDto) => {
+    setNotice(null);
     mark.mutate(
       { clientId: item.clientId },
       {
-        onSuccess: () => {
+        onSuccess: (response) => {
+          // The generated client resolves every status; only 204 marked her.
+          if (response.status !== 204) {
+            setNotice({ kind: "error", name: item.name });
+            return;
+          }
+          setOpen(null);
           void list.refetch();
           setNotice({ kind: "success", name: item.name });
         },
@@ -101,9 +72,21 @@ export function ContactListScreen() {
       },
     );
   };
+  const onClose = () => {
+    setOpen(null);
+    if (notice?.kind === "error") setNotice(null);
+  };
+  const onOpenFile = (item: ContactAlertItemDto) => {
+    setOpen(null);
+    navigation.navigate("ClientsTab", {
+      screen: "ClientOverview",
+      params: { clientId: item.clientId },
+      initial: false,
+    });
+  };
   const header = (
     <RootHeader
-      note="Clientas nuevas que conviene escribir por WhatsApp. Salen solas de la lista cuando reservan."
+      note="Clientas nuevas que conviene escribir. Salen solas de la lista cuando reservan."
       title="Para contactar"
     />
   );
@@ -139,21 +122,28 @@ export function ContactListScreen() {
           refreshControl={refreshControl}
         >
           {header}
-          {notice?.kind === "error" ? (
-            <View accessibilityRole="alert">
-              <NoticeRow message={`No pudimos marcar a ${notice.name}. Inténtalo de nuevo.`} />
+          <View>
+            <SectionTitle>
+              {items.length === 1 ? "1 clienta" : `${items.length} clientas`}
+            </SectionTitle>
+            <View style={styles.group}>
+              {items.map((item, index) => (
+                <View key={item.clientId} style={index > 0 && styles.divided}>
+                  <ContactRow item={item} onOpen={setOpen} />
+                </View>
+              ))}
             </View>
-          ) : null}
-          {items.map((item) => (
-            <ContactCard
-              busy={markingId === item.clientId}
-              item={item}
-              key={item.clientId}
-              onContacted={onContacted}
-            />
-          ))}
+          </View>
         </ScrollView>
       )}
+      <ContactSheet
+        failed={notice?.kind === "error" && notice.name === open?.name}
+        item={open}
+        marking={mark.isPending}
+        onClose={onClose}
+        onContacted={onContacted}
+        onOpenFile={onOpenFile}
+      />
       {notice?.kind === "success" ? (
         <BrandToast
           note="Sale de la lista y queda registrado a tu nombre"
@@ -167,19 +157,9 @@ export function ContactListScreen() {
 }
 
 const styles = StyleSheet.create({
-  actions: {
-    borderTopColor: colors.hairline,
-    borderTopWidth: 1,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  card: { ...surfaces.card, gap: spacing.md, paddingBottom: spacing.xs, padding: spacing.lg },
-  identity: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  identityBody: { flex: 1, gap: spacing.xxs },
-  list: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  name: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 16 },
-  quiet: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
-  reasons: { alignItems: "flex-start", flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  divided: { borderTopColor: colors.hairline, borderTopWidth: 1 },
+  group: { ...surfaces.card, overflow: "hidden" },
+  list: { gap: spacing.xl, paddingBottom: spacing.xxl },
   screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

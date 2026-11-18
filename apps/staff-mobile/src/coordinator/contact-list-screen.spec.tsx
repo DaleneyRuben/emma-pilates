@@ -1,5 +1,5 @@
 import type { ContactAlertItemDto } from "@pilates/api-contracts";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { Linking } from "react-native";
 
@@ -138,8 +138,9 @@ describe("S28 Para contactar", () => {
       ).toBeOnTheScreen();
     });
     expect(screen.queryByRole("button", { name: "Escribir por WhatsApp" })).toBeNull();
-    expect(screen.getByText("7 días sin reservar")).toBeOnTheScreen();
-    expect(screen.getByText("Menos de 2 clases a los 15 días")).toBeOnTheScreen();
+    const sheet = within(screen.getByTestId("contact-sheet"));
+    expect(sheet.getByText("7 días sin reservar")).toBeOnTheScreen();
+    expect(sheet.getByText("Menos de 2 clases a los 15 días")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Abrir su ficha" }));
     await waitFor(() => {
