@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { CatchBoundary, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
+import { currentSessionQueryOptions } from "../session/session-queries";
 import { pageTitleOf } from "../app/navigation";
 import { useDocumentTitle } from "../app/use-document-title";
 import { PageRecoveryState } from "../components/page/page-recovery-state";
@@ -44,6 +45,7 @@ function useFocusContentOnNavigation(
 export function AdminShell() {
   const narrow = useIsNarrowViewport();
   const branches = useQuery(activeBranchesQueryOptions());
+  const accountId = useQuery(currentSessionQueryOptions()).data?.accountId;
   const main = useRef<HTMLElement>(null);
   const pathname = useFocusContentOnNavigation(main);
   useDocumentTitle(pageTitleOf(pathname));
@@ -53,6 +55,7 @@ export function AdminShell() {
 
   return (
     <BranchProvider
+      accountId={accountId}
       branches={branches.data ?? noBranches}
       status={branches.status}
     >

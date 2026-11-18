@@ -19,12 +19,10 @@ import {
 describe("the remembered Branch", () => {
   useMockServer();
   beforeEach(() => {
-    window.localStorage.clear();
     server.use(...signedInHandlers(), ...emptyPageHandlers());
   });
   afterEach(() => {
     jest.restoreAllMocks();
-    window.localStorage.clear();
   });
 
   const heading = (name: string) =>
