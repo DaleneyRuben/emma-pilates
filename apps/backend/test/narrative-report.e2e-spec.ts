@@ -44,6 +44,7 @@ const counts = {
   newClients: 1,
   renewedClients: 4,
   renewalPercent: 50,
+  minimumCancellations: 0,
 };
 
 const finding: StoredRecommendation = {

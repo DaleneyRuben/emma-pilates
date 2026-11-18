@@ -123,4 +123,32 @@ describe('recommendation subjects', () => {
     const listed = await readRecommendations(prisma, { month });
     expect(listed.map((row) => row.state)).toEqual(['resolved']);
   });
+
+  it('counts classes cancelled for the minimum toward a weak schedule', async () => {
+    const trainerId = randomUUID();
+    const month = new Date('2026-09-01T00:00:00.000Z');
+    await context.pool.query(
+      `INSERT INTO studio.session_facts
+         (session_id, session_date, branch_id, class_type_id, trainer_staff_member_id,
+          capacity, bookings_at_window_close, attended, no_shows, updated_at)
+       VALUES ($1, '2026-09-08', $2, $2, $3, 8, 1, 1, 0, CURRENT_TIMESTAMP)`,
+      [randomUUID(), randomUUID(), trainerId],
+    );
+    for (const day of ['2026-09-01', '2026-09-15']) {
+      await context.pool.query(
+        `INSERT INTO studio.cancelled_session_facts
+           (session_id, session_date, branch_id, class_type_id,
+            trainer_staff_member_id, cause, bookings_held, updated_at)
+         VALUES ($1, $2::date, $3, $3, $4, 'minimum_not_met', 0, CURRENT_TIMESTAMP)`,
+        [randomUUID(), day, randomUUID(), trainerId],
+      );
+    }
+
+    await recomputeRecommendations(prisma, { month, today });
+    const listed = await readRecommendations(prisma, { month });
+
+    expect(listed.find((row) => row.subject === `${trainerId}:2`)?.detail).toBe(
+      'Revisa el horario del martes: de 3 clases, 2 se cancelaron por mínimo; promedia 0,3 alumnas.',
+    );
+  });
 });

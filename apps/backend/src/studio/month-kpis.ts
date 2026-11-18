@@ -30,6 +30,9 @@ export type MonthKpiCounts = {
   newClients: number;
   renewedClients: number;
   renewalPercent: number;
+  // Finding 107: classes cancelled for low demand (minimum not met or no
+  // booking); never part of the held classes or the occupancy.
+  minimumCancellations: number;
 };
 
 const sum = (values: readonly number[]) =>
@@ -46,6 +49,7 @@ export const monthKpis = (input: {
   clientMonths: readonly ClientMonthInput[];
   earlierActiveClientIds: readonly string[];
   planRenewals?: { ending: number; renewed: number };
+  minimumCancellations?: number;
 }): MonthKpiCounts => {
   const sessionsHeld = input.sessions.length;
   const bookings = sum(
@@ -70,5 +74,6 @@ export const monthKpis = (input: {
     newClients: active.filter((row) => !earlier.has(row.clientId)).length,
     renewedClients,
     renewalPercent: percent(renewedClients, renewalBase),
+    minimumCancellations: input.minimumCancellations ?? 0,
   };
 };

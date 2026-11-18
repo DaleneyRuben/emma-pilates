@@ -21,6 +21,7 @@ export type MonthKpiReport = {
   newClients: number;
   renewedClients: number;
   renewalPercent: number;
+  minimumCancellations: number;
   cashCentavos?: number;
   accruedCentavos?: number;
   deferredCentavos?: number;
