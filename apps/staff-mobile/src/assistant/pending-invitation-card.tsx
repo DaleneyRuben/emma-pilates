@@ -37,6 +37,13 @@ const invitationProblems: Record<string, string> = {
     "La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.",
 };
 
+// Walkthrough finding 95: a lapsed link «venció»; «Reenviar enlace» stays.
+const activationNote = (expiresAt: string | null | undefined): string | undefined => {
+  if (!expiresAt) return undefined;
+  const verb = new Date(expiresAt).getTime() <= Date.now() ? "venció" : "vence";
+  return `El enlace ${verb} el ${formatInstantDate(expiresAt)}`;
+};
+
 const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? name;
 
 /** S06's invitation card, above the plan while the Account is pending. */
@@ -167,11 +174,7 @@ export function PendingInvitationCard({
     <View style={styles.block}>
       <StateCard
         icon="clock"
-        note={
-          pending.activationExpiresAt
-            ? `El enlace vence el ${formatInstantDate(pending.activationExpiresAt)}`
-            : undefined
-        }
+        note={activationNote(pending.activationExpiresAt)}
         testID="pending-card"
         title="Cuenta pendiente de activación"
         trailing={more}

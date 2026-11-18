@@ -8,6 +8,7 @@ import {
   formatTimeRange,
   IconRow,
   IconRowGroup,
+  isCompletePhone,
   LoadingState,
   OutlinedButton,
   PrimaryButton,
@@ -127,7 +128,17 @@ export function ClientOverviewScreen({
             <Text accessibilityLabel={client.name} accessibilityRole="header" style={styles.name}>
               {client.name}
             </Text>
-            <Text style={styles.contact}>{describeContact(client.phone, client.email)}</Text>
+            <Text style={styles.contact}>
+              {isCompletePhone(client.phone) ? (
+                describeContact(client.phone, client.email)
+              ) : (
+                // Walkthrough finding 95: as the admin web's file (finding 74).
+                <>
+                  <Text style={styles.incompletePhone}>Celular incompleto</Text>
+                  {` · ${client.email}`}
+                </>
+              )}
+            </Text>
           </View>
         </View>
         {pending ? (
@@ -206,6 +217,7 @@ const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   identity: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
   identityBody: { flex: 1, gap: spacing.xxs },
+  incompletePhone: { color: colors.warningText },
   name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 24 },
   note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
