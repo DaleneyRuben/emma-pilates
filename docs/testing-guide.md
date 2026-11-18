@@ -10202,10 +10202,7 @@ one. Design option A (follow-ups 275 and 276). The migration
    `GET /api/v1/administrator/staff-members/{id}/payout-qr` is the
    Administrator's only (the Coordinator gets 403), with `imageUrl: null`
    once expired.
-10. Check the admin web at 1440 px and 420 px and the Staff app on the
-    iPhone 16 Pro, the iPad and the Android emulator, then drop the copy.
-
-11. **Sueldos › Por aprobar.** In a period that can be approved (Rango up to
+10. **Sueldos › Por aprobar.** In a period that can be approved (Rango up to
     yesterday, or a closed month), press **Aprobar pago** on Emma's card.
     Expected: the confirmation, wider, with her QR (or «Sin QR de cobro», or
     «QR vencido · pídele uno nuevo») on the left at 1440 and above the
@@ -10213,6 +10210,8 @@ one. Design option A (follow-ups 275 and 276). The migration
     en Pagados. ¿Ya le transferiste? Sube el comprobante y Emma lo verá en su
     app.» and **Subir comprobante**, which opens Pagados on Emma, where the
     row's panel takes the receipt (Test 95).
+11. Check the admin web at 1440 px and 420 px and the Staff app on the
+    iPhone 16 Pro, the iPad and the Android emulator, then drop the copy.
 
 ## Test 167: Informes recommendations and figures that add up (FIX-073)
 
