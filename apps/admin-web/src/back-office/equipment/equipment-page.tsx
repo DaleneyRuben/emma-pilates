@@ -2,7 +2,6 @@ import type { EquipmentDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { isForbidden } from "../../components/page/is-forbidden";
 import { NoBranchPage } from "../../components/page/no-branch-page";
 import { PageHeader } from "../../components/page/page-header";
 import { PageNotice } from "../../components/page/page-notice";
@@ -13,53 +12,51 @@ import {
 import { SidePanel } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
+import { useAdminRole } from "../../session/admin-role";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
 import { backOfficeProblem } from "../back-office-problems";
-import { NewEquipmentForm, ReportIssueForm } from "./equipment-forms";
-import { equipmentName } from "./equipment-format";
+import { AddUnitForm, ReportIssueForm } from "./equipment-forms";
+import { holdingsOf, holdsNone, pieceName, plural } from "./equipment-format";
 import { EquipmentIssuesCard } from "./equipment-issues-card";
 import {
   branchEquipmentQueryOptions,
+  branchIssuesQueryOptions,
+  branchStocksQueryOptions,
+  equipmentTypesQueryOptions,
   useEquipmentChange,
 } from "./equipment-queries";
-import { EquipmentSections } from "./equipment-sections";
+import { EquipmentSections, type EquipmentAction } from "./equipment-sections";
+import { DamageForm, QuantityForm } from "./equipment-stock-forms";
+import { EditTypeForm, NewTypeForm } from "./equipment-type-forms";
 
-type Panel =
-  | { mode: "closed" }
-  | { mode: "create" }
-  | { mode: "report"; piece: EquipmentDto }
-  | { mode: "archive"; piece: EquipmentDto };
+type Panel = { mode: "closed" } | { mode: "create-type" } | EquipmentAction;
 
-const subtitle = (
-  branch: Branch,
-  items: readonly EquipmentDto[] | undefined,
-) => {
-  if (items === undefined) return `Sucursal ${branch.name}`;
-  const out = items.filter((piece) => piece.status === "out_of_service").length;
-  const count = items.length === 1 ? "1 equipo" : `${items.length} equipos`;
-  return `Sucursal ${branch.name} · ${count} · ${out} fuera de servicio`;
+const panelTitle = (panel: Panel): string => {
+  switch (panel.mode) {
+    case "create-type":
+      return "Nuevo tipo";
+    case "report":
+      return `Registrar falla · ${pieceName(panel.piece)}`;
+    case "add":
+      return `Agregar ${panel.holding.type.name}`;
+    case "edit":
+      return `Editar tipo · ${panel.holding.type.name}`;
+    case "damage":
+      return `Registrar daño · ${panel.stock.typeName}`;
+    case "quantity":
+      return `Cambiar cantidad · ${panel.stock.typeName}`;
+    default:
+      return "";
+  }
 };
 
-const nameOf = (piece: EquipmentDto) => equipmentName(piece.kind, piece.number);
-
-function EmptyEquipment({ onCreate }: { onCreate: () => void }) {
-  return (
-    <div className="flex flex-col items-center gap-2 rounded-marco bg-lino px-6 py-10 text-center">
-      <p className="text-texto-secundario">
-        Todavía no hay equipos en esta sucursal.
-      </p>
-      <p className="text-nota text-texto-tenue">
-        Registra cada reformer, cadillac y mat con su número para llevar sus
-        fallas.
-      </p>
-      <Button onClick={onCreate}>Nuevo equipo</Button>
-    </div>
-  );
-}
-
 function BranchEquipment({ branch }: { branch: Branch }) {
+  const administrator = useAdminRole() === "administrator";
+  const types = useQuery(equipmentTypesQueryOptions());
   const equipment = useQuery(branchEquipmentQueryOptions(branch.id));
+  const stocks = useQuery(branchStocksQueryOptions(branch.id));
+  const openIssues = useQuery(branchIssuesQueryOptions(branch.id, "open"));
   const change = useEquipmentChange(branch.id);
   const [panel, setPanel] = useState<Panel>({ mode: "closed" });
   const [notice, setNotice] = useState<string | null>(null);
@@ -78,25 +75,37 @@ function BranchEquipment({ branch }: { branch: Branch }) {
   const archive = async (piece: EquipmentDto) => {
     try {
       await change.mutateAsync({ kind: "archive", equipmentId: piece.id });
-      done(`Dimos de baja ${nameOf(piece)}.`);
+      done(`Dimos de baja ${pieceName(piece)}.`);
     } catch (error) {
       close();
       setFailure(backOfficeProblem(error).message);
     }
   };
 
+  const reads = [types, equipment, stocks] as const;
+  const failed = reads.find((read) => read.isError);
+  const holdings =
+    types.data && equipment.data && stocks.data
+      ? holdingsOf(types.data, equipment.data, stocks.data, branch.id)
+      : undefined;
+  const subtitle =
+    holdings === undefined || openIssues.data === undefined
+      ? `Sucursal ${branch.name}`
+      : `Sucursal ${branch.name} · ${plural(holdings.length, "tipo de equipo", "tipos de equipo")} · ${plural(openIssues.data.length, "falla abierta", "fallas abiertas")}`;
+  const sidePanel = panel.mode !== "closed" && panel.mode !== "archive";
+
   return (
     <article className="flex flex-col gap-5">
       <PageHeader
         title="Equipos"
-        subtitle={subtitle(branch, equipment.data)}
+        subtitle={subtitle}
         actions={
-          isForbidden(equipment.error) ? undefined : (
-            <Button onClick={() => open({ mode: "create" })}>
+          administrator ? (
+            <Button onClick={() => open({ mode: "create-type" })}>
               <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
-              Nuevo equipo
+              Nuevo tipo
             </Button>
-          )
+          ) : undefined
         }
       />
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
@@ -105,45 +114,58 @@ function BranchEquipment({ branch }: { branch: Branch }) {
           {failure}
         </p>
       )}
-      {equipment.isPending ? (
-        <LoadingNotice>Cargando equipos…</LoadingNotice>
-      ) : equipment.isError ? (
+      {failed !== undefined ? (
         <QueryFailure
-          error={equipment.error}
+          error={failed.error}
           what="los equipos"
-          onRetry={() => void equipment.refetch()}
+          onRetry={() => reads.forEach((read) => void read.refetch())}
         />
-      ) : equipment.data.length === 0 ? (
-        <EmptyEquipment onCreate={() => open({ mode: "create" })} />
+      ) : holdings === undefined ? (
+        <LoadingNotice>Cargando equipos…</LoadingNotice>
       ) : (
         <>
           <EquipmentIssuesCard branchId={branch.id} onNotice={setNotice} />
           <EquipmentSections
-            items={equipment.data}
-            onAction={(mode, piece) => open({ mode, piece })}
+            holdings={holdings}
+            canEditTypes={administrator}
+            onAction={open}
           />
         </>
       )}
       <SidePanel
-        open={panel.mode === "create" || panel.mode === "report"}
+        open={sidePanel}
         onOpenChange={(isOpen) => {
           if (!isOpen) close();
         }}
-        title={
-          panel.mode === "report"
-            ? `Registrar falla · ${nameOf(panel.piece)}`
-            : "Nuevo equipo"
-        }
+        title={panelTitle(panel)}
       >
-        {panel.mode === "report" ? (
+        {panel.mode === "create-type" ? (
+          <NewTypeForm branch={branch} onDone={done} />
+        ) : panel.mode === "report" ? (
           <ReportIssueForm
             branchId={branch.id}
-            equipment={{ id: panel.piece.id, name: nameOf(panel.piece) }}
+            equipment={{ id: panel.piece.id, name: pieceName(panel.piece) }}
             onDone={done}
           />
-        ) : (
-          <NewEquipmentForm branchId={branch.id} onDone={done} />
-        )}
+        ) : panel.mode === "add" && panel.holding.tracking === "unit" ? (
+          <AddUnitForm
+            branchId={branch.id}
+            type={panel.holding.type}
+            numbers={panel.holding.units.map((piece) => piece.number)}
+            onDone={done}
+          />
+        ) : panel.mode === "edit" ? (
+          <EditTypeForm
+            branchId={branch.id}
+            type={panel.holding.type}
+            removable={holdsNone(panel.holding)}
+            onDone={done}
+          />
+        ) : panel.mode === "damage" ? (
+          <DamageForm branchId={branch.id} stock={panel.stock} onDone={done} />
+        ) : panel.mode === "quantity" ? (
+          <QuantityForm branch={branch} stock={panel.stock} onDone={done} />
+        ) : null}
       </SidePanel>
       <ConfirmDialog
         open={panel.mode === "archive"}
@@ -151,7 +173,9 @@ function BranchEquipment({ branch }: { branch: Branch }) {
           if (!isOpen) close();
         }}
         title={
-          panel.mode === "archive" ? `¿Dar de baja ${nameOf(panel.piece)}?` : ""
+          panel.mode === "archive"
+            ? `¿Dar de baja ${pieceName(panel.piece)}?`
+            : ""
         }
         confirmLabel="Dar de baja"
         busy={change.isPending}
@@ -168,8 +192,8 @@ function BranchEquipment({ branch }: { branch: Branch }) {
   );
 }
 
-// AW37 (BKO-004, ADR-0106): the selected Branch's reformers, cadillacs, and
-// mats, their faults, and whether each one works.
+// AW37 (BKO-004, ADR-0106, FIX-067): the selected Branch's equipment by
+// studio type, numbered units or a count, their faults, and what works.
 export function EquipmentPage() {
   const { selectedBranch, status } = useBranchSelection();
   if (selectedBranch === undefined) {

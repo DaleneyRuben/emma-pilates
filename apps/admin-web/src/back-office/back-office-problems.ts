@@ -90,6 +90,17 @@ const problems: Record<string, Omit<BackOfficeProblem, "code">> = {
   equipment_issue_resolved: {
     message: "Esta falla ya estaba resuelta.",
   },
+  equipment_type_name_taken: {
+    field: "name",
+    message: "Ya hay un tipo con ese nombre.",
+  },
+  equipment_type_in_use: {
+    message: "Primero da de baja sus unidades en todas las sucursales.",
+  },
+  equipment_type_not_found: {
+    message:
+      "Este tipo ya no existe. Cierra el panel para ver la lista actual.",
+  },
 };
 
 export function backOfficeProblem(error: unknown): BackOfficeProblem {
