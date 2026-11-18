@@ -119,7 +119,8 @@ export const createPrismaExpenses = (
         select: {
           id: true,
           name: true,
-          _count: { select: { expenses: true } },
+          // An eliminated Expense no longer uses its category (finding 104).
+          _count: { select: { expenses: { where: { voidedAt: null } } } },
         },
       });
       return categories.map(({ _count, ...category }) => ({
@@ -161,7 +162,7 @@ export const createPrismaExpenses = (
           throw new BackOfficeError('expense_category_not_found');
         }
         const uses = await transaction.expense.count({
-          where: { expenseCategoryId: input.expenseCategoryId },
+          where: { expenseCategoryId: input.expenseCategoryId, voidedAt: null },
         });
         if (uses > 0) throw new BackOfficeError('expense_category_in_use');
         await transaction.expenseCategory.update({

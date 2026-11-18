@@ -230,7 +230,9 @@ export class ExpenseVoidDto {
 }
 
 export const parseExpenseVoid = (value: unknown) =>
-  z.strictObject({ reason: z.string().max(300).optional() }).safeParse(value);
+  z
+    .strictObject({ reason: z.string().trim().max(300).optional() })
+    .safeParse(value);
 
 export class AdminExpensePageDto {
   @ApiProperty({ type: AdminExpenseDto, isArray: true })
