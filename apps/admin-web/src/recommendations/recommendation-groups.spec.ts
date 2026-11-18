@@ -43,20 +43,20 @@ describe("the Inicio recommendation groups", () => {
       weak("d", "Valeria Peña", 6),
     ]);
     expect(open).toBe(4);
-    expect(
-      groups.map((group) => [group.title, group.note, group.ids]),
-    ).toEqual([
+    expect(groups.map((group) => [group.title, group.note, group.ids])).toEqual(
       [
-        "Revisa el horario de Daniela Ortiz",
-        "3 días de la semana: lunes, martes y jueves",
-        ["a", "b", "c"],
+        [
+          "Revisa el horario de Daniela Ortiz",
+          "3 días de la semana: lunes, martes y jueves",
+          ["a", "b", "c"],
+        ],
+        [
+          "Revisa el horario de Valeria Peña",
+          "1 día de la semana: sábado",
+          ["d"],
+        ],
       ],
-      [
-        "Revisa el horario de Valeria Peña",
-        "1 día de la semana: sábado",
-        ["d"],
-      ],
-    ]);
+    );
   });
 
   it("joins every client into one row that names the first three", () => {

@@ -18,6 +18,8 @@ export const buttonVariants = cva(
           "bg-primario-tinte text-primario-profundo hover:bg-rosa-empolvado/40",
         link: "h-auto px-0 text-primario-profundo hover:text-primario-presionado",
         neutral: "bg-lino text-texto hover:bg-primario-tinte",
+        // FIX-084: the quiet companion of the one solid button in a list.
+        outline: "border border-borde bg-blanco text-texto hover:bg-hover-fila",
         destructive: "bg-error-tinte text-error hover:text-error-texto",
         ghost: "text-primario-profundo hover:bg-lino",
       },
