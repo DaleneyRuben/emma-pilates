@@ -9310,11 +9310,11 @@ D. **Staff app (E2–E5).** As Paola: **Pagos › Accesos › Facturas por subir
    **Clientes › Facturas por subir**. The list has **Por subir · n** and
    **Subidas**. Open Mariana: the hero, «Datos de la factura», the dashed
    «Sube la factura emitida». **Subir factura** offers **Tomar foto** and
-   **Elegir de la galería**; after the upload the toast «Factura subida» and
-   the file card with **Ver factura**. **Quitar factura** asks in a sheet. A
-   PDF uploaded from the web shows a small first-page thumbnail beside the file
-   name that opens the full-screen viewer (Test 144, FIX-051); picking a PDF from the
-   phone still waits for a document picker (FIX-049).
+   **Elegir de la galería** and **Elegir un PDF** (Test 175, FIX-049); after
+   the upload the toast «Factura subida» and the file card with **Ver
+   factura**. **Quitar factura** asks in a sheet. A PDF shows a small
+   first-page thumbnail beside the file name that opens the full-screen viewer
+   (Test 144, FIX-051).
 E. **Mis facturas (K1–K3).** As Mariana, the notification «Tu factura está
    lista · La factura de tu Paquete de 8 clases ya está en Mis facturas.»
    opens **Mis facturas** (also **Perfil › Mis facturas**). Rows read
@@ -9324,9 +9324,8 @@ E. **Mis facturas (K1–K3).** As Mariana, the notification «Tu factura está
    Open a ready one: the preview (the photo, or the PDF's first page with
    «Ver · N páginas» opening the viewer, Test 144),
    compra, NIT o CI, a nombre de, emitida, and **Descargar**: on the iPhone and
-   iPad the share sheet (**Guardar en Archivos**); on Android the folder
-   picker, opened in Documents (Android 11 and later refuse Download itself),
-   **Use this folder**, **Allow**, then «Factura guardada». An «En preparación» one says «El estudio
+   iPad the share sheet (**Guardar en Archivos**); on Android straight to
+   Descargas with «Guardada en Descargas» (Test 175, FIX-049). An «En preparación» one says «El estudio
    está preparando tu factura» and has no **Descargar**.
 F. **Refusals (API).** `PUT /api/v1/staff/payments/{id}/invoice` answers 409
    `payment_without_invoice_data` on a «Sin factura» sale, `payment_voided` on
@@ -10634,3 +10633,31 @@ Coordinación») do not change.
    changes and the audit `staff_member.contact_changed` records
    `previousGender` and `gender`.
 9. Check at 1440 px and 420 px.
+
+## Test 175: PDF invoices on the phones (FIX-049)
+
+**Needs a build made after FIX-049.** The Staff app's file picker
+(`expo-document-picker`) and the Client app's Descargas module
+(`apps/client-mobile/modules/emma-downloads`) are native. An older build
+still uploads photos and says «Para subir un PDF, actualiza la app. Mientras
+tanto puedes subir una foto.», and on Android still saves through the folder
+picker («Factura guardada»).
+
+A. **Staff app, Elegir un PDF.** As Camila (Assistant) or Ana: **Clientes ›
+   Facturas por subir** (Paola: **Pagos › Accesos**) → a payment waiting for
+   its invoice → **Subir factura** → **Elegir un PDF**. iOS opens Archivos,
+   Android the system file picker, both showing PDFs only. Pick a PDF under
+   10 MB: «Factura subida», the file card shows the PDF's own name (a name
+   without `.pdf` gets it added) and its first-page thumbnail (Test 144).
+   **Reemplazar** › **Elegir un PDF** swaps it. To put a PDF on a Simulator,
+   drag it onto the window (it lands in Archivos); on the emulator,
+   `adb push factura.pdf /sdcard/Download/`.
+B. **Refused before sending.** A PDF over 10 MB: «Este archivo no sirve. Sube
+   un PDF, JPG o PNG de hasta 10 MB.» and nothing reaches the API (no
+   `system.image_assets` row). Leaving the picker changes nothing.
+C. **Client app, Android.** As Mariana: **Perfil › Mis facturas** → a ready
+   invoice → **Descargar**. No folder picker opens; the toast says «Guardada
+   en Descargas» and the file is in **Files › Downloads** under its name (a
+   second download of the same name gets Android's « (1)» suffix). Android 9
+   and older still open the folder picker. On iPhone and iPad **Descargar**
+   still opens the share sheet.
