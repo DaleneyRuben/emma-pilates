@@ -25,7 +25,7 @@ async function openSchedule(role: "assistant" | "coordinator", profile: unknown)
   );
   await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
   await fireEvent.press(screen.getByTestId("tab-schedule"));
-  await waitFor(() => expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen());
+  await waitFor(() => expect(screen.getByText("Reformer Pilates · Emma Vargas")).toBeOnTheScreen());
   return screen;
 }
 
