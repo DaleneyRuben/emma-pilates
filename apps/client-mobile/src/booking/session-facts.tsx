@@ -11,6 +11,7 @@ import {
   SectionTitle,
   spacing,
   StaffFace,
+  surfaces,
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
@@ -38,8 +39,34 @@ function capitalized(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-/** C04's hero: the date, the class, the time and the seats on Rosa profundo. */
-export function SessionHero({ detail, full }: { detail: Detail; full: boolean }) {
+/**
+ * C04's hero: the date, the class, the time and the seats on Rosa profundo;
+ * `quiet` draws them on Lino as plain text, for a day she cannot book
+ * (FIX-082, frozen-plan option B).
+ */
+export function SessionHero({
+  detail,
+  full,
+  quiet = false,
+}: {
+  detail: Detail;
+  full: boolean;
+  quiet?: boolean;
+}) {
+  if (quiet) {
+    return (
+      <View style={styles.quietHero} testID="session-hero">
+        <Text style={styles.quietEyebrow}>{capitalized(formatSessionDate(detail.startsAt))}</Text>
+        <Text style={styles.quietTitle}>{detail.classType.name}</Text>
+        <Text style={styles.quietNote}>
+          {`${formatTimeRange(detail.startsAt, detail.endsAt)} · ${formatSessionMinutes(detail.startsAt, detail.endsAt)}`}
+        </Text>
+        <Text style={styles.quietNote}>
+          {`${full ? 0 : detail.availableSeats} de ${detail.capacity} cupos libres`}
+        </Text>
+      </View>
+    );
+  }
   return (
     <EmphasisCard
       eyebrow={capitalized(formatSessionDate(detail.startsAt))}
@@ -128,6 +155,22 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: 56,
     paddingHorizontal: spacing.lg,
+  },
+  quietEyebrow: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.label,
+    fontWeight: "500",
+    letterSpacing: typography.label * 0.12,
+    textTransform: "uppercase",
+  },
+  quietHero: { ...surfaces.card, gap: spacing.sm, padding: spacing.xlSm },
+  quietNote: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.body },
+  quietTitle: {
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: 24,
+    lineHeight: 29,
   },
   value: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
 });

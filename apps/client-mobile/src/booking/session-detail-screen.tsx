@@ -33,8 +33,8 @@ import { useClientFetcher } from "../client-fetcher";
 import { formatCivilDate } from "../home/home-format";
 import { usePaymentStanding } from "../payments/payment-standing";
 import { useResendReceipt } from "../payments/use-resend-receipt";
-import { freezeRange } from "../subscription/freeze-window";
 import { BookingOffFooter, bookingOffReason } from "./booking-off-footer";
+import { FrozenBookingFooter } from "./frozen-booking-footer";
 import { SessionFacts, SessionHero } from "./session-facts";
 
 export type ConfirmedBooking = {
@@ -245,9 +245,12 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
-        <SessionHero detail={detail} full={full} />
+        <SessionHero detail={detail} full={full} quiet={frozenOnClassDay} />
         <SessionFacts
-          cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
+          // A frozen day books nothing, so there is nothing to cancel (FIX-082).
+          cancellationWindowMinutes={
+            frozenOnClassDay ? undefined : studioRules?.cancellationWindowMinutes
+          }
           detail={detail}
           full={full}
         />
@@ -268,12 +271,11 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           </BodyText>
         ) : null}
         {frozenOnClassDay && view?.freeze != null ? (
-          <>
-            <BodyText style={styles.note}>
-              {`Tu plan está congelado ese día (${freezeRange(view.freeze.startsOn, view.freeze.endsOn).toLowerCase()}).`}
-            </BodyText>
-            <PrimaryButton disabled label="Reservar" />
-          </>
+          <FrozenBookingFooter
+            endsOn={view.freeze.endsOn}
+            onOtherDay={() => navigation.goBack()}
+            startsOn={view.freeze.startsOn}
+          />
         ) : full ? (
           waitlisted ? (
             <BodyText style={styles.note}>Ya estás en la lista de espera.</BodyText>
