@@ -10019,8 +10019,10 @@ migration: each new line stores its own detail, and the statement gains
    aprueba desde el 1 de diciembre» (a Trainer) or «… el 8 de diciembre»
    (the Coordinator). `GET /api/v1/administrator/pay-statements` returns
    `approvableOn` for each.
-3. **Pagar por Rango.** Expected: Rango from the 1st to yesterday; a Trainer
-   with work in it shows **Aprobar pago**; the Coordinator is not listed.
+3. **Pagar por Rango.** Expected: Rango from the 1st to yesterday, still
+   showing the month draft (it touches the range) until **Volver a
+   calcular**, which replaces it with the range's own draft; a Trainer with
+   work in it then shows **Aprobar pago**; the Coordinator is not listed.
 4. **Concepts.** Each card lists, in this order and only when present,
    «Clases dictadas», «Canceladas por mínimo», «Comisiones de primer plan»,
    «Base», «Clientas nuevas», «Bono de renovación», each with its rate

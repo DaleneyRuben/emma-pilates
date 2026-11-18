@@ -1151,8 +1151,8 @@ lista en **Por resolver**.
    **Aprobado** y la vista **Pagados** gana una fila por ese monto. Calcular
    el período otra vez no duplica el pago. Mientras el mes no terminó no se
    ofrece aprobar: la tarjeta dice «Se aprueba desde el 1 de …» (la
-   coordinadora, desde el 8), y **Pagar por Rango** paga a una instructora
-   hasta ayer.
+   coordinadora, desde el 8). Para pagarle antes a una instructora, **Pagar
+   por Rango** elige del 1 a ayer; después **Volver a calcular**.
 4. La coordinadora cobra por mes: su tarjeta aparece en **Por aprobar** solo
    con el período **Mes**. Sin coordinadora, el mes no tiene a quién
    liquidar. Cuando la invites, el cálculo es Bs 3.500 de base, más
