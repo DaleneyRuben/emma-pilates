@@ -103,7 +103,7 @@ can be found by its design name.
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82, 111, 114 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81, 112 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
-| AW37 Equipos | 82 |
+| AW37 Equipos | 82, 161 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114 |
 | AW42 Simulador | 97, 101 |
@@ -7480,6 +7480,9 @@ E. **Who decides.** The Administrator and the Coordinator decide
 
 ## Test 82: equipment, its faults, and the capacity flags (BKO-004)
 
+**Since FIX-067 (Test 161)** the kinds are studio-defined types: «Nuevo
+equipo» is each type's «Agregar», and quantity types sit beside them.
+
 The studio registers each reformer, cadillac, and mat per Branch; a Trainer
 reports a fault from a Session of her agenda; an Administrator resolves it;
 and Horario flags the future Sessions with more places than working machines
@@ -9995,3 +9998,68 @@ The owner chose «Filtro + CSV en Clientas» and design option A (follow-ups
    work the same.
 8. Check at 1440 px and 420 px (the chips wrap onto two lines at 420), then
    drop the copy.
+
+## Test 161: studio-defined equipment types, by unit or by quantity (FIX-067)
+
+Walkthrough findings 101 and 103. The owner chose «tipos propios» and design
+option A (follow-ups 269–271). Migration `20261118120000_equipment_types`
+(approved by the owner on 2026-11-18): `back_office.equipment_types` (Reformer,
+Cadillac and Mat seeded as per-unit types with every existing machine),
+`equipment.type_id`, `back_office.equipment_stocks`, and quantity damage on
+`equipment_issues`. Nothing is ever deleted.
+
+1. Use a copy of the fixtures (`createdb -T pilates_dev_sim
+   pilates_fix067_dev`), run `prisma migrate deploy` on it, and run the API
+   and the admin web on your own ports (export `ADMIN_WEB_TRUSTED_ORIGINS` in
+   the shell for your Vite port). Log in as Paola and open **Estudio ›
+   Equipos**. Expected: «Sucursal Centro · 3 tipos de equipo · N fallas
+   abiertas», **Fallas abiertas** on top, then one section per type
+   (Reformer, Cadillac, Mat) with «· N unidades», the «Con número» pill,
+   **Agregar** and **Editar tipo**; an empty one reads «Sin unidades en esta
+   sucursal.». Existing machines keep their faults.
+2. **Nuevo tipo** → Nombre «Balones», «Por cantidad», «Cantidad en Sucursal
+   Centro» 12 → **Crear tipo**. Expected: «Creamos el tipo Balones.» and a
+   «Balones · 12 en total» section with the «Por cantidad» pill, «12 en esta
+   sucursal», «12 se pueden usar», **Registrar daño** and **Cambiar
+   cantidad**. Creating «balones» again shows «Ya hay un tipo con ese
+   nombre.» (`409 equipment_type_name_taken`). The type shows in every
+   Branch, with «0 en esta sucursal» elsewhere.
+3. **Registrar daño** → «¿Cuántos?» 1 (the stepper stops at the usable
+   count, «De 12 que se pueden usar.»), «¿Qué pasó?» → register. Expected:
+   «1 dañado» on the card, «11 se pueden usar», and «Balones · 1 dañado» in
+   Fallas abiertas with **Dar de baja** and **Marcar resuelta**. **Dar de
+   baja** and confirm: «Dimos de baja 1 dañado de Balones.», the total 11,
+   the damage under Resueltas («Dada de baja por …»). **Marcar resuelta** on
+   another damage returns it to usable without changing the total.
+4. **Cambiar cantidad** to 14. Expected: «14 en esta sucursal»; a number
+   below the open damage is refused with «No puede ser menor que los dañados
+   (N).». Each change writes an audit record `equipment.quantity_changed`
+   (`previousQuantity`, `quantity`, `cause` `set` or `write_off`).
+5. **Nuevo tipo** «Sillas», «Por unidad, con número». Its section offers
+   **Agregar**: «Agregar Sillas» with only «Número», prefilled with the first
+   free number. Finding 103: on **Agregar Reformer** type a number already
+   used. Expected, as you type: «Ya hay un Reformer 1 en esta sucursal. El
+   primer número libre es el N.» in red, no «Se mostrará como…» line, and
+   **Agregar** disabled; a free number reads «Se mostrará como Reformer N.».
+6. **Editar tipo** renames a type. **Quitar tipo** is disabled with «Primero
+   da de baja sus unidades en todas las sucursales.» while this Branch has
+   units or a quantity; units in another Branch answer `409
+   equipment_type_in_use` with the same text. A type nobody uses goes away
+   with «Quitamos el tipo X.» (its row keeps `archived_at`). As Carolina
+   (Coordinación) the sections, Agregar, damage and quantities work, without
+   Nuevo tipo or Editar tipo.
+7. **Horario**: a class still matches the per-unit type whose name is a word
+   of its class type («Reformer Pilates» → Reformer); the flag's accessible
+   name says «… equipos Reformer funcionando para N lugares».
+8. Staff app as `emma.vargas@example.com`: from a Reformer Pilates Session,
+   **Reportar una falla**. Expected: the types as chips that scroll
+   sideways, Reformer first and chosen; only types the Branch has. A unit
+   type shows its numbered tiles and «No se puede usar». **Balones** shows
+   «Hay N que se pueden usar», «¿Cuántos se dañaron?» with − and + (1 to the
+   usable count) and no switch; sending it shows «Gracias por avisar» and the
+   damage appears in the admin web's Fallas abiertas. With 0 usable it says
+   «No hay ninguno que se pueda usar: ya están todos reportados.». Check on
+   the iPhone, the iPad and the Android emulator. Older app builds keep
+   working: `items` and `kind` still list only Reformer, Cadillac and Mat.
+9. Check Equipos at 1440 px and 420 px (stacked unit rows at 420), then drop
+   the copy.
