@@ -146,12 +146,13 @@ describe("the Coordinator's Staff app", () => {
     expect(screen.queryByText(/Puede comprar su plan/)).toBeNull();
   });
 
-  it("names her Role «Coordinación» and every Branch on Perfil", async () => {
+  // FIX-081: her Role in her gender, not the area name.
+  it("names her Role «Coordinadora» and every Branch on Perfil", async () => {
     const { screen } = await openAsCoordinator();
 
     await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => {
-      expect(screen.getByText("Coordinación")).toBeOnTheScreen();
+      expect(screen.getByText("Coordinadora")).toBeOnTheScreen();
     });
     expect(screen.getByText("Todas las sucursales")).toBeOnTheScreen();
   });

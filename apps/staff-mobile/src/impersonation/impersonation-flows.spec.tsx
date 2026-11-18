@@ -16,26 +16,35 @@ const administrator = {
 };
 const trainerProfile = {
   id: "staff-2",
-  name: "Camila Rojas",
-  email: "camila.rojas@example.com",
+  name: "Diego Rojas",
+  email: "diego.rojas@example.com",
   phone: null,
   role: "trainer",
+  // FIX-081 (finding 118): his Role reads «Entrenador».
+  gender: "male",
   branches: [{ id: "branch-1", name: "Equipetrol" }],
 };
-const member = (id: string, name: string, role: string, branchIds: string[]) => ({
+const member = (
+  id: string,
+  name: string,
+  role: string,
+  branchIds: string[],
+  gender = "female",
+) => ({
   id,
   accountId: `${id}-account`,
   name,
   email: `${id}@example.com`,
   phone: null,
   role,
+  gender,
   branchIds,
   status: "active",
   activationExpiresAt: null,
 });
 const staffPage = {
   items: [
-    member("staff-2", "Camila Rojas", "trainer", ["branch-1"]),
+    member("staff-2", "Diego Rojas", "trainer", ["branch-1"], "male"),
     member("staff-3", "Emma Vargas", "trainer", ["branch-1", "branch-2"]),
     member("staff-4", "Julia Zapata", "assistant", ["branch-1"]),
     member("staff-5", "Daniela Arce", "nutritionist", ["branch-2"]),
@@ -54,8 +63,9 @@ function impersonationOf(expiresAt: Date) {
   return {
     id: "impersonation-1",
     staffMemberId: "staff-2",
-    staffMemberName: "Camila Rojas",
+    staffMemberName: "Diego Rojas",
     role: "trainer" as const,
+    gender: "male" as const,
     expiresAt: expiresAt.toISOString(),
   };
 }
@@ -113,10 +123,11 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
       expect(screen.getByRole("button", { name: "Ver la app como…" })).toBeOnTheScreen(),
     );
     await fireEvent.press(screen.getByRole("button", { name: "Ver la app como…" }));
-    await waitFor(() => expect(screen.getByText("Camila Rojas")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("Diego Rojas")).toBeOnTheScreen());
     // v2 S24: one list of the team, each with her role and Branches.
     expect(screen.getByText("El equipo")).toBeOnTheScreen();
-    expect(screen.getByText(/ · Equipetrol, Centro$/)).toBeOnTheScreen();
+    expect(screen.getByText("Entrenadora · Equipetrol, Centro")).toBeOnTheScreen();
+    expect(screen.getByText("Entrenador · Equipetrol")).toBeOnTheScreen();
     expect(screen.getByText("Nunca aparece otra persona de administración.")).toBeOnTheScreen();
     expect(screen.queryByText("Paola Mendoza")).not.toBeOnTheScreen();
     expect(
@@ -125,34 +136,34 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
       ),
     ).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Camila Rojas" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Diego Rojas" }));
     // UX-002: the design's sheet (S24), not a native alert.
     const sheet = within(screen.getByTestId("view-as-sheet"));
-    expect(sheet.getByText("¿Ver la app como Camila Rojas?")).toBeOnTheScreen();
+    expect(sheet.getByText("¿Ver la app como Diego Rojas?")).toBeOnTheScreen();
     expect(sheet.getByText("Durante 30 minutos verás sus clases")).toBeOnTheScreen();
     expect(sheet.getByText("Lo que hagas queda registrado a tu nombre")).toBeOnTheScreen();
     await fireEvent.press(sheet.getByRole("button", { name: "Cancelar" }));
     expect(screen.queryByTestId("view-as-sheet")).toBeNull();
     expect(calls).toEqual([]);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Camila Rojas" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Diego Rojas" }));
     profile = trainerProfile;
     await fireEvent.press(screen.getByTestId("view-as-confirm"));
 
-    await waitFor(() => expect(screen.getByText("Viendo como Camila Rojas")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("Viendo como Diego Rojas")).toBeOnTheScreen());
     expect(calls).toEqual([
       { method: "POST", path: "/api/v1/impersonations", body: { staffMemberId: "staff-2" } },
     ]);
-    expect(screen.getByText("Entrenadora · Quedan 28 min")).toBeOnTheScreen();
+    expect(screen.getByText("Entrenador · Quedan 28 min")).toBeOnTheScreen();
     expect(screen.getByLabelText("Mi agenda")).toBeOnTheScreen();
     expect(screen.queryByLabelText("Pagos pendientes")).not.toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Salir de ver como Camila Rojas" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Salir de ver como Diego Rojas" }));
     profile = administrator;
     await waitFor(() => expect(screen.getByLabelText("Pagos pendientes")).toBeOnTheScreen());
     expect(calls[1]).toEqual({ method: "DELETE", path: "/api/v1/impersonations/current" });
-    expect(screen.getByText("Dejaste de ver la app como Camila Rojas.")).toBeOnTheScreen();
-    expect(screen.queryByText("Viendo como Camila Rojas")).not.toBeOnTheScreen();
+    expect(screen.getByText("Dejaste de ver la app como Diego Rojas.")).toBeOnTheScreen();
+    expect(screen.queryByText("Viendo como Diego Rojas")).not.toBeOnTheScreen();
   });
 
   it("returns to Pagos pendientes on its own when the 30 minutes run out", async () => {
@@ -171,14 +182,14 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
       .mockResolvedValue({ accountId: "account-1", role: "administrator" });
     const screen = await render(<App runtime={runtime} />);
 
-    await waitFor(() => expect(screen.getByText("Viendo como Camila Rojas")).toBeOnTheScreen());
-    expect(screen.getByText("Entrenadora · Quedan 0 min")).toBeOnTheScreen();
+    await waitFor(() => expect(screen.getByText("Viendo como Diego Rojas")).toBeOnTheScreen());
+    expect(screen.getByText("Entrenador · Quedan 0 min")).toBeOnTheScreen();
 
     await waitFor(() => expect(screen.getByLabelText("Pagos pendientes")).toBeOnTheScreen(), {
       timeout: 8_000,
     });
     expect(
-      screen.getByText("Terminó el tiempo para ver la app como Camila Rojas."),
+      screen.getByText("Terminó el tiempo para ver la app como Diego Rojas."),
     ).toBeOnTheScreen();
     expect(calls).toEqual([]);
   });
@@ -191,7 +202,7 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
       timeout: 10_000,
     });
     await fireEvent.press(screen.getByTestId("tab-profile"));
-    await waitFor(() => expect(screen.getByText("Camila Rojas")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("Diego Rojas")).toBeOnTheScreen());
     expect(screen.queryByRole("button", { name: "Ver la app como…" })).not.toBeOnTheScreen();
   });
 });

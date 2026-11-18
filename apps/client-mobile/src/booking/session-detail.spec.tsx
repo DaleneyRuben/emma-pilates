@@ -12,6 +12,18 @@ describe("Client Session detail", () => {
     clearMobileQueryCache();
   });
 
+  // FIX-081 (finding 118): the row beside his name reads «Entrenador».
+  it("names a male Trainer «Entrenador»", async () => {
+    const { screen } = await openDetail({
+      "/api/v1/sessions/session-1": () =>
+        jsonResponse({ ...detail(3), trainerName: "Diego Paz", trainerGender: "male" }),
+    });
+
+    const facts = within(screen.getByTestId("session-facts"));
+    await waitFor(() => expect(facts.getByText("Diego Paz")).toBeOnTheScreen());
+    expect(facts.getByText("Entrenador")).toBeOnTheScreen();
+  });
+
   it("shows the Session facts and books with an idempotency key", async () => {
     const booked = jest.fn();
     const { screen, consumeAllowance } = await openDetail({
