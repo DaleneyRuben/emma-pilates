@@ -2691,7 +2691,7 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    **Sueldos** has a second row of views (**Por aprobar · Pagados**: every
    statement of the month, the Coordinator's included, then the payments
    made), Gastos has **Editar categorías** opening the categories in a
-   panel, and Estudio › **Insumos** has **Stock · Retiros del mes**.
+   panel, and Estudio › **Insumos** has **Stock · Movimientos**.
    The other destinations: Horario (Clases · Nutrición), Clientas (Todas ·
    Para contactar · Congelamientos), Promociones (Carrusel ·
    Clases de campaña · Referidos · Contactos), Estudio (Personal · Insumos
@@ -7067,7 +7067,7 @@ password, holding every Branch.
    «Quitar contacto» included. In **Comentarios** she filters, exports and
    triages. In **Estudio › Insumos** there is no «Nuevo insumo» and a row's
    name does not open it, but **Registrar retiro** and **Registrar
-   reposición** work and «Retiros del mes» lists the month; **Equipos**
+   reposición** work and «Movimientos» lists the month; **Equipos**
    works as for the Administrator. **Horario › Nutrición** lists the
    Evaluations. **Ajustes › Reglas del estudio** shows «Reglas
    configurables» as text with «Solo administración las cambia.», no
@@ -10016,8 +10016,8 @@ default older admin builds get, `restock` or `all`) and every row carries
    «Toallas» with 20 and threshold 5. **Registrar retiro** 16 Toallas
    (Expected: **Stock bajo**), then log in as Carolina (Coordinación) in a
    private window and **Registrar reposición** 20 Toallas (24 now).
-3. As Paola, **Ver historial de movimientos**. Expected: the title
-   «Movimientos de insumos», filters **Insumo** and **Movimiento** (Todos,
+3. As Paola, **Ver historial de movimientos** (or the **Movimientos** view
+   beside **Stock**). Expected: the title «Movimientos de insumos», filters **Insumo** and **Movimiento** (Todos,
    Retiros, Reposiciones), and two rows newest first: Toallas · Reposición ·
    20 · Carolina Rivas, then Toallas · Retiro · 16 · Paola Mendoza, with
    «2 movimientos en <mes>.», «Mostrando 1–2 de 2 movimientos» and
