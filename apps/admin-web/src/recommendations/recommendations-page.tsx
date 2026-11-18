@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
 import type { RecommendationDto } from "@pilates/api-contracts";
+import { monthKpisQueryOptions } from "../indicators/indicator-queries";
 import { narrativeQueryOptions } from "../indicators/narrative-queries";
 import {
   dismissRecommendationRequest,
@@ -102,7 +103,8 @@ export function RecommendationsSection({
     queryClient.invalidateQueries({
       queryKey: recommendationsQueryOptions(month).queryKey,
     });
-  // The month report counts the findings, so it reads them again too.
+  // Recalcular refreshes the month's facts first, so the tiles and the month
+  // report read them again with the findings.
   const recompute = useMutation({
     mutationFn: () => recomputeRecommendationsRequest(month),
     onSuccess: () =>
@@ -110,6 +112,9 @@ export function RecommendationsSection({
         refresh(),
         queryClient.invalidateQueries({
           queryKey: narrativeQueryOptions(month).queryKey,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: monthKpisQueryOptions(month).queryKey,
         }),
       ]),
   });
