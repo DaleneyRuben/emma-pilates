@@ -106,4 +106,21 @@ describe('recommendation subjects', () => {
     const reopened = await readRecommendations(prisma, { month });
     expect(reopened.find((row) => row.subject === clientId)?.state).toBe('new');
   });
+
+  it('resolves every open finding when a month has none left', async () => {
+    const month = new Date('2026-08-01T00:00:00.000Z');
+    const clientId = randomUUID();
+    await context.pool.query(
+      `INSERT INTO studio.recommendations
+         (id, rule, subject, period, detail, state, updated_at)
+       VALUES ($1, 'inactive_client', $2, '2026-08-01', 'x: y', 'seen', CURRENT_TIMESTAMP)`,
+      [randomUUID(), clientId],
+    );
+
+    const result = await recomputeRecommendations(prisma, { month, today });
+
+    expect(result.written).toBe(0);
+    const listed = await readRecommendations(prisma, { month });
+    expect(listed.map((row) => row.state)).toEqual(['resolved']);
+  });
 });
