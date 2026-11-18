@@ -39,7 +39,16 @@ const avatarSize = 72;
  * or initials, her name and email, «Cambiar foto» and «Quitar foto», and the
  * role's note. The photo is saved the moment the upload finishes.
  */
-export function StaffPhotoSummary({ member, note }: { member: StaffProfileDto; note: string }) {
+export function StaffPhotoSummary({
+  editable = true,
+  member,
+  note,
+}: {
+  /** False while an Administrator sees the app as her (walkthrough finding 115). */
+  editable?: boolean;
+  member: StaffProfileDto;
+  note: string;
+}) {
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const [state, setState] = useState<PhotoState>({ status: "idle" });
@@ -116,7 +125,7 @@ export function StaffPhotoSummary({ member, note }: { member: StaffProfileDto; n
           <Text style={styles.detail}>{member.email}</Text>
           {member.phone ? <Text style={styles.detail}>{phoneWithFlag(member.phone)}</Text> : null}
           <View style={styles.actions}>
-            {state.status === "uploading" || state.status === "removing" ? (
+            {!editable ? null : state.status === "uploading" || state.status === "removing" ? (
               <Text style={styles.busy}>
                 {state.status === "uploading" ? "Subiendo foto…" : "Quitando foto…"}
               </Text>

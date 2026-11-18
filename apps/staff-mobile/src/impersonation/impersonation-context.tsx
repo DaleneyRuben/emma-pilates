@@ -10,6 +10,8 @@ export type ImpersonationState = {
   /** The transient line Pagos pendientes shows after an exit or an expiry. */
   notice: string | null;
   clearNotice: () => void;
+  /** Ends the Impersonation, as the banner's «Salir» (walkthrough finding 115). */
+  exit: () => void;
   /** Resolves the session again after an Impersonation starts or ends. */
   refreshSession: () => Promise<void>;
 };
@@ -18,6 +20,7 @@ const inactive: ImpersonationState = {
   impersonation: null,
   notice: null,
   clearNotice: () => undefined,
+  exit: () => undefined,
   refreshSession: () => Promise.resolve(),
 };
 

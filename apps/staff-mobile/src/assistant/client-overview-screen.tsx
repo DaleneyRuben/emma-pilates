@@ -28,7 +28,7 @@ import { useInClientPanel } from "./assistant-workspace";
 import { PlanHero } from "./plan-hero";
 import { StateCard } from "./state-card";
 import { PendingInvitationCard } from "./pending-invitation-card";
-import { describeContact } from "./assistant-format";
+import { describeContact, formatCivilDayMonth } from "./assistant-format";
 
 /** Whose behalf the Assistant acts on, carried from her file to each step. */
 export type ClientContext = {
@@ -177,7 +177,10 @@ export function ClientOverviewScreen({
               ) : null}
               {canBuy ? canBook ? <OutlinedButton {...cash} /> : <PrimaryButton {...cash} /> : null}
               {sells && futurePlan !== null ? (
-                <Text style={styles.note}>Ya tiene un plan siguiente.</Text>
+                // Walkthrough finding 117: why there is no «Registrar pago».
+                <Text style={styles.note}>
+                  {`Su próximo plan ya está pagado (${futurePlan.planName}, desde el ${formatCivilDayMonth(futurePlan.startsOn)}). Podrás registrar otro pago cuando empiece.`}
+                </Text>
               ) : null}
             </View>
           </>

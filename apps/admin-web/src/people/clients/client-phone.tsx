@@ -3,8 +3,9 @@ import { isCompletePhone } from "../../lib/complete-phone";
 import { phoneWithFlag } from "../../lib/phone-number";
 
 /**
- * A Client's phone in the Clientes list and her file: «🇧🇴 +591 70711001», or
- * «Celular incompleto» when none or an unusable one is stored (finding 74).
+ * A Client's phone in the Clientes lists and her file: «🇧🇴 +591 70711001»,
+ * «Celular incompleto» when an unusable one is stored (finding 74), or «Sin
+ * teléfono» when none is (finding 114).
  */
 export function ClientPhone({
   phone,
@@ -14,7 +15,10 @@ export function ClientPhone({
   /** The colour of a complete phone; an incomplete one is always a warning. */
   tone?: string;
 }) {
-  if (phone === null || !isCompletePhone(phone)) {
+  if (phone === null || phone.trim() === "") {
+    return <span className="text-texto-tenue">Sin teléfono</span>;
+  }
+  if (!isCompletePhone(phone)) {
     return <span className="text-advertencia-texto">Celular incompleto</span>;
   }
   return <span className={cn("tabular", tone)}>{phoneWithFlag(phone)}</span>;

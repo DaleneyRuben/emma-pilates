@@ -1988,7 +1988,7 @@ delivers it to the local capture), and opens her overview with the card
 enlace**, and a ⋯ button («Más opciones de la invitación») that opens the
 sheet «Invitación de Ana» with **Cambiar correo** («Anula los enlaces al
 correo anterior»; **Nuevo correo**, **Guardar correo**, **Cancelar**),
-**Cancelar invitación** («Libera el correo y borra la cuenta pendiente»;
+**Cancelar invitación** («Libera el correo y anula la cuenta pendiente»;
 confirmed with «¿Cancelar la invitación de …?» and **Sí, cancelar
 invitación**, then back to **Buscar cliente**) and **Cerrar**. A second
 send within a minute shows, inside the card, a white box with a clock: "Ya
@@ -8514,7 +8514,8 @@ D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search fiel
    as the Rosa profundo card (classes left in large Lora, a white bar, «Vence
    el …», **Activo**/**Vencido**); one primary **Reservar clase**;
    **Registrar pago** only when she can buy (never with a Plan
-   already queued, which shows «Ya tiene un plan siguiente.»); «Reservas» rows
+   already queued, which shows «Su próximo plan ya está pagado (<plan>, desde
+   el <día>). Podrás registrar otro pago cuando empiece.»); «Reservas» rows
    **Próximas reservas** and **Historial de clases**. Without a Plan, a Lino
    card «Sin plan activo» with **Registrar pago** and no
    **Reservar clase**. A pending Account (Sofía) shows one Lino line «Cuenta
@@ -10553,3 +10554,33 @@ on the fixtures) and open **Para contactar**.
 6. **Empty.** With nobody left it reads «Nadie para contactar» with
    **Buscar una clienta**, as before.
 7. Check on the iPhone 16 Pro, then the iPad and the Android emulator.
+
+## Test 173: phones, «Ver la app como…», and copy from walkthrough findings 114, 115, 117 (FIX-080)
+
+No migration; no API change.
+
+1. Admin web, **Clientas › Para contactar** (`/clientas/para-contactar`), with
+   a Client in the list whose stored phone fits no mobile (Sofía, «7000004»).
+   Expected: her **Teléfono** reads «Celular incompleto» (amber), not the
+   digits, and **Abrir WhatsApp** is a disabled button whose tooltip says
+   «Celular incompleto». A Client without a phone reads «Sin teléfono» with
+   the tooltip «Sin teléfono»; a complete phone keeps its flag and its
+   `wa.me` link.
+2. **Clientas › Todas**: a Client with no phone stored (Mariana) reads «Sin
+   teléfono» (muted) in the list and in her file; an unusable one (Sofía)
+   still reads «Celular incompleto».
+3. Staff app, as an Administrator, **Perfil › Ver la app como…**, pick a
+   Staff Member. Expected: every screen starts right under the «Viendo como …»
+   banner, with no blank band between them (the status bar counts once), on
+   iPhone, iPad, and Android.
+4. While viewing, **Perfil**: no **Cambiar foto** / **Quitar foto**, **Cambiar
+   contraseña**, **Enviar comentarios**, or **Cerrar sesión**; the note under
+   her name reads «Mientras ves la app como <nombre>, su foto, su contraseña,
+   sus comentarios y su sesión son solo suyos.», and the last row **Dejar de
+   ver como <nombre>** ends the viewing like the banner's **Salir** («Dejaste
+   de ver la app como …» on Pagos pendientes), without logging out.
+5. Staff app, a Client file with a next Plan already paid (Lucía): instead of
+   **Registrar pago**, «Su próximo plan ya está pagado (<plan>, desde el
+   <día>). Podrás registrar otro pago cuando empiece.»
+6. A pending Client's ⋯ sheet: **Cancelar invitación** reads «Libera el
+   correo y anula la cuenta pendiente».
