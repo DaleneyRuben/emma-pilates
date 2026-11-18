@@ -75,7 +75,7 @@ export function InvitationMenu({
             <MenuRow
               detail={
                 cancellable
-                  ? "Libera el correo y borra la cuenta pendiente"
+                  ? "Libera el correo y anula la cuenta pendiente"
                   : "Ya tiene pagos o reservas, así que se mantiene"
               }
               disabled={!cancellable}
