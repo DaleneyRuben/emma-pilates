@@ -40,9 +40,7 @@ describe("Staff Mis pagos", () => {
     ).toBeOnTheScreen();
 
     expect(screen.getByText("Historial")).toBeOnTheScreen();
-    const november = within(
-      screen.getByRole("button", { name: "Liquidación de noviembre 2026" }),
-    );
+    const november = within(screen.getByRole("button", { name: "Liquidación de noviembre 2026" }));
     expect(november.getByText("Noviembre 2026")).toBeOnTheScreen();
     expect(november.getByText("En curso · puede cambiar")).toBeOnTheScreen();
     const october = within(screen.getByRole("button", { name: "Liquidación de octubre 2026" }));
@@ -207,7 +205,12 @@ describe("Staff Mis pagos", () => {
       periodEnd: "2026-11-02",
       salaryPaymentId: null,
     };
-    const day = { ...week, id: "statement-day", periodStart: "2026-10-20", periodEnd: "2026-10-21" };
+    const day = {
+      ...week,
+      id: "statement-day",
+      periodStart: "2026-10-20",
+      periodEnd: "2026-10-21",
+    };
     const screen = await openMyPay({ statements: () => jsonResponse([week, day]) });
 
     await waitFor(() => {
