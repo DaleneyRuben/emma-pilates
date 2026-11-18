@@ -1,6 +1,12 @@
+import {
+  getListEquipmentFlaggedSessionsQueryKey,
+  getListEquipmentIssuesQueryKey,
+  getListEquipmentQueryKey,
+  getListEquipmentStocksQueryKey,
+} from "@pilates/api-contracts";
 import { screen, within } from "@testing-library/react";
 import { http } from "msw";
-import { centro } from "../../test/booking-handlers";
+import { centro, norte } from "../../test/booking-handlers";
 import {
   equipmentHandlers,
   equipmentTypesPath,
@@ -40,13 +46,17 @@ const openNewType = async () => {
 };
 
 const openEdit = async (section: RegExp, title: string) => {
-  const { user } = renderAdmin("/estudio/equipos");
+  const { user, queryClient } = renderAdmin("/estudio/equipos");
   await user.click(
     within(await sectionOf(section)).getByRole("button", {
       name: "Editar tipo",
     }),
   );
-  return { user, panel: await screen.findByRole("dialog", { name: title }) };
+  return {
+    user,
+    queryClient,
+    panel: await screen.findByRole("dialog", { name: title }),
+  };
 };
 
 // FIX-067 (finding 101, option A): the studio's own equipment types.
@@ -164,6 +174,37 @@ describe("AW37 equipment types", () => {
       await screen.findByText("Guardamos el tipo Aros mágicos."),
     ).toBeVisible();
     expect(bodies).toEqual([{ name: "Aros mágicos" }]);
+  });
+
+  it("refreshes every Branch's equipment after renaming a type", async () => {
+    server.use(
+      ...equipmentHandlers(),
+      recordPatch(`${equipmentTypesPath}/${ringsType.id}`, () =>
+        jsonResponse({ ...ringsType, name: "Aros mágicos" }),
+      ),
+    );
+    const { user, queryClient, panel } = await openEdit(
+      /^Aros ·/,
+      "Editar tipo · Aros",
+    );
+    const other = { branchId: norte.id };
+    const keys = [
+      getListEquipmentQueryKey(other),
+      getListEquipmentStocksQueryKey(other),
+      getListEquipmentIssuesQueryKey({ ...other, status: "open" }),
+      getListEquipmentFlaggedSessionsQueryKey(other as never),
+    ];
+    keys.forEach((key) => queryClient.setQueryData(key, []));
+    const name = within(panel).getByLabelText("Nombre");
+    await user.clear(name);
+    await user.type(name, "Aros mágicos");
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    expect(
+      await screen.findByText("Guardamos el tipo Aros mágicos."),
+    ).toBeVisible();
+    expect(
+      keys.map((key) => queryClient.getQueryState(key)?.isInvalidated),
+    ).toEqual([true, true, true, true]);
   });
 
   it("keeps Quitar tipo off while the type has units in this Branch", async () => {
