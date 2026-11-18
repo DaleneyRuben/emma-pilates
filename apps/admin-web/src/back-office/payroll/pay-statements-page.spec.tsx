@@ -18,6 +18,8 @@ import {
   attachSalaryReceipt,
   salaryReceiptHandlers,
 } from "../../test/salary-receipt-upload";
+import { emma } from "../../test/people-fixtures";
+import { payrollStaffHandler } from "../../test/payroll-fixtures";
 import { signedInHandlers } from "../../test/session-handlers";
 
 const minimum = (time: string) => ({
@@ -28,7 +30,7 @@ const minimum = (time: string) => ({
 
 const statement = {
   id: "statement-1",
-  staffMemberId: "emma",
+  staffMemberId: emma.id,
   staffMemberName: "Emma Vargas",
   month: "2026-09-01",
   periodStart: "2026-09-01",
@@ -65,46 +67,67 @@ const statementsPath = "/api/v1/administrator/pay-statements";
 describe("Sueldos por aprobar", () => {
   useMockServer();
   beforeEach(() => {
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), payrollStaffHandler());
   });
 
-  it("groups the lines by concept and opens each to its classes or clients", async () => {
+  it("shows one card per person with role, period, total, concepts and every line", async () => {
     server.use(
       http.get(apiUrl(statementsPath), () => jsonResponse([statement])),
     );
     const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
     const card = await screen.findByRole("article", { name: "Emma Vargas" });
-    expect(within(card).getAllByText("Bs 297,00")).not.toHaveLength(0);
-    const minimumRow = within(card).getByRole("row", {
-      name: /Canceladas por mínimo/,
-    });
-    expect(within(minimumRow).getByText("2 × Bs 25,00")).toBeInTheDocument();
+    expect(
+      await within(card).findByText("Instructora · Septiembre de 2026"),
+    ).toBeInTheDocument();
+    expect(within(card).getByText("Bs 297,00")).toBeInTheDocument();
+    const minimumRow = within(card).getByText(
+      "Canceladas por mínimo (2 × Bs 25,00)",
+    ).parentElement!;
     expect(within(minimumRow).getByText("Bs 50,00")).toBeInTheDocument();
+    expect(
+      within(card).getByText("Comisiones de primer plan (1)"),
+    ).toBeInTheDocument();
     expect(within(card).queryByText(/07:00/)).not.toBeInTheDocument();
 
     await user.click(
-      within(card).getByRole("button", {
-        name: "Ver las 2 canceladas por mínimo",
-      }),
+      within(card).getByRole("button", { name: "Ver las 5 líneas" }),
     );
     expect(
       within(card).getByText("lun 7 sep · 07:00 · Centro · Reformer"),
     ).toBeInTheDocument();
-    await user.click(
-      within(card).getByRole("button", { name: "Ver la comisión" }),
-    );
     expect(
       within(card).getByText("Nora Pay · Mensual · 10 % de Bs 1.010"),
     ).toBeInTheDocument();
     await user.click(
-      within(card).getByRole("button", { name: "Ver las 2 clases dictadas" }),
+      within(card).getByRole("button", { name: "Ocultar las líneas" }),
     );
-    expect(
-      within(card).getByText(
-        "lun 7 sep · 10:45 · Centro · Reformer · 1 alumna",
+    expect(within(card).queryByText(/07:00/)).not.toBeInTheDocument();
+  });
+
+  it("lists only who still waits: an approved person is never in Por aprobar", async () => {
+    server.use(
+      http.get(apiUrl(statementsPath), () =>
+        jsonResponse([
+          statement,
+          {
+            ...statement,
+            id: "statement-2",
+            staffMemberId: "valeria",
+            staffMemberName: "Valeria Peña",
+            state: "approved",
+            salaryPaymentId: "pay-2",
+          },
+        ]),
       ),
-    ).toBeInTheDocument();
+    );
+    renderAdmin("/dinero/sueldos?month=2026-09");
+
+    await screen.findByRole("article", { name: "Emma Vargas" });
+    expect(
+      screen.queryByRole("article", { name: "Valeria Peña" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Aprobado")).not.toBeInTheDocument();
   });
 
   it("asks before approving and approves once", async () => {
@@ -128,7 +151,7 @@ describe("Sueldos por aprobar", () => {
     const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
     await user.click(
-      await screen.findByRole("button", { name: "Aprobar pago" }),
+      await screen.findByRole("button", { name: "Aprobar Bs 297,00" }),
     );
     const dialog = await screen.findByRole("alertdialog", {
       name: "¿Aprobar Bs 297,00 a Emma Vargas por septiembre de 2026?",
@@ -137,7 +160,7 @@ describe("Sueldos por aprobar", () => {
     await user.click(within(dialog).getByRole("button", { name: "Volver" }));
     expect(approved).toBe(0);
 
-    await user.click(screen.getByRole("button", { name: "Aprobar pago" }));
+    await user.click(screen.getByRole("button", { name: "Aprobar Bs 297,00" }));
     const confirming = await screen.findByRole("alertdialog");
     await attachSalaryReceipt(user, confirming);
     await user.click(
@@ -149,13 +172,19 @@ describe("Sueldos por aprobar", () => {
         "Aprobamos Bs 297,00 a Emma Vargas con su comprobante. Quedó en Pagados y Emma lo verá en su app.",
       ),
     ).toBeInTheDocument();
-    expect(await screen.findByText("Aprobado")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Aprobar pago" }),
+      await screen.findByText(
+        "Septiembre de 2026: todos los sueldos están aprobados.",
+        { exact: false },
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("article", { name: "Emma Vargas" }),
     ).not.toBeInTheDocument();
+    expect(screen.queryByText("Aprobado")).not.toBeInTheDocument();
   });
 
-  it("offers no approval before the period can be paid, and points to Rango", async () => {
+  it("greys the button until the period can be paid, and points to Otro período", async () => {
     const month = boliviaMonth();
     const nextMonth = addDays(`${month}-28`, 7).slice(0, 7);
     server.use(
@@ -174,24 +203,27 @@ describe("Sueldos por aprobar", () => {
     const { user, router } = renderAdmin(`/dinero/sueldos?month=${month}`);
 
     const card = await screen.findByRole("article", { name: "Emma Vargas" });
+    const waiting = within(card).getByRole("button", {
+      name: /^Se aprueba desde el 1 de /,
+    });
+    expect(waiting).toBeDisabled();
     expect(
-      within(card).queryByRole("button", { name: "Aprobar pago" }),
+      within(card).queryByRole("button", { name: /^Aprobar/ }),
     ).not.toBeInTheDocument();
-    expect(
-      within(card).getByText(/^Se aprueba desde el 1 de /),
-    ).toBeInTheDocument();
+    const monthName = formatMonth(month).split(" ")[0] ?? "";
     expect(
       screen.getByText(
         new RegExp(
-          `^${formatMonth(month).split(" ")[0]} todavía no terminó`,
+          `^${monthName} cierra el \\d+\\. Para pagarle antes a una instructora, elige «Otro período»\\.$`,
           "i",
         ),
       ),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/todavía no terminó/)).not.toBeInTheDocument();
 
     const today = boliviaToday();
     if (today.endsWith("-01")) return;
-    await user.click(screen.getByRole("button", { name: "Pagar por Rango" }));
+    await user.click(screen.getByRole("button", { name: "Otro período" }));
     await waitFor(() =>
       expect(router.state.location.search).toMatchObject({
         period: "range",
@@ -199,6 +231,41 @@ describe("Sueldos por aprobar", () => {
         to: addDays(today, -1),
       }),
     );
+  });
+
+  it("says the Coordinator's bonus waits for the renewals", async () => {
+    server.use(
+      http.get(apiUrl(statementsPath), () =>
+        jsonResponse([
+          {
+            ...statement,
+            id: "statement-3",
+            staffMemberId: "carolina",
+            staffMemberName: "Carolina Rivas",
+            approvableOn: "2999-12-08",
+            totalCentavos: 378_000,
+            lines: [
+              { kind: "base", detail: "Base mensual", amountCentavos: 350_000 },
+              {
+                kind: "new_client",
+                detail: "Nora Pay",
+                amountCentavos: 28_000,
+              },
+            ],
+          },
+        ]),
+      ),
+    );
+    renderAdmin("/dinero/sueldos?month=2026-09");
+
+    const card = await screen.findByRole("article", { name: "Carolina Rivas" });
+    expect(
+      within(card).getByText("Su bono espera las renovaciones"),
+    ).toBeInTheDocument();
+    expect(within(card).getByText("Base mensual")).toBeInTheDocument();
+    expect(
+      within(card).getByRole("button", { name: /^Se aprueba desde el 8 de / }),
+    ).toBeDisabled();
   });
 
   it("explains a refused approval instead of a bare failure", async () => {
@@ -212,7 +279,7 @@ describe("Sueldos por aprobar", () => {
     const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
     await user.click(
-      await screen.findByRole("button", { name: "Aprobar pago" }),
+      await screen.findByRole("button", { name: "Aprobar Bs 297,00" }),
     );
     const confirming = await screen.findByRole("alertdialog");
     await attachSalaryReceipt(user, confirming);
