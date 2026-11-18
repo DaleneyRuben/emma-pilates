@@ -69,5 +69,6 @@ describe("pay statement concepts", () => {
     ]);
 
     expect(concepts.map((concept) => concept.label)).toEqual(["Base", "Otros"]);
+    expect(concepts[0]?.rate).toBe("Mensual");
   });
 });
