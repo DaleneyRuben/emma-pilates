@@ -160,9 +160,9 @@ function QuantityCard({
         </StatusPill>
       ) : null}
       <span className="flex-1 max-md:hidden" />
-      <span className="flex gap-2 max-md:w-full">
+      <span className="flex gap-4 max-md:w-full">
         <Button
-          variant="secondary"
+          variant="link"
           size="sm"
           disabled={stock.usable <= 0}
           onClick={() => onAction({ mode: "damage", stock })}
@@ -170,7 +170,7 @@ function QuantityCard({
           Registrar daño
         </Button>
         <Button
-          variant="ghost"
+          variant="link"
           size="sm"
           onClick={() => onAction({ mode: "quantity", stock })}
         >
@@ -205,13 +205,13 @@ function TypeSection({
             · {holdingCount(holding)}
           </span>
         </h2>
-        <span className="max-md:hidden">
-          <StatusPill tone="neutral">{trackingLabel[type.tracking]}</StatusPill>
+        <span className="text-nota text-texto-tenue max-md:hidden">
+          {trackingLabel[type.tracking]}
         </span>
         <span className="flex-1 max-md:hidden" />
         {holding.tracking === "unit" ? (
           <Button
-            variant="secondary"
+            variant="link"
             size="sm"
             onClick={() => onAction({ mode: "add", holding })}
           >
@@ -221,9 +221,8 @@ function TypeSection({
         ) : null}
         {canEditTypes ? (
           <Button
-            variant="ghost"
+            variant="link"
             size="sm"
-            className="max-md:px-2"
             onClick={() => onAction({ mode: "edit", holding })}
           >
             {narrow ? "Editar" : "Editar tipo"}
