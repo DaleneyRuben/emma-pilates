@@ -18,6 +18,9 @@ const campaignHandlers = () => [
         { clientId: "22222222-2222-4222-8222-222222222222", name: "Sofía" },
       ],
       skipped: [],
+      pastCampaigns: [
+        { name: "Fin de año", grantedAt: "2026-11-17T14:00:00.000Z" },
+      ],
     }),
   ),
   http.post(apiUrl(campaignPath), async ({ request }) => {
@@ -97,6 +100,27 @@ describe("AW21 Campaña", () => {
         "2 clientas recibieron 1 clase extra. 1 sin plan: se le suma en su próximo plan (Sofía).",
       ),
     ).toBeVisible();
+    // Walkthrough finding 92: the form empties so a second click gives nothing.
+    expect(screen.getByLabelText("Nombre de la campaña")).toHaveValue("");
+    expect(screen.getByLabelText("Clases extra")).toHaveValue("1");
+  });
+
+  it("warns when a campaign with the same name was already given", async () => {
+    const { user } = renderAdmin("/promociones/clases-de-campana");
+
+    await user.type(
+      await screen.findByLabelText("Nombre de la campaña"),
+      "fin de año",
+    );
+
+    expect(
+      screen.getByText(
+        /^Ya diste la campaña «Fin de año» el 17 de noviembre( de 2026)?\. Si la das otra vez, cada clienta recibe las clases de nuevo\.$/,
+      ),
+    ).toBeVisible();
+    await user.clear(screen.getByLabelText("Nombre de la campaña"));
+    await user.type(screen.getByLabelText("Nombre de la campaña"), "Navidad");
+    expect(screen.queryByText(/Ya diste/)).not.toBeInTheDocument();
   });
 
   // FIX-064 (walkthrough finding 90): founders are in; only an empty studio
