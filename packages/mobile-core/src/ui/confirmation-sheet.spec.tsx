@@ -119,4 +119,17 @@ describe("ConfirmationSheet", () => {
 
     expect(screen.queryByRole("button", { name: "Marcar contactada" })).toBeNull();
   });
+
+  it("locks the main action and the way back while the second action runs", async () => {
+    const onDismiss = jest.fn();
+    const screen = await renderSheet({
+      onDismiss,
+      secondaryAction: { busy: true, label: "Marcar contactada", onPress: jest.fn() },
+    });
+
+    expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled();
+    await fireEvent(screen.getByTestId("logout-sheet-modal"), "requestClose");
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
 });

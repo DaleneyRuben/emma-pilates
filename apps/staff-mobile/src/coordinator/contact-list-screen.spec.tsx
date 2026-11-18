@@ -192,6 +192,54 @@ describe("S28 Para contactar", () => {
     expect(screen.getByText("Por qué está aquí")).toBeOnTheScreen();
   });
 
+  // Review of finding 113: nothing else in the sheet reacts while she is marked.
+  it("locks the sheet while «Marcar contactada» is in flight", async () => {
+    let release: (response: Response) => void = () => undefined;
+    const { screen } = await openContactList(
+      coordinatorRoutes({
+        "POST /api/v1/administrator/contact-alerts/client-valeria/contacted": () =>
+          new Promise<Response>((resolve) => {
+            release = resolve;
+          }) as unknown as Response,
+      }),
+    );
+
+    await fireEvent.press(screen.getByTestId("contact-row-client-valeria"));
+    await fireEvent.press(await screen.findByRole("button", { name: "Marcar contactada" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Volver" })).toBeDisabled();
+    });
+    expect(screen.getByRole("button", { name: "Escribir por WhatsApp" })).toBeDisabled();
+
+    release(new Response(null, { status: 204 }));
+    await waitFor(() => {
+      expect(screen.getByText("Valeria, contactada")).toBeOnTheScreen();
+    });
+  });
+
+  it("refreshes after a refusal and closes the sheet of a Client who left the list", async () => {
+    let items = [valeria, daniela];
+    const { screen } = await openContactList(
+      coordinatorRoutes({
+        "/api/v1/administrator/contact-alerts": () => list(items),
+        "POST /api/v1/administrator/contact-alerts/client-valeria/contacted": () => {
+          // She booked in the meantime, so the alert is gone.
+          items = [daniela];
+          return jsonResponse({ code: "not_found", status: 404 }, 404);
+        },
+      }),
+    );
+
+    await fireEvent.press(screen.getByTestId("contact-row-client-valeria"));
+    await fireEvent.press(await screen.findByRole("button", { name: "Marcar contactada" }));
+    await waitFor(() => {
+      expect(screen.queryByText("Valeria Quiroga")).toBeNull();
+    });
+    expect(screen.queryByText("Por qué está aquí")).toBeNull();
+    expect(screen.queryByText("Valeria, contactada")).toBeNull();
+    expect(screen.getByText("1 clienta")).toBeOnTheScreen();
+  });
+
   it("shows the empty state", async () => {
     const { screen } = await openContactList(
       coordinatorRoutes({
