@@ -1,7 +1,7 @@
-# Critical journey (MOB-073): the Trainer opens «Mis pagos» from Perfil and
-# reads her statements and payments. Fresh fixtures may hold no statement
-# yet, so the flow accepts the empty state; with one, it opens and folds a
-# month's classes.
+# Critical journey (MOB-073, finding 111): the Trainer opens «Mis pagos»,
+# reads the summary and «Historial», and opens a statement. Fresh fixtures
+# may hold no statement yet, so the flow accepts the empty state; with one,
+# it opens the newest statement and folds its classes.
 appId: ${APP_ID}
 env:
   EMAIL: emma.vargas@example.com
@@ -16,29 +16,40 @@ env:
     id: "tab-pay"
 - extendedWaitUntil:
     visible:
-      text: "Liquidaciones.*|Pagos recibidos|Todavía no tienes pagos"
+      text: "Historial|Otros pagos|Todavía no tienes pagos"
     timeout: 15000
 - takeScreenshot: mob073-mis-pagos
 - runFlow:
     when:
-      visible: "Ver cada clase"
+      visible: "Historial"
     commands:
-      - tapOn: "Ver cada clase"
+      - tapOn:
+          id: "pay-history-row"
       - extendedWaitUntil:
-          visible: "Ocultar detalle"
-          timeout: 5000
+          visible:
+            id: "pay-statement"
+          timeout: 10000
+      - takeScreenshot: fix111-liquidacion
+      - tapOn: "Ver cada clase"
+      # A statement may hold dozens of lines: the fold link ends up below them.
+      - scrollUntilVisible:
+          element: "Ocultar detalle"
+          timeout: 60000
+          speed: 80
       - takeScreenshot: mob073-ver-cada-clase
       - tapOn: "Ocultar detalle"
       - assertVisible: "Ver cada clase"
-# BKO-008: a payment with a receipt opens it full screen.
-- runFlow:
-    when:
-      visible: "Ver el comprobante del pago.*"
-    commands:
-      - tapOn: "Ver el comprobante del pago.*"
-      - extendedWaitUntil:
-          visible: "Pago del .*"
-          timeout: 15000
-      - takeScreenshot: bko008-comprobante
-      - tapOn: "Cerrar"
-      - assertVisible: "Pagos recibidos"
+      # BKO-008: a payment with a receipt opens it full screen.
+      - runFlow:
+          when:
+            visible: "Ver el comprobante del pago.*"
+          commands:
+            - tapOn: "Ver el comprobante del pago.*"
+            - extendedWaitUntil:
+                visible: "Pago del .*"
+                timeout: 15000
+            - takeScreenshot: bko008-comprobante
+            - tapOn: "Cerrar"
+            - assertVisible: "Ver cada clase"
+      - tapOn: "Volver"
+      - assertVisible: "Historial"

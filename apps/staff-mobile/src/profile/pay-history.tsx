@@ -52,6 +52,7 @@ export function PayHistory({
                 index > 0 && styles.divider,
                 pressed && styles.pressed,
               ]}
+              testID="pay-history-row"
             >
               <View style={styles.body}>
                 <Text style={styles.period}>{heading}</Text>
