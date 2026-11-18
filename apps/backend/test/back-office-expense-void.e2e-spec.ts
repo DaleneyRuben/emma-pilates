@@ -98,7 +98,7 @@ describe('expense void endpoint (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/api/v1/administrator/expenses/${id}/void`)
       .set('authorization', bearer)
-      .send({ reason: 'Cargado dos veces' })
+      .send({ reason: `  Cargado dos veces${' '.repeat(300)}` })
       .expect(200);
     expect(expenses.voidExpense).toHaveBeenLastCalledWith(
       { expenseId: id, reason: 'Cargado dos veces' },

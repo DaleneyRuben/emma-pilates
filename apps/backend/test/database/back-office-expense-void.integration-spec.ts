@@ -189,4 +189,38 @@ describe('voiding a Back Office expense', () => {
       expect.objectContaining({ actualCentavos: 12_000 }),
     );
   });
+
+  it('lets a category used only by eliminated Expenses be deleted', async () => {
+    const admin = await administrator();
+    const mistake = await expenses().createExpenseCategory(
+      { name: 'Por error' },
+      admin,
+    );
+    const { id } = await expenses().recordExpense(
+      {
+        branchId: centro,
+        expenseCategoryId: mistake.id,
+        amountCentavos: 5_000,
+        incurredOn: civil('2026-09-17'),
+      },
+      admin,
+      randomUUID(),
+    );
+    await voids().voidExpense({ expenseId: id }, admin);
+    const listed = await expenses().listExpenseCategories(admin);
+    expect(listed.find(({ name }) => name === 'Por error')?.inUse).toBe(false);
+    await expect(
+      expenses().deleteExpenseCategory(
+        { expenseCategoryId: mistake.id },
+        admin,
+      ),
+    ).resolves.toBeUndefined();
+    const page = await expenses().listExpenses(
+      { branchId: centro, page: 1, pageSize: 50 },
+      admin,
+    );
+    expect(page.items.find((item) => item.id === id)).toMatchObject({
+      expenseCategoryName: 'Por error',
+    });
+  });
 });
