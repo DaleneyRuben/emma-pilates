@@ -115,7 +115,6 @@ export function PayStatementsPage({
       return recalculationSummary(shown.label, before, after);
     },
     onMutate: () => setNotice(null),
-    onSuccess: (summary) => setNotice(summary),
   });
   const statements = query.data;
   const change = (next: PayStatementsSearch) => {
@@ -134,7 +133,11 @@ export function PayStatementsPage({
             variant="secondary"
             busy={draft.isPending}
             disabled={period === null}
-            onClick={() => period && draft.mutate(period)}
+            onClick={() =>
+              // On the call, not the hook: changing the period resets the
+              // mutation, and a summary of the old period then never shows.
+              period && draft.mutate(period, { onSuccess: setNotice })
+            }
           >
             <RefreshCw size={16} aria-hidden="true" />
             Volver a calcular
